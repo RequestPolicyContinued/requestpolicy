@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+<?xml-stylesheet href="chrome://csrpolicy/skin/csrpolicy.css" type="text/css"?>
+
+<!DOCTYPE window SYSTEM "chrome://csrpolicy/locale/csrpolicy.dtd">
+
+<window id="csrpolicy" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<!-- TODO -->
+</window>

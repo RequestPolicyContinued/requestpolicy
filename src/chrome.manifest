@@ -1,0 +1,8 @@
+#content csrpolicy jar:chrome/csrpolicy.jar!/content/
+#locale	csrpolicy	en-US		jar:chrome/csrpolicy.jar!/locale/en-US/
+#skin	csrpolicy	classic/1.0	jar:chrome/csrpolicy.jar!/skin/
+
+content csrpolicy    content/
+locale  csrpolicy    en-US   locale/en-US/
+skin    csrpolicy    classic/1.0 skin/
+resource csrpolicy   modules/

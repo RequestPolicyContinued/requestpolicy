@@ -26,7 +26,7 @@ modulesDir.append("modules");
 var resourceURI = ioService.newFileURI(modulesDir);
 resProt.setSubstitution("csrpolicy", resourceURI);
 
-Components.utils.import("resource://csrpolicy/siteutils.jsm");
+Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
 
 // const STATE_START = CI.nsIWebProgressListener.STATE_START;
 // const STATE_DOC = CI.nsIWebProgressListener.STATE_IS_DOCUMENT;
@@ -58,10 +58,7 @@ CsrPolicyService.prototype = {
   classDescription : "CSR Policy Javascript XPCOM Component",
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
   contractID : "@csrpolicy.com/csrpolicy-service;1",
-  _xpcom_categories : [{
-        category : "content-policy"
-        ,
-      }],
+  _xpcom_categories : [{category : "content-policy"}],
   QueryInterface : XPCOMUtils.generateQI([CI.nsIContentPolicy]),
 
   // /////////////////////////////////////////////////////////////////////////

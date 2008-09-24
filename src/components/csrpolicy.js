@@ -8,27 +8,25 @@
 const CI = Components.interfaces;
 const CC = Components.classes;
 
+// Wasn't able to define a resource in chrome.manifest, so need to use file
+// paths to load modules. This method of doing it is described at
+// http://developer.mozilla.org/en/Using_JavaScript_code_modules
+// but this is using __LOCATION__ instead.
+// The reason a resources defined in chrome.manifest isn't working is likely
+// because at this point chrome.manifest hasn't been loaded yet. See
+// http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
+// for more info.
+var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+    .getService(Components.interfaces.nsIIOService);
+var resProt = ioService.getProtocolHandler("resource")
+    .QueryInterface(Components.interfaces.nsIResProtocolHandler);
+var extensionDir = __LOCATION__.parent.parent;
+var modulesDir = extensionDir.clone();
+modulesDir.append("modules");
+var resourceURI = ioService.newFileURI(modulesDir);
+resProt.setSubstitution("csrpolicy", resourceURI);
 
-//var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-//                          .getService(Components.interfaces.nsIIOService);
-//var resProt = ioService.getProtocolHandler("resource")
-//                       .QueryInterface(Components.interfaces.nsIResProtocolHandler);
-//var aliasFile = Components.classes["@mozilla.org/file/local;1"]
-//                          .createInstance(Components.interfaces.nsILocalFile);
-//aliasFile.initWithPath("/some/absolute/path");
-//
-//var aliasURI = ioService.newFileURI(aliasFile);
-//resProt.setSubstitution("myalias", aliasURI);
-//
-//// assuming the code modules are in the alias folder itself, not a subfolder
-//Components.utils.import("resource://myalias/file.jsm");
-
-
-
-
-// Import our other modules. "app" is predefined.
-// More info: http://developer.mozilla.org/en/Using_JavaScript_code_modules
-//Components.utils.import("resource://csrpolicy/testmodule.jsm");
+Components.utils.import("resource://csrpolicy/siteutils.jsm");
 
 // const STATE_START = CI.nsIWebProgressListener.STATE_START;
 // const STATE_DOC = CI.nsIWebProgressListener.STATE_IS_DOCUMENT;
@@ -48,7 +46,7 @@ const LOG_CHROME_WIN = 8;
 const LOG_LEAKS = 1024;
 // const LOG_SNIFF = 2048;
 
-// We'll use the new-fangled FF3 module, etc. generation
+// Use the new-fangled FF3 module, etc. generation.
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 function CsrPolicyService() {
@@ -147,8 +145,10 @@ CsrPolicyService.prototype = {
 
   // we only call this from shouldLoad when the request was a remote request
   // initiated
-  // by the content of a page. this is partly for efficiency. in other cases we
-  // just return CP_OK rather than return this function which ultimately returns
+  // by the content of a page. this is partly for efficiency. in other cases
+  // we
+  // just return CP_OK rather than return this function which ultimately
+  // returns
   // CP_OK.
   accept : function(reason, args) {
     if (this.consoleDump) {
@@ -225,12 +225,14 @@ CsrPolicyService.prototype = {
             return this.accept("www-similar hosts", arguments);
           }
 
-          // if the origin without any www if the final part of the destination,
+          // if the origin without any www if the final part of the
+          // destination,
           // then
           // allow it. note that we don't allow the other way around. that is,
           // www.example.com or example.com can request to images.example.com,
           // but
-          // images.example.com can't request to www.example.com or example.com
+          // images.example.com can't request to www.example.com or
+          // example.com
           var lengthDifference = destHostNoWWW.length - originHostNoWWW.length
           if (lengthDifference > 1) {
             if (destHostNoWWW.substring(lengthDifference - 1) == '.'

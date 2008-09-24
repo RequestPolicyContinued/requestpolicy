@@ -4,8 +4,9 @@
 		xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
 	<Description about="urn:mozilla:install-manifest">
-		<em:name>CSR Policy</em:name>
+		<em:name>Cross-Site Request Policy</em:name>
 		<em:version>0.1.0</em:version>
+		<em:type>2</em:type>
 		<em:description>Provides users the ability to specify policies for allowing and disallowing cross-site requests.</em:description>
 		<em:creator>Justin Samuel</em:creator>
 		<em:id>csrpolicy@csrpolicy.com</em:id>
@@ -14,8 +15,8 @@
 			<!-- Firefox -->
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-				<em:minVersion>3.0.0.0</em:minVersion>
-				<em:maxVersion>3.0.1.*</em:maxVersion>
+				<em:minVersion>3.0.0</em:minVersion>
+				<em:maxVersion>3.0.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 		

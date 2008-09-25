@@ -111,11 +111,14 @@ CsrPolicyService.prototype = {
 
       var httpChannel = subject
           .QueryInterface(Components.interfaces.nsIHttpChannel);
-      // TODO(justin): What happens if there is more than one Location header?
       try {
+        // If there is no Location header, an NS_ERROR_NOT_AVAILABLE is thrown.
+        // If there is more than one Location header, the last one is the one
+        // that will be used.
         var locationHeader = httpChannel.getResponseHeader("Location");
-        this.log(LOG_HEADER_REDIRECT, "Found 'Location' header: "
-                + locationHeader);
+        var requestUri = httpChannel.name;
+        this.log(LOG_HEADER_REDIRECT, "'Location' header to [" + locationHeader
+                + "]" + " found in response from [" + requestUri + "]");
       } catch (e) {
         // No location header.
       }

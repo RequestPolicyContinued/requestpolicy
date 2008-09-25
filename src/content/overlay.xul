@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://csrpolicy/skin/csrpolicy.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://csrpolicy/locale/en-US/csrpolicy.dtd">
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         id="stats-overlay">
+  <script src="overlay.js"/>
+</overlay>

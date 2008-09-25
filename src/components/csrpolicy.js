@@ -16,6 +16,8 @@ const CC = Components.classes;
 // because at this point chrome.manifest hasn't been loaded yet. See
 // http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
 // for more info.
+// TODO(justin): remove this and have code wait until after app startup,
+// so using chrome.manifest instead of this but just waiting until it's ready.
 var ioService = Components.classes["@mozilla.org/network/io-service;1"]
     .getService(Components.interfaces.nsIIOService);
 var resProt = ioService.getProtocolHandler("resource")
@@ -25,8 +27,6 @@ var modulesDir = extensionDir.clone();
 modulesDir.append("modules");
 var resourceURI = ioService.newFileURI(modulesDir);
 resProt.setSubstitution("csrpolicy", resourceURI);
-
-Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
 
 // const STATE_START = CI.nsIWebProgressListener.STATE_START;
 // const STATE_DOC = CI.nsIWebProgressListener.STATE_IS_DOCUMENT;
@@ -46,10 +46,16 @@ const LOG_CHROME_WIN = 8;
 const LOG_LEAKS = 1024;
 // const LOG_SNIFF = 2048;
 
+function loadLibraries() {
+  Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
+  Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
+}
+
 // Use the new-fangled FF3 module, etc. generation.
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 function CsrPolicyService() {
+  loadLibraries();
   this.wrappedJSObject = this;
   this.initContentPolicy();
 }
@@ -181,6 +187,9 @@ CsrPolicyService.prototype = {
         aContext, aMimeTypeGuess, aInternalCall) {
       try {
 
+        // this.cpDump("shouldLoad was called.", aContentType, aContentLocation,
+        // aRequestOrigin, aContext, aMimeTypeGuess);
+
         // TODO(justin): Determine if this really is ok. Are there any
         // non-user request cases where this is not set?
         if (!aRequestOrigin) {
@@ -216,9 +225,35 @@ CsrPolicyService.prototype = {
 
         if (destHost != originHost) {
           // need to confirm this is only the case when the user clicks a link
-          if (aContext && aContext.toString() == "[object XULElement]") {
+
+          this.dump("checking if an nsIDOMHTMLElement ");
+          if (aContext instanceof Components.interfaces.nsIDOMHTMLElement) {
+            this.dump("aContext instanceof nsIDOMHTMLElement");
+            this.dump(aContext.nodeType);
             return CP_OK;
           }
+
+          this.dump("checking if an nsIDOMXULControlElement ");
+          if (aContext instanceof Components.interfaces.nsIDOMXULControlElement) {
+            this.dump("aContext instanceof nsIDOMXULControlElement");
+            this.dump(aContext.nodeType);
+            return CP_OK;
+          }
+
+          this.dump("checking if an nsIDOMXULElement ");
+          if (aContext instanceof Components.interfaces.nsIDOMXULElement) {
+            this.dump("aContext instanceof nsIDOMXULElement");
+            this.dump(aContext.nodeType);
+            return CP_OK;
+          }
+
+          // if (aContext instanceof XULElement) {
+          // this.dump("aContext instanceof XULElement");
+          // this.dump(aContext.nodeType());
+          // this.dump("aContext instanceof nsIDOMWindow");
+          // var docShell = aContext.docShell;
+          // docShell.suspendRefreshURIs();
+          // }
 
           arguments = [aContentType, aContentLocation, aRequestOrigin,
               aContext, aMimeTypeGuess, aInternalCall]

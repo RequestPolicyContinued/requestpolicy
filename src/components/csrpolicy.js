@@ -58,8 +58,20 @@ CsrPolicyService.prototype = {
   classDescription : "CSR Policy Javascript XPCOM Component",
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
   contractID : "@csrpolicy.com/csrpolicy-service;1",
-  _xpcom_categories : [{category : "content-policy"}],
+  _xpcom_categories : [{
+        category : "content-policy"
+      }],
   QueryInterface : XPCOMUtils.generateQI([CI.nsIContentPolicy]),
+
+  /* Factory that creates a singleton instance of the component */
+  _xpcom_factory : {
+    createInstance : function() {
+      if (CsrPolicyService.instance == null) {
+        CsrPolicyService.instance = new CsrPolicyService();
+      }
+      return CsrPolicyService.instance;
+    }
+  },
 
   // /////////////////////////////////////////////////////////////////////////
   // Settings

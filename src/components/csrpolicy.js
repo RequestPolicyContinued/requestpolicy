@@ -36,14 +36,19 @@ const CP_NOP = function() {
   return CP_OK;
 };
 
-const LOG_CONTENT_BLOCK = 1;
-const LOG_CONTENT_CALL = 2;
-const LOG_CONTENT_INTERCEPT = 4;
-const LOG_CHROME_WIN = 8;
+const LOG_CONTENT_ALLOW = 1; // accepted requests
+const LOG_CONTENT_BLOCK = 2; // blocked requests
+const LOG_META_REFRESH = 4; // info related to meta refresh
+const LOG_HEADER_REDIRECT = 8; // info related to header redirects
+const LOG_INTERNAL = 16; // internal happenings of the extension
+const LOG_ERROR = 32; // errors
+const LOG_CONTENT_CALL = 64; // function call stacks
+
+// const LOG_CHROME_WIN = 8;
 // const LOG_XSS_FILTER = 16;
 // const LOG_INJECTION_CHECK = 32;
 // const LOG_DOMUTILS = 64;
-const LOG_LEAKS = 1024;
+// const LOG_LEAKS = 1024;
 // const LOG_SNIFF = 2048;
 
 function loadLibraries() {
@@ -65,9 +70,12 @@ CsrPolicyService.prototype = {
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
   contractID : "@csrpolicy.com/csrpolicy-service;1",
   _xpcom_categories : [{
+        category : "app-startup"
+      }, {
         category : "content-policy"
       }],
-  QueryInterface : XPCOMUtils.generateQI([CI.nsIContentPolicy]),
+  QueryInterface : XPCOMUtils.generateQI([Components.interfaces.nsIObserver,
+      CI.nsIContentPolicy]),
 
   /* Factory that creates a singleton instance of the component */
   _xpcom_factory : {
@@ -85,7 +93,44 @@ CsrPolicyService.prototype = {
 
   VERSION : "0.1",
 
-  consoleDump : 1,
+  // consoleLogLevel : LOG_CONTENT_ALLOW | LOG_CONTENT_BLOCK | LOG_META_REFRESH
+  // | LOG_HEADER_REDIRECT | LOG_INTERNAL | LOG_CONTENT_CALL,
+
+  // consoleLogLevel : LOG_CONTENT_BLOCK | LOG_META_REFRESH |
+  // LOG_HEADER_REDIRECT
+  // | LOG_INTERNAL,
+
+  consoleLogLevel : LOG_ERROR | LOG_HEADER_REDIRECT | LOG_INTERNAL,
+
+  // /////////////////////////////////////////////////////////////////////////
+  // nsIObserver interface
+  // /////////////////////////////////////////////////////////////////////////
+
+  observe : function(subject, topic, data) {
+    if (topic == "http-on-examine-response") {
+
+      var httpChannel = subject
+          .QueryInterface(Components.interfaces.nsIHttpChannel);
+      // TODO(justin): What happens if there is more than one Location header?
+      try {
+        var locationHeader = httpChannel.getResponseHeader("Location");
+        this.log(LOG_HEADER_REDIRECT, "Found 'Location' header: "
+                + locationHeader);
+      } catch (e) {
+        // No location header.
+      }
+
+    } else if (topic == "app-startup") {
+
+      // register observer for http-on-examine-response
+      var os = Components.classes["@mozilla.org/observer-service;1"]
+          .getService(Components.interfaces.nsIObserverService);
+      os.addObserver(this, "http-on-examine-response", false);
+
+    } else {
+      this.log(LOG_ERROR, "uknown topic observed: " + topic);
+    }
+  },
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility functions
@@ -96,6 +141,12 @@ CsrPolicyService.prototype = {
     this.dump("DUMPING " + this.__parent__);
     for (var v in this.__parent__) {
       this.dump(v + " = " + this.__parent__[v] + "\n");
+    }
+  },
+
+  log : function(level, msg) {
+    if (this.consoleLogLevel & level) {
+      this.dump(msg);
     }
   },
 
@@ -147,12 +198,12 @@ CsrPolicyService.prototype = {
 
   // we always call this from shouldLoad to reject a request
   reject : function(reason, args) {
-    if (this.consoleDump) {
-      if (this.consoleDump & LOG_CONTENT_BLOCK && args.length == 6) {
+    if (this.consoleLogLevel) {
+      if (this.consoleLogLevel & LOG_CONTENT_BLOCK && args.length == 6) {
         this.cpDump("BLOCKED, " + reason, args[0], args[1], args[2], args[3],
             args[4], args[5]);
       }
-      if (this.consoleDump & LOG_CONTENT_CALL) {
+      if (this.consoleLogLevel & LOG_CONTENT_CALL) {
         this.dump(new Error().stack);
       }
     }
@@ -166,12 +217,12 @@ CsrPolicyService.prototype = {
   // returns
   // CP_OK.
   accept : function(reason, args) {
-    if (this.consoleDump) {
-      if (this.consoleDump & LOG_CONTENT_BLOCK && args.length == 6) {
+    if (this.consoleLogLevel) {
+      if (this.consoleLogLevel & LOG_CONTENT_ALLOW && args.length == 6) {
         this.cpDump("ALLOWED, " + reason, args[0], args[1], args[2], args[3],
             args[4], args[5]);
       }
-      if (this.consoleDump & LOG_CONTENT_CALL) {
+      if (this.consoleLogLevel & LOG_CONTENT_CALL) {
         this.dump(new Error().stack);
       }
     }
@@ -226,26 +277,24 @@ CsrPolicyService.prototype = {
         if (destHost != originHost) {
           // need to confirm this is only the case when the user clicks a link
 
-          this.dump("checking if an nsIDOMHTMLElement ");
-          if (aContext instanceof Components.interfaces.nsIDOMHTMLElement) {
-            this.dump("aContext instanceof nsIDOMHTMLElement");
-            this.dump(aContext.nodeType);
-            return CP_OK;
-          }
-
-          this.dump("checking if an nsIDOMXULControlElement ");
-          if (aContext instanceof Components.interfaces.nsIDOMXULControlElement) {
-            this.dump("aContext instanceof nsIDOMXULControlElement");
-            this.dump(aContext.nodeType);
-            return CP_OK;
-          }
-
-          this.dump("checking if an nsIDOMXULElement ");
-          if (aContext instanceof Components.interfaces.nsIDOMXULElement) {
-            this.dump("aContext instanceof nsIDOMXULElement");
-            this.dump(aContext.nodeType);
-            return CP_OK;
-          }
+          // if (aContext instanceof Components.interfaces.nsIDOMHTMLElement) {
+          // this.dump("aContext instanceof nsIDOMHTMLElement");
+          // this.dump(aContext.nodeType);
+          // return CP_OK;
+          // }
+          //
+          // if (aContext instanceof
+          // Components.interfaces.nsIDOMXULControlElement) {
+          // this.dump("aContext instanceof nsIDOMXULControlElement");
+          // this.dump(aContext.nodeType);
+          // return CP_OK;
+          // }
+          //
+          // if (aContext instanceof Components.interfaces.nsIDOMXULElement) {
+          // this.dump("aContext instanceof nsIDOMXULElement");
+          // this.dump(aContext.nodeType);
+          // return CP_OK;
+          // }
 
           // if (aContext instanceof XULElement) {
           // this.dump("aContext instanceof XULElement");

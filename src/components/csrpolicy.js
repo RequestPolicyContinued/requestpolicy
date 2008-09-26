@@ -1,5 +1,7 @@
 /*
+ * Cross-Site Request Policy service
  * 
+ * @author Justin Samuel <justin at justinsamuel.com>
  * 
  * For info about the basic setup of this file, see:
  * http://developer.mozilla.org/en/How_to_Build_an_XPCOM_Component_in_Javascript
@@ -36,24 +38,10 @@ const CP_NOP = function() {
   return CP_OK;
 };
 
-const LOG_CONTENT_ALLOW = 1; // accepted requests
-const LOG_CONTENT_BLOCK = 2; // blocked requests
-const LOG_META_REFRESH = 4; // info related to meta refresh
-const LOG_HEADER_REDIRECT = 8; // info related to header redirects
-const LOG_INTERNAL = 16; // internal happenings of the extension
-const LOG_ERROR = 32; // errors
-const LOG_CONTENT_CALL = 64; // function call stacks
-
-// const LOG_CHROME_WIN = 8;
-// const LOG_XSS_FILTER = 16;
-// const LOG_INJECTION_CHECK = 32;
-// const LOG_DOMUTILS = 64;
-// const LOG_LEAKS = 1024;
-// const LOG_SNIFF = 2048;
-
 function loadLibraries() {
-  Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
   Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
+  Components.utils.import("resource://csrpolicy/Logger.jsm");
+  Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
 }
 
 // Use the new-fangled FF3 module, etc. generation.
@@ -74,8 +62,7 @@ CsrPolicyService.prototype = {
       }, {
         category : "content-policy"
       }],
-  QueryInterface : XPCOMUtils.generateQI([Components.interfaces.nsIObserver,
-      CI.nsIContentPolicy]),
+  QueryInterface : XPCOMUtils.generateQI([CI.nsIObserver, CI.nsIContentPolicy]),
 
   /* Factory that creates a singleton instance of the component */
   _xpcom_factory : {
@@ -93,15 +80,6 @@ CsrPolicyService.prototype = {
 
   VERSION : "0.1",
 
-  // consoleLogLevel : LOG_CONTENT_ALLOW | LOG_CONTENT_BLOCK | LOG_META_REFRESH
-  // | LOG_HEADER_REDIRECT | LOG_INTERNAL | LOG_CONTENT_CALL,
-
-  // consoleLogLevel : LOG_CONTENT_BLOCK | LOG_META_REFRESH |
-  // LOG_HEADER_REDIRECT
-  // | LOG_INTERNAL,
-
-  consoleLogLevel : LOG_ERROR | LOG_HEADER_REDIRECT | LOG_INTERNAL,
-
   // /////////////////////////////////////////////////////////////////////////
   // nsIObserver interface
   // /////////////////////////////////////////////////////////////////////////
@@ -117,8 +95,9 @@ CsrPolicyService.prototype = {
         // that will be used.
         var locationHeader = httpChannel.getResponseHeader("Location");
         var requestUri = httpChannel.name;
-        this.log(LOG_HEADER_REDIRECT, "'Location' header to [" + locationHeader
-                + "]" + " found in response from [" + requestUri + "]");
+        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'Location' header to <"
+                + locationHeader + ">" + " found in response from <"
+                + requestUri + ">");
       } catch (e) {
         // No location header.
       }
@@ -131,7 +110,7 @@ CsrPolicyService.prototype = {
       os.addObserver(this, "http-on-examine-response", false);
 
     } else {
-      this.log(LOG_ERROR, "uknown topic observed: " + topic);
+      Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);
     }
   },
 
@@ -147,19 +126,10 @@ CsrPolicyService.prototype = {
     }
   },
 
-  log : function(level, msg) {
-    if (this.consoleLogLevel & level) {
-      this.dump(msg);
-    }
-  },
-
   // this.dump() should be used by other functions instead of using dump()
   // directly
   dump : function(msg) {
-    msg = "[CsrPolicy] " + msg;
-    dump(msg + "\n");
-    if (this.consoleLog)
-      this.log(msg);
+    dump("[CSRPolicy] " + msg + "\n");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -181,53 +151,40 @@ CsrPolicyService.prototype = {
     }
   },
 
-  cpDump : function(msg, aContentType, aContentLocation, aRequestOrigin,
+  argumentsToString : function(aContentType, aContentLocation, aRequestOrigin,
       aContext, aMimeTypeGuess, aInternalCall) {
-    this.dump("Content " + msg + ", type: " + aContentType + ", location: "
-        + (aContentLocation && aContentLocation.spec) + ", origin: "
-        + (aRequestOrigin && aRequestOrigin.spec) + ", context: "
-        + ((aContext instanceof CI.nsIDOMHTMLElement) ? "<HTML Element>" // try
-            // not
-            // to
-            // cause
-            // side
-            // effects
-            // of
-            // toString()
-            // during
-            // load
-            : aContext) + ", mime: " + aMimeTypeGuess + ", " + aInternalCall);
+    // Note: try not to cause side effects of toString() during load, so "<HTML
+    // Element>" is hard-coded.
+    return "type: "
+        + aContentType
+        + ", location: "
+        + (aContentLocation && aContentLocation.spec)
+        + ", origin: "
+        + (aRequestOrigin && aRequestOrigin.spec)
+        + ", context: "
+        + ((aContext instanceof CI.nsIDOMHTMLElement)
+            ? "<HTML Element>"
+            : aContext) + ", mime: " + aMimeTypeGuess + ", " + aInternalCall;
   },
 
-  // we always call this from shouldLoad to reject a request
+  // We always call this from shouldLoad to reject a request.
   reject : function(reason, args) {
-    if (this.consoleLogLevel) {
-      if (this.consoleLogLevel & LOG_CONTENT_BLOCK && args.length == 6) {
-        this.cpDump("BLOCKED, " + reason, args[0], args[1], args[2], args[3],
-            args[4], args[5]);
-      }
-      if (this.consoleLogLevel & LOG_CONTENT_CALL) {
-        this.dump(new Error().stack);
-      }
+    Logger.info(Logger.TYPE_CONTENT_BLOCK, this.argumentsToString(args[0],
+            args[1], args[2], args[3], args[4], args[5]));
+    if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
+      Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
   },
 
-  // we only call this from shouldLoad when the request was a remote request
-  // initiated
-  // by the content of a page. this is partly for efficiency. in other cases
-  // we
-  // just return CP_OK rather than return this function which ultimately
-  // returns
-  // CP_OK.
+  // We only call this from shouldLoad when the request was a remote request
+  // initiated by the content of a page. this is partly for efficiency. in other
+  // cases we just return CP_OK rather than return this function which
+  // ultimately returns CP_OK.
   accept : function(reason, args) {
-    if (this.consoleLogLevel) {
-      if (this.consoleLogLevel & LOG_CONTENT_ALLOW && args.length == 6) {
-        this.cpDump("ALLOWED, " + reason, args[0], args[1], args[2], args[3],
-            args[4], args[5]);
-      }
-      if (this.consoleLogLevel & LOG_CONTENT_CALL) {
-        this.dump(new Error().stack);
-      }
+    Logger.info(Logger.TYPE_CONTENT_ALLOW, this.argumentsToString(args[0],
+            args[1], args[2], args[3], args[4], args[5]));
+    if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
+      Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
     return CP_OK;
   },
@@ -344,7 +301,7 @@ CsrPolicyService.prototype = {
         }
 
       } catch (e) {
-        this.dump("Content (Fatal Error, " + e + ")");
+        Logger.severe(Logger.TYPE_ERROR, "Content (Fatal Error, " + e + ")");
       }
 
       arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,

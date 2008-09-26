@@ -96,6 +96,9 @@ CsrPolicyService.prototype = {
   observe : function(subject, topic, data) {
     if (topic == "http-on-examine-response") {
 
+      // TODO: Allow Location header based on policy.
+      // TODO: Remove Refresh header, treat it like meta refresh.
+
       var httpChannel = subject
           .QueryInterface(Components.interfaces.nsIHttpChannel);
       try {
@@ -104,9 +107,19 @@ CsrPolicyService.prototype = {
         // that will be used.
         var locationHeader = httpChannel.getResponseHeader("Location");
         var requestUri = httpChannel.name;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'Location' header to <"
-                + locationHeader + ">" + " found in response from <"
-                + requestUri + ">");
+        Logger.info(Logger.TYPE_HEADER_REDIRECT, "Found 'Location' header to <"
+                + locationHeader + ">" + " in response from <" + requestUri
+                + ">");
+        try {
+          httpChannel.setResponseHeader("Location", "", false);
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+              "BLOCKED 'Location' header to <" + locationHeader + ">"
+                  + " found in response from <" + requestUri + ">");
+        } catch (e) {
+          Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing "
+                  + "'Location' header to <" + locationHeader + ">"
+                  + "  in response from <" + requestUri + ">." + e);
+        }
       } catch (e) {
         // No location header.
       }

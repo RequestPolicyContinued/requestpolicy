@@ -1,0 +1,7 @@
+#include "nsISupports.idl"
+
+[scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
+interface nsICSRPolicy : nsISupports
+{
+  void testing();
+};  

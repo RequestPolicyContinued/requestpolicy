@@ -1,9 +1,17 @@
 Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
 Components.utils.import("resource://csrpolicy/Logger.jsm");
 
+const CI = Components.interfaces;
+const CC = Components.classes;
+
 var OverlayTest = {
   onLoad : function(e) {
     var document = e.target;
+
+    // This just tests the interface we've defined for our service.
+    var csrPolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
+        .getService(CI.nsICSRPolicy);
+    csrPolicy.testing();
 
     // Disable meta redirects. This gets called on every DOMContentLoaded
     // but it may not need to be if there's a way to do it based on a

@@ -1,6 +1,6 @@
 var EXPORTED_SYMBOLS = ["Logger"]
 
-//TODO(): Make this cleaner javascript, and maybe not a single instance.
+// TODO(): Make this cleaner javascript, and maybe not a single instance.
 
 Logger = new function() {
 
@@ -10,7 +10,7 @@ Logger = new function() {
   this.TYPE_HEADER_REDIRECT = 8; // info related to header redirects
   this.TYPE_INTERNAL = 16; // internal happenings of the extension
   this.TYPE_ERROR = 32; // errors
-  this.TYPE_ALL = 0x11111111111; // all
+  this.TYPE_ALL = 0x0 - 1; // all
 
   this.LEVEL_OFF = Number.MAX_VALUE; // no logging
   this.LEVEL_SEVERE = 1000;
@@ -36,11 +36,11 @@ Logger = new function() {
   // var logTypes = Logger.TYPE_ERROR | Logger.TYPE_HEADER_REDIRECT
   // | Logger.TYPE_INTERNAL;
 
-  this.logTypes = this.TYPE_ALL;
+  this.logTypes = this.TYPE_ALL & ~this.TYPE_INTERNAL;
 };
 
 Logger._doLog = function(level, type, message) {
-  if (level >= this.logLevel && this.logTypes & level) {
+  if (level >= this.logLevel && this.logTypes & type) {
     var levelName = this.LEVEL_NAMES[level + ""];
     var typeName = this.TYPE_NAMES[type + ""];
     dump("[CSRPolicy] [" + levelName + "] [" + typeName + "] " + message + "\n");

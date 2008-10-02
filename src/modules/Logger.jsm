@@ -4,8 +4,8 @@ var EXPORTED_SYMBOLS = ["Logger"]
 
 Logger = new function() {
 
-  this.TYPE_CONTENT_ALLOW = 1; // accepted requests
-  this.TYPE_CONTENT_BLOCK = 2; // blocked requests
+  this.TYPE_CONTENT = 1; // content whose origin isn't known more specifically
+  // this.TYPE_CONTENT_BLOCK = 2; // blocked requests
   this.TYPE_META_REFRESH = 4; // info related to meta refresh
   this.TYPE_HEADER_REDIRECT = 8; // info related to header redirects
   this.TYPE_INTERNAL = 16; // internal happenings of the extension
@@ -19,8 +19,8 @@ Logger = new function() {
   this.LEVEL_ALL = Number.MIN_VALUE; // log everything
 
   this.TYPE_NAMES = {};
-  this.TYPE_NAMES[this.TYPE_CONTENT_ALLOW + ""] = "CONTENT_ALLOWED";
-  this.TYPE_NAMES[this.TYPE_CONTENT_BLOCK + ""] = "CONTENT_BLOCKED";
+  this.TYPE_NAMES[this.TYPE_CONTENT + ""] = "CONTENT";
+  //this.TYPE_NAMES[this.TYPE_CONTENT_BLOCK + ""] = "CONTENT_BLOCKED";
   this.TYPE_NAMES[this.TYPE_META_REFRESH + ""] = "META_REFRESH";
   this.TYPE_NAMES[this.TYPE_HEADER_REDIRECT + ""] = "HEADER_REDIRECT";
   this.TYPE_NAMES[this.TYPE_INTERNAL + ""] = "INTERNAL";
@@ -36,7 +36,7 @@ Logger = new function() {
   // var logTypes = Logger.TYPE_ERROR | Logger.TYPE_HEADER_REDIRECT
   // | Logger.TYPE_INTERNAL;
 
-  this.logTypes = this.TYPE_ALL & ~this.TYPE_INTERNAL;
+  this.logTypes = this.TYPE_ALL;
 };
 
 Logger._doLog = function(level, type, message) {

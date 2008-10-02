@@ -97,7 +97,10 @@ CsrPolicyService.prototype = {
     if (topic == "http-on-examine-response") {
 
       // TODO: Allow Location header based on policy.
-      // TODO: Remove Refresh header, treat it like meta refresh.
+
+      // TODO: Remove Refresh header, treat it like meta refresh. Refresh
+      // headers may be ignored by firefox, but probably good to remove them if
+      // they exist for future-proofing and bug-proofing.
 
       var httpChannel = subject
           .QueryInterface(Components.interfaces.nsIHttpChannel);
@@ -191,8 +194,11 @@ CsrPolicyService.prototype = {
 
   // We always call this from shouldLoad to reject a request.
   reject : function(reason, args) {
-    Logger.info(Logger.TYPE_CONTENT_BLOCK, this.argumentsToString(args[0],
-            args[1], args[2], args[3], args[4], args[5]));
+    Logger.warning(Logger.TYPE_CONTENT, "** BLOCKED ** reason: "
+            + reason
+            + ". "
+            + this.argumentsToString(args[0], args[1], args[2], args[3],
+                args[4], args[5]));
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
@@ -203,8 +209,11 @@ CsrPolicyService.prototype = {
   // cases we just return CP_OK rather than return this function which
   // ultimately returns CP_OK.
   accept : function(reason, args) {
-    Logger.info(Logger.TYPE_CONTENT_ALLOW, this.argumentsToString(args[0],
-            args[1], args[2], args[3], args[4], args[5]));
+    Logger.warning(Logger.TYPE_CONTENT, "** ALLOWED ** reason: "
+            + reason
+            + ". "
+            + this.argumentsToString(args[0], args[1], args[2], args[3],
+                args[4], args[5]));
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
@@ -220,16 +229,25 @@ CsrPolicyService.prototype = {
         aContext, aMimeTypeGuess, aInternalCall) {
       try {
 
+        arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
+            aMimeTypeGuess, aInternalCall]
+
         // this.cpDump("shouldLoad was called.", aContentType, aContentLocation,
         // aRequestOrigin, aContext, aMimeTypeGuess);
 
-        // TODO(justin): Determine if this really is ok. Are there any
-        // non-user request cases where this is not set?
+        // TODO(justin): Determine if this really is ok. The assumption for
+        // now is that if there is no request origin, then it was an initial
+        // user request (e.g. typed in the address bar).
         if (!aRequestOrigin) {
-          return CP_OK;
+          return this.accept("No aRequestOrigin, assuming user-entered url",
+              arguments);
         }
 
-        if (aContentLocation.scheme == 'resource') {
+        // Not cross-site requests.
+        if (aContentLocation.scheme == "resource"
+            || aContentLocation.scheme == "data"
+            || aContentLocation.scheme == "chrome"
+            || aContentLocation.scheme == "moz-icon") {
           return CP_OK;
         }
 
@@ -239,7 +257,9 @@ CsrPolicyService.prototype = {
           aRequestOrigin.asciiHost;
           aContentLocation.asciiHost;
         } catch (e) {
-          return CP_OK;
+          return this.accept("No asciiHost on either aRequestOrigin <"
+                  + aRequestOrigin.spec + "> or aContentLocation <"
+                  + aContentLocation.spec + ">", arguments);
         }
 
         var originHost = aRequestOrigin.asciiHost;
@@ -247,88 +267,79 @@ CsrPolicyService.prototype = {
 
         // "global" dest are [some sort of interal requests]
         // "browser" dest are [???]
-        // "browser" origin requests for things like favicon.ico and possibly
-        // original request
-        // the user made for a page (or would that be matched by one of the
-        // above checks?)
-        if (destHost == 'global' || destHost == 'browser'
-            || originHost == 'browser') {
+        if (destHost == "global" || destHost == "browser") {
           return CP_OK;
         }
 
-        if (destHost != originHost) {
-          // need to confirm this is only the case when the user clicks a link
+        // "browser" origin requests for things like favicon.ico and possibly
+        // original request
+        // TODO: check this, seems sketchy.
+        if (originHost == "browser") {
+          return this.accept(
+              "We think this is an original request by the user", arguments);
+        }
 
-          // if (aContext instanceof Components.interfaces.nsIDOMHTMLElement) {
-          // this.dump("aContext instanceof nsIDOMHTMLElement");
-          // this.dump(aContext.nodeType);
-          // return CP_OK;
-          // }
-          //
-          // if (aContext instanceof
-          // Components.interfaces.nsIDOMXULControlElement) {
-          // this.dump("aContext instanceof nsIDOMXULControlElement");
-          // this.dump(aContext.nodeType);
-          // return CP_OK;
-          // }
-          //
-          // if (aContext instanceof Components.interfaces.nsIDOMXULElement) {
-          // this.dump("aContext instanceof nsIDOMXULElement");
-          // this.dump(aContext.nodeType);
-          // return CP_OK;
-          // }
-
-          // if (aContext instanceof XULElement) {
-          // this.dump("aContext instanceof XULElement");
-          // this.dump(aContext.nodeType());
-          // this.dump("aContext instanceof nsIDOMWindow");
-          // var docShell = aContext.docShell;
-          // docShell.suspendRefreshURIs();
-          // }
-
+        if (destHost == originHost) {
           arguments = [aContentType, aContentLocation, aRequestOrigin,
               aContext, aMimeTypeGuess, aInternalCall]
-
-          var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost
-              .substring(4) : originHost;
-          var destHostNoWWW = destHost.indexOf('www.') == 0 ? destHost
-              .substring(4) : destHost;
-
-          // if these were both the same domain if you ignore any www, then
-          // allow it
-          if (originHostNoWWW == destHostNoWWW) {
-            return this.accept("www-similar hosts", arguments);
-          }
-
-          // if the origin without any www if the final part of the
-          // destination,
-          // then
-          // allow it. note that we don't allow the other way around. that is,
-          // www.example.com or example.com can request to images.example.com,
-          // but
-          // images.example.com can't request to www.example.com or
-          // example.com
-          var lengthDifference = destHostNoWWW.length - originHostNoWWW.length
-          if (lengthDifference > 1) {
-            if (destHostNoWWW.substring(lengthDifference - 1) == '.'
-                + originHostNoWWW) {
-              return this.accept("dest is subdomain of origin", arguments);
-            }
-          }
-
-          // if we didn't match any of the conditions in which to allow the
-          // request,
-          // then reject it.
-          return this.reject("hosts don't match", arguments);
+          return this.accept("same hosts", arguments);
         }
+
+        if (aContext instanceof CI.nsIDOMHTMLElement) {
+          // AFAICT, aContext will be an nsIDOMHTMLElement if it's a link or a
+          // form submission (whether user-initiated or not).
+          return this.accept("Link clicked or form submitted.", arguments);
+
+        } else if (aContext instanceof CI.nsIDOMXULElement) {
+          // AFAICT, aContext will be an nsIDOMXULElement if a request the
+          // browser makes for any other reason than a form submission or
+          // clicked link.
+          Logger.info(Logger.TYPE_INTERNAL, "Browser-initiated request. To <"
+                  + aRequestOrigin.spec + "> from <" + aContentLocation.spec
+                  + ">");
+
+        } else {
+          Logger
+              .warning(
+                  Logger.TYPE_INTERNAL,
+                  "OOPS: don't know this type of context/element (user-iniated? browser-iniated?). To <"
+                      + aContentLocation.spec
+                      + "> from <"
+                      + aRequestOrigin.spec + ">. element:" + aContext);
+        }
+
+        var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost
+            .substring(4) : originHost;
+        var destHostNoWWW = destHost.indexOf('www.') == 0 ? destHost
+            .substring(4) : destHost;
+
+        // if these were both the same domain if you ignore any www, then
+        // allow it
+        if (originHostNoWWW == destHostNoWWW) {
+          return this.accept("www-similar hosts", arguments);
+        }
+
+        // if the origin without any www if the final part of the
+        // destination, then allow it. note that we don't allow the other way
+        // around. that is, www.example.com or example.com can request to
+        // images.example.com, but images.example.com can't request to
+        // www.example.com or example.com
+        var lengthDifference = destHostNoWWW.length - originHostNoWWW.length
+        if (lengthDifference > 1) {
+          if (destHostNoWWW.substring(lengthDifference - 1) == '.'
+              + originHostNoWWW) {
+            return this.accept("dest is subdomain of origin", arguments);
+          }
+        }
+
+        // if we didn't match any of the conditions in which to allow the
+        // request, then reject it.
+        return this.reject("hosts don't match", arguments);
 
       } catch (e) {
         Logger.severe(Logger.TYPE_ERROR, "Content (Fatal Error, " + e + ")");
       }
 
-      arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
-          aMimeTypeGuess, aInternalCall]
-      return this.accept("same hosts", arguments);
     } // end shouldLoad
 
   } // end mainContentPolicy

@@ -1,10 +1,9 @@
-/*
+/**
  * Cross-Site Request Policy service
  * 
  * @author Justin Samuel <justin at justinsamuel.com>
- * 
- * For info about the basic setup of this file, see:
- * http://developer.mozilla.org/en/How_to_Build_an_XPCOM_Component_in_Javascript
+ * @copyright 2008
+ * @license GPL
  */
 
 const CI = Components.interfaces;
@@ -85,8 +84,28 @@ CsrPolicyService.prototype = {
   // nsICSRPolicy interface
   // /////////////////////////////////////////////////////////////////////////
 
-  testing : function testing() {
-    Logger.info(Logger.TYPE_INTERNAL, "Testing nsICSRPolicy interface.");
+  clickedLinks : {},
+
+  registerFormSubmitted : function registerFormSubmitted(element) {
+    Logger.info(Logger.TYPE_INTERNAL, "Form submitted: " + element);
+  },
+
+  registerLinkClicked : function registerLinkClicked(element) {
+    // TODO: Link click not being registered for "open in new tab" and "open in
+    // new window".
+    Logger.info(Logger.TYPE_INTERNAL, "Link clicked: " + element);
+
+    if (element instanceof CI.nsIDOMHTMLAnchorElement) {
+      // TODO use a different data structure or keep the array index from
+      // growing indefinitely
+      var documentUrl = element.ownerDocument.URL;
+      if (this.clickedLinks[documentUrl] == undefined) {
+        this.clickedLinks[documentUrl] = {};
+      }
+      if (this.clickedLinks[documentUrl][element.href] == undefined) {
+        this.clickedLinks[documentUrl][element.href] = true;
+      }
+    }
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -97,6 +116,8 @@ CsrPolicyService.prototype = {
     if (topic == "http-on-examine-response") {
 
       // TODO: Allow Location header based on policy.
+
+      // TODO: Allow subdomains or www.
 
       // TODO: Remove Refresh header, treat it like meta refresh. Refresh
       // headers may be ignored by firefox, but probably good to remove them if
@@ -182,7 +203,7 @@ CsrPolicyService.prototype = {
     // Element>" is hard-coded.
     return "type: "
         + aContentType
-        + ", location: "
+        + ", destination: "
         + (aContentLocation && aContentLocation.spec)
         + ", origin: "
         + (aRequestOrigin && aRequestOrigin.spec)
@@ -232,10 +253,10 @@ CsrPolicyService.prototype = {
         arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
             aMimeTypeGuess, aInternalCall]
 
-        // this.cpDump("shouldLoad was called.", aContentType, aContentLocation,
-        // aRequestOrigin, aContext, aMimeTypeGuess);
+        // TODO: Recognize user-initated action for "open in new tab" and "open
+        // in new window".
 
-        // TODO(justin): Determine if this really is ok. The assumption for
+        // TODO: Determine if this really is ok. The assumption for
         // now is that if there is no request origin, then it was an initial
         // user request (e.g. typed in the address bar).
         if (!aRequestOrigin) {
@@ -258,10 +279,12 @@ CsrPolicyService.prototype = {
           aContentLocation.asciiHost;
         } catch (e) {
           return this.accept("No asciiHost on either aRequestOrigin <"
-                  + aRequestOrigin.spec + "> or aContentLocation <"
+                  + aRequestOrigin.spec + "> or aContentLoc[ation <"
                   + aContentLocation.spec + ">", arguments);
         }
 
+        var origin = aRequestOrigin.spec;
+        var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
 
@@ -276,7 +299,9 @@ CsrPolicyService.prototype = {
         // TODO: check this, seems sketchy.
         if (originHost == "browser") {
           return this.accept(
-              "We think this is an original request by the user", arguments);
+              "Original request by the user or other good explanation "
+                  + "(i.e. entered in the address bar, new tab opened, etc.)",
+              arguments);
         }
 
         if (destHost == originHost) {
@@ -285,27 +310,14 @@ CsrPolicyService.prototype = {
           return this.accept("same hosts", arguments);
         }
 
-        if (aContext instanceof CI.nsIDOMHTMLElement) {
-          // AFAICT, aContext will be an nsIDOMHTMLElement if it's a link or a
-          // form submission (whether user-initiated or not).
-          return this.accept("Link clicked or form submitted.", arguments);
-
-        } else if (aContext instanceof CI.nsIDOMXULElement) {
-          // AFAICT, aContext will be an nsIDOMXULElement if a request the
-          // browser makes for any other reason than a form submission or
-          // clicked link.
-          Logger.info(Logger.TYPE_INTERNAL, "Browser-initiated request. To <"
-                  + aRequestOrigin.spec + "> from <" + aContentLocation.spec
-                  + ">");
-
-        } else {
-          Logger
-              .warning(
-                  Logger.TYPE_INTERNAL,
-                  "OOPS: don't know this type of context/element (user-iniated? browser-iniated?). To <"
-                      + aContentLocation.spec
-                      + "> from <"
-                      + aRequestOrigin.spec + ">. element:" + aContext);
+        if (aContext instanceof CI.nsIDOMXULElement) {
+          if (this.clickedLinks[origin] && this.clickedLinks[origin][dest]) {
+            // TODO: multiple calls to shouldLoad seem to be made for each link
+            // click, need a way to remove it but not immediately or figure out
+            // why there are multiple calls.
+            // delete this.clickedLinks[origin][dest];
+            return this.accept("User-initiated request.", arguments);
+          }
         }
 
         var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost
@@ -338,6 +350,7 @@ CsrPolicyService.prototype = {
 
       } catch (e) {
         Logger.severe(Logger.TYPE_ERROR, "Content (Fatal Error, " + e + ")");
+        // TODO: log stack trace
       }
 
     } // end shouldLoad

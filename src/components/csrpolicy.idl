@@ -1,7 +1,11 @@
 #include "nsISupports.idl"
 
+interface nsIDOMElement;
+
 [scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
 interface nsICSRPolicy : nsISupports
 {
-  void testing();
+  void registerFormSubmitted(in nsIDOMElement element);
+  
+  void registerLinkClicked(in nsIDOMElement element);
 };  

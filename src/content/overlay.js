@@ -5,13 +5,17 @@ const CI = Components.interfaces;
 const CC = Components.classes;
 
 var OverlayTest = {
+
   onLoad : function(e) {
+
+    // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
+    // new links/forms with csrPolicy even if they are added after initial
+    // load (e.g. they are added through javascript).
+
     var document = e.target;
 
-    // This just tests the interface we've defined for our service.
     var csrPolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
         .getService(CI.nsICSRPolicy);
-    csrPolicy.testing();
 
     // Disable meta redirects. This gets called on every DOMContentLoaded
     // but it may not need to be if there's a way to do it based on a
@@ -29,7 +33,26 @@ var OverlayTest = {
                 + document.location + ">");
       }
     }
+
+    // Find all anchor tags and add click events (which also fire when enter
+    // is pressed while the element has focus).
+    var anchorTags = document.getElementsByTagName("a");
+    for (var i = 0; i < anchorTags.length; i++) {
+      anchorTags[i].addEventListener("click", function(e) {
+            csrPolicy.registerLinkClicked(e.target);
+          }, false);
+    }
+
+    // Find all form tags and add submit events.
+    var formTags = document.getElementsByTagName("form");
+    for (var i = 0; i < formTags.length; i++) {
+      formTags[i].addEventListener("submit", function(e) {
+            csrPolicy.registerFormSubmitted(e.target);
+          }, false);
+    }
+
   }
+
 };
 
 addEventListener("DOMContentLoaded", function(e) {

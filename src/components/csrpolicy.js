@@ -87,24 +87,28 @@ CsrPolicyService.prototype = {
   clickedLinks : {},
 
   registerFormSubmitted : function registerFormSubmitted(element) {
+    // TODO: implement
     Logger.info(Logger.TYPE_INTERNAL, "Form submitted: " + element);
   },
 
-  registerLinkClicked : function registerLinkClicked(element) {
-    // TODO: Link click not being registered for "open in new tab" and "open in
-    // new window".
-    Logger.info(Logger.TYPE_INTERNAL, "Link clicked: " + element);
+  registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
+    Logger.info(Logger.TYPE_INTERNAL, "Link clicked from <" + originUrl
+            + "> to <" + destinationUrl + ">.");
 
-    if (element instanceof CI.nsIDOMHTMLAnchorElement) {
-      // TODO use a different data structure or keep the array index from
-      // growing indefinitely
-      var documentUrl = element.ownerDocument.URL;
-      if (this.clickedLinks[documentUrl] == undefined) {
-        this.clickedLinks[documentUrl] = {};
-      }
-      if (this.clickedLinks[documentUrl][element.href] == undefined) {
-        this.clickedLinks[documentUrl][element.href] = true;
-      }
+    if (this.clickedLinks[originUrl] == undefined) {
+      this.clickedLinks[originUrl] = {};
+    }
+    if (this.clickedLinks[originUrl][destinationUrl] == undefined) {
+      // TODO: Possibly set the value to a timestamp that can be used elsewhere
+      // to determine if this is a recent click. This is probably necessary as
+      // multiple calls to shouldLoad get made and we need a way to allow
+      // multiple in a short window of time. Alternately, as it seems to always
+      // be in order (repeats are always the same as the last), the last one
+      // could be tracked and always allowed (or allowed within a small period
+      // of time). This would have the advantage that we could delete items from
+      // the clickedLinks object. One of these approaches would also reduce log
+      // clutter, which would be good.
+      this.clickedLinks[originUrl][destinationUrl] = true;
     }
   },
 
@@ -150,7 +154,7 @@ CsrPolicyService.prototype = {
 
     } else if (topic == "app-startup") {
 
-      // register observer for http-on-examine-response
+      // Register observer for http-on-examine-response.
       var os = Components.classes["@mozilla.org/observer-service;1"]
           .getService(Components.interfaces.nsIObserverService);
       os.addObserver(this, "http-on-examine-response", false);
@@ -172,8 +176,6 @@ CsrPolicyService.prototype = {
     }
   },
 
-  // this.dump() should be used by other functions instead of using dump()
-  // directly
   dump : function(msg) {
     dump("[CSRPolicy] " + msg + "\n");
   },
@@ -253,24 +255,22 @@ CsrPolicyService.prototype = {
         arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
             aMimeTypeGuess, aInternalCall]
 
-        // TODO: Recognize user-initated action for "open in new tab" and "open
-        // in new window".
-
-        // TODO: Determine if this really is ok. The assumption for
-        // now is that if there is no request origin, then it was an initial
-        // user request (e.g. typed in the address bar).
-        if (!aRequestOrigin) {
-          return this.accept("No aRequestOrigin, assuming user-entered url",
-              arguments);
-        }
-
         // Not cross-site requests.
         if (aContentLocation.scheme == "resource"
+            || aContentLocation.scheme == "about"
             || aContentLocation.scheme == "data"
             || aContentLocation.scheme == "chrome"
             || aContentLocation.scheme == "moz-icon") {
           return CP_OK;
         }
+
+        // TODO: Determine if this really is ok. The assumption for
+        // now is that if there is no request origin, then it was an initial
+        // user request (e.g. typed in the address bar).
+        // if (!aRequestOrigin) {
+        // return this.accept("No aRequestOrigin, assuming user-entered url",
+        // arguments);
+        // }
 
         // javascript skills lacking. must be a better way to find out parameter
         // 'asciiHost' isn't there.
@@ -299,9 +299,8 @@ CsrPolicyService.prototype = {
         // TODO: check this, seems sketchy.
         if (originHost == "browser") {
           return this.accept(
-              "Original request by the user or other good explanation "
-                  + "(i.e. entered in the address bar, new tab opened, etc.)",
-              arguments);
+              "User action (e.g. address entered in address bar) or other good "
+                  + "explanation (e.g. new tab opened)", arguments);
         }
 
         if (destHost == originHost) {

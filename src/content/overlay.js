@@ -54,12 +54,18 @@ var csrPolicyOverlay = {
     }
 
     // Find all form tags and add submit events.
-    // TODO: This may require another approach to ensure that javascript hasn't
-    // initiated the submission.
+    // As far as I can tell, calling a form's submit() method from javascript
+    // will not cause this event listener to fire, which makes things easier in
+    // that we don't have to find another way to tell if the user submitted the
+    // form or if it was done by javascript. However, I'm not sure on the
+    // specifics of why submit() from javascript doesn't end up calling this. I
+    // can only conclude it's the same difference as with link clicks by humans
+    // vs. click(), but that the docmentation just doesn't state this.
     var formTags = document.getElementsByTagName("form");
     for (var i = 0; i < formTags.length; i++) {
       formTags[i].addEventListener("submit", function(e) {
-            csrPolicy.registerFormSubmitted(e.target);
+            csrPolicy.registerFormSubmitted(e.target.ownerDocument.URL,
+                e.target.action);
           }, false);
     }
 

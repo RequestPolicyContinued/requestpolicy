@@ -20,7 +20,7 @@ Logger = new function() {
 
   this.TYPE_NAMES = {};
   this.TYPE_NAMES[this.TYPE_CONTENT + ""] = "CONTENT";
-  //this.TYPE_NAMES[this.TYPE_CONTENT_BLOCK + ""] = "CONTENT_BLOCKED";
+  // this.TYPE_NAMES[this.TYPE_CONTENT_BLOCK + ""] = "CONTENT_BLOCKED";
   this.TYPE_NAMES[this.TYPE_META_REFRESH + ""] = "META_REFRESH";
   this.TYPE_NAMES[this.TYPE_HEADER_REDIRECT + ""] = "HEADER_REDIRECT";
   this.TYPE_NAMES[this.TYPE_INTERNAL + ""] = "INTERNAL";
@@ -58,3 +58,10 @@ Logger.warning = function(type, message) {
 Logger.info = function(type, message) {
   this._doLog(this.LEVEL_INFO, type, message);
 };
+
+Logger.vardump = function(obj) {
+  this.info(this.TYPE_INTERNAL, "Properties of object:");
+  for (var i in obj) {
+    this.info(this.TYPE_INTERNAL, "    => key: " + i + " / value: " + obj[i]);
+  }
+}

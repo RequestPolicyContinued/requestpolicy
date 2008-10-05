@@ -84,11 +84,27 @@ CsrPolicyService.prototype = {
   // nsICSRPolicy interface
   // /////////////////////////////////////////////////////////////////////////
 
+  submittedForms : {},
+
   clickedLinks : {},
 
-  registerFormSubmitted : function registerFormSubmitted(element) {
-    // TODO: implement
-    Logger.info(Logger.TYPE_INTERNAL, "Form submitted: " + element);
+  registerFormSubmitted : function registerFormSubmitted(originUrl,
+      destinationUrl) {
+    Logger.info(Logger.TYPE_INTERNAL, "Form submitted from <" + originUrl
+            + "> to <" + destinationUrl + ">.");
+
+    // Drop the query string from the destination url because form GET requests
+    // will end up with a query string on them when shouldLoad is called, so
+    // we'll need to be dropping the query string there.
+    destinationUrl = destinationUrl.split("?")[0];
+
+    if (this.submittedForms[originUrl] == undefined) {
+      this.submittedForms[originUrl] = {};
+    }
+    if (this.submittedForms[originUrl][destinationUrl] == undefined) {
+      // TODO: See TODO for registerLinkClicked.
+      this.submittedForms[originUrl][destinationUrl] = true;
+    }
   },
 
   registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
@@ -315,8 +331,20 @@ CsrPolicyService.prototype = {
             // click, need a way to remove it but not immediately or figure out
             // why there are multiple calls.
             // delete this.clickedLinks[origin][dest];
-            return this.accept("User-initiated request.", arguments);
+            return this.accept("User-initiated request by link click.",
+                arguments);
+
+          } else if (this.submittedForms[origin]
+              && this.submittedForms[origin][dest.split("?")[0]]) {
+            // Note: we dropped the query string from the dest because form GET
+            // requests will have that added on here but the original action of
+            // the form may not have had it.
+            return this.accept("User-initiated request by form submission.",
+                arguments);
           }
+          Logger.vardump(this.submittedForms);
+          Logger.vardump(this.submittedForms[origin]);
+          Logger.info(Logger.TYPE_INTERNAL, "testing\n\n\n\n");
         }
 
         var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost

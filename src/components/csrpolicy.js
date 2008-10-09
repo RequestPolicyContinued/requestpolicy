@@ -437,11 +437,8 @@ CsrPolicyService.prototype = {
 
         if (aContext instanceof CI.nsIDOMXULElement) {
           if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
-            // TODO: multiple calls to shouldLoad seem to be made for each link
-            // click, need a way to remove it but not immediately or figure out
-            // why there are multiple calls.
-            // delete this._clickedLinks[origin][dest];
-            return this.accept("User-initiated request by link click.",
+            delete this._clickedLinks[origin][dest];
+            return this.accept("User-initiated request by link click",
                 arguments);
 
           } else if (this._submittedForms[origin]
@@ -449,7 +446,8 @@ CsrPolicyService.prototype = {
             // Note: we dropped the query string from the dest because form GET
             // requests will have that added on here but the original action of
             // the form may not have had it.
-            return this.accept("User-initiated request by form submission.",
+            delete this._submittedForms[origin][dest.split("?")[0]];
+            return this.accept("User-initiated request by form submission",
                 arguments);
           }
         }

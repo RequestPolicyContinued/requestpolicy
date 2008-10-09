@@ -16,6 +16,7 @@ Logger = new function() {
   this.LEVEL_SEVERE = 1000;
   this.LEVEL_WARNING = 900;
   this.LEVEL_INFO = 800;
+  this.LEVEL_DEBUG = 700;
   this.LEVEL_ALL = Number.MIN_VALUE; // log everything
 
   this.TYPE_NAMES = {};
@@ -30,8 +31,11 @@ Logger = new function() {
   this.LEVEL_NAMES[this.LEVEL_SEVERE + ""] = "SEVERE";
   this.LEVEL_NAMES[this.LEVEL_WARNING + ""] = "WARNING";
   this.LEVEL_NAMES[this.LEVEL_INFO + ""] = "INFO";
+  this.LEVEL_NAMES[this.LEVEL_DEBUG + ""] = "DEBUG";
 
-  this.logLevel = this.LEVEL_ALL;
+  //this.logLevel = this.LEVEL_ALL;
+  
+  this.logLevel = this.LEVEL_INFO;
 
   // var logTypes = Logger.TYPE_ERROR | Logger.TYPE_HEADER_REDIRECT
   // | Logger.TYPE_INTERNAL;
@@ -57,6 +61,10 @@ Logger.warning = function(type, message) {
 
 Logger.info = function(type, message) {
   this._doLog(this.LEVEL_INFO, type, message);
+};
+
+Logger.debug = function(type, message) {
+  this._doLog(this.LEVEL_DEBUG, type, message);
 };
 
 Logger.vardump = function(obj) {

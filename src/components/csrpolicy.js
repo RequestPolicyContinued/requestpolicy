@@ -16,6 +16,7 @@ const CP_OK = CI.nsIContentPolicy.ACCEPT;
 const CP_NOP = function() {
   return CP_OK;
 };
+const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 
 function loadLibraries() {
   // Wasn't able to define a resource in chrome.manifest, so need to use file
@@ -81,12 +82,37 @@ CsrPolicyService.prototype = {
   VERSION : "0.1",
 
   // /////////////////////////////////////////////////////////////////////////
-  // nsICSRPolicy interface
+  // Variables
   // /////////////////////////////////////////////////////////////////////////
 
-  submittedForms : {},
+  _submittedForms : {},
 
-  clickedLinks : {},
+  _clickedLinks : {},
+
+  /**
+   * Number of elapsed milliseconds from the time of the last shouldLoad() call
+   * at which the cached results of the last shouldLoad() call are discarded.
+   * 
+   * @type Number
+   */
+  _lastShouldLoadCheckTimeout : 100,
+
+  // Calls to shouldLoad appear to be repeated, so successive repeated calls and
+  // their result (accept or reject) are tracked to avoid duplicate processing
+  // and duplicate logging.
+  /**
+   * Object that caches the last shouldLoad
+   */
+  _lastShouldLoadCheck : {
+    "origin" : null,
+    "destination" : null,
+    "time" : 0,
+    "result" : null
+  },
+
+  // /////////////////////////////////////////////////////////////////////////
+  // nsICSRPolicy interface
+  // /////////////////////////////////////////////////////////////////////////
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
@@ -98,12 +124,12 @@ CsrPolicyService.prototype = {
     // we'll need to be dropping the query string there.
     destinationUrl = destinationUrl.split("?")[0];
 
-    if (this.submittedForms[originUrl] == undefined) {
-      this.submittedForms[originUrl] = {};
+    if (this._submittedForms[originUrl] == undefined) {
+      this._submittedForms[originUrl] = {};
     }
-    if (this.submittedForms[originUrl][destinationUrl] == undefined) {
+    if (this._submittedForms[originUrl][destinationUrl] == undefined) {
       // TODO: See TODO for registerLinkClicked.
-      this.submittedForms[originUrl][destinationUrl] = true;
+      this._submittedForms[originUrl][destinationUrl] = true;
     }
   },
 
@@ -111,10 +137,10 @@ CsrPolicyService.prototype = {
     Logger.info(Logger.TYPE_INTERNAL, "Link clicked from <" + originUrl
             + "> to <" + destinationUrl + ">.");
 
-    if (this.clickedLinks[originUrl] == undefined) {
-      this.clickedLinks[originUrl] = {};
+    if (this._clickedLinks[originUrl] == undefined) {
+      this._clickedLinks[originUrl] = {};
     }
-    if (this.clickedLinks[originUrl][destinationUrl] == undefined) {
+    if (this._clickedLinks[originUrl][destinationUrl] == undefined) {
       // TODO: Possibly set the value to a timestamp that can be used elsewhere
       // to determine if this is a recent click. This is probably necessary as
       // multiple calls to shouldLoad get made and we need a way to allow
@@ -122,9 +148,9 @@ CsrPolicyService.prototype = {
       // be in order (repeats are always the same as the last), the last one
       // could be tracked and always allowed (or allowed within a small period
       // of time). This would have the advantage that we could delete items from
-      // the clickedLinks object. One of these approaches would also reduce log
+      // the _clickedLinks object. One of these approaches would also reduce log
       // clutter, which would be good.
-      this.clickedLinks[originUrl][destinationUrl] = true;
+      this._clickedLinks[originUrl][destinationUrl] = true;
     }
   },
 
@@ -241,6 +267,14 @@ CsrPolicyService.prototype = {
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
+
+    var date = new Date();
+    this._lastShouldLoadCheck.time = date.getMilliseconds();
+    this._lastShouldLoadCheck.destination = args[1].spec;
+    this._lastShouldLoadCheck.origin = args[2].spec;
+    this._lastShouldLoadCheck.result = CP_REJECT;
+
+    return CP_REJECT;
   },
 
   // We only call this from shouldLoad when the request was a remote request
@@ -256,7 +290,91 @@ CsrPolicyService.prototype = {
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
+
+    var date = new Date();
+    this._lastShouldLoadCheck.time = date.getMilliseconds();
+    this._lastShouldLoadCheck.destination = args[1].spec;
+    this._lastShouldLoadCheck.origin = args[2].spec;
+    this._lastShouldLoadCheck.result = CP_OK;
+
     return CP_OK;
+  },
+
+  /**
+   * Determines if a request is only related to internal resources.
+   * 
+   * @param {}
+   *            aContentLocation
+   * @param {}
+   *            aRequestOrigin
+   * @return {Boolean} true if the request is only related to internal
+   *         resources.
+   */
+  _isInternalRequest : function(aContentLocation, aRequestOrigin) {
+    // Not cross-site requests.
+    if (aContentLocation.scheme == "resource"
+        || aContentLocation.scheme == "about"
+        || aContentLocation.scheme == "data"
+        || aContentLocation.scheme == "chrome"
+        || aContentLocation.scheme == "moz-icon") {
+      return true;
+    }
+
+    // TODO: Identify when aRequestOrigin is not set.
+    if (aRequestOrigin == undefined || aRequestOrigin == null) {
+      return true;
+    }
+
+    // Javascript skills lacking. There must be a nicer way to find out
+    // parameter 'asciiHost' isn't there.
+    try {
+      aRequestOrigin.asciiHost;
+      aContentLocation.asciiHost;
+    } catch (e) {
+      Logger.info(Logger.TYPE_CONTENT,
+          "No asciiHost on either aRequestOrigin <" + aRequestOrigin.spec
+              + "> or aContentLocation <" + aContentLocation.spec + ">");
+      return true;
+
+    }
+
+    var destHost = aContentLocation.asciiHost;
+
+    // "global" dest are [some sort of interal requests]
+    // "browser" dest are [???]
+    if (destHost == "global" || destHost == "browser") {
+      return true;
+    }
+
+    return false;
+  },
+
+  /**
+   * Determines if a request is a duplicate of the last call to shouldLoad(). If
+   * it is, the cached result in _lastShouldLoadCheck.result can be used. Not
+   * sure why, it seems that there are duplicates so using this simple cache of
+   * the last call to shouldLoad() keeps duplicates out of log data.
+   * 
+   * @param {}
+   *            aContentLocation
+   * @param {}
+   *            aRequestOrigin
+   * @return {Boolean} true if the request a duplicate.
+   */
+  _isDuplicateRequest : function(aContentLocation, aRequestOrigin) {
+    var date = new Date();
+    if (date.getMilliseconds() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
+      if (this._lastShouldLoadCheck.origin == aRequestOrigin.spec
+          && this._lastShouldLoadCheck.destination == aContentLocation.spec) {
+        Logger.debug(Logger.TYPE_INTERNAL,
+            "Using cached shouldLoad() result of "
+                + this._lastShouldLoadCheck.result + " for request to <"
+                + aContentLocation.spec + "> from <" + aRequestOrigin.spec
+                + ">.");
+        return true;
+      }
+    }
+    return false;
   },
 
   // the content policy that does something useful
@@ -268,47 +386,21 @@ CsrPolicyService.prototype = {
         aContext, aMimeTypeGuess, aInternalCall) {
       try {
 
-        arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
-            aMimeTypeGuess, aInternalCall]
-
-        // Not cross-site requests.
-        if (aContentLocation.scheme == "resource"
-            || aContentLocation.scheme == "about"
-            || aContentLocation.scheme == "data"
-            || aContentLocation.scheme == "chrome"
-            || aContentLocation.scheme == "moz-icon") {
+        if (this._isInternalRequest(aContentLocation, aRequestOrigin)) {
           return CP_OK;
         }
 
-        // TODO: Determine if this really is ok. The assumption for
-        // now is that if there is no request origin, then it was an initial
-        // user request (e.g. typed in the address bar).
-        // if (!aRequestOrigin) {
-        // return this.accept("No aRequestOrigin, assuming user-entered url",
-        // arguments);
-        // }
-
-        // javascript skills lacking. must be a better way to find out parameter
-        // 'asciiHost' isn't there.
-        try {
-          aRequestOrigin.asciiHost;
-          aContentLocation.asciiHost;
-        } catch (e) {
-          return this.accept("No asciiHost on either aRequestOrigin <"
-                  + aRequestOrigin.spec + "> or aContentLoc[ation <"
-                  + aContentLocation.spec + ">", arguments);
+        if (this._isDuplicateRequest(aContentLocation, aRequestOrigin)) {
+          return this._lastShouldLoadCheck.result;
         }
+
+        arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
+            aMimeTypeGuess, aInternalCall]
 
         var origin = aRequestOrigin.spec;
         var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
-
-        // "global" dest are [some sort of interal requests]
-        // "browser" dest are [???]
-        if (destHost == "global" || destHost == "browser") {
-          return CP_OK;
-        }
 
         // "browser" origin requests for things like favicon.ico and possibly
         // original request
@@ -316,7 +408,7 @@ CsrPolicyService.prototype = {
         if (originHost == "browser") {
           return this.accept(
               "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new tab opened)", arguments);
+                  + "explanation (e.g. new window/tab opened)", arguments);
         }
 
         if (destHost == originHost) {
@@ -326,25 +418,22 @@ CsrPolicyService.prototype = {
         }
 
         if (aContext instanceof CI.nsIDOMXULElement) {
-          if (this.clickedLinks[origin] && this.clickedLinks[origin][dest]) {
+          if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
             // TODO: multiple calls to shouldLoad seem to be made for each link
             // click, need a way to remove it but not immediately or figure out
             // why there are multiple calls.
-            // delete this.clickedLinks[origin][dest];
+            // delete this._clickedLinks[origin][dest];
             return this.accept("User-initiated request by link click.",
                 arguments);
 
-          } else if (this.submittedForms[origin]
-              && this.submittedForms[origin][dest.split("?")[0]]) {
+          } else if (this._submittedForms[origin]
+              && this._submittedForms[origin][dest.split("?")[0]]) {
             // Note: we dropped the query string from the dest because form GET
             // requests will have that added on here but the original action of
             // the form may not have had it.
             return this.accept("User-initiated request by form submission.",
                 arguments);
           }
-          Logger.vardump(this.submittedForms);
-          Logger.vardump(this.submittedForms[origin]);
-          Logger.info(Logger.TYPE_INTERNAL, "testing\n\n\n\n");
         }
 
         var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost
@@ -376,8 +465,11 @@ CsrPolicyService.prototype = {
         return this.reject("hosts don't match", arguments);
 
       } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR, "Content (Fatal Error, " + e + ")");
-        // TODO: log stack trace
+        Logger.severe(Logger.TYPE_ERROR, "Fatal Error, " + e + ", stack was: "
+                + e.stack);
+        Logger.severe(Logger.TYPE_CONTENT,
+            "Rejecting request due to internal error.");
+        return CP_REJECT;
       }
 
     } // end shouldLoad

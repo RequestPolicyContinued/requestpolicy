@@ -5,6 +5,20 @@ const CC = Components.classes;
 
 var DomainUtils = {};
 
+DomainUtils._ios = CC["@mozilla.org/network/io-service;1"]
+    .getService(CI.nsIIOService);
+
+/**
+ * Returns the hostname from a uri string.
+ * 
+ * @param {String}
+ *            uri The uri.
+ * @return {String} The hostname of the uri.
+ */
+DomainUtils.getHost = function(uri) {
+  return this._ios.newURI(uri, null, null).host;
+};
+
 /**
  * Strips any "www." from the beginning of a hostname.
  * 
@@ -27,8 +41,7 @@ DomainUtils.stripWww = function(hostname) {
  *         false otherwise.
  */
 DomainUtils.sameHostIgnoreWww = function(destinationHost, originHost) {
-  return DomainUtils.stripWww(destinationHost) == DomainUtils
-      .stripWww(originHost);
+  return this.stripWww(destinationHost) == this.stripWww(originHost);
 
 };
 
@@ -48,8 +61,8 @@ DomainUtils.sameHostIgnoreWww = function(destinationHost, originHost) {
  */
 DomainUtils.destinationIsSubdomainOfOrigin = function(destinationHost,
     originHost) {
-  var destHostNoWww = DomainUtils.stripWww(destinationHost);
-  var originHostNoWww = DomainUtils.stripWww(originHost);
+  var destHostNoWww = this.stripWww(destinationHost);
+  var originHostNoWww = this.stripWww(originHost);
 
   var lengthDifference = destHostNoWww.length - originHostNoWww.length;
   if (lengthDifference > 1) {

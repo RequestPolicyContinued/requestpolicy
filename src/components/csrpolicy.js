@@ -164,8 +164,6 @@ CsrPolicyService.prototype = {
 
       // TODO: Allow Location header based on policy.
 
-      // TODO: Allow subdomains or www.
-
       // TODO: Remove Refresh header, treat it like meta refresh. Refresh
       // headers may be ignored by firefox, but probably good to remove them if
       // they exist for future-proofing and bug-proofing.
@@ -173,23 +171,42 @@ CsrPolicyService.prototype = {
       var httpChannel = subject
           .QueryInterface(Components.interfaces.nsIHttpChannel);
       try {
-        // If there is no Location header, an NS_ERROR_NOT_AVAILABLE is thrown.
-        // If there is more than one Location header, the last one is the one
-        // that will be used.
-        var locationHeader = httpChannel.getResponseHeader("Location");
-        var requestUri = httpChannel.name;
+        // If there is no Location header, getResponseHeader will throw
+        // NS_ERROR_NOT_AVAILABLE. If there is more than one Location header,
+        // the last one is the one that will be used.
+        var dest = httpChannel.getResponseHeader("Location");
+        var origin = httpChannel.name;
+
         Logger.info(Logger.TYPE_HEADER_REDIRECT, "Found 'Location' header to <"
-                + locationHeader + ">" + " in response from <" + requestUri
-                + ">");
+                + dest + ">" + " in response from <" + origin + ">");
+
+        var destHost = DomainUtils.getHost(dest);
+        var originHost = DomainUtils.getHost(origin);
+
+        if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+              "** ALLOWED ** www-similar hosts. To <" + dest + "> " + "from <"
+                  + origin + ">");
+          return;
+        }
+
+        if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+              "** ALLOWED ** dest is subdomain of origin. To <" + dest + "> "
+                  + "from <" + origin + ">");
+          return;
+        }
+
+        // The location header isn't allowed, so remove it.
         try {
           httpChannel.setResponseHeader("Location", "", false);
           Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "BLOCKED 'Location' header to <" + locationHeader + ">"
-                  + " found in response from <" + requestUri + ">");
+              "** BLOCKED ** 'Location' header to <" + dest + ">"
+                  + " found in response from <" + origin + ">");
         } catch (e) {
           Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing "
-                  + "'Location' header to <" + locationHeader + ">"
-                  + "  in response from <" + requestUri + ">." + e);
+                  + "'Location' header to <" + dest + ">"
+                  + "  in response from <" + origin + ">." + e);
         }
       } catch (e) {
         // No location header.

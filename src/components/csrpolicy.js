@@ -42,6 +42,7 @@ function loadLibraries() {
   Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
   Components.utils.import("resource://csrpolicy/Logger.jsm");
   Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
+  Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
 }
 
 // Use the new-fangled FF3 module, etc. generation.
@@ -436,32 +437,16 @@ CsrPolicyService.prototype = {
           }
         }
 
-        var originHostNoWWW = originHost.indexOf('www.') == 0 ? originHost
-            .substring(4) : originHost;
-        var destHostNoWWW = destHost.indexOf('www.') == 0 ? destHost
-            .substring(4) : destHost;
-
-        // if these were both the same domain if you ignore any www, then
-        // allow it
-        if (originHostNoWWW == destHostNoWWW) {
+        if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
           return this.accept("www-similar hosts", arguments);
         }
 
-        // if the origin without any www if the final part of the
-        // destination, then allow it. note that we don't allow the other way
-        // around. that is, www.example.com or example.com can request to
-        // images.example.com, but images.example.com can't request to
-        // www.example.com or example.com
-        var lengthDifference = destHostNoWWW.length - originHostNoWWW.length
-        if (lengthDifference > 1) {
-          if (destHostNoWWW.substring(lengthDifference - 1) == '.'
-              + originHostNoWWW) {
-            return this.accept("dest is subdomain of origin", arguments);
-          }
+        if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
+          return this.accept("dest is subdomain of origin", arguments);
         }
 
-        // if we didn't match any of the conditions in which to allow the
-        // request, then reject it.
+        // We didn't match any of the conditions in which to allow the request,
+        // so reject it.
         return this.reject("hosts don't match", arguments);
 
       } catch (e) {

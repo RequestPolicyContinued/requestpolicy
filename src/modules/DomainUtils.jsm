@@ -41,7 +41,8 @@ DomainUtils.stripWww = function(hostname) {
  *         false otherwise.
  */
 DomainUtils.sameHostIgnoreWww = function(destinationHost, originHost) {
-  return this.stripWww(destinationHost) == this.stripWww(originHost);
+  return destinationHost
+      && this.stripWww(destinationHost) == this.stripWww(originHost);
 
 };
 

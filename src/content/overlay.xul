@@ -4,7 +4,7 @@
 <!DOCTYPE overlay SYSTEM "chrome://csrpolicy/locale/csrpolicy.dtd">
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	id="csrPolicyOverlay">
+	id="csrpolicyOverlay">
 	
 	<script type="application/x-javascript" src="overlay.js" />
 
@@ -14,7 +14,7 @@
 				<menupopup>
 					<menuitem 
 						label="&csrpolicyAllowOriginTemporarily;"
-						oncommand="csrPolicyOverlay.allowOriginTemporarily();" />
+						oncommand="csrpolicyOverlay.allowOriginTemporarily();" />
 				</menupopup>
 			</menu>
 		</statusbarpanel>

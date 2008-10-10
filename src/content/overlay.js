@@ -4,24 +4,24 @@ Components.utils.import("resource://csrpolicy/Logger.jsm");
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-var csrPolicyOverlay = {
+var csrpolicyOverlay = {
 
-  csrPolicy : null,
+  csrpolicy : null,
 
   init : function() {
-    this.csrPolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
+    this.csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
         .getService(CI.nsICSRPolicy);
   },
 
   onDOMContentLoaded : function(e) {
 
     // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
-    // new links/forms with csrPolicy even if they are added after initial
+    // new links/forms with csrpolicy even if they are added after initial
     // load (e.g. they are added through javascript).
 
     var document = e.target;
 
-    var csrPolicy = this.csrPolicy;
+    var csrpolicy = this.csrpolicy;
 
     // Disable meta redirects. This gets called on every DOMContentLoaded
     // but it may not need to be if there's a way to do it based on a
@@ -48,7 +48,7 @@ var csrPolicyOverlay = {
     var anchorTags = document.getElementsByTagName("a");
     for (var i = 0; i < anchorTags.length; i++) {
       anchorTags[i].addEventListener("click", function(e) {
-            csrPolicy.registerLinkClicked(e.target.ownerDocument.URL,
+            csrpolicy.registerLinkClicked(e.target.ownerDocument.URL,
                 e.target.href);
           }, false);
     }
@@ -64,7 +64,7 @@ var csrPolicyOverlay = {
     var formTags = document.getElementsByTagName("form");
     for (var i = 0; i < formTags.length; i++) {
       formTags[i].addEventListener("submit", function(e) {
-            csrPolicy.registerFormSubmitted(e.target.ownerDocument.URL,
+            csrpolicy.registerFormSubmitted(e.target.ownerDocument.URL,
                 e.target.action);
           }, false);
     }
@@ -84,8 +84,8 @@ var csrPolicyOverlay = {
    * contentAreaContextMenu.
    */
   _contextMenuOnPopShowing : function() {
-    // gContextMenu.showItem("csrPolicyTest", true);
-    csrPolicyOverlay.wrapOpenLinkFunctions();
+    // gContextMenu.showItem("csrpolicyTest", true);
+    csrpolicyOverlay.wrapOpenLinkFunctions();
   },
 
   /**
@@ -94,12 +94,12 @@ var csrPolicyOverlay = {
    * link/window functions are executed.
    */
   wrapOpenLinkFunctions : function() {
-    var csrPolicy = this.csrPolicy;
+    var csrpolicy = this.csrpolicy;
 
     if (!gContextMenu.origOpenLinkInTab) {
       gContextMenu.origOpenLinkInTab = gContextMenu.openLinkInTab;
       gContextMenu.openLinkInTab = function() {
-        csrPolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+        csrpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
             gContextMenu.link.href);
         return gContextMenu.origOpenLinkInTab();
       };
@@ -115,19 +115,19 @@ var csrPolicyOverlay = {
 
 };
 
-csrPolicyOverlay.allowOriginTemporarily = function() {
+csrpolicyOverlay.allowOriginTemporarily = function() {
   // TODO: implement
   alert("Not implemented.");
 };
 
 addEventListener("DOMContentLoaded", function(e) {
-      csrPolicyOverlay.init();
-      csrPolicyOverlay.onDOMContentLoaded(e);
+      csrpolicyOverlay.init();
+      csrpolicyOverlay.onDOMContentLoaded(e);
     }, false);
 
 // "load" is called first. "DOMContentLoaded" is called later (when the DOM can
 // be accessed).
 
 // addEventListener("load", function(e) {
-// csrPolicyOverlay.onLoad(e);
+// csrpolicyOverlay.onLoad(e);
 // }, false);

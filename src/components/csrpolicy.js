@@ -27,8 +27,6 @@ function loadLibraries() {
   // because at this point chrome.manifest hasn't been loaded yet. See
   // http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
   // for more info.
-  // TODO(justin): remove this and have code wait until after app startup,
-  // so using chrome.manifest instead of this but just waiting until it's ready.
   var ioService = Components.classes["@mozilla.org/network/io-service;1"]
       .getService(Components.interfaces.nsIIOService);
   var resProt = ioService.getProtocolHandler("resource")
@@ -49,9 +47,7 @@ function loadLibraries() {
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 function CsrPolicyService() {
-  loadLibraries();
   this.wrappedJSObject = this;
-  this.initContentPolicy();
 }
 
 CsrPolicyService.prototype = {
@@ -213,6 +209,8 @@ CsrPolicyService.prototype = {
       }
 
     } else if (topic == "app-startup") {
+      loadLibraries();
+      this.initContentPolicy();
 
       // Register observer for http-on-examine-response.
       var os = Components.classes["@mozilla.org/observer-service;1"]

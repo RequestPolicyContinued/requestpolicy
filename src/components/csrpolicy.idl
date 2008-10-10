@@ -8,4 +8,10 @@ interface nsICSRPolicy : nsISupports
   void registerFormSubmitted(in ACString originUrl, in ACString destinationUrl);
   
   void registerLinkClicked(in ACString originUrl, in ACString destinationUrl);
+  
+  void temporarilyAllowOriginHost(in ACString host);
+  
+  void revokeTemporarilyAllowedOriginHost(in ACString host);
+  
+  boolean isTemporarilyAllowedOriginHost(in ACString host);
 };  

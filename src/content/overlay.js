@@ -1,4 +1,5 @@
 Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
+Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
 Components.utils.import("resource://csrpolicy/Logger.jsm");
 
 const CI = Components.interfaces;
@@ -115,9 +116,12 @@ var csrpolicyOverlay = {
 
 };
 
-csrpolicyOverlay.allowOriginTemporarily = function() {
-  // TODO: implement
-  alert("Not implemented.");
+csrpolicyOverlay.allowOriginTemporarily = function(e) {
+  // Note: the available variable "content" is different than the avaialable
+  // "window.target".
+  this.csrpolicy.temporarilyAllowOriginHost(DomainUtils
+      .getHost(content.document.documentURI));
+  content.document.location.reload(true);
 };
 
 addEventListener("DOMContentLoaded", function(e) {

@@ -107,6 +107,8 @@ CsrPolicyService.prototype = {
     "result" : null
   },
 
+  _temporarilyAllowedSites : {},
+
   // /////////////////////////////////////////////////////////////////////////
   // nsICSRPolicy interface
   // /////////////////////////////////////////////////////////////////////////
@@ -149,6 +151,21 @@ CsrPolicyService.prototype = {
       // clutter, which would be good.
       this._clickedLinks[originUrl][destinationUrl] = true;
     }
+  },
+
+  temporarilyAllowOriginHost : function temporarilyAllowOriginHost(host) {
+    this._temporarilyAllowedSites[host] = true;
+  },
+
+  revokeTemporarilyAllowedOriginHost : function revokeTemporarilyAllowedOriginHost(
+      host) {
+    if (this._temporarilyAllowedSites[host]) {
+      delete this._temporarilyAllowedSites[host];
+    }
+  },
+
+  isTemporarilyAllowedOriginHost : function isTemporarilyAllowedOriginHost(host) {
+    return this._temporarilyAllowedSites[host] ? true : false;
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -423,6 +440,10 @@ CsrPolicyService.prototype = {
         var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
+
+        if (this.isTemporarilyAllowedOriginHost(originHost)) {
+          return this.accept("Temporarily allowed origin host.", arguments);
+        }
 
         // "browser" origin requests for things like favicon.ico and possibly
         // original request

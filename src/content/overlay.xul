@@ -14,7 +14,7 @@
 				<menupopup>
 					<menuitem 
 						label="&csrpolicyAllowOriginTemporarily;"
-						oncommand="csrpolicyOverlay.allowOriginTemporarily();" />
+						oncommand="csrpolicyOverlay.allowOriginTemporarily(event);" />
 				</menupopup>
 			</menu>
 		</statusbarpanel>

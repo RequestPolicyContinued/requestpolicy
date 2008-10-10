@@ -3,6 +3,7 @@
 #skin       csrpolicy    classic/1.0    jar:chrome/csrpolicy.jar!/skin/
 
 content    csrpolicy    content/
-locale     csrpolicy    en-US          locale/en-US/
 skin       csrpolicy    classic/1.0    skin/
 overlay    chrome://browser/content/browser.xul    chrome://csrpolicy/content/overlay.xul
+
+locale     csrpolicy    en-US          locale/en-US/

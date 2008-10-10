@@ -115,6 +115,11 @@ var csrPolicyOverlay = {
 
 };
 
+csrPolicyOverlay.allowOriginTemporarily = function() {
+  // TODO: implement
+  alert("Not implemented.");
+};
+
 addEventListener("DOMContentLoaded", function(e) {
       csrPolicyOverlay.init();
       csrPolicyOverlay.onDOMContentLoaded(e);

@@ -1,9 +1,23 @@
 <?xml version="1.0"?>
+
 <?xml-stylesheet href="chrome://csrpolicy/skin/csrpolicy.css" type="text/css"?>
-<!DOCTYPE overlay SYSTEM "chrome://csrpolicy/locale/en-US/csrpolicy.dtd">
+<!DOCTYPE overlay SYSTEM "chrome://csrpolicy/locale/csrpolicy.dtd">
+
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	id="csrPolicyOverlay">
 	
-	<script type="application/x-javascript" src="overlay.js"/>
+	<script type="application/x-javascript" src="overlay.js" />
+
+	<statusbar id="status-bar">
+		<statusbarpanel>
+			<menu label="&csrpolicyStatusbarLabel;">
+				<menupopup>
+					<menuitem 
+						label="&csrpolicyAllowOriginTemporarily;"
+						oncommand="csrPolicyOverlay.allowOriginTemporarily();" />
+				</menupopup>
+			</menu>
+		</statusbarpanel>
+	</statusbar>
 
 </overlay>

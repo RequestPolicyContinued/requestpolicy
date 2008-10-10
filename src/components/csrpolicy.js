@@ -329,6 +329,12 @@ CsrPolicyService.prototype = {
    *         resources.
    */
   _isInternalRequest : function(aContentLocation, aRequestOrigin) {
+    // Note: Don't OK the origin scheme "moz-nullprincipal" without further
+    // understanding. It appears to be the source when test8.html is used. That
+    // is, javascript redirect to a "javascript:" url that creates the entire
+    // page's content which includes a form that it submits. Maybe
+    // "moz-nullprincipal" always shows up when using "document.location"?
+
     // Not cross-site requests.
     if (aContentLocation.scheme == "resource"
         || aContentLocation.scheme == "about"

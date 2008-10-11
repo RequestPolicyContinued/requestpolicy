@@ -5,25 +5,40 @@ Components.utils.import("resource://csrpolicy/Logger.jsm");
 const CI = Components.interfaces;
 const CC = Components.classes;
 
+/**
+ * Provides functionality for the overlay. An instance of this class exists for
+ * each tab/window.
+ */
 var csrpolicyOverlay = {
-
+  _initialized : false,
   _csrpolicy : null,
-
   _strbundle : null,
 
+  /**
+   * Initialize the object. This must be done after the DOM is loaded.
+   */
   init : function() {
-    this._csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
-        .getService(CI.nsICSRPolicy);
-    this._strbundle = document.getElementById("csrpolicyStrings");
+    if (this._initialized == false) {
+      this._csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
+          .getService(CI.nsICSRPolicy);
+      this._strbundle = document.getElementById("csrpolicyStrings");
+      this._initialized = true;
+    }
   },
 
-  onDOMContentLoaded : function(e) {
+  /**
+   * Perform the actions required once the DOM is loaded.
+   * 
+   * @param {Event}
+   *            event
+   */
+  onDOMContentLoaded : function(event) {
 
     // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
     // new links/forms with csrpolicy even if they are added after initial
     // load (e.g. they are added through javascript).
 
-    var document = e.target;
+    var document = event.target;
 
     const csrpolicy = this._csrpolicy;
 
@@ -51,9 +66,9 @@ var csrpolicyOverlay = {
     // http://developer.mozilla.org/en/DOM/element.click
     var anchorTags = document.getElementsByTagName("a");
     for (var i = 0; i < anchorTags.length; i++) {
-      anchorTags[i].addEventListener("click", function(e) {
-            csrpolicy.registerLinkClicked(e.target.ownerDocument.URL,
-                e.target.href);
+      anchorTags[i].addEventListener("click", function(event) {
+            csrpolicy.registerLinkClicked(event.target.ownerDocument.URL,
+                event.target.href);
           }, false);
     }
 
@@ -67,9 +82,9 @@ var csrpolicyOverlay = {
     // vs. click(), but that the docmentation just doesn't state this.
     var formTags = document.getElementsByTagName("form");
     for (var i = 0; i < formTags.length; i++) {
-      formTags[i].addEventListener("submit", function(e) {
-            csrpolicy.registerFormSubmitted(e.target.ownerDocument.URL,
-                e.target.action);
+      formTags[i].addEventListener("submit", function(event) {
+            csrpolicy.registerFormSubmitted(event.target.ownerDocument.URL,
+                event.target.action);
           }, false);
     }
 
@@ -88,8 +103,7 @@ var csrpolicyOverlay = {
    * contentAreaContextMenu.
    */
   _contextMenuOnPopShowing : function() {
-    // gContextMenu.showItem("csrpolicyTest", true);
-    csrpolicyOverlay.wrapOpenLinkFunctions();
+    csrpolicyOverlay._wrapOpenLinkFunctions();
   },
 
   /**
@@ -97,7 +111,7 @@ var csrpolicyOverlay = {
    * such that they first call our own functions before the original open in new
    * link/window functions are executed.
    */
-  wrapOpenLinkFunctions : function() {
+  _wrapOpenLinkFunctions : function() {
     const csrpolicy = this._csrpolicy;
 
     if (!gContextMenu.origOpenLinkInTab) {
@@ -115,80 +129,109 @@ var csrpolicyOverlay = {
         return gContextMenu.origOpenLink();
       };
     }
+  },
+
+  /**
+   * Called before the statusbar menu is shown.
+   * 
+   * @param {Event}
+   *            event
+   */
+  onMenuShowing : function(event) {
+    if (event.currentTarget != event.originalTarget) {
+      return;
+    }
+    this.prepareMenu();
+  },
+
+  /**
+   * Determines the current document's hostname without the "www.".
+   * 
+   * @return {String} The current document's hostname without any leading
+   *         "www.".
+   */
+  _getCurrentHostWithoutWww : function _getCurrentHostWithoutWww() {
+    var host = DomainUtils.getHost(content.document.documentURI);
+    return DomainUtils.stripWww(host);
+  },
+
+  /**
+   * Prepares the statusbar menu based on the user's settings and the current
+   * document.
+   */
+  prepareMenu : function() {
+    // TODO: This is broken for schemes that don't have host values (e.g.
+    // "file")
+    var host = this._getCurrentHostWithoutWww();
+
+    var itemAllowOriginTemporarily = document
+        .getElementById("csrpolicyAllowOriginTemporarily");
+    // var itemAllowOriginPermanently = document
+    // .getElementById("csrpolicyAllowOriginPermanently");
+    var itemRevokeOrigin = document.getElementById("csrpolicyRevokeOrigin");
+
+    if (this._csrpolicy.isTemporarilyAllowedOriginHost(host)) {
+      itemRevokeOrigin.label = this._strbundle.getFormattedString(
+          "forbidOriginHost", [host]);
+
+      itemAllowOriginTemporarily.hidden = true;
+      // itemAllowOriginPermanently.hidden = true;
+      itemRevokeOrigin.hidden = false;
+    } else {
+      itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
+          "allowOriginHostTemporarily", [host]);
+      // itemAllowOriginPermanently.label = this._strbundle.getFormattedString(
+      // "allowOriginHostPermanently", [host]);
+
+      itemAllowOriginTemporarily.hidden = false;
+      // itemAllowOriginPermanently.hidden = false;
+      itemRevokeOrigin.hidden = true;
+    }
+
+  },
+
+  /**
+   * Reloads the current document if the user's preferences indicate it should
+   * be reloaded.
+   */
+  _conditionallyReloadDocument : function() {
+    if (this._csrpolicy.prefs.getBoolPref("autoReload")) {
+      content.document.location.reload(true);
+    }
+  },
+
+  /**
+   * Allows the current document's origin to request from any destination for
+   * the duration of the browser session.
+   * 
+   * @param {Event}
+   *            event
+   */
+  allowOriginTemporarily : function(event) {
+    // Note: the available variable "content" is different than the avaialable
+    // "window.target".
+    var host = this._getCurrentHostWithoutWww();
+    this._csrpolicy.temporarilyAllowOriginHost(host);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Forbids the current document's origin from requesting from any destination.
+   * When a site is forbidden, no warning is shown to the user when requests are
+   * blocked.
+   * 
+   * @param {Event}
+   *            event
+   */
+  forbidOrigin : function(event) {
+    var host = this._getCurrentHostWithoutWww();
+    this._csrpolicy.revokeTemporarilyAllowedOriginHost(host);
+    this._conditionallyReloadDocument();
   }
-
 };
 
-csrpolicyOverlay.onMenuShowing = function(e) {
-  if (e.currentTarget != e.originalTarget) {
-    return;
-  }
-  this.prepareMenu(e.target);
-};
-
-csrpolicyOverlay._getCurrentHostWithoutWww = function _getCurrentHostWithoutWww() {
-  var host = DomainUtils.getHost(content.document.documentURI);
-  return DomainUtils.stripWww(host);
-};
-
-csrpolicyOverlay.prepareMenu = function(element) {
-  // TODO: This is broken for schemes that don't have host values (e.g. "file")
-  var host = this._getCurrentHostWithoutWww();
-
-  var itemAllowOriginTemporarily = document
-      .getElementById("csrpolicyAllowOriginTemporarily");
-  // var itemAllowOriginPermanently = document
-  // .getElementById("csrpolicyAllowOriginPermanently");
-  var itemRevokeOrigin = document.getElementById("csrpolicyRevokeOrigin");
-
-  if (this._csrpolicy.isTemporarilyAllowedOriginHost(host)) {
-    itemRevokeOrigin.label = this._strbundle.getFormattedString(
-        "forbidOriginHost", [host]);
-
-    itemAllowOriginTemporarily.hidden = true;
-    // itemAllowOriginPermanently.hidden = true;
-    itemRevokeOrigin.hidden = false;
-  } else {
-    itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
-        "allowOriginHostTemporarily", [host]);
-    // itemAllowOriginPermanently.label = this._strbundle.getFormattedString(
-    // "allowOriginHostPermanently", [host]);
-
-    itemAllowOriginTemporarily.hidden = false;
-    // itemAllowOriginPermanently.hidden = false;
-    itemRevokeOrigin.hidden = true;
-  }
-
-};
-
-csrpolicyOverlay._conditionallyReloadDocument = function() {
-  if (this._csrpolicy.prefs.getBoolPref("autoReload")) {
-    content.document.location.reload(true);
-  }
-}
-
-csrpolicyOverlay.allowOriginTemporarily = function(e) {
-  // Note: the available variable "content" is different than the avaialable
-  // "window.target".
-  var host = this._getCurrentHostWithoutWww();
-  this._csrpolicy.temporarilyAllowOriginHost(host);
-  this._conditionallyReloadDocument();
-};
-
-csrpolicyOverlay.csrpolicyRevokeOrigin = function(e) {
-  var host = this._getCurrentHostWithoutWww();
-  this._csrpolicy.revokeTemporarilyAllowedOriginHost(host);
-  this._conditionallyReloadDocument();
-}
-
-addEventListener("DOMContentLoaded", function(e) {
+// Initialize the csrpolicyOverlay object when the DOM is loaded.
+addEventListener("DOMContentLoaded", function(event) {
       csrpolicyOverlay.init();
-      csrpolicyOverlay.onDOMContentLoaded(e);
+      csrpolicyOverlay.onDOMContentLoaded(event);
     }, false);
-
-// "load" is called first. "DOMContentLoaded" is called later (when the DOM can
-// be accessed).
-
-// addEventListener("load", function(e) {
-// csrpolicyOverlay.onLoad(e);
-// }, false);

@@ -33,8 +33,8 @@ Logger = new function() {
   this.LEVEL_NAMES[this.LEVEL_INFO + ""] = "INFO";
   this.LEVEL_NAMES[this.LEVEL_DEBUG + ""] = "DEBUG";
 
-  //this.logLevel = this.LEVEL_ALL;
-  
+  // this.logLevel = this.LEVEL_ALL;
+
   this.logLevel = this.LEVEL_INFO;
 
   // var logTypes = Logger.TYPE_ERROR | Logger.TYPE_HEADER_REDIRECT
@@ -67,9 +67,13 @@ Logger.debug = function(type, message) {
   this._doLog(this.LEVEL_DEBUG, type, message);
 };
 
+Logger.dump = function(message) {
+  this.info(this.TYPE_INTERNAL, message);
+}
+
 Logger.vardump = function(obj) {
-  this.info(this.TYPE_INTERNAL, "Properties of object:");
+  this.dump(obj);
   for (var i in obj) {
-    this.info(this.TYPE_INTERNAL, "    => key: " + i + " / value: " + obj[i]);
+    this.dump("    `7`=> key: " + i + " / value: " + obj[i]);
   }
 }

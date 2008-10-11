@@ -7,11 +7,14 @@ const CC = Components.classes;
 
 var csrpolicyOverlay = {
 
-  csrpolicy : null,
+  _csrpolicy : null,
+
+  _strbundle : null,
 
   init : function() {
-    this.csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
+    this._csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
         .getService(CI.nsICSRPolicy);
+    this._strbundle = document.getElementById("csrpolicyStrings");
   },
 
   onDOMContentLoaded : function(e) {
@@ -22,7 +25,7 @@ var csrpolicyOverlay = {
 
     var document = e.target;
 
-    var csrpolicy = this.csrpolicy;
+    const csrpolicy = this._csrpolicy;
 
     // Disable meta redirects. This gets called on every DOMContentLoaded
     // but it may not need to be if there's a way to do it based on a
@@ -95,7 +98,7 @@ var csrpolicyOverlay = {
    * link/window functions are executed.
    */
   wrapOpenLinkFunctions : function() {
-    var csrpolicy = this.csrpolicy;
+    const csrpolicy = this._csrpolicy;
 
     if (!gContextMenu.origOpenLinkInTab) {
       gContextMenu.origOpenLinkInTab = gContextMenu.openLinkInTab;
@@ -116,13 +119,61 @@ var csrpolicyOverlay = {
 
 };
 
+csrpolicyOverlay.onMenuShowing = function(e) {
+  if (e.currentTarget != e.originalTarget) {
+    return;
+  }
+  this.prepareMenu(e.target);
+};
+
+csrpolicyOverlay._getCurrentHostWithoutWww = function _getCurrentHostWithoutWww() {
+  var host = DomainUtils.getHost(content.document.documentURI);
+  return DomainUtils.stripWww(host);
+};
+
+csrpolicyOverlay.prepareMenu = function(element) {
+  // TODO: This is broken for schemes that don't have host values (e.g. "file")
+  var host = this._getCurrentHostWithoutWww();
+
+  var itemAllowOriginTemporarily = document
+      .getElementById("csrpolicyAllowOriginTemporarily");
+  // var itemAllowOriginPermanently = document
+  // .getElementById("csrpolicyAllowOriginPermanently");
+  var itemRevokeOrigin = document.getElementById("csrpolicyRevokeOrigin");
+
+  if (this._csrpolicy.isTemporarilyAllowedOriginHost(host)) {
+    itemRevokeOrigin.label = this._strbundle.getFormattedString(
+        "forbidOriginHost", [host]);
+
+    itemAllowOriginTemporarily.hidden = true;
+    // itemAllowOriginPermanently.hidden = true;
+    itemRevokeOrigin.hidden = false;
+  } else {
+    itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
+        "allowOriginHostTemporarily", [host]);
+    // itemAllowOriginPermanently.label = this._strbundle.getFormattedString(
+    // "allowOriginHostPermanently", [host]);
+
+    itemAllowOriginTemporarily.hidden = false;
+    // itemAllowOriginPermanently.hidden = false;
+    itemRevokeOrigin.hidden = true;
+  }
+
+};
+
 csrpolicyOverlay.allowOriginTemporarily = function(e) {
   // Note: the available variable "content" is different than the avaialable
   // "window.target".
-  this.csrpolicy.temporarilyAllowOriginHost(DomainUtils
-      .getHost(content.document.documentURI));
+  var host = this._getCurrentHostWithoutWww();
+  this._csrpolicy.temporarilyAllowOriginHost(host);
   content.document.location.reload(true);
 };
+
+csrpolicyOverlay.csrpolicyRevokeOrigin = function(e) {
+  var host = this._getCurrentHostWithoutWww();
+  this._csrpolicy.revokeTemporarilyAllowedOriginHost(host);
+  content.document.location.reload(true);
+}
 
 addEventListener("DOMContentLoaded", function(e) {
       csrpolicyOverlay.init();

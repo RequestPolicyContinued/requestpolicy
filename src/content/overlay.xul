@@ -5,16 +5,28 @@
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	id="csrpolicyOverlay">
+
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="csrpolicyStrings" src="chrome://csrpolicy/locale/strings.properties"/>
+	</stringbundleset>
 	
 	<script type="application/x-javascript" src="overlay.js" />
 
 	<statusbar id="status-bar">
 		<statusbarpanel>
 			<menu label="&csrpolicyStatusbarLabel;">
-				<menupopup>
+				<menupopup onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
 					<menuitem 
-						label="&csrpolicyAllowOriginTemporarily;"
+						id="csrpolicyAllowOriginTemporarily"
 						oncommand="csrpolicyOverlay.allowOriginTemporarily(event);" />
+					<!--
+						<menuitem 
+							id="csrpolicyAllowOriginPermanently"
+							oncommand="csrpolicyOverlay.csrpolicyAllowOriginPermanently(event);" />
+							-->
+					<menuitem 
+						id="csrpolicyRevokeOrigin"
+						oncommand="csrpolicyOverlay.csrpolicyRevokeOrigin(event);" />
 				</menupopup>
 			</menu>
 		</statusbarpanel>

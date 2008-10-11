@@ -440,8 +440,10 @@ CsrPolicyService.prototype = {
         var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
+        var originHostNoWww = DomainUtils.stripWww(aRequestOrigin.asciiHost);
+        var destHostNoWww = DomainUtils.stripWww(aContentLocation.asciiHost);
 
-        if (this.isTemporarilyAllowedOriginHost(originHost)) {
+        if (this.isTemporarilyAllowedOriginHost(originHostNoWww)) {
           return this.accept("Temporarily allowed origin host.", arguments);
         }
 

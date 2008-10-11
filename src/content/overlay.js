@@ -161,18 +161,24 @@ csrpolicyOverlay.prepareMenu = function(element) {
 
 };
 
+csrpolicyOverlay._conditionallyReloadDocument = function() {
+  if (this._csrpolicy.prefs.getBoolPref("autoReload")) {
+    content.document.location.reload(true);
+  }
+}
+
 csrpolicyOverlay.allowOriginTemporarily = function(e) {
   // Note: the available variable "content" is different than the avaialable
   // "window.target".
   var host = this._getCurrentHostWithoutWww();
   this._csrpolicy.temporarilyAllowOriginHost(host);
-  content.document.location.reload(true);
+  this._conditionallyReloadDocument();
 };
 
 csrpolicyOverlay.csrpolicyRevokeOrigin = function(e) {
   var host = this._getCurrentHostWithoutWww();
   this._csrpolicy.revokeTemporarilyAllowedOriginHost(host);
-  content.document.location.reload(true);
+  this._conditionallyReloadDocument();
 }
 
 addEventListener("DOMContentLoaded", function(e) {

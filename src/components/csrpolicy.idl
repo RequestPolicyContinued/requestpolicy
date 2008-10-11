@@ -1,6 +1,7 @@
 #include "nsISupports.idl"
 
 interface nsIDOMElement;
+interface nsIPrefBranch;
 
 [scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
 interface nsICSRPolicy : nsISupports
@@ -14,4 +15,6 @@ interface nsICSRPolicy : nsISupports
   void revokeTemporarilyAllowedOriginHost(in ACString host);
   
   boolean isTemporarilyAllowedOriginHost(in ACString host);
+  
+  readonly attribute nsIPrefBranch prefs;
 };  

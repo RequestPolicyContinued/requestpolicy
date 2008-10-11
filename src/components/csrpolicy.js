@@ -51,7 +51,7 @@ CsrPolicyService.prototype = {
   VERSION : "0.1",
 
   // /////////////////////////////////////////////////////////////////////////
-  // Data
+  // Internal Data
   // /////////////////////////////////////////////////////////////////////////
 
   _submittedForms : {},
@@ -80,8 +80,6 @@ CsrPolicyService.prototype = {
   },
 
   _temporarilyAllowedSites : {},
-
-  _prefs : null,
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -116,9 +114,9 @@ CsrPolicyService.prototype = {
     // Get the preferences branch and setup the preferences observer.
     var prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
-    this._prefs = prefService.getBranch("extensions.csrpolicy.")
+    this.prefs = prefService.getBranch("extensions.csrpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
-    this._prefs.addObserver("", this, false);
+    this.prefs.addObserver("", this, false);
   },
 
   _loadLibraries : function() {
@@ -201,6 +199,8 @@ CsrPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
   // nsICSRPolicy interface
   // /////////////////////////////////////////////////////////////////////////
+
+  prefs : null,
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
@@ -296,7 +296,7 @@ CsrPolicyService.prototype = {
     }
   },
 
-  argumentsToString : function(aContentType, aContentLocation, aRequestOrigin,
+  _argumentsToString : function(aContentType, aContentLocation, aRequestOrigin,
       aContext, aMimeTypeGuess, aInternalCall) {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
@@ -317,7 +317,7 @@ CsrPolicyService.prototype = {
     Logger.warning(Logger.TYPE_CONTENT, "** BLOCKED ** reason: "
             + reason
             + ". "
-            + this.argumentsToString(args[0], args[1], args[2], args[3],
+            + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
@@ -340,7 +340,7 @@ CsrPolicyService.prototype = {
     Logger.warning(Logger.TYPE_CONTENT, "** ALLOWED ** reason: "
             + reason
             + ". "
-            + this.argumentsToString(args[0], args[1], args[2], args[3],
+            + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
     if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);

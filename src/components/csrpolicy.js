@@ -90,6 +90,13 @@ CsrPolicyService.prototype = {
     this._initContentPolicy();
     this._register();
     this._initializePrefs();
+    this._updateLoggingSettings();
+  },
+
+  _updateLoggingSettings : function() {
+    Logger.enabled = this.prefs.getBoolPref("log");
+    Logger.level = this.prefs.getIntPref("log.level");
+    Logger.types = this.prefs.getIntPref("log.types");
   },
 
   _register : function() {
@@ -106,7 +113,7 @@ CsrPolicyService.prototype = {
       os.removeObserver(this, "http-on-examine-response");
       os.removeObserver(this, "xpcom-shutdown");
     } catch (e) {
-      this.dump(e + " while unregistering.");
+      Logger.dump(e + " while unregistering.");
     }
   },
 
@@ -117,6 +124,23 @@ CsrPolicyService.prototype = {
     this.prefs = prefService.getBranch("extensions.csrpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
+  },
+
+  /**
+   * Take necessary actions when preferences are updated.
+   * 
+   * @paramString{} prefName NAme of the preference that was updated.
+   */
+  _updatePref : function(prefName) {
+    Logger.dump(prefName);
+    switch (prefName) {
+      case "log" :
+      case "log.level" :
+      case "log.types" :
+        this._updateLoggingSettings();
+      default :
+        break;
+    }
   },
 
   _loadLibraries : function() {
@@ -265,6 +289,9 @@ CsrPolicyService.prototype = {
     switch (topic) {
       case "http-on-examine-response" :
         this._examineHttpResponse(subject);
+        break;
+      case "nsPref:changed" :
+        this._updatePref(data);
         break;
       case "app-startup" :
         this._init();

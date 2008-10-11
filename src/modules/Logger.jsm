@@ -1,15 +1,15 @@
 var EXPORTED_SYMBOLS = ["Logger"]
 
-// TODO(): Make this cleaner javascript, and maybe not a single instance.
-
+/**
+ * Provides logging methods
+ */
 Logger = new function() {
 
   this.TYPE_CONTENT = 1; // content whose origin isn't known more specifically
-  // this.TYPE_CONTENT_BLOCK = 2; // blocked requests
-  this.TYPE_META_REFRESH = 4; // info related to meta refresh
-  this.TYPE_HEADER_REDIRECT = 8; // info related to header redirects
-  this.TYPE_INTERNAL = 16; // internal happenings of the extension
-  this.TYPE_ERROR = 32; // errors
+  this.TYPE_META_REFRESH = 2; // info related to meta refresh
+  this.TYPE_HEADER_REDIRECT = 4; // info related to header redirects
+  this.TYPE_INTERNAL = 8; // internal happenings of the extension
+  this.TYPE_ERROR = 16; // errors
   this.TYPE_ALL = 0x0 - 1; // all
 
   this.LEVEL_OFF = Number.MAX_VALUE; // no logging
@@ -19,34 +19,31 @@ Logger = new function() {
   this.LEVEL_DEBUG = 700;
   this.LEVEL_ALL = Number.MIN_VALUE; // log everything
 
-  this.TYPE_NAMES = {};
-  this.TYPE_NAMES[this.TYPE_CONTENT + ""] = "CONTENT";
-  // this.TYPE_NAMES[this.TYPE_CONTENT_BLOCK + ""] = "CONTENT_BLOCKED";
-  this.TYPE_NAMES[this.TYPE_META_REFRESH + ""] = "META_REFRESH";
-  this.TYPE_NAMES[this.TYPE_HEADER_REDIRECT + ""] = "HEADER_REDIRECT";
-  this.TYPE_NAMES[this.TYPE_INTERNAL + ""] = "INTERNAL";
-  this.TYPE_NAMES[this.TYPE_ERROR + ""] = "ERROR";
+  this._TYPE_NAMES = {};
+  this._TYPE_NAMES[this.TYPE_CONTENT.toString()] = "CONTENT";
+  this._TYPE_NAMES[this.TYPE_META_REFRESH.toString()] = "META_REFRESH";
+  this._TYPE_NAMES[this.TYPE_HEADER_REDIRECT.toString()] = "HEADER_REDIRECT";
+  this._TYPE_NAMES[this.TYPE_INTERNAL.toString()] = "INTERNAL";
+  this._TYPE_NAMES[this.TYPE_ERROR.toString()] = "ERROR";
 
-  this.LEVEL_NAMES = {};
-  this.LEVEL_NAMES[this.LEVEL_SEVERE + ""] = "SEVERE";
-  this.LEVEL_NAMES[this.LEVEL_WARNING + ""] = "WARNING";
-  this.LEVEL_NAMES[this.LEVEL_INFO + ""] = "INFO";
-  this.LEVEL_NAMES[this.LEVEL_DEBUG + ""] = "DEBUG";
+  this._LEVEL_NAMES = {};
+  this._LEVEL_NAMES[this.LEVEL_SEVERE.toString()] = "SEVERE";
+  this._LEVEL_NAMES[this.LEVEL_WARNING.toString()] = "WARNING";
+  this._LEVEL_NAMES[this.LEVEL_INFO.toString()] = "INFO";
+  this._LEVEL_NAMES[this.LEVEL_DEBUG.toString()] = "DEBUG";
 
-  // this.logLevel = this.LEVEL_ALL;
+  // These can be set to change logging level, what types of messages are
+  // logged, and to enable/disable logging.
+  this.level = this.LEVEL_INFO;
+  this.types = this.TYPE_ALL;
+  this.enabled = true;
 
-  this.logLevel = this.LEVEL_INFO;
-
-  // var logTypes = Logger.TYPE_ERROR | Logger.TYPE_HEADER_REDIRECT
-  // | Logger.TYPE_INTERNAL;
-
-  this.logTypes = this.TYPE_ALL;
 };
 
 Logger._doLog = function(level, type, message) {
-  if (level >= this.logLevel && this.logTypes & type) {
-    var levelName = this.LEVEL_NAMES[level + ""];
-    var typeName = this.TYPE_NAMES[type + ""];
+  if (this.enabled && level >= this.level && this.types & type) {
+    var levelName = this._LEVEL_NAMES[level.toString()];
+    var typeName = this._TYPE_NAMES[type.toString()];
     dump("[CSRPolicy] [" + levelName + "] [" + typeName + "] " + message + "\n");
   }
 };
@@ -74,6 +71,6 @@ Logger.dump = function(message) {
 Logger.vardump = function(obj) {
   this.dump(obj);
   for (var i in obj) {
-    this.dump("    `7`=> key: " + i + " / value: " + obj[i]);
+    this.dump("    => key: " + i + " / value: " + obj[i]);
   }
 }

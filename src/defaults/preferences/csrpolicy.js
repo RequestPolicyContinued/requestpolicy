@@ -1,1 +1,1 @@
-//TODO
+pref("csrpolicy.autoReload", true);

@@ -9,39 +9,11 @@
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-// const STATE_START = CI.nsIWebProgressListener.STATE_START;
-// const STATE_DOC = CI.nsIWebProgressListener.STATE_IS_DOCUMENT;
-// const NS_BINDING_ABORTED = 0x804B0002;
 const CP_OK = CI.nsIContentPolicy.ACCEPT;
 const CP_NOP = function() {
   return CP_OK;
 };
 const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
-
-function loadLibraries() {
-  // Wasn't able to define a resource in chrome.manifest, so need to use file
-  // paths to load modules. This method of doing it is described at
-  // http://developer.mozilla.org/en/Using_JavaScript_code_modules
-  // but this is using __LOCATION__ instead.
-  // The reason a resources defined in chrome.manifest isn't working is likely
-  // because at this point chrome.manifest hasn't been loaded yet. See
-  // http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
-  // for more info.
-  var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-      .getService(Components.interfaces.nsIIOService);
-  var resProt = ioService.getProtocolHandler("resource")
-      .QueryInterface(Components.interfaces.nsIResProtocolHandler);
-  var extensionDir = __LOCATION__.parent.parent;
-  var modulesDir = extensionDir.clone();
-  modulesDir.append("modules");
-  var resourceURI = ioService.newFileURI(modulesDir);
-  resProt.setSubstitution("csrpolicy", resourceURI);
-
-  Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
-  Components.utils.import("resource://csrpolicy/Logger.jsm");
-  Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
-  Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
-}
 
 // Use the new-fangled FF3 module, etc. generation.
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -79,7 +51,7 @@ CsrPolicyService.prototype = {
   VERSION : "0.1",
 
   // /////////////////////////////////////////////////////////////////////////
-  // Variables
+  // Data
   // /////////////////////////////////////////////////////////////////////////
 
   _submittedForms : {},
@@ -108,6 +80,123 @@ CsrPolicyService.prototype = {
   },
 
   _temporarilyAllowedSites : {},
+
+  _prefs : null,
+
+  // /////////////////////////////////////////////////////////////////////////
+  // Utility
+  // /////////////////////////////////////////////////////////////////////////
+
+  _init : function() {
+    this._loadLibraries();
+    this._initContentPolicy();
+    this._register();
+    this._initializePrefs();
+  },
+
+  _register : function() {
+    var os = CC['@mozilla.org/observer-service;1']
+        .getService(CI.nsIObserverService);
+    os.addObserver(this, "http-on-examine-response", false);
+    os.addObserver(this, "xpcom-shutdown", false);
+  },
+
+  _unregister : function() {
+    try {
+      var os = CC['@mozilla.org/observer-service;1']
+          .getService(CI.nsIObserverService);
+      os.removeObserver(this, "http-on-examine-response");
+      os.removeObserver(this, "xpcom-shutdown");
+    } catch (e) {
+      this.dump(e + " while unregistering.");
+    }
+  },
+
+  _initializePrefs : function() {
+    // Get the preferences branch and setup the preferences observer.
+    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+        .getService(Components.interfaces.nsIPrefService);
+    this._prefs = prefService.getBranch("extensions.csrpolicy.")
+        .QueryInterface(CI.nsIPrefBranch2);
+    this._prefs.addObserver("", this, false);
+  },
+
+  _loadLibraries : function() {
+    // Wasn't able to define a resource in chrome.manifest, so need to use file
+    // paths to load modules. This method of doing it is described at
+    // http://developer.mozilla.org/en/Using_JavaScript_code_modules
+    // but this is using __LOCATION__ instead.
+    // The reason a resources defined in chrome.manifest isn't working is likely
+    // because at this point chrome.manifest hasn't been loaded yet. See
+    // http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
+    // for more info.
+    var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+        .getService(Components.interfaces.nsIIOService);
+    var resProt = ioService.getProtocolHandler("resource")
+        .QueryInterface(Components.interfaces.nsIResProtocolHandler);
+    var extensionDir = __LOCATION__.parent.parent;
+    var modulesDir = extensionDir.clone();
+    modulesDir.append("modules");
+    var resourceURI = ioService.newFileURI(modulesDir);
+    resProt.setSubstitution("csrpolicy", resourceURI);
+
+    Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
+    Components.utils.import("resource://csrpolicy/Logger.jsm");
+    Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
+    Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
+  },
+
+  _examineHttpResponse : function(observedSubject) {
+    // TODO: Allow Location header based on policy.
+
+    // TODO: Remove Refresh header, treat it like meta refresh. Refresh
+    // headers may be ignored by firefox, but probably good to remove them if
+    // they exist for future-proofing and bug-proofing.
+
+    var httpChannel = observedSubject
+        .QueryInterface(Components.interfaces.nsIHttpChannel);
+    try {
+      // If there is no Location header, getResponseHeader will throw
+      // NS_ERROR_NOT_AVAILABLE. If there is more than one Location header,
+      // the last one is the one that will be used.
+      var dest = httpChannel.getResponseHeader("Location");
+      var origin = httpChannel.name;
+
+      Logger.info(Logger.TYPE_HEADER_REDIRECT, "Found 'Location' header to <"
+              + dest + ">" + " in response from <" + origin + ">");
+
+      var destHost = DomainUtils.getHost(dest);
+      var originHost = DomainUtils.getHost(origin);
+
+      if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "** ALLOWED ** www-similar hosts. To <" + dest + "> " + "from <"
+                + origin + ">");
+        return;
+      }
+
+      if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "** ALLOWED ** dest is subdomain of origin. To <" + dest + "> "
+                + "from <" + origin + ">");
+        return;
+      }
+
+      // The location header isn't allowed, so remove it.
+      try {
+        httpChannel.setResponseHeader("Location", "", false);
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "** BLOCKED ** 'Location' header to <" + dest + ">"
+                + " found in response from <" + origin + ">");
+      } catch (e) {
+        Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing "
+                + "'Location' header to <" + dest + ">"
+                + "  in response from <" + origin + ">." + e);
+      }
+    } catch (e) {
+      // No location header.
+    }
+  },
 
   // /////////////////////////////////////////////////////////////////////////
   // nsICSRPolicy interface
@@ -173,86 +262,19 @@ CsrPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 
   observe : function(subject, topic, data) {
-    if (topic == "http-on-examine-response") {
-
-      // TODO: Allow Location header based on policy.
-
-      // TODO: Remove Refresh header, treat it like meta refresh. Refresh
-      // headers may be ignored by firefox, but probably good to remove them if
-      // they exist for future-proofing and bug-proofing.
-
-      var httpChannel = subject
-          .QueryInterface(Components.interfaces.nsIHttpChannel);
-      try {
-        // If there is no Location header, getResponseHeader will throw
-        // NS_ERROR_NOT_AVAILABLE. If there is more than one Location header,
-        // the last one is the one that will be used.
-        var dest = httpChannel.getResponseHeader("Location");
-        var origin = httpChannel.name;
-
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "Found 'Location' header to <"
-                + dest + ">" + " in response from <" + origin + ">");
-
-        var destHost = DomainUtils.getHost(dest);
-        var originHost = DomainUtils.getHost(origin);
-
-        if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "** ALLOWED ** www-similar hosts. To <" + dest + "> " + "from <"
-                  + origin + ">");
-          return;
-        }
-
-        if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "** ALLOWED ** dest is subdomain of origin. To <" + dest + "> "
-                  + "from <" + origin + ">");
-          return;
-        }
-
-        // The location header isn't allowed, so remove it.
-        try {
-          httpChannel.setResponseHeader("Location", "", false);
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "** BLOCKED ** 'Location' header to <" + dest + ">"
-                  + " found in response from <" + origin + ">");
-        } catch (e) {
-          Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing "
-                  + "'Location' header to <" + dest + ">"
-                  + "  in response from <" + origin + ">." + e);
-        }
-      } catch (e) {
-        // No location header.
-      }
-
-    } else if (topic == "app-startup") {
-      loadLibraries();
-      this.initContentPolicy();
-
-      // Register observer for http-on-examine-response.
-      var os = Components.classes["@mozilla.org/observer-service;1"]
-          .getService(Components.interfaces.nsIObserverService);
-      os.addObserver(this, "http-on-examine-response", false);
-
-    } else {
-      Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);
+    switch (topic) {
+      case "http-on-examine-response" :
+        this._examineHttpResponse(subject);
+        break;
+      case "app-startup" :
+        this._init();
+        break;
+      case "xpcom-shutdown" :
+        this._unregister();
+        break;
+      default :
+        Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);
     }
-  },
-
-  // /////////////////////////////////////////////////////////////////////////
-  // Utility functions
-  // /////////////////////////////////////////////////////////////////////////
-
-  // leakage detection
-  reportLeaks : function() {
-    this.dump("DUMPING " + this.__parent__);
-    for (var v in this.__parent__) {
-      this.dump(v + " = " + this.__parent__[v] + "\n");
-    }
-  },
-
-  dump : function(msg) {
-    dump("[CSRPolicy] " + msg + "\n");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -264,7 +286,7 @@ CsrPolicyService.prototype = {
   shouldProcess : CP_NOP,
 
   // enable our actual shouldLoad function
-  initContentPolicy : function() {
+  _initContentPolicy : function() {
     this.shouldLoad = this.mainContentPolicy.shouldLoad;
     if (!this.mimeService) {
       // this.rejectCode = typeof(/ /) == "object" ? -4 : -3;

@@ -7,14 +7,20 @@ interface nsIPrefBranch;
 interface nsICSRPolicy : nsISupports
 {
   void registerFormSubmitted(in ACString originUrl, in ACString destinationUrl);
-  
   void registerLinkClicked(in ACString originUrl, in ACString destinationUrl);
   
-  void temporarilyAllowOriginHost(in ACString host);
+  void temporarilyAllowOrigin(in ACString host);
+  boolean isTemporarilyAllowedOrigin(in ACString host);
   
-  void revokeTemporarilyAllowedOriginHost(in ACString host);
+  void allowOrigin(in ACString host);
+  boolean isAllowedOrigin(in ACString host);
   
-  boolean isTemporarilyAllowedOriginHost(in ACString host);
+  void ignoreOrigin(in ACString host);
+  boolean isIgnoredOrigin(in ACString host);
+  
+  void revokeTemporaryPermissions();
+  
+  void forbidOrigin(in ACString host);
   
   readonly attribute nsIPrefBranch prefs;
 };  

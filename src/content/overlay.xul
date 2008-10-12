@@ -17,15 +17,18 @@
 			<menu label="&csrpolicyStatusbarLabel;">
 				<menupopup onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
 					<menuitem 
-						id="csrpolicyAllowOriginTemporarily"
-						oncommand="csrpolicyOverlay.allowOriginTemporarily(event);" />
-					<!--
-						<menuitem 
-							id="csrpolicyAllowOriginPermanently"
-							oncommand="csrpolicyOverlay.csrpolicyAllowOriginPermanently(event);" />
-							-->
+						id="csrpolicyRevokeTemporaryPermissions"
+						label="&revokeTemporaryPermissions;"
+						oncommand="csrpolicyOverlay.revokeTemporaryPermissions(event);" />
+					<menuseparator id="csrpolicyRevokeTemporaryPermissionsSeparator" />
 					<menuitem 
-						id="csrpolicyRevokeOrigin"
+						id="csrpolicyAllowOriginTemporarily"
+						oncommand="csrpolicyOverlay.temporarilyAllowOrigin(event);" />
+					<menuitem 
+						id="csrpolicyAllowOrigin"
+						oncommand="csrpolicyOverlay.allowOrigin(event);" />
+					<menuitem 
+						id="csrpolicyForbidOrigin"
 						oncommand="csrpolicyOverlay.forbidOrigin(event);" />
 				</menupopup>
 			</menu>

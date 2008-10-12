@@ -164,30 +164,48 @@ var csrpolicyOverlay = {
     // "file")
     var host = this._getCurrentHostWithoutWww();
 
+    // The menu items we may need.
+    var itemRevokeTemporaryPermissions = document
+        .getElementById("csrpolicyRevokeTemporaryPermissions");
+    var itemRevokeTemporaryPermissionsSeparator = document
+        .getElementById("csrpolicyRevokeTemporaryPermissionsSeparator");
     var itemAllowOriginTemporarily = document
         .getElementById("csrpolicyAllowOriginTemporarily");
-    // var itemAllowOriginPermanently = document
-    // .getElementById("csrpolicyAllowOriginPermanently");
-    var itemRevokeOrigin = document.getElementById("csrpolicyRevokeOrigin");
+    var itemAllowOrigin = document.getElementById("csrpolicyAllowOrigin");
+    var itemForbidOrigin = document.getElementById("csrpolicyForbidOrigin");
 
-    if (this._csrpolicy.isTemporarilyAllowedOriginHost(host)) {
-      itemRevokeOrigin.label = this._strbundle.getFormattedString(
-          "forbidOriginHost", [host]);
+    // Set all labels here for convenience, even though we won't display some of
+    // these menu items.
+    itemForbidOrigin.label = this._strbundle.getFormattedString("forbidOrigin",
+        [host]);
+    itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
+        "allowOriginTemporarily", [host]);
+    itemAllowOrigin.label = this._strbundle.getFormattedString("allowOrigin",
+        [host]);
 
-      itemAllowOriginTemporarily.hidden = true;
-      // itemAllowOriginPermanently.hidden = true;
-      itemRevokeOrigin.hidden = false;
+    // Initially make all menu items hidden.
+    itemRevokeTemporaryPermissions.hidden = true;
+    itemRevokeTemporaryPermissionsSeparator.hidden = true;
+    itemAllowOriginTemporarily.hidden = true;
+    itemAllowOrigin.hidden = true;
+    itemForbidOrigin.hidden = true;
+
+    if (this._csrpolicy.isTemporarilyAllowedOrigin(host)) {
+      itemForbidOrigin.hidden = false;
+    } else if (this._csrpolicy.isAllowedOrigin(host)) {
+      itemForbidOrigin.hidden = false;
     } else {
-      itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
-          "allowOriginHostTemporarily", [host]);
-      // itemAllowOriginPermanently.label = this._strbundle.getFormattedString(
-      // "allowOriginHostPermanently", [host]);
-
       itemAllowOriginTemporarily.hidden = false;
-      // itemAllowOriginPermanently.hidden = false;
-      itemRevokeOrigin.hidden = true;
+      itemAllowOrigin.hidden = false;
     }
 
+    // TODO: The condition should be related to any temporary permissions that
+    // affect the current document, including temporary destinations and
+    // temporary origin-to-destination pairs.
+    if (this._csrpolicy.isTemporarilyAllowedOrigin(host)) {
+      itemRevokeTemporaryPermissions.hidden = false;
+      itemRevokeTemporaryPermissionsSeparator.hidden = false;
+    }
   },
 
   /**
@@ -207,11 +225,24 @@ var csrpolicyOverlay = {
    * @param {Event}
    *            event
    */
-  allowOriginTemporarily : function(event) {
+  temporarilyAllowOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
     var host = this._getCurrentHostWithoutWww();
-    this._csrpolicy.temporarilyAllowOriginHost(host);
+    this._csrpolicy.temporarilyAllowOrigin(host);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Allows the current document's origin to request from any destination,
+   * including in future browser sessions.
+   * 
+   * @param {Event}
+   *            event
+   */
+  allowOrigin : function(event) {
+    var host = this._getCurrentHostWithoutWww();
+    this._csrpolicy.allowOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -225,7 +256,18 @@ var csrpolicyOverlay = {
    */
   forbidOrigin : function(event) {
     var host = this._getCurrentHostWithoutWww();
-    this._csrpolicy.revokeTemporarilyAllowedOriginHost(host);
+    this._csrpolicy.forbidOrigin(host);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Revokes all temporary permissions granted during the current session.
+   * 
+   * @param {Event}
+   *            event
+   */
+  revokeTemporaryPermissions : function(event) {
+    this._csrpolicy.revokeTemporaryPermissions();
     this._conditionallyReloadDocument();
   }
 };

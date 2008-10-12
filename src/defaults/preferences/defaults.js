@@ -4,9 +4,10 @@ pref("extensions.csrpolicy.log.types", 1023);
 
 pref("extensions.csrpolicy.autoReload", true);
 
-// pref("extensions.csrpolicy.allowedOrigins", true);
-// pref("extensions.csrpolicy.allowedDestinations", true);
-// pref("extensions.csrpolicy.allowedOriginsToDestinations", true);
-// pref("extensions.csrpolicy.forbiddenOrigins", true);
-// pref("extensions.csrpolicy.forbiddenDestinations", true);
-// pref("extensions.csrpolicy.forbiddenOriginsToDestinations", true);
+pref("extensions.csrpolicy.allowedOrigins", "test");
+// pref("extensions.csrpolicy.allowedDestinations", "");
+// pref("extensions.csrpolicy.allowedOriginsToDestinations", "");
+
+pref("extensions.csrpolicy.ignoredOrigins", "");
+// pref("extensions.csrpolicy.ignoredDestinations", "");
+// pref("extensions.csrpolicy.ignoredOriginsToDestinations", "");

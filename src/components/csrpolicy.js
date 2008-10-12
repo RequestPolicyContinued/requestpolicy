@@ -54,6 +54,8 @@ CsrPolicyService.prototype = {
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
 
+  _prefService : null,
+
   _submittedForms : {},
 
   _clickedLinks : {},
@@ -79,7 +81,11 @@ CsrPolicyService.prototype = {
     "result" : null
   },
 
-  _temporarilyAllowedSites : {},
+  _temporarilyAllowedOrigins : {},
+
+  _allowedOrigins : {},
+
+  _ignoredOrigins : {},
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -89,8 +95,19 @@ CsrPolicyService.prototype = {
     this._loadLibraries();
     this._initContentPolicy();
     this._register();
-    this._initializePrefs();
+    this._initializePrefSystem();
+    // Note that we don't load user preferences at this point because the user
+    // preferences may not be ready. If we tried right now, we may get the
+    // default preferences.
+  },
+
+  _syncFromPrefs : function() {
+    // Load the logging preferences before the otheres.
     this._updateLoggingSettings();
+    this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
+    Logger.vardump(this._allowedOrigins, "this._allowedOrigins");
+    this._ignoredOrigins = this._getPreferenceObj("ignoredOrigins");
+    Logger.vardump(this._ignoredOrigins, "this._ignoredOrigins");
   },
 
   _updateLoggingSettings : function() {
@@ -104,6 +121,7 @@ CsrPolicyService.prototype = {
         .getService(CI.nsIObserverService);
     os.addObserver(this, "http-on-examine-response", false);
     os.addObserver(this, "xpcom-shutdown", false);
+    os.addObserver(this, "profile-after-change", false);
   },
 
   _unregister : function() {
@@ -112,16 +130,17 @@ CsrPolicyService.prototype = {
           .getService(CI.nsIObserverService);
       os.removeObserver(this, "http-on-examine-response");
       os.removeObserver(this, "xpcom-shutdown");
+      os.removeObserver(this, "profile-after-change");
     } catch (e) {
       Logger.dump(e + " while unregistering.");
     }
   },
 
-  _initializePrefs : function() {
+  _initializePrefSystem : function() {
     // Get the preferences branch and setup the preferences observer.
-    var prefService = Components.classes["@mozilla.org/preferences-service;1"]
+    this._prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
-    this.prefs = prefService.getBranch("extensions.csrpolicy.")
+    this.prefs = this._prefService.getBranch("extensions.csrpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
   },
@@ -132,7 +151,6 @@ CsrPolicyService.prototype = {
    * @paramString{} prefName NAme of the preference that was updated.
    */
   _updatePref : function(prefName) {
-    Logger.dump(prefName);
     switch (prefName) {
       case "log" :
       case "log.level" :
@@ -266,19 +284,88 @@ CsrPolicyService.prototype = {
     }
   },
 
-  temporarilyAllowOriginHost : function temporarilyAllowOriginHost(host) {
-    this._temporarilyAllowedSites[host] = true;
+  allowOrigin : function allowOrigin(host) {
+    this._allowedOrigins[host] = true;
+    this._setPreferenceList("allowedOrigins", this._allowedOrigins);
   },
 
-  revokeTemporarilyAllowedOriginHost : function revokeTemporarilyAllowedOriginHost(
-      host) {
-    if (this._temporarilyAllowedSites[host]) {
-      delete this._temporarilyAllowedSites[host];
+  isAllowedOrigin : function isAllowedOrigin(host) {
+    return this._allowedOrigins[host] ? true : false;
+  },
+
+  temporarilyAllowOrigin : function temporarilyAllowOrigin(host) {
+    this._temporarilyAllowedOrigins[host] = true;
+    this._setPreferenceList("temporarilyAllowedOrigins",
+        this._temporarilyAllowedOrigins);
+  },
+
+  isTemporarilyAllowedOrigin : function isTemporarilyAllowedOrigin(host) {
+    return this._temporarilyAllowedOrigins[host] ? true : false;
+  },
+
+  revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
+    this._temporarilyAllowedOrigins = {};
+    this._setPreferenceList("temporarilyAllowedOrigins",
+        this._temporarilyAllowedOrigins);
+  },
+
+  forbidOrigin : function forbidOrigin(host) {
+    if (this._temporarilyAllowedOrigins[host]) {
+      delete this._temporarilyAllowedOrigins[host];
+      this._setPreferenceList("temporarilyAllowedOrigins",
+          this._temporarilyAllowedOrigins);
+    }
+    if (this._allowedOrigins[host]) {
+      delete this._allowedOrigins[host];
+      this._setPreferenceList("allowedOrigins", this._allowedOrigins);
     }
   },
 
-  isTemporarilyAllowedOriginHost : function isTemporarilyAllowedOriginHost(host) {
-    return this._temporarilyAllowedSites[host] ? true : false;
+  ignoreOrigin : function ignoreOrigin(host) {
+    if (this._ignoredOrigins[host]) {
+      delete this._ignoredOrigins[host];
+      this._setPreferenceList("ignoredOrigins", this._ignoredOrigins);
+    }
+  },
+
+  isIgnoredOrigin : function isIgnoredOrigin(host) {
+    return this._ignoredOrigins[host];
+    this._setPreferenceList("allowedOrigins", this._allowedOrigins);
+  },
+
+  _setPreferenceList : function(prefName, setFromObj) {
+    var value = this._objToPrefString(setFromObj);
+    Logger.info(Logger.TYPE_INTERNAL, "Setting preference <" + prefName
+            + "> to value <" + value + ">.");
+    this.prefs.setCharPref(prefName, value);
+    // Flush the prefs so that if the browser crashes, the changes aren't lost.
+    this._prefService.savePrefFile(null);
+  },
+
+  _getPreferenceObj : function(prefName) {
+    var prefString = this.prefs.getCharPref(prefName);
+    Logger.info(Logger.TYPE_INTERNAL, "Loading preference <" + prefName
+            + "> from value <" + prefString + ">.");
+    return this._prefStringToObj(prefString);
+  },
+
+  _objToPrefString : function(obj) {
+    var a = [];
+    for (var i in obj) {
+      a.push(i);
+    }
+    return a.join(" ");
+  },
+
+  _prefStringToObj : function(prefString) {
+    var prefObj = {};
+    var prefArray = prefString.split(" ");
+    if (prefArray[0] != "") {
+      for (var i in prefArray) {
+        prefObj[prefArray[i]] = true;
+      }
+    }
+    return prefObj;
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -292,6 +379,12 @@ CsrPolicyService.prototype = {
         break;
       case "nsPref:changed" :
         this._updatePref(data);
+        break;
+      case "profile-after-change" :
+        // "profile-after-change" means that user preferences are now
+        // accessible. If we tried to load preferences before this, we would get
+        // default preferences rather than user preferences.
+        this._syncFromPrefs();
         break;
       case "app-startup" :
         this._init();
@@ -454,7 +547,7 @@ CsrPolicyService.prototype = {
     if (date.getMilliseconds() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
       if (this._lastShouldLoadCheck.origin == aRequestOrigin.spec
           && this._lastShouldLoadCheck.destination == aContentLocation.spec) {
-        Logger.debug(Logger.TYPE_INTERNAL,
+        Logger.debug(Logger.TYPE_CONTENT,
             "Using cached shouldLoad() result of "
                 + this._lastShouldLoadCheck.result + " for request to <"
                 + aContentLocation.spec + "> from <" + aRequestOrigin.spec
@@ -492,8 +585,12 @@ CsrPolicyService.prototype = {
         var originHostNoWww = DomainUtils.stripWww(aRequestOrigin.asciiHost);
         var destHostNoWww = DomainUtils.stripWww(aContentLocation.asciiHost);
 
-        if (this.isTemporarilyAllowedOriginHost(originHostNoWww)) {
-          return this.accept("Temporarily allowed origin host.", arguments);
+        if (this.isTemporarilyAllowedOrigin(originHostNoWww)) {
+          return this.accept("Temporarily allowed origin.", arguments);
+        }
+
+        if (this.isAllowedOrigin(originHostNoWww)) {
+          return this.accept("Allowed origin.", arguments);
         }
 
         // "browser" origin requests for things like favicon.ico and possibly

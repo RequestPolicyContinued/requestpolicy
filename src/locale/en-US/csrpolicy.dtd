@@ -1,3 +1,2 @@
 <!ENTITY csrpolicyStatusbarLabel "Cross-Site Request Policy">
-<!ENTITY csrpolicyAllowOriginTemporarily "Allow origin site temporarily">
-
+<!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">

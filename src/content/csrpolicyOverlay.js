@@ -165,6 +165,9 @@ var csrpolicyOverlay = {
     var host = this._getCurrentHostWithoutWww();
 
     // The menu items we may need.
+    var itemIgnoreOrigin = document.getElementById("csrpolicyIgnoreOrigin");
+    var itemIgnoreOriginSeparator = document
+        .getElementById("csrpolicyIgnoreOriginSeparator");
     var itemRevokeTemporaryPermissions = document
         .getElementById("csrpolicyRevokeTemporaryPermissions");
     var itemRevokeTemporaryPermissionsSeparator = document
@@ -176,6 +179,8 @@ var csrpolicyOverlay = {
 
     // Set all labels here for convenience, even though we won't display some of
     // these menu items.
+    itemIgnoreOrigin.label = this._strbundle.getFormattedString("ignoreOrigin",
+        [host]);
     itemForbidOrigin.label = this._strbundle.getFormattedString("forbidOrigin",
         [host]);
     itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
@@ -184,6 +189,8 @@ var csrpolicyOverlay = {
         [host]);
 
     // Initially make all menu items hidden.
+    itemIgnoreOrigin.hidden = true;
+    itemIgnoreOriginSeparator.hidden = true;
     itemRevokeTemporaryPermissions.hidden = true;
     itemRevokeTemporaryPermissionsSeparator.hidden = true;
     itemAllowOriginTemporarily.hidden = true;
@@ -199,12 +206,17 @@ var csrpolicyOverlay = {
       itemAllowOrigin.hidden = false;
     }
 
-    // TODO: The condition should be related to any temporary permissions that
-    // affect the current document, including temporary destinations and
-    // temporary origin-to-destination pairs.
     if (this._csrpolicy.isTemporarilyAllowedOrigin(host)) {
+      // TODO: The condition should be related to any temporary permissions that
+      // affect the current document, including temporary destinations and
+      // temporary origin-to-destination pairs.
       itemRevokeTemporaryPermissions.hidden = false;
       itemRevokeTemporaryPermissionsSeparator.hidden = false;
+    } else if (this._csrpolicy.isAllowedOrigin(host) == false) {
+      if (this._csrpolicy.isIgnoredOrigin(host) == false) {
+        itemIgnoreOrigin.hidden = false;
+        itemIgnoreOriginSeparator.hidden = false;
+      }
     }
   },
 
@@ -248,8 +260,8 @@ var csrpolicyOverlay = {
 
   /**
    * Forbids the current document's origin from requesting from any destination.
-   * When a site is forbidden, no warning is shown to the user when requests are
-   * blocked.
+   * This revoke's temporary or permanent request permissions the origin had
+   * been given.
    * 
    * @param {Event}
    *            event
@@ -258,6 +270,19 @@ var csrpolicyOverlay = {
     var host = this._getCurrentHostWithoutWww();
     this._csrpolicy.forbidOrigin(host);
     this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Ignores the current document's origin when requests from the origin are
+   * blocked. When a site is ignored, no warning is shown to the user when
+   * requests are blocked.
+   * 
+   * @param {Event}
+   *            event
+   */
+  ignoreOrigin : function(event) {
+    var host = this._getCurrentHostWithoutWww();
+    this._csrpolicy.ignoreOrigin(host);
   },
 
   /**

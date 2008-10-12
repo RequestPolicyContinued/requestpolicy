@@ -10,12 +10,16 @@
 		<stringbundle id="csrpolicyStrings" src="chrome://csrpolicy/locale/strings.properties"/>
 	</stringbundleset>
 	
-	<script type="application/x-javascript" src="overlay.js" />
+	<script type="application/x-javascript" src="csrpolicyOverlay.js" />
 
 	<statusbar id="status-bar">
 		<statusbarpanel>
 			<menu label="&csrpolicyStatusbarLabel;">
 				<menupopup onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
+					<menuitem 
+						id="csrpolicyIgnoreOrigin"
+						oncommand="csrpolicyOverlay.ignoreOrigin(event);" />
+					<menuseparator id="csrpolicyIgnoreOriginSeparator" />
 					<menuitem 
 						id="csrpolicyRevokeTemporaryPermissions"
 						label="&revokeTemporaryPermissions;"

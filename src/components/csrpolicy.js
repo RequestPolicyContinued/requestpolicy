@@ -286,6 +286,7 @@ CsrPolicyService.prototype = {
 
   allowOrigin : function allowOrigin(host) {
     this._allowedOrigins[host] = true;
+    this._unignoreOrigin(host);
     this._setPreferenceList("allowedOrigins", this._allowedOrigins);
   },
 
@@ -310,6 +311,7 @@ CsrPolicyService.prototype = {
   },
 
   forbidOrigin : function forbidOrigin(host) {
+    this._unignoreOrigin(host);
     if (this._temporarilyAllowedOrigins[host]) {
       delete this._temporarilyAllowedOrigins[host];
       this._setPreferenceList("temporarilyAllowedOrigins",
@@ -322,6 +324,11 @@ CsrPolicyService.prototype = {
   },
 
   ignoreOrigin : function ignoreOrigin(host) {
+    this._ignoredOrigins[host] = true;
+    this._setPreferenceList("ignoredOrigins", this._ignoredOrigins);
+  },
+
+  _unignoreOrigin : function _unignoreOrigin(host) {
     if (this._ignoredOrigins[host]) {
       delete this._ignoredOrigins[host];
       this._setPreferenceList("ignoredOrigins", this._ignoredOrigins);
@@ -339,6 +346,8 @@ CsrPolicyService.prototype = {
             + "> to value <" + value + ">.");
     this.prefs.setCharPref(prefName, value);
     // Flush the prefs so that if the browser crashes, the changes aren't lost.
+    // TODO: flush the file once after any changed preferences have been
+    // modified, rather than once on each call to the current function.
     this._prefService.savePrefFile(null);
   },
 

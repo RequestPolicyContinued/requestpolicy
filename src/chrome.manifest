@@ -4,6 +4,6 @@
 
 content    csrpolicy    content/
 skin       csrpolicy    classic/1.0    skin/
-overlay    chrome://browser/content/browser.xul    chrome://csrpolicy/content/overlay.xul
+overlay    chrome://browser/content/browser.xul    chrome://csrpolicy/content/csrpolicyOverlay.xul
 
 locale     csrpolicy    en-US          locale/en-US/

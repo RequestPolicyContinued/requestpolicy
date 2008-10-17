@@ -506,7 +506,8 @@ CsrPolicyService.prototype = {
         || aContentLocation.scheme == "about"
         || aContentLocation.scheme == "data"
         || aContentLocation.scheme == "chrome"
-        || aContentLocation.scheme == "moz-icon") {
+        || aContentLocation.scheme == "moz-icon"
+        || aContentLocation.scheme == "view-source") {
       return true;
     }
 

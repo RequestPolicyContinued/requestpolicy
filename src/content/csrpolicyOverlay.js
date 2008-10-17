@@ -12,6 +12,7 @@ const CC = Components.classes;
 var csrpolicyOverlay = {
   _initialized : false,
   _csrpolicy : null,
+  _csrpolicyJSObject : null, // for development, direct access to the js object
   _strbundle : null,
 
   /**
@@ -21,13 +22,85 @@ var csrpolicyOverlay = {
     if (this._initialized == false) {
       this._csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
           .getService(CI.nsICSRPolicy);
+      this._csrpolicyJSObject = this._csrpolicy.wrappedJSObject;
       this._strbundle = document.getElementById("csrpolicyStrings");
       this._initialized = true;
     }
   },
 
   /**
-   * Perform the actions required once the DOM is loaded.
+   * Perform the actions required once the window has loaded. This just sets a
+   * listener for when the content of the window has changed (a page is loaded).
+   * 
+   * @param {Event}
+   *            event
+   */
+  onLoad : function(event) {
+    // Info on detecting page load at:
+    // http://developer.mozilla.org/En/Code_snippets/On_page_load
+    var appcontent = document.getElementById("appcontent");
+    if (appcontent) {
+      const csrpolicyOverlay = this;
+      appcontent.addEventListener("DOMContentLoaded", function() {
+            csrpolicyOverlay.onDOMContentLoaded(event)
+          }, true);
+      // Attempting to have the onPageLoad handler called after all page content
+      // has attempted to be loaded, but not sure this is actually being called
+      // late enough. Maybe those few remaining requests coming through are
+      // content that isn't part of the initial load of the page?
+      appcontent.addEventListener("load", function() {
+            csrpolicyOverlay.onPageLoad(event)
+          }, true);
+    }
+  },
+
+  /**
+   * Things to do when a page has loaded (after images, etc., have been loaded).
+   * 
+   * @param {Event}
+   *            event
+   */
+  onPageLoad : function(event) {
+    // TODO: This is getting called multiple times for a page, should only be
+    // called once.
+
+    if (event.originalTarget.nodeName != "#document") {
+      // It's a favicon. See the note at
+      // http://developer.mozilla.org/En/Code_snippets/On_page_load
+      return;
+    }
+
+    this._checkForBlockedContent();
+  },
+
+  _checkForBlockedContent : function() {
+    var uri = content.document.location;
+    var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
+    var anyRejected = false;
+    if (rejectedRequests) {
+      Logger.vardump(rejectedRequests);
+      for (var i in rejectedRequests) {
+        for (var j in rejectedRequests[i]) {
+          if (rejectedRequests[i][j]) {
+            anyRejected = true;
+          }
+        }
+      }
+    }
+
+    if (anyRejected) {
+      // TODO: indicate to user that requests were rejected
+      Logger.dump("Some requests rejected");
+    } else {
+      // TODO: clear indications of rejected content (or maybe do it back when
+      // DOM is loaded)
+      Logger.dump("No requests rejected");
+    }
+  },
+
+  /**
+   * Perform the actions required once the DOM is loaded. This may be being
+   * called for more than just the page content DOM. It seems to work for now.
    * 
    * @param {Event}
    *            event
@@ -297,8 +370,12 @@ var csrpolicyOverlay = {
   }
 };
 
-// Initialize the csrpolicyOverlay object when the DOM is loaded.
+// Initialize the csrpolicyOverlay object when the window DOM is loaded.
 addEventListener("DOMContentLoaded", function(event) {
       csrpolicyOverlay.init();
-      csrpolicyOverlay.onDOMContentLoaded(event);
+    }, false);
+
+// Registers event handlers for documents loaded in the window.
+addEventListener("load", function(event) {
+      csrpolicyOverlay.onLoad(event);
     }, false);

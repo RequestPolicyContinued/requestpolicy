@@ -54,6 +54,8 @@ CsrPolicyService.prototype = {
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
 
+  _rejectedRequests : {},
+
   _prefService : null,
 
   _submittedForms : {},
@@ -452,11 +454,29 @@ CsrPolicyService.prototype = {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
 
+    var origin = args[2].spec;
+    var destination = args[1].spec;
+    var destinationHost = args[1].asciiHost;
+
     var date = new Date();
     this._lastShouldLoadCheck.time = date.getMilliseconds();
-    this._lastShouldLoadCheck.destination = args[1].spec;
-    this._lastShouldLoadCheck.origin = args[2].spec;
+    this._lastShouldLoadCheck.destination = destination;
+    this._lastShouldLoadCheck.origin = origin;
     this._lastShouldLoadCheck.result = CP_REJECT;
+
+    // Keep track of the rejected requests by full origin uri, then within each
+    // full origin uri, organize by destination hostnames. This makes it easy to
+    // determine the rejected destination hosts from a given page. The full
+    // destination uri for each rejected destination is then also kept. This
+    // allows showing the number of blocked unique destinations to each
+    // destination host.
+    if (!this._rejectedRequests[origin]) {
+      this._rejectedRequests[origin] = {};
+    }
+    if (!this._rejectedRequests[origin][destinationHost]) {
+      this._rejectedRequests[origin][destinationHost] = {};
+    }
+    this._rejectedRequests[origin][destinationHost][destination] = true;
 
     return CP_REJECT;
   },

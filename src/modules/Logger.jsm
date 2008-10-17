@@ -68,13 +68,19 @@ Logger.dump = function(message) {
   this.info(this.TYPE_INTERNAL, message);
 }
 
-Logger.vardump = function(obj, name) {
+Logger.vardump = function(obj, name, ignoreFunctions) {
   if (name != undefined) {
     this.dump(name + " : " + obj);
   } else {
     this.dump(obj);
   }
   for (var i in obj) {
-    this.dump("    => key: " + i + " / value: " + obj[i]);
+    if (typeof obj[i] == 'function') {
+      if (!ignoreFunctions) {
+        this.dump("    => key: " + i + " / value: instanceof Function");
+      }
+    } else {
+      this.dump("    => key: " + i + " / value: " + obj[i]);
+    }
   }
 }

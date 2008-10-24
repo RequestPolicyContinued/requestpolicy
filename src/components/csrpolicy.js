@@ -473,10 +473,18 @@ CsrPolicyService.prototype = {
     if (!this._rejectedRequests[origin]) {
       this._rejectedRequests[origin] = {};
     }
-    if (!this._rejectedRequests[origin][destinationHost]) {
-      this._rejectedRequests[origin][destinationHost] = {};
+    var originRejected = this._rejectedRequests[origin];
+    if (!originRejected[destinationHost]) {
+      originRejected[destinationHost] = {};
     }
-    this._rejectedRequests[origin][destinationHost][destination] = true;
+    if (!originRejected[destinationHost][destination]) {
+      originRejected[destinationHost][destination] = true;
+      if (!originRejected[destinationHost].count) {
+        originRejected[destinationHost].count = 1;
+      } else {
+        originRejected[destinationHost].count++;
+      }
+    }
 
     return CP_REJECT;
   },
@@ -495,11 +503,27 @@ CsrPolicyService.prototype = {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
 
+    var origin = args[2].spec;
+    var destination = args[1].spec;
+    var destinationHost = args[1].asciiHost;
+
     var date = new Date();
     this._lastShouldLoadCheck.time = date.getMilliseconds();
-    this._lastShouldLoadCheck.destination = args[1].spec;
-    this._lastShouldLoadCheck.origin = args[2].spec;
+    this._lastShouldLoadCheck.destination = destination;
+    this._lastShouldLoadCheck.origin = origin;
     this._lastShouldLoadCheck.result = CP_OK;
+
+    // Remove this request from the set of rejected requests.
+    if (this._rejectedRequests[origin]) {
+      var originRejected = this._rejectedRequests[origin];
+      if (originRejected[destinationHost]) {
+        delete originRejected[destinationHost][destination];
+        originRejected[destinationHost].count--;
+        if (originRejected[destinationHost].count == 0) {
+          delete originRejected[destinationHost];
+        }
+      }
+    }
 
     return CP_OK;
   },

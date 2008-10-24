@@ -14,7 +14,7 @@
 
 	<statusbar id="status-bar">
 		<statusbarpanel>
-			<menu label="&csrpolicyStatusbarLabel;">
+			<menu label="&csrpolicyStatusbarLabel;" id="csrpolicyStatusbarLabel">
 				<menupopup onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
 					<menuitem 
 						id="csrpolicyIgnoreOrigin"

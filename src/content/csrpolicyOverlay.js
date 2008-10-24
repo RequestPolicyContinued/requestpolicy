@@ -73,6 +73,10 @@ var csrpolicyOverlay = {
     this._checkForBlockedContent();
   },
 
+  /**
+   * Checks if the current document has blocked content and shows appropriate
+   * notifications.
+   */
   _checkForBlockedContent : function() {
     var uri = content.document.location;
     var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
@@ -91,11 +95,21 @@ var csrpolicyOverlay = {
     if (anyRejected) {
       // TODO: indicate to user that requests were rejected
       Logger.dump("Some requests rejected");
+      var csrpolicyStatusbarLabel = document
+          .getElementById("csrpolicyStatusbarLabel");
+      csrpolicyStatusbarLabel.style.color = "#a00";
     } else {
-      // TODO: clear indications of rejected content (or maybe do it back when
-      // DOM is loaded)
       Logger.dump("No requests rejected");
     }
+  },
+
+  /**
+   * Clears any blocked content notifications visible to the user.
+   */
+  _clearBlockedContentNotifications : function() {
+    var csrpolicyStatusbarLabel = document
+        .getElementById("csrpolicyStatusbarLabel");
+    csrpolicyStatusbarLabel.style.color = "";
   },
 
   /**
@@ -114,6 +128,9 @@ var csrpolicyOverlay = {
     var document = event.target;
 
     const csrpolicy = this._csrpolicy;
+
+    // Clear any notifications that may have been present.
+    this._clearBlockedContentNotifications();
 
     // Disable meta redirects. This gets called on every DOMContentLoaded
     // but it may not need to be if there's a way to do it based on a

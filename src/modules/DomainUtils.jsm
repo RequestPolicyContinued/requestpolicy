@@ -8,6 +8,57 @@ var DomainUtils = {};
 DomainUtils._ios = CC["@mozilla.org/network/io-service;1"]
     .getService(CI.nsIIOService);
 
+DomainUtils._eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
+    .getService(Components.interfaces.nsIEffectiveTLDService);
+
+// LEVEL_DOMAIN: Use example.com from http://www.a.example.com:81
+DomainUtils.LEVEL_DOMAIN = 1;
+// LEVEL_HOST: Use www.a.example.com from http://www.a.example.com:81
+DomainUtils.LEVEL_HOST = 2;
+// LEVEL_SOP: Use http://www.a.example.com:81 from http://www.a.example.com:81
+DomainUtils.LEVEL_SOP = 3;
+
+DomainUtils.getIdentifier = function(uri, level) {
+  var identifier;
+  switch (level) {
+    case this.LEVEL_DOMAIN :
+      try {
+        identifier = this.getDomain(uri);
+        if (identifier) {
+          return identifier;
+        }
+      } catch (e) {
+        // fall through
+      }
+    case this.LEVEL_HOST :
+      try {
+        identifier = this.getHost(uri);
+        if (identifier) {
+          return identifier;
+        }
+      } catch (e) {
+        // fall through
+      }
+
+    case this.LEVEL_SOP :
+      try {
+        identifier = this.getPrePath(uri);
+        if (identifier) {
+          return identifier;
+        }
+      } catch (e) {
+        // fall through
+      }
+
+    default :
+      return uri;
+  }
+};
+
+DomainUtils.identifierIsInUri = function(identifier, uri, level) {
+  return identifier == this.getIdentifier(uri, level);
+};
+
 /**
  * Returns the hostname from a uri string.
  * 
@@ -16,7 +67,40 @@ DomainUtils._ios = CC["@mozilla.org/network/io-service;1"]
  * @return {String} The hostname of the uri.
  */
 DomainUtils.getHost = function(uri) {
-  return this._ios.newURI(uri, null, null).host;
+  return this._ios.newURI(uri, null, null).host
+};
+
+/**
+ * Returns the domain from a uri string.
+ * 
+ * @param {String}
+ *            uri The uri.
+ * @return {String} The domain of the uri.
+ */
+DomainUtils.getDomain = function(uri) {
+  var host = this.getHost(uri);
+  try {
+    return this._eTLDService.getBaseDomainFromHost(host, 0);
+  } catch (e) {
+    if (e == "NS_ERROR_HOST_IS_IP_ADDRESS ") {
+      return this.getHost(uri);
+    } else if (e == "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
+      return this.getHost(uri);
+    } else {
+      throw e;
+    }
+  }
+};
+
+/**
+ * Returns the prePath from a uri string.
+ * 
+ * @param {String}
+ *            uri The uri.
+ * @return {String} The prePath of the uri.
+ */
+DomainUtils.getPrePath = function(uri) {
+  return this._ios.newURI(uri, null, null).prePath;
 };
 
 /**

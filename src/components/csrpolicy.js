@@ -48,7 +48,7 @@ CsrPolicyService.prototype = {
   // Settings
   // /////////////////////////////////////////////////////////////////////////
 
-  VERSION : "0.1",
+  VERSION : "0.1.0",
 
   // /////////////////////////////////////////////////////////////////////////
   // Internal Data
@@ -56,11 +56,15 @@ CsrPolicyService.prototype = {
 
   _rejectedRequests : {},
 
+  _allowedRequests : {},
+
   _prefService : null,
 
   _submittedForms : {},
 
   _clickedLinks : {},
+
+  _uriIdentificationLevel : 0,
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -68,7 +72,7 @@ CsrPolicyService.prototype = {
    * 
    * @type Number
    */
-  _lastShouldLoadCheckTimeout : 100,
+  _lastShouldLoadCheckTimeout : 200,
 
   // Calls to shouldLoad appear to be repeated, so successive repeated calls and
   // their result (accept or reject) are tracked to avoid duplicate processing
@@ -85,9 +89,11 @@ CsrPolicyService.prototype = {
 
   _temporarilyAllowedOrigins : {},
 
+  _temporarilyAllowedDestinations : {},
+
   _allowedOrigins : {},
 
-  _ignoredOrigins : {},
+  _allowedDestinations : {},
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -101,15 +107,18 @@ CsrPolicyService.prototype = {
     // Note that we don't load user preferences at this point because the user
     // preferences may not be ready. If we tried right now, we may get the
     // default preferences.
+    this._uriIdentificationLevel = DomainUtils.LEVEL_DOMAIN;
   },
 
   _syncFromPrefs : function() {
     // Load the logging preferences before the otheres.
     this._updateLoggingSettings();
+    // origins
     this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
     Logger.vardump(this._allowedOrigins, "this._allowedOrigins");
-    this._ignoredOrigins = this._getPreferenceObj("ignoredOrigins");
-    Logger.vardump(this._ignoredOrigins, "this._ignoredOrigins");
+    // destinations
+    this._allowedDestinations = this._getPreferenceObj("allowedDestinations");
+    Logger.vardump(this._allowedDestinations, "this._allowedDestinations");
   },
 
   _updateLoggingSettings : function() {
@@ -246,6 +255,10 @@ CsrPolicyService.prototype = {
 
   prefs : null,
 
+  getUriIdentifier : function(uri) {
+    return DomainUtils.getIdentifier(uri, this._uriIdentificationLevel);
+  },
+
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
     Logger.info(Logger.TYPE_INTERNAL, "Form submitted from <" + originUrl
@@ -288,7 +301,6 @@ CsrPolicyService.prototype = {
 
   allowOrigin : function allowOrigin(host) {
     this._allowedOrigins[host] = true;
-    this._unignoreOrigin(host);
     this._setPreferenceList("allowedOrigins", this._allowedOrigins);
   },
 
@@ -306,14 +318,36 @@ CsrPolicyService.prototype = {
     return this._temporarilyAllowedOrigins[host] ? true : false;
   },
 
+  allowDestination : function allowDestination(host) {
+    this._allowedDestinations[host] = true;
+    this._setPreferenceList("allowedDestinations", this._allowedDestinations);
+  },
+
+  isAllowedDestination : function isAllowedDestination(host) {
+    return this._allowedDestinations[host] ? true : false;
+  },
+
+  temporarilyAllowDestination : function temporarilyAllowDestination(host) {
+    this._temporarilyAllowedDestinations[host] = true;
+    this._setPreferenceList("temporarilyAllowedDestinations",
+        this._temporarilyAllowedDestinations);
+  },
+
+  isTemporarilyAllowedDestination : function isTemporarilyAllowedDestination(
+      host) {
+    return this._temporarilyAllowedDestinations[host] ? true : false;
+  },
+
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
     this._temporarilyAllowedOrigins = {};
     this._setPreferenceList("temporarilyAllowedOrigins",
         this._temporarilyAllowedOrigins);
+    this._temporarilyAllowedDestinations = {};
+    this._setPreferenceList("temporarilyAllowedDestinations",
+        this._temporarilyAllowedDestinations);
   },
 
   forbidOrigin : function forbidOrigin(host) {
-    this._unignoreOrigin(host);
     if (this._temporarilyAllowedOrigins[host]) {
       delete this._temporarilyAllowedOrigins[host];
       this._setPreferenceList("temporarilyAllowedOrigins",
@@ -325,21 +359,16 @@ CsrPolicyService.prototype = {
     }
   },
 
-  ignoreOrigin : function ignoreOrigin(host) {
-    this._ignoredOrigins[host] = true;
-    this._setPreferenceList("ignoredOrigins", this._ignoredOrigins);
-  },
-
-  _unignoreOrigin : function _unignoreOrigin(host) {
-    if (this._ignoredOrigins[host]) {
-      delete this._ignoredOrigins[host];
-      this._setPreferenceList("ignoredOrigins", this._ignoredOrigins);
+  forbidDestination : function forbidDestination(host) {
+    if (this._temporarilyAllowedDestinations[host]) {
+      delete this._temporarilyAllowedDestinations[host];
+      this._setPreferenceList("temporarilyAllowedDestinations",
+          this._temporarilyAllowedDestinations);
     }
-  },
-
-  isIgnoredOrigin : function isIgnoredOrigin(host) {
-    return this._ignoredOrigins[host];
-    this._setPreferenceList("allowedOrigins", this._allowedOrigins);
+    if (this._allowedDestinations[host]) {
+      delete this._allowedDestinations[host];
+      this._setPreferenceList("allowedDestinations", this._allowedDestinations);
+    }
   },
 
   _setPreferenceList : function(prefName, setFromObj) {
@@ -455,34 +484,46 @@ CsrPolicyService.prototype = {
     }
 
     var origin = args[2].spec;
-    var destination = args[1].spec;
-    var destinationHost = args[1].asciiHost;
+    var dest = args[1].spec;
+    var destIdentifier = this.getUriIdentifier(dest);
 
     var date = new Date();
-    this._lastShouldLoadCheck.time = date.getMilliseconds();
-    this._lastShouldLoadCheck.destination = destination;
+    this._lastShouldLoadCheck.time = date.getTime();
+    this._lastShouldLoadCheck.destination = dest;
     this._lastShouldLoadCheck.origin = origin;
     this._lastShouldLoadCheck.result = CP_REJECT;
 
     // Keep track of the rejected requests by full origin uri, then within each
-    // full origin uri, organize by destination hostnames. This makes it easy to
-    // determine the rejected destination hosts from a given page. The full
-    // destination uri for each rejected destination is then also kept. This
-    // allows showing the number of blocked unique destinations to each
-    // destination host.
+    // full origin uri, organize by dest hostnames. This makes it easy to
+    // determine the rejected dest hosts from a given page. The full
+    // dest uri for each rejected dest is then also kept. This
+    // allows showing the number of blocked unique dests to each
+    // dest host.
     if (!this._rejectedRequests[origin]) {
       this._rejectedRequests[origin] = {};
     }
     var originRejected = this._rejectedRequests[origin];
-    if (!originRejected[destinationHost]) {
-      originRejected[destinationHost] = {};
+    if (!originRejected[destIdentifier]) {
+      originRejected[destIdentifier] = {};
     }
-    if (!originRejected[destinationHost][destination]) {
-      originRejected[destinationHost][destination] = true;
-      if (!originRejected[destinationHost].count) {
-        originRejected[destinationHost].count = 1;
+    if (!originRejected[destIdentifier][dest]) {
+      originRejected[destIdentifier][dest] = true;
+      if (!originRejected[destIdentifier].count) {
+        originRejected[destIdentifier].count = 1;
       } else {
-        originRejected[destinationHost].count++;
+        originRejected[destIdentifier].count++;
+      }
+    }
+
+    // Remove this request from the set of allowed requests.
+    if (this._allowedRequests[origin]) {
+      var originAllowed = this._allowedRequests[origin];
+      if (originAllowed[destIdentifier]) {
+        delete originAllowed[destIdentifier][dest];
+        originAllowed[destIdentifier].count--;
+        if (originAllowed[destIdentifier].count == 0) {
+          delete originAllowed[destIdentifier];
+        }
       }
     }
 
@@ -504,24 +545,52 @@ CsrPolicyService.prototype = {
     }
 
     var origin = args[2].spec;
-    var destination = args[1].spec;
-    var destinationHost = args[1].asciiHost;
+    var dest = args[1].spec;
+    var destIdentifier = this.getUriIdentifier(dest);
 
     var date = new Date();
-    this._lastShouldLoadCheck.time = date.getMilliseconds();
-    this._lastShouldLoadCheck.destination = destination;
+    this._lastShouldLoadCheck.time = date.getTime();
+    this._lastShouldLoadCheck.destination = dest;
     this._lastShouldLoadCheck.origin = origin;
     this._lastShouldLoadCheck.result = CP_OK;
+
+    // Reset the accepted and rejected requests originating from this
+    // destination. That is, if this accepts a request to a uri that may itself
+    // originate further requests, reset the information about what that page is
+    // accepting and rejecting.
+    if (this._allowedRequests[dest]) {
+      delete this._allowedRequests[dest];
+    }
+    if (this._rejectedRequests[dest]) {
+      delete this._rejectedRequests[dest];
+    }
 
     // Remove this request from the set of rejected requests.
     if (this._rejectedRequests[origin]) {
       var originRejected = this._rejectedRequests[origin];
-      if (originRejected[destinationHost]) {
-        delete originRejected[destinationHost][destination];
-        originRejected[destinationHost].count--;
-        if (originRejected[destinationHost].count == 0) {
-          delete originRejected[destinationHost];
+      if (originRejected[destIdentifier]) {
+        delete originRejected[destIdentifier][dest];
+        originRejected[destIdentifier].count--;
+        if (originRejected[destIdentifier].count == 0) {
+          delete originRejected[destIdentifier];
         }
+      }
+    }
+
+    // Keep track of the accepted requests.
+    if (!this._allowedRequests[origin]) {
+      this._allowedRequests[origin] = {};
+    }
+    var originAllowed = this._allowedRequests[origin];
+    if (!originAllowed[destIdentifier]) {
+      originAllowed[destIdentifier] = {};
+    }
+    if (!originAllowed[destIdentifier][dest]) {
+      originAllowed[destIdentifier][dest] = true;
+      if (!originAllowed[destIdentifier].count) {
+        originAllowed[destIdentifier].count = 1;
+      } else {
+        originAllowed[destIdentifier].count++;
       }
     }
 
@@ -597,16 +666,22 @@ CsrPolicyService.prototype = {
    * @return {Boolean} true if the request a duplicate.
    */
   _isDuplicateRequest : function(aContentLocation, aRequestOrigin) {
-    var date = new Date();
-    if (date.getMilliseconds() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
-      if (this._lastShouldLoadCheck.origin == aRequestOrigin.spec
-          && this._lastShouldLoadCheck.destination == aContentLocation.spec) {
+    if (this._lastShouldLoadCheck.origin == aRequestOrigin.spec
+        && this._lastShouldLoadCheck.destination == aContentLocation.spec) {
+      var date = new Date();
+      if (date.getTime() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
         Logger.debug(Logger.TYPE_CONTENT,
             "Using cached shouldLoad() result of "
                 + this._lastShouldLoadCheck.result + " for request to <"
                 + aContentLocation.spec + "> from <" + aRequestOrigin.spec
                 + ">.");
         return true;
+      } else {
+        Logger.debug(Logger.TYPE_CONTENT,
+            "shouldLoad() cache expired for result of "
+                + this._lastShouldLoadCheck.result + " for request to <"
+                + aContentLocation.spec + "> from <" + aRequestOrigin.spec
+                + ">.");
       }
     }
     return false;
@@ -636,15 +711,23 @@ CsrPolicyService.prototype = {
         var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
-        var originHostNoWww = DomainUtils.stripWww(aRequestOrigin.asciiHost);
-        var destHostNoWww = DomainUtils.stripWww(aContentLocation.asciiHost);
+        var originIdentifier = this.getUriIdentifier(origin);
+        var destIdentifier = this.getUriIdentifier(dest);
 
-        if (this.isTemporarilyAllowedOrigin(originHostNoWww)) {
-          return this.accept("Temporarily allowed origin.", arguments);
+        if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
+          return this.accept("Temporarily allowed origin", arguments);
         }
 
-        if (this.isAllowedOrigin(originHostNoWww)) {
-          return this.accept("Allowed origin.", arguments);
+        if (this.isAllowedOrigin(originIdentifier)) {
+          return this.accept("Allowed origin", arguments);
+        }
+
+        if (this.isTemporarilyAllowedDestination(destIdentifier)) {
+          return this.accept("Temporarily allowed destination", arguments);
+        }
+
+        if (this.isAllowedDestination(destIdentifier)) {
+          return this.accept("Allowed destination", arguments);
         }
 
         // "browser" origin requests for things like favicon.ico and possibly
@@ -656,10 +739,11 @@ CsrPolicyService.prototype = {
                   + "explanation (e.g. new window/tab opened)", arguments);
         }
 
-        if (destHost == originHost) {
+        if (destIdentifier == originIdentifier) {
           arguments = [aContentType, aContentLocation, aRequestOrigin,
               aContext, aMimeTypeGuess, aInternalCall]
-          return this.accept("same hosts", arguments);
+          return this.accept("same host (at current domain strictness level)",
+              arguments);
         }
 
         if (aContext instanceof CI.nsIDOMXULElement) {
@@ -677,14 +761,6 @@ CsrPolicyService.prototype = {
             return this.accept("User-initiated request by form submission",
                 arguments);
           }
-        }
-
-        if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
-          return this.accept("www-similar hosts", arguments);
-        }
-
-        if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
-          return this.accept("dest is subdomain of origin", arguments);
         }
 
         // We didn't match any of the conditions in which to allow the request,

@@ -15,22 +15,28 @@
 	<statusbar id="status-bar">
 		<statusbarpanel>
 			<menu label="&csrpolicyStatusbarLabel;" id="csrpolicyStatusbarLabel">
-				<menupopup onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
-					<menuitem 
-						id="csrpolicyIgnoreOrigin"
-						oncommand="csrpolicyOverlay.ignoreOrigin(event);" />
-					<menuseparator id="csrpolicyIgnoreOriginSeparator" />
+				<menupopup id="csrpolicyStatusbarPopup" onpopupshowing="csrpolicyOverlay.onMenuShowing(event)">
+                    <menu id="csrpolicyBlockedDestinations" label="&csrpolicyStatusbarBlockedDestinations;">
+                        <menupopup id="csrpolicyBlockedDestinationsPopup">
+                        </menupopup>
+                    </menu>
+                    <menu id="csrpolicyAllowedDestinations" label="&csrpolicyStatusbarAllowedDestinations;">
+                        <menupopup id="csrpolicyAllowedDestinationsPopup">
+                        </menupopup>
+                    </menu>
+                    <menuseparator id="csrpolicyOriginSubmenusSeparator" />
 					<menuitem 
 						id="csrpolicyRevokeTemporaryPermissions"
 						label="&revokeTemporaryPermissions;"
 						oncommand="csrpolicyOverlay.revokeTemporaryPermissions(event);" />
 					<menuseparator id="csrpolicyRevokeTemporaryPermissionsSeparator" />
 					<menuitem 
-						id="csrpolicyAllowOriginTemporarily"
-						oncommand="csrpolicyOverlay.temporarilyAllowOrigin(event);" />
-					<menuitem 
 						id="csrpolicyAllowOrigin"
 						oncommand="csrpolicyOverlay.allowOrigin(event);" />
+                    <menuitem 
+                        id="csrpolicyAllowOriginTemporarily"
+                        class="csrpolicyTemporary"
+                        oncommand="csrpolicyOverlay.temporarilyAllowOrigin(event);" />
 					<menuitem 
 						id="csrpolicyForbidOrigin"
 						oncommand="csrpolicyOverlay.forbidOrigin(event);" />

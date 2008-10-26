@@ -15,12 +15,16 @@ interface nsICSRPolicy : nsISupports
   void allowOrigin(in ACString host);
   boolean isAllowedOrigin(in ACString host);
   
-  void ignoreOrigin(in ACString host);
-  boolean isIgnoredOrigin(in ACString host);
+  void temporarilyAllowDestination(in ACString host);
+  boolean isTemporarilyAllowedDestination(in ACString host);
+  
+  void allowDestination(in ACString host);
+  boolean isAllowedDestination(in ACString host);
   
   void revokeTemporaryPermissions();
   
   void forbidOrigin(in ACString host);
+  void forbidDestination(in ACString host);
   
   readonly attribute nsIPrefBranch prefs;
 };  

@@ -10,10 +10,15 @@ const CC = Components.classes;
  * each tab/window.
  */
 var csrpolicyOverlay = {
+
   _initialized : false,
   _csrpolicy : null,
   _csrpolicyJSObject : null, // for development, direct access to the js object
   _strbundle : null,
+  _addedMenuItems : [],
+  _menu : null,
+  _blockedDestinationsMenu : null,
+  _allowedDestinationsMenu : null,
 
   /**
    * Initialize the object. This must be done after the DOM is loaded.
@@ -25,6 +30,12 @@ var csrpolicyOverlay = {
       this._csrpolicyJSObject = this._csrpolicy.wrappedJSObject;
       this._strbundle = document.getElementById("csrpolicyStrings");
       this._initialized = true;
+      this._menu = document.getElementById("csrpolicyStatusbarPopup");
+
+      this._blockedDestinationsMenu = document
+          .getElementById("csrpolicyBlockedDestinationsPopup");
+      this._allowedDestinationsMenu = document
+          .getElementById("csrpolicyAllowedDestinationsPopup");
     }
   },
 
@@ -38,19 +49,19 @@ var csrpolicyOverlay = {
   onLoad : function(event) {
     // Info on detecting page load at:
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
-    var appcontent = document.getElementById("appcontent");
+    var appcontent = document.getElementById("appcontent"); // browser
     if (appcontent) {
       const csrpolicyOverlay = this;
-      appcontent.addEventListener("DOMContentLoaded", function() {
-            csrpolicyOverlay.onDOMContentLoaded(event)
+      appcontent.addEventListener("DOMContentLoaded", function(event) {
+            csrpolicyOverlay.onPageLoad(event);
           }, true);
       // Attempting to have the onPageLoad handler called after all page content
       // has attempted to be loaded, but not sure this is actually being called
       // late enough. Maybe those few remaining requests coming through are
       // content that isn't part of the initial load of the page?
-      appcontent.addEventListener("load", function() {
-            csrpolicyOverlay.onPageLoad(event)
-          }, true);
+      // appcontent.addEventListener("load", function() {
+      // csrpolicyOverlay.onPageLoad(event)
+      // }, true);
     }
   },
 
@@ -70,6 +81,7 @@ var csrpolicyOverlay = {
       return;
     }
 
+    this._onDOMContentLoaded(event);
     this._checkForBlockedContent();
   },
 
@@ -82,7 +94,6 @@ var csrpolicyOverlay = {
     var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
     var anyRejected = false;
     if (rejectedRequests) {
-      Logger.vardump(rejectedRequests);
       for (var i in rejectedRequests) {
         for (var j in rejectedRequests[i]) {
           if (rejectedRequests[i][j]) {
@@ -93,14 +104,17 @@ var csrpolicyOverlay = {
     }
 
     if (anyRejected) {
-      // TODO: indicate to user that requests were rejected
-      Logger.dump("Some requests rejected");
-      var csrpolicyStatusbarLabel = document
-          .getElementById("csrpolicyStatusbarLabel");
-      csrpolicyStatusbarLabel.style.color = "#a00";
-    } else {
-      Logger.dump("No requests rejected");
+      this._setBlockedContentNotification();
     }
+  },
+
+  /**
+   * Creates a blocked content notifications visible to the user.
+   */
+  _setBlockedContentNotification : function() {
+    var csrpolicyStatusbarLabel = document
+        .getElementById("csrpolicyStatusbarLabel");
+    csrpolicyStatusbarLabel.style.color = "#a00";
   },
 
   /**
@@ -119,13 +133,14 @@ var csrpolicyOverlay = {
    * @param {Event}
    *            event
    */
-  onDOMContentLoaded : function(event) {
+  _onDOMContentLoaded : function(event) {
 
     // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
     // new links/forms with csrpolicy even if they are added after initial
     // load (e.g. they are added through javascript).
 
     var document = event.target;
+    Logger.vardump(document);
 
     const csrpolicy = this._csrpolicy;
 
@@ -235,14 +250,14 @@ var csrpolicyOverlay = {
   },
 
   /**
-   * Determines the current document's hostname without the "www.".
+   * Determines the current document's uri identifier based on the current
+   * identifier level setting.
    * 
-   * @return {String} The current document's hostname without any leading
-   *         "www.".
+   * @return {String} The current document's identifier.
    */
-  _getCurrentHostWithoutWww : function _getCurrentHostWithoutWww() {
-    var host = DomainUtils.getHost(content.document.documentURI);
-    return DomainUtils.stripWww(host);
+  _getCurrentUriIdentifier : function _getCurrentUriIdentifier() {
+    return this._csrpolicyJSObject
+        .getUriIdentifier(content.document.documentURI);
   },
 
   /**
@@ -252,12 +267,9 @@ var csrpolicyOverlay = {
   prepareMenu : function() {
     // TODO: This is broken for schemes that don't have host values (e.g.
     // "file")
-    var host = this._getCurrentHostWithoutWww();
+    var currentIdentifier = this._getCurrentUriIdentifier();
 
     // The menu items we may need.
-    var itemIgnoreOrigin = document.getElementById("csrpolicyIgnoreOrigin");
-    var itemIgnoreOriginSeparator = document
-        .getElementById("csrpolicyIgnoreOriginSeparator");
     var itemRevokeTemporaryPermissions = document
         .getElementById("csrpolicyRevokeTemporaryPermissions");
     var itemRevokeTemporaryPermissionsSeparator = document
@@ -269,45 +281,177 @@ var csrpolicyOverlay = {
 
     // Set all labels here for convenience, even though we won't display some of
     // these menu items.
-    itemIgnoreOrigin.label = this._strbundle.getFormattedString("ignoreOrigin",
-        [host]);
     itemForbidOrigin.label = this._strbundle.getFormattedString("forbidOrigin",
-        [host]);
+        [currentIdentifier]);
     itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
-        "allowOriginTemporarily", [host]);
+        "allowOriginTemporarily", [currentIdentifier]);
     itemAllowOrigin.label = this._strbundle.getFormattedString("allowOrigin",
-        [host]);
+        [currentIdentifier]);
 
     // Initially make all menu items hidden.
-    itemIgnoreOrigin.hidden = true;
-    itemIgnoreOriginSeparator.hidden = true;
     itemRevokeTemporaryPermissions.hidden = true;
     itemRevokeTemporaryPermissionsSeparator.hidden = true;
     itemAllowOriginTemporarily.hidden = true;
     itemAllowOrigin.hidden = true;
     itemForbidOrigin.hidden = true;
 
-    if (this._csrpolicy.isTemporarilyAllowedOrigin(host)) {
+    if (this._csrpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
       itemForbidOrigin.hidden = false;
-    } else if (this._csrpolicy.isAllowedOrigin(host)) {
+    } else if (this._csrpolicy.isAllowedOrigin(currentIdentifier)) {
       itemForbidOrigin.hidden = false;
     } else {
       itemAllowOriginTemporarily.hidden = false;
       itemAllowOrigin.hidden = false;
     }
 
-    if (this._csrpolicy.isTemporarilyAllowedOrigin(host)) {
+    if (this._csrpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
       // TODO: The condition should be related to any temporary permissions that
       // affect the current document, including temporary destinations and
       // temporary origin-to-destination pairs.
       itemRevokeTemporaryPermissions.hidden = false;
       itemRevokeTemporaryPermissionsSeparator.hidden = false;
-    } else if (this._csrpolicy.isAllowedOrigin(host) == false) {
-      if (this._csrpolicy.isIgnoredOrigin(host) == false) {
-        itemIgnoreOrigin.hidden = false;
-        itemIgnoreOriginSeparator.hidden = false;
-      }
     }
+
+    // Clear destinations submenus.
+    while (this._blockedDestinationsMenu.firstChild) {
+      this._blockedDestinationsMenu
+          .removeChild(this._blockedDestinationsMenu.firstChild);
+    }
+    while (this._allowedDestinationsMenu.firstChild) {
+      this._allowedDestinationsMenu
+          .removeChild(this._allowedDestinationsMenu.firstChild);
+    }
+
+    // Remove old menu items.
+    for (var i in this._addedMenuItems) {
+      this._menu.removeChild(this._addedMenuItems[i]);
+    }
+    this._addedMenuItems = [];
+
+    // Add new menu items giving options to allow content.
+    var uri = content.document.location;
+    var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
+    for (var destIdentifier in rejectedRequests) {
+      this._addBlockedDestinationsMenuSeparator();
+      this._addMenuItemTemporarilyAllowDest(destIdentifier);
+      this._addMenuItemAllowDest(destIdentifier);
+    }
+
+    // Add new menu items giving options to forbid currently accepted content.
+    var uri = content.document.location;
+    var allowedRequests = this._csrpolicyJSObject._allowedRequests[uri];
+    for (var destIdentifier in allowedRequests) {
+      if (destIdentifier == this._getCurrentUriIdentifier()) {
+        continue;
+      }
+      this._addAllowedDestinationsMenuSeparator();
+      this._addMenuItemForbidDest(destIdentifier);
+    }
+
+    this._cleanupMenus();
+
+  },
+
+  _cleanupMenus : function() {
+    this._removeExtraSubmenuSeparators(this._blockedDestinationsMenu);
+    this._removeExtraSubmenuSeparators(this._allowedDestinationsMenu);
+
+    this._disableMenuIfEmpty(this._blockedDestinationsMenu);
+    this._disableMenuIfEmpty(this._allowedDestinationsMenu);
+  },
+
+  _removeExtraSubmenuSeparators : function(menu) {
+    if (menu.firstChild && menu.lastChild.nodeName == "menuseparator") {
+      menu.removeChild(menu.lastChild);
+    }
+  },
+
+  _disableMenuIfEmpty : function(menu) {
+    // parentNode is the menu label
+    menu.parentNode.disabled = menu.firstChild ? false : true;
+  },
+
+  _addMenuItemTemporarilyAllowDest : function(destHost) {
+    var label = "Temporarily allow requests to " + destHost;
+    // TODO: sanitize destHost
+    var command = "csrpolicyOverlay.temporarilyAllowDestination('" + destHost
+        + "');";
+    var statustext = destHost;
+    var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
+        statustext);
+    item.setAttribute("class", "csrpolicyTemporary");
+  },
+
+  _addMenuItemAllowDest : function(destHost) {
+    var label = "Always allow requests to " + destHost;
+    // TODO: sanitize destHost
+    var command = "csrpolicyOverlay.allowDestination('" + destHost + "');";
+    var statustext = destHost;
+    var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
+        statustext);
+  },
+
+  _addMenuItemForbidDest : function(destHost) {
+    var label = "Forbid requests to " + destHost;
+    // TODO: sanitize destHost
+    var command = "csrpolicyOverlay.forbidDestination('" + destHost + "');";
+    var statustext = destHost;
+    var item = this._addAllowedDestinationsMenuItem(destHost, label, command,
+        statustext);
+  },
+
+  _addMenuSeparator : function() {
+    var separator = document.createElement("menuseparator");
+    this._menu.insertBefore(separator, this._menu.firstChild);
+    this._addedMenuItems.push(separator);
+  },
+
+  _addBlockedDestinationsMenuSeparator : function() {
+    var separator = document.createElement("menuseparator");
+    this._blockedDestinationsMenu.insertBefore(separator,
+        this._blockedDestinationsMenu.firstChild);
+  },
+
+  _addAllowedDestinationsMenuSeparator : function() {
+    var separator = document.createElement("menuseparator");
+    this._allowedDestinationsMenu.insertBefore(separator,
+        this._allowedDestinationsMenu.firstChild);
+  },
+
+  _addMenuItem : function(destHost, label, oncommand, statustext) {
+    var newNode = document.createElement("menuitem");
+    // newNode.setAttribute("label", this.getString("allowTemp", [menuSite]));
+    newNode.setAttribute("label", label);
+    newNode.setAttribute("statustext", statustext);
+    newNode.setAttribute("oncommand", oncommand);
+    // newNode.setAttribute("class", cssClass + " noscript-temp
+    // noscript-allow");
+    // newNode.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
+    this._menu.insertBefore(newNode, this._menu.firstChild);
+    this._addedMenuItems.push(newNode);
+    return newNode;
+  },
+
+  _addBlockedDestinationsMenuItem : function(destHost, label, oncommand,
+      statustext) {
+    var newNode = document.createElement("menuitem");
+    newNode.setAttribute("label", label);
+    newNode.setAttribute("statustext", statustext);
+    newNode.setAttribute("oncommand", oncommand);
+    this._blockedDestinationsMenu.insertBefore(newNode,
+        this._blockedDestinationsMenu.firstChild);
+    return newNode;
+  },
+
+  _addAllowedDestinationsMenuItem : function(destHost, label, oncommand,
+      statustext) {
+    var newNode = document.createElement("menuitem");
+    newNode.setAttribute("label", label);
+    newNode.setAttribute("statustext", statustext);
+    newNode.setAttribute("oncommand", oncommand);
+    this._allowedDestinationsMenu.insertBefore(newNode,
+        this._allowedDestinationsMenu.firstChild);
+    return newNode;
   },
 
   /**
@@ -330,8 +474,20 @@ var csrpolicyOverlay = {
   temporarilyAllowOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
-    var host = this._getCurrentHostWithoutWww();
+    var host = this._getCurrentUriIdentifier();
     this._csrpolicy.temporarilyAllowOrigin(host);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Allows a destination to be requested from any origin for the duration of
+   * the browser session.
+   * 
+   * @param {String}
+   *            destHost
+   */
+  temporarilyAllowDestination : function(destHost) {
+    this._csrpolicy.temporarilyAllowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -343,8 +499,19 @@ var csrpolicyOverlay = {
    *            event
    */
   allowOrigin : function(event) {
-    var host = this._getCurrentHostWithoutWww();
+    var host = this._getCurrentUriIdentifier();
     this._csrpolicy.allowOrigin(host);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Allows requests to a destination, including in future browser sessions.
+   * 
+   * @param {String}
+   *            destHost
+   */
+  allowDestination : function(destHost) {
+    this._csrpolicy.allowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -357,22 +524,21 @@ var csrpolicyOverlay = {
    *            event
    */
   forbidOrigin : function(event) {
-    var host = this._getCurrentHostWithoutWww();
+    var host = this._getCurrentUriIdentifier();
     this._csrpolicy.forbidOrigin(host);
     this._conditionallyReloadDocument();
   },
 
   /**
-   * Ignores the current document's origin when requests from the origin are
-   * blocked. When a site is ignored, no warning is shown to the user when
-   * requests are blocked.
+   * Forbids a destination from being requested by any origina. This revoke's
+   * temporary or permanent request permissions the destination had been given.
    * 
-   * @param {Event}
-   *            event
+   * @param {String}
+   *            destHost
    */
-  ignoreOrigin : function(event) {
-    var host = this._getCurrentHostWithoutWww();
-    this._csrpolicy.ignoreOrigin(host);
+  forbidDestination : function(destHost) {
+    this._csrpolicy.forbidDestination(destHost);
+    this._conditionallyReloadDocument();
   },
 
   /**

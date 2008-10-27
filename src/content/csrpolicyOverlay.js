@@ -193,8 +193,11 @@ var csrpolicyOverlay = {
     var anchorTags = document.getElementsByTagName("a");
     for (var i = 0; i < anchorTags.length; i++) {
       anchorTags[i].addEventListener("click", function(event) {
-            csrpolicy.registerLinkClicked(event.target.ownerDocument.URL,
-                event.target.href);
+            // Note: need to use currentTarget so that it is the link, not
+            // something else within the link that got clicked, it seems.
+            csrpolicy
+                .registerLinkClicked(event.currentTarget.ownerDocument.URL,
+                    event.currentTarget.href);
           }, false);
     }
 

@@ -456,16 +456,16 @@ CsrPolicyService.prototype = {
     }
   },
 
-  _argumentsToString : function(aContentType, aContentLocation, aRequestOrigin,
-      aContext, aMimeTypeGuess, aInternalCall) {
+  _argumentsToString : function(aContentType, dest, origin, aContext,
+      aMimeTypeGuess, aInternalCall) {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
     return "type: "
         + aContentType
         + ", destination: "
-        + (aContentLocation && aContentLocation.spec)
+        + dest
         + ", origin: "
-        + (aRequestOrigin && aRequestOrigin.spec)
+        + origin
         + ", context: "
         + ((aContext instanceof CI.nsIDOMHTMLElement)
             ? "<HTML Element>"
@@ -483,8 +483,8 @@ CsrPolicyService.prototype = {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
 
-    var origin = args[2].spec;
-    var dest = args[1].spec;
+    var origin = args[2];
+    var dest = args[1];
     var destIdentifier = this.getUriIdentifier(dest);
 
     var date = new Date();
@@ -544,8 +544,8 @@ CsrPolicyService.prototype = {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
 
-    var origin = args[2].spec;
-    var dest = args[1].spec;
+    var origin = args[2];
+    var dest = args[1];
     var destIdentifier = this.getUriIdentifier(dest);
 
     var date = new Date();
@@ -620,7 +620,9 @@ CsrPolicyService.prototype = {
         || aContentLocation.scheme == "data"
         || aContentLocation.scheme == "chrome"
         || aContentLocation.scheme == "moz-icon"
-        || aContentLocation.scheme == "view-source") {
+        || aContentLocation.scheme == "view-source"
+        || aContentLocation.scheme == "wyciwyg"
+        || aContentLocation.scheme == "javascript") {
       return true;
     }
 
@@ -665,23 +667,22 @@ CsrPolicyService.prototype = {
    *            aRequestOrigin
    * @return {Boolean} true if the request a duplicate.
    */
-  _isDuplicateRequest : function(aContentLocation, aRequestOrigin) {
-    if (this._lastShouldLoadCheck.origin == aRequestOrigin.spec
-        && this._lastShouldLoadCheck.destination == aContentLocation.spec) {
+  _isDuplicateRequest : function(dest, origin) {
+
+    if (this._lastShouldLoadCheck.origin == origin
+        && this._lastShouldLoadCheck.destination == dest) {
       var date = new Date();
       if (date.getTime() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
         Logger.debug(Logger.TYPE_CONTENT,
             "Using cached shouldLoad() result of "
-                + this._lastShouldLoadCheck.result + " for request to <"
-                + aContentLocation.spec + "> from <" + aRequestOrigin.spec
-                + ">.");
+                + this._lastShouldLoadCheck.result + " for request to <" + dest
+                + "> from <" + origin + ">.");
         return true;
       } else {
         Logger.debug(Logger.TYPE_CONTENT,
             "shouldLoad() cache expired for result of "
-                + this._lastShouldLoadCheck.result + " for request to <"
-                + aContentLocation.spec + "> from <" + aRequestOrigin.spec
-                + ">.");
+                + this._lastShouldLoadCheck.result + " for request to <" + dest
+                + "> from <" + origin + ">.");
       }
     }
     return false;
@@ -700,15 +701,16 @@ CsrPolicyService.prototype = {
           return CP_OK;
         }
 
-        if (this._isDuplicateRequest(aContentLocation, aRequestOrigin)) {
+        var origin = DomainUtils.stripFragment(aRequestOrigin.spec);
+        var dest = DomainUtils.stripFragment(aContentLocation.spec);
+
+        if (this._isDuplicateRequest(dest, origin)) {
           return this._lastShouldLoadCheck.result;
         }
 
-        arguments = [aContentType, aContentLocation, aRequestOrigin, aContext,
-            aMimeTypeGuess, aInternalCall]
+        arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
+            aInternalCall]
 
-        var origin = aRequestOrigin.spec;
-        var dest = aContentLocation.spec;
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
         var originIdentifier = this.getUriIdentifier(origin);
@@ -740,15 +742,15 @@ CsrPolicyService.prototype = {
         }
 
         if (destIdentifier == originIdentifier) {
-          arguments = [aContentType, aContentLocation, aRequestOrigin,
-              aContext, aMimeTypeGuess, aInternalCall]
           return this.accept("same host (at current domain strictness level)",
               arguments);
         }
 
         if (aContext instanceof CI.nsIDOMXULElement) {
           if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
-            delete this._clickedLinks[origin][dest];
+            // Don't delete the _clickedLinks item. We need it for if the user
+            // goes back/forward through their history.
+            // delete this._clickedLinks[origin][dest];
             return this.accept("User-initiated request by link click",
                 arguments);
 
@@ -757,7 +759,9 @@ CsrPolicyService.prototype = {
             // Note: we dropped the query string from the dest because form GET
             // requests will have that added on here but the original action of
             // the form may not have had it.
-            delete this._submittedForms[origin][dest.split("?")[0]];
+            // Don't delete the _clickedLinks item. We need it for if the user
+            // goes back/forward through their history.
+            // delete this._submittedForms[origin][dest.split("?")[0]];
             return this.accept("User-initiated request by form submission",
                 arguments);
           }

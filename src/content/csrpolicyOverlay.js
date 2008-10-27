@@ -63,6 +63,15 @@ var csrpolicyOverlay = {
       // csrpolicyOverlay.onPageLoad(event)
       // }, true);
     }
+
+    // Add an event listener for when the contentAreaContextMenu (generally the
+    // right-click menu within the document) is shown.
+    var contextMenu = document.getElementById("contentAreaContextMenu");
+    if (contextMenu) {
+      contextMenu.addEventListener("popupshowing",
+          this._contextMenuOnPopShowing, false);
+    }
+
   },
 
   /**
@@ -90,7 +99,7 @@ var csrpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function() {
-    var uri = content.document.location;
+    var uri = this._getCurrentUri();
     var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
     var anyRejected = false;
     if (rejectedRequests) {
@@ -140,8 +149,6 @@ var csrpolicyOverlay = {
     // load (e.g. they are added through javascript).
 
     var document = event.target;
-    Logger.vardump(document);
-
     const csrpolicy = this._csrpolicy;
 
     // Clear any notifications that may have been present.
@@ -175,6 +182,7 @@ var csrpolicyOverlay = {
             csrpolicy.registerLinkClicked(event.target.ownerDocument.URL,
                 event.target.href);
           }, false);
+      Logger.dump("Added click listener to link: " + anchorTags[i].href);
     }
 
     // Find all form tags and add submit events.
@@ -191,14 +199,6 @@ var csrpolicyOverlay = {
             csrpolicy.registerFormSubmitted(event.target.ownerDocument.URL,
                 event.target.action);
           }, false);
-    }
-
-    // Add an event listener for when the contentAreaContextMenu (generally the
-    // right-click menu within the document) is shown.
-    var contextMenu = document.getElementById("contentAreaContextMenu");
-    if (contextMenu) {
-      contextMenu.addEventListener("popupshowing",
-          this._contextMenuOnPopShowing, false);
     }
 
   },
@@ -256,8 +256,11 @@ var csrpolicyOverlay = {
    * @return {String} The current document's identifier.
    */
   _getCurrentUriIdentifier : function _getCurrentUriIdentifier() {
-    return this._csrpolicyJSObject
-        .getUriIdentifier(content.document.documentURI);
+    return this._csrpolicyJSObject.getUriIdentifier(this._getCurrentUri());
+  },
+
+  _getCurrentUri : function _getCurrentUriIdentifier() {
+    return DomainUtils.stripFragment(content.document.documentURI);
   },
 
   /**
@@ -265,8 +268,6 @@ var csrpolicyOverlay = {
    * document.
    */
   prepareMenu : function() {
-    // TODO: This is broken for schemes that don't have host values (e.g.
-    // "file")
     var currentIdentifier = this._getCurrentUriIdentifier();
 
     // The menu items we may need.
@@ -328,8 +329,9 @@ var csrpolicyOverlay = {
     }
     this._addedMenuItems = [];
 
+    var uri = this._getCurrentUri();
+
     // Add new menu items giving options to allow content.
-    var uri = content.document.location;
     var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
     for (var destIdentifier in rejectedRequests) {
       this._addBlockedDestinationsMenuSeparator();
@@ -338,7 +340,6 @@ var csrpolicyOverlay = {
     }
 
     // Add new menu items giving options to forbid currently accepted content.
-    var uri = content.document.location;
     var allowedRequests = this._csrpolicyJSObject._allowedRequests[uri];
     for (var destIdentifier in allowedRequests) {
       if (destIdentifier == this._getCurrentUriIdentifier()) {

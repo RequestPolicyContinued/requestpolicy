@@ -130,6 +130,10 @@ DomainUtils.sameHostIgnoreWww = function(destinationHost, originHost) {
 
 };
 
+DomainUtils.stripFragment = function(uri) {
+  return uri.split("#")[0];
+};
+
 /**
  * Determine if the destination hostname is a subdomain of the origin hostname,
  * ignoring any "www." that may exist in the origin hostname. That is,

@@ -50,8 +50,8 @@ var csrpolicyOverlay = {
     // Info on detecting page load at:
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
     var appcontent = document.getElementById("appcontent"); // browser
+    const csrpolicyOverlay = this;
     if (appcontent) {
-      const csrpolicyOverlay = this;
       appcontent.addEventListener("DOMContentLoaded", function(event) {
             csrpolicyOverlay.onPageLoad(event);
           }, true);
@@ -72,6 +72,16 @@ var csrpolicyOverlay = {
           this._contextMenuOnPopShowing, false);
     }
 
+    // During initialisation
+    var container = gBrowser.tabContainer;
+    container.addEventListener("TabSelect", function(event) {
+          csrpolicyOverlay.tabChanged();
+        }, false);
+
+  },
+
+  tabChanged : function() {
+    this._checkForBlockedContent();
   },
 
   /**
@@ -99,6 +109,8 @@ var csrpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function() {
+    Logger.dump("checking for blocked content");
+
     var uri = this._getCurrentUri();
     var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
     var anyRejected = false;
@@ -114,6 +126,8 @@ var csrpolicyOverlay = {
 
     if (anyRejected) {
       this._setBlockedContentNotification();
+    } else {
+      this._clearBlockedContentNotifications();
     }
   },
 
@@ -182,7 +196,6 @@ var csrpolicyOverlay = {
             csrpolicy.registerLinkClicked(event.target.ownerDocument.URL,
                 event.target.href);
           }, false);
-      Logger.dump("Added click listener to link: " + anchorTags[i].href);
     }
 
     // Find all form tags and add submit events.

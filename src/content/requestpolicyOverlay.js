@@ -2,9 +2,6 @@ Components.utils.import("resource://requestpolicy/DOMUtils.jsm");
 Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 
-const CI = Components.interfaces;
-const CC = Components.classes;
-
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
@@ -25,8 +22,8 @@ var requestpolicyOverlay = {
    */
   init : function() {
     if (this._initialized == false) {
-      this._requestpolicy = CC["@requestpolicy.com/requestpolicy-service;1"]
-          .getService(CI.nsIRequestPolicy);
+      this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
+          .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
       this._strbundle = document.getElementById("requestpolicyStrings");
       this._initialized = true;

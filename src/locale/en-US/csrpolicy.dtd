@@ -1,4 +1,0 @@
-<!ENTITY csrpolicyStatusbarLabel "Cross-Site Request Policy">
-<!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
-<!ENTITY csrpolicyStatusbarBlockedDestinations "Blocked destinations">
-<!ENTITY csrpolicyStatusbarAllowedDestinations "Allowed destinations">

@@ -44,7 +44,7 @@ Logger._doLog = function(level, type, message) {
   if (this.enabled && level >= this.level && this.types & type) {
     var levelName = this._LEVEL_NAMES[level.toString()];
     var typeName = this._TYPE_NAMES[type.toString()];
-    dump("[CSRPolicy] [" + levelName + "] [" + typeName + "] " + message + "\n");
+    dump("[RequestPolicy] [" + levelName + "] [" + typeName + "] " + message + "\n");
   }
 };
 

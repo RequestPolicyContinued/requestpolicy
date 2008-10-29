@@ -1,9 +1,9 @@
-pref("extensions.csrpolicy.log", true);
-pref("extensions.csrpolicy.log.level", 0);
-pref("extensions.csrpolicy.log.types", 1023);
+pref("extensions.requestpolicy.log", true);
+pref("extensions.requestpolicy.log.level", 0);
+pref("extensions.requestpolicy.log.types", 1023);
 
-pref("extensions.csrpolicy.autoReload", true);
+pref("extensions.requestpolicy.autoReload", true);
 
-pref("extensions.csrpolicy.allowedOrigins", "test");
-pref("extensions.csrpolicy.allowedDestinations", "");
-// pref("extensions.csrpolicy.allowedOriginsToDestinations", "");
+pref("extensions.requestpolicy.allowedOrigins", "test");
+pref("extensions.requestpolicy.allowedDestinations", "");
+// pref("extensions.requestpolicy.allowedOriginsToDestinations", "");

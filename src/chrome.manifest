@@ -1,9 +1,9 @@
-overlay    chrome://browser/content/browser.xul    chrome://csrpolicy/content/csrpolicyOverlay.xul
+overlay    chrome://browser/content/browser.xul    chrome://requestpolicy/content/requestpolicyOverlay.xul
 
-#content    csrpolicy    jar:chrome/csrpolicy.jar!/content/
-#skin       csrpolicy    classic/1.0    jar:chrome/csrpolicy.jar!/skin/
-#locale     csrpolicy    en-US          jar:chrome/csrpolicy.jar!/locale/en-US/
+#content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
+#skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/
+#locale     requestpolicy    en-US          jar:chrome/requestpolicy.jar!/locale/en-US/
 
-content    csrpolicy    content/
-skin       csrpolicy    classic/1.0    skin/
-locale     csrpolicy    en-US          locale/en-US/
+content    requestpolicy    content/
+skin       requestpolicy    classic/1.0    skin/
+locale     requestpolicy    en-US          locale/en-US/

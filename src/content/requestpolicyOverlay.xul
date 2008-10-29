@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://requestpolicy/skin/requestpolicy.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	id="requestpolicyOverlay">
+
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/strings.properties"/>
+	</stringbundleset>
+	
+	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
+
+	<statusbar id="status-bar">
+		<statusbarpanel>
+			<menu label="&requestpolicyStatusbarLabel;" id="requestpolicyStatusbarLabel">
+				<menupopup id="requestpolicyStatusbarPopup" onpopupshowing="requestpolicyOverlay.onMenuShowing(event)">
+					<menu id="requestpolicyBlockedDestinations" label="&requestpolicyStatusbarBlockedDestinations;">
+						<menupopup id="requestpolicyBlockedDestinationsPopup">
+						</menupopup>
+					</menu>
+					<menu id="requestpolicyAllowedDestinations" label="&requestpolicyStatusbarAllowedDestinations;">
+						<menupopup id="requestpolicyAllowedDestinationsPopup">
+						</menupopup>
+					</menu>
+					<menuseparator id="requestpolicyOriginSubmenusSeparator" />
+					<menuitem 
+						id="requestpolicyRevokeTemporaryPermissions"
+						label="&revokeTemporaryPermissions;"
+						oncommand="requestpolicyOverlay.revokeTemporaryPermissions(event);" />
+					<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
+					<menuitem 
+						id="requestpolicyAllowOrigin"
+						oncommand="requestpolicyOverlay.allowOrigin(event);" />
+					<menuitem 
+						id="requestpolicyAllowOriginTemporarily"
+						class="requestpolicyTemporary"
+						oncommand="requestpolicyOverlay.temporarilyAllowOrigin(event);" />
+					<menuitem 
+						id="requestpolicyForbidOrigin"
+						oncommand="requestpolicyOverlay.forbidOrigin(event);" />
+				</menupopup>
+			</menu>
+		</statusbarpanel>
+	</statusbar>
+
+</overlay>

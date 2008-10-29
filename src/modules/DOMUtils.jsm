@@ -10,7 +10,7 @@ const DOMUtils = {
   consoleDump: false,
   
   dump: function(msg) {
-    if(this.consoleDump) dump("[CsrPolicy DOMUtils] " + msg + "\n");
+    if(this.consoleDump) dump("[RequestPolicy DOMUtils] " + msg + "\n");
   },
   
   findBrowser: function(chrome, win) {

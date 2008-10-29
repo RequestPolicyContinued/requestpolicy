@@ -1,6 +1,6 @@
-Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
-Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
-Components.utils.import("resource://csrpolicy/Logger.jsm");
+Components.utils.import("resource://requestpolicy/DOMUtils.jsm");
+Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
+Components.utils.import("resource://requestpolicy/Logger.jsm");
 
 const CI = Components.interfaces;
 const CC = Components.classes;
@@ -9,11 +9,11 @@ const CC = Components.classes;
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-var csrpolicyOverlay = {
+var requestpolicyOverlay = {
 
   _initialized : false,
-  _csrpolicy : null,
-  _csrpolicyJSObject : null, // for development, direct access to the js object
+  _requestpolicy : null,
+  _requestpolicyJSObject : null, // for development, direct access to the js object
   _strbundle : null,
   _addedMenuItems : [],
   _menu : null,
@@ -25,17 +25,17 @@ var csrpolicyOverlay = {
    */
   init : function() {
     if (this._initialized == false) {
-      this._csrpolicy = CC["@csrpolicy.com/csrpolicy-service;1"]
-          .getService(CI.nsICSRPolicy);
-      this._csrpolicyJSObject = this._csrpolicy.wrappedJSObject;
-      this._strbundle = document.getElementById("csrpolicyStrings");
+      this._requestpolicy = CC["@requestpolicy.com/requestpolicy-service;1"]
+          .getService(CI.nsIRequestPolicy);
+      this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+      this._strbundle = document.getElementById("requestpolicyStrings");
       this._initialized = true;
-      this._menu = document.getElementById("csrpolicyStatusbarPopup");
+      this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
       this._blockedDestinationsMenu = document
-          .getElementById("csrpolicyBlockedDestinationsPopup");
+          .getElementById("requestpolicyBlockedDestinationsPopup");
       this._allowedDestinationsMenu = document
-          .getElementById("csrpolicyAllowedDestinationsPopup");
+          .getElementById("requestpolicyAllowedDestinationsPopup");
     }
   },
 
@@ -50,17 +50,17 @@ var csrpolicyOverlay = {
     // Info on detecting page load at:
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
     var appcontent = document.getElementById("appcontent"); // browser
-    const csrpolicyOverlay = this;
+    const requestpolicyOverlay = this;
     if (appcontent) {
       appcontent.addEventListener("DOMContentLoaded", function(event) {
-            csrpolicyOverlay.onPageLoad(event);
+            requestpolicyOverlay.onPageLoad(event);
           }, true);
       // Attempting to have the onPageLoad handler called after all page content
       // has attempted to be loaded, but not sure this is actually being called
       // late enough. Maybe those few remaining requests coming through are
       // content that isn't part of the initial load of the page?
       // appcontent.addEventListener("load", function() {
-      // csrpolicyOverlay.onPageLoad(event)
+      // requestpolicyOverlay.onPageLoad(event)
       // }, true);
     }
 
@@ -75,7 +75,7 @@ var csrpolicyOverlay = {
     // During initialisation
     var container = gBrowser.tabContainer;
     container.addEventListener("TabSelect", function(event) {
-          csrpolicyOverlay.tabChanged();
+          requestpolicyOverlay.tabChanged();
         }, false);
 
   },
@@ -112,7 +112,7 @@ var csrpolicyOverlay = {
     Logger.dump("checking for blocked content");
 
     var uri = this._getCurrentUri();
-    var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
+    var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
     var anyRejected = false;
     if (rejectedRequests) {
       for (var i in rejectedRequests) {
@@ -135,18 +135,18 @@ var csrpolicyOverlay = {
    * Creates a blocked content notifications visible to the user.
    */
   _setBlockedContentNotification : function() {
-    var csrpolicyStatusbarLabel = document
-        .getElementById("csrpolicyStatusbarLabel");
-    csrpolicyStatusbarLabel.style.color = "#a00";
+    var requestpolicyStatusbarLabel = document
+        .getElementById("requestpolicyStatusbarLabel");
+    requestpolicyStatusbarLabel.style.color = "#a00";
   },
 
   /**
    * Clears any blocked content notifications visible to the user.
    */
   _clearBlockedContentNotifications : function() {
-    var csrpolicyStatusbarLabel = document
-        .getElementById("csrpolicyStatusbarLabel");
-    csrpolicyStatusbarLabel.style.color = "";
+    var requestpolicyStatusbarLabel = document
+        .getElementById("requestpolicyStatusbarLabel");
+    requestpolicyStatusbarLabel.style.color = "";
   },
 
   /**
@@ -159,11 +159,11 @@ var csrpolicyOverlay = {
   _onDOMContentLoaded : function(event) {
 
     // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
-    // new links/forms with csrpolicy even if they are added after initial
+    // new links/forms with requestpolicy even if they are added after initial
     // load (e.g. they are added through javascript).
 
     var document = event.target;
-    const csrpolicy = this._csrpolicy;
+    const requestpolicy = this._requestpolicy;
 
     // Clear any notifications that may have been present.
     this._clearBlockedContentNotifications();
@@ -195,7 +195,7 @@ var csrpolicyOverlay = {
       anchorTags[i].addEventListener("click", function(event) {
             // Note: need to use currentTarget so that it is the link, not
             // something else within the link that got clicked, it seems.
-            csrpolicy
+            requestpolicy
                 .registerLinkClicked(event.currentTarget.ownerDocument.URL,
                     event.currentTarget.href);
           }, false);
@@ -212,7 +212,7 @@ var csrpolicyOverlay = {
     var formTags = document.getElementsByTagName("form");
     for (var i = 0; i < formTags.length; i++) {
       formTags[i].addEventListener("submit", function(event) {
-            csrpolicy.registerFormSubmitted(event.target.ownerDocument.URL,
+            requestpolicy.registerFormSubmitted(event.target.ownerDocument.URL,
                 event.target.action);
           }, false);
     }
@@ -237,7 +237,7 @@ var csrpolicyOverlay = {
    * contentAreaContextMenu.
    */
   _contextMenuOnPopShowing : function() {
-    csrpolicyOverlay._wrapOpenLinkFunctions();
+    requestpolicyOverlay._wrapOpenLinkFunctions();
   },
 
   /**
@@ -246,12 +246,12 @@ var csrpolicyOverlay = {
    * link/window functions are executed.
    */
   _wrapOpenLinkFunctions : function() {
-    const csrpolicy = this._csrpolicy;
+    const requestpolicy = this._requestpolicy;
 
     if (!gContextMenu.origOpenLinkInTab) {
       gContextMenu.origOpenLinkInTab = gContextMenu.openLinkInTab;
       gContextMenu.openLinkInTab = function() {
-        csrpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+        requestpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
             gContextMenu.link.href);
         return gContextMenu.origOpenLinkInTab();
       };
@@ -285,7 +285,7 @@ var csrpolicyOverlay = {
    * @return {String} The current document's identifier.
    */
   _getCurrentUriIdentifier : function _getCurrentUriIdentifier() {
-    return this._csrpolicyJSObject.getUriIdentifier(this._getCurrentUri());
+    return this._requestpolicyJSObject.getUriIdentifier(this._getCurrentUri());
   },
 
   _getCurrentUri : function _getCurrentUriIdentifier() {
@@ -301,13 +301,13 @@ var csrpolicyOverlay = {
 
     // The menu items we may need.
     var itemRevokeTemporaryPermissions = document
-        .getElementById("csrpolicyRevokeTemporaryPermissions");
+        .getElementById("requestpolicyRevokeTemporaryPermissions");
     var itemRevokeTemporaryPermissionsSeparator = document
-        .getElementById("csrpolicyRevokeTemporaryPermissionsSeparator");
+        .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
     var itemAllowOriginTemporarily = document
-        .getElementById("csrpolicyAllowOriginTemporarily");
-    var itemAllowOrigin = document.getElementById("csrpolicyAllowOrigin");
-    var itemForbidOrigin = document.getElementById("csrpolicyForbidOrigin");
+        .getElementById("requestpolicyAllowOriginTemporarily");
+    var itemAllowOrigin = document.getElementById("requestpolicyAllowOrigin");
+    var itemForbidOrigin = document.getElementById("requestpolicyForbidOrigin");
 
     // Set all labels here for convenience, even though we won't display some of
     // these menu items.
@@ -325,16 +325,16 @@ var csrpolicyOverlay = {
     itemAllowOrigin.hidden = true;
     itemForbidOrigin.hidden = true;
 
-    if (this._csrpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+    if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
       itemForbidOrigin.hidden = false;
-    } else if (this._csrpolicy.isAllowedOrigin(currentIdentifier)) {
+    } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
       itemForbidOrigin.hidden = false;
     } else {
       itemAllowOriginTemporarily.hidden = false;
       itemAllowOrigin.hidden = false;
     }
 
-    if (this._csrpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+    if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
       // TODO: The condition should be related to any temporary permissions that
       // affect the current document, including temporary destinations and
       // temporary origin-to-destination pairs.
@@ -361,7 +361,7 @@ var csrpolicyOverlay = {
     var uri = this._getCurrentUri();
 
     // Add new menu items giving options to allow content.
-    var rejectedRequests = this._csrpolicyJSObject._rejectedRequests[uri];
+    var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
     for (var destIdentifier in rejectedRequests) {
       this._addBlockedDestinationsMenuSeparator();
       this._addMenuItemTemporarilyAllowDest(destIdentifier);
@@ -369,7 +369,7 @@ var csrpolicyOverlay = {
     }
 
     // Add new menu items giving options to forbid currently accepted content.
-    var allowedRequests = this._csrpolicyJSObject._allowedRequests[uri];
+    var allowedRequests = this._requestpolicyJSObject._allowedRequests[uri];
     for (var destIdentifier in allowedRequests) {
       if (destIdentifier == this._getCurrentUriIdentifier()) {
         continue;
@@ -404,18 +404,18 @@ var csrpolicyOverlay = {
   _addMenuItemTemporarilyAllowDest : function(destHost) {
     var label = "Temporarily allow requests to " + destHost;
     // TODO: sanitize destHost
-    var command = "csrpolicyOverlay.temporarilyAllowDestination('" + destHost
+    var command = "requestpolicyOverlay.temporarilyAllowDestination('" + destHost
         + "');";
     var statustext = destHost;
     var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
         statustext);
-    item.setAttribute("class", "csrpolicyTemporary");
+    item.setAttribute("class", "requestpolicyTemporary");
   },
 
   _addMenuItemAllowDest : function(destHost) {
     var label = "Always allow requests to " + destHost;
     // TODO: sanitize destHost
-    var command = "csrpolicyOverlay.allowDestination('" + destHost + "');";
+    var command = "requestpolicyOverlay.allowDestination('" + destHost + "');";
     var statustext = destHost;
     var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
         statustext);
@@ -424,7 +424,7 @@ var csrpolicyOverlay = {
   _addMenuItemForbidDest : function(destHost) {
     var label = "Forbid requests to " + destHost;
     // TODO: sanitize destHost
-    var command = "csrpolicyOverlay.forbidDestination('" + destHost + "');";
+    var command = "requestpolicyOverlay.forbidDestination('" + destHost + "');";
     var statustext = destHost;
     var item = this._addAllowedDestinationsMenuItem(destHost, label, command,
         statustext);
@@ -489,7 +489,7 @@ var csrpolicyOverlay = {
    * be reloaded.
    */
   _conditionallyReloadDocument : function() {
-    if (this._csrpolicy.prefs.getBoolPref("autoReload")) {
+    if (this._requestpolicy.prefs.getBoolPref("autoReload")) {
       content.document.location.reload(true);
     }
   },
@@ -505,7 +505,7 @@ var csrpolicyOverlay = {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
     var host = this._getCurrentUriIdentifier();
-    this._csrpolicy.temporarilyAllowOrigin(host);
+    this._requestpolicy.temporarilyAllowOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -517,7 +517,7 @@ var csrpolicyOverlay = {
    *            destHost
    */
   temporarilyAllowDestination : function(destHost) {
-    this._csrpolicy.temporarilyAllowDestination(destHost);
+    this._requestpolicy.temporarilyAllowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -530,7 +530,7 @@ var csrpolicyOverlay = {
    */
   allowOrigin : function(event) {
     var host = this._getCurrentUriIdentifier();
-    this._csrpolicy.allowOrigin(host);
+    this._requestpolicy.allowOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -541,7 +541,7 @@ var csrpolicyOverlay = {
    *            destHost
    */
   allowDestination : function(destHost) {
-    this._csrpolicy.allowDestination(destHost);
+    this._requestpolicy.allowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -555,7 +555,7 @@ var csrpolicyOverlay = {
    */
   forbidOrigin : function(event) {
     var host = this._getCurrentUriIdentifier();
-    this._csrpolicy.forbidOrigin(host);
+    this._requestpolicy.forbidOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -567,7 +567,7 @@ var csrpolicyOverlay = {
    *            destHost
    */
   forbidDestination : function(destHost) {
-    this._csrpolicy.forbidDestination(destHost);
+    this._requestpolicy.forbidDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -578,17 +578,17 @@ var csrpolicyOverlay = {
    *            event
    */
   revokeTemporaryPermissions : function(event) {
-    this._csrpolicy.revokeTemporaryPermissions();
+    this._requestpolicy.revokeTemporaryPermissions();
     this._conditionallyReloadDocument();
   }
 };
 
-// Initialize the csrpolicyOverlay object when the window DOM is loaded.
+// Initialize the requestpolicyOverlay object when the window DOM is loaded.
 addEventListener("DOMContentLoaded", function(event) {
-      csrpolicyOverlay.init();
+      requestpolicyOverlay.init();
     }, false);
 
 // Registers event handlers for documents loaded in the window.
 addEventListener("load", function(event) {
-      csrpolicyOverlay.onLoad(event);
+      requestpolicyOverlay.onLoad(event);
     }, false);

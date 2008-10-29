@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-		xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+	xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
 	<Description about="urn:mozilla:install-manifest">
-		<em:name>Cross-Site Request Policy</em:name>
+		<em:name>Request Policy</em:name>
 		<em:version>0.1.0</em:version>
 		<em:type>2</em:type>
 		<em:description>Provides users the ability to specify policies for allowing and disallowing cross-site requests.</em:description>
 		<em:creator>Justin Samuel</em:creator>
-		<em:id>csrpolicy@csrpolicy.com</em:id>
+		<em:id>requestpolicy@requestpolicy.com</em:id>
 		
 		<em:targetApplication>
 			<!-- Firefox -->
@@ -21,6 +21,6 @@
 		</em:targetApplication>
 		
 		<em:iconURL></em:iconURL>
-		<em:homepageURL></em:homepageURL>
+		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
 	</Description>
 </RDF>

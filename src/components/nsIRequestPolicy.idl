@@ -4,7 +4,7 @@ interface nsIDOMElement;
 interface nsIPrefBranch;
 
 [scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
-interface nsICSRPolicy : nsISupports
+interface nsIRequestPolicy : nsISupports
 {
   void registerFormSubmitted(in ACString originUrl, in ACString destinationUrl);
   void registerLinkClicked(in ACString originUrl, in ACString destinationUrl);

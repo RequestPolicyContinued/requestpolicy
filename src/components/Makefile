@@ -1,6 +1,6 @@
 IDLC=/usr/lib/xulrunner/xpidl
 INC=/usr/lib/xulrunner/sdk/idl
-XPTS=csrpolicy.xpt
+XPTS=nsIRequestPolicy.xpt
 
 all: $(XPTS)
 

@@ -18,29 +18,29 @@ const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 // Use the new-fangled FF3 module, etc. generation.
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-function CsrPolicyService() {
+function RequestPolicyService() {
   this.wrappedJSObject = this;
 }
 
-CsrPolicyService.prototype = {
-  classDescription : "CSR Policy Javascript XPCOM Component",
+RequestPolicyService.prototype = {
+  classDescription : "RequestPolicy JavaScript XPCOM Component",
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
-  contractID : "@csrpolicy.com/csrpolicy-service;1",
+  contractID : "@requestpolicy.com/requestpolicy-service;1",
   _xpcom_categories : [{
         category : "app-startup"
       }, {
         category : "content-policy"
       }],
-  QueryInterface : XPCOMUtils.generateQI([CI.nsICSRPolicy, CI.nsIObserver,
+  QueryInterface : XPCOMUtils.generateQI([CI.nsIRequestPolicy, CI.nsIObserver,
       CI.nsIContentPolicy]),
 
   /* Factory that creates a singleton instance of the component */
   _xpcom_factory : {
     createInstance : function() {
-      if (CsrPolicyService.instance == null) {
-        CsrPolicyService.instance = new CsrPolicyService();
+      if (RequestPolicyService.instance == null) {
+        RequestPolicyService.instance = new RequestPolicyService();
       }
-      return CsrPolicyService.instance;
+      return RequestPolicyService.instance;
     }
   },
 
@@ -158,7 +158,7 @@ CsrPolicyService.prototype = {
     this._prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
 
-    this.prefs = this._prefService.getBranch("extensions.csrpolicy.")
+    this.prefs = this._prefService.getBranch("extensions.requestpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
   },
@@ -196,12 +196,12 @@ CsrPolicyService.prototype = {
     var modulesDir = extensionDir.clone();
     modulesDir.append("modules");
     var resourceURI = ioService.newFileURI(modulesDir);
-    resProt.setSubstitution("csrpolicy", resourceURI);
+    resProt.setSubstitution("requestpolicy", resourceURI);
 
-    Components.utils.import("resource://csrpolicy/DOMUtils.jsm");
-    Components.utils.import("resource://csrpolicy/Logger.jsm");
-    Components.utils.import("resource://csrpolicy/SiteUtils.jsm");
-    Components.utils.import("resource://csrpolicy/DomainUtils.jsm");
+    Components.utils.import("resource://requestpolicy/DOMUtils.jsm");
+    Components.utils.import("resource://requestpolicy/Logger.jsm");
+    Components.utils.import("resource://requestpolicy/SiteUtils.jsm");
+    Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
   },
 
   _examineHttpResponse : function(observedSubject) {
@@ -277,7 +277,7 @@ CsrPolicyService.prototype = {
   },
 
   // /////////////////////////////////////////////////////////////////////////
-  // nsICSRPolicy interface
+  // nsIRequestPolicy interface
   // /////////////////////////////////////////////////////////////////////////
 
   prefs : null,
@@ -818,7 +818,7 @@ CsrPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 };
 
-var components = [CsrPolicyService];
+var components = [RequestPolicyService];
 function NSGetModule(compMgr, fileSpec) {
   return XPCOMUtils.generateModule(components);
 }

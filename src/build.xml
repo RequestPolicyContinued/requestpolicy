@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 
-<project name="csrpolicy" default="dist">
+<project name="requestpolicy" default="dist">
 	<property name="src.dir" value="." />
 	<property name="dist.dir" value="dist" />
-	<property name="app.name" value="csrpolicy" />
+	<property name="app.name" value="requestpolicy" />
 	<property name="app.id" value="${app.name}" />
 	<!-- extension id like: xxx@xxx.com -->
 	<property name="ff.dir" value="" />

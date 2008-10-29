@@ -131,6 +131,7 @@ CsrPolicyService.prototype = {
     var os = CC['@mozilla.org/observer-service;1']
         .getService(CI.nsIObserverService);
     os.addObserver(this, "http-on-examine-response", false);
+    os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
   },
@@ -140,6 +141,7 @@ CsrPolicyService.prototype = {
       var os = CC['@mozilla.org/observer-service;1']
           .getService(CI.nsIObserverService);
       os.removeObserver(this, "http-on-examine-response");
+      os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
     } catch (e) {
@@ -147,10 +149,15 @@ CsrPolicyService.prototype = {
     }
   },
 
+  _shutdown : function() {
+    this._unregister();
+  },
+
   _initializePrefSystem : function() {
     // Get the preferences branch and setup the preferences observer.
     this._prefService = Components.classes["@mozilla.org/preferences-service;1"]
         .getService(Components.interfaces.nsIPrefService);
+
     this.prefs = this._prefService.getBranch("extensions.csrpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
@@ -246,6 +253,26 @@ CsrPolicyService.prototype = {
       }
     } catch (e) {
       // No location header.
+    }
+  },
+
+  /**
+   * Currently this just looks for prefetch requests that are getting through
+   * which we currently can't stop.
+   */
+  _examineHttpRequest : function(observedSubject) {
+    var httpChannel = observedSubject
+        .QueryInterface(Components.interfaces.nsIHttpChannel);
+    try {
+      // Determine if prefetch requests are slipping through.
+      if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
+        // Seems to be too late to block it at this point. Calling the
+        // cancel(status) method didn't stop it.
+        Logger.warning(Logger.TYPE_CONTENT,
+            "Discovered prefetch request being sent to: " + httpChannel.name);
+      }
+    } catch (e) {
+      // No X-moz header.
     }
   },
 
@@ -417,6 +444,9 @@ CsrPolicyService.prototype = {
       case "http-on-examine-response" :
         this._examineHttpResponse(subject);
         break;
+      case "http-on-modify-request" :
+        this._examineHttpRequest(subject);
+        break;
       case "nsPref:changed" :
         this._updatePref(data);
         break;
@@ -430,7 +460,7 @@ CsrPolicyService.prototype = {
         this._init();
         break;
       case "xpcom-shutdown" :
-        this._unregister();
+        this._shutdown();
         break;
       default :
         Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);

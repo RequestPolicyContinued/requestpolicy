@@ -217,6 +217,19 @@ var csrpolicyOverlay = {
           }, false);
     }
 
+    // Find all <link rel="prefetch" ...> tags. Unfortunately, they can't
+    // just be removed (the url is still prefetched). Just use this as a way
+    // to warn the user. Fundamentally, the user needs to manually change
+    // their preferences until it's possible to change the prefetch preference
+    // programmatically.
+    var linkTags = document.getElementsByTagName("link");
+    for (var i = 0; i < linkTags.length; i++) {
+      if (linkTags[i].rel == "prefetch") {
+        Logger.info(Logger.TYPE_CONTENT, "prefetch of <" + linkTags[i].href
+                + "> found in document at <" + document.location + ">");
+      }
+    }
+
   },
 
   /**

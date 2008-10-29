@@ -7,7 +7,7 @@
 		<em:name>Request Policy</em:name>
 		<em:version>0.1.0</em:version>
 		<em:type>2</em:type>
-		<em:description>Provides users the ability to specify policies for allowing and disallowing cross-site requests.</em:description>
+		<em:description>Provides the ability to specify policies for allowing and disallowing cross-site requests.</em:description>
 		<em:creator>Justin Samuel</em:creator>
 		<em:id>requestpolicy@requestpolicy.com</em:id>
 		

@@ -4,7 +4,7 @@
 	<property name="src.dir" value="." />
 	<property name="dist.dir" value="dist" />
 	<property name="app.name" value="requestpolicy" />
-	<property name="app.id" value="${app.name}" />
+	<property name="app.id" value="requestpolicy@requestpolicy.com" />
 	<!-- extension id like: xxx@xxx.com -->
 	<property name="ff.dir" value="" />
 
@@ -31,7 +31,7 @@
 	<target name="test.chrome" depends="chrome" if="ff.present">
 		<!-- copy to chrome directory -->
 		<copy file="${dist.dir}/${app.name}.jar" todir="${ff.dir}/chrome/chrome" overwrite="true" />
-		<copy file="${src.dir}/chrome.manifest" tofile="${ff.dir}/chrome/${app.name}.manifest" overwrite="true" />
+		<copy file="${src.dir}/chrome.manifest.packaging" tofile="${ff.dir}/chrome/${app.name}.manifest" overwrite="true" />
 	</target>
 
 	<!-- copy to extensions directory -->
@@ -43,6 +43,7 @@
 	-->
 
 	<target name="dist" depends="chrome">
+		<copy file="chrome.manifest.packaging" tofile="chrome.manifest" overwrite="true" />
 		<zip destfile="${dist.dir}/${app.name}.xpi">
 			<zipfileset file="${dist.dir}/${app.name}.jar" prefix="chrome" />
 			<fileset dir="${src.dir}">
@@ -56,6 +57,7 @@
 				<exclude name="**/CVS/**" />
 			</fileset>
 		</zip>
+		<copy file="chrome.manifest.devel" tofile="chrome.manifest" overwrite="true" />
 	</target>
 
 	<target name="clean">

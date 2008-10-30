@@ -16,6 +16,14 @@
 		<statusbarpanel>
 			<menu label="&requestpolicyStatusbarLabel;" id="requestpolicyStatusbarLabel">
 				<menupopup id="requestpolicyStatusbarPopup" onpopupshowing="requestpolicyOverlay.onMenuShowing(event)">
+					<menuitem 
+						id="requestpolicyAllowAllTemporarily"
+						class="requestpolicyTemporary"
+						label="&requestpolicyStatusbarTemporarilyAllowAll;"
+						type="checkbox"
+						checked="false"
+						oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
+					<menuseparator />
 					<menu id="requestpolicyBlockedDestinations" label="&requestpolicyStatusbarBlockedDestinations;">
 						<menupopup id="requestpolicyBlockedDestinationsPopup">
 						</menupopup>

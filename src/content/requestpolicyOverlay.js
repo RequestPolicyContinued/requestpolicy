@@ -10,7 +10,10 @@ var requestpolicyOverlay = {
 
   _initialized : false,
   _requestpolicy : null,
-  _requestpolicyJSObject : null, // for development, direct access to the js object
+  
+  // for development, direct access to the js object
+  _requestpolicyJSObject : null, 
+  
   _strbundle : null,
   _addedMenuItems : [],
   _menu : null,
@@ -401,8 +404,8 @@ var requestpolicyOverlay = {
   _addMenuItemTemporarilyAllowDest : function(destHost) {
     var label = "Temporarily allow requests to " + destHost;
     // TODO: sanitize destHost
-    var command = "requestpolicyOverlay.temporarilyAllowDestination('" + destHost
-        + "');";
+    var command = "requestpolicyOverlay.temporarilyAllowDestination('"
+        + destHost + "');";
     var statustext = destHost;
     var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
         statustext);
@@ -489,6 +492,20 @@ var requestpolicyOverlay = {
     if (this._requestpolicy.prefs.getBoolPref("autoReload")) {
       content.document.location.reload(true);
     }
+  },
+
+  /**
+   * Toggles disabling of all blocking for the current session.
+   * 
+   * @param {Event}
+   *            event
+   */
+  toggleTemporarilyAllowAll : function(event) {
+    // TODO: Refactor to use a function call to disable blocking.
+    this._requestpolicyJSObject._blockingDisabled = !this._requestpolicyJSObject._blockingDisabled;
+    // Only reloading the current document. Should we reload all? Seems like it
+    // would be unexpected to the user if all were reloaded.
+    this._conditionallyReloadDocument();
   },
 
   /**

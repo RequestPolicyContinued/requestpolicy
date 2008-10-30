@@ -54,6 +54,8 @@ RequestPolicyService.prototype = {
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
 
+  _blockingDisabled : false,
+
   _rejectedRequests : {},
 
   _allowedRequests : {},
@@ -242,7 +244,9 @@ RequestPolicyService.prototype = {
 
       // The location header isn't allowed, so remove it.
       try {
-        httpChannel.setResponseHeader("Location", "", false);
+        if (!this._blockingDisabled) {
+          httpChannel.setResponseHeader("Location", "", false);
+        }
         Logger.warning(Logger.TYPE_HEADER_REDIRECT,
             "** BLOCKED ** 'Location' header to <" + dest + ">"
                 + " found in response from <" + origin + ">");
@@ -513,6 +517,10 @@ RequestPolicyService.prototype = {
       Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
     }
 
+    if (this._blockingDisabled) {
+      return CP_OK;
+    }
+
     var origin = args[2];
     var dest = args[1];
     var destIdentifier = this.getUriIdentifier(dest);
@@ -682,6 +690,11 @@ RequestPolicyService.prototype = {
       return true;
     }
 
+    if (aRequestOrigin.scheme == 'about'
+        && aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
+      return true;
+    }
+
     return false;
   },
 
@@ -806,7 +819,7 @@ RequestPolicyService.prototype = {
                 + e.stack);
         Logger.severe(Logger.TYPE_CONTENT,
             "Rejecting request due to internal error.");
-        return CP_REJECT;
+        return this._blockingDisabled ? CP_OK : CP_REJECT;
       }
 
     } // end shouldLoad

@@ -1,4 +1,5 @@
 <!ENTITY requestpolicyStatusbarLabel "Request Policy">
+<!ENTITY requestpolicyStatusbarTemporarilyAllowAll "Temporarily allow all requests">
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
 <!ENTITY requestpolicyStatusbarBlockedDestinations "Blocked destinations">
 <!ENTITY requestpolicyStatusbarAllowedDestinations "Allowed destinations">

@@ -207,56 +207,53 @@ RequestPolicyService.prototype = {
   },
 
   _examineHttpResponse : function(observedSubject) {
-    // TODO: Allow Location header based on policy.
-
-    // TODO: Remove Refresh header, treat it like meta refresh. Refresh
-    // headers may be ignored by firefox, but probably good to remove them if
-    // they exist for future-proofing and bug-proofing.
+    // TODO: Make user aware of blocked headers so they can allow them if
+    // desired.
 
     var httpChannel = observedSubject
         .QueryInterface(Components.interfaces.nsIHttpChannel);
+
     try {
-      // If there is no Location header, getResponseHeader will throw
-      // NS_ERROR_NOT_AVAILABLE. If there is more than one Location header,
-      // the last one is the one that will be used.
-      var dest = httpChannel.getResponseHeader("Location");
-      var origin = httpChannel.name;
-
-      Logger.info(Logger.TYPE_HEADER_REDIRECT, "Found 'Location' header to <"
-              + dest + ">" + " in response from <" + origin + ">");
-
-      var destHost = DomainUtils.getHost(dest);
-      var originHost = DomainUtils.getHost(origin);
-
-      if (DomainUtils.sameHostIgnoreWww(destHost, originHost)) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** ALLOWED ** www-similar hosts. To <" + dest + "> " + "from <"
-                + origin + ">");
-        return;
-      }
-
-      if (DomainUtils.destinationIsSubdomainOfOrigin(destHost, originHost)) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** ALLOWED ** dest is subdomain of origin. To <" + dest + "> "
-                + "from <" + origin + ">");
-        return;
-      }
-
-      // The location header isn't allowed, so remove it.
-      try {
-        if (!this._blockingDisabled) {
-          httpChannel.setResponseHeader("Location", "", false);
-        }
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** BLOCKED ** 'Location' header to <" + dest + ">"
-                + " found in response from <" + origin + ">");
-      } catch (e) {
-        Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing "
-                + "'Location' header to <" + dest + ">"
-                + "  in response from <" + origin + ">." + e);
-      }
+      // If there is no such header, getResponseHeader() will throw
+      // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
+      // the one that will be used.
+      var headerType = "Location";
+      var dest = httpChannel.getResponseHeader(headerType);
     } catch (e) {
-      // No location header.
+      // No location header. Look for a Refresh header.
+      try {
+        var headerType = "Refresh";
+        var dest = httpChannel.getResponseHeader(headerType);
+        // Refresh header has the format: "0,http://..."
+        dest = dest.split(",")[1];
+      } catch (e) {
+        // No Location header or Refresh header.
+        return;
+      }
+    }
+
+    var origin = httpChannel.name;
+
+    if (this._isAllowedRedirect(origin, dest)) {
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
+              + headerType
+              + "' header. Same hosts or allowed origin/destination. To <"
+              + dest + "> " + "from <" + origin + ">");
+      return;
+    }
+
+    // The header isn't allowed, so remove it.
+    try {
+      if (!this._blockingDisabled) {
+        httpChannel.setResponseHeader(headerType, "", false);
+      }
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
+              + headerType + "' header to <" + dest + ">"
+              + " found in response from <" + origin + ">");
+    } catch (e) {
+      Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing " + "'"
+              + headerType + "' header to <" + dest + ">"
+              + "  in response from <" + origin + ">." + e);
     }
   },
 
@@ -280,13 +277,38 @@ RequestPolicyService.prototype = {
     }
   },
 
+  _isAllowedRedirect : function(originUri, destinationUri) {
+    // TODO: Find a way to get rid of repitition of code between this and
+    // shouldLoad().
+
+    // Note: If changing the logic here, also make necessary changes to
+    // shouldLoad().
+
+    var originIdentifier = this.getUriIdentifier(originUri);
+    var destIdentifier = this.getUriIdentifier(destinationUri);
+
+    if (destIdentifier == originIdentifier) {
+      return true;
+    } else if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
+      return true;
+    } else if (this.isAllowedOrigin(originIdentifier)) {
+      return true;
+    } else if (this.isTemporarilyAllowedDestination(destIdentifier)) {
+      return true;
+    } else if (this.isAllowedDestination(destIdentifier)) {
+      return true;
+    }
+
+    return false;
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIRequestPolicy interface
   // /////////////////////////////////////////////////////////////////////////
 
   prefs : null,
 
-  getUriIdentifier : function(uri) {
+  getUriIdentifier : function getUriIdentifier(uri) {
     return DomainUtils.getIdentifier(uri, this._uriIdentificationLevel);
   },
 
@@ -523,13 +545,15 @@ RequestPolicyService.prototype = {
 
     var origin = args[2];
     var dest = args[1];
-    var destIdentifier = this.getUriIdentifier(dest);
 
-    var date = new Date();
-    this._lastShouldLoadCheck.time = date.getTime();
-    this._lastShouldLoadCheck.destination = dest;
-    this._lastShouldLoadCheck.origin = origin;
-    this._lastShouldLoadCheck.result = CP_REJECT;
+    this._cacheShouldLoadResult(CP_REJECT, origin, dest);
+    this._recordRejectedRequest(origin, dest);
+
+    return CP_REJECT;
+  },
+
+  _recordRejectedRequest : function(originUri, destUri) {
+    var destIdentifier = this.getUriIdentifier(destUri);
 
     // Keep track of the rejected requests by full origin uri, then within each
     // full origin uri, organize by dest hostnames. This makes it easy to
@@ -537,15 +561,15 @@ RequestPolicyService.prototype = {
     // dest uri for each rejected dest is then also kept. This
     // allows showing the number of blocked unique dests to each
     // dest host.
-    if (!this._rejectedRequests[origin]) {
-      this._rejectedRequests[origin] = {};
+    if (!this._rejectedRequests[originUri]) {
+      this._rejectedRequests[originUri] = {};
     }
-    var originRejected = this._rejectedRequests[origin];
+    var originRejected = this._rejectedRequests[originUri];
     if (!originRejected[destIdentifier]) {
       originRejected[destIdentifier] = {};
     }
-    if (!originRejected[destIdentifier][dest]) {
-      originRejected[destIdentifier][dest] = true;
+    if (!originRejected[destIdentifier][destUri]) {
+      originRejected[destIdentifier][destUri] = true;
       if (!originRejected[destIdentifier].count) {
         originRejected[destIdentifier].count = 1;
       } else {
@@ -554,18 +578,16 @@ RequestPolicyService.prototype = {
     }
 
     // Remove this request from the set of allowed requests.
-    if (this._allowedRequests[origin]) {
-      var originAllowed = this._allowedRequests[origin];
+    if (this._allowedRequests[originUri]) {
+      var originAllowed = this._allowedRequests[originUri];
       if (originAllowed[destIdentifier]) {
-        delete originAllowed[destIdentifier][dest];
+        delete originAllowed[destIdentifier][destUri];
         originAllowed[destIdentifier].count--;
         if (originAllowed[destIdentifier].count == 0) {
           delete originAllowed[destIdentifier];
         }
       }
     }
-
-    return CP_REJECT;
   },
 
   // We only call this from shouldLoad when the request was a remote request
@@ -584,30 +606,32 @@ RequestPolicyService.prototype = {
 
     var origin = args[2];
     var dest = args[1];
-    var destIdentifier = this.getUriIdentifier(dest);
 
-    var date = new Date();
-    this._lastShouldLoadCheck.time = date.getTime();
-    this._lastShouldLoadCheck.destination = dest;
-    this._lastShouldLoadCheck.origin = origin;
-    this._lastShouldLoadCheck.result = CP_OK;
+    this._cacheShouldLoadResult(CP_OK, origin, dest);
+    this._recordAcceptedRequest(origin, dest);
+
+    return CP_OK;
+  },
+
+  _recordAcceptedRequest : function(originUri, destUri) {
+    var destIdentifier = this.getUriIdentifier(destUri);
 
     // Reset the accepted and rejected requests originating from this
     // destination. That is, if this accepts a request to a uri that may itself
     // originate further requests, reset the information about what that page is
     // accepting and rejecting.
-    if (this._allowedRequests[dest]) {
-      delete this._allowedRequests[dest];
+    if (this._allowedRequests[destUri]) {
+      delete this._allowedRequests[destUri];
     }
-    if (this._rejectedRequests[dest]) {
-      delete this._rejectedRequests[dest];
+    if (this._rejectedRequests[destUri]) {
+      delete this._rejectedRequests[destUri];
     }
 
     // Remove this request from the set of rejected requests.
-    if (this._rejectedRequests[origin]) {
-      var originRejected = this._rejectedRequests[origin];
+    if (this._rejectedRequests[originUri]) {
+      var originRejected = this._rejectedRequests[originUri];
       if (originRejected[destIdentifier]) {
-        delete originRejected[destIdentifier][dest];
+        delete originRejected[destIdentifier][destUri];
         originRejected[destIdentifier].count--;
         if (originRejected[destIdentifier].count == 0) {
           delete originRejected[destIdentifier];
@@ -616,23 +640,29 @@ RequestPolicyService.prototype = {
     }
 
     // Keep track of the accepted requests.
-    if (!this._allowedRequests[origin]) {
-      this._allowedRequests[origin] = {};
+    if (!this._allowedRequests[originUri]) {
+      this._allowedRequests[originUri] = {};
     }
-    var originAllowed = this._allowedRequests[origin];
+    var originAllowed = this._allowedRequests[originUri];
     if (!originAllowed[destIdentifier]) {
       originAllowed[destIdentifier] = {};
     }
-    if (!originAllowed[destIdentifier][dest]) {
-      originAllowed[destIdentifier][dest] = true;
+    if (!originAllowed[destIdentifier][destUri]) {
+      originAllowed[destIdentifier][destUri] = true;
       if (!originAllowed[destIdentifier].count) {
         originAllowed[destIdentifier].count = 1;
       } else {
         originAllowed[destIdentifier].count++;
       }
     }
+  },
 
-    return CP_OK;
+  _cacheShouldLoadResult : function(result, originUri, destUri) {
+    var date = new Date();
+    this._lastShouldLoadCheck.time = date.getTime();
+    this._lastShouldLoadCheck.destination = destUri;
+    this._lastShouldLoadCheck.origin = originUri;
+    this._lastShouldLoadCheck.result = result;
   },
 
   /**
@@ -758,6 +788,9 @@ RequestPolicyService.prototype = {
         var destHost = aContentLocation.asciiHost;
         var originIdentifier = this.getUriIdentifier(origin);
         var destIdentifier = this.getUriIdentifier(dest);
+
+        // Note: If changing the logic here, also make necessary changes to
+        // isAllowedRedirect).
 
         if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
           return this.accept("Temporarily allowed origin", arguments);

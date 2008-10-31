@@ -6,25 +6,27 @@ interface nsIPrefBranch;
 [scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
 interface nsIRequestPolicy : nsISupports
 {
-  void registerFormSubmitted(in ACString originUrl, in ACString destinationUrl);
-  void registerLinkClicked(in ACString originUrl, in ACString destinationUrl);
+  ACString getUriIdentifier(in ACString uri);
+
+  void registerFormSubmitted(in ACString originUri, in ACString destinationUri);
+  void registerLinkClicked(in ACString originUri, in ACString destinationUri);
   
-  void temporarilyAllowOrigin(in ACString host);
-  boolean isTemporarilyAllowedOrigin(in ACString host);
+  void temporarilyAllowOrigin(in ACString siteIdentifier);
+  boolean isTemporarilyAllowedOrigin(in ACString siteIdentifier);
   
-  void allowOrigin(in ACString host);
-  boolean isAllowedOrigin(in ACString host);
+  void allowOrigin(in ACString siteIdentifier);
+  boolean isAllowedOrigin(in ACString siteIdentifier);
   
-  void temporarilyAllowDestination(in ACString host);
-  boolean isTemporarilyAllowedDestination(in ACString host);
+  void temporarilyAllowDestination(in ACString siteIdentifier);
+  boolean isTemporarilyAllowedDestination(in ACString siteIdentifier);
   
-  void allowDestination(in ACString host);
-  boolean isAllowedDestination(in ACString host);
+  void allowDestination(in ACString siteIdentifier);
+  boolean isAllowedDestination(in ACString siteIdentifier);
   
   void revokeTemporaryPermissions();
   
-  void forbidOrigin(in ACString host);
-  void forbidDestination(in ACString host);
+  void forbidOrigin(in ACString siteIdentifier);
+  void forbidDestination(in ACString siteIdentifier);
   
   readonly attribute nsIPrefBranch prefs;
 };  

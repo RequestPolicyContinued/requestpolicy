@@ -10,10 +10,10 @@ var requestpolicyOverlay = {
 
   _initialized : false,
   _requestpolicy : null,
-  
+
   // for development, direct access to the js object
-  _requestpolicyJSObject : null, 
-  
+  _requestpolicyJSObject : null,
+
   _strbundle : null,
   _addedMenuItems : [],
   _menu : null,
@@ -78,6 +78,41 @@ var requestpolicyOverlay = {
           requestpolicyOverlay.tabChanged();
         }, false);
 
+  },
+
+  // This function not currently in use.
+  _showMetaRedirectNotification : function(redirectTargetUri) {
+    var notificationBox = gBrowser.getNotificationBox();
+    var notificationValue = "request-policy-meta-redirect";
+    var notificationLabel = "This webpage tried to redirect to "
+        + redirectTargetUri;
+    var notificationButtonAllow = "Allow";
+    var notificationButtonDeny = "Deny";
+
+    var notification = notificationBox
+        .getNotificationWithValue(notificationValue);
+    if (notification) {
+      notification.label = notificationLabel;
+    } else {
+      var buttons = [{
+            label : notificationButtonAllow,
+            accessKey : '', // TODO
+            popup : null,
+            callback : function() {
+              content.document.location.href = redirectTargetUri;
+            }
+          }, {
+            label : notificationButtonDeny,
+            accessKey : '', // TODO
+            popup : null,
+            callback : function() {
+              // Do nothing. The notification closes when this is called.
+            }
+          }];
+      const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
+      notificationBox.appendNotification(notificationLabel, notificationValue,
+          "chrome://browser/skin/Info.png", priority, buttons);
+    }
   },
 
   tabChanged : function() {
@@ -168,17 +203,12 @@ var requestpolicyOverlay = {
     // Clear any notifications that may have been present.
     this._clearBlockedContentNotifications();
 
-    // Disable meta redirects. This gets called on every DOMContentLoaded
-    // but it may not need to be if there's a way to do it based on a
-    // different event besides DOMContentLoaded.
-    var docShell = DOMUtils.getDocShellFromWindow(document.defaultView);
-    docShell.allowMetaRedirects = false;
-
     // Find all meta redirects.
-    // TODO(justin): Do something with them besides alert.
     var metaTags = document.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
       if (metaTags[i].httpEquiv && metaTags[i].httpEquiv == "refresh") {
+        // TODO: Register meta redirects so we can tell which blocked requests
+        // were meta redirects in the statusbar menu.
         Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <"
                 + metaTags[i].content + "> found in document at <"
                 + document.location + ">");

@@ -81,10 +81,10 @@ var requestpolicyOverlay = {
   },
 
   // This function not currently in use.
-  _showMetaRedirectNotification : function(redirectTargetUri) {
+  _showRedirectNotification : function(redirectTargetUri) {
     var notificationBox = gBrowser.getNotificationBox();
     var notificationValue = "request-policy-meta-redirect";
-    var notificationLabel = "This webpage tried to redirect to "
+    var notificationLabel = "This webpage has asked to redirect to "
         + redirectTargetUri;
     var notificationButtonAllow = "Allow";
     var notificationButtonDeny = "Deny";
@@ -258,6 +258,15 @@ var requestpolicyOverlay = {
         Logger.info(Logger.TYPE_CONTENT, "prefetch of <" + linkTags[i].href
                 + "> found in document at <" + document.location + ">");
       }
+    }
+
+    if (this._requestpolicyJSObject._blockedRedirects[document.location]) {
+      var dest = this._requestpolicyJSObject._blockedRedirects[document.location];
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "Showing notification for attempted redirect. To <" + dest + "> "
+              + "from <" + document.location + ">");
+      this._showRedirectNotification(dest);
+      delete this._requestpolicyJSObject._blockedRedirects[document.location];
     }
 
   },

@@ -58,6 +58,8 @@ RequestPolicyService.prototype = {
 
   _rejectedRequests : {},
 
+  _blockedRedirects : {},
+
   _allowedRequests : {},
 
   _prefService : null,
@@ -239,6 +241,7 @@ RequestPolicyService.prototype = {
               + headerType
               + "' header. Same hosts or allowed origin/destination. To <"
               + dest + "> " + "from <" + origin + ">");
+      this._recordAllowedRequest(origin, dest);
       return;
     }
 
@@ -246,6 +249,8 @@ RequestPolicyService.prototype = {
     try {
       if (!this._blockingDisabled) {
         httpChannel.setResponseHeader(headerType, "", false);
+        this._recordRejectedRequest(origin, dest);
+        this._blockedRedirects[origin] = dest;
       }
       Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
               + headerType + "' header to <" + dest + ">"
@@ -297,6 +302,9 @@ RequestPolicyService.prototype = {
       return true;
     } else if (this.isAllowedDestination(destIdentifier)) {
       return true;
+    } else if (destinationUri[0] && destinationUri[0] == '/') {
+    	// Redirect is to a relative path.
+    	return true;
     }
 
     return false;
@@ -608,12 +616,12 @@ RequestPolicyService.prototype = {
     var dest = args[1];
 
     this._cacheShouldLoadResult(CP_OK, origin, dest);
-    this._recordAcceptedRequest(origin, dest);
+    this._recordAllowedRequest(origin, dest);
 
     return CP_OK;
   },
 
-  _recordAcceptedRequest : function(originUri, destUri) {
+  _recordAllowedRequest : function(originUri, destUri) {
     var destIdentifier = this.getUriIdentifier(destUri);
 
     // Reset the accepted and rejected requests originating from this

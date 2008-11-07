@@ -20,6 +20,12 @@ var requestpolicyOverlay = {
   _blockedDestinationsMenu : null,
   _allowedDestinationsMenu : null,
 
+  _blockedDestinationsItems : [],
+  _allowedDestinationsItems : [],
+
+  _blockedDestinationsBeforeReferenceItem : null,
+  _allowedDestinationsBeforeReferenceItem : null,
+
   /**
    * Initialize the object. This must be done after the DOM is loaded.
    */
@@ -36,6 +42,11 @@ var requestpolicyOverlay = {
           .getElementById("requestpolicyBlockedDestinationsPopup");
       this._allowedDestinationsMenu = document
           .getElementById("requestpolicyAllowedDestinationsPopup");
+
+      this._blockedDestinationsBeforeReferenceItem = document
+          .getElementById("requestpolicyAllowedDestinationsSeparator");
+      this._allowedDestinationsBeforeReferenceItem = document
+          .getElementById("requestpolicyOriginSubmenusSeparator");
     }
   },
 
@@ -382,14 +393,14 @@ var requestpolicyOverlay = {
     }
 
     // Clear destinations submenus.
-    while (this._blockedDestinationsMenu.firstChild) {
-      this._blockedDestinationsMenu
-          .removeChild(this._blockedDestinationsMenu.firstChild);
-    }
-    while (this._allowedDestinationsMenu.firstChild) {
-      this._allowedDestinationsMenu
-          .removeChild(this._allowedDestinationsMenu.firstChild);
-    }
+    /*
+     * while (this._blockedDestinationsMenu.firstChild) {
+     * this._blockedDestinationsMenu
+     * .removeChild(this._blockedDestinationsMenu.firstChild); } while
+     * (this._allowedDestinationsMenu.firstChild) {
+     * this._allowedDestinationsMenu
+     * .removeChild(this._allowedDestinationsMenu.firstChild); }
+     */
 
     // Remove old menu items.
     for (var i in this._addedMenuItems) {
@@ -401,20 +412,29 @@ var requestpolicyOverlay = {
 
     // Add new menu items giving options to allow content.
     var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
+    this._clearBlockedDestinations();
     for (var destIdentifier in rejectedRequests) {
-      this._addBlockedDestinationsMenuSeparator();
-      this._addMenuItemTemporarilyAllowDest(destIdentifier);
-      this._addMenuItemAllowDest(destIdentifier);
+      var submenu = this._addBlockedDestination(destIdentifier);
+      this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
+      this._addMenuItemAllowDest(submenu, destIdentifier);
+      this._addMenuSeparator(submenu);
+      this._addMenuItemTemporarilyAllowOriginToDest(submenu, currentIdentifier,
+          destIdentifier);
+      this._addMenuItemAllowOriginToDest(submenu, currentIdentifier,
+          destIdentifier);
     }
 
-    // Add new menu items giving options to forbid currently accepted content.
+    // Add new menu items giving options to forbid currently accepted
+    // content.
+    this._clearAllowedDestinations();
     var allowedRequests = this._requestpolicyJSObject._allowedRequests[uri];
     for (var destIdentifier in allowedRequests) {
       if (destIdentifier == this._getCurrentUriIdentifier()) {
         continue;
       }
-      this._addAllowedDestinationsMenuSeparator();
-      this._addMenuItemForbidDest(destIdentifier);
+      var submenu = this._addAllowedDestination(destIdentifier);
+      // this._addMenuSeparator(submenu);
+      this._addMenuItemForbidDest(submenu, destIdentifier);
     }
 
     this._cleanupMenus();
@@ -422,11 +442,11 @@ var requestpolicyOverlay = {
   },
 
   _cleanupMenus : function() {
-    this._removeExtraSubmenuSeparators(this._blockedDestinationsMenu);
-    this._removeExtraSubmenuSeparators(this._allowedDestinationsMenu);
+    // this._removeExtraSubmenuSeparators(this._blockedDestinationsMenu);
+    // this._removeExtraSubmenuSeparators(this._allowedDestinationsMenu);
 
-    this._disableMenuIfEmpty(this._blockedDestinationsMenu);
-    this._disableMenuIfEmpty(this._allowedDestinationsMenu);
+    // this._disableMenuIfEmpty(this._blockedDestinationsMenu);
+    // this._disableMenuIfEmpty(this._allowedDestinationsMenu);
   },
 
   _removeExtraSubmenuSeparators : function(menu) {
@@ -440,87 +460,133 @@ var requestpolicyOverlay = {
     menu.parentNode.disabled = menu.firstChild ? false : true;
   },
 
-  _addMenuItemTemporarilyAllowDest : function(destHost) {
+  _addMenuItemTemporarilyAllowDest : function(menu, destHost) {
     var label = "Temporarily allow requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.temporarilyAllowDestination('"
         + destHost + "');";
     var statustext = destHost;
-    var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
-        statustext);
+    var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
+    return item;
   },
 
-  _addMenuItemAllowDest : function(destHost) {
-    var label = "Always allow requests to " + destHost;
+  _addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost,
+      destHost) {
+    var label = "Temporarily allow requests from " + originHost + " to "
+        + destHost;
+    // TODO: sanitize destHost
+    var command = "requestpolicyOverlay.temporarilyAllowOriginToDestination('"
+        + originHost + "', '" + destHost + "');";
+    var statustext = destHost;
+    var item = this._addMenuItem(menu, label, command, statustext);
+    item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
+
+  _addMenuItemAllowDest : function(menu, destHost) {
+    var label = "Allow requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.allowDestination('" + destHost + "');";
     var statustext = destHost;
-    var item = this._addBlockedDestinationsMenuItem(destHost, label, command,
-        statustext);
+    return this._addMenuItem(menu, label, command, statustext);
   },
 
-  _addMenuItemForbidDest : function(destHost) {
+  _addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
+    var label = "Allow requests from " + originHost + " to " + destHost;
+    // TODO: sanitize destHost
+    var command = "requestpolicyOverlay.allowOriginToDestination('"
+        + originHost + "', '" + destHost + "');";
+    var statustext = destHost;
+    var item = this._addMenuItem(menu, label, command, statustext);
+    item.setAttribute("class", "requestpolicyAllowOriginToDest");
+    return item;
+  },
+
+  _addMenuItemForbidDest : function(menu, destHost) {
     var label = "Forbid requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.forbidDestination('" + destHost + "');";
     var statustext = destHost;
-    var item = this._addAllowedDestinationsMenuItem(destHost, label, command,
-        statustext);
+    return this._addMenuItem(menu, label, command, statustext);
   },
 
-  _addMenuSeparator : function() {
+  _addMenuSeparator : function(menu) {
     var separator = document.createElement("menuseparator");
-    this._menu.insertBefore(separator, this._menu.firstChild);
-    this._addedMenuItems.push(separator);
+    menu.insertBefore(separator, menu.firstChild);
+    return separator;
   },
 
-  _addBlockedDestinationsMenuSeparator : function() {
-    var separator = document.createElement("menuseparator");
-    this._blockedDestinationsMenu.insertBefore(separator,
-        this._blockedDestinationsMenu.firstChild);
+  _addMenuItem : function(menu, label, oncommand, statustext) {
+    var menuItem = document.createElement("menuitem");
+    menuItem.setAttribute("label", label);
+    menuItem.setAttribute("statustext", statustext);
+    menuItem.setAttribute("oncommand", oncommand);
+    // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
+    menu.insertBefore(menuItem, menu.firstChild);
+    return menuItem;
   },
 
-  _addAllowedDestinationsMenuSeparator : function() {
-    var separator = document.createElement("menuseparator");
-    this._allowedDestinationsMenu.insertBefore(separator,
-        this._allowedDestinationsMenu.firstChild);
+  _addMenu : function(parentMenu, label) {
+    // add the menu item
+    var menu = document.createElement("menu");
+    menu.setAttribute("label", label);
+    parentMenu.insertBefore(menu, parentMenu.firstChild);
+    // add the menu popup in the menu item
+    var menuPopup = document.createElement("menupopup");
+    menu.insertBefore(menuPopup, menu.firstChild);
+    // return the popup as that's what will have items added to it
+    return menuPopup;
   },
 
-  _addMenuItem : function(destHost, label, oncommand, statustext) {
-    var newNode = document.createElement("menuitem");
-    // newNode.setAttribute("label", this.getString("allowTemp", [menuSite]));
-    newNode.setAttribute("label", label);
-    newNode.setAttribute("statustext", statustext);
-    newNode.setAttribute("oncommand", oncommand);
-    // newNode.setAttribute("class", cssClass + " noscript-temp
-    // noscript-allow");
-    // newNode.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
-    this._menu.insertBefore(newNode, this._menu.firstChild);
-    this._addedMenuItems.push(newNode);
-    return newNode;
+  _addBlockedDestination : function(label) {
+    // add the menu item
+    var menu = document.createElement("menu");
+    // TODO: internationalize indent (left vs. right)
+    menu.setAttribute("label", "    " + label);
+    menu.setAttribute("class", "requestpolicyBlocked");
+    this._menu.insertBefore(menu, this._blockedDestinationsBeforeReferenceItem);
+    // add the menu popup in the menu item
+    var menuPopup = document.createElement("menupopup");
+    menu.insertBefore(menuPopup, menu.firstChild);
+    // return the popup as that's what will have items added to it
+
+    // remember what we added
+    this._blockedDestinationsItems.push(menu);
+
+    return menuPopup;
   },
 
-  _addBlockedDestinationsMenuItem : function(destHost, label, oncommand,
-      statustext) {
-    var newNode = document.createElement("menuitem");
-    newNode.setAttribute("label", label);
-    newNode.setAttribute("statustext", statustext);
-    newNode.setAttribute("oncommand", oncommand);
-    this._blockedDestinationsMenu.insertBefore(newNode,
-        this._blockedDestinationsMenu.firstChild);
-    return newNode;
+  _addAllowedDestination : function(label) {
+    // add the menu item
+    var menu = document.createElement("menu");
+    // TODO: internationalize indent (left vs. right)
+    menu.setAttribute("label", "    " + label);
+    menu.setAttribute("class", "requestpolicyAllowed");
+    this._menu.insertBefore(menu, this._allowedDestinationsBeforeReferenceItem);
+    // add the menu popup in the menu item
+    var menuPopup = document.createElement("menupopup");
+    menu.insertBefore(menuPopup, menu.firstChild);
+    // return the popup as that's what will have items added to it
+
+    // remember what we added
+    this._allowedDestinationsItems.push(menu);
+
+    return menuPopup;
   },
 
-  _addAllowedDestinationsMenuItem : function(destHost, label, oncommand,
-      statustext) {
-    var newNode = document.createElement("menuitem");
-    newNode.setAttribute("label", label);
-    newNode.setAttribute("statustext", statustext);
-    newNode.setAttribute("oncommand", oncommand);
-    this._allowedDestinationsMenu.insertBefore(newNode,
-        this._allowedDestinationsMenu.firstChild);
-    return newNode;
+  _clearBlockedDestinations : function() {
+    for (var i = 0; i < this._blockedDestinationsItems.length; i++) {
+      this._menu.removeChild(this._blockedDestinationsItems[i]);
+    }
+    this._blockedDestinationsItems = [];
+  },
+
+  _clearAllowedDestinations : function() {
+    for (var i = 0; i < this._allowedDestinationsItems.length; i++) {
+      this._menu.removeChild(this._allowedDestinationsItems[i]);
+    }
+    this._allowedDestinationsItems = [];
   },
 
   /**

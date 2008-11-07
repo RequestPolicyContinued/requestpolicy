@@ -23,6 +23,12 @@ interface nsIRequestPolicy : nsISupports
   void allowDestination(in ACString siteIdentifier);
   boolean isAllowedDestination(in ACString siteIdentifier);
   
+  void temporarilyAllowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  boolean isTemporarilyAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  
+  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  boolean isAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  
   void revokeTemporaryPermissions();
   
   void forbidOrigin(in ACString siteIdentifier);

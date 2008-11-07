@@ -95,9 +95,13 @@ RequestPolicyService.prototype = {
 
   _temporarilyAllowedDestinations : {},
 
+  _temporarilyAllowedOriginsToDestinations : {},
+
   _allowedOrigins : {},
 
   _allowedDestinations : {},
+
+  _allowedOriginsToDestinations : {},
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -123,6 +127,11 @@ RequestPolicyService.prototype = {
     // destinations
     this._allowedDestinations = this._getPreferenceObj("allowedDestinations");
     Logger.vardump(this._allowedDestinations, "this._allowedDestinations");
+    // origins to destinations
+    this._allowedOriginsToDestinations = this
+        ._getPreferenceObj("allowedOriginsToDestinations");
+    Logger.vardump(this._allowedOriginsToDestinations,
+        "this._allowedOriginsToDestinations");
   },
 
   _updateLoggingSettings : function() {
@@ -303,8 +312,8 @@ RequestPolicyService.prototype = {
     } else if (this.isAllowedDestination(destIdentifier)) {
       return true;
     } else if (destinationUri[0] && destinationUri[0] == '/') {
-    	// Redirect is to a relative path.
-    	return true;
+      // Redirect is to a relative path.
+      return true;
     }
 
     return false;
@@ -399,6 +408,45 @@ RequestPolicyService.prototype = {
     return this._temporarilyAllowedDestinations[host] ? true : false;
   },
 
+  _getCombinedOriginToDestinationIdentifier : function(originIdentifier,
+      destIdentifier) {
+    return originIdentifier + "|" + destIdentifier;
+  },
+
+  allowOriginToDestination : function allowOriginToDestination(
+      originIdentifier, destIdentifier) {
+    var combinedId = this._getCombinedOriginToDestinationIdentifier(
+        originIdentifier, destIdentifier);
+    this._allowedOriginsToDestinations[combinedId] = true;
+    this._setPreferenceList("allowedOriginsToDestinations",
+        this._allowedOriginsToDestinations);
+  },
+
+  isAllowedOriginToDestination : function isAllowedOriginToDestination(
+      originIdentifier, destIdentifier) {
+    var combinedId = this._getCombinedOriginToDestinationIdentifier(
+        originIdentifier, destIdentifier);
+    return this._allowedOriginsToDestinations[combinedId] ? true : false;
+  },
+
+  temporarilyAllowOriginToDestination : function temporarilyAllowOriginToDestination(
+      originIdentifier, destIdentifier) {
+    var combinedId = this._getCombinedOriginToDestinationIdentifier(
+        originIdentifier, destIdentifier);
+    this._temporarilyAllowedOriginsToDestinations[combinedId] = true;
+    this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
+        this._temporarilyAllowedOriginsToDestinations);
+  },
+
+  isTemporarilyAllowedOriginToDestination : function isTemporarilyAllowedOriginToDestination(
+      originIdentifier, destIdentifier) {
+    var combinedId = this._getCombinedOriginToDestinationIdentifier(
+        originIdentifier, destIdentifier);
+    return this._temporarilyAllowedOriginsToDestinations[combinedId]
+        ? true
+        : false;
+  },
+
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
     this._temporarilyAllowedOrigins = {};
     this._setPreferenceList("temporarilyAllowedOrigins",
@@ -406,6 +454,9 @@ RequestPolicyService.prototype = {
     this._temporarilyAllowedDestinations = {};
     this._setPreferenceList("temporarilyAllowedDestinations",
         this._temporarilyAllowedDestinations);
+    this._temporarilyAllowedOriginsToDestinations = {};
+    this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
+        this._temporarilyAllowedOriginsToDestinations);
   },
 
   forbidOrigin : function forbidOrigin(host) {
@@ -429,6 +480,22 @@ RequestPolicyService.prototype = {
     if (this._allowedDestinations[host]) {
       delete this._allowedDestinations[host];
       this._setPreferenceList("allowedDestinations", this._allowedDestinations);
+    }
+  },
+
+  forbidOriginToDestination : function forbidOriginToDestination(
+      originIdentifier, destIdentifier) {
+    var combinedId = this._getCombinedOriginToDestinationIdentifier(
+        originIdentifier, destIdentifier);
+    if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
+      delete this._temporarilyAllowedOriginsToDestinations[combinedId];
+      this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
+          this._temporarilyAllowedOriginsToDestinations);
+    }
+    if (this._allowedOriginsToDestinations[combinedId]) {
+      delete this._allowedOriginsToDestinations[combinedId];
+      this._setPreferenceList("allowedOriginsToDestinations",
+          this._allowedOriginsToDestinations);
     }
   },
 
@@ -814,6 +881,16 @@ RequestPolicyService.prototype = {
 
         if (this.isAllowedDestination(destIdentifier)) {
           return this.accept("Allowed destination", arguments);
+        }
+
+        if (this.isTemporarilyAllowedOriginToDestination(originIdentifier,
+            destIdentifier)) {
+          return this.accept("Temporarily allowed origin to destination",
+              arguments);
+        }
+
+        if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
+          return this.accept("Allowed origin to destination", arguments);
         }
 
         // "browser" origin requests for things like favicon.ico and possibly

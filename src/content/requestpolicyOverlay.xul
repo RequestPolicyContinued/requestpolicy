@@ -24,14 +24,25 @@
 						checked="false"
 						oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
 					<menuseparator />
-					<menu id="requestpolicyBlockedDestinations" label="&requestpolicyStatusbarBlockedDestinations;">
-						<menupopup id="requestpolicyBlockedDestinationsPopup">
-						</menupopup>
-					</menu>
-					<menu id="requestpolicyAllowedDestinations" label="&requestpolicyStatusbarAllowedDestinations;">
-						<menupopup id="requestpolicyAllowedDestinationsPopup">
-						</menupopup>
-					</menu>
+					<!--<menu id="requestpolicyBlockedDestinations" label="&requestpolicyStatusbarBlockedDestinations;">
+							<menupopup id="requestpolicyBlockedDestinationsPopup">
+							</menupopup>
+						</menu>-->
+					<menuitem id="requestpolicyBlockedDestinations"
+						label="&requestpolicyStatusbarBlockedDestinations;"
+						class="requestpolicyBlockedHeading"
+						disabled="true"
+						/>
+					<menuseparator id="requestpolicyAllowedDestinationsSeparator" />
+					<!--<menu id="requestpolicyAllowedDestinations" label="&requestpolicyStatusbarAllowedDestinations;">
+							<menupopup id="requestpolicyAllowedDestinationsPopup">
+							</menupopup>
+						</menu>-->
+					<menuitem id="requestpolicyAllowedDestinations"
+						label="&requestpolicyStatusbarAllowedDestinations;"
+						class="requestpolicyAllowedHeading"
+						disabled="true"
+						/>
 					<menuseparator id="requestpolicyOriginSubmenusSeparator" />
 					<menuitem 
 						id="requestpolicyRevokeTemporaryPermissions"

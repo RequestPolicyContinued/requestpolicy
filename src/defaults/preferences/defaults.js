@@ -6,4 +6,4 @@ pref("extensions.requestpolicy.autoReload", true);
 
 pref("extensions.requestpolicy.allowedOrigins", "test");
 pref("extensions.requestpolicy.allowedDestinations", "");
-// pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
+pref("extensions.requestpolicy.allowedOriginsToDestinations", "");

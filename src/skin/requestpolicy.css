@@ -1,3 +1,23 @@
 .requestpolicyTemporary {
 	font-style: italic;
 }
+
+.requestpolicyBlockedHeading {
+	color: #977;
+}
+
+.requestpolicyBlocked {
+	color: #700;
+}
+
+.requestpolicyAllowedHeading {
+	color: #797;
+}
+
+.requestpolicyAllowed {
+	color: #070;
+}
+
+.requestpolicyAllowOriginToDest {
+    font-weight : bold;	
+}

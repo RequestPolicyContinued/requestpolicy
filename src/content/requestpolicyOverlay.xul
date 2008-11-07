@@ -14,7 +14,9 @@
 
 	<statusbar id="status-bar">
 		<statusbarpanel>
-			<menu label="&requestpolicyStatusbarLabel;" onclick="this.firstChild.showPopup()" id="requestpolicyStatusbarLabel">
+			<menu label="&requestpolicyStatusbarLabel;"
+				onclick="if (event.originalTarget == this) this.firstChild.showPopup();"
+				id="requestpolicyStatusbarLabel">
 				<menupopup id="requestpolicyStatusbarPopup" onpopupshowing="requestpolicyOverlay.onMenuShowing(event)">
 					<menuitem 
 						id="requestpolicyAllowAllTemporarily"

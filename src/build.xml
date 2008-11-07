@@ -47,6 +47,8 @@
 		<zip destfile="${dist.dir}/${app.name}.xpi">
 			<zipfileset file="${dist.dir}/${app.name}.jar" prefix="chrome" />
 			<fileset dir="${src.dir}">
+				<include name="LICENSE" />
+				<include name="README" />
 				<include name="chrome.manifest" />
 				<include name="install.rdf" />
 				<include name="components/**" />

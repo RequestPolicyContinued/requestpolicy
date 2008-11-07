@@ -413,6 +413,12 @@ RequestPolicyService.prototype = {
     return originIdentifier + "|" + destIdentifier;
   },
 
+  _combinedOriginToDestinationIdentifierHasDestination : function(
+      originToDestIdentifier, destIdentifier) {
+    // TODO eliminate false positives
+    return originToDestIdentifier.indexOf("|" + destIdentifier) != -1;
+  },
+
   allowOriginToDestination : function allowOriginToDestination(
       originIdentifier, destIdentifier) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
@@ -481,12 +487,26 @@ RequestPolicyService.prototype = {
       delete this._allowedDestinations[host];
       this._setPreferenceList("allowedDestinations", this._allowedDestinations);
     }
+    this._forbidAllOriginsToSingleDestination(host);
+  },
+
+  _forbidAllOriginsToSingleDestination : function _forbidAllOriginsToSingleDestination(
+      host) {
+    for (var i in this._allowedOriginsToDestinations) {
+      if (this._combinedOriginToDestinationIdentifierHasDestination(i, host)) {
+        this._forbidOriginToDestinationByCombinedIdentifier(i);
+      }
+    }
   },
 
   forbidOriginToDestination : function forbidOriginToDestination(
       originIdentifier, destIdentifier) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
+    this._forbidOriginToDestinationByCombinedIdentifier(combinedId);
+  },
+
+  _forbidOriginToDestinationByCombinedIdentifier : function(combinedId) {
     if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
       delete this._temporarilyAllowedOriginsToDestinations[combinedId];
       this._setPreferenceList("temporarilyAllowedOriginsToDestinations",

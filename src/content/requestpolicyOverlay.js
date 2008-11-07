@@ -433,8 +433,7 @@ var requestpolicyOverlay = {
         continue;
       }
       var submenu = this._addAllowedDestination(destIdentifier);
-      // this._addMenuSeparator(submenu);
-      this._addMenuItemForbidDest(submenu, destIdentifier);
+      this._addMenuItemForbidDest(submenu, destIdentifier, currentIdentifier);
     }
 
     this._cleanupMenus();
@@ -503,7 +502,7 @@ var requestpolicyOverlay = {
     return item;
   },
 
-  _addMenuItemForbidDest : function(menu, destHost) {
+  _addMenuItemForbidDest : function(menu, destHost, originHost) {
     var label = "Forbid requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.forbidDestination('" + destHost + "');";
@@ -641,6 +640,21 @@ var requestpolicyOverlay = {
   },
 
   /**
+   * Allows a destination to be requested from a single origin for the duration
+   * of the browser session.
+   * 
+   * @param {String}
+   *            originHost
+   * @param {String}
+   *            destHost
+   */
+  temporarilyAllowOriginToDestination : function(originHost, destHost) {
+    this._requestpolicy.temporarilyAllowOriginToDestination(originHost,
+        destHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
    * Allows the current document's origin to request from any destination,
    * including in future browser sessions.
    * 
@@ -665,6 +679,20 @@ var requestpolicyOverlay = {
   },
 
   /**
+   * Allows requests to a destination from a single origin, including in future
+   * browser sessions.
+   * 
+   * @param {String}
+   *            originHost
+   * @param {String}
+   *            destHost
+   */
+  allowOriginToDestination : function(originHost, destHost) {
+    this._requestpolicy.allowOriginToDestination(originHost, destHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
    * Forbids the current document's origin from requesting from any destination.
    * This revoke's temporary or permanent request permissions the origin had
    * been given.
@@ -679,7 +707,7 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Forbids a destination from being requested by any origina. This revoke's
+   * Forbids a destination from being requested by any origin. This revoke's
    * temporary or permanent request permissions the destination had been given.
    * 
    * @param {String}
@@ -687,6 +715,21 @@ var requestpolicyOverlay = {
    */
   forbidDestination : function(destHost) {
     this._requestpolicy.forbidDestination(destHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * Forbids a destination from being requested by a single origin. This
+   * revoke's temporary or permanent request permissions the destination had
+   * been given.
+   * 
+   * @param {String}
+   *            originHost
+   * @param {String}
+   *            destHost
+   */
+  forbidOriginToDestination : function(originHost, destHost) {
+    this._requestpolicy.forbidOriginToDestination(originHost, destHost);
     this._conditionallyReloadDocument();
   },
 

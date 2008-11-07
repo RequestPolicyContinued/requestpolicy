@@ -223,6 +223,11 @@ var requestpolicyOverlay = {
         Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <"
                 + metaTags[i].content + "> found in document at <"
                 + document.location + ">");
+
+        var dest = metaTags[i].content.split(";url=").slice(1).join("");
+        if (dest != undefined) {
+          this._showRedirectNotification(dest);
+        }
       }
     }
 

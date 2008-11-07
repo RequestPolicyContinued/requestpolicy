@@ -1,9 +1,10 @@
 /**
- * Cross-Site Request Policy service
+ * Request Policy service.
  * 
- * @author Justin Samuel <justin at justinsamuel.com>
+ * @author Justin Samuel <justin (at) justinsamuel (dot) com>
  * @copyright 2008
- * @license GPL
+ * @license GPL 3 or Later
+ * @link http://www.requestpolicy.com/
  */
 
 const CI = Components.interfaces;
@@ -211,9 +212,7 @@ RequestPolicyService.prototype = {
     var resourceURI = ioService.newFileURI(modulesDir);
     resProt.setSubstitution("requestpolicy", resourceURI);
 
-    Components.utils.import("resource://requestpolicy/DOMUtils.jsm");
     Components.utils.import("resource://requestpolicy/Logger.jsm");
-    Components.utils.import("resource://requestpolicy/SiteUtils.jsm");
     Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
   },
 
@@ -415,7 +414,7 @@ RequestPolicyService.prototype = {
 
   _combinedOriginToDestinationIdentifierHasOrigin : function(
       originToDestIdentifier, originIdentifier) {
-    return originToDestIdentifier.indexOf(destIdentifier + "|") == 0;
+    return originToDestIdentifier.indexOf(originIdentifier + "|") == 0;
   },
 
   _combinedOriginToDestinationIdentifierHasDestination : function(

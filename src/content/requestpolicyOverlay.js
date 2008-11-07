@@ -1,4 +1,3 @@
-Components.utils.import("resource://requestpolicy/DOMUtils.jsm");
 Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 

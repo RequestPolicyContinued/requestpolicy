@@ -7,7 +7,7 @@
 }
 
 .requestpolicyBlocked {
-	color: #700;
+	color: #600;
 }
 
 .requestpolicyAllowedHeading {
@@ -15,7 +15,7 @@
 }
 
 .requestpolicyAllowed {
-	color: #070;
+	color: #060;
 }
 
 .requestpolicyAllowOriginToDest {

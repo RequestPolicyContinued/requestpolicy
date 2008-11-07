@@ -413,6 +413,11 @@ RequestPolicyService.prototype = {
     return originIdentifier + "|" + destIdentifier;
   },
 
+  _combinedOriginToDestinationIdentifierHasOrigin : function(
+      originToDestIdentifier, originIdentifier) {
+    return originToDestIdentifier.indexOf(destIdentifier + "|") == 0;
+  },
+
   _combinedOriginToDestinationIdentifierHasDestination : function(
       originToDestIdentifier, destIdentifier) {
     // TODO eliminate false positives
@@ -475,6 +480,7 @@ RequestPolicyService.prototype = {
       delete this._allowedOrigins[host];
       this._setPreferenceList("allowedOrigins", this._allowedOrigins);
     }
+    this._forbidAllDestinationsFromSingleOrigin(host);
   },
 
   forbidDestination : function forbidDestination(host) {
@@ -488,6 +494,15 @@ RequestPolicyService.prototype = {
       this._setPreferenceList("allowedDestinations", this._allowedDestinations);
     }
     this._forbidAllOriginsToSingleDestination(host);
+  },
+
+  _forbidAllDestinationsFromSingleOrigin : function _forbidAllDestinationsFromSingleOrigin(
+      host) {
+    for (var i in this._allowedOriginsToDestinations) {
+      if (this._combinedOriginToDestinationIdentifierHasOrigin(i, host)) {
+        this._forbidOriginToDestinationByCombinedIdentifier(i);
+      }
+    }
   },
 
   _forbidAllOriginsToSingleDestination : function _forbidAllOriginsToSingleDestination(

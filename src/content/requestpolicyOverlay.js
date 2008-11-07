@@ -433,7 +433,38 @@ var requestpolicyOverlay = {
         continue;
       }
       var submenu = this._addAllowedDestination(destIdentifier);
-      this._addMenuItemForbidDest(submenu, destIdentifier, currentIdentifier);
+
+      // Show a "forbid ___" option that is specific to why the content is
+      // allowed.
+
+      // The "order" in which to show these may be worth further consideration.
+      // Currently, the options for forbidding content start from the "allow"
+      // rules that are most liberal if they exist and shows the more specific
+      // ones if there aren't more liberal ones that would apply. The big catch
+      // is putting it in any other order may result in the user having to
+      // perform multiple "forbids" after successive reloads, which would be
+      // unacceptable.
+
+      if (this._requestpolicy.isAllowedOrigin(currentIdentifier)
+          || this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+        this._addMenuItemForbidOrigin(submenu, currentIdentifier);
+
+      } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
+          || this._requestpolicy
+              .isTemporarilyAllowedDestination(destIdentifier)) {
+        this._addMenuItemForbidDest(submenu, destIdentifier);
+
+      } else if (this._requestpolicy.isAllowedOriginToDestination(
+          currentIdentifier, destIdentifier)
+          || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+              currentIdentifier, destIdentifier)) {
+        this._addMenuItemForbidOriginToDest(submenu, currentIdentifier,
+            destIdentifier);
+
+      } else {
+        // TODO: make very sure this can never happen or, better, get an idea of
+        // when it can and make a sane default.
+      }
     }
 
     this._cleanupMenus();
@@ -464,7 +495,7 @@ var requestpolicyOverlay = {
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.temporarilyAllowDestination('"
         + destHost + "');";
-    var statustext = destHost;
+    var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
@@ -477,17 +508,17 @@ var requestpolicyOverlay = {
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.temporarilyAllowOriginToDestination('"
         + originHost + "', '" + destHost + "');";
-    var statustext = destHost;
+    var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
   },
 
   _addMenuItemAllowDest : function(menu, destHost) {
-    var label = "Allow requests to " + destHost;
+    var label = "Allow all requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.allowDestination('" + destHost + "');";
-    var statustext = destHost;
+    var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
   },
 
@@ -496,17 +527,34 @@ var requestpolicyOverlay = {
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.allowOriginToDestination('"
         + originHost + "', '" + destHost + "');";
-    var statustext = destHost;
+    var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyAllowOriginToDest");
     return item;
   },
 
-  _addMenuItemForbidDest : function(menu, destHost, originHost) {
-    var label = "Forbid requests to " + destHost;
+  _addMenuItemForbidOrigin : function(menu, originHost) {
+    var label = "Forbid all requests from " + originHost;
+    // TODO: sanitize originHost
+    var command = "requestpolicyOverlay.forbidOrigin('" + originHost + "');";
+    var statustext = originHost;
+    return this._addMenuItem(menu, label, command, statustext);
+  },
+
+  _addMenuItemForbidDest : function(menu, destHost) {
+    var label = "Forbid all requests to " + destHost;
     // TODO: sanitize destHost
     var command = "requestpolicyOverlay.forbidDestination('" + destHost + "');";
-    var statustext = destHost;
+    var statustext = destHost; // TODO
+    return this._addMenuItem(menu, label, command, statustext);
+  },
+
+  _addMenuItemForbidOriginToDest : function(menu, originHost, destHost) {
+    var label = "Forbid requests from " + originHost + " to " + destHost;
+    // TODO: sanitize destHost
+    var command = "requestpolicyOverlay.forbidOriginToDestination('"
+        + originHost + "', '" + destHost + "');";
+    var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
   },
 

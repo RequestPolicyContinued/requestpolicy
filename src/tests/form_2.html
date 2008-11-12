@@ -1,0 +1,51 @@
+<html>
+<head>
+</head>
+<body>
+
+<h2>Same hosts</h2>
+
+<p>On this page there are automatically submitted forms and forms
+for manual submission.</p>
+
+<form action="automatically-submitted-form.html" method="get"
+	target="loadingframe_same" id="autoform_same"><input
+	type="submit" value="Don't click me. I'm the auto-submit form." /></form>
+
+<br />
+
+<form action="manually-submitted-form.html" method="get"
+	target="loadingframe_same"><input type="submit"
+	value="Click me for manual form submission." /></form>
+
+<iframe id="loadingframe_same" name="loadingframe_same"></iframe>
+
+<script>
+	document.getElementById("autoform_same").submit();
+</script>
+
+<h2>Different hosts</h2>
+
+<form action="http://127.0.0.1/automatically-submitted-form.html"
+	method="get" target="loadingframe_different" id="autoform_different">
+<input type="submit" value="Don't click me. I'm the auto-submit form." />
+</form>
+
+<br />
+
+<form action="http://127.0.0.1/manually-submitted-form.html"
+	method="get" target="loadingframe_different"><input
+	type="submit" value="Click me for manual form submission." /></form>
+
+<iframe id="loadingframe_different" name="loadingframe_different"></iframe>
+
+<script>
+	// This may cause the following error to show in the error console when the request gets blocked.
+	// Error: Component returned failure code: 0x805e000a [nsIDOMHTMLFormElement.submit] = <unknown>
+	// Source file: http://localhost/csrpolicy/tests/test6.html
+	// Line: 47
+	document.getElementById("autoform_different").submit();
+</script>
+
+</body>
+</html>

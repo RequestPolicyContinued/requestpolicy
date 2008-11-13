@@ -7,6 +7,9 @@ Components.utils.import("resource://requestpolicy/Logger.jsm");
  */
 var requestpolicyOverlay = {
 
+  _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
+  _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
+
   _initialized : false,
   _requestpolicy : null,
 
@@ -381,10 +384,16 @@ var requestpolicyOverlay = {
     var currentIdentifier = this._getCurrentUriIdentifier();
 
     // The menu items we may need.
+    var itemPrefetchWarning = document
+        .getElementById("requestpolicyPrefetchWarning");
+    var itemPrefetchWarningSeparator = document
+        .getElementById("requestpolicyPrefetchWarningSeparator");
+
     var itemRevokeTemporaryPermissions = document
         .getElementById("requestpolicyRevokeTemporaryPermissions");
     var itemRevokeTemporaryPermissionsSeparator = document
         .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
+
     var itemAllowOriginTemporarily = document
         .getElementById("requestpolicyAllowOriginTemporarily");
     var itemAllowOrigin = document.getElementById("requestpolicyAllowOrigin");
@@ -405,6 +414,9 @@ var requestpolicyOverlay = {
     itemAllowOriginTemporarily.hidden = true;
     itemAllowOrigin.hidden = true;
     itemForbidOrigin.hidden = true;
+
+    itemPrefetchWarning.hidden = itemPrefetchWarningSeparator.hidden = !this._requestpolicy
+        .isPrefetchEnabled();
 
     if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
       itemForbidOrigin.hidden = false;
@@ -835,7 +847,20 @@ var requestpolicyOverlay = {
       redirectTargetUri = curDir + "/" + redirectTargetUri;
     }
     content.document.location.href = redirectTargetUri;
+  },
+
+  _openInNewTab : function(uri) {
+    gBrowser.selectedTab = gBrowser.addTab(uri);
+  },
+
+  showPrefetchInfo : function() {
+    this._openInNewTab(this._prefetchInfoUri);
+  },
+
+  showPrefetchDisablingInstructions : function() {
+    this._openInNewTab(this._prefetchDisablingInstructionsUri);
   }
+
 };
 
 // Initialize the requestpolicyOverlay object when the window DOM is loaded.

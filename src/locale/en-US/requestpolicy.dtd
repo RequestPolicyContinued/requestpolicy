@@ -1,4 +1,9 @@
 <!ENTITY requestpolicyStatusbarLabel "Request Policy">
+
+<!ENTITY requestpolicyPrefetchWarning "Warning: Prefetch is enabled">
+<!ENTITY requestpolicyPrefetchInfo "Learn about prefetching">
+<!ENTITY requestpolicyPrefetchDisablingInstructions "Disable prefetching">
+
 <!ENTITY requestpolicyStatusbarTemporarilyAllowAll "Temporarily allow all requests">
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
 <!ENTITY requestpolicyStatusbarBlockedDestinations "Blocked destinations">

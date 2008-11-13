@@ -22,6 +22,20 @@
 				onclick="if (event.originalTarget == this) this.firstChild.showPopup();"
 				id="requestpolicyStatusbarLabel">
 				<menupopup id="requestpolicyStatusbarPopup" onpopupshowing="requestpolicyOverlay.onMenuShowing(event)">
+					<menu id="requestpolicyPrefetchWarning"
+						label="&requestpolicyPrefetchWarning;">
+						<menupopup>
+							<menuitem id="requestpolicyPrefetchInfo"
+								label="&requestpolicyPrefetchInfo;"
+								oncommand="requestpolicyOverlay.showPrefetchInfo();"
+								/>
+							<menuitem id="requestpolicyPrefetchDisablingInstructions"
+								label="&requestpolicyPrefetchDisablingInstructions;"
+								oncommand="requestpolicyOverlay.showPrefetchDisablingInstructions();"
+								/>
+						</menupopup>
+					</menu>
+					<menuseparator id="requestpolicyPrefetchWarningSeparator" />
 					<menuitem 
 						id="requestpolicyAllowAllTemporarily"
 						class="requestpolicyTemporary"

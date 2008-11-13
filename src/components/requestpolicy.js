@@ -62,6 +62,7 @@ RequestPolicyService.prototype = {
   _allowedRequests : {},
 
   _prefService : null,
+  _rootPrefs : null,
 
   _submittedForms : {},
   _clickedLinks : {},
@@ -130,6 +131,12 @@ RequestPolicyService.prototype = {
         ._getPreferenceObj("allowedOriginsToDestinations");
     Logger.vardump(this._allowedOriginsToDestinations,
         "this._allowedOriginsToDestinations");
+
+    // Disable prefetch.
+    if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
+      this._rootPrefs.setBoolPref("network.prefetch-next", false);
+      Logger.info(Logger.TYPE_INTERNAL, "Disabled prefetch.");
+    }
   },
 
   _updateLoggingSettings : function() {
@@ -172,6 +179,9 @@ RequestPolicyService.prototype = {
     this.prefs = this._prefService.getBranch("extensions.requestpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
+
+    this._rootPrefs = this._prefService.getBranch("")
+        .QueryInterface(CI.nsIPrefBranch2);
   },
 
   /**
@@ -185,6 +195,7 @@ RequestPolicyService.prototype = {
       case "log.level" :
       case "log.types" :
         this._updateLoggingSettings();
+        break;
       default :
         break;
     }
@@ -602,6 +613,10 @@ RequestPolicyService.prototype = {
     return this._temporarilyAllowedOriginsCount != 0
         || this._temporarilyAllowedDestinationsCount != 0
         || this._temporarilyAllowedOriginsToDestinationsCount != 0;
+  },
+
+  isPrefetchEnabled : function isPrefetchEnabled() {
+    return this._rootPrefs.getBoolPref("network.prefetch-next");
   },
 
   // /////////////////////////////////////////////////////////////////////////

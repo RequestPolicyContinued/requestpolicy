@@ -38,5 +38,7 @@ interface nsIRequestPolicy : nsISupports
   
   boolean isAllowedRedirect(in ACString originUri, in ACString destinationUri);
   
+  boolean isPrefetchEnabled();
+  
   readonly attribute nsIPrefBranch prefs;
 };  

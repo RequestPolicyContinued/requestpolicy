@@ -12,6 +12,10 @@
 	
 	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
 
+	<popupset id="mainPopupSet">
+		<popup id="requestpolicyRedirectNotificationOptions" />
+	</popupset>
+
 	<statusbar id="status-bar">
 		<statusbarpanel>
 			<menu label="&requestpolicyStatusbarLabel;"

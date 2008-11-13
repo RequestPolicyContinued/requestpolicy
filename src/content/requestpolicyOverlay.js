@@ -96,8 +96,22 @@ var requestpolicyOverlay = {
     var notificationValue = "request-policy-meta-redirect";
     var notificationLabel = "This webpage has asked to redirect to "
         + redirectTargetUri;
+    var notificationButtonOptions = "Options";
     var notificationButtonAllow = "Allow";
     var notificationButtonDeny = "Deny";
+
+    // TODO: Don't show notification if we can tell that the redirect is going
+    // to be allowed. That is, prevent the notification from appearing
+    // momentarily and then going away as the redirect happens.
+
+    optionsPopupName = "requestpolicyRedirectNotificationOptions";
+    var optionsPopup = document.getElementById(optionsPopupName);
+    this._clearMenu(optionsPopup);
+    var currentIdent = this._getCurrentUriIdentifier();
+    var destIdent = this._requestpolicy.getUriIdentifier(redirectTargetUri);
+    this._addMenuItemTemporarilyAllowOriginToDest(optionsPopup, currentIdent,
+        destIdent);
+    this._addMenuItemAllowOriginToDest(optionsPopup, currentIdent, destIdent);
 
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
@@ -105,6 +119,11 @@ var requestpolicyOverlay = {
       notification.label = notificationLabel;
     } else {
       var buttons = [{
+            label : notificationButtonOptions,
+            accessKey : '', // TODO
+            popup : optionsPopupName,
+            callback : null
+          }, {
             label : notificationButtonAllow,
             accessKey : '', // TODO
             popup : null,
@@ -225,7 +244,15 @@ var requestpolicyOverlay = {
 
         var dest = metaTags[i].content.split(";url=").slice(1).join("");
         if (dest != undefined) {
-          this._showRedirectNotification(dest);
+          if (this._requestpolicyJSObject._blockingDisabled
+              || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
+            // The meta refresh is allowed.
+            this._performRedirect(dest);
+            // TODO: set it to happen after the same amount of time specified in
+            // the redirect.
+          } else {
+            this._showRedirectNotification(dest);
+          }
         }
       }
     }
@@ -278,7 +305,7 @@ var requestpolicyOverlay = {
     if (this._requestpolicyJSObject._blockedRedirects[document.location]) {
       var dest = this._requestpolicyJSObject._blockedRedirects[document.location];
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "Showing notification for attempted redirect. To <" + dest + "> "
+          "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(dest);
       delete this._requestpolicyJSObject._blockedRedirects[document.location];
@@ -640,6 +667,12 @@ var requestpolicyOverlay = {
     this._allowedDestinationsItems = [];
   },
 
+  _clearMenu : function(menu) {
+    while (menu.firstChild) {
+      menu.removeChild(menu.firstChild);
+    }
+  },
+
   /**
    * Reloads the current document if the user's preferences indicate it should
    * be reloaded.
@@ -794,6 +827,10 @@ var requestpolicyOverlay = {
   revokeTemporaryPermissions : function(event) {
     this._requestpolicy.revokeTemporaryPermissions();
     this._conditionallyReloadDocument();
+  },
+
+  _performRedirect : function(redirectTargetUri) {
+    content.document.location.href = redirectTargetUri;
   }
 };
 

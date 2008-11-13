@@ -244,7 +244,7 @@ RequestPolicyService.prototype = {
 
     var origin = httpChannel.name;
 
-    if (this._isAllowedRedirect(origin, dest)) {
+    if (this.isAllowedRedirect(origin, dest)) {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
               + headerType
               + "' header. Same hosts or allowed origin/destination. To <"
@@ -288,34 +288,6 @@ RequestPolicyService.prototype = {
     } catch (e) {
       // No X-moz header.
     }
-  },
-
-  _isAllowedRedirect : function(originUri, destinationUri) {
-    // TODO: Find a way to get rid of repitition of code between this and
-    // shouldLoad().
-
-    // Note: If changing the logic here, also make necessary changes to
-    // shouldLoad().
-
-    var originIdentifier = this.getUriIdentifier(originUri);
-    var destIdentifier = this.getUriIdentifier(destinationUri);
-
-    if (destIdentifier == originIdentifier) {
-      return true;
-    } else if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
-      return true;
-    } else if (this.isAllowedOrigin(originIdentifier)) {
-      return true;
-    } else if (this.isTemporarilyAllowedDestination(destIdentifier)) {
-      return true;
-    } else if (this.isAllowedDestination(destIdentifier)) {
-      return true;
-    } else if (destinationUri[0] && destinationUri[0] == '/') {
-      // Redirect is to a relative path.
-      return true;
-    }
-
-    return false;
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -568,6 +540,40 @@ RequestPolicyService.prototype = {
       }
     }
     return prefObj;
+  },
+
+  isAllowedRedirect : function(originUri, destinationUri) {
+    // TODO: Find a way to get rid of repitition of code between this and
+    // shouldLoad().
+
+    // Note: If changing the logic here, also make necessary changes to
+    // shouldLoad().
+
+    var originIdentifier = this.getUriIdentifier(originUri);
+    var destIdentifier = this.getUriIdentifier(destinationUri);
+
+    if (destIdentifier == originIdentifier) {
+      return true;
+    } else if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
+      return true;
+    } else if (this.isAllowedOrigin(originIdentifier)) {
+      return true;
+    } else if (this.isTemporarilyAllowedDestination(destIdentifier)) {
+      return true;
+    } else if (this.isAllowedDestination(destIdentifier)) {
+      return true;
+    } else if (this.isTemporarilyAllowedOriginToDestination(originIdentifier,
+        destIdentifier)) {
+      return true;
+    } else if (this.isAllowedOriginToDestination(originIdentifier,
+        destIdentifier)) {
+      return true;
+    } else if (destinationUri[0] && destinationUri[0] == '/') {
+      // Redirect is to a relative url.
+      return true;
+    }
+
+    return false;
   },
 
   // /////////////////////////////////////////////////////////////////////////

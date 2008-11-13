@@ -58,15 +58,12 @@ RequestPolicyService.prototype = {
   _blockingDisabled : false,
 
   _rejectedRequests : {},
-
   _blockedRedirects : {},
-
   _allowedRequests : {},
 
   _prefService : null,
 
   _submittedForms : {},
-
   _clickedLinks : {},
 
   _uriIdentificationLevel : 0,
@@ -92,16 +89,16 @@ RequestPolicyService.prototype = {
     "result" : null
   },
 
+  _temporarilyAllowedOriginsCount : 0,
+  _temporarilyAllowedDestinationsCount : 0,
+  _temporarilyAllowedOriginsToDestinationsCount : 0,
+
   _temporarilyAllowedOrigins : {},
-
   _temporarilyAllowedDestinations : {},
-
   _temporarilyAllowedOriginsToDestinations : {},
 
   _allowedOrigins : {},
-
   _allowedDestinations : {},
-
   _allowedOriginsToDestinations : {},
 
   // /////////////////////////////////////////////////////////////////////////
@@ -350,9 +347,12 @@ RequestPolicyService.prototype = {
   },
 
   temporarilyAllowOrigin : function temporarilyAllowOrigin(host) {
-    this._temporarilyAllowedOrigins[host] = true;
-    this._setPreferenceList("temporarilyAllowedOrigins",
-        this._temporarilyAllowedOrigins);
+    if (!this._temporarilyAllowedOrigins[host]) {
+      this._temporarilyAllowedOriginsCount++;
+      this._temporarilyAllowedOrigins[host] = true;
+      this._setPreferenceList("temporarilyAllowedOrigins",
+          this._temporarilyAllowedOrigins);
+    }
   },
 
   isTemporarilyAllowedOrigin : function isTemporarilyAllowedOrigin(host) {
@@ -369,9 +369,12 @@ RequestPolicyService.prototype = {
   },
 
   temporarilyAllowDestination : function temporarilyAllowDestination(host) {
-    this._temporarilyAllowedDestinations[host] = true;
-    this._setPreferenceList("temporarilyAllowedDestinations",
-        this._temporarilyAllowedDestinations);
+    if (!this._temporarilyAllowedDestinations[host]) {
+      this._temporarilyAllowedDestinationsCount++;
+      this._temporarilyAllowedDestinations[host] = true;
+      this._setPreferenceList("temporarilyAllowedDestinations",
+          this._temporarilyAllowedDestinations);
+    }
   },
 
   isTemporarilyAllowedDestination : function isTemporarilyAllowedDestination(
@@ -415,9 +418,12 @@ RequestPolicyService.prototype = {
       originIdentifier, destIdentifier) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
-    this._temporarilyAllowedOriginsToDestinations[combinedId] = true;
-    this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
-        this._temporarilyAllowedOriginsToDestinations);
+    if (!this._temporarilyAllowedOriginsToDestinations[combinedId]) {
+      this._temporarilyAllowedOriginsToDestinationsCount++;
+      this._temporarilyAllowedOriginsToDestinations[combinedId] = true;
+      this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
+          this._temporarilyAllowedOriginsToDestinations);
+    }
   },
 
   isTemporarilyAllowedOriginToDestination : function isTemporarilyAllowedOriginToDestination(
@@ -430,12 +436,17 @@ RequestPolicyService.prototype = {
   },
 
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
+    this._temporarilyAllowedOriginsCount = 0;
     this._temporarilyAllowedOrigins = {};
     this._setPreferenceList("temporarilyAllowedOrigins",
         this._temporarilyAllowedOrigins);
+
+    this._temporarilyAllowedDestinationsCount = 0;
     this._temporarilyAllowedDestinations = {};
     this._setPreferenceList("temporarilyAllowedDestinations",
         this._temporarilyAllowedDestinations);
+
+    this._temporarilyAllowedOriginsToDestinationsCount = 0;
     this._temporarilyAllowedOriginsToDestinations = {};
     this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
         this._temporarilyAllowedOriginsToDestinations);
@@ -443,6 +454,7 @@ RequestPolicyService.prototype = {
 
   forbidOrigin : function forbidOrigin(host) {
     if (this._temporarilyAllowedOrigins[host]) {
+      this._temporarilyAllowedOriginsCount--;
       delete this._temporarilyAllowedOrigins[host];
       this._setPreferenceList("temporarilyAllowedOrigins",
           this._temporarilyAllowedOrigins);
@@ -456,6 +468,7 @@ RequestPolicyService.prototype = {
 
   forbidDestination : function forbidDestination(host) {
     if (this._temporarilyAllowedDestinations[host]) {
+      this._temporarilyAllowedDestinationsCount--;
       delete this._temporarilyAllowedDestinations[host];
       this._setPreferenceList("temporarilyAllowedDestinations",
           this._temporarilyAllowedDestinations);
@@ -494,6 +507,7 @@ RequestPolicyService.prototype = {
 
   _forbidOriginToDestinationByCombinedIdentifier : function(combinedId) {
     if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
+      this._temporarilyAllowedOriginsToDestinationsCount--;
       delete this._temporarilyAllowedOriginsToDestinations[combinedId];
       this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
           this._temporarilyAllowedOriginsToDestinations);
@@ -575,6 +589,19 @@ RequestPolicyService.prototype = {
     }
 
     return false;
+  },
+
+  /**
+   * Determines whether the user has granted any temporary permissions. This
+   * does not include temporarily disabling all blocking.
+   * 
+   * @return {Boolean} true if any temporary permissions have been granted,
+   *         false otherwise.
+   */
+  areTemporaryPermissionsGranted : function areTemporaryPermissionsGranted() {
+    return this._temporarilyAllowedOriginsCount != 0
+        || this._temporarilyAllowedDestinationsCount != 0
+        || this._temporarilyAllowedOriginsToDestinationsCount != 0;
   },
 
   // /////////////////////////////////////////////////////////////////////////

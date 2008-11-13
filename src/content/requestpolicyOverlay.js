@@ -415,10 +415,7 @@ var requestpolicyOverlay = {
       itemAllowOrigin.hidden = false;
     }
 
-    if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
-      // TODO: The condition should be related to any temporary permissions that
-      // affect the current document, including temporary destinations and
-      // temporary origin-to-destination pairs.
+    if (this._requestpolicy.areTemporaryPermissionsGranted()) {
       itemRevokeTemporaryPermissions.hidden = false;
       itemRevokeTemporaryPermissionsSeparator.hidden = false;
     }

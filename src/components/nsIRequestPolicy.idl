@@ -30,6 +30,7 @@ interface nsIRequestPolicy : nsISupports
   boolean isAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   
   void revokeTemporaryPermissions();
+  boolean areTemporaryPermissionsGranted();
   
   void forbidOrigin(in ACString siteIdentifier);
   void forbidDestination(in ACString siteIdentifier);

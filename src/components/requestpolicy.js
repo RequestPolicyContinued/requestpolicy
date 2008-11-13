@@ -568,7 +568,8 @@ RequestPolicyService.prototype = {
     } else if (this.isAllowedOriginToDestination(originIdentifier,
         destIdentifier)) {
       return true;
-    } else if (destinationUri[0] && destinationUri[0] == '/') {
+    } else if (destinationUri[0] && destinationUri[0] == '/'
+        || destinationUri.indexOf(":") == -1) {
       // Redirect is to a relative url.
       return true;
     }

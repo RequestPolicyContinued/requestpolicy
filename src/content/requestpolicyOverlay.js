@@ -830,6 +830,13 @@ var requestpolicyOverlay = {
   },
 
   _performRedirect : function(redirectTargetUri) {
+    // If it's relative to the current directory, figure out what it ultimately
+    // should be because firefox doesn't know what to do with setting the href
+    // to something like "somedir/whatever.html".
+    if (redirectTargetUri[0] != '/' || redirectTargetUri.indexOf(":") == -1) {
+      var curDir = this._getCurrentUri().split("/").pop().join("/");
+      redirectTargetUri = curDir + "/" + redirectTargetUri;
+    }
     content.document.location.href = redirectTargetUri;
   }
 };

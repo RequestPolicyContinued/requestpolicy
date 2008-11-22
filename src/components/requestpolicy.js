@@ -1,5 +1,5 @@
 /**
- * Request Policy service.
+ * RequestPolicy service.
  * 
  * @author Justin Samuel <justin (at) justinsamuel (dot) com>
  * @copyright 2008

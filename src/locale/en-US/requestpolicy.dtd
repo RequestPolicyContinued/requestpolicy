@@ -1,4 +1,4 @@
-<!ENTITY requestpolicyStatusbarLabel "Request Policy">
+<!ENTITY requestpolicyTitle "RequestPolicy">
 
 <!ENTITY requestpolicyPrefetchWarning "Warning: Prefetch is enabled">
 <!ENTITY requestpolicyPrefetchInfo "Learn about prefetching">

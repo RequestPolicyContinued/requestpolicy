@@ -85,7 +85,8 @@ var requestpolicyOverlay = {
           this._contextMenuOnPopShowing, false);
     }
 
-    // During initialisation
+    // Listen for the user changing tab so we can update any notification or
+    // indication of blocked requests.
     var container = gBrowser.tabContainer;
     container.addEventListener("TabSelect", function(event) {
           requestpolicyOverlay.tabChanged();
@@ -93,19 +94,14 @@ var requestpolicyOverlay = {
 
   },
 
-  // This function not currently in use.
   _showRedirectNotification : function(redirectTargetUri) {
     var notificationBox = gBrowser.getNotificationBox();
     var notificationValue = "request-policy-meta-redirect";
-    var notificationLabel = "This webpage has asked to redirect to "
-        + redirectTargetUri;
-    var notificationButtonOptions = "Options";
-    var notificationButtonAllow = "Allow";
-    var notificationButtonDeny = "Deny";
-
-    // TODO: Don't show notification if we can tell that the redirect is going
-    // to be allowed. That is, prevent the notification from appearing
-    // momentarily and then going away as the redirect happens.
+    var notificationLabel = this._strbundle.getFormattedString(
+        "redirectNotification", [redirectTargetUri]);
+    var notificationButtonOptions = this._strbundle.getString("Options");
+    var notificationButtonAllow = this._strbundle.getString("Allow");
+    var notificationButtonDeny = this._strbundle.getString("Deny");
 
     optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
@@ -176,8 +172,7 @@ var requestpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function() {
-    Logger.dump("checking for blocked content");
-
+    Logger.debug(Logger.TYPE_INTERNAL, "checking for blocked content");
     var uri = this._getCurrentUri();
     var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
     var anyRejected = false;
@@ -507,16 +502,6 @@ var requestpolicyOverlay = {
       }
     }
 
-    this._cleanupMenus();
-
-  },
-
-  _cleanupMenus : function() {
-    // this._removeExtraSubmenuSeparators(this._blockedDestinationsMenu);
-    // this._removeExtraSubmenuSeparators(this._allowedDestinationsMenu);
-
-    // this._disableMenuIfEmpty(this._blockedDestinationsMenu);
-    // this._disableMenuIfEmpty(this._allowedDestinationsMenu);
   },
 
   _removeExtraSubmenuSeparators : function(menu) {
@@ -531,10 +516,10 @@ var requestpolicyOverlay = {
   },
 
   _addMenuItemTemporarilyAllowDest : function(menu, destHost) {
-    var label = "Temporarily allow requests to " + destHost;
-    // TODO: sanitize destHost
+    var label = this._strbundle.getFormattedString(
+        "allowDestinationTemporarily", [destHost]);
     var command = "requestpolicyOverlay.temporarilyAllowDestination('"
-        + destHost + "');";
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
@@ -543,11 +528,11 @@ var requestpolicyOverlay = {
 
   _addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost,
       destHost) {
-    var label = "Temporarily allow requests from " + originHost + " to "
-        + destHost;
-    // TODO: sanitize destHost
+    var label = this._strbundle.getFormattedString(
+        "allowOriginToDestinationTemporarily", [originHost, destHost]);
     var command = "requestpolicyOverlay.temporarilyAllowOriginToDestination('"
-        + originHost + "', '" + destHost + "');";
+        + this._sanitizeJsFunctionArg(originHost) + "', '"
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
@@ -555,18 +540,20 @@ var requestpolicyOverlay = {
   },
 
   _addMenuItemAllowDest : function(menu, destHost) {
-    var label = "Allow all requests to " + destHost;
-    // TODO: sanitize destHost
-    var command = "requestpolicyOverlay.allowDestination('" + destHost + "');";
+    var label = this._strbundle.getFormattedString("allowDestination",
+        [destHost]);
+    var command = "requestpolicyOverlay.allowDestination('"
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
   },
 
   _addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
-    var label = "Allow requests from " + originHost + " to " + destHost;
-    // TODO: sanitize destHost
+    var label = this._strbundle.getFormattedString("allowOriginToDestination",
+        [originHost, destHost]);
     var command = "requestpolicyOverlay.allowOriginToDestination('"
-        + originHost + "', '" + destHost + "');";
+        + this._sanitizeJsFunctionArg(originHost) + "', '"
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyAllowOriginToDest");
@@ -574,28 +561,36 @@ var requestpolicyOverlay = {
   },
 
   _addMenuItemForbidOrigin : function(menu, originHost) {
-    var label = "Forbid all requests from " + originHost;
-    // TODO: sanitize originHost
-    var command = "requestpolicyOverlay.forbidOrigin('" + originHost + "');";
+    var label = this._strbundle
+        .getFormattedString("forbidOrigin", [originHost]);
+    var command = "requestpolicyOverlay.forbidOrigin('"
+        + this._sanitizeJsFunctionArg(originHost) + "');";
     var statustext = originHost;
     return this._addMenuItem(menu, label, command, statustext);
   },
 
   _addMenuItemForbidDest : function(menu, destHost) {
-    var label = "Forbid all requests to " + destHost;
-    // TODO: sanitize destHost
-    var command = "requestpolicyOverlay.forbidDestination('" + destHost + "');";
+    var label = this._strbundle.getFormattedString("forbidDestination",
+        [destHost]);
+    var command = "requestpolicyOverlay.forbidDestination('"
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
   },
 
   _addMenuItemForbidOriginToDest : function(menu, originHost, destHost) {
-    var label = "Forbid requests from " + originHost + " to " + destHost;
-    // TODO: sanitize destHost
+    var label = this._strbundle.getFormattedString("forbidOriginToDestination",
+        [originHost, destHost]);
     var command = "requestpolicyOverlay.forbidOriginToDestination('"
-        + originHost + "', '" + destHost + "');";
+        + this._sanitizeJsFunctionArg(originHost) + "', '"
+        + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
+  },
+
+  _sanitizeJsFunctionArg : function(str) {
+    // strip single quotes and backslashes
+    return str.replace(/['\\]/g, "");
   },
 
   _addMenuSeparator : function(menu) {
@@ -615,7 +610,6 @@ var requestpolicyOverlay = {
   },
 
   _addMenu : function(parentMenu, label) {
-    // add the menu item
     var menu = document.createElement("menu");
     menu.setAttribute("label", label);
     parentMenu.insertBefore(menu, parentMenu.firstChild);
@@ -627,10 +621,9 @@ var requestpolicyOverlay = {
   },
 
   _addBlockedDestination : function(label) {
-    // add the menu item
     var menu = document.createElement("menu");
-    // TODO: internationalize indent (left vs. right)
-    menu.setAttribute("label", "    " + label);
+    menu.setAttribute("label", this._strbundle.getFormattedString(
+            "indentedText", [label]));
     menu.setAttribute("class", "requestpolicyBlocked");
     this._menu.insertBefore(menu, this._blockedDestinationsBeforeReferenceItem);
     // add the menu popup in the menu item
@@ -645,10 +638,9 @@ var requestpolicyOverlay = {
   },
 
   _addAllowedDestination : function(label) {
-    // add the menu item
     var menu = document.createElement("menu");
-    // TODO: internationalize indent (left vs. right)
-    menu.setAttribute("label", "    " + label);
+    menu.setAttribute("label", this._strbundle.getFormattedString(
+            "indentedText", [label]));
     menu.setAttribute("class", "requestpolicyAllowed");
     this._menu.insertBefore(menu, this._allowedDestinationsBeforeReferenceItem);
     // add the menu popup in the menu item

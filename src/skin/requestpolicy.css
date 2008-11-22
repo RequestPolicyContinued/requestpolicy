@@ -1,13 +1,36 @@
-#requestpolicyStatusbarIcon {
-	list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
+#requestpolicyStatusbar {
+	padding-left: 4px;
+	padding-right: 4px;
+	cursor: pointer;
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
 }
 
-#requestpolicyStatusbarIcon[blocked="true"] {
-    list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
+#requestpolicyStatusbar[blocked="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
 }
 
-#requestpolicyStatusbarIcon[disabled="true"] {
-    list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
+#requestpolicyStatusbar[permissive="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
+}
+
+#requestpolicyContextMenu {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+}
+
+#requestpolicyContextMenu[blocked="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+    color : #a00;
+}
+
+#requestpolicyContextMenu[permissive="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+    color : #d07100;
 }
 
 .requestpolicyTemporary {

@@ -28,6 +28,10 @@ var requestpolicyOverlay = {
   _blockedDestinationsBeforeReferenceItem : null,
   _allowedDestinationsBeforeReferenceItem : null,
 
+  _statusbar : null,
+  _rpStatusbar : null,
+  _rpContextMenu : null,
+
   /**
    * Initialize the object. This must be done after the DOM is loaded.
    */
@@ -49,6 +53,10 @@ var requestpolicyOverlay = {
           .getElementById("requestpolicyAllowedDestinationsSeparator");
       this._allowedDestinationsBeforeReferenceItem = document
           .getElementById("requestpolicyOriginSubmenusSeparator");
+
+      this._statusbar = document.getElementById("status-bar");
+      this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
+      this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
     }
   },
 
@@ -82,7 +90,9 @@ var requestpolicyOverlay = {
     var contextMenu = document.getElementById("contentAreaContextMenu");
     if (contextMenu) {
       contextMenu.addEventListener("popupshowing",
-          this._contextMenuOnPopShowing, false);
+          this._contextMenuOnPopupShowing, false);
+      contextMenu.addEventListener("popuphidden",
+          this._contextMenuOnPopupHidden, false);
     }
 
     // Listen for the user changing tab so we can update any notification or
@@ -91,7 +101,6 @@ var requestpolicyOverlay = {
     container.addEventListener("TabSelect", function(event) {
           requestpolicyOverlay.tabChanged();
         }, false);
-
   },
 
   _showRedirectNotification : function(redirectTargetUri) {
@@ -192,16 +201,16 @@ var requestpolicyOverlay = {
    * Sets the blocked content notifications visible to the user.
    */
   _setBlockedContentNotification : function(isContentBlocked) {
-    var icon = document.getElementById("requestpolicyStatusbarIcon");
-    icon.setAttribute("blocked", isContentBlocked);
+    this._rpStatusbar.setAttribute("blocked", isContentBlocked);
+    this._rpContextMenu.setAttribute("blocked", isContentBlocked);
   },
 
   /**
-   * Sets the disabled status visible to the user.
+   * Sets the permissive status visible to the user.
    */
-  _setDisabledNotification : function(isDisabled) {
-    var icon = document.getElementById("requestpolicyStatusbarIcon");
-    icon.setAttribute("disabled", isDisabled);
+  _setPermissiveNotification : function(isPermissive) {
+    this._rpStatusbar.setAttribute("permissive", isPermissive);
+    this._rpContextMenu.setAttribute("permissive", isPermissive);
   },
 
   /**
@@ -308,8 +317,20 @@ var requestpolicyOverlay = {
    * Called as an event listener when popupshowing fires on the
    * contentAreaContextMenu.
    */
-  _contextMenuOnPopShowing : function() {
+  _contextMenuOnPopupShowing : function() {
     requestpolicyOverlay._wrapOpenLinkFunctions();
+    requestpolicyOverlay._attachPopupToContextMenu();
+  },
+
+  /**
+   * Called as an event listener when popuphidden fires on the
+   * contentAreaContextMenu.
+   */
+  _contextMenuOnPopupHidden : function(event) {
+    if (event.currentTarget != event.originalTarget) {
+      return;
+    }
+    requestpolicyOverlay._attachPopupToStatusbar();
   },
 
   /**
@@ -689,7 +710,7 @@ var requestpolicyOverlay = {
     // Only reloading the current document. Should we reload all? Seems like it
     // would be unexpected to the user if all were reloaded.
     this
-        ._setDisabledNotification(this._requestpolicyJSObject._blockingDisabled);
+        ._setPermissiveNotification(this._requestpolicyJSObject._blockingDisabled);
     this._conditionallyReloadDocument();
   },
 
@@ -848,7 +869,23 @@ var requestpolicyOverlay = {
     this._openInNewTab(this._prefetchDisablingInstructionsUri);
   },
 
+  _attachPopupToContextMenu : function() {
+    // Add the menupopup back to the contextmenu.
+    if (!requestpolicyOverlay._rpContextMenu.firstChild) {
+      requestpolicyOverlay._rpContextMenu.insertBefore(
+          requestpolicyOverlay._menu, null);
+    }
+  },
+
+  _attachPopupToStatusbar : function() {
+    // Add the menupopup to the statusbar as it may be attached to the
+    // contextmenu.
+    requestpolicyOverlay._statusbar.insertBefore(requestpolicyOverlay._menu,
+        null);
+  },
+
   openStatusbarPopup : function(anchor) {
+    // Open the popup.
     this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
   }
 

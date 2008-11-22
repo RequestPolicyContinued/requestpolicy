@@ -1,3 +1,15 @@
+#requestpolicyStatusbarIcon {
+	list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
+}
+
+#requestpolicyStatusbarIcon[blocked="true"] {
+    list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
+}
+
+#requestpolicyStatusbarIcon[disabled="true"] {
+    list-style-image: url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
+}
+
 .requestpolicyTemporary {
 	font-style: italic;
 }
@@ -19,5 +31,5 @@
 }
 
 .requestpolicyAllowOriginToDest {
-    font-weight : bold;	
+	font-weight: bold;
 }

@@ -185,30 +185,23 @@ var requestpolicyOverlay = {
         }
       }
     }
-
-    if (anyRejected) {
-      this._setBlockedContentNotification();
-    } else {
-      this._clearBlockedContentNotifications();
-    }
+    this._setBlockedContentNotification(anyRejected);
   },
 
   /**
-   * Creates a blocked content notifications visible to the user.
+   * Sets the blocked content notifications visible to the user.
    */
-  _setBlockedContentNotification : function() {
-    var requestpolicyStatusbarLabel = document
-        .getElementById("requestpolicyStatusbarLabel");
-    requestpolicyStatusbarLabel.style.color = "#a00";
+  _setBlockedContentNotification : function(isContentBlocked) {
+    var icon = document.getElementById("requestpolicyStatusbarIcon");
+    icon.setAttribute("blocked", isContentBlocked);
   },
 
   /**
-   * Clears any blocked content notifications visible to the user.
+   * Sets the disabled status visible to the user.
    */
-  _clearBlockedContentNotifications : function() {
-    var requestpolicyStatusbarLabel = document
-        .getElementById("requestpolicyStatusbarLabel");
-    requestpolicyStatusbarLabel.style.color = "";
+  _setDisabledNotification : function(isDisabled) {
+    var icon = document.getElementById("requestpolicyStatusbarIcon");
+    icon.setAttribute("disabled", isDisabled);
   },
 
   /**
@@ -228,7 +221,7 @@ var requestpolicyOverlay = {
     const requestpolicy = this._requestpolicy;
 
     // Clear any notifications that may have been present.
-    this._clearBlockedContentNotifications();
+    this._setBlockedContentNotification(false);
 
     // Find all meta redirects.
     var metaTags = document.getElementsByTagName("meta");
@@ -695,6 +688,8 @@ var requestpolicyOverlay = {
     this._requestpolicyJSObject._blockingDisabled = !this._requestpolicyJSObject._blockingDisabled;
     // Only reloading the current document. Should we reload all? Seems like it
     // would be unexpected to the user if all were reloaded.
+    this
+        ._setDisabledNotification(this._requestpolicyJSObject._blockingDisabled);
     this._conditionallyReloadDocument();
   },
 
@@ -834,7 +829,7 @@ var requestpolicyOverlay = {
     // If it's relative to the current directory, figure out what it ultimately
     // should be because firefox doesn't know what to do with setting the href
     // to something like "somedir/whatever.html".
-    if (redirectTargetUri[0] != '/' || redirectTargetUri.indexOf(":") == -1) {
+    if (redirectTargetUri[0] != '/' && redirectTargetUri.indexOf(":") == -1) {
       var curDir = this._getCurrentUri().split("/").pop().join("/");
       redirectTargetUri = curDir + "/" + redirectTargetUri;
     }
@@ -851,6 +846,10 @@ var requestpolicyOverlay = {
 
   showPrefetchDisablingInstructions : function() {
     this._openInNewTab(this._prefetchDisablingInstructionsUri);
+  },
+
+  openStatusbarPopup : function(anchor) {
+    this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
   }
 
 };

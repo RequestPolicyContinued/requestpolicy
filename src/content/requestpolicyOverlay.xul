@@ -12,76 +12,77 @@
 	
 	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
 
-	<popupset id="mainPopupSet">
-		<popup id="requestpolicyRedirectNotificationOptions" />
-	</popupset>
-
 	<statusbar id="status-bar">
-		<statusbarpanel>
-			<menu label="&requestpolicyStatusbarLabel;"
-				onclick="if (event.originalTarget == this) this.firstChild.showPopup();"
-				id="requestpolicyStatusbarLabel">
-				<menupopup id="requestpolicyStatusbarPopup" onpopupshowing="requestpolicyOverlay.onMenuShowing(event)">
-					<menu id="requestpolicyPrefetchWarning"
-						label="&requestpolicyPrefetchWarning;">
-						<menupopup>
-							<menuitem id="requestpolicyPrefetchInfo"
-								label="&requestpolicyPrefetchInfo;"
-								oncommand="requestpolicyOverlay.showPrefetchInfo();"
-								/>
-							<menuitem id="requestpolicyPrefetchDisablingInstructions"
-								label="&requestpolicyPrefetchDisablingInstructions;"
-								oncommand="requestpolicyOverlay.showPrefetchDisablingInstructions();"
-								/>
-						</menupopup>
-					</menu>
-					<menuseparator id="requestpolicyPrefetchWarningSeparator" />
-					<menuitem 
-						id="requestpolicyAllowAllTemporarily"
-						class="requestpolicyTemporary"
-						label="&requestpolicyStatusbarTemporarilyAllowAll;"
-						type="checkbox"
-						checked="false"
-						oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
-					<menuseparator />
-					<!--<menu id="requestpolicyBlockedDestinations" label="&requestpolicyStatusbarBlockedDestinations;">
-							<menupopup id="requestpolicyBlockedDestinationsPopup">
-							</menupopup>
-						</menu>-->
-					<menuitem id="requestpolicyBlockedDestinations"
-						label="&requestpolicyStatusbarBlockedDestinations;"
-						class="requestpolicyBlockedHeading"
-						disabled="true"
-						/>
-					<menuseparator id="requestpolicyAllowedDestinationsSeparator" />
-					<!--<menu id="requestpolicyAllowedDestinations" label="&requestpolicyStatusbarAllowedDestinations;">
-							<menupopup id="requestpolicyAllowedDestinationsPopup">
-							</menupopup>
-						</menu>-->
-					<menuitem id="requestpolicyAllowedDestinations"
-						label="&requestpolicyStatusbarAllowedDestinations;"
-						class="requestpolicyAllowedHeading"
-						disabled="true"
-						/>
-					<menuseparator id="requestpolicyOriginSubmenusSeparator" />
-					<menuitem 
-						id="requestpolicyRevokeTemporaryPermissions"
-						label="&revokeTemporaryPermissions;"
-						oncommand="requestpolicyOverlay.revokeTemporaryPermissions(event);" />
-					<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
-					<menuitem 
-						id="requestpolicyAllowOrigin"
-						oncommand="requestpolicyOverlay.allowOrigin(event);" />
-					<menuitem 
-						id="requestpolicyAllowOriginTemporarily"
-						class="requestpolicyTemporary"
-						oncommand="requestpolicyOverlay.temporarilyAllowOrigin(event);" />
-					<menuitem 
-						id="requestpolicyForbidOrigin"
-						oncommand="requestpolicyOverlay.forbidOrigin(event);" />
-				</menupopup>
-			</menu>
+		<statusbarpanel 
+			class="statusbarpanel-menu-iconic" 
+			id="requestpolicyStatusbarIcon"
+			onclick="requestpolicyOverlay.openStatusbarPopup(this);"
+			>
 		</statusbarpanel>
 	</statusbar>
+
+	<popupset>
+		<popup id="requestpolicyRedirectNotificationOptions" />
+
+		<menupopup 
+			id="requestpolicyStatusbarPopup" 
+			onpopupshowing="requestpolicyOverlay.onMenuShowing(event)"
+			>
+			<menu
+				id="requestpolicyPrefetchWarning"
+				label="&requestpolicyPrefetchWarning;">
+				<menupopup>
+					<menuitem
+						id="requestpolicyPrefetchInfo"
+						label="&requestpolicyPrefetchInfo;"
+						oncommand="requestpolicyOverlay.showPrefetchInfo();"
+						/>
+					<menuitem
+						id="requestpolicyPrefetchDisablingInstructions"
+						label="&requestpolicyPrefetchDisablingInstructions;"
+						oncommand="requestpolicyOverlay.showPrefetchDisablingInstructions();"
+						/>
+				</menupopup>
+			</menu>
+			<menuseparator id="requestpolicyPrefetchWarningSeparator" />
+			<menuitem 
+				id="requestpolicyAllowAllTemporarily"
+				class="requestpolicyTemporary"
+				label="&requestpolicyStatusbarTemporarilyAllowAll;"
+				type="checkbox"
+				checked="false"
+				oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
+			<menuseparator />
+			<menuitem
+				id="requestpolicyBlockedDestinations"
+				label="&requestpolicyStatusbarBlockedDestinations;"
+				class="requestpolicyBlockedHeading"
+				disabled="true"
+				/>
+			<menuseparator id="requestpolicyAllowedDestinationsSeparator" />
+			<menuitem
+				id="requestpolicyAllowedDestinations"
+				label="&requestpolicyStatusbarAllowedDestinations;"
+				class="requestpolicyAllowedHeading"
+				disabled="true"
+				/>
+			<menuseparator id="requestpolicyOriginSubmenusSeparator" />
+			<menuitem 
+				id="requestpolicyRevokeTemporaryPermissions"
+				label="&revokeTemporaryPermissions;"
+				oncommand="requestpolicyOverlay.revokeTemporaryPermissions(event);" />
+			<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
+			<menuitem 
+				id="requestpolicyAllowOrigin"
+				oncommand="requestpolicyOverlay.allowOrigin(event);" />
+			<menuitem 
+				id="requestpolicyAllowOriginTemporarily"
+				class="requestpolicyTemporary"
+				oncommand="requestpolicyOverlay.temporarilyAllowOrigin(event);" />
+			<menuitem 
+				id="requestpolicyForbidOrigin"
+				oncommand="requestpolicyOverlay.forbidOrigin(event);" />
+		</menupopup>
+	</popupset>
 
 </overlay>

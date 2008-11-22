@@ -91,9 +91,11 @@ var requestpolicyOverlay = {
     if (contextMenu) {
       contextMenu.addEventListener("popupshowing",
           this._contextMenuOnPopupShowing, false);
-      contextMenu.addEventListener("popuphidden",
-          this._contextMenuOnPopupHidden, false);
     }
+
+    // We consider the default place for the popup to be attached to the context
+    // menu, so attach it there.
+    this._attachPopupToContextMenu();
 
     // Listen for the user changing tab so we can update any notification or
     // indication of blocked requests.
@@ -359,7 +361,7 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Called before the statusbar menu is shown.
+   * Called before the popup menu is shown.
    * 
    * @param {Event}
    *            event
@@ -369,6 +371,21 @@ var requestpolicyOverlay = {
       return;
     }
     this.prepareMenu();
+  },
+
+  /**
+   * Called after the popup menu is hidden.
+   * 
+   * @param {Event}
+   *            event
+   */
+  onMenuHidden : function(event) {
+    if (event.currentTarget != event.originalTarget) {
+      return;
+    }
+    // Leave the popup attached to the context menu, as we consdier that the
+    // default location for it.
+    this._attachPopupToContextMenu();
   },
 
   /**
@@ -886,6 +903,7 @@ var requestpolicyOverlay = {
 
   openStatusbarPopup : function(anchor) {
     // Open the popup.
+    this._attachPopupToStatusbar();
     this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
   }
 

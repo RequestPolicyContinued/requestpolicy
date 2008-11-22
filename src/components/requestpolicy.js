@@ -310,6 +310,9 @@ RequestPolicyService.prototype = {
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
+    var originUrl = DomainUtils.stripFragment(originUrl);
+    var destinationUrl = DomainUtils.stripFragment(destinationUrl);
+
     Logger.info(Logger.TYPE_INTERNAL, "Form submitted from <" + originUrl
             + "> to <" + destinationUrl + ">.");
 
@@ -328,6 +331,9 @@ RequestPolicyService.prototype = {
   },
 
   registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
+    var originUrl = DomainUtils.stripFragment(originUrl);
+    var destinationUrl = DomainUtils.stripFragment(destinationUrl);
+
     Logger.info(Logger.TYPE_INTERNAL, "Link clicked from <" + originUrl
             + "> to <" + destinationUrl + ">.");
 

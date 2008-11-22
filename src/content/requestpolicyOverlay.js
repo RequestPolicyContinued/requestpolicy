@@ -108,9 +108,9 @@ var requestpolicyOverlay = {
     var notificationValue = "request-policy-meta-redirect";
     var notificationLabel = this._strbundle.getFormattedString(
         "redirectNotification", [redirectTargetUri]);
-    var notificationButtonOptions = this._strbundle.getString("Options");
-    var notificationButtonAllow = this._strbundle.getString("Allow");
-    var notificationButtonDeny = this._strbundle.getString("Deny");
+    var notificationButtonOptions = this._strbundle.getString("options");
+    var notificationButtonAllow = this._strbundle.getString("allow");
+    var notificationButtonDeny = this._strbundle.getString("deny");
 
     optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);

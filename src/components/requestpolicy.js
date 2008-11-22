@@ -757,8 +757,9 @@ RequestPolicyService.prototype = {
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
   // cases we just return CP_OK rather than return this function which
-  // ultimately returns CP_OK.
-  accept : function(reason, args) {
+  // ultimately returns CP_OK. Third param, "unrecorded", is set to true if
+  // this request shouldn'tbe recorded as an allowed request.
+  accept : function(reason, args, unrecorded) {
     Logger.warning(Logger.TYPE_CONTENT, "** ALLOWED ** reason: "
             + reason
             + ". "
@@ -772,7 +773,9 @@ RequestPolicyService.prototype = {
     var dest = args[1];
 
     this._cacheShouldLoadResult(CP_OK, origin, dest);
-    this._recordAllowedRequest(origin, dest);
+    if (!unrecorded) {
+      this._recordAllowedRequest(origin, dest);
+    }
 
     return CP_OK;
   },
@@ -1002,7 +1005,7 @@ RequestPolicyService.prototype = {
             // goes back/forward through their history.
             // delete this._clickedLinks[origin][dest];
             return this.accept("User-initiated request by link click",
-                arguments);
+                arguments, true);
 
           } else if (this._submittedForms[origin]
               && this._submittedForms[origin][dest.split("?")[0]]) {
@@ -1013,7 +1016,7 @@ RequestPolicyService.prototype = {
             // goes back/forward through their history.
             // delete this._submittedForms[origin][dest.split("?")[0]];
             return this.accept("User-initiated request by form submission",
-                arguments);
+                arguments, true);
           }
         }
 

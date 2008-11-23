@@ -46,20 +46,15 @@ RequestPolicyService.prototype = {
   },
 
   // /////////////////////////////////////////////////////////////////////////
-  // Settings
-  // /////////////////////////////////////////////////////////////////////////
-
-  VERSION : "0.1.0",
-
-  // /////////////////////////////////////////////////////////////////////////
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
 
   _blockingDisabled : false,
 
   _rejectedRequests : {},
-  _blockedRedirects : {},
   _allowedRequests : {},
+
+  _blockedRedirects : {},
 
   _prefService : null,
   _rootPrefs : null,
@@ -258,6 +253,31 @@ RequestPolicyService.prototype = {
               + "' header. Same hosts or allowed origin/destination. To <"
               + dest + "> " + "from <" + origin + ">");
       this._recordAllowedRequest(origin, dest);
+
+      // If this was a link click or a form submission, we register an
+      // additional click/submit with the original source but with a new
+      // destination of the target of the redirect. This is because future
+      // requests (such as using back/forward) might show up as directly from
+      // the initial origin to the ultimate redirected destination.
+      var realOrigin = httpChannel.referrer.spec;
+
+      if (this._clickedLinks[realOrigin]
+          && this._clickedLinks[realOrigin][origin]) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "This redirect was from a link click."
+                + " Registering an additional click to <" + dest + "> "
+                + "from <" + realOrigin + ">");
+        this.registerLinkClicked(realOrigin, dest);
+
+      } else if (this._submittedForms[realOrigin]
+          && this._submittedForms[realOrigin][origin.split("?")[0]]) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "This redirect was from a form submission."
+                + " Registering an additional form submission to <" + dest
+                + "> " + "from <" + realOrigin + ">");
+        this.registerFormSubmitted(realOrigin, dest);
+      }
+
       return;
     }
 

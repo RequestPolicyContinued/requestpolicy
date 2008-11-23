@@ -5,14 +5,16 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>RequestPolicy</em:name>
-		<em:version>0.1.3</em:version>
+		<em:version>0.1.4</em:version>
 		<em:type>2</em:type>
-		<em:description>Provides the ability to specify policies for allowing and disallowing cross-site requests.</em:description>
+		<em:description>Specify policies for allowing cross-site requests.</em:description>
 		<em:creator>Justin Samuel</em:creator>
 		<em:id>requestpolicy@requestpolicy.com</em:id>
+		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
+		<em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 		
+		<!-- Firefox -->
 		<em:targetApplication>
-			<!-- Firefox -->
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>3.0.0</em:minVersion>
@@ -20,7 +22,5 @@
 			</Description>
 		</em:targetApplication>
 		
-		<em:iconURL></em:iconURL>
-		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
 	</Description>
 </RDF>

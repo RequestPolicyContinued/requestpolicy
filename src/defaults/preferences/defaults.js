@@ -1,4 +1,4 @@
-pref("extensions.requestpolicy.log", true);
+pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);
 pref("extensions.requestpolicy.log.types", 1023);
 

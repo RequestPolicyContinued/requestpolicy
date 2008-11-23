@@ -22,11 +22,5 @@
 		
 		<em:iconURL></em:iconURL>
 		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
-		
-		<em:updateURL>http://www.requestpolicy.com/updates.rdf</em:updateURL>
-		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvCwMJOKjCMKDhQ5ghShmIt1Hz
-		              gLQfP+3TvXFZuKy+imTalEJ+eVwO2PNwktPyYHmpzhHDyQKlHpqdSS3mgYcjUu/S
-		              HikIHjx4MgCFpAg8CJtkpQhK0lZozynmF8/2kDOMKIdgkE1ljA3tJBYNQi+L35l6
-		              J7+1uavuZ20j1tTrCwIDAQAB</em:updateKey>
 	</Description>
 </RDF>

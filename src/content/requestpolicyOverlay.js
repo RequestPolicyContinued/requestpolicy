@@ -28,6 +28,16 @@ var requestpolicyOverlay = {
   _blockedDestinationsBeforeReferenceItem : null,
   _allowedDestinationsBeforeReferenceItem : null,
 
+  _itemPrefetchWarning : null,
+  _itemPrefetchWarningSeparator : null,
+
+  _itemRevokeTemporaryPermissions : null,
+  _itemRevokeTemporaryPermissionsSeparator : null,
+
+  _itemAllowOriginTemporarily : null,
+  _itemAllowOrigin : null,
+  _itemForbidOrigin : null,
+
   _statusbar : null,
   _rpStatusbar : null,
   _rpContextMenu : null,
@@ -53,6 +63,23 @@ var requestpolicyOverlay = {
           .getElementById("requestpolicyAllowedDestinationsSeparator");
       this._allowedDestinationsBeforeReferenceItem = document
           .getElementById("requestpolicyOriginSubmenusSeparator");
+
+      this._itemPrefetchWarning = document
+          .getElementById("requestpolicyPrefetchWarning");
+      this._itemPrefetchWarningSeparator = document
+          .getElementById("requestpolicyPrefetchWarningSeparator");
+
+      this._itemRevokeTemporaryPermissions = document
+          .getElementById("requestpolicyRevokeTemporaryPermissions");
+      this._itemRevokeTemporaryPermissionsSeparator = document
+          .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
+
+      this._itemAllowOriginTemporarily = document
+          .getElementById("requestpolicyAllowOriginTemporarily");
+      this._itemAllowOrigin = document
+          .getElementById("requestpolicyAllowOrigin");
+      this._itemForbidOrigin = document
+          .getElementById("requestpolicyForbidOrigin");
 
       this._statusbar = document.getElementById("status-bar");
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
@@ -409,64 +436,38 @@ var requestpolicyOverlay = {
   prepareMenu : function() {
     var currentIdentifier = this._getCurrentUriIdentifier();
 
-    // The menu items we may need.
-    var itemPrefetchWarning = document
-        .getElementById("requestpolicyPrefetchWarning");
-    var itemPrefetchWarningSeparator = document
-        .getElementById("requestpolicyPrefetchWarningSeparator");
-
-    var itemRevokeTemporaryPermissions = document
-        .getElementById("requestpolicyRevokeTemporaryPermissions");
-    var itemRevokeTemporaryPermissionsSeparator = document
-        .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
-
-    var itemAllowOriginTemporarily = document
-        .getElementById("requestpolicyAllowOriginTemporarily");
-    var itemAllowOrigin = document.getElementById("requestpolicyAllowOrigin");
-    var itemForbidOrigin = document.getElementById("requestpolicyForbidOrigin");
-
     // Set all labels here for convenience, even though we won't display some of
     // these menu items.
-    itemForbidOrigin.label = this._strbundle.getFormattedString("forbidOrigin",
-        [currentIdentifier]);
-    itemAllowOriginTemporarily.label = this._strbundle.getFormattedString(
-        "allowOriginTemporarily", [currentIdentifier]);
-    itemAllowOrigin.label = this._strbundle.getFormattedString("allowOrigin",
-        [currentIdentifier]);
+    this._itemForbidOrigin.setAttribute("label", this._strbundle
+            .getFormattedString("forbidOrigin", [currentIdentifier]));
+    this._itemAllowOriginTemporarily.setAttribute("label", this._strbundle
+            .getFormattedString("allowOriginTemporarily", [currentIdentifier]));
+    this._itemAllowOrigin.setAttribute("label", this._strbundle
+            .getFormattedString("allowOrigin", [currentIdentifier]));
 
     // Initially make all menu items hidden.
-    itemRevokeTemporaryPermissions.hidden = true;
-    itemRevokeTemporaryPermissionsSeparator.hidden = true;
-    itemAllowOriginTemporarily.hidden = true;
-    itemAllowOrigin.hidden = true;
-    itemForbidOrigin.hidden = true;
+    this._itemRevokeTemporaryPermissions.hidden = true;
+    this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
+    this._itemAllowOriginTemporarily.hidden = true;
+    this._itemAllowOrigin.hidden = true;
+    this._itemForbidOrigin.hidden = true;
 
-    itemPrefetchWarning.hidden = itemPrefetchWarningSeparator.hidden = !this._requestpolicy
+    this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._requestpolicy
         .isPrefetchEnabled();
 
     if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
-      itemForbidOrigin.hidden = false;
+      this._itemForbidOrigin.hidden = false;
     } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
-      itemForbidOrigin.hidden = false;
+      this._itemForbidOrigin.hidden = false;
     } else {
-      itemAllowOriginTemporarily.hidden = false;
-      itemAllowOrigin.hidden = false;
+      this._itemAllowOriginTemporarily.hidden = false;
+      this._itemAllowOrigin.hidden = false;
     }
 
     if (this._requestpolicy.areTemporaryPermissionsGranted()) {
-      itemRevokeTemporaryPermissions.hidden = false;
-      itemRevokeTemporaryPermissionsSeparator.hidden = false;
+      this._itemRevokeTemporaryPermissions.hidden = false;
+      this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
     }
-
-    // Clear destinations submenus.
-    /*
-     * while (this._blockedDestinationsMenu.firstChild) {
-     * this._blockedDestinationsMenu
-     * .removeChild(this._blockedDestinationsMenu.firstChild); } while
-     * (this._allowedDestinationsMenu.firstChild) {
-     * this._allowedDestinationsMenu
-     * .removeChild(this._allowedDestinationsMenu.firstChild); }
-     */
 
     // Remove old menu items.
     for (var i in this._addedMenuItems) {

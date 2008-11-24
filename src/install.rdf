@@ -17,16 +17,10 @@
 		<em:targetApplication>
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-				<em:minVersion>3.0.0</em:minVersion>
-				<em:maxVersion>3.1.*</em:maxVersion>
+				<em:minVersion>3.0</em:minVersion>
+				<em:maxVersion>3.1b2pre</em:maxVersion>
 			</Description>
 		</em:targetApplication>
-		
-		<em:updateURL>http://www.requestpolicy.com/updates.rdf</em:updateURL>
-		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvCwMJOKjCMKDhQ5ghShmIt1Hz
-		              gLQfP+3TvXFZuKy+imTalEJ+eVwO2PNwktPyYHmpzhHDyQKlHpqdSS3mgYcjUu/S
-		              HikIHjx4MgCFpAg8CJtkpQhK0lZozynmF8/2kDOMKIdgkE1ljA3tJBYNQi+L35l6
-		              J7+1uavuZ20j1tTrCwIDAQAB</em:updateKey>
 		
 	</Description>
 </RDF>

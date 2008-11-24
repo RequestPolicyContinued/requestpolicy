@@ -17,6 +17,7 @@
 
 	<target name="chrome">
 		<mkdir dir="${dist.dir}" />
+		<delete file="${dist.dir}/${app.name}.jar" />
 		<zip destfile="${dist.dir}/${app.name}.jar">
 			<fileset dir="${src.dir}">
 				<include name="content/**" />
@@ -24,6 +25,7 @@
 				<include name="skin/**" />
 				<exclude name="**/.*" />
 				<exclude name="**/CVS/**" />
+				<exclude name="**/Copy *" />
 			</fileset>
 		</zip>
 	</target>
@@ -44,6 +46,7 @@
 
 	<target name="dist" depends="chrome">
 		<copy file="chrome.manifest.packaging" tofile="chrome.manifest" overwrite="true" />
+		<delete file="${dist.dir}/${app.name}.xpi" />
 		<zip destfile="${dist.dir}/${app.name}.xpi">
 			<zipfileset file="${dist.dir}/${app.name}.jar" prefix="chrome" />
 			<fileset dir="${src.dir}">
@@ -57,6 +60,7 @@
 				<exclude name="**/Makefile" />
 				<exclude name="**/.*" />
 				<exclude name="**/CVS/**" />
+				<exclude name="**/Copy *" />
 			</fileset>
 		</zip>
 		<copy file="chrome.manifest.devel" tofile="chrome.manifest" overwrite="true" />

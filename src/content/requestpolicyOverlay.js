@@ -101,7 +101,7 @@ var requestpolicyOverlay = {
     const requestpolicyOverlay = this;
     if (appcontent) {
       appcontent.addEventListener("DOMContentLoaded", function(event) {
-            requestpolicyOverlay.onPageLoad(event);
+            requestpolicyOverlay.onAppContentLoaded(event);
           }, true);
     }
 
@@ -140,7 +140,8 @@ var requestpolicyOverlay = {
     // Source file: chrome://global/content/bindings/notification.xml
     // Line: 260
 
-    var notificationBox = gBrowser.getNotificationBox();
+    var targetBrowser = gBrowser.getBrowserForDocument(targetDocument);
+    var notificationBox = gBrowser.getNotificationBox(targetBrowser)
     var notificationValue = "request-policy-meta-redirect";
     var notificationLabel = this._strbundle.getFormattedString(
         "redirectNotification", [redirectTargetUri]);
@@ -151,10 +152,10 @@ var requestpolicyOverlay = {
     optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
     this._clearMenu(optionsPopup);
-    var currentIdent = this._getCurrentUriIdentifier();
+    var currentIdent = this._requestpolicy
+        .getUriIdentifier(targetDocument.location);
     var destIdent = this._requestpolicy.getUriIdentifier(redirectTargetUri);
-    Logger.dump(currentIdent);
-    Logger.dump(destIdent);
+
     this._addMenuItemTemporarilyAllowOriginToDest(optionsPopup, currentIdent,
         destIdent);
     this._addMenuItemAllowOriginToDest(optionsPopup, currentIdent, destIdent);
@@ -200,7 +201,7 @@ var requestpolicyOverlay = {
    * @param {Event}
    *            event
    */
-  onPageLoad : function(event) {
+  onAppContentLoaded : function(event) {
     // TODO: This is getting called multiple times for a page, should only be
     // called once.
 
@@ -210,15 +211,16 @@ var requestpolicyOverlay = {
       return;
     }
 
-    this._onDOMContentLoaded(event);
-    this._checkForBlockedContent();
+    var document = event.target;
+    this._onDOMContentLoaded(document);
+    this._checkForBlockedContent(document);
   },
 
   /**
    * Checks if the current document has blocked content and shows appropriate
    * notifications.
    */
-  _checkForBlockedContent : function() {
+  _checkForBlockedContent : function(document) {
     Logger.debug(Logger.TYPE_INTERNAL, "checking for blocked content");
     var uri = this._getCurrentUri();
     var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
@@ -232,6 +234,8 @@ var requestpolicyOverlay = {
         }
       }
     }
+    // TODO: show block notification if there is content blocked from documents
+    // within this document.
     this._setBlockedContentNotification(anyRejected);
   },
 
@@ -258,13 +262,12 @@ var requestpolicyOverlay = {
    * @param {Event}
    *            event
    */
-  _onDOMContentLoaded : function(event) {
+  _onDOMContentLoaded : function(document) {
 
     // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
     // new links/forms with requestpolicy even if they are added after initial
     // load (e.g. they are added through javascript).
 
-    var document = event.target;
     const requestpolicy = this._requestpolicy;
 
     // Clear any notifications that may have been present.

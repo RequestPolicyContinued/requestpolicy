@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>RequestPolicy</em:name>
-		<em:version>0.1.5</em:version>
+		<em:version>0.1.6pre1</em:version>
 		<em:type>2</em:type>
 		<em:description>Specify policies for allowing cross-site requests.</em:description>
 		<em:creator>Justin Samuel</em:creator>
@@ -21,6 +21,12 @@
 				<em:maxVersion>3.1.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
+		
+		<em:updateURL>http://www.requestpolicy.com/updates.rdf</em:updateURL>
+		<em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvCwMJOKjCMKDhQ5ghShmIt1Hz
+		              gLQfP+3TvXFZuKy+imTalEJ+eVwO2PNwktPyYHmpzhHDyQKlHpqdSS3mgYcjUu/S
+		              HikIHjx4MgCFpAg8CJtkpQhK0lZozynmF8/2kDOMKIdgkE1ljA3tJBYNQi+L35l6
+		              J7+1uavuZ20j1tTrCwIDAQAB</em:updateKey>
 		
 	</Description>
 </RDF>

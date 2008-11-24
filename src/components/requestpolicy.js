@@ -259,23 +259,25 @@ RequestPolicyService.prototype = {
       // destination of the target of the redirect. This is because future
       // requests (such as using back/forward) might show up as directly from
       // the initial origin to the ultimate redirected destination.
-      var realOrigin = httpChannel.referrer.spec;
+      if (httpChannel.referrer) {
+        var realOrigin = httpChannel.referrer.spec;
 
-      if (this._clickedLinks[realOrigin]
-          && this._clickedLinks[realOrigin][origin]) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "This redirect was from a link click."
-                + " Registering an additional click to <" + dest + "> "
-                + "from <" + realOrigin + ">");
-        this.registerLinkClicked(realOrigin, dest);
+        if (this._clickedLinks[realOrigin]
+            && this._clickedLinks[realOrigin][origin]) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+              "This redirect was from a link click."
+                  + " Registering an additional click to <" + dest + "> "
+                  + "from <" + realOrigin + ">");
+          this.registerLinkClicked(realOrigin, dest);
 
-      } else if (this._submittedForms[realOrigin]
-          && this._submittedForms[realOrigin][origin.split("?")[0]]) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "This redirect was from a form submission."
-                + " Registering an additional form submission to <" + dest
-                + "> " + "from <" + realOrigin + ">");
-        this.registerFormSubmitted(realOrigin, dest);
+        } else if (this._submittedForms[realOrigin]
+            && this._submittedForms[realOrigin][origin.split("?")[0]]) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+              "This redirect was from a form submission."
+                  + " Registering an additional form submission to <" + dest
+                  + "> " + "from <" + realOrigin + ">");
+          this.registerFormSubmitted(realOrigin, dest);
+        }
       }
 
       return;

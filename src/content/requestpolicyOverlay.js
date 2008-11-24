@@ -125,7 +125,10 @@ var requestpolicyOverlay = {
         }, false);
   },
 
-  _showRedirectNotification : function(targetDocument, redirectTargetUri) {
+  _showRedirectNotification : function(targetDocument, redirectTargetUri, delay) {
+    // TODO: Do something with the delay. Not sure what the best thing to do is
+    // without complicating the UI.
+
     // TODO: The following error seems to be resulting when the notification
     // goes away with a redirect, either after clicking "allow" or if the
     // redirect is allowed and happens automatically.
@@ -280,16 +283,15 @@ var requestpolicyOverlay = {
 
         // TODO: move this logic to the requestpolicy service.
         var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(metaTags[i].content);
+        var delay = parts[1];
         var dest = parts[2];
         if (dest != undefined) {
           if (this._requestpolicyJSObject._blockingDisabled
               || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
             // The meta refresh is allowed.
-            this._performRedirect(document, dest);
-            // TODO: set it to happen after the same amount of time specified in
-            // the redirect.
+            this._performRedirectAfterDelay(document, dest, delay);
           } else {
-            this._showRedirectNotification(document, dest);
+            this._showRedirectNotification(document, dest, delay);
           }
         }
       }
@@ -883,21 +885,33 @@ var requestpolicyOverlay = {
     this._conditionallyReloadDocument();
   },
 
+  _performRedirectAfterDelay : function(document, redirectTargetUri, delay) {
+    Logger.info(Logger.TYPE_INTERNAL, "Registering delayed (" + delay
+            + "s) redirect to <" + redirectTargetUri + "> from <"
+            + document.documentURI + ">");
+    const constDocument = document;
+    const constRedirectTargetUri = redirectTargetUri;
+    document.defaultView.setTimeout(function() {
+          requestpolicyOverlay._performRedirect(constDocument,
+              constRedirectTargetUri);
+        }, delay * 1000);
+  },
+
   _performRedirect : function(document, redirectTargetUri) {
     try {
       if (redirectTargetUri[0] == '/') {
         Logger.info(Logger.TYPE_INTERNAL, "Redirecting to relative path <"
-                + redirectTargetUri + "> from <" + this._getCurrentUri() + ">");
+                + redirectTargetUri + "> from <" + document.documentURI + ">");
         document.location.pathname = redirectTargetUri;
       } else {
         // If there is no scheme, treat it as relative to the current directory.
         if (redirectTargetUri.indexOf(":") == -1) {
           // TODO: Move this logic to DomainUtils.
-          var curDir = this._getCurrentUri().split("/").slice(0, -1).join("/");
+          var curDir = document.documentURI.split("/").slice(0, -1).join("/");
           redirectTargetUri = curDir + "/" + redirectTargetUri;
         }
         Logger.info(Logger.TYPE_INTERNAL, "Redirecting to <"
-                + redirectTargetUri + "> from <" + this._getCurrentUri() + ">");
+                + redirectTargetUri + "> from <" + document.documentURI + ">");
         document.location.href = redirectTargetUri;
       }
     } catch (e) {

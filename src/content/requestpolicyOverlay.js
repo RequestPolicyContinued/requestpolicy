@@ -103,13 +103,6 @@ var requestpolicyOverlay = {
       appcontent.addEventListener("DOMContentLoaded", function(event) {
             requestpolicyOverlay.onPageLoad(event);
           }, true);
-      // Attempting to have the onPageLoad handler called after all page content
-      // has attempted to be loaded, but not sure this is actually being called
-      // late enough. Maybe those few remaining requests coming through are
-      // content that isn't part of the initial load of the page?
-      // appcontent.addEventListener("load", function() {
-      // requestpolicyOverlay.onPageLoad(event)
-      // }, true);
     }
 
     // Add an event listener for when the contentAreaContextMenu (generally the
@@ -132,7 +125,18 @@ var requestpolicyOverlay = {
         }, false);
   },
 
-  _showRedirectNotification : function(redirectTargetUri) {
+  _showRedirectNotification : function(targetDocument, redirectTargetUri) {
+    // TODO: The following error seems to be resulting when the notification
+    // goes away with a redirect, either after clicking "allow" or if the
+    // redirect is allowed and happens automatically.
+    //
+    // Source file: chrome://browser/content/browser.js
+    // Line: 3704
+    // ----------
+    // Error: self._closedNotification.parentNode is null
+    // Source file: chrome://global/content/bindings/notification.xml
+    // Line: 260
+
     var notificationBox = gBrowser.getNotificationBox();
     var notificationValue = "request-policy-meta-redirect";
     var notificationLabel = this._strbundle.getFormattedString(
@@ -146,6 +150,8 @@ var requestpolicyOverlay = {
     this._clearMenu(optionsPopup);
     var currentIdent = this._getCurrentUriIdentifier();
     var destIdent = this._requestpolicy.getUriIdentifier(redirectTargetUri);
+    Logger.dump(currentIdent);
+    Logger.dump(destIdent);
     this._addMenuItemTemporarilyAllowOriginToDest(optionsPopup, currentIdent,
         destIdent);
     this._addMenuItemAllowOriginToDest(optionsPopup, currentIdent, destIdent);
@@ -165,7 +171,7 @@ var requestpolicyOverlay = {
             accessKey : '', // TODO
             popup : null,
             callback : function() {
-              content.document.location.href = redirectTargetUri;
+              targetDocument.location.href = redirectTargetUri;
             }
           }, {
             label : notificationButtonDeny,
@@ -264,23 +270,26 @@ var requestpolicyOverlay = {
     // Find all meta redirects.
     var metaTags = document.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
-      if (metaTags[i].httpEquiv && metaTags[i].httpEquiv == "refresh") {
+      if (metaTags[i].httpEquiv
+          && metaTags[i].httpEquiv.toLowerCase() == "refresh") {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
         Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <"
                 + metaTags[i].content + "> found in document at <"
                 + document.location + ">");
 
-        var dest = metaTags[i].content.split(";url=").slice(1).join("");
+        // TODO: move this logic to the requestpolicy service.
+        var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(metaTags[i].content);
+        var dest = parts[2];
         if (dest != undefined) {
           if (this._requestpolicyJSObject._blockingDisabled
               || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
             // The meta refresh is allowed.
-            this._performRedirect(dest);
+            this._performRedirect(document, dest);
             // TODO: set it to happen after the same amount of time specified in
             // the redirect.
           } else {
-            this._showRedirectNotification(dest);
+            this._showRedirectNotification(document, dest);
           }
         }
       }
@@ -325,7 +334,7 @@ var requestpolicyOverlay = {
     // programmatically.
     var linkTags = document.getElementsByTagName("link");
     for (var i = 0; i < linkTags.length; i++) {
-      if (linkTags[i].rel == "prefetch") {
+      if (linkTags[i].rel.toLowerCase() == "prefetch") {
         Logger.info(Logger.TYPE_CONTENT, "prefetch of <" + linkTags[i].href
                 + "> found in document at <" + document.location + ">");
       }
@@ -336,7 +345,7 @@ var requestpolicyOverlay = {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
-      this._showRedirectNotification(dest);
+      this._showRedirectNotification(document, dest);
       delete this._requestpolicyJSObject._blockedRedirects[document.location];
     }
 
@@ -434,106 +443,116 @@ var requestpolicyOverlay = {
    * document.
    */
   prepareMenu : function() {
-    var currentIdentifier = this._getCurrentUriIdentifier();
+    try {
+      var currentIdentifier = this._getCurrentUriIdentifier();
 
-    // Set all labels here for convenience, even though we won't display some of
-    // these menu items.
-    this._itemForbidOrigin.setAttribute("label", this._strbundle
-            .getFormattedString("forbidOrigin", [currentIdentifier]));
-    this._itemAllowOriginTemporarily.setAttribute("label", this._strbundle
-            .getFormattedString("allowOriginTemporarily", [currentIdentifier]));
-    this._itemAllowOrigin.setAttribute("label", this._strbundle
-            .getFormattedString("allowOrigin", [currentIdentifier]));
+      Logger.dump(currentIdentifier);
 
-    // Initially make all menu items hidden.
-    this._itemRevokeTemporaryPermissions.hidden = true;
-    this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
-    this._itemAllowOriginTemporarily.hidden = true;
-    this._itemAllowOrigin.hidden = true;
-    this._itemForbidOrigin.hidden = true;
+      // Set all labels here for convenience, even though we won't display some
+      // of these menu items.
+      this._itemForbidOrigin.setAttribute("label", this._strbundle
+              .getFormattedString("forbidOrigin", [currentIdentifier]));
+      this._itemAllowOriginTemporarily.setAttribute("label",
+          this._strbundle.getFormattedString("allowOriginTemporarily",
+              [currentIdentifier]));
+      this._itemAllowOrigin.setAttribute("label", this._strbundle
+              .getFormattedString("allowOrigin", [currentIdentifier]));
 
-    this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._requestpolicy
-        .isPrefetchEnabled();
+      // Initially make all menu items hidden.
+      this._itemRevokeTemporaryPermissions.hidden = true;
+      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
+      this._itemAllowOriginTemporarily.hidden = true;
+      this._itemAllowOrigin.hidden = true;
+      this._itemForbidOrigin.hidden = true;
 
-    if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
-      this._itemForbidOrigin.hidden = false;
-    } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
-      this._itemForbidOrigin.hidden = false;
-    } else {
-      this._itemAllowOriginTemporarily.hidden = false;
-      this._itemAllowOrigin.hidden = false;
-    }
+      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._requestpolicy
+          .isPrefetchEnabled();
 
-    if (this._requestpolicy.areTemporaryPermissionsGranted()) {
-      this._itemRevokeTemporaryPermissions.hidden = false;
-      this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
-    }
-
-    // Remove old menu items.
-    for (var i in this._addedMenuItems) {
-      this._menu.removeChild(this._addedMenuItems[i]);
-    }
-    this._addedMenuItems = [];
-
-    var uri = this._getCurrentUri();
-
-    // Add new menu items giving options to allow content.
-    var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
-    this._clearBlockedDestinations();
-    for (var destIdentifier in rejectedRequests) {
-      var submenu = this._addBlockedDestination(destIdentifier);
-      this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
-      this._addMenuItemAllowDest(submenu, destIdentifier);
-      this._addMenuSeparator(submenu);
-      this._addMenuItemTemporarilyAllowOriginToDest(submenu, currentIdentifier,
-          destIdentifier);
-      this._addMenuItemAllowOriginToDest(submenu, currentIdentifier,
-          destIdentifier);
-    }
-
-    // Add new menu items giving options to forbid currently accepted
-    // content.
-    this._clearAllowedDestinations();
-    var allowedRequests = this._requestpolicyJSObject._allowedRequests[uri];
-    for (var destIdentifier in allowedRequests) {
-      if (destIdentifier == this._getCurrentUriIdentifier()) {
-        continue;
-      }
-      var submenu = this._addAllowedDestination(destIdentifier);
-
-      // Show a "forbid ___" option that is specific to why the content is
-      // allowed.
-
-      // The "order" in which to show these may be worth further consideration.
-      // Currently, the options for forbidding content start from the "allow"
-      // rules that are most liberal if they exist and shows the more specific
-      // ones if there aren't more liberal ones that would apply. The big catch
-      // is putting it in any other order may result in the user having to
-      // perform multiple "forbids" after successive reloads, which would be
-      // unacceptable.
-
-      if (this._requestpolicy.isAllowedOrigin(currentIdentifier)
-          || this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
-        this._addMenuItemForbidOrigin(submenu, currentIdentifier);
-
-      } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
-          || this._requestpolicy
-              .isTemporarilyAllowedDestination(destIdentifier)) {
-        this._addMenuItemForbidDest(submenu, destIdentifier);
-
-      } else if (this._requestpolicy.isAllowedOriginToDestination(
-          currentIdentifier, destIdentifier)
-          || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
-              currentIdentifier, destIdentifier)) {
-        this._addMenuItemForbidOriginToDest(submenu, currentIdentifier,
-            destIdentifier);
-
+      if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+        this._itemForbidOrigin.hidden = false;
+      } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
+        this._itemForbidOrigin.hidden = false;
       } else {
-        // TODO: make very sure this can never happen or, better, get an idea of
-        // when it can and make a sane default.
+        this._itemAllowOriginTemporarily.hidden = false;
+        this._itemAllowOrigin.hidden = false;
       }
-    }
 
+      if (this._requestpolicy.areTemporaryPermissionsGranted()) {
+        this._itemRevokeTemporaryPermissions.hidden = false;
+        this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
+      }
+
+      // Remove old menu items.
+      for (var i in this._addedMenuItems) {
+        this._menu.removeChild(this._addedMenuItems[i]);
+      }
+      this._addedMenuItems = [];
+
+      var uri = this._getCurrentUri();
+
+      // Add new menu items giving options to allow content.
+      var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
+      this._clearBlockedDestinations();
+      for (var destIdentifier in rejectedRequests) {
+        var submenu = this._addBlockedDestination(destIdentifier);
+        this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
+        this._addMenuItemAllowDest(submenu, destIdentifier);
+        this._addMenuSeparator(submenu);
+        this._addMenuItemTemporarilyAllowOriginToDest(submenu,
+            currentIdentifier, destIdentifier);
+        this._addMenuItemAllowOriginToDest(submenu, currentIdentifier,
+            destIdentifier);
+      }
+
+      // Add new menu items giving options to forbid currently accepted
+      // content.
+      this._clearAllowedDestinations();
+      var allowedRequests = this._requestpolicyJSObject._allowedRequests[uri];
+      for (var destIdentifier in allowedRequests) {
+        if (destIdentifier == this._getCurrentUriIdentifier()) {
+          continue;
+        }
+        var submenu = this._addAllowedDestination(destIdentifier);
+
+        // Show a "forbid ___" option that is specific to why the content is
+        // allowed.
+
+        // The "order" in which to show these may be worth further
+        // consideration. Currently, the options for forbidding content start
+        // from the "allow" rules that are most liberal if they exist and shows
+        // the more specific ones if there aren't more liberal ones that would
+        // apply. The big catch is putting it in any other order may result in
+        // the user having to perform multiple "forbids" after successive
+        // reloads, which would be unacceptable.
+
+        if (this._requestpolicy.isAllowedOrigin(currentIdentifier)
+            || this._requestpolicy
+                .isTemporarilyAllowedOrigin(currentIdentifier)) {
+          this._addMenuItemForbidOrigin(submenu, currentIdentifier);
+
+        } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
+            || this._requestpolicy
+                .isTemporarilyAllowedDestination(destIdentifier)) {
+          this._addMenuItemForbidDest(submenu, destIdentifier);
+
+        } else if (this._requestpolicy.isAllowedOriginToDestination(
+            currentIdentifier, destIdentifier)
+            || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+                currentIdentifier, destIdentifier)) {
+          this._addMenuItemForbidOriginToDest(submenu, currentIdentifier,
+              destIdentifier);
+
+        } else {
+          // TODO: make very sure this can never happen or, better, get an idea
+          // of when it can and make a sane default.
+        }
+      }
+    } catch (e) {
+      Logger.severe(Logger.TYPE_ERROR, "Fatal Error, " + e + ", stack was: "
+              + e.stack);
+      Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
+      throw e;
+    }
   },
 
   _removeExtraSubmenuSeparators : function(menu) {
@@ -864,15 +883,28 @@ var requestpolicyOverlay = {
     this._conditionallyReloadDocument();
   },
 
-  _performRedirect : function(redirectTargetUri) {
-    // If it's relative to the current directory, figure out what it ultimately
-    // should be because firefox doesn't know what to do with setting the href
-    // to something like "somedir/whatever.html".
-    if (redirectTargetUri[0] != '/' && redirectTargetUri.indexOf(":") == -1) {
-      var curDir = this._getCurrentUri().split("/").pop().join("/");
-      redirectTargetUri = curDir + "/" + redirectTargetUri;
+  _performRedirect : function(document, redirectTargetUri) {
+    try {
+      if (redirectTargetUri[0] == '/') {
+        Logger.info(Logger.TYPE_INTERNAL, "Redirecting to relative path <"
+                + redirectTargetUri + "> from <" + this._getCurrentUri() + ">");
+        document.location.pathname = redirectTargetUri;
+      } else {
+        // If there is no scheme, treat it as relative to the current directory.
+        if (redirectTargetUri.indexOf(":") == -1) {
+          // TODO: Move this logic to DomainUtils.
+          var curDir = this._getCurrentUri().split("/").slice(0, -1).join("/");
+          redirectTargetUri = curDir + "/" + redirectTargetUri;
+        }
+        Logger.info(Logger.TYPE_INTERNAL, "Redirecting to <"
+                + redirectTargetUri + "> from <" + this._getCurrentUri() + ">");
+        document.location.href = redirectTargetUri;
+      }
+    } catch (e) {
+      if (e.name != "NS_ERROR_FILE_NOT_FOUND") {
+        throw e;
+      }
     }
-    content.document.location.href = redirectTargetUri;
   },
 
   _openInNewTab : function(uri) {

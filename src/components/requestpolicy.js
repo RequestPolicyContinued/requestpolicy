@@ -647,6 +647,81 @@ RequestPolicyService.prototype = {
     return this._rootPrefs.getBoolPref("network.prefetch-next");
   },
 
+  originHasRejectedRequests : function(originUri) {
+    var rejectedRequests = this._rejectedRequests[originUri];
+    if (rejectedRequests) {
+      for (var i in rejectedRequests) {
+        for (var j in rejectedRequests[i]) {
+          if (rejectedRequests[i][j]) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  },
+
+  originHasRejectedRequestsRecursive : function(originUri) {
+    return this._originHasRejectedRequestsRecursiveHelper(originUri, {});
+  },
+
+  _originHasRejectedRequestsRecursiveHelper : function(originUri,
+      checkedOrigins) {
+    if (checkedOrigins[originUri]) {
+      return false;
+    }
+    checkedOrigins[originUri] = true;
+    if (this.originHasRejectedRequests(originUri)) {
+      return true;
+    }
+    var allowedRequests = this._allowedRequests[originUri];
+    if (allowedRequests) {
+      for (var i in allowedRequests) {
+        for (var j in allowedRequests[i]) {
+          if (this.originHasRejectedRequestsRecursive(allowedRequests[i][j],
+              checkedOrigins)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  },
+
+  // This is for external consumption, but can't be in the idl for now because
+  // it returns an array.
+  _getOtherOriginsWithBlockedContent : function(rootUri) {
+    var originsWithBlockedContent = [];
+    this._getOtherOriginsWithBlockedContentHelper(rootUri,
+        originsWithBlockedContent, {});
+    return originsWithBlockedContent;
+  },
+
+  _getOtherOriginsWithBlockedContentHelper : function(rootUri,
+      originsWithBlockedContent, checkedOrigins) {
+    var allowedRequests = this._allowedRequests[rootUri];
+    if (allowedRequests) {
+      for (var i in allowedRequests) {
+        for (var j in allowedRequests[i]) {
+          var allowedUri = j;
+          // TODO: "count" is one of the items iterated over here.
+          if (checkedOrigins[allowedUri]) {
+            continue;
+          }
+          checkedOrigins[allowedUri] = true;
+
+          Logger.debug(Logger.TYPE_INTERNAL, "Checking other origin <"
+                  + allowedUri + "> for rejected requests.");
+          if (this.originHasRejectedRequests(allowedUri)) {
+            originsWithBlockedContent.push(allowedUri);
+          }
+          this._getOtherOriginsWithBlockedContent(allowedUri,
+              originsWithBlockedContent, checkedOrigins);
+        }
+      }
+    }
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIObserver interface
   // /////////////////////////////////////////////////////////////////////////

@@ -40,5 +40,8 @@ interface nsIRequestPolicy : nsISupports
   
   boolean isPrefetchEnabled();
   
+  boolean originHasRejectedRequests(in ACString originUri);
+  boolean originHasRejectedRequestsRecursive(in ACString originUri);
+  
   readonly attribute nsIPrefBranch prefs;
 };  

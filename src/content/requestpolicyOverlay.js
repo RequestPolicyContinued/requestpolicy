@@ -221,22 +221,12 @@ var requestpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function(document) {
-    Logger.debug(Logger.TYPE_INTERNAL, "checking for blocked content");
-    var uri = this._getCurrentUri();
-    var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
-    var anyRejected = false;
-    if (rejectedRequests) {
-      for (var i in rejectedRequests) {
-        for (var j in rejectedRequests[i]) {
-          if (rejectedRequests[i][j]) {
-            anyRejected = true;
-          }
-        }
-      }
+    Logger.debug(Logger.TYPE_INTERNAL,
+        "Checking for blocked content from page <" + document.location + ">");
+    if (this._requestpolicy
+        .originHasRejectedRequestsRecursive(document.location)) {
+      this._setBlockedContentNotification(true);
     }
-    // TODO: show block notification if there is content blocked from documents
-    // within this document.
-    this._setBlockedContentNotification(anyRejected);
   },
 
   /**
@@ -450,8 +440,10 @@ var requestpolicyOverlay = {
   prepareMenu : function() {
     try {
       var currentIdentifier = this._getCurrentUriIdentifier();
+      var currentUri = this._getCurrentUri();
 
-      Logger.dump(currentIdentifier);
+      var otherOriginsWithBlockedContent = this._requestpolicyJSObject
+          ._getOtherOriginsWithBlockedContent(currentUri);
 
       // Set all labels here for convenience, even though we won't display some
       // of these menu items.
@@ -493,11 +485,9 @@ var requestpolicyOverlay = {
       }
       this._addedMenuItems = [];
 
-      var uri = this._getCurrentUri();
-
       // Add new menu items giving options to allow content.
-      var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[uri];
       this._clearBlockedDestinations();
+      var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[currentUri];
       for (var destIdentifier in rejectedRequests) {
         var submenu = this._addBlockedDestination(destIdentifier);
         this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
@@ -509,14 +499,18 @@ var requestpolicyOverlay = {
             destIdentifier);
       }
 
+      var otherOriginsWithBlockedContent = {};
+
       // Add new menu items giving options to forbid currently accepted
       // content.
       this._clearAllowedDestinations();
-      var allowedRequests = this._requestpolicyJSObject._allowedRequests[uri];
+      var allowedRequests = this._requestpolicyJSObject._allowedRequests[currentUri];
       for (var destIdentifier in allowedRequests) {
-        if (destIdentifier == this._getCurrentUriIdentifier()) {
+        // Ignore allowed requests that are to the same site.
+        if (destIdentifier == currentIdentifier) {
           continue;
         }
+
         var submenu = this._addAllowedDestination(destIdentifier);
 
         // Show a "forbid ___" option that is specific to why the content is
@@ -558,6 +552,10 @@ var requestpolicyOverlay = {
       Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
       throw e;
     }
+
+    // TODO: do something with otherOriginsWithBlockedContent.
+    Logger.vardump(otherOriginsWithBlockedContent);
+
   },
 
   _removeExtraSubmenuSeparators : function(menu) {

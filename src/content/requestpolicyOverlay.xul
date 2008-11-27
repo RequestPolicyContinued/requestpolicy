@@ -61,6 +61,14 @@
 				checked="false"
 				oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
 			<menuseparator />
+			<menu
+				id="requestpolicyOtherOrigins"
+				label="&requestpolicyStatusbarOtherOrigins;"
+				class="requestpolicyOtherOrigins"
+				>
+				<menupopup id="requestpolicyOtherOriginsPopup" />
+			</menu>
+			<menuseparator id="requestpolicyOtherOriginsSeparator" />
 			<menuitem
 				id="requestpolicyBlockedDestinations"
 				label="&requestpolicyStatusbarBlockedDestinations;"

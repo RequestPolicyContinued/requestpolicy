@@ -31,6 +31,9 @@ var requestpolicyOverlay = {
   _itemPrefetchWarning : null,
   _itemPrefetchWarningSeparator : null,
 
+  _itemOtherOrigins : null,
+  _itemOtherOriginsPopup : null,
+
   _itemRevokeTemporaryPermissions : null,
   _itemRevokeTemporaryPermissionsSeparator : null,
 
@@ -69,6 +72,11 @@ var requestpolicyOverlay = {
       this._itemPrefetchWarningSeparator = document
           .getElementById("requestpolicyPrefetchWarningSeparator");
 
+      this._itemOtherOrigins = document
+          .getElementById("requestpolicyOtherOrigins");
+      this._itemOtherOriginsPopup = document
+          .getElementById("requestpolicyOtherOriginsPopup");
+
       this._itemRevokeTemporaryPermissions = document
           .getElementById("requestpolicyRevokeTemporaryPermissions");
       this._itemRevokeTemporaryPermissionsSeparator = document
@@ -103,6 +111,11 @@ var requestpolicyOverlay = {
       appcontent.addEventListener("DOMContentLoaded", function(event) {
             requestpolicyOverlay.onAppContentLoaded(event);
           }, true);
+      // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
+      // enclosed frames.
+      appcontent.addEventListener("DOMFrameContentLoaded", function(event) {
+            requestpolicyOverlay.onAppFrameContentLoaded(event);
+          }, true);
     }
 
     // Add an event listener for when the contentAreaContextMenu (generally the
@@ -125,6 +138,17 @@ var requestpolicyOverlay = {
         }, false);
   },
 
+  /**
+   * Shows a notification that a redirect was requested by a page (meta refresh
+   * or with headers).
+   * 
+   * @param {document}
+   *            targetDocument
+   * @param {String}
+   *            redirectTargetUri
+   * @param {int}
+   *            delay
+   */
   _showRedirectNotification : function(targetDocument, redirectTargetUri, delay) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
@@ -139,6 +163,11 @@ var requestpolicyOverlay = {
     // Error: self._closedNotification.parentNode is null
     // Source file: chrome://global/content/bindings/notification.xml
     // Line: 260
+
+    if (!this._isTopLevelDocument(targetDocument)) {
+      // Don't show notification if this isn't the main document of a tab;
+      return;
+    }
 
     var targetBrowser = gBrowser.getBrowserForDocument(targetDocument);
     var notificationBox = gBrowser.getNotificationBox(targetBrowser)
@@ -175,6 +204,9 @@ var requestpolicyOverlay = {
             accessKey : '', // TODO
             popup : null,
             callback : function() {
+              Logger.dump("User allowed redirection from <"
+                  + targetDocument.location.href + "> to <" + redirectTargetUri
+                  + ">");
               targetDocument.location.href = redirectTargetUri;
             }
           }, {
@@ -191,8 +223,32 @@ var requestpolicyOverlay = {
     }
   },
 
+  /**
+   * Determines if documentToCheck is the main document loaded in a frame.
+   * 
+   * @param {document}
+   *            documentToCheck
+   * @return {Boolean}
+   */
+  _isTopLevelDocument : function(documentToCheck) {
+    var num = gBrowser.browsers.length;
+    for (var i = 0; i < num; i++) {
+      if (gBrowser.getBrowserAtIndex(i).contentDocument == documentToCheck) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  _isActiveTopLevelDocument : function(documentToCheck) {
+    return documentToCheck == content.document;
+  },
+
+  /**
+   * Performs actions required to be performed after a tab change.
+   */
   tabChanged : function() {
-    this._checkForBlockedContent();
+    this._checkForBlockedContent(content.document);
   },
 
   /**
@@ -212,21 +268,62 @@ var requestpolicyOverlay = {
     }
 
     var document = event.target;
+    Logger.dump("onAppContentLoaded called for " + document.documentURI);
+    if (!document) {
+      // onAppContentLoaded getting called more often than it should? document
+      // isn't set on new tab open when this is called.
+      return;
+    }
+
     this._onDOMContentLoaded(document);
-    this._checkForBlockedContent(document);
+
+    if (this._isActiveTopLevelDocument(document)) {
+      // Clear any notifications that may have been present.
+      this._setBlockedContentNotification(false);
+      this._checkForBlockedContent(document);
+    }
   },
 
   /**
-   * Checks if the current document has blocked content and shows appropriate
+   * Things to do when a page or a frame within the page has loaded.
+   * 
+   * @param {Event}
+   *            event
+   */
+  onAppFrameContentLoaded : function(event) {
+    // TODO: This only works for (i)frames that are direct children of the main
+    // document, not (i)frames within those (i)frames.
+    var iframe = event.target;
+    Logger.dump("onAppFrameContentLoaded called for <"
+        + iframe.contentDocument.documentURI + "> in <"
+        + iframe.ownerDocument.documentURI + ">");
+    if (this._isActiveTopLevelDocument(iframe.ownerDocument)) {
+      this._setBlockedContentNotification(false);
+      this._checkForBlockedContent(iframe.ownerDocument);
+    }
+  },
+
+  /**
+   * Checks if the document has blocked content and shows appropriate
    * notifications.
    */
   _checkForBlockedContent : function(document) {
-    Logger.debug(Logger.TYPE_INTERNAL,
-        "Checking for blocked content from page <" + document.location + ">");
-    if (this._requestpolicy
-        .originHasRejectedRequestsRecursive(document.location)) {
+    Logger
+        .debug(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
+                + document.documentUri + ">");
+    if (this._requestpolicy.originHasRejectedRequests(document.documentUri)) {
       this._setBlockedContentNotification(true);
+      return;
     }
+    var otherOrigins = this._getOtherOrigins(document);
+    for (var i in otherOrigins) {
+      Logger.dump(i);
+      if (this._requestpolicy.originHasRejectedRequests) {
+        this._setBlockedContentNotification(true);
+        return;
+      }
+    }
+    this._setBlockedContentNotification(false);
   },
 
   /**
@@ -260,9 +357,6 @@ var requestpolicyOverlay = {
 
     const requestpolicy = this._requestpolicy;
 
-    // Clear any notifications that may have been present.
-    this._setBlockedContentNotification(false);
-
     // Find all meta redirects.
     var metaTags = document.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
@@ -275,9 +369,9 @@ var requestpolicyOverlay = {
                 + document.location + ">");
 
         // TODO: move this logic to the requestpolicy service.
-        var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(metaTags[i].content);
-        var delay = parts[1];
-        var dest = parts[2];
+        var parts = DomainUtils.parseRefresh(metaTags[i].content);
+        var delay = parts[0];
+        var dest = parts[1];
         if (dest != undefined) {
           if (this._requestpolicyJSObject._blockingDisabled
               || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
@@ -442,8 +536,11 @@ var requestpolicyOverlay = {
       var currentIdentifier = this._getCurrentUriIdentifier();
       var currentUri = this._getCurrentUri();
 
-      var otherOriginsWithBlockedContent = this._requestpolicyJSObject
-          ._getOtherOriginsWithBlockedContent(currentUri);
+      var otherOrigins = this._getOtherOrigins(content.document);
+      this._dumpOtherOrigins(otherOrigins);
+
+      // this._requestpolicyJSObject._printAllowedRequests();
+      // this._requestpolicyJSObject._printRejectedRequests();
 
       // Set all labels here for convenience, even though we won't display some
       // of these menu items.
@@ -487,7 +584,10 @@ var requestpolicyOverlay = {
 
       // Add new menu items giving options to allow content.
       this._clearBlockedDestinations();
-      var rejectedRequests = this._requestpolicyJSObject._rejectedRequests[currentUri];
+      // Get the requests rejected by the current uri.
+      var rejectedRequests = this._getRejectedRequests(currentUri,
+          currentIdentifier, otherOrigins);
+      this._dumpRequestSet(rejectedRequests, "Rejected requests");
       for (var destIdentifier in rejectedRequests) {
         var submenu = this._addBlockedDestination(destIdentifier);
         this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
@@ -499,12 +599,12 @@ var requestpolicyOverlay = {
             destIdentifier);
       }
 
-      var otherOriginsWithBlockedContent = {};
-
       // Add new menu items giving options to forbid currently accepted
       // content.
       this._clearAllowedDestinations();
-      var allowedRequests = this._requestpolicyJSObject._allowedRequests[currentUri];
+      var allowedRequests = this._getAllowedRequests(currentUri,
+          currentIdentifier, otherOrigins);
+      this._dumpRequestSet(allowedRequests, "Allowed requests");
       for (var destIdentifier in allowedRequests) {
         // Ignore allowed requests that are to the same site.
         if (destIdentifier == currentIdentifier) {
@@ -554,7 +654,133 @@ var requestpolicyOverlay = {
     }
 
     // TODO: do something with otherOriginsWithBlockedContent.
-    Logger.vardump(otherOriginsWithBlockedContent);
+
+    // Create menu for other origins.
+    this._clearChildMenus(this._itemOtherOriginsPopup);
+    var lastOriginIdentifier = null;
+    for (var otherOriginIdentifier in otherOrigins) {
+      if (otherOriginIdentifier == currentIdentifier) {
+        // It's not a different origin, it's the same.
+        continue;
+      }
+      if (lastOriginIdentifier != otherOriginIdentifier) {
+        Logger.dump("New identifier: " + otherOriginIdentifier);
+        this._createOtherOriginMenu(otherOriginIdentifier);
+        lastOriginIdentifier = otherOriginIdentifier;
+      }
+      // TODO: loop over items in curOriginIdentifier and
+      // use it to populate the menus.
+      // this._populateOtherOriginsMenuItem(i);
+    }
+
+  },
+
+  _getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+    var rejectedRequests = {};
+    for (var ident in this._requestpolicyJSObject._rejectedRequests[currentUri]) {
+      rejectedRequests[ident] = true;
+    }
+    // Add the rejected requests from other origins within this page that have
+    // the same uriIdentifier as the current page.
+    for (var i in otherOrigins[currentIdentifier]) {
+      this._dumpRequestSet(this._requestpolicyJSObject._rejectedRequests[i],
+          "Rejected requests of " + i);
+      for (var ident in this._requestpolicyJSObject._rejectedRequests[i]) {
+        rejectedRequests[ident] = true;
+      }
+    }
+    return rejectedRequests;
+  },
+
+  _getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+    var allowedRequests = {};
+    for (var ident in this._requestpolicyJSObject._allowedRequests[currentUri]) {
+      allowedRequests[ident] = true;
+    }
+    // Add the allowed requests from other origins within this page that have
+    // the same uriIdentifier as the current page.
+    for (var i in otherOrigins[currentIdentifier]) {
+      for (var ident in this._requestpolicyJSObject._allowedRequests[i]) {
+        allowedRequests[ident] = true;
+      }
+    }
+    return allowedRequests;
+  },
+
+  _getOtherOrigins : function(document) {
+    var origins = {};
+    this._getOtherOriginsHelper(document, origins);
+    return origins;
+  },
+
+  _getOtherOriginsHelper : function(document, origins) {
+    Logger.dump("Looking for other origins within " + document.documentURI);
+    // TODO: Check other elements besides iframes and frames?
+    var frameTagTypes = {
+      "iframe" : null,
+      "frame" : null
+    };
+    for (var tagType in frameTagTypes) {
+      var iframes = document.getElementsByTagName(tagType);
+      for (var i = 0; i < iframes.length; i++) {
+        var child = iframes[i];
+        var childDocument = child.contentDocument;
+        var childUri = DomainUtils.stripFragment(childDocument.documentURI);
+        if (childUri == "about:blank") {
+          // iframe empty or not loaded yet, or maybe blocked.
+          childUri = child.src;
+        }
+        if (!childUri) {
+          continue;
+        }
+        Logger.dump("Found child " + tagType + " with src <" + childUri
+            + "> in document <" + document.documentURI + ">");
+        var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
+        if (!origins[childUriIdent]) {
+          origins[childUriIdent] = {};
+        }
+        origins[childUriIdent][childUri] = true;
+        this._getOtherOriginsHelper(childDocument, origins);
+      }
+    }
+  },
+
+  _dumpOtherOrigins : function(otherOrigins) {
+    Logger.dump("-------------------------------------------------");
+    Logger.dump("Other origins");
+    for (i in otherOrigins) {
+      Logger.dump("\t" + "Origin identifier: <" + i + ">");
+      for (var j in otherOrigins[i]) {
+        Logger.dump("\t\t" + j);
+      }
+    }
+    Logger.dump("-------------------------------------------------");
+  },
+
+  _dumpRequestSet : function(requestSet, name) {
+    Logger.dump("-------------------------------------------------");
+    Logger.dump(name);
+    for (i in requestSet) {
+      Logger.dump("\t" + "Identifier: <" + i + ">");
+      for (var j in requestSet[i]) {
+        Logger.dump("\t\t" + j);
+      }
+    }
+    Logger.dump("-------------------------------------------------");
+  },
+
+  _clearChildMenus : function(menu) {
+    while (menu.firstChild) {
+      this._clearChildMenus(menu.firstChild);
+      menu.removeChild(menu.firstChild);
+    }
+  },
+
+  _createOtherOriginMenu : function(originIdentifier) {
+    this._addMenu(this._itemOtherOriginsPopup, originIdentifier);
+  },
+
+  _populateOtherOriginsMenuItem : function(originUri) {
 
   },
 

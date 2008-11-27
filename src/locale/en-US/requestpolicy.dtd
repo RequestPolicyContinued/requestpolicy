@@ -6,3 +6,4 @@
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
 <!ENTITY requestpolicyStatusbarBlockedDestinations "Blocked destinations">
 <!ENTITY requestpolicyStatusbarAllowedDestinations "Allowed destinations">
+<!ENTITY requestpolicyStatusbarOtherOrigins "Other origins within this page">

@@ -161,3 +161,18 @@ DomainUtils.destinationIsSubdomainOfOrigin = function(destinationHost,
   }
   return false;
 };
+
+// TODO: Maybe this should have a different home.
+/**
+ * Gets the relevant pieces out of a meta refresh or header refresh string.
+ * 
+ * @param {String}
+ *            refreshString The original content of a refresh header or meta
+ *            tag..
+ * @return {Array} First element is the delay in seconds, second element is the
+ *         url to refresh to.
+ */
+DomainUtils.parseRefresh = function(refreshString) {
+  var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(refreshString);
+  return [parts[1], parts[2]];
+}

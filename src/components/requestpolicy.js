@@ -226,19 +226,22 @@ RequestPolicyService.prototype = {
     var httpChannel = observedSubject
         .QueryInterface(Components.interfaces.nsIHttpChannel);
 
+    var headerType;
+    var dest;
     try {
       // If there is no such header, getResponseHeader() will throw
       // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
       // the one that will be used.
-      var headerType = "Location";
-      var dest = httpChannel.getResponseHeader(headerType);
+      headerType = "Location";
+      dest = httpChannel.getResponseHeader(headerType);
     } catch (e) {
       // No location header. Look for a Refresh header.
       try {
-        var headerType = "Refresh";
-        var dest = httpChannel.getResponseHeader(headerType);
-        // Refresh header has the format: "0,http://..."
-        dest = dest.split(",")[1];
+        headerType = "Refresh";
+        dest = httpChannel.getResponseHeader(headerType);
+        var parts = DomainUtils.parseRefresh(metaTags[i].content);
+        // TODO: Handle a delay value in the refresh.
+        dest = parts[1];
       } catch (e) {
         // No Location header or Refresh header.
         return;
@@ -318,6 +321,42 @@ RequestPolicyService.prototype = {
     } catch (e) {
       // No X-moz header.
     }
+  },
+
+  _printAllowedRequests : function() {
+    Logger.dump("-------------------------------------------------");
+    Logger.dump("Allowed Requests");
+    for (i in this._allowedRequests) {
+      Logger.dump("\t" + "Origin uri: <" + i + ">");
+      for (var j in this._allowedRequests[i]) {
+        Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
+        for (var k in this._allowedRequests[i][j]) {
+          if (k == "count") {
+            continue;
+          }
+          Logger.dump("\t\t\t" + k);
+        }
+      }
+    }
+    Logger.dump("-------------------------------------------------");
+  },
+
+  _printRejectedRequests : function() {
+    Logger.dump("-------------------------------------------------");
+    Logger.dump("Rejected Requests");
+    for (i in this._rejectedRequests) {
+      Logger.dump("\t" + "Origin uri: <" + i + ">");
+      for (var j in this._rejectedRequests[i]) {
+        Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
+        for (var k in this._rejectedRequests[i][j]) {
+          if (k == "count") {
+            continue;
+          }
+          Logger.dump("\t\t\t" + k);
+        }
+      }
+    }
+    Logger.dump("-------------------------------------------------");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -659,67 +698,6 @@ RequestPolicyService.prototype = {
       }
     }
     return false;
-  },
-
-  originHasRejectedRequestsRecursive : function(originUri) {
-    return this._originHasRejectedRequestsRecursiveHelper(originUri, {});
-  },
-
-  _originHasRejectedRequestsRecursiveHelper : function(originUri,
-      checkedOrigins) {
-    if (checkedOrigins[originUri]) {
-      return false;
-    }
-    checkedOrigins[originUri] = true;
-    if (this.originHasRejectedRequests(originUri)) {
-      return true;
-    }
-    var allowedRequests = this._allowedRequests[originUri];
-    if (allowedRequests) {
-      for (var i in allowedRequests) {
-        for (var j in allowedRequests[i]) {
-          if (this.originHasRejectedRequestsRecursive(allowedRequests[i][j],
-              checkedOrigins)) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  },
-
-  // This is for external consumption, but can't be in the idl for now because
-  // it returns an array.
-  _getOtherOriginsWithBlockedContent : function(rootUri) {
-    var originsWithBlockedContent = [];
-    this._getOtherOriginsWithBlockedContentHelper(rootUri,
-        originsWithBlockedContent, {});
-    return originsWithBlockedContent;
-  },
-
-  _getOtherOriginsWithBlockedContentHelper : function(rootUri,
-      originsWithBlockedContent, checkedOrigins) {
-    var allowedRequests = this._allowedRequests[rootUri];
-    if (allowedRequests) {
-      for (var i in allowedRequests) {
-        for (var j in allowedRequests[i]) {
-          var allowedUri = j;
-          // TODO: "count" is one of the items iterated over here.
-          if (checkedOrigins[allowedUri]) {
-            continue;
-          }
-          checkedOrigins[allowedUri] = true;
-
-          Logger.debug(Logger.TYPE_INTERNAL, "Checking other origin <"
-                  + allowedUri + "> for rejected requests.");
-          if (this.originHasRejectedRequests(allowedUri)) {
-            originsWithBlockedContent.push(allowedUri);
-          }
-          this._getOtherOriginsWithBlockedContent(allowedUri,
-              originsWithBlockedContent, checkedOrigins);
-        }
-      }
-    }
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -1096,25 +1074,23 @@ RequestPolicyService.prototype = {
               arguments);
         }
 
-        if (aContext instanceof CI.nsIDOMXULElement) {
-          if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
-            // Don't delete the _clickedLinks item. We need it for if the user
-            // goes back/forward through their history.
-            // delete this._clickedLinks[origin][dest];
-            return this.accept("User-initiated request by link click",
-                arguments, true);
+        if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
+          // Don't delete the _clickedLinks item. We need it for if the user
+          // goes back/forward through their history.
+          // delete this._clickedLinks[origin][dest];
+          return this.accept("User-initiated request by link click", arguments,
+              true);
 
-          } else if (this._submittedForms[origin]
-              && this._submittedForms[origin][dest.split("?")[0]]) {
-            // Note: we dropped the query string from the dest because form GET
-            // requests will have that added on here but the original action of
-            // the form may not have had it.
-            // Don't delete the _clickedLinks item. We need it for if the user
-            // goes back/forward through their history.
-            // delete this._submittedForms[origin][dest.split("?")[0]];
-            return this.accept("User-initiated request by form submission",
-                arguments, true);
-          }
+        } else if (this._submittedForms[origin]
+            && this._submittedForms[origin][dest.split("?")[0]]) {
+          // Note: we dropped the query string from the dest because form GET
+          // requests will have that added on here but the original action of
+          // the form may not have had it.
+          // Don't delete the _clickedLinks item. We need it for if the user
+          // goes back/forward through their history.
+          // delete this._submittedForms[origin][dest.split("?")[0]];
+          return this.accept("User-initiated request by form submission",
+              arguments, true);
         }
 
         // We didn't match any of the conditions in which to allow the request,

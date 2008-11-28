@@ -313,18 +313,25 @@ var requestpolicyOverlay = {
    */
   _checkForBlockedContent : function(document) {
     Logger
-        .debug(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
-                + document.documentUri + ">");
-    if (this._requestpolicy.originHasRejectedRequests(document.documentUri)) {
+        .info(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
+                + document.documentURI + ">");
+    if (this._requestpolicy.originHasRejectedRequests(document.documentURI)) {
+      Logger.info(Logger.TYPE_INTERNAL, "Main document <"
+              + document.documentURI + "> has rejected requests.");
       this._setBlockedContentNotification(true);
       return;
     }
     var otherOrigins = this._getOtherOrigins(document);
     for (var i in otherOrigins) {
-      Logger.dump(i);
-      if (this._requestpolicy.originHasRejectedRequests) {
-        this._setBlockedContentNotification(true);
-        return;
+      for (var j in otherOrigins[i]) {
+        Logger.dump("Checking for blocked content from " + j);
+        if (this._requestpolicy.originHasRejectedRequests(j)) {
+          Logger.info(Logger.TYPE_INTERNAL, "Other origin <" + j
+                  + "> of main document <" + document.documentURI
+                  + "> has rejected requests.");
+          this._setBlockedContentNotification(true);
+          return;
+        }
       }
     }
     this._setBlockedContentNotification(false);
@@ -543,9 +550,6 @@ var requestpolicyOverlay = {
       var otherOrigins = this._getOtherOrigins(content.document);
       this._dumpOtherOrigins(otherOrigins);
 
-      // this._requestpolicyJSObject._printAllowedRequests();
-      // this._requestpolicyJSObject._printRejectedRequests();
-
       // Set all labels here for convenience, even though we won't display some
       // of these menu items.
       this._itemForbidOrigin.setAttribute("label", this._strbundle
@@ -591,7 +595,8 @@ var requestpolicyOverlay = {
       // Get the requests rejected by the current uri.
       var rejectedRequests = this._getRejectedRequests(currentUri,
           currentIdentifier, otherOrigins);
-      this._dumpRequestSet(rejectedRequests, "Rejected requests");
+      this._dumpRequestSet(rejectedRequests,
+          "All rejected requests (including from other origins)");
       for (var destIdentifier in rejectedRequests) {
         var submenu = this._addBlockedDestination(this._menu,
             this._blockedDestinationsBeforeReferenceItem, destIdentifier, true);
@@ -609,7 +614,8 @@ var requestpolicyOverlay = {
       this._clearAllowedDestinations();
       var allowedRequests = this._getAllowedRequests(currentUri,
           currentIdentifier, otherOrigins);
-      this._dumpRequestSet(allowedRequests, "Allowed requests");
+      this._dumpRequestSet(allowedRequests,
+          "All allowed requests (including from other origins)");
       for (var destIdentifier in allowedRequests) {
         // Ignore allowed requests that are to the same site.
         if (destIdentifier == currentIdentifier) {
@@ -661,7 +667,6 @@ var requestpolicyOverlay = {
           // It's not a different origin, it's the same.
           continue;
         }
-        Logger.dump("New identifier: " + otherOriginIdentifier);
         currentOtherOriginMenu = this._createOtherOriginMenu(
             otherOriginIdentifier, otherOrigins);
         // If there are no blocked/allowed destinations from this other origin,

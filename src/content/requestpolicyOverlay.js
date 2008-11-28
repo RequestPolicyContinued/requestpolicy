@@ -19,11 +19,12 @@ var requestpolicyOverlay = {
   _strbundle : null,
   _addedMenuItems : [],
   _menu : null,
-  _blockedDestinationsMenu : null,
-  _allowedDestinationsMenu : null,
 
   _blockedDestinationsItems : [],
   _allowedDestinationsItems : [],
+
+  _blockedDestinationsHeadingMenuItem : null,
+  _allowedDestinationsHeadingMenuItem : null,
 
   _blockedDestinationsBeforeReferenceItem : null,
   _allowedDestinationsBeforeReferenceItem : null,
@@ -57,15 +58,15 @@ var requestpolicyOverlay = {
       this._initialized = true;
       this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
-      this._blockedDestinationsMenu = document
-          .getElementById("requestpolicyBlockedDestinationsPopup");
-      this._allowedDestinationsMenu = document
-          .getElementById("requestpolicyAllowedDestinationsPopup");
-
       this._blockedDestinationsBeforeReferenceItem = document
           .getElementById("requestpolicyAllowedDestinationsSeparator");
       this._allowedDestinationsBeforeReferenceItem = document
           .getElementById("requestpolicyOriginSubmenusSeparator");
+
+      this._blockedDestinationsHeadingMenuItem = document
+          .getElementById("requestpolicyBlockedDestinations");
+      this._allowedDestinationsHeadingMenuItem = document
+          .getElementById("requestpolicyAllowedDestinations");
 
       this._itemPrefetchWarning = document
           .getElementById("requestpolicyPrefetchWarning");
@@ -589,7 +590,8 @@ var requestpolicyOverlay = {
           currentIdentifier, otherOrigins);
       this._dumpRequestSet(rejectedRequests, "Rejected requests");
       for (var destIdentifier in rejectedRequests) {
-        var submenu = this._addBlockedDestination(destIdentifier);
+        var submenu = this._addBlockedDestination(this._menu,
+            this._blockedDestinationsBeforeReferenceItem, destIdentifier, true);
         this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
         this._addMenuItemAllowDest(submenu, destIdentifier);
         this._addMenuSeparator(submenu);
@@ -610,8 +612,8 @@ var requestpolicyOverlay = {
         if (destIdentifier == currentIdentifier) {
           continue;
         }
-
-        var submenu = this._addAllowedDestination(destIdentifier);
+        var submenu = this._addAllowedDestination(this._menu,
+            this._allowedDestinationsBeforeReferenceItem, destIdentifier, true);
 
         // Show a "forbid ___" option that is specific to why the content is
         // allowed.
@@ -657,22 +659,89 @@ var requestpolicyOverlay = {
 
     // Create menu for other origins.
     this._clearChildMenus(this._itemOtherOriginsPopup);
-    var lastOriginIdentifier = null;
+    var currentOtherOriginMenu;
     for (var otherOriginIdentifier in otherOrigins) {
       if (otherOriginIdentifier == currentIdentifier) {
         // It's not a different origin, it's the same.
         continue;
       }
-      if (lastOriginIdentifier != otherOriginIdentifier) {
-        Logger.dump("New identifier: " + otherOriginIdentifier);
-        this._createOtherOriginMenu(otherOriginIdentifier);
-        lastOriginIdentifier = otherOriginIdentifier;
-      }
-      // TODO: loop over items in curOriginIdentifier and
-      // use it to populate the menus.
-      // this._populateOtherOriginsMenuItem(i);
+      Logger.dump("New identifier: " + otherOriginIdentifier);
+      currentOtherOriginMenu = this._createOtherOriginMenu(
+          otherOriginIdentifier, otherOrigins);
     }
 
+  },
+
+  _createOtherOriginMenu : function(originIdentifier, otherOrigins) {
+
+    var menu = this._addMenu(this._itemOtherOriginsPopup, originIdentifier);
+
+    var allowedIdentifiers = this._getAllowedRequests(null, originIdentifier,
+        otherOrigins);
+    for (var i in allowedIdentifiers) {
+      // Ignore allowed requests that are to the same site.
+      if (i == originIdentifier) {
+        continue;
+      }
+      var submenu = this
+          ._addAllowedDestination(menu, menu.firstChild, i, false);
+      this._populateOtherOriginsMenuItemAllowedDestinations(submenu,
+          originIdentifier, i);
+    }
+
+    newNode = this._allowedDestinationsHeadingMenuItem.cloneNode(true);
+    newNode.setAttribute("id", null);
+    menu.insertBefore(newNode, menu.firstChild);
+
+    this._addMenuSeparator(menu);
+
+    var blockedIdentifiers = this._getRejectedRequests(null, originIdentifier,
+        otherOrigins);
+    for (var i in blockedIdentifiers) {
+      var submenu = this
+          ._addBlockedDestination(menu, menu.firstChild, i, false);
+      this._populateOtherOriginsMenuItemBlockedDestinations(submenu,
+          originIdentifier, i);
+    }
+
+    var newNode = this._blockedDestinationsHeadingMenuItem.cloneNode(true);
+    newNode.setAttribute("id", null);
+    menu.insertBefore(newNode, menu.firstChild);
+
+  },
+
+  _populateOtherOriginsMenuItemBlockedDestinations : function(submenu,
+      originIdentifier, destIdentifier) {
+    this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
+    this._addMenuItemAllowDest(submenu, destIdentifier);
+    this._addMenuSeparator(submenu);
+    this._addMenuItemTemporarilyAllowOriginToDest(submenu, originIdentifier,
+        destIdentifier);
+    this._addMenuItemAllowOriginToDest(submenu, originIdentifier,
+        destIdentifier);
+  },
+
+  _populateOtherOriginsMenuItemAllowedDestinations : function(submenu,
+      originIdentifier, destIdentifier) {
+    if (this._requestpolicy.isAllowedOrigin(originIdentifier)
+        || this._requestpolicy.isTemporarilyAllowedOrigin(originIdentifier)) {
+      this._addMenuItemForbidOrigin(submenu, originIdentifier);
+
+    } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
+        || this._requestpolicy.isTemporarilyAllowedDestination(destIdentifier)) {
+      this._addMenuItemForbidDest(submenu, destIdentifier);
+
+    } else if (this._requestpolicy.isAllowedOriginToDestination(
+        originIdentifier, destIdentifier)
+        || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+            originIdentifier, destIdentifier)) {
+      this._addMenuItemForbidOriginToDest(submenu, originIdentifier,
+          destIdentifier);
+
+    } else {
+      // TODO: make very sure this can never happen or, better, get an idea
+      // of when it can and make a sane default.
+    }
   },
 
   _getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
@@ -728,11 +797,14 @@ var requestpolicyOverlay = {
         var childUri = DomainUtils.stripFragment(childDocument.documentURI);
         if (childUri == "about:blank") {
           // iframe empty or not loaded yet, or maybe blocked.
-          childUri = child.src;
-        }
-        if (!childUri) {
+          // childUri = child.src;
+          // If it's not loaded or blocked, it's not the origin for anything
+          // yet.
           continue;
         }
+        // if (!childUri) {
+        // continue;
+        // }
         Logger.dump("Found child " + tagType + " with src <" + childUri
             + "> in document <" + document.documentURI + ">");
         var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
@@ -774,14 +846,6 @@ var requestpolicyOverlay = {
       this._clearChildMenus(menu.firstChild);
       menu.removeChild(menu.firstChild);
     }
-  },
-
-  _createOtherOriginMenu : function(originIdentifier) {
-    this._addMenu(this._itemOtherOriginsPopup, originIdentifier);
-  },
-
-  _populateOtherOriginsMenuItem : function(originUri) {
-
   },
 
   _removeExtraSubmenuSeparators : function(menu) {
@@ -900,36 +964,42 @@ var requestpolicyOverlay = {
     return menuPopup;
   },
 
-  _addBlockedDestination : function(label) {
+  _addBlockedDestination : function(parentMenu, itemToInsertBefore, label,
+      isMainMenu) {
     var menu = document.createElement("menu");
     menu.setAttribute("label", this._strbundle.getFormattedString(
             "indentedText", [label]));
     menu.setAttribute("class", "requestpolicyBlocked");
-    this._menu.insertBefore(menu, this._blockedDestinationsBeforeReferenceItem);
+    parentMenu.insertBefore(menu, itemToInsertBefore);
     // add the menu popup in the menu item
     var menuPopup = document.createElement("menupopup");
     menu.insertBefore(menuPopup, menu.firstChild);
     // return the popup as that's what will have items added to it
 
-    // remember what we added
-    this._blockedDestinationsItems.push(menu);
+    // remember what we added if we added it to the main menu
+    if (isMainMenu) {
+      this._blockedDestinationsItems.push(menu);
+    }
 
     return menuPopup;
   },
 
-  _addAllowedDestination : function(label) {
+  _addAllowedDestination : function(parentMenu, itemToInsertBefore, label,
+      isMainMenu) {
     var menu = document.createElement("menu");
     menu.setAttribute("label", this._strbundle.getFormattedString(
             "indentedText", [label]));
     menu.setAttribute("class", "requestpolicyAllowed");
-    this._menu.insertBefore(menu, this._allowedDestinationsBeforeReferenceItem);
+    parentMenu.insertBefore(menu, itemToInsertBefore);
     // add the menu popup in the menu item
     var menuPopup = document.createElement("menupopup");
     menu.insertBefore(menuPopup, menu.firstChild);
     // return the popup as that's what will have items added to it
 
     // remember what we added
-    this._allowedDestinationsItems.push(menu);
+    if (isMainMenu) {
+      this._allowedDestinationsItems.push(menu);
+    }
 
     return menuPopup;
   },

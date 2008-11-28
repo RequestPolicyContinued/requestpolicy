@@ -34,6 +34,7 @@ var requestpolicyOverlay = {
 
   _itemOtherOrigins : null,
   _itemOtherOriginsPopup : null,
+  _itemOtherOriginsSeparator : null,
 
   _itemRevokeTemporaryPermissions : null,
   _itemRevokeTemporaryPermissionsSeparator : null,
@@ -77,6 +78,8 @@ var requestpolicyOverlay = {
           .getElementById("requestpolicyOtherOrigins");
       this._itemOtherOriginsPopup = document
           .getElementById("requestpolicyOtherOriginsPopup");
+      this._itemOtherOriginsSeparator = document
+          .getElementById("requestpolicyOtherOriginsSeparator");
 
       this._itemRevokeTemporaryPermissions = document
           .getElementById("requestpolicyRevokeTemporaryPermissions");
@@ -648,33 +651,44 @@ var requestpolicyOverlay = {
           // of when it can and make a sane default.
         }
       }
+
+      // Create menu for other origins.
+      this._clearChildMenus(this._itemOtherOriginsPopup);
+      var currentOtherOriginMenu;
+      var otherOriginMenuCount = 0;
+      for (var otherOriginIdentifier in otherOrigins) {
+        if (otherOriginIdentifier == currentIdentifier) {
+          // It's not a different origin, it's the same.
+          continue;
+        }
+        Logger.dump("New identifier: " + otherOriginIdentifier);
+        currentOtherOriginMenu = this._createOtherOriginMenu(
+            otherOriginIdentifier, otherOrigins);
+        // If there are no blocked/allowed destinations from this other origin,
+        // don't display it.
+        if (currentOtherOriginMenu.childNodes.length == 3) {
+          var menuNotPopup = currentOtherOriginMenu.parentNode;
+          this._clearChildMenus(menuNotPopup);
+          this._itemOtherOriginsPopup.removeChild(menuNotPopup);
+        } else {
+          otherOriginMenuCount++;
+        }
+      }
+      // If there are no other origins being displayed, don't display the "other
+      // origins" item in the main menu.
+      this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
+
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR, "Fatal Error, " + e + ", stack was: "
               + e.stack);
       Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
       throw e;
     }
-
-    // TODO: do something with otherOriginsWithBlockedContent.
-
-    // Create menu for other origins.
-    this._clearChildMenus(this._itemOtherOriginsPopup);
-    var currentOtherOriginMenu;
-    for (var otherOriginIdentifier in otherOrigins) {
-      if (otherOriginIdentifier == currentIdentifier) {
-        // It's not a different origin, it's the same.
-        continue;
-      }
-      Logger.dump("New identifier: " + otherOriginIdentifier);
-      currentOtherOriginMenu = this._createOtherOriginMenu(
-          otherOriginIdentifier, otherOrigins);
-    }
-
   },
 
   _createOtherOriginMenu : function(originIdentifier, otherOrigins) {
-
     var menu = this._addMenu(this._itemOtherOriginsPopup, originIdentifier);
+    var newNode;
 
     var allowedIdentifiers = this._getAllowedRequests(null, originIdentifier,
         otherOrigins);
@@ -704,10 +718,11 @@ var requestpolicyOverlay = {
           originIdentifier, i);
     }
 
-    var newNode = this._blockedDestinationsHeadingMenuItem.cloneNode(true);
+    newNode = this._blockedDestinationsHeadingMenuItem.cloneNode(true);
     newNode.setAttribute("id", null);
     menu.insertBefore(newNode, menu.firstChild);
 
+    return menu;
   },
 
   _populateOtherOriginsMenuItemBlockedDestinations : function(submenu,

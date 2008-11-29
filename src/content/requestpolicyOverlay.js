@@ -13,7 +13,8 @@ var requestpolicyOverlay = {
   _initialized : false,
   _requestpolicy : null,
 
-  // for development, direct access to the js object
+  // For things we can't do through the nsIRequestPolicy interface, use direct
+  // access to the underlying JS object.
   _requestpolicyJSObject : null,
 
   _strbundle : null,
@@ -140,6 +141,8 @@ var requestpolicyOverlay = {
     container.addEventListener("TabSelect", function(event) {
           requestpolicyOverlay.tabChanged();
         }, false);
+
+    this._doWorkaroundsForOtherInstalledExtensions();
   },
 
   /**
@@ -492,6 +495,49 @@ var requestpolicyOverlay = {
       gContextMenu.origOpenLink = gContextMenu.openLink;
       gContextMenu.openLink = function() {
         return gContextMenu.origOpenLink();
+      };
+    }
+  },
+
+  /**
+   * Some extensions require some intervention in order to work properly (for
+   * example, to make sure link clicks get registered). Detect these extensions
+   * and perform required actions.
+   */
+  _doWorkaroundsForOtherInstalledExtensions : function() {
+    var em = Components.classes["@mozilla.org/extensions/manager;1"]
+        .getService(Components.interfaces.nsIExtensionManager);
+
+    var allInOneGestures = em
+        .getItemForID("{8b86149f-01fb-4842-9dd8-4d7eb02fd055}");
+    if (allInOneGestures) {
+      Logger.dump("All-in-One Gestures extension detected. Wrapping addTab.");
+      this._wrapAddTab();
+    }
+  },
+
+  /**
+   * Wraps the addTab function. This is called if the user has certain
+   * extensions (e.g. All-in-One Gestures) installed that call addTab with a
+   * referrerURI. This is not done for everyone because it seems like too loose
+   * of a policy in the default case as it is possible/likely that addTab is
+   * called in other situations that aren't link clicks. Also, using a TabOpen
+   * event handler, I was unable to determine the referrer, so that approach
+   * doesn't seem to be an option.
+   */
+  _wrapAddTab : function() {
+    const requestpolicy = this._requestpolicy;
+    const content = document.getElementById("content");
+
+    if (!content.origAddTab) {
+      content.origAddTab = content.addTab;
+      content.addTab = function(URL, referrerURI, charset, postData, owner,
+          allowThirdPartyFixup) {
+        if (referrerURI) {
+          requestpolicy.registerLinkClicked(referrerURI.spec, URL);
+        }
+        return content.origAddTab(URL, referrerURI, charset, postData, owner,
+            allowThirdPartyFixup);
       };
     }
   },

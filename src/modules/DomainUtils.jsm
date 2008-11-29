@@ -176,3 +176,20 @@ DomainUtils.parseRefresh = function(refreshString) {
   var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(refreshString);
   return [parts[1], parts[2]];
 }
+
+/**
+ * Adds a path of "/" to the uri if it doesn't have one. That is,
+ * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return the origin
+ * uri if the provided one is not valid.
+ * 
+ * @param {String}
+ *            uri
+ * @return {String}
+ */
+DomainUtils.ensureUriHasPath = function(uri) {
+  try {
+    return this._ios.newURI(uri, null, null).spec;
+  } catch (e) {
+    return uri;
+  }
+}

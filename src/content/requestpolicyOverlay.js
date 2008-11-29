@@ -142,7 +142,7 @@ var requestpolicyOverlay = {
           requestpolicyOverlay.tabChanged();
         }, false);
 
-    this._doWorkaroundsForOtherInstalledExtensions();
+    this._wrapAddTab();
   },
 
   /**
@@ -452,6 +452,7 @@ var requestpolicyOverlay = {
       delete this._requestpolicyJSObject._blockedRedirects[document.location];
     }
 
+    this._wrapWindowOpen(document.defaultView);
   },
 
   /**
@@ -459,7 +460,7 @@ var requestpolicyOverlay = {
    * contentAreaContextMenu.
    */
   _contextMenuOnPopupShowing : function() {
-    requestpolicyOverlay._wrapOpenLinkFunctions();
+    requestpolicyOverlay._wrapOpenLink();
     requestpolicyOverlay._attachPopupToContextMenu();
   },
 
@@ -475,55 +476,30 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Changes the gContextMenu's functions that open links in new tabs or windows
-   * such that they first call our own functions before the original open in new
-   * link/window functions are executed.
+   * Wraps the gContextMenu's openLink() function so that RequestPolicy can be
+   * aware of the window being opened. The openLinkInTab() method doesn't need
+   * to be wrapped because addTab() is wrapped elsewhere and that ends up being
+   * called when openLinkInTab() is called.
    */
-  _wrapOpenLinkFunctions : function() {
+  _wrapOpenLink : function() {
     const requestpolicy = this._requestpolicy;
-
-    if (!gContextMenu.origOpenLinkInTab) {
-      gContextMenu.origOpenLinkInTab = gContextMenu.openLinkInTab;
-      gContextMenu.openLinkInTab = function() {
-        requestpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
-            gContextMenu.link.href);
-        return gContextMenu.origOpenLinkInTab();
-      };
-    }
 
     if (!gContextMenu.origOpenLink) {
       gContextMenu.origOpenLink = gContextMenu.openLink;
       gContextMenu.openLink = function() {
+        requestpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+            gContextMenu.link.href);
         return gContextMenu.origOpenLink();
       };
     }
   },
 
   /**
-   * Some extensions require some intervention in order to work properly (for
-   * example, to make sure link clicks get registered). Detect these extensions
-   * and perform required actions.
-   */
-  _doWorkaroundsForOtherInstalledExtensions : function() {
-    var em = Components.classes["@mozilla.org/extensions/manager;1"]
-        .getService(Components.interfaces.nsIExtensionManager);
-
-    var allInOneGestures = em
-        .getItemForID("{8b86149f-01fb-4842-9dd8-4d7eb02fd055}");
-    if (allInOneGestures) {
-      Logger.dump("All-in-One Gestures extension detected. Wrapping addTab.");
-      this._wrapAddTab();
-    }
-  },
-
-  /**
-   * Wraps the addTab function. This is called if the user has certain
-   * extensions (e.g. All-in-One Gestures) installed that call addTab with a
-   * referrerURI. This is not done for everyone because it seems like too loose
-   * of a policy in the default case as it is possible/likely that addTab is
-   * called in other situations that aren't link clicks. Also, using a TabOpen
-   * event handler, I was unable to determine the referrer, so that approach
-   * doesn't seem to be an option.
+   * Wraps the addTab() function so that RequestPolicy can be aware of the tab
+   * being opened. Assume that if the tab is being opened, it was an action the
+   * user wanted (e.g. the equivalent of a link click). Using a TabOpen event
+   * handler, I was unable to determine the referrer, so that approach doesn't
+   * seem to be an option.
    */
   _wrapAddTab : function() {
     const requestpolicy = this._requestpolicy;
@@ -538,6 +514,27 @@ var requestpolicyOverlay = {
         }
         return content.origAddTab(URL, referrerURI, charset, postData, owner,
             allowThirdPartyFixup);
+      };
+    }
+  },
+
+  /**
+   * Wraps the window's open() method so that RequestPolicy can know the origin
+   * and destination URLs of the window being opened. Assume that if
+   * window.open() calls have made it this far, it's a window the user wanted
+   * open (e.g. they have allowed the popup).
+   * 
+   * @param {Window}
+   *            window
+   */
+  _wrapWindowOpen : function(window) {
+    const requestpolicy = this._requestpolicy;
+
+    if (!window.origOpen) {
+      window.origOpen = window.open;
+      window.open = function(url, windowName, windowFeatures) {
+        requestpolicy.registerLinkClicked(window.document.documentURI, url);
+        return window.origOpen(url, windowName, windowFeatures);
       };
     }
   },

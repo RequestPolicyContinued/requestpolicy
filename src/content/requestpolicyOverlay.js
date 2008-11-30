@@ -484,12 +484,12 @@ var requestpolicyOverlay = {
   _wrapOpenLink : function() {
     const requestpolicy = this._requestpolicy;
 
-    if (!gContextMenu.origOpenLink) {
-      gContextMenu.origOpenLink = gContextMenu.openLink;
+    if (!gContextMenu.requestpolicyOrigOpenLink) {
+      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
       gContextMenu.openLink = function() {
         requestpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
             gContextMenu.link.href);
-        return gContextMenu.origOpenLink();
+        return gContextMenu.requestpolicyOrigOpenLink();
       };
     }
   },
@@ -505,15 +505,15 @@ var requestpolicyOverlay = {
     const requestpolicy = this._requestpolicy;
     const content = document.getElementById("content");
 
-    if (!content.origAddTab) {
-      content.origAddTab = content.addTab;
+    if (!content.requestpolicyOrigAddTab) {
+      content.requestpolicyOrigAddTab = content.addTab;
       content.addTab = function(URL, referrerURI, charset, postData, owner,
           allowThirdPartyFixup) {
         if (referrerURI) {
           requestpolicy.registerLinkClicked(referrerURI.spec, URL);
         }
-        return content.origAddTab(URL, referrerURI, charset, postData, owner,
-            allowThirdPartyFixup);
+        return content.requestpolicyOrigAddTab(URL, referrerURI, charset,
+            postData, owner, allowThirdPartyFixup);
       };
     }
   },
@@ -522,7 +522,12 @@ var requestpolicyOverlay = {
    * Wraps the window's open() method so that RequestPolicy can know the origin
    * and destination URLs of the window being opened. Assume that if
    * window.open() calls have made it this far, it's a window the user wanted
-   * open (e.g. they have allowed the popup).
+   * open (e.g. they have allowed the popup). Unfortunately, this method (or our
+   * timing of doing this) doesn't seem to work for popups that are allowed
+   * popups (the user has allowed popups from the domain). So, the workaround
+   * was to also add the 'if(aContext.nodeName == "xul:browser" &&
+   * aContext.currentURI && aContext.currentURI.spec == "about:blank")' to
+   * shouldLoad().
    * 
    * @param {Window}
    *            window
@@ -530,11 +535,21 @@ var requestpolicyOverlay = {
   _wrapWindowOpen : function(window) {
     const requestpolicy = this._requestpolicy;
 
-    if (!window.origOpen) {
-      window.origOpen = window.open;
+    if (!window.requestpolicyOrigOpen) {
+      window.requestpolicyOrigOpen = window.open;
       window.open = function(url, windowName, windowFeatures) {
         requestpolicy.registerLinkClicked(window.document.documentURI, url);
-        return window.origOpen(url, windowName, windowFeatures);
+        return window.requestpolicyOrigOpen(url, windowName, windowFeatures);
+      };
+    }
+
+    if (!window.requestpolicyOrigOpenDialog) {
+      window.requestpolicyOrigOpenDialog = window.openDialog;
+      window.openDialog = function() {
+        // openDialog(url, name, features, arg1, arg2, ...)
+        requestpolicy.registerLinkClicked(window.document.documentURI,
+            arguments[0]);
+        return window.requestpolicyOrigOpenDialog.apply(this, arguments);
       };
     }
   },

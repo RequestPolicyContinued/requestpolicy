@@ -1097,6 +1097,11 @@ RequestPolicyService.prototype = {
               arguments, true);
         }
 
+        if (aContext.nodeName == "xul:browser" && aContext.currentURI
+            && aContext.currentURI.spec == "about:blank") {
+          return this.accept("New window (we think)", arguments, true);
+        }
+
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
         return this.reject("hosts don't match", arguments);

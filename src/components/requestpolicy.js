@@ -1097,9 +1097,18 @@ RequestPolicyService.prototype = {
               arguments, true);
         }
 
+        // This is mostly here for the case of popup windows where the user has
+        // allowed popups for the domain. In that case, the window.open() call
+        // that made the popup isn't calling the wrapped version of
+        // window.open() and we can't find a better way to register the source
+        // and destination before the request is made. This should be able to be
+        // removed if we can find a better solution for the allowed popup case.
         if (aContext.nodeName == "xul:browser" && aContext.currentURI
             && aContext.currentURI.spec == "about:blank") {
-          return this.accept("New window (we think)", arguments, true);
+          return this
+              .accept(
+                  "New window (should probably only be an allowed popup's initial request)",
+                  arguments, true);
         }
 
         // We didn't match any of the conditions in which to allow the request,

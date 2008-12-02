@@ -850,14 +850,33 @@ var requestpolicyOverlay = {
     return allowedRequests;
   },
 
+  /**
+   * This will look both at the DOM as well as the recorded allowed requests to
+   * determine which other origins exist within the document. This includes
+   * other origins that have the same domain. The returned format is an object
+   * with properties that are URI identifiers and the properties of those are
+   * the actual other URIs (i.e. origin[uriIdent][uri]). The reason for also
+   * needing to check the DOM is that some sites (like gmail) will make multiple
+   * requests to the same uri for different iframs and this will cause us to
+   * only have in the recorded requests from a source uri the destinations from
+   * the most recent iframe that loaded that source uri. It may also help in
+   * cases where the user has multiple tabs/windows open to the same page.
+   * 
+   * @param {}
+   *            document
+   * @return {}
+   */
   _getOtherOrigins : function(document) {
     var origins = {};
-    this._getOtherOriginsHelper(document, origins);
+    this._getOtherOriginsHelperFromDOM(document, origins);
+    this._getOtherOriginsHelperFromAllowedRequests(document.documentURI,
+        origins, {});
     return origins;
   },
 
-  _getOtherOriginsHelper : function(document, origins) {
-    Logger.dump("Looking for other origins within " + document.documentURI);
+  _getOtherOriginsHelperFromDOM : function(document, origins) {
+    Logger.dump("Looking for other origins within DOM of "
+        + document.documentURI);
     // TODO: Check other elements besides iframes and frames?
     var frameTagTypes = {
       "iframe" : null,
@@ -876,10 +895,7 @@ var requestpolicyOverlay = {
           // yet.
           continue;
         }
-        // if (!childUri) {
-        // continue;
-        // }
-        Logger.dump("Found child " + tagType + " with src <" + childUri
+        Logger.dump("Found DOM child " + tagType + " with src <" + childUri
             + "> in document <" + document.documentURI + ">");
         var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
         if (!origins[childUriIdent]) {
@@ -887,6 +903,34 @@ var requestpolicyOverlay = {
         }
         origins[childUriIdent][childUri] = true;
         this._getOtherOriginsHelper(childDocument, origins);
+      }
+    }
+  },
+
+  _getOtherOriginsHelperFromAllowedRequests : function(rootUri, origins,
+      checkedOrigins) {
+    Logger.dump("Looking for other origins within allowed requests from "
+        + document.documentURI);
+    var allowedRequests = this._requestpolicyJSObject._allowedRequests[rootUri];
+    if (allowedRequests) {
+      for (var i in allowedRequests) {
+        for (var allowedUri in allowedRequests[i]) {
+          if (checkedOrigins[allowedUri] || allowedUri == "count") {
+            continue;
+          }
+          checkedOrigins[allowedUri] = true;
+
+          Logger.dump("Found allowed request to <" + allowedUri + "> from <"
+              + rootUri + ">");
+          var allowedUriIdent = this._requestpolicy
+              .getUriIdentifier(allowedUri);
+          if (!origins[allowedUriIdent]) {
+            origins[allowedUriIdent] = {};
+          }
+          origins[allowedUriIdent][allowedUri] = true;
+          this._getOtherOriginsHelperFromAllowedRequests(allowedUri, origins,
+              checkedOrigins);
+        }
       }
     }
   },

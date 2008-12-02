@@ -902,7 +902,7 @@ var requestpolicyOverlay = {
           origins[childUriIdent] = {};
         }
         origins[childUriIdent][childUri] = true;
-        this._getOtherOriginsHelper(childDocument, origins);
+        this._getOtherOriginsHelperFromDOM(childDocument, origins);
       }
     }
   },

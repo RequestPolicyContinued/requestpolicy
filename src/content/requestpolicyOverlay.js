@@ -10,6 +10,11 @@ var requestpolicyOverlay = {
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
   _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
 
+  _blockedContentCheckTimeoutDelay : 1000, // milliseconds
+  _blockedContentCheckTimeoutId : null,
+  _blockedContentCheckMinWaitOnObservedBlockedRequest : 500,
+  _blockedContentCheckLastTime : 0,
+
   _initialized : false,
   _requestpolicy : null,
 
@@ -97,6 +102,11 @@ var requestpolicyOverlay = {
       this._statusbar = document.getElementById("status-bar");
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
       this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
+
+      // Register this window with the requestpolicy service so that we can be
+      // notified of blocked requests. When blocked requests happen, this
+      // object's observerBlockedRequests() method will be called.
+      this._requestpolicyJSObject.addBlockedRequestObserver(this);
     }
   },
 
@@ -336,11 +346,19 @@ var requestpolicyOverlay = {
     // TODO: This only works for (i)frames that are direct children of the main
     // document, not (i)frames within those (i)frames.
     var iframe = event.target;
-    Logger.dump("onAppFrameContentLoaded called for <"
-        + iframe.contentDocument.documentURI + "> in <"
-        + iframe.ownerDocument.documentURI + ">");
+    Logger.debug(Logger.TYPE_INTERNAL, "onAppFrameContentLoaded called for <"
+            + iframe.contentDocument.documentURI + "> in <"
+            + iframe.ownerDocument.documentURI + ">");
+    // TODO: maybe this can check if the iframe's documentURI is in the other
+    // origins of the current document, and that way not just be limited to
+    // direct children of the main document. That would require building the
+    // other origins every time an iframe is loaded. Maybe, then, this should
+    // use a timeout like observerBlockedRequests does.
     if (this._isActiveTopLevelDocument(iframe.ownerDocument)) {
-      this._setBlockedContentNotification(false);
+      // This has an advantage over just relying on the observeBlockedRequest()
+      // call in that this will clear a blocked content notification if there no
+      // longer blocked content. Another way to solve this would be to observe
+      // allowed requests as well as blocked requests.
       this._checkForBlockedContent(iframe.ownerDocument);
     }
   },
@@ -351,10 +369,12 @@ var requestpolicyOverlay = {
    */
   _checkForBlockedContent : function(document) {
     Logger
-        .info(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
+        .debug(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
                 + document.documentURI + ">");
+    this._blockedContentCheckLastTime = (new Date()).getTime();
+    this._stopBlockedContentCheckTimeout();
     if (this._requestpolicy.originHasRejectedRequests(document.documentURI)) {
-      Logger.info(Logger.TYPE_INTERNAL, "Main document <"
+      Logger.debug(Logger.TYPE_INTERNAL, "Main document <"
               + document.documentURI + "> has rejected requests.");
       this._setBlockedContentNotification(true);
       return;
@@ -364,7 +384,7 @@ var requestpolicyOverlay = {
       for (var j in otherOrigins[i]) {
         Logger.dump("Checking for blocked content from " + j);
         if (this._requestpolicy.originHasRejectedRequests(j)) {
-          Logger.info(Logger.TYPE_INTERNAL, "Other origin <" + j
+          Logger.debug(Logger.TYPE_INTERNAL, "Other origin <" + j
                   + "> of main document <" + document.documentURI
                   + "> has rejected requests.");
           this._setBlockedContentNotification(true);
@@ -389,6 +409,43 @@ var requestpolicyOverlay = {
   _setPermissiveNotification : function(isPermissive) {
     this._rpStatusbar.setAttribute("permissive", isPermissive);
     this._rpContextMenu.setAttribute("permissive", isPermissive);
+  },
+
+  observeBlockedRequest : function(blockedOriginUri, blockedDestinationUri) {
+    Logger.debug(Logger.TYPE_INTERNAL, "Observed blocked request from <"
+            + blockedOriginUri + "> to <" + blockedDestinationUri + ">");
+    if (this._blockedContentCheckTimeoutId) {
+      Logger.debug(Logger.TYPE_INTERNAL,
+          "observeBlockedRequest: Timeout already running. No action taken.");
+      return;
+    }
+
+    var curTime = (new Date()).getTime();
+    if (this._blockedContentCheckLastTime
+        + this._blockedContentCheckMinWaitOnObservedBlockedRequest > curTime) {
+      Logger.debug(Logger.TYPE_INTERNAL,
+          "observeBlockedRequest: Setting timeout.");
+      Logger.debug(Logger.TYPE_INTERNAL, "");
+      const document = content.document;
+      this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
+          function() {
+            Logger.debug(Logger.TYPE_INTERNAL,
+                "observeBlockedRequest: Timeout fired.");
+            requestpolicyOverlay._checkForBlockedContent(document);
+          }, this._blockedContentCheckTimeoutDelay);
+    } else {
+      Logger.debug(Logger.TYPE_INTERNAL,
+          "observeBlockedRequest: Checking now, not setting timeout.");
+      this._checkForBlockedContent(content.document);
+    }
+  },
+
+  _stopBlockedContentCheckTimeout : function() {
+    if (this._blockedContentCheckTimeoutId) {
+      content.document.defaultView
+          .clearTimeout(this._blockedContentCheckTimeoutId);
+      this._blockedContentCheckTimeoutId = null;
+    }
   },
 
   /**

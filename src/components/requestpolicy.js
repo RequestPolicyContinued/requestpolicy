@@ -62,6 +62,8 @@ RequestPolicyService.prototype = {
   _submittedForms : {},
   _clickedLinks : {},
 
+  _blockedRequestObservers : [],
+
   _uriIdentificationLevel : 0,
 
   /**
@@ -357,6 +359,14 @@ RequestPolicyService.prototype = {
       }
     }
     Logger.dump("-------------------------------------------------");
+  },
+
+  _notifyBlockedRequestObservers : function(blockedOriginUri,
+      blockedDestinationUri) {
+    for (var i = 0; i < this._blockedRequestObservers.length; i++) {
+      this._blockedRequestObservers[i].observeBlockedRequest(blockedOriginUri,
+          blockedDestinationUri);
+    }
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -704,6 +714,21 @@ RequestPolicyService.prototype = {
     return false;
   },
 
+  /**
+   * Add an observer to be notified of all blocked requests. TODO: This should
+   * be made to accept instances of a defined interface.
+   * 
+   * @param {}
+   *            listener
+   */
+  addBlockedRequestObserver : function addBlockedRequestObserver(observer) {
+    if (!("observeBlockedRequest" in observer)) {
+      throw "Observer passed to addBlockedRequestObserver does "
+          + "not have an observeBlockedRequest() method.";
+    }
+    this._blockedRequestObservers.push(observer);
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIObserver interface
   // /////////////////////////////////////////////////////////////////////////
@@ -791,6 +816,7 @@ RequestPolicyService.prototype = {
 
     this._cacheShouldLoadResult(CP_REJECT, origin, dest);
     this._recordRejectedRequest(origin, dest);
+    this._notifyBlockedRequestObservers(origin, dest);
 
     return CP_REJECT;
   },

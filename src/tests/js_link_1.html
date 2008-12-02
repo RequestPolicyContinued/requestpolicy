@@ -1,0 +1,19 @@
+<html>
+<head>
+<script>
+	function addLink() {
+		document.getElementById("target").innerHTML = "<a href='http://127.0.0.1/?test'>Link to http://127.0.0.1/</a>";
+	}
+</script>
+</head>
+<body onload="setTimeout('addLink()', 500);">
+
+This page has javascript which adds a link to a remote site after 1/2
+second.
+
+<br /><br />
+
+<div id="target"></div>
+
+</body>
+</html>

@@ -116,10 +116,45 @@ var requestpolicyOverlay = {
       appcontent.addEventListener("DOMContentLoaded", function(event) {
             requestpolicyOverlay.onAppContentLoaded(event);
           }, true);
+
       // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
       // enclosed frames.
       appcontent.addEventListener("DOMFrameContentLoaded", function(event) {
             requestpolicyOverlay.onAppFrameContentLoaded(event);
+          }, true);
+
+      // Add a click handler so we can register all link clicks and be able to
+      // allow them.
+      // This seems to be a safe approach in that the MDC states that javascript
+      // can't be used to initiate a click event on a link:
+      // http://developer.mozilla.org/en/DOM/element.click
+      appcontent.addEventListener("click", function(event) {
+            // We're only interested in left-clicks on anchor tags.
+            if (event.target.nodeName.toLowerCase() != "a" || event.button != 0) {
+              return;
+            }
+            requestpolicyOverlay._requestpolicy.registerLinkClicked(
+                event.target.ownerDocument.URL, event.target.href);
+          }, true);
+
+      // Add a submit handler so we can register all form submissions and be
+      // able to allow them.
+      // As far as I can tell, calling a form's submit() method from javascript
+      // will not cause this event listener to fire even though it will submit
+      // the form, which makes things easier in that we don't have to find
+      // another way to tell if the user submitted the form or if it was done by
+      // javascript. However, I'm not sure on the specifics of why submit() from
+      // javascript doesn't end up calling this. I can only conclude it's the
+      // same difference as with link clicks by humans vs. click(), but that the
+      // documentation just doesn't state this (with the exception that
+      // nonprivileged code can call submit(), but it just doesn't result in a
+      // submit event going through the DOM).
+      appcontent.addEventListener("submit", function(event) {
+            if (event.target.nodeName.toLowerCase() != "form") {
+              return;
+            }
+            requestpolicyOverlay._requestpolicy.registerFormSubmitted(
+                event.target.ownerDocument.URL, event.target.action);
           }, true);
     }
 
@@ -364,11 +399,6 @@ var requestpolicyOverlay = {
    *            event
    */
   _onDOMContentLoaded : function(document) {
-
-    // TODO: Listen for DOMSubtreeModified and/or DOMLinkAdded to register
-    // new links/forms with requestpolicy even if they are added after initial
-    // load (e.g. they are added through javascript).
-
     const requestpolicy = this._requestpolicy;
 
     // Find all meta redirects.
@@ -395,51 +425,6 @@ var requestpolicyOverlay = {
             this._showRedirectNotification(document, dest, delay);
           }
         }
-      }
-    }
-
-    // Find all anchor tags and add click events (which also fire when enter
-    // is pressed while the element has focus).
-    // This semes to be a safe approach in that the MDC states that javascript
-    // can't be used to initiate a click event on a link:
-    // http://developer.mozilla.org/en/DOM/element.click
-    var anchorTags = document.getElementsByTagName("a");
-    for (var i = 0; i < anchorTags.length; i++) {
-      anchorTags[i].addEventListener("click", function(event) {
-            // Note: need to use currentTarget so that it is the link, not
-            // something else within the link that got clicked, it seems.
-            requestpolicy
-                .registerLinkClicked(event.currentTarget.ownerDocument.URL,
-                    event.currentTarget.href);
-          }, false);
-    }
-
-    // Find all form tags and add submit events.
-    // As far as I can tell, calling a form's submit() method from javascript
-    // will not cause this event listener to fire, which makes things easier in
-    // that we don't have to find another way to tell if the user submitted the
-    // form or if it was done by javascript. However, I'm not sure on the
-    // specifics of why submit() from javascript doesn't end up calling this. I
-    // can only conclude it's the same difference as with link clicks by humans
-    // vs. click(), but that the docmentation just doesn't state this.
-    var formTags = document.getElementsByTagName("form");
-    for (var i = 0; i < formTags.length; i++) {
-      formTags[i].addEventListener("submit", function(event) {
-            requestpolicy.registerFormSubmitted(event.target.ownerDocument.URL,
-                event.target.action);
-          }, false);
-    }
-
-    // Find all <link rel="prefetch" ...> tags. Unfortunately, they can't
-    // just be removed (the url is still prefetched). Just use this as a way
-    // to warn the user. Fundamentally, the user needs to manually change
-    // their preferences until it's possible to change the prefetch preference
-    // programmatically.
-    var linkTags = document.getElementsByTagName("link");
-    for (var i = 0; i < linkTags.length; i++) {
-      if (linkTags[i].rel.toLowerCase() == "prefetch") {
-        Logger.info(Logger.TYPE_CONTENT, "prefetch of <" + linkTags[i].href
-                + "> found in document at <" + document.location + ">");
       }
     }
 
@@ -495,26 +480,37 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Wraps the addTab() function so that RequestPolicy can be aware of the tab
-   * being opened. Assume that if the tab is being opened, it was an action the
-   * user wanted (e.g. the equivalent of a link click). Using a TabOpen event
-   * handler, I was unable to determine the referrer, so that approach doesn't
-   * seem to be an option.
+   * Modifies the addTab() function so that RequestPolicy can be aware of the
+   * tab being opened. Assume that if the tab is being opened, it was an action
+   * the user wanted (e.g. the equivalent of a link click). Using a TabOpen
+   * event handler, I was unable to determine the referrer, so that approach
+   * doesn't seem to be an option. This doesn't actually wrap addTab because the
+   * extension TabMixPlus modifies the function rather than wraps it, so
+   * wrapping it will break tabs if TabMixPlus is installed.
    */
   _wrapAddTab : function() {
-    const requestpolicy = this._requestpolicy;
-    const content = document.getElementById("content");
+    if (!gBrowser.requestpolicyAddTabModified) {
+      gBrowser.requestpolicyAddTabModified = true;
+      var functionSignature = "function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner, aAllowThirdPartyFixup) {";
+      var newFirstCodeLine = "\n    requestpolicyOverlay.tabAdded(aURI, aReferrerURI);";
+      // Add a line to the beginning of the addTab function.
+      eval("gBrowser.addTab = "
+          + gBrowser.addTab.toString().replace(functionSignature,
+              functionSignature + newFirstCodeLine));
+    }
+  },
 
-    if (!content.requestpolicyOrigAddTab) {
-      content.requestpolicyOrigAddTab = content.addTab;
-      content.addTab = function(URL, referrerURI, charset, postData, owner,
-          allowThirdPartyFixup) {
-        if (referrerURI) {
-          requestpolicy.registerLinkClicked(referrerURI.spec, URL);
-        }
-        return content.requestpolicyOrigAddTab(URL, referrerURI, charset,
-            postData, owner, allowThirdPartyFixup);
-      };
+  /**
+   * This is called by the modified addTab().
+   * 
+   * @param {String?}
+   *            tabUri
+   * @param {nsIURI}
+   *            referrerUri
+   */
+  tabAdded : function(tabUri, referrerUri) {
+    if (referrerUri) {
+      this._requestpolicy.registerLinkClicked(referrerUri.spec, tabUri);
     }
   },
 

@@ -1,7 +1,6 @@
 <!ENTITY prefetchWarning "Attention : la préextraction est activée">
 <!ENTITY prefetchInfo "En savoir plus à propos de la préextraction">
 <!ENTITY prefetchDisablingInstructions "Désactiver la préextraction">
-
 <!ENTITY temporarilyAllowAll "Accepter temporairement toutes les requêtes">
 <!ENTITY revokeTemporaryPermissions "Révoquer toutes les droits d&apos;accès temporaires">
 <!ENTITY blockedDestinations "Cibles bloquées">

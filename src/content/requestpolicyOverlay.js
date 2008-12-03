@@ -7,6 +7,8 @@ Components.utils.import("resource://requestpolicy/Logger.jsm");
  */
 var requestpolicyOverlay = {
 
+  _overlayId : 0,
+
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
   _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
 
@@ -53,11 +55,17 @@ var requestpolicyOverlay = {
   _rpStatusbar : null,
   _rpContextMenu : null,
 
+  toString : function() {
+    return "[requestpolicyOverlay " + this._overlayId + "]";
+  },
+
   /**
    * Initialize the object. This must be done after the DOM is loaded.
    */
   init : function() {
     if (this._initialized == false) {
+      this._overlayId = (new Date()).getTime();
+
       this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
@@ -108,6 +116,10 @@ var requestpolicyOverlay = {
       // object's observerBlockedRequests() method will be called.
       this._requestpolicyJSObject.addBlockedRequestObserver(this);
     }
+  },
+
+  onWindowClose : function(event) {
+    this._requestpolicyJSObject.removeBlockedRequestObserver(this);
   },
 
   /**
@@ -1437,6 +1449,11 @@ var requestpolicyOverlay = {
 // Initialize the requestpolicyOverlay object when the window DOM is loaded.
 addEventListener("DOMContentLoaded", function(event) {
       requestpolicyOverlay.init();
+    }, false);
+
+// Event handler for when the window is closed.
+addEventListener("close", function(event) {
+      requestpolicyOverlay.onWindowClose(event);
     }, false);
 
 // Registers event handlers for documents loaded in the window.

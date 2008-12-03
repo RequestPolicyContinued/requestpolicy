@@ -364,6 +364,9 @@ RequestPolicyService.prototype = {
   _notifyBlockedRequestObservers : function(blockedOriginUri,
       blockedDestinationUri) {
     for (var i = 0; i < this._blockedRequestObservers.length; i++) {
+      if (!this._blockedRequestObservers[i]) {
+        continue;
+      }
       this._blockedRequestObservers[i].observeBlockedRequest(blockedOriginUri,
           blockedDestinationUri);
     }
@@ -719,14 +722,35 @@ RequestPolicyService.prototype = {
    * be made to accept instances of a defined interface.
    * 
    * @param {}
-   *            listener
+   *            observer
    */
   addBlockedRequestObserver : function addBlockedRequestObserver(observer) {
     if (!("observeBlockedRequest" in observer)) {
       throw "Observer passed to addBlockedRequestObserver does "
           + "not have an observeBlockedRequest() method.";
     }
+    Logger.debug(Logger.TYPE_INTERNAL, "Adding blocked request observer: "
+            + observer.toString());
     this._blockedRequestObservers.push(observer);
+  },
+
+  /**
+   * Remove an observer added through addBlockedRequestObserver().
+   * 
+   * @param {}
+   *            observer
+   */
+  removeBlockedRequestObserver : function removeBlockedRequestObserver(observer) {
+    for (var i = 0; i < this._blockedRequestObservers.length; i++) {
+      if (this._blockedRequestObservers[i] == observer) {
+        Logger.debug(Logger.TYPE_INTERNAL,
+            "Removing blocked request observer: " + observer.toString());
+        delete this._blockedRequestObservers[i];
+        return;
+      }
+    }
+    Logger.warning(Logger.TYPE_INTERNAL, "Could not find observer to remove "
+            + "in removeBlockedRequestObserver()");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -816,7 +840,6 @@ RequestPolicyService.prototype = {
 
     this._cacheShouldLoadResult(CP_REJECT, origin, dest);
     this._recordRejectedRequest(origin, dest);
-    this._notifyBlockedRequestObservers(origin, dest);
 
     return CP_REJECT;
   },
@@ -857,6 +880,8 @@ RequestPolicyService.prototype = {
         }
       }
     }
+
+    this._notifyBlockedRequestObservers(originUri, destUri);
   },
 
   // We only call this from shouldLoad when the request was a remote request
@@ -994,6 +1019,14 @@ RequestPolicyService.prototype = {
 
     if (aRequestOrigin.scheme == 'about'
         && aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
+      return true;
+    }
+
+    // If there are entities in the document, they may trigger a local file
+    // request. We'll only allow requests to .dtd files, though, so we don't
+    // open up all file:// destinations.
+    if (aContentLocation.scheme == "file"
+        && /.\.dtd$/.test(aContentLocation.path)) {
       return true;
     }
 

@@ -7,7 +7,7 @@
 	id="requestpolicyOverlay">
 
 	<stringbundleset id="stringbundleset">
-		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/strings.properties"/>
+		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
 	</stringbundleset>
 	
 	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
@@ -38,16 +38,16 @@
 			>
 			<menu
 				id="requestpolicyPrefetchWarning"
-				label="&requestpolicyPrefetchWarning;">
+				label="&prefetchWarning;">
 				<menupopup>
 					<menuitem
 						id="requestpolicyPrefetchInfo"
-						label="&requestpolicyPrefetchInfo;"
+						label="&prefetchInfo;"
 						oncommand="requestpolicyOverlay.showPrefetchInfo();"
 						/>
 					<menuitem
 						id="requestpolicyPrefetchDisablingInstructions"
-						label="&requestpolicyPrefetchDisablingInstructions;"
+						label="&prefetchDisablingInstructions;"
 						oncommand="requestpolicyOverlay.showPrefetchDisablingInstructions();"
 						/>
 				</menupopup>
@@ -56,14 +56,14 @@
 			<menuitem 
 				id="requestpolicyAllowAllTemporarily"
 				class="requestpolicyTemporary"
-				label="&requestpolicyStatusbarTemporarilyAllowAll;"
+				label="&temporarilyAllowAll;"
 				type="checkbox"
 				checked="false"
 				oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
 			<menuseparator />
 			<menu
 				id="requestpolicyOtherOrigins"
-				label="&requestpolicyStatusbarOtherOrigins;"
+				label="&otherOrigins;"
 				class="requestpolicyOtherOrigins"
 				>
 				<menupopup id="requestpolicyOtherOriginsPopup" />
@@ -71,14 +71,14 @@
 			<menuseparator id="requestpolicyOtherOriginsSeparator" />
 			<menuitem
 				id="requestpolicyBlockedDestinations"
-				label="&requestpolicyStatusbarBlockedDestinations;"
+				label="&blockedDestinations;"
 				class="requestpolicyBlockedHeading"
 				disabled="true"
 				/>
 			<menuseparator id="requestpolicyAllowedDestinationsSeparator" />
 			<menuitem
 				id="requestpolicyAllowedDestinations"
-				label="&requestpolicyStatusbarAllowedDestinations;"
+				label="&allowedDestinations;"
 				class="requestpolicyAllowedHeading"
 				disabled="true"
 				/>

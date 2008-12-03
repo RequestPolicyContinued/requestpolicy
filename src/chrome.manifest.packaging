@@ -2,4 +2,6 @@ overlay    chrome://browser/content/browser.xul    chrome://requestpolicy/conten
 
 content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
 skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/
+
 locale     requestpolicy    en-US          jar:chrome/requestpolicy.jar!/locale/en-US/
+locale     requestpolicy    fr-FR          jar:chrome/requestpolicy.jar!/locale/fr-FR/

@@ -1,9 +1,9 @@
-<!ENTITY requestpolicyPrefetchWarning "Warning: Prefetch is enabled">
-<!ENTITY requestpolicyPrefetchInfo "Learn about prefetching">
-<!ENTITY requestpolicyPrefetchDisablingInstructions "Disable prefetching">
+<!ENTITY prefetchWarning "Warning: Prefetch is enabled">
+<!ENTITY prefetchInfo "Learn about prefetching">
+<!ENTITY prefetchDisablingInstructions "Disable prefetching">
 
-<!ENTITY requestpolicyStatusbarTemporarilyAllowAll "Temporarily allow all requests">
+<!ENTITY temporarilyAllowAll "Temporarily allow all requests">
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
-<!ENTITY requestpolicyStatusbarBlockedDestinations "Blocked destinations">
-<!ENTITY requestpolicyStatusbarAllowedDestinations "Allowed destinations">
-<!ENTITY requestpolicyStatusbarOtherOrigins "Other origins within this page">
+<!ENTITY blockedDestinations "Blocked destinations">
+<!ENTITY allowedDestinations "Allowed destinations">
+<!ENTITY otherOrigins "Other origins within this page">

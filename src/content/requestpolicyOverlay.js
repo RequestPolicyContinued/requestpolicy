@@ -1142,8 +1142,14 @@ var requestpolicyOverlay = {
   _addBlockedDestination : function(parentMenu, itemToInsertBefore, label,
       isMainMenu) {
     var menu = document.createElement("menu");
+    // This seems to be the easiest way to deal with indenting ltr/rtl text,
+    // given that there was either a bug in the babelzilla system or having the
+    // spaces in the properties files was confusing the translators. Don't want
+    // to use css because I think it would require putting a margin/padding on
+    // both the left and right, and so result in extra margin on the side that
+    // doesn't need to be indented.
     menu.setAttribute("label", this._strbundle.getFormattedString(
-            "indentedText", [label]));
+            "indentedText", ["    ", label]));
     menu.setAttribute("class", "requestpolicyBlocked");
     parentMenu.insertBefore(menu, itemToInsertBefore);
     // add the menu popup in the menu item
@@ -1163,7 +1169,7 @@ var requestpolicyOverlay = {
       isMainMenu) {
     var menu = document.createElement("menu");
     menu.setAttribute("label", this._strbundle.getFormattedString(
-            "indentedText", [label]));
+            "indentedText", ["    ", label]));
     menu.setAttribute("class", "requestpolicyAllowed");
     parentMenu.insertBefore(menu, itemToInsertBefore);
     // add the menu popup in the menu item

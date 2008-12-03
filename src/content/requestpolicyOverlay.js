@@ -497,6 +497,29 @@ var requestpolicyOverlay = {
       }
     }
 
+    // Find all anchor tags and add click events (which also fire when enter
+    // is pressed while the element has focus).
+    // This seems to be a safe approach in that the MDC states that javascript
+    // can't be used to initiate a click event on a link:
+    // http://developer.mozilla.org/en/DOM/element.click
+    // We keep this even though we have the document looking for clicks because
+    // for certain links the target will not be the link (and we can't use the
+    // currentTarget in the other case it seems, as we can here). There probably
+    // is some solution when handling the click events at the document level,
+    // but I just don't know what it is. For now, there remains the risk of
+    // dynamically added links whose target of the click event isn't the anchor
+    // tag.
+    var anchorTags = document.getElementsByTagName("a");
+    for (var i = 0; i < anchorTags.length; i++) {
+      anchorTags[i].addEventListener("click", function(event) {
+            // Note: need to use currentTarget so that it is the link, not
+            // something else within the link that got clicked, it seems.
+            requestpolicy
+                .registerLinkClicked(event.currentTarget.ownerDocument.URL,
+                    event.currentTarget.href);
+          }, false);
+    }
+
     if (this._requestpolicyJSObject._blockedRedirects[document.location]) {
       var dest = this._requestpolicyJSObject._blockedRedirects[document.location];
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,

@@ -426,8 +426,18 @@ var requestpolicyOverlay = {
    * Sets the permissive status visible to the user.
    */
   _setPermissiveNotification : function(isPermissive) {
-    this._rpStatusbar.setAttribute("permissive", isPermissive);
-    this._rpContextMenu.setAttribute("permissive", isPermissive);
+    // We do it for all windows, not just the current one.
+    for (var i = 0; i < Application.windows.length; i++) {
+      // It seems that _window should be treated as privite, but it's there and
+      // it is what we want.
+      var window = Application.windows[i]._window;
+      if (window.requestpolicyOverlay) {
+        window.requestpolicyOverlay._rpStatusbar.setAttribute("permissive",
+            isPermissive);
+        window.requestpolicyOverlay._rpContextMenu.setAttribute("permissive",
+            isPermissive);
+      }
+    }
   },
 
   observeBlockedRequest : function(blockedOriginUri, blockedDestinationUri) {

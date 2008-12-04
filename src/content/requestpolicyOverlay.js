@@ -928,9 +928,10 @@ var requestpolicyOverlay = {
     // the same uriIdentifier as the current page.
     if (currentIdentifier in otherOrigins) {
       for (var i in otherOrigins[currentIdentifier]) {
-        this._dumpRequestSet(this._requestpolicyJSObject._rejectedRequests[i],
-            "Rejected requests of " + i);
         if (i in this._requestpolicyJSObject._rejectedRequests) {
+          this._dumpRequestSet(
+              this._requestpolicyJSObject._rejectedRequests[i],
+              "Rejected requests of " + i);
           for (var ident in this._requestpolicyJSObject._rejectedRequests[i]) {
             rejectedRequests[ident] = true;
           }

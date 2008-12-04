@@ -919,16 +919,22 @@ var requestpolicyOverlay = {
 
   _getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     var rejectedRequests = {};
-    for (var ident in this._requestpolicyJSObject._rejectedRequests[currentUri]) {
-      rejectedRequests[ident] = true;
+    if (currentUri in this._requestpolicyJSObject._rejectedRequests) {
+      for (var ident in this._requestpolicyJSObject._rejectedRequests[currentUri]) {
+        rejectedRequests[ident] = true;
+      }
     }
     // Add the rejected requests from other origins within this page that have
     // the same uriIdentifier as the current page.
-    for (var i in otherOrigins[currentIdentifier]) {
-      this._dumpRequestSet(this._requestpolicyJSObject._rejectedRequests[i],
-          "Rejected requests of " + i);
-      for (var ident in this._requestpolicyJSObject._rejectedRequests[i]) {
-        rejectedRequests[ident] = true;
+    if (currentIdentifier in otherOrigins) {
+      for (var i in otherOrigins[currentIdentifier]) {
+        this._dumpRequestSet(this._requestpolicyJSObject._rejectedRequests[i],
+            "Rejected requests of " + i);
+        if (i in this._requestpolicyJSObject._rejectedRequests) {
+          for (var ident in this._requestpolicyJSObject._rejectedRequests[i]) {
+            rejectedRequests[ident] = true;
+          }
+        }
       }
     }
     return rejectedRequests;
@@ -936,14 +942,20 @@ var requestpolicyOverlay = {
 
   _getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     var allowedRequests = {};
-    for (var ident in this._requestpolicyJSObject._allowedRequests[currentUri]) {
-      allowedRequests[ident] = true;
+    if (currentUri in this._requestpolicyJSObject._allowedRequests) {
+      for (var ident in this._requestpolicyJSObject._allowedRequests[currentUri]) {
+        allowedRequests[ident] = true;
+      }
     }
     // Add the allowed requests from other origins within this page that have
     // the same uriIdentifier as the current page.
-    for (var i in otherOrigins[currentIdentifier]) {
-      for (var ident in this._requestpolicyJSObject._allowedRequests[i]) {
-        allowedRequests[ident] = true;
+    if (currentIdentifier in otherOrigins) {
+      for (var i in otherOrigins[currentIdentifier]) {
+        if (i in this._requestpolicyJSObject._allowedRequests) {
+          for (var ident in this._requestpolicyJSObject._allowedRequests[i]) {
+            allowedRequests[ident] = true;
+          }
+        }
       }
     }
     return allowedRequests;

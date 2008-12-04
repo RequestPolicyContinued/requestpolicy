@@ -5,12 +5,13 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>RequestPolicy</em:name>
-		<em:version>0.1.10</em:version>
+		<em:version>0.1.11pre1</em:version>
 		<em:type>2</em:type>
 		<em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from CSRF and other attacks.</em:description>
 		<em:creator>Justin Samuel</em:creator>
 		<em:id>requestpolicy@requestpolicy.com</em:id>
 		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
+		<em:optionsURL>chrome://requestpolicy/content/requestpolicyPrefs.xul</em:optionsURL>
 		<em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 		
 		<em:contributor>myahoo (French translation)</em:contributor>

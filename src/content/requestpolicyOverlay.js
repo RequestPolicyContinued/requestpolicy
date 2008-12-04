@@ -1446,6 +1446,12 @@ var requestpolicyOverlay = {
     this._openInNewTab(this._prefetchDisablingInstructionsUri);
   },
 
+  openOptionsDialog : function() {
+    window.openDialog("chrome://requestpolicy/content/requestpolicyPrefs.xul",
+        "requestpolicyPreferencesDialogWindow",
+        "chrome, dialog, centerscreen, alwaysRaised");
+  },
+
   _attachPopupToContextMenu : function() {
     // Add the menupopup back to the contextmenu.
     if (!requestpolicyOverlay._rpContextMenu.firstChild) {

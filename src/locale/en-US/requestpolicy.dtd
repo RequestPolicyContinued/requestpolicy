@@ -1,9 +1,13 @@
 <!ENTITY prefetchWarning "Warning: Prefetch is enabled">
 <!ENTITY prefetchInfo "Learn about prefetching">
 <!ENTITY prefetchDisablingInstructions "Disable prefetching">
-
 <!ENTITY temporarilyAllowAll "Temporarily allow all requests">
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
 <!ENTITY blockedDestinations "Blocked destinations">
 <!ENTITY allowedDestinations "Allowed destinations">
 <!ENTITY otherOrigins "Other origins within this page">
+<!ENTITY preferences "Preferences">
+
+<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
+<!ENTITY preferences.general "General">
+<!ENTITY preferences.statusbarIcon "Status bar icon:">

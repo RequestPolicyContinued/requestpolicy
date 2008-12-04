@@ -1,0 +1,29 @@
+prefwindow .chromeclass-toolbar {
+	display: -moz-box !important; /* Ignore toolbar collapse button on OS X */
+}
+
+prefwindow {
+   width: 30em;
+   height : 20em;
+}
+
+radio[pane] {
+	min-width: 5.5em;
+	height: 48px;
+	-moz-box-align: center;
+	-moz-box-pack: end;
+}
+
+.statusLine {
+	margin: .75em 0;
+	font-size: .85em;
+}
+
+/* General pane */
+grid row:not (:first-child ) {
+	margin-top: .3em;
+}
+
+grid row hbox:first-child {
+	-moz-box-pack: end; /* Right-justify left column */
+}

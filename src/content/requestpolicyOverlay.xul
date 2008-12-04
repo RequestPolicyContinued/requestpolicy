@@ -37,10 +37,10 @@
 			onpopuphidden="requestpolicyOverlay.onMenuHidden(event);"
 			>
 			<menuitem
-				hidden="true"
+				hidden="false"
 				label="&preferences;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
-			<menuseparator hidden="true" />
+			<menuseparator hidden="false" />
 			<menu
 				id="requestpolicyPrefetchWarning"
 				label="&prefetchWarning;">

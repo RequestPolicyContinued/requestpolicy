@@ -1,17 +1,32 @@
 #requestpolicyStatusbar {
-	padding-left: 4px;
-	padding-right: 4px;
+	padding-left: 2px;
+	padding-right: 2px;
 	cursor: pointer;
 	list-style-image:
-		url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
+		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
 #requestpolicyStatusbar[blocked="true"] {
 	list-style-image:
-		url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
+		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 }
 
 #requestpolicyStatusbar[permissive="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+}
+
+#requestpolicyStatusbar[iconStyle="large"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
+}
+
+#requestpolicyStatusbar[iconStyle="large"][blocked="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
+}
+
+#requestpolicyStatusbar[iconStyle="large"][permissive="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
 }
@@ -24,13 +39,13 @@
 #requestpolicyContextMenu[blocked="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
-    color : #a00;
+	color: #a00;
 }
 
 #requestpolicyContextMenu[permissive="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
-    color : #d07100;
+	color: #d07100;
 }
 
 .requestpolicyTemporary {

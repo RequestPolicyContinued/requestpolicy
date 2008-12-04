@@ -115,7 +115,14 @@ var requestpolicyOverlay = {
       // notified of blocked requests. When blocked requests happen, this
       // object's observerBlockedRequests() method will be called.
       this._requestpolicyJSObject.addBlockedRequestObserver(this);
+
+      this.setStatusbarIconStyle(this._requestpolicy.prefs
+          .getCharPref("statusbarIcon"));
     }
+  },
+
+  setStatusbarIconStyle : function(iconStyle) {
+    this._rpStatusbar.setAttribute("iconStyle", iconStyle);
   },
 
   onWindowClose : function(event) {

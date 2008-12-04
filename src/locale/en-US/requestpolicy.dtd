@@ -9,5 +9,6 @@
 <!ENTITY preferences "Preferences">
 
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
-<!ENTITY preferences.general "General">
+<!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.userInterface "User Interface">
 <!ENTITY preferences.statusbarIcon "Status bar icon:">

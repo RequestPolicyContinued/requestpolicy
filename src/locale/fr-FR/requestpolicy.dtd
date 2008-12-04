@@ -6,3 +6,9 @@
 <!ENTITY blockedDestinations "Cibles bloquées">
 <!ENTITY allowedDestinations "Cibles autorisées">
 <!ENTITY otherOrigins "Autres origines dans cette page">
+<!ENTITY preferences "Preferences">
+
+<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
+<!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.userInterface "User Interface">
+<!ENTITY preferences.statusbarIcon "Status bar icon:">

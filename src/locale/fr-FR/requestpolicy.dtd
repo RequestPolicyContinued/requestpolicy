@@ -6,7 +6,7 @@
 <!ENTITY blockedDestinations "Cibles bloquées">
 <!ENTITY allowedDestinations "Cibles autorisées">
 <!ENTITY otherOrigins "Autres origines dans cette page">
-<!ENTITY preferences "Preferences">
+<!ENTITY preferences "Préférences">
 
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">

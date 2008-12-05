@@ -12,6 +12,15 @@
 	
 	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
 
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="requestpolicyToolbarButton" 
+			class="toolbarbutton-1"
+			type="menu-button"
+			label="RequestPolicy"
+			tooltiptext="RequestPolicy"
+			onclick="requestpolicyOverlay.openToolbarPopup(this)" />
+	</toolbarpalette>
+
 	<popup id="contentAreaContextMenu">
 		<menu
 			id="requestpolicyContextMenu"
@@ -23,6 +32,7 @@
 		<statusbarpanel 
 			class="statusbarpanel-menu-iconic" 
 			id="requestpolicyStatusbar"
+			tooltiptext="RequestPolicy"
 			onclick="requestpolicyOverlay.openStatusbarPopup(this);"
 			>
 		</statusbarpanel>

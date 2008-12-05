@@ -48,6 +48,36 @@
 	color: #d07100;
 }
 
+#requestpolicyToolbarButton {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
+}
+
+#requestpolicyToolbarButton[blocked="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
+}
+
+#requestpolicyToolbarButton[permissive="true"] {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
+}
+
+toolbar[iconsize="small"] #requestpolicyToolbarButton {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+}
+
+toolbar[iconsize="small"] #requestpolicyToolbarButton[blocked="true"] {
+    list-style-image:
+        url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+}
+
+toolbar[iconsize="small"] #requestpolicyToolbarButton[permissive="true"] {
+    list-style-image:
+        url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+}
+
 .requestpolicyTemporary {
 	font-style: italic;
 }

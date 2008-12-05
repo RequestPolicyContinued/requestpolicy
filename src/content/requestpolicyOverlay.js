@@ -54,6 +54,7 @@ var requestpolicyOverlay = {
   _statusbar : null,
   _rpStatusbar : null,
   _rpContextMenu : null,
+  _rpToolbar : null,
 
   toString : function() {
     return "[requestpolicyOverlay " + this._overlayId + "]";
@@ -110,6 +111,7 @@ var requestpolicyOverlay = {
       this._statusbar = document.getElementById("status-bar");
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
       this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
+      this._rpToolbar = document.getElementById("requestpolicyToolbarButton");
 
       // Register this window with the requestpolicy service so that we can be
       // notified of blocked requests. When blocked requests happen, this
@@ -420,6 +422,7 @@ var requestpolicyOverlay = {
   _setBlockedContentNotification : function(isContentBlocked) {
     this._rpStatusbar.setAttribute("blocked", isContentBlocked);
     this._rpContextMenu.setAttribute("blocked", isContentBlocked);
+    this._rpToolbar.setAttribute("blocked", isContentBlocked);
   },
 
   /**
@@ -435,6 +438,8 @@ var requestpolicyOverlay = {
         window.requestpolicyOverlay._rpStatusbar.setAttribute("permissive",
             isPermissive);
         window.requestpolicyOverlay._rpContextMenu.setAttribute("permissive",
+            isPermissive);
+        window.requestpolicyOverlay._rpToolbar.setAttribute("permissive",
             isPermissive);
       }
     }
@@ -1490,17 +1495,24 @@ var requestpolicyOverlay = {
     }
   },
 
+  openStatusbarPopup : function(anchor) {
+    this._attachPopupToStatusbar();
+    this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
+  },
+
+  openToolbarPopup : function(anchor) {
+    // It seems to work to just attach it to the status bar, and that's good
+    // because we couldn't getElementById the BrowserToolbarPalette element to
+    // attach it to.
+    this._attachPopupToStatusbar();
+    this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
+  },
+
   _attachPopupToStatusbar : function() {
     // Add the menupopup to the statusbar as it may be attached to the
     // contextmenu.
     requestpolicyOverlay._statusbar.insertBefore(requestpolicyOverlay._menu,
         null);
-  },
-
-  openStatusbarPopup : function(anchor) {
-    // Open the popup.
-    this._attachPopupToStatusbar();
-    this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
   }
 
 };

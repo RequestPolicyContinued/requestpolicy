@@ -6,12 +6,12 @@
 		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
-#requestpolicyStatusbar[blocked="true"] {
+#requestpolicyStatusbar[requestpolicyBlocked="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 }
 
-#requestpolicyStatusbar[permissive="true"] {
+#requestpolicyStatusbar[requestpolicyPermissive="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
 }
@@ -21,12 +21,12 @@
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
 }
 
-#requestpolicyStatusbar[iconStyle="large"][blocked="true"] {
+#requestpolicyStatusbar[iconStyle="large"][requestpolicyBlocked="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
 }
 
-#requestpolicyStatusbar[iconStyle="large"][permissive="true"] {
+#requestpolicyStatusbar[iconStyle="large"][requestpolicyPermissive="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
 }
@@ -36,44 +36,44 @@
 		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
-#requestpolicyContextMenu[blocked="true"] {
+#requestpolicyContextMenu[requestpolicyBlocked="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 	color: #a00;
 }
 
-#requestpolicyContextMenu[permissive="true"] {
+#requestpolicyContextMenu[requestpolicyPermissive="true"] {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
 	color: #d07100;
 }
 
-#requestpolicyToolbarButton {
+toolbox toolbar #requestpolicyToolbarButton {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
 }
 
-#requestpolicyToolbarButton[blocked="true"] {
+toolbox[requestpolicyBlocked="true"] toolbar #requestpolicyToolbarButton {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
 }
 
-#requestpolicyToolbarButton[permissive="true"] {
+toolbox[requestpolicyPermissive="true"] toolbar #requestpolicyToolbarButton {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
 }
 
-toolbar[iconsize="small"] #requestpolicyToolbarButton {
+toolbox toolbar[iconsize="small"] #requestpolicyToolbarButton {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
-toolbar[iconsize="small"] #requestpolicyToolbarButton[blocked="true"] {
+toolbox[requestpolicyBlocked="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton {
     list-style-image:
         url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 }
 
-toolbar[iconsize="small"] #requestpolicyToolbarButton[permissive="true"] {
+toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton {
     list-style-image:
         url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
 }

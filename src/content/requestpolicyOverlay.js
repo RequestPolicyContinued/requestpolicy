@@ -56,7 +56,7 @@ var requestpolicyOverlay = {
   _statusbar : null,
   _rpStatusbar : null,
   _rpContextMenu : null,
-  _rpToolbar : null,
+  _toolbox : null,
 
   toString : function() {
     return "[requestpolicyOverlay " + this._overlayId + "]";
@@ -116,7 +116,7 @@ var requestpolicyOverlay = {
       this._statusbar = document.getElementById("status-bar");
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
       this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
-      this._rpToolbar = document.getElementById("requestpolicyToolbarButton");
+      this._toolbox = document.getElementById("navigator-toolbox");
 
       // Register this window with the requestpolicy service so that we can be
       // notified of blocked requests. When blocked requests happen, this
@@ -126,8 +126,7 @@ var requestpolicyOverlay = {
       this.setStatusbarIconStyle(this._requestpolicy.prefs
           .getCharPref("statusbarIcon"));
 
-      this._setPermissiveNotificationForWindow(this, this._requestpolicy
-              .isBlockingDisabled());
+      this._setPermissiveNotification(this._requestpolicy.isBlockingDisabled());
     }
   },
 
@@ -428,35 +427,34 @@ var requestpolicyOverlay = {
    * Sets the blocked content notifications visible to the user.
    */
   _setBlockedContentNotification : function(isContentBlocked) {
-    this._rpStatusbar.setAttribute("blocked", isContentBlocked);
-    this._rpContextMenu.setAttribute("blocked", isContentBlocked);
-    this._rpToolbar.setAttribute("blocked", isContentBlocked);
+    this._rpStatusbar.setAttribute("requestpolicyBlocked", isContentBlocked);
+    this._rpContextMenu.setAttribute("requestpolicyBlocked", isContentBlocked);
+    this._toolbox.setAttribute("requestpolicyBlocked", isContentBlocked);
   },
 
   /**
    * Sets the permissive status visible to the user for all windows.
    */
-  _setPermissiveNotification : function(isPermissive) {
+  _setPermissiveNotificationForAllWindows : function(isPermissive) {
     // We do it for all windows, not just the current one.
     for (var i = 0; i < Application.windows.length; i++) {
       // It seems that _window should be treated as privite, but it's there and
       // it is what we want.
       var window = Application.windows[i]._window;
       if (window.requestpolicyOverlay) {
-        this._setPermissiveNotificationForWindow(window.requestpolicyOverlay,
-            isPermissive);
+        window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
       }
     }
   },
 
   /**
-   * Sets the permissive status visible to the user for just one window.
+   * Sets the permissive status visible to the user for just this window.
    */
-  _setPermissiveNotificationForWindow : function(rpOverlay, isPermissive) {
-    rpOverlay._rpStatusbar.setAttribute("permissive", isPermissive);
-    rpOverlay._rpContextMenu.setAttribute("permissive", isPermissive);
-    rpOverlay._rpToolbar.setAttribute("permissive", isPermissive);
-    rpOverlay._itemAllowAllTemporarily.setAttribute("checked", isPermissive);
+  _setPermissiveNotification : function(isPermissive) {
+    this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
+    this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
+    this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
+    this._itemAllowAllTemporarily.setAttribute("checked", isPermissive);
   },
 
   observeBlockedRequest : function(blockedOriginUri, blockedDestinationUri) {
@@ -1311,7 +1309,7 @@ var requestpolicyOverlay = {
     // Only reloading the current document. Should we reload all? Seems like it
     // would be unexpected to the user if all were reloaded.
     this
-        ._setPermissiveNotification(this._requestpolicyJSObject._blockingDisabled);
+        ._setPermissiveNotificationForAllWindows(this._requestpolicyJSObject._blockingDisabled);
     this._conditionallyReloadDocument();
   },
 
@@ -1515,9 +1513,7 @@ var requestpolicyOverlay = {
   },
 
   openToolbarPopup : function(anchor) {
-    // It seems to work to just attach it to the status bar, and that's good
-    // because we couldn't getElementById the BrowserToolbarPalette element to
-    // attach it to.
+    // It seems to work to just attach it to the status bar.
     this._attachPopupToStatusbar();
     this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
   },

@@ -39,6 +39,7 @@ interface nsIRequestPolicy : nsISupports
   boolean isAllowedRedirect(in ACString originUri, in ACString destinationUri);
   
   boolean isPrefetchEnabled();
+  boolean isBlockingDisabled();
   
   boolean originHasRejectedRequests(in ACString originUri);
   boolean originHasRejectedRequestsRecursive(in ACString originUri);

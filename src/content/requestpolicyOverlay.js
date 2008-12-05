@@ -47,6 +47,8 @@ var requestpolicyOverlay = {
   _itemRevokeTemporaryPermissions : null,
   _itemRevokeTemporaryPermissionsSeparator : null,
 
+  _itemAllowAllTemporarily : null,
+
   _itemAllowOriginTemporarily : null,
   _itemAllowOrigin : null,
   _itemForbidOrigin : null,
@@ -101,6 +103,9 @@ var requestpolicyOverlay = {
       this._itemRevokeTemporaryPermissionsSeparator = document
           .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
 
+      this._itemAllowAllTemporarily = document
+          .getElementById("requestpolicyAllowAllTemporarily");
+
       this._itemAllowOriginTemporarily = document
           .getElementById("requestpolicyAllowOriginTemporarily");
       this._itemAllowOrigin = document
@@ -120,6 +125,9 @@ var requestpolicyOverlay = {
 
       this.setStatusbarIconStyle(this._requestpolicy.prefs
           .getCharPref("statusbarIcon"));
+
+      this._setPermissiveNotificationForWindow(this, this._requestpolicy
+              .isBlockingDisabled());
     }
   },
 
@@ -426,7 +434,7 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Sets the permissive status visible to the user.
+   * Sets the permissive status visible to the user for all windows.
    */
   _setPermissiveNotification : function(isPermissive) {
     // We do it for all windows, not just the current one.
@@ -435,14 +443,20 @@ var requestpolicyOverlay = {
       // it is what we want.
       var window = Application.windows[i]._window;
       if (window.requestpolicyOverlay) {
-        window.requestpolicyOverlay._rpStatusbar.setAttribute("permissive",
-            isPermissive);
-        window.requestpolicyOverlay._rpContextMenu.setAttribute("permissive",
-            isPermissive);
-        window.requestpolicyOverlay._rpToolbar.setAttribute("permissive",
+        this._setPermissiveNotificationForWindow(window.requestpolicyOverlay,
             isPermissive);
       }
     }
+  },
+
+  /**
+   * Sets the permissive status visible to the user for just one window.
+   */
+  _setPermissiveNotificationForWindow : function(rpOverlay, isPermissive) {
+    rpOverlay._rpStatusbar.setAttribute("permissive", isPermissive);
+    rpOverlay._rpContextMenu.setAttribute("permissive", isPermissive);
+    rpOverlay._rpToolbar.setAttribute("permissive", isPermissive);
+    rpOverlay._itemAllowAllTemporarily.setAttribute("checked", isPermissive);
   },
 
   observeBlockedRequest : function(blockedOriginUri, blockedDestinationUri) {

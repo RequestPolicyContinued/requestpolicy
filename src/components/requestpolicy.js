@@ -703,6 +703,10 @@ RequestPolicyService.prototype = {
     return this._rootPrefs.getBoolPref("network.prefetch-next");
   },
 
+  isBlockingDisabled : function isBlockingDisabled() {
+    return this._blockingDisabled;
+  },
+
   originHasRejectedRequests : function(originUri) {
     var rejectedRequests = this._rejectedRequests[originUri];
     if (rejectedRequests) {

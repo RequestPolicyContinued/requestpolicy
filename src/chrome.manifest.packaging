@@ -1,4 +1,5 @@
-overlay    chrome://browser/content/browser.xul    chrome://requestpolicy/content/requestpolicyOverlay.xul
+overlay    chrome://browser/content/browser.xul            chrome://requestpolicy/content/requestpolicyOverlay.xul
+style      chrome://global/content/customizeToolbar.xul    chrome://requestpolicy/skin/requestpolicy.css
 
 content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
 skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/

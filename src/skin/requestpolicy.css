@@ -1,3 +1,6 @@
+/*********************************************
+ * Statusbar
+ *********************************************/
 #requestpolicyStatusbar {
 	padding-left: 2px;
 	padding-right: 2px;
@@ -21,16 +24,21 @@
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
 }
 
-#requestpolicyStatusbar[iconStyle="large"][requestpolicyBlocked="true"] {
+#requestpolicyStatusbar[iconStyle="large"][requestpolicyBlocked="true"]
+	{
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
 }
 
-#requestpolicyStatusbar[iconStyle="large"][requestpolicyPermissive="true"] {
+#requestpolicyStatusbar[iconStyle="large"][requestpolicyPermissive="true"]
+	{
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
 }
 
+/*********************************************
+ * Context menu
+ *********************************************/
 #requestpolicyContextMenu {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
@@ -48,17 +56,27 @@
 	color: #d07100;
 }
 
+/*********************************************
+ * Toolbar
+ *********************************************/
+#palette-box #requestpolicyToolbarButton {
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
+}
+
 toolbox toolbar #requestpolicyToolbarButton {
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
 }
 
-toolbox[requestpolicyBlocked="true"] toolbar #requestpolicyToolbarButton {
+toolbox[requestpolicyBlocked="true"] toolbar #requestpolicyToolbarButton
+	{
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
 }
 
-toolbox[requestpolicyPermissive="true"] toolbar #requestpolicyToolbarButton {
+toolbox[requestpolicyPermissive="true"] toolbar #requestpolicyToolbarButton
+	{
 	list-style-image:
 		url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
 }
@@ -68,16 +86,21 @@ toolbox toolbar[iconsize="small"] #requestpolicyToolbarButton {
 		url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
-toolbox[requestpolicyBlocked="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton {
-    list-style-image:
-        url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+toolbox[requestpolicyBlocked="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton
+	{
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 }
 
-toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton {
-    list-style-image:
-        url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton
+	{
+	list-style-image:
+		url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
 }
 
+/*********************************************
+ * Menu contents
+ *********************************************/
 .requestpolicyTemporary {
 	font-style: italic;
 }

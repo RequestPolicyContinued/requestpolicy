@@ -1174,6 +1174,15 @@ RequestPolicyService.prototype = {
                   arguments, true);
         }
 
+        // XMLHttpRequest's made within chrome's context have this origin.
+        // Greasemonkey uses such a method to provide their cross-site xhr.
+        if (origin == "resource://gre/res/hiddenWindow.html") {
+          return this.accept(
+              "Privileged actions being done. Possibly a greasemonkey script "
+                  + "doing an XMLHttpRequest in chrome's context", arguments,
+              true);
+        }
+
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
         return this.reject("hosts don't match", arguments);

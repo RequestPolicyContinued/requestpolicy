@@ -6,8 +6,10 @@
 <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css"?>
 <?xml-stylesheet href="chrome://requestpolicy/skin/preferences/requestpolicyPrefs.css"?>
 
-<prefwindow id="requestpolicyPrefs" title="&preferences.windowTitle;"
-	windowtype="requestpolicy:pref" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<prefwindow id="requestpolicyPrefs" title="&preferences.windowTitle;" type="prefwindow"
+	windowtype="requestpolicy:pref" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	buttons="accept"
+	>
     
 	<prefpane id="requestpolicyPrefpaneGeneral"
 		label="&preferences.prefpane.general;"
@@ -30,7 +32,7 @@
 						<hbox align="center">
 							<label value="&preferences.statusbarIcon;" control="statusbarIcon"/>
 						</hbox>
-						<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="statusbarIconChanged(this.value)">
+						<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="requestpolicyPrefs.statusbarIconChanged(this.value)">
 							<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
 							<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
 						</radiogroup>
@@ -38,6 +40,74 @@
 				</rows>
 			</grid>
 		</groupbox>
+	</prefpane>
+
+	<prefpane id="requestpolicyPrefpaneWhitelist"
+		label="&preferences.prefpane.whitelist;"
+		image="chrome://requestpolicy/skin/preferences/prefpane-whitelist.png"
+		>
+
+		<tabbox flex="1">
+			<tabs>
+				<tab label="&preferences.origins;"/>
+				<tab label="&preferences.destinations;"/>
+				<tab label="&preferences.originsToDestinations;"/>
+			</tabs>
+			<tabpanels flex="1">
+				<tabpanel flex="1">
+					<vbox flex="1">
+						<listbox id="originsList" seltype="multiple" flex="1"
+							onselect="requestpolicyPrefs.listChanged(this)"
+							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							>
+							<listhead>
+								<listheader label="&preferences.origin;" flex="1"/>
+								<listheader label="&preferences.temporary;"/>
+							</listhead>
+						</listbox>
+						<hbox>
+							<button id="removeOrigins" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
+							<hbox flex="1"/>
+						</hbox>
+					</vbox>
+				</tabpanel>
+				<tabpanel>
+					<vbox flex="1">
+						<listbox id="destinationsList" seltype="multiple" flex="1"
+							onselect="requestpolicyPrefs.listChanged(this)"
+							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							>
+							<listhead>
+								<listheader label="&preferences.destination;" flex="1"/>
+								<listheader label="&preferences.temporary;"/>
+							</listhead>
+						</listbox>
+						<hbox>
+							<button id="removeDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
+							<hbox flex="1"/>
+						</hbox>
+					</vbox>
+				</tabpanel>
+				<tabpanel>
+					<vbox flex="1">
+						<listbox id="originsToDestinationsList" seltype="multiple" flex="1"
+							onselect="requestpolicyPrefs.listChanged(this)"
+							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							>
+							<listhead>
+								<listheader label="&preferences.origin;" flex="1"/>
+								<listheader label="&preferences.destination;" flex="1"/>
+								<listheader label="&preferences.temporary;"/>
+							</listhead>
+						</listbox>
+						<hbox>
+							<button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
+							<hbox flex="1"/>
+						</hbox>
+					</vbox>
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
 	</prefpane>
 
 	<!-- These mess up the prefwindow if they come before the prefpanes

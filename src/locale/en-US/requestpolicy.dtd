@@ -7,8 +7,15 @@
 <!ENTITY allowedDestinations "Allowed destinations">
 <!ENTITY otherOrigins "Other origins within this page">
 <!ENTITY preferences "Preferences">
-
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.prefpane.whitelist "Whitelist">
 <!ENTITY preferences.userInterface "User Interface">
 <!ENTITY preferences.statusbarIcon "Status bar icon:">
+<!ENTITY preferences.origin "Origin">
+<!ENTITY preferences.origins "Origins">
+<!ENTITY preferences.destination "Destination">
+<!ENTITY preferences.destinations "Destinations">
+<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
+<!ENTITY preferences.temporary "Temporary">
+<!ENTITY preferences.removeSelectedSites "Remove Selected Sites">

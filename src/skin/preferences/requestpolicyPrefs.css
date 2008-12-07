@@ -3,8 +3,8 @@ prefwindow .chromeclass-toolbar {
 }
 
 prefwindow {
-   width: 30em;
-   height : 20em;
+   width: 35em;
+   height : 35em;
 }
 
 radio[pane] {
@@ -26,4 +26,14 @@ grid row:not (:first-child ) {
 
 grid row hbox:first-child {
 	-moz-box-pack: end; /* Right-justify left column */
+}
+
+.temporaryPermissionsCell {
+    list-style-image:
+        url(chrome://requestpolicy/skin/preferences/dot.png);
+    -moz-box-pack : center;
+}
+
+.temporaryPermissionsCell label {
+    display: none;
 }

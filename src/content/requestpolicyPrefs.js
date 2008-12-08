@@ -1,4 +1,6 @@
+Components.utils.import("resource://requestpolicy/FileUtils.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
+Components.utils.import("resource://requestpolicy/Prompter.jsm");
 
 var requestpolicyPrefs = {
 
@@ -8,6 +10,8 @@ var requestpolicyPrefs = {
   // For things we can't do through the nsIRequestPolicy interface, use direct
   // access to the underlying JS object.
   _requestpolicyJSObject : null,
+
+  _strbundle : null,
 
   _originsList : null,
   _destinationsList : null,
@@ -20,6 +24,8 @@ var requestpolicyPrefs = {
       this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+
+      this._strbundle = document.getElementById("requestpolicyStrings");
 
       this._originsList = document.getElementById("originsList");
       this._destinationsList = document.getElementById("destinationsList");
@@ -190,7 +196,7 @@ var requestpolicyPrefs = {
     if (action == "import") {
       fp.defaultExtension = ".txt";
     } else {
-      fp.defaultString = "requestpolicy-whitelist.txt";
+      fp.defaultString = "requestpolicy-settings.txt";
     }
 
     var ret = fp.show();
@@ -216,7 +222,7 @@ var requestpolicyPrefs = {
 
   _import : function(file) {
     Logger.dump("Starting import from " + file.path);
-    var lines = this._fileToArray(file);
+    var lines = FileUtils.fileToArray(file);
     var currentGroup = null;
     var importFunction = null;
     for (var i = 0; i < lines.length; i++) {
@@ -252,49 +258,28 @@ var requestpolicyPrefs = {
         this._requestpolicyJSObject[importFunction](currentLine);
       }
     }
+    Prompter.alert(this._getFilePickerWindowTitle('import'), this._strbundle
+            .getString("importCompleted"));
   },
 
   _export : function(file) {
-    Logger.dump("Starting export from " + file.path);
-  },
-
-  /**
-   * Returns the lines of the file in an array.
-   * 
-   * @param {}
-   *            file
-   */
-  _fileToArray : function(file) {
-    var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-        .createInstance(Components.interfaces.nsIFileInputStream);
-    stream.init(file, 0x01, 0444, 0);
-    stream.QueryInterface(Components.interfaces.nsILineInputStream);
-    var line = {}, lines = [], hasmore;
-    do {
-      hasmore = stream.readLine(line);
-      lines.push(line.value);
-    } while (hasmore);
-    stream.close();
-    return lines;
-  },
-
-  /**
-   * Writes each element of an array to a line of a file (truncates the file if
-   * it exists, creates it if it doesn't).
-   * 
-   * @param {}
-   *            lines
-   * @param {}
-   *            file
-   */
-  _arrayToFile : function(lines, file) {
-    var stream = Components.classes["@mozilla.org/network/safe-file-output-stream;1"]
-        .createInstance(Components.interfaces.nsIFileOutputStream);
-    stream.init(file, 0x04 | 0x08 | 0x20, 0600, 0); // write, create, truncate
-    for (var i = 0; i < lines.length; i++) {
-      foStream.write(lines + "\n", lines[i].length + 1);
+    Logger.dump("Starting export to " + file.path);
+    var lines = [];
+    lines.push("[origins]");
+    for (var i in this._requestpolicyJSObject._allowedOrigins) {
+      lines.push(i);
     }
-    stream.close();
+    lines.push("[destinations]");
+    for (var i in this._requestpolicyJSObject._allowedDestinations) {
+      lines.push(i);
+    }
+    lines.push("[origins-to-destinations]");
+    for (var i in this._requestpolicyJSObject._allowedOriginsToDestinations) {
+      lines.push(i);
+    }
+    FileUtils.arrayToFile(lines, file);
+    Prompter.alert(this._getFilePickerWindowTitle('export'), this._strbundle
+            .getString("exportCompleted"));
   }
 
 }

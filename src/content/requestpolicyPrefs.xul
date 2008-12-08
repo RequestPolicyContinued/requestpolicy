@@ -11,6 +11,10 @@
 	buttons="accept"
 	>
     
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
+	</stringbundleset>
+    
 	<prefpane id="requestpolicyPrefpaneGeneral"
 		label="&preferences.prefpane.general;"
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"

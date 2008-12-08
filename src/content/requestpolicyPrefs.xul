@@ -11,6 +11,10 @@
 	buttons="accept"
 	>
     
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
+	</stringbundleset>
+    
 	<prefpane id="requestpolicyPrefpaneGeneral"
 		label="&preferences.prefpane.general;"
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
@@ -67,7 +71,6 @@
 						</listbox>
 						<hbox>
 							<button id="removeOrigins" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
-							<hbox flex="1"/>
 						</hbox>
 					</vbox>
 				</tabpanel>
@@ -84,7 +87,6 @@
 						</listbox>
 						<hbox>
 							<button id="removeDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
-							<hbox flex="1"/>
 						</hbox>
 					</vbox>
 				</tabpanel>
@@ -102,12 +104,55 @@
 						</listbox>
 						<hbox>
 							<button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
-							<hbox flex="1"/>
 						</hbox>
 					</vbox>
 				</tabpanel>
 			</tabpanels>
 		</tabbox>
+	</prefpane>
+    
+	<prefpane id="requestpolicyPrefpaneExport"
+		label="&preferences.prefpane.export;"
+		image="chrome://requestpolicy/skin/preferences/prefpane-export.png"
+		>
+
+		<groupbox flex="1">
+			<caption label="&preferences.export.caption;"/>
+			<description>&preferences.export.description;</description>
+			<separator class="thin"/>
+			
+			<groupbox>
+				<caption label="&preferences.export.details.caption;"/>
+				<description>&preferences.export.details.description;</description>
+			</groupbox>
+			<separator />
+			
+			<hbox>
+				<button label="&preferences.export.button.label;" oncommand="requestpolicyPrefs.doFileAction('export')"/>
+			</hbox>
+		</groupbox>
+	</prefpane>
+
+	<prefpane id="requestpolicyPrefpaneImport"
+		label="&preferences.prefpane.import;"
+		image="chrome://requestpolicy/skin/preferences/prefpane-import.png"
+		>
+
+		<groupbox flex="1">
+			<caption label="&preferences.import.caption;"/>
+			<description>&preferences.import.description;</description>
+			<separator class="thin"/>
+            
+			<groupbox>
+				<caption label="&preferences.import.details.caption;"/>
+				<description>&preferences.import.details.description;</description>
+			</groupbox>
+			<separator />
+            
+			<hbox>
+				<button label="&preferences.import.button.label;" oncommand="requestpolicyPrefs.doFileAction('import')"/>
+			</hbox>
+		</groupbox>
 	</prefpane>
 
 	<!-- These mess up the prefwindow if they come before the prefpanes

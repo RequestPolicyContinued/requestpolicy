@@ -10,6 +10,8 @@
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
+<!ENTITY preferences.prefpane.import "Import">
+<!ENTITY preferences.prefpane.export "Export">
 <!ENTITY preferences.userInterface "User Interface">
 <!ENTITY preferences.statusbarIcon "Status bar icon:">
 <!ENTITY preferences.origin "Origin">
@@ -19,3 +21,15 @@
 <!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
 <!ENTITY preferences.temporary "Temporary">
 <!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
+<!ENTITY preferences.export "Export">
+<!ENTITY preferences.export.caption "Export Your Setting">
+<!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
+<!ENTITY preferences.export.details.caption "What is included in the export">
+<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
+<!ENTITY preferences.export.button.label "Export to File">
+<!ENTITY preferences.import "Import">
+<!ENTITY preferences.import.caption "Import Your Setting">
+<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
+<!ENTITY preferences.import.details.caption "What the import will do">
+<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
+<!ENTITY preferences.import.button.label "Import from File">

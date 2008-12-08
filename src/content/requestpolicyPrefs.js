@@ -9,6 +9,8 @@ var requestpolicyPrefs = {
   // access to the underlying JS object.
   _requestpolicyJSObject : null,
 
+  _strbundle : null,
+
   _originsList : null,
   _destinationsList : null,
   _originsToDestinationsList : null,
@@ -20,6 +22,8 @@ var requestpolicyPrefs = {
       this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+
+      this._strbundle = document.getElementById("requestpolicyStrings");
 
       this._originsList = document.getElementById("originsList");
       this._destinationsList = document.getElementById("destinationsList");
@@ -168,6 +172,82 @@ var requestpolicyPrefs = {
     while (listbox.selectedItems.length > 0) {
       listbox.removeItemAt(listbox.getIndexOfItem(listbox.selectedItems[0]));
     }
+  },
+
+  _getFilePickerWindowTitle : function(action) {
+    // TODO
+    // return this._strbundle.getString(action == "import" ? XXX : XXX);
+    return "Select a file...";
+  },
+
+  _getPickedFile : function(action, type) {
+    const nsIFilePicker = Components.interfaces.nsIFilePicker;
+    var fp = Components.classes["@mozilla.org/filepicker;1"]
+        .createInstance(nsIFilePicker);
+
+    var windowTitle = this._getFilePickerWindowTitle(action);
+    var mode = action == "import"
+        ? nsIFilePicker.modeOpen
+        : nsIFilePicker.modeSave;
+    fp.init(window, windowTitle, mode);
+    fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterText);
+
+    if (action == "import") {
+      fp.defaultExtension = ".txt";
+    } else {
+      fp.defaultString = "requestpolicy-whitelist.txt";
+    }
+
+    var ret = fp.show();
+    return (ret == nsIFilePicker.returnOK || ret == nsIFilePicker.returnReplace)
+        ? fp.file
+        : null;
+  },
+
+  doFileAction : function(action) {
+    try {
+      var file = this._getPickedFile(action);
+      if (!file) {
+        return;
+      }
+      this["_" + action](file);
+    } catch (e) {
+      window.alert(e.toString());
+    }
+  },
+
+  _import : function(file, type) {
+    Logger.dump("Importing: " + type);
+    var items = this._fileToArray(file);
+    Logger.vardump(items);
+  },
+
+  _export : function(file, type) {
+    Logger.dump("Exporting: " + type);
+  },
+
+  _fileToArray : function(file) {
+    var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+        .createInstance(Components.interfaces.nsIFileInputStream);
+    stream.init(file, 0x01, 0444, 0);
+    stream.QueryInterface(Components.interfaces.nsILineInputStream);
+    var line = {}, lines = [], hasmore;
+    do {
+      hasmore = stream.readLine(line);
+      lines.push(line.value);
+    } while (hasmore);
+    stream.close();
+    return lines;
+  },
+
+  _arrayToFile : function(dataArray, file) {
+    var stream = Components.classes["@mozilla.org/network/safe-file-output-stream;1"]
+        .createInstance(Components.interfaces.nsIFileOutputStream);
+    stream.init(file, 0x04 | 0x08 | 0x20, 0600, 0); // write, create, truncate
+    for (var i = 0; i < dataArray.length; i++) {
+      foStream.write(dataArray + "\n", dataArray[i].length + 1);
+    }
+    stream.close();
   }
 
 }

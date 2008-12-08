@@ -497,6 +497,10 @@ RequestPolicyService.prototype = {
       originIdentifier, destIdentifier) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
+    this._allowOriginToDestinationByCombinedIdentifier(combinedId);
+  },
+
+  _allowOriginToDestinationByCombinedIdentifier : function(combinedId) {
     this._allowedOriginsToDestinations[combinedId] = true;
     this._setPreferenceList("allowedOriginsToDestinations",
         this._allowedOriginsToDestinations);

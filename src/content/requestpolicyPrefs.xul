@@ -11,10 +11,6 @@
 	buttons="accept"
 	>
     
-	<stringbundleset id="stringbundleset">
-		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
-	</stringbundleset>
-    
 	<prefpane id="requestpolicyPrefpaneGeneral"
 		label="&preferences.prefpane.general;"
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
@@ -128,7 +124,7 @@
 			<separator />
 			
 			<hbox>
-				<button label="&preferences.export.button.label;" oncommand="requestpolicyPrefs.doFileAction('export')"/>
+				<button id="exportButton" label="&preferences.export.button.label;" oncommand="requestpolicyPrefs.doFileAction('export')"/>
 			</hbox>
 		</groupbox>
 	</prefpane>
@@ -150,7 +146,7 @@
 			<separator />
             
 			<hbox>
-				<button label="&preferences.import.button.label;" oncommand="requestpolicyPrefs.doFileAction('import')"/>
+				<button id="importButton" label="&preferences.import.button.label;" oncommand="requestpolicyPrefs.doFileAction('import')"/>
 			</hbox>
 		</groupbox>
 	</prefpane>

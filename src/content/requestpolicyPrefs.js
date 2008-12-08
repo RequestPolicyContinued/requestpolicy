@@ -9,8 +9,6 @@ var requestpolicyPrefs = {
   // access to the underlying JS object.
   _requestpolicyJSObject : null,
 
-  _strbundle : null,
-
   _originsList : null,
   _destinationsList : null,
   _originsToDestinationsList : null,
@@ -22,8 +20,6 @@ var requestpolicyPrefs = {
       this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
-
-      this._strbundle = document.getElementById("requestpolicyStrings");
 
       this._originsList = document.getElementById("originsList");
       this._destinationsList = document.getElementById("destinationsList");
@@ -175,12 +171,11 @@ var requestpolicyPrefs = {
   },
 
   _getFilePickerWindowTitle : function(action) {
-    // TODO
-    // return this._strbundle.getString(action == "import" ? XXX : XXX);
-    return "Select a file...";
+    // Give the window title the same text as the clicked button's label.
+    return document.getElementById(action + "Button").label;
   },
 
-  _getPickedFile : function(action, type) {
+  _getPickedFile : function(action) {
     const nsIFilePicker = Components.interfaces.nsIFilePicker;
     var fp = Components.classes["@mozilla.org/filepicker;1"]
         .createInstance(nsIFilePicker);
@@ -212,20 +207,63 @@ var requestpolicyPrefs = {
       }
       this["_" + action](file);
     } catch (e) {
+      Logger.severe(Logger.TYPE_ERROR,
+          "Fatal Error during import/export file operation: " + e
+              + ", stack was: " + e.stack);
       window.alert(e.toString());
     }
   },
 
-  _import : function(file, type) {
-    Logger.dump("Importing: " + type);
-    var items = this._fileToArray(file);
-    Logger.vardump(items);
+  _import : function(file) {
+    Logger.dump("Starting import from " + file.path);
+    var lines = this._fileToArray(file);
+    var currentGroup = null;
+    var importFunction = null;
+    for (var i = 0; i < lines.length; i++) {
+      var currentLine = lines[i];
+      // Skip empty lines.
+      if (currentLine.length == 0) {
+        continue;
+      }
+      // Change the import function if this is a group label.
+      var label = currentLine.match(/^\[(.*)\]$/);
+      if (label) {
+        currentGroup = label[1];
+        switch (currentGroup) {
+          case "origins" :
+            importFunction = "allowOrigin";
+            break;
+          case "destinations" :
+            importFunction = "allowDestination";
+            break;
+          case "origins-to-destinations" :
+            importFunction = "_allowOriginToDestinationByCombinedIdentifier";
+            break;
+          default :
+            throw "RequestPolicy: invalid group name in import: [" + label[0]
+                + "]";
+        }
+      } else {
+        // It's not a group label, it's something to import.
+        if (!importFunction) {
+          throw "RequestPolicy: there is no group label before the first item to import.";
+        }
+        Logger.dump("Importing " + currentLine + " into " + currentGroup);
+        this._requestpolicyJSObject[importFunction](currentLine);
+      }
+    }
   },
 
-  _export : function(file, type) {
-    Logger.dump("Exporting: " + type);
+  _export : function(file) {
+    Logger.dump("Starting export from " + file.path);
   },
 
+  /**
+   * Returns the lines of the file in an array.
+   * 
+   * @param {}
+   *            file
+   */
   _fileToArray : function(file) {
     var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Components.interfaces.nsIFileInputStream);
@@ -240,12 +278,21 @@ var requestpolicyPrefs = {
     return lines;
   },
 
-  _arrayToFile : function(dataArray, file) {
+  /**
+   * Writes each element of an array to a line of a file (truncates the file if
+   * it exists, creates it if it doesn't).
+   * 
+   * @param {}
+   *            lines
+   * @param {}
+   *            file
+   */
+  _arrayToFile : function(lines, file) {
     var stream = Components.classes["@mozilla.org/network/safe-file-output-stream;1"]
         .createInstance(Components.interfaces.nsIFileOutputStream);
     stream.init(file, 0x04 | 0x08 | 0x20, 0600, 0); // write, create, truncate
-    for (var i = 0; i < dataArray.length; i++) {
-      foStream.write(dataArray + "\n", dataArray[i].length + 1);
+    for (var i = 0; i < lines.length; i++) {
+      foStream.write(lines + "\n", lines[i].length + 1);
     }
     stream.close();
   }

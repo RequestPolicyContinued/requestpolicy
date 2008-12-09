@@ -124,3 +124,8 @@ toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicy
 .requestpolicyAllowOriginToDest {
 	font-weight: bold;
 }
+
+#requestpolicyOtherOrigins {
+	color : #c85000;
+	list-style-image: url(chrome://requestpolicy/skin/menu-other-origins.png);
+}

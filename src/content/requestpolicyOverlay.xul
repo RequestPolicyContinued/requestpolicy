@@ -79,7 +79,7 @@
 			<menu
 				id="requestpolicyOtherOrigins"
 				label="&otherOrigins;"
-				class="requestpolicyOtherOrigins"
+				class="menu-iconic"
 				>
 				<menupopup id="requestpolicyOtherOriginsPopup" />
 			</menu>

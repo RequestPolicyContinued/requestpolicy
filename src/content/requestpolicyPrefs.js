@@ -255,6 +255,7 @@ var requestpolicyPrefs = {
         this._requestpolicyJSObject[importFunction](currentLine);
       }
     }
+    this._populateWhitelists();
     Prompter.alert(this._getFilePickerWindowTitle('import'), this._strbundle
             .getString("importCompleted"));
   },

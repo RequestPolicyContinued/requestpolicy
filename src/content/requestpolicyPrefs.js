@@ -109,7 +109,7 @@ var requestpolicyPrefs = {
     var originsToDestinations = [];
     for (var i in this._requestpolicyJSObject._allowedOriginsToDestinations) {
       var parts = i.split("|");
-      originsToDestinations.push([parts[0], parts[1], false]);
+      originsToDestinations.push([parts[0], parts[1], i, false]);
     }
     for (var i in this._requestpolicyJSObject._temporarilyAllowedOriginsToDestinations) {
       var parts = i.split("|");

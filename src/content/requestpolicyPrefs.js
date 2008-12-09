@@ -46,17 +46,19 @@ var requestpolicyPrefs = {
       this._destinationsList.removeButton.listbox = this._destinationsList;
       this._originsToDestinationsList.removeButton.listbox = this._originsToDestinationsList;
 
-      // Each list has a "forbid" function to remove an item from the list.
+      // Each list has a "forbid" function to remove an item from the list. We
+      // use the "noStore" parameter to delay the storage of the modified lists.
       this._originsList.forbid = function(origin) {
-        requestpolicyPrefs._requestpolicyJSObject.forbidOrigin(origin);
+        requestpolicyPrefs._requestpolicyJSObject.forbidOrigin(origin, true);
       };
       this._destinationsList.forbid = function(destination) {
-        requestpolicyPrefs._requestpolicyJSObject
-            .forbidDestination(destination);
+        requestpolicyPrefs._requestpolicyJSObject.forbidDestination(
+            destination, true);
       };
       this._originsToDestinationsList.forbid = function(originToDestIdentifier) {
         requestpolicyPrefs._requestpolicyJSObject
-            ._forbidOriginToDestinationByCombinedIdentifier(originToDestIdentifier);
+            ._forbidOriginToDestinationByCombinedIdentifier(
+                originToDestIdentifier, true);
       };
 
       this._populateWhitelists();
@@ -78,8 +80,8 @@ var requestpolicyPrefs = {
   },
 
   _clearListbox : function(listbox) {
-    while (listbox.itemCount > 0) {
-      listbox.removeItemAt(0);
+    for (var i = listbox.itemCount - 1; i >= 0; i--) {
+      listbox.removeItemAt(i);
     }
   },
 
@@ -134,9 +136,15 @@ var requestpolicyPrefs = {
     // The arrays are formatted as: [identifier, temporary]
     for (var i = 0; i < items.length; i++) {
       // This label goes in an implicit first cell.
-      var item = listbox.appendItem(items[i][0], items[i][0]);
+      var item = document.createElement("listitem");
+      item.setAttribute("value", items[i][0]);
+      // Create a cell for the origin or destination.
+      var cell = document.createElement("listcell");
+      cell.setAttribute("label", items[i][0]);
+      item.appendChild(cell);
       // Add cell indicating whether it is a temporary permission.
       item.appendChild(this._createTemporaryPermissionsCell(items[i][1]));
+      listbox.appendChild(item);
     }
   },
 
@@ -145,13 +153,19 @@ var requestpolicyPrefs = {
     // The arrays are formatted as: [origin, dest, identifier, temporary]
     for (var i = 0; i < items.length; i++) {
       // This label (the origin) goes in an implicit first cell.
-      var item = listbox.appendItem(items[i][0], items[i][2]);
-      // Create a cell for the "destination" indicator.
+      var item = document.createElement("listitem");
+      item.setAttribute("value", items[i][2]);
+      // Create a cell for the origin.
       var cell = document.createElement("listcell");
+      cell.setAttribute("label", items[i][0]);
+      item.appendChild(cell);
+      // Create a cell for the destination.
+      cell = document.createElement("listcell");
       cell.setAttribute("label", items[i][1]);
       item.appendChild(cell);
       // Add cell indicating whether it is a temporary permission.
       item.appendChild(this._createTemporaryPermissionsCell(items[i][3]));
+      listbox.appendChild(item);
     }
   },
 
@@ -170,7 +184,7 @@ var requestpolicyPrefs = {
     return cell;
   },
 
-  listChanged : function(listbox) {
+  listSelectionChanged : function(listbox) {
     listbox.removeButton.setAttribute("disabled",
         listbox.selectedItems.length == 0);
   },
@@ -179,9 +193,18 @@ var requestpolicyPrefs = {
     for (var i = 0; i < listbox.selectedItems.length; i++) {
       listbox.forbid(listbox.selectedItems[i].value);
     }
-    while (listbox.selectedItems.length > 0) {
-      listbox.removeItemAt(listbox.getIndexOfItem(listbox.selectedItems[0]));
+    // We delayed storage of the preference lists by using the "noStore" second
+    // parameter when removing each value, so store the data now.
+    this._requestpolicyJSObject._storeAllPreferenceLists();
+    // while (listbox.selectedItems.length > 0) {
+    // listbox.removeItemAt(listbox.getIndexOfItem(listbox.selectedItems[0]));
+    // }
+    for (var i = listbox.childNodes.length - 1; i >= 0; i--) {
+      if (listbox.childNodes[i].selected) {
+        listbox.removeChild(listbox.childNodes[i]);
+      }
     }
+    requestpolicyPrefs.listSelectionChanged(listbox)
   },
 
   _getFilePickerWindowTitle : function(action) {
@@ -260,9 +283,14 @@ var requestpolicyPrefs = {
           throw "RequestPolicy: there is no group label before the first item to import.";
         }
         Logger.dump("Importing " + currentLine + " into " + currentGroup);
-        this._requestpolicyJSObject[importFunction](currentLine);
+        this._requestpolicyJSObject[importFunction](currentLine, true);
       }
     }
+
+    // We delayed storage of the preference lists by using the "noStore" second
+    // parameter when importing each new value, so store the data now.
+    this._requestpolicyJSObject._storeAllPreferenceLists();
+
     this._populateWhitelists();
     Prompter.alert(this._getFilePickerWindowTitle('import'), this._strbundle
             .getString("importCompleted"));
@@ -290,6 +318,10 @@ var requestpolicyPrefs = {
 
   selectAll : function(event) {
     if ("selectAll" in event.explicitOriginalTarget) {
+      // Unfortunately, selectAll() will sometimes leave some items unselected.
+      // Trying to do it ourselves, though, seemed buggy in other ways (e.g. the
+      // listbox's selectedItems wouldn't be updated, and doing it ourselves led
+      // to other issues).
       event.explicitOriginalTarget.selectAll();
     }
   }

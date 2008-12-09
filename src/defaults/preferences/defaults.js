@@ -11,8 +11,4 @@ pref("extensions.requestpolicy.allowedOrigins", "");
 pref("extensions.requestpolicy.allowedDestinations", "");
 pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
 
-pref("extensions.requestpolicy.temporarilyAllowedOrigins", "");
-pref("extensions.requestpolicy.temporarilyAllowedDestinations", "");
-pref("extensions.requestpolicy.temporarilyAllowedOriginsToDestinations", "");
-
 pref("extensions.requestpolicy.statusbarIcon", "standard");

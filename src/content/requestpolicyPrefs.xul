@@ -65,7 +65,7 @@
 				<tabpanel flex="1">
 					<vbox flex="1">
 						<listbox id="originsList" seltype="multiple" flex="1"
-							onselect="requestpolicyPrefs.listChanged(this)"
+							onselect="requestpolicyPrefs.listSelectionChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
 							key="select-all-key"
 							>
@@ -82,7 +82,7 @@
 				<tabpanel>
 					<vbox flex="1">
 						<listbox id="destinationsList" seltype="multiple" flex="1"
-							onselect="requestpolicyPrefs.listChanged(this)"
+							onselect="requestpolicyPrefs.listSelectionChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
 							key="select-all-key"
 							>
@@ -99,7 +99,7 @@
 				<tabpanel>
 					<vbox flex="1">
 						<listbox id="originsToDestinationsList" seltype="multiple" flex="1"
-							onselect="requestpolicyPrefs.listChanged(this)"
+							onselect="requestpolicyPrefs.listSelectionChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
 							key="select-all-key"
 							>

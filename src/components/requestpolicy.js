@@ -99,6 +99,8 @@ RequestPolicyService.prototype = {
   _allowedDestinations : {},
   _allowedOriginsToDestinations : {},
 
+  _prefNameToObjectMap : null,
+
   // /////////////////////////////////////////////////////////////////////////
   // Utility
   // /////////////////////////////////////////////////////////////////////////
@@ -128,6 +130,12 @@ RequestPolicyService.prototype = {
         ._getPreferenceObj("allowedOriginsToDestinations");
     Logger.vardump(this._allowedOriginsToDestinations,
         "this._allowedOriginsToDestinations");
+
+    this._prefNameToObjectMap = {
+      "allowedOrigins" : this._allowedOrigins,
+      "allowedDestinations" : this._allowedDestinations,
+      "allowedOriginsToDestinations" : this._allowedOriginsToDestinations
+    };
 
     // Disable prefetch.
     if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
@@ -432,9 +440,11 @@ RequestPolicyService.prototype = {
     }
   },
 
-  allowOrigin : function allowOrigin(host) {
+  allowOrigin : function allowOrigin(host, noStore) {
     this._allowedOrigins[host] = true;
-    this._setPreferenceList("allowedOrigins", this._allowedOrigins);
+    if (!noStore) {
+      this._storePreferenceList("allowedOrigins");
+    }
   },
 
   isAllowedOrigin : function isAllowedOrigin(host) {
@@ -445,8 +455,6 @@ RequestPolicyService.prototype = {
     if (!this._temporarilyAllowedOrigins[host]) {
       this._temporarilyAllowedOriginsCount++;
       this._temporarilyAllowedOrigins[host] = true;
-      this._setPreferenceList("temporarilyAllowedOrigins",
-          this._temporarilyAllowedOrigins);
     }
   },
 
@@ -454,9 +462,11 @@ RequestPolicyService.prototype = {
     return this._temporarilyAllowedOrigins[host] ? true : false;
   },
 
-  allowDestination : function allowDestination(host) {
+  allowDestination : function allowDestination(host, noStore) {
     this._allowedDestinations[host] = true;
-    this._setPreferenceList("allowedDestinations", this._allowedDestinations);
+    if (!noStore) {
+      this._storePreferenceList("allowedDestinations");
+    }
   },
 
   isAllowedDestination : function isAllowedDestination(host) {
@@ -467,8 +477,6 @@ RequestPolicyService.prototype = {
     if (!this._temporarilyAllowedDestinations[host]) {
       this._temporarilyAllowedDestinationsCount++;
       this._temporarilyAllowedDestinations[host] = true;
-      this._setPreferenceList("temporarilyAllowedDestinations",
-          this._temporarilyAllowedDestinations);
     }
   },
 
@@ -500,10 +508,11 @@ RequestPolicyService.prototype = {
     this._allowOriginToDestinationByCombinedIdentifier(combinedId);
   },
 
-  _allowOriginToDestinationByCombinedIdentifier : function(combinedId) {
+  _allowOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
     this._allowedOriginsToDestinations[combinedId] = true;
-    this._setPreferenceList("allowedOriginsToDestinations",
-        this._allowedOriginsToDestinations);
+    if (!noStore) {
+      this._storePreferenceList("allowedOriginsToDestinations");
+    }
   },
 
   isAllowedOriginToDestination : function isAllowedOriginToDestination(
@@ -520,8 +529,6 @@ RequestPolicyService.prototype = {
     if (!this._temporarilyAllowedOriginsToDestinations[combinedId]) {
       this._temporarilyAllowedOriginsToDestinationsCount++;
       this._temporarilyAllowedOriginsToDestinations[combinedId] = true;
-      this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
-          this._temporarilyAllowedOriginsToDestinations);
     }
   },
 
@@ -537,44 +544,38 @@ RequestPolicyService.prototype = {
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
     this._temporarilyAllowedOriginsCount = 0;
     this._temporarilyAllowedOrigins = {};
-    this._setPreferenceList("temporarilyAllowedOrigins",
-        this._temporarilyAllowedOrigins);
 
     this._temporarilyAllowedDestinationsCount = 0;
     this._temporarilyAllowedDestinations = {};
-    this._setPreferenceList("temporarilyAllowedDestinations",
-        this._temporarilyAllowedDestinations);
 
     this._temporarilyAllowedOriginsToDestinationsCount = 0;
     this._temporarilyAllowedOriginsToDestinations = {};
-    this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
-        this._temporarilyAllowedOriginsToDestinations);
   },
 
-  forbidOrigin : function forbidOrigin(host) {
+  forbidOrigin : function forbidOrigin(host, noStore) {
     if (this._temporarilyAllowedOrigins[host]) {
       this._temporarilyAllowedOriginsCount--;
       delete this._temporarilyAllowedOrigins[host];
-      this._setPreferenceList("temporarilyAllowedOrigins",
-          this._temporarilyAllowedOrigins);
     }
     if (this._allowedOrigins[host]) {
       delete this._allowedOrigins[host];
-      this._setPreferenceList("allowedOrigins", this._allowedOrigins);
+      if (!noStore) {
+        this._storePreferenceList("allowedOrigins");
+      }
     }
     this._forbidAllDestinationsFromSingleOrigin(host);
   },
 
-  forbidDestination : function forbidDestination(host) {
+  forbidDestination : function forbidDestination(host, noStore) {
     if (this._temporarilyAllowedDestinations[host]) {
       this._temporarilyAllowedDestinationsCount--;
       delete this._temporarilyAllowedDestinations[host];
-      this._setPreferenceList("temporarilyAllowedDestinations",
-          this._temporarilyAllowedDestinations);
     }
     if (this._allowedDestinations[host]) {
       delete this._allowedDestinations[host];
-      this._setPreferenceList("allowedDestinations", this._allowedDestinations);
+      if (!noStore) {
+        this._storePreferenceList("allowedDestinations");
+      }
     }
     this._forbidAllOriginsToSingleDestination(host);
   },
@@ -598,27 +599,30 @@ RequestPolicyService.prototype = {
   },
 
   forbidOriginToDestination : function forbidOriginToDestination(
-      originIdentifier, destIdentifier) {
+      originIdentifier, destIdentifier, noStore) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
     this._forbidOriginToDestinationByCombinedIdentifier(combinedId);
   },
 
-  _forbidOriginToDestinationByCombinedIdentifier : function(combinedId) {
+  _forbidOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
     if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
       this._temporarilyAllowedOriginsToDestinationsCount--;
       delete this._temporarilyAllowedOriginsToDestinations[combinedId];
-      this._setPreferenceList("temporarilyAllowedOriginsToDestinations",
-          this._temporarilyAllowedOriginsToDestinations);
     }
     if (this._allowedOriginsToDestinations[combinedId]) {
       delete this._allowedOriginsToDestinations[combinedId];
-      this._setPreferenceList("allowedOriginsToDestinations",
-          this._allowedOriginsToDestinations);
+      if (!noStore) {
+        this._storePreferenceList("allowedOriginsToDestinations");
+      }
     }
   },
 
-  _setPreferenceList : function(prefName, setFromObj) {
+  _storePreferenceList : function(prefName) {
+    var setFromObj = this._prefNameToObjectMap[prefName];
+    if (setFromObj === undefined) {
+      throw "Invalid prefName: " + prefName;
+    }
     var value = this._objToPrefString(setFromObj);
     Logger.info(Logger.TYPE_INTERNAL, "Setting preference <" + prefName
             + "> to value <" + value + ">.");
@@ -627,6 +631,12 @@ RequestPolicyService.prototype = {
     // TODO: flush the file once after any changed preferences have been
     // modified, rather than once on each call to the current function.
     this._prefService.savePrefFile(null);
+  },
+
+  _storeAllPreferenceLists : function() {
+    for (var prefName in this._prefNameToObjectMap) {
+      this._storePreferenceList(prefName);
+    }
   },
 
   _getPreferenceObj : function(prefName) {

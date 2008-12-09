@@ -77,6 +77,12 @@ var requestpolicyPrefs = {
     }
   },
 
+  _clearListbox : function(listbox) {
+    while (listbox.itemCount > 0) {
+      listbox.removeItemAt(0);
+    }
+  },
+
   _populateWhitelists : function() {
     // Origins.
     var origins = [];
@@ -124,6 +130,7 @@ var requestpolicyPrefs = {
   },
 
   _populateListboxFromObjectProperties : function(listbox, items) {
+    this._clearListbox(listbox);
     // The arrays are formatted as: [identifier, temporary]
     for (var i = 0; i < items.length; i++) {
       // This label goes in an implicit first cell.
@@ -134,6 +141,7 @@ var requestpolicyPrefs = {
   },
 
   _populateListboxFromTwoPartObjectProperties : function(listbox, items) {
+    this._clearListbox(listbox);
     // The arrays are formatted as: [origin, dest, identifier, temporary]
     for (var i = 0; i < items.length; i++) {
       // This label (the origin) goes in an implicit first cell.

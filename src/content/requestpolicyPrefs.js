@@ -222,6 +222,11 @@ var requestpolicyPrefs = {
 
   _import : function(file) {
     Logger.dump("Starting import from " + file.path);
+    var groupToFunctionMap = {
+      "origins" : "allowOrigin",
+      "destinations" : "allowDestination",
+      "origins-to-destinations" : "_allowOriginToDestinationByCombinedIdentifier"
+    };
     var lines = FileUtils.fileToArray(file);
     var currentGroup = null;
     var importFunction = null;
@@ -235,19 +240,11 @@ var requestpolicyPrefs = {
       var label = currentLine.match(/^\[(.*)\]$/);
       if (label) {
         currentGroup = label[1];
-        switch (currentGroup) {
-          case "origins" :
-            importFunction = "allowOrigin";
-            break;
-          case "destinations" :
-            importFunction = "allowDestination";
-            break;
-          case "origins-to-destinations" :
-            importFunction = "_allowOriginToDestinationByCombinedIdentifier";
-            break;
-          default :
-            throw "RequestPolicy: invalid group name in import: [" + label[0]
-                + "]";
+        if (currentGroup in groupToFunctionMap) {
+          importFunction = groupToFunctionMap[currentGroup];
+        } else {
+          throw "RequestPolicy: invalid group name in import: [" + label[0]
+              + "]";
         }
       } else {
         // It's not a group label, it's something to import.

@@ -278,6 +278,12 @@ var requestpolicyPrefs = {
     FileUtils.arrayToFile(lines, file);
     Prompter.alert(this._getFilePickerWindowTitle('export'), this._strbundle
             .getString("exportCompleted"));
+  },
+
+  selectAll : function(event) {
+    if ("selectAll" in event.explicitOriginalTarget) {
+      event.explicitOriginalTarget.selectAll();
+    }
   }
 
 }

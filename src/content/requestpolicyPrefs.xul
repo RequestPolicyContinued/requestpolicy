@@ -15,6 +15,10 @@
 		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
 	</stringbundleset>
     
+	<keyset>
+		<key id="select-all-key" modifiers="accel" key="A" oncommand="requestpolicyPrefs.selectAll(event)"/>
+	</keyset>
+    
 	<prefpane id="requestpolicyPrefpaneGeneral"
 		label="&preferences.prefpane.general;"
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
@@ -63,6 +67,7 @@
 						<listbox id="originsList" seltype="multiple" flex="1"
 							onselect="requestpolicyPrefs.listChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							key="select-all-key"
 							>
 							<listhead>
 								<listheader label="&preferences.origin;" flex="1"/>
@@ -79,6 +84,7 @@
 						<listbox id="destinationsList" seltype="multiple" flex="1"
 							onselect="requestpolicyPrefs.listChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							key="select-all-key"
 							>
 							<listhead>
 								<listheader label="&preferences.destination;" flex="1"/>
@@ -95,6 +101,7 @@
 						<listbox id="originsToDestinationsList" seltype="multiple" flex="1"
 							onselect="requestpolicyPrefs.listChanged(this)"
 							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicyPrefs.removeSelectedFromList(this)"
+							key="select-all-key"
 							>
 							<listhead>
 								<listheader label="&preferences.origin;" flex="1"/>

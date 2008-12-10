@@ -1,7 +1,11 @@
 <?xml version="1.0"?>
 
 <?xml-stylesheet href="chrome://requestpolicy/skin/requestpolicy.css"?>
-<!DOCTYPE overlay SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
+
+<!DOCTYPE overlay [
+	<!ENTITY % globalDTD SYSTEM "chrome://browser/locale/browser.dtd"> %globalDTD;
+	<!ENTITY % requestpolicyDTD SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd"> %requestpolicyDTD;
+]>
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	id="requestpolicyOverlay">
@@ -48,7 +52,7 @@
 			>
 			<menuitem
 				hidden="false"
-				label="&preferences;"
+				label="&preferencesCmdUnix.label;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
 			<menuseparator hidden="false" />
 			<menu

@@ -1,11 +1,11 @@
-<!ENTITY prefetchWarning "Warning: Prefetch is enabled">
-<!ENTITY prefetchInfo "Learn about prefetching">
-<!ENTITY prefetchDisablingInstructions "Disable prefetching">
-<!ENTITY temporarilyAllowAll "Temporarily allow all requests">
-<!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
-<!ENTITY blockedDestinations "Blocked destinations">
-<!ENTITY allowedDestinations "Allowed destinations">
-<!ENTITY otherOrigins "Other origins within this page">
+<!ENTITY prefetchWarning "Aviso: pré-carregamento está ativado">
+<!ENTITY prefetchInfo "Aprenda sobre pré-carregamento">
+<!ENTITY prefetchDisablingInstructions "Desativar pré-carregamento">
+<!ENTITY temporarilyAllowAll "Temporariamente permitir todos os pedidos">
+<!ENTITY revokeTemporaryPermissions "Revogar todas as permissões temporárias">
+<!ENTITY blockedDestinations "Destinos bloqueados">
+<!ENTITY allowedDestinations "Destinos permitidos">
+<!ENTITY otherOrigins "Outras origens nesta página">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">

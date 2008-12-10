@@ -4,5 +4,7 @@ style      chrome://global/content/customizeToolbar.xul    chrome://requestpolic
 content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
 skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/
 
+locale     requestpolicy    de-DE          jar:chrome/requestpolicy.jar!/locale/de-DE/
 locale     requestpolicy    en-US          jar:chrome/requestpolicy.jar!/locale/en-US/
 locale     requestpolicy    fr-FR          jar:chrome/requestpolicy.jar!/locale/fr-FR/
+locale     requestpolicy    pt-BR          jar:chrome/requestpolicy.jar!/locale/pt-BR/

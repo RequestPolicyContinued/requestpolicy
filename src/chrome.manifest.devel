@@ -4,5 +4,7 @@ style      chrome://global/content/customizeToolbar.xul    chrome://requestpolic
 content    requestpolicy    content/
 skin       requestpolicy    classic/1.0    skin/
 
+locale     requestpolicy    de-DE          locale/de-DE/
 locale     requestpolicy    en-US          locale/en-US/
 locale     requestpolicy    fr-FR          locale/fr-FR/
+locale     requestpolicy    pt-BR          locale/pt-BR/

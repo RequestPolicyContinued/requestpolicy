@@ -144,9 +144,14 @@ RequestPolicyService.prototype = {
     }
 
     // Clean up old, unused prefs (removed in 0.2.0).
-    this.prefs.clearUserPref("temporarilyAllowedOrigins");
-    this.prefs.clearUserPref("temporarilyAllowedDestinations");
-    this.prefs.clearUserPref("temporarilyAllowedOriginsToDestinations");
+    deletePrefs = ["temporarilyAllowedOrigins",
+        "temporarilyAllowedDestinations",
+        "temporarilyAllowedOriginsToDestinations"];
+    for (var i = 0; i < deletePrefs.length; i++) {
+      if (this.prefs.prefHasUserValue(deletePrefs[i])) {
+        this.prefs.clearUserPref(deletePrefs[i]);
+      }
+    }
     this._prefService.savePrefFile(null);
   },
 

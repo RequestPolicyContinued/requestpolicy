@@ -142,6 +142,12 @@ RequestPolicyService.prototype = {
       this._rootPrefs.setBoolPref("network.prefetch-next", false);
       Logger.info(Logger.TYPE_INTERNAL, "Disabled prefetch.");
     }
+
+    // Clean up old, unused prefs (removed in 0.2.0).
+    this.prefs.clearUserPref("temporarilyAllowedOrigins");
+    this.prefs.clearUserPref("temporarilyAllowedDestinations");
+    this.prefs.clearUserPref("temporarilyAllowedOriginsToDestinations");
+    this._prefService.savePrefFile(null);
   },
 
   _updateLoggingSettings : function() {

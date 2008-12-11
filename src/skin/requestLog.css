@@ -1,0 +1,25 @@
+treechildren::-moz-tree-cell-text(hover) {
+    color : #00b;
+}
+
+treechildren::-moz-tree-cell-text(hover) {
+    color : #00b;
+}
+
+treechildren::-moz-tree-row(allowed) {
+	background-color: #efe;
+}
+treechildren::-moz-tree-row(allowed, hover) {
+    background-color: #cfc;
+}
+
+treechildren::-moz-tree-row(blocked) {
+	background-color: #fdd;
+}
+treechildren::-moz-tree-row(blocked, hover) {
+    background-color: #fcc;
+}
+
+#requestpolicy-requestLog-blocked {
+  text-align : center;
+}

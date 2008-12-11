@@ -9,11 +9,16 @@ var requestLogTreeView = {
   _columnNameToIndexMap : {
     "requestpolicy-requestLog-origin" : 0,
     "requestpolicy-requestLog-destination" : 1,
-    "requestpolicy-requestLog-blocked" : 2
+    "requestpolicy-requestLog-blocked" : 2,
+    "requestpolicy-requestLog-time" : 3
   },
 
+  _aserv : Components.classes["@mozilla.org/atom-service;1"]
+      .getService(Components.interfaces.nsIAtomService),
+
   addAllowedRequest : function(originUri, destUri) {
-    this._visibleData.push([originUri, destUri, ""]);
+    this._visibleData.push([originUri, destUri, false,
+        (new Date()).toLocaleTimeString()]);
     this.rowCount++;
     if (!this._treebox) {
       return;
@@ -22,12 +27,17 @@ var requestLogTreeView = {
   },
 
   addBlockedRequest : function(originUri, destUri) {
-    this._visibleData.push([originUri, destUri, "X"]);
+    this._visibleData.push([originUri, destUri, true,
+        (new Date()).toLocaleTimeString()]);
     this.rowCount++;
     if (!this._treebox) {
       return;
     }
     this._treebox.rowCountChanged(0, 1);
+  },
+
+  _getVisibleItemAtIndex : function(index) {
+    return this._visibleData[this._visibleData.length - index - 1];
   },
 
   // Start of interface.
@@ -41,28 +51,35 @@ var requestLogTreeView = {
     this._treebox = _treebox;
   },
 
-  getCellText : function(idx, column) {
-    // Logger.dump("CALL TO getCellText " + idx + " / " + column.id + "\n");
+  getCellText : function(index, column) {
+    // Logger.dump("CALL TO getCellText " + index + " / " + column.id + "\n");
     // Row 0 is actually the last element in the array so that we don't have to
     // unshift() the array and can just push().
     // TODO: Do an actual speed test with push vs. unshift to see if it matters
     // with this javascript array implementation, though I'm assuming it does.
-    return this._visibleData[this._visibleData.length - idx - 1][this._columnNameToIndexMap[column.id]];
+    var columnIndex = this._columnNameToIndexMap[column.id];
+    if (columnIndex == 2) {
+      return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]]
+          ? "X"
+          : "";
+    } else {
+      return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]];
+    }
   },
 
-  isContainer : function(idx) {
+  isContainer : function(index) {
     return false;
   },
 
-  isContainerOpen : function(idx) {
+  isContainerOpen : function(index) {
     return false;
   },
 
-  isContainerEmpty : function(idx) {
+  isContainerEmpty : function(index) {
     return false;
   },
 
-  isSeparator : function(idx) {
+  isSeparator : function(index) {
     return false;
   },
 
@@ -70,32 +87,32 @@ var requestLogTreeView = {
     return false;
   },
 
-  isEditable : function(idx, column) {
+  isEditable : function(index, column) {
     return false;
   },
 
-  getParentIndex : function(idx) {
+  getParentIndex : function(index) {
     return -1;
   },
 
-  getLevel : function(idx) {
+  getLevel : function(index) {
     return 0;
   },
 
-  hasNextSibling : function(idx, after) {
+  hasNextSibling : function(index, after) {
     return false;
   },
 
-  toggleOpenState : function(idx) {
+  toggleOpenState : function(index) {
   },
 
-  getImageSrc : function(idx, column) {
+  getImageSrc : function(index, column) {
   },
 
-  getProgressMode : function(idx, column) {
+  getProgressMode : function(index, column) {
   },
 
-  getCellValue : function(idx, column) {
+  getCellValue : function(index, column) {
   },
 
   cycleHeader : function(col, elem) {
@@ -104,7 +121,7 @@ var requestLogTreeView = {
   selectionChanged : function() {
   },
 
-  cycleCell : function(idx, column) {
+  cycleCell : function(index, column) {
   },
 
   performAction : function(action) {
@@ -113,13 +130,18 @@ var requestLogTreeView = {
   performActionOnCell : function(action, index, column) {
   },
 
-  getRowProperties : function(idx, column, prop) {
+  getRowProperties : function(index, props) {
+    if (this._getVisibleItemAtIndex(index)[2]) {
+      props.AppendElement(this._aserv.getAtom("blocked"));
+    } else {
+      props.AppendElement(this._aserv.getAtom("allowed"));
+    }
   },
 
-  getCellProperties : function(idx, column, prop) {
+  getCellProperties : function(index, column, props) {
   },
 
-  getColumnProperties : function(column, element, prop) {
+  getColumnProperties : function(column, props) {
   }
 
 };

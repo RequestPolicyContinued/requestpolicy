@@ -132,7 +132,7 @@
 		<vbox id="rp-requestLog" height="300" hidden="true" persist="height">
 			<toolbox id="rp-requestLog-header">
 				<toolbar id="rp-requestLog-toolbar" align="center">
-					<label id="rp-requestLog-title" control="rp-requestLog-browser" value="&requestLog.title;" flex="1" crop="end"/>
+					<label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" flex="1" crop="end"/>
 					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicyUtil.toggleRequestLog()"/>
 				</toolbar>
 			</toolbox>

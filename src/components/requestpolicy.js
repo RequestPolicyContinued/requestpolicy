@@ -62,7 +62,7 @@ RequestPolicyService.prototype = {
   _submittedForms : {},
   _clickedLinks : {},
 
-  _blockedRequestObservers : [],
+  _requestObservers : [],
 
   _uriIdentificationLevel : 0,
 
@@ -380,14 +380,21 @@ RequestPolicyService.prototype = {
     Logger.dump("-------------------------------------------------");
   },
 
-  _notifyBlockedRequestObservers : function(blockedOriginUri,
-      blockedDestinationUri) {
-    for (var i = 0; i < this._blockedRequestObservers.length; i++) {
-      if (!this._blockedRequestObservers[i]) {
+  _notifyRequestObserversOfBlockedRequest : function(originUri, destUri) {
+    for (var i = 0; i < this._requestObservers.length; i++) {
+      if (!this._requestObservers[i]) {
         continue;
       }
-      this._blockedRequestObservers[i].observeBlockedRequest(blockedOriginUri,
-          blockedDestinationUri);
+      this._requestObservers[i].observeBlockedRequest(originUri, destUri);
+    }
+  },
+
+  _notifyRequestObserversOfAllowedRequest : function(originUri, destUri) {
+    for (var i = 0; i < this._requestObservers.length; i++) {
+      if (!this._requestObservers[i]) {
+        continue;
+      }
+      this._requestObservers[i].observeAllowedRequest(originUri, destUri);
     }
   },
 
@@ -747,39 +754,39 @@ RequestPolicyService.prototype = {
   },
 
   /**
-   * Add an observer to be notified of all blocked requests. TODO: This should
-   * be made to accept instances of a defined interface.
+   * Add an observer to be notified of all blocked and allowed requests. TODO:
+   * This should be made to accept instances of a defined interface.
    * 
    * @param {}
    *            observer
    */
-  addBlockedRequestObserver : function addBlockedRequestObserver(observer) {
+  addRequestObserver : function addRequestObserver(observer) {
     if (!("observeBlockedRequest" in observer)) {
-      throw "Observer passed to addBlockedRequestObserver does "
+      throw "Observer passed to addRequestObserver does "
           + "not have an observeBlockedRequest() method.";
     }
-    Logger.debug(Logger.TYPE_INTERNAL, "Adding blocked request observer: "
+    Logger.debug(Logger.TYPE_INTERNAL, "Adding request observer: "
             + observer.toString());
-    this._blockedRequestObservers.push(observer);
+    this._requestObservers.push(observer);
   },
 
   /**
-   * Remove an observer added through addBlockedRequestObserver().
+   * Remove an observer added through addRequestObserver().
    * 
    * @param {}
    *            observer
    */
-  removeBlockedRequestObserver : function removeBlockedRequestObserver(observer) {
-    for (var i = 0; i < this._blockedRequestObservers.length; i++) {
-      if (this._blockedRequestObservers[i] == observer) {
-        Logger.debug(Logger.TYPE_INTERNAL,
-            "Removing blocked request observer: " + observer.toString());
-        delete this._blockedRequestObservers[i];
+  removeRequestObserver : function removeRequestObserver(observer) {
+    for (var i = 0; i < this._requestObservers.length; i++) {
+      if (this._requestObservers[i] == observer) {
+        Logger.debug(Logger.TYPE_INTERNAL, "Removing request observer: "
+                + observer.toString());
+        delete this._requestObservers[i];
         return;
       }
     }
     Logger.warning(Logger.TYPE_INTERNAL, "Could not find observer to remove "
-            + "in removeBlockedRequestObserver()");
+            + "in removeRequestObserver()");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -910,7 +917,7 @@ RequestPolicyService.prototype = {
       }
     }
 
-    this._notifyBlockedRequestObservers(originUri, destUri);
+    this._notifyRequestObserversOfBlockedRequest(originUri, destUri);
   },
 
   // We only call this from shouldLoad when the request was a remote request
@@ -981,6 +988,8 @@ RequestPolicyService.prototype = {
         originAllowed[destIdentifier].count++;
       }
     }
+
+    this._notifyRequestObserversOfAllowedRequest(originUri, destUri);
   },
 
   _cacheShouldLoadResult : function(result, originUri, destUri) {

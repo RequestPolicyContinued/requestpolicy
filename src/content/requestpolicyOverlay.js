@@ -24,6 +24,10 @@ var requestpolicyOverlay = {
   // access to the underlying JS object.
   _requestpolicyJSObject : null,
 
+  // This is set by requestLog.js when it is initialized. We don't need to worry
+  // about setting it here.
+  requestLogTreeView : null,
+
   _strbundle : null,
   _addedMenuItems : [],
   _menu : null,
@@ -67,13 +71,14 @@ var requestpolicyOverlay = {
    */
   init : function() {
     if (this._initialized == false) {
+      this._initialized = true;
       this._overlayId = (new Date()).getTime();
 
       this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
       this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+
       this._strbundle = document.getElementById("requestpolicyStrings");
-      this._initialized = true;
       this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
       this._blockedDestinationsBeforeReferenceItem = document
@@ -121,7 +126,7 @@ var requestpolicyOverlay = {
       // Register this window with the requestpolicy service so that we can be
       // notified of blocked requests. When blocked requests happen, this
       // object's observerBlockedRequests() method will be called.
-      this._requestpolicyJSObject.addBlockedRequestObserver(this);
+      this._requestpolicyJSObject.addRequestObserver(this);
 
       this.setStatusbarIconStyle(this._requestpolicy.prefs
           .getCharPref("statusbarIcon"));
@@ -135,7 +140,7 @@ var requestpolicyOverlay = {
   },
 
   onWindowClose : function(event) {
-    this._requestpolicyJSObject.removeBlockedRequestObserver(this);
+    this._requestpolicyJSObject.removeRequestObserver(this);
   },
 
   /**
@@ -457,9 +462,20 @@ var requestpolicyOverlay = {
     this._itemAllowAllTemporarily.setAttribute("checked", isPermissive);
   },
 
-  observeBlockedRequest : function(blockedOriginUri, blockedDestinationUri) {
-    Logger.debug(Logger.TYPE_INTERNAL, "Observed blocked request from <"
-            + blockedOriginUri + "> to <" + blockedDestinationUri + ">");
+  observeAllowedRequest : function(originUri, destUri) {
+    if (this.requestLogTreeView) {
+      this.requestLogTreeView.addAllowedRequest(originUri, destUri);
+    }
+  },
+
+  observeBlockedRequest : function(originUri, destUri) {
+    this._updateNotificationDueToBlockedContent();
+    if (this.requestLogTreeView) {
+      this.requestLogTreeView.addBlockedRequest(originUri, destUri);
+    }
+  },
+
+  _updateNotificationDueToBlockedContent : function() {
     if (this._blockedContentCheckTimeoutId) {
       Logger.debug(Logger.TYPE_INTERNAL,
           "observeBlockedRequest: Timeout already running. No action taken.");

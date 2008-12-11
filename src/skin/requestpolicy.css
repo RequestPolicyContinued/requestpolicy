@@ -129,3 +129,21 @@ toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicy
 	color : #c85000;
 	list-style-image: url(chrome://requestpolicy/skin/menu-other-origins.png);
 }
+
+/*********************************************
+ * Request Log
+ *********************************************/
+ #rp-requestLog-close {
+    -moz-appearance: none;
+    padding: 0 !important;
+    margin-right : 4px;
+    border: none !important;
+    background: transparent !important;
+    list-style-image: url(chrome://requestpolicy/skin/close.png);
+    -moz-image-region: rect(0px, 16px, 16px, 0px);
+    -moz-box-align: end;
+}
+
+#rp-requestLog-close:hover {
+    -moz-image-region: rect(0px, 32px, 16px, 16px);
+}

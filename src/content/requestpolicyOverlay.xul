@@ -15,6 +15,7 @@
 	</stringbundleset>
 	
 	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
+	<script type="application/x-javascript" src="requestpolicyUtil.js" />
 
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="requestpolicyToolbarButton" 
@@ -51,9 +52,15 @@
 			onpopuphidden="requestpolicyOverlay.onMenuHidden(event);"
 			>
 			<menuitem
-				hidden="false"
 				label="&preferencesCmdUnix.label;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
+			<menuitem
+				label="&menu.openRequestLog.label;"
+				oncommand="requestpolicyUtil.toggleRequestLog();" />
+			<menuitem
+				hidden="true"
+				label="&menu.closeRequestLog.label;"
+				oncommand="requestpolicyUtil.toggleRequestLog();" />
 			<menuseparator hidden="false" />
 			<menu
 				id="requestpolicyPrefetchWarning"
@@ -120,4 +127,16 @@
 		</menupopup>
 	</popupset>
 
+	<vbox id="appcontent">
+		<splitter id="rp-requestLog-splitter" hidden="true"/>
+		<vbox id="rp-requestLog" height="300" hidden="true" persist="height">
+			<toolbox id="rp-requestLog-header">
+				<toolbar id="rp-requestLog-toolbar" align="center">
+					<label id="rp-requestLog-title" control="rp-requestLog-browser" value="&requestLog.title;" flex="1" crop="end"/>
+					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicyUtil.toggleRequestLog()"/>
+				</toolbar>
+			</toolbox>
+			<iframe id="rp-requestLog-frame" flex="1"/>
+		</vbox>
+	</vbox>
 </overlay>

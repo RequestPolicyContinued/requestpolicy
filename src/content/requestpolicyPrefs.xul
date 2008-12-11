@@ -70,7 +70,7 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&preferences.origin;" flex="1"/>
+								<listheader label="&rp.origin;" flex="1"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
 						</listbox>
@@ -87,7 +87,7 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&preferences.destination;" flex="1"/>
+								<listheader label="&rp.destination;" flex="1"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
 						</listbox>
@@ -104,8 +104,8 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&preferences.origin;" flex="1"/>
-								<listheader label="&preferences.destination;" flex="1"/>
+								<listheader label="&rp.origin;" flex="1"/>
+								<listheader label="&rp.destination;" flex="1"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
 						</listbox>

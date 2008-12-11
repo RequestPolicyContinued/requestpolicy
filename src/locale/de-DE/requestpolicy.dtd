@@ -7,7 +7,7 @@
 <!ENTITY allowedDestinations "Erlaubte Anfragen">
 <!ENTITY otherOrigins "Weitere Quellen dieser Seite">
 <!ENTITY menu.openRequestLog.label "Show request log">
-<!ENTITY menu.closeRequestLog.label "Hide request log">
+<!ENTITY menu.closeRequestLog.label "Close request log">
 <!ENTITY rp.origin "Origin">
 <!ENTITY rp.destination "Destination">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
@@ -36,6 +36,6 @@
 <!ENTITY preferences.import.details.caption "What the import will do">
 <!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
 <!ENTITY preferences.import.button.label "Import from File">
-<!ENTITY requestLog.title "RequestPolicy Request Log">
+<!ENTITY requestLog.title "Request Log">
 <!ENTITY requestLog.blocked "Blocked">
 <!ENTITY requestLog.time "Time">

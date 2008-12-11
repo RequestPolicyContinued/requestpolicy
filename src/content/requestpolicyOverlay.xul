@@ -54,9 +54,11 @@
 				label="&preferencesCmdUnix.label;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
 			<menuitem
+				id="requestpolicyOpenRequestLog"
 				label="&menu.openRequestLog.label;"
 				oncommand="requestpolicyOverlay.toggleRequestLog();" />
 			<menuitem
+				id="requestpolicyCloseRequestLog"
 				hidden="true"
 				label="&menu.closeRequestLog.label;"
 				oncommand="requestpolicyOverlay.toggleRequestLog();" />

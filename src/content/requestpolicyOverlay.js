@@ -1545,13 +1545,19 @@ var requestpolicyOverlay = {
     var requestLog = document.getElementById("rp-requestLog");
     var requestLogSplitter = document.getElementById("rp-requestLog-splitter");
     var requestLogFrame = document.getElementById("rp-requestLog-frame");
+    var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
+    var closeRequestLog = document
+        .getElementById("requestpolicyCloseRequestLog");
 
-    requestLogSplitter.hidden = !requestLog.hidden;
-    requestLogFrame.setAttribute("src", requestLog.hidden
-            ? "chrome://requestpolicy/content/requestLog.xul"
-            : "about:blank");
-    requestLog.hidden = !requestLog.hidden;
     if (requestLog.hidden) {
+      requestLogFrame.setAttribute("src",
+          "chrome://requestpolicy/content/requestLog.xul");
+      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
+      openRequestLog.hidden = true;
+    } else {
+      requestLogFrame.setAttribute("src", "about:blank");
+      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
+      openRequestLog.hidden = false;
       this.requestLogTreeView = null;
     }
   }

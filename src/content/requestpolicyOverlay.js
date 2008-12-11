@@ -1539,6 +1539,21 @@ var requestpolicyOverlay = {
     // contextmenu.
     requestpolicyOverlay._statusbar.insertBefore(requestpolicyOverlay._menu,
         null);
+  },
+
+  toggleRequestLog : function() {
+    var requestLog = document.getElementById("rp-requestLog");
+    var requestLogSplitter = document.getElementById("rp-requestLog-splitter");
+    var requestLogFrame = document.getElementById("rp-requestLog-frame");
+
+    requestLogSplitter.hidden = !requestLog.hidden;
+    requestLogFrame.setAttribute("src", requestLog.hidden
+            ? "chrome://requestpolicy/content/requestLog.xul"
+            : "about:blank");
+    requestLog.hidden = !requestLog.hidden;
+    if (requestLog.hidden) {
+      this.requestLogTreeView = null;
+    }
   }
 
 };

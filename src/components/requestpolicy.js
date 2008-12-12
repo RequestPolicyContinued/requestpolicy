@@ -939,7 +939,11 @@ RequestPolicyService.prototype = {
     var dest = args[1];
 
     this._cacheShouldLoadResult(CP_OK, origin, dest);
-    if (!unrecorded) {
+    // We aren't recording the request so it doesn't show up in the menu, but we
+    // want it to still show up in the request log.
+    if (unrecorded) {
+      this._notifyRequestObserversOfAllowedRequest(origin, dest);
+    } else {
       this._recordAllowedRequest(origin, dest);
     }
 

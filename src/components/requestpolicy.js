@@ -925,7 +925,7 @@ RequestPolicyService.prototype = {
   // cases we just return CP_OK rather than return this function which
   // ultimately returns CP_OK. Third param, "unrecorded", is set to true if
   // this request shouldn'tbe recorded as an allowed request.
-  accept : function(reason, args, unrecorded) {
+  accept : function(reason, args, unforbidable) {
     Logger.warning(Logger.TYPE_CONTENT, "** ALLOWED ** reason: "
             + reason
             + ". "
@@ -941,7 +941,7 @@ RequestPolicyService.prototype = {
     this._cacheShouldLoadResult(CP_OK, origin, dest);
     // We aren't recording the request so it doesn't show up in the menu, but we
     // want it to still show up in the request log.
-    if (unrecorded) {
+    if (unforbidable) {
       this._notifyRequestObserversOfAllowedRequest(origin, dest);
     } else {
       this._recordAllowedRequest(origin, dest);

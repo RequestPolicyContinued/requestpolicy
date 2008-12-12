@@ -30,7 +30,7 @@ grid row hbox:first-child {
 
 .temporaryPermissionsCell {
     list-style-image:
-        url(chrome://requestpolicy/skin/preferences/dot.png);
+        url(chrome://requestpolicy/skin/dot.png);
     -moz-box-pack : center;
 }
 

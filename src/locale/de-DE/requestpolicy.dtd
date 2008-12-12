@@ -6,8 +6,8 @@
 <!ENTITY blockedDestinations "Blockierte Anfragen">
 <!ENTITY allowedDestinations "Erlaubte Anfragen">
 <!ENTITY otherOrigins "Weitere Quellen dieser Seite">
-<!ENTITY menu.openRequestLog.label "Show request log">
-<!ENTITY menu.closeRequestLog.label "Close request log">
+<!ENTITY menu.openRequestLog.label "Show Request Log">
+<!ENTITY menu.closeRequestLog.label "Close Request Log">
 <!ENTITY rp.origin "Origin">
 <!ENTITY rp.destination "Destination">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">

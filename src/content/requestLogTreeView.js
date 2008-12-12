@@ -58,11 +58,7 @@ var requestLogTreeView = {
     // TODO: Do an actual speed test with push vs. unshift to see if it matters
     // with this javascript array implementation, though I'm assuming it does.
     var columnIndex = this._columnNameToIndexMap[column.id];
-    if (columnIndex == 2) {
-      return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]]
-          ? "X"
-          : "";
-    } else {
+    if (columnIndex != 2) {
       return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]];
     }
   },
@@ -107,6 +103,11 @@ var requestLogTreeView = {
   },
 
   getImageSrc : function(index, column) {
+    if (this._columnNameToIndexMap[column.id] == 2) {
+      if (this._getVisibleItemAtIndex(index)[2]) {
+        return "chrome://requestpolicy/skin/dot.png";
+      }
+    }
   },
 
   getProgressMode : function(index, column) {
@@ -139,6 +140,11 @@ var requestLogTreeView = {
   },
 
   getCellProperties : function(index, column, props) {
+    if (this._columnNameToIndexMap[column.id] == 2) {
+      if (this._getVisibleItemAtIndex(index)[2]) {
+        props.AppendElement(this._aserv.getAtom("blocked"));
+      }
+    }
   },
 
   getColumnProperties : function(column, props) {

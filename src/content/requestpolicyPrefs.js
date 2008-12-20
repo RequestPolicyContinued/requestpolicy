@@ -32,6 +32,11 @@ var requestpolicyPrefs = {
       this._originsToDestinationsList = document
           .getElementById("originsToDestinationsList");
 
+      this._addOriginButton = document.getElementById("addOrigin");
+      this._addDestinationButton = document.getElementById("addDestination");
+      this._addOriginToDestinationButton = document
+          .getElementById("addOriginToDestination");
+
       // Each list has a "removeButton" property which is the list's associated
       // "remove selected items" button.
       this._originsList.removeButton = document.getElementById("removeOrigins");
@@ -39,6 +44,15 @@ var requestpolicyPrefs = {
           .getElementById("removeDestinations");
       this._originsToDestinationsList.removeButton = document
           .getElementById("removeOriginsToDestinations");
+
+      this._addOrigin_originField = document
+          .getElementById("addOrigin-originField");
+      this._addDestination_destinationField = document
+          .getElementById("addDestination-destinationField");
+      this._addOriginToDestination_originField = document
+          .getElementById("addOriginToDestination-originField");
+      this._addOriginToDestination_destinationField = document
+          .getElementById("addOriginToDestination-destinationField");
 
       // Each "remove selected items" button has a "listbox" property which is
       // the button's associated list.
@@ -59,6 +73,35 @@ var requestpolicyPrefs = {
         requestpolicyPrefs._requestpolicyJSObject
             ._forbidOriginToDestinationByCombinedIdentifier(
                 originToDestIdentifier, true);
+      };
+
+      // Each "allow" button has an array of its associated textboxes.
+      this._addOriginButton.textboxes = [this._addOrigin_originField];
+      this._addDestinationButton.textboxes = [this._addDestination_destinationField];
+      this._addOriginToDestinationButton.textboxes = [
+          this._addOriginToDestination_originField,
+          this._addOriginToDestination_destinationField];
+
+      // Each "allow" textbox knows its associated button.
+      this._addOrigin_originField.button = this._addOriginButton;
+      this._addDestination_destinationField.button = this._addDestinationButton;
+      this._addOriginToDestination_originField.button = this._addOriginToDestinationButton;
+      this._addOriginToDestination_destinationField.button = this._addOriginToDestinationButton;
+
+      // Each button has an "allow" function to whitelist the user-entered item.
+      this._addOriginButton.allow = function() {
+        requestpolicyPrefs._requestpolicyJSObject
+            .allowOrigin(requestpolicyPrefs._addOriginButton.textboxes[0].value);
+      };
+      this._addDestinationButton.allow = function() {
+        requestpolicyPrefs._requestpolicyJSObject
+            .allowDestination(requestpolicyPrefs._addDestinationButton.textboxes[0].value);
+      };
+      this._addOriginToDestinationButton.allow = function() {
+        requestpolicyPrefs._requestpolicyJSObject
+            .allowOriginToDestination(
+                requestpolicyPrefs._addOriginToDestinationButton.textboxes[0].value,
+                requestpolicyPrefs._addOriginToDestinationButton.textboxes[1].value);
       };
 
       this._populateWhitelists();
@@ -205,6 +248,32 @@ var requestpolicyPrefs = {
       }
     }
     requestpolicyPrefs.listSelectionChanged(listbox)
+  },
+
+  addToWhitelistInputChanged : function(textbox) {
+    for (var i = 0; i < textbox.button.textboxes.length; i++) {
+      if (textbox.button.textboxes[i].value.length == 0) {
+        textbox.button.disabled = true;
+        return;
+      }
+    }
+    textbox.button.disabled = false;
+  },
+
+  addToWhitelist : function(button) {
+    button.disabled = true;
+    // Remove any "|" and spaces to avoid conflict with separators.
+    for (var i = 0; i < button.textboxes.length; i++) {
+      button.textboxes[i].value = button.textboxes[i].value.replace(/\s|\|/g, "");
+      if (button.textboxes[i].value == "") {
+        return;
+      }
+    }
+    button.allow();
+    for (var i = 0; i < button.textboxes.length; i++) {
+      button.textboxes[i].value = "";
+    }
+    this._populateWhitelists();
   },
 
   _getFilePickerWindowTitle : function(action) {

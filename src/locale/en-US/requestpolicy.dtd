@@ -10,6 +10,7 @@
 <!ENTITY menu.closeRequestLog.label "Close Request Log">
 <!ENTITY rp.origin "Origin">
 <!ENTITY rp.destination "Destination">
+<!ENTITY rp.allow "Allow">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">

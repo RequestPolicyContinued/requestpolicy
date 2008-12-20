@@ -77,6 +77,11 @@
 						<hbox>
 							<button id="removeOrigins" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
 						</hbox>
+						<separator class="thin"/>
+						<hbox>
+							<textbox id="addOrigin-originField" emptytext="&rp.origin;" oninput="requestpolicyPrefs.addToWhitelistInputChanged(this)" flex="1"/>
+							<button id="addOrigin" label="&rp.allow;" oncommand="requestpolicyPrefs.addToWhitelist(this)" disabled="true"/>
+						</hbox>
 					</vbox>
 				</tabpanel>
 				<tabpanel>
@@ -93,6 +98,11 @@
 						</listbox>
 						<hbox>
 							<button id="removeDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
+						</hbox>
+						<separator class="thin"/>
+						<hbox>
+							<textbox id="addDestination-destinationField" emptytext="&rp.destination;" oninput="requestpolicyPrefs.addToWhitelistInputChanged(this)" flex="1"/>
+							<button id="addDestination" label="&rp.allow;" oncommand="requestpolicyPrefs.addToWhitelist(this)" disabled="true"/>
 						</hbox>
 					</vbox>
 				</tabpanel>
@@ -111,6 +121,12 @@
 						</listbox>
 						<hbox>
 							<button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
+						</hbox>
+						<separator class="thin"/>
+						<hbox>
+							<textbox id="addOriginToDestination-originField" emptytext="&rp.origin;" oninput="requestpolicyPrefs.addToWhitelistInputChanged(this)" flex="1"/>
+							<textbox id="addOriginToDestination-destinationField" emptytext="&rp.destination;" oninput="requestpolicyPrefs.addToWhitelistInputChanged(this)" flex="1"/>
+							<button id="addOriginToDestination" label="&rp.allow;" oncommand="requestpolicyPrefs.addToWhitelist(this)" disabled="true"/>
 						</hbox>
 					</vbox>
 				</tabpanel>

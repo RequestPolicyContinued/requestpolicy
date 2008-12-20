@@ -6,34 +6,34 @@
 <!ENTITY blockedDestinations "Blockierte Anfragen">
 <!ENTITY allowedDestinations "Erlaubte Anfragen">
 <!ENTITY otherOrigins "Weitere Quellen dieser Seite">
-<!ENTITY menu.openRequestLog.label "Show Request Log">
-<!ENTITY menu.closeRequestLog.label "Close Request Log">
-<!ENTITY rp.origin "Origin">
-<!ENTITY rp.destination "Destination">
-<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
-<!ENTITY preferences.prefpane.general "General">
-<!ENTITY preferences.prefpane.whitelist "Whitelist">
+<!ENTITY menu.openRequestLog.label "Anfragenchronik anzeigen">
+<!ENTITY menu.closeRequestLog.label "Anfragenchronik schließen">
+<!ENTITY rp.origin "Quelle">
+<!ENTITY rp.destination "Ziel">
+<!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
+<!ENTITY preferences.prefpane.general "Allgemein">
+<!ENTITY preferences.prefpane.whitelist "Erlaubt Seiten">
 <!ENTITY preferences.prefpane.import "Import">
 <!ENTITY preferences.prefpane.export "Export">
-<!ENTITY preferences.userInterface "User Interface">
-<!ENTITY preferences.statusbarIcon "Status bar icon:">
-<!ENTITY preferences.origins "Origins">
-<!ENTITY preferences.destinations "Destinations">
-<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
-<!ENTITY preferences.temporary "Temporary">
-<!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
-<!ENTITY preferences.export "Export">
-<!ENTITY preferences.export.caption "Export Your Setting">
-<!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
-<!ENTITY preferences.export.details.caption "What is included in the export">
-<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
-<!ENTITY preferences.export.button.label "Export to File">
-<!ENTITY preferences.import "Import">
-<!ENTITY preferences.import.caption "Import Your Setting">
-<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
-<!ENTITY preferences.import.details.caption "What the import will do">
-<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
-<!ENTITY preferences.import.button.label "Import from File">
-<!ENTITY requestLog.title "Request Log">
-<!ENTITY requestLog.blocked "Blocked">
-<!ENTITY requestLog.time "Time">
+<!ENTITY preferences.userInterface "Benutzeroberfläche">
+<!ENTITY preferences.statusbarIcon "Statusleistensymbol:">
+<!ENTITY preferences.origins "Quellen">
+<!ENTITY preferences.destinations "Ziele">
+<!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">
+<!ENTITY preferences.temporary "Temporär">
+<!ENTITY preferences.removeSelectedSites "Ausgewählte Seiten entfernen">
+<!ENTITY preferences.export "Exportieren">
+<!ENTITY preferences.export.caption "Export der Einstellungen">
+<!ENTITY preferences.export.description "Es empfiehlt sich, mittels Export eine Sicherheitskopie der Regeln anzulegen. Um die gleichen Regeln auf einem anderen Computer zu verwenden, muss die exportierte Datei auf jenen Computer kopiert und dann die Regeln aus dieser Datei importiert werden.">
+<!ENTITY preferences.export.details.caption "Was in einer Exportdatei enthalten ist">
+<!ENTITY preferences.export.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln exportiert. Temporäre Berechtigungen werden nicht exportiert.">
+<!ENTITY preferences.export.button.label "Export in Datei">
+<!ENTITY preferences.import "Importieren">
+<!ENTITY preferences.import.caption "Import der Einstellungen">
+<!ENTITY preferences.import.description "Der Import kann mit Dateien durchgeführt werden, die von der Exportfunktion erstellt worden.">
+<!ENTITY preferences.import.details.caption "Was beim Import durchgeführt wird">
+<!ENTITY preferences.import.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln hinzugefügt. Nichts aus der Liste der erlaubten Seiten wird entfernt, sie wird also nicht ersetzt.">
+<!ENTITY preferences.import.button.label "Import aus Datei">
+<!ENTITY requestLog.title "Anfragenchronik">
+<!ENTITY requestLog.blocked "Blockiert">
+<!ENTITY requestLog.time "Zeit">

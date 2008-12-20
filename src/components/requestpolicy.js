@@ -101,6 +101,8 @@ RequestPolicyService.prototype = {
 
   _prefNameToObjectMap : null,
 
+  _extensionCompatibilityRules : [],
+
   // /////////////////////////////////////////////////////////////////////////
   // Utility
   // /////////////////////////////////////////////////////////////////////////
@@ -116,8 +118,35 @@ RequestPolicyService.prototype = {
     this._uriIdentificationLevel = DomainUtils.LEVEL_DOMAIN;
   },
 
+  _initializeExtensionCompatibility : function() {
+    if (this._extensionCompatibilityRules.length != 0) {
+      return;
+    }
+    var em = Components.classes["@mozilla.org/extensions/manager;1"]
+        .getService(Components.interfaces.nsIExtensionManager);
+    var ext;
+
+    // TODO: Don't add the rules if the extension is installed but disabled.
+
+    // Adblock Plus
+    if (ext = em.getItemForID("{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}")) {
+      Logger.info(Logger.TYPE_INTERNAL, "Extension detected: " + ext.name);
+      this._extensionCompatibilityRules.push([
+          "http://easylist.adblockplus.org/",
+          "http://adblockplus.mozdev.org/easylist/", ext.name]);
+    }
+    // Greasefire
+    if (ext = em.getItemForID("greasefire@skrul.com")) {
+      Logger.info(Logger.TYPE_INTERNAL, "Extension detected: " + ext.name);
+      this._extensionCompatibilityRules.push(["file://",
+          "http://userscripts.org/", ext.name]);
+      this._extensionCompatibilityRules.push(["file://",
+          "http://static.userscripts.org/", ext.name]);
+    }
+  },
+
   _syncFromPrefs : function() {
-    // Load the logging preferences before the otheres.
+    // Load the logging preferences before the others.
     this._updateLoggingSettings();
     // origins
     this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
@@ -715,6 +744,18 @@ RequestPolicyService.prototype = {
       return true;
     }
 
+    for (var i = 0; i < this._extensionCompatibilityRules.length; i++) {
+      var rule = this._extensionCompatibilityRules[i];
+      var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
+      var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
+      if (allowOrigin && allowDest) {
+        // TODO: Give the reason the request was allowed.
+        // return this.accept("Extension compatibility rule matched [" + rule[2]
+        // + "]", arguments, true);
+        return true;
+      }
+    }
+
     return false;
   },
 
@@ -809,6 +850,9 @@ RequestPolicyService.prototype = {
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.
         this._syncFromPrefs();
+        // Detect other installed extensions and do what is needed to allow
+        // their requests.
+        this._initializeExtensionCompatibility();
         break;
       case "app-startup" :
         this._init();
@@ -1165,13 +1209,25 @@ RequestPolicyService.prototype = {
           return this.accept("Allowed origin to destination", arguments);
         }
 
-        // "browser" origin requests for things like favicon.ico and possibly
-        // original request
-        // TODO: check this, seems sketchy.
-        if (originHost == "browser") {
-          return this.accept(
-              "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new window/tab opened)", arguments);
+        if (aRequestOrigin.scheme == "chrome") {
+          if (originHost == "browser") {
+            // "browser" origin shows up for favicon.ico and adderss entered in
+            // address bar.
+            return this.accept(
+                "User action (e.g. address entered in address bar) or other good "
+                    + "explanation (e.g. new window/tab opened)", arguments);
+          } else {
+            // TODO: It seems sketchy to allow all requests from chrome. If I
+            // had to put my money on a possible bug (in terms of not blocking
+            // requests that should be), I'd put it here. Doing this, however,
+            // saves a lot of blocking of legitimate requests from extensions
+            // that originate from their xul files. If you're reading this and
+            // you know of a way to use this to evade RequestPolicy, please let
+            // me know, I will be very grateful.
+            return this.accept(
+                "User action (e.g. address entered in address bar) or other good "
+                    + "explanation (e.g. new window/tab opened)", arguments);
+          }
         }
 
         if (destIdentifier == originIdentifier) {
@@ -1216,9 +1272,18 @@ RequestPolicyService.prototype = {
         // Greasemonkey uses such a method to provide their cross-site xhr.
         if (origin == "resource://gre/res/hiddenWindow.html") {
           return this.accept(
-              "Privileged actions being done. Possibly a greasemonkey script "
-                  + "doing an XMLHttpRequest in chrome's context", arguments,
-              true);
+              "Privileged request (possibly a cross-site XMLHttpRequest)",
+              arguments, true);
+        }
+
+        for (var i = 0; i < this._extensionCompatibilityRules.length; i++) {
+          var rule = this._extensionCompatibilityRules[i];
+          var allowOrigin = rule[0] ? origin.indexOf(rule[0]) == 0 : true;
+          var allowDest = rule[1] ? dest.indexOf(rule[1]) == 0 : true;
+          if (allowOrigin && allowDest) {
+            return this.accept("Extension compatibility rule matched ["
+                    + rule[2] + "]", arguments, true);
+          }
         }
 
         // We didn't match any of the conditions in which to allow the request,

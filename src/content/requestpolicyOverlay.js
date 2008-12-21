@@ -63,25 +63,26 @@ var requestpolicyOverlay = {
   _rpContextMenu : null,
   _toolbox : null,
 
-  _clearImageDataUri : "data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAEBMgA7",
-  _missingImageDataUri : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0"
-      + "d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArZJREFUeNqUU0trU0EYPTOT"
-      + "e29u0iYRE4NpY62Kz00Vi0sXrnQtiCCoezc+Nv4AURQR3Sgo4lYEF+JGcCeC"
-      + "BUGo1pb4AF2kefdxc5P7mIdfIi0uiujAd2eY+50z53zfDDPG3GiteueePrh/"
-      + "4cDj689z+exx2FYq5s6cGN+xcOjJC42/jATF1FK7Xcy/eXWzHOJecddUge3f"
-      + "y7xaM6xXq9WXJ44+8xuLd0+9r9TXQLc4s5VBipa9AcEZFvTmD1Yqkzu9GGh1"
-      + "gEIJydF8CovNXY25z1dD4PLTsdxivx/NLAfSBJwdY8o8FMDDAUHLzW3qNhwn"
-      + "j1ACP6uAtwxlpZDcsxtjP74iuerbYawnPPgTQRwi4gaBkgcYkBsQwMlkl6Vl"
-      + "A5rsLq1QkIoswBwb6dJWSJcIlYa7ZEOwZfC2RiuWeQMUhwTCdb90M5mpocGQ"
-      + "BNdr0MZANlqIOx349RYkt8EshpRtI8X64MA4EUzzAYacf5OlMgxIlFJkqgnW"
-      + "68KQEh2E4LFCJGMoxmEoxSGUBYwQwe7fFjir6s2kSDAGm7bqDWjHRdxuQkcR"
-      + "mBAQBOJEMAjxu32pCNgxJCC2706hYAznjCWoFu0OVCzhrXro9CUkKVNMIFY+"
-      + "OYwQGg2HzvWBbUMCps2sv3mLnuXCZJNoWQOjAhnNLCFUjK6RUDZHTGBNRiVn"
-      + "SBKM3GSGNRBKtpv5Yv9ecculFUTbVyH31YLu9Hzk3/7Odc1PCC3pVE2sctAp"
-      + "6jZ9qS/oDBXYltVDv+e9dbIrj+e/BbQ1iPph4APNV+6URo+0Y5weMWaMRbEQ"
-      + "UlWp8I+oiAuJteuZct2PLnR5o/t+serN0DSz0T++tkin068TiQT+d6wjisXi"
-      + "u0wmU/5X4DUqIfuTgB7ep1Kp9OPPpJNnz2PPzwVMVmbRkhy2NFBhDBbI9Zxf"
-      + "AgwAQhA3/0AzeAcAAAAASUVORK5CYII=",
+  _clearImageDataUri : "data:image/gif;base64,"
+      + "R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAEBMgA7",
+  _missingImageDataUri : "data:image/png;base64,"
+      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c"
+      + "6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0"
+      + "SU1FB9gMFRANL5LXnioAAAJWSURBVDjLnZI/ixtXFMV/972ZNzPSrmTtalex"
+      + "lsWBGMfEYOzaVciXyKdIkW/hFKnS22WafIDUxk0g2AQSgm0csIPWK42ktaSR"
+      + "NPP+pRBK5SLOqS7cew7ccw4xxrPJ+8XdHx4+7AE8e3Cj++zLm71fvrqT8x+Q"
+      + "AK35dJr2n/x89urTa+eDm/cS+eI2y3eT+Lx/bt8u1vNqfDH++teXdk/6ThAf"
+      + "UUBIgL9ku75z/8WL7LOlhXIGJ0Pyw75wMcnGv//xSQ2DH4ddu9k01dXWsWzc"
+      + "ofhYaiiViLjiWi9UWQa1gzcjWF7hgfzzW5ydnXB62JLjg0PTLfJertNepnQS"
+      + "IA+gE4Cs03UuNYYQYP4e5jPogmSG9vA6rrjC+0AxN2i5Qk0DpXVJhCQB0EVR"
+      + "rzqdFgB1DZfvCDHixiV2NqO6LHHKIKnQMoaWbFBgIrQVgIXaDc+JCHgP5QRZ"
+      + "r4jzGWFbo6yncRYviiiQKUhBRch3Lyix4bgPWsAkcDkmZAV2OiE0DaI1WoES"
+      + "hRKF3sWnmt01pFBnJydEpZDEwHSGt47lYsls43AIXjTWV9R1Qx0DGahqLyAh"
+      + "bqrj0/ib0nRzXNoyCo0Kkor2llV0eKOwdUMg4pSQA7JPQXvnJv1B+GlwOvrG"
+      + "laXB6fV2lb5t6qOtike56DSJgYDGBQcOAsQAfueBMeHR48fhadb1j/58HWAR"
+      + "dt6yBv7+/vpBe2o5OogxlcaKdt5aKCNsk309W0WxKQjmQ33/9mJVAdWHdmo/"
+      + "tNvtRZIkfCz+ZQwGg6rT6Zj/LTAajTbD4bD5WIF/AAseEisPFO8uAAAAAElF"
+      + "TkSuQmCC",
 
   toString : function() {
     return "[requestpolicyOverlay " + this._overlayId + "]";
@@ -460,20 +461,22 @@ var requestpolicyOverlay = {
       var img = images[i];
       if (img.requestpolicyBlocked && !img.requestpolicyIdentified) {
         img.requestpolicyIdentified = true;
-        img.style.border = "solid 1px #faa";
+        img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";
         img.style.backgroundPosition = "center center";
         img.style.backgroundImage = "url('" + this._missingImageDataUri + "')";
-        img.style.opacity = "0.3";
         if (!img.width) {
-          img.width = 20;
+          img.width = 50;
         }
         if (!img.height) {
-          img.height = 20;
+          img.height = 50;
         }
-        // Set the src to a blank image. Need to do this to have a blocked image
-        // be rendered at all, and so show the border and background.
-        img.src = this._clearImageDataUri;
+        // Set the src to be null. Need to do this to have a blocked image
+        // be rendered at all, and so show the border and background. Setting it
+        // to a transparent image, instead, resulted in the background/border
+        // being displayed but not the alt text. We end up with the broken image
+        // icon being displayed as well in most cases, but that's fine.
+        img.src = null;
       }
     }
   },

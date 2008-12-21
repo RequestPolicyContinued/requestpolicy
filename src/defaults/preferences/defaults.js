@@ -12,3 +12,4 @@ pref("extensions.requestpolicy.allowedDestinations", "");
 pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
 
 pref("extensions.requestpolicy.statusbarIcon", "standard");
+pref("extensions.requestpolicy.indicateBlockedObjects", true);

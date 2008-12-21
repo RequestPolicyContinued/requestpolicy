@@ -25,6 +25,7 @@
 		>
 		<preferences>
 			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string"/>
+			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
 		</preferences>
 
 		<groupbox>
@@ -44,6 +45,12 @@
 							<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
 							<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
 						</radiogroup>
+					</row>
+					<row>
+						<hbox align="center">
+							<label value="&preferences.indicateBlockedObjects;" control="indicateBlockedObjects"/>
+						</hbox>
+						<checkbox id="indicateBlockedObjects" preference="pref-indicateBlockedObjects"/>
 					</row>
 				</rows>
 			</grid>

@@ -417,7 +417,7 @@ var requestpolicyOverlay = {
       Logger.debug(Logger.TYPE_INTERNAL, "Main document <"
               + document.documentURI + "> has rejected requests.");
       this._setBlockedContentNotification(true);
-      this._identifyBlockedVisibleObjects(document);
+      this._indicateBlockedVisibleObjects(document);
       return;
     }
     var otherOrigins = this._getOtherOrigins(document);
@@ -429,7 +429,7 @@ var requestpolicyOverlay = {
                   + "> of main document <" + document.documentURI
                   + "> has rejected requests.");
           this._setBlockedContentNotification(true);
-          this._identifyBlockedVisibleObjects(document);
+          this._indicateBlockedVisibleObjects(document);
           return;
         }
       }
@@ -437,7 +437,10 @@ var requestpolicyOverlay = {
     this._setBlockedContentNotification(false);
   },
 
-  _identifyBlockedVisibleObjects : function(document) {
+  _indicateBlockedVisibleObjects : function(document) {
+    if (!this._requestpolicy.prefs.getBoolPref("indicateBlockedObjects")) {
+      return;
+    }
     var images = document.getElementsByTagName("img");
     for (var i = 0; i < images.length; i++) {
       var img = images[i];

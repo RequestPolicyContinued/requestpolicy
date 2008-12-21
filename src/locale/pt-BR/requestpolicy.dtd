@@ -18,6 +18,7 @@
 <!ENTITY preferences.prefpane.export "Export">
 <!ENTITY preferences.userInterface "User Interface">
 <!ENTITY preferences.statusbarIcon "Status bar icon:">
+<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images:">
 <!ENTITY preferences.origins "Origins">
 <!ENTITY preferences.destinations "Destinations">
 <!ENTITY preferences.originsToDestinations "Origins-to-Destinations">

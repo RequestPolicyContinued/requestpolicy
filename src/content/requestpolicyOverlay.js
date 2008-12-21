@@ -63,8 +63,6 @@ var requestpolicyOverlay = {
   _rpContextMenu : null,
   _toolbox : null,
 
-  _clearImageDataUri : "data:image/gif;base64,"
-      + "R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAEBMgA7",
   _missingImageDataUri : "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c"
       + "6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0"
@@ -471,12 +469,12 @@ var requestpolicyOverlay = {
         if (!img.height) {
           img.height = 50;
         }
-        // Set the src to be null. Need to do this to have a blocked image
-        // be rendered at all, and so show the border and background. Setting it
-        // to a transparent image, instead, resulted in the background/border
-        // being displayed but not the alt text. We end up with the broken image
-        // icon being displayed as well in most cases, but that's fine.
-        img.src = null;
+        // We want it to be registered as a broken image so that the alt text
+        // shows. By default, the blocked image will just not show up at all.
+        // Setting src to null worked on firefox 3.0 but not 3.1. So, use a
+        // local url that doesn't exist (using resource:// because chrome:// is
+        // forbidden in this context).
+        img.src = "resource://doesnt/exist.png";
       }
     }
   },

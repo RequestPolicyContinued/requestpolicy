@@ -8,7 +8,7 @@
 
 <prefwindow id="requestpolicyPrefs" title="&preferences.windowTitle;" type="prefwindow"
 	windowtype="requestpolicy:pref" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	buttons="accept"
+	buttons="accept,cancel"
 	>
     
 	<stringbundleset id="stringbundleset">
@@ -24,7 +24,7 @@
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
 		>
 		<preferences>
-			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string"/>
+			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string" instantApply="true"/>
 			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
 		</preferences>
 

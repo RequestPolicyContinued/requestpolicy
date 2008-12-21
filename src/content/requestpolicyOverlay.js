@@ -451,6 +451,12 @@ var requestpolicyOverlay = {
         img.style.backgroundPosition = "center center";
         img.style.backgroundImage = "url('" + this._missingImageDataUri + "')";
         img.style.opacity = "0.3";
+        if (!img.width) {
+          img.width = 20;
+        }
+        if (!img.height) {
+          img.height = 20;
+        }
         // Set the src to a blank image. Need to do this to have a blocked image
         // be rendered at all, and so show the border and background.
         img.src = this._clearImageDataUri;

@@ -918,6 +918,9 @@ RequestPolicyService.prototype = {
     var origin = args[2];
     var dest = args[1];
 
+    // args[3] is the context
+    args[3].requestpolicyBlocked = true;
+
     this._cacheShouldLoadResult(CP_REJECT, origin, dest);
     this._recordRejectedRequest(origin, dest);
 

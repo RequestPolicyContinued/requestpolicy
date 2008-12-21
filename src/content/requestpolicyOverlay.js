@@ -1,4 +1,5 @@
 Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
+Components.utils.import("resource://requestpolicy/FileUtils.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 
 /**
@@ -62,6 +63,9 @@ var requestpolicyOverlay = {
   _rpContextMenu : null,
   _toolbox : null,
 
+  _clearImageDataUri : "data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAEBMgA7",
+  _missingImageDataUri : null,
+
   toString : function() {
     return "[requestpolicyOverlay " + this._overlayId + "]";
   },
@@ -122,6 +126,9 @@ var requestpolicyOverlay = {
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
       this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
       this._toolbox = document.getElementById("navigator-toolbox");
+
+      this._missingImageDataUri = FileUtils
+          .chromeUriToDataUri("chrome://requestpolicy/skin/requestpolicy-icon-blocked.png");
 
       // Register this window with the requestpolicy service so that we can be
       // notified of blocked requests. When blocked requests happen, this
@@ -410,6 +417,7 @@ var requestpolicyOverlay = {
       Logger.debug(Logger.TYPE_INTERNAL, "Main document <"
               + document.documentURI + "> has rejected requests.");
       this._setBlockedContentNotification(true);
+      this._identifyBlockedVisibleObjects(document);
       return;
     }
     var otherOrigins = this._getOtherOrigins(document);
@@ -421,11 +429,30 @@ var requestpolicyOverlay = {
                   + "> of main document <" + document.documentURI
                   + "> has rejected requests.");
           this._setBlockedContentNotification(true);
+          this._identifyBlockedVisibleObjects(document);
           return;
         }
       }
     }
     this._setBlockedContentNotification(false);
+  },
+
+  _identifyBlockedVisibleObjects : function(document) {
+    var images = document.getElementsByTagName("img");
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      if (img.requestpolicyBlocked && !img.requestpolicyIdentified) {
+        img.requestpolicyIdentified = true;
+        img.style.border = "solid 1px #faa";
+        img.style.backgroundRepeat = "no-repeat";
+        img.style.backgroundPosition = "center center";
+        img.style.backgroundImage = "url('" + this._missingImageDataUri + "')";
+        img.style.opacity = "0.3";
+        // Set the src to a blank image. Need to do this to have a blocked image
+        // be rendered at all, and so show the border and background.
+        img.src = this._clearImageDataUri;
+      }
+    }
   },
 
   /**
@@ -477,27 +504,18 @@ var requestpolicyOverlay = {
 
   _updateNotificationDueToBlockedContent : function() {
     if (this._blockedContentCheckTimeoutId) {
-      Logger.debug(Logger.TYPE_INTERNAL,
-          "observeBlockedRequest: Timeout already running. No action taken.");
       return;
     }
 
     var curTime = (new Date()).getTime();
     if (this._blockedContentCheckLastTime
         + this._blockedContentCheckMinWaitOnObservedBlockedRequest > curTime) {
-      Logger.debug(Logger.TYPE_INTERNAL,
-          "observeBlockedRequest: Setting timeout.");
-      Logger.debug(Logger.TYPE_INTERNAL, "");
       const document = content.document;
       this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
           function() {
-            Logger.debug(Logger.TYPE_INTERNAL,
-                "observeBlockedRequest: Timeout fired.");
             requestpolicyOverlay._checkForBlockedContent(document);
           }, this._blockedContentCheckTimeoutDelay);
     } else {
-      Logger.debug(Logger.TYPE_INTERNAL,
-          "observeBlockedRequest: Checking now, not setting timeout.");
       this._checkForBlockedContent(content.document);
     }
   },

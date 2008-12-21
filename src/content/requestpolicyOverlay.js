@@ -64,7 +64,24 @@ var requestpolicyOverlay = {
   _toolbox : null,
 
   _clearImageDataUri : "data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAEBMgA7",
-  _missingImageDataUri : null,
+  _missingImageDataUri : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0"
+      + "d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAArZJREFUeNqUU0trU0EYPTOT"
+      + "e29u0iYRE4NpY62Kz00Vi0sXrnQtiCCoezc+Nv4AURQR3Sgo4lYEF+JGcCeC"
+      + "BUGo1pb4AF2kefdxc5P7mIdfIi0uiujAd2eY+50z53zfDDPG3GiteueePrh/"
+      + "4cDj689z+exx2FYq5s6cGN+xcOjJC42/jATF1FK7Xcy/eXWzHOJecddUge3f"
+      + "y7xaM6xXq9WXJ44+8xuLd0+9r9TXQLc4s5VBipa9AcEZFvTmD1Yqkzu9GGh1"
+      + "gEIJydF8CovNXY25z1dD4PLTsdxivx/NLAfSBJwdY8o8FMDDAUHLzW3qNhwn"
+      + "j1ACP6uAtwxlpZDcsxtjP74iuerbYawnPPgTQRwi4gaBkgcYkBsQwMlkl6Vl"
+      + "A5rsLq1QkIoswBwb6dJWSJcIlYa7ZEOwZfC2RiuWeQMUhwTCdb90M5mpocGQ"
+      + "BNdr0MZANlqIOx349RYkt8EshpRtI8X64MA4EUzzAYacf5OlMgxIlFJkqgnW"
+      + "68KQEh2E4LFCJGMoxmEoxSGUBYwQwe7fFjir6s2kSDAGm7bqDWjHRdxuQkcR"
+      + "mBAQBOJEMAjxu32pCNgxJCC2706hYAznjCWoFu0OVCzhrXro9CUkKVNMIFY+"
+      + "OYwQGg2HzvWBbUMCps2sv3mLnuXCZJNoWQOjAhnNLCFUjK6RUDZHTGBNRiVn"
+      + "SBKM3GSGNRBKtpv5Yv9ecculFUTbVyH31YLu9Hzk3/7Odc1PCC3pVE2sctAp"
+      + "6jZ9qS/oDBXYltVDv+e9dbIrj+e/BbQ1iPph4APNV+6URo+0Y5weMWaMRbEQ"
+      + "UlWp8I+oiAuJteuZct2PLnR5o/t+serN0DSz0T++tkin068TiQT+d6wjisXi"
+      + "u0wmU/5X4DUqIfuTgB7ep1Kp9OPPpJNnz2PPzwVMVmbRkhy2NFBhDBbI9Zxf"
+      + "AgwAQhA3/0AzeAcAAAAASUVORK5CYII=",
 
   toString : function() {
     return "[requestpolicyOverlay " + this._overlayId + "]";
@@ -126,9 +143,6 @@ var requestpolicyOverlay = {
       this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
       this._rpContextMenu = document.getElementById("requestpolicyContextMenu");
       this._toolbox = document.getElementById("navigator-toolbox");
-
-      this._missingImageDataUri = FileUtils
-          .chromeUriToDataUri("chrome://requestpolicy/skin/requestpolicy-icon-blocked.png");
 
       // Register this window with the requestpolicy service so that we can be
       // notified of blocked requests. When blocked requests happen, this

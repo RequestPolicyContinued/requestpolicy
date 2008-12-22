@@ -37,3 +37,12 @@ grid row hbox:first-child {
 .temporaryPermissionsCell label {
     display: none;
 }
+
+/* Whitelist pane */
+listcol.temporary {
+	width : 8em;
+}
+
+listcol#originToDestinationOriginColumn {
+	width : 12em;
+}

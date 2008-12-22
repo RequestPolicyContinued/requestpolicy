@@ -57,7 +57,7 @@
 			<listheader label="&rp.destination;"/>
 		</listhead>
 		<listcols>
-			<listcol style="width : 18em;"/>
+			<listcol id="originColumn"/>
 			<listcol flex="1"/>
 		</listcols>
 

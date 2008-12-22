@@ -82,9 +82,13 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&rp.origin;" flex="1"/>
+								<listheader label="&rp.origin;"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
+							<listcols>
+								<listcol flex="1"/>
+								<listcol class="temporary"/>
+							</listcols>
 						</listbox>
 						<hbox>
 							<button id="removeOrigins" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
@@ -104,9 +108,13 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&rp.destination;" flex="1"/>
+								<listheader label="&rp.destination;"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
+							<listcols>
+								<listcol flex="1"/>
+								<listcol class="temporary"/>
+							</listcols>
 						</listbox>
 						<hbox>
 							<button id="removeDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>
@@ -126,10 +134,15 @@
 							key="select-all-key"
 							>
 							<listhead>
-								<listheader label="&rp.origin;" flex="1"/>
-								<listheader label="&rp.destination;" flex="1"/>
+								<listheader label="&rp.origin;"/>
+								<listheader label="&rp.destination;"/>
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
+							<listcols>
+								<listcol id="originToDestinationOriginColumn"/>
+								<listcol flex="1"/>
+								<listcol class="temporary"/>
+							</listcols>
 						</listbox>
 						<hbox>
 							<button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicyPrefs.removeSelectedFromList(this.listbox)" disabled="true"/>

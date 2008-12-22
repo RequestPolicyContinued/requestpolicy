@@ -15,3 +15,7 @@ grid#checkboxgrid {
     margin-top : 0.6em;	
     margin-bottom : 0;
 }
+
+listcol#originColumn {
+    width : 18em;
+}

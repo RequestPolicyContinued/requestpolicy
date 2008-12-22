@@ -19,6 +19,7 @@
 <!ENTITY preferences.userInterface "Benutzeroberfläche">
 <!ENTITY preferences.statusbarIcon "Statusleistensymbol:">
 <!ENTITY preferences.indicateBlockedObjects "Indicate blocked images:">
+<!ENTITY preferences.openInitialSetup "Open initial setup tool">
 <!ENTITY preferences.origins "Quellen">
 <!ENTITY preferences.destinations "Ziele">
 <!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">

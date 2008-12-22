@@ -55,6 +55,11 @@
 				</rows>
 			</grid>
 		</groupbox>
+		
+		<groupbox>
+			<caption label="&initialSetup.title;"/>
+			<label value="&preferences.openInitialSetup;" class="text-link" onclick="requestpolicyPrefs.openModalInitialSetupDialog()"/>
+		</groupbox>
 	</prefpane>
 
 	<prefpane id="requestpolicyPrefpaneWhitelist"

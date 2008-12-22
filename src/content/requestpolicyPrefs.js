@@ -264,7 +264,8 @@ var requestpolicyPrefs = {
     button.disabled = true;
     // Remove any "|" and spaces to avoid conflict with separators.
     for (var i = 0; i < button.textboxes.length; i++) {
-      button.textboxes[i].value = button.textboxes[i].value.replace(/\[|\]|\s|\|/g, "");
+      button.textboxes[i].value = button.textboxes[i].value.replace(
+          /\[|\]|\s|\|/g, "");
       if (button.textboxes[i].value == "") {
         return;
       }
@@ -393,6 +394,17 @@ var requestpolicyPrefs = {
       // to other issues).
       event.explicitOriginalTarget.selectAll();
     }
+  },
+
+  /**
+   * Opens the initial setup dialog as a modal window so that it can repopulate
+   * the listboxes after the dialog is closed.
+   */
+  openModalInitialSetupDialog : function() {
+    window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
+        "requestpolicyInitialSetupDialogWindow",
+        "chrome, dialog, centerscreen, alwaysRaised, modal");
+    this._populateWhitelists();
   }
 
 }

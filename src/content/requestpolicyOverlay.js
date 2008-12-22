@@ -1,5 +1,4 @@
 Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
-Components.utils.import("resource://requestpolicy/FileUtils.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 
 /**
@@ -241,6 +240,8 @@ var requestpolicyOverlay = {
         }, false);
 
     this._wrapAddTab();
+
+    this._showInitialSetupDialog();
   },
 
   /**
@@ -1555,6 +1556,16 @@ var requestpolicyOverlay = {
     window.openDialog("chrome://requestpolicy/content/requestpolicyPrefs.xul",
         "requestpolicyPreferencesDialogWindow",
         "chrome, dialog, centerscreen, alwaysRaised");
+  },
+
+  _showInitialSetupDialog : function() {
+    if (!this._requestpolicy.prefs.getBoolPref("initialSetupDialogShown")) {
+      this._requestpolicy.prefs.setBoolPref("initialSetupDialogShown", true);
+      this._requestpolicyJSObject._prefService.savePrefFile(null);
+      window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
+          "requestpolicyInitialSetupDialogWindow",
+          "chrome, dialog, centerscreen, alwaysRaised");
+    }
   },
 
   _attachPopupToContextMenu : function() {

@@ -549,10 +549,10 @@ RequestPolicyService.prototype = {
   },
 
   allowOriginToDestination : function allowOriginToDestination(
-      originIdentifier, destIdentifier) {
+      originIdentifier, destIdentifier, noStore) {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
-    this._allowOriginToDestinationByCombinedIdentifier(combinedId);
+    this._allowOriginToDestinationByCombinedIdentifier(combinedId, noStore);
   },
 
   _allowOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
@@ -680,7 +680,7 @@ RequestPolicyService.prototype = {
     this._prefService.savePrefFile(null);
   },
 
-  _storeAllPreferenceLists : function() {
+  storeAllPreferenceLists : function() {
     for (var prefName in this._prefNameToObjectMap) {
       this._storePreferenceList(prefName);
     }

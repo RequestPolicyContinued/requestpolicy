@@ -14,20 +14,22 @@ interface nsIRequestPolicy : nsISupports
   void temporarilyAllowOrigin(in ACString siteIdentifier);
   boolean isTemporarilyAllowedOrigin(in ACString siteIdentifier);
   
-  void allowOrigin(in ACString siteIdentifier);
+  void allowOrigin(in ACString siteIdentifier, in boolean delayStore);
   boolean isAllowedOrigin(in ACString siteIdentifier);
   
   void temporarilyAllowDestination(in ACString siteIdentifier);
   boolean isTemporarilyAllowedDestination(in ACString siteIdentifier);
   
-  void allowDestination(in ACString siteIdentifier);
+  void allowDestination(in ACString siteIdentifier, in boolean delayStore);
   boolean isAllowedDestination(in ACString siteIdentifier);
   
   void temporarilyAllowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   boolean isTemporarilyAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   
-  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier, in boolean delayStore);
   boolean isAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  
+  void storeAllPreferenceLists();
   
   void revokeTemporaryPermissions();
   boolean areTemporaryPermissionsGranted();

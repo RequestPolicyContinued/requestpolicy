@@ -238,7 +238,7 @@ var requestpolicyPrefs = {
     }
     // We delayed storage of the preference lists by using the "noStore" second
     // parameter when removing each value, so store the data now.
-    this._requestpolicyJSObject._storeAllPreferenceLists();
+    this._requestpolicy.storeAllPreferenceLists();
     // while (listbox.selectedItems.length > 0) {
     // listbox.removeItemAt(listbox.getIndexOfItem(listbox.selectedItems[0]));
     // }
@@ -358,7 +358,7 @@ var requestpolicyPrefs = {
 
     // We delayed storage of the preference lists by using the "noStore" second
     // parameter when importing each new value, so store the data now.
-    this._requestpolicyJSObject._storeAllPreferenceLists();
+    this._requestpolicy.storeAllPreferenceLists();
 
     this._populateWhitelists();
     Prompter.alert(this._getFilePickerWindowTitle('import'), this._strbundle

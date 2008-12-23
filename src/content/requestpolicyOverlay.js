@@ -470,6 +470,8 @@ var requestpolicyOverlay = {
         if (!img.height) {
           img.height = 50;
         }
+        img.title = "[" + this._requestpolicy.getUriIdentifier(img.src) + "]"
+            + (img.title ? " " + img.title : "");
         // We want it to be registered as a broken image so that the alt text
         // shows. By default, the blocked image will just not show up at all.
         // Setting src to null worked on firefox 3.0 but not 3.1. So, use a

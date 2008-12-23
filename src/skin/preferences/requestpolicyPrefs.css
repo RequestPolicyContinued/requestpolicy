@@ -4,7 +4,9 @@ prefwindow .chromeclass-toolbar {
 
 prefwindow {
    width: 35em;
-   height : 35em;
+}
+prefwindow > prefpane > vbox.content-box {
+   height: 30em;
 }
 
 radio[pane] {

@@ -1557,7 +1557,7 @@ var requestpolicyOverlay = {
   openOptionsDialog : function() {
     window.openDialog("chrome://requestpolicy/content/requestpolicyPrefs.xul",
         "requestpolicyPreferencesDialogWindow",
-        "chrome, dialog, centerscreen, alwaysRaised");
+        "chrome, close, centerscreen, alwaysRaised");
   },
 
   _showInitialSetupDialog : function() {
@@ -1566,7 +1566,7 @@ var requestpolicyOverlay = {
       this._requestpolicyJSObject._prefService.savePrefFile(null);
       window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
           "requestpolicyInitialSetupDialogWindow",
-          "chrome, dialog, centerscreen, alwaysRaised");
+          "chrome, close, centerscreen, alwaysRaised");
     }
   },
 

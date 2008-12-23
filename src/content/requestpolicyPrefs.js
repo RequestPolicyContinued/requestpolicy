@@ -403,7 +403,7 @@ var requestpolicyPrefs = {
   openModalInitialSetupDialog : function() {
     window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
         "requestpolicyInitialSetupDialogWindow",
-        "chrome, dialog, centerscreen, alwaysRaised, modal");
+        "chrome, close, centerscreen, alwaysRaised, modal");
     this._populateWhitelists();
   }
 

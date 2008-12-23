@@ -8,7 +8,6 @@
 
 <prefwindow id="requestpolicyPrefs" title="&preferences.windowTitle;" type="prefwindow"
 	windowtype="requestpolicy:pref" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	buttons="accept,cancel"
 	>
     
 	<stringbundleset id="stringbundleset">
@@ -173,7 +172,7 @@
 				<caption label="&preferences.export.details.caption;"/>
 				<description>&preferences.export.details.description;</description>
 			</groupbox>
-			<separator />
+			<separator class="thin"/>
 			
 			<hbox>
 				<button id="exportButton" label="&preferences.export.button.label;" oncommand="requestpolicyPrefs.doFileAction('export')"/>
@@ -195,7 +194,7 @@
 				<caption label="&preferences.import.details.caption;"/>
 				<description>&preferences.import.details.description;</description>
 			</groupbox>
-			<separator />
+			<separator class="thin"/>
             
 			<hbox>
 				<button id="importButton" label="&preferences.import.button.label;" oncommand="requestpolicyPrefs.doFileAction('import')"/>

@@ -14,7 +14,7 @@ initialSetup = {
         ["hotmail.com", "passport.com"], ["passport.com", "live.com"],
         ["live.com", "hotmail.com"], ["microsoft.com", "msn.com"],
         ["microsoft.com", "live.com"], ["live.com", "microsoft.com"],
-        ["facebook.com", "fbcdn.com"], ["myspace.com", "myspacecdn.com"],
+        ["facebook.com", "fbcdn.net"], ["myspace.com", "myspacecdn.com"],
         ["wikipedia.com", "wikipedia.org"], ["wikipedia.org", "wikimedia.org"],
         ["blogger.com", "google.com"], ["google.com", "blogger.com"],
         ["blogspot.com", "blogger.com"], ["flickr.com", "yimg.com"],

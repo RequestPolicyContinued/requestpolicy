@@ -18,8 +18,8 @@
 <!ENTITY preferences.prefpane.export "Export">
 <!ENTITY preferences.userInterface "Benutzeroberfläche">
 <!ENTITY preferences.statusbarIcon "Statusleistensymbol:">
-<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images:">
-<!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.indicateBlockedObjects "Blockierte Grafiken durch Platzhalter ersetzen:">
+<!ENTITY preferences.openInitialSetup "Erstkonfiguration öffnen">
 <!ENTITY preferences.origins "Quellen">
 <!ENTITY preferences.destinations "Ziele">
 <!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">
@@ -40,12 +40,12 @@
 <!ENTITY requestLog.title "Anfragenchronik">
 <!ENTITY requestLog.blocked "Blockiert">
 <!ENTITY requestLog.time "Zeit">
-<!ENTITY initialSetup.title "Initial Setup">
-<!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
-<!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
+<!ENTITY initialSetup.title "Erstkonfiguration">
+<!ENTITY initialSetup.whitelist.caption "Hinzufügen häufig benutzter Regeln zur Liste erlaubter Anfragen">
+<!ENTITY initialSetup.whitelist.description "Die Regeln in dieser Liste können zugelassen werden, da (1) die Anfrage zwischen zwei Seiten stattfindet, die dem selben Unternehmen gehören, oder (2) sie auftretende Probleme beheben und dabei nur kleinen Einfluss aus Sicherheit und Privatsphäre haben.">
 <!ENTITY initialSetup.region.international "International">
-<!ENTITY initialSetup.region.americas "Americas">
-<!ENTITY initialSetup.region.asia "Asia">
-<!ENTITY initialSetup.region.usAndCanada "US and Canada">
-<!ENTITY initialSetup.region.europeAndRussia "Europe and Russia">
-<!ENTITY initialSetup.region.oceania "Oceania">
+<!ENTITY initialSetup.region.americas "Amerika">
+<!ENTITY initialSetup.region.asia "Asien">
+<!ENTITY initialSetup.region.usAndCanada "USA und Kanada">
+<!ENTITY initialSetup.region.europeAndRussia "Europa und Russland">
+<!ENTITY initialSetup.region.oceania "Ozeanien">

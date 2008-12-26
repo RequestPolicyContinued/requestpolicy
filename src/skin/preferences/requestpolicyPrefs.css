@@ -3,7 +3,8 @@ prefwindow .chromeclass-toolbar {
 }
 
 prefwindow {
-   width: 35em;
+   /* Must be wide enough to accommodate locales with long translations of General pane labels. */
+   width: 40em;
 }
 prefwindow > prefpane > vbox.content-box {
    height: 30em;

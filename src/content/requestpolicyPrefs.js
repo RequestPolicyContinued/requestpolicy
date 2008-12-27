@@ -82,16 +82,15 @@ var requestpolicyPrefs = {
       this._destinationsList.removeButton.listbox = this._destinationsList;
       this._originsToDestinationsList.removeButton.listbox = this._originsToDestinationsList;
 
-      // Each list has a "forbid" function to remove an item from the list. We
-      // use the "noStore" parameter to delay the storage of the modified lists.
       this._originsList.forbid = function(origin) {
-        requestpolicyPrefs._requestpolicyJSObject.forbidOrigin(origin, true);
+        requestpolicyPrefs._requestpolicy.forbidOriginDelayStore(origin);
       };
       this._destinationsList.forbid = function(destination) {
-        requestpolicyPrefs._requestpolicyJSObject.forbidDestination(
-            destination, true);
+        requestpolicyPrefs._requestpolicy
+            .forbidDestinationDelayStore(destination);
       };
       this._originsToDestinationsList.forbid = function(originToDestIdentifier) {
+        // Third param is "delay store".
         requestpolicyPrefs._requestpolicyJSObject
             ._forbidOriginToDestinationByCombinedIdentifier(
                 originToDestIdentifier, true);
@@ -258,12 +257,8 @@ var requestpolicyPrefs = {
     for (var i = 0; i < listbox.selectedItems.length; i++) {
       listbox.forbid(listbox.selectedItems[i].value);
     }
-    // We delayed storage of the preference lists by using the "noStore" second
-    // parameter when removing each value, so store the data now.
+    // We delayed storage of the preference lists, so store the data now.
     this._requestpolicy.storeAllPreferenceLists();
-    // while (listbox.selectedItems.length > 0) {
-    // listbox.removeItemAt(listbox.getIndexOfItem(listbox.selectedItems[0]));
-    // }
     for (var i = listbox.childNodes.length - 1; i >= 0; i--) {
       if (listbox.childNodes[i].selected) {
         listbox.removeChild(listbox.childNodes[i]);
@@ -379,8 +374,7 @@ var requestpolicyPrefs = {
       }
     }
 
-    // We delayed storage of the preference lists by using the "noStore" second
-    // parameter when importing each new value, so store the data now.
+    // We delayed storage of the preference lists, so store the data now.
     this._requestpolicy.storeAllPreferenceLists();
 
     this._populateWhitelists();

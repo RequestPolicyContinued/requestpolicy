@@ -14,19 +14,22 @@ interface nsIRequestPolicy : nsISupports
   void temporarilyAllowOrigin(in ACString siteIdentifier);
   boolean isTemporarilyAllowedOrigin(in ACString siteIdentifier);
   
-  void allowOrigin(in ACString siteIdentifier, in boolean delayStore);
+  void allowOrigin(in ACString siteIdentifier);
+  void allowOriginDelayStore(in ACString siteIdentifier);
   boolean isAllowedOrigin(in ACString siteIdentifier);
   
   void temporarilyAllowDestination(in ACString siteIdentifier);
   boolean isTemporarilyAllowedDestination(in ACString siteIdentifier);
   
-  void allowDestination(in ACString siteIdentifier, in boolean delayStore);
+  void allowDestination(in ACString siteIdentifier);
+  void allowDestinationDelayStore(in ACString siteIdentifier);
   boolean isAllowedDestination(in ACString siteIdentifier);
   
   void temporarilyAllowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   boolean isTemporarilyAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   
-  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier, in boolean delayStore);
+  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  void allowOriginToDestinationDelayStore(in ACString originIdentifier, in ACString destinationIdentifier);
   boolean isAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
   
   void storeAllPreferenceLists();
@@ -35,8 +38,13 @@ interface nsIRequestPolicy : nsISupports
   boolean areTemporaryPermissionsGranted();
   
   void forbidOrigin(in ACString siteIdentifier);
+  void forbidOriginDelayStore(in ACString siteIdentifier);
+  
   void forbidDestination(in ACString siteIdentifier);
+  void forbidDestinationDelayStore(in ACString siteIdentifier);
+  
   void forbidOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  void forbidOriginToDestinationDelayStore(in ACString originIdentifier, in ACString destinationIdentifier);
   
   boolean isAllowedRedirect(in ACString originUri, in ACString destinationUri);
   

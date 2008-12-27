@@ -97,15 +97,14 @@ initialSetup = {
       var origin = this._items[i][0];
       var dest = this._items[i][1];
       if (origin == "*") {
-        this._requestpolicy.allowDestination(dest, true);
+        this._requestpolicy.allowDestinationDelayStore(dest);
       } else if (dest == "*") {
-        this._requestpolicy.allowOrigin(origin, true);
+        this._requestpolicy.allowOriginDelayStore(origin);
       } else {
-        this._requestpolicy.allowOriginToDestination(origin, dest, true);
+        this._requestpolicy.allowOriginToDestinationDelayStore(origin, dest);
       }
     }
-    // We delayed storage of the preference lists by using the "noStore" second
-    // parameter when adding each new value, so store the data now.
+    // We delayed storage of the preference lists, so store the data now.
     this._requestpolicy.storeAllPreferenceLists();
     return true;
   },

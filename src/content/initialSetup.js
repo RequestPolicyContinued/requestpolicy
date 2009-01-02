@@ -20,7 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Components.utils.import("resource://requestpolicy/Logger.jsm");
+var rpModules;
+if (rpModules === undefined) {
+  rpModules = {};
+}
+Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
 
 initialSetup = {
 
@@ -94,7 +98,7 @@ initialSetup = {
 
   save : function() {
     for (var i = 0; i < this._items.length; i++) {
-      Logger.dump("Adding item to whitelist: " + this._items[i]);
+      rpModules.Logger.dump("Adding item to whitelist: " + this._items[i]);
       var origin = this._items[i][0];
       var dest = this._items[i][1];
       if (origin == "*") {

@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Components.utils.import("resource://requestpolicy/Logger.jsm");
-
 var requestLog = {
 
   _initialized : false,

@@ -20,8 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
-Components.utils.import("resource://requestpolicy/Logger.jsm");
+var rpModules;
+if (rpModules === undefined) {
+  rpModules = {};
+}
+Components.utils.import("resource://requestpolicy/DomainUtils.jsm", rpModules);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -332,7 +336,7 @@ var requestpolicyOverlay = {
             accessKey : '', // TODO
             popup : null,
             callback : function() {
-              Logger.dump("User allowed redirection from <"
+              rpModules.Logger.dump("User allowed redirection from <"
                   + targetDocument.location.href + "> to <" + redirectTargetUri
                   + ">");
               targetDocument.location.href = redirectTargetUri;
@@ -404,7 +408,8 @@ var requestpolicyOverlay = {
     }
 
     var document = event.target;
-    Logger.dump("onAppContentLoaded called for " + document.documentURI);
+    rpModules.Logger.dump("onAppContentLoaded called for "
+        + document.documentURI);
     if (!document) {
       // onAppContentLoaded getting called more often than it should? document
       // isn't set on new tab open when this is called.
@@ -430,7 +435,8 @@ var requestpolicyOverlay = {
     // TODO: This only works for (i)frames that are direct children of the main
     // document, not (i)frames within those (i)frames.
     var iframe = event.target;
-    Logger.debug(Logger.TYPE_INTERNAL, "onAppFrameContentLoaded called for <"
+    rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+        "onAppFrameContentLoaded called for <"
             + iframe.contentDocument.documentURI + "> in <"
             + iframe.ownerDocument.documentURI + ">");
     // TODO: maybe this can check if the iframe's documentURI is in the other
@@ -452,14 +458,13 @@ var requestpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function(document) {
-  	var documentUri = DomainUtils.stripFragment(document.documentURI);
-    Logger
-        .debug(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
-                + documentUri + ">");
+    var documentUri = rpModules.DomainUtils.stripFragment(document.documentURI);
+    rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+        "Checking for blocked content from page <" + documentUri + ">");
     this._blockedContentCheckLastTime = (new Date()).getTime();
     this._stopBlockedContentCheckTimeout();
     if (this._requestpolicy.originHasRejectedRequests(documentUri)) {
-      Logger.debug(Logger.TYPE_INTERNAL, "Main document <"
+      rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL, "Main document <"
               + documentUri + "> has rejected requests.");
       this._setBlockedContentNotification(true);
       this._indicateBlockedVisibleObjects(document);
@@ -468,10 +473,10 @@ var requestpolicyOverlay = {
     var otherOrigins = this._getOtherOrigins(document);
     for (var i in otherOrigins) {
       for (var j in otherOrigins[i]) {
-        Logger.dump("Checking for blocked content from " + j);
+        rpModules.Logger.dump("Checking for blocked content from " + j);
         if (this._requestpolicy.originHasRejectedRequests(j)) {
-          Logger.debug(Logger.TYPE_INTERNAL, "Other origin <" + j
-                  + "> of main document <" + documentUri
+          rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+              "Other origin <" + j + "> of main document <" + documentUri
                   + "> has rejected requests.");
           this._setBlockedContentNotification(true);
           this._indicateBlockedVisibleObjects(document);
@@ -604,12 +609,13 @@ var requestpolicyOverlay = {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
         // TODO: move this logic to the requestpolicy service.
-        var parts = DomainUtils.parseRefresh(metaTags[i].content);
+        var parts = rpModules.DomainUtils.parseRefresh(metaTags[i].content);
         var delay = parts[0];
         var dest = parts[1];
-        Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <" + dest
-                + "> (" + delay + " second delay) found in document at <"
-                + document.location + ">");
+        rpModules.Logger.info(rpModules.Logger.TYPE_META_REFRESH,
+            "meta refresh to <" + dest + "> (" + delay
+                + " second delay) found in document at <" + document.location
+                + ">");
         if (dest != undefined) {
           if (this._requestpolicyJSObject._blockingDisabled
               || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
@@ -647,7 +653,7 @@ var requestpolicyOverlay = {
 
     if (this._requestpolicyJSObject._blockedRedirects[document.location]) {
       var dest = this._requestpolicyJSObject._blockedRedirects[document.location];
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+      rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(document, dest);
@@ -806,7 +812,7 @@ var requestpolicyOverlay = {
   },
 
   _getCurrentUri : function _getCurrentUriIdentifier() {
-    return DomainUtils.stripFragment(content.document.documentURI);
+    return rpModules.DomainUtils.stripFragment(content.document.documentURI);
   },
 
   /**
@@ -955,9 +961,10 @@ var requestpolicyOverlay = {
       this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
 
     } catch (e) {
-      Logger.severe(Logger.TYPE_ERROR, "Fatal Error, " + e + ", stack was: "
-              + e.stack);
-      Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
+      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
+              + ", stack was: " + e.stack);
+      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
+          "Unable to prepare menu due to error.");
       throw e;
     }
   },
@@ -1099,14 +1106,15 @@ var requestpolicyOverlay = {
   _getOtherOrigins : function(document) {
     var origins = {};
     this._getOtherOriginsHelperFromDOM(document, origins);
-    this._getOtherOriginsHelperFromAllowedRequests(DomainUtils
+    this._getOtherOriginsHelperFromAllowedRequests(rpModules.DomainUtils
             .stripFragment(document.documentURI), origins, {});
     return origins;
   },
 
   _getOtherOriginsHelperFromDOM : function(document, origins) {
-    var documentUri = DomainUtils.stripFragment(document.documentURI);
-    Logger.dump("Looking for other origins within DOM of " + documentUri);
+    var documentUri = rpModules.DomainUtils.stripFragment(document.documentURI);
+    rpModules.Logger.dump("Looking for other origins within DOM of "
+        + documentUri);
     // TODO: Check other elements besides iframes and frames?
     var frameTagTypes = {
       "iframe" : null,
@@ -1117,7 +1125,8 @@ var requestpolicyOverlay = {
       for (var i = 0; i < iframes.length; i++) {
         var child = iframes[i];
         var childDocument = child.contentDocument;
-        var childUri = DomainUtils.stripFragment(childDocument.documentURI);
+        var childUri = rpModules.DomainUtils
+            .stripFragment(childDocument.documentURI);
         if (childUri == "about:blank") {
           // iframe empty or not loaded yet, or maybe blocked.
           // childUri = child.src;
@@ -1125,8 +1134,8 @@ var requestpolicyOverlay = {
           // yet.
           continue;
         }
-        Logger.dump("Found DOM child " + tagType + " with src <" + childUri
-            + "> in document <" + documentUri + ">");
+        rpModules.Logger.dump("Found DOM child " + tagType + " with src <"
+            + childUri + "> in document <" + documentUri + ">");
         var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
         if (!origins[childUriIdent]) {
           origins[childUriIdent] = {};
@@ -1139,8 +1148,9 @@ var requestpolicyOverlay = {
 
   _getOtherOriginsHelperFromAllowedRequests : function(rootUri, origins,
       checkedOrigins) {
-    Logger.dump("Looking for other origins within allowed requests from "
-        + rootUri);
+    rpModules.Logger
+        .dump("Looking for other origins within allowed requests from "
+            + rootUri);
     var allowedRequests = this._requestpolicyJSObject._allowedRequests[rootUri];
     if (allowedRequests) {
       for (var i in allowedRequests) {
@@ -1150,8 +1160,8 @@ var requestpolicyOverlay = {
           }
           checkedOrigins[allowedUri] = true;
 
-          Logger.dump("Found allowed request to <" + allowedUri + "> from <"
-              + rootUri + ">");
+          rpModules.Logger.dump("Found allowed request to <" + allowedUri
+              + "> from <" + rootUri + ">");
           var allowedUriIdent = this._requestpolicy
               .getUriIdentifier(allowedUri);
           if (!origins[allowedUriIdent]) {
@@ -1166,27 +1176,27 @@ var requestpolicyOverlay = {
   },
 
   _dumpOtherOrigins : function(otherOrigins) {
-    Logger.dump("-------------------------------------------------");
-    Logger.dump("Other origins");
+    rpModules.Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("Other origins");
     for (i in otherOrigins) {
-      Logger.dump("\t" + "Origin identifier: <" + i + ">");
+      rpModules.Logger.dump("\t" + "Origin identifier: <" + i + ">");
       for (var j in otherOrigins[i]) {
-        Logger.dump("\t\t" + j);
+        rpModules.Logger.dump("\t\t" + j);
       }
     }
-    Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("-------------------------------------------------");
   },
 
   _dumpRequestSet : function(requestSet, name) {
-    Logger.dump("-------------------------------------------------");
-    Logger.dump(name);
+    rpModules.Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump(name);
     for (i in requestSet) {
-      Logger.dump("\t" + "Identifier: <" + i + ">");
+      rpModules.Logger.dump("\t" + "Identifier: <" + i + ">");
       for (var j in requestSet[i]) {
-        Logger.dump("\t\t" + j);
+        rpModules.Logger.dump("\t\t" + j);
       }
     }
-    Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("-------------------------------------------------");
   },
 
   _clearChildMenus : function(menu) {
@@ -1537,9 +1547,9 @@ var requestpolicyOverlay = {
   },
 
   _performRedirectAfterDelay : function(document, redirectTargetUri, delay) {
-    Logger.info(Logger.TYPE_INTERNAL, "Registering delayed (" + delay
-            + "s) redirect to <" + redirectTargetUri + "> from <"
-            + document.documentURI + ">");
+    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        "Registering delayed (" + delay + "s) redirect to <"
+            + redirectTargetUri + "> from <" + document.documentURI + ">");
     const constDocument = document;
     const constRedirectTargetUri = redirectTargetUri;
     document.defaultView.setTimeout(function() {
@@ -1551,8 +1561,9 @@ var requestpolicyOverlay = {
   _performRedirect : function(document, redirectTargetUri) {
     try {
       if (redirectTargetUri[0] == '/') {
-        Logger.info(Logger.TYPE_INTERNAL, "Redirecting to relative path <"
-                + redirectTargetUri + "> from <" + document.documentURI + ">");
+        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+            "Redirecting to relative path <" + redirectTargetUri + "> from <"
+                + document.documentURI + ">");
         document.location.pathname = redirectTargetUri;
       } else {
         // If there is no scheme, treat it as relative to the current directory.
@@ -1561,8 +1572,9 @@ var requestpolicyOverlay = {
           var curDir = document.documentURI.split("/").slice(0, -1).join("/");
           redirectTargetUri = curDir + "/" + redirectTargetUri;
         }
-        Logger.info(Logger.TYPE_INTERNAL, "Redirecting to <"
-                + redirectTargetUri + "> from <" + document.documentURI + ">");
+        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+            "Redirecting to <" + redirectTargetUri + "> from <"
+                + document.documentURI + ">");
         document.location.href = redirectTargetUri;
       }
     } catch (e) {

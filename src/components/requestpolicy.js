@@ -32,6 +32,12 @@ const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 // Use the new-fangled FF3 module, etc. generation.
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
+// Scope for imported modules.
+var rpModules;
+if (rpModules === undefined) {
+  rpModules = {};
+}
+
 function RequestPolicyService() {
   this.wrappedJSObject = this;
 }
@@ -128,7 +134,7 @@ RequestPolicyService.prototype = {
     // Note that we don't load user preferences at this point because the user
     // preferences may not be ready. If we tried right now, we may get the
     // default preferences.
-    this._uriIdentificationLevel = DomainUtils.LEVEL_DOMAIN;
+    this._uriIdentificationLevel = rpModules.DomainUtils.LEVEL_DOMAIN;
   },
 
   _initializeExtensionCompatibility : function() {
@@ -143,14 +149,16 @@ RequestPolicyService.prototype = {
 
     // Adblock Plus
     if (ext = em.getItemForID("{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}")) {
-      Logger.info(Logger.TYPE_INTERNAL, "Extension detected: " + ext.name);
+      rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+          "Extension detected: " + ext.name);
       this._extensionCompatibilityRules.push([
           "http://easylist.adblockplus.org/",
           "http://adblockplus.mozdev.org/easylist/", ext.name]);
     }
     // Greasefire
     if (ext = em.getItemForID("greasefire@skrul.com")) {
-      Logger.info(Logger.TYPE_INTERNAL, "Extension detected: " + ext.name);
+      rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+          "Extension detected: " + ext.name);
       this._extensionCompatibilityRules.push(["file://",
           "http://userscripts.org/", ext.name]);
       this._extensionCompatibilityRules.push(["file://",
@@ -163,14 +171,15 @@ RequestPolicyService.prototype = {
     this._updateLoggingSettings();
     // origins
     this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
-    Logger.vardump(this._allowedOrigins, "this._allowedOrigins");
+    rpModules.Logger.vardump(this._allowedOrigins, "this._allowedOrigins");
     // destinations
     this._allowedDestinations = this._getPreferenceObj("allowedDestinations");
-    Logger.vardump(this._allowedDestinations, "this._allowedDestinations");
+    rpModules.Logger.vardump(this._allowedDestinations,
+        "this._allowedDestinations");
     // origins to destinations
     this._allowedOriginsToDestinations = this
         ._getPreferenceObj("allowedOriginsToDestinations");
-    Logger.vardump(this._allowedOriginsToDestinations,
+    rpModules.Logger.vardump(this._allowedOriginsToDestinations,
         "this._allowedOriginsToDestinations");
 
     this._prefNameToObjectMap = {
@@ -183,7 +192,8 @@ RequestPolicyService.prototype = {
     if (!this._blockingDisabled
         && this._rootPrefs.getBoolPref("network.prefetch-next")) {
       this._rootPrefs.setBoolPref("network.prefetch-next", false);
-      Logger.info(Logger.TYPE_INTERNAL, "Disabled prefetch.");
+      rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+          "Disabled prefetch.");
     }
 
     // Clean up old, unused prefs (removed in 0.2.0).
@@ -199,9 +209,9 @@ RequestPolicyService.prototype = {
   },
 
   _updateLoggingSettings : function() {
-    Logger.enabled = this.prefs.getBoolPref("log");
-    Logger.level = this.prefs.getIntPref("log.level");
-    Logger.types = this.prefs.getIntPref("log.types");
+    rpModules.Logger.enabled = this.prefs.getBoolPref("log");
+    rpModules.Logger.level = this.prefs.getIntPref("log.level");
+    rpModules.Logger.types = this.prefs.getIntPref("log.types");
   },
 
   _register : function() {
@@ -222,7 +232,7 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
     } catch (e) {
-      Logger.dump(e + " while unregistering.");
+      rpModules.Logger.dump(e + " while unregistering.");
     }
   },
 
@@ -279,8 +289,9 @@ RequestPolicyService.prototype = {
     var resourceURI = ioService.newFileURI(modulesDir);
     resProt.setSubstitution("requestpolicy", resourceURI);
 
-    Components.utils.import("resource://requestpolicy/Logger.jsm");
-    Components.utils.import("resource://requestpolicy/DomainUtils.jsm");
+    Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
+    Components.utils.import("resource://requestpolicy/DomainUtils.jsm",
+        rpModules);
   },
 
   _examineHttpResponse : function(observedSubject) {
@@ -303,7 +314,7 @@ RequestPolicyService.prototype = {
       try {
         headerType = "Refresh";
         dest = httpChannel.getResponseHeader(headerType);
-        var parts = DomainUtils.parseRefresh(metaTags[i].content);
+        var parts = rpModules.DomainUtils.parseRefresh(metaTags[i].content);
         // TODO: Handle a delay value in the refresh.
         dest = parts[1];
       } catch (e) {
@@ -315,8 +326,9 @@ RequestPolicyService.prototype = {
     var origin = httpChannel.name;
 
     if (this.isAllowedRedirect(origin, dest)) {
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-              + headerType + "' header to <" + dest + "> " + "from <" + origin
+      rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
+          "** ALLOWED ** '" + headerType + "' header to <" + dest + "> "
+              + "from <" + origin
               + ">. Same hosts or allowed origin/destination.");
       this._recordAllowedRequest(origin, dest);
 
@@ -330,7 +342,7 @@ RequestPolicyService.prototype = {
 
         if (this._clickedLinks[realOrigin]
             && this._clickedLinks[realOrigin][origin]) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
               "This redirect was from a link click."
                   + " Registering an additional click to <" + dest + "> "
                   + "from <" + realOrigin + ">");
@@ -338,7 +350,7 @@ RequestPolicyService.prototype = {
 
         } else if (this._submittedForms[realOrigin]
             && this._submittedForms[realOrigin][origin.split("?")[0]]) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
               "This redirect was from a form submission."
                   + " Registering an additional form submission to <" + dest
                   + "> " + "from <" + realOrigin + ">");
@@ -356,12 +368,12 @@ RequestPolicyService.prototype = {
         this._recordRejectedRequest(origin, dest);
         this._blockedRedirects[origin] = dest;
       }
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
-              + headerType + "' header to <" + dest + ">"
+      rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
+          "** BLOCKED ** '" + headerType + "' header to <" + dest + ">"
               + " found in response from <" + origin + ">");
     } catch (e) {
-      Logger.severe(Logger.TYPE_HEADER_REDIRECT, "Failed removing " + "'"
-              + headerType + "' header to <" + dest + ">"
+      rpModules.Logger.severe(rpModules.Logger.TYPE_HEADER_REDIRECT,
+          "Failed removing " + "'" + headerType + "' header to <" + dest + ">"
               + "  in response from <" + origin + ">." + e);
     }
   },
@@ -378,7 +390,7 @@ RequestPolicyService.prototype = {
       if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
         // Seems to be too late to block it at this point. Calling the
         // cancel(status) method didn't stop it.
-        Logger.warning(Logger.TYPE_CONTENT,
+        rpModules.Logger.warning(rpModules.Logger.TYPE_CONTENT,
             "Discovered prefetch request being sent to: " + httpChannel.name);
       }
     } catch (e) {
@@ -387,39 +399,39 @@ RequestPolicyService.prototype = {
   },
 
   _printAllowedRequests : function() {
-    Logger.dump("-------------------------------------------------");
-    Logger.dump("Allowed Requests");
+    rpModules.Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("Allowed Requests");
     for (i in this._allowedRequests) {
-      Logger.dump("\t" + "Origin uri: <" + i + ">");
+      rpModules.Logger.dump("\t" + "Origin uri: <" + i + ">");
       for (var j in this._allowedRequests[i]) {
-        Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
+        rpModules.Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
         for (var k in this._allowedRequests[i][j]) {
           if (k == "count") {
             continue;
           }
-          Logger.dump("\t\t\t" + k);
+          rpModules.Logger.dump("\t\t\t" + k);
         }
       }
     }
-    Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("-------------------------------------------------");
   },
 
   _printRejectedRequests : function() {
-    Logger.dump("-------------------------------------------------");
-    Logger.dump("Rejected Requests");
+    rpModules.Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("Rejected Requests");
     for (i in this._rejectedRequests) {
-      Logger.dump("\t" + "Origin uri: <" + i + ">");
+      rpModules.Logger.dump("\t" + "Origin uri: <" + i + ">");
       for (var j in this._rejectedRequests[i]) {
-        Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
+        rpModules.Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
         for (var k in this._rejectedRequests[i][j]) {
           if (k == "count") {
             continue;
           }
-          Logger.dump("\t\t\t" + k);
+          rpModules.Logger.dump("\t\t\t" + k);
         }
       }
     }
-    Logger.dump("-------------------------------------------------");
+    rpModules.Logger.dump("-------------------------------------------------");
   },
 
   _notifyRequestObserversOfBlockedRequest : function(originUri, destUri) {
@@ -447,18 +459,19 @@ RequestPolicyService.prototype = {
   prefs : null,
 
   getUriIdentifier : function getUriIdentifier(uri) {
-    return DomainUtils.getIdentifier(uri, this._uriIdentificationLevel);
+    return rpModules.DomainUtils.getIdentifier(uri,
+        this._uriIdentificationLevel);
   },
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
-    var originUrl = DomainUtils.ensureUriHasPath(DomainUtils
-        .stripFragment(originUrl));
-    var destinationUrl = DomainUtils.ensureUriHasPath(DomainUtils
-        .stripFragment(destinationUrl));
+    var originUrl = rpModules.DomainUtils
+        .ensureUriHasPath(rpModules.DomainUtils.stripFragment(originUrl));
+    var destinationUrl = rpModules.DomainUtils
+        .ensureUriHasPath(rpModules.DomainUtils.stripFragment(destinationUrl));
 
-    Logger.info(Logger.TYPE_INTERNAL, "Form submitted from <" + originUrl
-            + "> to <" + destinationUrl + ">.");
+    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        "Form submitted from <" + originUrl + "> to <" + destinationUrl + ">.");
 
     // Drop the query string from the destination url because form GET requests
     // will end up with a query string on them when shouldLoad is called, so
@@ -475,13 +488,13 @@ RequestPolicyService.prototype = {
   },
 
   registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
-    var originUrl = DomainUtils.ensureUriHasPath(DomainUtils
-        .stripFragment(originUrl));
-    var destinationUrl = DomainUtils.ensureUriHasPath(DomainUtils
-        .stripFragment(destinationUrl));
+    var originUrl = rpModules.DomainUtils
+        .ensureUriHasPath(rpModules.DomainUtils.stripFragment(originUrl));
+    var destinationUrl = rpModules.DomainUtils
+        .ensureUriHasPath(rpModules.DomainUtils.stripFragment(destinationUrl));
 
-    Logger.info(Logger.TYPE_INTERNAL, "Link clicked from <" + originUrl
-            + "> to <" + destinationUrl + ">.");
+    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL, "Link clicked from <"
+            + originUrl + "> to <" + destinationUrl + ">.");
 
     if (this._clickedLinks[originUrl] == undefined) {
       this._clickedLinks[originUrl] = {};
@@ -736,8 +749,8 @@ RequestPolicyService.prototype = {
       throw "Invalid prefName: " + prefName;
     }
     var value = this._objToPrefString(setFromObj);
-    Logger.info(Logger.TYPE_INTERNAL, "Setting preference <" + prefName
-            + "> to value <" + value + ">.");
+    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        "Setting preference <" + prefName + "> to value <" + value + ">.");
     this.prefs.setCharPref(prefName, value);
     // Flush the prefs so that if the browser crashes, the changes aren't lost.
     // TODO: flush the file once after any changed preferences have been
@@ -753,8 +766,9 @@ RequestPolicyService.prototype = {
 
   _getPreferenceObj : function(prefName) {
     var prefString = this.prefs.getCharPref(prefName);
-    Logger.info(Logger.TYPE_INTERNAL, "Loading preference <" + prefName
-            + "> from value <" + prefString + ">.");
+    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        "Loading preference <" + prefName + "> from value <" + prefString
+            + ">.");
     return this._prefStringToObj(prefString);
   },
 
@@ -871,8 +885,8 @@ RequestPolicyService.prototype = {
       throw "Observer passed to addRequestObserver does "
           + "not have an observeBlockedRequest() method.";
     }
-    Logger.debug(Logger.TYPE_INTERNAL, "Adding request observer: "
-            + observer.toString());
+    rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+        "Adding request observer: " + observer.toString());
     this._requestObservers.push(observer);
   },
 
@@ -885,14 +899,14 @@ RequestPolicyService.prototype = {
   removeRequestObserver : function removeRequestObserver(observer) {
     for (var i = 0; i < this._requestObservers.length; i++) {
       if (this._requestObservers[i] == observer) {
-        Logger.debug(Logger.TYPE_INTERNAL, "Removing request observer: "
-                + observer.toString());
+        rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+            "Removing request observer: " + observer.toString());
         delete this._requestObservers[i];
         return;
       }
     }
-    Logger.warning(Logger.TYPE_INTERNAL, "Could not find observer to remove "
-            + "in removeRequestObserver()");
+    rpModules.Logger.warning(rpModules.Logger.TYPE_INTERNAL,
+        "Could not find observer to remove " + "in removeRequestObserver()");
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -926,7 +940,8 @@ RequestPolicyService.prototype = {
         this._shutdown();
         break;
       default :
-        Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);
+        rpModules.Logger.warning(rpModules.Logger.TYPE_ERROR,
+            "uknown topic observed: " + topic);
     }
   },
 
@@ -967,13 +982,15 @@ RequestPolicyService.prototype = {
 
   // We always call this from shouldLoad to reject a request.
   reject : function(reason, args) {
-    Logger.warning(Logger.TYPE_CONTENT, "** BLOCKED ** reason: "
+    rpModules.Logger.warning(rpModules.Logger.TYPE_CONTENT,
+        "** BLOCKED ** reason: "
             + reason
             + ". "
             + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
-    if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
-      Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
+    if (rpModules.Logger.logTypes & rpModules.Logger.TYPE_CONTENT_CALL) {
+      rpModules.Logger.info(rpModules.Logger.TYPE_CONTENT_CALL,
+          new Error().stack);
     }
 
     if (this._blockingDisabled) {
@@ -1038,13 +1055,15 @@ RequestPolicyService.prototype = {
   // ultimately returns CP_OK. Third param, "unrecorded", is set to true if
   // this request shouldn'tbe recorded as an allowed request.
   accept : function(reason, args, unforbidable) {
-    Logger.warning(Logger.TYPE_CONTENT, "** ALLOWED ** reason: "
+    rpModules.Logger.warning(rpModules.Logger.TYPE_CONTENT,
+        "** ALLOWED ** reason: "
             + reason
             + ". "
             + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
-    if (Logger.logTypes & Logger.TYPE_CONTENT_CALL) {
-      Logger.info(Logger.TYPE_CONTENT_CALL, new Error().stack);
+    if (rpModules.Logger.logTypes & rpModules.Logger.TYPE_CONTENT_CALL) {
+      rpModules.Logger.info(rpModules.Logger.TYPE_CONTENT_CALL,
+          new Error().stack);
     }
 
     var origin = args[2];
@@ -1156,7 +1175,7 @@ RequestPolicyService.prototype = {
       aRequestOrigin.asciiHost;
       aContentLocation.asciiHost;
     } catch (e) {
-      Logger.info(Logger.TYPE_CONTENT,
+      rpModules.Logger.info(rpModules.Logger.TYPE_CONTENT,
           "No asciiHost on either aRequestOrigin <" + aRequestOrigin.spec
               + "> or aContentLocation <" + aContentLocation.spec + ">");
       return true;
@@ -1205,13 +1224,13 @@ RequestPolicyService.prototype = {
         && this._lastShouldLoadCheck.destination == dest) {
       var date = new Date();
       if (date.getTime() - this._lastShouldLoadCheck.time < this._lastShouldLoadCheckTimeout) {
-        Logger.debug(Logger.TYPE_CONTENT,
+        rpModules.Logger.debug(rpModules.Logger.TYPE_CONTENT,
             "Using cached shouldLoad() result of "
                 + this._lastShouldLoadCheck.result + " for request to <" + dest
                 + "> from <" + origin + ">.");
         return true;
       } else {
-        Logger.debug(Logger.TYPE_CONTENT,
+        rpModules.Logger.debug(rpModules.Logger.TYPE_CONTENT,
             "shouldLoad() cache expired for result of "
                 + this._lastShouldLoadCheck.result + " for request to <" + dest
                 + "> from <" + origin + ">.");
@@ -1233,8 +1252,8 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        var origin = DomainUtils.stripFragment(aRequestOrigin.spec);
-        var dest = DomainUtils.stripFragment(aContentLocation.spec);
+        var origin = rpModules.DomainUtils.stripFragment(aRequestOrigin.spec);
+        var dest = rpModules.DomainUtils.stripFragment(aContentLocation.spec);
 
         if (this._isDuplicateRequest(dest, origin)) {
           return this._lastShouldLoadCheck.result;
@@ -1359,9 +1378,9 @@ RequestPolicyService.prototype = {
         return this.reject("hosts don't match", arguments);
 
       } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR, "Fatal Error, " + e + ", stack was: "
-                + e.stack);
-        Logger.severe(Logger.TYPE_CONTENT,
+        rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, "
+                + e + ", stack was: " + e.stack);
+        rpModules.Logger.severe(rpModules.Logger.TYPE_CONTENT,
             "Rejecting request due to internal error.");
         return this._blockingDisabled ? CP_OK : CP_REJECT;
       }

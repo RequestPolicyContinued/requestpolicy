@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Components.utils.import("resource://requestpolicy/Logger.jsm");
-
 var requestLogTreeView = {
 
   _treebox : null,
@@ -74,7 +72,6 @@ var requestLogTreeView = {
   },
 
   getCellText : function(index, column) {
-    // Logger.dump("CALL TO getCellText " + index + " / " + column.id + "\n");
     // Row 0 is actually the last element in the array so that we don't have to
     // unshift() the array and can just push().
     // TODO: Do an actual speed test with push vs. unshift to see if it matters

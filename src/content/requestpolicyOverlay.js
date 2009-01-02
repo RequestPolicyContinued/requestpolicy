@@ -52,7 +52,7 @@ var requestpolicyOverlay = {
 
   // This is set by requestLog.js when it is initialized. We don't need to worry
   // about setting it here.
-  requestLogTreeView : null,
+  requestpolicyRequestLogTreeView : null,
 
   _strbundle : null,
   _addedMenuItems : [],
@@ -553,15 +553,17 @@ var requestpolicyOverlay = {
   },
 
   observeAllowedRequest : function(originUri, destUri) {
-    if (this.requestLogTreeView) {
-      this.requestLogTreeView.addAllowedRequest(originUri, destUri);
+    if (this.requestpolicyRequestLogTreeView) {
+      this.requestpolicyRequestLogTreeView
+          .addAllowedRequest(originUri, destUri);
     }
   },
 
   observeBlockedRequest : function(originUri, destUri) {
     this._updateNotificationDueToBlockedContent();
-    if (this.requestLogTreeView) {
-      this.requestLogTreeView.addBlockedRequest(originUri, destUri);
+    if (this.requestpolicyRequestLogTreeView) {
+      this.requestpolicyRequestLogTreeView
+          .addBlockedRequest(originUri, destUri);
     }
   },
 
@@ -1655,7 +1657,7 @@ var requestpolicyOverlay = {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
       openRequestLog.hidden = false;
-      this.requestLogTreeView = null;
+      this.requestpolicyRequestLogTreeView = null;
     }
   }
 

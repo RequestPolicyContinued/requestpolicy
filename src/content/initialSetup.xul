@@ -30,8 +30,8 @@
 	title="RequestPolicy"
 	windowtype="requestpolicy:initialSetup"
 	buttons="accept,cancel"
-	onload="initialSetup.init()"
-	ondialogaccept="return initialSetup.save()">
+	onload="requestpolicyInitialSetup.init()"
+	ondialogaccept="return requestpolicyInitialSetup.save()">
 
 	<script type="application/x-javascript" src="initialSetup.js"/>
 
@@ -50,21 +50,21 @@
 			</columns>
 			<rows>
 				<row>
-					<checkbox id="international" checked="true" oncommand="initialSetup.buildList()"/>
+					<checkbox id="international" checked="true" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.international;" control="international"/>
-					<checkbox id="us-canada" oncommand="initialSetup.buildList()"/>
+					<checkbox id="us-canada" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.usAndCanada;" control="us-canada"/>
 				</row>
 				<row>
-					<checkbox id="americas" oncommand="initialSetup.buildList()"/>
+					<checkbox id="americas" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.americas;" control="americas"/>
-					<checkbox id="europe-russia" oncommand="initialSetup.buildList()"/>
+					<checkbox id="europe-russia" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.europeAndRussia;" control="europe-russia"/>
 				</row>
 				<row>
-					<checkbox id="asia" oncommand="initialSetup.buildList()"/>
+					<checkbox id="asia" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.asia;" control="asia"/>
-					<checkbox id="oceania" oncommand="initialSetup.buildList()"/>
+					<checkbox id="oceania" oncommand="requestpolicyInitialSetup.buildList()"/>
 					<label value="&initialSetup.region.oceania;" control="oceania"/>
 				</row>
 			</rows>

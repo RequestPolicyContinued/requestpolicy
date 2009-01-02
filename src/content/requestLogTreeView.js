@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var requestLogTreeView = {
+var requestpolicyRequestLogTreeView = {
 
   _treebox : null,
 
@@ -171,6 +171,6 @@ var requestLogTreeView = {
 
 };
 
-requestLogTreeView.__defineGetter__("rowCount", function() {
+requestpolicyRequestLogTreeView.__defineGetter__("rowCount", function() {
       return this._getRowCount();
     });

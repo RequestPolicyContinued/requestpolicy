@@ -26,7 +26,7 @@ if (rpModules === undefined) {
 }
 Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
 
-initialSetup = {
+requestpolicyInitialSetup = {
 
   _itemsByRegion : {
     "international" : [["*", "recaptcha.net"], ["yahoo.com", "yimg.com"],

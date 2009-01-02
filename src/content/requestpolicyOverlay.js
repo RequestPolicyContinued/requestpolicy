@@ -352,7 +352,7 @@ var requestpolicyOverlay = {
   },
 
   /**
-   * Determines if documentToCheck is the main document loaded in a frame.
+   * Determines if documentToCheck is the main document loaded in any tab.
    * 
    * @param {document}
    *            documentToCheck
@@ -368,6 +368,14 @@ var requestpolicyOverlay = {
     return false;
   },
 
+  /**
+   * Determines if documentToCheck is the main document loaded in the currently
+   * active tab.
+   * 
+   * @param {document}
+   *            documentToCheck
+   * @return {Boolean}
+   */
   _isActiveTopLevelDocument : function(documentToCheck) {
     return documentToCheck == content.document;
   },
@@ -444,14 +452,15 @@ var requestpolicyOverlay = {
    * notifications.
    */
   _checkForBlockedContent : function(document) {
+  	var documentUri = DomainUtils.stripFragment(document.documentURI);
     Logger
         .debug(Logger.TYPE_INTERNAL, "Checking for blocked content from page <"
-                + document.documentURI + ">");
+                + documentUri + ">");
     this._blockedContentCheckLastTime = (new Date()).getTime();
     this._stopBlockedContentCheckTimeout();
-    if (this._requestpolicy.originHasRejectedRequests(document.documentURI)) {
+    if (this._requestpolicy.originHasRejectedRequests(documentUri)) {
       Logger.debug(Logger.TYPE_INTERNAL, "Main document <"
-              + document.documentURI + "> has rejected requests.");
+              + documentUri + "> has rejected requests.");
       this._setBlockedContentNotification(true);
       this._indicateBlockedVisibleObjects(document);
       return;
@@ -462,7 +471,7 @@ var requestpolicyOverlay = {
         Logger.dump("Checking for blocked content from " + j);
         if (this._requestpolicy.originHasRejectedRequests(j)) {
           Logger.debug(Logger.TYPE_INTERNAL, "Other origin <" + j
-                  + "> of main document <" + document.documentURI
+                  + "> of main document <" + documentUri
                   + "> has rejected requests.");
           this._setBlockedContentNotification(true);
           this._indicateBlockedVisibleObjects(document);
@@ -594,14 +603,13 @@ var requestpolicyOverlay = {
           && metaTags[i].httpEquiv.toLowerCase() == "refresh") {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
-        Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <"
-                + metaTags[i].content + "> found in document at <"
-                + document.location + ">");
-
         // TODO: move this logic to the requestpolicy service.
         var parts = DomainUtils.parseRefresh(metaTags[i].content);
         var delay = parts[0];
         var dest = parts[1];
+        Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <" + dest
+                + "> (" + delay + " second delay) found in document at <"
+                + document.location + ">");
         if (dest != undefined) {
           if (this._requestpolicyJSObject._blockingDisabled
               || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
@@ -1091,14 +1099,14 @@ var requestpolicyOverlay = {
   _getOtherOrigins : function(document) {
     var origins = {};
     this._getOtherOriginsHelperFromDOM(document, origins);
-    this._getOtherOriginsHelperFromAllowedRequests(document.documentURI,
-        origins, {});
+    this._getOtherOriginsHelperFromAllowedRequests(DomainUtils
+            .stripFragment(document.documentURI), origins, {});
     return origins;
   },
 
   _getOtherOriginsHelperFromDOM : function(document, origins) {
-    Logger.dump("Looking for other origins within DOM of "
-        + document.documentURI);
+    var documentUri = DomainUtils.stripFragment(document.documentURI);
+    Logger.dump("Looking for other origins within DOM of " + documentUri);
     // TODO: Check other elements besides iframes and frames?
     var frameTagTypes = {
       "iframe" : null,
@@ -1118,7 +1126,7 @@ var requestpolicyOverlay = {
           continue;
         }
         Logger.dump("Found DOM child " + tagType + " with src <" + childUri
-            + "> in document <" + document.documentURI + ">");
+            + "> in document <" + documentUri + ">");
         var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
         if (!origins[childUriIdent]) {
           origins[childUriIdent] = {};
@@ -1132,7 +1140,7 @@ var requestpolicyOverlay = {
   _getOtherOriginsHelperFromAllowedRequests : function(rootUri, origins,
       checkedOrigins) {
     Logger.dump("Looking for other origins within allowed requests from "
-        + document.documentURI);
+        + rootUri);
     var allowedRequests = this._requestpolicyJSObject._allowedRequests[rootUri];
     if (allowedRequests) {
       for (var i in allowedRequests) {

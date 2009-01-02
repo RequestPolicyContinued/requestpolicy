@@ -180,7 +180,8 @@ RequestPolicyService.prototype = {
     };
 
     // Disable prefetch.
-    if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
+    if (!this._blockingDisabled
+        && this._rootPrefs.getBoolPref("network.prefetch-next")) {
       this._rootPrefs.setBoolPref("network.prefetch-next", false);
       Logger.info(Logger.TYPE_INTERNAL, "Disabled prefetch.");
     }
@@ -315,9 +316,8 @@ RequestPolicyService.prototype = {
 
     if (this.isAllowedRedirect(origin, dest)) {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-              + headerType
-              + "' header. Same hosts or allowed origin/destination. To <"
-              + dest + "> " + "from <" + origin + ">");
+              + headerType + "' header to <" + dest + "> " + "from <" + origin
+              + ">. Same hosts or allowed origin/destination.");
       this._recordAllowedRequest(origin, dest);
 
       // If this was a link click or a form submission, we register an

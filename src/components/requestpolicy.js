@@ -175,6 +175,11 @@ RequestPolicyService.prototype = {
           "Application detected: " + appInfo.vendor);
       this._compatibilityRules.push(["about:myworld", "http://www.flock.com/",
           appInfo.vendor]);
+      this._compatibilityRules.push(["about:flock", null, appInfo.vendor]);
+      this._compatibilityRules.push(["http://www.flock.com/rss",
+          "http://feeds.feedburner.com/flock", appInfo.vendor]);
+      this._compatibilityRules.push(["http://feeds.feedburner.com/",
+          "http://www.flock.com/", appInfo.vendor]);
     }
   },
 

@@ -11,6 +11,7 @@
 <!ENTITY rp.origin "Quelle">
 <!ENTITY rp.destination "Ziel">
 <!ENTITY rp.allow "Erlauben">
+<!ENTITY preferences "Einstellungen">
 <!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
 <!ENTITY preferences.prefpane.general "Allgemein">
 <!ENTITY preferences.prefpane.whitelist "Erlaubt Seiten">

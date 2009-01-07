@@ -20,12 +20,9 @@
 
     ***** END LICENSE BLOCK *****
 -->
-<?xml-stylesheet href="chrome://requestpolicy/skin/requestpolicy.css"?>
+<!DOCTYPE overlay SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
 
-<!DOCTYPE overlay [
-	<!ENTITY % globalDTD SYSTEM "chrome://browser/locale/browser.dtd"> %globalDTD;
-	<!ENTITY % requestpolicyDTD SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd"> %requestpolicyDTD;
-]>
+<?xml-stylesheet href="chrome://requestpolicy/skin/requestpolicy.css" type="text/css"?>
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	id="requestpolicyOverlay">
@@ -71,7 +68,7 @@
 			onpopuphidden="requestpolicyOverlay.onMenuHidden(event);"
 			>
 			<menuitem
-				label="&preferencesCmdUnix.label;"
+				label="&preferences;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
 			<menuitem
 				id="requestpolicyOpenRequestLog"

@@ -11,6 +11,7 @@
 <!ENTITY rp.origin "Origin">
 <!ENTITY rp.destination "Destination">
 <!ENTITY rp.allow "Permitir">
+<!ENTITY preferences "Preferências">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">

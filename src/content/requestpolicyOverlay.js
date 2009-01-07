@@ -532,13 +532,12 @@ var requestpolicyOverlay = {
    */
   _setPermissiveNotificationForAllWindows : function(isPermissive) {
     // We do it for all windows, not just the current one.
-    for (var i = 0; i < Application.windows.length; i++) {
-      // It seems that _window should be treated as privite, but it's there and
-      // it is what we want.
-      var window = Application.windows[i]._window;
-      if (window.requestpolicyOverlay) {
-        window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
-      }
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+        .getService(Components.interfaces.nsIWindowMediator);
+    var enumerator = wm.getEnumerator("navigator:browser");
+    while (enumerator.hasMoreElements()) {
+      var window = enumerator.getNext();
+      window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
     }
   },
 

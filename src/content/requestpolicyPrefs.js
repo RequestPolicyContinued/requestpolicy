@@ -137,13 +137,12 @@ var requestpolicyPrefs = {
    * Updates the status bar icons in each window.
    */
   statusbarIconChanged : function(iconStyle) {
-    for (var i = 0; i < Application.windows.length; i++) {
-      // It seems that _window should be treated as privite, but it's there and
-      // it is what we want.
-      var window = Application.windows[i]._window;
-      if (window.requestpolicyOverlay) {
-        window.requestpolicyOverlay.setStatusbarIconStyle(iconStyle);
-      }
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+        .getService(Components.interfaces.nsIWindowMediator);
+    var enumerator = wm.getEnumerator("navigator:browser");
+    while (enumerator.hasMoreElements()) {
+      var window = enumerator.getNext();
+      window.requestpolicyOverlay.setStatusbarIconStyle(iconStyle);
     }
   },
 
@@ -373,7 +372,8 @@ var requestpolicyPrefs = {
         if (!importFunction) {
           throw "RequestPolicy: there is no group label before the first item to import.";
         }
-        rpModules.Logger.dump("Importing " + currentLine + " into " + currentGroup);
+        rpModules.Logger.dump("Importing " + currentLine + " into "
+            + currentGroup);
         this._requestpolicyJSObject[importFunction](currentLine, true);
       }
     }
@@ -382,8 +382,8 @@ var requestpolicyPrefs = {
     this._requestpolicy.storeAllPreferenceLists();
 
     this._populateWhitelists();
-    rpModules.Prompter.alert(this._getFilePickerWindowTitle('import'), this._strbundle
-            .getString("importCompleted"));
+    rpModules.Prompter.alert(this._getFilePickerWindowTitle('import'),
+        this._strbundle.getString("importCompleted"));
   },
 
   _export : function(file) {
@@ -402,8 +402,8 @@ var requestpolicyPrefs = {
       lines.push(i);
     }
     rpModules.FileUtils.arrayToFile(lines, file);
-    rpModules.Prompter.alert(this._getFilePickerWindowTitle('export'), this._strbundle
-            .getString("exportCompleted"));
+    rpModules.Prompter.alert(this._getFilePickerWindowTitle('export'),
+        this._strbundle.getString("exportCompleted"));
   },
 
   selectAll : function(event) {

@@ -56,7 +56,7 @@
             
 				<rows>
 					<row>
-						<hbox align="center">
+						<hbox>
 							<label value="&preferences.statusbarIcon;" control="statusbarIcon"/>
 						</hbox>
 						<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="requestpolicyPrefs.statusbarIconChanged(this.value)">
@@ -65,7 +65,7 @@
 						</radiogroup>
 					</row>
 					<row>
-						<hbox align="center">
+						<hbox>
 							<label value="&preferences.indicateBlockedObjects;" control="indicateBlockedObjects"/>
 						</hbox>
 						<checkbox id="indicateBlockedObjects" preference="pref-indicateBlockedObjects"/>

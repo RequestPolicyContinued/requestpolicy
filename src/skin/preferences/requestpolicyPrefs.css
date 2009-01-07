@@ -23,12 +23,9 @@ radio[pane] {
 }
 
 /* General pane */
-grid row:not (:first-child ) {
-	margin-top: .3em;
-}
-
-grid row hbox:first-child {
+#requestpolicyPrefpaneGeneral grid row hbox:first-child {
 	-moz-box-pack: end; /* Right-justify left column */
+	-moz-box-align : end; /* Keep the labels at the bottom so they line up with the right column */
 }
 
 .temporaryPermissionsCell {

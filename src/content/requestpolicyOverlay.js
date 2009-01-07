@@ -1126,6 +1126,13 @@ var requestpolicyOverlay = {
       for (var i = 0; i < iframes.length; i++) {
         var child = iframes[i];
         var childDocument = child.contentDocument;
+        // Flock's special home page is about:myworld. It has (i)frames in it
+        // that have no contentDocument. It's probably related to the fact that
+        // that is an xul page, but I have no reason to fully understand the
+        // problem in order to fix it.
+        if (childDocument === undefined) {
+          continue;
+        }
         var childUri = rpModules.DomainUtils
             .stripFragment(childDocument.documentURI);
         if (childUri == "about:blank") {

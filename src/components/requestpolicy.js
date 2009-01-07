@@ -120,7 +120,7 @@ RequestPolicyService.prototype = {
 
   _prefNameToObjectMap : null,
 
-  _extensionCompatibilityRules : [],
+  _compatibilityRules : [],
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -138,7 +138,7 @@ RequestPolicyService.prototype = {
   },
 
   _initializeExtensionCompatibility : function() {
-    if (this._extensionCompatibilityRules.length != 0) {
+    if (this._compatibilityRules.length != 0) {
       return;
     }
     var em = Components.classes["@mozilla.org/extensions/manager;1"]
@@ -151,18 +151,30 @@ RequestPolicyService.prototype = {
     if (ext = em.getItemForID("{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}")) {
       rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
           "Extension detected: " + ext.name);
-      this._extensionCompatibilityRules.push([
-          "http://easylist.adblockplus.org/",
+      this._compatibilityRules.push(["http://easylist.adblockplus.org/",
           "http://adblockplus.mozdev.org/easylist/", ext.name]);
     }
     // Greasefire
     if (ext = em.getItemForID("greasefire@skrul.com")) {
       rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
           "Extension detected: " + ext.name);
-      this._extensionCompatibilityRules.push(["file://",
-          "http://userscripts.org/", ext.name]);
-      this._extensionCompatibilityRules.push(["file://",
+      this._compatibilityRules.push(["file://", "http://userscripts.org/",
+          ext.name]);
+      this._compatibilityRules.push(["file://",
           "http://static.userscripts.org/", ext.name]);
+    }
+  },
+
+  _initializeApplicationCompatibility : function() {
+    var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
+        .getService(Components.interfaces.nsIXULAppInfo);
+
+    // Flock
+    if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
+      rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+          "Application detected: " + appInfo.vendor);
+      this._compatibilityRules.push(["about:myworld", "http://www.flock.com/",
+          appInfo.vendor]);
     }
   },
 
@@ -823,8 +835,8 @@ RequestPolicyService.prototype = {
       return true;
     }
 
-    for (var i = 0; i < this._extensionCompatibilityRules.length; i++) {
-      var rule = this._extensionCompatibilityRules[i];
+    for (var i = 0; i < this._compatibilityRules.length; i++) {
+      var rule = this._compatibilityRules[i];
       var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
       var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
       if (allowOrigin && allowDest) {
@@ -929,9 +941,10 @@ RequestPolicyService.prototype = {
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.
         this._syncFromPrefs();
-        // Detect other installed extensions and do what is needed to allow
-        // their requests.
+        // Detect other installed extensions and the current application and do
+        // what is needed to allow their requests.
         this._initializeExtensionCompatibility();
+        this._initializeApplicationCompatibility();
         break;
       case "app-startup" :
         this._init();
@@ -1377,13 +1390,14 @@ RequestPolicyService.prototype = {
               arguments, true);
         }
 
-        for (var i = 0; i < this._extensionCompatibilityRules.length; i++) {
-          var rule = this._extensionCompatibilityRules[i];
+        for (var i = 0; i < this._compatibilityRules.length; i++) {
+          var rule = this._compatibilityRules[i];
           var allowOrigin = rule[0] ? origin.indexOf(rule[0]) == 0 : true;
           var allowDest = rule[1] ? dest.indexOf(rule[1]) == 0 : true;
           if (allowOrigin && allowDest) {
-            return this.accept("Extension compatibility rule matched ["
-                    + rule[2] + "]", arguments, true);
+            return this.accept(
+                "Extension/application compatibility rule matched [" + rule[2]
+                    + "]", arguments, true);
           }
         }
 

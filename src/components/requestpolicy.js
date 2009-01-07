@@ -1260,12 +1260,26 @@ RequestPolicyService.prototype = {
         }
 
         arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
-            aInternalCall]
+            aInternalCall];
 
         var originHost = aRequestOrigin.asciiHost;
         var destHost = aContentLocation.asciiHost;
         var originIdentifier = this.getUriIdentifier(origin);
         var destIdentifier = this.getUriIdentifier(dest);
+
+        // Sometimes, clicking a link to a fragment will result in a request
+        // where the origin is the same as the destination, but none of the
+        // additional content of the page is again requested. The result is that
+        // nothing ends up showing for blocked or allowed destinations because
+        // all of that data was cleared due to the new request.
+        // Example to test with: Click on "expand all" at
+        // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
+        if (origin == dest) {
+          rpModules.Logger.warning(rpModules.Logger.TYPE_CONTENT,
+              "Allowing (but not recording) request "
+                  + "where origin is the same as the destination: " + origin);
+          return CP_OK;
+        }
 
         // Note: If changing the logic here, also make necessary changes to
         // isAllowedRedirect).

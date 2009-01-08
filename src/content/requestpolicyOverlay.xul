@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <!--
-    ***** BEGIN LICENSE BLOCK *****
+	***** BEGIN LICENSE BLOCK *****
 
-    RequestPolicy - A Firefox extension for control over cross-site requests.
-    Copyright (c) 2008 Justin Samuel
+	RequestPolicy - A Firefox extension for control over cross-site requests.
+	Copyright (c) 2008 Justin Samuel
 
-    This program is free software: you can redistribute it and/or modify it under
-    the terms of the GNU General Public License as published by the Free Software
-    Foundation, either version 3 of the License, or (at your option) any later
-    version.
+	This program is free software: you can redistribute it and/or modify it under
+	the terms of the GNU General Public License as published by the Free Software
+	Foundation, either version 3 of the License, or (at your option) any later
+	version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-    details.
+	This program is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+	details.
 
-    You should have received a copy of the GNU General Public License along with
-    this program. If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License along with
+	this program. If not, see <http://www.gnu.org/licenses/>.
 
-    ***** END LICENSE BLOCK *****
+	***** END LICENSE BLOCK *****
 -->
 <!DOCTYPE overlay SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
 
@@ -59,6 +59,17 @@
 		</statusbarpanel>
 	</statusbar>
 
+	<!-- Fennec -->
+	<toolbar id="toolbar-main">
+		<toolbarbutton id="requestpolicyStatusbar"
+			class="requestpolicyFennec"
+			label="RequestPolicy"
+			buttonstyle="pictures"
+			insertafter="tool-bookmarks"
+			popup="requestpolicyStatusbarPopup"
+			/>
+	</toolbar>
+
 	<popupset>
 		<popup id="requestpolicyRedirectNotificationOptions" />
 
@@ -68,6 +79,7 @@
 			onpopuphidden="requestpolicyOverlay.onMenuHidden(event);"
 			>
 			<menuitem
+				id="requestpolicyOpenPreferences"
 				label="&preferences;"
 				oncommand="requestpolicyOverlay.openOptionsDialog();" />
 			<menuitem
@@ -79,7 +91,7 @@
 				hidden="true"
 				label="&menu.closeRequestLog.label;"
 				oncommand="requestpolicyOverlay.toggleRequestLog();" />
-			<menuseparator hidden="false" />
+			<menuseparator id="preferencesSeparator"/>
 			<menu
 				id="requestpolicyPrefetchWarning"
 				label="&prefetchWarning;">

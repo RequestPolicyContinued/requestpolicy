@@ -66,7 +66,8 @@ Logger._doLog = function(level, type, message) {
   if (this.enabled && level >= this.level && this.types & type) {
     var levelName = this._LEVEL_NAMES[level.toString()];
     var typeName = this._TYPE_NAMES[type.toString()];
-    dump("[RequestPolicy] [" + levelName + "] [" + typeName + "] " + message + "\n");
+    dump("[RequestPolicy] [" + levelName + "] [" + typeName + "] " + message
+        + "\n");
   }
 };
 
@@ -97,12 +98,16 @@ Logger.vardump = function(obj, name, ignoreFunctions) {
     this.dump(obj);
   }
   for (var i in obj) {
-    if (typeof obj[i] == 'function') {
-      if (!ignoreFunctions) {
-        this.dump("    => key: " + i + " / value: instanceof Function");
+    try {
+      if (typeof obj[i] == 'function') {
+        if (!ignoreFunctions) {
+          this.dump("    => key: " + i + " / value: instanceof Function");
+        }
+      } else {
+        this.dump("    => key: " + i + " / value: " + obj[i]);
       }
-    } else {
-      this.dump("    => key: " + i + " / value: " + obj[i]);
+    } catch (e) {
+      this.dump("    => key: " + i + " / value: [unable to access value]");
     }
   }
 }

@@ -126,24 +126,54 @@ toolbox[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicy
 }
 
 #requestpolicyOtherOrigins {
-	color : #c85000;
-	list-style-image: url(chrome://requestpolicy/skin/menu-other-origins.png);
+	color: #c85000;
+	list-style-image:
+		url(chrome://requestpolicy/skin/menu-other-origins.png);
 }
 
 /*********************************************
  * Request Log
  *********************************************/
- #rp-requestLog-close {
-    -moz-appearance: none;
-    padding: 0 !important;
-    margin-right : 4px;
-    border: none !important;
-    background: transparent !important;
-    list-style-image: url(chrome://requestpolicy/skin/close.png);
-    -moz-image-region: rect(0px, 16px, 16px, 0px);
-    -moz-box-align: end;
+#rp-requestLog-close {
+	-moz-appearance: none;
+	padding: 0 !important;
+	margin-right: 4px;
+	border: none !important;
+	background: transparent !important;
+	list-style-image: url(chrome://requestpolicy/skin/close.png);
+	-moz-image-region: rect(0px, 16px, 16px, 0px);
+	-moz-box-align: end;
 }
 
-#rp-requestLog-close:hover {
-    -moz-image-region: rect(0px, 32px, 16px, 16px);
+#rp-requestLog-close :hover {
+	-moz-image-region: rect(0px, 32px, 16px, 16px);
+}
+
+/*********************************************
+ * Fennec
+ *********************************************/
+#requestpolicyStatusbar.requestpolicyFennec {
+	-moz-border-radius: 8px;
+	border: 2px solid #444;
+	-moz-border-bottom-colors: #aaa #888;
+	-moz-border-top-colors: #666 #444;
+	-moz-border-left-colors: #aaa #888;
+	-moz-border-right-colors: #aaa #888;
+	padding-left: 4px;
+	margin: 0px;
+	width: 40px;
+	height: 40px;
+	background-color: #eee;
+	-moz-user-focus: ignore;
+}
+
+#requestpolicyStatusbarPopup[fennec="true"],#requestpolicyStatusbarPopup[fennec="true"] menupopup
+	{
+	border: 2px solid #444;
+	-moz-border-bottom-colors: #aaa #888;
+	-moz-border-top-colors: #666 #444;
+	-moz-border-left-colors: #aaa #888;
+	-moz-border-right-colors: #aaa #888;
+	background-color: #eee;
+	-moz-user-focus: ignore;
 }

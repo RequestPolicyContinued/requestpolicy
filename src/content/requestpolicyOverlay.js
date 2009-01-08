@@ -465,7 +465,7 @@ var requestpolicyOverlay = {
       }
       rpModules.Logger.warning(rpModules.Logger.TYPE_INTERNAL,
           "onAppContentLoaded called for " + document.documentURI);
-          
+
       this._onDOMContentLoaded(document);
 
       if (this._isActiveTopLevelDocument(document)) {
@@ -494,6 +494,12 @@ var requestpolicyOverlay = {
     // document, not (i)frames within those (i)frames.
     try {
       var iframe = event.target;
+      // Flock's special home page is about:myworld. It has (i)frames in it
+      // that have no contentDocument. It's probably related to the fact that
+      // that is an xul page.
+      if (iframe.contentDocument === undefined) {
+        return;
+      }
       rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
           "onAppFrameContentLoaded called for <"
               + iframe.contentDocument.documentURI + "> in <"

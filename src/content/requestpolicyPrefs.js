@@ -139,10 +139,12 @@ var requestpolicyPrefs = {
   statusbarIconChanged : function(iconStyle) {
     var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
         .getService(Components.interfaces.nsIWindowMediator);
-    var enumerator = wm.getEnumerator("navigator:browser");
+    var enumerator = wm.getEnumerator(null);
     while (enumerator.hasMoreElements()) {
       var window = enumerator.getNext();
-      window.requestpolicyOverlay.setStatusbarIconStyle(iconStyle);
+      if ("requestpolicyOverlay" in window) {
+        window.requestpolicyOverlay.setStatusbarIconStyle(iconStyle);
+      }
     }
   },
 

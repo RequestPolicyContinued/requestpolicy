@@ -621,10 +621,12 @@ var requestpolicyOverlay = {
     // We do it for all windows, not just the current one.
     var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
         .getService(Components.interfaces.nsIWindowMediator);
-    var enumerator = wm.getEnumerator("navigator:browser");
+    var enumerator = wm.getEnumerator(null);
     while (enumerator.hasMoreElements()) {
       var window = enumerator.getNext();
-      window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
+      if ("requestpolicyOverlay" in window) {
+        window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
+      }
     }
   },
 

@@ -1,0 +1,52 @@
+<!ENTITY prefetchWarning "Prefetch 가 활성화되었습니다.">
+<!ENTITY prefetchInfo "Prefetch 란?">
+<!ENTITY prefetchDisablingInstructions "Prefetch 비활성화">
+<!ENTITY temporarilyAllowAll "임시적으로 모든 요청을 허용합니다.">
+<!ENTITY revokeTemporaryPermissions "임시로 설정된 모든 권한을 취소합니다.">
+<!ENTITY blockedDestinations "차단된 목적지 주소">
+<!ENTITY allowedDestinations "허용된 목적지 주소">
+<!ENTITY otherOrigins "이 페이지에 있는 다른 출발지 주소">
+<!ENTITY menu.openRequestLog.label "요청 기록 보기">
+<!ENTITY menu.closeRequestLog.label "요청 기록 닫기">
+<!ENTITY rp.origin "출발지 주소">
+<!ENTITY rp.destination "목적지 주소">
+<!ENTITY rp.allow "허용">
+<!ENTITY preferences "환경 설정">
+<!ENTITY preferences.windowTitle "RequestPolicy 설정">
+<!ENTITY preferences.prefpane.general "일반">
+<!ENTITY preferences.prefpane.whitelist "">
+<!ENTITY preferences.prefpane.import "들어오기">
+<!ENTITY preferences.prefpane.export "내보내기">
+<!ENTITY preferences.userInterface "사용자 인터페이스">
+<!ENTITY preferences.statusbarIcon "상태바 아이콘">
+<!ENTITY preferences.indicateBlockedObjects "">
+<!ENTITY preferences.openInitialSetup "">
+<!ENTITY preferences.origins "출발지 주소">
+<!ENTITY preferences.destinations "목적지 주소">
+<!ENTITY preferences.originsToDestinations "">
+<!ENTITY preferences.temporary "임시">
+<!ENTITY preferences.removeSelectedSites "선택된 사이트를 삭제합니다.">
+<!ENTITY preferences.export "내보내기">
+<!ENTITY preferences.export.caption "설정 내보내기">
+<!ENTITY preferences.export.description "">
+<!ENTITY preferences.export.details.caption "">
+<!ENTITY preferences.export.details.description "">
+<!ENTITY preferences.export.button.label "파일로 내보내기">
+<!ENTITY preferences.import "들여오기">
+<!ENTITY preferences.import.caption "설정 들여오기">
+<!ENTITY preferences.import.description "">
+<!ENTITY preferences.import.details.caption "">
+<!ENTITY preferences.import.details.description "">
+<!ENTITY preferences.import.button.label "파일로부터 들여오기">
+<!ENTITY requestLog.title "요청 기록">
+<!ENTITY requestLog.blocked "">
+<!ENTITY requestLog.time "시간">
+<!ENTITY initialSetup.title "초기 설정">
+<!ENTITY initialSetup.whitelist.caption "">
+<!ENTITY initialSetup.whitelist.description "">
+<!ENTITY initialSetup.region.international "국제">
+<!ENTITY initialSetup.region.americas "아메리카">
+<!ENTITY initialSetup.region.asia "아시아">
+<!ENTITY initialSetup.region.usAndCanada "미국 및 캐나다">
+<!ENTITY initialSetup.region.europeAndRussia "유럽 및 러시아">
+<!ENTITY initialSetup.region.oceania "오세아니아">

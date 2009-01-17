@@ -206,11 +206,20 @@ RequestPolicyService.prototype = {
     };
 
     // Disable prefetch.
-    if (!this._blockingDisabled
-        && this._rootPrefs.getBoolPref("network.prefetch-next")) {
-      this._rootPrefs.setBoolPref("network.prefetch-next", false);
-      rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
-          "Disabled prefetch.");
+    if (!this._blockingDisabled) {
+      if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
+        this._rootPrefs.setBoolPref("network.prefetch-next", false);
+        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+            "Disabled prefetch.");
+      }
+      // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
+      // doesn't have a default value, at least in 3.1b2, but if and when it
+      // does have a default it will be false).
+      if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch")) {
+        this._rootPrefs.setBoolPref("network.dns.disablePrefetch", true);
+        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+            "Disabled DNS prefetch.");
+      }
     }
 
     // Clean up old, unused prefs (removed in 0.2.0).
@@ -869,7 +878,13 @@ RequestPolicyService.prototype = {
   },
 
   isPrefetchEnabled : function isPrefetchEnabled() {
-    return this._rootPrefs.getBoolPref("network.prefetch-next");
+    // network.dns.prefetch only exists starting in Firefox 3.1
+    try {
+      return this._rootPrefs.getBoolPref("network.prefetch-next")
+          || !this._rootPrefs.getBoolPref("network.dns.disablePrefetch");
+    } catch (e) {
+      return this._rootPrefs.getBoolPref("network.prefetch-next");
+    }
   },
 
   isBlockingDisabled : function isBlockingDisabled() {

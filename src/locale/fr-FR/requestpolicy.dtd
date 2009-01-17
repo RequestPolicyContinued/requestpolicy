@@ -8,45 +8,45 @@
 <!ENTITY otherOrigins "Autres origines dans cette page">
 <!ENTITY menu.openRequestLog.label "Show Request Log">
 <!ENTITY menu.closeRequestLog.label "Close Request Log">
-<!ENTITY rp.origin "Origin">
+<!ENTITY rp.origin "Origine">
 <!ENTITY rp.destination "Destination">
 <!ENTITY rp.allow "Accepter">
 <!ENTITY preferences "Préférences">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
-<!ENTITY preferences.prefpane.general "General">
-<!ENTITY preferences.prefpane.whitelist "Whitelist">
-<!ENTITY preferences.prefpane.import "Import">
-<!ENTITY preferences.prefpane.export "Export">
+<!ENTITY preferences.prefpane.general "Général">
+<!ENTITY preferences.prefpane.whitelist "Liste blanche">
+<!ENTITY preferences.prefpane.import "Importer">
+<!ENTITY preferences.prefpane.export "Exporter">
 <!ENTITY preferences.userInterface "User Interface">
-<!ENTITY preferences.statusbarIcon "Status bar icon:">
-<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images:">
+<!ENTITY preferences.statusbarIcon "Icône de la barre d&apos;état :">
+<!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées :">
 <!ENTITY preferences.openInitialSetup "Open initial setup tool">
-<!ENTITY preferences.origins "Origins">
+<!ENTITY preferences.origins "Origines">
 <!ENTITY preferences.destinations "Destinations">
 <!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
-<!ENTITY preferences.temporary "Temporary">
-<!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
-<!ENTITY preferences.export "Export">
-<!ENTITY preferences.export.caption "Export Your Setting">
+<!ENTITY preferences.temporary "Temporaire">
+<!ENTITY preferences.removeSelectedSites "Retirer les sites sélectionnés">
+<!ENTITY preferences.export "Exporter">
+<!ENTITY preferences.export.caption "Exporter vos préférences">
 <!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
-<!ENTITY preferences.export.details.caption "What is included in the export">
+<!ENTITY preferences.export.details.caption "Ce qui est inclus dans l&apos;exportation">
 <!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
-<!ENTITY preferences.export.button.label "Export to File">
-<!ENTITY preferences.import "Import">
-<!ENTITY preferences.import.caption "Import Your Setting">
+<!ENTITY preferences.export.button.label "Exporter vers le fichier">
+<!ENTITY preferences.import "Importer">
+<!ENTITY preferences.import.caption "Importer vos paramètres">
 <!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
-<!ENTITY preferences.import.details.caption "What the import will do">
+<!ENTITY preferences.import.details.caption "Ce que l&apos;importation va faire">
 <!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
-<!ENTITY preferences.import.button.label "Import from File">
+<!ENTITY preferences.import.button.label "Importer depuis un gfichier">
 <!ENTITY requestLog.title "Request Log">
-<!ENTITY requestLog.blocked "Blocked">
+<!ENTITY requestLog.blocked "Bloqué">
 <!ENTITY requestLog.time "Time">
 <!ENTITY initialSetup.title "Initial Setup">
 <!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
 <!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
 <!ENTITY initialSetup.region.international "International">
-<!ENTITY initialSetup.region.americas "Americas">
-<!ENTITY initialSetup.region.asia "Asia">
-<!ENTITY initialSetup.region.usAndCanada "US and Canada">
-<!ENTITY initialSetup.region.europeAndRussia "Europe and Russia">
-<!ENTITY initialSetup.region.oceania "Oceania">
+<!ENTITY initialSetup.region.americas "Amérique">
+<!ENTITY initialSetup.region.asia "Asie">
+<!ENTITY initialSetup.region.usAndCanada "États-Unis et Canada">
+<!ENTITY initialSetup.region.europeAndRussia "Europe et Russie">
+<!ENTITY initialSetup.region.oceania "Océanie">

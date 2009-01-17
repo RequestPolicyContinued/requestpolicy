@@ -15,36 +15,38 @@
 <!ENTITY preferences.windowTitle "RequestPolicy 설정">
 <!ENTITY preferences.prefpane.general "일반">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
-<!ENTITY preferences.prefpane.import "들어오기">
+<!ENTITY preferences.prefpane.import "들여오기">
 <!ENTITY preferences.prefpane.export "내보내기">
 <!ENTITY preferences.userInterface "사용자 인터페이스">
 <!ENTITY preferences.statusbarIcon "상태바 아이콘">
-<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images:">
-<!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.indicateBlockedObjects "거부된 사이트 표시">
+<!ENTITY preferences.openInitialSetup "초기 설정 도구 열기">
 <!ENTITY preferences.origins "출발지 주소">
 <!ENTITY preferences.destinations "목적지 주소">
-<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
+<!ENTITY preferences.originsToDestinations "출발지-목적지">
 <!ENTITY preferences.temporary "임시">
 <!ENTITY preferences.removeSelectedSites "선택된 사이트를 삭제합니다.">
 <!ENTITY preferences.export "내보내기">
 <!ENTITY preferences.export.caption "설정 내보내기">
 <!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
-<!ENTITY preferences.export.details.caption "What is included in the export">
-<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
+<!ENTITY preferences.export.details.caption "내보내기에 포함되는 내용">
+<!ENTITY preferences.export.details.description "내보내기 파일은 사용자가 허용한 출발지와 목적지, 그리고 출발지-목적지 주소를 포함합니다. 임시로 허용한 사이트는 포함되지 않습니다.">
 <!ENTITY preferences.export.button.label "파일로 내보내기">
 <!ENTITY preferences.import "들여오기">
 <!ENTITY preferences.import.caption "설정 들여오기">
-<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
-<!ENTITY preferences.import.details.caption "What the import will do">
-<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
+<!ENTITY preferences.import.description "내보내기 도구를 이용하여 Whitelist를 파일로부터 들여올 수 있습니다.">
+<!ENTITY preferences.import.details.caption "들여오기가 하는 일">
+<!ENTITY preferences.import.details.description "출발지와 목적지, 그리고 출발지-목적지 주소를 파일로부터 들여옵니다. Whitelist 에 있는 내용은 지워지지 않습니다.">
 <!ENTITY preferences.import.button.label "파일로부터 들여오기">
 <!ENTITY requestLog.title "요청 기록">
-<!ENTITY requestLog.blocked "Blocked">
+<!ENTITY requestLog.blocked "거부됨">
 <!ENTITY requestLog.time "시간">
 <!ENTITY initialSetup.title "초기 설정">
-<!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
-<!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
-<!ENTITY initialSetup.region.international "국제">
+<!ENTITY initialSetup.whitelist.caption "Cross-site whitelist에 사이트를 추가합니다.">
+<!ENTITY initialSetup.whitelist.description "이 목록에 있는 사이트들은 다음의 이유로 선정되었습니다.
+(1) 같은 회사 소유의 사이트 내에서의 요청을 포함하거나,
+(2) they reduce the problems you may encounter, 프라이버시나 보안에 미미한 영향을 미치는 사이트.">
+<!ENTITY initialSetup.region.international "모든 지역">
 <!ENTITY initialSetup.region.americas "아메리카">
 <!ENTITY initialSetup.region.asia "아시아">
 <!ENTITY initialSetup.region.usAndCanada "미국 및 캐나다">

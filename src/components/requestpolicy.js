@@ -878,7 +878,7 @@ RequestPolicyService.prototype = {
   },
 
   isPrefetchEnabled : function isPrefetchEnabled() {
-    // network.dns.prefetch only exists starting in Firefox 3.1
+    // network.dns.disablePrefetch only exists starting in Firefox 3.1
     try {
       return this._rootPrefs.getBoolPref("network.prefetch-next")
           || !this._rootPrefs.getBoolPref("network.dns.disablePrefetch");

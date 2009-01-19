@@ -287,7 +287,7 @@ var requestpolicyPrefs = {
     // Remove any "|" and spaces to avoid conflict with separators.
     for (var i = 0; i < button.textboxes.length; i++) {
       button.textboxes[i].value = button.textboxes[i].value.replace(
-          /[^a-zA-Z0-9.-]/g, "");
+          /[^a-zA-Z0-9.:/-]/g, "");
       if (button.textboxes[i].value == "") {
         return;
       }

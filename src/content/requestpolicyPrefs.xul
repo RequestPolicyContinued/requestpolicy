@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <!--
-    ***** BEGIN LICENSE BLOCK *****
+	***** BEGIN LICENSE BLOCK *****
 
-    RequestPolicy - A Firefox extension for control over cross-site requests.
-    Copyright (c) 2008 Justin Samuel
+	RequestPolicy - A Firefox extension for control over cross-site requests.
+	Copyright (c) 2008 Justin Samuel
 
-    This program is free software: you can redistribute it and/or modify it under
-    the terms of the GNU General Public License as published by the Free Software
-    Foundation, either version 3 of the License, or (at your option) any later
-    version.
+	This program is free software: you can redistribute it and/or modify it under
+	the terms of the GNU General Public License as published by the Free Software
+	Foundation, either version 3 of the License, or (at your option) any later
+	version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-    FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-    details.
+	This program is distributed in the hope that it will be useful, but WITHOUT
+	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+	details.
 
-    You should have received a copy of the GNU General Public License along with
-    this program. If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU General Public License along with
+	this program. If not, see <http://www.gnu.org/licenses/>.
 
-    ***** END LICENSE BLOCK *****
+	***** END LICENSE BLOCK *****
 -->
 <!DOCTYPE prefwindow SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
 
@@ -42,36 +42,31 @@
 		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
 		>
 		<preferences>
+			<preference id="pref-uriIdentificationLevel" name="extensions.requestpolicy.uriIdentificationLevel" type="int"/>
 			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string" instantApply="true"/>
 			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
 		</preferences>
 
 		<groupbox>
-			<caption label="&preferences.userInterface;"/>
-			<grid>
-				<columns>
-					<column/>
-					<column flex="1"/>
-				</columns>
-            
-				<rows>
-					<row>
-						<hbox>
-							<label value="&preferences.statusbarIcon;" control="statusbarIcon"/>
-						</hbox>
-						<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="requestpolicyPrefs.statusbarIconChanged(this.value)">
-							<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
-							<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
-						</radiogroup>
-					</row>
-					<row>
-						<hbox>
-							<label value="&preferences.indicateBlockedObjects;" control="indicateBlockedObjects"/>
-						</hbox>
-						<checkbox id="indicateBlockedObjects" preference="pref-indicateBlockedObjects"/>
-					</row>
-				</rows>
-			</grid>
+			<caption label="&preferences.strictness;"/>
+			<radiogroup id="uriIdentificationLevel" preference="pref-uriIdentificationLevel">
+				<radio label="&preferences.baseDomain;" value="1"/>
+				<radio label="&preferences.fullDomain;" value="2"/>
+				<radio label="&preferences.fullAddress;" value="3"/>
+			</radiogroup>
+		</groupbox>
+
+		<groupbox>
+			<caption label="&preferences.statusbarIcon;"/>
+			<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="requestpolicyPrefs.statusbarIconChanged(this.value)">
+				<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
+				<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
+			</radiogroup>
+		</groupbox>
+
+		<groupbox>
+			<caption label="&preferences.webpages;"/>
+			<checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
 		</groupbox>
 		
 		<groupbox>
@@ -157,7 +152,7 @@
 								<listheader label="&preferences.temporary;"/>
 							</listhead>
 							<listcols>
-								<listcol id="originToDestinationOriginColumn"/>
+								<listcol flex="1" id="originToDestinationOriginColumn"/>
 								<listcol flex="1"/>
 								<listcol class="temporary"/>
 							</listcols>

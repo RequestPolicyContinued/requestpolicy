@@ -134,7 +134,6 @@ RequestPolicyService.prototype = {
     // Note that we don't load user preferences at this point because the user
     // preferences may not be ready. If we tried right now, we may get the
     // default preferences.
-    this._uriIdentificationLevel = rpModules.DomainUtils.LEVEL_DOMAIN;
   },
 
   _initializeExtensionCompatibility : function() {
@@ -186,6 +185,8 @@ RequestPolicyService.prototype = {
   _syncFromPrefs : function() {
     // Load the logging preferences before the others.
     this._updateLoggingSettings();
+    this._uriIdentificationLevel = this.prefs
+        .getIntPref("uriIdentificationLevel");
     // origins
     this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
     rpModules.Logger.vardump(this._allowedOrigins, "this._allowedOrigins");
@@ -290,6 +291,10 @@ RequestPolicyService.prototype = {
       case "log.level" :
       case "log.types" :
         this._updateLoggingSettings();
+        break;
+      case "uriIdentificationLevel" :
+        this._uriIdentificationLevel = this.prefs
+            .getIntPref("uriIdentificationLevel");
         break;
       default :
         break;

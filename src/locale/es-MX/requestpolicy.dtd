@@ -17,9 +17,13 @@
 <!ENTITY preferences.prefpane.whitelist "Lista Permitida">
 <!ENTITY preferences.prefpane.import "Importar">
 <!ENTITY preferences.prefpane.export "Exportar">
-<!ENTITY preferences.userInterface "Interface de usuario">
-<!ENTITY preferences.statusbarIcon "Icono de la barra de estatus:">
-<!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas:">
+<!ENTITY preferences.strictness "Strictness">
+<!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Web pages">
+<!ENTITY preferences.statusbarIcon "Icono de la barra de estatus">
+<!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas">
 <!ENTITY preferences.openInitialSetup "Abrir la herramienta de configuracion inicial">
 <!ENTITY preferences.origins "Orígenes">
 <!ENTITY preferences.destinations "Destinos">

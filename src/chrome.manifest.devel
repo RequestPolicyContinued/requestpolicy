@@ -2,6 +2,7 @@ content    requestpolicy    content/
 skin       requestpolicy    classic/1.0    skin/
 
 locale     requestpolicy    en-US          locale/en-US/
+locale     requestpolicy    es-MX          locale/es-MX/
 locale     requestpolicy    de-DE          locale/de-DE/
 locale     requestpolicy    fr-FR          locale/fr-FR/
 locale     requestpolicy    ko-KR          locale/ko-KR/

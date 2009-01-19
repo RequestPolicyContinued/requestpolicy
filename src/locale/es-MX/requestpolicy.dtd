@@ -1,0 +1,52 @@
+<!ENTITY prefetchWarning "Advertencia: La pre carga esta habilitada">
+<!ENTITY prefetchInfo "¿Que es la pre carga?">
+<!ENTITY prefetchDisablingInstructions "Deshabilitar la pre carga">
+<!ENTITY temporarilyAllowAll "Permitir temporalmente todas las peticiones">
+<!ENTITY revokeTemporaryPermissions "Cancelar los permisos temporales">
+<!ENTITY blockedDestinations "Destinos bloqueados">
+<!ENTITY allowedDestinations "Destinos permitidos">
+<!ENTITY otherOrigins "Otros origenes en esta pagina">
+<!ENTITY menu.openRequestLog.label "Mostrar el registro de peticiones">
+<!ENTITY menu.closeRequestLog.label "Cerrar el registro de peticiones">
+<!ENTITY rp.origin "Origen">
+<!ENTITY rp.destination "Destino">
+<!ENTITY rp.allow "Permitir">
+<!ENTITY preferences "Preferencias">
+<!ENTITY preferences.windowTitle "Preferencias de RequestPolicy">
+<!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.prefpane.whitelist "Lista Permitida">
+<!ENTITY preferences.prefpane.import "Importar">
+<!ENTITY preferences.prefpane.export "Exportar">
+<!ENTITY preferences.userInterface "Interface de usuario">
+<!ENTITY preferences.statusbarIcon "Icono de la barra de estatus:">
+<!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas:">
+<!ENTITY preferences.openInitialSetup "Abrir la herramienta de configuracion inicial">
+<!ENTITY preferences.origins "Orígenes">
+<!ENTITY preferences.destinations "Destinos">
+<!ENTITY preferences.originsToDestinations "Origenes-a-Destinos">
+<!ENTITY preferences.temporary "Temporal">
+<!ENTITY preferences.removeSelectedSites "Eliminar sitios seleccionados">
+<!ENTITY preferences.export "Exportar">
+<!ENTITY preferences.export.caption "Exportar tu configuración">
+<!ENTITY preferences.export.description "Puedes exportar tu lista de sitios permitidos a un archivo para tenerlos como respaldo. Para configurar en otra computadora la misma lista de sitios permitidos, copia el archivo a esa computadora y usa la opción importar.">
+<!ENTITY preferences.export.details.caption "¿Que se incluye en el archivo?:">
+<!ENTITY preferences.export.details.description "El archivo incluirá orígenes, destinos y orígenes-a-destinos que haz permitido. No contendrá nada que hayas permitido solo de modo temporal">
+<!ENTITY preferences.export.button.label "Exportar a Archivo">
+<!ENTITY preferences.import "Importar">
+<!ENTITY preferences.import.caption "Importar configuración">
+<!ENTITY preferences.import.description "Puedes importar tu lista de sitios permitidos desde un archivo de respaldo que hayas hecho con la herramienta de exportar">
+<!ENTITY preferences.import.details.caption "¿Como funciona importar?:">
+<!ENTITY preferences.import.details.description "Se agregaran los orígenes, destinos y origen-a-destino del archivo de respaldo. Nada sera eliminado de tu lista de sitios permitidos. Es decir, no remplaza tu lista actual, solo agrega sitios nuevos a tu lista de sitios permitidos.">
+<!ENTITY preferences.import.button.label "Importar desde archivo">
+<!ENTITY requestLog.title "Registro de peticiones">
+<!ENTITY requestLog.blocked "Bloqueado">
+<!ENTITY requestLog.time "Hora">
+<!ENTITY initialSetup.title "Configuracion Inicial">
+<!ENTITY initialSetup.whitelist.caption "Agregar sitios a tu lista de sitios permitidos para peticiones cruzadas">
+<!ENTITY initialSetup.whitelist.description "Los sitios en esta lista fueron seleccionados debido a: (1) Involucran peticiones entre sitios de la misma compañia, o (2) Reducen los problemas que puedas encontrar y tienen muy poco impacto en tu privacidad y seguridad">
+<!ENTITY initialSetup.region.international "Internacional">
+<!ENTITY initialSetup.region.americas "America">
+<!ENTITY initialSetup.region.asia "Asia">
+<!ENTITY initialSetup.region.usAndCanada "EU y Canada">
+<!ENTITY initialSetup.region.europeAndRussia "Europa y Rusia">
+<!ENTITY initialSetup.region.oceania "Oceania">

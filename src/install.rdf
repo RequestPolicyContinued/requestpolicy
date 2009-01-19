@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>RequestPolicy</em:name>
-		<em:version>0.4.5</em:version>
+		<em:version>0.4.6</em:version>
 		<em:type>2</em:type>
 		<em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
 		<em:creator>Justin Samuel</em:creator>
@@ -52,8 +52,8 @@
 		<em:targetApplication>
 			<Description>
 				<em:id>songbird@songbirdnest.com</em:id>
-				<em:minVersion>0.7</em:minVersion>
-				<em:maxVersion>1.1.0pre</em:maxVersion>
+				<em:minVersion>1.0.0</em:minVersion>
+				<em:maxVersion>1.1.0a</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 		

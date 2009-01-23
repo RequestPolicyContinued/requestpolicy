@@ -11,8 +11,8 @@ locale     requestpolicy    pt-BR          jar:chrome/requestpolicy.jar!/locale/
 style      chrome://global/content/customizeToolbar.xul            chrome://requestpolicy/skin/requestpolicy.css
 
 # Firefox
-overlay    chrome://browser/content/browser.xul                    chrome://requestpolicy/content/requestpolicyOverlay.xul
+overlay    chrome://browser/content/browser.xul                    chrome://requestpolicy/content/overlay.xul
 # Seamonkey
-overlay    chrome://navigator/content/navigatorOverlay.xul         chrome://requestpolicy/content/requestpolicyOverlay.xul
+overlay    chrome://navigator/content/navigatorOverlay.xul         chrome://requestpolicy/content/overlay.xul
 # Songbird
-overlay    chrome://songbird/content/xul/mainScriptsOverlay.xul    chrome://requestpolicy/content/requestpolicyOverlay.xul
+overlay    chrome://songbird/content/xul/mainScriptsOverlay.xul    chrome://requestpolicy/content/overlay.xul

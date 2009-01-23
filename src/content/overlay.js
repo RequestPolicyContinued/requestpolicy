@@ -20,18 +20,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var rpModules;
-if (rpModules === undefined) {
-  rpModules = {};
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
 }
-Components.utils.import("resource://requestpolicy/DomainUtils.jsm", rpModules);
-Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
+
+Components.utils.import("resource://requestpolicy/DomainUtils.jsm",
+    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-var requestpolicyOverlay = {
+requestpolicy.overlay = {
 
   _overlayId : 0,
 
@@ -44,15 +48,15 @@ var requestpolicyOverlay = {
   _blockedContentCheckLastTime : 0,
 
   _initialized : false,
-  _requestpolicy : null,
+  _rpService : null,
 
   // For things we can't do through the nsIRequestPolicy interface, use direct
   // access to the underlying JS object.
-  _requestpolicyJSObject : null,
+  _rpServiceJSObject : null,
 
   // This is set by requestLog.js when it is initialized. We don't need to worry
   // about setting it here.
-  requestpolicyRequestLogTreeView : null,
+  requestLogTreeView : null,
 
   _strbundle : null,
   _addedMenuItems : [],
@@ -110,7 +114,7 @@ var requestpolicyOverlay = {
       + "TkSuQmCC",
 
   toString : function() {
-    return "[requestpolicyOverlay " + this._overlayId + "]";
+    return "[requestpolicy.overlay " + this._overlayId + "]";
   },
 
   /**
@@ -122,9 +126,9 @@ var requestpolicyOverlay = {
         this._initialized = true;
         this._overlayId = (new Date()).getTime();
 
-        this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
+        this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
             .getService(Components.interfaces.nsIRequestPolicy);
-        this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+        this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
         this._strbundle = document.getElementById("requestpolicyStrings");
         this._menu = document.getElementById("requestpolicyStatusbarPopup");
@@ -177,7 +181,7 @@ var requestpolicyOverlay = {
         this._isFennec = (appInfo.ID == "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
 
         if (this._isFennec) {
-          rpModules.Logger.dump("Detected Fennec.");
+          requestpolicy.mod.Logger.dump("Detected Fennec.");
           // Set an attribute for CSS usage.
           this._menu.setAttribute("fennec", "true");
           this._menu.setAttribute("position", "after_end");
@@ -190,18 +194,17 @@ var requestpolicyOverlay = {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        this._requestpolicyJSObject.addRequestObserver(this);
+        this._rpServiceJSObject.addRequestObserver(this);
 
-        this.setStatusbarIconStyle(this._requestpolicy.prefs
+        this.setStatusbarIconStyle(this._rpService.prefs
             .getCharPref("statusbarIcon"));
-        this._setPermissiveNotification(this._requestpolicy
-            .isBlockingDisabled());
+        this._setPermissiveNotification(this._rpService.isBlockingDisabled());
       }
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
-          "Unable to initialize requestpolicyOverlay.");
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Unable to initialize requestpolicy.overlay.");
       throw e;
     }
   },
@@ -211,7 +214,7 @@ var requestpolicyOverlay = {
   },
 
   onWindowClose : function(event) {
-    this._requestpolicyJSObject.removeRequestObserver(this);
+    this._rpServiceJSObject.removeRequestObserver(this);
   },
 
   /**
@@ -250,7 +253,7 @@ var requestpolicyOverlay = {
                   || event.button != 0) {
                 return;
               }
-              requestpolicyOverlay._requestpolicy.registerLinkClicked(
+              requestpolicyOverlay._rpService.registerLinkClicked(
                   event.target.ownerDocument.URL, event.target.href);
             }, true);
 
@@ -270,7 +273,7 @@ var requestpolicyOverlay = {
               if (event.target.nodeName.toLowerCase() != "form") {
                 return;
               }
-              requestpolicyOverlay._requestpolicy.registerFormSubmitted(
+              requestpolicyOverlay._rpService.registerFormSubmitted(
                   event.target.ownerDocument.URL, event.target.action);
             }, true);
 
@@ -305,10 +308,10 @@ var requestpolicyOverlay = {
       this._showInitialSetupDialog();
 
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
-          "Unable to complete requestpolicyOverlay.onLoad actions.");
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Unable to complete requestpolicy.overlay.onLoad actions.");
       throw e;
     }
   },
@@ -340,7 +343,7 @@ var requestpolicyOverlay = {
     // Line: 260
 
     if (this._isFennec) {
-      rpModules.Logger.warning(rpModules.Logger.TYPE_INTERNAL,
+      requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Should have shown redirect notification to <" + redirectTargetUri
               + ">, but it's not implemented yet on Fennec.");
       return;
@@ -363,9 +366,9 @@ var requestpolicyOverlay = {
     optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
     this._clearMenu(optionsPopup);
-    var currentIdent = this._requestpolicy
+    var currentIdent = this._rpService
         .getUriIdentifier(targetDocument.location);
-    var destIdent = this._requestpolicy.getUriIdentifier(redirectTargetUri);
+    var destIdent = this._rpService.getUriIdentifier(redirectTargetUri);
 
     this._addMenuItemTemporarilyAllowOriginToDest(optionsPopup, currentIdent,
         destIdent);
@@ -386,7 +389,7 @@ var requestpolicyOverlay = {
             accessKey : '', // TODO
             popup : null,
             callback : function() {
-              rpModules.Logger.dump("User allowed redirection from <"
+              requestpolicy.mod.Logger.dump("User allowed redirection from <"
                   + targetDocument.location.href + "> to <" + redirectTargetUri
                   + ">");
               targetDocument.location.href = redirectTargetUri;
@@ -463,7 +466,7 @@ var requestpolicyOverlay = {
         // isn't set on new tab open when this is called.
         return;
       }
-      rpModules.Logger.warning(rpModules.Logger.TYPE_INTERNAL,
+      requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "onAppContentLoaded called for " + document.documentURI);
 
       this._onDOMContentLoaded(document);
@@ -474,11 +477,11 @@ var requestpolicyOverlay = {
         this._checkForBlockedContent(document);
       }
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger
-          .severe(rpModules.Logger.TYPE_ERROR,
-              "Unable to complete requestpolicyOverlay.onAppContentLoaded actions.");
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger
+          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+              "Unable to complete requestpolicy.overlay.onAppContentLoaded actions.");
       throw e;
     }
   },
@@ -500,7 +503,7 @@ var requestpolicyOverlay = {
       if (iframe.contentDocument === undefined) {
         return;
       }
-      rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+      requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "onAppFrameContentLoaded called for <"
               + iframe.contentDocument.documentURI + "> in <"
               + iframe.ownerDocument.documentURI + ">");
@@ -518,11 +521,11 @@ var requestpolicyOverlay = {
         this._checkForBlockedContent(iframe.ownerDocument);
       }
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger
-          .severe(rpModules.Logger.TYPE_ERROR,
-              "Unable to complete requestpolicyOverlay.onAppFrameContentLoaded actions.");
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger
+          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+              "Unable to complete requestpolicy.overlay.onAppFrameContentLoaded actions.");
       throw e;
     }
   },
@@ -533,14 +536,14 @@ var requestpolicyOverlay = {
    */
   _checkForBlockedContent : function(document) {
     try {
-      var documentUri = rpModules.DomainUtils
+      var documentUri = requestpolicy.mod.DomainUtils
           .stripFragment(document.documentURI);
-      rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+      requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Checking for blocked content from page <" + documentUri + ">");
       this._blockedContentCheckLastTime = (new Date()).getTime();
       this._stopBlockedContentCheckTimeout();
-      if (this._requestpolicy.originHasRejectedRequests(documentUri)) {
-        rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
+      if (this._rpService.originHasRejectedRequests(documentUri)) {
+        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Main document <" + documentUri + "> has rejected requests.");
         this._setBlockedContentNotification(true);
         this._indicateBlockedVisibleObjects(document);
@@ -549,10 +552,12 @@ var requestpolicyOverlay = {
       var otherOrigins = this._getOtherOrigins(document);
       for (var i in otherOrigins) {
         for (var j in otherOrigins[i]) {
-          rpModules.Logger.dump("Checking for blocked content from " + j);
-          if (this._requestpolicy.originHasRejectedRequests(j)) {
-            rpModules.Logger.debug(rpModules.Logger.TYPE_INTERNAL,
-                "Other origin <" + j + "> of main document <" + documentUri
+          requestpolicy.mod.Logger.dump("Checking for blocked content from "
+              + j);
+          if (this._rpService.originHasRejectedRequests(j)) {
+            requestpolicy.mod.Logger.debug(
+                requestpolicy.mod.Logger.TYPE_INTERNAL, "Other origin <" + j
+                    + "> of main document <" + documentUri
                     + "> has rejected requests.");
             this._setBlockedContentNotification(true);
             this._indicateBlockedVisibleObjects(document);
@@ -562,17 +567,17 @@ var requestpolicyOverlay = {
       }
       this._setBlockedContentNotification(false);
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger
-          .severe(rpModules.Logger.TYPE_ERROR,
-              "Unable to complete requestpolicyOverlay._checkForBlockedContent actions.");
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger
+          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+              "Unable to complete requestpolicy.overlay._checkForBlockedContent actions.");
       throw e;
     }
   },
 
   _indicateBlockedVisibleObjects : function(document) {
-    if (!this._requestpolicy.prefs.getBoolPref("indicateBlockedObjects")) {
+    if (!this._rpService.prefs.getBoolPref("indicateBlockedObjects")) {
       return;
     }
     var images = document.getElementsByTagName("img");
@@ -590,7 +595,7 @@ var requestpolicyOverlay = {
         if (!img.height) {
           img.height = 50;
         }
-        img.title = "[" + this._requestpolicy.getUriIdentifier(img.src) + "]"
+        img.title = "[" + this._rpService.getUriIdentifier(img.src) + "]"
             + (img.title ? " " + img.title : "");
         // We want it to be registered as a broken image so that the alt text
         // shows. By default, the blocked image will just not show up at all.
@@ -624,8 +629,8 @@ var requestpolicyOverlay = {
     var enumerator = wm.getEnumerator(null);
     while (enumerator.hasMoreElements()) {
       var window = enumerator.getNext();
-      if ("requestpolicyOverlay" in window) {
-        window.requestpolicyOverlay._setPermissiveNotification(isPermissive);
+      if ("requestpolicy.overlay" in window) {
+        window.requestpolicy.overlay._setPermissiveNotification(isPermissive);
       }
     }
   },
@@ -643,17 +648,15 @@ var requestpolicyOverlay = {
   },
 
   observeAllowedRequest : function(originUri, destUri) {
-    if (this.requestpolicyRequestLogTreeView) {
-      this.requestpolicyRequestLogTreeView
-          .addAllowedRequest(originUri, destUri);
+    if (this.requestLogTreeView) {
+      this.requestLogTreeView.addAllowedRequest(originUri, destUri);
     }
   },
 
   observeBlockedRequest : function(originUri, destUri) {
     this._updateNotificationDueToBlockedContent();
-    if (this.requestpolicyRequestLogTreeView) {
-      this.requestpolicyRequestLogTreeView
-          .addBlockedRequest(originUri, destUri);
+    if (this.requestLogTreeView) {
+      this.requestLogTreeView.addBlockedRequest(originUri, destUri);
     }
   },
 
@@ -668,7 +671,7 @@ var requestpolicyOverlay = {
       const document = content.document;
       this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
           function() {
-            requestpolicyOverlay._checkForBlockedContent(document);
+            requestpolicy.overlay._checkForBlockedContent(document);
           }, this._blockedContentCheckTimeoutDelay);
     } else {
       this._checkForBlockedContent(content.document);
@@ -691,10 +694,8 @@ var requestpolicyOverlay = {
    *            event
    */
   _onDOMContentLoaded : function(document) {
-    rpModules.Logger.warning(rpModules.Logger.TYPE_INTERNAL,
+    requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "_onDOMContentLoaded called.");
-
-    const requestpolicy = this._requestpolicy;
 
     // Find all meta redirects.
     var metaTags = document.getElementsByTagName("meta");
@@ -704,16 +705,18 @@ var requestpolicyOverlay = {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
         // TODO: move this logic to the requestpolicy service.
-        var parts = rpModules.DomainUtils.parseRefresh(metaTags[i].content);
+        var parts = requestpolicy.mod.DomainUtils
+            .parseRefresh(metaTags[i].content);
         var delay = parts[0];
         var dest = parts[1];
-        rpModules.Logger.info(rpModules.Logger.TYPE_META_REFRESH,
-            "meta refresh to <" + dest + "> (" + delay
+        requestpolicy.mod.Logger.info(
+            requestpolicy.mod.Logger.TYPE_META_REFRESH, "meta refresh to <"
+                + dest + "> (" + delay
                 + " second delay) found in document at <" + document.location
                 + ">");
         if (dest != undefined) {
-          if (this._requestpolicyJSObject._blockingDisabled
-              || this._requestpolicy.isAllowedRedirect(document.location, dest)) {
+          if (this._rpServiceJSObject._blockingDisabled
+              || this._rpService.isAllowedRedirect(document.location, dest)) {
             // The meta refresh is allowed.
             this._performRedirectAfterDelay(document, dest, delay);
           } else {
@@ -746,13 +749,14 @@ var requestpolicyOverlay = {
           }, false);
     }
 
-    if (this._requestpolicyJSObject._blockedRedirects[document.location]) {
-      var dest = this._requestpolicyJSObject._blockedRedirects[document.location];
-      rpModules.Logger.warning(rpModules.Logger.TYPE_HEADER_REDIRECT,
+    if (this._rpServiceJSObject._blockedRedirects[document.location]) {
+      var dest = this._rpServiceJSObject._blockedRedirects[document.location];
+      requestpolicy.mod.Logger.warning(
+          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(document, dest);
-      delete this._requestpolicyJSObject._blockedRedirects[document.location];
+      delete this._rpServiceJSObject._blockedRedirects[document.location];
     }
 
     this._wrapWindowOpen(document.defaultView);
@@ -763,8 +767,8 @@ var requestpolicyOverlay = {
    * contentAreaContextMenu.
    */
   _contextMenuOnPopupShowing : function() {
-    requestpolicyOverlay._wrapOpenLink();
-    requestpolicyOverlay._attachPopupToContextMenu();
+    requestpolicy.overlay._wrapOpenLink();
+    requestpolicy.overlay._attachPopupToContextMenu();
   },
 
   /**
@@ -775,7 +779,7 @@ var requestpolicyOverlay = {
     if (event.currentTarget != event.originalTarget) {
       return;
     }
-    requestpolicyOverlay._attachPopupToStatusbar();
+    requestpolicy.overlay._attachPopupToStatusbar();
   },
 
   /**
@@ -785,7 +789,7 @@ var requestpolicyOverlay = {
    * called when openLinkInTab() is called.
    */
   _wrapOpenLink : function() {
-    const requestpolicy = this._requestpolicy;
+    const requestpolicy = this._rpService;
 
     if (!gContextMenu.requestpolicyOrigOpenLink) {
       gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
@@ -810,7 +814,7 @@ var requestpolicyOverlay = {
     if (!gBrowser.requestpolicyAddTabModified) {
       gBrowser.requestpolicyAddTabModified = true;
       var functionSignature = "function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner, aAllowThirdPartyFixup) {";
-      var newFirstCodeLine = "\n    requestpolicyOverlay.tabAdded(aURI, aReferrerURI);";
+      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(aURI, aReferrerURI);";
       // Add a line to the beginning of the addTab function.
       eval("gBrowser.addTab = "
           + gBrowser.addTab.toString().replace(functionSignature,
@@ -828,7 +832,7 @@ var requestpolicyOverlay = {
    */
   tabAdded : function(tabUri, referrerUri) {
     if (referrerUri) {
-      this._requestpolicy.registerLinkClicked(referrerUri.spec, tabUri);
+      this._rpService.registerLinkClicked(referrerUri.spec, tabUri);
     }
   },
 
@@ -847,7 +851,7 @@ var requestpolicyOverlay = {
    *            window
    */
   _wrapWindowOpen : function(window) {
-    const requestpolicy = this._requestpolicy;
+    const requestpolicy = this._rpService;
 
     if (!window.requestpolicyOrigOpen) {
       window.requestpolicyOrigOpen = window.open;
@@ -903,11 +907,12 @@ var requestpolicyOverlay = {
    * @return {String} The current document's identifier.
    */
   _getCurrentUriIdentifier : function _getCurrentUriIdentifier() {
-    return this._requestpolicyJSObject.getUriIdentifier(this._getCurrentUri());
+    return this._rpServiceJSObject.getUriIdentifier(this._getCurrentUri());
   },
 
   _getCurrentUri : function _getCurrentUriIdentifier() {
-    return rpModules.DomainUtils.stripFragment(content.document.documentURI);
+    return requestpolicy.mod.DomainUtils
+        .stripFragment(content.document.documentURI);
   },
 
   /**
@@ -939,19 +944,19 @@ var requestpolicyOverlay = {
       this._itemAllowOrigin.hidden = true;
       this._itemForbidOrigin.hidden = true;
 
-      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._requestpolicy
+      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._rpService
           .isPrefetchEnabled();
 
-      if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+      if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;
-      } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
+      } else if (this._rpService.isAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;
       } else {
         this._itemAllowOriginTemporarily.hidden = false;
         this._itemAllowOrigin.hidden = false;
       }
 
-      if (this._requestpolicy.areTemporaryPermissionsGranted()) {
+      if (this._rpService.areTemporaryPermissionsGranted()) {
         this._itemRevokeTemporaryPermissions.hidden = false;
         this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
       }
@@ -1007,19 +1012,17 @@ var requestpolicyOverlay = {
         // the user having to perform multiple "forbids" after successive
         // reloads, which would be unacceptable.
 
-        if (this._requestpolicy.isAllowedOrigin(currentIdentifier)
-            || this._requestpolicy
-                .isTemporarilyAllowedOrigin(currentIdentifier)) {
+        if (this._rpService.isAllowedOrigin(currentIdentifier)
+            || this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
           this._addMenuItemForbidOrigin(submenu, currentIdentifier);
 
-        } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
-            || this._requestpolicy
-                .isTemporarilyAllowedDestination(destIdentifier)) {
+        } else if (this._rpService.isAllowedDestination(destIdentifier)
+            || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
           this._addMenuItemForbidDest(submenu, destIdentifier);
 
-        } else if (this._requestpolicy.isAllowedOriginToDestination(
+        } else if (this._rpService.isAllowedOriginToDestination(
             currentIdentifier, destIdentifier)
-            || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+            || this._rpService.isTemporarilyAllowedOriginToDestination(
                 currentIdentifier, destIdentifier)) {
           this._addMenuItemForbidOriginToDest(submenu, currentIdentifier,
               destIdentifier);
@@ -1056,9 +1059,9 @@ var requestpolicyOverlay = {
       this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
 
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
           "Unable to prepare menu due to error.");
       throw e;
     }
@@ -1116,17 +1119,17 @@ var requestpolicyOverlay = {
 
   _populateOtherOriginsMenuItemAllowedDestinations : function(submenu,
       originIdentifier, destIdentifier) {
-    if (this._requestpolicy.isAllowedOrigin(originIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedOrigin(originIdentifier)) {
+    if (this._rpService.isAllowedOrigin(originIdentifier)
+        || this._rpService.isTemporarilyAllowedOrigin(originIdentifier)) {
       this._addMenuItemForbidOrigin(submenu, originIdentifier);
 
-    } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedDestination(destIdentifier)) {
+    } else if (this._rpService.isAllowedDestination(destIdentifier)
+        || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
       this._addMenuItemForbidDest(submenu, destIdentifier);
 
-    } else if (this._requestpolicy.isAllowedOriginToDestination(
-        originIdentifier, destIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+    } else if (this._rpService.isAllowedOriginToDestination(originIdentifier,
+        destIdentifier)
+        || this._rpService.isTemporarilyAllowedOriginToDestination(
             originIdentifier, destIdentifier)) {
       this._addMenuItemForbidOriginToDest(submenu, originIdentifier,
           destIdentifier);
@@ -1139,8 +1142,8 @@ var requestpolicyOverlay = {
 
   _getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     var rejectedRequests = {};
-    if (currentUri in this._requestpolicyJSObject._rejectedRequests) {
-      for (var ident in this._requestpolicyJSObject._rejectedRequests[currentUri]) {
+    if (currentUri in this._rpServiceJSObject._rejectedRequests) {
+      for (var ident in this._rpServiceJSObject._rejectedRequests[currentUri]) {
         rejectedRequests[ident] = true;
       }
     }
@@ -1148,11 +1151,10 @@ var requestpolicyOverlay = {
     // the same uriIdentifier as the current page.
     if (currentIdentifier in otherOrigins) {
       for (var i in otherOrigins[currentIdentifier]) {
-        if (i in this._requestpolicyJSObject._rejectedRequests) {
-          this._dumpRequestSet(
-              this._requestpolicyJSObject._rejectedRequests[i],
+        if (i in this._rpServiceJSObject._rejectedRequests) {
+          this._dumpRequestSet(this._rpServiceJSObject._rejectedRequests[i],
               "Rejected requests of " + i);
-          for (var ident in this._requestpolicyJSObject._rejectedRequests[i]) {
+          for (var ident in this._rpServiceJSObject._rejectedRequests[i]) {
             rejectedRequests[ident] = true;
           }
         }
@@ -1163,8 +1165,8 @@ var requestpolicyOverlay = {
 
   _getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     var allowedRequests = {};
-    if (currentUri in this._requestpolicyJSObject._allowedRequests) {
-      for (var ident in this._requestpolicyJSObject._allowedRequests[currentUri]) {
+    if (currentUri in this._rpServiceJSObject._allowedRequests) {
+      for (var ident in this._rpServiceJSObject._allowedRequests[currentUri]) {
         allowedRequests[ident] = true;
       }
     }
@@ -1172,8 +1174,8 @@ var requestpolicyOverlay = {
     // the same uriIdentifier as the current page.
     if (currentIdentifier in otherOrigins) {
       for (var i in otherOrigins[currentIdentifier]) {
-        if (i in this._requestpolicyJSObject._allowedRequests) {
-          for (var ident in this._requestpolicyJSObject._allowedRequests[i]) {
+        if (i in this._rpServiceJSObject._allowedRequests) {
+          for (var ident in this._rpServiceJSObject._allowedRequests[i]) {
             allowedRequests[ident] = true;
           }
         }
@@ -1201,14 +1203,16 @@ var requestpolicyOverlay = {
   _getOtherOrigins : function(document) {
     var origins = {};
     this._getOtherOriginsHelperFromDOM(document, origins);
-    this._getOtherOriginsHelperFromAllowedRequests(rpModules.DomainUtils
-            .stripFragment(document.documentURI), origins, {});
+    this._getOtherOriginsHelperFromAllowedRequests(
+        requestpolicy.mod.DomainUtils.stripFragment(document.documentURI),
+        origins, {});
     return origins;
   },
 
   _getOtherOriginsHelperFromDOM : function(document, origins) {
-    var documentUri = rpModules.DomainUtils.stripFragment(document.documentURI);
-    rpModules.Logger.dump("Looking for other origins within DOM of "
+    var documentUri = requestpolicy.mod.DomainUtils
+        .stripFragment(document.documentURI);
+    requestpolicy.mod.Logger.dump("Looking for other origins within DOM of "
         + documentUri);
     // TODO: Check other elements besides iframes and frames?
     var frameTagTypes = {
@@ -1227,7 +1231,7 @@ var requestpolicyOverlay = {
         if (childDocument === undefined) {
           continue;
         }
-        var childUri = rpModules.DomainUtils
+        var childUri = requestpolicy.mod.DomainUtils
             .stripFragment(childDocument.documentURI);
         if (childUri == "about:blank") {
           // iframe empty or not loaded yet, or maybe blocked.
@@ -1236,9 +1240,9 @@ var requestpolicyOverlay = {
           // yet.
           continue;
         }
-        rpModules.Logger.dump("Found DOM child " + tagType + " with src <"
-            + childUri + "> in document <" + documentUri + ">");
-        var childUriIdent = this._requestpolicy.getUriIdentifier(childUri);
+        requestpolicy.mod.Logger.dump("Found DOM child " + tagType
+            + " with src <" + childUri + "> in document <" + documentUri + ">");
+        var childUriIdent = this._rpService.getUriIdentifier(childUri);
         if (!origins[childUriIdent]) {
           origins[childUriIdent] = {};
         }
@@ -1250,10 +1254,10 @@ var requestpolicyOverlay = {
 
   _getOtherOriginsHelperFromAllowedRequests : function(rootUri, origins,
       checkedOrigins) {
-    rpModules.Logger
+    requestpolicy.mod.Logger
         .dump("Looking for other origins within allowed requests from "
             + rootUri);
-    var allowedRequests = this._requestpolicyJSObject._allowedRequests[rootUri];
+    var allowedRequests = this._rpServiceJSObject._allowedRequests[rootUri];
     if (allowedRequests) {
       for (var i in allowedRequests) {
         for (var allowedUri in allowedRequests[i]) {
@@ -1262,10 +1266,9 @@ var requestpolicyOverlay = {
           }
           checkedOrigins[allowedUri] = true;
 
-          rpModules.Logger.dump("Found allowed request to <" + allowedUri
-              + "> from <" + rootUri + ">");
-          var allowedUriIdent = this._requestpolicy
-              .getUriIdentifier(allowedUri);
+          requestpolicy.mod.Logger.dump("Found allowed request to <"
+              + allowedUri + "> from <" + rootUri + ">");
+          var allowedUriIdent = this._rpService.getUriIdentifier(allowedUri);
           if (!origins[allowedUriIdent]) {
             origins[allowedUriIdent] = {};
           }
@@ -1278,27 +1281,31 @@ var requestpolicyOverlay = {
   },
 
   _dumpOtherOrigins : function(otherOrigins) {
-    rpModules.Logger.dump("-------------------------------------------------");
-    rpModules.Logger.dump("Other origins");
+    requestpolicy.mod.Logger
+        .dump("-------------------------------------------------");
+    requestpolicy.mod.Logger.dump("Other origins");
     for (i in otherOrigins) {
-      rpModules.Logger.dump("\t" + "Origin identifier: <" + i + ">");
+      requestpolicy.mod.Logger.dump("\t" + "Origin identifier: <" + i + ">");
       for (var j in otherOrigins[i]) {
-        rpModules.Logger.dump("\t\t" + j);
+        requestpolicy.mod.Logger.dump("\t\t" + j);
       }
     }
-    rpModules.Logger.dump("-------------------------------------------------");
+    requestpolicy.mod.Logger
+        .dump("-------------------------------------------------");
   },
 
   _dumpRequestSet : function(requestSet, name) {
-    rpModules.Logger.dump("-------------------------------------------------");
-    rpModules.Logger.dump(name);
+    requestpolicy.mod.Logger
+        .dump("-------------------------------------------------");
+    requestpolicy.mod.Logger.dump(name);
     for (i in requestSet) {
-      rpModules.Logger.dump("\t" + "Identifier: <" + i + ">");
+      requestpolicy.mod.Logger.dump("\t" + "Identifier: <" + i + ">");
       for (var j in requestSet[i]) {
-        rpModules.Logger.dump("\t\t" + j);
+        requestpolicy.mod.Logger.dump("\t\t" + j);
       }
     }
-    rpModules.Logger.dump("-------------------------------------------------");
+    requestpolicy.mod.Logger
+        .dump("-------------------------------------------------");
   },
 
   _clearChildMenus : function(menu) {
@@ -1322,7 +1329,7 @@ var requestpolicyOverlay = {
   _addMenuItemTemporarilyAllowDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString(
         "allowDestinationTemporarily", [destHost]);
-    var command = "requestpolicyOverlay.temporarilyAllowDestination('"
+    var command = "requestpolicy.overlay.temporarilyAllowDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     var item = this._addMenuItem(menu, label, command, statustext);
@@ -1334,7 +1341,7 @@ var requestpolicyOverlay = {
       destHost) {
     var label = this._strbundle.getFormattedString(
         "allowOriginToDestinationTemporarily", [originHost, destHost]);
-    var command = "requestpolicyOverlay.temporarilyAllowOriginToDestination('"
+    var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -1346,7 +1353,7 @@ var requestpolicyOverlay = {
   _addMenuItemAllowDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString("allowDestination",
         [destHost]);
-    var command = "requestpolicyOverlay.allowDestination('"
+    var command = "requestpolicy.overlay.allowDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
@@ -1355,7 +1362,7 @@ var requestpolicyOverlay = {
   _addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
     var label = this._strbundle.getFormattedString("allowOriginToDestination",
         [originHost, destHost]);
-    var command = "requestpolicyOverlay.allowOriginToDestination('"
+    var command = "requestpolicy.overlay.allowOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -1367,7 +1374,7 @@ var requestpolicyOverlay = {
   _addMenuItemForbidOrigin : function(menu, originHost) {
     var label = this._strbundle
         .getFormattedString("forbidOrigin", [originHost]);
-    var command = "requestpolicyOverlay.forbidOrigin('"
+    var command = "requestpolicy.overlay.forbidOrigin('"
         + this._sanitizeJsFunctionArg(originHost) + "');";
     var statustext = originHost;
     return this._addMenuItem(menu, label, command, statustext);
@@ -1376,7 +1383,7 @@ var requestpolicyOverlay = {
   _addMenuItemForbidDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString("forbidDestination",
         [destHost]);
-    var command = "requestpolicyOverlay.forbidDestination('"
+    var command = "requestpolicy.overlay.forbidDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this._addMenuItem(menu, label, command, statustext);
@@ -1385,7 +1392,7 @@ var requestpolicyOverlay = {
   _addMenuItemForbidOriginToDest : function(menu, originHost, destHost) {
     var label = this._strbundle.getFormattedString("forbidOriginToDestination",
         [originHost, destHost]);
-    var command = "requestpolicyOverlay.forbidOriginToDestination('"
+    var command = "requestpolicy.overlay.forbidOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -1495,7 +1502,7 @@ var requestpolicyOverlay = {
    * be reloaded.
    */
   _conditionallyReloadDocument : function() {
-    if (this._requestpolicy.prefs.getBoolPref("autoReload")) {
+    if (this._rpService.prefs.getBoolPref("autoReload")) {
       content.document.location.reload(true);
     }
   },
@@ -1508,11 +1515,11 @@ var requestpolicyOverlay = {
    */
   toggleTemporarilyAllowAll : function(event) {
     // TODO: Refactor to use a function call to disable blocking.
-    this._requestpolicyJSObject._blockingDisabled = !this._requestpolicyJSObject._blockingDisabled;
+    this._rpServiceJSObject._blockingDisabled = !this._rpServiceJSObject._blockingDisabled;
     // Only reloading the current document. Should we reload all? Seems like it
     // would be unexpected to the user if all were reloaded.
     this
-        ._setPermissiveNotificationForAllWindows(this._requestpolicyJSObject._blockingDisabled);
+        ._setPermissiveNotificationForAllWindows(this._rpServiceJSObject._blockingDisabled);
     this._conditionallyReloadDocument();
   },
 
@@ -1527,7 +1534,7 @@ var requestpolicyOverlay = {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
     var host = this._getCurrentUriIdentifier();
-    this._requestpolicy.temporarilyAllowOrigin(host);
+    this._rpService.temporarilyAllowOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -1539,7 +1546,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   temporarilyAllowDestination : function(destHost) {
-    this._requestpolicy.temporarilyAllowDestination(destHost);
+    this._rpService.temporarilyAllowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1553,8 +1560,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   temporarilyAllowOriginToDestination : function(originHost, destHost) {
-    this._requestpolicy.temporarilyAllowOriginToDestination(originHost,
-        destHost);
+    this._rpService.temporarilyAllowOriginToDestination(originHost, destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1567,7 +1573,7 @@ var requestpolicyOverlay = {
    */
   allowOrigin : function(event) {
     var host = this._getCurrentUriIdentifier();
-    this._requestpolicy.allowOrigin(host);
+    this._rpService.allowOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -1578,7 +1584,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   allowDestination : function(destHost) {
-    this._requestpolicy.allowDestination(destHost);
+    this._rpService.allowDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1592,7 +1598,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   allowOriginToDestination : function(originHost, destHost) {
-    this._requestpolicy.allowOriginToDestination(originHost, destHost);
+    this._rpService.allowOriginToDestination(originHost, destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1606,7 +1612,7 @@ var requestpolicyOverlay = {
    */
   forbidOrigin : function(event) {
     var host = this._getCurrentUriIdentifier();
-    this._requestpolicy.forbidOrigin(host);
+    this._rpService.forbidOrigin(host);
     this._conditionallyReloadDocument();
   },
 
@@ -1618,7 +1624,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   forbidDestination : function(destHost) {
-    this._requestpolicy.forbidDestination(destHost);
+    this._rpService.forbidDestination(destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1633,7 +1639,7 @@ var requestpolicyOverlay = {
    *            destHost
    */
   forbidOriginToDestination : function(originHost, destHost) {
-    this._requestpolicy.forbidOriginToDestination(originHost, destHost);
+    this._rpService.forbidOriginToDestination(originHost, destHost);
     this._conditionallyReloadDocument();
   },
 
@@ -1644,18 +1650,18 @@ var requestpolicyOverlay = {
    *            event
    */
   revokeTemporaryPermissions : function(event) {
-    this._requestpolicy.revokeTemporaryPermissions();
+    this._rpService.revokeTemporaryPermissions();
     this._conditionallyReloadDocument();
   },
 
   _performRedirectAfterDelay : function(document, redirectTargetUri, delay) {
-    rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Registering delayed (" + delay + "s) redirect to <"
             + redirectTargetUri + "> from <" + document.documentURI + ">");
     const constDocument = document;
     const constRedirectTargetUri = redirectTargetUri;
     document.defaultView.setTimeout(function() {
-          requestpolicyOverlay._performRedirect(constDocument,
+          requestpolicy.overlay._performRedirect(constDocument,
               constRedirectTargetUri);
         }, delay * 1000);
   },
@@ -1663,7 +1669,7 @@ var requestpolicyOverlay = {
   _performRedirect : function(document, redirectTargetUri) {
     try {
       if (redirectTargetUri[0] == '/') {
-        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Redirecting to relative path <" + redirectTargetUri + "> from <"
                 + document.documentURI + ">");
         document.location.pathname = redirectTargetUri;
@@ -1674,7 +1680,7 @@ var requestpolicyOverlay = {
           var curDir = document.documentURI.split("/").slice(0, -1).join("/");
           redirectTargetUri = curDir + "/" + redirectTargetUri;
         }
-        rpModules.Logger.info(rpModules.Logger.TYPE_INTERNAL,
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Redirecting to <" + redirectTargetUri + "> from <"
                 + document.documentURI + ">");
         document.location.href = redirectTargetUri;
@@ -1699,15 +1705,15 @@ var requestpolicyOverlay = {
   },
 
   openOptionsDialog : function() {
-    window.openDialog("chrome://requestpolicy/content/requestpolicyPrefs.xul",
+    window.openDialog("chrome://requestpolicy/content/prefWindow.xul",
         "requestpolicyPreferencesDialogWindow",
         "chrome, close, centerscreen, alwaysRaised");
   },
 
   _showInitialSetupDialog : function() {
-    if (!this._requestpolicy.prefs.getBoolPref("initialSetupDialogShown")) {
-      this._requestpolicy.prefs.setBoolPref("initialSetupDialogShown", true);
-      this._requestpolicyJSObject._prefService.savePrefFile(null);
+    if (!this._rpService.prefs.getBoolPref("initialSetupDialogShown")) {
+      this._rpService.prefs.setBoolPref("initialSetupDialogShown", true);
+      this._rpServiceJSObject._prefService.savePrefFile(null);
       window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
           "requestpolicyInitialSetupDialogWindow",
           "chrome, close, centerscreen, alwaysRaised");
@@ -1715,13 +1721,13 @@ var requestpolicyOverlay = {
   },
 
   _attachPopupToContextMenu : function() {
-    if (requestpolicyOverlay._isFennec) {
+    if (requestpolicy.overlay._isFennec) {
       return;
     }
     // Add the menupopup back to the contextmenu.
-    if (!requestpolicyOverlay._rpContextMenu.firstChild) {
-      requestpolicyOverlay._rpContextMenu.insertBefore(
-          requestpolicyOverlay._menu, null);
+    if (!requestpolicy.overlay._rpContextMenu.firstChild) {
+      requestpolicy.overlay._rpContextMenu.insertBefore(
+          requestpolicy.overlay._menu, null);
     }
   },
 
@@ -1739,7 +1745,7 @@ var requestpolicyOverlay = {
   _attachPopupToStatusbar : function() {
     // Add the menupopup to the statusbar as it may be attached to the
     // contextmenu.
-    requestpolicyOverlay._statusbar.insertBefore(requestpolicyOverlay._menu,
+    requestpolicy.overlay._statusbar.insertBefore(requestpolicy.overlay._menu,
         null);
   },
 
@@ -1760,23 +1766,23 @@ var requestpolicyOverlay = {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
       openRequestLog.hidden = false;
-      this.requestpolicyRequestLogTreeView = null;
+      this.requestLogTreeView = null;
     }
   }
 
 };
 
-// Initialize the requestpolicyOverlay object when the window DOM is loaded.
+// Initialize the requestpolicy.overlay object when the window DOM is loaded.
 addEventListener("DOMContentLoaded", function(event) {
-      requestpolicyOverlay.init();
+      requestpolicy.overlay.init();
     }, false);
 
 // Event handler for when the window is closed.
 addEventListener("close", function(event) {
-      requestpolicyOverlay.onWindowClose(event);
+      requestpolicy.overlay.onWindowClose(event);
     }, false);
 
 // Registers event handlers for documents loaded in the window.
 addEventListener("load", function(event) {
-      requestpolicyOverlay.onLoad(event);
+      requestpolicy.overlay.onLoad(event);
     }, false);

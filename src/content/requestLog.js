@@ -20,7 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var requestpolicyRequestLog = {
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
+}
+
+requestpolicy.requestLog = {
 
   _initialized : false,
 
@@ -33,14 +39,14 @@ var requestpolicyRequestLog = {
     this._initialized = true;
 
     this._tree = document.getElementById("requestpolicy-requestLog-tree");
-    this._tree.view = window.requestpolicyRequestLogTreeView;
+    this._tree.view = window.requestpolicy.requestLogTreeView;
 
     // Give the requestpolicyOverlay direct access to the tree view.
-    window.parent.requestpolicyOverlay.requestpolicyRequestLogTreeView = window.requestpolicyRequestLogTreeView;
+    window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
   }
 
 };
 
 addEventListener("DOMContentLoaded", function(event) {
-      requestpolicyRequestLog.init(event);
+      requestpolicy.requestLog.init(event);
     }, false);

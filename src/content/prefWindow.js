@@ -20,22 +20,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var rpModules;
-if (rpModules === undefined) {
-  rpModules = {};
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
 }
-Components.utils.import("resource://requestpolicy/FileUtils.jsm", rpModules);
-Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
-Components.utils.import("resource://requestpolicy/Prompter.jsm", rpModules);
 
-var requestpolicyPrefs = {
+Components.utils.import("resource://requestpolicy/FileUtils.jsm",
+    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Prompter.jsm",
+    requestpolicy.mod);
+
+requestpolicy.prefWindow = {
 
   _initialized : false,
-  _requestpolicy : null,
+  _rpService : null,
 
   // For things we can't do through the nsIRequestPolicy interface, use direct
   // access to the underlying JS object.
-  _requestpolicyJSObject : null,
+  _rpServiceJSObject : null,
 
   _strbundle : null,
 
@@ -47,9 +52,9 @@ var requestpolicyPrefs = {
     if (this._initialized == false) {
       this._initialized = true;
 
-      this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
+      this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
           .getService(Components.interfaces.nsIRequestPolicy);
-      this._requestpolicyJSObject = this._requestpolicy.wrappedJSObject;
+      this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
       this._strbundle = document.getElementById("requestpolicyStrings");
 
@@ -87,15 +92,15 @@ var requestpolicyPrefs = {
       this._originsToDestinationsList.removeButton.listbox = this._originsToDestinationsList;
 
       this._originsList.forbid = function(origin) {
-        requestpolicyPrefs._requestpolicy.forbidOriginDelayStore(origin);
+        requestpolicy.prefWindow._rpService.forbidOriginDelayStore(origin);
       };
       this._destinationsList.forbid = function(destination) {
-        requestpolicyPrefs._requestpolicy
+        requestpolicy.prefWindow._rpService
             .forbidDestinationDelayStore(destination);
       };
       this._originsToDestinationsList.forbid = function(originToDestIdentifier) {
         // Third param is "delay store".
-        requestpolicyPrefs._requestpolicyJSObject
+        requestpolicy.prefWindow._rpServiceJSObject
             ._forbidOriginToDestinationByCombinedIdentifier(
                 originToDestIdentifier, true);
       };
@@ -115,18 +120,18 @@ var requestpolicyPrefs = {
 
       // Each button has an "allow" function to whitelist the user-entered item.
       this._addOriginButton.allow = function() {
-        requestpolicyPrefs._requestpolicyJSObject
-            .allowOrigin(requestpolicyPrefs._addOriginButton.textboxes[0].value);
+        requestpolicy.prefWindow._rpServiceJSObject
+            .allowOrigin(requestpolicy.prefWindow._addOriginButton.textboxes[0].value);
       };
       this._addDestinationButton.allow = function() {
-        requestpolicyPrefs._requestpolicyJSObject
-            .allowDestination(requestpolicyPrefs._addDestinationButton.textboxes[0].value);
+        requestpolicy.prefWindow._rpServiceJSObject
+            .allowDestination(requestpolicy.prefWindow._addDestinationButton.textboxes[0].value);
       };
       this._addOriginToDestinationButton.allow = function() {
-        requestpolicyPrefs._requestpolicyJSObject
+        requestpolicy.prefWindow._rpServiceJSObject
             .allowOriginToDestination(
-                requestpolicyPrefs._addOriginToDestinationButton.textboxes[0].value,
-                requestpolicyPrefs._addOriginToDestinationButton.textboxes[1].value);
+                requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[0].value,
+                requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[1].value);
       };
 
       this._populateWhitelists();
@@ -157,10 +162,10 @@ var requestpolicyPrefs = {
   _populateWhitelists : function() {
     // Origins.
     var origins = [];
-    for (var i in this._requestpolicyJSObject._allowedOrigins) {
+    for (var i in this._rpServiceJSObject._allowedOrigins) {
       origins.push([i, false]);
     }
-    for (var i in this._requestpolicyJSObject._temporarilyAllowedOrigins) {
+    for (var i in this._rpServiceJSObject._temporarilyAllowedOrigins) {
       origins.push([i, true]);
     }
     origins.sort(function(a, b) {
@@ -170,10 +175,10 @@ var requestpolicyPrefs = {
 
     // Destinations.
     var destinations = [];
-    for (var i in this._requestpolicyJSObject._allowedDestinations) {
+    for (var i in this._rpServiceJSObject._allowedDestinations) {
       destinations.push([i, false]);
     }
-    for (var i in this._requestpolicyJSObject._temporarilyAllowedDestinations) {
+    for (var i in this._rpServiceJSObject._temporarilyAllowedDestinations) {
       destinations.push([i, true]);
     }
     destinations.sort(function(a, b) {
@@ -184,11 +189,11 @@ var requestpolicyPrefs = {
 
     // Origins to destinations.
     var originsToDestinations = [];
-    for (var i in this._requestpolicyJSObject._allowedOriginsToDestinations) {
+    for (var i in this._rpServiceJSObject._allowedOriginsToDestinations) {
       var parts = i.split("|");
       originsToDestinations.push([parts[0], parts[1], i, false]);
     }
-    for (var i in this._requestpolicyJSObject._temporarilyAllowedOriginsToDestinations) {
+    for (var i in this._rpServiceJSObject._temporarilyAllowedOriginsToDestinations) {
       var parts = i.split("|");
       originsToDestinations.push([parts[0], parts[1], i, true]);
     }
@@ -263,13 +268,13 @@ var requestpolicyPrefs = {
       listbox.forbid(listbox.selectedItems[i].value);
     }
     // We delayed storage of the preference lists, so store the data now.
-    this._requestpolicy.storeAllPreferenceLists();
+    this._rpService.storeAllPreferenceLists();
     for (var i = listbox.childNodes.length - 1; i >= 0; i--) {
       if (listbox.childNodes[i].selected) {
         listbox.removeChild(listbox.childNodes[i]);
       }
     }
-    requestpolicyPrefs.listSelectionChanged(listbox)
+    requestpolicy.prefWindow.listSelectionChanged(listbox)
   },
 
   addToWhitelistInputChanged : function(textbox) {
@@ -376,12 +381,12 @@ var requestpolicyPrefs = {
         }
         rpModules.Logger.dump("Importing " + currentLine + " into "
             + currentGroup);
-        this._requestpolicyJSObject[importFunction](currentLine, true);
+        this._rpServiceJSObject[importFunction](currentLine, true);
       }
     }
 
     // We delayed storage of the preference lists, so store the data now.
-    this._requestpolicy.storeAllPreferenceLists();
+    this._rpService.storeAllPreferenceLists();
 
     this._populateWhitelists();
     rpModules.Prompter.alert(this._getFilePickerWindowTitle('import'),
@@ -392,15 +397,15 @@ var requestpolicyPrefs = {
     rpModules.Logger.dump("Starting export to " + file.path);
     var lines = [];
     lines.push("[origins]");
-    for (var i in this._requestpolicyJSObject._allowedOrigins) {
+    for (var i in this._rpServiceJSObject._allowedOrigins) {
       lines.push(i);
     }
     lines.push("[destinations]");
-    for (var i in this._requestpolicyJSObject._allowedDestinations) {
+    for (var i in this._rpServiceJSObject._allowedDestinations) {
       lines.push(i);
     }
     lines.push("[origins-to-destinations]");
-    for (var i in this._requestpolicyJSObject._allowedOriginsToDestinations) {
+    for (var i in this._rpServiceJSObject._allowedOriginsToDestinations) {
       lines.push(i);
     }
     rpModules.FileUtils.arrayToFile(lines, file);
@@ -431,7 +436,7 @@ var requestpolicyPrefs = {
 
 }
 
-// Initialize the requestpolicyPrefs object when the window DOM is loaded.
+// Initialize the requestpolicy.prefWindow object when the window DOM is loaded.
 addEventListener("DOMContentLoaded", function(event) {
-      requestpolicyPrefs.init();
+      requestpolicy.prefWindow.init();
     }, false);

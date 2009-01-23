@@ -20,7 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var requestpolicyRequestLogTreeView = {
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
+}
+
+requestpolicy.requestLogTreeView = {
 
   _treebox : null,
 
@@ -171,6 +177,6 @@ var requestpolicyRequestLogTreeView = {
 
 };
 
-requestpolicyRequestLogTreeView.__defineGetter__("rowCount", function() {
+requestpolicy.requestLogTreeView.__defineGetter__("rowCount", function() {
       return this._getRowCount();
     });

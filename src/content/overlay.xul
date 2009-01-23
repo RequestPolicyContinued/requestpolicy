@@ -31,7 +31,7 @@
 		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
 	</stringbundleset>
 	
-	<script type="application/x-javascript" src="requestpolicyOverlay.js" />
+	<script type="application/x-javascript" src="overlay.js" />
 
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="requestpolicyToolbarButton" 
@@ -39,7 +39,7 @@
 			label="RequestPolicy"
 			tooltiptext="RequestPolicy"
 			type="menu-button"
-			onclick="requestpolicyOverlay.openToolbarPopup(this)" />
+			onclick="requestpolicy.overlay.openToolbarPopup(this)" />
 	</toolbarpalette>
 	
 	<popup id="contentAreaContextMenu">
@@ -54,7 +54,7 @@
 			class="statusbarpanel-menu-iconic" 
 			id="requestpolicyStatusbar"
 			tooltiptext="RequestPolicy"
-			onclick="requestpolicyOverlay.openStatusbarPopup(this);"
+			onclick="requestpolicy.overlay.openStatusbarPopup(this);"
 			>
 		</statusbarpanel>
 	</statusbar>
@@ -75,22 +75,22 @@
 
 		<menupopup 
 			id="requestpolicyStatusbarPopup" 
-			onpopupshowing="requestpolicyOverlay.onMenuShowing(event);"
-			onpopuphidden="requestpolicyOverlay.onMenuHidden(event);"
+			onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
+			onpopuphidden="requestpolicy.overlay.onMenuHidden(event);"
 			>
 			<menuitem
 				id="requestpolicyOpenPreferences"
 				label="&preferences;"
-				oncommand="requestpolicyOverlay.openOptionsDialog();" />
+				oncommand="requestpolicy.overlay.openOptionsDialog();" />
 			<menuitem
 				id="requestpolicyOpenRequestLog"
 				label="&menu.openRequestLog.label;"
-				oncommand="requestpolicyOverlay.toggleRequestLog();" />
+				oncommand="requestpolicy.overlay.toggleRequestLog();" />
 			<menuitem
 				id="requestpolicyCloseRequestLog"
 				hidden="true"
 				label="&menu.closeRequestLog.label;"
-				oncommand="requestpolicyOverlay.toggleRequestLog();" />
+				oncommand="requestpolicy.overlay.toggleRequestLog();" />
 			<menuseparator id="preferencesSeparator"/>
 			<menu
 				id="requestpolicyPrefetchWarning"
@@ -99,12 +99,12 @@
 					<menuitem
 						id="requestpolicyPrefetchInfo"
 						label="&prefetchInfo;"
-						oncommand="requestpolicyOverlay.showPrefetchInfo();"
+						oncommand="requestpolicy.overlay.showPrefetchInfo();"
 						/>
 					<menuitem
 						id="requestpolicyPrefetchDisablingInstructions"
 						label="&prefetchDisablingInstructions;"
-						oncommand="requestpolicyOverlay.showPrefetchDisablingInstructions();"
+						oncommand="requestpolicy.overlay.showPrefetchDisablingInstructions();"
 						/>
 				</menupopup>
 			</menu>
@@ -115,7 +115,7 @@
 				label="&temporarilyAllowAll;"
 				type="checkbox"
 				checked="false"
-				oncommand="requestpolicyOverlay.toggleTemporarilyAllowAll(event);" />
+				oncommand="requestpolicy.overlay.toggleTemporarilyAllowAll(event);" />
 			<menuseparator />
 			<menu
 				id="requestpolicyOtherOrigins"
@@ -142,18 +142,18 @@
 			<menuitem 
 				id="requestpolicyRevokeTemporaryPermissions"
 				label="&revokeTemporaryPermissions;"
-				oncommand="requestpolicyOverlay.revokeTemporaryPermissions(event);" />
+				oncommand="requestpolicy.overlay.revokeTemporaryPermissions(event);" />
 			<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
 			<menuitem 
 				id="requestpolicyAllowOrigin"
-				oncommand="requestpolicyOverlay.allowOrigin(event);" />
+				oncommand="requestpolicy.overlay.allowOrigin(event);" />
 			<menuitem 
 				id="requestpolicyAllowOriginTemporarily"
 				class="requestpolicyTemporary"
-				oncommand="requestpolicyOverlay.temporarilyAllowOrigin(event);" />
+				oncommand="requestpolicy.overlay.temporarilyAllowOrigin(event);" />
 			<menuitem 
 				id="requestpolicyForbidOrigin"
-				oncommand="requestpolicyOverlay.forbidOrigin(event);" />
+				oncommand="requestpolicy.overlay.forbidOrigin(event);" />
 		</menupopup>
 	</popupset>
 
@@ -163,7 +163,7 @@
 			<toolbox id="rp-requestLog-header">
 				<toolbar id="rp-requestLog-toolbar" align="center">
 					<label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" flex="1" crop="end"/>
-					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicyOverlay.toggleRequestLog()"/>
+					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
 				</toolbar>
 			</toolbox>
 			<iframe id="rp-requestLog-frame" flex="1"/>

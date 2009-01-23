@@ -20,13 +20,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var rpModules;
-if (rpModules === undefined) {
-  rpModules = {};
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
 }
-Components.utils.import("resource://requestpolicy/Logger.jsm", rpModules);
 
-requestpolicyInitialSetup = {
+Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
+
+requestpolicy.initialSetup = {
 
   _itemsByRegion : {
     "international" : [["*", "recaptcha.net"], ["yahoo.com", "yimg.com"],
@@ -92,14 +95,14 @@ requestpolicyInitialSetup = {
         ["ebay.com.au", "ebay.com"], ["ebay.com", "ebay.com.au"]]
   },
 
-  _requestpolicy : null,
-  _requestpolicyJSObject : null,
+  _rpService : null,
+  _rpServiceJSObject : null,
   _listbox : null,
   _checkboxes : null,
   _items : [],
 
   init : function() {
-    this._requestpolicy = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
+    this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
         .getService(Components.interfaces.nsIRequestPolicy);
     this._listbox = document.getElementById("originsToDestinationsList");
     this._checkboxes = ["international", "americas", "asia", "us-canada",
@@ -109,19 +112,20 @@ requestpolicyInitialSetup = {
 
   save : function() {
     for (var i = 0; i < this._items.length; i++) {
-      rpModules.Logger.dump("Adding item to whitelist: " + this._items[i]);
+      requestpolicy.mod.Logger.dump("Adding item to whitelist: "
+          + this._items[i]);
       var origin = this._items[i][0];
       var dest = this._items[i][1];
       if (origin == "*") {
-        this._requestpolicy.allowDestinationDelayStore(dest);
+        this._rpService.allowDestinationDelayStore(dest);
       } else if (dest == "*") {
-        this._requestpolicy.allowOriginDelayStore(origin);
+        this._rpService.allowOriginDelayStore(origin);
       } else {
-        this._requestpolicy.allowOriginToDestinationDelayStore(origin, dest);
+        this._rpService.allowOriginToDestinationDelayStore(origin, dest);
       }
     }
     // We delayed storage of the preference lists, so store the data now.
-    this._requestpolicy.storeAllPreferenceLists();
+    this._rpService.storeAllPreferenceLists();
     return true;
   },
 

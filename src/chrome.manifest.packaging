@@ -7,6 +7,7 @@ locale     requestpolicy    de-DE          jar:chrome/requestpolicy.jar!/locale/
 locale     requestpolicy    fr-FR          jar:chrome/requestpolicy.jar!/locale/fr-FR/
 locale     requestpolicy    ko-KR          jar:chrome/requestpolicy.jar!/locale/ko-KR/
 locale     requestpolicy    pt-BR          jar:chrome/requestpolicy.jar!/locale/pt-BR/
+locale     requestpolicy    uk-UA          jar:chrome/requestpolicy.jar!/locale/uk-UA/
 
 style      chrome://global/content/customizeToolbar.xul            chrome://requestpolicy/skin/requestpolicy.css
 

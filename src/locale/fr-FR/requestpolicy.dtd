@@ -6,46 +6,46 @@
 <!ENTITY blockedDestinations "Cibles bloquées">
 <!ENTITY allowedDestinations "Cibles autorisées">
 <!ENTITY otherOrigins "Autres origines dans cette page">
-<!ENTITY menu.openRequestLog.label "Show Request Log">
-<!ENTITY menu.closeRequestLog.label "Close Request Log">
+<!ENTITY menu.openRequestLog.label "Voir le journal des requêtes">
+<!ENTITY menu.closeRequestLog.label "Fermer le journal des requêtes">
 <!ENTITY rp.origin "Origine">
 <!ENTITY rp.destination "Destination">
 <!ENTITY rp.allow "Accepter">
 <!ENTITY preferences "Préférences">
-<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
+<!ENTITY preferences.windowTitle "Préférences des règles de requêtes">
 <!ENTITY preferences.prefpane.general "Général">
 <!ENTITY preferences.prefpane.whitelist "Liste blanche">
 <!ENTITY preferences.prefpane.import "Importer">
 <!ENTITY preferences.prefpane.export "Exporter">
-<!ENTITY preferences.strictness "Strictness">
-<!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Web pages">
+<!ENTITY preferences.strictness "Rigueur">
+<!ENTITY preferences.baseDomain "Domaine basique (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Domaine complet (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Adresse complète (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Pages Web">
 <!ENTITY preferences.statusbarIcon "Icône de la barre d&apos;état">
 <!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées">
-<!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.openInitialSetup "Ouvrir l&apos;outil de réglage initial">
 <!ENTITY preferences.origins "Origines">
 <!ENTITY preferences.destinations "Destinations">
-<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
+<!ENTITY preferences.originsToDestinations "Origines-vers-destinations">
 <!ENTITY preferences.temporary "Temporaire">
 <!ENTITY preferences.removeSelectedSites "Retirer les sites sélectionnés">
 <!ENTITY preferences.export "Exporter">
 <!ENTITY preferences.export.caption "Exporter vos préférences">
-<!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
+<!ENTITY preferences.export.description "Vous pouvez exporter votre liste blanche vers un fichier, et ainsi avoir une sauvegarde. Pour qu&apos;un autre ordinateur dispose de la même configuration, déplacez-y ce fichier et utilisez l&apos;option d&apos;importation.">
 <!ENTITY preferences.export.details.caption "Ce qui est inclus dans l&apos;exportation">
-<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
+<!ENTITY preferences.export.details.description "Le fichier exporté contiendra les origines, les destinations, et les « origines-vers-destinations » que vous avez autorisées. Il ne contiendra aucune autre chose que vous avez autorisée temporairement.">
 <!ENTITY preferences.export.button.label "Exporter vers le fichier">
 <!ENTITY preferences.import "Importer">
 <!ENTITY preferences.import.caption "Importer vos paramètres">
-<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
+<!ENTITY preferences.import.description "Vous pouvez importer votre liste blanche depuis un fichier de sauvegarde ayant été fait depuis l&apos;outil d&apos;exportation.">
 <!ENTITY preferences.import.details.caption "Ce que l&apos;importation va faire">
-<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
+<!ENTITY preferences.import.details.description "L&apos;importation ajoutera les origines, les destinations, et les « origines-vers-destinations » contenues dans le fichier importé. Dans votre liste blanche actuelle aucun élément ne sera enlevé : en quelque sorte, cela ne fait qu&apos;ajouter des sites à la liste, et non remplacer complètement la liste actuelle.">
 <!ENTITY preferences.import.button.label "Importer depuis un gfichier">
 <!ENTITY requestLog.title "Request Log">
 <!ENTITY requestLog.blocked "Bloqué">
 <!ENTITY requestLog.time "Time">
-<!ENTITY initialSetup.title "Initial Setup">
+<!ENTITY initialSetup.title "Installation initiale">
 <!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
 <!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
 <!ENTITY initialSetup.region.international "International">

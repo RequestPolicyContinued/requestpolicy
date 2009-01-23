@@ -1,0 +1,56 @@
+<!ENTITY prefetchWarning "Warning: Prefetch is enabled">
+<!ENTITY prefetchInfo "Learn about prefetching">
+<!ENTITY prefetchDisablingInstructions "Disable prefetching">
+<!ENTITY temporarilyAllowAll "Temporarily allow all requests">
+<!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
+<!ENTITY blockedDestinations "Blocked destinations">
+<!ENTITY allowedDestinations "Allowed destinations">
+<!ENTITY otherOrigins "Other origins within this page">
+<!ENTITY menu.openRequestLog.label "Show Request Log">
+<!ENTITY menu.closeRequestLog.label "Close Request Log">
+<!ENTITY rp.origin "Origin">
+<!ENTITY rp.destination "Destination">
+<!ENTITY rp.allow "Дозволити">
+<!ENTITY preferences "Вподобання">
+<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
+<!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.prefpane.whitelist "Whitelist">
+<!ENTITY preferences.prefpane.import "Імпорт">
+<!ENTITY preferences.prefpane.export "Експорт">
+<!ENTITY preferences.strictness "Strictness">
+<!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Веб-сторінки">
+<!ENTITY preferences.statusbarIcon "Піктограма рядку стану">
+<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images">
+<!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.origins "Origins">
+<!ENTITY preferences.destinations "Destinations">
+<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
+<!ENTITY preferences.temporary "Temporary">
+<!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
+<!ENTITY preferences.export "Експорт">
+<!ENTITY preferences.export.caption "Export Your Setting">
+<!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
+<!ENTITY preferences.export.details.caption "What is included in the export">
+<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
+<!ENTITY preferences.export.button.label "Export to File">
+<!ENTITY preferences.import "Імпорт">
+<!ENTITY preferences.import.caption "Import Your Setting">
+<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
+<!ENTITY preferences.import.details.caption "What the import will do">
+<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
+<!ENTITY preferences.import.button.label "Import from File">
+<!ENTITY requestLog.title "Request Log">
+<!ENTITY requestLog.blocked "Blocked">
+<!ENTITY requestLog.time "Час">
+<!ENTITY initialSetup.title "Initial setup">
+<!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
+<!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
+<!ENTITY initialSetup.region.international "International">
+<!ENTITY initialSetup.region.americas "Америка">
+<!ENTITY initialSetup.region.asia "Азія">
+<!ENTITY initialSetup.region.usAndCanada "США та Канада">
+<!ENTITY initialSetup.region.europeAndRussia "Європа та Росія">
+<!ENTITY initialSetup.region.oceania "Океанія">

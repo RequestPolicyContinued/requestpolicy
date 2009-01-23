@@ -7,6 +7,7 @@ locale     requestpolicy    de-DE          locale/de-DE/
 locale     requestpolicy    fr-FR          locale/fr-FR/
 locale     requestpolicy    ko-KR          locale/ko-KR/
 locale     requestpolicy    pt-BR          locale/pt-BR/
+locale     requestpolicy    uk-UA          locale/uk-UA/
 
 style      chrome://global/content/customizeToolbar.xul            chrome://requestpolicy/skin/requestpolicy.css
 

@@ -323,7 +323,7 @@ RequestPolicyService.prototype = {
 
     Components.utils.import("resource://requestpolicy/Logger.jsm",
         requestpolicy.mod);
-    Components.utils.import("resource://requestpolicy/DomainUtils.jsm",
+    Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
         requestpolicy.mod);
   },
 
@@ -347,7 +347,7 @@ RequestPolicyService.prototype = {
       try {
         headerType = "Refresh";
         dest = httpChannel.getResponseHeader(headerType);
-        var parts = requestpolicy.mod.DomainUtils
+        var parts = requestpolicy.mod.DomainUtil
             .parseRefresh(metaTags[i].content);
         // TODO: Handle a delay value in the refresh.
         dest = parts[1];
@@ -501,17 +501,16 @@ RequestPolicyService.prototype = {
   prefs : null,
 
   getUriIdentifier : function getUriIdentifier(uri) {
-    return requestpolicy.mod.DomainUtils.getIdentifier(uri,
+    return requestpolicy.mod.DomainUtil.getIdentifier(uri,
         this._uriIdentificationLevel);
   },
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
       destinationUrl) {
-    var originUrl = requestpolicy.mod.DomainUtils
-        .ensureUriHasPath(requestpolicy.mod.DomainUtils
-            .stripFragment(originUrl));
-    var destinationUrl = requestpolicy.mod.DomainUtils
-        .ensureUriHasPath(requestpolicy.mod.DomainUtils
+    var originUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
+    var destinationUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil
             .stripFragment(destinationUrl));
 
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -532,11 +531,10 @@ RequestPolicyService.prototype = {
   },
 
   registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
-    var originUrl = requestpolicy.mod.DomainUtils
-        .ensureUriHasPath(requestpolicy.mod.DomainUtils
-            .stripFragment(originUrl));
-    var destinationUrl = requestpolicy.mod.DomainUtils
-        .ensureUriHasPath(requestpolicy.mod.DomainUtils
+    var originUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
+    var destinationUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil
             .stripFragment(destinationUrl));
 
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -1307,9 +1305,9 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        var origin = requestpolicy.mod.DomainUtils
+        var origin = requestpolicy.mod.DomainUtil
             .stripFragment(aRequestOrigin.spec);
-        var dest = requestpolicy.mod.DomainUtils
+        var dest = requestpolicy.mod.DomainUtil
             .stripFragment(aContentLocation.spec);
 
         if (this._isDuplicateRequest(dest, origin)) {

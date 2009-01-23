@@ -26,9 +26,11 @@ if (!requestpolicy) {
   };
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtils.jsm",
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
 
 /**
@@ -37,10 +39,10 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
  */
 requestpolicy.overlay = {
 
-  _overlayId : 0,
-
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
   _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
+
+  _overlayId : 0,
 
   _blockedContentCheckTimeoutDelay : 1000, // milliseconds
   _blockedContentCheckTimeoutId : null,
@@ -59,33 +61,7 @@ requestpolicy.overlay = {
   requestLogTreeView : null,
 
   _strbundle : null,
-  _addedMenuItems : [],
   _menu : null,
-
-  _blockedDestinationsItems : [],
-  _allowedDestinationsItems : [],
-
-  _blockedDestinationsHeadingMenuItem : null,
-  _allowedDestinationsHeadingMenuItem : null,
-
-  _blockedDestinationsBeforeReferenceItem : null,
-  _allowedDestinationsBeforeReferenceItem : null,
-
-  _itemPrefetchWarning : null,
-  _itemPrefetchWarningSeparator : null,
-
-  _itemOtherOrigins : null,
-  _itemOtherOriginsPopup : null,
-  _itemOtherOriginsSeparator : null,
-
-  _itemRevokeTemporaryPermissions : null,
-  _itemRevokeTemporaryPermissionsSeparator : null,
-
-  _itemAllowAllTemporarily : null,
-
-  _itemAllowOriginTemporarily : null,
-  _itemAllowOrigin : null,
-  _itemForbidOrigin : null,
 
   _statusbar : null,
   _rpStatusbar : null,
@@ -126,49 +102,14 @@ requestpolicy.overlay = {
         this._initialized = true;
         this._overlayId = (new Date()).getTime();
 
+        requestpolicy.menu.init();
+
         this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
             .getService(Components.interfaces.nsIRequestPolicy);
         this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
         this._strbundle = document.getElementById("requestpolicyStrings");
         this._menu = document.getElementById("requestpolicyStatusbarPopup");
-
-        this._blockedDestinationsBeforeReferenceItem = document
-            .getElementById("requestpolicyAllowedDestinationsSeparator");
-        this._allowedDestinationsBeforeReferenceItem = document
-            .getElementById("requestpolicyOriginSubmenusSeparator");
-
-        this._blockedDestinationsHeadingMenuItem = document
-            .getElementById("requestpolicyBlockedDestinations");
-        this._allowedDestinationsHeadingMenuItem = document
-            .getElementById("requestpolicyAllowedDestinations");
-
-        this._itemPrefetchWarning = document
-            .getElementById("requestpolicyPrefetchWarning");
-        this._itemPrefetchWarningSeparator = document
-            .getElementById("requestpolicyPrefetchWarningSeparator");
-
-        this._itemOtherOrigins = document
-            .getElementById("requestpolicyOtherOrigins");
-        this._itemOtherOriginsPopup = document
-            .getElementById("requestpolicyOtherOriginsPopup");
-        this._itemOtherOriginsSeparator = document
-            .getElementById("requestpolicyOtherOriginsSeparator");
-
-        this._itemRevokeTemporaryPermissions = document
-            .getElementById("requestpolicyRevokeTemporaryPermissions");
-        this._itemRevokeTemporaryPermissionsSeparator = document
-            .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
-
-        this._itemAllowAllTemporarily = document
-            .getElementById("requestpolicyAllowAllTemporarily");
-
-        this._itemAllowOriginTemporarily = document
-            .getElementById("requestpolicyAllowOriginTemporarily");
-        this._itemAllowOrigin = document
-            .getElementById("requestpolicyAllowOrigin");
-        this._itemForbidOrigin = document
-            .getElementById("requestpolicyForbidOrigin");
 
         this._statusbar = document.getElementById("status-bar");
         this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
@@ -365,14 +306,15 @@ requestpolicy.overlay = {
 
     optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
-    this._clearMenu(optionsPopup);
+    requestpolicy.menu.clearMenu(optionsPopup);
     var currentIdent = this._rpService
         .getUriIdentifier(targetDocument.location);
     var destIdent = this._rpService.getUriIdentifier(redirectTargetUri);
 
-    this._addMenuItemTemporarilyAllowOriginToDest(optionsPopup, currentIdent,
+    requestpolicy.menu.addMenuItemTemporarilyAllowOriginToDest(optionsPopup,
+        currentIdent, destIdent);
+    requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
         destIdent);
-    this._addMenuItemAllowOriginToDest(optionsPopup, currentIdent, destIdent);
 
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
@@ -536,7 +478,7 @@ requestpolicy.overlay = {
    */
   _checkForBlockedContent : function(document) {
     try {
-      var documentUri = requestpolicy.mod.DomainUtils
+      var documentUri = requestpolicy.mod.DomainUtil
           .stripFragment(document.documentURI);
       requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Checking for blocked content from page <" + documentUri + ">");
@@ -549,7 +491,8 @@ requestpolicy.overlay = {
         this._indicateBlockedVisibleObjects(document);
         return;
       }
-      var otherOrigins = this._getOtherOrigins(document);
+      var otherOrigins = requestpolicy.mod.RequestUtil
+          .getOtherOrigins(document);
       for (var i in otherOrigins) {
         for (var j in otherOrigins[i]) {
           requestpolicy.mod.Logger.dump("Checking for blocked content from "
@@ -629,7 +572,7 @@ requestpolicy.overlay = {
     var enumerator = wm.getEnumerator(null);
     while (enumerator.hasMoreElements()) {
       var window = enumerator.getNext();
-      if ("requestpolicy.overlay" in window) {
+      if ("requestpolicy" in window && "overlay" in window.requestpolicy) {
         window.requestpolicy.overlay._setPermissiveNotification(isPermissive);
       }
     }
@@ -640,7 +583,7 @@ requestpolicy.overlay = {
    */
   _setPermissiveNotification : function(isPermissive) {
     this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
-    this._itemAllowAllTemporarily.setAttribute("checked", isPermissive);
+    requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
     if (!this._isFennec) {
       this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
       this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
@@ -705,7 +648,7 @@ requestpolicy.overlay = {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
         // TODO: move this logic to the requestpolicy service.
-        var parts = requestpolicy.mod.DomainUtils
+        var parts = requestpolicy.mod.DomainUtil
             .parseRefresh(metaTags[i].content);
         var delay = parts[0];
         var dest = parts[1];
@@ -743,7 +686,7 @@ requestpolicy.overlay = {
       anchorTags[i].addEventListener("click", function(event) {
             // Note: need to use currentTarget so that it is the link, not
             // something else within the link that got clicked, it seems.
-            requestpolicy
+            requestpolicy.overlay._rpService
                 .registerLinkClicked(event.currentTarget.ownerDocument.URL,
                     event.currentTarget.href);
           }, false);
@@ -789,12 +732,12 @@ requestpolicy.overlay = {
    * called when openLinkInTab() is called.
    */
   _wrapOpenLink : function() {
-    const requestpolicy = this._rpService;
+    const rpService = this._rpService;
 
     if (!gContextMenu.requestpolicyOrigOpenLink) {
       gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
       gContextMenu.openLink = function() {
-        requestpolicy.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
             gContextMenu.link.href);
         return gContextMenu.requestpolicyOrigOpenLink();
       };
@@ -851,12 +794,12 @@ requestpolicy.overlay = {
    *            window
    */
   _wrapWindowOpen : function(window) {
-    const requestpolicy = this._rpService;
+    const rpService = this._rpService;
 
     if (!window.requestpolicyOrigOpen) {
       window.requestpolicyOrigOpen = window.open;
       window.open = function(url, windowName, windowFeatures) {
-        requestpolicy.registerLinkClicked(window.document.documentURI, url);
+        rpService.registerLinkClicked(window.document.documentURI, url);
         return window.requestpolicyOrigOpen(url, windowName, windowFeatures);
       };
     }
@@ -865,8 +808,8 @@ requestpolicy.overlay = {
       window.requestpolicyOrigOpenDialog = window.openDialog;
       window.openDialog = function() {
         // openDialog(url, name, features, arg1, arg2, ...)
-        requestpolicy.registerLinkClicked(window.document.documentURI,
-            arguments[0]);
+        rpService
+            .registerLinkClicked(window.document.documentURI, arguments[0]);
         return window.requestpolicyOrigOpenDialog.apply(this, arguments);
       };
     }
@@ -882,7 +825,7 @@ requestpolicy.overlay = {
     if (event.currentTarget != event.originalTarget) {
       return;
     }
-    this.prepareMenu();
+    requestpolicy.menu.prepareMenu();
   },
 
   /**
@@ -906,595 +849,13 @@ requestpolicy.overlay = {
    * 
    * @return {String} The current document's identifier.
    */
-  _getCurrentUriIdentifier : function _getCurrentUriIdentifier() {
-    return this._rpServiceJSObject.getUriIdentifier(this._getCurrentUri());
+  getCurrentUriIdentifier : function getCurrentUriIdentifier() {
+    return this._rpServiceJSObject.getUriIdentifier(this.getCurrentUri());
   },
 
-  _getCurrentUri : function _getCurrentUriIdentifier() {
-    return requestpolicy.mod.DomainUtils
+  getCurrentUri : function getCurrentUriIdentifier() {
+    return requestpolicy.mod.DomainUtil
         .stripFragment(content.document.documentURI);
-  },
-
-  /**
-   * Prepares the statusbar menu based on the user's settings and the current
-   * document.
-   */
-  prepareMenu : function() {
-    try {
-      var currentIdentifier = this._getCurrentUriIdentifier();
-      var currentUri = this._getCurrentUri();
-
-      var otherOrigins = this._getOtherOrigins(content.document);
-      this._dumpOtherOrigins(otherOrigins);
-
-      // Set all labels here for convenience, even though we won't display some
-      // of these menu items.
-      this._itemForbidOrigin.setAttribute("label", this._strbundle
-              .getFormattedString("forbidOrigin", [currentIdentifier]));
-      this._itemAllowOriginTemporarily.setAttribute("label",
-          this._strbundle.getFormattedString("allowOriginTemporarily",
-              [currentIdentifier]));
-      this._itemAllowOrigin.setAttribute("label", this._strbundle
-              .getFormattedString("allowOrigin", [currentIdentifier]));
-
-      // Initially make all menu items hidden.
-      this._itemRevokeTemporaryPermissions.hidden = true;
-      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
-      this._itemAllowOriginTemporarily.hidden = true;
-      this._itemAllowOrigin.hidden = true;
-      this._itemForbidOrigin.hidden = true;
-
-      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._rpService
-          .isPrefetchEnabled();
-
-      if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
-        this._itemForbidOrigin.hidden = false;
-      } else if (this._rpService.isAllowedOrigin(currentIdentifier)) {
-        this._itemForbidOrigin.hidden = false;
-      } else {
-        this._itemAllowOriginTemporarily.hidden = false;
-        this._itemAllowOrigin.hidden = false;
-      }
-
-      if (this._rpService.areTemporaryPermissionsGranted()) {
-        this._itemRevokeTemporaryPermissions.hidden = false;
-        this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
-      }
-
-      // Remove old menu items.
-      for (var i in this._addedMenuItems) {
-        this._menu.removeChild(this._addedMenuItems[i]);
-      }
-      this._addedMenuItems = [];
-
-      // Add new menu items giving options to allow content.
-      this._clearBlockedDestinations();
-      // Get the requests rejected by the current uri.
-      var rejectedRequests = this._getRejectedRequests(currentUri,
-          currentIdentifier, otherOrigins);
-      this._dumpRequestSet(rejectedRequests,
-          "All rejected requests (including from other origins)");
-      for (var destIdentifier in rejectedRequests) {
-        var submenu = this._addBlockedDestination(this._menu,
-            this._blockedDestinationsBeforeReferenceItem, destIdentifier, true);
-        this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
-        this._addMenuItemAllowDest(submenu, destIdentifier);
-        this._addMenuSeparator(submenu);
-        this._addMenuItemTemporarilyAllowOriginToDest(submenu,
-            currentIdentifier, destIdentifier);
-        this._addMenuItemAllowOriginToDest(submenu, currentIdentifier,
-            destIdentifier);
-      }
-
-      // Add new menu items giving options to forbid currently accepted
-      // content.
-      this._clearAllowedDestinations();
-      var allowedRequests = this._getAllowedRequests(currentUri,
-          currentIdentifier, otherOrigins);
-      this._dumpRequestSet(allowedRequests,
-          "All allowed requests (including from other origins)");
-      for (var destIdentifier in allowedRequests) {
-        // Ignore allowed requests that are to the same site.
-        if (destIdentifier == currentIdentifier) {
-          continue;
-        }
-        var submenu = this._addAllowedDestination(this._menu,
-            this._allowedDestinationsBeforeReferenceItem, destIdentifier, true);
-
-        // Show a "forbid ___" option that is specific to why the content is
-        // allowed.
-
-        // The "order" in which to show these may be worth further
-        // consideration. Currently, the options for forbidding content start
-        // from the "allow" rules that are most liberal if they exist and shows
-        // the more specific ones if there aren't more liberal ones that would
-        // apply. The big catch is putting it in any other order may result in
-        // the user having to perform multiple "forbids" after successive
-        // reloads, which would be unacceptable.
-
-        if (this._rpService.isAllowedOrigin(currentIdentifier)
-            || this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
-          this._addMenuItemForbidOrigin(submenu, currentIdentifier);
-
-        } else if (this._rpService.isAllowedDestination(destIdentifier)
-            || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
-          this._addMenuItemForbidDest(submenu, destIdentifier);
-
-        } else if (this._rpService.isAllowedOriginToDestination(
-            currentIdentifier, destIdentifier)
-            || this._rpService.isTemporarilyAllowedOriginToDestination(
-                currentIdentifier, destIdentifier)) {
-          this._addMenuItemForbidOriginToDest(submenu, currentIdentifier,
-              destIdentifier);
-
-        } else {
-          // TODO: make very sure this can never happen or, better, get an idea
-          // of when it can and make a sane default.
-        }
-      }
-
-      // Create menu for other origins.
-      this._clearChildMenus(this._itemOtherOriginsPopup);
-      var currentOtherOriginMenu;
-      var otherOriginMenuCount = 0;
-      for (var otherOriginIdentifier in otherOrigins) {
-        if (otherOriginIdentifier == currentIdentifier) {
-          // It's not a different origin, it's the same.
-          continue;
-        }
-        currentOtherOriginMenu = this._createOtherOriginMenu(
-            otherOriginIdentifier, otherOrigins);
-        // If there are no blocked/allowed destinations from this other origin,
-        // don't display it.
-        if (currentOtherOriginMenu.childNodes.length == 3) {
-          var menuNotPopup = currentOtherOriginMenu.parentNode;
-          this._clearChildMenus(menuNotPopup);
-          this._itemOtherOriginsPopup.removeChild(menuNotPopup);
-        } else {
-          otherOriginMenuCount++;
-        }
-      }
-      // If there are no other origins being displayed, don't display the "other
-      // origins" item in the main menu.
-      this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
-
-    } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-          "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-          "Unable to prepare menu due to error.");
-      throw e;
-    }
-  },
-
-  _createOtherOriginMenu : function(originIdentifier, otherOrigins) {
-    var menu = this._addMenu(this._itemOtherOriginsPopup, originIdentifier);
-    var newNode;
-
-    var allowedIdentifiers = this._getAllowedRequests(null, originIdentifier,
-        otherOrigins);
-    for (var i in allowedIdentifiers) {
-      // Ignore allowed requests that are to the same site.
-      if (i == originIdentifier) {
-        continue;
-      }
-      var submenu = this
-          ._addAllowedDestination(menu, menu.firstChild, i, false);
-      this._populateOtherOriginsMenuItemAllowedDestinations(submenu,
-          originIdentifier, i);
-    }
-
-    newNode = this._allowedDestinationsHeadingMenuItem.cloneNode(true);
-    newNode.setAttribute("id", null);
-    menu.insertBefore(newNode, menu.firstChild);
-
-    this._addMenuSeparator(menu);
-
-    var blockedIdentifiers = this._getRejectedRequests(null, originIdentifier,
-        otherOrigins);
-    for (var i in blockedIdentifiers) {
-      var submenu = this
-          ._addBlockedDestination(menu, menu.firstChild, i, false);
-      this._populateOtherOriginsMenuItemBlockedDestinations(submenu,
-          originIdentifier, i);
-    }
-
-    newNode = this._blockedDestinationsHeadingMenuItem.cloneNode(true);
-    newNode.setAttribute("id", null);
-    menu.insertBefore(newNode, menu.firstChild);
-
-    return menu;
-  },
-
-  _populateOtherOriginsMenuItemBlockedDestinations : function(submenu,
-      originIdentifier, destIdentifier) {
-    this._addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
-    this._addMenuItemAllowDest(submenu, destIdentifier);
-    this._addMenuSeparator(submenu);
-    this._addMenuItemTemporarilyAllowOriginToDest(submenu, originIdentifier,
-        destIdentifier);
-    this._addMenuItemAllowOriginToDest(submenu, originIdentifier,
-        destIdentifier);
-  },
-
-  _populateOtherOriginsMenuItemAllowedDestinations : function(submenu,
-      originIdentifier, destIdentifier) {
-    if (this._rpService.isAllowedOrigin(originIdentifier)
-        || this._rpService.isTemporarilyAllowedOrigin(originIdentifier)) {
-      this._addMenuItemForbidOrigin(submenu, originIdentifier);
-
-    } else if (this._rpService.isAllowedDestination(destIdentifier)
-        || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
-      this._addMenuItemForbidDest(submenu, destIdentifier);
-
-    } else if (this._rpService.isAllowedOriginToDestination(originIdentifier,
-        destIdentifier)
-        || this._rpService.isTemporarilyAllowedOriginToDestination(
-            originIdentifier, destIdentifier)) {
-      this._addMenuItemForbidOriginToDest(submenu, originIdentifier,
-          destIdentifier);
-
-    } else {
-      // TODO: make very sure this can never happen or, better, get an idea
-      // of when it can and make a sane default.
-    }
-  },
-
-  _getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
-    var rejectedRequests = {};
-    if (currentUri in this._rpServiceJSObject._rejectedRequests) {
-      for (var ident in this._rpServiceJSObject._rejectedRequests[currentUri]) {
-        rejectedRequests[ident] = true;
-      }
-    }
-    // Add the rejected requests from other origins within this page that have
-    // the same uriIdentifier as the current page.
-    if (currentIdentifier in otherOrigins) {
-      for (var i in otherOrigins[currentIdentifier]) {
-        if (i in this._rpServiceJSObject._rejectedRequests) {
-          this._dumpRequestSet(this._rpServiceJSObject._rejectedRequests[i],
-              "Rejected requests of " + i);
-          for (var ident in this._rpServiceJSObject._rejectedRequests[i]) {
-            rejectedRequests[ident] = true;
-          }
-        }
-      }
-    }
-    return rejectedRequests;
-  },
-
-  _getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
-    var allowedRequests = {};
-    if (currentUri in this._rpServiceJSObject._allowedRequests) {
-      for (var ident in this._rpServiceJSObject._allowedRequests[currentUri]) {
-        allowedRequests[ident] = true;
-      }
-    }
-    // Add the allowed requests from other origins within this page that have
-    // the same uriIdentifier as the current page.
-    if (currentIdentifier in otherOrigins) {
-      for (var i in otherOrigins[currentIdentifier]) {
-        if (i in this._rpServiceJSObject._allowedRequests) {
-          for (var ident in this._rpServiceJSObject._allowedRequests[i]) {
-            allowedRequests[ident] = true;
-          }
-        }
-      }
-    }
-    return allowedRequests;
-  },
-
-  /**
-   * This will look both at the DOM as well as the recorded allowed requests to
-   * determine which other origins exist within the document. This includes
-   * other origins that have the same domain. The returned format is an object
-   * with properties that are URI identifiers and the properties of those are
-   * the actual other URIs (i.e. origin[uriIdent][uri]). The reason for also
-   * needing to check the DOM is that some sites (like gmail) will make multiple
-   * requests to the same uri for different iframs and this will cause us to
-   * only have in the recorded requests from a source uri the destinations from
-   * the most recent iframe that loaded that source uri. It may also help in
-   * cases where the user has multiple tabs/windows open to the same page.
-   * 
-   * @param {}
-   *            document
-   * @return {}
-   */
-  _getOtherOrigins : function(document) {
-    var origins = {};
-    this._getOtherOriginsHelperFromDOM(document, origins);
-    this._getOtherOriginsHelperFromAllowedRequests(
-        requestpolicy.mod.DomainUtils.stripFragment(document.documentURI),
-        origins, {});
-    return origins;
-  },
-
-  _getOtherOriginsHelperFromDOM : function(document, origins) {
-    var documentUri = requestpolicy.mod.DomainUtils
-        .stripFragment(document.documentURI);
-    requestpolicy.mod.Logger.dump("Looking for other origins within DOM of "
-        + documentUri);
-    // TODO: Check other elements besides iframes and frames?
-    var frameTagTypes = {
-      "iframe" : null,
-      "frame" : null
-    };
-    for (var tagType in frameTagTypes) {
-      var iframes = document.getElementsByTagName(tagType);
-      for (var i = 0; i < iframes.length; i++) {
-        var child = iframes[i];
-        var childDocument = child.contentDocument;
-        // Flock's special home page is about:myworld. It has (i)frames in it
-        // that have no contentDocument. It's probably related to the fact that
-        // that is an xul page, but I have no reason to fully understand the
-        // problem in order to fix it.
-        if (childDocument === undefined) {
-          continue;
-        }
-        var childUri = requestpolicy.mod.DomainUtils
-            .stripFragment(childDocument.documentURI);
-        if (childUri == "about:blank") {
-          // iframe empty or not loaded yet, or maybe blocked.
-          // childUri = child.src;
-          // If it's not loaded or blocked, it's not the origin for anything
-          // yet.
-          continue;
-        }
-        requestpolicy.mod.Logger.dump("Found DOM child " + tagType
-            + " with src <" + childUri + "> in document <" + documentUri + ">");
-        var childUriIdent = this._rpService.getUriIdentifier(childUri);
-        if (!origins[childUriIdent]) {
-          origins[childUriIdent] = {};
-        }
-        origins[childUriIdent][childUri] = true;
-        this._getOtherOriginsHelperFromDOM(childDocument, origins);
-      }
-    }
-  },
-
-  _getOtherOriginsHelperFromAllowedRequests : function(rootUri, origins,
-      checkedOrigins) {
-    requestpolicy.mod.Logger
-        .dump("Looking for other origins within allowed requests from "
-            + rootUri);
-    var allowedRequests = this._rpServiceJSObject._allowedRequests[rootUri];
-    if (allowedRequests) {
-      for (var i in allowedRequests) {
-        for (var allowedUri in allowedRequests[i]) {
-          if (checkedOrigins[allowedUri] || allowedUri == "count") {
-            continue;
-          }
-          checkedOrigins[allowedUri] = true;
-
-          requestpolicy.mod.Logger.dump("Found allowed request to <"
-              + allowedUri + "> from <" + rootUri + ">");
-          var allowedUriIdent = this._rpService.getUriIdentifier(allowedUri);
-          if (!origins[allowedUriIdent]) {
-            origins[allowedUriIdent] = {};
-          }
-          origins[allowedUriIdent][allowedUri] = true;
-          this._getOtherOriginsHelperFromAllowedRequests(allowedUri, origins,
-              checkedOrigins);
-        }
-      }
-    }
-  },
-
-  _dumpOtherOrigins : function(otherOrigins) {
-    requestpolicy.mod.Logger
-        .dump("-------------------------------------------------");
-    requestpolicy.mod.Logger.dump("Other origins");
-    for (i in otherOrigins) {
-      requestpolicy.mod.Logger.dump("\t" + "Origin identifier: <" + i + ">");
-      for (var j in otherOrigins[i]) {
-        requestpolicy.mod.Logger.dump("\t\t" + j);
-      }
-    }
-    requestpolicy.mod.Logger
-        .dump("-------------------------------------------------");
-  },
-
-  _dumpRequestSet : function(requestSet, name) {
-    requestpolicy.mod.Logger
-        .dump("-------------------------------------------------");
-    requestpolicy.mod.Logger.dump(name);
-    for (i in requestSet) {
-      requestpolicy.mod.Logger.dump("\t" + "Identifier: <" + i + ">");
-      for (var j in requestSet[i]) {
-        requestpolicy.mod.Logger.dump("\t\t" + j);
-      }
-    }
-    requestpolicy.mod.Logger
-        .dump("-------------------------------------------------");
-  },
-
-  _clearChildMenus : function(menu) {
-    while (menu.firstChild) {
-      this._clearChildMenus(menu.firstChild);
-      menu.removeChild(menu.firstChild);
-    }
-  },
-
-  _removeExtraSubmenuSeparators : function(menu) {
-    if (menu.firstChild && menu.lastChild.nodeName == "menuseparator") {
-      menu.removeChild(menu.lastChild);
-    }
-  },
-
-  _disableMenuIfEmpty : function(menu) {
-    // parentNode is the menu label
-    menu.parentNode.disabled = menu.firstChild ? false : true;
-  },
-
-  _addMenuItemTemporarilyAllowDest : function(menu, destHost) {
-    var label = this._strbundle.getFormattedString(
-        "allowDestinationTemporarily", [destHost]);
-    var command = "requestpolicy.overlay.temporarilyAllowDestination('"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    var item = this._addMenuItem(menu, label, command, statustext);
-    item.setAttribute("class", "requestpolicyTemporary");
-    return item;
-  },
-
-  _addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost,
-      destHost) {
-    var label = this._strbundle.getFormattedString(
-        "allowOriginToDestinationTemporarily", [originHost, destHost]);
-    var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
-        + this._sanitizeJsFunctionArg(originHost) + "', '"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    var item = this._addMenuItem(menu, label, command, statustext);
-    item.setAttribute("class", "requestpolicyTemporary");
-    return item;
-  },
-
-  _addMenuItemAllowDest : function(menu, destHost) {
-    var label = this._strbundle.getFormattedString("allowDestination",
-        [destHost]);
-    var command = "requestpolicy.overlay.allowDestination('"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    return this._addMenuItem(menu, label, command, statustext);
-  },
-
-  _addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
-    var label = this._strbundle.getFormattedString("allowOriginToDestination",
-        [originHost, destHost]);
-    var command = "requestpolicy.overlay.allowOriginToDestination('"
-        + this._sanitizeJsFunctionArg(originHost) + "', '"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    var item = this._addMenuItem(menu, label, command, statustext);
-    item.setAttribute("class", "requestpolicyAllowOriginToDest");
-    return item;
-  },
-
-  _addMenuItemForbidOrigin : function(menu, originHost) {
-    var label = this._strbundle
-        .getFormattedString("forbidOrigin", [originHost]);
-    var command = "requestpolicy.overlay.forbidOrigin('"
-        + this._sanitizeJsFunctionArg(originHost) + "');";
-    var statustext = originHost;
-    return this._addMenuItem(menu, label, command, statustext);
-  },
-
-  _addMenuItemForbidDest : function(menu, destHost) {
-    var label = this._strbundle.getFormattedString("forbidDestination",
-        [destHost]);
-    var command = "requestpolicy.overlay.forbidDestination('"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    return this._addMenuItem(menu, label, command, statustext);
-  },
-
-  _addMenuItemForbidOriginToDest : function(menu, originHost, destHost) {
-    var label = this._strbundle.getFormattedString("forbidOriginToDestination",
-        [originHost, destHost]);
-    var command = "requestpolicy.overlay.forbidOriginToDestination('"
-        + this._sanitizeJsFunctionArg(originHost) + "', '"
-        + this._sanitizeJsFunctionArg(destHost) + "');";
-    var statustext = destHost; // TODO
-    return this._addMenuItem(menu, label, command, statustext);
-  },
-
-  _sanitizeJsFunctionArg : function(str) {
-    // strip single quotes and backslashes
-    return str.replace(/['\\]/g, "");
-  },
-
-  _addMenuSeparator : function(menu) {
-    var separator = document.createElement("menuseparator");
-    menu.insertBefore(separator, menu.firstChild);
-    return separator;
-  },
-
-  _addMenuItem : function(menu, label, oncommand, statustext) {
-    var menuItem = document.createElement("menuitem");
-    menuItem.setAttribute("label", label);
-    menuItem.setAttribute("statustext", statustext);
-    menuItem.setAttribute("oncommand", oncommand);
-    // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
-    menu.insertBefore(menuItem, menu.firstChild);
-    return menuItem;
-  },
-
-  _addMenu : function(parentMenu, label) {
-    var menu = document.createElement("menu");
-    menu.setAttribute("label", label);
-    parentMenu.insertBefore(menu, parentMenu.firstChild);
-    // add the menu popup in the menu item
-    var menuPopup = document.createElement("menupopup");
-    menu.insertBefore(menuPopup, menu.firstChild);
-    // return the popup as that's what will have items added to it
-    return menuPopup;
-  },
-
-  _addBlockedDestination : function(parentMenu, itemToInsertBefore, label,
-      isMainMenu) {
-    var menu = document.createElement("menu");
-    // This seems to be the easiest way to deal with indenting ltr/rtl text,
-    // given that there was either a bug in the babelzilla system or having the
-    // spaces in the properties files was confusing the translators. Don't want
-    // to use css because I think it would require putting a margin/padding on
-    // both the left and right, and so result in extra margin on the side that
-    // doesn't need to be indented.
-    menu.setAttribute("label", this._strbundle.getFormattedString(
-            "indentedText", ["    ", label]));
-    menu.setAttribute("class", "requestpolicyBlocked");
-    parentMenu.insertBefore(menu, itemToInsertBefore);
-    // add the menu popup in the menu item
-    var menuPopup = document.createElement("menupopup");
-    menu.insertBefore(menuPopup, menu.firstChild);
-    // return the popup as that's what will have items added to it
-
-    // remember what we added if we added it to the main menu
-    if (isMainMenu) {
-      this._blockedDestinationsItems.push(menu);
-    }
-
-    return menuPopup;
-  },
-
-  _addAllowedDestination : function(parentMenu, itemToInsertBefore, label,
-      isMainMenu) {
-    var menu = document.createElement("menu");
-    menu.setAttribute("label", this._strbundle.getFormattedString(
-            "indentedText", ["    ", label]));
-    menu.setAttribute("class", "requestpolicyAllowed");
-    parentMenu.insertBefore(menu, itemToInsertBefore);
-    // add the menu popup in the menu item
-    var menuPopup = document.createElement("menupopup");
-    menu.insertBefore(menuPopup, menu.firstChild);
-    // return the popup as that's what will have items added to it
-
-    // remember what we added
-    if (isMainMenu) {
-      this._allowedDestinationsItems.push(menu);
-    }
-
-    return menuPopup;
-  },
-
-  _clearBlockedDestinations : function() {
-    for (var i = 0; i < this._blockedDestinationsItems.length; i++) {
-      this._menu.removeChild(this._blockedDestinationsItems[i]);
-    }
-    this._blockedDestinationsItems = [];
-  },
-
-  _clearAllowedDestinations : function() {
-    for (var i = 0; i < this._allowedDestinationsItems.length; i++) {
-      this._menu.removeChild(this._allowedDestinationsItems[i]);
-    }
-    this._allowedDestinationsItems = [];
-  },
-
-  _clearMenu : function(menu) {
-    while (menu.firstChild) {
-      menu.removeChild(menu.firstChild);
-    }
   },
 
   /**
@@ -1533,7 +894,7 @@ requestpolicy.overlay = {
   temporarilyAllowOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
-    var host = this._getCurrentUriIdentifier();
+    var host = this.getCurrentUriIdentifier();
     this._rpService.temporarilyAllowOrigin(host);
     this._conditionallyReloadDocument();
   },
@@ -1572,7 +933,7 @@ requestpolicy.overlay = {
    *            event
    */
   allowOrigin : function(event) {
-    var host = this._getCurrentUriIdentifier();
+    var host = this.getCurrentUriIdentifier();
     this._rpService.allowOrigin(host);
     this._conditionallyReloadDocument();
   },
@@ -1611,7 +972,7 @@ requestpolicy.overlay = {
    *            event
    */
   forbidOrigin : function(event) {
-    var host = this._getCurrentUriIdentifier();
+    var host = this.getCurrentUriIdentifier();
     this._rpService.forbidOrigin(host);
     this._conditionallyReloadDocument();
   },
@@ -1676,7 +1037,7 @@ requestpolicy.overlay = {
       } else {
         // If there is no scheme, treat it as relative to the current directory.
         if (redirectTargetUri.indexOf(":") == -1) {
-          // TODO: Move this logic to DomainUtils.
+          // TODO: Move this logic to DomainUtil.
           var curDir = document.documentURI.split("/").slice(0, -1).join("/");
           redirectTargetUri = curDir + "/" + redirectTargetUri;
         }

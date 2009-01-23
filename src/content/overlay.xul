@@ -32,6 +32,7 @@
 	</stringbundleset>
 	
 	<script type="application/x-javascript" src="overlay.js" />
+	<script type="application/x-javascript" src="menu.js" />
 
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="requestpolicyToolbarButton" 

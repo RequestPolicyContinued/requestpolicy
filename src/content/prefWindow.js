@@ -26,7 +26,7 @@ if (!requestpolicy) {
   };
 }
 
-Components.utils.import("resource://requestpolicy/FileUtils.jsm",
+Components.utils.import("resource://requestpolicy/FileUtil.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
@@ -147,8 +147,8 @@ requestpolicy.prefWindow = {
     var enumerator = wm.getEnumerator(null);
     while (enumerator.hasMoreElements()) {
       var window = enumerator.getNext();
-      if ("requestpolicyOverlay" in window) {
-        window.requestpolicyOverlay.setStatusbarIconStyle(iconStyle);
+      if ("requestpolicy" in window && "overlay" in window.requestpolicy) {
+        window.requestpolicy.overlay.setStatusbarIconStyle(iconStyle);
       }
     }
   },
@@ -341,7 +341,7 @@ requestpolicy.prefWindow = {
       }
       this["_" + action](file);
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
           "Fatal Error during import/export file operation: " + e
               + ", stack was: " + e.stack);
       window.alert(e.toString());
@@ -349,13 +349,13 @@ requestpolicy.prefWindow = {
   },
 
   _import : function(file) {
-    rpModules.Logger.dump("Starting import from " + file.path);
+    requestpolicy.mod.Logger.dump("Starting import from " + file.path);
     var groupToFunctionMap = {
       "origins" : "allowOrigin",
       "destinations" : "allowDestination",
       "origins-to-destinations" : "_allowOriginToDestinationByCombinedIdentifier"
     };
-    var lines = rpModules.FileUtils.fileToArray(file);
+    var lines = requestpolicy.mod.FileUtil.fileToArray(file);
     var currentGroup = null;
     var importFunction = null;
     for (var i = 0; i < lines.length; i++) {
@@ -379,7 +379,7 @@ requestpolicy.prefWindow = {
         if (!importFunction) {
           throw "RequestPolicy: there is no group label before the first item to import.";
         }
-        rpModules.Logger.dump("Importing " + currentLine + " into "
+        requestpolicy.mod.Logger.dump("Importing " + currentLine + " into "
             + currentGroup);
         this._rpServiceJSObject[importFunction](currentLine, true);
       }
@@ -389,12 +389,12 @@ requestpolicy.prefWindow = {
     this._rpService.storeAllPreferenceLists();
 
     this._populateWhitelists();
-    rpModules.Prompter.alert(this._getFilePickerWindowTitle('import'),
+    requestpolicy.mod.Prompter.alert(this._getFilePickerWindowTitle('import'),
         this._strbundle.getString("importCompleted"));
   },
 
   _export : function(file) {
-    rpModules.Logger.dump("Starting export to " + file.path);
+    requestpolicy.mod.Logger.dump("Starting export to " + file.path);
     var lines = [];
     lines.push("[origins]");
     for (var i in this._rpServiceJSObject._allowedOrigins) {
@@ -408,8 +408,8 @@ requestpolicy.prefWindow = {
     for (var i in this._rpServiceJSObject._allowedOriginsToDestinations) {
       lines.push(i);
     }
-    rpModules.FileUtils.arrayToFile(lines, file);
-    rpModules.Prompter.alert(this._getFilePickerWindowTitle('export'),
+    requestpolicy.mod.FileUtil.arrayToFile(lines, file);
+    requestpolicy.mod.Prompter.alert(this._getFilePickerWindowTitle('export'),
         this._strbundle.getString("exportCompleted"));
   },
 

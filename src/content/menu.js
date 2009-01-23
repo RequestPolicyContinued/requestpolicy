@@ -21,23 +21,27 @@
  */
 
 if (!requestpolicy) {
-  var requestpolicy = {};
-  requestpolicy.mod = {};
+  var requestpolicy = {
+    mod : {}
+  };
 }
 
 Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
+    requestpolicy.mod);
 
 requestpolicy.menu = {
 
-  _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
-  _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
+  _initialized : false,
+  _rpService : null,
+  _rpServiceJSObject : null,
 
   _strbundle : null,
   addedMenuItems : [],
   _menu : null,
-  _blockedDestinationsItems : [],
 
+  _blockedDestinationsItems : [],
   _allowedDestinationsItems : [],
 
   _blockedDestinationsHeadingMenuItem : null,
@@ -63,44 +67,53 @@ requestpolicy.menu = {
   _itemForbidOrigin : null,
 
   init : function() {
-    this._strbundle = document.getElementById("requestpolicyStrings");
-    this._menu = document.getElementById("requestpolicyStatusbarPopup");
+    if (this._initialized == false) {
+      this._initialized = true;
 
-    this._blockedDestinationsBeforeReferenceItem = document
-        .getElementById("requestpolicyAllowedDestinationsSeparator");
-    this._allowedDestinationsBeforeReferenceItem = document
-        .getElementById("requestpolicyOriginSubmenusSeparator");
+      this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
+          .getService(Components.interfaces.nsIRequestPolicy);
+      this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
-    this._blockedDestinationsHeadingMenuItem = document
-        .getElementById("requestpolicyBlockedDestinations");
-    this._allowedDestinationsHeadingMenuItem = document
-        .getElementById("requestpolicyAllowedDestinations");
+      this._strbundle = document.getElementById("requestpolicyStrings");
+      this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
-    this._itemPrefetchWarning = document
-        .getElementById("requestpolicyPrefetchWarning");
-    this._itemPrefetchWarningSeparator = document
-        .getElementById("requestpolicyPrefetchWarningSeparator");
+      this._blockedDestinationsBeforeReferenceItem = document
+          .getElementById("requestpolicyAllowedDestinationsSeparator");
+      this._allowedDestinationsBeforeReferenceItem = document
+          .getElementById("requestpolicyOriginSubmenusSeparator");
 
-    this._itemOtherOrigins = document
-        .getElementById("requestpolicyOtherOrigins");
-    this._itemOtherOriginsPopup = document
-        .getElementById("requestpolicyOtherOriginsPopup");
-    this._itemOtherOriginsSeparator = document
-        .getElementById("requestpolicyOtherOriginsSeparator");
+      this._blockedDestinationsHeadingMenuItem = document
+          .getElementById("requestpolicyBlockedDestinations");
+      this._allowedDestinationsHeadingMenuItem = document
+          .getElementById("requestpolicyAllowedDestinations");
 
-    this._itemRevokeTemporaryPermissions = document
-        .getElementById("requestpolicyRevokeTemporaryPermissions");
-    this._itemRevokeTemporaryPermissionsSeparator = document
-        .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
+      this._itemPrefetchWarning = document
+          .getElementById("requestpolicyPrefetchWarning");
+      this._itemPrefetchWarningSeparator = document
+          .getElementById("requestpolicyPrefetchWarningSeparator");
 
-    this._itemAllowAllTemporarily = document
-        .getElementById("requestpolicyAllowAllTemporarily");
+      this._itemOtherOrigins = document
+          .getElementById("requestpolicyOtherOrigins");
+      this._itemOtherOriginsPopup = document
+          .getElementById("requestpolicyOtherOriginsPopup");
+      this._itemOtherOriginsSeparator = document
+          .getElementById("requestpolicyOtherOriginsSeparator");
 
-    this._itemAllowOriginTemporarily = document
-        .getElementById("requestpolicyAllowOriginTemporarily");
-    this._itemAllowOrigin = document.getElementById("requestpolicyAllowOrigin");
-    this._itemForbidOrigin = document
-        .getElementById("requestpolicyForbidOrigin");
+      this._itemRevokeTemporaryPermissions = document
+          .getElementById("requestpolicyRevokeTemporaryPermissions");
+      this._itemRevokeTemporaryPermissionsSeparator = document
+          .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
+
+      this._itemAllowAllTemporarily = document
+          .getElementById("requestpolicyAllowAllTemporarily");
+
+      this._itemAllowOriginTemporarily = document
+          .getElementById("requestpolicyAllowOriginTemporarily");
+      this._itemAllowOrigin = document
+          .getElementById("requestpolicyAllowOrigin");
+      this._itemForbidOrigin = document
+          .getElementById("requestpolicyForbidOrigin");
+    }
   },
 
   /**
@@ -109,11 +122,12 @@ requestpolicy.menu = {
    */
   prepareMenu : function() {
     try {
-      var currentIdentifier = this._getCurrentUriIdentifier();
-      var currentUri = this._getCurrentUri();
+      var currentIdentifier = requestpolicy.overlay.getCurrentUriIdentifier();
+      var currentUri = requestpolicy.overlay.getCurrentUri();
 
-      var otherOrigins = this._getOtherOrigins(content.document);
-      this._dumpOtherOrigins(otherOrigins);
+      var otherOrigins = requestpolicy.mod.RequestUtil
+          .getOtherOrigins(content.document);
+      requestpolicy.mod.RequestUtil.dumpOtherOrigins(otherOrigins);
 
       // Set all labels here for convenience, even though we won't display some
       // of these menu items.
@@ -132,19 +146,19 @@ requestpolicy.menu = {
       this._itemAllowOrigin.hidden = true;
       this._itemForbidOrigin.hidden = true;
 
-      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._requestpolicy
+      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._rpService
           .isPrefetchEnabled();
 
-      if (this._requestpolicy.isTemporarilyAllowedOrigin(currentIdentifier)) {
+      if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;
-      } else if (this._requestpolicy.isAllowedOrigin(currentIdentifier)) {
+      } else if (this._rpService.isAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;
       } else {
         this._itemAllowOriginTemporarily.hidden = false;
         this._itemAllowOrigin.hidden = false;
       }
 
-      if (this._requestpolicy.areTemporaryPermissionsGranted()) {
+      if (this._rpService.areTemporaryPermissionsGranted()) {
         this._itemRevokeTemporaryPermissions.hidden = false;
         this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
       }
@@ -158,9 +172,9 @@ requestpolicy.menu = {
       // Add new menu items giving options to allow content.
       this._clearBlockedDestinations();
       // Get the requests rejected by the current uri.
-      var rejectedRequests = this._getRejectedRequests(currentUri,
-          currentIdentifier, otherOrigins);
-      this._dumpRequestSet(rejectedRequests,
+      var rejectedRequests = requestpolicy.mod.RequestUtil.getRejectedRequests(
+          currentUri, currentIdentifier, otherOrigins);
+      requestpolicy.mod.RequestUtil.dumpRequestSet(rejectedRequests,
           "All rejected requests (including from other origins)");
       for (var destIdentifier in rejectedRequests) {
         var submenu = this.addBlockedDestination(this._menu,
@@ -177,9 +191,9 @@ requestpolicy.menu = {
       // Add new menu items giving options to forbid currently accepted
       // content.
       this._clearAllowedDestinations();
-      var allowedRequests = this._getAllowedRequests(currentUri,
-          currentIdentifier, otherOrigins);
-      this._dumpRequestSet(allowedRequests,
+      var allowedRequests = requestpolicy.mod.RequestUtil.getAllowedRequests(
+          currentUri, currentIdentifier, otherOrigins);
+      requestpolicy.mod.RequestUtil.dumpRequestSet(allowedRequests,
           "All allowed requests (including from other origins)");
       for (var destIdentifier in allowedRequests) {
         // Ignore allowed requests that are to the same site.
@@ -200,19 +214,17 @@ requestpolicy.menu = {
         // the user having to perform multiple "forbids" after successive
         // reloads, which would be unacceptable.
 
-        if (this._requestpolicy.isAllowedOrigin(currentIdentifier)
-            || this._requestpolicy
-                .isTemporarilyAllowedOrigin(currentIdentifier)) {
+        if (this._rpService.isAllowedOrigin(currentIdentifier)
+            || this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
           this.addMenuItemForbidOrigin(submenu, currentIdentifier);
 
-        } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
-            || this._requestpolicy
-                .isTemporarilyAllowedDestination(destIdentifier)) {
+        } else if (this._rpService.isAllowedDestination(destIdentifier)
+            || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
           this.addMenuItemForbidDest(submenu, destIdentifier);
 
-        } else if (this._requestpolicy.isAllowedOriginToDestination(
+        } else if (this._rpService.isAllowedOriginToDestination(
             currentIdentifier, destIdentifier)
-            || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+            || this._rpService.isTemporarilyAllowedOriginToDestination(
                 currentIdentifier, destIdentifier)) {
           this.addMenuItemForbidOriginToDest(submenu, currentIdentifier,
               destIdentifier);
@@ -249,12 +261,16 @@ requestpolicy.menu = {
       this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
 
     } catch (e) {
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR, "Fatal Error, " + e
-              + ", stack was: " + e.stack);
-      rpModules.Logger.severe(rpModules.Logger.TYPE_ERROR,
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
           "Unable to prepare menu due to error.");
       throw e;
     }
+  },
+
+  setItemAllowAllTemporarilyChecked : function(isChecked) {
+    this._itemAllowAllTemporarily.setAttribute("checked", isChecked);
   },
 
   addMenuSeparator : function(menu) {
@@ -351,7 +367,7 @@ requestpolicy.menu = {
   addMenuItemTemporarilyAllowDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString(
         "allowDestinationTemporarily", [destHost]);
-    var command = "requestpolicyOverlay.temporarilyAllowDestination('"
+    var command = "requestpolicy.overlay.temporarilyAllowDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     var item = this.addMenuItem(menu, label, command, statustext);
@@ -362,7 +378,7 @@ requestpolicy.menu = {
   addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost, destHost) {
     var label = this._strbundle.getFormattedString(
         "allowOriginToDestinationTemporarily", [originHost, destHost]);
-    var command = "requestpolicyOverlay.temporarilyAllowOriginToDestination('"
+    var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -374,7 +390,7 @@ requestpolicy.menu = {
   addMenuItemAllowDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString("allowDestination",
         [destHost]);
-    var command = "requestpolicyOverlay.allowDestination('"
+    var command = "requestpolicy.overlay.allowDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this.addMenuItem(menu, label, command, statustext);
@@ -383,7 +399,7 @@ requestpolicy.menu = {
   addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
     var label = this._strbundle.getFormattedString("allowOriginToDestination",
         [originHost, destHost]);
-    var command = "requestpolicyOverlay.allowOriginToDestination('"
+    var command = "requestpolicy.overlay.allowOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -395,7 +411,7 @@ requestpolicy.menu = {
   addMenuItemForbidOrigin : function(menu, originHost) {
     var label = this._strbundle
         .getFormattedString("forbidOrigin", [originHost]);
-    var command = "requestpolicyOverlay.forbidOrigin('"
+    var command = "requestpolicy.overlay.forbidOrigin('"
         + this._sanitizeJsFunctionArg(originHost) + "');";
     var statustext = originHost;
     return this.addMenuItem(menu, label, command, statustext);
@@ -404,7 +420,7 @@ requestpolicy.menu = {
   addMenuItemForbidDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString("forbidDestination",
         [destHost]);
-    var command = "requestpolicyOverlay.forbidDestination('"
+    var command = "requestpolicy.overlay.forbidDestination('"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
     return this.addMenuItem(menu, label, command, statustext);
@@ -413,7 +429,7 @@ requestpolicy.menu = {
   addMenuItemForbidOriginToDest : function(menu, originHost, destHost) {
     var label = this._strbundle.getFormattedString("forbidOriginToDestination",
         [originHost, destHost]);
-    var command = "requestpolicyOverlay.forbidOriginToDestination('"
+    var command = "requestpolicy.overlay.forbidOriginToDestination('"
         + this._sanitizeJsFunctionArg(originHost) + "', '"
         + this._sanitizeJsFunctionArg(destHost) + "');";
     var statustext = destHost; // TODO
@@ -434,7 +450,7 @@ requestpolicy.menu = {
     this._allowedDestinationsItems = [];
   },
 
-  _clearMenu : function(menu) {
+  clearMenu : function(menu) {
     while (menu.firstChild) {
       menu.removeChild(menu.firstChild);
     }
@@ -444,8 +460,8 @@ requestpolicy.menu = {
     var menu = this.addMenu(this._itemOtherOriginsPopup, originIdentifier);
     var newNode;
 
-    var allowedIdentifiers = this._getAllowedRequests(null, originIdentifier,
-        otherOrigins);
+    var allowedIdentifiers = requestpolicy.mod.RequestUtil.getAllowedRequests(
+        null, originIdentifier, otherOrigins);
     for (var i in allowedIdentifiers) {
       // Ignore allowed requests that are to the same site.
       if (i == originIdentifier) {
@@ -462,8 +478,8 @@ requestpolicy.menu = {
 
     this.addMenuSeparator(menu);
 
-    var blockedIdentifiers = this._getRejectedRequests(null, originIdentifier,
-        otherOrigins);
+    var blockedIdentifiers = requestpolicy.mod.RequestUtil.getRejectedRequests(
+        null, originIdentifier, otherOrigins);
     for (var i in blockedIdentifiers) {
       var submenu = this.addBlockedDestination(menu, menu.firstChild, i, false);
       this._populateOtherOriginsMenuItemBlockedDestinations(submenu,
@@ -490,17 +506,17 @@ requestpolicy.menu = {
 
   _populateOtherOriginsMenuItemAllowedDestinations : function(submenu,
       originIdentifier, destIdentifier) {
-    if (this._requestpolicy.isAllowedOrigin(originIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedOrigin(originIdentifier)) {
+    if (this._rpService.isAllowedOrigin(originIdentifier)
+        || this._rpService.isTemporarilyAllowedOrigin(originIdentifier)) {
       this.addMenuItemForbidOrigin(submenu, originIdentifier);
 
-    } else if (this._requestpolicy.isAllowedDestination(destIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedDestination(destIdentifier)) {
+    } else if (this._rpService.isAllowedDestination(destIdentifier)
+        || this._rpService.isTemporarilyAllowedDestination(destIdentifier)) {
       this.addMenuItemForbidDest(submenu, destIdentifier);
 
-    } else if (this._requestpolicy.isAllowedOriginToDestination(
-        originIdentifier, destIdentifier)
-        || this._requestpolicy.isTemporarilyAllowedOriginToDestination(
+    } else if (this._rpService.isAllowedOriginToDestination(originIdentifier,
+        destIdentifier)
+        || this._rpService.isTemporarilyAllowedOriginToDestination(
             originIdentifier, destIdentifier)) {
       this.addMenuItemForbidOriginToDest(submenu, originIdentifier,
           destIdentifier);

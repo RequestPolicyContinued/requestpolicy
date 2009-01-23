@@ -20,27 +20,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["DomainUtils"]
+var EXPORTED_SYMBOLS = ["DomainUtil"]
 
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-var DomainUtils = {};
+var DomainUtil = {};
 
-DomainUtils._ios = CC["@mozilla.org/network/io-service;1"]
+DomainUtil._ios = CC["@mozilla.org/network/io-service;1"]
     .getService(CI.nsIIOService);
 
-DomainUtils._eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
+DomainUtil._eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
     .getService(Components.interfaces.nsIEffectiveTLDService);
 
 // LEVEL_DOMAIN: Use example.com from http://www.a.example.com:81
-DomainUtils.LEVEL_DOMAIN = 1;
+DomainUtil.LEVEL_DOMAIN = 1;
 // LEVEL_HOST: Use www.a.example.com from http://www.a.example.com:81
-DomainUtils.LEVEL_HOST = 2;
+DomainUtil.LEVEL_HOST = 2;
 // LEVEL_SOP: Use http://www.a.example.com:81 from http://www.a.example.com:81
-DomainUtils.LEVEL_SOP = 3;
+DomainUtil.LEVEL_SOP = 3;
 
-DomainUtils.getIdentifier = function(uri, level) {
+DomainUtil.getIdentifier = function(uri, level) {
   var identifier;
   switch (level) {
     case this.LEVEL_DOMAIN :
@@ -77,7 +77,7 @@ DomainUtils.getIdentifier = function(uri, level) {
   }
 };
 
-DomainUtils.identifierIsInUri = function(identifier, uri, level) {
+DomainUtil.identifierIsInUri = function(identifier, uri, level) {
   return identifier == this.getIdentifier(uri, level);
 };
 
@@ -88,7 +88,7 @@ DomainUtils.identifierIsInUri = function(identifier, uri, level) {
  *            uri The uri.
  * @return {String} The hostname of the uri.
  */
-DomainUtils.getHost = function(uri) {
+DomainUtil.getHost = function(uri) {
   return this._ios.newURI(uri, null, null).host
 };
 
@@ -99,7 +99,7 @@ DomainUtils.getHost = function(uri) {
  *            uri The uri.
  * @return {String} The domain of the uri.
  */
-DomainUtils.getDomain = function(uri) {
+DomainUtil.getDomain = function(uri) {
   var host = this.getHost(uri);
   try {
     return this._eTLDService.getBaseDomainFromHost(host, 0);
@@ -121,7 +121,7 @@ DomainUtils.getDomain = function(uri) {
  *            uri The uri.
  * @return {String} The prePath of the uri.
  */
-DomainUtils.getPrePath = function(uri) {
+DomainUtil.getPrePath = function(uri) {
   return this._ios.newURI(uri, null, null).prePath;
 };
 
@@ -132,7 +132,7 @@ DomainUtils.getPrePath = function(uri) {
  *            hostname The hostname to strip.
  * @return {String} The hostname with any leading "www." removed.
  */
-DomainUtils.stripWww = function(hostname) {
+DomainUtil.stripWww = function(hostname) {
   return hostname.indexOf('www.') == 0 ? hostname.substring(4) : hostname;
 };
 
@@ -146,13 +146,13 @@ DomainUtils.stripWww = function(hostname) {
  * @return {Boolean} True if the hostnames are the same regardless of "www.",
  *         false otherwise.
  */
-DomainUtils.sameHostIgnoreWww = function(destinationHost, originHost) {
+DomainUtil.sameHostIgnoreWww = function(destinationHost, originHost) {
   return destinationHost
       && this.stripWww(destinationHost) == this.stripWww(originHost);
 
 };
 
-DomainUtils.stripFragment = function(uri) {
+DomainUtil.stripFragment = function(uri) {
   return uri.split("#")[0];
 };
 
@@ -170,7 +170,7 @@ DomainUtils.stripFragment = function(uri) {
  * @return {Boolean} True if the destination hostname is a subdomain of the
  *         origin hostname.
  */
-DomainUtils.destinationIsSubdomainOfOrigin = function(destinationHost,
+DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
     originHost) {
   var destHostNoWww = this.stripWww(destinationHost);
   var originHostNoWww = this.stripWww(originHost);
@@ -194,7 +194,7 @@ DomainUtils.destinationIsSubdomainOfOrigin = function(destinationHost,
  * @return {Array} First element is the delay in seconds, second element is the
  *         url to refresh to.
  */
-DomainUtils.parseRefresh = function(refreshString) {
+DomainUtil.parseRefresh = function(refreshString) {
   var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(refreshString);
   return [parts[1], parts[2]];
 }
@@ -208,7 +208,7 @@ DomainUtils.parseRefresh = function(refreshString) {
  *            uri
  * @return {String}
  */
-DomainUtils.ensureUriHasPath = function(uri) {
+DomainUtil.ensureUriHasPath = function(uri) {
   try {
     return this._ios.newURI(uri, null, null).spec;
   } catch (e) {

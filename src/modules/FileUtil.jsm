@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["FileUtils"]
+var EXPORTED_SYMBOLS = ["FileUtil"]
 
-var FileUtils = {
+var FileUtil = {
 
   /**
    * Returns the lines of the file in an array.

@@ -1217,22 +1217,30 @@ RequestPolicyService.prototype = {
       return true;
     }
 
-    // TODO: Identify when aRequestOrigin is not set.
     if (aRequestOrigin == undefined || aRequestOrigin == null) {
       return true;
     }
 
-    // Javascript skills lacking. There must be a nicer way to find out
-    // parameter 'asciiHost' isn't there.
     try {
+      // The asciiHost values will exist but be empty strings for the "file"
+      // scheme, so we don't want to allow just because they are empty strings,
+      // only if not set at all.
       aRequestOrigin.asciiHost;
       aContentLocation.asciiHost;
+      // The spec can be empty if odd things are going on, like the Refcontrol
+      // extension causing back/forward button-initiated requests to have
+      // aRequestOrigin be a virtually empty nsIURL object.
+      var missingSpecOrHost = aRequestOrigin.spec === "";
     } catch (e) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_CONTENT,
-          "No asciiHost on either aRequestOrigin <" + aRequestOrigin.spec
-              + "> or aContentLocation <" + aContentLocation.spec + ">");
-      return true;
+      missingSpecOrHost = true;
+    }
 
+    if (missingSpecOrHost) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_CONTENT,
+          "No asciiHost or empty spec on either aRequestOrigin <"
+              + aRequestOrigin.spec + "> or aContentLocation <"
+              + aContentLocation.spec + ">");
+      return true;
     }
 
     var destHost = aContentLocation.asciiHost;

@@ -120,18 +120,28 @@ requestpolicy.prefWindow = {
 
       // Each button has an "allow" function to whitelist the user-entered item.
       this._addOriginButton.allow = function() {
-        requestpolicy.prefWindow._rpServiceJSObject
-            .allowOrigin(requestpolicy.prefWindow._addOriginButton.textboxes[0].value);
+        var origin = requestpolicy.prefWindow._addOriginButton.textboxes[0].value;
+        // First forbid the item so that amy temporarily allowed item will be
+        // removed.
+        requestpolicy.prefWindow._rpServiceJSObject.forbidOrigin(origin);
+        requestpolicy.prefWindow._rpServiceJSObject.allowOrigin(origin);
       };
       this._addDestinationButton.allow = function() {
-        requestpolicy.prefWindow._rpServiceJSObject
-            .allowDestination(requestpolicy.prefWindow._addDestinationButton.textboxes[0].value);
+        var dest = requestpolicy.prefWindow._addDestinationButton.textboxes[0].value;
+        // First forbid the item so that amy temporarily allowed item will be
+        // removed.
+        requestpolicy.prefWindow._rpServiceJSObject.forbidDestination(dest);
+        requestpolicy.prefWindow._rpServiceJSObject.allowDestination(dest);
       };
       this._addOriginToDestinationButton.allow = function() {
-        requestpolicy.prefWindow._rpServiceJSObject
-            .allowOriginToDestination(
-                requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[0].value,
-                requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[1].value);
+        var origin = requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[0].value;
+        var dest = requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[1].value;
+        // First forbid the item so that amy temporarily allowed item will be
+        // removed.
+        requestpolicy.prefWindow._rpServiceJSObject.forbidOriginToDestination(
+            origin, dest);
+        requestpolicy.prefWindow._rpServiceJSObject.allowOriginToDestination(
+            origin, dest);
       };
 
       this._populateWhitelists();
@@ -289,7 +299,8 @@ requestpolicy.prefWindow = {
 
   addToWhitelist : function(button) {
     button.disabled = true;
-    // Remove any "|" and spaces to avoid conflict with separators.
+    // Remove invalid characters, including any "|" and spaces which would
+    // cause conflict with separators when storing in preferences.
     for (var i = 0; i < button.textboxes.length; i++) {
       button.textboxes[i].value = button.textboxes[i].value.replace(
           /[^a-zA-Z0-9.:/-]/g, "");

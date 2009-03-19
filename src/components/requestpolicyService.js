@@ -1358,6 +1358,41 @@ RequestPolicyService.prototype = {
         // Note: If changing the logic here, also make necessary changes to
         // isAllowedRedirect).
 
+        // Checking for link clicks, form submissions, and history requests
+        // should be done before other checks. Specifically, when link clicks
+        // were done after allowed-origin and other checks, then links that
+        // were allowed due to other checks would end up recorded in the origin
+        // url's allowed requests, and woud then show up on one tab if link
+        // was opened in a new tab but that link would have been allowed
+        // regardless of the link click. The original tab would then show it
+        // in its menu.
+        if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
+          // Don't delete the _clickedLinks item. We need it for if the user
+          // goes back/forward through their history.
+          // delete this._clickedLinks[origin][dest];
+          return this.accept("User-initiated request by link click", arguments,
+              true);
+
+        } else if (this._submittedForms[origin]
+            && this._submittedForms[origin][dest.split("?")[0]]) {
+          // Note: we dropped the query string from the dest because form GET
+          // requests will have that added on here but the original action of
+          // the form may not have had it.
+          // Don't delete the _clickedLinks item. We need it for if the user
+          // goes back/forward through their history.
+          // delete this._submittedForms[origin][dest.split("?")[0]];
+          return this.accept("User-initiated request by form submission",
+              arguments, true);
+
+        } else if (this._historyRequests[dest]) {
+          // When the user goes back and forward in their history, a request for
+          // the url comes through but is not followed by requests for any of
+          // the page's content. Therefore, we make sure that our cache of
+          // blocked requests isn't removed in this case.
+          delete this._historyRequests[dest];
+          return this.accept("History request", arguments, true);
+        }
+
         if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
           return this.accept("Temporarily allowed origin", arguments);
         }
@@ -1384,15 +1419,6 @@ RequestPolicyService.prototype = {
           return this.accept("Allowed origin to destination", arguments);
         }
 
-        // When the user goes back and forward in their history, a request for
-        // the url comes through but is not followed by requests for any of the
-        // page's content. Therefore, we make sure that our cache of blocked
-        // requests isn't removed in this case.
-        if (this._historyRequests[dest]) {
-          delete this._historyRequests[dest];
-          return this.accept("History request", arguments, true);
-        }
-
         if (aRequestOrigin.scheme == "chrome") {
           if (originHost == "browser") {
             // "browser" origin shows up for favicon.ico and adderss entered in
@@ -1417,25 +1443,6 @@ RequestPolicyService.prototype = {
         if (destIdentifier == originIdentifier) {
           return this.accept("same host (at current domain strictness level)",
               arguments);
-        }
-
-        if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
-          // Don't delete the _clickedLinks item. We need it for if the user
-          // goes back/forward through their history.
-          // delete this._clickedLinks[origin][dest];
-          return this.accept("User-initiated request by link click", arguments,
-              true);
-
-        } else if (this._submittedForms[origin]
-            && this._submittedForms[origin][dest.split("?")[0]]) {
-          // Note: we dropped the query string from the dest because form GET
-          // requests will have that added on here but the original action of
-          // the form may not have had it.
-          // Don't delete the _clickedLinks item. We need it for if the user
-          // goes back/forward through their history.
-          // delete this._submittedForms[origin][dest.split("?")[0]];
-          return this.accept("User-initiated request by form submission",
-              arguments, true);
         }
 
         // This is mostly here for the case of popup windows where the user has

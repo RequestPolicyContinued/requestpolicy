@@ -8,6 +8,7 @@ interface nsIRequestPolicy : nsISupports
 {
   ACString getUriIdentifier(in ACString uri);
 
+  void registerHistoryRequest(in ACString destinationUri);
   void registerFormSubmitted(in ACString originUri, in ACString destinationUri);
   void registerLinkClicked(in ACString originUri, in ACString destinationUri);
   

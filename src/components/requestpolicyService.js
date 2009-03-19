@@ -78,6 +78,7 @@ RequestPolicyService.prototype = {
   _prefService : null,
   _rootPrefs : null,
 
+  _historyRequests : {},
   _submittedForms : {},
   _clickedLinks : {},
 
@@ -503,6 +504,15 @@ RequestPolicyService.prototype = {
   getUriIdentifier : function getUriIdentifier(uri) {
     return requestpolicy.mod.DomainUtil.getIdentifier(uri,
         this._uriIdentificationLevel);
+  },
+
+  registerHistoryRequest : function(destinationUrl) {
+    var destinationUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil
+            .stripFragment(destinationUrl));
+    this._historyRequests[destinationUrl] = true;
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "History item requested: <" + destinationUrl + ">.");
   },
 
   registerFormSubmitted : function registerFormSubmitted(originUrl,
@@ -1372,6 +1382,15 @@ RequestPolicyService.prototype = {
 
         if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
           return this.accept("Allowed origin to destination", arguments);
+        }
+
+        // When the user goes back and forward in their history, a request for
+        // the url comes through but is not followed by requests for any of the
+        // page's content. Therefore, we make sure that our cache of blocked
+        // requests isn't removed in this case.
+        if (this._historyRequests[dest]) {
+          delete this._historyRequests[dest];
+          return this.accept("History request", arguments, true);
         }
 
         if (aRequestOrigin.scheme == "chrome") {

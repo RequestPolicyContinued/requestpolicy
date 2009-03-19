@@ -156,6 +156,8 @@ requestpolicy.overlay = {
 
   onWindowClose : function(event) {
     this._rpServiceJSObject.removeRequestObserver(this);
+    this._removeHistoryObserver();
+    this._removeLocationObserver();
   },
 
   /**
@@ -246,6 +248,8 @@ requestpolicy.overlay = {
             }, false);
         this._wrapAddTab();
       }
+      this._addLocationObserver();
+      this._addHistoryObserver();
       this._showInitialSetupDialog();
 
     } catch (e) {
@@ -331,10 +335,19 @@ requestpolicy.overlay = {
             accessKey : '', // TODO
             popup : null,
             callback : function() {
+              var location = targetDocument.location;
+              // When refreshing a page that wants to redirect, sometimes the
+              // targetDocument.location is null. If that's the case, just use
+              // do the redirection in the current content pane.
+              if (targetDocument.location == null) {
+                requestpolicy.mod.Logger
+                    .dump("in callback: targetDocument.location == null, "
+                        + "using content.location instead");
+                location = content.location;
+              }
               requestpolicy.mod.Logger.dump("User allowed redirection from <"
-                  + targetDocument.location.href + "> to <" + redirectTargetUri
-                  + ">");
-              targetDocument.location.href = redirectTargetUri;
+                  + location.href + "> to <" + redirectTargetUri + ">");
+              location.href = redirectTargetUri;
             }
           }, {
             label : notificationButtonDeny,
@@ -383,7 +396,10 @@ requestpolicy.overlay = {
    * Performs actions required to be performed after a tab change.
    */
   tabChanged : function() {
-    this._checkForBlockedContent(content.document);
+    // TODO: verify the Fennec and all supported browser versions update the
+    // status bar properly with only the ProgressListener. Once verified,
+    // remove calls to tabChanged();
+    // this._checkForBlockedContent(content.document);
   },
 
   /**
@@ -813,6 +829,95 @@ requestpolicy.overlay = {
         return window.requestpolicyOrigOpenDialog.apply(this, arguments);
       };
     }
+  },
+
+  _addLocationObserver : function() {
+    this.locationListener = {
+      onLocationChange : function(aProgress, aRequest, aURI) {
+        requestpolicy.overlay._checkForBlockedContent(content.document);
+      },
+      onStateChange : function() {
+      },
+      onProgressChange : function() {
+      },
+      onStatusChange : function() {
+      },
+      onSecurityChange : function() {
+      },
+      onLinkIconAvailable : function() {
+      },
+
+      QueryInterface : function(aIID) {
+        if (aIID.equals(Components.interfaces.nsIWebProgressListener)
+            || aIID.equals(Components.interfaces.nsISupportsWeakReference)
+            || aIID.equals(Components.interfaces.nsISupports))
+          return this;
+        throw Components.results.NS_NOINTERFACE;
+      }
+    };
+
+    gBrowser.addProgressListener(this.locationListener,
+        Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+  },
+
+  _removeLocationObserver : function() {
+    gBrowser.removeProgressListener(this.locationListener);
+  },
+
+  _addHistoryObserver : function() {
+    // Implements nsISHistoryListener (and nsISupportsWeakReference)
+    this.historyListener = {
+      OnHistoryGoBack : function(backURI) {
+        requestpolicy.overlay._rpService
+            .registerHistoryRequest(backURI.asciiSpec);
+        return true;
+      },
+
+      OnHistoryGoForward : function(forwardURI) {
+        requestpolicy.overlay._rpService
+            .registerHistoryRequest(forwardURI.asciiSpec);
+        return true;
+      },
+
+      OnHistoryGotoIndex : function(index, gotoURI) {
+        requestpolicy.overlay._rpService
+            .registerHistoryRequest(gotoURI.asciiSpec);
+        return true;
+      },
+
+      OnHistoryNewEntry : function(newURI) {
+      },
+
+      OnHistoryPurge : function(numEntries) {
+        return true;
+      },
+
+      OnHistoryReload : function(reloadURI, reloadFlags) {
+        return true;
+      },
+
+      QueryInterface : function(aIID, aResult) {
+        if (aIID.equals(Components.interfaces.nsISHistoryListener)
+            || aIID.equals(Components.interfaces.nsISupportsWeakReference)
+            || aIID.equals(Components.interfaces.nsISupports)) {
+          return this;
+        }
+        throw Components.results.NS_NOINTERFACE;
+      },
+
+      GetWeakReference : function() {
+        return Components.classes["@mozilla.org/appshell/appShellService;1"]
+            .createInstance(Components.interfaces.nsIWeakReference);
+      }
+    };
+
+    var sHistory = gBrowser.webNavigation.sessionHistory;
+    sHistory.addSHistoryListener(this.historyListener);
+  },
+
+  _removeHistoryObserver : function() {
+    var sHistory = gBrowser.webNavigation.sessionHistory;
+    sHistory.removeSHistoryListener(this.historyListener);
   },
 
   /**

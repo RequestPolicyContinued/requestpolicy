@@ -196,6 +196,12 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  */
 DomainUtil.parseRefresh = function(refreshString) {
   var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(refreshString);
+  // Strip off enclosing quotes around the url.
+  var first = parts[2][0];
+  var last = parts[2][parts[2].length - 1];
+  if (first == last && (first == "'" || first == '"')) {
+    parts[2] = parts[2].substring(1, parts[2].length - 1)
+  }
   return [parts[1], parts[2]];
 }
 

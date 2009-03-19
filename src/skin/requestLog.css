@@ -1,7 +1,6 @@
-treechildren::-moz-tree-cell-text(hover) {
+treechildren::-moz-tree-cell-text(selected) {
     color : #00b;
 }
-
 treechildren::-moz-tree-cell-text(hover) {
     color : #00b;
 }

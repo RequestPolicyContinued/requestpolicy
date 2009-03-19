@@ -247,9 +247,9 @@ requestpolicy.overlay = {
               requestpolicyOverlay.tabChanged();
             }, false);
         this._wrapAddTab();
+        this._addLocationObserver();
+        this._addHistoryObserver();
       }
-      this._addLocationObserver();
-      this._addHistoryObserver();
       this._showInitialSetupDialog();
 
     } catch (e) {

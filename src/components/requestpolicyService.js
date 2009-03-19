@@ -1049,11 +1049,6 @@ RequestPolicyService.prototype = {
             + ". "
             + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
-    if (requestpolicy.mod.Logger.logTypes
-        & requestpolicy.mod.Logger.TYPE_CONTENT_CALL) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_CONTENT_CALL,
-          new Error().stack);
-    }
 
     if (this._blockingDisabled) {
       return CP_OK;
@@ -1123,11 +1118,6 @@ RequestPolicyService.prototype = {
             + ". "
             + this._argumentsToString(args[0], args[1], args[2], args[3],
                 args[4], args[5]));
-    if (requestpolicy.mod.Logger.logTypes
-        & requestpolicy.mod.Logger.TYPE_CONTENT_CALL) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_CONTENT_CALL,
-          new Error().stack);
-    }
 
     var origin = args[2];
     var dest = args[1];

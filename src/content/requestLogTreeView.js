@@ -45,7 +45,6 @@ requestpolicy.requestLogTreeView = {
   addAllowedRequest : function(originUri, destUri) {
     this._visibleData.push([originUri, destUri, false,
         (new Date()).toLocaleTimeString()]);
-    this.rowCount++;
     if (!this._treebox) {
       return;
     }
@@ -55,7 +54,6 @@ requestpolicy.requestLogTreeView = {
   addBlockedRequest : function(originUri, destUri) {
     this._visibleData.push([originUri, destUri, true,
         (new Date()).toLocaleTimeString()]);
-    this.rowCount++;
     if (!this._treebox) {
       return;
     }
@@ -70,7 +68,7 @@ requestpolicy.requestLogTreeView = {
 
   // rowCount --- we define _getRowCount() as an (old-style) getter for this.
   _getRowCount : function() {
-    return this._visibleData.length
+    return this._visibleData.length;
   },
 
   setTree : function(_treebox) {

@@ -302,8 +302,24 @@ requestpolicy.overlay = {
     var targetBrowser = gBrowser.getBrowserForDocument(targetDocument);
     var notificationBox = gBrowser.getNotificationBox(targetBrowser)
     var notificationValue = "request-policy-meta-redirect";
+
+    // There doesn't seem to be a way to use the xul crop attribute with the
+    // notification, so do our own cropping, showing at a minimum the entire
+    // prePath.
+    const maxLength = 50;
+    if (redirectTargetUri.length < maxLength) {
+      var shortUri = redirectTargetUri;
+    } else {
+      var prePathLength = requestpolicy.mod.DomainUtil
+          .getPrePath(redirectTargetUri).length
+          + 1;
+      shortUri = redirectTargetUri.substring(0, Math.max(prePathLength,
+              maxLength))
+          + "...";
+    }
     var notificationLabel = this._strbundle.getFormattedString(
-        "redirectNotification", [redirectTargetUri]);
+        "redirectNotification", [shortUri]);
+
     var notificationButtonOptions = this._strbundle.getString("options");
     var notificationButtonAllow = this._strbundle.getString("allow");
     var notificationButtonDeny = this._strbundle.getString("deny");

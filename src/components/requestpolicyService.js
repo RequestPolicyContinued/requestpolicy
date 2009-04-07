@@ -169,6 +169,15 @@ RequestPolicyService.prototype = {
     var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
         .getService(Components.interfaces.nsIXULAppInfo);
 
+    // Mozilla updates (doing this for all applications, not just individual
+    // applications from the Mozilla community that I'm aware of).
+    // At least the http url is needed for Firefox updates, adding the https
+    // one as well to be safe.
+    this._compatibilityRules.push(["http://download.mozilla.org/", null,
+        appInfo.vendor]);
+    this._compatibilityRules.push(["https://download.mozilla.org/", null,
+        appInfo.vendor]);
+
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,

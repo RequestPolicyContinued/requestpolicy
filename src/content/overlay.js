@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  * 
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2008-2009 Justin Samuel
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -634,6 +634,23 @@ requestpolicy.overlay = {
       this.requestLogTreeView.addBlockedRequest(originUri, destUri);
     }
   },
+
+  observeBlockedLinkClickRedirect : function(sourcePageUri, linkDestUri,
+      blockedRedirectUri) {
+    // TODO: Figure out a good way to notify the user. For now, it should at
+    // least be showing up in the menu the first time it happens. After that,
+    // some caching issues seem to get in the way and the blocked request
+    // isn't tried again, so there's no awareness of it.
+    requestpolicy.mod.Logger.warning(
+        requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+        "Observed blocked link click redirect from page <" + sourcePageUri
+            + "> with redirect origin <" + linkDestUri
+            + "> and redirect dest <" + blockedRedirectUri
+            + ">. --- WARNING: other than the menu "
+            + "showing this blocked request, there is no other indication.");
+  },
+
+  // TODO: observeBlockedFormSubmissionRedirect
 
   _updateNotificationDueToBlockedContent : function() {
     if (this._blockedContentCheckTimeoutId) {

@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  * 
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2008-2009 Justin Samuel
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -74,13 +74,18 @@ RequestPolicyService.prototype = {
   _allowedRequests : {},
 
   _blockedRedirects : {},
+  _allowedRedirectsReverse : {},
 
   _prefService : null,
   _rootPrefs : null,
 
   _historyRequests : {},
+
   _submittedForms : {},
+  _submittedFormsReverse : {},
+
   _clickedLinks : {},
+  _clickedLinksReverse : {},
 
   _requestObservers : [],
 
@@ -338,6 +343,14 @@ RequestPolicyService.prototype = {
   },
 
   _examineHttpResponse : function(observedSubject) {
+    // Currently, if a user clicks a link to download a file and that link
+    // redirects and is subsequently blocked, the user will see the blocked
+    // destination in the menu. However, after they have allowed it from
+    // the menu and attempted the download again, they won't see the allowed
+    // request in the menu. Fixing that might be a pain and also runs the
+    // risk of making the menu cluttered and confusing with destinations of
+    // followed links from the current page.
+
     // TODO: Make user aware of blocked headers so they can allow them if
     // desired.
 
@@ -375,6 +388,7 @@ RequestPolicyService.prototype = {
               + headerType + "' header to <" + dest + "> " + "from <" + origin
               + ">. Same hosts or allowed origin/destination.");
       this._recordAllowedRequest(origin, dest);
+      this._allowedRedirectsReverse[dest] = origin;
 
       // If this was a link click or a form submission, we register an
       // additional click/submit with the original source but with a new
@@ -411,8 +425,42 @@ RequestPolicyService.prototype = {
     try {
       if (!this._blockingDisabled) {
         httpChannel.setResponseHeader(headerType, "", false);
-        this._recordRejectedRequest(origin, dest);
         this._blockedRedirects[origin] = dest;
+
+        // We try to trace the blocked redirect back to a link click or form
+        // submission if we can. It may indicate, for example, a link that
+        // was to download a file but a redirect got blocked at some point.
+        var initialOrigin = origin;
+        var initialDest = dest;
+        while (this._allowedRedirectsReverse[initialOrigin]) {
+          initialDest = initialOrigin;
+          initialOrigin = this._allowedRedirectsReverse[initialOrigin];
+        }
+
+        if (this._clickedLinksReverse[initialOrigin]) {
+          for (var i in this._clickedLinksReverse[initialOrigin]) {
+            // We hope there's only one possibility of a source page (that is,
+            // ideally there will be one iteration of this loop).
+            var sourcePage = i;
+          }
+
+          this._notifyRequestObserversOfBlockedLinkClickRedirect(sourcePage,
+              origin, dest);
+
+          // Maybe we just record the clicked link and each step in between as
+          // an allowed request, and the final blocked one as a blocked request.
+          // That is, make it show up in the requestpolicy menu like anything
+          // else.
+          // We set the "isInsert" parameter so we don't clobber the existing
+          // info about allowed and deleted requests.
+          this._recordAllowedRequest(sourcePage, initialOrigin, true);
+        }
+
+        // if (this._submittedFormsReverse[initialOrigin]) {
+        // // TODO: implement for form submissions whose redirects are blocked
+        // }
+
+        this._recordRejectedRequest(origin, dest);
       }
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
@@ -504,6 +552,17 @@ RequestPolicyService.prototype = {
     }
   },
 
+  _notifyRequestObserversOfBlockedLinkClickRedirect : function(sourcePageUri,
+      linkDestUri, blockedRedirectUri) {
+    for (var i = 0; i < this._requestObservers.length; i++) {
+      if (!this._requestObservers[i]) {
+        continue;
+      }
+      this._requestObservers[i].observeBlockedLinkClickRedirect(sourcePageUri,
+          linkDestUri, blockedRedirectUri);
+    }
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIRequestPolicy interface
   // /////////////////////////////////////////////////////////////////////////
@@ -544,8 +603,17 @@ RequestPolicyService.prototype = {
       this._submittedForms[originUrl] = {};
     }
     if (this._submittedForms[originUrl][destinationUrl] == undefined) {
-      // TODO: See TODO for registerLinkClicked.
+      // TODO: See timestamp note for registerLinkClicked.
       this._submittedForms[originUrl][destinationUrl] = true;
+    }
+
+    // Keep track of a destination-indexed map, as well.
+    if (this._submittedFormsReverse[destinationUrl] == undefined) {
+      this._submittedFormsReverse[destinationUrl] = {};
+    }
+    if (this._submittedFormsReverse[destinationUrl][originUrl] == undefined) {
+      // TODO: See timestamp note for registerLinkClicked.
+      this._submittedFormsReverse[destinationUrl][originUrl] = true;
     }
   },
 
@@ -573,6 +641,15 @@ RequestPolicyService.prototype = {
       // the _clickedLinks object. One of these approaches would also reduce log
       // clutter, which would be good.
       this._clickedLinks[originUrl][destinationUrl] = true;
+    }
+
+    // Keep track of a destination-indexed map, as well.
+    if (this._clickedLinksReverse[destinationUrl] == undefined) {
+      this._clickedLinksReverse[destinationUrl] = {};
+    }
+    if (this._clickedLinksReverse[destinationUrl][originUrl] == undefined) {
+      // TODO: Possibly set the value to a timestamp, as described above.
+      this._clickedLinksReverse[destinationUrl][originUrl] = true;
     }
   },
 
@@ -929,6 +1006,15 @@ RequestPolicyService.prototype = {
   },
 
   originHasRejectedRequests : function(originUri) {
+    return this._originHasRejectedRequestsHelper(originUri, {});
+  },
+
+  _originHasRejectedRequestsHelper : function(originUri, checkedUris) {
+    if (checkedUris[originUri]) {
+      return false;
+    }
+    checkedUris[originUri] = true;
+
     var rejectedRequests = this._rejectedRequests[originUri];
     if (rejectedRequests) {
       for (var i in rejectedRequests) {
@@ -939,7 +1025,52 @@ RequestPolicyService.prototype = {
         }
       }
     }
+    // If this url had an allowed redirect to another url which in turn had a
+    // rejected redirect (e.g. installing extensions from AMO with full domain
+    // strictness enabled), then it will show up by recursively checking each
+    // allowed request.
+    // I think this logic will also indicate rejected requests if this
+    // origin has rejected requests from other origins within it. I don't
+    // believe this will cause a problem.
+    var allowedRequests = this._allowedRequests[originUri];
+    if (allowedRequests) {
+      for (var i in allowedRequests) {
+        for (var j in allowedRequests[i]) {
+          if (this._originHasRejectedRequestsHelper(j, checkedUris)) {
+            return true;
+          }
+        }
+      }
+    }
     return false;
+  },
+
+  _dumpRequestTrackingObject : function(obj, name) {
+    function print(msg) {
+      requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          msg);
+    }
+    print("--------------------------------------------");
+    print(name + ":");
+    for (var i in obj) {
+      print("\t" + i);
+      for (var j in obj[i]) {
+        print("\t\t" + j);
+        for (var k in obj[i][j]) {
+          print("\t\t\t" + k);
+        }
+      }
+    }
+    print("--------------------------------------------");
+  },
+
+  _dumpRejectedRequests : function() {
+    this
+        ._dumpRequestTrackingObject(this._rejectedRequests, "Rejected requests")
+  },
+
+  _dumpAllowedRequests : function() {
+    this._dumpRequestTrackingObject(this._allowedRequests, "Allowed requests")
   },
 
   /**
@@ -1143,18 +1274,25 @@ RequestPolicyService.prototype = {
     return CP_OK;
   },
 
-  _recordAllowedRequest : function(originUri, destUri) {
+  _recordAllowedRequest : function(originUri, destUri, isInsert) {
     var destIdentifier = this.getUriIdentifier(destUri);
+
+    if (isInsert == undefined) {
+      isInsert = false;
+    }
 
     // Reset the accepted and rejected requests originating from this
     // destination. That is, if this accepts a request to a uri that may itself
     // originate further requests, reset the information about what that page is
     // accepting and rejecting.
-    if (this._allowedRequests[destUri]) {
-      delete this._allowedRequests[destUri];
-    }
-    if (this._rejectedRequests[destUri]) {
-      delete this._rejectedRequests[destUri];
+    // If "isInsert" is set, then we don't want to clear the destUri info.
+    if (!isInsert) {
+      if (this._allowedRequests[destUri]) {
+        delete this._allowedRequests[destUri];
+      }
+      if (this._rejectedRequests[destUri]) {
+        delete this._rejectedRequests[destUri];
+      }
     }
 
     // Remove this request from the set of rejected requests.

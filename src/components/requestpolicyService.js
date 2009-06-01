@@ -182,7 +182,18 @@ RequestPolicyService.prototype = {
         appInfo.vendor]);
     this._compatibilityRules.push(["https://download.mozilla.org/", null,
         appInfo.vendor]);
-
+    // There are redirects from 'addons' to 'releases' when isntalling addons
+    // from AMO. Adding the origin of 'releases' to be safe in case those
+    // start redirecting elsewhere at some point.
+    this._compatibilityRules.push(["http://addons.mozilla.org/", null,
+        appInfo.vendor]);
+    this._compatibilityRules.push(["https://addons.mozilla.org/", null,
+        appInfo.vendor]);
+    this._compatibilityRules.push(["http://releases.mozilla.org/", null,
+        appInfo.vendor]);
+    this._compatibilityRules.push(["https://releases.mozilla.org/", null,
+        appInfo.vendor]);
+        
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,

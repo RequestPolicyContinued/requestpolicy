@@ -17,6 +17,7 @@
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
 <!ENTITY preferences.prefpane.import "들여오기">
 <!ENTITY preferences.prefpane.export "내보내기">
+<!ENTITY preferences.prefpane.advanced "Advanced">
 <!ENTITY preferences.strictness "Strictness">
 <!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
@@ -25,6 +26,8 @@
 <!ENTITY preferences.statusbarIcon "상태바 아이콘">
 <!ENTITY preferences.indicateBlockedObjects "거부된 사이트 표시">
 <!ENTITY preferences.openInitialSetup "초기 설정 도구 열기">
+<!ENTITY preferences.misc "Miscellaneous">
+<!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
 <!ENTITY preferences.origins "출발지 주소">
 <!ENTITY preferences.destinations "목적지 주소">
 <!ENTITY preferences.originsToDestinations "출발지-목적지">

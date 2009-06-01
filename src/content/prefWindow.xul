@@ -44,7 +44,6 @@
 		<preferences>
 			<preference id="pref-uriIdentificationLevel" name="extensions.requestpolicy.uriIdentificationLevel" type="int"/>
 			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string" instantApply="true"/>
-			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
 		</preferences>
 
 		<groupbox>
@@ -62,11 +61,6 @@
 				<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
 				<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
 			</radiogroup>
-		</groupbox>
-
-		<groupbox>
-			<caption label="&preferences.webpages;"/>
-			<checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
 		</groupbox>
 		
 		<groupbox>
@@ -219,6 +213,26 @@
 			</hbox>
 		</groupbox>
 	</prefpane>
+
+    <prefpane id="requestpolicyPrefpaneAdvanced"
+        label="&preferences.prefpane.advanced;"
+        image="chrome://requestpolicy/skin/preferences/prefpane-advanced.png"
+        >
+        <preferences>
+            <preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
+            <preference id="pref-startWithAllowAllEnabled" name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool"/>
+        </preferences>
+
+        <groupbox>
+            <caption label="&preferences.webpages;"/>
+            <checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
+        </groupbox>
+        
+        <groupbox>
+            <caption label="&preferences.misc;"/>
+            <checkbox id="indicateBlockedObjects" label="&preferences.startWithAllowAllEnabled;" preference="pref-startWithAllowAllEnabled"/>
+        </groupbox>
+    </prefpane>
 
 	<!-- These mess up the prefwindow if they come before the prefpanes
 		 https://bugzilla.mozilla.org/show_bug.cgi?id=296418 -->

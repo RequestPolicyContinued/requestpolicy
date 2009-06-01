@@ -16,3 +16,4 @@ pref("extensions.requestpolicy.initialSetupDialogShown", false);
 
 pref("extensions.requestpolicy.statusbarIcon", "standard");
 pref("extensions.requestpolicy.indicateBlockedObjects", true);
+pref("extensions.requestpolicy.startWithAllowAllEnabled", false);

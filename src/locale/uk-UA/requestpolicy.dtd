@@ -17,6 +17,7 @@
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
 <!ENTITY preferences.prefpane.import "Імпорт">
 <!ENTITY preferences.prefpane.export "Експорт">
+<!ENTITY preferences.prefpane.advanced "Advanced">
 <!ENTITY preferences.strictness "Strictness">
 <!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
@@ -25,6 +26,8 @@
 <!ENTITY preferences.statusbarIcon "Піктограма рядку стану">
 <!ENTITY preferences.indicateBlockedObjects "Indicate blocked images">
 <!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.misc "Miscellaneous">
+<!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
 <!ENTITY preferences.origins "Origins">
 <!ENTITY preferences.destinations "Destinations">
 <!ENTITY preferences.originsToDestinations "Origins-to-Destinations">

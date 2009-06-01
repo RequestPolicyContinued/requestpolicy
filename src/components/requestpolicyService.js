@@ -70,6 +70,8 @@ RequestPolicyService.prototype = {
 
   _blockingDisabled : false,
 
+  _conflictingExtensions : [],
+
   _rejectedRequests : {},
   _allowedRequests : {},
 
@@ -168,6 +170,27 @@ RequestPolicyService.prototype = {
       this._compatibilityRules.push(["file://",
           "http://static.userscripts.org/", ext.name]);
     }
+
+    // Sage-Too
+    if (ext = em.getItemForID("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}")) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Extension detected: " + ext.name);
+      this._conflictingExtensions.push({
+            "id" : ext.id,
+            "name" : ext.name,
+            "version" : ext.version
+          });
+    }
+    // NewsFox
+    if (ext = em.getItemForID("{899DF1F8-2F43-4394-8315-37F6744E6319}")) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Extension detected: " + ext.name);
+      this._conflictingExtensions.push({
+            "id" : ext.id,
+            "name" : ext.name,
+            "version" : ext.version
+          });
+    }
   },
 
   _initializeApplicationCompatibility : function() {
@@ -193,7 +216,7 @@ RequestPolicyService.prototype = {
         appInfo.vendor]);
     this._compatibilityRules.push(["https://releases.mozilla.org/", null,
         appInfo.vendor]);
-        
+
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -1000,6 +1023,10 @@ RequestPolicyService.prototype = {
     return this._temporarilyAllowedOriginsCount != 0
         || this._temporarilyAllowedDestinationsCount != 0
         || this._temporarilyAllowedOriginsToDestinationsCount != 0;
+  },
+
+  getConflictingExtensions : function getConflictingExtensions() {
+    return this._conflictingExtensions;
   },
 
   isPrefetchEnabled : function isPrefetchEnabled() {

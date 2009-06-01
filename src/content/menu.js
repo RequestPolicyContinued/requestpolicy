@@ -53,6 +53,9 @@ requestpolicy.menu = {
   _itemPrefetchWarning : null,
   _itemPrefetchWarningSeparator : null,
 
+  _extensionConflictWarning : null,
+  _extensionConflictWarningSeparator : null,
+
   _itemOtherOrigins : null,
   _itemOtherOriginsPopup : null,
   _itemOtherOriginsSeparator : null,
@@ -92,6 +95,11 @@ requestpolicy.menu = {
       this._itemPrefetchWarningSeparator = document
           .getElementById("requestpolicyPrefetchWarningSeparator");
 
+      this._extensionConflictWarning = document
+          .getElementById("requestpolicyExtensionConflictWarning");
+      this._extensionConflictWarningSeparator = document
+          .getElementById("requestpolicyExtensionConflictWarningSeparator");
+
       this._itemOtherOrigins = document
           .getElementById("requestpolicyOtherOrigins");
       this._itemOtherOriginsPopup = document
@@ -113,6 +121,16 @@ requestpolicy.menu = {
           .getElementById("requestpolicyAllowOrigin");
       this._itemForbidOrigin = document
           .getElementById("requestpolicyForbidOrigin");
+
+      var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
+      var hideConflictInfo = (conflictCount == 0);
+      if (!hideConflictInfo) {
+        this._extensionConflictWarning.setAttribute("label",
+            this._strbundle.getFormattedString("extensionConflictWarning",
+                [conflictCount]));
+      }
+      this._extensionConflictWarning.hidden = hideConflictInfo;
+      this._extensionConflictWarningSeparator.hidden = hideConflictInfo;
     }
   },
 
@@ -146,8 +164,9 @@ requestpolicy.menu = {
       this._itemAllowOrigin.hidden = true;
       this._itemForbidOrigin.hidden = true;
 
-      this._itemPrefetchWarning.hidden = this._itemPrefetchWarningSeparator.hidden = !this._rpService
-          .isPrefetchEnabled();
+      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
+      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
+      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
 
       if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;

@@ -32,12 +32,15 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/JSON.jsm", requestpolicy.mod);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
 requestpolicy.overlay = {
+
+  _extensionConflictInfoUri : "http://www.requestpolicy.com/conflict?ext=",
 
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
   _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
@@ -580,7 +583,7 @@ requestpolicy.overlay = {
         // It turns out that the broken resource trick causes "save page as" to
         // to fail. On the glorious plus side, it looks like Fx 3.5b4 works
         // with setting the src to null, as well.
-        //img.src = "resource://doesnt/exist.png";
+        // img.src = "resource://doesnt/exist.png";
         img.src = null;
       }
     }
@@ -1123,15 +1126,14 @@ requestpolicy.overlay = {
   },
 
   /**
-   * Forbids an origin from requesting from any destination.
-   * This revoke's temporary or permanent request permissions the origin had
-   * been given.
+   * Forbids an origin from requesting from any destination. This revoke's
+   * temporary or permanent request permissions the origin had been given.
    */
   forbidOrigin : function(originHost) {
     this._rpService.forbidOrigin(originHost);
     this._conditionallyReloadDocument();
   },
-  
+
   /**
    * Forbids the current document's origin from requesting from any destination.
    * This revoke's temporary or permanent request permissions the origin had
@@ -1224,6 +1226,13 @@ requestpolicy.overlay = {
 
   _openInNewTab : function(uri) {
     gBrowser.selectedTab = gBrowser.addTab(uri);
+  },
+
+  showExtensionConflictInfo : function() {
+    var ext = this._rpServiceJSObject.getConflictingExtensions();
+    var extJson = requestpolicy.mod.JSON.stringify(ext);
+    this._openInNewTab(this._extensionConflictInfoUri
+        + encodeURIComponent(extJson));
   },
 
   showPrefetchInfo : function() {

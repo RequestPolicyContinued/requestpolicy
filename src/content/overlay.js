@@ -577,7 +577,11 @@ requestpolicy.overlay = {
         // Setting src to null worked on firefox 3.0 but not 3.1. So, use a
         // local url that doesn't exist (using resource:// because chrome:// is
         // forbidden in this context).
-        img.src = "resource://doesnt/exist.png";
+        // It turns out that the broken resource trick causes "save page as" to
+        // to fail. On the glorious plus side, it looks like Fx 3.5b4 works
+        // with setting the src to null, as well.
+        //img.src = "resource://doesnt/exist.png";
+        img.src = null;
       }
     }
   },

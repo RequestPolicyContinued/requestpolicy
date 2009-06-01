@@ -1023,13 +1023,22 @@ requestpolicy.overlay = {
   },
 
   /**
+   * Allows requests from the specified origin to any destination for the
+   * duration of the browser session.
+   */
+  temporarilyAllowOrigin : function(originHost) {
+    this._rpService.temporarilyAllowOrigin(originHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
    * Allows the current document's origin to request from any destination for
    * the duration of the browser session.
    * 
    * @param {Event}
    *            event
    */
-  temporarilyAllowOrigin : function(event) {
+  temporarilyAllowCurrentOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
     var host = this.getCurrentUriIdentifier();
@@ -1064,13 +1073,21 @@ requestpolicy.overlay = {
   },
 
   /**
+   * Allows requests from an origin, including in future browser sessions.
+   */
+  allowOrigin : function(originHost) {
+    this._rpService.allowOrigin(originHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
    * Allows the current document's origin to request from any destination,
    * including in future browser sessions.
    * 
    * @param {Event}
    *            event
    */
-  allowOrigin : function(event) {
+  allowCurrentOrigin : function(event) {
     var host = this.getCurrentUriIdentifier();
     this._rpService.allowOrigin(host);
     this._conditionallyReloadDocument();
@@ -1102,6 +1119,16 @@ requestpolicy.overlay = {
   },
 
   /**
+   * Forbids an origin from requesting from any destination.
+   * This revoke's temporary or permanent request permissions the origin had
+   * been given.
+   */
+  forbidOrigin : function(originHost) {
+    this._rpService.forbidOrigin(originHost);
+    this._conditionallyReloadDocument();
+  },
+  
+  /**
    * Forbids the current document's origin from requesting from any destination.
    * This revoke's temporary or permanent request permissions the origin had
    * been given.
@@ -1109,7 +1136,7 @@ requestpolicy.overlay = {
    * @param {Event}
    *            event
    */
-  forbidOrigin : function(event) {
+  forbidCurrentOrigin : function(event) {
     var host = this.getCurrentUriIdentifier();
     this._rpService.forbidOrigin(host);
     this._conditionallyReloadDocument();

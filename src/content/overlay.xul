@@ -147,14 +147,14 @@
 			<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
 			<menuitem 
 				id="requestpolicyAllowOrigin"
-				oncommand="requestpolicy.overlay.allowOrigin(event);" />
+				oncommand="requestpolicy.overlay.allowCurrentOrigin(event);" />
 			<menuitem 
 				id="requestpolicyAllowOriginTemporarily"
 				class="requestpolicyTemporary"
-				oncommand="requestpolicy.overlay.temporarilyAllowOrigin(event);" />
+				oncommand="requestpolicy.overlay.temporarilyAllowCurrentOrigin(event);" />
 			<menuitem 
 				id="requestpolicyForbidOrigin"
-				oncommand="requestpolicy.overlay.forbidOrigin(event);" />
+				oncommand="requestpolicy.overlay.forbidCurrentOrigin(event);" />
 		</menupopup>
 	</popupset>
 

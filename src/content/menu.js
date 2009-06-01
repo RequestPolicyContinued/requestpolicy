@@ -248,7 +248,7 @@ requestpolicy.menu = {
             otherOriginIdentifier, otherOrigins);
         // If there are no blocked/allowed destinations from this other origin,
         // don't display it.
-        if (currentOtherOriginMenu.childNodes.length == 3) {
+        if (currentOtherOriginMenu.meaningfulChildCount == 0) {
           var menuNotPopup = currentOtherOriginMenu.parentNode;
           this._clearChildMenus(menuNotPopup);
           this._itemOtherOriginsPopup.removeChild(menuNotPopup);
@@ -364,6 +364,17 @@ requestpolicy.menu = {
     menu.parentNode.disabled = menu.firstChild ? false : true;
   },
 
+  addMenuItemTemporarilyAllowOrigin : function(menu, originHost) {
+    var label = this._strbundle.getFormattedString("allowOriginTemporarily",
+        [originHost]);
+    var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
+        + this._sanitizeJsFunctionArg(originHost) + "');";
+    var statustext = originHost; // TODO
+    var item = this.addMenuItem(menu, label, command, statustext);
+    item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
+
   addMenuItemTemporarilyAllowDest : function(menu, destHost) {
     var label = this._strbundle.getFormattedString(
         "allowDestinationTemporarily", [destHost]);
@@ -385,6 +396,14 @@ requestpolicy.menu = {
     var item = this.addMenuItem(menu, label, command, statustext);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
+  },
+
+  addMenuItemAllowOrigin : function(menu, originHost) {
+    var label = this._strbundle.getFormattedString("allowOrigin", [originHost]);
+    var command = "requestpolicy.overlay.allowOrigin('"
+        + this._sanitizeJsFunctionArg(originHost) + "');";
+    var statustext = originHost; // TODO
+    return this.addMenuItem(menu, label, command, statustext);
   },
 
   addMenuItemAllowDest : function(menu, destHost) {
@@ -460,6 +479,19 @@ requestpolicy.menu = {
     var menu = this.addMenu(this._itemOtherOriginsPopup, originIdentifier);
     var newNode;
 
+    // This will indicate whether the menu is worth displaying.
+    menu.meaningfulChildCount = 0;
+
+    if (this._rpService.isTemporarilyAllowedOrigin(originIdentifier)
+        || this._rpService.isAllowedOrigin(originIdentifier)) {
+      this.addMenuItemForbidOrigin(menu, originIdentifier);
+    } else {
+      this.addMenuItemTemporarilyAllowOrigin(menu, originIdentifier);
+      this.addMenuItemAllowOrigin(menu, originIdentifier);
+    }
+
+    this.addMenuSeparator(menu);
+
     var allowedIdentifiers = requestpolicy.mod.RequestUtil.getAllowedRequests(
         null, originIdentifier, otherOrigins);
     for (var i in allowedIdentifiers) {
@@ -467,6 +499,7 @@ requestpolicy.menu = {
       if (i == originIdentifier) {
         continue;
       }
+      menu.meaningfulChildCount++;
       var submenu = this.addAllowedDestination(menu, menu.firstChild, i, false);
       this._populateOtherOriginsMenuItemAllowedDestinations(submenu,
           originIdentifier, i);
@@ -481,6 +514,7 @@ requestpolicy.menu = {
     var blockedIdentifiers = requestpolicy.mod.RequestUtil.getRejectedRequests(
         null, originIdentifier, otherOrigins);
     for (var i in blockedIdentifiers) {
+      menu.meaningfulChildCount++;
       var submenu = this.addBlockedDestination(menu, menu.firstChild, i, false);
       this._populateOtherOriginsMenuItemBlockedDestinations(submenu,
           originIdentifier, i);

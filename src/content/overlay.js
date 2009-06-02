@@ -714,6 +714,16 @@ requestpolicy.overlay = {
                 + " second delay) found in document at <" + document.location
                 + ">");
         if (dest != undefined) {
+          // If dest isn't a valid uri, assume it's a relative uri.
+          if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
+            var origDest = dest;
+            dest = this.getCurrentUriObject().resolve(dest);
+            requestpolicy.mod.Logger.info(
+                requestpolicy.mod.Logger.TYPE_META_REFRESH,
+                "meta refresh destination <" + origDest
+                    + "> appeared to be relative to <" + this.getCurrentUri()
+                    + ">, so it has been resolved to <" + dest + ">");
+          }
           if (this._rpServiceJSObject._blockingDisabled
               || this._rpService.isAllowedRedirect(document.location, dest)) {
             // The meta refresh is allowed.
@@ -1001,6 +1011,10 @@ requestpolicy.overlay = {
   getCurrentUri : function getCurrentUriIdentifier() {
     return requestpolicy.mod.DomainUtil
         .stripFragment(content.document.documentURI);
+  },
+
+  getCurrentUriObject : function() {
+    return content.document.documentURIObject;
   },
 
   /**

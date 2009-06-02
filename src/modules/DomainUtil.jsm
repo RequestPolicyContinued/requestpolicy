@@ -86,10 +86,40 @@ DomainUtil.identifierIsInUri = function(identifier, uri, level) {
  * 
  * @param {String}
  *            uri The uri.
- * @return {String} The hostname of the uri.
+ * @return {String} The hostname of the uri or throws an exception if it is an
+ *         invalid uri.
  */
 DomainUtil.getHost = function(uri) {
-  return this._ios.newURI(uri, null, null).host
+  return this.getUriObject(uri).host;
+};
+
+/**
+ * Returns an nsIURI object from a uri string.
+ * 
+ * @param {String}
+ *            uri The uri.
+ * @return {nsIURI} The nsIURI object created from the uri, or throws an
+ *         exception if it is an invalid uri.
+ */
+DomainUtil.getUriObject = function(uri) {
+  // Throws an exception if uri is invalid.
+  return this._ios.newURI(uri, null, null);
+};
+
+/**
+ * Determines whether a uri string represents a valid uri.
+ * 
+ * @param {String}
+ *            uri The uri.
+ * @return {boolean} True if the uri is valid, false otherwise.
+ */
+DomainUtil.isValidUri = function(uri) {
+  try {
+    this.getUriObject(uri);
+    return true;
+  } catch (e) {
+    return false;
+  }
 };
 
 /**

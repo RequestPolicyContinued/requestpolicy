@@ -717,11 +717,11 @@ requestpolicy.overlay = {
           // If dest isn't a valid uri, assume it's a relative uri.
           if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
             var origDest = dest;
-            dest = this.getCurrentUriObject().resolve(dest);
+            dest = document.documentURIObject.resolve(dest);
             requestpolicy.mod.Logger.info(
                 requestpolicy.mod.Logger.TYPE_META_REFRESH,
                 "meta refresh destination <" + origDest
-                    + "> appeared to be relative to <" + this.getCurrentUri()
+                    + "> appeared to be relative to <" + document.documentURI
                     + ">, so it has been resolved to <" + dest + ">");
           }
           if (this._rpServiceJSObject._blockingDisabled
@@ -999,22 +999,22 @@ requestpolicy.overlay = {
   },
 
   /**
-   * Determines the current document's uri identifier based on the current
+   * Determines the top-level document's uri identifier based on the current
    * identifier level setting.
    * 
    * @return {String} The current document's identifier.
    */
-  getCurrentUriIdentifier : function getCurrentUriIdentifier() {
-    return this._rpServiceJSObject.getUriIdentifier(this.getCurrentUri());
+  getTopLevelDocumentUriIdentifier : function() {
+    return this._rpServiceJSObject.getUriIdentifier(this
+        .getTopLevelDocumentUri());
   },
 
-  getCurrentUri : function getCurrentUriIdentifier() {
+  /**
+   * Get the top-level document's uri.
+   */
+  getTopLevelDocumentUri : function() {
     return requestpolicy.mod.DomainUtil
         .stripFragment(content.document.documentURI);
-  },
-
-  getCurrentUriObject : function() {
-    return content.document.documentURIObject;
   },
 
   /**
@@ -1062,7 +1062,7 @@ requestpolicy.overlay = {
   temporarilyAllowCurrentOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
     // "window.target".
-    var host = this.getCurrentUriIdentifier();
+    var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.temporarilyAllowOrigin(host);
     this._conditionallyReloadDocument();
   },
@@ -1109,7 +1109,7 @@ requestpolicy.overlay = {
    *            event
    */
   allowCurrentOrigin : function(event) {
-    var host = this.getCurrentUriIdentifier();
+    var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.allowOrigin(host);
     this._conditionallyReloadDocument();
   },
@@ -1157,7 +1157,7 @@ requestpolicy.overlay = {
    *            event
    */
   forbidCurrentOrigin : function(event) {
-    var host = this.getCurrentUriIdentifier();
+    var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.forbidOrigin(host);
     this._conditionallyReloadDocument();
   },

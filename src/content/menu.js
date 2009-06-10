@@ -140,8 +140,9 @@ requestpolicy.menu = {
    */
   prepareMenu : function() {
     try {
-      var currentIdentifier = requestpolicy.overlay.getCurrentUriIdentifier();
-      var currentUri = requestpolicy.overlay.getCurrentUri();
+      var currentIdentifier = requestpolicy.overlay
+          .getTopLevelDocumentUriIdentifier();
+      var currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
       var otherOrigins = requestpolicy.mod.RequestUtil
           .getOtherOrigins(content.document);

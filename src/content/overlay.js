@@ -822,26 +822,56 @@ requestpolicy.overlay = {
   _wrapAddTab : function() {
     if (!gBrowser.requestpolicyAddTabModified) {
       gBrowser.requestpolicyAddTabModified = true;
-      var functionSignature = "function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner, aAllowThirdPartyFixup) {";
-      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(aURI, aReferrerURI);";
-      // Add a line to the beginning of the addTab function.
-      eval("gBrowser.addTab = "
-          + gBrowser.addTab.toString().replace(functionSignature,
-              functionSignature + newFirstCodeLine));
+
+      // For reference, the addTab() function signature looks like this:
+      // function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner,
+      // aAllowThirdPartyFixup) {";
+      // where it's possible that only two arguments are used and aReferrerURI
+      // is a hash of the other arguments as well as new ones.
+      // See https://www.requestpolicy.com/dev/ticket/38
+
+      // In order to keep our code from breaking if the signature of addTab
+      // changes (even just a change in variable names, for example), we'll
+      // simply insert our own line right after the first curly brace in the
+      // string representation of the addTab function.
+      addTabString = gBrowser.addTab.toString()
+      firstCurlyBrace = addTabString.indexOf("{")
+      addTabParts = [];
+      // Includes the '{'
+      addTabParts[0] = addTabString.substring(0, firstCurlyBrace + 1);
+      // Starts after the '{'
+      addTabParts[1] = addTabString.substring(firstCurlyBrace + 1);
+
+      // We use 'arguments' so that we aren't dependent on the names of two
+      // parameters, as it seems not unlikely that these could change due to
+      // the second parameter's purpose having been changed.
+      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(arguments[0], arguments[1]);";
+      // Finally, add our line to the beginning of the addTab function.
+      eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine
+          + addTabParts[1]);
     }
   },
 
   /**
    * This is called by the modified addTab().
    * 
-   * @param {String?}
-   *            tabUri
-   * @param {nsIURI}
-   *            referrerUri
+   * @param {String}
+   *            url
+   * @param {nsIURI/hash}
+   *            referrerURI
    */
-  tabAdded : function(tabUri, referrerUri) {
-    if (referrerUri) {
-      this._rpService.registerLinkClicked(referrerUri.spec, tabUri);
+  tabAdded : function(url, referrerURI) {
+    // The second argument to addTab was changed to a hash.
+    // See https://www.requestpolicy.com/dev/ticket/38
+    if (referrerURI && !(referrerURI instanceof Components.interfaces.nsIURI)) {
+      if ("referrerURI" in referrerURI) {
+        referrerURI = referrerURI.referrerURI
+      } else {
+        referrerURI = null
+      }
+    }
+    if (referrerURI) {
+      this._rpService.registerLinkClicked(referrerURI.spec, url);
     }
   },
 

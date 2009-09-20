@@ -32,7 +32,7 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
 requestpolicy.initialSetup = {
 
   _itemsByRegion : {
-    "international" : [["*", "recaptcha.net"], ["yahoo.com", "yimg.com"],
+    "international" : [["yahoo.com", "yimg.com"],
         ["google.com", "googlehosted.com"], ["google.com", "gvt0.com"],
         ["google.com", "youtube.com"], ["google.com", "ggpht.com"],
         ["google.com", "gstatic.com"], ["gmail.com", "google.com"],

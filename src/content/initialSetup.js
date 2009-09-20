@@ -33,6 +33,7 @@ requestpolicy.initialSetup = {
 
   _itemsByRegion : {
     "international" : [["yahoo.com", "yimg.com"],
+        ["paypal.com", "paypalobjects.com"],
         ["google.com", "googlehosted.com"], ["google.com", "gvt0.com"],
         ["google.com", "youtube.com"], ["google.com", "ggpht.com"],
         ["google.com", "gstatic.com"], ["gmail.com", "google.com"],

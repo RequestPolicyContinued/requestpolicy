@@ -834,8 +834,8 @@ requestpolicy.overlay = {
       // changes (even just a change in variable names, for example), we'll
       // simply insert our own line right after the first curly brace in the
       // string representation of the addTab function.
-      addTabString = gBrowser.addTab.toString()
-      firstCurlyBrace = addTabString.indexOf("{")
+      addTabString = gBrowser.addTab.toString();
+      firstCurlyBrace = addTabString.indexOf("{");
       addTabParts = [];
       // Includes the '{'
       addTabParts[0] = addTabString.substring(0, firstCurlyBrace + 1);
@@ -865,9 +865,9 @@ requestpolicy.overlay = {
     // See https://www.requestpolicy.com/dev/ticket/38
     if (referrerURI && !(referrerURI instanceof Components.interfaces.nsIURI)) {
       if ("referrerURI" in referrerURI) {
-        referrerURI = referrerURI.referrerURI
+        referrerURI = referrerURI.referrerURI;
       } else {
-        referrerURI = null
+        referrerURI = null;
       }
     }
     if (referrerURI) {

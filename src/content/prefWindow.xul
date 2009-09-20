@@ -214,25 +214,25 @@
 		</groupbox>
 	</prefpane>
 
-    <prefpane id="requestpolicyPrefpaneAdvanced"
-        label="&preferences.prefpane.advanced;"
-        image="chrome://requestpolicy/skin/preferences/prefpane-advanced.png"
-        >
-        <preferences>
-            <preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
-            <preference id="pref-startWithAllowAllEnabled" name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool"/>
-        </preferences>
+	<prefpane id="requestpolicyPrefpaneAdvanced"
+		label="&preferences.prefpane.advanced;"
+		image="chrome://requestpolicy/skin/preferences/prefpane-advanced.png"
+		>
+		<preferences>
+			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
+			<preference id="pref-startWithAllowAllEnabled" name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool"/>
+		</preferences>
 
-        <groupbox>
-            <caption label="&preferences.webpages;"/>
-            <checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
-        </groupbox>
+		<groupbox>
+			<caption label="&preferences.webpages;"/>
+			<checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
+		</groupbox>
         
-        <groupbox>
-            <caption label="&preferences.misc;"/>
-            <checkbox id="indicateBlockedObjects" label="&preferences.startWithAllowAllEnabled;" preference="pref-startWithAllowAllEnabled"/>
-        </groupbox>
-    </prefpane>
+		<groupbox>
+			<caption label="&preferences.misc;"/>
+			<checkbox id="indicateBlockedObjects" label="&preferences.startWithAllowAllEnabled;" preference="pref-startWithAllowAllEnabled"/>
+		</groupbox>
+	</prefpane>
 
 	<!-- These mess up the prefwindow if they come before the prefpanes
 		 https://bugzilla.mozilla.org/show_bug.cgi?id=296418 -->

@@ -98,7 +98,7 @@ var RequestUtil = {
    * cases where the user has multiple tabs/windows open to the same page.
    * 
    * @param {}
-   *            document
+   *          document
    * @return {}
    */
   getOtherOrigins : function(document) {

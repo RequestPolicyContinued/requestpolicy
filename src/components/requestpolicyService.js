@@ -1116,7 +1116,7 @@ RequestPolicyService.prototype = {
    * This should be made to accept instances of a defined interface.
    * 
    * @param {}
-   *            observer
+   *          observer
    */
   addRequestObserver : function addRequestObserver(observer) {
     if (!("observeBlockedRequest" in observer)) {
@@ -1132,7 +1132,7 @@ RequestPolicyService.prototype = {
    * Remove an observer added through addRequestObserver().
    * 
    * @param {}
-   *            observer
+   *          observer
    */
   removeRequestObserver : function removeRequestObserver(observer) {
     for (var i = 0; i < this._requestObservers.length; i++) {
@@ -1377,9 +1377,9 @@ RequestPolicyService.prototype = {
    * Determines if a request is only related to internal resources.
    * 
    * @param {}
-   *            aContentLocation
+   *          aContentLocation
    * @param {}
-   *            aRequestOrigin
+   *          aRequestOrigin
    * @return {Boolean} true if the request is only related to internal
    *         resources.
    */
@@ -1459,9 +1459,9 @@ RequestPolicyService.prototype = {
    * the last call to shouldLoad() keeps duplicates out of log data.
    * 
    * @param {}
-   *            aContentLocation
+   *          aContentLocation
    * @param {}
-   *            aRequestOrigin
+   *          aRequestOrigin
    * @return {Boolean} true if the request a duplicate.
    */
   _isDuplicateRequest : function(dest, origin) {

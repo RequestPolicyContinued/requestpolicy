@@ -168,7 +168,7 @@ requestpolicy.overlay = {
    * listener for when the content of the window has changed (a page is loaded).
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   onLoad : function(event) {
     try {
@@ -269,11 +269,11 @@ requestpolicy.overlay = {
    * or with headers).
    * 
    * @param {document}
-   *            targetDocument
+   *          targetDocument
    * @param {String}
-   *            redirectTargetUri
+   *          redirectTargetUri
    * @param {int}
-   *            delay
+   *          delay
    */
   _showRedirectNotification : function(targetDocument, redirectTargetUri, delay) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
@@ -386,7 +386,7 @@ requestpolicy.overlay = {
    * Determines if documentToCheck is the main document loaded in any tab.
    * 
    * @param {document}
-   *            documentToCheck
+   *          documentToCheck
    * @return {Boolean}
    */
   _isTopLevelDocument : function(documentToCheck) {
@@ -404,7 +404,7 @@ requestpolicy.overlay = {
    * active tab.
    * 
    * @param {document}
-   *            documentToCheck
+   *          documentToCheck
    * @return {Boolean}
    */
   _isActiveTopLevelDocument : function(documentToCheck) {
@@ -425,7 +425,7 @@ requestpolicy.overlay = {
    * Things to do when a page has loaded (after images, etc., have been loaded).
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   onAppContentLoaded : function(event) {
     // TODO: This is getting called multiple times for a page, should only be
@@ -467,7 +467,7 @@ requestpolicy.overlay = {
    * Things to do when a page or a frame within the page has loaded.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   onAppFrameContentLoaded : function(event) {
     // TODO: This only works for (i)frames that are direct children of the main
@@ -690,7 +690,7 @@ requestpolicy.overlay = {
    * called for more than just the page content DOM. It seems to work for now.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   _onDOMContentLoaded : function(document) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -856,9 +856,9 @@ requestpolicy.overlay = {
    * This is called by the modified addTab().
    * 
    * @param {String}
-   *            url
+   *          url
    * @param {nsIURI/hash}
-   *            referrerURI
+   *          referrerURI
    */
   tabAdded : function(url, referrerURI) {
     // The second argument to addTab was changed to a hash.
@@ -887,7 +887,7 @@ requestpolicy.overlay = {
    * shouldLoad().
    * 
    * @param {Window}
-   *            window
+   *          window
    */
   _wrapWindowOpen : function(window) {
     const rpService = this._rpService;
@@ -1004,7 +1004,7 @@ requestpolicy.overlay = {
    * Called before the popup menu is shown.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   onMenuShowing : function(event) {
     if (event.currentTarget != event.originalTarget) {
@@ -1017,7 +1017,7 @@ requestpolicy.overlay = {
    * Called after the popup menu is hidden.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   onMenuHidden : function(event) {
     if (event.currentTarget != event.originalTarget) {
@@ -1061,7 +1061,7 @@ requestpolicy.overlay = {
    * Toggles disabling of all blocking for the current session.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   toggleTemporarilyAllowAll : function(event) {
     // TODO: Refactor to use a function call to disable blocking.
@@ -1087,7 +1087,7 @@ requestpolicy.overlay = {
    * the duration of the browser session.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   temporarilyAllowCurrentOrigin : function(event) {
     // Note: the available variable "content" is different than the avaialable
@@ -1102,7 +1102,7 @@ requestpolicy.overlay = {
    * the browser session.
    * 
    * @param {String}
-   *            destHost
+   *          destHost
    */
   temporarilyAllowDestination : function(destHost) {
     this._rpService.temporarilyAllowDestination(destHost);
@@ -1114,9 +1114,9 @@ requestpolicy.overlay = {
    * of the browser session.
    * 
    * @param {String}
-   *            originHost
+   *          originHost
    * @param {String}
-   *            destHost
+   *          destHost
    */
   temporarilyAllowOriginToDestination : function(originHost, destHost) {
     this._rpService.temporarilyAllowOriginToDestination(originHost, destHost);
@@ -1136,7 +1136,7 @@ requestpolicy.overlay = {
    * including in future browser sessions.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   allowCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
@@ -1148,7 +1148,7 @@ requestpolicy.overlay = {
    * Allows requests to a destination, including in future browser sessions.
    * 
    * @param {String}
-   *            destHost
+   *          destHost
    */
   allowDestination : function(destHost) {
     this._rpService.allowDestination(destHost);
@@ -1160,9 +1160,9 @@ requestpolicy.overlay = {
    * browser sessions.
    * 
    * @param {String}
-   *            originHost
+   *          originHost
    * @param {String}
-   *            destHost
+   *          destHost
    */
   allowOriginToDestination : function(originHost, destHost) {
     this._rpService.allowOriginToDestination(originHost, destHost);
@@ -1184,7 +1184,7 @@ requestpolicy.overlay = {
    * been given.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   forbidCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
@@ -1197,7 +1197,7 @@ requestpolicy.overlay = {
    * temporary or permanent request permissions the destination had been given.
    * 
    * @param {String}
-   *            destHost
+   *          destHost
    */
   forbidDestination : function(destHost) {
     this._rpService.forbidDestination(destHost);
@@ -1210,9 +1210,9 @@ requestpolicy.overlay = {
    * been given.
    * 
    * @param {String}
-   *            originHost
+   *          originHost
    * @param {String}
-   *            destHost
+   *          destHost
    */
   forbidOriginToDestination : function(originHost, destHost) {
     this._rpService.forbidOriginToDestination(originHost, destHost);
@@ -1223,7 +1223,7 @@ requestpolicy.overlay = {
    * Revokes all temporary permissions granted during the current session.
    * 
    * @param {Event}
-   *            event
+   *          event
    */
   revokeTemporaryPermissions : function(event) {
     this._rpService.revokeTemporaryPermissions();

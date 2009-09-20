@@ -28,7 +28,7 @@ var FileUtil = {
    * Returns the lines of the file in an array.
    * 
    * @param {nsIFile}
-   *            file
+   *          file
    */
   fileToArray : function(file) {
     var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
@@ -49,9 +49,9 @@ var FileUtil = {
    * it exists, creates it if it doesn't).
    * 
    * @param {Array}
-   *            lines
+   *          lines
    * @param {nsIFile}
-   *            file
+   *          file
    */
   arrayToFile : function(lines, file) {
     var stream = Components.classes["@mozilla.org/network/file-output-stream;1"]

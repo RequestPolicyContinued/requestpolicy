@@ -257,7 +257,7 @@ requestpolicy.prefWindow = {
    * Create a cell for the "temporary" indicator.
    * 
    * @param {Boolean}
-   *            isTemporary
+   *          isTemporary
    * @return {listcell}
    */
   _createTemporaryPermissionsCell : function(isTemporary) {

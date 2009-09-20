@@ -85,7 +85,7 @@ DomainUtil.identifierIsInUri = function(identifier, uri, level) {
  * Returns the hostname from a uri string.
  * 
  * @param {String}
- *            uri The uri.
+ *          uri The uri.
  * @return {String} The hostname of the uri or throws an exception if it is an
  *         invalid uri.
  */
@@ -97,7 +97,7 @@ DomainUtil.getHost = function(uri) {
  * Returns an nsIURI object from a uri string.
  * 
  * @param {String}
- *            uri The uri.
+ *          uri The uri.
  * @return {nsIURI} The nsIURI object created from the uri, or throws an
  *         exception if it is an invalid uri.
  */
@@ -110,7 +110,7 @@ DomainUtil.getUriObject = function(uri) {
  * Determines whether a uri string represents a valid uri.
  * 
  * @param {String}
- *            uri The uri.
+ *          uri The uri.
  * @return {boolean} True if the uri is valid, false otherwise.
  */
 DomainUtil.isValidUri = function(uri) {
@@ -126,7 +126,7 @@ DomainUtil.isValidUri = function(uri) {
  * Returns the domain from a uri string.
  * 
  * @param {String}
- *            uri The uri.
+ *          uri The uri.
  * @return {String} The domain of the uri.
  */
 DomainUtil.getDomain = function(uri) {
@@ -148,7 +148,7 @@ DomainUtil.getDomain = function(uri) {
  * Returns the prePath from a uri string.
  * 
  * @param {String}
- *            uri The uri.
+ *          uri The uri.
  * @return {String} The prePath of the uri.
  */
 DomainUtil.getPrePath = function(uri) {
@@ -159,7 +159,7 @@ DomainUtil.getPrePath = function(uri) {
  * Strips any "www." from the beginning of a hostname.
  * 
  * @param {String}
- *            hostname The hostname to strip.
+ *          hostname The hostname to strip.
  * @return {String} The hostname with any leading "www." removed.
  */
 DomainUtil.stripWww = function(hostname) {
@@ -170,9 +170,9 @@ DomainUtil.stripWww = function(hostname) {
  * Determine if two hostnames are the same if any "www." prefix is ignored.
  * 
  * @param {String}
- *            destinationHost The destination hostname.
+ *          destinationHost The destination hostname.
  * @param {String}
- *            originHost The origin hostname.
+ *          originHost The origin hostname.
  * @return {Boolean} True if the hostnames are the same regardless of "www.",
  *         false otherwise.
  */
@@ -194,9 +194,9 @@ DomainUtil.stripFragment = function(uri) {
  * "images.example.com".
  * 
  * @param {String}
- *            destinationHost The destination hostname.
+ *          destinationHost The destination hostname.
  * @param {String}
- *            originHost The origin hostname.
+ *          originHost The origin hostname.
  * @return {Boolean} True if the destination hostname is a subdomain of the
  *         origin hostname.
  */
@@ -219,8 +219,7 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  * Gets the relevant pieces out of a meta refresh or header refresh string.
  * 
  * @param {String}
- *            refreshString The original content of a refresh header or meta
- *            tag..
+ *          refreshString The original content of a refresh header or meta tag.
  * @return {Array} First element is the delay in seconds, second element is the
  *         url to refresh to.
  */
@@ -241,7 +240,7 @@ DomainUtil.parseRefresh = function(refreshString) {
  * uri if the provided one is not valid.
  * 
  * @param {String}
- *            uri
+ *          uri
  * @return {String}
  */
 DomainUtil.ensureUriHasPath = function(uri) {

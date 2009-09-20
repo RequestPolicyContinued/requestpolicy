@@ -165,6 +165,8 @@ requestpolicy.menu = {
       this._itemAllowOrigin.hidden = true;
       this._itemForbidOrigin.hidden = true;
 
+      var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled();
+
       var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
       this._itemPrefetchWarning.hidden = hidePrefetchInfo;
       this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
@@ -175,7 +177,7 @@ requestpolicy.menu = {
         this._itemForbidOrigin.hidden = false;
       } else {
         this._itemAllowOriginTemporarily.hidden = false;
-        this._itemAllowOrigin.hidden = false;
+        this._itemAllowOrigin.hidden = privateBrowsingEnabled;
       }
 
       if (this._rpService.areTemporaryPermissionsGranted()) {
@@ -200,12 +202,16 @@ requestpolicy.menu = {
         var submenu = this.addBlockedDestination(this._menu,
             this._blockedDestinationsBeforeReferenceItem, destIdentifier, true);
         this.addMenuItemTemporarilyAllowDest(submenu, destIdentifier);
-        this.addMenuItemAllowDest(submenu, destIdentifier);
+        if (!privateBrowsingEnabled) {
+          this.addMenuItemAllowDest(submenu, destIdentifier);
+        }
         this.addMenuSeparator(submenu);
         this.addMenuItemTemporarilyAllowOriginToDest(submenu,
             currentIdentifier, destIdentifier);
-        this.addMenuItemAllowOriginToDest(submenu, currentIdentifier,
-            destIdentifier);
+        if (!privateBrowsingEnabled) {
+          this.addMenuItemAllowOriginToDest(submenu, currentIdentifier,
+              destIdentifier);
+        }
       }
 
       // Add new menu items giving options to forbid currently accepted

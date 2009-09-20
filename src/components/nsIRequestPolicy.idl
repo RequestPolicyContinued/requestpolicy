@@ -51,6 +51,7 @@ interface nsIRequestPolicy : nsISupports
   
   boolean isPrefetchEnabled();
   boolean isBlockingDisabled();
+  boolean isPrivateBrowsingEnabled();
   
   boolean originHasRejectedRequests(in ACString originUri);
   boolean originHasRejectedRequestsRecursive(in ACString originUri);

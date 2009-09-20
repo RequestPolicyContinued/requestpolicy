@@ -130,6 +130,8 @@ RequestPolicyService.prototype = {
 
   _compatibilityRules : [],
 
+  _privateBrowsingEnabled : null,
+
   // /////////////////////////////////////////////////////////////////////////
   // Utility
   // /////////////////////////////////////////////////////////////////////////
@@ -139,6 +141,7 @@ RequestPolicyService.prototype = {
     this._initContentPolicy();
     this._register();
     this._initializePrefSystem();
+    this._initializePrivateBrowsing();
     // Note that we don't load user preferences at this point because the user
     // preferences may not be ready. If we tried right now, we may get the
     // default preferences.
@@ -298,6 +301,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
+    os.addObserver(this, "private-browsing", false);
   },
 
   _unregister : function() {
@@ -374,6 +378,12 @@ RequestPolicyService.prototype = {
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
         requestpolicy.mod);
+  },
+
+  _initializePrivateBrowsing : function() {
+    var pbs = Components.classes["@mozilla.org/privatebrowsing;1"]
+        .getService(Components.interfaces.nsIPrivateBrowsingService);
+    this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
   },
 
   _examineHttpResponse : function(observedSubject) {
@@ -1059,6 +1069,10 @@ RequestPolicyService.prototype = {
     return this._blockingDisabled;
   },
 
+  isPrivateBrowsingEnabled : function isPrivateBrowsingEnabled() {
+    return this._privateBrowsingEnabled;
+  },
+
   originHasRejectedRequests : function(originUri) {
     return this._originHasRejectedRequestsHelper(originUri, {});
   },
@@ -1187,6 +1201,14 @@ RequestPolicyService.prototype = {
         // what is needed to allow their requests.
         this._initializeExtensionCompatibility();
         this._initializeApplicationCompatibility();
+        break;
+      case "private-browsing" :
+        if (data == "enter") {
+          this._privateBrowsingEnabled = true;
+        } else if (data == "exit") {
+          this._privateBrowsingEnabled = false;
+          this.revokeTemporaryPermissions();
+        }
         break;
       case "app-startup" :
         this._init();

@@ -1303,8 +1303,8 @@ RequestPolicyService.prototype = {
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
   // cases we just return CP_OK rather than return this function which
-  // ultimately returns CP_OK. Third param, "unrecorded", is set to true if
-  // this request shouldn'tbe recorded as an allowed request.
+  // ultimately returns CP_OK. Third param, "unforbidable", is set to true if
+  // this request shouldn't be recorded as an allowed request.
   accept : function(reason, args, unforbidable) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** ALLOWED ** reason: "
@@ -1611,12 +1611,17 @@ RequestPolicyService.prototype = {
         }
 
         if (aRequestOrigin.scheme == "chrome") {
+          // We use the third argument to accept ("unforbidable/unrecorded") so
+          // that we don't make available a list of all of these requested
+          // destinations if a user views a chrome url directly.
+          // See https://www.requestpolicy.com/dev/ticket/35
           if (originHost == "browser") {
-            // "browser" origin shows up for favicon.ico and adderss entered in
-            // address bar.
+            // "browser" origin shows up for favicon.ico and an address entered
+            // in address bar.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments);
+                    + "explanation (e.g. new window/tab opened)", arguments,
+                true);
           } else {
             // TODO: It seems sketchy to allow all requests from chrome. If I
             // had to put my money on a possible bug (in terms of not blocking
@@ -1627,7 +1632,8 @@ RequestPolicyService.prototype = {
             // me know, I will be very grateful.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments);
+                    + "explanation (e.g. new window/tab opened)", arguments,
+                true);
           }
         }
 

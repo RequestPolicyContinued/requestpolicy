@@ -25,6 +25,15 @@ var EXPORTED_SYMBOLS = ["DomainUtil"]
 const CI = Components.interfaces;
 const CC = Components.classes;
 
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
+}
+
+Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
+
 var DomainUtil = {};
 
 DomainUtil._ios = CC["@mozilla.org/network/io-service;1"]
@@ -42,38 +51,36 @@ DomainUtil.LEVEL_SOP = 3;
 
 DomainUtil.getIdentifier = function(uri, level) {
   var identifier;
+  var identifierGettingFunctionName;
   switch (level) {
     case this.LEVEL_DOMAIN :
-      try {
-        identifier = this.getDomain(uri);
-        if (identifier) {
-          return identifier;
-        }
-      } catch (e) {
-        // fall through
-      }
+      identifierGettingFunctionName = "getDomain";
+      break;
     case this.LEVEL_HOST :
-      try {
-        identifier = this.getHost(uri);
-        if (identifier) {
-          return identifier;
-        }
-      } catch (e) {
-        // fall through
-      }
-
+      identifierGettingFunctionName = "getHost";
+      break;
     case this.LEVEL_SOP :
-      try {
-        identifier = this.getPrePath(uri);
-        if (identifier) {
-          return identifier;
-        }
-      } catch (e) {
-        // fall through
-      }
-
+      identifierGettingFunctionName = "getPrePath";
+      break;
     default :
-      return uri;
+      throw "Invalid identifier level specified in DomainUtil.getIdentifier().";
+  }
+
+  try {
+    identifier = this[identifierGettingFunctionName](uri);
+  } catch (e) {
+    // This will happen not infrequently with chrome:// and similar values
+    // for the uri that get passed to this function.
+    identifier = false;
+  }
+
+  if (identifier) {
+    return identifier;
+  } else {
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Unable to getIdentifier from uri " + uri + " using identifier level "
+            + level + ".");
+    return uri;
   }
 };
 
@@ -248,5 +255,26 @@ DomainUtil.ensureUriHasPath = function(uri) {
     return this._ios.newURI(uri, null, null).spec;
   } catch (e) {
     return uri;
+  }
+}
+
+/**
+ * Given an origin URI string and a destination path to redirect to, returns a
+ * string which is a valid uri which will be/should be redirected to. This takes
+ * into account whether the destPath is an absolute path (starts with a slash)
+ * or is relative to the originUri path.
+ * 
+ * @param {String}
+ *          originUri
+ * @param {String}
+ *          destPath
+ * @return {String}
+ */
+DomainUtil.determineRedirectUri = function(originUri, destPath) {
+  if (destPath[0] == '/') {
+    return this.getPrePath(originUri) + destPath
+  } else {
+    var curDir = originUri.split("/").slice(0, -1).join("/");
+    return curDir + "/" + destPath;
   }
 }

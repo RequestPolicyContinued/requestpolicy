@@ -416,6 +416,22 @@ RequestPolicyService.prototype = {
 
     var origin = httpChannel.name;
 
+    // If it's not a valid uri, the redirect is relative to the origin host.
+    // The way we have things written currently, without this check the full
+    // dest string will get treated as the destination and displayed in the
+    // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
+    // We add this to fix https://www.requestpolicy.com/dev/ticket/39.
+    if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
+      var destAsUri = requestpolicy.mod.DomainUtil.determineRedirectUri(origin,
+          dest);
+      requestpolicy.mod.Logger.warning(
+          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+          "Redirect destination is not a valid uri, assuming dest <" + dest
+              + "> from origin <" + origin + "> is actually dest <" + destAsUri
+              + ">.");
+      dest = destAsUri;
+    }
+
     if (this.isAllowedRedirect(origin, dest)) {
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"

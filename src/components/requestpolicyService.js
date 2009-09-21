@@ -381,9 +381,13 @@ RequestPolicyService.prototype = {
   },
 
   _initializePrivateBrowsing : function() {
-    var pbs = Components.classes["@mozilla.org/privatebrowsing;1"]
-        .getService(Components.interfaces.nsIPrivateBrowsingService);
-    this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
+    try {
+      var pbs = Components.classes["@mozilla.org/privatebrowsing;1"]
+          .getService(Components.interfaces.nsIPrivateBrowsingService);
+      this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
+    } catch (e) {
+      // Ignore exceptions from browsers that do not support private browsing.
+    }
   },
 
   _examineHttpResponse : function(observedSubject) {

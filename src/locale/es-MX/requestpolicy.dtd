@@ -17,7 +17,7 @@
 <!ENTITY preferences.prefpane.whitelist "Lista Permitida">
 <!ENTITY preferences.prefpane.import "Importar">
 <!ENTITY preferences.prefpane.export "Exportar">
-<!ENTITY preferences.prefpane.advanced "Advanced">
+<!ENTITY preferences.prefpane.advanced "Avanzado">
 <!ENTITY preferences.strictness "Precisión">
 <!ENTITY preferences.baseDomain "Dominio base (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Dominio completo (www.requestpolicy.com)">
@@ -26,8 +26,8 @@
 <!ENTITY preferences.statusbarIcon "Icono de la barra de estatus">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas">
 <!ENTITY preferences.openInitialSetup "Abrir la herramienta de configuracion inicial">
-<!ENTITY preferences.misc "Miscellaneous">
-<!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
+<!ENTITY preferences.misc "Miscelaneos">
+<!ENTITY preferences.startWithAllowAllEnabled "Cuando inicie el navegador habilitar 'Temporalmente permitir todas las peticiones'">
 <!ENTITY preferences.origins "Orígenes">
 <!ENTITY preferences.destinations "Destinos">
 <!ENTITY preferences.originsToDestinations "Origenes-a-Destinos">

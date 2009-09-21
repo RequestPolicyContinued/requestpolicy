@@ -13,7 +13,7 @@
 <!ENTITY rp.allow "Дозволити">
 <!ENTITY preferences "Вподобання">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
-<!ENTITY preferences.prefpane.general "General">
+<!ENTITY preferences.prefpane.general "Загальні">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
 <!ENTITY preferences.prefpane.import "Імпорт">
 <!ENTITY preferences.prefpane.export "Експорт">

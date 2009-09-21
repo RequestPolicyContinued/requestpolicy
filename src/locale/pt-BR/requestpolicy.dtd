@@ -6,54 +6,54 @@
 <!ENTITY blockedDestinations "Destinos bloqueados">
 <!ENTITY allowedDestinations "Destinos permitidos">
 <!ENTITY otherOrigins "Outras origens nesta página">
-<!ENTITY menu.openRequestLog.label "Show Request Log">
-<!ENTITY menu.closeRequestLog.label "Close Request Log">
-<!ENTITY rp.origin "Origin">
-<!ENTITY rp.destination "Destination">
+<!ENTITY menu.openRequestLog.label "Exibir lista de pedidos">
+<!ENTITY menu.closeRequestLog.label "Ocultar lista de pedidos">
+<!ENTITY rp.origin "Origem">
+<!ENTITY rp.destination "Destino">
 <!ENTITY rp.allow "Permitir">
-<!ENTITY preferences "Preferências">
-<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
-<!ENTITY preferences.prefpane.general "General">
-<!ENTITY preferences.prefpane.whitelist "Whitelist">
-<!ENTITY preferences.prefpane.import "Import">
-<!ENTITY preferences.prefpane.export "Export">
+<!ENTITY preferences "Preferências...">
+<!ENTITY preferences.windowTitle "Preferências do RequestPolicy">
+<!ENTITY preferences.prefpane.general "Geral">
+<!ENTITY preferences.prefpane.whitelist "Permissões">
+<!ENTITY preferences.prefpane.import "Importar">
+<!ENTITY preferences.prefpane.export "Exportar">
 <!ENTITY preferences.prefpane.advanced "Advanced">
-<!ENTITY preferences.strictness "Strictness">
-<!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Web pages">
-<!ENTITY preferences.statusbarIcon "Status bar icon">
-<!ENTITY preferences.indicateBlockedObjects "Indicate blocked images">
-<!ENTITY preferences.openInitialSetup "Open initial setup tool">
+<!ENTITY preferences.strictness "Rigidez">
+<!ENTITY preferences.baseDomain "Domínio base (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Domínio completo (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Endereço completo (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Exibição da página">
+<!ENTITY preferences.statusbarIcon "Aparência na barra de status">
+<!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
+<!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
 <!ENTITY preferences.misc "Miscellaneous">
 <!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
-<!ENTITY preferences.origins "Origins">
-<!ENTITY preferences.destinations "Destinations">
-<!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
-<!ENTITY preferences.temporary "Temporary">
-<!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
-<!ENTITY preferences.export "Export">
-<!ENTITY preferences.export.caption "Export Your Setting">
-<!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
-<!ENTITY preferences.export.details.caption "What is included in the export">
-<!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
-<!ENTITY preferences.export.button.label "Export to File">
-<!ENTITY preferences.import "Import">
-<!ENTITY preferences.import.caption "Import Your Setting">
-<!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
-<!ENTITY preferences.import.details.caption "What the import will do">
-<!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
-<!ENTITY preferences.import.button.label "Import from File">
-<!ENTITY requestLog.title "Request Log">
-<!ENTITY requestLog.blocked "Blocked">
-<!ENTITY requestLog.time "Time">
-<!ENTITY initialSetup.title "Initial Setup">
-<!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
-<!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
-<!ENTITY initialSetup.region.international "International">
-<!ENTITY initialSetup.region.americas "Americas">
-<!ENTITY initialSetup.region.asia "Asia">
-<!ENTITY initialSetup.region.usAndCanada "US and Canada">
-<!ENTITY initialSetup.region.europeAndRussia "Europe and Russia">
+<!ENTITY preferences.origins "Origens">
+<!ENTITY preferences.destinations "Destinos">
+<!ENTITY preferences.originsToDestinations "Pares origem-destino">
+<!ENTITY preferences.temporary "Temporário">
+<!ENTITY preferences.removeSelectedSites "Remover entradas selecionadas">
+<!ENTITY preferences.export "Exportar">
+<!ENTITY preferences.export.caption "Exportar as suas configurações">
+<!ENTITY preferences.export.description "Você pode exportar sua lista de permissões para fazer uma cópia de segurança. Para usar a mesma lista em outro computador basta transferir para ele o arquivo exportado e usar o recurso de importação do RequestPolicy.">
+<!ENTITY preferences.export.details.caption "O que será incluído na exportação?">
+<!ENTITY preferences.export.details.description "O arquivo exportado conterá as origens, os destinos e os pares origem-destino que você adicionou à lista de permissões. Não serão incluídas as permissões temporárias.">
+<!ENTITY preferences.export.button.label "Exportar para arquivo">
+<!ENTITY preferences.import "Importar">
+<!ENTITY preferences.import.caption "Importar as suas configurações">
+<!ENTITY preferences.import.description "Você pode importar sua lista de permissões a partir da cópia de segurança feita através do recurso de exportação do RequestPolicy.">
+<!ENTITY preferences.import.details.caption "O que a importação alterará na lista de permissões atual?">
+<!ENTITY preferences.import.details.description "A importação adicionará as origens, os destinos e os pares origem-destino presentes no arquivo importado. Nenhuma entrada será removida da lista de permissões atual. Assim, a importação complementará a lista de permissões atual com as entradas do arquivo importado.">
+<!ENTITY preferences.import.button.label "Importar de arquivo">
+<!ENTITY requestLog.title "Pedidos nesta página">
+<!ENTITY requestLog.blocked "Bloqueado">
+<!ENTITY requestLog.time "Hora">
+<!ENTITY initialSetup.title "Configuração inicial">
+<!ENTITY initialSetup.whitelist.caption "Adicione a sua lista de permissões algumas entradas comuns">
+<!ENTITY initialSetup.whitelist.description "Estas permissões são aqui sugeridas por (1) envolverem pedidos entre servidores de uma mesma empresa ou (2) resolverem problemas que você poderá ter durante a navegação com muito pouco impacto em sua privacidade e segurança.">
+<!ENTITY initialSetup.region.international "Internacional">
+<!ENTITY initialSetup.region.americas "Américas">
+<!ENTITY initialSetup.region.asia "Ásia">
+<!ENTITY initialSetup.region.usAndCanada "Estados Unidos e Canadá">
+<!ENTITY initialSetup.region.europeAndRussia "Europa e Rússia">
 <!ENTITY initialSetup.region.oceania "Oceania">

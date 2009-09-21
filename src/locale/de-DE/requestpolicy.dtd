@@ -14,10 +14,10 @@
 <!ENTITY preferences "Einstellungen">
 <!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
 <!ENTITY preferences.prefpane.general "Allgemein">
-<!ENTITY preferences.prefpane.whitelist "Erlaubt Seiten">
+<!ENTITY preferences.prefpane.whitelist "Erlaubte Seiten">
 <!ENTITY preferences.prefpane.import "Import">
 <!ENTITY preferences.prefpane.export "Export">
-<!ENTITY preferences.prefpane.advanced "Advanced">
+<!ENTITY preferences.prefpane.advanced "Erweitert">
 <!ENTITY preferences.strictness "Regelstruktur">
 <!ENTITY preferences.baseDomain "Domain (z. B. requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Host (z. B. www.requestpolicy.com)">
@@ -26,8 +26,8 @@
 <!ENTITY preferences.statusbarIcon "Statusleistensymbol">
 <!ENTITY preferences.indicateBlockedObjects "Blockierte Grafiken durch Platzhalter ersetzen">
 <!ENTITY preferences.openInitialSetup "Erstkonfiguration öffnen">
-<!ENTITY preferences.misc "Miscellaneous">
-<!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
+<!ENTITY preferences.misc "Sonstiges">
+<!ENTITY preferences.startWithAllowAllEnabled "'Alle Anfragen temporär erlauben' beim Browser-Start aktivieren">
 <!ENTITY preferences.origins "Quellen">
 <!ENTITY preferences.destinations "Ziele">
 <!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">

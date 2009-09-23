@@ -130,7 +130,7 @@ RequestPolicyService.prototype = {
 
   _compatibilityRules : [],
 
-  _privateBrowsingEnabled : null,
+  _privateBrowsingEnabled : false,
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility

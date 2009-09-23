@@ -194,6 +194,16 @@ RequestPolicyService.prototype = {
             "version" : ext.version
           });
     }
+    // Brief
+    if (ext = em.getItemForID("brief@mozdev.org")) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Extension detected: " + ext.name);
+      this._conflictingExtensions.push({
+            "id" : ext.id,
+            "name" : ext.name,
+            "version" : ext.version
+          });
+    }
   },
 
   _initializeApplicationCompatibility : function() {

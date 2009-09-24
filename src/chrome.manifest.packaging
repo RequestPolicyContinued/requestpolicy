@@ -9,6 +9,7 @@ locale     requestpolicy    ko-KR          jar:chrome/requestpolicy.jar!/locale/
 locale     requestpolicy    nl-NL          jar:chrome/requestpolicy.jar!/locale/nl-NL/
 locale     requestpolicy    pt-BR          jar:chrome/requestpolicy.jar!/locale/pt-BR/
 locale     requestpolicy    ru-RU          jar:chrome/requestpolicy.jar!/locale/ru-RU/
+locale     requestpolicy    tr-TR          jar:chrome/requestpolicy.jar!/locale/tr-TR/
 locale     requestpolicy    uk-UA          jar:chrome/requestpolicy.jar!/locale/uk-UA/
 locale     requestpolicy    zh-CN          jar:chrome/requestpolicy.jar!/locale/zh-CN/
 

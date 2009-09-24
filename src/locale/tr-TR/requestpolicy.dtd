@@ -1,0 +1,59 @@
+<!ENTITY prefetchWarning "Uyarı: Önbellek aktif">
+<!ENTITY prefetchInfo "Önbellek hakkında bilgi">
+<!ENTITY prefetchDisablingInstructions "Önbelleği kapat">
+<!ENTITY temporarilyAllowAll "Geçici olarak tümüne izin ver">
+<!ENTITY revokeTemporaryPermissions "Bütün izinleri geri al">
+<!ENTITY blockedDestinations "Yasaklı sayfalar">
+<!ENTITY allowedDestinations "İzinli sayfalar">
+<!ENTITY otherOrigins "Diğer ana sitelerle ilişkili">
+<!ENTITY menu.openRequestLog.label "İzin talep kayıtları">
+<!ENTITY menu.closeRequestLog.label "Kayıtları kapat">
+<!ENTITY rp.origin "Ana">
+<!ENTITY rp.destination "Hedef">
+<!ENTITY rp.allow "İzin ver">
+<!ENTITY preferences "Seçenekler">
+<!ENTITY preferences.windowTitle "RequestPolicy Seçenekleri">
+<!ENTITY preferences.prefpane.general "Genel">
+<!ENTITY preferences.prefpane.whitelist "Beyazliste">
+<!ENTITY preferences.prefpane.import "İçeri">
+<!ENTITY preferences.prefpane.export "Dışarı">
+<!ENTITY preferences.prefpane.advanced "Gelişmiş">
+<!ENTITY preferences.strictness "Sıkı">
+<!ENTITY preferences.baseDomain "Ana adres (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Tam site (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Tam adres (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Web sayfaları">
+<!ENTITY preferences.statusbarIcon "Durum çubuğu">
+<!ENTITY preferences.indicateBlockedObjects "Bloklanan resimi işaretle">
+<!ENTITY preferences.openInitialSetup "Yükleme sihirbazını aç">
+<!ENTITY preferences.misc "Çeşitli">
+<!ENTITY preferences.startWithAllowAllEnabled "Aktif et 'Bütün sayfalara izin veri' tarayıcıyı her açışta">
+<!ENTITY preferences.origins "Ana">
+<!ENTITY preferences.destinations "Hedef">
+<!ENTITY preferences.originsToDestinations "Ana-dan-Hedefe">
+<!ENTITY preferences.temporary "Geçici">
+<!ENTITY preferences.removeSelectedSites "Seçileni sil">
+<!ENTITY preferences.export "Dışarı">
+<!ENTITY preferences.export.caption "Ayarları kaydet">
+<!ENTITY preferences.export.description "Buradan beyaz listenizi yedekleyebilirsiniz.Beyaz listesini geri yüklemek için içeri özelliğini kullanarak dosyayı aktarın.">
+<!ENTITY preferences.export.details.caption "Dosyada neler var">
+<!ENTITY preferences.export.details.description "Dosyada ana,hedef,ana-dan-hedefe izin verilen siteler var.Geçici olarak izin verilen siteler içinde bulunmaz.">
+<!ENTITY preferences.export.button.label "Dosyayı çıkar">
+<!ENTITY preferences.import "İçeri">
+<!ENTITY preferences.import.caption "İçeri aktar">
+<!ENTITY preferences.import.description "Beyaz listenizi buradan yükleyebilirsiniz.">
+<!ENTITY preferences.import.details.caption "İçeri neleri aktarır">
+<!ENTITY preferences.import.details.description "Dosyada ana,hedef,ana-dan-hedefe izin verilen siteler bulunur.Şu an kullandığınız beyaz listeden hiç bir şey silinmez.Siteler şu an kullandığınız listeye eklenir.">
+<!ENTITY preferences.import.button.label "Dosyadan yükle">
+<!ENTITY requestLog.title "Kayıtlar">
+<!ENTITY requestLog.blocked "Yasaklı">
+<!ENTITY requestLog.time "Zaman">
+<!ENTITY initialSetup.title "İlk yükleme">
+<!ENTITY initialSetup.whitelist.caption "Beyaz listenize bağlantıları  ekleyin">
+<!ENTITY initialSetup.whitelist.description "Bu listesi siteler (1) Aynı kuruluşlardandır veya (2) yaşayabileceğiniz sıkıntıları en az düzeye indirir ve çok az güvenlik,gizliliği etkiler.">
+<!ENTITY initialSetup.region.international "Uluslararası">
+<!ENTITY initialSetup.region.americas "Amerika">
+<!ENTITY initialSetup.region.asia "Asya">
+<!ENTITY initialSetup.region.usAndCanada "Abd ve Kanada">
+<!ENTITY initialSetup.region.europeAndRussia "Avrupa ve Rusya">
+<!ENTITY initialSetup.region.oceania "Okyanus">

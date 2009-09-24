@@ -9,6 +9,7 @@ locale     requestpolicy    ko-KR          locale/ko-KR/
 locale     requestpolicy    nl-NL          locale/nl-NL/
 locale     requestpolicy    pt-BR          locale/pt-BR/
 locale     requestpolicy    ru-RU          locale/ru-RU/
+locale     requestpolicy    tr-TR          locale/tr-TR/
 locale     requestpolicy    uk-UA          locale/uk-UA/
 locale     requestpolicy    zh-CN          locale/zh-CN/
 

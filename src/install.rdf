@@ -5,7 +5,7 @@
 
 	<Description about="urn:mozilla:install-manifest">
 		<em:name>RequestPolicy</em:name>
-		<em:version>0.5.9</em:version>
+		<em:version>0.5.10b1</em:version>
 		<em:type>2</em:type>
 		<em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
 		<em:creator>Justin Samuel</em:creator>

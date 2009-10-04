@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Export">
 <!ENTITY preferences.prefpane.advanced "Advanced">
 <!ENTITY preferences.strictness "Strictness">
+<!ENTITY preferences.strictness.description "The level of classification to use for allowing same-site requests. After changing this, the menu will start out empty for each currently open tab.">
 <!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">

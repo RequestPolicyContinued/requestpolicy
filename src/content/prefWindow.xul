@@ -48,7 +48,8 @@
 
 		<groupbox>
 			<caption label="&preferences.strictness;"/>
-			<radiogroup id="uriIdentificationLevel" preference="pref-uriIdentificationLevel">
+			<description>&preferences.strictness.description;</description>
+			<radiogroup id="uriIdentificationLevel" preference="pref-uriIdentificationLevel" onsynctopreference="requestpolicy.prefWindow.uriIdentificationLevelChanged(this.value)">
 				<radio label="&preferences.baseDomain;" value="1"/>
 				<radio label="&preferences.fullDomain;" value="2"/>
 				<radio label="&preferences.fullAddress;" value="3"/>

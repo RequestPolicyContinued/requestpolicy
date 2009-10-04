@@ -163,6 +163,19 @@ requestpolicy.prefWindow = {
     }
   },
 
+  /**
+   * Clears the data we have about allowed and blocked requests for the current
+   * session because it will no longer be relevant with the uri identification
+   * level having been changed. Not clearing this out results in odd and
+   * confusing content in the menu. Attempting to make the information valid for
+   * the new identification level will only lead to more confusion, as what
+   * would be shown in the menu really wouldn't be correct still.
+   */
+  uriIdentificationLevelChanged : function(level) {
+    this._rpServiceJSObject._rejectedRequests = {};
+    this._rpServiceJSObject._allowedRequests = {};
+  },
+
   _clearListbox : function(listbox) {
     for (var i = listbox.itemCount - 1; i >= 0; i--) {
       listbox.removeItemAt(i);

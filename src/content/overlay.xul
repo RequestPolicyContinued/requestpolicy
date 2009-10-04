@@ -160,6 +160,8 @@
 			<menuitem 
 				id="requestpolicyForbidOrigin"
 				oncommand="requestpolicy.overlay.forbidCurrentOrigin(event);" />
+			<menuitem 
+				id="requestpolicyUnrestrictedOrigin" />
 		</menupopup>
 	</popupset>
 

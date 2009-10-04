@@ -1647,17 +1647,12 @@ RequestPolicyService.prototype = {
         }
 
         if (aRequestOrigin.scheme == "chrome") {
-          // We use the third argument to accept ("unforbidable/unrecorded") so
-          // that we don't make available a list of all of these requested
-          // destinations if a user views a chrome url directly.
-          // See https://www.requestpolicy.com/dev/ticket/35
           if (originHost == "browser") {
             // "browser" origin shows up for favicon.ico and an address entered
             // in address bar.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments,
-                true);
+                    + "explanation (e.g. new window/tab opened)", arguments);
           } else {
             // TODO: It seems sketchy to allow all requests from chrome. If I
             // had to put my money on a possible bug (in terms of not blocking
@@ -1668,8 +1663,7 @@ RequestPolicyService.prototype = {
             // me know, I will be very grateful.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments,
-                true);
+                    + "explanation (e.g. new window/tab opened)", arguments);
           }
         }
 

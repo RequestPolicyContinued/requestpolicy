@@ -68,6 +68,7 @@ requestpolicy.menu = {
   _itemAllowOriginTemporarily : null,
   _itemAllowOrigin : null,
   _itemForbidOrigin : null,
+  _itemUnrestrictedOrigin : null,
 
   init : function() {
     if (this._initialized == false) {
@@ -121,6 +122,8 @@ requestpolicy.menu = {
           .getElementById("requestpolicyAllowOrigin");
       this._itemForbidOrigin = document
           .getElementById("requestpolicyForbidOrigin");
+      this._itemUnrestrictedOrigin = document
+          .getElementById("requestpolicyUnrestrictedOrigin");
 
       var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
@@ -143,10 +146,32 @@ requestpolicy.menu = {
       var currentIdentifier = requestpolicy.overlay
           .getTopLevelDocumentUriIdentifier();
       var currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
+      var isChromeUri = currentUri.indexOf("chrome://") == 0;
 
       var otherOrigins = requestpolicy.mod.RequestUtil
           .getOtherOrigins(content.document);
       requestpolicy.mod.RequestUtil.dumpOtherOrigins(otherOrigins);
+
+      // Initially make all menu items hidden.
+      this._itemRevokeTemporaryPermissions.hidden = true;
+      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
+      this._itemAllowOriginTemporarily.hidden = true;
+      this._itemAllowOrigin.hidden = true;
+      this._itemForbidOrigin.hidden = true;
+      this._itemUnrestrictedOrigin.hidden = true;
+      this._itemOtherOrigins.hidden = true;
+      this._itemOtherOriginsSeparator.hidden = true;
+
+      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
+      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
+      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
+      
+      if (isChromeUri) {
+        this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
+                .getFormattedString("unrestrictedOrigin", ["chrome://"]));
+        this._itemUnrestrictedOrigin.hidden = false;
+        return;
+      }
 
       // Set all labels here for convenience, even though we won't display some
       // of these menu items.
@@ -158,18 +183,7 @@ requestpolicy.menu = {
       this._itemAllowOrigin.setAttribute("label", this._strbundle
               .getFormattedString("allowOrigin", [currentIdentifier]));
 
-      // Initially make all menu items hidden.
-      this._itemRevokeTemporaryPermissions.hidden = true;
-      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
-      this._itemAllowOriginTemporarily.hidden = true;
-      this._itemAllowOrigin.hidden = true;
-      this._itemForbidOrigin.hidden = true;
-
       var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled();
-
-      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
-      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
-      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
 
       if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;

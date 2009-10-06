@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Exportar">
 <!ENTITY preferences.prefpane.advanced "Avanzado">
 <!ENTITY preferences.strictness "Precisión">
+<!ENTITY preferences.strictness.description "Nivel de la direccion a usar para peticiones permitidas desde el mismo sitio. Despues de modificarlo, la lista de sitios permitidos de las pestañas abiertas sera eliminada.">
 <!ENTITY preferences.baseDomain "Dominio base (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Dominio completo (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Direccion completa (http://www.requestpolicy.com:81)">

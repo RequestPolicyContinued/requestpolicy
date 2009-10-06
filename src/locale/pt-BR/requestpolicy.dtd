@@ -17,8 +17,9 @@
 <!ENTITY preferences.prefpane.whitelist "Permissões">
 <!ENTITY preferences.prefpane.import "Importar">
 <!ENTITY preferences.prefpane.export "Exportar">
-<!ENTITY preferences.prefpane.advanced "Advanced">
+<!ENTITY preferences.prefpane.advanced "Avançado">
 <!ENTITY preferences.strictness "Rigidez">
+<!ENTITY preferences.strictness.description "The level of classification to use for allowing same-site requests. After changing this, the menu will start out empty for each currently open tab.">
 <!ENTITY preferences.baseDomain "Domínio base (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Domínio completo (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Endereço completo (http://www.requestpolicy.com:81)">
@@ -26,8 +27,8 @@
 <!ENTITY preferences.statusbarIcon "Aparência na barra de status">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
 <!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
-<!ENTITY preferences.misc "Miscellaneous">
-<!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">
+<!ENTITY preferences.misc "Diversos">
+<!ENTITY preferences.startWithAllowAllEnabled "'Temporariamente permitir todos os pedidos' ativo ao iniciar o navegador">
 <!ENTITY preferences.origins "Origens">
 <!ENTITY preferences.destinations "Destinos">
 <!ENTITY preferences.originsToDestinations "Pares origem-destino">

@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Экспорт">
 <!ENTITY preferences.prefpane.advanced "Дополнительно">
 <!ENTITY preferences.strictness "Точность">
+<!ENTITY preferences.strictness.description "Уровень классификации, используемый для разрешения запросов внутри сайта. После изменения настройка будет применена ко всем открытым вкладкам.">
 <!ENTITY preferences.baseDomain "Основной домен (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Полный домен (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Полный адрес (http://www.requestpolicy.com:81)">

@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "导出">
 <!ENTITY preferences.prefpane.advanced "高级">
 <!ENTITY preferences.strictness "精确">
+<!ENTITY preferences.strictness.description "分类方面允许使用同一站点的请求。更改后，每个当前打开的标签，菜单将开始清空。">
 <!ENTITY preferences.baseDomain "根域名 (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "完整域名 (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "完整地址 (http://www.requestpolicy.com:81)">

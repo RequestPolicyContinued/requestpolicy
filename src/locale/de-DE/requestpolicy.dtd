@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Export">
 <!ENTITY preferences.prefpane.advanced "Erweitert">
 <!ENTITY preferences.strictness "Regelstruktur">
+<!ENTITY preferences.strictness.description "Die Ebene zur Behandlung als Anfragen an die gleiche Seite. Nach Veränderung sind die RequestPolicy-Menus für derzeit geöffnete Tabs leer und diese müssen zur Erstellung von Regeln neu geladen werden.">
 <!ENTITY preferences.baseDomain "Domain (z. B. requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Host (z. B. www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Vollständige Adresse (z. B. http://www.requestpolicy.com:81)">

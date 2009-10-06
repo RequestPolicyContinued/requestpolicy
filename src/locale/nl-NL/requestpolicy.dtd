@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Exporteren">
 <!ENTITY preferences.prefpane.advanced "Geavanceerd">
 <!ENTITY preferences.strictness "Striktheid">
+<!ENTITY preferences.strictness.description "Het te gebruiken classificatieniveau voor toestaan van zelfde-site-verzoeken. Na wijzigen hiervan start het menu leeg voor elk tabblad dat nu open staat.">
 <!ENTITY preferences.baseDomain "Basisdomein (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Volledig domein (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Volledig adres (http://www.requestpolicy.com:81)">
@@ -35,15 +36,15 @@
 <!ENTITY preferences.removeSelectedSites "Geselecteerde sites verwijderen">
 <!ENTITY preferences.export "Exporteren">
 <!ENTITY preferences.export.caption "Uw instellingen exporteren">
-<!ENTITY preferences.export.description "U kunt uw whitelist naar een bestand exporteren zodat u een back-up heeft. Verplaats het bestand naar een andere computer en gebruik daar de functie ‘Importeren’ om deze in te stellen met dezelfde whitelist.">
+<!ENTITY preferences.export.description "U kunt uw witte lijst naar een bestand exporteren zodat u een back-up heeft. Verplaats het bestand naar een andere computer en gebruik daar de functie ‘Importeren’ om deze in te stellen met dezelfde witte lijst.">
 <!ENTITY preferences.export.details.caption "Wat is opgenomen in het exportbestand">
 <!ENTITY preferences.export.details.description "Het exportbestand bevat de toegestane oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen. Het bevat niets dat u tijdelijk heeft toegestaan.">
 <!ENTITY preferences.export.button.label "Naar bestand exporteren">
 <!ENTITY preferences.import "Importeren">
 <!ENTITY preferences.import.caption "Uw instellingen importeren">
-<!ENTITY preferences.import.description "U kunt uw whitelist importeren uit een back-upbestand dat u heeft aangemaakt met de functie ‘Exporteren’.">
+<!ENTITY preferences.import.description "U kunt uw witte lijst importeren uit een back-upbestand dat u heeft aangemaakt met de functie ‘Exporteren’.">
 <!ENTITY preferences.import.details.caption "Wat doet het importeren">
-<!ENTITY preferences.import.details.description "Het importeren voegt oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen in het bestand waaruit u exporteert toe. Niets in uw huidige whitelist wordt verwijderd. Dat wil zeggen dat importeren slechts sites aan uw whitelist toevoegt, het vervangt niet uw huidige whitelist.">
+<!ENTITY preferences.import.details.description "Het importeren voegt oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen in het bestand waaruit u exporteert toe. Niets in uw huidige witte lijst wordt verwijderd. Dat wil zeggen dat importeren slechts sites aan uw witte lijst toevoegt, het vervangt niet uw huidige witte lijst.">
 <!ENTITY preferences.import.button.label "Uit bestand importeren">
 <!ENTITY requestLog.title "Logbestand verzoeken">
 <!ENTITY requestLog.blocked "Geblokkeerd">

@@ -19,6 +19,7 @@
 <!ENTITY preferences.prefpane.export "Dışarı">
 <!ENTITY preferences.prefpane.advanced "Gelişmiş">
 <!ENTITY preferences.strictness "Sıkı">
+<!ENTITY preferences.strictness.description "The level of classification to use for allowing same-site requests. After changing this, the menu will start out empty for each currently open tab.">
 <!ENTITY preferences.baseDomain "Ana adres (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Tam site (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Tam adres (http://www.requestpolicy.com:81)">

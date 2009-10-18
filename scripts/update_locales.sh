@@ -16,7 +16,7 @@
 ##############################################################################
 
 # These are the locales to replace. Don't put en-US in the list.
-REPLACE_LOCALES="de-DE es-MX fr-FR ko-KR nl-NL pt-BR ru-RU tr-TR uk-UA zh-CN"
+REPLACE_LOCALES="de-DE es-MX fr ja ko-KR nl-NL pt-BR ru-RU tr-TR uk-UA zh-CN"
 
 LOCALES_DIR="`dirname $0`/../src/locale"
 

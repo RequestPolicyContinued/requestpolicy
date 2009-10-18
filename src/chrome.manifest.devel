@@ -4,7 +4,8 @@ skin       requestpolicy    classic/1.0    skin/
 locale     requestpolicy    en-US          locale/en-US/
 locale     requestpolicy    de-DE          locale/de-DE/
 locale     requestpolicy    es-MX          locale/es-MX/
-locale     requestpolicy    fr-FR          locale/fr-FR/
+locale     requestpolicy    fr             locale/fr/
+locale     requestpolicy    ja             locale/ja/
 locale     requestpolicy    ko-KR          locale/ko-KR/
 locale     requestpolicy    nl-NL          locale/nl-NL/
 locale     requestpolicy    pt-BR          locale/pt-BR/

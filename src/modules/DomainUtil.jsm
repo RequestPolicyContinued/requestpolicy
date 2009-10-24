@@ -141,7 +141,7 @@ DomainUtil.getDomain = function(uri) {
   try {
     return this._eTLDService.getBaseDomainFromHost(host, 0);
   } catch (e) {
-    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS ") {
+    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return host;
     } else if (e.name == "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
       return host;

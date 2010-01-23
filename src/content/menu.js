@@ -165,7 +165,7 @@ requestpolicy.menu = {
       var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
       this._itemPrefetchWarning.hidden = hidePrefetchInfo;
       this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
-      
+
       if (isChromeUri) {
         this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
                 .getFormattedString("unrestrictedOrigin", ["chrome://"]));
@@ -183,7 +183,9 @@ requestpolicy.menu = {
       this._itemAllowOrigin.setAttribute("label", this._strbundle
               .getFormattedString("allowOrigin", [currentIdentifier]));
 
-      var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled();
+      var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
+          && !this._rpService.prefs
+              .getBoolPref("privateBrowsingPermanentWhitelisting");
 
       if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
         this._itemForbidOrigin.hidden = false;

@@ -222,6 +222,7 @@
 		<preferences>
 			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
 			<preference id="pref-startWithAllowAllEnabled" name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool"/>
+			<preference id="pref-privateBrowsingPermanentWhitelisting" name="extensions.requestpolicy.privateBrowsingPermanentWhitelisting" type="bool"/>
 		</preferences>
 
 		<groupbox>
@@ -232,6 +233,7 @@
 		<groupbox>
 			<caption label="&preferences.misc;"/>
 			<checkbox id="indicateBlockedObjects" label="&preferences.startWithAllowAllEnabled;" preference="pref-startWithAllowAllEnabled"/>
+			<checkbox id="privateBrowsingPermanentWhitelisting" label="&preferences.privateBrowsingPermanentWhitelisting;" preference="pref-privateBrowsingPermanentWhitelisting"/>
 		</groupbox>
 	</prefpane>
 

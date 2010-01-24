@@ -29,6 +29,7 @@
 <!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
 <!ENTITY preferences.misc "Diversos">
 <!ENTITY preferences.startWithAllowAllEnabled "'Temporariamente permitir todos os pedidos' ativo ao iniciar o navegador">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Allow permanent whitelisting when using Private Browsing">
 <!ENTITY preferences.origins "Origens">
 <!ENTITY preferences.destinations "Destinos">
 <!ENTITY preferences.originsToDestinations "Pares origem-destino">

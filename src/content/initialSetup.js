@@ -58,7 +58,7 @@ requestpolicy.initialSetup = {
         ["cnet.com", "com.com"], ["gamespot.com", "com.com"],
         ["sf.net", "sourceforge.net"], ["sourceforge.net", "fsdn.com"],
         ["mapquest.com", "mqcdn.com"], ["mapquest.com", "aolcdn.com"],
-        ["mapquest.com", "aol.com"]],
+        ["mapquest.com", "aol.com"], ["twitter.com", "twimg.com"]],
     "americas" : [["orkut.com", "google.com"], ["orkut.com.br", "google.com"],
         ["uol.com.br", "imguol.com"], ["google.com", "orkut.com"]],
     "asia" : [["orkut.com", "google.com"], ["orkut.co.in", "google.com"],

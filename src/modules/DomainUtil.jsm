@@ -23,8 +23,8 @@
 /*
  * It's worth noting that many of the functions in this module will convert ACE
  * formatted IDNs to UTF8 formatted values. This is done automatically when
- * constructing nsIURI instances from ACE formatted URIs when the TLD is one
- * in which Mozilla supports UTF8 IDNs.
+ * constructing nsIURI instances from ACE formatted URIs when the TLD is one in
+ * which Mozilla supports UTF8 IDNs.
  */
 
 var EXPORTED_SYMBOLS = ["DomainUtil"]
@@ -48,6 +48,9 @@ DomainUtil._ios = CC["@mozilla.org/network/io-service;1"]
 
 DomainUtil._eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
     .getService(Components.interfaces.nsIEffectiveTLDService);
+
+DomainUtil._idnService = Components.classes["@mozilla.org/network/idn-service;1"]
+    .getService(Components.interfaces.nsIIDNService);
 
 // LEVEL_DOMAIN: Use example.com from http://www.a.example.com:81
 DomainUtil.LEVEL_DOMAIN = 1;
@@ -151,7 +154,13 @@ DomainUtil.isValidUri = function(uri) {
 DomainUtil.getDomain = function(uri) {
   var host = this.getHost(uri);
   try {
-    return this._eTLDService.getBaseDomainFromHost(host, 0);
+    // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
+    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+    // Note: we use convertToDisplayIDN rather than convertACEtoUTF8() because
+    // we want to only convert IDNs that that are in Mozilla's IDN whitelist.
+    // The second argument will have the property named "value" set to true if
+    // the result is ASCII/ACE encoded, false otherwise.
+    return DomainUtil._idnService.convertToDisplayIDN(baseDomain, {});
   } catch (e) {
     if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return host;
@@ -274,14 +283,14 @@ DomainUtil.ensureUriHasPath = function(uri) {
 
 /**
  * Returns the same uri but makes sure that it's UTF8 formatted instead of ACE
- * formatted if it's an IDN that Mozilla supports displaying in UTF8 format.
- * See http://www.mozilla.org/projects/security/tld-idn-policy-list.html for
- * more info.
+ * formatted if it's an IDN that Mozilla supports displaying in UTF8 format. See
+ * http://www.mozilla.org/projects/security/tld-idn-policy-list.html for more
+ * info.
  * 
  * @param {String}
  *          uri The uri.
  * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
- *          was ACE formatted.
+ *         was ACE formatted.
  */
 DomainUtil.formatIDNUri = function(uri) {
   // Throws an exception if uri is invalid. This is almost the same as the

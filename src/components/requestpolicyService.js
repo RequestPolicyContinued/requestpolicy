@@ -440,7 +440,7 @@ RequestPolicyService.prototype = {
 
     // For origins that are IDNs, this will always be in ACE format. We want
     // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
-    var origin = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name)
+    var origin = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name);
 
     // If it's not a valid uri, the redirect is relative to the origin host.
     // The way we have things written currently, without this check the full

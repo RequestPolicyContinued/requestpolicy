@@ -27,6 +27,10 @@
 
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
+	</stringbundleset>
+
 	<script type="application/x-javascript" src="requestLogTreeView.js" /> 
 	<script type="application/x-javascript" src="requestLog.js" />
 

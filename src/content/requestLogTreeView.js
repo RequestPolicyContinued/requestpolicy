@@ -30,6 +30,8 @@ requestpolicy.requestLogTreeView = {
 
   _treebox : null,
 
+  _isEmpty : true,
+
   _visibleData : [],
 
   _columnNameToIndexMap : {
@@ -42,7 +44,21 @@ requestpolicy.requestLogTreeView = {
   _aserv : Components.classes["@mozilla.org/atom-service;1"]
       .getService(Components.interfaces.nsIAtomService),
 
+  init : function(e) {
+    var strBundle = document.getElementById("requestpolicyStrings");
+    var message = strBundle.getString("requestLogIsEmpty");
+    var directions = strBundle.getString("requestLogDirections");
+    this._visibleData.push([message, directions, false, ""]);
+  },
+
   addAllowedRequest : function(originUri, destUri) {
+    if (this._isEmpty) {
+      // If this were to be called in a multithreaded manner, there's probably
+      // a race condition here.
+      this._visibleData.shift();
+      this._isEmpty = false;
+      this._treebox.rowCountChanged(0, -1);
+    }
     this._visibleData.push([originUri, destUri, false,
         (new Date()).toLocaleTimeString()]);
     if (!this._treebox) {
@@ -52,6 +68,13 @@ requestpolicy.requestLogTreeView = {
   },
 
   addBlockedRequest : function(originUri, destUri) {
+    if (this._isEmpty) {
+      // If this were to be called in a multithreaded manner, there's probably
+      // a race condition here.
+      this._visibleData.shift();
+      this._isEmpty = false;
+      this._treebox.rowCountChanged(0, -1);
+    }
     this._visibleData.push([originUri, destUri, true,
         (new Date()).toLocaleTimeString()]);
     if (!this._treebox) {
@@ -178,3 +201,8 @@ requestpolicy.requestLogTreeView = {
 requestpolicy.requestLogTreeView.__defineGetter__("rowCount", function() {
       return this._getRowCount();
     });
+
+// Initialize when the window DOM is loaded.
+addEventListener("DOMContentLoaded", function(event) {
+      requestpolicy.requestLogTreeView.init();
+    }, false);

@@ -311,12 +311,22 @@ requestpolicy.prefWindow = {
   },
 
   addToWhitelist : function(button) {
+    // TODO: Warn people when they enter UTF8 formatted IDNs for TLDs that
+    //       Mozilla doesn't support UTF8 IDNs for, and warn when they enter
+    //       ACE formatted IDNs for TLDs that are supported in UTF8. An entry
+    //       in the wrong format will get ignored. This seems to be somewhat
+    //       of an argument for always storing/comparing in ACE format. Even
+    //       though this seems like it may be a pain to go back and rectify
+    //       later if we decide we only want to store ACE format, I just don't
+    //       see the complexity of dealing with it now to be worth it,
+    //       especially as only time will tell if it really is a nuisance.
+    
     button.disabled = true;
-    // Remove invalid characters, including any "|" and spaces which would
-    // cause conflict with separators when storing in preferences.
+    // Remove pipes and spaces which would conflict with the separators we use
+    // when storing these in preferences.
     for (var i = 0; i < button.textboxes.length; i++) {
-      button.textboxes[i].value = button.textboxes[i].value.replace(
-          /[^a-zA-Z0-9.:/-]/g, "");
+      button.textboxes[i].value = button.textboxes[i].value.replace(/[\|\s]/g,
+          "");
       if (button.textboxes[i].value == "") {
         return;
       }

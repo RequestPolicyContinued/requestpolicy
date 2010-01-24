@@ -6,55 +6,55 @@ interface nsIPrefBranch;
 [scriptable, uuid(14027e96-1afb-4066-8846-e6c89b5faf3b)]
 interface nsIRequestPolicy : nsISupports
 {
-  ACString getUriIdentifier(in ACString uri);
+  AString getUriIdentifier(in AString uri);
 
-  void registerHistoryRequest(in ACString destinationUri);
-  void registerFormSubmitted(in ACString originUri, in ACString destinationUri);
-  void registerLinkClicked(in ACString originUri, in ACString destinationUri);
+  void registerHistoryRequest(in AString destinationUri);
+  void registerFormSubmitted(in AString originUri, in AString destinationUri);
+  void registerLinkClicked(in AString originUri, in AString destinationUri);
   
-  void temporarilyAllowOrigin(in ACString siteIdentifier);
-  boolean isTemporarilyAllowedOrigin(in ACString siteIdentifier);
+  void temporarilyAllowOrigin(in AString siteIdentifier);
+  boolean isTemporarilyAllowedOrigin(in AString siteIdentifier);
   
-  void allowOrigin(in ACString siteIdentifier);
-  void allowOriginDelayStore(in ACString siteIdentifier);
-  boolean isAllowedOrigin(in ACString siteIdentifier);
+  void allowOrigin(in AString siteIdentifier);
+  void allowOriginDelayStore(in AString siteIdentifier);
+  boolean isAllowedOrigin(in AString siteIdentifier);
   
-  void temporarilyAllowDestination(in ACString siteIdentifier);
-  boolean isTemporarilyAllowedDestination(in ACString siteIdentifier);
+  void temporarilyAllowDestination(in AString siteIdentifier);
+  boolean isTemporarilyAllowedDestination(in AString siteIdentifier);
   
-  void allowDestination(in ACString siteIdentifier);
-  void allowDestinationDelayStore(in ACString siteIdentifier);
-  boolean isAllowedDestination(in ACString siteIdentifier);
+  void allowDestination(in AString siteIdentifier);
+  void allowDestinationDelayStore(in AString siteIdentifier);
+  boolean isAllowedDestination(in AString siteIdentifier);
   
-  void temporarilyAllowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
-  boolean isTemporarilyAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  void temporarilyAllowOriginToDestination(in AString originIdentifier, in AString destinationIdentifier);
+  boolean isTemporarilyAllowedOriginToDestination(in AString originIdentifier, in AString destinationIdentifier);
   
-  void allowOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
-  void allowOriginToDestinationDelayStore(in ACString originIdentifier, in ACString destinationIdentifier);
-  boolean isAllowedOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
+  void allowOriginToDestination(in AString originIdentifier, in AString destinationIdentifier);
+  void allowOriginToDestinationDelayStore(in AString originIdentifier, in AString destinationIdentifier);
+  boolean isAllowedOriginToDestination(in AString originIdentifier, in AString destinationIdentifier);
   
   void storeAllPreferenceLists();
   
   void revokeTemporaryPermissions();
   boolean areTemporaryPermissionsGranted();
   
-  void forbidOrigin(in ACString siteIdentifier);
-  void forbidOriginDelayStore(in ACString siteIdentifier);
+  void forbidOrigin(in AString siteIdentifier);
+  void forbidOriginDelayStore(in AString siteIdentifier);
   
-  void forbidDestination(in ACString siteIdentifier);
-  void forbidDestinationDelayStore(in ACString siteIdentifier);
+  void forbidDestination(in AString siteIdentifier);
+  void forbidDestinationDelayStore(in AString siteIdentifier);
   
-  void forbidOriginToDestination(in ACString originIdentifier, in ACString destinationIdentifier);
-  void forbidOriginToDestinationDelayStore(in ACString originIdentifier, in ACString destinationIdentifier);
+  void forbidOriginToDestination(in AString originIdentifier, in AString destinationIdentifier);
+  void forbidOriginToDestinationDelayStore(in AString originIdentifier, in AString destinationIdentifier);
   
-  boolean isAllowedRedirect(in ACString originUri, in ACString destinationUri);
+  boolean isAllowedRedirect(in AString originUri, in AString destinationUri);
   
   boolean isPrefetchEnabled();
   boolean isBlockingDisabled();
   boolean isPrivateBrowsingEnabled();
   
-  boolean originHasRejectedRequests(in ACString originUri);
-  boolean originHasRejectedRequestsRecursive(in ACString originUri);
+  boolean originHasRejectedRequests(in AString originUri);
+  boolean originHasRejectedRequestsRecursive(in AString originUri);
   
   readonly attribute nsIPrefBranch prefs;
 };  

@@ -438,7 +438,9 @@ RequestPolicyService.prototype = {
       }
     }
 
-    var origin = httpChannel.name;
+    // For origins that are IDNs, this will always be in ACE format. We want
+    // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
+    var origin = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name)
 
     // If it's not a valid uri, the redirect is relative to the origin host.
     // The way we have things written currently, without this check the full
@@ -965,7 +967,14 @@ RequestPolicyService.prototype = {
     var value = this._objToPrefString(setFromObj);
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Setting preference <" + prefName + "> to value <" + value + ">.");
-    this.prefs.setCharPref(prefName, value);
+
+    // Not using just setCharPref because these values may contain Unicode
+    // strings (e.g. for IDNs).
+    var str = CC["@mozilla.org/supports-string;1"]
+        .createInstance(CI.nsISupportsString);
+    str.data = value;
+    this.prefs.setComplexValue(prefName, CI.nsISupportsString, str);
+
     // Flush the prefs so that if the browser crashes, the changes aren't lost.
     // TODO: flush the file once after any changed preferences have been
     // modified, rather than once on each call to the current function.
@@ -979,7 +988,9 @@ RequestPolicyService.prototype = {
   },
 
   _getPreferenceObj : function(prefName) {
-    var prefString = this.prefs.getCharPref(prefName);
+    // Not using just getCharPref because these values may contain Unicode
+    // strings (e.g. for IDNs).
+    var prefString = this.prefs.getComplexValue(prefName, CI.nsISupportsString).data;
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Loading preference <" + prefName + "> from value <" + prefString
             + ">.");
@@ -1550,6 +1561,10 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
+        // We don't need to worry about ACE formatted IDNs because it seems
+        // that they'll automatically be converted to UTF8 format before we
+        // even get here, as long as they're valid and Mozilla allows the TLD
+        // to have UTF8 formatted IDNs.
         var origin = requestpolicy.mod.DomainUtil
             .stripFragment(aRequestOrigin.spec);
         var dest = requestpolicy.mod.DomainUtil
@@ -1562,8 +1577,6 @@ RequestPolicyService.prototype = {
         arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aInternalCall];
 
-        var originHost = aRequestOrigin.asciiHost;
-        var destHost = aContentLocation.asciiHost;
         var originIdentifier = this.getUriIdentifier(origin);
         var destIdentifier = this.getUriIdentifier(dest);
 
@@ -1647,7 +1660,7 @@ RequestPolicyService.prototype = {
         }
 
         if (aRequestOrigin.scheme == "chrome") {
-          if (originHost == "browser") {
+          if (aRequestOrigin.asciiHost == "browser") {
             // "browser" origin shows up for favicon.ico and an address entered
             // in address bar.
             return this.accept(

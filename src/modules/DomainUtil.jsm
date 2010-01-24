@@ -20,6 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/*
+ * It's worth noting that many of the functions in this module will convert ACE
+ * formatted IDNs to UTF8 formatted values. This is done automatically when
+ * constructing nsIURI instances from ACE formatted URIs when the TLD is one
+ * in which Mozilla supports UTF8 IDNs.
+ */
+
 var EXPORTED_SYMBOLS = ["DomainUtil"]
 
 const CI = Components.interfaces;
@@ -104,7 +111,9 @@ DomainUtil.getHost = function(uri) {
 };
 
 /**
- * Returns an nsIURI object from a uri string.
+ * Returns an nsIURI object from a uri string. Note that nsIURI objects will
+ * automatically convert ACE formatting to UTF8 for IDNs in the various
+ * attributes of the object that are available.
  * 
  * @param {String}
  *          uri The uri.
@@ -155,14 +164,16 @@ DomainUtil.getDomain = function(uri) {
 };
 
 /**
- * Returns the prePath from a uri string.
+ * Returns the prePath from a uri string. Not that this will return a prePath in
+ * UTF8 format for all IDNs, even if the uri passed to the function is ACE
+ * formatted.
  * 
  * @param {String}
  *          uri The uri.
  * @return {String} The prePath of the uri.
  */
 DomainUtil.getPrePath = function(uri) {
-  return this._ios.newURI(uri, null, null).prePath;
+  return this.getUriObject(uri).prePath;
 };
 
 /**
@@ -255,11 +266,30 @@ DomainUtil.parseRefresh = function(refreshString) {
  */
 DomainUtil.ensureUriHasPath = function(uri) {
   try {
-    return this._ios.newURI(uri, null, null).spec;
+    return this.getUriObject(uri).spec;
   } catch (e) {
     return uri;
   }
 }
+
+/**
+ * Returns the same uri but makes sure that it's UTF8 formatted instead of ACE
+ * formatted if it's an IDN that Mozilla supports displaying in UTF8 format.
+ * See http://www.mozilla.org/projects/security/tld-idn-policy-list.html for
+ * more info.
+ * 
+ * @param {String}
+ *          uri The uri.
+ * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
+ *          was ACE formatted.
+ */
+DomainUtil.formatIDNUri = function(uri) {
+  // Throws an exception if uri is invalid. This is almost the same as the
+  // ensureUriHasPath function, but the separate function makes the calling
+  // code clearer and this one we want to raise an exception if the uri is
+  // not valid.
+  return this.getUriObject(uri).spec;
+};
 
 /**
  * Given an origin URI string and a destination path to redirect to, returns a

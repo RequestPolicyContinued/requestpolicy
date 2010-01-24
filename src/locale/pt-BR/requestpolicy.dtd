@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Exibição da página">
 <!ENTITY preferences.statusbarIcon "Aparência na barra de status">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
 <!ENTITY preferences.misc "Diversos">
 <!ENTITY preferences.startWithAllowAllEnabled "'Temporariamente permitir todos os pedidos' ativo ao iniciar o navegador">

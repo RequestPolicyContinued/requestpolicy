@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Web pages">
 <!ENTITY preferences.statusbarIcon "상태바 아이콘">
 <!ENTITY preferences.indicateBlockedObjects "거부된 사이트 표시">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "초기 설정 도구 열기">
 <!ENTITY preferences.misc "Miscellaneous">
 <!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">

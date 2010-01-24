@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Webpagina’s">
 <!ENTITY preferences.statusbarIcon "Statusbalkpictogram">
 <!ENTITY preferences.indicateBlockedObjects "Geblokkeerde afbeeldingen aanduiden">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Initiële instelwizard openen">
 <!ENTITY preferences.misc "Diversen">
 <!ENTITY preferences.startWithAllowAllEnabled "‘Tijdelijk alle verzoeken toestaan’ inschakelen wanneer browser start">

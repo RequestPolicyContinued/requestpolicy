@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Web sayfaları">
 <!ENTITY preferences.statusbarIcon "Durum çubuğu">
 <!ENTITY preferences.indicateBlockedObjects "Bloklanan resimi işaretle">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Yükleme sihirbazını aç">
 <!ENTITY preferences.misc "Çeşitli">
 <!ENTITY preferences.startWithAllowAllEnabled "Aktif et 'Bütün sayfalara izin veri' tarayıcıyı her açışta">

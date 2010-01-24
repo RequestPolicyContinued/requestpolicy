@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Webページ">
 <!ENTITY preferences.statusbarIcon "ステータスバーアイコン">
 <!ENTITY preferences.indicateBlockedObjects "ブロックされたことを示す画像を表示する">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "初期設定画面を表示する">
 <!ENTITY preferences.misc "その他">
 <!ENTITY preferences.startWithAllowAllEnabled "ブラウザの起動時に「一時的にすべてのリクエストを許可する」オプションを有効にする">

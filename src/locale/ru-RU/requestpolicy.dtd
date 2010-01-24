@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Веб-страницы">
 <!ENTITY preferences.statusbarIcon "Значок панели статуса">
 <!ENTITY preferences.indicateBlockedObjects "Помечать заблокированные изображения">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Открыть окно начальной настройки">
 <!ENTITY preferences.misc "Прочее">
 <!ENTITY preferences.startWithAllowAllEnabled "Включить 'Временно Разрешить Все Запросы' при старте браузера">

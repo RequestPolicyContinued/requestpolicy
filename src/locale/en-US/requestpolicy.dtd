@@ -26,6 +26,7 @@
 <!ENTITY preferences.webpages "Web pages">
 <!ENTITY preferences.statusbarIcon "Status bar icon">
 <!ENTITY preferences.indicateBlockedObjects "Indicate blocked images">
+<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Open initial setup tool">
 <!ENTITY preferences.misc "Miscellaneous">
 <!ENTITY preferences.startWithAllowAllEnabled "Enable 'Temporarily Allow All Requests' when browser starts">

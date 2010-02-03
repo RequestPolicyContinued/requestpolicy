@@ -47,7 +47,7 @@ requestpolicy.overlay = {
 
   _overlayId : 0,
 
-  _blockedContentCheckTimeoutDelay : 1000, // milliseconds
+  _blockedContentCheckTimeoutDelay : 250, // milliseconds
   _blockedContentCheckTimeoutId : null,
   _blockedContentCheckMinWaitOnObservedBlockedRequest : 500,
   _blockedContentCheckLastTime : 0,
@@ -451,7 +451,19 @@ requestpolicy.overlay = {
       if (this._isActiveTopLevelDocument(document)) {
         // Clear any notifications that may have been present.
         this._setBlockedContentNotification(false);
-        this._checkForBlockedContent(document);
+        // We don't do this immediately anymore because slow systems might have
+        // this slow down the loading of the page, which is noticable
+        // especially with CSS loading delays (it's not unlikely that slow
+        // webservers have a hand in this, too).
+        // Note that the change to _setBlockedContentCheckTimeout seems to have
+        // added a bug where opening a blank tab and then quickly switching back
+        // to the original tab can cause the original tab's blocked content
+        // notification to be cleared. A simple compensation was to decrease
+        // the timeout from 1000ms to 250ms, making it much less likely the tab
+        // switch can be done in time for a blank opened tab. This isn't a real
+        // solution, though.
+        // this._checkForBlockedContent(document);
+        this._setBlockedContentCheckTimeout();
       }
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -629,12 +641,32 @@ requestpolicy.overlay = {
     }
   },
 
+  /**
+   * This function is called when any allowed requests happen. This must be as
+   * fast as possible because request processing blocks until this function
+   * returns.
+   * 
+   * @param {}
+   *          originUri
+   * @param {}
+   *          destUri
+   */
   observeAllowedRequest : function(originUri, destUri) {
     if (this.requestLogTreeView) {
       this.requestLogTreeView.addAllowedRequest(originUri, destUri);
     }
   },
 
+  /**
+   * This function is called when any blocked requests happen. This must be as
+   * fast as possible because request processing blocks until this function
+   * returns.
+   * 
+   * @param {}
+   *          originUri
+   * @param {}
+   *          destUri
+   */
   observeBlockedRequest : function(originUri, destUri) {
     this._updateNotificationDueToBlockedContent();
     if (this.requestLogTreeView) {
@@ -660,21 +692,17 @@ requestpolicy.overlay = {
   // TODO: observeBlockedFormSubmissionRedirect
 
   _updateNotificationDueToBlockedContent : function() {
-    if (this._blockedContentCheckTimeoutId) {
-      return;
+    if (!this._blockedContentCheckTimeoutId) {
+      this._setBlockedContentCheckTimeout();
     }
+  },
 
-    var curTime = (new Date()).getTime();
-    if (this._blockedContentCheckLastTime
-        + this._blockedContentCheckMinWaitOnObservedBlockedRequest > curTime) {
-      const document = content.document;
-      this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
-          function() {
-            requestpolicy.overlay._checkForBlockedContent(document);
-          }, this._blockedContentCheckTimeoutDelay);
-    } else {
-      this._checkForBlockedContent(content.document);
-    }
+  _setBlockedContentCheckTimeout : function() {
+    const document = content.document;
+    this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
+        function() {
+          requestpolicy.overlay._checkForBlockedContent(document);
+        }, this._blockedContentCheckTimeoutDelay);
   },
 
   _stopBlockedContentCheckTimeout : function() {
@@ -936,8 +964,22 @@ requestpolicy.overlay = {
       }
     };
 
+    // This was changed to try to prevent immediate checking of blocked
+    // requests on page loads. This is mostly (only?) intended to identify tab
+    // changes, and using NOTIFY_STATE_DOCUMENT was making it fire immediately
+    // on any location change, even before much of the page was loaded. Using
+    // STATE_IS_WINDOW with STATE_STOP seems to prevent the blocked request
+    // checking from being triggered immediately on a location change but is
+    // still essentially immediate for a tab change (as there isn't any real
+    // activity going on before the STATE_IS_WINDOW & STATE_STOP is hit). For
+    // more details, see:
+    // https://developer.mozilla.org/en/nsIWebProgressListener#onStateChange
+    // https://developer.mozilla.org/En/NsIWebProgress
+    // gBrowser.addProgressListener(this.locationListener,
+    // Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
     gBrowser.addProgressListener(this.locationListener,
-        Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+        Components.interfaces.nsIWebProgress.STATE_IS_WINDOW
+            & Components.interfaces.nsIWebProgress.STATE_STOP);
   },
 
   _removeLocationObserver : function() {

@@ -7,7 +7,7 @@ locale     requestpolicy    es-MX          locale/es-MX/
 locale     requestpolicy    fr             locale/fr/
 locale     requestpolicy    ja             locale/ja/
 locale     requestpolicy    ko-KR          locale/ko-KR/
-locale     requestpolicy    nl-NL          locale/nl-NL/
+locale     requestpolicy    nl             locale/nl/
 locale     requestpolicy    pt-BR          locale/pt-BR/
 locale     requestpolicy    ru-RU          locale/ru-RU/
 locale     requestpolicy    tr-TR          locale/tr-TR/

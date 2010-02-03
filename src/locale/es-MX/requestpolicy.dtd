@@ -26,11 +26,11 @@
 <!ENTITY preferences.webpages "Paginas web">
 <!ENTITY preferences.statusbarIcon "Icono de la barra de estatus">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas">
-<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
+<!ENTITY preferences.autoReload "Recargar la pagina actual cuando cambie la lista de sitios permitidos">
 <!ENTITY preferences.openInitialSetup "Abrir la herramienta de configuracion inicial">
 <!ENTITY preferences.misc "Miscelaneos">
 <!ENTITY preferences.startWithAllowAllEnabled "Cuando inicie el navegador habilitar 'Temporalmente permitir todas las peticiones'">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Allow permanent whitelisting when using Private Browsing">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Al usar navegación privada permitir poner sitios en la lista de modo permanente">
 <!ENTITY preferences.origins "Orígenes">
 <!ENTITY preferences.destinations "Destinos">
 <!ENTITY preferences.originsToDestinations "Origenes-a-Destinos">

@@ -19,7 +19,7 @@
 <!ENTITY preferences.prefpane.export "Exportar">
 <!ENTITY preferences.prefpane.advanced "Avançado">
 <!ENTITY preferences.strictness "Rigidez">
-<!ENTITY preferences.strictness.description "The level of classification to use for allowing same-site requests. After changing this, the menu will start out empty for each currently open tab.">
+<!ENTITY preferences.strictness.description "Escolha a rigidez com a qual o RequestPolicy deve decidir se dois endereços são ou não do mesmo servidor. Alterar essa opção limpará o menu do RequestPolicy nas abas abertas do navegador; cada menu será preenchido novamente quando uma nova página for carregada na respectiva aba.">
 <!ENTITY preferences.baseDomain "Domínio base (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Domínio completo (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "Endereço completo (http://www.requestpolicy.com:81)">

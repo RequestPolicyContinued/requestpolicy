@@ -26,11 +26,11 @@
 <!ENTITY preferences.webpages "网页">
 <!ENTITY preferences.statusbarIcon "状态栏图标">
 <!ENTITY preferences.indicateBlockedObjects "图像显示封锁">
-<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
+<!ENTITY preferences.autoReload "当白名单变化时重新载入当前页面">
 <!ENTITY preferences.openInitialSetup "打开初始设置工具">
 <!ENTITY preferences.misc "其他">
 <!ENTITY preferences.startWithAllowAllEnabled "当浏览器启动时启用 “暂时允许所有请求”">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Allow permanent whitelisting when using Private Browsing">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "当使用隐私浏览时允许永久白名单">
 <!ENTITY preferences.origins "来源">
 <!ENTITY preferences.destinations "目标">
 <!ENTITY preferences.originsToDestinations "来源到目标">

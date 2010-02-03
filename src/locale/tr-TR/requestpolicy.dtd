@@ -26,11 +26,11 @@
 <!ENTITY preferences.webpages "Web sayfaları">
 <!ENTITY preferences.statusbarIcon "Durum çubuğu">
 <!ENTITY preferences.indicateBlockedObjects "Bloklanan resimi işaretle">
-<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
+<!ENTITY preferences.autoReload "Beyaz liste değiştiğinde sayfayı yenile">
 <!ENTITY preferences.openInitialSetup "Yükleme sihirbazını aç">
 <!ENTITY preferences.misc "Çeşitli">
 <!ENTITY preferences.startWithAllowAllEnabled "Aktif et 'Bütün sayfalara izin veri' tarayıcıyı her açışta">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Allow permanent whitelisting when using Private Browsing">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Özel Gezinti yaparken kalıcı beyazlistelemeye izin ver">
 <!ENTITY preferences.origins "Ana">
 <!ENTITY preferences.destinations "Hedef">
 <!ENTITY preferences.originsToDestinations "Ana-dan-Hedefe">

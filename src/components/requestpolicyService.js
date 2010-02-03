@@ -1574,12 +1574,6 @@ RequestPolicyService.prototype = {
           return this._lastShouldLoadCheck.result;
         }
 
-        arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
-            aInternalCall];
-
-        var originIdentifier = this.getUriIdentifier(origin);
-        var destIdentifier = this.getUriIdentifier(dest);
-
         // Sometimes, clicking a link to a fragment will result in a request
         // where the origin is the same as the destination, but none of the
         // additional content of the page is again requested. The result is that
@@ -1594,6 +1588,9 @@ RequestPolicyService.prototype = {
                   + "where origin is the same as the destination: " + origin);
           return CP_OK;
         }
+
+        arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
+            aInternalCall];
 
         // Note: If changing the logic here, also make necessary changes to
         // isAllowedRedirect).
@@ -1633,16 +1630,20 @@ RequestPolicyService.prototype = {
           return this.accept("History request", arguments, true);
         }
 
-        if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
-          return this.accept("Temporarily allowed origin", arguments);
+        var originIdentifier = this.getUriIdentifier(origin);
+        var destIdentifier = this.getUriIdentifier(dest);
+
+        if (destIdentifier == originIdentifier) {
+          return this.accept("same host (at current domain strictness level)",
+              arguments);
+        }
+
+        if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
+          return this.accept("Allowed origin to destination", arguments);
         }
 
         if (this.isAllowedOrigin(originIdentifier)) {
           return this.accept("Allowed origin", arguments);
-        }
-
-        if (this.isTemporarilyAllowedDestination(destIdentifier)) {
-          return this.accept("Temporarily allowed destination", arguments);
         }
 
         if (this.isAllowedDestination(destIdentifier)) {
@@ -1655,8 +1656,12 @@ RequestPolicyService.prototype = {
               arguments);
         }
 
-        if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
-          return this.accept("Allowed origin to destination", arguments);
+        if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
+          return this.accept("Temporarily allowed origin", arguments);
+        }
+
+        if (this.isTemporarilyAllowedDestination(destIdentifier)) {
+          return this.accept("Temporarily allowed destination", arguments);
         }
 
         if (aRequestOrigin.scheme == "chrome") {
@@ -1678,11 +1683,6 @@ RequestPolicyService.prototype = {
                 "User action (e.g. address entered in address bar) or other good "
                     + "explanation (e.g. new window/tab opened)", arguments);
           }
-        }
-
-        if (destIdentifier == originIdentifier) {
-          return this.accept("same host (at current domain strictness level)",
-              arguments);
         }
 
         // This is mostly here for the case of popup windows where the user has

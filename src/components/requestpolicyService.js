@@ -427,15 +427,28 @@ RequestPolicyService.prototype = {
       // No location header. Look for a Refresh header.
       try {
         headerType = "Refresh";
-        dest = httpChannel.getResponseHeader(headerType);
-        var parts = requestpolicy.mod.DomainUtil
-            .parseRefresh(metaTags[i].content);
-        // TODO: Handle a delay value in the refresh.
-        dest = parts[1];
+        var refreshString = httpChannel.getResponseHeader(headerType);
       } catch (e) {
         // No Location header or Refresh header.
         return;
       }
+      try {
+        var parts = requestpolicy.mod.DomainUtil.parseRefresh(refreshString);
+      } catch (e) {
+        requestpolicy.mod.Logger.warning(
+            requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+            "Invalid refresh header: <" + refreshString + "> from origin <"
+                + origin + ">");
+        if (!this._blockingDisabled) {
+          httpChannel.setResponseHeader(headerType, "", false);
+        }
+        return;
+      }
+      // We can ignore the delay (parts[0]) because we aren't manually doing
+      // the refreshes. Allowed refreshes we still leave to the browser.
+      // The dest may be empty if the origin is what should be refreshed. This
+      // will be handled by DomainUtil.determineRedirectUri().
+      dest = parts[1];
     }
 
     // For origins that are IDNs, this will always be in ACE format. We want

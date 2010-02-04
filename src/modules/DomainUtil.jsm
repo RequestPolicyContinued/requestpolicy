@@ -251,17 +251,31 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  * @param {String}
  *          refreshString The original content of a refresh header or meta tag.
  * @return {Array} First element is the delay in seconds, second element is the
- *         url to refresh to.
+ *         url to refresh to. The url may be an empty string if the current url
+ *         should be refreshed.
+ * @throws Generic
+ *           exception if the refreshString has an invalid format, including if
+ *           the seconds can't be turned into an int.
  */
 DomainUtil.parseRefresh = function(refreshString) {
-  var parts = /^\s*(\S*)\s*;\s*url\s*=\s*(.*?)\s*$/i(refreshString);
-  // Strip off enclosing quotes around the url.
-  var first = parts[2][0];
-  var last = parts[2][parts[2].length - 1];
-  if (first == last && (first == "'" || first == '"')) {
-    parts[2] = parts[2].substring(1, parts[2].length - 1)
+  var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i(refreshString);
+  var delay = parseInt(parts[1]);
+  if (isNaN(delay)) {
+    throw "Invalid delay value in refresh string: " + parts[1];
   }
-  return [parts[1], parts[2]];
+  var url = parts[3];
+  if (url == undefined) {
+    url = '';
+  }
+  // Strip off enclosing quotes around the url.
+  if (url) {
+    var first = url[0];
+    var last = url[url.length - 1];
+    if (first == last && (first == "'" || first == '"')) {
+      url = url.substring(1, url.length - 1);
+    }
+  }
+  return [delay, url];
 }
 
 /**
@@ -313,8 +327,10 @@ DomainUtil.formatIDNUri = function(uri) {
  * @return {String}
  */
 DomainUtil.determineRedirectUri = function(originUri, destPath) {
-  if (destPath[0] == '/') {
-    return this.getPrePath(originUri) + destPath
+  if (destPath == '') {
+    return originUri;
+  } else if (destPath[0] == '/') {
+    return this.getPrePath(originUri) + destPath;
   } else {
     var curDir = originUri.split("/").slice(0, -1).join("/");
     return curDir + "/" + destPath;

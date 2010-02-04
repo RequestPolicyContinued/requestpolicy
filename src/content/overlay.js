@@ -735,30 +735,30 @@ requestpolicy.overlay = {
         var parts = requestpolicy.mod.DomainUtil
             .parseRefresh(metaTags[i].content);
         var delay = parts[0];
+        // The dest may be empty if the origin is what should be refreshed. This
+        // will be handled by DomainUtil.determineRedirectUri().
         var dest = parts[1];
         requestpolicy.mod.Logger.info(
             requestpolicy.mod.Logger.TYPE_META_REFRESH, "meta refresh to <"
                 + dest + "> (" + delay
                 + " second delay) found in document at <" + document.location
                 + ">");
-        if (dest != undefined) {
-          // If dest isn't a valid uri, assume it's a relative uri.
-          if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
-            var origDest = dest;
-            dest = document.documentURIObject.resolve(dest);
-            requestpolicy.mod.Logger.info(
-                requestpolicy.mod.Logger.TYPE_META_REFRESH,
-                "meta refresh destination <" + origDest
-                    + "> appeared to be relative to <" + document.documentURI
-                    + ">, so it has been resolved to <" + dest + ">");
-          }
-          if (this._rpServiceJSObject._blockingDisabled
-              || this._rpService.isAllowedRedirect(document.location, dest)) {
-            // The meta refresh is allowed.
-            this._performRedirectAfterDelay(document, dest, delay);
-          } else {
-            this._showRedirectNotification(document, dest, delay);
-          }
+        // If dest isn't a valid uri, assume it's a relative uri.
+        if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
+          var origDest = dest;
+          dest = document.documentURIObject.resolve(dest);
+          requestpolicy.mod.Logger.info(
+              requestpolicy.mod.Logger.TYPE_META_REFRESH,
+              "meta refresh destination <" + origDest
+                  + "> appeared to be relative to <" + document.documentURI
+                  + ">, so it has been resolved to <" + dest + ">");
+        }
+        if (this._rpServiceJSObject._blockingDisabled
+            || this._rpService.isAllowedRedirect(document.location, dest)) {
+          // The meta refresh is allowed.
+          this._performRedirectAfterDelay(document, dest, delay);
+        } else {
+          this._showRedirectNotification(document, dest, delay);
         }
       }
     }

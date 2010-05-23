@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "출발지-목적지">
 <!ENTITY preferences.temporary "임시">
 <!ENTITY preferences.removeSelectedSites "선택된 사이트를 삭제합니다.">
-<!ENTITY preferences.export "내보내기">
 <!ENTITY preferences.export.caption "설정 내보내기">
 <!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
 <!ENTITY preferences.export.details.caption "내보내기에 포함되는 내용">
 <!ENTITY preferences.export.details.description "내보내기 파일은 사용자가 허용한 출발지와 목적지, 그리고 출발지-목적지 주소를 포함합니다. 임시로 허용한 사이트는 포함되지 않습니다.">
 <!ENTITY preferences.export.button.label "파일로 내보내기">
-<!ENTITY preferences.import "들여오기">
 <!ENTITY preferences.import.caption "설정 들여오기">
 <!ENTITY preferences.import.description "내보내기 도구를 이용하여 Whitelist를 파일로부터 들여올 수 있습니다.">
 <!ENTITY preferences.import.details.caption "들여오기가 하는 일">

@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Fontoj + celoj">
 <!ENTITY preferences.temporary "Provizora">
 <!ENTITY preferences.removeSelectedSites "Forigi la elektitajn permesojn">
-<!ENTITY preferences.export "Export">
 <!ENTITY preferences.export.caption "Eksporto de agordoj">
 <!ENTITY preferences.export.description "Vi povas eligi vian permesaron en dosieron por havi sekurkopion. Por igi alian komputilon uzi la saman permesaron, simple transportu la dosieron al tiu komputilo kaj uzu la importilon.">
 <!ENTITY preferences.export.details.caption "Kion inkluzivas eksportaĵo">
 <!ENTITY preferences.export.details.description "La eksporta dosiero enhavos la konservitajn fontajn, celajn kaj font-al-celajn permesojn. Ĝi ne enhavos la provizorajn permesojn.">
 <!ENTITY preferences.export.button.label "Eksporti al dosiero">
-<!ENTITY preferences.import "Import">
 <!ENTITY preferences.import.caption "Importo de agordoj">
 <!ENTITY preferences.import.description "Vi povas importi vian permesaron el dosiero farita de vi per la eksportilo.">
 <!ENTITY preferences.import.details.caption "Kion faros la importo">

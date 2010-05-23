@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Источники-Цели">
 <!ENTITY preferences.temporary "Временный">
 <!ENTITY preferences.removeSelectedSites "Удалить Выбранные Сайты">
-<!ENTITY preferences.export "Экспорт">
 <!ENTITY preferences.export.caption "Экспорт настроек">
 <!ENTITY preferences.export.description "Для создания резервной копии белого списка вы можете экспортировать его в файл. Чтобы настроить такой же белый список на другом компьютере просто перенесите этот файл и используйте функцию импорта.">
 <!ENTITY preferences.export.details.caption "Что включается в экспорт">
 <!ENTITY preferences.export.details.description "Файл экспорта включает списки источников, целей и источников-целей, которые вы разрешили. Он не включает ничего, что вы разрешили временно.">
 <!ENTITY preferences.export.button.label "Экспорт в файл">
-<!ENTITY preferences.import "Импорт">
 <!ENTITY preferences.import.caption "Импорт настроек">
 <!ENTITY preferences.import.description "Вы можете импортировать белый список из файла резервной копии, который вы создали с помощью режима экспорта.">
 <!ENTITY preferences.import.details.caption "Что делает импорт">

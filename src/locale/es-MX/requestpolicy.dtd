@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Origenes-a-Destinos">
 <!ENTITY preferences.temporary "Temporal">
 <!ENTITY preferences.removeSelectedSites "Eliminar sitios seleccionados">
-<!ENTITY preferences.export "Exportar">
 <!ENTITY preferences.export.caption "Exportar tu configuración">
 <!ENTITY preferences.export.description "Puedes exportar tu lista de sitios permitidos a un archivo para tenerlos como respaldo. Para configurar en otra computadora la misma lista de sitios permitidos, copia el archivo a esa computadora y usa la opción importar.">
 <!ENTITY preferences.export.details.caption "¿Que se incluye en el archivo?:">
 <!ENTITY preferences.export.details.description "El archivo incluirá orígenes, destinos y orígenes-a-destinos que haz permitido. No contendrá nada que hayas permitido solo de modo temporal">
 <!ENTITY preferences.export.button.label "Exportar a Archivo">
-<!ENTITY preferences.import "Importar">
 <!ENTITY preferences.import.caption "Importar configuración">
 <!ENTITY preferences.import.description "Puedes importar tu lista de sitios permitidos desde un archivo de respaldo que hayas hecho con la herramienta de exportar">
 <!ENTITY preferences.import.details.caption "¿Como funciona importar?:">

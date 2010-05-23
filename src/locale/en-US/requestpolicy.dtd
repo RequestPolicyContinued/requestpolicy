@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Origins-to-Destinations">
 <!ENTITY preferences.temporary "Temporary">
 <!ENTITY preferences.removeSelectedSites "Remove Selected Sites">
-<!ENTITY preferences.export "Export">
 <!ENTITY preferences.export.caption "Export Your Settings">
 <!ENTITY preferences.export.description "You can export your whitelist to a file so that you have a backup. To configure another computer with the same whitelist, just move the file to that computer and use the import option.">
 <!ENTITY preferences.export.details.caption "What is included in the export">
 <!ENTITY preferences.export.details.description "The export file will contain the origins, destinations, and origins-to-destinations that you have allowed. It will not contain anything that you have only temporarily allowed.">
 <!ENTITY preferences.export.button.label "Export to File">
-<!ENTITY preferences.import "Import">
 <!ENTITY preferences.import.caption "Import Your Settings">
 <!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
 <!ENTITY preferences.import.details.caption "What the import will do">

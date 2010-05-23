@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Pares origem-destino">
 <!ENTITY preferences.temporary "Temporário">
 <!ENTITY preferences.removeSelectedSites "Remover entradas selecionadas">
-<!ENTITY preferences.export "Exportar">
 <!ENTITY preferences.export.caption "Exportar as suas configurações">
 <!ENTITY preferences.export.description "Você pode exportar sua lista de permissões para fazer uma cópia de segurança. Para usar a mesma lista em outro computador basta transferir para ele o arquivo exportado e usar o recurso de importação do RequestPolicy.">
 <!ENTITY preferences.export.details.caption "O que será incluído na exportação?">
 <!ENTITY preferences.export.details.description "O arquivo exportado conterá as origens, os destinos e os pares origem-destino que você adicionou à lista de permissões. Não serão incluídas as permissões temporárias.">
 <!ENTITY preferences.export.button.label "Exportar para arquivo">
-<!ENTITY preferences.import "Importar">
 <!ENTITY preferences.import.caption "Importar as suas configurações">
 <!ENTITY preferences.import.description "Você pode importar sua lista de permissões a partir da cópia de segurança feita através do recurso de exportação do RequestPolicy.">
 <!ENTITY preferences.import.details.caption "O que a importação alterará na lista de permissões atual?">

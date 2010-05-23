@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Origines-vers-destinations">
 <!ENTITY preferences.temporary "Temporaire">
 <!ENTITY preferences.removeSelectedSites "Retirer les sites sélectionnés">
-<!ENTITY preferences.export "Exporter">
 <!ENTITY preferences.export.caption "Exporter vos préférences">
 <!ENTITY preferences.export.description "Vous pouvez exporter votre liste blanche vers un fichier, et ainsi avoir une sauvegarde. Pour qu'un autre ordinateur dispose de la même configuration, déplacez-y ce fichier et utilisez l'option d'importation.">
 <!ENTITY preferences.export.details.caption "Ce qui est inclus dans l'exportation">
 <!ENTITY preferences.export.details.description "Le fichier exporté contiendra les origines, les destinations, et les « origines-vers-destinations » que vous avez autorisées. Il ne contiendra aucune autre chose que vous avez autorisée temporairement.">
 <!ENTITY preferences.export.button.label "Exporter vers le fichier">
-<!ENTITY preferences.import "Importer">
 <!ENTITY preferences.import.caption "Importer vos paramètres">
 <!ENTITY preferences.import.description "Vous pouvez importer votre liste blanche depuis un fichier de sauvegarde ayant été fait depuis l'outil d'exportation.">
 <!ENTITY preferences.import.details.caption "Ce que l'importation va faire">

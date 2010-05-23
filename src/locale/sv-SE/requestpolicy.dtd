@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Källor-till-mål">
 <!ENTITY preferences.temporary "Tillfälligt">
 <!ENTITY preferences.removeSelectedSites "Ta bort valda sidor">
-<!ENTITY preferences.export "Export">
 <!ENTITY preferences.export.caption "Exportera dina inställningar">
 <!ENTITY preferences.export.description "Du kan exportera din vitlista till en fil så att du har en backup. Flytta över filen och importera den för att ställa in en annan dator med samma vitlista.">
 <!ENTITY preferences.export.details.caption "Vad som är inkluderat i exporten">
 <!ENTITY preferences.export.details.description "Exportfilen kommer att inehålla källorna, målen och källorna-till-målen som du har tillåtit. Den kommer inte att innehålla något du enbart tillåtit tillfälligt.">
 <!ENTITY preferences.export.button.label "Exportera till fil">
-<!ENTITY preferences.import "Importera">
 <!ENTITY preferences.import.caption "Importera dina inställningar">
 <!ENTITY preferences.import.description "Du kan importera din vitlista från en backupfil som du har skapat med exportverktyget.">
 <!ENTITY preferences.import.details.caption "Vad importen kommer att göra">

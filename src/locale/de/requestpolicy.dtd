@@ -15,8 +15,8 @@
 <!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
 <!ENTITY preferences.prefpane.general "Allgemein">
 <!ENTITY preferences.prefpane.whitelist "Erlaubte Seiten">
-<!ENTITY preferences.prefpane.import "Import">
-<!ENTITY preferences.prefpane.export "Export">
+<!ENTITY preferences.prefpane.import "Importieren">
+<!ENTITY preferences.prefpane.export "Exportieren">
 <!ENTITY preferences.prefpane.advanced "Erweitert">
 <!ENTITY preferences.strictness "Regelstruktur">
 <!ENTITY preferences.strictness.description "Die Ebene zur Behandlung als Anfragen an die gleiche Seite. Nach Veränderung sind die RequestPolicy-Menus für derzeit geöffnete Tabs leer und diese müssen zur Erstellung von Regeln neu geladen werden.">
@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">
 <!ENTITY preferences.temporary "Temporär">
 <!ENTITY preferences.removeSelectedSites "Ausgewählte Seiten entfernen">
-<!ENTITY preferences.export "Exportieren">
 <!ENTITY preferences.export.caption "Export der Einstellungen">
 <!ENTITY preferences.export.description "Es empfiehlt sich, mittels Export eine Sicherheitskopie der Regeln anzulegen. Um die gleichen Regeln auf einem anderen Computer zu verwenden, muss die exportierte Datei auf jenen Computer kopiert und dann die Regeln aus dieser Datei importiert werden.">
 <!ENTITY preferences.export.details.caption "Was in einer Exportdatei enthalten ist">
 <!ENTITY preferences.export.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln exportiert. Temporäre Berechtigungen werden nicht exportiert.">
 <!ENTITY preferences.export.button.label "Export in Datei">
-<!ENTITY preferences.import "Importieren">
 <!ENTITY preferences.import.caption "Import der Einstellungen">
 <!ENTITY preferences.import.description "Der Import kann mit Dateien durchgeführt werden, die von der Exportfunktion erstellt worden.">
 <!ENTITY preferences.import.details.caption "Was beim Import durchgeführt wird">

@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "來源到目標">
 <!ENTITY preferences.temporary "Temporary">
 <!ENTITY preferences.removeSelectedSites "移除選擇的網站">
-<!ENTITY preferences.export "匯出">
 <!ENTITY preferences.export.caption "匯出您的設定">
 <!ENTITY preferences.export.description "您可以匯出白名單，儲存為檔案。如果您要在另一台電腦套用同樣的白名單，只要匯入該檔案即可。">
 <!ENTITY preferences.export.details.caption "匯出的檔案內容為何?">
 <!ENTITY preferences.export.details.description "匯出的檔案只會包含您允許的來源、目標與來源到目標的網站清單，排除任何您暫時允許的網站清單">
 <!ENTITY preferences.export.button.label "匯出到檔案">
-<!ENTITY preferences.import "匯入">
 <!ENTITY preferences.import.caption "匯入您的設定">
 <!ENTITY preferences.import.description "您可以匯入任何以匯出工具製作的檔案。">
 <!ENTITY preferences.import.details.caption "匯入工具的作用為何?">

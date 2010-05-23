@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "来源到目标">
 <!ENTITY preferences.temporary "临时">
 <!ENTITY preferences.removeSelectedSites "删除所选网站">
-<!ENTITY preferences.export "导出">
 <!ENTITY preferences.export.caption "导出您的设置">
 <!ENTITY preferences.export.description "您可以导出您的白名单到一个文件，让您有一个备份。要设置另一台计算机上相同的白名单，只需将文件保存到该计算机，并使用导入。">
 <!ENTITY preferences.export.details.caption "在导出文件中包含什么">
 <!ENTITY preferences.export.details.description "导出的文件将包含您允许的来源，目标，和起源到目标。它将不包含任何暂时允许。">
 <!ENTITY preferences.export.button.label "导出到文件">
-<!ENTITY preferences.import "导入">
 <!ENTITY preferences.import.caption "导入您的设置">
 <!ENTITY preferences.import.description "你可以从一个备份文件导入白名单。">
 <!ENTITY preferences.import.details.caption "导入将做什么">

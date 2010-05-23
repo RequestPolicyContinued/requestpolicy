@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Oorsprongen-naar-bestemmingen">
 <!ENTITY preferences.temporary "Tijdelijk">
 <!ENTITY preferences.removeSelectedSites "Geselecteerde sites verwijderen">
-<!ENTITY preferences.export "Exporteren">
 <!ENTITY preferences.export.caption "Uw instellingen exporteren">
 <!ENTITY preferences.export.description "U kunt uw witte lijst naar een bestand exporteren zodat u een back-up heeft. Verplaats het bestand naar een andere computer en gebruik daar de functie ‘Importeren’ om deze in te stellen met dezelfde witte lijst.">
 <!ENTITY preferences.export.details.caption "Wat is opgenomen in het exportbestand">
 <!ENTITY preferences.export.details.description "Het exportbestand bevat de toegestane oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen. Het bevat niets dat u tijdelijk heeft toegestaan.">
 <!ENTITY preferences.export.button.label "Naar bestand exporteren">
-<!ENTITY preferences.import "Importeren">
 <!ENTITY preferences.import.caption "Uw instellingen importeren">
 <!ENTITY preferences.import.description "U kunt uw witte lijst importeren uit een back-upbestand dat u heeft aangemaakt met de functie ‘Exporteren’.">
 <!ENTITY preferences.import.details.caption "Wat doet het importeren">

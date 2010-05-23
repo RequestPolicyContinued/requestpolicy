@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "Ana-dan-Hedefe">
 <!ENTITY preferences.temporary "Geçici">
 <!ENTITY preferences.removeSelectedSites "Seçileni sil">
-<!ENTITY preferences.export "Dışarı">
 <!ENTITY preferences.export.caption "Ayarları kaydet">
 <!ENTITY preferences.export.description "Buradan beyaz listenizi yedekleyebilirsiniz.Beyaz listesini geri yüklemek için içeri özelliğini kullanarak dosyayı aktarın.">
 <!ENTITY preferences.export.details.caption "Dosyada neler var">
 <!ENTITY preferences.export.details.description "Dosyada ana,hedef,ana-dan-hedefe izin verilen siteler var.Geçici olarak izin verilen siteler içinde bulunmaz.">
 <!ENTITY preferences.export.button.label "Dosyayı çıkar">
-<!ENTITY preferences.import "İçeri">
 <!ENTITY preferences.import.caption "İçeri aktar">
 <!ENTITY preferences.import.description "Beyaz listenizi buradan yükleyebilirsiniz.">
 <!ENTITY preferences.import.details.caption "İçeri neleri aktarır">

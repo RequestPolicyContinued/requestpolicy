@@ -36,13 +36,11 @@
 <!ENTITY preferences.originsToDestinations "オリジンと送信先のペア">
 <!ENTITY preferences.temporary "一時的かどうか">
 <!ENTITY preferences.removeSelectedSites "選択したサイトを削除">
-<!ENTITY preferences.export "エクスポート">
 <!ENTITY preferences.export.caption "設定をエクスポートする">
 <!ENTITY preferences.export.description "バックアップのために，ホワイトリストをエクスポートすることができます．ほかのコンピュータで同じホワイトリストを使いたいときは，エクスポートしたファイルをそのコンピュータにコピーして，インポートしてください．">
 <!ENTITY preferences.export.details.caption "エクスポートした設定に含まれるもの">
 <!ENTITY preferences.export.details.description "エクスポートしたファイルには，あなたが許可した「オリジン」と「送信先」と「オリジンと送信先のペア」のリストが含まれます．一時的な許可を行ったサイトのリストは一切含まれません．">
 <!ENTITY preferences.export.button.label "ファイルに設定をエクスポートする">
-<!ENTITY preferences.import "インポート">
 <!ENTITY preferences.import.caption "設定をインポートする">
 <!ENTITY preferences.import.description "エクスポートしたホワイトリストのバックアップファイルをインポートすることができます．">
 <!ENTITY preferences.import.details.caption "インポートで行われること">

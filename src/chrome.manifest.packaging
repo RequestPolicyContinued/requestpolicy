@@ -2,7 +2,7 @@ content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
 skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/
 
 locale     requestpolicy    en-US          jar:chrome/requestpolicy.jar!/locale/en-US/
-locale     requestpolicy    de-DE          jar:chrome/requestpolicy.jar!/locale/de-DE/
+locale     requestpolicy    de             jar:chrome/requestpolicy.jar!/locale/de/
 locale     requestpolicy    eo             jar:chrome/requestpolicy.jar!/locale/eo/
 locale     requestpolicy    es-MX          jar:chrome/requestpolicy.jar!/locale/es-MX/
 locale     requestpolicy    fr             jar:chrome/requestpolicy.jar!/locale/fr/

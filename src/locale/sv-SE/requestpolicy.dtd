@@ -1,0 +1,62 @@
+<!ENTITY prefetchWarning "Varning: Förhämtning är aktiverad">
+<!ENTITY prefetchInfo "Lär dig mer om förhämtning">
+<!ENTITY prefetchDisablingInstructions "Inaktivera förhämtning">
+<!ENTITY temporarilyAllowAll "Tillåt tillfälligt alla förfrågningar">
+<!ENTITY revokeTemporaryPermissions "Återkalla alla tillfälliga tillstånd">
+<!ENTITY blockedDestinations "Blockerade destinationer">
+<!ENTITY allowedDestinations "Tillåtna mål">
+<!ENTITY otherOrigins "Andra källor inom denna sida">
+<!ENTITY menu.openRequestLog.label "Visa förfrågningsloggen">
+<!ENTITY menu.closeRequestLog.label "Stäng förfrågningsloggen">
+<!ENTITY rp.origin "Källa">
+<!ENTITY rp.destination "Mål">
+<!ENTITY rp.allow "Tillåt">
+<!ENTITY preferences "Alternativ">
+<!ENTITY preferences.windowTitle "RequestPolicy - Inställningar">
+<!ENTITY preferences.prefpane.general "Generellt">
+<!ENTITY preferences.prefpane.whitelist "Vitlista">
+<!ENTITY preferences.prefpane.import "Importera">
+<!ENTITY preferences.prefpane.export "Exportera">
+<!ENTITY preferences.prefpane.advanced "Avancerat">
+<!ENTITY preferences.strictness "Strikthet">
+<!ENTITY preferences.strictness.description "Klassificeringsnivån att använda för samma-sida-förfrågningar. Menyn kommer inledningsvis vara tom för varje flik.">
+<!ENTITY preferences.baseDomain "Basdomän (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Full domän (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Full adress (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Webbsidor">
+<!ENTITY preferences.statusbarIcon "Statusradsikon">
+<!ENTITY preferences.indicateBlockedObjects "Indikera blockerade bilder">
+<!ENTITY preferences.autoReload "Ladda om nuvarande sida när vitlistan ändras">
+<!ENTITY preferences.openInitialSetup "Öppna inställningsguiden">
+<!ENTITY preferences.misc "Blandat">
+<!ENTITY preferences.startWithAllowAllEnabled "Aktivera &quot;Tillåt tillfälligt alla förfrågningar&quot; när webbläsaren startar">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Tillåt permanent vitlistning när privat surfning används">
+<!ENTITY preferences.origins "Källor">
+<!ENTITY preferences.destinations "Mål">
+<!ENTITY preferences.originsToDestinations "Källor-till-mål">
+<!ENTITY preferences.temporary "Tillfälligt">
+<!ENTITY preferences.removeSelectedSites "Ta bort valda sidor">
+<!ENTITY preferences.export "Export">
+<!ENTITY preferences.export.caption "Exportera dina inställningar">
+<!ENTITY preferences.export.description "Du kan exportera din vitlista till en fil så att du har en backup. Flytta över filen och importera den för att ställa in en annan dator med samma vitlista.">
+<!ENTITY preferences.export.details.caption "Vad som är inkluderat i exporten">
+<!ENTITY preferences.export.details.description "Exportfilen kommer att inehålla källorna, målen och källorna-till-målen som du har tillåtit. Den kommer inte att innehålla något du enbart tillåtit tillfälligt.">
+<!ENTITY preferences.export.button.label "Exportera till fil">
+<!ENTITY preferences.import "Importera">
+<!ENTITY preferences.import.caption "Importera dina inställningar">
+<!ENTITY preferences.import.description "Du kan importera din vitlista från en backupfil som du har skapat med exportverktyget.">
+<!ENTITY preferences.import.details.caption "Vad importen kommer att göra">
+<!ENTITY preferences.import.details.description "Importen kommer att lägga till alla källor, mål och källor-till-mål i filen som du importerar. Ingen i din nuvarande vitlista kommer att tas bort. En import läggar alltså enbart till sidor till vitlistan, den kommer inte att ersätta den.">
+<!ENTITY preferences.import.button.label "Importera från fil">
+<!ENTITY requestLog.title "Förfrågningslogg">
+<!ENTITY requestLog.blocked "Blockerad">
+<!ENTITY requestLog.time "Tid">
+<!ENTITY initialSetup.title "Första inställning">
+<!ENTITY initialSetup.whitelist.caption "Lägg till sidor till din mellan-sidor-vitlista">
+<!ENTITY initialSetup.whitelist.description "Dessa sidor listas antingen eftersom (1) de skickar förfrågningar mellan sidor som ägs av samma företag eller (2) de minskar problem du kan stöta på och har en väldigt liten påverkan på på integritet och säkerhet.">
+<!ENTITY initialSetup.region.international "Internationella">
+<!ENTITY initialSetup.region.americas "Amerika">
+<!ENTITY initialSetup.region.asia "Asien">
+<!ENTITY initialSetup.region.usAndCanada "USA och Kanada">
+<!ENTITY initialSetup.region.europeAndRussia "Europa och Ryssland">
+<!ENTITY initialSetup.region.oceania "Oceanien">

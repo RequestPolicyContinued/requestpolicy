@@ -157,13 +157,6 @@ RequestPolicyService.prototype = {
 
     // TODO: Don't add the rules if the extension is installed but disabled.
 
-    // Adblock Plus
-    if (ext = em.getItemForID("{d10d0bf8-f5b5-c8b4-a8b2-2b9879e08c5d}")) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Extension detected: " + ext.name);
-      this._compatibilityRules.push(["http://easylist.adblockplus.org/",
-          "http://adblockplus.mozdev.org/easylist/", ext.name]);
-    }
     // Greasefire
     if (ext = em.getItemForID("greasefire@skrul.com")) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -400,6 +393,38 @@ RequestPolicyService.prototype = {
     }
   },
 
+  /**
+   * Checks whether a request is initiated by a content window. If it's from a
+   * content window, then it's from unprivileged code.
+   */
+  _isContentRequest : function(channel) {
+    var callbacks = [];
+    if (channel.notificationCallbacks) {
+      callbacks.push(channel.notificationCallbacks);
+    }
+    if (channel.loadGroup && channel.loadGroup.notificationCallbacks) {
+      callbacks.push(channel.loadGroup.notificationCallbacks);
+    }
+
+    for (var i = 0; i < callbacks.length; i++) {
+      var callback = callbacks[i];
+      try {
+        // For Gecko 1.9.1
+        return callback.getInterface(CI.nsILoadContext).isContent;
+      } catch (e) {
+      }
+      try {
+        // For Gecko 1.9.0
+        var itemType = callback.getInterface(CI.nsIWebNavigation)
+            .QueryInterface(CI.nsIDocShellTreeItem).itemType;
+        return itemType == CI.nsIDocShellTreeItem.typeContent;
+      } catch (e) {
+      }
+    }
+
+    return false;
+  },
+
   _examineHttpResponse : function(observedSubject) {
     // Currently, if a user clicks a link to download a file and that link
     // redirects and is subsequently blocked, the user will see the blocked
@@ -454,6 +479,15 @@ RequestPolicyService.prototype = {
     // For origins that are IDNs, this will always be in ACE format. We want
     // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
     var origin = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name);
+
+    // Allow redirects of requests from privileged code.
+    if (!this._isContentRequest(httpChannel)) {
+      requestpolicy.mod.Logger.warning(
+          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
+              + headerType + "' header to <" + dest + "> " + "from <" + origin
+              + ">. Original request is from privileged code.");
+      return;
+    }
 
     // If it's not a valid uri, the redirect is relative to the origin host.
     // The way we have things written currently, without this check the full

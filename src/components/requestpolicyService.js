@@ -81,7 +81,6 @@ RequestPolicyService.prototype = {
    */
   _userAllowedRedirects : {},
 
-  // _allowedRedirectsReverse and _allowedRedirectsReverse
   _blockedRedirects : {},
   _allowedRedirectsReverse : {},
 

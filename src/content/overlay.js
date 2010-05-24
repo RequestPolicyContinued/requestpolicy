@@ -871,9 +871,9 @@ requestpolicy.overlay = {
       // changes (even just a change in variable names, for example), we'll
       // simply insert our own line right after the first curly brace in the
       // string representation of the addTab function.
-      addTabString = gBrowser.addTab.toString();
-      firstCurlyBrace = addTabString.indexOf("{");
-      addTabParts = [];
+      var addTabString = gBrowser.addTab.toString();
+      var firstCurlyBrace = addTabString.indexOf("{");
+      var addTabParts = [];
       // Includes the '{'
       addTabParts[0] = addTabString.substring(0, firstCurlyBrace + 1);
       // Starts after the '{'

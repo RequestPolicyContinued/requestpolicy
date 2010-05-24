@@ -339,6 +339,8 @@ requestpolicy.overlay = {
     requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
         destIdent);
 
+    const rpServiceObj = this._rpServiceJSObject;
+
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
     if (notification) {
@@ -366,6 +368,13 @@ requestpolicy.overlay = {
               }
               requestpolicy.mod.Logger.dump("User allowed redirection from <"
                   + location.href + "> to <" + redirectTargetUri + ">");
+              // Record the allowed redirect as location.href calls shouldLoad
+              // in Fx 3.7a5pre.
+              var allowedRedirects = rpServiceObj._userAllowedRedirects;
+              if (!allowedRedirects[location.href]) {
+                allowedRedirects[location.href] = {};
+              }
+              allowedRedirects[location.href][redirectTargetUri] = true;
               location.href = redirectTargetUri;
             }
           }, {

@@ -75,6 +75,13 @@ RequestPolicyService.prototype = {
   _rejectedRequests : {},
   _allowedRequests : {},
 
+  /**
+   * These are redirects that the user allowed when presented with a redirect
+   * notification.
+   */
+  _userAllowedRedirects : {},
+
+  // _allowedRedirectsReverse and _allowedRedirectsReverse
   _blockedRedirects : {},
   _allowedRedirectsReverse : {},
 
@@ -1070,6 +1077,9 @@ RequestPolicyService.prototype = {
     // Note: If changing the logic here, also make necessary changes to
     // shouldLoad().
 
+    // This is not including link clicks, form submissions, and user-allowed
+    // redirects.
+
     var originIdentifier = this.getUriIdentifier(originUri);
     var destIdentifier = this.getUriIdentifier(destinationUri);
 
@@ -1636,7 +1646,7 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        arguments = [aContentType, dest, origin, aContext, aMimeTypeGuess,
+        var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aInternalCall];
 
         // Note: If changing the logic here, also make necessary changes to
@@ -1654,8 +1664,8 @@ RequestPolicyService.prototype = {
           // Don't delete the _clickedLinks item. We need it for if the user
           // goes back/forward through their history.
           // delete this._clickedLinks[origin][dest];
-          return this.accept("User-initiated request by link click", arguments,
-              true);
+          return this
+              .accept("User-initiated request by link click", args, true);
 
         } else if (this._submittedForms[origin]
             && this._submittedForms[origin][dest.split("?")[0]]) {
@@ -1665,8 +1675,8 @@ RequestPolicyService.prototype = {
           // Don't delete the _clickedLinks item. We need it for if the user
           // goes back/forward through their history.
           // delete this._submittedForms[origin][dest.split("?")[0]];
-          return this.accept("User-initiated request by form submission",
-              arguments, true);
+          return this.accept("User-initiated request by form submission", args,
+              true);
 
         } else if (this._historyRequests[dest]) {
           // When the user goes back and forward in their history, a request for
@@ -1674,7 +1684,12 @@ RequestPolicyService.prototype = {
           // the page's content. Therefore, we make sure that our cache of
           // blocked requests isn't removed in this case.
           delete this._historyRequests[dest];
-          return this.accept("History request", arguments, true);
+          return this.accept("History request", args, true);
+        } else if (this._userAllowedRedirects[origin]
+            && this._userAllowedRedirects[origin][dest]) {
+          // shouldLoad is called by location.href in overlay.js as of Fx
+          // 3.7a5pre and SeaMonkey 2.1a.
+          return this.accept("User-allowed redirect", args, true);
         }
 
         var originIdentifier = this.getUriIdentifier(origin);
@@ -1682,33 +1697,32 @@ RequestPolicyService.prototype = {
 
         if (destIdentifier == originIdentifier) {
           return this.accept("same host (at current domain strictness level)",
-              arguments);
+              args);
         }
 
         if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
-          return this.accept("Allowed origin to destination", arguments);
+          return this.accept("Allowed origin to destination", args);
         }
 
         if (this.isAllowedOrigin(originIdentifier)) {
-          return this.accept("Allowed origin", arguments);
+          return this.accept("Allowed origin", args);
         }
 
         if (this.isAllowedDestination(destIdentifier)) {
-          return this.accept("Allowed destination", arguments);
+          return this.accept("Allowed destination", args);
         }
 
         if (this.isTemporarilyAllowedOriginToDestination(originIdentifier,
             destIdentifier)) {
-          return this.accept("Temporarily allowed origin to destination",
-              arguments);
+          return this.accept("Temporarily allowed origin to destination", args);
         }
 
         if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
-          return this.accept("Temporarily allowed origin", arguments);
+          return this.accept("Temporarily allowed origin", args);
         }
 
         if (this.isTemporarilyAllowedDestination(destIdentifier)) {
-          return this.accept("Temporarily allowed destination", arguments);
+          return this.accept("Temporarily allowed destination", args);
         }
 
         if (aRequestOrigin.scheme == "chrome") {
@@ -1717,7 +1731,7 @@ RequestPolicyService.prototype = {
             // in address bar.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments);
+                    + "explanation (e.g. new window/tab opened)", args);
           } else {
             // TODO: It seems sketchy to allow all requests from chrome. If I
             // had to put my money on a possible bug (in terms of not blocking
@@ -1728,7 +1742,7 @@ RequestPolicyService.prototype = {
             // me know, I will be very grateful.
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", arguments);
+                    + "explanation (e.g. new window/tab opened)", args);
           }
         }
 
@@ -1743,7 +1757,7 @@ RequestPolicyService.prototype = {
           return this
               .accept(
                   "New window (should probably only be an allowed popup's initial request)",
-                  arguments, true);
+                  args, true);
         }
 
         // XMLHttpRequest's made within chrome's context have this origin.
@@ -1751,7 +1765,7 @@ RequestPolicyService.prototype = {
         if (origin == "resource://gre/res/hiddenWindow.html") {
           return this.accept(
               "Privileged request (possibly a cross-site XMLHttpRequest)",
-              arguments, true);
+              args, true);
         }
 
         for (var i = 0; i < this._compatibilityRules.length; i++) {
@@ -1761,13 +1775,13 @@ RequestPolicyService.prototype = {
           if (allowOrigin && allowDest) {
             return this.accept(
                 "Extension/application compatibility rule matched [" + rule[2]
-                    + "]", arguments, true);
+                    + "]", args, true);
           }
         }
 
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
-        return this.reject("hosts don't match", arguments);
+        return this.reject("hosts don't match", args);
 
       } catch (e) {
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,

@@ -327,7 +327,7 @@ requestpolicy.overlay = {
     var notificationButtonAllow = this._strbundle.getString("allow");
     var notificationButtonDeny = this._strbundle.getString("deny");
 
-    optionsPopupName = "requestpolicyRedirectNotificationOptions";
+    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
     requestpolicy.menu.clearMenu(optionsPopup);
     var currentIdent = this._rpService

@@ -46,8 +46,12 @@ RequestPolicyService.prototype = {
   classDescription : "RequestPolicy JavaScript XPCOM Component",
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
   contractID : "@requestpolicy.com/requestpolicy-service;1",
+  // For info about the change from app-startup to profile-after-change, see:
+  // https://developer.mozilla.org/en/XPCOM/XPCOM_changes_in_Gecko_1.9.3
   _xpcom_categories : [{
         category : "app-startup"
+      }, {
+        category : "profile-after-change"
       }, {
         category : "content-policy"
       }],
@@ -67,6 +71,8 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
+
+  _initialized : false,
 
   _blockingDisabled : false,
 
@@ -143,6 +149,11 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 
   _init : function() {
+    if (this._initialized) {
+      return;
+    }
+    this._initialized = true;
+
     this._loadLibraries();
     this._initContentPolicy();
     this._register();
@@ -157,51 +168,75 @@ RequestPolicyService.prototype = {
     if (this._compatibilityRules.length != 0) {
       return;
     }
-    var em = Components.classes["@mozilla.org/extensions/manager;1"]
-        .getService(Components.interfaces.nsIExtensionManager);
-    var ext;
 
-    // TODO: Don't add the rules if the extension is installed but disabled.
+    var idArray = [];
+    idArray.push("greasefire@skrul.com"); // GreaseFire
+    idArray.push("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}"); // Sage-Too
+    idArray.push("{899DF1F8-2F43-4394-8315-37F6744E6319}"); // NewsFox
+    idArray.push("brief@mozdev.org"); // Brief
 
-    // Greasefire
-    if (ext = em.getItemForID("greasefire@skrul.com")) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Extension detected: " + ext.name);
-      this._compatibilityRules.push(["file://", "http://userscripts.org/",
-          ext.name]);
-      this._compatibilityRules.push(["file://",
-          "http://static.userscripts.org/", ext.name]);
+    try {
+      // For Firefox <= 3.6.
+      var em = Components.classes["@mozilla.org/extensions/manager;1"]
+          .getService(Components.interfaces.nsIExtensionManager);
+      var ext;
+      for (var i = 0; i < idArray.length; i++) {
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Extension old-style check: " + idArray[i]);
+        this._initializeExtCompatCallback(em.getItemForID(idArray[i]));
+      }
+    } catch (e) {
+      // As of Firefox 3.7, the extension manager has been replaced.
+      const rpService = this;
+      var callback = function(ext) {
+        rpService._initializeExtCompatCallback(ext)
+      };
+      Components.utils.import("resource://gre/modules/AddonManager.jsm");
+      for (var i = 0; i < idArray.length; i++) {
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Extension new-style check: " + idArray[i]);
+        AddonManager.getAddonByID(idArray[i], callback);
+      }
+    }
+  },
+
+  _initializeExtCompatCallback : function(ext) {
+    if (!ext) {
+      return;
     }
 
-    // Sage-Too
-    if (ext = em.getItemForID("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}")) {
+    // As of Firefox 3.7, we can easily whether addons are disabled.
+    // The isActive property won't exist before 3.7, so it will be null.
+    if (ext.isActive == false) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Extension detected: " + ext.name);
-      this._conflictingExtensions.push({
-            "id" : ext.id,
-            "name" : ext.name,
-            "version" : ext.version
-          });
+          "Extension is not active: " + ext.name);
+      return;
     }
-    // NewsFox
-    if (ext = em.getItemForID("{899DF1F8-2F43-4394-8315-37F6744E6319}")) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Extension detected: " + ext.name);
-      this._conflictingExtensions.push({
-            "id" : ext.id,
-            "name" : ext.name,
-            "version" : ext.version
-          });
-    }
-    // Brief
-    if (ext = em.getItemForID("brief@mozdev.org")) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Extension detected: " + ext.name);
-      this._conflictingExtensions.push({
-            "id" : ext.id,
-            "name" : ext.name,
-            "version" : ext.version
-          });
+
+    switch (ext.id) {
+      case "greasefire@skrul.com" : // Greasefire
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push(["file://", "http://userscripts.org/",
+            ext.name]);
+        this._compatibilityRules.push(["file://",
+            "http://static.userscripts.org/", ext.name]);
+        break;
+      case "{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}" : // Sage-Too
+      case "{899DF1F8-2F43-4394-8315-37F6744E6319}" : // NewsFox
+      case "brief@mozdev.org" : // Brief
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Conflicting extension: " + ext.name);
+        this._conflictingExtensions.push({
+              "id" : ext.id,
+              "name" : ext.name,
+              "version" : ext.version
+            });
+        break;
+      default :
+        requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Unhandled extension (id typo?): " + ext.name);
+        break;
     }
   },
 
@@ -1274,6 +1309,9 @@ RequestPolicyService.prototype = {
         this._updatePref(data);
         break;
       case "profile-after-change" :
+        // We call _init() here because gecko 1.9.3 states that extensions will
+        // no longer be able to receive app-startup.
+        this._init();
         // "profile-after-change" means that user preferences are now
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.

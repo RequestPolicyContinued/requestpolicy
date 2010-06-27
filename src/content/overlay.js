@@ -951,6 +951,7 @@ requestpolicy.overlay = {
   _addLocationObserver : function() {
     this.locationListener = {
       onLocationChange : function(aProgress, aRequest, aURI) {
+        // This gets called both for tab changes and for history navigation.
         requestpolicy.overlay._checkForBlockedContent(content.document);
       },
       onStateChange : function() {
@@ -973,22 +974,10 @@ requestpolicy.overlay = {
       }
     };
 
-    // This was changed to try to prevent immediate checking of blocked
-    // requests on page loads. This is mostly (only?) intended to identify tab
-    // changes, and using NOTIFY_STATE_DOCUMENT was making it fire immediately
-    // on any location change, even before much of the page was loaded. Using
-    // STATE_IS_WINDOW with STATE_STOP seems to prevent the blocked request
-    // checking from being triggered immediately on a location change but is
-    // still essentially immediate for a tab change (as there isn't any real
-    // activity going on before the STATE_IS_WINDOW & STATE_STOP is hit). For
-    // more details, see:
-    // https://developer.mozilla.org/en/nsIWebProgressListener#onStateChange
-    // https://developer.mozilla.org/En/NsIWebProgress
-    // gBrowser.addProgressListener(this.locationListener,
-    // Components.interfaces.nsIWebProgress.NOTIFY_STATE_DOCUMENT);
+    // Oddly, it doesn't seem right now that the mask is actually working. All
+    // of the on*Change methods appear to be getting called.
     gBrowser.addProgressListener(this.locationListener,
-        Components.interfaces.nsIWebProgress.STATE_IS_WINDOW
-            & Components.interfaces.nsIWebProgress.STATE_STOP);
+        Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
   },
 
   _removeLocationObserver : function() {

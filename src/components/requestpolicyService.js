@@ -276,6 +276,14 @@ RequestPolicyService.prototype = {
       this._compatibilityRules.push(["http://feeds.feedburner.com/",
           "http://www.flock.com/", appInfo.vendor]);
     }
+
+    // Seamonkey
+    if (appInfo.ID == "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Application detected: Seamonkey");
+      this._compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
+      this._compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
+    }
   },
 
   _syncFromPrefs : function() {

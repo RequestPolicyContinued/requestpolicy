@@ -722,6 +722,14 @@ requestpolicy.overlay = {
     }
   },
 
+  _getDocShellAllowMetaRedirects : function(document) {
+    var docShell = document.defaultView
+        .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+        .getInterface(Components.interfaces.nsIWebNavigation)
+        .QueryInterface(Components.interfaces.nsIDocShell);
+    return docShell.allowMetaRedirects;
+  },
+
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
@@ -762,11 +770,19 @@ requestpolicy.overlay = {
                   + "> appeared to be relative to <" + document.documentURI
                   + ">, so it has been resolved to <" + dest + ">");
         }
-        if (this._rpServiceJSObject._blockingDisabled
-            || this._rpService.isAllowedRedirect(document.location, dest)) {
-          // The meta refresh is allowed.
-          this._performRedirectAfterDelay(document, dest, delay);
-        } else {
+
+        if (!this._getDocShellAllowMetaRedirects(document)) {
+          requestpolicy.mod.Logger.warning(
+              requestpolicy.mod.Logger.TYPE_META_REFRESH,
+              "Another extension disabled docShell.allowMetaRedirects.");
+        }
+
+        // We don't automatically perform any allowed redirects. Instead, we
+        // just detect when they will be blocked and show a notification. If
+        // the docShell has allowMetaRedirects disabled, it will be respected.
+        if (!this._rpServiceJSObject._blockingDisabled
+            && !this._rpService.isAllowedRedirect(document.location, dest)) {
+          // The request will be blocked by shouldLoad.
           this._showRedirectNotification(document, dest, delay);
         }
       }
@@ -1268,18 +1284,6 @@ requestpolicy.overlay = {
   revokeTemporaryPermissions : function(event) {
     this._rpService.revokeTemporaryPermissions();
     this._conditionallyReloadDocument();
-  },
-
-  _performRedirectAfterDelay : function(document, redirectTargetUri, delay) {
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-        "Registering delayed (" + delay + "s) redirect to <"
-            + redirectTargetUri + "> from <" + document.documentURI + ">");
-    const constDocument = document;
-    const constRedirectTargetUri = redirectTargetUri;
-    document.defaultView.setTimeout(function() {
-          requestpolicy.overlay._performRedirect(constDocument,
-              constRedirectTargetUri);
-        }, delay * 1000);
   },
 
   _performRedirect : function(document, redirectTargetUri) {

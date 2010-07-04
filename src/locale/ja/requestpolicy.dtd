@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "リクエストログ">
 <!ENTITY requestLog.blocked "禁止">
 <!ENTITY requestLog.time "時間">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "初期設定">
 <!ENTITY initialSetup.whitelist.caption "ホワイトリストにWebサイトを追加">
 <!ENTITY initialSetup.whitelist.description "このリストにあるWebサイトは，以下の目的のために選択されます．ひとつは，同じ会社によって所有されているWebサイト間のリクエストにかかわるため．もうひとつは，プライバシーとセキュリティにさほど影響を及ぼさない範囲で，あなたが行き当たりうる問題を減少させるためです．">

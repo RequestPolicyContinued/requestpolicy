@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "Request Log">
 <!ENTITY requestLog.blocked "Blocked">
 <!ENTITY requestLog.time "Час">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "Initial setup">
 <!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
 <!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">

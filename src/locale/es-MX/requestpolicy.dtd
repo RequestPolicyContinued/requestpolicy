@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "Registro de peticiones">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "Configuracion Inicial">
 <!ENTITY initialSetup.whitelist.caption "Agregar sitios a tu lista de sitios permitidos para peticiones cruzadas">
 <!ENTITY initialSetup.whitelist.description "Los sitios en esta lista fueron seleccionados debido a: (1) Involucran peticiones entre sitios de la misma compañia, o (2) Reducen los problemas que puedas encontrar y tienen muy poco impacto en tu privacidad y seguridad">

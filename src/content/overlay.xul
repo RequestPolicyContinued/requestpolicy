@@ -170,7 +170,9 @@
 		<vbox id="rp-requestLog" height="300" hidden="true" persist="height">
 			<toolbox id="rp-requestLog-header">
 				<toolbar id="rp-requestLog-toolbar" align="center">
-					<label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" flex="1" crop="end"/>
+					<label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" crop="end" />
+					<button label="&requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
+					<vbox flex="1" />
 					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
 				</toolbar>
 			</toolbox>

@@ -1376,6 +1376,10 @@ requestpolicy.overlay = {
         null);
   },
 
+  clearRequestLog : function() {
+    this.requestLogTreeView.clear();
+  },
+
   toggleRequestLog : function() {
     var requestLog = document.getElementById("rp-requestLog");
     var requestLogSplitter = document.getElementById("rp-requestLog-splitter");

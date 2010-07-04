@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "Logbestand verzoeken">
 <!ENTITY requestLog.blocked "Geblokkeerd">
 <!ENTITY requestLog.time "Tijdstip">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "Initiële instelling">
 <!ENTITY initialSetup.whitelist.caption "Voeg sites toe aan uw cross-site witte lijst.">
 <!ENTITY initialSetup.whitelist.description "De sites op deze lijsten zijn geselecteerd omdat ze (1) verzoeken betreffen tussen sites van hetzelfde bedrijf, of (2) ze de mogelijke problemen vermijden en weinig impact hebben op privacy en beveiliging.">

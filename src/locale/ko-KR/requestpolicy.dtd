@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "요청 기록">
 <!ENTITY requestLog.blocked "거부됨">
 <!ENTITY requestLog.time "시간">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "초기 설정">
 <!ENTITY initialSetup.whitelist.caption "Cross-site whitelist에 사이트를 추가합니다.">
 <!ENTITY initialSetup.whitelist.description "이 목록에 있는 사이트들은 다음의 이유로 선정되었습니다.(1) 같은 회사 소유의 사이트 내에서의 요청을 포함하거나,(2) they reduce the problems you may encounter, 프라이버시나 보안에 미미한 영향을 미치는 사이트.">

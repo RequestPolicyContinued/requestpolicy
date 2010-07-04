@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "Anfragenchronik">
 <!ENTITY requestLog.blocked "Blockiert">
 <!ENTITY requestLog.time "Zeit">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "Erstkonfiguration">
 <!ENTITY initialSetup.whitelist.caption "Hinzufügen häufig benutzter Regeln zur Liste erlaubter Anfragen">
 <!ENTITY initialSetup.whitelist.description "Die Regeln in dieser Liste können zugelassen werden, da (1) die Anfrage zwischen zwei Seiten stattfindet, die dem selben Unternehmen gehören, oder (2) sie auftretende Probleme beheben und dabei nur kleinen Einfluss aus Sicherheit und Privatsphäre haben.">

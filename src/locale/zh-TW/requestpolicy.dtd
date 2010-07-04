@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "請求記錄">
 <!ENTITY requestLog.blocked "已阻擋">
 <!ENTITY requestLog.time "發生時間">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "初始設定">
 <!ENTITY initialSetup.whitelist.caption "新增網站到您的跨網站白名單">
 <!ENTITY initialSetup.whitelist.description "您勾選的區域已經預設某些網站，因為這些為同一家公司擁有的網站之間的請求，或是能夠減少使用者的不便，而且對隱私與安全性的影響很小。">

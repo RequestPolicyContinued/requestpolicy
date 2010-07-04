@@ -30,7 +30,7 @@ requestpolicy.requestLogTreeView = {
 
   _treebox : null,
 
-  _isEmpty : true,
+  _emptyMessageDisplayed : true,
 
   _visibleData : [],
 
@@ -51,12 +51,24 @@ requestpolicy.requestLogTreeView = {
     this._visibleData.push([message, directions, false, ""]);
   },
 
+  clear : function(e) {
+    var count = this._getRowCount();
+    if (count == 0) {
+      return;
+    }
+    this._visibleData = [];
+    if (!this._treebox) {
+      return;
+    }
+    this._treebox.rowCountChanged(0, -count);
+  },
+
   addAllowedRequest : function(originUri, destUri) {
-    if (this._isEmpty) {
+    if (this._emptyMessageDisplayed) {
       // If this were to be called in a multithreaded manner, there's probably
       // a race condition here.
       this._visibleData.shift();
-      this._isEmpty = false;
+      this._emptyMessageDisplayed = false;
       this._treebox.rowCountChanged(0, -1);
     }
     this._visibleData.push([originUri, destUri, false,
@@ -68,11 +80,11 @@ requestpolicy.requestLogTreeView = {
   },
 
   addBlockedRequest : function(originUri, destUri) {
-    if (this._isEmpty) {
+    if (this._emptyMessageDisplayed) {
       // If this were to be called in a multithreaded manner, there's probably
       // a race condition here.
       this._visibleData.shift();
-      this._isEmpty = false;
+      this._emptyMessageDisplayed = false;
       this._treebox.rowCountChanged(0, -1);
     }
     this._visibleData.push([originUri, destUri, true,

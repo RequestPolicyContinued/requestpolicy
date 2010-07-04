@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "Kayıtlar">
 <!ENTITY requestLog.blocked "Yasaklı">
 <!ENTITY requestLog.time "Zaman">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "İlk yükleme">
 <!ENTITY initialSetup.whitelist.caption "Beyaz listenize bağlantıları  ekleyin">
 <!ENTITY initialSetup.whitelist.description "Bu listesi siteler (1) Aynı kuruluşlardandır veya (2) yaşayabileceğiniz sıkıntıları en az düzeye indirir ve çok az güvenlik,gizliliği etkiler.">

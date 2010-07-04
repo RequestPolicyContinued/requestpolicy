@@ -49,6 +49,11 @@
 <!ENTITY requestLog.title "请求日志">
 <!ENTITY requestLog.blocked "阻止">
 <!ENTITY requestLog.time "时间">
+<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY requestLog.clear "Clear">
 <!ENTITY initialSetup.title "开始安装">
 <!ENTITY initialSetup.whitelist.caption "添加网站到您的跨网域白名单">
 <!ENTITY initialSetup.whitelist.description "网站在这些名单选定可能是因为（1）它们涉及的请求的网站之间所拥有的同一家公司，或者（2）他们减少您可能会遇到的问题，并有一个非常低的影响隐私和安全。">

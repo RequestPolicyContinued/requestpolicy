@@ -1,182 +1,182 @@
 <?xml version="1.0"?>
 <!--
-	***** BEGIN LICENSE BLOCK *****
+  ***** BEGIN LICENSE BLOCK *****
 
-	RequestPolicy - A Firefox extension for control over cross-site requests.
-	Copyright (c) 2008 Justin Samuel
+  RequestPolicy - A Firefox extension for control over cross-site requests.
+  Copyright (c) 2008 Justin Samuel
 
-	This program is free software: you can redistribute it and/or modify it under
-	the terms of the GNU General Public License as published by the Free Software
-	Foundation, either version 3 of the License, or (at your option) any later
-	version.
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later
+  version.
 
-	This program is distributed in the hope that it will be useful, but WITHOUT
-	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-	details.
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
 
-	You should have received a copy of the GNU General Public License along with
-	this program. If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License along with
+  this program. If not, see <http://www.gnu.org/licenses/>.
 
-	***** END LICENSE BLOCK *****
+  ***** END LICENSE BLOCK *****
 -->
 <!DOCTYPE overlay SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
 
 <?xml-stylesheet href="chrome://requestpolicy/skin/requestpolicy.css" type="text/css"?>
 
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	id="requestpolicyOverlay">
+  id="requestpolicyOverlay">
 
-	<stringbundleset id="stringbundleset">
-		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
-	</stringbundleset>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
+  </stringbundleset>
 	
-	<script type="application/x-javascript" src="overlay.js" />
-	<script type="application/x-javascript" src="menu.js" />
+  <script type="application/x-javascript" src="overlay.js" />
+  <script type="application/x-javascript" src="menu.js" />
 
-	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="requestpolicyToolbarButton" 
-			class="toolbarbutton-1 chromeclass-toolbar-additional"
-			label="RequestPolicy"
-			tooltiptext="RequestPolicy"
-			type="menu-button"
-			onclick="requestpolicy.overlay.openToolbarPopup(this)" />
-	</toolbarpalette>
+  <toolbarpalette id="BrowserToolbarPalette">
+    <toolbarbutton id="requestpolicyToolbarButton"
+      class="toolbarbutton-1 chromeclass-toolbar-additional"
+      label="RequestPolicy"
+      tooltiptext="RequestPolicy"
+      type="menu-button"
+      onclick="requestpolicy.overlay.openToolbarPopup(this)" />
+  </toolbarpalette>
 	
-	<popup id="contentAreaContextMenu">
-		<menu
-			id="requestpolicyContextMenu"
-			class="menu-iconic"
-			label="RequestPolicy" />
-	</popup>
+  <popup id="contentAreaContextMenu">
+    <menu
+      id="requestpolicyContextMenu"
+      class="menu-iconic"
+      label="RequestPolicy" />
+  </popup>
 
-	<statusbar id="status-bar">
-		<statusbarpanel 
-			class="statusbarpanel-menu-iconic" 
-			id="requestpolicyStatusbar"
-			tooltiptext="RequestPolicy"
-			onclick="requestpolicy.overlay.openStatusbarPopup(this);"
-			>
-		</statusbarpanel>
-	</statusbar>
+  <statusbar id="status-bar">
+    <statusbarpanel
+      class="statusbarpanel-menu-iconic"
+      id="requestpolicyStatusbar"
+      tooltiptext="RequestPolicy"
+      onclick="requestpolicy.overlay.openStatusbarPopup(this);"
+      >
+    </statusbarpanel>
+  </statusbar>
 
-	<!-- Fennec -->
-	<toolbar id="toolbar-main">
-		<toolbarbutton id="requestpolicyStatusbar"
-			class="requestpolicyFennec"
-			label="RequestPolicy"
-			buttonstyle="pictures"
-			insertafter="tool-bookmarks"
-			popup="requestpolicyStatusbarPopup"
-			/>
-	</toolbar>
+  <!-- Fennec -->
+  <toolbar id="toolbar-main">
+    <toolbarbutton id="requestpolicyStatusbar"
+      class="requestpolicyFennec"
+      label="RequestPolicy"
+      buttonstyle="pictures"
+      insertafter="tool-bookmarks"
+      popup="requestpolicyStatusbarPopup"
+      />
+  </toolbar>
 
-	<popupset>
-		<popup id="requestpolicyRedirectNotificationOptions" />
+  <popupset>
+    <popup id="requestpolicyRedirectNotificationOptions" />
 
-		<menupopup 
-			id="requestpolicyStatusbarPopup" 
-			onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
-			onpopuphidden="requestpolicy.overlay.onMenuHidden(event);"
-			>
-			<menuitem
-				id="requestpolicyOpenPreferences"
-				label="&preferences;"
-				oncommand="requestpolicy.overlay.openOptionsDialog();" />
-			<menuitem
-				id="requestpolicyOpenRequestLog"
-				label="&menu.openRequestLog.label;"
-				oncommand="requestpolicy.overlay.toggleRequestLog();" />
-			<menuitem
-				id="requestpolicyCloseRequestLog"
-				hidden="true"
-				label="&menu.closeRequestLog.label;"
-				oncommand="requestpolicy.overlay.toggleRequestLog();" />
-			<menuseparator id="preferencesSeparator"/>
-			<menuitem
-				id="requestpolicyExtensionConflictWarning"
-				hidden="true"
-				oncommand="requestpolicy.overlay.showExtensionConflictInfo();" />
-			<menuseparator id="requestpolicyExtensionConflictWarningSeparator" hidden="true" />
-			<menu
-				id="requestpolicyPrefetchWarning"
-				label="&prefetchWarning;">
-				<menupopup>
-					<menuitem
-						id="requestpolicyPrefetchInfo"
-						label="&prefetchInfo;"
-						oncommand="requestpolicy.overlay.showPrefetchInfo();"
-						/>
-					<menuitem
-						id="requestpolicyPrefetchDisablingInstructions"
-						label="&prefetchDisablingInstructions;"
-						oncommand="requestpolicy.overlay.showPrefetchDisablingInstructions();"
-						/>
-				</menupopup>
-			</menu>
-			<menuseparator id="requestpolicyPrefetchWarningSeparator" />
-			<menuitem 
-				id="requestpolicyAllowAllTemporarily"
-				class="requestpolicyTemporary"
-				label="&temporarilyAllowAll;"
-				type="checkbox"
-				checked="false"
-				oncommand="requestpolicy.overlay.toggleTemporarilyAllowAll(event);" />
-			<menuseparator />
-			<menu
-				id="requestpolicyOtherOrigins"
-				label="&otherOrigins;"
-				class="menu-iconic"
-				>
-				<menupopup id="requestpolicyOtherOriginsPopup" />
-			</menu>
-			<menuseparator id="requestpolicyOtherOriginsSeparator" />
-			<menuitem
-				id="requestpolicyBlockedDestinations"
-				label="&blockedDestinations;"
-				class="requestpolicyBlockedHeading"
-				disabled="true"
-				/>
-			<menuseparator id="requestpolicyAllowedDestinationsSeparator" />
-			<menuitem
-				id="requestpolicyAllowedDestinations"
-				label="&allowedDestinations;"
-				class="requestpolicyAllowedHeading"
-				disabled="true"
-				/>
-			<menuseparator id="requestpolicyOriginSubmenusSeparator" />
-			<menuitem 
-				id="requestpolicyRevokeTemporaryPermissions"
-				label="&revokeTemporaryPermissions;"
-				oncommand="requestpolicy.overlay.revokeTemporaryPermissions(event);" />
-			<menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
-			<menuitem 
-				id="requestpolicyAllowOrigin"
-				oncommand="requestpolicy.overlay.allowCurrentOrigin(event);" />
-			<menuitem 
-				id="requestpolicyAllowOriginTemporarily"
-				class="requestpolicyTemporary"
-				oncommand="requestpolicy.overlay.temporarilyAllowCurrentOrigin(event);" />
-			<menuitem 
-				id="requestpolicyForbidOrigin"
-				oncommand="requestpolicy.overlay.forbidCurrentOrigin(event);" />
-			<menuitem 
-				id="requestpolicyUnrestrictedOrigin" />
-		</menupopup>
-	</popupset>
+    <menupopup
+      id="requestpolicyStatusbarPopup"
+      onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
+      onpopuphidden="requestpolicy.overlay.onMenuHidden(event);"
+      >
+      <menuitem
+        id="requestpolicyOpenPreferences"
+        label="&preferences;"
+        oncommand="requestpolicy.overlay.openOptionsDialog();" />
+      <menuitem
+        id="requestpolicyOpenRequestLog"
+        label="&menu.openRequestLog.label;"
+        oncommand="requestpolicy.overlay.toggleRequestLog();" />
+      <menuitem
+        id="requestpolicyCloseRequestLog"
+        hidden="true"
+        label="&menu.closeRequestLog.label;"
+        oncommand="requestpolicy.overlay.toggleRequestLog();" />
+      <menuseparator id="preferencesSeparator"/>
+      <menuitem
+        id="requestpolicyExtensionConflictWarning"
+        hidden="true"
+        oncommand="requestpolicy.overlay.showExtensionConflictInfo();" />
+      <menuseparator id="requestpolicyExtensionConflictWarningSeparator" hidden="true" />
+      <menu
+        id="requestpolicyPrefetchWarning"
+        label="&prefetchWarning;">
+        <menupopup>
+          <menuitem
+            id="requestpolicyPrefetchInfo"
+            label="&prefetchInfo;"
+            oncommand="requestpolicy.overlay.showPrefetchInfo();"
+            />
+          <menuitem
+            id="requestpolicyPrefetchDisablingInstructions"
+            label="&prefetchDisablingInstructions;"
+            oncommand="requestpolicy.overlay.showPrefetchDisablingInstructions();"
+            />
+        </menupopup>
+      </menu>
+      <menuseparator id="requestpolicyPrefetchWarningSeparator" />
+      <menuitem
+        id="requestpolicyAllowAllTemporarily"
+        class="requestpolicyTemporary"
+        label="&temporarilyAllowAll;"
+        type="checkbox"
+        checked="false"
+        oncommand="requestpolicy.overlay.toggleTemporarilyAllowAll(event);" />
+      <menuseparator />
+      <menu
+        id="requestpolicyOtherOrigins"
+        label="&otherOrigins;"
+        class="menu-iconic"
+        >
+        <menupopup id="requestpolicyOtherOriginsPopup" />
+      </menu>
+      <menuseparator id="requestpolicyOtherOriginsSeparator" />
+      <menuitem
+        id="requestpolicyBlockedDestinations"
+        label="&blockedDestinations;"
+        class="requestpolicyBlockedHeading"
+        disabled="true"
+        />
+      <menuseparator id="requestpolicyAllowedDestinationsSeparator" />
+      <menuitem
+        id="requestpolicyAllowedDestinations"
+        label="&allowedDestinations;"
+        class="requestpolicyAllowedHeading"
+        disabled="true"
+        />
+      <menuseparator id="requestpolicyOriginSubmenusSeparator" />
+      <menuitem
+        id="requestpolicyRevokeTemporaryPermissions"
+        label="&revokeTemporaryPermissions;"
+        oncommand="requestpolicy.overlay.revokeTemporaryPermissions(event);" />
+      <menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
+      <menuitem
+        id="requestpolicyAllowOrigin"
+        oncommand="requestpolicy.overlay.allowCurrentOrigin(event);" />
+      <menuitem
+        id="requestpolicyAllowOriginTemporarily"
+        class="requestpolicyTemporary"
+        oncommand="requestpolicy.overlay.temporarilyAllowCurrentOrigin(event);" />
+      <menuitem
+        id="requestpolicyForbidOrigin"
+        oncommand="requestpolicy.overlay.forbidCurrentOrigin(event);" />
+      <menuitem
+        id="requestpolicyUnrestrictedOrigin" />
+    </menupopup>
+  </popupset>
 
-	<vbox id="appcontent">
-		<splitter id="rp-requestLog-splitter" hidden="true"/>
-		<vbox id="rp-requestLog" height="300" hidden="true" persist="height">
-			<toolbox id="rp-requestLog-header">
-				<toolbar id="rp-requestLog-toolbar" align="center">
-					<label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" crop="end" />
-					<button label="&requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
-					<vbox flex="1" />
-					<toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
-				</toolbar>
-			</toolbox>
-			<iframe id="rp-requestLog-frame" flex="1"/>
-		</vbox>
-	</vbox>
+  <vbox id="appcontent">
+    <splitter id="rp-requestLog-splitter" hidden="true"/>
+    <vbox id="rp-requestLog" height="300" hidden="true" persist="height">
+      <toolbox id="rp-requestLog-header">
+        <toolbar id="rp-requestLog-toolbar" align="center">
+          <label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" crop="end" />
+          <button label="&requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
+          <vbox flex="1" />
+          <toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
+        </toolbar>
+      </toolbox>
+      <iframe id="rp-requestLog-frame" flex="1"/>
+    </vbox>
+  </vbox>
 </overlay>

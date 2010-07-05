@@ -1,71 +1,71 @@
 <?xml version="1.0"?>
 
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
-	<Description about="urn:mozilla:install-manifest">
-		<em:name>RequestPolicy</em:name>
-		<em:version>0.5.15a4</em:version>
-		<em:type>2</em:type>
-		<em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
-		<em:creator>Justin Samuel</em:creator>
-		<em:id>requestpolicy@requestpolicy.com</em:id>
-		<em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
-		<em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
-		<em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
+  <Description about="urn:mozilla:install-manifest">
+    <em:name>RequestPolicy</em:name>
+    <em:version>0.5.15a4</em:version>
+    <em:type>2</em:type>
+    <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
+    <em:creator>Justin Samuel</em:creator>
+    <em:id>requestpolicy@requestpolicy.com</em:id>
+    <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
+    <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
+    <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 		
-		<em:contributor>myahoo (French translation)</em:contributor>
-		<em:contributor>Team erweiterungen.de (German translation)</em:contributor>
-		<em:contributor>Archaeopteryx (German translation)</em:contributor>
-		<em:contributor>petruc (Portuguese [Brazil] translation)</em:contributor>
-		<em:contributor>Sumin Byeon (Korean translation)</em:contributor>
-		<em:contributor>pedro arana matus (Spanish [Mexico] translation)</em:contributor>
-		<em:contributor>Володимир Савчук / Volodymyr Savchuk (Ukrainian translation)</em:contributor>
-		<em:contributor>markh van BabelZilla.org (Dutch translation)</em:contributor>
-		<em:contributor>alpmild (Russian translation)</em:contributor>
-		<em:contributor>yfdyh000 (Chinese [simplified] translation)</em:contributor>
-		<em:contributor>nikneyim (Turkish translation)</em:contributor>
-		<em:contributor>Anonymous (Japanese translation)</em:contributor>
-		<em:contributor>Aleksej R. Serdjukov kaj babilejanoj (Esperanto translation)</em:contributor>
-		<em:contributor>Natanael_L01 (Swedish translation)</em:contributor>
-		<em:contributor>James (Silencer) (Chinese [traditional] translation)</em:contributor>
-		<em:contributor>Brad Horrocks</em:contributor>
+    <em:contributor>myahoo (French translation)</em:contributor>
+    <em:contributor>Team erweiterungen.de (German translation)</em:contributor>
+    <em:contributor>Archaeopteryx (German translation)</em:contributor>
+    <em:contributor>petruc (Portuguese [Brazil] translation)</em:contributor>
+    <em:contributor>Sumin Byeon (Korean translation)</em:contributor>
+    <em:contributor>pedro arana matus (Spanish [Mexico] translation)</em:contributor>
+    <em:contributor>Володимир Савчук / Volodymyr Savchuk (Ukrainian translation)</em:contributor>
+    <em:contributor>markh van BabelZilla.org (Dutch translation)</em:contributor>
+    <em:contributor>alpmild (Russian translation)</em:contributor>
+    <em:contributor>yfdyh000 (Chinese [simplified] translation)</em:contributor>
+    <em:contributor>nikneyim (Turkish translation)</em:contributor>
+    <em:contributor>Anonymous (Japanese translation)</em:contributor>
+    <em:contributor>Aleksej R. Serdjukov kaj babilejanoj (Esperanto translation)</em:contributor>
+    <em:contributor>Natanael_L01 (Swedish translation)</em:contributor>
+    <em:contributor>James (Silencer) (Chinese [traditional] translation)</em:contributor>
+    <em:contributor>Brad Horrocks</em:contributor>
 				
-		<!-- Firefox (Flock will recognize this, too) -->
-		<em:targetApplication>
-			<Description>
-				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-				<em:minVersion>3.0</em:minVersion>
-				<em:maxVersion>4.0b2pre</em:maxVersion>
-			</Description>
-		</em:targetApplication>
+    <!-- Firefox (Flock will recognize this, too) -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>4.0b2pre</em:maxVersion>
+      </Description>
+    </em:targetApplication>
 		
-		<!-- SeaMonkey -->
-		<em:targetApplication>
-			<Description>
-				<em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-				<em:minVersion>2.0a</em:minVersion>
-				<em:maxVersion>2.1a3</em:maxVersion>
-			</Description>
-		</em:targetApplication>
+    <!-- SeaMonkey -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
+        <em:minVersion>2.0a</em:minVersion>
+        <em:maxVersion>2.1a3</em:maxVersion>
+      </Description>
+    </em:targetApplication>
 		
-		<!-- Fennec -->
-		<em:targetApplication>
-			<Description>
-				<em:id>{a23983c0-fd0e-11dc-95ff-0800200c9a66}</em:id>
-				<em:minVersion>0.1</em:minVersion>
-				<em:maxVersion>1.0.*</em:maxVersion>
-			</Description>
-		</em:targetApplication>
+    <!-- Fennec -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{a23983c0-fd0e-11dc-95ff-0800200c9a66}</em:id>
+        <em:minVersion>0.1</em:minVersion>
+        <em:maxVersion>1.0.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
 		
-		<!-- Songbird -->
-		<em:targetApplication>
-			<Description>
-				<em:id>songbird@songbirdnest.com</em:id>
-				<em:minVersion>1.0.0</em:minVersion>
-				<em:maxVersion>1.4.3</em:maxVersion>
-			</Description>
-		</em:targetApplication>
+    <!-- Songbird -->
+    <em:targetApplication>
+      <Description>
+        <em:id>songbird@songbirdnest.com</em:id>
+        <em:minVersion>1.0.0</em:minVersion>
+        <em:maxVersion>1.4.3</em:maxVersion>
+      </Description>
+    </em:targetApplication>
 		
-	</Description>
+  </Description>
 </RDF>

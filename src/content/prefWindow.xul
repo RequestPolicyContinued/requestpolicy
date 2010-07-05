@@ -1,245 +1,284 @@
 <?xml version="1.0"?>
 <!--
-	***** BEGIN LICENSE BLOCK *****
+  ***** BEGIN LICENSE BLOCK *****
 
-	RequestPolicy - A Firefox extension for control over cross-site requests.
-	Copyright (c) 2008 Justin Samuel
+  RequestPolicy - A Firefox extension for control over cross-site requests.
+  Copyright (c) 2008 Justin Samuel
 
-	This program is free software: you can redistribute it and/or modify it under
-	the terms of the GNU General Public License as published by the Free Software
-	Foundation, either version 3 of the License, or (at your option) any later
-	version.
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later
+  version.
 
-	This program is distributed in the hope that it will be useful, but WITHOUT
-	ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-	FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
-	details.
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
 
-	You should have received a copy of the GNU General Public License along with
-	this program. If not, see <http://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License along with
+  this program. If not, see <http://www.gnu.org/licenses/>.
 
-	***** END LICENSE BLOCK *****
--->
+  ***** END LICENSE BLOCK *****
+  -->
 <!DOCTYPE prefwindow SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://requestpolicy/skin/preferences/prefWindow.css" type="text/css"?>
 
-<prefwindow id="requestpolicyPrefWindow" title="&preferences.windowTitle;" type="prefwindow"
-	windowtype="requestpolicy:pref" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	>
-    
-	<stringbundleset id="stringbundleset">
-		<stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
-	</stringbundleset>
-    
-	<keyset>
-		<key id="select-all-key" modifiers="accel" key="A" oncommand="requestpolicy.prefWindow.selectAll(event)"/>
-	</keyset>
-    
-	<prefpane id="requestpolicyPrefpaneGeneral"
-		label="&preferences.prefpane.general;"
-		image="chrome://requestpolicy/skin/preferences/prefpane-general.png"
-		>
-		<preferences>
-			<preference id="pref-uriIdentificationLevel" name="extensions.requestpolicy.uriIdentificationLevel" type="int"/>
-			<preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon" type="string" instantApply="true"/>
-		</preferences>
+<prefwindow id="requestpolicyPrefWindow" title="&preferences.windowTitle;"
+  type="prefwindow" windowtype="requestpolicy:pref"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-		<groupbox>
-			<caption label="&preferences.strictness;"/>
-			<description>&preferences.strictness.description;</description>
-			<radiogroup id="uriIdentificationLevel" preference="pref-uriIdentificationLevel" onsynctopreference="requestpolicy.prefWindow.uriIdentificationLevelChanged(this.value)">
-				<radio label="&preferences.baseDomain;" value="1"/>
-				<radio label="&preferences.fullDomain;" value="2"/>
-				<radio label="&preferences.fullAddress;" value="3"/>
-			</radiogroup>
-		</groupbox>
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="requestpolicyStrings"
+      src="chrome://requestpolicy/locale/requestpolicy.properties" />
+  </stringbundleset>
 
-		<groupbox>
-			<caption label="&preferences.statusbarIcon;"/>
-			<radiogroup id="statusbarIcon" orient="horizontal" preference="pref-statusbarIcon" onsynctopreference="requestpolicy.prefWindow.statusbarIconChanged(this.value)">
-				<radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png" value="standard"/>
-				<radio src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png" value="large"/>
-			</radiogroup>
-		</groupbox>
-		
-		<groupbox>
-			<caption label="&initialSetup.title;"/>
-			<label value="&preferences.openInitialSetup;" class="text-link" onclick="requestpolicy.prefWindow.openModalInitialSetupDialog()"/>
-		</groupbox>
-	</prefpane>
+  <keyset>
+    <key id="select-all-key" modifiers="accel" key="A"
+      oncommand="requestpolicy.prefWindow.selectAll(event)" />
+  </keyset>
 
-	<prefpane id="requestpolicyPrefpaneWhitelist"
-		label="&preferences.prefpane.whitelist;"
-		image="chrome://requestpolicy/skin/preferences/prefpane-whitelist.png"
-		>
+  <prefpane id="requestpolicyPrefpaneGeneral" label="&preferences.prefpane.general;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-general.png">
+    <preferences>
+      <preference id="pref-uriIdentificationLevel"
+        name="extensions.requestpolicy.uriIdentificationLevel" type="int" />
+      <preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon"
+        type="string" instantApply="true" />
+    </preferences>
 
-		<tabbox flex="1">
-			<tabs>
-				<tab label="&preferences.origins;"/>
-				<tab label="&preferences.destinations;"/>
-				<tab label="&preferences.originsToDestinations;"/>
-			</tabs>
-			<tabpanels flex="1">
-				<tabpanel flex="1">
-					<vbox flex="1">
-						<listbox id="originsList" seltype="multiple" flex="1"
-							onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
-							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
-							key="select-all-key"
-							>
-							<listhead>
-								<listheader label="&rp.origin;"/>
-								<listheader label="&preferences.temporary;"/>
-							</listhead>
-							<listcols>
-								<listcol flex="1"/>
-								<listcol class="temporary"/>
-							</listcols>
-						</listbox>
-						<hbox>
-							<button id="removeOrigins" label="&preferences.removeSelectedSites;" oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)" disabled="true"/>
-						</hbox>
-						<separator class="thin"/>
-						<hbox>
-							<textbox id="addOrigin-originField" emptytext="&rp.origin;" oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)" flex="1"
-								onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
-							<button id="addOrigin" label="&rp.allow;" oncommand="requestpolicy.prefWindow.addToWhitelist(this)" disabled="true"/>
-						</hbox>
-					</vbox>
-				</tabpanel>
-				<tabpanel>
-					<vbox flex="1">
-						<listbox id="destinationsList" seltype="multiple" flex="1"
-							onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
-							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
-							key="select-all-key"
-							>
-							<listhead>
-								<listheader label="&rp.destination;"/>
-								<listheader label="&preferences.temporary;"/>
-							</listhead>
-							<listcols>
-								<listcol flex="1"/>
-								<listcol class="temporary"/>
-							</listcols>
-						</listbox>
-						<hbox>
-							<button id="removeDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)" disabled="true"/>
-						</hbox>
-						<separator class="thin"/>
-						<hbox>
-							<textbox id="addDestination-destinationField" emptytext="&rp.destination;" oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)" flex="1"
-								onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
-							<button id="addDestination" label="&rp.allow;" oncommand="requestpolicy.prefWindow.addToWhitelist(this)" disabled="true"/>
-						</hbox>
-					</vbox>
-				</tabpanel>
-				<tabpanel>
-					<vbox flex="1">
-						<listbox id="originsToDestinationsList" seltype="multiple" flex="1"
-							onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
-							onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
-							key="select-all-key"
-							>
-							<listhead>
-								<listheader label="&rp.origin;"/>
-								<listheader label="&rp.destination;"/>
-								<listheader label="&preferences.temporary;"/>
-							</listhead>
-							<listcols>
-								<listcol flex="1" id="originToDestinationOriginColumn"/>
-								<listcol flex="1"/>
-								<listcol class="temporary"/>
-							</listcols>
-						</listbox>
-						<hbox>
-							<button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;" oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)" disabled="true"/>
-						</hbox>
-						<separator class="thin"/>
-						<hbox>
-							<textbox id="addOriginToDestination-originField" emptytext="&rp.origin;" oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)" flex="1"
-								onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
-							<textbox id="addOriginToDestination-destinationField" emptytext="&rp.destination;" oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)" flex="1"
-								onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
-							<button id="addOriginToDestination" label="&rp.allow;" oncommand="requestpolicy.prefWindow.addToWhitelist(this)" disabled="true"/>
-						</hbox>
-					</vbox>
-				</tabpanel>
-			</tabpanels>
-		</tabbox>
-	</prefpane>
-    
-	<prefpane id="requestpolicyPrefpaneExport"
-		label="&preferences.prefpane.export;"
-		image="chrome://requestpolicy/skin/preferences/prefpane-export.png"
-		>
+    <groupbox>
+      <caption label="&preferences.strictness;" />
+      <description>&preferences.strictness.description;
+      </description>
+      <radiogroup id="uriIdentificationLevel" preference="pref-uriIdentificationLevel"
+        onsynctopreference="requestpolicy.prefWindow.uriIdentificationLevelChanged(this.value)">
+        <radio label="&preferences.baseDomain;" value="1" />
+        <radio label="&preferences.fullDomain;" value="2" />
+        <radio label="&preferences.fullAddress;" value="3" />
+      </radiogroup>
+    </groupbox>
 
-		<groupbox flex="1">
-			<caption label="&preferences.export.caption;"/>
-			<description>&preferences.export.description;</description>
-			<separator class="thin"/>
-			
-			<groupbox>
-				<caption label="&preferences.export.details.caption;"/>
-				<description>&preferences.export.details.description;</description>
-			</groupbox>
-			<separator class="thin"/>
-			
-			<hbox>
-				<button id="exportButton" label="&preferences.export.button.label;" oncommand="requestpolicy.prefWindow.doFileAction('export')"/>
-			</hbox>
-		</groupbox>
-	</prefpane>
+    <groupbox>
+      <caption label="&preferences.statusbarIcon;" />
+      <radiogroup id="statusbarIcon" orient="horizontal"
+        preference="pref-statusbarIcon"
+        onsynctopreference="requestpolicy.prefWindow.statusbarIconChanged(this.value)">
+        <radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png"
+          value="standard" />
+        <radio
+          src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png"
+          value="large" />
+      </radiogroup>
+    </groupbox>
 
-	<prefpane id="requestpolicyPrefpaneImport"
-		label="&preferences.prefpane.import;"
-		image="chrome://requestpolicy/skin/preferences/prefpane-import.png"
-		>
+    <groupbox>
+      <caption label="&initialSetup.title;" />
+      <label value="&preferences.openInitialSetup;" class="text-link"
+        onclick="requestpolicy.prefWindow.openModalInitialSetupDialog()" />
+    </groupbox>
+  </prefpane>
 
-		<groupbox flex="1">
-			<caption label="&preferences.import.caption;"/>
-			<description>&preferences.import.description;</description>
-			<separator class="thin"/>
-            
-			<groupbox>
-				<caption label="&preferences.import.details.caption;"/>
-				<description>&preferences.import.details.description;</description>
-			</groupbox>
-			<separator class="thin"/>
-            
-			<hbox>
-				<button id="importButton" label="&preferences.import.button.label;" oncommand="requestpolicy.prefWindow.doFileAction('import')"/>
-			</hbox>
-		</groupbox>
-	</prefpane>
+  <prefpane id="requestpolicyPrefpaneWhitelist" label="&preferences.prefpane.whitelist;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-whitelist.png">
 
-	<prefpane id="requestpolicyPrefpaneAdvanced"
-		label="&preferences.prefpane.advanced;"
-		image="chrome://requestpolicy/skin/preferences/prefpane-advanced.png"
-		>
-		<preferences>
-			<preference id="pref-indicateBlockedObjects" name="extensions.requestpolicy.indicateBlockedObjects" type="bool"/>
-			<preference id="pref-autoReload" name="extensions.requestpolicy.autoReload" type="bool"/>
-			<preference id="pref-startWithAllowAllEnabled" name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool"/>
-			<preference id="pref-privateBrowsingPermanentWhitelisting" name="extensions.requestpolicy.privateBrowsingPermanentWhitelisting" type="bool"/>
-		</preferences>
+    <tabbox flex="1">
+      <tabs>
+        <tab label="&preferences.origins;" />
+        <tab label="&preferences.destinations;" />
+        <tab label="&preferences.originsToDestinations;" />
+      </tabs>
+      <tabpanels flex="1">
+        <tabpanel flex="1">
+          <vbox flex="1">
+            <listbox id="originsList" seltype="multiple" flex="1"
+              onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
+              onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
+              key="select-all-key">
+              <listhead>
+                <listheader label="&rp.origin;" />
+                <listheader label="&preferences.temporary;" />
+              </listhead>
+              <listcols>
+                <listcol flex="1" />
+                <listcol class="temporary" />
+              </listcols>
+            </listbox>
+            <hbox>
+              <button id="removeOrigins" label="&preferences.removeSelectedSites;"
+                oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)"
+                disabled="true" />
+            </hbox>
+            <separator class="thin" />
+            <hbox>
+              <textbox id="addOrigin-originField" emptytext="&rp.origin;"
+                oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
+                flex="1"
+                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+              <button id="addOrigin" label="&rp.allow;"
+                oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
+                disabled="true" />
+            </hbox>
+          </vbox>
+        </tabpanel>
+        <tabpanel>
+          <vbox flex="1">
+            <listbox id="destinationsList" seltype="multiple" flex="1"
+              onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
+              onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
+              key="select-all-key">
+              <listhead>
+                <listheader label="&rp.destination;" />
+                <listheader label="&preferences.temporary;" />
+              </listhead>
+              <listcols>
+                <listcol flex="1" />
+                <listcol class="temporary" />
+              </listcols>
+            </listbox>
+            <hbox>
+              <button id="removeDestinations" label="&preferences.removeSelectedSites;"
+                oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)"
+                disabled="true" />
+            </hbox>
+            <separator class="thin" />
+            <hbox>
+              <textbox id="addDestination-destinationField" emptytext="&rp.destination;"
+                oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
+                flex="1"
+                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+              <button id="addDestination" label="&rp.allow;"
+                oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
+                disabled="true" />
+            </hbox>
+          </vbox>
+        </tabpanel>
+        <tabpanel>
+          <vbox flex="1">
+            <listbox id="originsToDestinationsList" seltype="multiple"
+              flex="1" onselect="requestpolicy.prefWindow.listSelectionChanged(this)"
+              onkeyup="if(event.keyCode==event.DOM_VK_DELETE) requestpolicy.prefWindow.removeSelectedFromList(this)"
+              key="select-all-key">
+              <listhead>
+                <listheader label="&rp.origin;" />
+                <listheader label="&rp.destination;" />
+                <listheader label="&preferences.temporary;" />
+              </listhead>
+              <listcols>
+                <listcol flex="1" id="originToDestinationOriginColumn" />
+                <listcol flex="1" />
+                <listcol class="temporary" />
+              </listcols>
+            </listbox>
+            <hbox>
+              <button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;"
+                oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)"
+                disabled="true" />
+            </hbox>
+            <separator class="thin" />
+            <hbox>
+              <textbox id="addOriginToDestination-originField"
+                emptytext="&rp.origin;"
+                oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
+                flex="1"
+                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+              <textbox id="addOriginToDestination-destinationField"
+                emptytext="&rp.destination;"
+                oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
+                flex="1"
+                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+              <button id="addOriginToDestination" label="&rp.allow;"
+                oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
+                disabled="true" />
+            </hbox>
+          </vbox>
+        </tabpanel>
+      </tabpanels>
+    </tabbox>
+  </prefpane>
 
-		<groupbox>
-			<caption label="&preferences.webpages;"/>
-			<checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;" preference="pref-indicateBlockedObjects"/>
-			<checkbox id="autoReload" label="&preferences.autoReload;" preference="pref-autoReload"/>
-		</groupbox>
-        
-		<groupbox>
-			<caption label="&preferences.misc;"/>
-			<checkbox id="startWithAllowAllEnabled" label="&preferences.startWithAllowAllEnabled;" preference="pref-startWithAllowAllEnabled"/>
-			<checkbox id="privateBrowsingPermanentWhitelisting" label="&preferences.privateBrowsingPermanentWhitelisting;" preference="pref-privateBrowsingPermanentWhitelisting"/>
-		</groupbox>
-	</prefpane>
+  <prefpane id="requestpolicyPrefpaneExport" label="&preferences.prefpane.export;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-export.png">
 
-	<!-- These mess up the prefwindow if they come before the prefpanes
-		 https://bugzilla.mozilla.org/show_bug.cgi?id=296418 -->
-	<script src="prefWindow.js"/>
+    <groupbox flex="1">
+      <caption label="&preferences.export.caption;" />
+      <description>&preferences.export.description;
+      </description>
+      <separator class="thin" />
+
+      <groupbox>
+        <caption label="&preferences.export.details.caption;" />
+        <description>&preferences.export.details.description;
+        </description>
+      </groupbox>
+      <separator class="thin" />
+
+      <hbox>
+        <button id="exportButton" label="&preferences.export.button.label;"
+          oncommand="requestpolicy.prefWindow.doFileAction('export')" />
+      </hbox>
+    </groupbox>
+  </prefpane>
+
+  <prefpane id="requestpolicyPrefpaneImport" label="&preferences.prefpane.import;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-import.png">
+
+    <groupbox flex="1">
+      <caption label="&preferences.import.caption;" />
+      <description>&preferences.import.description;
+      </description>
+      <separator class="thin" />
+
+      <groupbox>
+        <caption label="&preferences.import.details.caption;" />
+        <description>&preferences.import.details.description;
+        </description>
+      </groupbox>
+      <separator class="thin" />
+
+      <hbox>
+        <button id="importButton" label="&preferences.import.button.label;"
+          oncommand="requestpolicy.prefWindow.doFileAction('import')" />
+      </hbox>
+    </groupbox>
+  </prefpane>
+
+  <prefpane id="requestpolicyPrefpaneAdvanced" label="&preferences.prefpane.advanced;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-advanced.png">
+    <preferences>
+      <preference id="pref-indicateBlockedObjects"
+        name="extensions.requestpolicy.indicateBlockedObjects" type="bool" />
+      <preference id="pref-autoReload" name="extensions.requestpolicy.autoReload"
+        type="bool" />
+      <preference id="pref-startWithAllowAllEnabled"
+        name="extensions.requestpolicy.startWithAllowAllEnabled" type="bool" />
+      <preference id="pref-privateBrowsingPermanentWhitelisting"
+        name="extensions.requestpolicy.privateBrowsingPermanentWhitelisting"
+        type="bool" />
+    </preferences>
+
+    <groupbox>
+      <caption label="&preferences.webpages;" />
+      <checkbox id="indicateBlockedObjects" label="&preferences.indicateBlockedObjects;"
+        preference="pref-indicateBlockedObjects" />
+      <checkbox id="autoReload" label="&preferences.autoReload;"
+        preference="pref-autoReload" />
+    </groupbox>
+
+    <groupbox>
+      <caption label="&preferences.misc;" />
+      <checkbox id="startWithAllowAllEnabled" label="&preferences.startWithAllowAllEnabled;"
+        preference="pref-startWithAllowAllEnabled" />
+      <checkbox id="privateBrowsingPermanentWhitelisting"
+        label="&preferences.privateBrowsingPermanentWhitelisting;"
+        preference="pref-privateBrowsingPermanentWhitelisting" />
+    </groupbox>
+  </prefpane>
+
+  <!--
+      These mess up the prefwindow if they come before the prefpanes
+      https://bugzilla.mozilla.org/show_bug.cgi?id=296418
+    -->
+  <script src="prefWindow.js" />
 </prefwindow>

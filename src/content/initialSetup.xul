@@ -40,7 +40,7 @@
   <groupbox flex="1">
     <caption label="&initialSetup.whitelist.caption;"/>
     <description>&initialSetup.whitelist.description;</description>
-		
+
     <grid id="checkboxgrid">
       <columns>
         <column/>
@@ -70,7 +70,7 @@
       </rows>
     </grid>
   </groupbox>
-	
+
   <listbox id="originsToDestinationsList" seltype="single" flex="1">
     <listhead>
       <listheader label="&rp.origin;"/>

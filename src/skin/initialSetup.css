@@ -1,21 +1,21 @@
 dialog {
-	width: 40em;
-	height: 40em;
+  width: 40em;
+  height: 40em;
 }
 
 dialogheader {
-	padding-left: 40px;
-	background-image:
-		url("chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png");
-	background-repeat: no-repeat;
-	background-position: 6px center;
+  padding-left: 40px;
+  background-image:
+    url("chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png");
+  background-repeat: no-repeat;
+  background-position: 6px center;
 }
 
 grid#checkboxgrid {
-    margin-top : 0.6em;	
-    margin-bottom : 0;
+  margin-top: 0.6em;
+  margin-bottom: 0;
 }
 
 listcol#originColumn {
-    width : 18em;
+  width: 18em;
 }

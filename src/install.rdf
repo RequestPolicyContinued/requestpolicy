@@ -13,7 +13,7 @@
     <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
-		
+
     <em:contributor>myahoo (French translation)</em:contributor>
     <em:contributor>Team erweiterungen.de (German translation)</em:contributor>
     <em:contributor>Archaeopteryx (German translation)</em:contributor>
@@ -30,7 +30,7 @@
     <em:contributor>Natanael_L01 (Swedish translation)</em:contributor>
     <em:contributor>James (Silencer) (Chinese [traditional] translation)</em:contributor>
     <em:contributor>Brad Horrocks</em:contributor>
-				
+
     <!-- Firefox (Flock will recognize this, too) -->
     <em:targetApplication>
       <Description>
@@ -39,7 +39,7 @@
         <em:maxVersion>4.0b2pre</em:maxVersion>
       </Description>
     </em:targetApplication>
-		
+
     <!-- SeaMonkey -->
     <em:targetApplication>
       <Description>
@@ -48,7 +48,7 @@
         <em:maxVersion>2.1a3</em:maxVersion>
       </Description>
     </em:targetApplication>
-		
+
     <!-- Fennec -->
     <em:targetApplication>
       <Description>
@@ -57,7 +57,7 @@
         <em:maxVersion>1.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-		
+
     <!-- Songbird -->
     <em:targetApplication>
       <Description>
@@ -66,6 +66,6 @@
         <em:maxVersion>1.4.3</em:maxVersion>
       </Description>
     </em:targetApplication>
-		
+
   </Description>
 </RDF>

@@ -30,7 +30,7 @@
   <stringbundleset id="stringbundleset">
     <stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
   </stringbundleset>
-	
+
   <script type="application/x-javascript" src="overlay.js" />
   <script type="application/x-javascript" src="menu.js" />
 
@@ -42,7 +42,7 @@
       type="menu-button"
       onclick="requestpolicy.overlay.openToolbarPopup(this)" />
   </toolbarpalette>
-	
+
   <popup id="contentAreaContextMenu">
     <menu
       id="requestpolicyContextMenu"

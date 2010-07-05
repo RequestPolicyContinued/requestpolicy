@@ -1,28 +1,31 @@
 treechildren::-moz-tree-cell-text(selected) {
-    color : #00b;
+  color: #00b;
 }
+
 treechildren::-moz-tree-cell-text(hover) {
-    color : #00b;
+  color: #00b;
 }
 
 treechildren::-moz-tree-row(allowed) {
-	background-color: #efe;
+  background-color: #efe;
 }
+
 treechildren::-moz-tree-row(allowed, hover) {
-    background-color: #cfc;
+  background-color: #cfc;
 }
 
 treechildren::-moz-tree-row(blocked) {
-	background-color: #fdd;
+  background-color: #fdd;
 }
+
 treechildren::-moz-tree-row(blocked, hover) {
-    background-color: #fcc;
+  background-color: #fcc;
 }
 
 #requestpolicy-requestLog-blocked {
-    text-align : center;
+  text-align: center;
 }
 
 treechildren::-moz-tree-cell(blocked) {
-    margin : 0 30px 0 30px
+  margin: 0 30px 0 30px;
 }

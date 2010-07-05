@@ -1845,7 +1845,11 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 };
 
-var components = [RequestPolicyService];
-function NSGetModule(compMgr, fileSpec) {
-  return XPCOMUtils.generateModule(components);
-}
+/**
+ * XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
+ * XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
+ */
+if (XPCOMUtils.generateNSGetFactory)
+  var NSGetFactory = XPCOMUtils.generateNSGetFactory([RequestPolicyService]);
+else
+  var NSGetModule = XPCOMUtils.generateNSGetModule([RequestPolicyService]);

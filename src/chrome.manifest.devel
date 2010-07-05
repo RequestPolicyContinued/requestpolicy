@@ -25,3 +25,10 @@ overlay    chrome://browser/content/browser.xul                    chrome://requ
 overlay    chrome://navigator/content/navigatorOverlay.xul         chrome://requestpolicy/content/overlay.xul
 # Songbird
 overlay    chrome://songbird/content/xul/mainScriptsOverlay.xul    chrome://requestpolicy/content/overlay.xul
+
+# Gecko 2 requires component and category registration via chrome.manifest.
+component {14027e96-1afb-4066-8846-e6c89b5faf3b} components/requestpolicyService.js
+contract @requestpolicy.com/requestpolicy-service;1 {14027e96-1afb-4066-8846-e6c89b5faf3b}
+category profile-after-change RequestPolicyService @requestpolicy.com/requestpolicy-service;1
+category content-policy RequestPolicyService @requestpolicy.com/requestpolicy-service;1
+interfaces components/nsIRequestPolicy.xpt

@@ -366,15 +366,9 @@ requestpolicy.overlay = {
                         + "using content.location instead");
                 location = content.location;
               }
-              requestpolicy.mod.Logger.dump("User allowed redirection from <"
-                  + location.href + "> to <" + redirectTargetUri + ">");
-              // Record the allowed redirect as location.href calls shouldLoad
-              // in Fx 3.7a5pre.
-              var allowedRedirects = rpServiceObj._userAllowedRedirects;
-              if (!allowedRedirects[location.href]) {
-                allowedRedirects[location.href] = {};
-              }
-              allowedRedirects[location.href][redirectTargetUri] = true;
+              // Fx 3.7a5+ calls shouldLoad for location.href changes.
+              rpServiceObj.registerAllowedRedirect(location.href,
+                  redirectTargetUri);
               location.href = redirectTargetUri;
             }
           }, {

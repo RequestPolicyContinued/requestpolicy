@@ -825,6 +825,26 @@ RequestPolicyService.prototype = {
     }
   },
 
+  registerAllowedRedirect : function registerAllowedRedirect(originUrl,
+      destinationUrl) {
+    var originUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
+    var destinationUrl = requestpolicy.mod.DomainUtil
+        .ensureUriHasPath(requestpolicy.mod.DomainUtil
+            .stripFragment(destinationUrl));
+
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "User-allowed redirect from <" + originUrl + "> to <" + destinationUrl
+            + ">.");
+
+    if (this._userAllowedRedirects[originUrl] == undefined) {
+      this._userAllowedRedirects[originUrl] = {};
+    }
+    if (this._userAllowedRedirects[originUrl][destinationUrl] == undefined) {
+      this._userAllowedRedirects[originUrl][destinationUrl] = true;
+    }
+  },
+
   _allowOrigin : function(host, noStore) {
     this._allowedOrigins[host] = true;
     if (!noStore) {

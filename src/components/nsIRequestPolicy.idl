@@ -11,6 +11,7 @@ interface nsIRequestPolicy : nsISupports
   void registerHistoryRequest(in AString destinationUri);
   void registerFormSubmitted(in AString originUri, in AString destinationUri);
   void registerLinkClicked(in AString originUri, in AString destinationUri);
+  void registerAllowedRedirect(in AString originUri, in AString destinationUri);
   
   void temporarilyAllowOrigin(in AString siteIdentifier);
   boolean isTemporarilyAllowedOrigin(in AString siteIdentifier);

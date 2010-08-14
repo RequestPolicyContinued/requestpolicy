@@ -49,11 +49,11 @@
 <!ENTITY requestLog.title "Protokolo de petoj">
 <!ENTITY requestLog.blocked "Blokita">
 <!ENTITY requestLog.time "Tempo">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Kopii la fontadreson en la tondujon">
+<!ENTITY requestLog.copyDestinationToClipboard "Kopii la celadreson en la tondujon">
+<!ENTITY requestLog.openOriginInNewTab "Malfermi la fonton en nova folio">
+<!ENTITY requestLog.openDestinationInNewTab "Malfermi la celon en nova folio">
+<!ENTITY requestLog.clear "Forviŝi">
 <!ENTITY initialSetup.title "Postinstala agordo">
 <!ENTITY initialSetup.whitelist.caption "Aldoni retejojn al via inter-reteja permesaro">
 <!ENTITY initialSetup.whitelist.description "La retejparoj en ĉi tiuj listoj estas elektitaj aŭ ĉar (1) temas pri petoj inter retejoj apartenantaj al la sama societo, aŭ ĉar (2) tio malpliigas eventualajn problemojn sen rimarkinda malbonefiko al privateco kaj sekureco.">

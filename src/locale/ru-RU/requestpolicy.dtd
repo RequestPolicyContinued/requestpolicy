@@ -49,11 +49,11 @@
 <!ENTITY requestLog.title "Журнал Запросов">
 <!ENTITY requestLog.blocked "Заблокирован">
 <!ENTITY requestLog.time "Время">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Скопировать источник в буфер обмена">
+<!ENTITY requestLog.copyDestinationToClipboard "Скопировать цель в буфер обмена">
+<!ENTITY requestLog.openOriginInNewTab "Открыть источник в новой вкладке">
+<!ENTITY requestLog.openDestinationInNewTab "Открыть цель в новой вкладке">
+<!ENTITY requestLog.clear "Очистить">
 <!ENTITY initialSetup.title "Начальная настройка">
 <!ENTITY initialSetup.whitelist.caption "Добавьте сайты в ваш белый список">
 <!ENTITY initialSetup.whitelist.description "Сайты из этих списков были выбраны потому, что (1) они включают в себя запросы между сайтами, принадлежащими одной компании (2) их наличие в списке уменьшает возможность появления проблем и не сильно влияет на уровень конфиденциальности и безопасности.">

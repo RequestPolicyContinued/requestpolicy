@@ -49,11 +49,11 @@
 <!ENTITY requestLog.title "Förfrågningslogg">
 <!ENTITY requestLog.blocked "Blockerad">
 <!ENTITY requestLog.time "Tid">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Kopiera källa till urklipp">
+<!ENTITY requestLog.copyDestinationToClipboard "Kopiera mål till urklipp">
+<!ENTITY requestLog.openOriginInNewTab "Öppna källa i ny flik">
+<!ENTITY requestLog.openDestinationInNewTab "Öppna mål i ny flik">
+<!ENTITY requestLog.clear "Rensa">
 <!ENTITY initialSetup.title "Första inställning">
 <!ENTITY initialSetup.whitelist.caption "Lägg till sidor till din mellan-sidor-vitlista">
 <!ENTITY initialSetup.whitelist.description "Dessa sidor listas antingen eftersom (1) de skickar förfrågningar mellan sidor som ägs av samma företag eller (2) de minskar problem du kan stöta på och har en väldigt liten påverkan på på integritet och säkerhet.">

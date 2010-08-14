@@ -49,11 +49,11 @@
 <!ENTITY requestLog.title "Pedidos nesta página">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Copiar origem">
+<!ENTITY requestLog.copyDestinationToClipboard "Copiar destino">
+<!ENTITY requestLog.openOriginInNewTab "Abrir origem em nova aba">
+<!ENTITY requestLog.openDestinationInNewTab "Abrir destino em nova aba">
+<!ENTITY requestLog.clear "Limpar">
 <!ENTITY initialSetup.title "Configuração inicial">
 <!ENTITY initialSetup.whitelist.caption "Adicione a sua lista de permissões algumas entradas comuns">
 <!ENTITY initialSetup.whitelist.description "Estas permissões são aqui sugeridas por (1) envolverem pedidos entre servidores de uma mesma empresa ou (2) resolverem problemas que você poderá ter durante a navegação com muito pouco impacto em sua privacidade e segurança.">

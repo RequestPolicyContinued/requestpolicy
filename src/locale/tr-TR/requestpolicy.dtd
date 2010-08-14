@@ -49,17 +49,17 @@
 <!ENTITY requestLog.title "Kayıtlar">
 <!ENTITY requestLog.blocked "Yasaklı">
 <!ENTITY requestLog.time "Zaman">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Ana adresi hafızaya kopyala">
+<!ENTITY requestLog.copyDestinationToClipboard "Hedef adresi hafızaya kopyala">
+<!ENTITY requestLog.openOriginInNewTab "Ana adresi Yeni sekmede aç">
+<!ENTITY requestLog.openDestinationInNewTab "Hedef adresi Yeni sekmede aç">
+<!ENTITY requestLog.clear "Temizle">
 <!ENTITY initialSetup.title "İlk yükleme">
-<!ENTITY initialSetup.whitelist.caption "Beyaz listenize bağlantıları  ekleyin">
+<!ENTITY initialSetup.whitelist.caption "Beyaz listenize bağlantıları ekleyin">
 <!ENTITY initialSetup.whitelist.description "Bu listesi siteler (1) Aynı kuruluşlardandır veya (2) yaşayabileceğiniz sıkıntıları en az düzeye indirir ve çok az güvenlik,gizliliği etkiler.">
 <!ENTITY initialSetup.region.international "Uluslararası">
 <!ENTITY initialSetup.region.americas "Amerika">
 <!ENTITY initialSetup.region.asia "Asya">
 <!ENTITY initialSetup.region.usAndCanada "Abd ve Kanada">
 <!ENTITY initialSetup.region.europeAndRussia "Avrupa ve Rusya">
-<!ENTITY initialSetup.region.oceania "Okyanus">
+<!ENTITY initialSetup.region.oceania "Okyanusya">

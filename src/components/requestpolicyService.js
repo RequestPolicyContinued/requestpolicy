@@ -29,6 +29,12 @@ const CP_NOP = function() {
 };
 const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 
+// A value intended to not conflict with aExtra passed to shouldLoad() by any
+// other callers. Was chosen randomly.
+const CP_MAPPEDDESTINATION = 0x178c40bf;
+
+const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 // Scope for imported modules.
@@ -100,6 +106,8 @@ RequestPolicyService.prototype = {
 
   _clickedLinks : {},
   _clickedLinksReverse : {},
+
+  _mappedDestinations : {},
 
   _requestObservers : [],
 
@@ -354,6 +362,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
     os.addObserver(this, "private-browsing", false);
+    os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
   },
 
   _unregister : function() {
@@ -1075,6 +1084,16 @@ RequestPolicyService.prototype = {
     }
   },
 
+  mapDestinations : function(origDestUri, newDestUri) {
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Mapping destination <" + origDestUri + "> to <" + newDestUri + ">.");
+    if (!this._mappedDestinations[newDestUri]) {
+      this._mappedDestinations[newDestUri] = {};
+    }
+    this._mappedDestinations[newDestUri][origDestUri] =
+        requestpolicy.mod.DomainUtil.getUriObject(origDestUri);
+  },
+
   _storePreferenceList : function(prefName) {
     var setFromObj = this._prefNameToObjectMap[prefName];
     if (setFromObj === undefined) {
@@ -1321,6 +1340,18 @@ RequestPolicyService.prototype = {
         "Could not find observer to remove " + "in removeRequestObserver()");
   },
 
+  /**
+   * Handles observer notifications sent by the HTTPS Everywhere extension
+   * that inform us of URIs that extension has rewritten.
+   *
+   * @param nsIURI oldURI
+   * @param string newSpec
+   */
+  _handleHttpsEverywhereUriRewrite: function (oldURI, newSpec) {
+    oldURI = oldURI.QueryInterface(CI.nsIURI);
+    this.mapDestinations(oldURI.spec, newSpec);
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIObserver interface
   // /////////////////////////////////////////////////////////////////////////
@@ -1332,6 +1363,9 @@ RequestPolicyService.prototype = {
         break;
       case "http-on-modify-request" :
         this._examineHttpRequest(subject);
+        break;
+      case HTTPS_EVERYWHERE_REWRITE_TOPIC :
+        this._handleHttpsEverywhereUriRewrite(subject, data);
         break;
       case "nsPref:changed" :
         this._updatePref(data);
@@ -1389,7 +1423,7 @@ RequestPolicyService.prototype = {
   },
 
   _argumentsToString : function(aContentType, dest, origin, aContext,
-      aMimeTypeGuess, aInternalCall) {
+      aMimeTypeGuess, aExtra) {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
     return "type: "
@@ -1401,7 +1435,7 @@ RequestPolicyService.prototype = {
         + ", context: "
         + ((aContext instanceof CI.nsIDOMHTMLElement)
             ? "<HTML Element>"
-            : aContext) + ", mime: " + aMimeTypeGuess + ", " + aInternalCall;
+            : aContext) + ", mime: " + aMimeTypeGuess + ", " + aExtra;
   },
 
   // We always call this from shouldLoad to reject a request.
@@ -1673,10 +1707,9 @@ RequestPolicyService.prototype = {
   // the content policy that does something useful
   mainContentPolicy : {
 
-    // called automatically. see:
-    // http://people.mozilla.com/~axel/doxygen/html/interfacensIContentPolicy.html
+    // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
-        aContext, aMimeTypeGuess, aInternalCall) {
+        aContext, aMimeTypeGuess, aExtra) {
       try {
 
         if (this._isInternalRequest(aContentLocation, aRequestOrigin)) {
@@ -1712,7 +1745,7 @@ RequestPolicyService.prototype = {
         }
 
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
-            aInternalCall];
+            aExtra];
 
         // Note: If changing the logic here, also make necessary changes to
         // isAllowedRedirect).
@@ -1844,9 +1877,28 @@ RequestPolicyService.prototype = {
           }
         }
 
+        // If the destination has a mapping (i.e. it was originally a different
+        // destination but was changed into the current one), accept this
+        // request if the original destination would have been accepted.
+        // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
+        if (aExtra != CP_MAPPEDDESTINATION && this._mappedDestinations[dest]) {
+          for (var mappedDest in this._mappedDestinations[dest]) {
+            var mappedDestUriObj = this._mappedDestinations[dest][mappedDest];
+            requestpolicy.mod.Logger.warning(
+                requestpolicy.mod.Logger.TYPE_CONTENT,
+                "Checking mapped destination: " + mappedDest);
+            var mappedResult = this.shouldLoad(aContentType, mappedDestUriObj,
+                aRequestOrigin, aContext, aMimeTypeGuess, CP_MAPPEDDESTINATION);
+            if (mappedResult == CP_OK) {
+              return CP_OK;
+            }
+          }
+        }
+
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
-        return this.reject("hosts don't match", args);
+        return aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
+            this.reject("hosts don't match", args);
 
       } catch (e) {
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,

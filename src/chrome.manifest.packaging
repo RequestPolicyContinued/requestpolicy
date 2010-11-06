@@ -1,4 +1,5 @@
 content    requestpolicy    jar:chrome/requestpolicy.jar!/content/
+resource   requestpolicy    modules/
 skin       requestpolicy    classic/1.0    jar:chrome/requestpolicy.jar!/skin/
 
 locale     requestpolicy    en-US          jar:chrome/requestpolicy.jar!/locale/en-US/

@@ -417,24 +417,6 @@ RequestPolicyService.prototype = {
   },
 
   _loadLibraries : function() {
-    // Wasn't able to define a resource in chrome.manifest, so need to use file
-    // paths to load modules. This method of doing it is described at
-    // http://developer.mozilla.org/en/Using_JavaScript_code_modules
-    // but this is using __LOCATION__ instead.
-    // The reason a resources defined in chrome.manifest isn't working is likely
-    // because at this point chrome.manifest hasn't been loaded yet. See
-    // http://groups.google.com/group/mozilla.dev.tech.xpcom/browse_thread/thread/6a8ea7f803ac720a
-    // for more info.
-    var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-        .getService(Components.interfaces.nsIIOService);
-    var resProt = ioService.getProtocolHandler("resource")
-        .QueryInterface(Components.interfaces.nsIResProtocolHandler);
-    var extensionDir = __LOCATION__.parent.parent;
-    var modulesDir = extensionDir.clone();
-    modulesDir.append("modules");
-    var resourceURI = ioService.newFileURI(modulesDir);
-    resProt.setSubstitution("requestpolicy", resourceURI);
-
     Components.utils.import("resource://requestpolicy/Logger.jsm",
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/DomainUtil.jsm",

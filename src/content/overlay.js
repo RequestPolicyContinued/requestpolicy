@@ -953,7 +953,7 @@ requestpolicy.overlay = {
         // openDialog(url, name, features, arg1, arg2, ...)
         rpService
             .registerLinkClicked(window.document.documentURI, arguments[0]);
-        return window.requestpolicyOrigOpenDialog.apply(this, arguments);
+        return window.requestpolicyOrigOpenDialog.apply(window, arguments);
       };
     }
   },

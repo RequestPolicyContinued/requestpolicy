@@ -1358,8 +1358,8 @@ requestpolicy.overlay = {
   },
 
   openToolbarPopup : function(anchor) {
-    // It seems to work to just attach it to the status bar.
-    this._attachPopupToStatusbar();
+    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
+        null);
     this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
   },
 

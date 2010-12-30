@@ -70,6 +70,8 @@ requestpolicy.overlay = {
   _rpStatusbar : null,
   _rpContextMenu : null,
   _toolbox : null,
+  _addonbar : null,
+  _tabbar : null,
 
   _isFennec : false,
 
@@ -119,6 +121,8 @@ requestpolicy.overlay = {
         this._rpContextMenu = document
             .getElementById("requestpolicyContextMenu");
         this._toolbox = document.getElementById("navigator-toolbox");
+        this._addonbar = document.getElementById("addon-bar");
+        this._tabbar = document.getElementById("TabsToolbar");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
@@ -614,6 +618,10 @@ requestpolicy.overlay = {
           .setAttribute("requestpolicyBlocked", isContentBlocked);
       this._toolbox.setAttribute("requestpolicyBlocked", isContentBlocked);
     }
+    if (this._addonbar) {
+      this._addonbar.setAttribute("requestpolicyBlocked", isContentBlocked);
+      this._tabbar.setAttribute("requestpolicyBlocked", isContentBlocked);
+    }
   },
 
   /**
@@ -641,6 +649,10 @@ requestpolicy.overlay = {
     if (!this._isFennec) {
       this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
       this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
+    }
+    if (this._addonbar) {
+      this._addonbar.setAttribute("requestpolicyPermissive", isPermissive);
+      this._tabbar.setAttribute("requestpolicyPermissive", isPermissive);
     }
   },
 

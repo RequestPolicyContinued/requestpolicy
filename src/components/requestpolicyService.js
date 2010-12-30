@@ -985,7 +985,6 @@ RequestPolicyService.prototype = {
         this._storePreferenceList("allowedOrigins");
       }
     }
-    this._forbidAllDestinationsFromSingleOrigin(host);
   },
 
   forbidOrigin : function forbidOrigin(host) {
@@ -1007,7 +1006,6 @@ RequestPolicyService.prototype = {
         this._storePreferenceList("allowedDestinations");
       }
     }
-    this._forbidAllOriginsToSingleDestination(host);
   },
 
   forbidDestination : function forbidDestination(host) {
@@ -1016,24 +1014,6 @@ RequestPolicyService.prototype = {
 
   forbidDestinationDelayStore : function forbidDestinationDelayStore(host) {
     this._forbidDestination(host, true);
-  },
-
-  _forbidAllDestinationsFromSingleOrigin : function _forbidAllDestinationsFromSingleOrigin(
-      host) {
-    for (var i in this._allowedOriginsToDestinations) {
-      if (this._combinedOriginToDestinationIdentifierHasOrigin(i, host)) {
-        this._forbidOriginToDestinationByCombinedIdentifier(i);
-      }
-    }
-  },
-
-  _forbidAllOriginsToSingleDestination : function _forbidAllOriginsToSingleDestination(
-      host) {
-    for (var i in this._allowedOriginsToDestinations) {
-      if (this._combinedOriginToDestinationIdentifierHasDestination(i, host)) {
-        this._forbidOriginToDestinationByCombinedIdentifier(i);
-      }
-    }
   },
 
   _forbidOriginToDestination : function(originIdentifier, destIdentifier,

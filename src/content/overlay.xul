@@ -43,12 +43,12 @@
       onclick="requestpolicy.overlay.openToolbarPopup(this)" />
   </toolbarpalette>
 
-  <popup id="contentAreaContextMenu">
+  <menupopup id="contentAreaContextMenu">
     <menu
       id="requestpolicyContextMenu"
       class="menu-iconic"
       label="RequestPolicy" />
-  </popup>
+  </menupopup>
 
   <statusbar id="status-bar">
     <statusbarpanel
@@ -72,7 +72,7 @@
   </toolbar>
 
   <popupset>
-    <popup id="requestpolicyRedirectNotificationOptions" />
+    <menupopup id="requestpolicyRedirectNotificationOptions" />
 
     <menupopup
       id="requestpolicyStatusbarPopup"

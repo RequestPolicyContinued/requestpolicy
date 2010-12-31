@@ -714,7 +714,7 @@ requestpolicy.overlay = {
 
   _setBlockedContentCheckTimeout : function() {
     const document = content.document;
-    this._blockedContentCheckTimeoutId = document.defaultView.setTimeout(
+    this._blockedContentCheckTimeoutId = window.setTimeout(
         function() {
           requestpolicy.overlay._checkForBlockedContent(document);
         }, this._blockedContentCheckTimeoutDelay);
@@ -722,8 +722,7 @@ requestpolicy.overlay = {
 
   _stopBlockedContentCheckTimeout : function() {
     if (this._blockedContentCheckTimeoutId) {
-      content.document.defaultView
-          .clearTimeout(this._blockedContentCheckTimeoutId);
+      window.clearTimeout(this._blockedContentCheckTimeoutId);
       this._blockedContentCheckTimeoutId = null;
     }
   },
@@ -974,6 +973,9 @@ requestpolicy.overlay = {
     this.locationListener = {
       onLocationChange : function(aProgress, aRequest, aURI) {
         // This gets called both for tab changes and for history navigation.
+        // The timer is running on the main window, not the document's window,
+        // so we want to stop the timer when the tab is changed.
+        requestpolicy.overlay._stopBlockedContentCheckTimeout();
         requestpolicy.overlay._checkForBlockedContent(content.document);
       },
       onStateChange : function() {

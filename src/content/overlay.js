@@ -363,11 +363,6 @@ requestpolicy.overlay = {
       notification.label = notificationLabel;
     } else {
       var buttons = [{
-            label : notificationButtonOptions,
-            accessKey : notificationButtonOptionsKey,
-            popup : optionsPopupName,
-            callback : null
-          }, {
             label : notificationButtonAllow,
             accessKey : notificationButtonAllowKey,
             popup : null,
@@ -394,6 +389,11 @@ requestpolicy.overlay = {
             callback : function() {
               // Do nothing. The notification closes when this is called.
             }
+          }, {
+            label : notificationButtonOptions,
+            accessKey : notificationButtonOptionsKey,
+            popup : optionsPopupName,
+            callback : null
           }];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
       notificationBox.appendNotification(notificationLabel, notificationValue,

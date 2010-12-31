@@ -164,6 +164,21 @@ requestpolicy.prefWindow = {
   },
 
   /**
+   * Updates the context menu visibility in each window.
+   */
+  contextMenuChanged : function(isEnabled) {
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+        .getService(Components.interfaces.nsIWindowMediator);
+    var enumerator = wm.getEnumerator(null);
+    while (enumerator.hasMoreElements()) {
+      var window = enumerator.getNext();
+      if ("requestpolicy" in window && "overlay" in window.requestpolicy) {
+        window.requestpolicy.overlay.setContextMenuEnabled(isEnabled);
+      }
+    }
+  },
+
+  /**
    * Clears the data we have about allowed and blocked requests for the current
    * session because it will no longer be relevant with the uri identification
    * level having been changed. Not clearing this out results in odd and

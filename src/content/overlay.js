@@ -146,6 +146,8 @@ requestpolicy.overlay = {
 
         this.setStatusbarIconStyle(this._rpService.prefs
             .getCharPref("statusbarIcon"));
+        this.setContextMenuEnabled(this._rpService.prefs
+            .getBoolPref("contextMenu"));
         this._setPermissiveNotification(this._rpService.isBlockingDisabled());
       }
     } catch (e) {
@@ -159,6 +161,10 @@ requestpolicy.overlay = {
 
   setStatusbarIconStyle : function(iconStyle) {
     this._rpStatusbar.setAttribute("iconStyle", iconStyle);
+  },
+
+  setContextMenuEnabled : function(isEnabled) {
+    this._rpContextMenu.setAttribute("hidden", !isEnabled);
   },
 
   onWindowClose : function(event) {

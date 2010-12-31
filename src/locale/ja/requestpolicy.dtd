@@ -14,6 +14,7 @@
 <!ENTITY preferences "設定">
 <!ENTITY preferences.windowTitle "RequestPolicyの設定">
 <!ENTITY preferences.prefpane.general "一般設定">
+<!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "ホワイトリスト">
 <!ENTITY preferences.prefpane.import "インポート">
 <!ENTITY preferences.prefpane.export "エクスポート">
@@ -25,6 +26,7 @@
 <!ENTITY preferences.fullAddress "フルアドレス (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webページ">
 <!ENTITY preferences.statusbarIcon "ステータスバーアイコン">
+<!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "ブロックされたことを示す画像を表示する">
 <!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "初期設定画面を表示する">

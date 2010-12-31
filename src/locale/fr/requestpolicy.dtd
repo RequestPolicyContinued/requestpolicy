@@ -14,6 +14,7 @@
 <!ENTITY preferences "Préférences">
 <!ENTITY preferences.windowTitle "Préférences des règles de requêtes">
 <!ENTITY preferences.prefpane.general "Général">
+<!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "Liste blanche">
 <!ENTITY preferences.prefpane.import "Importer">
 <!ENTITY preferences.prefpane.export "Exporter">
@@ -25,6 +26,7 @@
 <!ENTITY preferences.fullAddress "Adresse complète (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Pages Web">
 <!ENTITY preferences.statusbarIcon "Icône de la barre d'état">
+<!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées">
 <!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Ouvrir l'outil de réglage initial">

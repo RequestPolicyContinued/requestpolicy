@@ -14,6 +14,7 @@
 <!ENTITY preferences "偏好設定">
 <!ENTITY preferences.windowTitle "RequestPolicy 偏好設定">
 <!ENTITY preferences.prefpane.general "一般">
+<!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "白名單">
 <!ENTITY preferences.prefpane.import "匯入">
 <!ENTITY preferences.prefpane.export "匯出">
@@ -25,6 +26,7 @@
 <!ENTITY preferences.fullAddress "完整的網址(http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "網頁">
 <!ENTITY preferences.statusbarIcon "狀態列圖示">
+<!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "IndicateBlockedObject">
 <!ENTITY preferences.autoReload "更改白名單後重新載入目前頁面">
 <!ENTITY preferences.openInitialSetup "開啟初始設定工具">

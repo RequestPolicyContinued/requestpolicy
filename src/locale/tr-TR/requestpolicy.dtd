@@ -14,6 +14,7 @@
 <!ENTITY preferences "Seçenekler">
 <!ENTITY preferences.windowTitle "RequestPolicy Seçenekleri">
 <!ENTITY preferences.prefpane.general "Genel">
+<!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "Beyazliste">
 <!ENTITY preferences.prefpane.import "İçeri">
 <!ENTITY preferences.prefpane.export "Dışarı">
@@ -25,6 +26,7 @@
 <!ENTITY preferences.fullAddress "Tam adres (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Web sayfaları">
 <!ENTITY preferences.statusbarIcon "Durum çubuğu">
+<!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "Bloklanan resimi işaretle">
 <!ENTITY preferences.autoReload "Beyaz liste değiştiğinde sayfayı yenile">
 <!ENTITY preferences.openInitialSetup "Yükleme sihirbazını aç">

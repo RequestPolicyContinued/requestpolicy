@@ -18,3 +18,4 @@ pref("extensions.requestpolicy.statusbarIcon", "standard");
 pref("extensions.requestpolicy.indicateBlockedObjects", true);
 pref("extensions.requestpolicy.startWithAllowAllEnabled", false);
 pref("extensions.requestpolicy.privateBrowsingPermanentWhitelisting", false);
+pref("extensions.requestpolicy.contextMenu", true);

@@ -14,6 +14,7 @@
 <!ENTITY preferences "配置">
 <!ENTITY preferences.windowTitle "RequestPolicy 配置">
 <!ENTITY preferences.prefpane.general "常规">
+<!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "白名单">
 <!ENTITY preferences.prefpane.import "导入">
 <!ENTITY preferences.prefpane.export "导出">
@@ -25,6 +26,7 @@
 <!ENTITY preferences.fullAddress "完整地址 (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "网页">
 <!ENTITY preferences.statusbarIcon "状态栏图标">
+<!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "标示封锁图像">
 <!ENTITY preferences.autoReload "当白名单更改后重新载入当前页面">
 <!ENTITY preferences.openInitialSetup "打开初始安装工具">

@@ -44,8 +44,6 @@
     <preferences>
       <preference id="pref-uriIdentificationLevel"
         name="extensions.requestpolicy.uriIdentificationLevel" type="int" />
-      <preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon"
-        type="string" instantApply="true" />
     </preferences>
 
     <groupbox>
@@ -61,6 +59,22 @@
     </groupbox>
 
     <groupbox>
+      <caption label="&initialSetup.title;" />
+      <label value="&preferences.openInitialSetup;" class="text-link"
+        onclick="requestpolicy.prefWindow.openModalInitialSetupDialog()" />
+    </groupbox>
+  </prefpane>
+
+  <prefpane id="requestpolicyPrefpaneAppearance" label="&preferences.prefpane.appearance;"
+    image="chrome://requestpolicy/skin/preferences/prefpane-appearance.png">
+    <preferences>
+      <preference id="pref-statusbarIcon" name="extensions.requestpolicy.statusbarIcon"
+        type="string" instantApply="true" />
+      <preference id="pref-contextMenu" name="extensions.requestpolicy.contextMenu"
+        type="bool" />
+    </preferences>
+
+    <groupbox>
       <caption label="&preferences.statusbarIcon;" />
       <radiogroup id="statusbarIcon" orient="horizontal"
         preference="pref-statusbarIcon"
@@ -72,11 +86,12 @@
           value="large" />
       </radiogroup>
     </groupbox>
-
     <groupbox>
-      <caption label="&initialSetup.title;" />
-      <label value="&preferences.openInitialSetup;" class="text-link"
-        onclick="requestpolicy.prefWindow.openModalInitialSetupDialog()" />
+      <caption>
+        <checkbox id="contextMenu" label="&preferences.contextMenu;"
+          onsynctopreference="requestpolicy.prefWindow.contextMenuChanged(this.checked)"
+          preference="pref-contextMenu" />
+      </caption>
     </groupbox>
   </prefpane>
 

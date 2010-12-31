@@ -1303,6 +1303,9 @@ requestpolicy.overlay = {
    */
   revokeTemporaryPermissions : function(event) {
     this._rpService.revokeTemporaryPermissions();
+    // Revoking temporary permissions disables permissive mode. This is partly
+    // because permissive mode is called "temporarily allow all".
+    this._setPermissiveNotification(false);
     this._conditionallyReloadDocument();
   },
 

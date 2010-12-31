@@ -972,6 +972,8 @@ RequestPolicyService.prototype = {
 
     this._temporarilyAllowedOriginsToDestinationsCount = 0;
     this._temporarilyAllowedOriginsToDestinations = {};
+
+    this._blockingDisabled = false;
   },
 
   _forbidOrigin : function(host, noStore) {

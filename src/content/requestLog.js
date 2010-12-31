@@ -103,6 +103,6 @@ requestpolicy.requestLog = {
 
 };
 
-addEventListener("DOMContentLoaded", function(event) {
+addEventListener("load", function(event) {
       requestpolicy.requestLog.init(event);
     }, false);

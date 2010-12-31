@@ -215,6 +215,6 @@ requestpolicy.requestLogTreeView.__defineGetter__("rowCount", function() {
     });
 
 // Initialize when the window DOM is loaded.
-addEventListener("DOMContentLoaded", function(event) {
+addEventListener("load", function(event) {
       requestpolicy.requestLogTreeView.init();
     }, false);

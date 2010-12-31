@@ -328,8 +328,14 @@ requestpolicy.overlay = {
         "redirectNotification", [shortUri]);
 
     var notificationButtonOptions = this._strbundle.getString("options");
+    var notificationButtonOptionsKey = this._strbundle
+        .getString("options.accesskey");
     var notificationButtonAllow = this._strbundle.getString("allow");
+    var notificationButtonAllowKey = this._strbundle
+        .getString("allow.accesskey");
     var notificationButtonDeny = this._strbundle.getString("deny");
+    var notificationButtonDenyKey = this._strbundle
+        .getString("deny.accesskey");
 
     var optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
@@ -352,12 +358,12 @@ requestpolicy.overlay = {
     } else {
       var buttons = [{
             label : notificationButtonOptions,
-            accessKey : '', // TODO
+            accessKey : notificationButtonOptionsKey,
             popup : optionsPopupName,
             callback : null
           }, {
             label : notificationButtonAllow,
-            accessKey : '', // TODO
+            accessKey : notificationButtonAllowKey,
             popup : null,
             callback : function() {
               var location = targetDocument.location;
@@ -377,7 +383,7 @@ requestpolicy.overlay = {
             }
           }, {
             label : notificationButtonDeny,
-            accessKey : '', // TODO
+            accessKey : notificationButtonDenyKey,
             popup : null,
             callback : function() {
               // Do nothing. The notification closes when this is called.

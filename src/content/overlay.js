@@ -333,9 +333,9 @@ requestpolicy.overlay = {
     var notificationLabel = this._strbundle.getFormattedString(
         "redirectNotification", [shortUri]);
 
-    var notificationButtonOptions = this._strbundle.getString("options");
+    var notificationButtonOptions = this._strbundle.getString("more");
     var notificationButtonOptionsKey = this._strbundle
-        .getString("options.accesskey");
+        .getString("more.accesskey");
     var notificationButtonAllow = this._strbundle.getString("allow");
     var notificationButtonAllowKey = this._strbundle
         .getString("allow.accesskey");

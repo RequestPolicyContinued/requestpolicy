@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "What the import will do">
 <!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
 <!ENTITY preferences.import.button.label "Import from File">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Request Log">
 <!ENTITY requestLog.blocked "Blocked">
 <!ENTITY requestLog.time "Час">

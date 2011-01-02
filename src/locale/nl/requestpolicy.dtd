@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Wat doet het importeren">
 <!ENTITY preferences.import.details.description "Het importeren voegt oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen in het bestand waaruit u exporteert toe. Niets in uw huidige witte lijst wordt verwijderd. Dat wil zeggen dat importeren slechts sites aan uw witte lijst toevoegt, het vervangt niet uw huidige witte lijst.">
 <!ENTITY preferences.import.button.label "Uit bestand importeren">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Logbestand verzoeken">
 <!ENTITY requestLog.blocked "Geblokkeerd">
 <!ENTITY requestLog.time "Tijdstip">

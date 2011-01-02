@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "İçeri neleri aktarır">
 <!ENTITY preferences.import.details.description "Dosyada ana,hedef,ana-dan-hedefe izin verilen siteler bulunur.Şu an kullandığınız beyaz listeden hiç bir şey silinmez.Siteler şu an kullandığınız listeye eklenir.">
 <!ENTITY preferences.import.button.label "Dosyadan yükle">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Kayıtlar">
 <!ENTITY requestLog.blocked "Yasaklı">
 <!ENTITY requestLog.time "Zaman">

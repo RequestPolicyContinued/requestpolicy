@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Что делает импорт">
 <!ENTITY preferences.import.details.description "Импорт добавляет источники, цели и источники-цели, перечисленные в файле, из которого вы импортируете. Из вашего текущего белого списка ничего не удаляется. Таким образом, запуск импорта только добавит сайты в ваш белый список, а не полностью перепишет его.">
 <!ENTITY preferences.import.button.label "Импорт из файла">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Журнал Запросов">
 <!ENTITY requestLog.blocked "Заблокирован">
 <!ENTITY requestLog.time "Время">

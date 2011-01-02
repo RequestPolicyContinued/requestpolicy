@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "O que a importação alterará na lista de permissões atual?">
 <!ENTITY preferences.import.details.description "A importação adicionará as origens, os destinos e os pares origem-destino presentes no arquivo importado. Nenhuma entrada será removida da lista de permissões atual. Assim, a importação complementará a lista de permissões atual com as entradas do arquivo importado.">
 <!ENTITY preferences.import.button.label "Importar de arquivo">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Pedidos nesta página">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">

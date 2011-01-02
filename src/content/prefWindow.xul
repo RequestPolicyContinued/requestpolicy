@@ -271,6 +271,24 @@
       <preference id="pref-privateBrowsingPermanentWhitelisting"
         name="extensions.requestpolicy.privateBrowsingPermanentWhitelisting"
         type="bool" />
+      <preference id="pref-prefetch.link.disableOnStartup"
+        name="extensions.requestpolicy.prefetch.link.disableOnStartup"
+        type="bool" />
+      <preference id="pref-prefetch.link.restoreDefaultOnUninstall"
+        name="extensions.requestpolicy.prefetch.link.restoreDefaultOnUninstall"
+        type="bool" />
+      <preference id="pref-prefetch.dns.disableOnStartup"
+        name="extensions.requestpolicy.prefetch.dns.disableOnStartup"
+        type="bool" />
+      <preference id="pref-prefetch.dns.restoreDefaultOnUninstall"
+        name="extensions.requestpolicy.prefetch.dns.restoreDefaultOnUninstall"
+        type="bool" />
+      <preference id="pref-network.prefetch-next"
+        name="network.prefetch-next"
+        type="bool" />
+      <preference id="pref-network.dns.disablePrefetch"
+        name="network.dns.disablePrefetch"
+        type="bool" inverted="true" />
     </preferences>
 
     <groupbox>
@@ -289,6 +307,21 @@
         label="&preferences.privateBrowsingPermanentWhitelisting;"
         preference="pref-privateBrowsingPermanentWhitelisting" />
     </groupbox>
+
+    <groupbox>
+      <caption label="&preferences.prefetch.link;"/>
+      <checkbox id="network.prefetch-next" label="&preferences.enabled;" preference="pref-network.prefetch-next"/>
+      <checkbox id="prefetch.link.disableOnStartup" label="&preferences.disableOnStartup;" preference="pref-prefetch.link.disableOnStartup"/>
+      <checkbox id="prefetch.link.restoreDefaultOnUninstall" label="&preferences.restoreDefaultOnUninstall;" preference="pref-prefetch.link.restoreDefaultOnUninstall"/>
+    </groupbox>
+
+    <groupbox>
+      <caption label="&preferences.prefetch.dns;"/>
+      <checkbox id="network.dns.disablePrefetch" label="&preferences.enabled;" preference="pref-network.dns.disablePrefetch"/>
+      <checkbox id="prefetch.dns.disableOnStartup" label="&preferences.disableOnStartup;" preference="pref-prefetch.dns.disableOnStartup"/>
+      <checkbox id="prefetch.dns.restoreDefaultOnUninstall" label="&preferences.restoreDefaultOnUninstall;" preference="pref-prefetch.dns.restoreDefaultOnUninstall"/>
+    </groupbox>
+
   </prefpane>
 
   <!--

@@ -18,4 +18,9 @@ pref("extensions.requestpolicy.statusbarIcon", "standard");
 pref("extensions.requestpolicy.indicateBlockedObjects", true);
 pref("extensions.requestpolicy.startWithAllowAllEnabled", false);
 pref("extensions.requestpolicy.privateBrowsingPermanentWhitelisting", false);
+
+pref("extensions.requestpolicy.prefetch.link.disableOnStartup", true);
+pref("extensions.requestpolicy.prefetch.link.restoreDefaultOnUninstall", true);
+pref("extensions.requestpolicy.prefetch.dns.disableOnStartup", true);
+pref("extensions.requestpolicy.prefetch.dns.restoreDefaultOnUninstall", true);
 pref("extensions.requestpolicy.contextMenu", true);

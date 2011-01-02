@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Was beim Import durchgeführt wird">
 <!ENTITY preferences.import.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln hinzugefügt. Nichts aus der Liste der erlaubten Seiten wird entfernt, sie wird also nicht ersetzt.">
 <!ENTITY preferences.import.button.label "Import aus Datei">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Anfragenchronik">
 <!ENTITY requestLog.blocked "Blockiert">
 <!ENTITY requestLog.time "Zeit">

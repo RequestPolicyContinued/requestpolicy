@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "¿Como funciona importar?:">
 <!ENTITY preferences.import.details.description "Se agregaran los orígenes, destinos y origen-a-destino del archivo de respaldo. Nada sera eliminado de tu lista de sitios permitidos. Es decir, no remplaza tu lista actual, solo agrega sitios nuevos a tu lista de sitios permitidos.">
 <!ENTITY preferences.import.button.label "Importar desde archivo">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Registro de peticiones">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">

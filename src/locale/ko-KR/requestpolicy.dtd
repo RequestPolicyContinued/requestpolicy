@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "들여오기가 하는 일">
 <!ENTITY preferences.import.details.description "출발지와 목적지, 그리고 출발지-목적지 주소를 파일로부터 들여옵니다. Whitelist 에 있는 내용은 지워지지 않습니다.">
 <!ENTITY preferences.import.button.label "파일로부터 들여오기">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "요청 기록">
 <!ENTITY requestLog.blocked "거부됨">
 <!ENTITY requestLog.time "시간">

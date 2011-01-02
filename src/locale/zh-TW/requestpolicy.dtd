@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "匯入工具的作用為何?">
 <!ENTITY preferences.import.details.description "此匯入工具能夠讓您由檔案匯入來源、目標、與來源到目標的白名單。匯入動作只會加入新增的網站，不會取代您現有的白名單">
 <!ENTITY preferences.import.button.label "由檔案匯入">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "請求記錄">
 <!ENTITY requestLog.blocked "已阻擋">
 <!ENTITY requestLog.time "發生時間">

@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Kion faros la importo">
 <!ENTITY preferences.import.details.description "La importo aldonos ĉiujn fontojn, celojn, kaj ties parojn, listigitajn en la dosiero, el kiu vi importas. El via nuna permesaro estos forigita nenio. Tio estas, importo nur aldonos retejojn al via permesaro, ĝi ne anstataŭigos tute la permesaron.">
 <!ENTITY preferences.import.button.label "Importi el dosiero">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Protokolo de petoj">
 <!ENTITY requestLog.blocked "Blokita">
 <!ENTITY requestLog.time "Tempo">

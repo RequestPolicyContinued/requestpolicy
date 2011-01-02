@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "导入将做什么">
 <!ENTITY preferences.import.details.description "导入会增加该文件可导入的所有来源、目标、来源到目标。不会删除任何您当前的白名单。也就是说，完成的导入只添加网站到您的白名单，它不会完全取代您当前的白名单。">
 <!ENTITY preferences.import.button.label "导入文件">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "请求日志">
 <!ENTITY requestLog.blocked "阻止">
 <!ENTITY requestLog.time "时间">

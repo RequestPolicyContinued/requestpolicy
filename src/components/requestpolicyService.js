@@ -29,6 +29,8 @@ const CP_NOP = function() {
 };
 const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 
+const EXTENSION_ID = "requestpolicy@requestpolicy.com";
+
 // A value intended to not conflict with aExtra passed to shouldLoad() by any
 // other callers. Was chosen randomly.
 const CP_MAPPEDDESTINATION = 0x178c40bf;
@@ -151,6 +153,7 @@ RequestPolicyService.prototype = {
   _compatibilityRules : [],
 
   _privateBrowsingEnabled : false,
+  _uninstall : false,
 
   // /////////////////////////////////////////////////////////////////////////
   // Utility
@@ -199,7 +202,6 @@ RequestPolicyService.prototype = {
       var callback = function(ext) {
         rpService._initializeExtCompatCallback(ext)
       };
-      Components.utils.import("resource://gre/modules/AddonManager.jsm");
       for (var i = 0; i < idArray.length; i++) {
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Extension new-style check: " + idArray[i]);
@@ -321,19 +323,24 @@ RequestPolicyService.prototype = {
 
     this._blockingDisabled = this.prefs.getBoolPref("startWithAllowAllEnabled");
 
-    // Disable prefetch.
-    if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
-      this._rootPrefs.setBoolPref("network.prefetch-next", false);
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Disabled prefetch.");
+    // Disable link prefetch.
+    if (this.prefs.getBoolPref("prefetch.link.disableOnStartup")) {
+      if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
+        this._rootPrefs.setBoolPref("network.prefetch-next", false);
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Disabled prefetch.");
+      }
     }
-    // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
-    // doesn't have a default value, at least in 3.1b2, but if and when it
-    // does have a default it will be false).
-    if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch")) {
-      this._rootPrefs.setBoolPref("network.dns.disablePrefetch", true);
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Disabled DNS prefetch.");
+    // Disable DNS prefetch.
+    if (this.prefs.getBoolPref("prefetch.dns.disableOnStartup")) {
+      // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
+      // doesn't have a default value, at least in 3.1b2, but if and when it
+      // does have a default it will be false).
+      if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch")) {
+        this._rootPrefs.setBoolPref("network.dns.disablePrefetch", true);
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Disabled DNS prefetch.");
+      }
     }
 
     // Clean up old, unused prefs (removed in 0.2.0).
@@ -354,6 +361,47 @@ RequestPolicyService.prototype = {
     requestpolicy.mod.Logger.types = this.prefs.getIntPref("log.types");
   },
 
+  _registerAddonListener : function() {
+    const rpService = this;
+    var addonListener = {
+      onDisabling : function(addon, needsRestart) {
+        if (addon.id != EXTENSION_ID) {
+          return;
+        }
+        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Addon set to be disabled.");
+        rpService._uninstall = true;
+      },
+      onUninstalling : function(addon, needsRestart) {
+        if (addon.id != EXTENSION_ID) {
+          return;
+        }
+        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Addon set to be uninstalled.");
+        rpService._uninstall = true;
+      },
+      onOperationCancelled : function(addon, needsRestart) {
+        if (addon.id != EXTENSION_ID) {
+          return;
+        }
+        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Addon operation cancelled.");
+        // Just because an operation was cancelled doesn't mean there isn't
+        // a pending operation we care about. For example, a user can choose
+        // disable and then uninstall, then clicking "undo" once will cancel
+        // the uninstall but not the disable.
+        var pending = addon.pendingOperations &
+            (AddonManager.PENDING_DISABLE | AddonManager.PENDING_UNINSTALL);
+        if (!pending) {
+          requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+              "No pending uninstall or disable.");
+          rpService._uninstall = false;
+        }
+      }
+    };
+    AddonManager.addAddonListener(addonListener);
+  },
+
   _register : function() {
     var os = CC['@mozilla.org/observer-service;1']
         .getService(CI.nsIObserverService);
@@ -361,8 +409,17 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
+    os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
+
+    // Listening for uninstall/disable events is done with the AddonManager
+    // since Firefox 4.
+    if (AddonManager) {
+      this._registerAddonListener();
+    } else {
+      os.addObserver(this, "em-action-requested", false);
+    }
   },
 
   _unregister : function() {
@@ -373,6 +430,10 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
+      os.removeObserver(this, "quit-application");
+      if (!AddonManager) {
+        os.removeObserver(this, "em-action-requested");
+      }
     } catch (e) {
       requestpolicy.mod.Logger.dump(e + " while unregistering.");
     }
@@ -421,6 +482,12 @@ RequestPolicyService.prototype = {
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
         requestpolicy.mod);
+    try {
+      Components.utils.import("resource://gre/modules/AddonManager.jsm");
+    } catch (e) {
+      // We'll be using the old (pre-Firefox 4) addon manager.
+      AddonManager = null;
+    }
   },
 
   _initializePrivateBrowsing : function() {
@@ -1311,9 +1378,30 @@ RequestPolicyService.prototype = {
    * @param nsIURI oldURI
    * @param string newSpec
    */
-  _handleHttpsEverywhereUriRewrite: function (oldURI, newSpec) {
+  _handleHttpsEverywhereUriRewrite: function(oldURI, newSpec) {
     oldURI = oldURI.QueryInterface(CI.nsIURI);
     this.mapDestinations(oldURI.spec, newSpec);
+  },
+
+  _handleUninstallOrDisable : function() {
+    requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Performing 'disable' operations.");
+    var resetLinkPrefetch = this.prefs.getBoolPref(
+        "prefetch.link.restoreDefaultOnUninstall");
+    var resetDNSPrefetch = this.prefs.getBoolPref(
+        "prefetch.dns.restoreDefaultOnUninstall");
+
+    if (resetLinkPrefetch) {
+      if (this._rootPrefs.prefHasUserValue("network.prefetch-next")) {
+        this._rootPrefs.clearUserPref("network.prefetch-next");
+      }
+    }
+    if (resetDNSPrefetch) {
+      if (this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch")) {
+        this._rootPrefs.clearUserPref("network.dns.disablePrefetch");
+      }
+    }
+    this._prefService.savePrefFile(null);
   },
 
   // /////////////////////////////////////////////////////////////////////////
@@ -1360,6 +1448,31 @@ RequestPolicyService.prototype = {
         break;
       case "xpcom-shutdown" :
         this._shutdown();
+        break;
+      case "em-action-requested" :
+        if ((subject instanceof CI.nsIUpdateItem)
+            && subject.id == EXTENSION_ID) {
+          if (data == "item-uninstalled" || data == "item-disabled") {
+            this._uninstall = true;
+            requestpolicy.mod.Logger.debug(
+                requestpolicy.mod.Logger.TYPE_INTERNAL, "Disabled");
+          } else if (data == "item-cancel-action") {
+            // This turns out to be correct. Unlike with the AddonManager
+            // in Firefox 4, here if the user does a "disable" followed by
+            // "uninstall" followed by a single "undo", rather than the
+            // "undo" triggering a"n "item-cancel-action", the first "undo"
+            // appears to send an "item-disabled" and only if the user click
+            // "undo" a second time does the "item-cancel-action" event occur.
+            this._uninstall = false;
+            requestpolicy.mod.Logger.debug(
+                requestpolicy.mod.Logger.TYPE_INTERNAL, "Enabled");
+          }
+        }
+        break;
+      case "quit-application" :
+        if (this._uninstall) {
+          this._handleUninstallOrDisable();
+        }
         break;
       default :
         requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_ERROR,

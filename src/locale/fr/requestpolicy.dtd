@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Ce que l'importation va faire">
 <!ENTITY preferences.import.details.description "L'importation ajoutera les origines, les destinations, et les « origines-vers-destinations » contenues dans le fichier importé. Dans votre liste blanche actuelle aucun élément ne sera enlevé : en quelque sorte, cela ne fait qu'ajouter des sites à la liste, et non remplacer complètement la liste actuelle.">
 <!ENTITY preferences.import.button.label "Importer depuis un fichier">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Journal des requêtes">
 <!ENTITY requestLog.blocked "Bloqué">
 <!ENTITY requestLog.time "Durée">

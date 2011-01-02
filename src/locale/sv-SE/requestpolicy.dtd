@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "Vad importen kommer att göra">
 <!ENTITY preferences.import.details.description "Importen kommer att lägga till alla källor, mål och källor-till-mål i filen som du importerar. Ingen i din nuvarande vitlista kommer att tas bort. En import läggar alltså enbart till sidor till vitlistan, den kommer inte att ersätta den.">
 <!ENTITY preferences.import.button.label "Importera från fil">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Förfrågningslogg">
 <!ENTITY requestLog.blocked "Blockerad">
 <!ENTITY requestLog.time "Tid">

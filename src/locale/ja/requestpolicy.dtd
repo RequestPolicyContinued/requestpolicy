@@ -48,6 +48,11 @@
 <!ENTITY preferences.import.details.caption "インポートで行われること">
 <!ENTITY preferences.import.details.description "インポートはインポートしたファイルに含まれるすべての「オリジン」と「送信先」と「オリジンと送信先のペア」をホワイトリストに追加します．現在のホワイトリストが削除されることはありません．つまり，インポートはWebサイトをホワイトリストに追加するだけです．あなたの現在のホワイトリストを置き換えるというわけではありません．">
 <!ENTITY preferences.import.button.label "ファイルから設定をインポートする">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Enabled">
+<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "リクエストログ">
 <!ENTITY requestLog.blocked "禁止">
 <!ENTITY requestLog.time "時間">

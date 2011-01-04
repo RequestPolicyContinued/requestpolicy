@@ -46,11 +46,14 @@ var DomainUtil = {};
 DomainUtil._ios = CC["@mozilla.org/network/io-service;1"]
     .getService(CI.nsIIOService);
 
-DomainUtil._eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
-    .getService(Components.interfaces.nsIEffectiveTLDService);
+DomainUtil._eTLDService = CC["@mozilla.org/network/effective-tld-service;1"]
+    .getService(CI.nsIEffectiveTLDService);
 
-DomainUtil._idnService = Components.classes["@mozilla.org/network/idn-service;1"]
-    .getService(Components.interfaces.nsIIDNService);
+DomainUtil._idnService = CC["@mozilla.org/network/idn-service;1"]
+    .getService(CI.nsIIDNService);
+
+DomainUtil._uriFixupService = CC["@mozilla.org/docshell/urifixup;1"]
+    .getService(CI.nsIURIFixup);
 
 // LEVEL_DOMAIN: Use example.com from http://www.a.example.com:81
 DomainUtil.LEVEL_DOMAIN = 1;
@@ -336,3 +339,18 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
     return curDir + "/" + destPath;
   }
 }
+
+/**
+ * Returns a uri object that is the result of running
+ * nsIURIFixup.createExposableURI() over the uri string argument. We use this
+ * to, for example, strip wyciwyg:/x/ from URIs.
+ *
+ * @param {String}
+ *          uri The uri.
+ * @return {nsIURI} The result of running nsIURIFixup.createExposableURI() over
+ *          the uri argument. We're using to strip wyciwyg:/x/ from URIs.
+ */
+DomainUtil.createExposableURI = function(uri) {
+  var uriObject = this.getUriObject(uri);
+  return DomainUtil._uriFixupService.createExposableURI(uriObject);
+};

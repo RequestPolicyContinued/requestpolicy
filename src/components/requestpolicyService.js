@@ -1803,25 +1803,14 @@ RequestPolicyService.prototype = {
             .stripFragment(aContentLocation.spec);
 
         if (aRequestOrigin.scheme == "moz-nullprincipal") {
-          try {
-            // Other ways to get the document uri are through
-            // aContext.contentDocument and aContext.contentPrincipal.
-            var newOrigin = requestpolicy.mod.DomainUtil
-                  .stripFragment(aContext.currentURI.spec);
-            // We might have a wyciwyg: uri, so turn it into something usable.
-            var newOrigin = requestpolicy.mod.DomainUtil
-                  .createExposableURI(newOrigin).spec;
-            requestpolicy.mod.Logger.info(
-                requestpolicy.mod.Logger.TYPE_CONTENT,
-                "Considering moz-nullprincipal origin <"
-                    + origin + "> to be origin <" + newOrigin + ">");
-            origin = newOrigin;
-            aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
-          } catch (e) {
-            requestpolicy.mod.Logger.severe(
-                requestpolicy.mod.Logger.TYPE_ERROR,
-                "Fatal Error, " + e + ", stack was: " + e.stack);
-          }
+          var newOrigin = requestpolicy.mod.DomainUtil
+                .stripFragment(aContext.contentDocument.documentURI);
+          requestpolicy.mod.Logger.info(
+              requestpolicy.mod.Logger.TYPE_CONTENT,
+              "Considering moz-nullprincipal origin <"
+                  + origin + "> to be origin <" + newOrigin + ">");
+          origin = newOrigin;
+          aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
         }
 
         if (this._isDuplicateRequest(dest, origin)) {

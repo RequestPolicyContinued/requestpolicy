@@ -285,6 +285,9 @@ RequestPolicyService.prototype = {
         "https://www.mozilla.com/", appInfo.vendor]);
     this._compatibilityRules.push(["https://services.addons.mozilla.org/",
         "https://www.getpersonas.com/", appInfo.vendor]);
+    // Firefox 4 uses an about:home page that is locally stored but can be
+    // the origin for remote requests. See bug #140 for more info.
+    this._compatibilityRules.push(["about:home", null, appInfo.vendor]);
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {

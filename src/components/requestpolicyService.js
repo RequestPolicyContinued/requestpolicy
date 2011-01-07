@@ -185,6 +185,7 @@ RequestPolicyService.prototype = {
     idArray.push("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}"); // Sage-Too
     idArray.push("{899DF1F8-2F43-4394-8315-37F6744E6319}"); // NewsFox
     idArray.push("brief@mozdev.org"); // Brief
+    idArray.push("foxmarks@kei.com"); // Xmarks Sync (a.k.a. Foxmarks)
 
     try {
       // For Firefox <= 3.6.
@@ -242,6 +243,12 @@ RequestPolicyService.prototype = {
               "name" : ext.name,
               "version" : ext.version
             });
+        break;
+      case "foxmarks@kei.com" : // Xmarks Sync
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push(["https://login.xmarks.com/",
+            "https://static.xmarks.com/", ext.name]);
         break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,

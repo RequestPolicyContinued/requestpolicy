@@ -262,7 +262,7 @@ RequestPolicyService.prototype = {
         appInfo.vendor]);
     this._compatibilityRules.push(["https://download.mozilla.org/", null,
         appInfo.vendor]);
-    // There are redirects from 'addons' to 'releases' when isntalling addons
+    // There are redirects from 'addons' to 'releases' when installing addons
     // from AMO. Adding the origin of 'releases' to be safe in case those
     // start redirecting elsewhere at some point.
     this._compatibilityRules.push(["http://addons.mozilla.org/", null,
@@ -273,6 +273,18 @@ RequestPolicyService.prototype = {
         appInfo.vendor]);
     this._compatibilityRules.push(["https://releases.mozilla.org/", null,
         appInfo.vendor]);
+    // Firefox 4 has the about:addons page open an iframe to the mozilla site.
+    // That opened page grabs content from other mozilla domains.
+    this._compatibilityRules.push(["about:addons",
+        "https://services.addons.mozilla.org/", appInfo.vendor]);
+    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
+        "https://static.addons.mozilla.net/", appInfo.vendor]);
+    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
+        "https://addons.mozilla.org/", appInfo.vendor]);
+    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
+        "https://www.mozilla.com/", appInfo.vendor]);
+    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
+        "https://www.getpersonas.com/", appInfo.vendor]);
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {

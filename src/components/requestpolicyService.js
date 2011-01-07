@@ -186,6 +186,8 @@ RequestPolicyService.prototype = {
     idArray.push("{899DF1F8-2F43-4394-8315-37F6744E6319}"); // NewsFox
     idArray.push("brief@mozdev.org"); // Brief
     idArray.push("foxmarks@kei.com"); // Xmarks Sync (a.k.a. Foxmarks)
+    // Norton Safe Web Lite Toolbar
+    idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
 
     try {
       // For Firefox <= 3.6.
@@ -249,6 +251,11 @@ RequestPolicyService.prototype = {
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push(["https://login.xmarks.com/",
             "https://static.xmarks.com/", ext.name]);
+        break;
+      case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton toolbar
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push([null, "symnst:", ext.name]);
         break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,

@@ -240,6 +240,8 @@ RequestPolicyService.prototype = {
       case "brief@mozdev.org" : // Brief
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Conflicting extension: " + ext.name);
+        this._compatibilityRules.push(["resource://brief-content/", null,
+            ext.name]);
         this._conflictingExtensions.push({
               "id" : ext.id,
               "name" : ext.name,

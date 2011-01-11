@@ -1,6 +1,6 @@
-<!ENTITY prefetchWarning "Warnung: Vorabrufen von Links ist aktiv">
-<!ENTITY prefetchInfo "Mehr über Vorabrufen von Links erfahren">
-<!ENTITY prefetchDisablingInstructions "Vorabrufen von Links deaktivieren">
+<!ENTITY prefetchWarning "Warnung: Vorabruf von Links ist aktiv">
+<!ENTITY prefetchInfo "Mehr über Vorabruf von Links erfahren">
+<!ENTITY prefetchDisablingInstructions "Vorabruf von Links deaktivieren">
 <!ENTITY temporarilyAllowAll "Alle Anfragen temporär erlauben">
 <!ENTITY revokeTemporaryPermissions "Temporäre Berechtigungen aufheben">
 <!ENTITY blockedDestinations "Blockierte Anfragen">
@@ -14,7 +14,7 @@
 <!ENTITY preferences "Einstellungen">
 <!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
 <!ENTITY preferences.prefpane.general "Allgemein">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Ansicht">
 <!ENTITY preferences.prefpane.whitelist "Erlaubte Seiten">
 <!ENTITY preferences.prefpane.import "Import">
 <!ENTITY preferences.prefpane.export "Export">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Vollständige Adresse (z. B. http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webseiten">
 <!ENTITY preferences.statusbarIcon "Statusleistensymbol">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Im Kontextmenü anzeigen">
 <!ENTITY preferences.indicateBlockedObjects "Blockierte Grafiken durch Platzhalter ersetzen">
 <!ENTITY preferences.autoReload "Aktuelle Seite beim Ändern der Liste erlaubter Anfragen neu laden">
 <!ENTITY preferences.openInitialSetup "Erstkonfiguration öffnen">
@@ -48,19 +48,19 @@
 <!ENTITY preferences.import.details.caption "Was beim Import durchgeführt wird">
 <!ENTITY preferences.import.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln hinzugefügt. Nichts aus der Liste der erlaubten Seiten wird entfernt, sie wird also nicht ersetzt.">
 <!ENTITY preferences.import.button.label "Import aus Datei">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Link-Prefetching (verlinkte Seite ohne Anforderung durch Nutzer herunterladen)">
+<!ENTITY preferences.prefetch.dns "DNS-Prefetching (IP-Adresse für verlinkte Seiten vor derem Abruf einholen)">
+<!ENTITY preferences.enabled "Aktivieren">
+<!ENTITY preferences.disableOnStartup "Beim Start von Firefox deaktivieren">
+<!ENTITY preferences.restoreDefaultOnUninstall "Bei der Deinstallation von RequestPolicy Standardeinstellung wiederherstellen">
 <!ENTITY requestLog.title "Anfragenchronik">
 <!ENTITY requestLog.blocked "Blockiert">
 <!ENTITY requestLog.time "Zeit">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">
+<!ENTITY requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
+<!ENTITY requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
+<!ENTITY requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
+<!ENTITY requestLog.clear "Löschen">
 <!ENTITY initialSetup.title "Erstkonfiguration">
 <!ENTITY initialSetup.whitelist.caption "Hinzufügen häufig benutzter Regeln zur Liste erlaubter Anfragen">
 <!ENTITY initialSetup.whitelist.description "Die Regeln in dieser Liste können zugelassen werden, da (1) die Anfrage zwischen zwei Seiten stattfindet, die dem selben Unternehmen gehören, oder (2) sie auftretende Probleme beheben und dabei nur kleinen Einfluss aus Sicherheit und Privatsphäre haben.">

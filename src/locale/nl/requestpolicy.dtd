@@ -14,7 +14,7 @@
 <!ENTITY preferences "Voorkeuren">
 <!ENTITY preferences.windowTitle "RequestPolicy voorkeuren">
 <!ENTITY preferences.prefpane.general "Algemeen">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Weergave">
 <!ENTITY preferences.prefpane.whitelist "Witte lijst">
 <!ENTITY preferences.prefpane.import "Importeren">
 <!ENTITY preferences.prefpane.export "Exporteren">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Volledig adres (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webpagina’s">
 <!ENTITY preferences.statusbarIcon "Statusbalkpictogram">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Contextmenu">
 <!ENTITY preferences.indicateBlockedObjects "Geblokkeerde afbeeldingen aanduiden">
 <!ENTITY preferences.autoReload "Huidige pagina opnieuw laden wanneer witte lijst wijzigt">
 <!ENTITY preferences.openInitialSetup "Initiële instelwizard openen">
@@ -48,11 +48,11 @@
 <!ENTITY preferences.import.details.caption "Wat doet het importeren">
 <!ENTITY preferences.import.details.description "Het importeren voegt oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen in het bestand waaruit u exporteert toe. Niets in uw huidige witte lijst wordt verwijderd. Dat wil zeggen dat importeren slechts sites aan uw witte lijst toevoegt, het vervangt niet uw huidige witte lijst.">
 <!ENTITY preferences.import.button.label "Uit bestand importeren">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Vooraf ophalen koppelingen">
+<!ENTITY preferences.prefetch.dns "Vooraf ophalen DNS">
+<!ENTITY preferences.enabled "Ingeschakeld">
+<!ENTITY preferences.disableOnStartup "Uitschakelen bij opstarten">
+<!ENTITY preferences.restoreDefaultOnUninstall "Standaard herstellen wanneer RequestPolicy is gedeïnstalleerd">
 <!ENTITY requestLog.title "Logbestand verzoeken">
 <!ENTITY requestLog.blocked "Geblokkeerd">
 <!ENTITY requestLog.time "Tijdstip">

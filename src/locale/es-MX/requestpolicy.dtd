@@ -14,7 +14,7 @@
 <!ENTITY preferences "Preferencias">
 <!ENTITY preferences.windowTitle "Preferencias de RequestPolicy">
 <!ENTITY preferences.prefpane.general "General">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Apariencia">
 <!ENTITY preferences.prefpane.whitelist "Lista Permitida">
 <!ENTITY preferences.prefpane.import "Importar">
 <!ENTITY preferences.prefpane.export "Exportar">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Direccion completa (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Paginas web">
 <!ENTITY preferences.statusbarIcon "Icono de la barra de estatus">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Menú contextual">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imágenes bloqueadas">
 <!ENTITY preferences.autoReload "Recargar la pagina actual cuando cambie la lista de sitios permitidos">
 <!ENTITY preferences.openInitialSetup "Abrir la herramienta de configuracion inicial">
@@ -48,11 +48,11 @@
 <!ENTITY preferences.import.details.caption "¿Como funciona importar?:">
 <!ENTITY preferences.import.details.description "Se agregaran los orígenes, destinos y origen-a-destino del archivo de respaldo. Nada sera eliminado de tu lista de sitios permitidos. Es decir, no remplaza tu lista actual, solo agrega sitios nuevos a tu lista de sitios permitidos.">
 <!ENTITY preferences.import.button.label "Importar desde archivo">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Descarga anticipada de enlaces">
+<!ENTITY preferences.prefetch.dns "Descarga anticipada de DNS">
+<!ENTITY preferences.enabled "Activado">
+<!ENTITY preferences.disableOnStartup "Deshabilitar al inicio">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restaurar predeterminados cuando RequestPolicy es des-instalado">
 <!ENTITY requestLog.title "Registro de peticiones">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">

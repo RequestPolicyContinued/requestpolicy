@@ -1,8 +1,8 @@
-<!ENTITY prefetchWarning "警告：预取启用">
-<!ENTITY prefetchInfo "了解预取">
+<!ENTITY prefetchWarning "警告：预取已启用">
+<!ENTITY prefetchInfo "了解有关预取">
 <!ENTITY prefetchDisablingInstructions "禁用预取">
 <!ENTITY temporarilyAllowAll "临时允许所有请求">
-<!ENTITY revokeTemporaryPermissions "撤销所有临时许可">
+<!ENTITY revokeTemporaryPermissions "撤销所有临时允许">
 <!ENTITY blockedDestinations "阻止目标">
 <!ENTITY allowedDestinations "允许目标">
 <!ENTITY otherOrigins "在这个页面上的其他来源">
@@ -11,59 +11,61 @@
 <!ENTITY rp.origin "来源">
 <!ENTITY rp.destination "目标">
 <!ENTITY rp.allow "允许">
-<!ENTITY preferences "配置">
-<!ENTITY preferences.windowTitle "RequestPolicy 配置">
+<!ENTITY preferences "首选项">
+<!ENTITY preferences.windowTitle "RequestPolicy 首选项">
 <!ENTITY preferences.prefpane.general "常规">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "外观">
 <!ENTITY preferences.prefpane.whitelist "白名单">
 <!ENTITY preferences.prefpane.import "导入">
 <!ENTITY preferences.prefpane.export "导出">
 <!ENTITY preferences.prefpane.advanced "高级">
-<!ENTITY preferences.strictness "精确">
-<!ENTITY preferences.strictness.description "该等级的分级是允许同站点请求。更改后，每个当前打开的标签，菜单将开始清空。">
+<!ENTITY preferences.strictness "严格">
+<!ENTITY preferences.strictness.description "等级的分级是用于允许同站点请求。更改后，每个当前打开的标签页的菜单将开始清空。">
 <!ENTITY preferences.baseDomain "根域名 (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "完整域名 (www.requestpolicy.com)">
 <!ENTITY preferences.fullAddress "完整地址 (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "网页">
 <!ENTITY preferences.statusbarIcon "状态栏图标">
-<!ENTITY preferences.contextMenu "Contextual menu">
-<!ENTITY preferences.indicateBlockedObjects "标示封锁图像">
-<!ENTITY preferences.autoReload "当白名单更改后重新载入当前页面">
-<!ENTITY preferences.openInitialSetup "打开初始安装工具">
+<!ENTITY preferences.contextMenu "上下文菜单">
+<!ENTITY preferences.indicateBlockedObjects "标示已阻止图像">
+<!ENTITY preferences.autoReload "白名单更改后，重新载入当前页面">
+<!ENTITY preferences.openInitialSetup "打开初始化设置工具">
 <!ENTITY preferences.misc "杂项">
-<!ENTITY preferences.startWithAllowAllEnabled "当浏览器启动时启用 “临时允许所有请求”">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "当使用隐私浏览时允许永久白名单">
+<!ENTITY preferences.startWithAllowAllEnabled "浏览器启动时启用“临时允许所有请求”">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "使用隐私浏览时允许永久白名单">
 <!ENTITY preferences.origins "来源">
 <!ENTITY preferences.destinations "目标">
 <!ENTITY preferences.originsToDestinations "来源到目标">
 <!ENTITY preferences.temporary "临时">
-<!ENTITY preferences.removeSelectedSites "删除所选网站">
+<!ENTITY preferences.removeSelectedSites "移除选定站点">
 <!ENTITY preferences.export.caption "导出您的设置">
-<!ENTITY preferences.export.description "您可以导出您的白名单到一个文件，让您有一个备份。要设置另一台计算机上有相同的白名单，只需将文件保存到那台计算机，并使用导入选项。">
+<!ENTITY preferences.export.description "您可以导出您的白名单到一个文件，让您有一个备份。要配置另一台计算机上有相同的白名单，只需将文件保存到那台计算机，并使用导入选项。">
 <!ENTITY preferences.export.details.caption "在导出文件中包含什么">
 <!ENTITY preferences.export.details.description "导出的文件将包含您允许的来源、目标和来源到目标。它将不包含任何临时允许。">
 <!ENTITY preferences.export.button.label "导出到文件">
 <!ENTITY preferences.import.caption "导入您的设置">
 <!ENTITY preferences.import.description "你可以从一个备份文件导入白名单。">
 <!ENTITY preferences.import.details.caption "导入将做什么">
-<!ENTITY preferences.import.details.description "导入会增加该文件可导入的所有来源、目标、来源到目标。不会删除任何您当前的白名单。也就是说，完成的导入只添加网站到您的白名单，它不会完全取代您当前的白名单。">
-<!ENTITY preferences.import.button.label "导入文件">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.import.details.description "导入会增加该文件可导入的所有来源、目标、来源到目标。不会删除任何您当前的白名单。也就是说，完成导入只添加站点到您的白名单，它不会完全取代您当前的白名单。">
+<!ENTITY preferences.import.button.label "从文件导入">
+<!ENTITY preferences.prefetch.link "链接预取">
+<!ENTITY preferences.prefetch.dns "DNS 预取">
+<!ENTITY preferences.enabled "启用">
+<!ENTITY preferences.disableOnStartup "在启动时禁用">
+<!ENTITY preferences.restoreDefaultOnUninstall "RequestPolicy 卸载后恢复默认">
 <!ENTITY requestLog.title "请求日志">
 <!ENTITY requestLog.blocked "阻止">
 <!ENTITY requestLog.time "时间">
-<!ENTITY requestLog.copyOriginToClipboard "复制'来源'到剪贴板">
-<!ENTITY requestLog.copyDestinationToClipboard "复制'目标'到剪贴板">
-<!ENTITY requestLog.openOriginInNewTab "在新标签页打开'来源'">
-<!ENTITY requestLog.openDestinationInNewTab "在新标签页打开'目标'">
+<!ENTITY requestLog.copyOriginToClipboard "复制“来源”到剪贴板">
+<!ENTITY requestLog.copyDestinationToClipboard "复制“目标”到剪贴板">
+<!ENTITY requestLog.openOriginInNewTab "在新标签页打开“来源”">
+<!ENTITY requestLog.openDestinationInNewTab "在新标签页打开“目标”">
 <!ENTITY requestLog.clear "清除">
-<!ENTITY initialSetup.title "开始安装">
-<!ENTITY initialSetup.whitelist.caption "添加网站到您的跨网域白名单">
-<!ENTITY initialSetup.whitelist.description "网站在这些名单选定可能是因为(1)它们涉及请求的网站是同一家公司所拥有，或者(2)它们能减少您可能会遇到的问题，并仅对隐私和安全造成一个非常低的影响。">
+<!ENTITY initialSetup.title "初始设置">
+<!ENTITY initialSetup.whitelist.caption "添加站点到您的跨站点白名单">
+<!ENTITY initialSetup.whitelist.description "站点在这些名单被选定可能是因为：
+(1)它们涉及请求的站点是同一家公司所拥有，或者
+(2)它们能减少您可能会遇到的问题，并仅对隐私和安全造成一个非常低的影响。">
 <!ENTITY initialSetup.region.international "国际">
 <!ENTITY initialSetup.region.americas "美洲">
 <!ENTITY initialSetup.region.asia "亚洲">

@@ -14,7 +14,7 @@
 <!ENTITY preferences "Preferoj">
 <!ENTITY preferences.windowTitle "Agordoj de RequestPolicy">
 <!ENTITY preferences.prefpane.general "Ĉefaj">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Aspekto">
 <!ENTITY preferences.prefpane.whitelist "Permesaroj">
 <!ENTITY preferences.prefpane.import "Importi">
 <!ENTITY preferences.prefpane.export "Eksporti">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Tuta adreso (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Retpaĝoj">
 <!ENTITY preferences.statusbarIcon "Aspekto en la stata strio">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Kunteksta menuo">
 <!ENTITY preferences.indicateBlockedObjects "Indiki blokitajn bildojn">
 <!ENTITY preferences.autoReload "Reŝargi la montratan paĝon ĉe ŝanĝo de permesoj.">
 <!ENTITY preferences.openInitialSetup "Malfermi la aldonilon de antaŭkunmetitaj permesaroj">
@@ -48,11 +48,11 @@
 <!ENTITY preferences.import.details.caption "Kion faros la importo">
 <!ENTITY preferences.import.details.description "La importo aldonos ĉiujn fontojn, celojn, kaj ties parojn, listigitajn en la dosiero, el kiu vi importas. El via nuna permesaro estos forigita nenio. Tio estas, importo nur aldonos retejojn al via permesaro, ĝi ne anstataŭigos tute la permesaron.">
 <!ENTITY preferences.import.button.label "Importi el dosiero">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Laŭligila antaŭakirado">
+<!ENTITY preferences.prefetch.dns "DNSa antaŭakirado">
+<!ENTITY preferences.enabled "Ŝaltita">
+<!ENTITY preferences.disableOnStartup "Malŝalti ĉe starto de la programo">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restarigi la defaŭltan agordon ĉe malinstalo de RequestPolicy">
 <!ENTITY requestLog.title "Protokolo de petoj">
 <!ENTITY requestLog.blocked "Blokita">
 <!ENTITY requestLog.time "Tempo">

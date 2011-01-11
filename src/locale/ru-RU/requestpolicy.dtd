@@ -14,7 +14,7 @@
 <!ENTITY preferences "Настройки">
 <!ENTITY preferences.windowTitle "Настройки RequestPolicy">
 <!ENTITY preferences.prefpane.general "Общие">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Вид">
 <!ENTITY preferences.prefpane.whitelist "Белый список">
 <!ENTITY preferences.prefpane.import "Импорт">
 <!ENTITY preferences.prefpane.export "Экспорт">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Полный адрес (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Веб-страницы">
 <!ENTITY preferences.statusbarIcon "Значок панели статуса">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Контекстное меню">
 <!ENTITY preferences.indicateBlockedObjects "Помечать заблокированные изображения">
 <!ENTITY preferences.autoReload "Перегружать текущую страницу при изменении белого списка">
 <!ENTITY preferences.openInitialSetup "Открыть окно начальной настройки">
@@ -48,11 +48,11 @@
 <!ENTITY preferences.import.details.caption "Что делает импорт">
 <!ENTITY preferences.import.details.description "Импорт добавляет источники, цели и источники-цели, перечисленные в файле, из которого вы импортируете. Из вашего текущего белого списка ничего не удаляется. Таким образом, запуск импорта только добавит сайты в ваш белый список, а не полностью перепишет его.">
 <!ENTITY preferences.import.button.label "Импорт из файла">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Предварительная загрузка ссылок">
+<!ENTITY preferences.prefetch.dns "Упреждающее чтение DNS">
+<!ENTITY preferences.enabled "Включено">
+<!ENTITY preferences.disableOnStartup "Отключать при запуске">
+<!ENTITY preferences.restoreDefaultOnUninstall "Восстанавливать по умолчанию при удалении RequestPolicy">
 <!ENTITY requestLog.title "Журнал Запросов">
 <!ENTITY requestLog.blocked "Заблокирован">
 <!ENTITY requestLog.time "Время">

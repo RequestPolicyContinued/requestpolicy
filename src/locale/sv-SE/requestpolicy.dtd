@@ -14,7 +14,7 @@
 <!ENTITY preferences "Alternativ">
 <!ENTITY preferences.windowTitle "RequestPolicy - Inställningar">
 <!ENTITY preferences.prefpane.general "Generellt">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Utseende">
 <!ENTITY preferences.prefpane.whitelist "Vitlista">
 <!ENTITY preferences.prefpane.import "Importera">
 <!ENTITY preferences.prefpane.export "Exportera">
@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Full adress (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webbsidor">
 <!ENTITY preferences.statusbarIcon "Statusradsikon">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Högerklicksmenyn">
 <!ENTITY preferences.indicateBlockedObjects "Indikera blockerade bilder">
 <!ENTITY preferences.autoReload "Ladda om nuvarande sida när vitlistan ändras">
 <!ENTITY preferences.openInitialSetup "Öppna inställningsguiden">
@@ -48,11 +48,11 @@
 <!ENTITY preferences.import.details.caption "Vad importen kommer att göra">
 <!ENTITY preferences.import.details.description "Importen kommer att lägga till alla källor, mål och källor-till-mål i filen som du importerar. Ingen i din nuvarande vitlista kommer att tas bort. En import läggar alltså enbart till sidor till vitlistan, den kommer inte att ersätta den.">
 <!ENTITY preferences.import.button.label "Importera från fil">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Länkförhämtning">
+<!ENTITY preferences.prefetch.dns "DNS-förhämtning">
+<!ENTITY preferences.enabled "Aktiverad">
+<!ENTITY preferences.disableOnStartup "Inaktivera vid start">
+<!ENTITY preferences.restoreDefaultOnUninstall "Återställ standard när RequestPolicy avinstalleras">
 <!ENTITY requestLog.title "Förfrågningslogg">
 <!ENTITY requestLog.blocked "Blockerad">
 <!ENTITY requestLog.time "Tid">

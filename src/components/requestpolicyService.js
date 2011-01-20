@@ -1977,9 +1977,10 @@ RequestPolicyService.prototype = {
                   args, true);
         }
 
-        // XMLHttpRequest's made within chrome's context have this origin.
+        // XMLHttpRequests made within chrome's context have these origins.
         // Greasemonkey uses such a method to provide their cross-site xhr.
-        if (origin == "resource://gre/res/hiddenWindow.html") {
+        if (origin == "resource://gre/res/hiddenWindow.html" ||
+            origin == "resource://gre-resources/hiddenWindow.html") {
           return this.accept(
               "Privileged request (possibly a cross-site XMLHttpRequest)",
               args, true);

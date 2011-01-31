@@ -359,7 +359,7 @@ RequestPolicyService.prototype = {
       if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
         this._rootPrefs.setBoolPref("network.prefetch-next", false);
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            "Disabled prefetch.");
+            "Disabled link prefetch.");
       }
     }
     // Disable DNS prefetch.
@@ -367,7 +367,8 @@ RequestPolicyService.prototype = {
       // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
       // doesn't have a default value, at least in 3.1b2, but if and when it
       // does have a default it will be false).
-      if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch")) {
+      if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch") ||
+          !this._rootPrefs.getBoolPref("network.dns.disablePrefetch")) {
         this._rootPrefs.setBoolPref("network.dns.disablePrefetch", true);
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Disabled DNS prefetch.");

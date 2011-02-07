@@ -173,7 +173,18 @@ DomainUtil.getDomain = function(uri) {
 };
 
 /**
- * Returns the prePath from a uri string. Not that this will return a prePath in
+ * Returns the path from a uri string.
+ *
+ * @param {String}
+ *          uri The uri.
+ * @return {String} The path of the uri.
+ */
+DomainUtil.getPath = function(uri) {
+  return this.getUriObject(uri).path;
+};
+
+/**
+ * Returns the prePath from a uri string. Note that this will return a prePath in
  * UTF8 format for all IDNs, even if the uri passed to the function is ACE
  * formatted.
  * 

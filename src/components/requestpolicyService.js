@@ -109,6 +109,8 @@ RequestPolicyService.prototype = {
   _clickedLinks : {},
   _clickedLinksReverse : {},
 
+  _faviconRequests : {},
+
   _mappedDestinations : {},
 
   _requestObservers : [],
@@ -621,11 +623,27 @@ RequestPolicyService.prototype = {
 
     // Allow redirects of requests from privileged code.
     if (!this._isContentRequest(httpChannel)) {
-      requestpolicy.mod.Logger.warning(
-          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-              + headerType + "' header to <" + dest + "> " + "from <" + origin
-              + ">. Original request is from privileged code.");
-      return;
+      // However, favicon requests that are redirected appear as non-content
+      // requests. So, check if the original request was for a favicon.
+      var originPath = requestpolicy.mod.DomainUtil.getPath(httpChannel.name);
+      // We always have to check "/favicon.ico" because Firefox will use this
+      // as a default path and that request won't pass through shouldLoad().
+      if (originPath == "/favicon.ico" || this._faviconRequests[origin]) {
+        // If the redirected request is allowed, we need to know that was a
+        // favicon request in case it is further redirected.
+        this._faviconRequests[dest] = true;
+        requestpolicy.mod.Logger.info(
+            requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "'" + headerType
+                + "' header to <" + dest + "> " + "from <" + origin
+                + "> appears to be a redirected favicon request. "
+                + "This will be treated as a content request.");
+      } else {
+        requestpolicy.mod.Logger.warning(
+            requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
+                + headerType + "' header to <" + dest + "> " + "from <"
+                + origin + ">. Original request is from privileged code.");
+        return;
+      }
     }
 
     // If it's not a valid uri, the redirect is relative to the origin host.
@@ -1866,6 +1884,11 @@ RequestPolicyService.prototype = {
 
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aExtra];
+
+        if (aContext.nodeName == "LINK" &&
+            (aContext.rel == "icon" || aContext.rel == "shortcut icon")) {
+          this._faviconRequests[dest] = true;
+        }
 
         // Note: If changing the logic here, also make necessary changes to
         // isAllowedRedirect).

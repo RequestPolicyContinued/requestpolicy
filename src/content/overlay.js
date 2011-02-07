@@ -1073,7 +1073,12 @@ requestpolicy.overlay = {
 
   _removeHistoryObserver : function() {
     var sHistory = gBrowser.webNavigation.sessionHistory;
-    sHistory.removeSHistoryListener(this.historyListener);
+    try {
+      sHistory.removeSHistoryListener(this.historyListener);
+    } catch (e) {
+      // When closing the last window in a session where additional windows
+      // have been opened and closed, this will sometimes fail (bug #175).
+    }
   },
 
   /**

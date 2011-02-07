@@ -1129,7 +1129,7 @@ requestpolicy.overlay = {
    */
   _conditionallyReloadDocument : function() {
     if (this._rpService.prefs.getBoolPref("autoReload")) {
-      content.document.location.reload(true);
+      content.document.location.reload(false);
     }
   },
 

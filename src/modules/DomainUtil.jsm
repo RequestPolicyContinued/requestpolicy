@@ -266,11 +266,11 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  *         should be refreshed.
  * @throws Generic
  *           exception if the refreshString has an invalid format, including if
- *           the seconds can't be turned into an int.
+ *           the seconds can't be parsed as a float.
  */
 DomainUtil.parseRefresh = function(refreshString) {
   var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i(refreshString);
-  var delay = parseInt(parts[1]);
+  var delay = parseFloat(parts[1]);
   if (isNaN(delay)) {
     throw "Invalid delay value in refresh string: " + parts[1];
   }

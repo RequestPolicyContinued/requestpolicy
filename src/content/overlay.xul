@@ -40,6 +40,7 @@
       label="RequestPolicy"
       tooltiptext="RequestPolicy"
       type="menu-button"
+      oncontextmenu="event.preventDefault();"
       onclick="requestpolicy.overlay.openToolbarPopup(this)" />
   </toolbarpalette>
 
@@ -55,6 +56,7 @@
       class="statusbarpanel-menu-iconic"
       id="requestpolicyStatusbar"
       tooltiptext="RequestPolicy"
+      oncontextmenu="event.preventDefault();"
       onclick="requestpolicy.overlay.openStatusbarPopup(this);"
       >
     </statusbarpanel>
@@ -78,6 +80,7 @@
       id="requestpolicyStatusbarPopup"
       onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
       onpopuphidden="requestpolicy.overlay.onMenuHidden(event);"
+      oncontextmenu="event.preventDefault();"
       >
       <menuitem
         id="requestpolicyOpenPreferences"

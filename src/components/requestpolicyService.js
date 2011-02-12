@@ -716,6 +716,26 @@ RequestPolicyService.prototype = {
         httpChannel.setResponseHeader(headerType, "", false);
         this._blockedRedirects[origin] = dest;
 
+        try {
+          contentDisp = httpChannel.getResponseHeader("Content-Disposition");
+          if (contentDisp.indexOf("attachment") != -1) {
+            try {
+              httpChannel.setResponseHeader("Content-Disposition", "", false);
+              requestpolicy.mod.Logger.warning(
+                  requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+                  "Removed 'Content-Disposition: attachment' header to "
+                      + "prevent display of about:neterror.");
+            } catch (e) {
+              requestpolicy.mod.Logger.warning(
+                  requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+                  "Unable to remove 'Content-Disposition: attachment' header "
+                      + "to prevent display of about:neterror. " + e);
+            }
+          }
+        } catch (e) {
+          // No Content-Disposition header.
+        }
+
         // We try to trace the blocked redirect back to a link click or form
         // submission if we can. It may indicate, for example, a link that
         // was to download a file but a redirect got blocked at some point.

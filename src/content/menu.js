@@ -148,6 +148,12 @@ requestpolicy.menu = {
       var currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
       var isChromeUri = currentUri.indexOf("chrome://") == 0;
 
+      // The fact that getOtherOrigins uses documentURI directly from
+      // content.document is important because getTopLevelDocumentUri will
+      // not return the real documentURI if there is an applicable
+      // top-level document translation rule (these are used sometimes
+      // for extension compatibility). For example, this is essential to the
+      // menu showing relevant info when using the Update Scanner extension.
       var otherOrigins = requestpolicy.mod.RequestUtil
           .getOtherOrigins(content.document);
       requestpolicy.mod.RequestUtil.dumpOtherOrigins(otherOrigins);

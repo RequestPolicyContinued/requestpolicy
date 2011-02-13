@@ -1124,6 +1124,18 @@ requestpolicy.overlay = {
    * Get the top-level document's uri.
    */
   getTopLevelDocumentUri : function() {
+    // We don't just retrieve the translations array once during init because
+    // we're not sure if it will be fully populated during init. This is
+    // especially a concern given the async addon manager API in Firefox 4.
+    var translations = this._rpServiceJSObject.getTopLevelDocTranslations();
+    if (translations.length) {
+      var docURI = content.document.documentURI;
+      for (var i = 0; i < translations.length; i++) {
+        if (docURI.indexOf(translations[i][0]) == 0) {
+          return translations[i][1];
+        }
+      }
+    }
     return requestpolicy.mod.DomainUtil
         .stripFragment(content.document.documentURI);
   },

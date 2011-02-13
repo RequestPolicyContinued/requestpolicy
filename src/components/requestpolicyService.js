@@ -153,6 +153,7 @@ RequestPolicyService.prototype = {
   _prefNameToObjectMap : null,
 
   _compatibilityRules : [],
+  _topLevelDocTranslationRules : [],
 
   _privateBrowsingEnabled : false,
   _uninstall : false,
@@ -191,6 +192,7 @@ RequestPolicyService.prototype = {
     // Norton Safe Web Lite Toolbar
     idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
+    idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
 
     try {
       // For Firefox <= 3.6.
@@ -269,6 +271,13 @@ RequestPolicyService.prototype = {
             "http://jigsaw.w3.org/css-validator/validator", ext.name]);
         this._compatibilityRules.push(["about:blank",
             "http://validator.w3.org/check", ext.name]);
+        break;
+      case "{c07d1a49-9894-49ff-a594-38960ede8fb9}" : // Update Scanner
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        var orig = "chrome://updatescan/content/diffPage.xul";
+        var translated = "data:text/html";
+        this._topLevelDocTranslationRules.push([orig, translated]);
         break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -1328,6 +1337,10 @@ RequestPolicyService.prototype = {
     return this._conflictingExtensions;
   },
 
+  getTopLevelDocTranslations : function getTopLevelDocTranslations() {
+    return this._topLevelDocTranslationRules;
+  },
+
   isPrefetchEnabled : function isPrefetchEnabled() {
     // network.dns.disablePrefetch only exists starting in Firefox 3.1
     try {
@@ -1890,6 +1903,25 @@ RequestPolicyService.prototype = {
                   + origin + "> to be origin <" + newOrigin + ">");
           origin = newOrigin;
           aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
+        }
+
+        if (origin == "about:blank") {
+          var newOrigin;
+          if (aContext.documentURI && aContext.documentURI != "about:blank") {
+            newOrigin = aContext.documentURI;
+          } else if (aContext.ownerDocument &&
+                     aContext.ownerDocument.documentURI &&
+                     aContext.ownerDocument.documentURI != "about:blank") {
+            newOrigin = aContext.ownerDocument.documentURI;
+          }
+          if (newOrigin) {
+            newOrigin = requestpolicy.mod.DomainUtil.stripFragment(newOrigin);
+            requestpolicy.mod.Logger.info(
+                requestpolicy.mod.Logger.TYPE_CONTENT, "Considering origin <"
+                    + origin + "> to be origin <" + newOrigin + ">");
+            origin = newOrigin;
+            aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
+          }
         }
 
         if (this._isDuplicateRequest(dest, origin)) {

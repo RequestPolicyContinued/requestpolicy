@@ -89,6 +89,10 @@ DomainUtil.getIdentifier = function(uri, level) {
   } else {
     if (uri.indexOf("file://") == 0) {
       return "file://";
+    } else if (uri.indexOf("data:") == 0) {
+      // Format: data:[<MIME-type>][;charset=<encoding>][;base64],<data>
+      var identifier = uri.split(",")[0];
+      return identifier.split(";")[0];
     }
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Unable to getIdentifier from uri " + uri + " using identifier level "

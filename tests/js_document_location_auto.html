@@ -1,0 +1,12 @@
+<html>
+<body onload="document.location = 'http://127.0.0.1/'">
+
+<p>This only works when not loaded from a local file. That is, this
+   page must be requested through a webserver. If used through a file://
+   location, then the request origin will appear to be the directory
+   this file is in, not the full path with the filename, and thus it
+   won't match any url in open tabs and the redirect notification won't
+   be shown.</p>
+
+</body>
+</html>

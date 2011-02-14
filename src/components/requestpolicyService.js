@@ -881,6 +881,16 @@ RequestPolicyService.prototype = {
     }
   },
 
+  _notifyBlockedTopLevelDocRequest : function(originUri, destUri) {
+    for (var i = 0; i < this._requestObservers.length; i++) {
+      if (!this._requestObservers[i]) {
+        continue;
+      }
+      this._requestObservers[i].observeBlockedTopLevelDocRequest(originUri,
+          destUri);
+    }
+  },
+
   // /////////////////////////////////////////////////////////////////////////
   // nsIRequestPolicy interface
   // /////////////////////////////////////////////////////////////////////////
@@ -1628,6 +1638,13 @@ RequestPolicyService.prototype = {
 
     this._cacheShouldLoadResult(CP_REJECT, origin, dest);
     this._recordRejectedRequest(origin, dest);
+
+    var aContentType = args[0];
+    if (CI.nsIContentPolicy.TYPE_DOCUMENT == aContentType) {
+      // This was a blocked top-level document request. This may be due to
+      // a blocked attempt by javascript to set the document location.
+      this._notifyBlockedTopLevelDocRequest(origin, dest);
+    }
 
     return CP_REJECT;
   },

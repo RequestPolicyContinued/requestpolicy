@@ -94,6 +94,9 @@ requestpolicy.overlay = {
       + "tNvtRZIkfCz+ZQwGg6rT6Zj/LTAajTbD4bD5WIF/AAseEisPFO8uAAAAAElF"
       + "TkSuQmCC",
 
+  _transparentImageDataUri : "data:image/gif;base64,R0lGODlhAQABAIAAA"
+      + "AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+
   toString : function() {
     return "[requestpolicy.overlay " + this._overlayId + "]";
   },
@@ -590,9 +593,28 @@ requestpolicy.overlay = {
       return;
     }
     var images = document.getElementsByTagName("img");
+    var rejectedRequests = requestpolicy.mod.RequestUtil.getDirectRejectedRequests(
+        document.location);
+
+    // Ideally, want the image to be a broken image so that the alt text
+    // shows. By default, the blocked image will just not show up at all.
+    // Setting img.src to a broken resource:// causes "save page as" to fail
+    // for some earlier Fx 3.x versions. Also, using a broken resource://
+    // causes our width setting to be ignored, as does using null for img.src.
+    // With Firefox 4, setting img.src to null doesn't work reliably for
+    // having the rest of the styles (e.g. background and border) applied.
+    // So, for now we're punting on trying to display alt text. We'll just use
+    // a transparent image as the replacement image.
+    // Note that with our changes to the image here, "save page as" works but
+    // different data is saved depending on what type of "save page as" the
+    // user performs. With "save all files", the saved source includes the
+    // original, blocked image src. With "web page, complete" the saved source
+    // has changes we make here to show the blocked request indicator.
+
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
-      if (img.requestpolicyBlocked && !img.requestpolicyIdentified) {
+      // Note: we're no longer checking img.requestpolicyBlocked here.
+      if (!img.requestpolicyIdentified && img.src in rejectedRequests) {
         img.requestpolicyIdentified = true;
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";
@@ -606,16 +628,7 @@ requestpolicy.overlay = {
         }
         img.title = "[" + this._rpService.getUriIdentifier(img.src) + "]"
             + (img.title ? " " + img.title : "");
-        // We want it to be registered as a broken image so that the alt text
-        // shows. By default, the blocked image will just not show up at all.
-        // Setting src to null worked on firefox 3.0 but not 3.1. So, use a
-        // local url that doesn't exist (using resource:// because chrome:// is
-        // forbidden in this context).
-        // It turns out that the broken resource trick causes "save page as" to
-        // to fail. On the glorious plus side, it looks like Fx 3.5b4 works
-        // with setting the src to null, as well.
-        // img.src = "resource://doesnt/exist.png";
-        img.src = null;
+        img.src = this._transparentImageDataUri;
       }
     }
   },

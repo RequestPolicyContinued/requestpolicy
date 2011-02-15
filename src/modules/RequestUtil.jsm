@@ -41,6 +41,25 @@ var RequestUtil = {
   _rpServiceJSObject : Components.classes["@requestpolicy.com/requestpolicy-service;1"]
       .getService(Components.interfaces.nsIRequestPolicy).wrappedJSObject,
 
+  /**
+   * Returns an object whose keys are the rejected URIs from |currentUri|.
+   */
+  getDirectRejectedRequests : function(currentUri) {
+    var rejectedRequests = {};
+    var rr = this._rpServiceJSObject._rejectedRequests;
+    if (currentUri in rr) {
+      for (var ident in rr[currentUri]) {
+        for (var destUri in rr[currentUri][ident]) {
+          if (destUri == "count") {
+            continue;
+          }
+          rejectedRequests[destUri] = true;
+        }
+      }
+    }
+    return rejectedRequests;
+  },
+
   getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     var rejectedRequests = {};
     if (currentUri in this._rpServiceJSObject._rejectedRequests) {

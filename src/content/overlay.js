@@ -627,7 +627,8 @@ requestpolicy.overlay = {
           img.height = 50;
         }
         img.title = "[" + this._rpService.getUriIdentifier(img.src) + "]"
-            + (img.title ? " " + img.title : "");
+            + (img.title ? " " + img.title : "")
+            + (img.alt ? " " + img.alt : "");
         img.src = this._transparentImageDataUri;
       }
     }

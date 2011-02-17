@@ -52,6 +52,8 @@ DomainUtil._eTLDService = CC["@mozilla.org/network/effective-tld-service;1"]
 DomainUtil._idnService = CC["@mozilla.org/network/idn-service;1"]
     .getService(CI.nsIIDNService);
 
+const STANDARDURL_CONTRACTID = "@mozilla.org/network/standard-url;1";
+
 // LEVEL_DOMAIN: Use example.com from http://www.a.example.com:81
 DomainUtil.LEVEL_DOMAIN = 1;
 // LEVEL_HOST: Use www.a.example.com from http://www.a.example.com:81
@@ -331,8 +333,9 @@ DomainUtil.formatIDNUri = function(uri) {
 
 /**
  * Given an origin URI string and a destination path to redirect to, returns a
- * string which is a valid uri which will be/should be redirected to. This takes
- * into account whether the destPath is an absolute path (starts with a slash)
+ * string which is a valid uri which will be/should be redirected to. This
+ * takes into account whether the destPath is a full URI, an absolute path
+ * (starts with a slash), a protocol relative path (starts with two slashes),
  * or is relative to the originUri path.
  * 
  * @param {String}
@@ -342,12 +345,10 @@ DomainUtil.formatIDNUri = function(uri) {
  * @return {String}
  */
 DomainUtil.determineRedirectUri = function(originUri, destPath) {
-  if (destPath == '') {
-    return originUri;
-  } else if (destPath[0] == '/') {
-    return this.getPrePath(originUri) + destPath;
-  } else {
-    var curDir = originUri.split("/").slice(0, -1).join("/");
-    return curDir + "/" + destPath;
-  }
+  var baseUri = this.getUriObject(originUri);
+  var urlType = CI.nsIStandardURL.URLTYPE_AUTHORITY;
+  var newUri = CC[STANDARDURL_CONTRACTID].createInstance(CI.nsIStandardURL);
+  newUri.init(urlType, 0, destPath, null, baseUri);
+  var resolvedUri = newUri.QueryInterface(Components.interfaces.nsIURI);
+  return resolvedUri.spec;
 }

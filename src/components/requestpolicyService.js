@@ -1214,6 +1214,8 @@ RequestPolicyService.prototype = {
   },
 
   mapDestinations : function(origDestUri, newDestUri) {
+    origDestUri = requestpolicy.mod.DomainUtil.stripFragment(origDestUri);
+    newDestUri = requestpolicy.mod.DomainUtil.stripFragment(newDestUri);
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Mapping destination <" + origDestUri + "> to <" + newDestUri + ">.");
     if (!this._mappedDestinations[newDestUri]) {

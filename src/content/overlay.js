@@ -139,7 +139,7 @@ requestpolicy.overlay = {
           // Remove extra items from the menu.
           document.getElementById("requestpolicyOpenPreferences").hidden = true;
           document.getElementById("requestpolicyOpenRequestLog").hidden = true;
-          document.getElementById("preferencesSeparator").hidden = true;
+          document.getElementById("requestpolicy-preferencesSeparator").hidden = true;
         }
 
         // Register this window with the requestpolicy service so that we can be
@@ -1477,9 +1477,9 @@ requestpolicy.overlay = {
   },
 
   toggleRequestLog : function() {
-    var requestLog = document.getElementById("rp-requestLog");
-    var requestLogSplitter = document.getElementById("rp-requestLog-splitter");
-    var requestLogFrame = document.getElementById("rp-requestLog-frame");
+    var requestLog = document.getElementById("requestpolicy-requestLog");
+    var requestLogSplitter = document.getElementById("requestpolicy-requestLog-splitter");
+    var requestLogFrame = document.getElementById("requestpolicy-requestLog-frame");
     var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
     var closeRequestLog = document
         .getElementById("requestpolicyCloseRequestLog");

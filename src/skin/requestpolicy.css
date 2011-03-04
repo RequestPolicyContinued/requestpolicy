@@ -140,7 +140,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 /*********************************************
  * Request Log
  *********************************************/
-#rp-requestLog-close {
+#requestpolicy-requestLog-close {
   -moz-appearance: none;
   padding: 0 !important;
   margin-right: 4px;
@@ -151,7 +151,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   -moz-box-align: end;
 }
 
-#rp-requestLog-close :hover {
+#requestpolicy-requestLog-close :hover {
   -moz-image-region: rect(0px, 32px, 16px, 16px);
 }
 

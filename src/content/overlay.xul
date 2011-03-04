@@ -95,7 +95,7 @@
         hidden="true"
         label="&menu.closeRequestLog.label;"
         oncommand="requestpolicy.overlay.toggleRequestLog();" />
-      <menuseparator id="preferencesSeparator"/>
+      <menuseparator id="requestpolicy-preferencesSeparator"/>
       <menuitem
         id="requestpolicyExtensionConflictWarning"
         hidden="true"
@@ -169,17 +169,17 @@
   </popupset>
 
   <vbox id="appcontent">
-    <splitter id="rp-requestLog-splitter" hidden="true"/>
-    <vbox id="rp-requestLog" height="300" hidden="true" persist="height">
-      <toolbox id="rp-requestLog-header">
-        <toolbar id="rp-requestLog-toolbar" align="center">
-          <label id="rp-requestLog-title" control="rp-requestLog-frame" value="&requestLog.title;" crop="end" />
+    <splitter id="requestpolicy-requestLog-splitter" hidden="true"/>
+    <vbox id="requestpolicy-requestLog" height="300" hidden="true" persist="height">
+      <toolbox id="requestpolicy-requestLog-header">
+        <toolbar id="requestpolicy-requestLog-toolbar" align="center">
+          <label id="requestpolicy-requestLog-title" control="requestpolicy-requestLog-frame" value="&requestLog.title;" crop="end" />
           <button label="&requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
           <vbox flex="1" />
-          <toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
+          <toolbarbutton id="requestpolicy-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
         </toolbar>
       </toolbox>
-      <iframe id="rp-requestLog-frame" type="chrome" flex="1"/>
+      <iframe id="requestpolicy-requestLog-frame" type="chrome" flex="1"/>
     </vbox>
   </vbox>
 </overlay>

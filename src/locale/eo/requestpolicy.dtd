@@ -26,6 +26,7 @@
 <!ENTITY preferences.fullAddress "Tuta adreso (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Retpaĝoj">
 <!ENTITY preferences.statusbarIcon "Aspekto en la stata strio">
+<!ENTITY preferences.statusbarIcon.none "None">
 <!ENTITY preferences.contextMenu "Kunteksta menuo">
 <!ENTITY preferences.indicateBlockedObjects "Indiki blokitajn bildojn">
 <!ENTITY preferences.autoReload "Reŝargi la montratan paĝon ĉe ŝanĝo de permesoj.">

@@ -84,6 +84,7 @@
         <radio
           src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png"
           value="large" />
+        <radio label="&preferences.statusbarIcon.none;" value="none" />
       </radiogroup>
     </groupbox>
     <groupbox>

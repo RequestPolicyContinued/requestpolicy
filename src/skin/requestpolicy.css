@@ -34,6 +34,10 @@
     url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
 }
 
+#requestpolicyStatusbar[iconStyle="none"] {
+  display : none;
+}
+
 /*********************************************
  * Context menu
  *********************************************/

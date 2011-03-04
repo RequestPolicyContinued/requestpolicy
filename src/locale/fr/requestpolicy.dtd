@@ -26,6 +26,7 @@
 <!ENTITY preferences.fullAddress "Adresse complète (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Pages Web">
 <!ENTITY preferences.statusbarIcon "Icône de la barre d'état">
+<!ENTITY preferences.statusbarIcon.none "None">
 <!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées">
 <!ENTITY preferences.autoReload "Reload current page when whitelist is changed">

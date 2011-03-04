@@ -26,6 +26,7 @@
 <!ENTITY preferences.fullAddress "Tam adres (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Web sayfaları">
 <!ENTITY preferences.statusbarIcon "Durum çubuğu">
+<!ENTITY preferences.statusbarIcon.none "None">
 <!ENTITY preferences.contextMenu "Sağ tık menüsü">
 <!ENTITY preferences.indicateBlockedObjects "Bloklanan resimi işaretle">
 <!ENTITY preferences.autoReload "Beyaz liste değiştiğinde sayfayı yenile">

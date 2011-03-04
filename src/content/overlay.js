@@ -847,6 +847,14 @@ requestpolicy.overlay = {
         // the docShell has allowMetaRedirects disabled, it will be respected.
         if (!this._rpServiceJSObject._blockingDisabled
             && !this._rpService.isAllowedRedirect(document.location, dest)) {
+          // Ignore redirects to javascript. The browser will ignore them, as well.
+          if (requestpolicy.mod.DomainUtil.getUriObject(dest)
+                .schemeIs("javascript")) {
+            requestpolicy.mod.Logger.warning(
+                requestpolicy.mod.Logger.TYPE_META_REFRESH,
+                "Ignoring redirect to javascript URI <" + dest + ">");
+            continue;
+          }
           // The request will be blocked by shouldLoad.
           this._showRedirectNotification(document, dest, delay);
         }

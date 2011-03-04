@@ -680,6 +680,15 @@ RequestPolicyService.prototype = {
       dest = destAsUri;
     }
 
+    // Ignore redirects to javascript. The browser will ignore them, as well.
+    if (requestpolicy.mod.DomainUtil.getUriObject(dest)
+          .schemeIs("javascript")) {
+      requestpolicy.mod.Logger.warning(
+          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+          "Ignoring redirect to javascript URI <" + dest + ">");
+      return;
+    }
+
     if (this.isAllowedRedirect(origin, dest)) {
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"

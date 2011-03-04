@@ -179,7 +179,7 @@
           <toolbarbutton id="rp-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
         </toolbar>
       </toolbox>
-      <iframe id="rp-requestLog-frame" flex="1"/>
+      <iframe id="rp-requestLog-frame" type="chrome" flex="1"/>
     </vbox>
   </vbox>
 </overlay>

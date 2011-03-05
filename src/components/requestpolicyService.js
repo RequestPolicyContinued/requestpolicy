@@ -1922,7 +1922,7 @@ RequestPolicyService.prototype = {
         var dest = requestpolicy.mod.DomainUtil
             .stripFragment(aContentLocation.spec);
 
-        if (aRequestOrigin.scheme == "moz-nullprincipal") {
+        if (aRequestOrigin.scheme == "moz-nullprincipal" && aContext) {
           var newOrigin = requestpolicy.mod.DomainUtil
                 .stripFragment(aContext.contentDocument.documentURI);
           requestpolicy.mod.Logger.info(
@@ -1933,7 +1933,7 @@ RequestPolicyService.prototype = {
           aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
         }
 
-        if (origin == "about:blank") {
+        if (origin == "about:blank" && aContext) {
           var newOrigin;
           if (aContext.documentURI && aContext.documentURI != "about:blank") {
             newOrigin = aContext.documentURI;
@@ -1974,7 +1974,7 @@ RequestPolicyService.prototype = {
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aExtra];
 
-        if (aContext.nodeName == "LINK" &&
+        if (aContext && aContext.nodeName == "LINK" &&
             (aContext.rel == "icon" || aContext.rel == "shortcut icon")) {
           this._faviconRequests[dest] = true;
         }
@@ -2082,7 +2082,7 @@ RequestPolicyService.prototype = {
         // window.open() and we can't find a better way to register the source
         // and destination before the request is made. This should be able to be
         // removed if we can find a better solution for the allowed popup case.
-        if (aContext.nodeName == "xul:browser" && aContext.currentURI
+        if (aContext && aContext.nodeName == "xul:browser" && aContext.currentURI
             && aContext.currentURI.spec == "about:blank") {
           return this
               .accept(

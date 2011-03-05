@@ -8,7 +8,7 @@ prefwindow {
 }
 
 prefwindow>prefpane>vbox.content-box {
-  height: 30em;
+  min-height: 30em;
 }
 
 radio[pane] {

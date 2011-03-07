@@ -1504,8 +1504,10 @@ addEventListener("DOMContentLoaded", function(event) {
       requestpolicy.overlay.init();
     }, false);
 
-// Event handler for when the window is closed.
-addEventListener("close", function(event) {
+// Event handler for when the window is closed. We listen for "unload" rather
+// than "close" because "close" will fire when a print preview opened from this
+// window is closed.
+addEventListener("unload", function(event) {
       requestpolicy.overlay.onWindowClose(event);
     }, false);
 

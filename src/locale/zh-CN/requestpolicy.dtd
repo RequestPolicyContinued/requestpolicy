@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "完整地址 (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "网页">
 <!ENTITY preferences.statusbarIcon "状态栏图标">
-<!ENTITY preferences.statusbarIcon.none "None">
+<!ENTITY preferences.statusbarIcon.none "无">
 <!ENTITY preferences.contextMenu "上下文菜单">
 <!ENTITY preferences.indicateBlockedObjects "标示已阻止图像">
 <!ENTITY preferences.autoReload "白名单更改后，重新载入当前页面">
@@ -65,7 +65,10 @@
 <!ENTITY initialSetup.title "初始设置">
 <!ENTITY initialSetup.whitelist.caption "添加站点到您的跨站点白名单">
 <!ENTITY initialSetup.whitelist.description "站点在这些名单被选定可能是因为：
+
+
 (1)它们涉及请求的站点是同一家公司所拥有，或者
+
 (2)它们能减少您可能会遇到的问题，并仅对隐私和安全造成一个非常低的影响。">
 <!ENTITY initialSetup.region.international "国际">
 <!ENTITY initialSetup.region.americas "美洲">

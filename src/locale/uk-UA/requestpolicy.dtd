@@ -12,22 +12,22 @@
 <!ENTITY rp.destination "Destination">
 <!ENTITY rp.allow "Дозволити">
 <!ENTITY preferences "Вподобання">
-<!ENTITY preferences.windowTitle "RequestPolicy Preferences">
+<!ENTITY preferences.windowTitle "RequestPolicy Вподобання">
 <!ENTITY preferences.prefpane.general "Загальні">
 <!ENTITY preferences.prefpane.appearance "Appearance">
 <!ENTITY preferences.prefpane.whitelist "Whitelist">
 <!ENTITY preferences.prefpane.import "Імпорт">
 <!ENTITY preferences.prefpane.export "Експорт">
-<!ENTITY preferences.prefpane.advanced "Advanced">
+<!ENTITY preferences.prefpane.advanced "Додатково">
 <!ENTITY preferences.strictness "Strictness">
 <!ENTITY preferences.strictness.description "The level of classification to use for allowing same-site requests. After changing this, the menu will start out empty for each currently open tab.">
 <!ENTITY preferences.baseDomain "Base domain (requestpolicy.com)">
 <!ENTITY preferences.fullDomain "Full domain (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Full address (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.fullAddress "Повна адреса (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Веб-сторінки">
 <!ENTITY preferences.statusbarIcon "Піктограма рядку стану">
 <!ENTITY preferences.statusbarIcon.none "None">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Контекстне меню">
 <!ENTITY preferences.indicateBlockedObjects "Indicate blocked images">
 <!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
 <!ENTITY preferences.openInitialSetup "Open initial setup tool">
@@ -48,7 +48,7 @@
 <!ENTITY preferences.import.description "You can import your whitelist from a backup file that you made with the export tool.">
 <!ENTITY preferences.import.details.caption "What the import will do">
 <!ENTITY preferences.import.details.description "The import will add any origins, destinations, and origins-to-destinations listed in the file you are importing from. Nothing in your current whitelist will be removed. That is, performing an import will only add sites to your whitelist, it will not completely replace your current whitelist.">
-<!ENTITY preferences.import.button.label "Import from File">
+<!ENTITY preferences.import.button.label "Імпортувати з файлу">
 <!ENTITY preferences.prefetch.link "Link Prefetching">
 <!ENTITY preferences.prefetch.dns "DNS Prefetching">
 <!ENTITY preferences.enabled "Enabled">
@@ -65,7 +65,7 @@
 <!ENTITY initialSetup.title "Initial setup">
 <!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
 <!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
-<!ENTITY initialSetup.region.international "International">
+<!ENTITY initialSetup.region.international "Міжнародний">
 <!ENTITY initialSetup.region.americas "Америка">
 <!ENTITY initialSetup.region.asia "Азія">
 <!ENTITY initialSetup.region.usAndCanada "США та Канада">

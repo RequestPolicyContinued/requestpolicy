@@ -2,7 +2,7 @@
 <!ENTITY prefetchInfo "En savoir plus à propos de la préextraction">
 <!ENTITY prefetchDisablingInstructions "Désactiver la préextraction">
 <!ENTITY temporarilyAllowAll "Accepter temporairement toutes les requêtes">
-<!ENTITY revokeTemporaryPermissions "Révoquer toutes les droits d'accès temporaires">
+<!ENTITY revokeTemporaryPermissions "Révoquer tous les droits d'accès temporaires">
 <!ENTITY blockedDestinations "Cibles bloquées">
 <!ENTITY allowedDestinations "Cibles autorisées">
 <!ENTITY otherOrigins "Autres origines dans cette page">
@@ -14,7 +14,7 @@
 <!ENTITY preferences "Préférences">
 <!ENTITY preferences.windowTitle "Préférences des règles de requêtes">
 <!ENTITY preferences.prefpane.general "Général">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Apparence">
 <!ENTITY preferences.prefpane.whitelist "Liste blanche">
 <!ENTITY preferences.prefpane.import "Importer">
 <!ENTITY preferences.prefpane.export "Exporter">
@@ -26,10 +26,10 @@
 <!ENTITY preferences.fullAddress "Adresse complète (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Pages Web">
 <!ENTITY preferences.statusbarIcon "Icône de la barre d'état">
-<!ENTITY preferences.statusbarIcon.none "None">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.statusbarIcon.none "Aucun">
+<!ENTITY preferences.contextMenu "Menu contextuel">
 <!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées">
-<!ENTITY preferences.autoReload "Reload current page when whitelist is changed">
+<!ENTITY preferences.autoReload "Actualiser la page en cours lorsque liste blanche est modifiée">
 <!ENTITY preferences.openInitialSetup "Ouvrir l'outil de réglage initial">
 <!ENTITY preferences.misc "Divers">
 <!ENTITY preferences.startWithAllowAllEnabled "Activer « Accepter temporairement toutes les requêtes » quand le navigateur démarre">
@@ -49,19 +49,19 @@
 <!ENTITY preferences.import.details.caption "Ce que l'importation va faire">
 <!ENTITY preferences.import.details.description "L'importation ajoutera les origines, les destinations, et les « origines-vers-destinations » contenues dans le fichier importé. Dans votre liste blanche actuelle aucun élément ne sera enlevé : en quelque sorte, cela ne fait qu'ajouter des sites à la liste, et non remplacer complètement la liste actuelle.">
 <!ENTITY preferences.import.button.label "Importer depuis un fichier">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
+<!ENTITY preferences.prefetch.link "Préchargement des liens">
+<!ENTITY preferences.prefetch.dns "Préchargement DNS">
+<!ENTITY preferences.enabled "Activé">
+<!ENTITY preferences.disableOnStartup "Désactiver au démarrage">
 <!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
 <!ENTITY requestLog.title "Journal des requêtes">
 <!ENTITY requestLog.blocked "Bloqué">
 <!ENTITY requestLog.time "Durée">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY requestLog.copyOriginToClipboard "Copier l'original dans le presse-papiers">
+<!ENTITY requestLog.copyDestinationToClipboard "Copier la destination dans le presse-papiers">
+<!ENTITY requestLog.openOriginInNewTab "Ouvrir l'original dans un nouvel onglet">
+<!ENTITY requestLog.openDestinationInNewTab "Ouvrir la destination dans un nouvel onglet">
+<!ENTITY requestLog.clear "Effacer">
 <!ENTITY initialSetup.title "Installation initiale">
 <!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
 <!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">

@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Volledig adres (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webpagina’s">
 <!ENTITY preferences.statusbarIcon "Statusbalkpictogram">
-<!ENTITY preferences.statusbarIcon.none "None">
+<!ENTITY preferences.statusbarIcon.none "Geen">
 <!ENTITY preferences.contextMenu "Contextmenu">
 <!ENTITY preferences.indicateBlockedObjects "Geblokkeerde afbeeldingen aanduiden">
 <!ENTITY preferences.autoReload "Huidige pagina opnieuw laden wanneer witte lijst wijzigt">

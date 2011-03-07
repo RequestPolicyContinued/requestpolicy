@@ -14,7 +14,7 @@
 <!ENTITY preferences "Preferências...">
 <!ENTITY preferences.windowTitle "Preferências do RequestPolicy">
 <!ENTITY preferences.prefpane.general "Geral">
-<!ENTITY preferences.prefpane.appearance "Appearance">
+<!ENTITY preferences.prefpane.appearance "Aparência">
 <!ENTITY preferences.prefpane.whitelist "Permissões">
 <!ENTITY preferences.prefpane.import "Importar">
 <!ENTITY preferences.prefpane.export "Exportar">
@@ -26,14 +26,14 @@
 <!ENTITY preferences.fullAddress "Endereço completo (http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Exibição da página">
 <!ENTITY preferences.statusbarIcon "Aparência na barra de status">
-<!ENTITY preferences.statusbarIcon.none "None">
+<!ENTITY preferences.statusbarIcon.none "Nenhuma">
 <!ENTITY preferences.contextMenu "Contextual menu">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
 <!ENTITY preferences.autoReload "Recarregar a página logo após modificar a lista de permissões">
 <!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
 <!ENTITY preferences.misc "Diversos">
-<!ENTITY preferences.startWithAllowAllEnabled "'Temporariamente permitir todos os pedidos' ativo ao iniciar o navegador">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Adicionar permissões não temporárias também durante navegação privativa">
+<!ENTITY preferences.startWithAllowAllEnabled "'Temp. permitir todos os pedidos' ativo ao abrir o navegador">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Adicionar permissões às listas também durante navegação privativa">
 <!ENTITY preferences.origins "Origens">
 <!ENTITY preferences.destinations "Destinos">
 <!ENTITY preferences.originsToDestinations "Pares origem-destino">
@@ -49,11 +49,11 @@
 <!ENTITY preferences.import.details.caption "O que a importação alterará na lista de permissões atual?">
 <!ENTITY preferences.import.details.description "A importação adicionará as origens, os destinos e os pares origem-destino presentes no arquivo importado. Nenhuma entrada será removida da lista de permissões atual. Assim, a importação complementará a lista de permissões atual com as entradas do arquivo importado.">
 <!ENTITY preferences.import.button.label "Importar de arquivo">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.prefetch.link "Pré-carregamento de links">
+<!ENTITY preferences.prefetch.dns "Pré-busca de nomes de domínio (DNS)">
+<!ENTITY preferences.enabled "Ativo">
+<!ENTITY preferences.disableOnStartup "Desativado ao iniciar o navegador">
+<!ENTITY preferences.restoreDefaultOnUninstall "Restaurar padrão quando RequestPolicy for desinstalado">
 <!ENTITY requestLog.title "Pedidos nesta página">
 <!ENTITY requestLog.blocked "Bloqueado">
 <!ENTITY requestLog.time "Hora">

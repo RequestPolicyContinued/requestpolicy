@@ -26,7 +26,7 @@
 <!ENTITY preferences.fullAddress "Vollständige Adresse (z. B. http://www.requestpolicy.com:81)">
 <!ENTITY preferences.webpages "Webseiten">
 <!ENTITY preferences.statusbarIcon "Statusleistensymbol">
-<!ENTITY preferences.statusbarIcon.none "None">
+<!ENTITY preferences.statusbarIcon.none "Kein">
 <!ENTITY preferences.contextMenu "Im Kontextmenü anzeigen">
 <!ENTITY preferences.indicateBlockedObjects "Blockierte Grafiken durch Platzhalter ersetzen">
 <!ENTITY preferences.autoReload "Aktuelle Seite beim Ändern der Liste erlaubter Anfragen neu laden">

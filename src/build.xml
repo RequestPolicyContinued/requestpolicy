@@ -62,6 +62,8 @@
 				<exclude name="**/.*" />
 				<exclude name="**/CVS/**" />
 				<exclude name="**/Copy *" />
+				<exclude name="**/*.bak" />
+				<exclude name="**/*.orig" />
 				<!-- Include the idl for reference for other developers, but don't leave it in the
                      components directory or else it shows up as an error in the error console. -->
 				<include name="nsIRequestPolicy.idl" />

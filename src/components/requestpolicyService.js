@@ -193,6 +193,7 @@ RequestPolicyService.prototype = {
     idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
+    idArray.push("{340c2bbc-ce74-4362-90b5-7c26312808ef}"); // Firefox Sync
 
     try {
       // For Firefox <= 3.6.
@@ -278,6 +279,17 @@ RequestPolicyService.prototype = {
         var orig = "chrome://updatescan/content/diffPage.xul";
         var translated = "data:text/html";
         this._topLevelDocTranslationRules.push([orig, translated]);
+        break;
+      case "{340c2bbc-ce74-4362-90b5-7c26312808ef}" : // Firefox Sync
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push(["https://auth.services.mozilla.com/",
+            "https://api-secure.recaptcha.net/challenge?", ext.name]);
+        this._compatibilityRules.push([
+            "https://api-secure.recaptcha.net/challenge?",
+            "https://www.google.com/recaptcha/api/challenge?", ext.name]);
+        this._compatibilityRules.push(["https://auth.services.mozilla.com/",
+            "https://www.google.com/recaptcha/api/", ext.name]);
         break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,

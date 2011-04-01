@@ -521,6 +521,49 @@ RequestPolicyService.prototype = {
         .QueryInterface(CI.nsIPrefBranch2);
   },
 
+  _initVersionInfo : function() {
+    try {
+      const util = requestpolicy.mod.Util;
+
+      // Set the last version values in the Util module based on the prefs.
+      util.lastVersion = this.prefs.getCharPref("lastVersion");
+      util.lastAppVersion = this.prefs.getCharPref("lastAppVersion");
+
+      // Now update the last version prefs and set current version values.
+      util.initCurAppVersion();
+      this.prefs.setCharPref("lastAppVersion", util.curAppVersion);
+
+      var versionChanged = false;
+      if (AddonManager) {
+        const usePrefs = this.prefs;
+        AddonManager.getAddonByID(EXTENSION_ID,
+          function(addon) {
+            usePrefs.setCharPref("lastVersion", addon.version);
+            util.curVersion = addon.version;
+            if (util.lastVersion != util.curVersion) {
+              this._prefService.savePrefFile(null);
+            }
+          });
+      } else {
+        var em = Components.classes["@mozilla.org/extensions/manager;1"]
+                 .getService(Components.interfaces.nsIExtensionManager);
+        var addon = em.getItemForID(EXTENSION_ID);
+        this.prefs.setCharPref("lastVersion", addon.version);
+        util.curVersion = addon.version;
+        if (util.lastVersion != util.curVersion) {
+          versionChanged = true;
+        }
+      }
+
+      if (versionChanged || util.lastAppVersion != util.curAppVersion) {
+        this._prefService.savePrefFile(null);
+      }
+    } catch (e) {
+        requestpolicy.mod.Logger.error(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "_initVersionInfo failed: " + e);
+    }
+  },
+
   /**
    * Take necessary actions when preferences are updated.
    * 
@@ -546,6 +589,8 @@ RequestPolicyService.prototype = {
     Components.utils.import("resource://requestpolicy/Logger.jsm",
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
+        requestpolicy.mod);
+    Components.utils.import("resource://requestpolicy/Util.jsm",
         requestpolicy.mod);
     try {
       Components.utils.import("resource://gre/modules/AddonManager.jsm");
@@ -1562,6 +1607,7 @@ RequestPolicyService.prototype = {
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.
         this._syncFromPrefs();
+        this._initVersionInfo();
         // Detect other installed extensions and the current application and do
         // what is needed to allow their requests.
         this._initializeExtensionCompatibility();

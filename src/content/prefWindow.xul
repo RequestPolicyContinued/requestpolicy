@@ -81,9 +81,6 @@
         onsynctopreference="requestpolicy.prefWindow.statusbarIconChanged(this.value)">
         <radio src="chrome://requestpolicy/skin/requestpolicy-icon-blocked.png"
           value="standard" />
-        <radio
-          src="chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png"
-          value="large" />
         <radio label="&preferences.statusbarIcon.none;" value="none" />
       </radiogroup>
     </groupbox>

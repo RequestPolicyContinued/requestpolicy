@@ -28,11 +28,14 @@ if (!requestpolicy) {
 
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/JSON.jsm",
+    requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/JSON.jsm", requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Util.jsm",
+    requestpolicy.mod);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -44,6 +47,8 @@ requestpolicy.overlay = {
 
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
   _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
+
+  _toolbarButtonId : "requestpolicyToolbarButton",
 
   _overlayId : 0,
 
@@ -148,7 +153,7 @@ requestpolicy.overlay = {
         this._rpServiceJSObject.addRequestObserver(this);
 
         this.setStatusbarIconStyle(this._rpService.prefs
-            .getCharPref("statusbarIcon"));
+            .getCharPref("statusbarIcon"), true);
         this.setContextMenuEnabled(this._rpService.prefs
             .getBoolPref("contextMenu"));
         this._setPermissiveNotification(this._rpService.isBlockingDisabled());
@@ -162,8 +167,138 @@ requestpolicy.overlay = {
     }
   },
 
-  setStatusbarIconStyle : function(iconStyle) {
-    this._rpStatusbar.setAttribute("iconStyle", iconStyle);
+  _installToolbarButtonOnce : function() {
+    var util = requestpolicy.mod.Util;
+
+    // Only do a toolbar button check for Fx >= 4.0
+    if (!util.isFirefox() ||
+        util.compareVersions(util.curAppVersion, "4.0") < 0) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Not performing toolbar button check: not Fx or not Fx 4.0+.");
+      return;
+    }
+    // If this isn't the first time the user is running Fx >= 4.0 (as far as RP
+    // is concerned), then we've done a toolbar button check on a previous run.
+    if (util.compareVersions(util.lastAppVersion, "4.0") >= 0) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Not performing toolbar button check: we've checked before.");
+      return;
+    }
+
+    var statusBarIconDisabled = this._rpServiceJSObject.prefs
+          .getCharPref("statusbarIcon") == "none";
+    if (statusBarIconDisabled) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Status bar icon not enabled, so not adding button to addon-bar.");
+      return;
+    }
+
+    // If a user has already added the button to a toolbar, don't
+    // add the button to the addon-bar because it can only be in one toolbar
+    // and it will end up moving from where the user had put it.
+    var toolbars = ["addon-bar", "nav-bar", "toolbar-menubar",
+                    "PersonalToolbar", "TabsToolbar"];
+    for (var i in toolbars) {
+      var toolbarName = toolbars[i];
+      if (this._isButtonInToolbar(toolbarName)) {
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Button already in toolbar: " + toolbarName);
+        return;
+      }
+    }
+
+    this._addButtonToAddonBar();
+  },
+
+  _addButtonToAddonBar : function() {
+    //var afterId = "urlbar-container";    // ID of element to insert after
+    // The addon bar was introduced in Fx 4 to replace the status bar.
+    var toolbar = document.getElementById("addon-bar");
+    var curSet = toolbar.currentSet.split(",");
+    //var pos = curSet.indexOf(afterId) + 1 || curSet.length;
+    var pos = curSet.length;
+    var set = curSet.slice(0, pos).concat(this._toolbarButtonId)
+          .concat(curSet.slice(pos));
+    toolbar.setAttribute("currentset", set.join(","));
+    toolbar.currentSet = set.join(",");
+    document.persist(toolbar.id, "currentset");
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      "Adding toolbar button.");
+    try {
+      BrowserToolboxCustomizeDone(true);
+    }
+    catch (e) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Adding toolbar button failed: " + e);
+    }
+    // Make sure the addon bar is shown.
+    toolbar.collapsed = false;
+  },
+
+  _removeButtonFromAddonBar : function() {
+    var toolbar = document.getElementById("addon-bar");
+    var curSet = toolbar.currentSet.split(",");
+    var pos = curSet.indexOf(this._toolbarButtonId);
+    if (pos == -1) {
+      return;
+    }
+    var set = curSet.slice(0, pos).concat(curSet.slice(pos + 1));
+    toolbar.setAttribute("currentset", set.join(","));
+    toolbar.currentSet = set.join(",");
+    document.persist(toolbar.id, "currentset");
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      "Removing toolbar button.");
+    try {
+      BrowserToolboxCustomizeDone(true);
+    }
+    catch (e) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Removing toolbar button failed: " + e);
+    }
+  },
+
+  _isButtonInToolbar : function(toolbarName) {
+    if (!toolbarName) {
+      toolbarName = "addon-bar";
+    }
+    var toolbar = document.getElementById(toolbarName);
+    if (!toolbar) {
+      return false;
+    }
+    var curSet = toolbar.currentSet.split(",");
+    return curSet.indexOf(this._toolbarButtonId) != -1;
+  },
+
+  /**
+   * @param isOverlayInit {Boolean} Whether this is being called during the
+   *     overlay's initialization (as opposed to the user changing a pref).
+   */
+  setStatusbarIconStyle : function(iconStyle, isOverlayInit) {
+    var util = requestpolicy.mod.Util;
+    if (util.isFirefox() &&
+        util.compareVersions(util.curAppVersion, "4.0") >= 0) {
+      // Always disable the status bar icon in Fx4. Essentially, our status
+      // bar pref has become an addon bar pref for Fx4.
+      this._rpStatusbar.setAttribute("iconStyle", "none");
+
+      if (isOverlayInit) {
+        return;
+      }
+
+      if (iconStyle == "none") {
+        // Remove the toolbar icon from the addon-bar if it's there.
+        if (this._isButtonInToolbar("addon-bar")) {
+          this._removeButtonFromAddonBar();
+        }
+      } else {
+        // Add the toolbar icon to the addon-bar if it's not there.
+        if (!this._isButtonInToolbar("addon-bar")) {
+          this._addButtonToAddonBar();
+        }
+      }
+    } else {
+      this._rpStatusbar.setAttribute("iconStyle", iconStyle);
+    }
   },
 
   setContextMenuEnabled : function(isEnabled) {
@@ -185,6 +320,11 @@ requestpolicy.overlay = {
    */
   onLoad : function(event) {
     try {
+      // This must be done here rather than from init() because during init()
+      // we won't see if the toolbar button is already installed somewhere,
+      // we'll only see the standard buttons when we inspect the toolbars.
+      this._installToolbarButtonOnce();
+
       // Info on detecting page load at:
       // http://developer.mozilla.org/En/Code_snippets/On_page_load
       var appcontent = this._isFennec ? event.currentTarget : document

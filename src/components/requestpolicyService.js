@@ -536,12 +536,13 @@ RequestPolicyService.prototype = {
       var versionChanged = false;
       if (AddonManager) {
         const usePrefs = this.prefs;
+        const prefService = this._prefService;
         AddonManager.getAddonByID(EXTENSION_ID,
           function(addon) {
             usePrefs.setCharPref("lastVersion", addon.version);
             util.curVersion = addon.version;
             if (util.lastVersion != util.curVersion) {
-              this._prefService.savePrefFile(null);
+              prefService.savePrefFile(null);
             }
           });
       } else {

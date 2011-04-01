@@ -81,6 +81,7 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 
   _initialized : false,
+  _profileAfterChangeCompleted : false,
 
   _blockingDisabled : false,
 
@@ -1548,6 +1549,12 @@ RequestPolicyService.prototype = {
         this._updatePref(data);
         break;
       case "profile-after-change" :
+        // Firefox 3.6 ends up here twice with how we have things set up.
+        if (this._profileAfterChangeCompleted) {
+          break;
+        }
+        this._profileAfterChangeCompleted = true;
+
         // We call _init() here because gecko 1.9.3 states that extensions will
         // no longer be able to receive app-startup.
         this._init();

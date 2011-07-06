@@ -1878,7 +1878,6 @@ RequestPolicyService.prototype = {
         || aContentLocation.scheme == "data"
         || aContentLocation.scheme == "chrome"
         || aContentLocation.scheme == "moz-icon"
-        || aContentLocation.scheme == "view-source"
         || aContentLocation.scheme == "wyciwyg"
         || aContentLocation.scheme == "javascript") {
       return true;
@@ -1997,6 +1996,16 @@ RequestPolicyService.prototype = {
                   + origin + "> to be origin <" + newOrigin + ">");
           origin = newOrigin;
           aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
+        }
+
+        if (aContentLocation.scheme == "view-source") {
+          var newDest = dest.split(":").slice(1).join(":");
+          requestpolicy.mod.Logger.info(
+              requestpolicy.mod.Logger.TYPE_CONTENT,
+              "Considering view-source destination <"
+                  + dest + "> to be destination <" + newDest + ">");
+          dest = newDest;
+          aContentLocation = requestpolicy.mod.DomainUtil.getUriObject(dest);
         }
 
         if (origin == "about:blank" && aContext) {

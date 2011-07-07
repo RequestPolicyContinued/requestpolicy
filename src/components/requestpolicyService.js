@@ -341,6 +341,8 @@ RequestPolicyService.prototype = {
         "https://www.mozilla.com/", appInfo.vendor]);
     this._compatibilityRules.push(["https://services.addons.mozilla.org/",
         "https://www.getpersonas.com/", appInfo.vendor]);
+    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
+        "https://static-cdn.addons.mozilla.net/", appInfo.vendor]);
     // Firefox 4 uses an about:home page that is locally stored but can be
     // the origin for remote requests. See bug #140 for more info.
     this._compatibilityRules.push(["about:home", null, appInfo.vendor]);

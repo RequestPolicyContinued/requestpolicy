@@ -194,6 +194,8 @@ RequestPolicyService.prototype = {
     idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
     // Norton Toolbar (a.k.a. NIS Toolbar)
     idArray.push("{0C55C096-0F1D-4F28-AAA2-85EF591126E7}");
+    // Norton Toolbar 2011.7.0.8
+    idArray.push("{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}");
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("{340c2bbc-ce74-4362-90b5-7c26312808ef}"); // Firefox Sync
@@ -265,9 +267,11 @@ RequestPolicyService.prototype = {
         break;
       case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
       case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
+      case "{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}" : // Norton Toolbar
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([null, "symnst:", ext.name]);
+        this._compatibilityRules.push([null, "symres:", ext.name]);
         break;
       case "{c45c406e-ab73-11d8-be73-000a95be3b12}" : // Web Developer
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,

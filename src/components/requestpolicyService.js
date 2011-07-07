@@ -192,6 +192,8 @@ RequestPolicyService.prototype = {
     idArray.push("foxmarks@kei.com"); // Xmarks Sync (a.k.a. Foxmarks)
     // Norton Safe Web Lite Toolbar
     idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
+    // Norton Toolbar (a.k.a. NIS Toolbar)
+    idArray.push("{0C55C096-0F1D-4F28-AAA2-85EF591126E7}");
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("{340c2bbc-ce74-4362-90b5-7c26312808ef}"); // Firefox Sync
@@ -261,7 +263,8 @@ RequestPolicyService.prototype = {
         this._compatibilityRules.push(["https://login.xmarks.com/",
             "https://static.xmarks.com/", ext.name]);
         break;
-      case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton toolbar
+      case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
+      case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([null, "symnst:", ext.name]);

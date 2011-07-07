@@ -275,7 +275,7 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  *           the seconds can't be parsed as a float.
  */
 DomainUtil.parseRefresh = function(refreshString) {
-  var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i(refreshString);
+  var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
   var delay = parseFloat(parts[1]);
   if (isNaN(delay)) {
     throw "Invalid delay value in refresh string: " + parts[1];

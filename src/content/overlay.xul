@@ -179,6 +179,7 @@
           <toolbarbutton id="requestpolicy-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
         </toolbar>
       </toolbox>
+      <!-- The src of this iframe is set to chrome://requestpolicy/content/requestLog.xul in overlay.js -->
       <iframe id="requestpolicy-requestLog-frame" type="chrome" flex="1"/>
     </vbox>
   </vbox>

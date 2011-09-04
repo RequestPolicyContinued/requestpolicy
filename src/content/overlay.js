@@ -341,39 +341,40 @@ requestpolicy.overlay = {
               requestpolicyOverlay.onAppFrameContentLoaded(event);
             }, true);
 
-        // Add a click handler so we can register all link clicks and be able to
-        // allow them.
-        // This seems to be a safe approach in that the MDC states that
-        // javascript can't be used to initiate a click event on a link:
-        // http://developer.mozilla.org/en/DOM/element.click
+        // Listen for click events so that we can allow requests that result from
+        // user-initiated link clicks and form submissions.
         appcontent.addEventListener("click", function(event) {
-              // We're only interested in left-clicks on anchor tags.
-              if (event.target.nodeName.toLowerCase() != "a"
-                  || event.button != 0) {
+              // If mozInputSource is undefined or zero, then this was a javascript-generated event.
+              // If there is a way to forge mozInputSource from javascript, then that could be used
+              // to bypass RequestPolicy.
+              if (!event.mozInputSource) {
                 return;
               }
-              requestpolicyOverlay._rpService.registerLinkClicked(
-                  event.target.ownerDocument.URL, event.target.href);
-            }, true);
-
-        // Add a submit handler so we can register all form submissions and be
-        // able to allow them.
-        // As far as I can tell, calling a form's submit() method from
-        // javascript will not cause this event listener to fire even though it
-        // will submit the form, which makes things easier in that we don't have
-        // to find another way to tell if the user submitted the form or if it
-        // was done by javascript. However, I'm not sure on the specifics of why
-        // submit() from javascript doesn't end up calling this. I can only
-        // conclude it's the ame difference as with link clicks by humans vs.
-        // click(), but that the documentation just doesn't state this (with the
-        // exception that nonprivileged code can call submit(), but it just
-        // doesn't result in a submit event going through the DOM).
-        appcontent.addEventListener("submit", function(event) {
-              if (event.target.nodeName.toLowerCase() != "form") {
+              // The following show up as button value 0 for links and form input submit buttons:
+              // * left-clicks
+              // * enter key while focused
+              // * space bar while focused (no event sent for links in this case)
+              if (event.button != 0) {
                 return;
               }
-              requestpolicyOverlay._rpService.registerFormSubmitted(
-                  event.target.ownerDocument.URL, event.target.action);
+              // Link clicked.
+              // I believe an empty href always gets filled in with the current URL so
+              // it will never actually be empty. However, I don't know this for certain.
+              if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
+                requestpolicyOverlay._rpService.registerLinkClicked(
+                    event.target.ownerDocument.URL, event.target.href);
+                return;
+              }
+              // Form submit button clicked. This can either be directly (e.g. mouseclick,
+              // enter/space while the the submit button has focus) or indirectly (e.g.
+              // pressing enter when a text input has focus).
+              if (event.target.nodeName.toLowerCase() == "input" &&
+                  event.target.type.toLowerCase() == "submit" &&
+                  event.target.form.action) {
+                requestpolicyOverlay._rpService.registerFormSubmitted(
+                  event.target.ownerDocument.URL, event.target.form.action);
+                return;
+              }
             }, true);
 
         if (this._isFennec) {

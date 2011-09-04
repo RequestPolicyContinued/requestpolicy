@@ -211,16 +211,12 @@ requestpolicy.overlay = {
   },
 
   _addButtonToAddonBar : function() {
-    //var afterId = "urlbar-container";    // ID of element to insert after
     // The addon bar was introduced in Fx 4 to replace the status bar.
     var toolbar = document.getElementById("addon-bar");
-    var curSet = toolbar.currentSet.split(",");
-    //var pos = curSet.indexOf(afterId) + 1 || curSet.length;
-    var pos = curSet.length;
-    var set = curSet.slice(0, pos).concat(this._toolbarButtonId)
-          .concat(curSet.slice(pos));
-    toolbar.setAttribute("currentset", set.join(","));
-    toolbar.currentSet = set.join(",");
+
+    toolbar.insertItem(this._toolbarButtonId, null);
+    toolbar.setAttribute("currentset", toolbar.currentSet);
+
     document.persist(toolbar.id, "currentset");
     requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
       "Adding toolbar button.");
@@ -231,8 +227,8 @@ requestpolicy.overlay = {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Adding toolbar button failed: " + e);
     }
-    // Make sure the addon bar is shown.
-    toolbar.collapsed = false;
+    // Make sure the addon bar is shown and stays shown after restart.
+    setToolbarVisibility(toolbar, true);
   },
 
   _removeButtonFromAddonBar : function() {

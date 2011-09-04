@@ -1187,16 +1187,6 @@ requestpolicy.overlay = {
         requestpolicy.overlay._stopBlockedContentCheckTimeout();
         requestpolicy.overlay._checkForBlockedContent(content.document);
       },
-      onStateChange : function() {
-      },
-      onProgressChange : function() {
-      },
-      onStatusChange : function() {
-      },
-      onSecurityChange : function() {
-      },
-      onLinkIconAvailable : function() {
-      },
 
       QueryInterface : function(aIID) {
         if (aIID.equals(Components.interfaces.nsIWebProgressListener)
@@ -1207,10 +1197,10 @@ requestpolicy.overlay = {
       }
     };
 
-    // Oddly, it doesn't seem right now that the mask is actually working. All
-    // of the on*Change methods appear to be getting called.
-    gBrowser.addProgressListener(this.locationListener,
-        Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+    // https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
+    // "Starting in Gecko 2.0, all events are optional. The tabbrowser only
+    // notifies you of the events for which you provide a callback."
+    gBrowser.addProgressListener(this.locationListener);
   },
 
   _removeLocationObserver : function() {

@@ -198,7 +198,6 @@ RequestPolicyService.prototype = {
     idArray.push("{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}");
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
-    idArray.push("{340c2bbc-ce74-4362-90b5-7c26312808ef}"); // Firefox Sync
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
 
     try {
@@ -289,17 +288,6 @@ RequestPolicyService.prototype = {
         var translated = "data:text/html";
         this._topLevelDocTranslationRules.push([orig, translated]);
         break;
-      case "{340c2bbc-ce74-4362-90b5-7c26312808ef}" : // Firefox Sync
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            "Using extension compatibility rules for: " + ext.name);
-        this._compatibilityRules.push(["https://auth.services.mozilla.com/",
-            "https://api-secure.recaptcha.net/challenge?", ext.name]);
-        this._compatibilityRules.push([
-            "https://api-secure.recaptcha.net/challenge?",
-            "https://www.google.com/recaptcha/api/challenge?", ext.name]);
-        this._compatibilityRules.push(["https://auth.services.mozilla.com/",
-            "https://www.google.com/recaptcha/api/", ext.name]);
-        break;
       case "FirefoxAddon@similarWeb.com" : // SimilarWeb
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
@@ -355,6 +343,14 @@ RequestPolicyService.prototype = {
     // Firefox 4 uses an about:home page that is locally stored but can be
     // the origin for remote requests. See bug #140 for more info.
     this._compatibilityRules.push(["about:home", null, appInfo.vendor]);
+    // Firefox Sync uses a google captcha.
+    this._compatibilityRules.push(["https://auth.services.mozilla.com/",
+        "https://api-secure.recaptcha.net/challenge?", appInfo.vendor]);
+    this._compatibilityRules.push([
+        "https://api-secure.recaptcha.net/challenge?",
+        "https://www.google.com/recaptcha/api/challenge?", appInfo.vendor]);
+    this._compatibilityRules.push(["https://auth.services.mozilla.com/",
+        "https://www.google.com/recaptcha/api/", appInfo.vendor]);
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {

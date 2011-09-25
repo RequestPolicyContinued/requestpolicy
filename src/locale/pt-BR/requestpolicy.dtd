@@ -11,7 +11,7 @@
 <!ENTITY rp.origin "Origem">
 <!ENTITY rp.destination "Destino">
 <!ENTITY rp.allow "Permitir">
-<!ENTITY preferences "Preferências...">
+<!ENTITY preferences "Preferências…">
 <!ENTITY preferences.windowTitle "Preferências do RequestPolicy">
 <!ENTITY preferences.prefpane.general "Geral">
 <!ENTITY preferences.prefpane.appearance "Aparência">
@@ -27,7 +27,7 @@
 <!ENTITY preferences.webpages "Exibição da página">
 <!ENTITY preferences.statusbarIcon "Aparência na barra de status">
 <!ENTITY preferences.statusbarIcon.none "Nenhuma">
-<!ENTITY preferences.contextMenu "Contextual menu">
+<!ENTITY preferences.contextMenu "Menu de contexto">
 <!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
 <!ENTITY preferences.autoReload "Recarregar a página logo após modificar a lista de permissões">
 <!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
@@ -64,7 +64,7 @@
 <!ENTITY requestLog.clear "Limpar">
 <!ENTITY initialSetup.title "Configuração inicial">
 <!ENTITY initialSetup.whitelist.caption "Adicione a sua lista de permissões algumas entradas comuns">
-<!ENTITY initialSetup.whitelist.description "Estas permissões são aqui sugeridas por (1) envolverem pedidos entre servidores de uma mesma empresa ou (2) resolverem problemas que você poderá ter durante a navegação com muito pouco impacto em sua privacidade e segurança.">
+<!ENTITY initialSetup.whitelist.description "Estas permissões são aqui sugeridas por (1) envolverem pedidos entre servidores de uma mesma empresa e (2) resolverem problemas que você poderá ter durante a navegação com muito pouco impacto em sua privacidade e segurança.">
 <!ENTITY initialSetup.region.international "Internacional">
 <!ENTITY initialSetup.region.americas "Américas">
 <!ENTITY initialSetup.region.asia "Ásia">

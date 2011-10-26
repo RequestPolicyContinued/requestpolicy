@@ -3,8 +3,7 @@ syntax: regexp
 ^src/dist$
 
 syntax: glob
-.settings
-.project
+.*
 temp
 *.bak*
 *.orig*

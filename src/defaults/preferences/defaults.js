@@ -27,3 +27,10 @@ pref("extensions.requestpolicy.contextMenu", true);
 
 pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
+
+pref("extensions.requestpolicy.study.participate", false);
+pref("extensions.requestpolicy.study.profileID", "");
+pref("extensions.requestpolicy.study.consentID", 0);
+pref("extensions.requestpolicy.study.consentVersion", 0);
+pref("extensions.requestpolicy.study.sessionID", 0);
+pref("extensions.requestpolicy.study.globalEventID", 0);

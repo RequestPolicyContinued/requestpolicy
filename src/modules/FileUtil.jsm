@@ -20,7 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["FileUtil"]
+var EXPORTED_SYMBOLS = ["FileUtil"];
+
+const CI = Components.interfaces;
+const CC = Components.classes;
+
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
+}
+
+Components.utils.import("resource://requestpolicy/Services.jsm",
+    requestpolicy.mod);
+
+const REQUESTPOLICY_DIR = "requestpolicy";
 
 var FileUtil = {
 
@@ -42,6 +56,34 @@ var FileUtil = {
     } while (hasmore);
     stream.close();
     return lines;
+  },
+
+  /**
+   * Returns the contents of the file as a string.
+   *
+   * @param {nsIFile}
+   *          file
+   */
+  fileToString : function(file) {
+    var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+        .createInstance(Components.interfaces.nsIFileInputStream);
+    stream.init(file, 0x01, 0444, 0);
+    stream.QueryInterface(Components.interfaces.nsILineInputStream);
+
+    var cstream = Components.classes["@mozilla.org/intl/converter-input-stream;1"].
+                  createInstance(Components.interfaces.nsIConverterInputStream);
+    cstream.init(stream, "UTF-8", 0, 0);
+
+    var str = "";
+    var data = {};
+    do {
+      // Read as much as we can and put it in |data.value|.
+      read = cstream.readString(0xffffffff, data);
+      str += data.value;
+    } while (read != 0);
+    cstream.close(); // This closes |fstream|.
+
+    return str;
   },
 
   /**
@@ -68,6 +110,71 @@ var FileUtil = {
     }
     cos.close();
     stream.close();
-  }
+  },
 
+  /**
+   * Writes a string to a file (truncates the file if it exists, creates it if
+   * it doesn't).
+   *
+   * @param {String}
+   *          str
+   * @param {nsIFile}
+   *          file
+   */
+  stringToFile : function(str, file) {
+    // TODO: this should probably write to a tmp file and move the file into
+    // place.
+    var stream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+        .createInstance(Components.interfaces.nsIFileOutputStream);
+    // write, create, append on write, truncate
+    stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
+
+    var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"]
+        .createInstance(Components.interfaces.nsIConverterOutputStream);
+    cos.init(stream, "UTF-8", 4096, 0x0000);
+    cos.writeString(str);
+    cos.close();
+    stream.close();
+  },
+
+  /**
+   * Returns a file object for a path relative to the user's "requestpolicy"
+   * under their profile directory. The "requestpolicy" directory is created if
+   * it doesn't already exist. Each subdir, if specified, is created if it does
+   * not exist.
+   *
+   * @return {nsILocalFile}
+   */
+  getRPUserDir : function(subdir1, subdir2, subdir3) {
+    var profileDir = requestpolicy.mod.Services.directoryService
+          .get("ProfD", CI.nsIFile);
+    var file = profileDir.clone().QueryInterface(CI.nsILocalFile);
+    file.appendRelativePath(REQUESTPOLICY_DIR);
+    if(!file.exists()) {
+      file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+    }
+
+    if (subdir1) {
+      file.appendRelativePath(subdir1);
+      if(!file.exists()) {
+        file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+      }
+
+      if (subdir2) {
+        file.appendRelativePath(subdir2);
+        if(!file.exists()) {
+          file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+        }
+
+        if (subdir3) {
+          file.appendRelativePath(subdir3);
+          if(!file.exists()) {
+            file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+          }
+        }
+      }
+    }
+
+    return file;
+  }
 };

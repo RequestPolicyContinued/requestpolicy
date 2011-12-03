@@ -382,6 +382,12 @@ RequestPolicyService.prototype = {
     }
   },
 
+  _clearPref: function(name) {
+    if (this.prefs.prefHasUserValue(name)) {
+      this.prefs.clearUserPref(name);
+    }
+  },
+
   _syncFromPrefs : function() {
     // Load the logging preferences before the others.
     this._updateLoggingSettings();
@@ -430,16 +436,97 @@ RequestPolicyService.prototype = {
       }
     }
 
-    // Clean up old, unused prefs (removed in 0.2.0).
-    deletePrefs = ["temporarilyAllowedOrigins",
-        "temporarilyAllowedDestinations",
-        "temporarilyAllowedOriginsToDestinations"];
-    for (var i = 0; i < deletePrefs.length; i++) {
-      if (this.prefs.prefHasUserValue(deletePrefs[i])) {
-        this.prefs.clearUserPref(deletePrefs[i]);
+    if (requestpolicy.mod.Telemetry.isPastEndDate()) {
+      if (this.prefs.getBoolPref('study.participate')) {
+        this.endParticipationInStudy();
       }
+      this._clearPref('study.participate');
+      this._clearPref('study.profileID');
+      this._clearPref('study.consentID');
+      this._clearPref('study.consentVersion');
+      this._clearPref('study.sessionID');
+      this._clearPref('study.globalEventID');
+      this._prefService.savePrefFile(null);
+    } else if (this.prefs.getBoolPref('study.participate')) {
+      var profileID = this.prefs.getCharPref('study.profileID');
+      profileID = parseInt(profileID);
+      // If participating in the study there should already be a profileID.
+      if (!profileID) {
+        this.prefs.setBoolPref('study.participate', false);
+        this._prefService.savePrefFile(null);
+        return;
+      }
+      requestpolicy.mod.Telemetry.setProfileID(profileID);
+
+      var consentID = this.prefs.getIntPref('study.consentID');
+      requestpolicy.mod.Telemetry.setConsentID(consentID);
+
+      var sessionID = this.prefs.getIntPref('study.sessionID');
+      sessionID++;
+      this.prefs.setIntPref('study.sessionID', sessionID);
+      requestpolicy.mod.Telemetry.setSessionID(sessionID);
+
+      var globalEventID = this.prefs.getIntPref('study.globalEventID');
+      requestpolicy.mod.Telemetry.setGlobalEventID(globalEventID);
+
+      this._prefService.savePrefFile(null);
+      requestpolicy.mod.Telemetry.setEnabled(true);
     }
+
+    // Clean up old, unused prefs (removed in 0.2.0).
+    this._clearPref("temporarilyAllowedOrigins");
+    this._clearPref("temporarilyAllowedDestinations");
+    this._clearPref("temporarilyAllowedOriginsToDestinations");
     this._prefService.savePrefFile(null);
+  },
+
+  beginParticipationInStudy : function() {
+    // I assume I made profileID a char pref rather than an int pref out of
+    // concern that it might be limited to 32-bit values.
+    var profileID = this.prefs.getCharPref('study.profileID');
+    if (!profileID) {
+      profileID = requestpolicy.mod.Telemetry.generateProfileID();
+      this.prefs.setCharPref('study.profileID', profileID);
+    }
+    requestpolicy.mod.Telemetry.setProfileID(profileID);
+
+    var consentID = this.prefs.getIntPref('study.consentID');
+    consentID++;
+    this.prefs.setIntPref('study.consentID', consentID);
+    requestpolicy.mod.Telemetry.setConsentID(consentID);
+
+    this.prefs.setIntPref('study.consentVersion', 1);
+
+    var sessionID = this.prefs.getIntPref('study.sessionID');
+    sessionID++;
+    this.prefs.setIntPref('study.sessionID', sessionID);
+    requestpolicy.mod.Telemetry.setSessionID(sessionID);
+
+    this.prefs.setBoolPref('study.participate', true);
+    this._prefService.savePrefFile(null);
+    requestpolicy.mod.Telemetry.setEnabled(true);
+
+    requestpolicy.mod.Stats.consentGranted();
+
+    // We have to process the queue synchronously here (or not at all) because
+    // doing it async causes the xhr request to silently disappear and the
+    // events are lost.
+    //requestpolicy.mod.Telemetry.processQueue(null, true);
+  },
+
+  endParticipationInStudy : function() {
+    requestpolicy.mod.Stats.consentRevoked();
+    requestpolicy.mod.Telemetry.processQueue();
+
+    this.prefs.setBoolPref('study.participate', false);
+    this._clearPref('study.consentVersion');
+    this._prefService.savePrefFile(null);
+    requestpolicy.mod.Telemetry.setEnabled(false);
+    requestpolicy.mod.Stats.deleteFile();
+  },
+
+  isParticipatingInStudy : function() {
+    return requestpolicy.mod.Telemetry.getEnabled();
   },
 
   _updateLoggingSettings : function() {
@@ -606,6 +693,7 @@ RequestPolicyService.prototype = {
       default :
         break;
     }
+    requestpolicy.mod.Stats.prefChanged(prefName);
   },
 
   _loadLibraries : function() {
@@ -614,6 +702,10 @@ RequestPolicyService.prototype = {
     Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/Util.jsm",
+        requestpolicy.mod);
+    Components.utils.import("resource://requestpolicy/Stats.jsm",
+        requestpolicy.mod);
+    Components.utils.import("resource://requestpolicy/Telemetry.jsm",
         requestpolicy.mod);
     try {
       Components.utils.import("resource://gre/modules/AddonManager.jsm");
@@ -1104,6 +1196,7 @@ RequestPolicyService.prototype = {
     if (!noStore) {
       this._storePreferenceList("allowedOrigins");
     }
+    requestpolicy.mod.Stats.ruleAddedOrigin(host);
   },
 
   allowOrigin : function allowOrigin(host) {
@@ -1123,6 +1216,7 @@ RequestPolicyService.prototype = {
       this._temporarilyAllowedOriginsCount++;
       this._temporarilyAllowedOrigins[host] = true;
     }
+    requestpolicy.mod.Stats.ruleAddedTempOrigin(host);
   },
 
   isTemporarilyAllowedOrigin : function isTemporarilyAllowedOrigin(host) {
@@ -1134,6 +1228,7 @@ RequestPolicyService.prototype = {
     if (!noStore) {
       this._storePreferenceList("allowedDestinations");
     }
+    requestpolicy.mod.Stats.ruleAddedDest(host);
   },
 
   allowDestination : function allowDestination(host) {
@@ -1153,6 +1248,7 @@ RequestPolicyService.prototype = {
       this._temporarilyAllowedDestinationsCount++;
       this._temporarilyAllowedDestinations[host] = true;
     }
+    requestpolicy.mod.Stats.ruleAddedTempDest(host);
   },
 
   isTemporarilyAllowedDestination : function isTemporarilyAllowedDestination(
@@ -1181,6 +1277,8 @@ RequestPolicyService.prototype = {
     var combinedId = this._getCombinedOriginToDestinationIdentifier(
         originIdentifier, destIdentifier);
     this._allowOriginToDestinationByCombinedIdentifier(combinedId, noStore);
+    requestpolicy.mod.Stats.ruleAddedOriginToDest(
+      originIdentifier, destIdentifier);
   },
 
   allowOriginToDestination : function allowOriginToDestination(
@@ -1215,6 +1313,8 @@ RequestPolicyService.prototype = {
       this._temporarilyAllowedOriginsToDestinationsCount++;
       this._temporarilyAllowedOriginsToDestinations[combinedId] = true;
     }
+    requestpolicy.mod.Stats.ruleAddedTempOriginToDest(
+      originIdentifier, destIdentifier);
   },
 
   isTemporarilyAllowedOriginToDestination : function isTemporarilyAllowedOriginToDestination(
@@ -1237,18 +1337,21 @@ RequestPolicyService.prototype = {
     this._temporarilyAllowedOriginsToDestinations = {};
 
     this._blockingDisabled = false;
+    // TODO: stats: remove all temp rules
   },
 
   _forbidOrigin : function(host, noStore) {
     if (this._temporarilyAllowedOrigins[host]) {
       this._temporarilyAllowedOriginsCount--;
       delete this._temporarilyAllowedOrigins[host];
+      requestpolicy.mod.Stats.ruleRemovedTempOrigin(host);
     }
     if (this._allowedOrigins[host]) {
       delete this._allowedOrigins[host];
       if (!noStore) {
         this._storePreferenceList("allowedOrigins");
       }
+      requestpolicy.mod.Stats.ruleRemovedOrigin(host);
     }
   },
 
@@ -1264,12 +1367,14 @@ RequestPolicyService.prototype = {
     if (this._temporarilyAllowedDestinations[host]) {
       this._temporarilyAllowedDestinationsCount--;
       delete this._temporarilyAllowedDestinations[host];
+      requestpolicy.mod.Stats.ruleRemovedTempDest(host);
     }
     if (this._allowedDestinations[host]) {
       delete this._allowedDestinations[host];
       if (!noStore) {
         this._storePreferenceList("allowedDestinations");
       }
+      requestpolicy.mod.Stats.ruleRemovedDest(host);
     }
   },
 
@@ -1299,15 +1404,22 @@ RequestPolicyService.prototype = {
   },
 
   _forbidOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
+    var parts = combinedId.split('|');
+    var originIdentifier = parts[0];
+    var destIdentifier = parts[1];
     if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
       this._temporarilyAllowedOriginsToDestinationsCount--;
       delete this._temporarilyAllowedOriginsToDestinations[combinedId];
+      requestpolicy.mod.Stats.ruleRemovedTempOriginToDest(
+        originIdentifier, destIdentifier);
     }
     if (this._allowedOriginsToDestinations[combinedId]) {
       delete this._allowedOriginsToDestinations[combinedId];
       if (!noStore) {
         this._storePreferenceList("allowedOriginsToDestinations");
       }
+      requestpolicy.mod.Stats.ruleRemovedOriginToDest(
+        originIdentifier, destIdentifier);
     }
   },
 
@@ -1643,6 +1755,8 @@ RequestPolicyService.prototype = {
         // what is needed to allow their requests.
         this._initializeExtensionCompatibility();
         this._initializeApplicationCompatibility();
+
+        requestpolicy.mod.Stats.browserStarted();
         break;
       case "private-browsing" :
         if (data == "enter") {
@@ -1682,6 +1796,15 @@ RequestPolicyService.prototype = {
         if (this._uninstall) {
           this._handleUninstallOrDisable();
         }
+        requestpolicy.mod.Stats.reportQueuedDocActions();
+        requestpolicy.mod.Stats.reportStatsHighFrequency();
+        requestpolicy.mod.Stats.reportStatsMedFrequency();
+        // Don't send the low frequency stats because some of them (e.g. addons)
+        // happen async.
+        //requestpolicy.mod.Stats.reportStatsLowFrequency();
+        requestpolicy.mod.Telemetry.track('browser_quit');
+        requestpolicy.mod.Telemetry.processQueue(null, true);
+        requestpolicy.mod.Stats.saveToFile();
         break;
       default :
         requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -2110,6 +2233,11 @@ RequestPolicyService.prototype = {
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aExtra];
 
+        // TYPE_DOCUMENT = 6
+        if (aContentType == 6) {
+          requestpolicy.mod.Stats.requestedTopLevelDocument(dest);
+        }
+
         if (aContext && aContext.nodeName == "LINK" &&
             (aContext.rel == "icon" || aContext.rel == "shortcut icon")) {
           this._faviconRequests[dest] = true;
@@ -2127,6 +2255,7 @@ RequestPolicyService.prototype = {
         // regardless of the link click. The original tab would then show it
         // in its menu.
         if (this._clickedLinks[origin] && this._clickedLinks[origin][dest]) {
+          requestpolicy.mod.Stats.allowedLinkClick(args);
           // Don't delete the _clickedLinks item. We need it for if the user
           // goes back/forward through their history.
           // delete this._clickedLinks[origin][dest];
@@ -2135,6 +2264,7 @@ RequestPolicyService.prototype = {
 
         } else if (this._submittedForms[origin]
             && this._submittedForms[origin][dest.split("?")[0]]) {
+          requestpolicy.mod.Stats.allowedFormSubmission(args);
           // Note: we dropped the query string from the dest because form GET
           // requests will have that added on here but the original action of
           // the form may not have had it.
@@ -2162,32 +2292,41 @@ RequestPolicyService.prototype = {
         var destIdentifier = this.getUriIdentifier(dest);
 
         if (destIdentifier == originIdentifier) {
+          requestpolicy.mod.Stats.allowedSameHost(args);
           return this.accept("same host (at current domain strictness level)",
               args);
         }
 
         if (this.isAllowedOriginToDestination(originIdentifier, destIdentifier)) {
+          requestpolicy.mod.Stats.allowedByOriginToDest(
+            args, originIdentifier, destIdentifier);
           return this.accept("Allowed origin to destination", args);
         }
 
         if (this.isAllowedOrigin(originIdentifier)) {
+          requestpolicy.mod.Stats.allowedByOrigin(args, originIdentifier);
           return this.accept("Allowed origin", args);
         }
 
         if (this.isAllowedDestination(destIdentifier)) {
+          requestpolicy.mod.Stats.allowedByDest(args, destIdentifier);
           return this.accept("Allowed destination", args);
         }
 
         if (this.isTemporarilyAllowedOriginToDestination(originIdentifier,
             destIdentifier)) {
+          requestpolicy.mod.Stats.tempAllowedByOriginToDest(
+            args, originIdentifier, destIdentifier);
           return this.accept("Temporarily allowed origin to destination", args);
         }
 
         if (this.isTemporarilyAllowedOrigin(originIdentifier)) {
+          requestpolicy.mod.Stats.tempAllowedByOrigin(args, originIdentifier);
           return this.accept("Temporarily allowed origin", args);
         }
 
         if (this.isTemporarilyAllowedDestination(destIdentifier)) {
+          requestpolicy.mod.Stats.tempAllowedByDest(args, destIdentifier);
           return this.accept("Temporarily allowed destination", args);
         }
 
@@ -2263,6 +2402,8 @@ RequestPolicyService.prototype = {
             }
           }
         }
+
+        requestpolicy.mod.Stats.denied(args);
 
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.

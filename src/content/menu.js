@@ -30,6 +30,8 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Telemetry.jsm",
+    requestpolicy.mod);
 
 requestpolicy.menu = {
 
@@ -69,6 +71,10 @@ requestpolicy.menu = {
   _itemAllowOrigin : null,
   _itemForbidOrigin : null,
   _itemUnrestrictedOrigin : null,
+
+  _itemParticipateInStudy : null,
+  _itemEndParticipationInStudy : null,
+  _itemStudySeparator : null,
 
   init : function() {
     if (this._initialized == false) {
@@ -125,6 +131,13 @@ requestpolicy.menu = {
       this._itemUnrestrictedOrigin = document
           .getElementById("requestpolicyUnrestrictedOrigin");
 
+      this._itemParticipateInStudy = document
+        .getElementById("requestpolicyParticipateInStudy");
+      this._itemEndParticipationInStudy = document
+        .getElementById("requestpolicyEndParticipationInStudy");
+      this._itemStudySeparator = document
+          .getElementById("requestpolicy-studySeparator");
+
       var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
       if (!hideConflictInfo) {
@@ -171,6 +184,13 @@ requestpolicy.menu = {
       var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
       this._itemPrefetchWarning.hidden = hidePrefetchInfo;
       this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
+
+      var studyEnded = requestpolicy.mod.Telemetry.isPastEndDate();
+      this._itemParticipateInStudy.hidden =
+        studyEnded || this._rpServiceJSObject.isParticipatingInStudy();
+      this._itemEndParticipationInStudy.hidden =
+        studyEnded || !this._rpServiceJSObject.isParticipatingInStudy();
+      this._itemStudySeparator.hidden = studyEnded;
 
       if (isChromeUri) {
         this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
@@ -307,6 +327,8 @@ requestpolicy.menu = {
       // If there are no other origins being displayed, don't display the "other
       // origins" item in the main menu.
       this._itemOtherOrigins.hidden = this._itemOtherOriginsSeparator.hidden = (otherOriginMenuCount == 0);
+
+      this.stats_otherOriginMenuCount = otherOriginMenuCount;
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,

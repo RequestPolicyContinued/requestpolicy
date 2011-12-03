@@ -196,3 +196,11 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   background-color: #eee;
   -moz-user-focus: ignore;
 }
+
+/*********************************************
+ * Research study
+ *********************************************/
+
+#requestpolicyParticipateInStudy {
+  color: #3950c5;
+}

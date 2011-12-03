@@ -150,6 +150,19 @@ DomainUtil.isValidUri = function(uri) {
   }
 };
 
+
+DomainUtil.isIPAddress = function(host) {
+  try {
+    this._eTLDService.getBaseDomainFromHost(host, 0);
+  } catch (e) {
+    if (e.name == 'NS_ERROR_HOST_IS_IP_ADDRESS') {
+      return true;
+    }
+  }
+  return false;
+};
+
+
 /**
  * Returns the domain from a uri string.
  * 

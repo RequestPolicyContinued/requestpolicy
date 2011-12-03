@@ -95,6 +95,15 @@
         hidden="true"
         label="&menu.closeRequestLog.label;"
         oncommand="requestpolicy.overlay.toggleRequestLog();" />
+      <menuseparator id="requestpolicy-studySeparator"/>
+        <menuitem
+        id="requestpolicyParticipateInStudy"
+        label="Participate in research study"
+        oncommand="requestpolicy.overlay.openStudyParticipationWindow();" />
+      <menuitem
+        id="requestpolicyEndParticipationInStudy"
+        label="End participation in research study"
+        oncommand="requestpolicy.overlay.endParticipationInStudy();" />
       <menuseparator id="requestpolicy-preferencesSeparator"/>
       <menuitem
         id="requestpolicyExtensionConflictWarning"

@@ -1,0 +1,6 @@
+.*
+!.gitignore
+*.jar
+*.xpi
+*.bak*
+*.orig

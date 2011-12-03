@@ -1,0 +1,1 @@
+{"metadata":{"version":1,"name":"policyname","source":"user"},"entries":{"allow":[{"o":{"h":"www.foo.com"},"d":{"h":"www.bar.com"}},{"o":{"h":"www.example.com","s":"https","pathPre":"/test/"},"d":{"h":"www.bar.com","s":"https"}}],"deny":[{"d":{"h":"google-analytics.com"}},{"o":{"s":"https"},"d":{"s":"http"}}]}}

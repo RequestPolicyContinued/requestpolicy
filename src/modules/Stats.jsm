@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  * 
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2011 Justin Samuel
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,19 +20,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["Logger"]
+var EXPORTED_SYMBOLS = ["Stats"]
 
 /**
- * Provides logging methods
+ * Statistics gathering.
  */
-Logger = new function() {
+Stats = new function() {
 
   this.TYPE_CONTENT = 1; // content whose origin isn't known more specifically
   this.TYPE_META_REFRESH = 2; // info related to meta refresh
   this.TYPE_HEADER_REDIRECT = 4; // info related to header redirects
   this.TYPE_INTERNAL = 8; // internal happenings of the extension
   this.TYPE_ERROR = 16; // errors
-  this.TYPE_POLICY = 32; // Policy changes, storage, etc.
   this.TYPE_ALL = 0x0 - 1; // all
 
   this.LEVEL_OFF = Number.MAX_VALUE; // no logging
@@ -48,7 +47,6 @@ Logger = new function() {
   this._TYPE_NAMES[this.TYPE_HEADER_REDIRECT.toString()] = "HEADER_REDIRECT";
   this._TYPE_NAMES[this.TYPE_INTERNAL.toString()] = "INTERNAL";
   this._TYPE_NAMES[this.TYPE_ERROR.toString()] = "ERROR";
-  this._TYPE_NAMES[this.TYPE_POLICY.toString()] = "POLICY";
 
   this._LEVEL_NAMES = {};
   this._LEVEL_NAMES[this.LEVEL_SEVERE.toString()] = "SEVERE";
@@ -62,15 +60,14 @@ Logger = new function() {
   this.types = this.TYPE_ALL;
   this.enabled = true;
 
-  this.printFunc = dump;
 };
 
 Logger._doLog = function(level, type, message) {
   if (this.enabled && level >= this.level && this.types & type) {
     var levelName = this._LEVEL_NAMES[level.toString()];
     var typeName = this._TYPE_NAMES[type.toString()];
-    this.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
-        + message + "\n");
+    dump("[RequestPolicy] [" + levelName + "] [" + typeName + "] " + message
+        + "\n");
   }
 };
 

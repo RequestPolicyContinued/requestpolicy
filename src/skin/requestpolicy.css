@@ -126,19 +126,27 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 
 .requestpolicyBlockedHeading {
-  color: #977;
+  color: #999;
 }
 
 .requestpolicyBlocked {
   color: #600;
 }
 
+.requestpolicyBlockedFullIdentifier {
+  color: #977;
+}
+
 .requestpolicyAllowedHeading {
-  color: #797;
+  color: #999;
 }
 
 .requestpolicyAllowed {
   color: #060;
+}
+
+.requestpolicyAllowedFullIdentifier {
+  color: #797;
 }
 
 .requestpolicyAllowOriginToDest {

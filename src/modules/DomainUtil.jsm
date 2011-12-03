@@ -75,7 +75,9 @@ DomainUtil.getIdentifier = function(uri, level) {
       identifierGettingFunctionName = "getPrePath";
       break;
     default :
-      throw "Invalid identifier level specified in DomainUtil.getIdentifier().";
+      throw "Invalid identifier level specified in DomainUtil.getIdentifier(): "
+            + level;
+      break;
   }
 
   try {
@@ -177,6 +179,24 @@ DomainUtil.getDomain = function(uri) {
     }
   }
 };
+
+
+/**
+ * Determine whether a hostname is an address.
+ * 
+ * @param {String} host
+ * @return {Boolean} True if |host| is an address rather than a name.
+ */
+DomainUtil.isAddress = function(host) {
+  try {
+    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+  } catch (e) {
+    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Returns the path from a uri string.
@@ -351,4 +371,19 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
   newUri.init(urlType, 0, destPath, null, baseUri);
   var resolvedUri = newUri.QueryInterface(Components.interfaces.nsIURI);
   return resolvedUri.spec;
+}
+
+/**
+ * Determines whether a URI uses the standard port for its scheme.
+ * 
+ * @param {nsIURI}
+ *          uri
+ * @return {Boolean}
+ */
+DomainUtil.hasStandardPort = function(uri) {
+  // A port value of -1 in the uriObj means the default for the protocol.
+  return uri.port == -1 ||
+         uri.scheme != "http" && uri.scheme != "https" ||
+         uri.port == 80 && uri.scheme == "http" ||
+         uri.port == 443 && uri.scheme == "https";
 }

@@ -690,7 +690,7 @@ requestpolicy.overlay = {
           "Checking for blocked content from page <" + documentUri + ">");
       this._blockedContentCheckLastTime = (new Date()).getTime();
       this._stopBlockedContentCheckTimeout();
-      if (this._rpService.originHasRejectedRequests(documentUri)) {
+      if (requestpolicy.mod.RequestUtil.originHasRejectedRequests(documentUri)) {
         requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Main document <" + documentUri + "> has rejected requests.");
         this._setBlockedContentNotification(true);
@@ -703,7 +703,7 @@ requestpolicy.overlay = {
         for (var j in otherOrigins[i]) {
           requestpolicy.mod.Logger.dump("Checking for blocked content from "
               + j);
-          if (this._rpService.originHasRejectedRequests(j)) {
+          if (requestpolicy.mod.RequestUtil.originHasRejectedRequests(j)) {
             requestpolicy.mod.Logger.debug(
                 requestpolicy.mod.Logger.TYPE_INTERNAL, "Other origin <" + j
                     + "> of main document <" + documentUri
@@ -1496,6 +1496,33 @@ requestpolicy.overlay = {
    */
   forbidOriginToDestination : function(originHost, destHost) {
     this._rpService.forbidOriginToDestination(originHost, destHost);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * TODO: comment
+   */
+  addAllowRule : function(event) {
+    var rawRule = event.target.requestpolicyRawRule;
+    this._rpServiceJSObject.addAllowRule(rawRule);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * TODO: comment
+   */
+  addTemporaryAllowRule : function(event) {
+    var rawRule = event.target.requestpolicyRawRule;
+    this._rpServiceJSObject.addTemporaryAllowRule(rawRule);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * TODO: comment
+   */
+  removeAllowRule : function(event) {
+    var rawRule = event.target.requestpolicyRawRule;
+    this._rpServiceJSObject.removeAllowRule(rawRule);
     this._conditionallyReloadDocument();
   },
 

@@ -832,7 +832,16 @@ RequestPolicyService.prototype = {
         // was to download a file but a redirect got blocked at some point.
         var initialOrigin = origin;
         var initialDest = dest;
+        // To prevent infinite loops, bound the number of iterations.
+        // Note that an apparent redirect loop doesn't mean a problem with a
+        // website as the site may be using other information, such as cookies
+        // that get set in the redirection process, to stop the redirection.
+        var iterations = 0;
+        const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
         while (this._allowedRedirectsReverse[initialOrigin]) {
+          if (iterations++ >= ASSUME_REDIRECT_LOOP) {
+            break;
+          }
           initialDest = initialOrigin;
           initialOrigin = this._allowedRedirectsReverse[initialOrigin];
         }

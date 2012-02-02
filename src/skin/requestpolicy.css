@@ -121,41 +121,95 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 /*********************************************
  * Menu contents
  *********************************************/
-.requestpolicyTemporary {
-  font-style: italic;
+#rp-popup {
+  padding: 0;
+  margin: 0;
+  font-family: Helvetica, sans-serif;
+}
+#rp-contents {
+  background-color: #ffffff;
+  width: 600px;
+}
+#rp-main {
+  width: 100%;
+  font-size: 0.9em;
+  padding: 10px 10px 10px 10px;
 }
 
-.requestpolicyBlockedHeading {
-  color: #999;
+#rp-origins-destinations {
+  width : 200px;
 }
 
-.requestpolicyBlocked {
-  color: #600;
+#rp-origins-destinations .rp-od-item {
+  border: 1px solid #ffffff;
+  border-right: 0;
+  padding: 2px 0 2px 5px;
+  margin: 0;
+}
+#rp-origins-destinations .rp-od-item:hover {
+  border-color: #eee;
+  background-color: #fafafa;
 }
 
-.requestpolicyBlockedFullIdentifier {
-  color: #977;
+#rp-origin {
+  font-size: 1.2em;
+  color : #555;
+  padding-right: 10px;
+}
+#rp-origin {
+  border: 1px solid #ffffff;
+  /*border-color: #eee !important;*/
+  background-color: #eee;
 }
 
-.requestpolicyAllowedHeading {
-  color: #999;
+.rp-label-list {
+  margin-left : 1em;
+}
+#rp-other-origins {
+  color: #666;
+  margin-top: 1em;
+}
+#rp-other-origins-label {
+  color: #aaa;
 }
 
-.requestpolicyAllowed {
-  color: #060;
+#rp-blocked-destinations {
+  color: #844;
+  margin-top: 1em;
+}
+#rp-blocked-destinations-label {
+  color: #caa;
 }
 
-.requestpolicyAllowedFullIdentifier {
-  color: #797;
+#rp-allowed-destinations {
+  color: #484;
+  margin-top: 1em;
+}
+#rp-allowed-destinations-label {
+  color: #aca;
 }
 
-.requestpolicyAllowOriginToDest {
-  font-weight: bold;
+#rp-details {
+  padding: 1em;
+  border: 1px solid #eee;
+  background-color: #f9f9f9;
+  width: 100%;
 }
 
-#requestpolicyOtherOrigins {
-  color: #c85000;
-  list-style-image: url(chrome://requestpolicy/skin/menu-other-origins.png);
+#rp-footer {
+  border-top: 1px solid #ddd;
+  font-size: 0.9em;
+}
+#rp-footer-links {
+  margin-top: 4px;
+}
+.rp-footer-link {
+  color: #8f8f8f;
+  font-size: 11px;
+}
+.rp-footer-link:hover {
+  color: #3073c5;
+  cursor: pointer;
 }
 
 /*********************************************

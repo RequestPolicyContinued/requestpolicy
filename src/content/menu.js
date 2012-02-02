@@ -48,31 +48,31 @@ requestpolicy.menu = {
   _blockedDestinationsItems : [],
   _allowedDestinationsItems : [],
 
-  _blockedDestinationsHeadingMenuItem : null,
-  _allowedDestinationsHeadingMenuItem : null,
-
-  _blockedDestinationsBeforeReferenceItem : null,
-  _allowedDestinationsBeforeReferenceItem : null,
-
-  _itemPrefetchWarning : null,
-  _itemPrefetchWarningSeparator : null,
-
-  _extensionConflictWarning : null,
-  _extensionConflictWarningSeparator : null,
-
-  _itemOtherOrigins : null,
-  _itemOtherOriginsPopup : null,
-  _itemOtherOriginsSeparator : null,
-
-  _itemRevokeTemporaryPermissions : null,
-  _itemRevokeTemporaryPermissionsSeparator : null,
-
-  _itemAllowAllTemporarily : null,
-
-  _itemAllowOriginTemporarily : null,
-  _itemAllowOrigin : null,
-  _itemForbidOrigin : null,
-  _itemUnrestrictedOrigin : null,
+//  _blockedDestinationsHeadingMenuItem : null,
+//  _allowedDestinationsHeadingMenuItem : null,
+//
+//  _blockedDestinationsBeforeReferenceItem : null,
+//  _allowedDestinationsBeforeReferenceItem : null,
+//
+//  _itemPrefetchWarning : null,
+//  _itemPrefetchWarningSeparator : null,
+//
+//  _extensionConflictWarning : null,
+//  _extensionConflictWarningSeparator : null,
+//
+//  _itemOtherOrigins : null,
+//  _itemOtherOriginsPopup : null,
+//  _itemOtherOriginsSeparator : null,
+//
+//  _itemRevokeTemporaryPermissions : null,
+//  _itemRevokeTemporaryPermissionsSeparator : null,
+//
+//  _itemAllowAllTemporarily : null,
+//
+//  _itemAllowOriginTemporarily : null,
+//  _itemAllowOrigin : null,
+//  _itemForbidOrigin : null,
+//  _itemUnrestrictedOrigin : null,
 
   init : function() {
     if (this._initialized == false) {
@@ -83,61 +83,62 @@ requestpolicy.menu = {
       this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
       this._strbundle = document.getElementById("requestpolicyStrings");
-      this._menu = document.getElementById("requestpolicyStatusbarPopup");
+      this._menu = document.getElementById("rp-popup");
+//      this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
-      this._blockedDestinationsBeforeReferenceItem = document
-          .getElementById("requestpolicyAllowedDestinationsSeparator");
-      this._allowedDestinationsBeforeReferenceItem = document
-          .getElementById("requestpolicyOriginSubmenusSeparator");
-
-      this._blockedDestinationsHeadingMenuItem = document
-          .getElementById("requestpolicyBlockedDestinations");
-      this._allowedDestinationsHeadingMenuItem = document
-          .getElementById("requestpolicyAllowedDestinations");
-
-      this._itemPrefetchWarning = document
-          .getElementById("requestpolicyPrefetchWarning");
-      this._itemPrefetchWarningSeparator = document
-          .getElementById("requestpolicyPrefetchWarningSeparator");
-
-      this._extensionConflictWarning = document
-          .getElementById("requestpolicyExtensionConflictWarning");
-      this._extensionConflictWarningSeparator = document
-          .getElementById("requestpolicyExtensionConflictWarningSeparator");
-
-      this._itemOtherOrigins = document
-          .getElementById("requestpolicyOtherOrigins");
-      this._itemOtherOriginsPopup = document
-          .getElementById("requestpolicyOtherOriginsPopup");
-      this._itemOtherOriginsSeparator = document
-          .getElementById("requestpolicyOtherOriginsSeparator");
-
-      this._itemRevokeTemporaryPermissions = document
-          .getElementById("requestpolicyRevokeTemporaryPermissions");
-      this._itemRevokeTemporaryPermissionsSeparator = document
-          .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
-
-      this._itemAllowAllTemporarily = document
-          .getElementById("requestpolicyAllowAllTemporarily");
-
-      this._itemAllowOriginTemporarily = document
-          .getElementById("requestpolicyAllowOriginTemporarily");
-      this._itemAllowOrigin = document
-          .getElementById("requestpolicyAllowOrigin");
-      this._itemForbidOrigin = document
-          .getElementById("requestpolicyForbidOrigin");
-      this._itemUnrestrictedOrigin = document
-          .getElementById("requestpolicyUnrestrictedOrigin");
+//      this._blockedDestinationsBeforeReferenceItem = document
+//          .getElementById("requestpolicyAllowedDestinationsSeparator");
+//      this._allowedDestinationsBeforeReferenceItem = document
+//          .getElementById("requestpolicyOriginSubmenusSeparator");
+//
+//      this._blockedDestinationsHeadingMenuItem = document
+//          .getElementById("requestpolicyBlockedDestinations");
+//      this._allowedDestinationsHeadingMenuItem = document
+//          .getElementById("requestpolicyAllowedDestinations");
+//
+//      this._itemPrefetchWarning = document
+//          .getElementById("requestpolicyPrefetchWarning");
+//      this._itemPrefetchWarningSeparator = document
+//          .getElementById("requestpolicyPrefetchWarningSeparator");
+//
+//      this._extensionConflictWarning = document
+//          .getElementById("requestpolicyExtensionConflictWarning");
+//      this._extensionConflictWarningSeparator = document
+//          .getElementById("requestpolicyExtensionConflictWarningSeparator");
+//
+//      this._itemOtherOrigins = document
+//          .getElementById("requestpolicyOtherOrigins");
+//      this._itemOtherOriginsPopup = document
+//          .getElementById("requestpolicyOtherOriginsPopup");
+//      this._itemOtherOriginsSeparator = document
+//          .getElementById("requestpolicyOtherOriginsSeparator");
+//
+//      this._itemRevokeTemporaryPermissions = document
+//          .getElementById("requestpolicyRevokeTemporaryPermissions");
+//      this._itemRevokeTemporaryPermissionsSeparator = document
+//          .getElementById("requestpolicyRevokeTemporaryPermissionsSeparator");
+//
+//      this._itemAllowAllTemporarily = document
+//          .getElementById("requestpolicyAllowAllTemporarily");
+//
+//      this._itemAllowOriginTemporarily = document
+//          .getElementById("requestpolicyAllowOriginTemporarily");
+//      this._itemAllowOrigin = document
+//          .getElementById("requestpolicyAllowOrigin");
+//      this._itemForbidOrigin = document
+//          .getElementById("requestpolicyForbidOrigin");
+//      this._itemUnrestrictedOrigin = document
+//          .getElementById("requestpolicyUnrestrictedOrigin");
 
       var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
-      if (!hideConflictInfo) {
-        this._extensionConflictWarning.setAttribute("label",
-            this._strbundle.getFormattedString("extensionConflictWarning",
-                [conflictCount]));
-      }
-      this._extensionConflictWarning.hidden = hideConflictInfo;
-      this._extensionConflictWarningSeparator.hidden = hideConflictInfo;
+//      if (!hideConflictInfo) {
+//        this._extensionConflictWarning.setAttribute("label",
+//            this._strbundle.getFormattedString("extensionConflictWarning",
+//                [conflictCount]));
+//      }
+//      this._extensionConflictWarning.hidden = hideConflictInfo;
+//      this._extensionConflictWarningSeparator.hidden = hideConflictInfo;
     }
   },
 
@@ -183,26 +184,26 @@ requestpolicy.menu = {
       otherOriginsReqSet.print("otherOriginsReqSet");
       //requestpolicy.mod.RequestUtil.dumpOtherOrigins(otherOrigins);
 
-      // Initially make all menu items hidden.
-      this._itemRevokeTemporaryPermissions.hidden = true;
-      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
-      this._itemAllowOriginTemporarily.hidden = true;
-      this._itemAllowOrigin.hidden = true;
-      this._itemForbidOrigin.hidden = true;
-      this._itemUnrestrictedOrigin.hidden = true;
-      this._itemOtherOrigins.hidden = true;
-      this._itemOtherOriginsSeparator.hidden = true;
-
-      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
-      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
-      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
-
-      if (isChromeUri) {
-        this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
-                .getFormattedString("unrestrictedOrigin", ["chrome://"]));
-        this._itemUnrestrictedOrigin.hidden = false;
-        return;
-      }
+//      // Initially make all menu items hidden.
+//      this._itemRevokeTemporaryPermissions.hidden = true;
+//      this._itemRevokeTemporaryPermissionsSeparator.hidden = true;
+//      this._itemAllowOriginTemporarily.hidden = true;
+//      this._itemAllowOrigin.hidden = true;
+//      this._itemForbidOrigin.hidden = true;
+//      this._itemUnrestrictedOrigin.hidden = true;
+//      this._itemOtherOrigins.hidden = true;
+//      this._itemOtherOriginsSeparator.hidden = true;
+//
+//      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
+//      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
+//      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
+//
+//      if (isChromeUri) {
+//        this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
+//                .getFormattedString("unrestrictedOrigin", ["chrome://"]));
+//        this._itemUnrestrictedOrigin.hidden = false;
+//        return;
+//      }
 
       try {
         var currentBaseDomain = requestpolicy.mod.DomainUtil.getDomain(
@@ -214,53 +215,53 @@ requestpolicy.menu = {
         return;
       }
 
-      // Set all labels here for convenience, even though we won't display some
-      // of these menu items.
-      this._itemForbidOrigin.setAttribute("label", this._strbundle
-              .getFormattedString("forbidOrigin", [currentIdentifier]));
-      this._itemAllowOriginTemporarily.setAttribute("label",
-          this._strbundle.getFormattedString("allowOriginTemporarily",
-              [currentIdentifier]));
-      this._itemAllowOrigin.setAttribute("label", this._strbundle
-              .getFormattedString("allowOrigin", [currentIdentifier]));
-
-      var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
-          && !this._rpService.prefs
-              .getBoolPref("privateBrowsingPermanentWhitelisting");
-
-      if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
-        this._itemForbidOrigin.hidden = false;
-      } else if (this._rpService.isAllowedOrigin(currentIdentifier)) {
-        this._itemForbidOrigin.hidden = false;
-      } else {
-        this._itemAllowOriginTemporarily.hidden = false;
-        this._itemAllowOrigin.hidden = privateBrowsingEnabled;
-      }
-
-      if (this._rpService.areTemporaryPermissionsGranted()) {
-        this._itemRevokeTemporaryPermissions.hidden = false;
-        this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
-      }
-
-      // Remove old menu items.
-      for (var i in this.addedMenuItems) {
-        this._menu.removeChild(this.addedMenuItems[i]);
-      }
-      this.addedMenuItems = [];
-
-      this._clearBlockedDestinations();
-      this._clearAllowedDestinations();
+//      // Set all labels here for convenience, even though we won't display some
+//      // of these menu items.
+//      this._itemForbidOrigin.setAttribute("label", this._strbundle
+//              .getFormattedString("forbidOrigin", [currentIdentifier]));
+//      this._itemAllowOriginTemporarily.setAttribute("label",
+//          this._strbundle.getFormattedString("allowOriginTemporarily",
+//              [currentIdentifier]));
+//      this._itemAllowOrigin.setAttribute("label", this._strbundle
+//              .getFormattedString("allowOrigin", [currentIdentifier]));
+//
+//      var privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
+//          && !this._rpService.prefs
+//              .getBoolPref("privateBrowsingPermanentWhitelisting");
+//
+//      if (this._rpService.isTemporarilyAllowedOrigin(currentIdentifier)) {
+//        this._itemForbidOrigin.hidden = false;
+//      } else if (this._rpService.isAllowedOrigin(currentIdentifier)) {
+//        this._itemForbidOrigin.hidden = false;
+//      } else {
+//        this._itemAllowOriginTemporarily.hidden = false;
+//        this._itemAllowOrigin.hidden = privateBrowsingEnabled;
+//      }
+//
+//      if (this._rpService.areTemporaryPermissionsGranted()) {
+//        this._itemRevokeTemporaryPermissions.hidden = false;
+//        this._itemRevokeTemporaryPermissionsSeparator.hidden = false;
+//      }
+//
+//      // Remove old menu items.
+//      for (var i in this.addedMenuItems) {
+//        this._menu.removeChild(this.addedMenuItems[i]);
+//      }
+//      this.addedMenuItems = [];
+//
+//      this._clearBlockedDestinations();
+//      this._clearAllowedDestinations();
           
-      // Add menu items for rejected dests, allowed dests, and other origins.
-      
-      this._addRejectedRequests(this._menu, currentUri, currentUriObj, currentIdentifier,
-            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
-
-      this._addAllowedRequests(this._menu, currentUri, currentUriObj, currentIdentifier,
-            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
-
-      this._addOtherOrigins(currentUri, currentUriObj, currentIdentifier,
-            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
+//      // Add menu items for rejected dests, allowed dests, and other origins.
+//
+//      this._addRejectedRequests(this._menu, currentUri, currentUriObj, currentIdentifier,
+//            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
+//
+//      this._addAllowedRequests(this._menu, currentUri, currentUriObj, currentIdentifier,
+//            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
+//
+//      this._addOtherOrigins(currentUri, currentUriObj, currentIdentifier,
+//            otherOrigins, privateBrowsingEnabled, currentBaseDomain);
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,

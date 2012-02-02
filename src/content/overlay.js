@@ -122,7 +122,7 @@ requestpolicy.overlay = {
         this._rpServiceJSObject = this._rpService.wrappedJSObject;
 
         this._strbundle = document.getElementById("requestpolicyStrings");
-        this._menu = document.getElementById("requestpolicyStatusbarPopup");
+        this._menu = document.getElementById("rp-popup");
 
         this._statusbar = document.getElementById("status-bar");
         this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
@@ -382,15 +382,15 @@ requestpolicy.overlay = {
 
       // Add an event listener for when the contentAreaContextMenu (generally
       // the right-click menu within the document) is shown.
-      var contextMenu = document.getElementById("contentAreaContextMenu");
-      if (contextMenu) {
-        contextMenu.addEventListener("popupshowing",
-            this._contextMenuOnPopupShowing, false);
-      }
+      //var contextMenu = document.getElementById("contentAreaContextMenu");
+      //if (contextMenu) {
+      //  contextMenu.addEventListener("popupshowing",
+      //      this._contextMenuOnPopupShowing, false);
+      //}
 
       // We consider the default place for the popup to be attached to the
       // context menu, so attach it there.
-      this._attachPopupToContextMenu();
+      //this._attachPopupToContextMenu();
 
       // Listen for the user changing tab so we can update any notification or
       // indication of blocked requests.
@@ -403,7 +403,7 @@ requestpolicy.overlay = {
         this._addLocationObserver();
         this._addHistoryObserver();
       }
-      this._showInitialSetupDialog();
+      //this._showInitialSetupDialog();
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -808,7 +808,7 @@ requestpolicy.overlay = {
    */
   _setPermissiveNotification : function(isPermissive) {
     this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
-    requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
+    //requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
     if (!this._isFennec) {
       this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
       this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
@@ -1040,7 +1040,7 @@ requestpolicy.overlay = {
    */
   _contextMenuOnPopupShowing : function() {
     requestpolicy.overlay._wrapOpenLink();
-    requestpolicy.overlay._attachPopupToContextMenu();
+    /*requestpolicy.overlay._attachPopupToContextMenu();*/
   },
 
   /**
@@ -1051,7 +1051,7 @@ requestpolicy.overlay = {
     if (event.currentTarget != event.originalTarget) {
       return;
     }
-    requestpolicy.overlay._attachPopupToStatusbar();
+    /*requestpolicy.overlay._attachPopupToStatusbar();*/
   },
 
   /**
@@ -1274,7 +1274,7 @@ requestpolicy.overlay = {
    * @param {Event}
    *          event
    */
-  onMenuShowing : function(event) {
+  onPopupShowing : function(event) {
     if (event.currentTarget != event.originalTarget) {
       return;
     }
@@ -1287,13 +1287,13 @@ requestpolicy.overlay = {
    * @param {Event}
    *          event
    */
-  onMenuHidden : function(event) {
+  onPopupHiding : function(event) {
     if (event.currentTarget != event.originalTarget) {
       return;
     }
-    // Leave the popup attached to the context menu, as we consdier that the
+    // Leave the popup attached to the context menu, as we consider that the
     // default location for it.
-    this._attachPopupToContextMenu();
+    //this._attachPopupToContextMenu();
   },
 
   /**
@@ -1618,8 +1618,8 @@ requestpolicy.overlay = {
   },
 
   openToolbarPopup : function(anchor) {
-    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
-        null);
+//    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
+//        null);
     this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
   },
 

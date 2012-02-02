@@ -40,9 +40,10 @@
       label="RequestPolicy"
       tooltiptext="RequestPolicy"
       type="menu-button"
-      oncontextmenu="event.preventDefault();"
-      onclick="requestpolicy.overlay.openToolbarPopup(this)" />
+      popup="rp-popup" />
   </toolbarpalette>
+    <!-- oncontextmenu="event.preventDefault();" -->
+    <!-- onclick="requestpolicy.overlay.openToolbarPopup(this)" -->
 
   <menupopup id="contentAreaContextMenu">
     <menu
@@ -62,20 +63,71 @@
     </statusbarpanel>
   </statusbar>
 
-  <!-- Fennec -->
-  <toolbar id="toolbar-main">
-    <toolbarbutton id="requestpolicyStatusbar"
-      class="requestpolicyFennec"
-      label="RequestPolicy"
-      buttonstyle="pictures"
-      insertafter="tool-bookmarks"
-      popup="requestpolicyStatusbarPopup"
-      />
-  </toolbar>
-
   <popupset>
     <menupopup id="requestpolicyRedirectNotificationOptions" />
 
+    <menupopup id="rp-popup" noautohide="true" position="after_start"
+               onpopupshowing="requestpolicy.overlay.onPopupShowing(event);"
+               onpopuphiding="requestpolicy.overlay.onPopupHiding(event);">
+      <vbox id="rp-contents">
+        <hbox id="rp-main">
+          <vbox id="rp-origins-destinations">
+            <label id="rp-origin" class="rp-od-item" value="foo.com" />
+            <vbox id="rp-other-origins">
+              <label id="rp-other-origins-label" value="Other origins" />
+              <vbox class="rp-label-list">
+                <label value="bbc.img.co.uk" class="rp-od-item" />
+              </vbox>
+            </vbox>
+            <vbox id="rp-blocked-destinations">
+              <label id="rp-blocked-destinations-label" value="Blocked destinations" />
+              <vbox class="rp-label-list">
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+              </vbox>
+            </vbox>
+            <vbox id="rp-allowed-destinations">
+              <label id="rp-allowed-destinations-label" value="Allowed destinations" />
+              <vbox class="rp-label-list">
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+                <label value="bbci.co.uk" class="rp-od-item" />
+              </vbox>
+            </vbox>
+          </vbox>
+          <vbox id="rp-details">
+            <vbox id="rp-rule-options">
+              <label value="Allow requests from bbc.co.uk to doubleclick.net" />
+              <label value="Allow requests from * to doubleclick.net" />
+              <label id="rp-rule-options-more" value="+ more options" />
+            </vbox>
+            <vbox id="rp-request-info">
+              <label value="Blocked images: 13" />
+              <label value="Blocked stylesheets: 2" />
+              <label value="Blocked frames: 1" />
+              <label value="Blocked scripts: 5" />
+            </vbox>
+          </vbox>
+        </hbox>
+        <hbox id="rp-footer">
+          <hbox id="rp-footer-links">
+            <label id="rp-link-prefs" class="rp-footer-link"
+                   value="&preferences;"
+                   onclick="requestpolicy.overlay.openPrefs(event);"/>
+            <label id="rp-link-help" class="rp-footer-link"
+                   value="Help"
+                   onclick="requestpolicy.overlay.openHelp(event);"/>
+          </hbox>
+        </hbox>
+      </vbox>
+    </menupopup>
+
+<!--
     <menupopup
       id="requestpolicyStatusbarPopup"
       onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
@@ -166,6 +218,8 @@
       <menuitem
         id="requestpolicyUnrestrictedOrigin" />
     </menupopup>
+-->
+
   </popupset>
 
   <vbox id="appcontent">

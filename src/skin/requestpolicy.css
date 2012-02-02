@@ -147,6 +147,10 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   border-bottom-left-radius: 3px;
 }
 */
+#rp-origins-destinations [selected-origin="true"] {
+  border: 1px solid #ddd !important;
+  background-color: #eee;
+}
 #rp-origins-destinations .rp-od-item {
   border: 1px solid #ffffff;
   padding: 2px 12px 2px 12px;
@@ -163,11 +167,6 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   font-size: 1.2em;
   color : #555;
   padding-right: 10px;
-}
-#rp-origin {
-  border: 1px solid #ddd !important;
-  /*border-color: #eee !important;*/
-  background-color: #eee;
 }
 
 .rp-label-list {

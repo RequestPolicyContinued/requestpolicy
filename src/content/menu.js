@@ -45,6 +45,7 @@ requestpolicy.menu = {
   addedMenuItems : [],
   _menu : null,
 
+  _originItem : null,
   _otherOriginsList : null,
   _blockedDestinationsList : null,
   _allowedDestinationsList : null,
@@ -59,8 +60,8 @@ requestpolicy.menu = {
 
       this._strbundle = document.getElementById("requestpolicyStrings");
       this._menu = document.getElementById("rp-popup");
-//      this._menu = document.getElementById("requestpolicyStatusbarPopup");
 
+      this._originItem = document.getElementById("rp-origin");
       this._otherOriginsList = document.getElementById("rp-other-origins-list");
       this._blockedDestinationsList = document
             .getElementById("rp-blocked-destinations-list");
@@ -72,55 +73,59 @@ requestpolicy.menu = {
     }
   },
 
-  /**
-   * Prepares the statusbar menu based on the user's settings and the current
-   * document.
-   */
   prepareMenu : function() {
     try {
-      var currentIdentifier = requestpolicy.overlay
-          .getTopLevelDocumentUriIdentifier();
-      var currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(
-          requestpolicy.overlay.getTopLevelDocumentUri());
+      this._currentIdentifier = requestpolicy.overlay
+        .getTopLevelDocumentUriIdentifier();
+      this._currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(
+        requestpolicy.overlay.getTopLevelDocumentUri());
+      this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
+      this._isChromeUri = this._currentUriObj.scheme == "chrome";
 
-      var currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
-      var isChromeUri = currentUriObj.scheme == "chrome";
-
-      var self = this;
-      function populateList(list, values) {
-        self._removeChildren(list);
-        for (var i in values) {
-          self._addListItem(list, 'rp-od-item', values[i]);
-        }
-      }
-
-      populateList(this._otherOriginsList, this._getOtherOrigins());
-      populateList(this._allowedDestinationsList, this._getAllowedDestinations());
-      populateList(this._blockedDestinationsList, this._getBlockedDestinations());
+      this._populateOrigin();
+      this._populateOtherOrigins();
+      this._activateOriginItem(this._originItem);
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-          "Fatal Error, " + e + ", stack was: " + e.stack);
+                                      "Fatal Error, " + e + ", stack was: " + e.stack);
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-          "Unable to prepare menu due to error.");
+                                      "Unable to prepare menu due to error.");
       throw e;
     }
-
   },
 
-  _getBlockedDestinations : function(currentUri, currentUriObj,
-        currentIdentifier, currentBaseDomain) {
-    return ['foo.com', 'bar.com'];
+  _populateList : function(list, values) {
+    this._removeChildren(list);
+    for (var i in values) {
+      this._addListItem(list, 'rp-od-item', values[i]);
+    }
+    this._disableIfNoChildren(list);
   },
 
-  _getAllowedDestinations : function(currentUri, currentUriObj,
-                                     currentIdentifier, currentBaseDomain) {
-    return ['yaz.com', 'example.com'];
+  _populateOrigin : function() {
+    this._originItem.setAttribute('value', 'foo.com');
   },
 
-  _getOtherOrigins : function(currentUri, currentUriObj,
-                              currentIdentifier, currentBaseDomain) {
-    return ['otherorigin.com'];
+  _populateOtherOrigins : function() {
+    this._populateList(this._otherOriginsList, this._getOtherOrigins());
+  },
+
+  _populateDestinations : function(originIdentifier) {
+    this._populateList(this._allowedDestinationsList, this._getAllowedDestinations());
+    this._populateList(this._blockedDestinationsList, this._getBlockedDestinations());
+  },
+
+  _getBlockedDestinations : function() {
+    return ['foo.com', 'bar.com', Math.random()];
+  },
+
+  _getAllowedDestinations : function() {
+    return ['yaz.com', 'example.com', Math.random()];
+  },
+
+  _getOtherOrigins : function() {
+    return ['otherorigin.com', Math.random()];
   },
 
   _removeChildren : function(el) {
@@ -133,7 +138,41 @@ requestpolicy.menu = {
     var item = document.createElement("label");
     item.setAttribute("value", value);
     item.setAttribute("class", cssClass);
+    item.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
     list.insertBefore(item, null);
+  },
+
+  _disableIfNoChildren : function(el) {
+    // TODO: this isn't working.
+    el.disabled = el.firstChild ? false : true;
+  },
+
+  _activateOriginItem : function(item) {
+    var value = item.value;
+
+    // Unset all selected-origin attribute which is used by our CSS.
+    this._originItem.setAttribute('selected-origin', '');
+    for (var i = 0; i < this._otherOriginsList.childNodes.length; i++) {
+      var child = this._otherOriginsList.childNodes[i];
+      child.setAttribute('selected-origin', '');
+    }
+    // Now set selected-origin for the one which has been selected.
+    item.setAttribute('selected-origin', 'true');
+
+    this._populateDestinations();
+  },
+
+  itemSelected : function(event) {
+    var item = event.target;
+    if (item.id == 'rp-origin' || item.parentNode.id == 'rp-other-origins-list') {
+      this._activateOriginItem(item);
+    } else if (item.parentNode.id == 'rp-allowed-destinations-list') {
+      // TODO
+    } else if (item.parentNode.id == 'rp-blocked-destinations-list') {
+      // TODO
+    } else {
+      throw "Hulk confused."
+    }
   },
 
 }

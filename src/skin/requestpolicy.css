@@ -128,11 +128,8 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 #rp-contents {
   background-color: #ffffff;
-  width: 600px;
 }
 #rp-main {
-  width: 100%;
-  font-size: 0.9em;
   padding: 10px 10px 10px 10px;
 }
 
@@ -143,12 +140,14 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 #rp-origins-destinations .rp-od-item {
   border: 1px solid #ffffff;
   border-right: 0;
-  padding: 2px 0 2px 5px;
+  padding: 2px 0 2px 8px;
   margin: 0;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 #rp-origins-destinations .rp-od-item:hover {
-  border-color: #eee;
-  background-color: #fafafa;
+  border-color: #dadada;
+  background-color: #f6f6f6;
 }
 
 #rp-origin {
@@ -157,7 +156,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   padding-right: 10px;
 }
 #rp-origin {
-  border: 1px solid #ffffff;
+  border: 1px solid #eee !important;
   /*border-color: #eee !important;*/
   background-color: #eee;
 }
@@ -166,10 +165,10 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   margin-left : 1em;
 }
 #rp-other-origins {
-  color: #666;
+  color: #444;
   margin-top: 1em;
 }
-#rp-other-origins-label {
+#rp-other-origins-title {
   color: #aaa;
 }
 
@@ -177,7 +176,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   color: #844;
   margin-top: 1em;
 }
-#rp-blocked-destinations-label {
+#rp-blocked-destinations-title {
   color: #caa;
 }
 
@@ -185,7 +184,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   color: #484;
   margin-top: 1em;
 }
-#rp-allowed-destinations-label {
+#rp-allowed-destinations-title {
   color: #aca;
 }
 
@@ -193,7 +192,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   padding: 1em;
   border: 1px solid #eee;
   background-color: #f9f9f9;
-  width: 100%;
+  width: 500px !important;
 }
 
 #rp-footer {
@@ -202,13 +201,16 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 #rp-footer-links {
   margin-top: 4px;
+  margin-left: 570px;
 }
 .rp-footer-link {
-  color: #8f8f8f;
+  color: #888;
   font-size: 11px;
+  margin-left: 20px;
 }
 .rp-footer-link:hover {
-  color: #3073c5;
+  color: #555;
+  text-decoration: underline;
   cursor: pointer;
 }
 

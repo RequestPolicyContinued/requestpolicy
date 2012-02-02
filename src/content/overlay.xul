@@ -74,13 +74,13 @@
           <vbox id="rp-origins-destinations">
             <label id="rp-origin" class="rp-od-item" value="foo.com" />
             <vbox id="rp-other-origins">
-              <label id="rp-other-origins-label" value="Other origins" />
+              <label id="rp-other-origins-title" value="Other origins" />
               <vbox class="rp-label-list">
                 <label value="bbc.img.co.uk" class="rp-od-item" />
               </vbox>
             </vbox>
             <vbox id="rp-blocked-destinations">
-              <label id="rp-blocked-destinations-label" value="Blocked destinations" />
+              <label id="rp-blocked-destinations-title" value="Blocked destinations" />
               <vbox class="rp-label-list">
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />
@@ -90,7 +90,7 @@
               </vbox>
             </vbox>
             <vbox id="rp-allowed-destinations">
-              <label id="rp-allowed-destinations-label" value="Allowed destinations" />
+              <label id="rp-allowed-destinations-title" value="Allowed destinations" />
               <vbox class="rp-label-list">
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />

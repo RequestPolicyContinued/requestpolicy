@@ -33,6 +33,7 @@
 
   <script type="application/x-javascript" src="overlay.js" />
   <script type="application/x-javascript" src="menu.js" />
+  <script type="application/x-javascript" src="test.js" />
 
   <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton id="requestpolicyToolbarButton"
@@ -75,13 +76,13 @@
             <label id="rp-origin" class="rp-od-item" value="foo.com" />
             <vbox id="rp-other-origins">
               <label id="rp-other-origins-title" value="Other origins" />
-              <vbox class="rp-label-list">
+              <vbox id="rp-other-origins-list" class="rp-label-list">
                 <label value="bbc.img.co.uk" class="rp-od-item" />
               </vbox>
             </vbox>
             <vbox id="rp-blocked-destinations">
               <label id="rp-blocked-destinations-title" value="Blocked destinations" />
-              <vbox class="rp-label-list">
+              <vbox id="rp-blocked-destinations-list" class="rp-label-list">
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />
@@ -91,7 +92,7 @@
             </vbox>
             <vbox id="rp-allowed-destinations">
               <label id="rp-allowed-destinations-title" value="Allowed destinations" />
-              <vbox class="rp-label-list">
+              <vbox id="rp-allowed-destinations-list" class="rp-label-list">
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />
                 <label value="bbci.co.uk" class="rp-od-item" />
@@ -107,10 +108,6 @@
               <label id="rp-rule-options-more" value="+ more options" />
             </vbox>
             <vbox id="rp-request-info">
-              <label value="Blocked images: 13" />
-              <label value="Blocked stylesheets: 2" />
-              <label value="Blocked frames: 1" />
-              <label value="Blocked scripts: 5" />
             </vbox>
           </vbox>
         </hbox>
@@ -120,8 +117,8 @@
                    value="&preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
             <label id="rp-link-help" class="rp-footer-link"
-                   value="Help"
-                   onclick="requestpolicy.overlay.openHelp(event);"/>
+                   value="&requestLog.title;"
+                   onclick="requestpolicy.overlay.openRequestLog(event);"/>
           </hbox>
         </hbox>
       </vbox>

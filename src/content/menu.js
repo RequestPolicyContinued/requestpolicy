@@ -276,17 +276,19 @@ requestpolicy.menu = {
                item.parentNode.id == 'rp-blocked-destinations-list' ||
                item.parentNode.id == 'rp-allowed-destinations-list') {
       this._activateDestinationItem(item);
-    } else if (item.parentNode.id == 'rp-rule-options') {
+    } else if (item.parentNode.id == 'rp-rule-options' ||
+               item.parentNode.id == 'rp-rules-remove' ||
+               item.parentNode.id == 'rp-rules-add') {
       this._processRuleSelection(item);
     } else {
-      throw 'Hulk confused';
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+            'Unable to figure out which item type was selected.');
     }
   },
 
   _processRuleSelection : function(item) {
     var ruleData = item.requestpolicyRuleData;
     var ruleAction = item.requestpolicyRuleAction;
-    var ruleTemporary = item.requestpolicyRuleTemporary;
 
     if (!ruleData) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -300,7 +302,6 @@ requestpolicy.menu = {
     }
     requestpolicy.mod.Logger.dump("ruleData: " + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     requestpolicy.mod.Logger.dump("ruleAction: " + ruleAction);
-    requestpolicy.mod.Logger.dump("ruleTemporary: " + ruleTemporary);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
@@ -316,15 +317,15 @@ requestpolicy.menu = {
     // TODO: we're going to have more than two types of actions. They should be
     // constants and are probably the following:
     // * allow
+    // * allow-temp
     // * stop-allow
     // * forbid
+    // * forbid-temp
     // * stop-forbid
     if (ruleAction == 'allow') {
-      if (ruleTemporary == 'true') {
+      requestpolicy.overlay.addAllowRule(ruleData);
+    } else if (ruleAction == 'allow-temp') {
         requestpolicy.overlay.addTemporaryAllowRule(ruleData);
-      } else {
-        requestpolicy.overlay.addAllowRule(ruleData);
-      }
     } else if (ruleAction == 'stop-allow') {
       requestpolicy.overlay.removeAllowRule(ruleData);
     } else {
@@ -482,9 +483,8 @@ requestpolicy.menu = {
     var label = this._strbundle.getFormattedString(
       "allowOriginTemporarily", [originHost]);
     var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleTemporary = true;
     item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow';
+    item.requestpolicyRuleAction = 'allow-temp';
     //var statustext = destHost; // TODO
     item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
     return item;
@@ -496,9 +496,8 @@ requestpolicy.menu = {
     var label = this._strbundle.getFormattedString(
       "allowOriginToDestinationTemporarily", [originHost, destHost]);
     var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleTemporary = true;
     item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow';
+    item.requestpolicyRuleAction = 'allow-temp';
     //var statustext = destHost; // TODO
     item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
     return item;
@@ -607,7 +606,7 @@ requestpolicy.menu = {
     //var statustext = ""; // TODO
     var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
     item.requestpolicyRuleData = rawRule;
-    item.requestpolicyRuleAction = 'revoke-allow';
+    item.requestpolicyRuleAction = 'stop-allow';
     // Take an argument to the current function that specifies whether this
     // is only a temporary rule.
     //item.setAttribute("class", "requestpolicyTemporary");

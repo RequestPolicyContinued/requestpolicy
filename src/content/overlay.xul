@@ -92,8 +92,14 @@
             </vbox>
           </vbox>
           <vbox id="rp-details">
-            <vbox id="rp-rule-options">
-              <label value="Allow requests from bbc.co.uk to doubleclick.net" class="rp-od-item" />
+            <vbox id="rp-rules-remove">
+              <label value="Stop allowing requests from bbc.co.uk to foo.net" class="rp-od-item" />
+            </vbox>
+            <vbox id="rp-rules-add">
+              <hbox>
+                <label value="Allow requests from bbc.co.uk to doubleclick.net" class="rp-od-item" />
+                <label value="Allow temporarily" class="rp-od-item rp-temporary" />
+              </hbox>
               <label value="Allow requests from * to doubleclick.net" class="rp-od-item" />
             </vbox>
             <!--

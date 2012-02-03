@@ -49,7 +49,8 @@ requestpolicy.menu = {
   _otherOriginsList : null,
   _blockedDestinationsList : null,
   _allowedDestinationsList : null,
-  _ruleOptionsList : null,
+  _removeRulesList : null,
+  _addRulesList : null,
 
   init : function() {
     if (this._initialized == false) {
@@ -68,7 +69,8 @@ requestpolicy.menu = {
             .getElementById("rp-blocked-destinations-list");
       this._allowedDestinationsList = document
             .getElementById("rp-allowed-destinations-list");
-      this._ruleOptionsList = document.getElementById("rp-rule-options");
+      this._addRulesList = document.getElementById("rp-rules-add");
+      this._removeRulesList = document.getElementById("rp-rules-remove");
 
       var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
@@ -169,20 +171,24 @@ requestpolicy.menu = {
   _populateDetails : function() {
     var origin = this._currentlySelectedOrigin;
     var dest = this._currentlySelectedDest;
-    var list = this._ruleOptionsList;
-    this._removeChildren(list);
+    this._removeChildren(this._removeRulesList);
+    this._removeChildren(this._addRulesList);
 
     var ruleData = {
       'o' : {
         'h' : this._addWildcard(origin)
       }
     };
+
+    // Note: in PBR we'll need to still use the old string for the temporary
+    // rule. We won't be able to use just "allow temporarily".
+
     if (!this._privateBrowsingEnabled) {
       var item = this._addMenuItemAllowOrigin(
-            this._ruleOptionsList, ruleData);
+            this._addRulesList, ruleData);
     }
     var item = this._addMenuItemTemporarilyAllowOrigin(
-          this._ruleOptionsList, ruleData);
+          this._addRulesList, ruleData);
 
     if (dest) {
       ruleData['d'] = {
@@ -190,13 +196,13 @@ requestpolicy.menu = {
       };
       if (!this._privateBrowsingEnabled) {
         var item = this._addMenuItemAllowOriginToDest(
-              this._ruleOptionsList, ruleData);
+              this._addRulesList, ruleData);
       }
       var item = this._addMenuItemTemporarilyAllowOriginToDest(
-            this._ruleOptionsList, ruleData);
+            this._addRulesList, ruleData);
     }
 
-    this._populateDetailsRemoveAllowRules(list);
+    this._populateDetailsRemoveAllowRules(this._removeRulesList);
   },
 
   _removeChildren : function(el) {
@@ -310,16 +316,16 @@ requestpolicy.menu = {
     // TODO: we're going to have more than two types of actions. They should be
     // constants and are probably the following:
     // * allow
-    // * revoke-allow (or maybe remove-allow-rule for consistency of using "remove")
+    // * stop-allow
     // * forbid
-    // * revoke-forbid
+    // * stop-forbid
     if (ruleAction == 'allow') {
       if (ruleTemporary == 'true') {
         requestpolicy.overlay.addTemporaryAllowRule(ruleData);
       } else {
         requestpolicy.overlay.addAllowRule(ruleData);
       }
-    } else if (ruleAction == 'revoke-allow') {
+    } else if (ruleAction == 'stop-allow') {
       requestpolicy.overlay.removeAllowRule(ruleData);
     } else {
       throw 'action not implemented: ' + ruleAction;
@@ -427,9 +433,9 @@ requestpolicy.menu = {
       "forbidOrigin", [originHost]);
     var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'forbid';
+    item.requestpolicyRuleAction = 'stop-allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
+    item.setAttribute("class", "rp-od-item rp-stop-allow");
     return item;
   },
 
@@ -440,9 +446,9 @@ requestpolicy.menu = {
       "forbidOriginToDestination", [originHost, destHost]);
     var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'forbid';
+    item.requestpolicyRuleAction = 'stop-allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
+    item.setAttribute("class", "rp-od-item rp-stop-allow");
     return item;
   },
 
@@ -454,7 +460,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
+    item.setAttribute("class", "rp-od-item rp-allow");
     return item;
   },
 
@@ -467,7 +473,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
+    item.setAttribute("class", "rp-od-item rp-allow");
     return item;
   },
 
@@ -480,8 +486,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
-    item.setAttribute("class", "rp-od-item requestpolicyTemporary");
+    item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
     return item;
   },
 
@@ -495,8 +500,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
-    // TODO: set a cssClass
-    item.setAttribute("class", "rp-od-item requestpolicyTemporary");
+    item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
     return item;
   },
 
@@ -601,7 +605,7 @@ requestpolicy.menu = {
 
     //var command = "requestpolicy.overlay.removeAllowRule(event);";
     //var statustext = ""; // TODO
-    var item = this._addListItem(this._ruleOptionsList, 'rp-od-item', label);
+    var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
     item.requestpolicyRuleData = rawRule;
     item.requestpolicyRuleAction = 'revoke-allow';
     // Take an argument to the current function that specifies whether this

@@ -136,6 +136,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 
 #rp-origins-destinations {
   width : 200px;
+  margin-right: 10px;
 }
 
 /*
@@ -151,7 +152,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 .rp-od-item {
   border: 1px solid #ffffff;
   padding: 2px 12px 2px 12px;
-  margin: 0px 12px 0px 4px;
+  margin: 0px 4px 0px 4px;
   border-radius: 3px;
 }
 .rp-od-item:hover {
@@ -185,9 +186,21 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   background-color: #f1fff1;
 }
 
-#rp-rule-options .rp-od-item:hover {
-  border-color: #ddd !important;
-  background-color: #eee;
+#rp-details .rp-od-item:hover {
+  border-color: #eee !important;
+  background-color: #f1f1f1;
+}
+#rp-details .rp-allow {
+  color: #373;
+}
+#rp-details .rp-temporary {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #999;
+}
+
+#rp-rules-remove label:last-child {
+  margin-bottom: 14px;
 }
 
 #rp-origin {
@@ -224,7 +237,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 
 #rp-details {
-  padding: 1em;
+  padding: 0 1em 0 1em;
   border-left: 1px solid #eee;
   width: 500px !important;
 }

@@ -191,7 +191,8 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   background-color: #f1f1f1;
 }
 #rp-details .rp-allow {
-  color: #373;
+  /* This should probably stay the same color as the allowed destinations. */
+  color: #484;
 }
 #rp-details .rp-temporary {
   font-style: italic;

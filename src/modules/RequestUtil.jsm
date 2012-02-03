@@ -45,11 +45,9 @@ function getBaseDomain(uri) {
 }
 
 function RequestSet() {
-  //this._uriObjects = {};
   this._origins = {};
 }
 RequestSet.prototype = {
-  //_uriObjects : null,
   _origins : null,
   
   print : function(name) {
@@ -194,12 +192,6 @@ RequestSet.prototype = {
 
 var RequestUtil = {
 
-  // _rpService : Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-  //     .getService(Components.interfaces.nsIRequestPolicy),
-  // 
-  // _rpServiceJSObject : Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-  //     .getService(Components.interfaces.nsIRequestPolicy).wrappedJSObject,
-
   setRPService : function (rpService) {
     this._rpServiceJSObject = rpService;
   },
@@ -210,27 +202,14 @@ var RequestUtil = {
   getDirectRejectedRequests : function(currentUri) {
     // Let's try this: returning the same data structure we already have.
     return this._rpServiceJSObject._rejectedRequests.getOriginUri(currentUri);
-    // var rejectedRequests = {};
-    // var rr = this._rpServiceJSObject._rejectedRequests.getOriginUri(currentUri);
-    // for (var destBaseDomain in rr) {
-    //   for (var destIdent in rr[destBaseDomain]) {
-    //     for (var destUri in rr[destBaseDomain][destIdent]) {
-    //       rejectedRequests[destUri] = rr[destBaseDomain][destIdent][destUri];
-    //     }
-    //   }
-    // }
-    // return rejectedRequests;
   },
 
   _getRequestsHelper : function(currentUri, curIdent, otherOrigins, requests) {
     var result = new RequestSet();
-    //var result = {};
-    //var domainUtil = DomainUtil;
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
     for (var destBase in requests[currentUri]) {
-      //Logger.dump("test destBase: " + destBase);
       for (var destIdent in requests[currentUri][destBase]) {
         for (var destUri in requests[currentUri][destBase][destIdent]) {
           result.addRequest(currentUri, destUri,
@@ -238,21 +217,6 @@ var RequestUtil = {
         }
       }
     }
-    //     //result[ident] = true;
-    //     var baseDomain = domainUtil.getIdentifier(ident, domainUtil.LEVEL_DOMAIN);
-    //     if (!result[baseDomain]) {
-    //       result[baseDomain] = {};
-    //     }
-    //     for (var uri in requests[currentUri][ident]) {
-    //       //var fullIdent = domainUtil.getIdentifier(uri, domainUtil.LEVEL_SOP);
-    //       if (!result[baseDomain][ident]) {
-    //         result[baseDomain][ident] = {};
-    //       }
-    //       // This is the |CheckRequestResults| object.
-    //       result[baseDomain][ident][uri] = requests[currentUri][ident][uri];
-    //     }
-    //   }
-    // }
 
     // Add the rejected requests from other origins within this page that have
     // the same uriIdentifier as the current page.
@@ -276,85 +240,9 @@ var RequestUtil = {
         }
       }
     }
-        // if (originUri in requests) {
-        //   this.dumpRequestSet(requests[originUri],
-        //       "Requests of " + originUri);
-        //   for (var ident in requests[originUri]) {
-        //     var baseDomain = domainUtil.getIdentifier(ident, domainUtil.LEVEL_DOMAIN);
-        //     //result[ident] = true;
-        //     if (!result[baseDomain]) {
-        //       result[baseDomain] = {};
-        //     }
-        //     for (var uri in requests[originUri][ident]) {
-        //       //var fullIdent = domainUtil.getIdentifier(uri, domainUtil.LEVEL_SOP);
-        //       if (!result[baseDomain][ident]) {
-        //         result[baseDomain][ident] = {};
-        //       }
-        //       // TODO: do we really want to set to |true| here rather than populating
-        //       // with matched rules or something?
-        //       result[baseDomain][ident][uri] = true;
-        //     }
-        //   }
-        // }
-     // }
-    //}
+
     return result;
   },
-
-/*
-  _getRequestsHelper : function(currentUri, currentIdentifier, otherOrigins, requests) {
-    var result = {};
-    var domainUtil = DomainUtil;
-    
-    if (currentUri in requests) {
-      for (var ident in requests[currentUri]) {
-        //result[ident] = true;
-        if (!result[ident]) {
-          result[ident] = {};
-        }
-        for (var uri in requests[currentUri][ident]) {
-          if (uri == "count") {
-            continue;
-          }
-          var fullIdent = domainUtil.getIdentifier(uri, domainUtil.LEVEL_SOP);
-          if (!result[ident][fullIdent]) {
-            result[ident][fullIdent] = {};
-          }
-          // This is the |CheckRequestResults| object.
-          result[ident][fullIdent][uri] = requests[currentUri][ident][uri];
-        }
-      }
-    }
-
-    // Add the rejected requests from other origins within this page that have
-    // the same uriIdentifier as the current page.
-    if (currentIdentifier in otherOrigins) {
-      for (var originUri in otherOrigins[currentIdentifier]) {
-        if (originUri in requests) {
-          this.dumpRequestSet(requests[originUri],
-              "Requests of " + originUri);
-          for (var ident in requests[originUri]) {
-            //result[ident] = true;
-            if (!result[ident]) {
-              result[ident] = {};
-            }
-            for (var uri in requests[originUri][ident]) {
-              if (uri == "count") {
-                continue;
-              }
-              var fullIdent = domainUtil.getIdentifier(uri, domainUtil.LEVEL_SOP);
-              if (!result[ident][fullIdent]) {
-                result[ident][fullIdent] = {};
-              }
-              result[ident][fullIdent][uri] = true;
-            }
-          }
-        }
-      }
-    }
-    return result;
-  },
-*/
 
   getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     this._rpServiceJSObject._rejectedRequests.print("from getRejectedRequests");
@@ -366,73 +254,6 @@ var RequestUtil = {
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
           this._rpServiceJSObject._allowedRequests.getAll());
   },
-
-  // getRejectedRequestsNew : function(currentUri, currentIdentifier, otherOrigins) {
-  //   var result = this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-  //         this._rpServiceJSObject._rejectedRequests);
-  //   for (var ident in result) {
-  //     for (var fullIdent in result[ident]) {
-  //       for (var uri in result[ident][fullIdent]) {
-  //         requestSet.addRequest(requestSet, uri);
-  //       }
-  //     }
-  //   }
-  //   return requestSet;
-  // },
-
-  // getAllowedRequestsNew : function(currentUri, currentIdentifier, otherOrigins) {
-  //   var result = this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-  //         this._rpServiceJSObject._allowedRequests);
-  //   var requestSet = new RequestSet();
-  //   // result[ident][fullIdent][uri]
-  //   for (var ident in result) {
-  //     for (var fullIdent in result[ident]) {
-  //       for (var uri in result[ident][fullIdent]) {
-  //         requestSet.addRequest(requestSet, uri);
-  //       }
-  //     }
-  //   }
-  //   return requestSet;
-  // },
-  
-
-  // // TODO: refactor getAllowedRequests and getRejectedRequests (code duplication).
-  // getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
-  //   var result = {};
-  //   var allowedReq = this._rpServiceJSObject._allowedRequests;
-  //   var domainUtil = DomainUtil;
-  // 
-  //   if (currentUri in allowedReq) {
-  //     for (var ident in allowedReq[currentUri]) {
-  //       //result[ident] = true;
-  //       if (!result[ident]) {
-  //         result[ident] = {};
-  //       }
-  //       for (var uri in allowedReq[currentUri][ident]) {
-  //         if (uri == "count") {
-  //           continue;
-  //         }
-  //         var fullIdent = domainUtil.getIdentifier(uri, domainUtil.LEVEL_SOP);
-  //         if (!result[ident][fullIdent]) {
-  //           result[ident][fullIdent] = {};
-  //         }
-  //         result[ident][fullIdent][uri] = true;
-  //       }
-  //     }
-  //   }
-  //   // Add the allowed requests from other origins within this page that have
-  //   // the same uriIdentifier as the current page.
-  //   if (currentIdentifier in otherOrigins) {
-  //     for (var i in otherOrigins[currentIdentifier]) {
-  //       if (i in this._rpServiceJSObject._allowedRequests) {
-  //         for (var ident in allowedReq[i]) {
-  //           result[ident] = true;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return result;
-  // },
 
   /**
    * This will look both at the DOM as well as the recorded allowed requests to
@@ -540,32 +361,6 @@ var RequestUtil = {
     }
   },
 
-  // dumpRequestSet : function(requestSet, name) {
-  //   Logger
-  //       .dump("-------------------------------------------------");
-  //   Logger.dump(name);
-  //   for (i in requestSet) {
-  //     Logger.dump("\t" + "Identifier: <" + i + ">");
-  //     for (var j in requestSet[i]) {
-  //       Logger.dump("\t\t" + j);
-  //     }
-  //   }
-  //   Logger
-  //       .dump("-------------------------------------------------");
-  // },
-
-  // dumpOtherOrigins : function(otherOrigins) {
-  //   Logger.dump("-------------------------------------------------");
-  //   Logger.dump("Other origins");
-  //   for (i in otherOrigins) {
-  //     Logger.dump("\t" + "Origin identifier: <" + i + ">");
-  //     for (var j in otherOrigins[i]) {
-  //       Logger.dump("\t\t" + j);
-  //     }
-  //   }
-  //   Logger.dump("-------------------------------------------------");
-  // },
-  
   originHasRejectedRequests : function(originUri) {
     return this._originHasRejectedRequestsHelper(originUri, {});
   },

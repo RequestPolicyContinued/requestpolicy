@@ -75,16 +75,53 @@ requestpolicy.menu = {
 
   prepareMenu : function() {
     try {
-      this._currentIdentifier = requestpolicy.overlay
-        .getTopLevelDocumentUriIdentifier();
-      this._currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(
-        requestpolicy.overlay.getTopLevelDocumentUri());
       this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
-      this._isChromeUri = this._currentUriObj.scheme == "chrome";
+
+      try {
+        this._currentBaseDomain = requestpolicy.mod.DomainUtil.getDomain(
+              this._currentUri);
+      } catch (e) {
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+              "Unable to prepare menu because base domain can't be determined: " + this._currentUri);
+        return;
+      }
+
+      this._currentIdentifier = requestpolicy.overlay
+            .getTopLevelDocumentUriIdentifier();
+
+      //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+      //                              "this._currentUri: " + this._currentUri);
+      this._currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(this._currentUri);
+
+//      this._isChromeUri = this._currentUriObj.scheme == "chrome";
+//      this._currentUriIsHttps = currentUriObj.scheme == "https";
+
+      // The fact that getOtherOrigins uses documentURI directly from
+      // content.document is important because getTopLevelDocumentUri will
+      // not return the real documentURI if there is an applicable
+      // top-level document translation rule (these are used sometimes
+      // for extension compatibility). For example, this is essential to the
+      // menu showing relevant info when using the Update Scanner extension.
+      this._otherOriginsReqSet = requestpolicy.mod.RequestUtil
+            .getOtherOrigins(content.document);
+      this._otherOrigins = this._otherOriginsReqSet.getAllMergedOrigins();
+      this._otherOriginsReqSet.print("_otherOriginsReqSet");
+
+//      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
+//      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
+//      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
+//
+//      if (isChromeUri) {
+//        this._itemUnrestrictedOrigin.setAttribute("label", this._strbundle
+//          .getFormattedString("unrestrictedOrigin", ["chrome://"]));
+//        this._itemUnrestrictedOrigin.hidden = false;
+//        return;
+//      }
 
       this._populateOrigin();
       this._populateOtherOrigins();
       this._activateOriginItem(this._originItem);
+      this._populateDetails();
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -117,18 +154,11 @@ requestpolicy.menu = {
   },
 
   _populateDetails : function() {
-  },
-
-  _getBlockedDestinations : function() {
-    return ['foo.com', 'bar.com', Math.random()];
-  },
-
-  _getAllowedDestinations : function() {
-    return ['yaz.com', 'example.com', Math.random()];
-  },
-
-  _getOtherOrigins : function() {
-    return ['otherorigin.com', Math.random()];
+    var origin = this._currentlySelectedOrigin;
+    var dest = this._currentlySelectedDest;
+    var list = document.getElementById('rp-rule-options');
+    this._removeChildren(list);
+    var item = this._addListItem(list, 'rp-details-item', 'blah');
   },
 
   _removeChildren : function(el) {
@@ -143,6 +173,7 @@ requestpolicy.menu = {
     item.setAttribute("class", cssClass);
     item.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
     list.insertBefore(item, null);
+    return item;
   },
 
   _disableIfNoChildren : function(el) {
@@ -170,7 +201,8 @@ requestpolicy.menu = {
   },
 
   _activateOriginItem : function(item) {
-    var value = item.value;
+    this._currentlySelectedOrigin = item.value;
+    this._currentlySelectedDest = null;
     this._resetSelectedOrigin();
     item.setAttribute('selected-origin', 'true');
     this._populateDestinations();
@@ -178,7 +210,7 @@ requestpolicy.menu = {
   },
 
   _activateDestinationItem : function(item) {
-    var value = item.value;
+    this._currentlySelectedDest = item.value;
     this._resetSelectedDest();
     item.setAttribute('selected-dest', 'true');
     this._populateDetails();
@@ -193,5 +225,87 @@ requestpolicy.menu = {
       this._activateDestinationItem(item);
     }
   },
+
+
+
+ // Note to self: It's been too long since I looked at some of the new code.
+ // I think I may have assumed that I'd get rid of the different strictness
+ // levels and just use what is currently called LEVEL_SOP. If using anything
+ // else there will be errors from within RequestUtil.
+
+
+
+  _getBlockedDestinations : function() {
+    var reqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
+          this._currentUri, this._currentIdentifier, this._otherOrigins);
+    var requests = reqSet.getAllMergedOrigins();
+    //reqSet.print("rejectedReqSet");
+
+    var result = [];
+    for (var destBase in requests) {
+      result.push(destBase);
+    }
+    return result;
+  },
+
+  _getAllowedDestinations : function() {
+    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+      this._currentUri, this._currentIdentifier, this._otherOrigins);
+    var requests = reqSet.getAllMergedOrigins();
+    //reqSet.print("rejectedReqSet");
+
+    var result = [];
+    for (var destBase in requests) {
+      result.push(destBase);
+    }
+    return result;
+  },
+
+
+  _getOtherOrigins : function() {
+    return ['otherorigin.com', Math.random()];
+  },
+
+
+//  _addRejectedRequests : function(menu, currentUri, currentUriObj, currentIdentifier,
+//                                  otherOrigins, privateBrowsingEnabled, currentBaseDomain) {
+//
+//    var currentUri = this._currentUri;
+//    var currentUriObj = this._currentUriObj;
+//    var currentIdentifier = this._currentIdentifier;
+//    var privateBrowsingEnabled = false;
+//    var currentBaseDomain = this._currentBaseDomain;
+//    var otherOrigins = {};
+//
+//    // Get the requests rejected by the current uri.
+//    var rejectedReqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
+//      currentUri, currentIdentifier, otherOrigins);
+//    var rejectedRequests = rejectedReqSet.getAllMergedOrigins();
+//    rejectedReqSet.print("rejectedReqSet");
+//    //requestpolicy.mod.RequestUtil.dumpRequestSet(rejectedRequests,
+//    //    "All rejected requests (including from other origins)");
+//    // TODO: destIdentifier is now supposed to be the base domain, so this
+//    // should be renamed to baseDomain. Right now these are equivalent while
+//    // in base domain strictness mode.
+//    for (var destBase in rejectedRequests) {
+//      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+//                                    "destBase in rejectedRequests: " + destBase);
+//
+//      // TODO: continue if destIdentifier is an address rather than a domain name.
+//
+//      var ruleData = {"d" : {"h" : this._addWildcard(destBase)} };
+//
+//      if (!requestpolicy.mod.DomainUtil.hasStandardPort(currentUriObj)) {
+//        if (!ruleData["o"]) {
+//          ruleData["o"] = {};
+//        }
+//        ruleData["o"]["port"] = currentUriObj.port;
+//      }
+//
+//      var submenu = this.addBlockedDestination(menu,
+//                                               this._blockedDestinationsBeforeReferenceItem, destBase,
+//                                               true);
+//    }
+//  },
 
 }

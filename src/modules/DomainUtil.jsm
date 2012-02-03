@@ -133,7 +133,14 @@ DomainUtil.getHost = function(uri) {
  */
 DomainUtil.getUriObject = function(uri) {
   // Throws an exception if uri is invalid.
-  return this._ios.newURI(uri, null, null);
+  try {
+    return this._ios.newURI(uri, null, null);
+  } catch (e) {
+    var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> "
+      + ". Exception was: " + e;
+    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL, msg);
+    throw e;
+  }
 };
 
 /**

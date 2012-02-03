@@ -187,6 +187,7 @@ requestpolicy.menu = {
             this._ruleOptionsList, ruleData);
     }
 
+    this._populateDetailsRemoveAllowRules(list);
   },
 
   _removeChildren : function(el) {
@@ -270,6 +271,16 @@ requestpolicy.menu = {
     var ruleAction = item.requestpolicyRuleAction;
     var ruleTemporary = item.requestpolicyRuleTemporary;
 
+    if (!ruleData) {
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+            'ruleData is empty in menu._processRuleSelection()');
+      return;
+    }
+    if (!ruleAction) {
+      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+                                      'ruleAction is empty in menu._processRuleSelection()');
+      return;
+    }
     requestpolicy.mod.Logger.dump("ruleData: " + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     requestpolicy.mod.Logger.dump("ruleAction: " + ruleAction);
     requestpolicy.mod.Logger.dump("ruleTemporary: " + ruleTemporary);
@@ -284,38 +295,23 @@ requestpolicy.menu = {
     if (ruleData['d'] && ruleData['d']['h']) {
       dest = ruleData['d']['h'];
     }
+
+    // TODO: we're going to have more than two types of actions. They should be
+    // constants and are probably the following:
+    // * allow
+    // * revoke-allow (or maybe remove-allow-rule for consistency of using "remove")
+    // * forbid
+    // * revoke-forbid
     if (ruleAction == 'allow') {
       if (ruleTemporary == 'true') {
-        if (origin && dest) {
-          requestpolicy.overlay.temporarilyAllowOriginToDestination(origin, dest);
-        } else if (origin) {
-          requestpolicy.overlay.temporarilyAllowOrigin(origin);
-        } else if (dest) {
-          requestpolicy.overlay.temporarilyAllowDestination(dest);
-        } else {
-          throw 'invalid ruleData';
-        }
+        requestpolicy.overlay.addTemporaryAllowRule(ruleData);
       } else {
-        if (origin && dest) {
-          requestpolicy.overlay.allowOriginToDestination(origin, dest);
-        } else if (origin) {
-          requestpolicy.overlay.allowOrigin(origin);
-        } else if (dest) {
-          requestpolicy.overlay.allowDestination(dest);
-        } else {
-          throw 'invalid ruleData';
-        }
+        requestpolicy.overlay.addAllowRule(ruleData);
       }
+    } else if (ruleAction == 'revoke-allow') {
+      requestpolicy.overlay.removeAllowRule(ruleData);
     } else {
-      if (origin && dest) {
-        requestpolicy.overlay.forbidOriginToDestination(origin, dest);
-      } else if (origin) {
-        requestpolicy.overlay.forbidOrigin(origin);
-      } else if (dest) {
-        requestpolicy.overlay.forbidDestination(dest);
-      } else {
-        throw 'invalid ruleData';
-      }
+      throw 'action not implemented: ' + ruleAction;
     }
   },
 
@@ -382,7 +378,7 @@ requestpolicy.menu = {
     var originHost = ruleData["o"]["h"];
     var label = this._strbundle.getFormattedString(
       "forbidOrigin", [originHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'forbid';
     //var statustext = destHost; // TODO
@@ -395,7 +391,7 @@ requestpolicy.menu = {
     var destHost = ruleData["d"]["h"];
     var label = this._strbundle.getFormattedString(
       "forbidOriginToDestination", [originHost, destHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'forbid';
     //var statustext = destHost; // TODO
@@ -407,7 +403,7 @@ requestpolicy.menu = {
     var originHost = ruleData["o"]["h"];
     var label = this._strbundle.getFormattedString(
       "allowOrigin", [originHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
@@ -420,7 +416,7 @@ requestpolicy.menu = {
     var destHost = ruleData["d"]["h"];
     var label = this._strbundle.getFormattedString(
       "allowOriginToDestination", [originHost, destHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
@@ -432,13 +428,13 @@ requestpolicy.menu = {
     var originHost = ruleData["o"]["h"];
     var label = this._strbundle.getFormattedString(
       "allowOriginTemporarily", [originHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleTemporary = true;
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
     // TODO: set a cssClass
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rp-od-item requestpolicyTemporary");
     return item;
   },
 
@@ -447,65 +443,115 @@ requestpolicy.menu = {
     var destHost = ruleData["d"]["h"];
     var label = this._strbundle.getFormattedString(
       "allowOriginToDestinationTemporarily", [originHost, destHost]);
-    var item = this._addListItem(list, '', label);
+    var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleTemporary = true;
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = 'allow';
     //var statustext = destHost; // TODO
     // TODO: set a cssClass
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rp-od-item requestpolicyTemporary");
     return item;
   },
 
-//  _foo : function() {
-//    var rules = {};
-//    for (var destIdent in this._allowedRequests[destBase]) {
-//      var destinations = allowedRequests[destBase][destIdent];
-//      for (var destUri in destinations) {
-//        var results = destinations[destUri];
-//        for (var i in results.matchedAllowRules) {
-//          var policy, match;
-//          [policy, match] = results.matchedAllowRules[i];
-//          var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
-//          var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
-//          // requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
-//          //       "matched allow rule: " + rawRuleStr);
-//          // This is how we remove duplicates: if two rules have the same
-//          // canonical string, they'll have in the same key.
-//          rules[rawRuleStr] = rawRule;
-//        }
-//      }
-//    }
-//    // TODO: sort these into some meaningful order.
-//    for (var i in rules) {
-//      this.addMenuItemRemoveAllowRule(submenu, rules[i]);
-//    }
-//  },
-//
-//  _addMenuItemRemoveAllowRule : function(menu, rawRule) {
-//    var fmtVars = this._ruleDataToFormatVariables(rawRule);
-//
-//    if (rawRule["o"] && rawRule["d"]) {
-//      var fmtName = "stopAllowingOriginToDestination";
-//    } else if (rawRule["o"]) {
-//      fmtName = "stopAllowingOrigin";
-//    } else if (rawRule["d"]) {
-//      fmtName = "stopAllowingDestination";
-//    } else {
-//      throw "Invalid rule data: no origin or destination parts.";
-//    }
-//
-//    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
-//
-//    // TODO: implement removeAllowRule
-//    var command = "requestpolicy.overlay.removeAllowRule(event);";
-//    var statustext = ""; // TODO
-//    var item = this._addListItem(this._ruleOptionsList, '', label);
-//    item.requestpolicyRawRule = rawRule;
-//    // Take an argument to the current function that specifies whether this
-//    // is only a temporary rule.
-//    //item.setAttribute("class", "requestpolicyTemporary");
-//    return item;
-//  },
+  _populateDetailsRemoveAllowRules : function(list) {
+    // TODO: can we avoid calling getAllowedRequests here and reuse a result
+    // from calling it earlier?
+    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+      this._currentUri, this._currentIdentifier, this._otherOrigins);
+    var requests = reqSet.getAllMergedOrigins();
+
+    var rules = {};
+
+    //reqSet.print('allowedRequests');
+
+    // TODO: there is no dest if no dest is selected (origin only).
+    //var destBase = requestpolicy.mod.DomainUtil.getDomain(
+    //      this._currentlySelectedDest);
+
+    for (var destBase in requests) {
+
+      for (var destIdent in requests[destBase]) {
+
+        var destinations = requests[destBase][destIdent];
+        for (var destUri in destinations) {
+
+          // TODO: figure out why destinations[destUri] is undefined sometimes
+          if (!destinations[destUri]) {
+            requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
+            continue;
+          }
+
+          var results = destinations[destUri];
+          for (var i in results.matchedAllowRules) {
+
+            var policy, match;
+            [policy, match] = results.matchedAllowRules[i];
+            var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+            var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
+            //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+            //       "matched allow rule: " + rawRuleStr);
+            // This is how we remove duplicates: if two rules have the same
+            // canonical string, they'll have in the same key.
+            rules[rawRuleStr] = rawRule;
+          }
+        }
+      }
+    }
+
+    // TODO: sort these into some meaningful order.
+    for (var i in rules) {
+      this._addMenuItemRemoveAllowRule(list, rules[i]);
+    }
+  },
+
+  _ruleDataPartToDisplayString : function(ruleDataPart) {
+    var str = "";
+    if (ruleDataPart["s"]) {
+      str += ruleDataPart["s"] + "://";
+    }
+    str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+    if (ruleDataPart["port"]) {
+      str += ":" + ruleDataPart["port"];
+    }
+    // TODO: path
+    return str;
+  },
+
+  _ruleDataToFormatVariables : function(rawRule) {
+    var fmtVars = [];
+    if (rawRule["o"]) {
+      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["o"]));
+    }
+    if (rawRule["d"]) {
+      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["d"]));
+    }
+    return fmtVars;
+  },
+
+  _addMenuItemRemoveAllowRule : function(list, rawRule) {
+    var fmtVars = this._ruleDataToFormatVariables(rawRule);
+
+    if (rawRule["o"] && rawRule["d"]) {
+      var fmtName = "stopAllowingOriginToDestination";
+    } else if (rawRule["o"]) {
+      fmtName = "stopAllowingOrigin";
+    } else if (rawRule["d"]) {
+      fmtName = "stopAllowingDestination";
+    } else {
+      throw "Invalid rule data: no origin or destination parts.";
+    }
+
+    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
+
+    //var command = "requestpolicy.overlay.removeAllowRule(event);";
+    //var statustext = ""; // TODO
+    var item = this._addListItem(this._ruleOptionsList, 'rp-od-item', label);
+    item.requestpolicyRuleData = rawRule;
+    item.requestpolicyRuleAction = 'revoke-allow';
+    // Take an argument to the current function that specifies whether this
+    // is only a temporary rule.
+    //item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
 
 }

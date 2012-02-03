@@ -147,13 +147,13 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   border-bottom-left-radius: 3px;
 }
 */
-#rp-origins-destinations .rp-od-item {
+.rp-od-item {
   border: 1px solid #ffffff;
   padding: 2px 12px 2px 12px;
   margin: 1px 12px 1px 4px;
   border-radius: 3px;
 }
-#rp-origins-destinations .rp-od-item:hover {
+.rp-od-item:hover {
   cursor: pointer;
 }
 
@@ -182,6 +182,11 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 #rp-allowed-destinations [selected-dest="false"]:hover {
   border-color: #efe !important;
   background-color: #fafffa;
+}
+
+#rp-rule-options .rp-od-item:hover {
+  border-color: #ddd !important;
+  background-color: #eee;
 }
 
 #rp-origin {

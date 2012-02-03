@@ -83,17 +83,17 @@ RequestSet.prototype = {
 
   getAllMergedOrigins : function() {
     var result = {};
-    for (originUri in this._origins) {
+    for (var originUri in this._origins) {
       var dests = this._origins[originUri];
-      for (destBase in dests) {
+      for (var destBase in dests) {
         if (!result[destBase]) {
            result[destBase] = {};
         }
-        for (destIdent in dests[destBase]) {
+        for (var destIdent in dests[destBase]) {
           if (!result[destBase][destIdent]) {
              result[destBase][destIdent] = {};
           }
-          for (destUri in dests[destBase][destIdent]) {
+          for (var destUri in dests[destBase][destIdent]) {
             // TODO: handle the case where we encounter the uri more than
             // once (that is, we need to merge the triggered rules).
             result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];

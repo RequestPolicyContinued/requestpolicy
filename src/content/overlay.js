@@ -726,6 +726,9 @@ requestpolicy.overlay = {
   },
 
   _indicateBlockedVisibleObjects : function(document) {
+    // TODO: make this work again.
+    return;
+
     if (!this._rpService.prefs.getBoolPref("indicateBlockedObjects")) {
       return;
     }
@@ -1502,27 +1505,24 @@ requestpolicy.overlay = {
   /**
    * TODO: comment
    */
-  addAllowRule : function(event) {
-    var rawRule = event.target.requestpolicyRawRule;
-    this._rpServiceJSObject.addAllowRule(rawRule);
+  addAllowRule : function(ruleData) {
+    this._rpServiceJSObject.addAllowRule(ruleData);
     this._conditionallyReloadDocument();
   },
 
   /**
    * TODO: comment
    */
-  addTemporaryAllowRule : function(event) {
-    var rawRule = event.target.requestpolicyRawRule;
-    this._rpServiceJSObject.addTemporaryAllowRule(rawRule);
+  addTemporaryAllowRule : function(ruleData) {
+    this._rpServiceJSObject.addTemporaryAllowRule(ruleData);
     this._conditionallyReloadDocument();
   },
 
   /**
    * TODO: comment
    */
-  removeAllowRule : function(event) {
-    var rawRule = event.target.requestpolicyRawRule;
-    this._rpServiceJSObject.removeAllowRule(rawRule);
+  removeAllowRule : function(ruleData) {
+    this._rpServiceJSObject.removeAllowRule(ruleData);
     this._conditionallyReloadDocument();
   },
 

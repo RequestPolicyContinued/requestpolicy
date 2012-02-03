@@ -104,10 +104,10 @@
           </vbox>
           <vbox id="rp-details">
             <vbox id="rp-rule-options">
-              <label value="Allow requests from bbc.co.uk to doubleclick.net" />
-              <label value="Allow requests from * to doubleclick.net" />
-              <label id="rp-rule-options-more" value="+ more options" />
+              <label value="Allow requests from bbc.co.uk to doubleclick.net" class="rp-od-item" />
+              <label value="Allow requests from * to doubleclick.net" class="rp-od-item" />
             </vbox>
+            <label id="rp-rule-options-more" value="+ more options" class="rp-od-item" />
             <vbox id="rp-request-info">
             </vbox>
           </vbox>

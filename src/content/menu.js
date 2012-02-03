@@ -241,6 +241,8 @@ requestpolicy.menu = {
   _activateOriginItem : function(item) {
     this._currentlySelectedOrigin = item.value;
     this._currentlySelectedDest = null;
+    // TODO: if the document's origin (rather than an other origin) is being
+    // activated, then regenerate the other origins list, as well.
     this._resetSelectedOrigin();
     item.setAttribute('selected-origin', 'true');
     this._populateDestinations();
@@ -333,10 +335,18 @@ requestpolicy.menu = {
 
 
   _getBlockedDestinations : function() {
+    // Only pass a uri to getRejectedRequests if this isn't for listing the
+    // blocked destinations of an other origin.
+    var uri = null;
+    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
+      uri = this._currentUri;
+    }
+
+    var ident = 'http://' + this._currentlySelectedOrigin;
+
     var reqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
-          this._currentUri, this._currentIdentifier, this._otherOrigins);
+          uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
-    //reqSet.print("rejectedReqSet");
 
     var result = [];
     for (var destBase in requests) {
@@ -347,10 +357,18 @@ requestpolicy.menu = {
   },
 
   _getAllowedDestinations : function() {
+    // Only pass a uri to getAllowedRequests if this isn't for listing the
+    // blocked destinations of an other origin.
+    var uri = null;
+    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
+      uri = this._currentUri;
+    }
+
+    var ident = 'http://' + this._currentlySelectedOrigin;
+
     var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
-      this._currentUri, this._currentIdentifier, this._otherOrigins);
+          uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
-    //reqSet.print("rejectedReqSet");
 
     var result = [];
     for (var destBase in requests) {
@@ -359,7 +377,6 @@ requestpolicy.menu = {
     result.sort();
     return result;
   },
-
 
   _getOtherOrigins : function() {
     //return ['otherorigin.com', Math.random()];

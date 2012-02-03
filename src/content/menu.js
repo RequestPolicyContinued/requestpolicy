@@ -116,6 +116,9 @@ requestpolicy.menu = {
     this._populateList(this._blockedDestinationsList, this._getBlockedDestinations());
   },
 
+  _populateDetails : function() {
+  },
+
   _getBlockedDestinations : function() {
     return ['foo.com', 'bar.com', Math.random()];
   },
@@ -147,31 +150,47 @@ requestpolicy.menu = {
     el.disabled = el.firstChild ? false : true;
   },
 
-  _activateOriginItem : function(item) {
-    var value = item.value;
-
-    // Unset all selected-origin attribute which is used by our CSS.
-    this._originItem.setAttribute('selected-origin', '');
+  _resetSelectedOrigin : function() {
+    this._originItem.setAttribute('selected-origin', 'false');
     for (var i = 0; i < this._otherOriginsList.childNodes.length; i++) {
       var child = this._otherOriginsList.childNodes[i];
-      child.setAttribute('selected-origin', '');
+      child.setAttribute('selected-origin', 'false');
     }
-    // Now set selected-origin for the one which has been selected.
-    item.setAttribute('selected-origin', 'true');
-
-    this._populateDestinations();
   },
+
+  _resetSelectedDest : function() {
+    for (var i = 0; i < this._blockedDestinationsList.childNodes.length; i++) {
+      var child = this._blockedDestinationsList.childNodes[i];
+      child.setAttribute('selected-dest', 'false');
+    }
+    for (var i = 0; i < this._allowedDestinationsList.childNodes.length; i++) {
+      var child = this._allowedDestinationsList.childNodes[i];
+      child.setAttribute('selected-dest', 'false');
+    }
+  },
+
+  _activateOriginItem : function(item) {
+    var value = item.value;
+    this._resetSelectedOrigin();
+    item.setAttribute('selected-origin', 'true');
+    this._populateDestinations();
+    this._resetSelectedDest();
+  },
+
+  _activateDestinationItem : function(item) {
+    var value = item.value;
+    this._resetSelectedDest();
+    item.setAttribute('selected-dest', 'true');
+    this._populateDetails();
+  },
+
 
   itemSelected : function(event) {
     var item = event.target;
     if (item.id == 'rp-origin' || item.parentNode.id == 'rp-other-origins-list') {
       this._activateOriginItem(item);
-    } else if (item.parentNode.id == 'rp-allowed-destinations-list') {
-      // TODO
-    } else if (item.parentNode.id == 'rp-blocked-destinations-list') {
-      // TODO
     } else {
-      throw "Hulk confused."
+      this._activateDestinationItem(item);
     }
   },
 

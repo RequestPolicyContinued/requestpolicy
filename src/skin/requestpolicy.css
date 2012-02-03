@@ -147,10 +147,6 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   border-bottom-left-radius: 3px;
 }
 */
-#rp-origins-destinations [selected-origin="true"] {
-  border: 1px solid #ddd !important;
-  background-color: #eee;
-}
 #rp-origins-destinations .rp-od-item {
   border: 1px solid #ffffff;
   padding: 2px 12px 2px 12px;
@@ -158,9 +154,34 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   border-radius: 3px;
 }
 #rp-origins-destinations .rp-od-item:hover {
-  border-color: #dadada;
-  background-color: #f6f6f6;
   cursor: pointer;
+}
+
+#rp-origins-destinations [selected-origin="true"] {
+  border-color: #ddd !important;
+  background-color: #eee;
+}
+#rp-origins-destinations [selected-origin="false"]:hover {
+  border-color: #eee !important;
+  background-color: #fafafa;
+}
+
+#rp-blocked-destinations [selected-dest="true"] {
+  border-color: #edd !important;
+  background-color: #fee;
+}
+#rp-blocked-destinations [selected-dest="false"]:hover {
+  border-color: #fee !important;
+  background-color: #fffafa;
+}
+
+#rp-allowed-destinations [selected-dest="true"] {
+  border-color: #ded !important;
+  background-color: #efe;
+}
+#rp-allowed-destinations [selected-dest="false"]:hover {
+  border-color: #efe !important;
+  background-color: #fafffa;
 }
 
 #rp-origin {

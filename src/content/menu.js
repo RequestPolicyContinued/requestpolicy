@@ -85,6 +85,8 @@ requestpolicy.menu = {
       } catch (e) {
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
               "Unable to prepare menu because base domain can't be determined: " + this._currentUri);
+        // TODO: before returning, populate the menu with a useful message and
+        // remove anything confusing that would be been left visible in the menu.
         return;
       }
 
@@ -141,7 +143,7 @@ requestpolicy.menu = {
     for (var i in values) {
       this._addListItem(list, 'rp-od-item', values[i]);
     }
-    this._disableIfNoChildren(list);
+    //this._disableIfNoChildren(list);
   },
 
   _populateOrigin : function() {
@@ -149,12 +151,19 @@ requestpolicy.menu = {
   },
 
   _populateOtherOrigins : function() {
-    this._populateList(this._otherOriginsList, this._getOtherOrigins());
+    var values = this._getOtherOrigins();
+    this._populateList(this._otherOriginsList, values);
+    document.getElementById('rp-other-origins').hidden = values.length == 0;
   },
 
   _populateDestinations : function(originIdentifier) {
-    this._populateList(this._allowedDestinationsList, this._getAllowedDestinations());
-    this._populateList(this._blockedDestinationsList, this._getBlockedDestinations());
+    var values = this._getAllowedDestinations();
+    this._populateList(this._allowedDestinationsList, values);
+    document.getElementById('rp-allowed-destinations').hidden = values.length == 0;
+
+    var values = this._getBlockedDestinations();
+    this._populateList(this._blockedDestinationsList, values);
+    document.getElementById('rp-blocked-destinations').hidden = values.length == 0;
   },
 
   _populateDetails : function() {
@@ -207,7 +216,7 @@ requestpolicy.menu = {
 
   _disableIfNoChildren : function(el) {
     // TODO: this isn't working.
-    el.disabled = el.firstChild ? false : true;
+    el.hidden = el.firstChild ? false : true;
   },
 
   _resetSelectedOrigin : function() {
@@ -333,6 +342,7 @@ requestpolicy.menu = {
     for (var destBase in requests) {
       result.push(destBase);
     }
+    result.sort();
     return result;
   },
 
@@ -346,6 +356,7 @@ requestpolicy.menu = {
     for (var destBase in requests) {
       result.push(destBase);
     }
+    result.sort();
     return result;
   },
 
@@ -371,6 +382,7 @@ requestpolicy.menu = {
         result.push(domain);
       }
     }
+    result.sort();
     return result;
   },
 

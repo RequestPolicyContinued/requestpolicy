@@ -1639,8 +1639,11 @@ requestpolicy.overlay = {
     var requestLogSplitter = document.getElementById("requestpolicy-requestLog-splitter");
     var requestLogFrame = document.getElementById("requestpolicy-requestLog-frame");
     var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
-    var closeRequestLog = document
-        .getElementById("requestpolicyCloseRequestLog");
+
+    // TODO: figure out how this should interact with the new menu.
+    //var closeRequestLog = document
+    //    .getElementById("requestpolicyCloseRequestLog");
+    var closeRequestLog = {};
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",

@@ -366,9 +366,7 @@ var RequestUtil = {
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
           this._rpServiceJSObject._allowedRequests.getAll());
   },
-  
-  
-  
+
   // getRejectedRequestsNew : function(currentUri, currentIdentifier, otherOrigins) {
   //   var result = this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
   //         this._rpServiceJSObject._rejectedRequests);

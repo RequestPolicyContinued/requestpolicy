@@ -351,7 +351,27 @@ requestpolicy.menu = {
 
 
   _getOtherOrigins : function() {
-    return ['otherorigin.com', Math.random()];
+    //return ['otherorigin.com', Math.random()];
+    var reqSet = requestpolicy.mod.RequestUtil.getOtherOrigins(document);
+    var requests = reqSet.getAll();
+    //reqSet.print("other origins reqSet");
+
+    var result = [];
+    for (var originUri in requests) {
+      var domain = requestpolicy.mod.DomainUtil.getDomain(originUri);
+      if (domain == this._currentBaseDomain) {
+        continue;
+      }
+      // TODO: we should prevent chrome://browser/ URLs from getting anywhere
+      // near here in the first place.
+      if (domain == 'browser') {
+        continue;
+      }
+      if (result.indexOf(domain) == -1) {
+        result.push(domain);
+      }
+    }
+    return result;
   },
 
   _sanitizeJsFunctionArg : function(str) {

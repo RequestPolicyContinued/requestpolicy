@@ -81,6 +81,9 @@ RequestSet.prototype = {
     return this._origins;
   },
 
+  // TODO: the name of this method, getAllMergedOrigins, is confusing. Is it
+  // getting all of the "merged origins" is it "getting all" and merging the
+  // origins when it does it?
   getAllMergedOrigins : function() {
     var result = {};
     for (var originUri in this._origins) {
@@ -457,55 +460,56 @@ var RequestUtil = {
     // rules that were involved with allowing/denying the request.
     // Maybe just look up the allowed/blocked requests in the
     // main allowed/denied request sets before adding them.
-    this._getOtherOriginsHelperFromDOM(document, reqSet);
+    //this._getOtherOriginsHelperFromDOM(document, reqSet);
+
     this._getOtherOriginsHelperFromAllowedRequests(DomainUtil
             .stripFragment(document.documentURI), reqSet, {});
     return reqSet;
   },
 
-  _getOtherOriginsHelperFromDOM : function(document, reqSet) {
-    var documentUri = DomainUtil
-        .stripFragment(document.documentURI);
-    Logger.dump("Looking for other origins within DOM of "
-        + documentUri);
-    // TODO: Check other elements besides iframes and frames?
-    var frameTagTypes = {
-      "iframe" : null,
-      "frame" : null
-    };
-    for (var tagType in frameTagTypes) {
-      var iframes = document.getElementsByTagName(tagType);
-      for (var i = 0; i < iframes.length; i++) {
-        var child = iframes[i];
-        var childDocument = child.contentDocument;
-        // Flock's special home page is about:myworld. It has (i)frames in it
-        // that have no contentDocument. It's probably related to the fact that
-        // that is an xul page, but I have no reason to fully understand the
-        // problem in order to fix it.
-        if (!childDocument) {
-          continue;
-        }
-        var childUri = DomainUtil
-            .stripFragment(childDocument.documentURI);
-        if (childUri == "about:blank") {
-          // iframe empty or not loaded yet, or maybe blocked.
-          // childUri = child.src;
-          // If it's not loaded or blocked, it's not the origin for anything
-          // yet.
-          continue;
-        }
-        Logger.dump("Found DOM child " + tagType
-            + " with src <" + childUri + "> in document <" + documentUri + ">");
-        //var childUriIdent = getUriIdentifier(childUri);
-        // if (!origins[childUriIdent]) {
-        //   origins[childUriIdent] = {};
-        // }
-        // origins[childUriIdent][childUri] = true;
-        reqSet.addRequest(documentUri, childUri);
-        this._getOtherOriginsHelperFromDOM(childDocument, reqSet);
-      }
-    }
-  },
+//  _getOtherOriginsHelperFromDOM : function(document, reqSet) {
+//    var documentUri = DomainUtil
+//        .stripFragment(document.documentURI);
+//    Logger.dump("Looking for other origins within DOM of "
+//        + documentUri);
+//    // TODO: Check other elements besides iframes and frames?
+//    var frameTagTypes = {
+//      "iframe" : null,
+//      "frame" : null
+//    };
+//    for (var tagType in frameTagTypes) {
+//      var iframes = document.getElementsByTagName(tagType);
+//      for (var i = 0; i < iframes.length; i++) {
+//        var child = iframes[i];
+//        var childDocument = child.contentDocument;
+//        // Flock's special home page is about:myworld. It has (i)frames in it
+//        // that have no contentDocument. It's probably related to the fact that
+//        // that is an xul page, but I have no reason to fully understand the
+//        // problem in order to fix it.
+//        if (!childDocument) {
+//          continue;
+//        }
+//        var childUri = DomainUtil
+//            .stripFragment(childDocument.documentURI);
+//        if (childUri == "about:blank") {
+//          // iframe empty or not loaded yet, or maybe blocked.
+//          // childUri = child.src;
+//          // If it's not loaded or blocked, it's not the origin for anything
+//          // yet.
+//          continue;
+//        }
+//        Logger.dump("Found DOM child " + tagType
+//            + " with src <" + childUri + "> in document <" + documentUri + ">");
+//        //var childUriIdent = getUriIdentifier(childUri);
+//        // if (!origins[childUriIdent]) {
+//        //   origins[childUriIdent] = {};
+//        // }
+//        // origins[childUriIdent][childUri] = true;
+//        reqSet.addRequest(documentUri, childUri);
+//        this._getOtherOriginsHelperFromDOM(childDocument, reqSet);
+//      }
+//    }
+//  },
 
   _getOtherOriginsHelperFromAllowedRequests : function(rootUri, reqSet,
       checkedOrigins) {

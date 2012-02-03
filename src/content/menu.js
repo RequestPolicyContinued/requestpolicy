@@ -341,7 +341,6 @@ requestpolicy.menu = {
     if (this._currentBaseDomain == this._currentlySelectedOrigin) {
       uri = this._currentUri;
     }
-
     var ident = 'http://' + this._currentlySelectedOrigin;
 
     var reqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
@@ -363,7 +362,6 @@ requestpolicy.menu = {
     if (this._currentBaseDomain == this._currentlySelectedOrigin) {
       uri = this._currentUri;
     }
-
     var ident = 'http://' + this._currentlySelectedOrigin;
 
     var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
@@ -505,8 +503,17 @@ requestpolicy.menu = {
   _populateDetailsRemoveAllowRules : function(list) {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
+
+    // Only pass a uri to getAllowedRequests if this isn't for listing the
+    // blocked destinations of an other origin.
+    var uri = null;
+    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
+      uri = this._currentUri;
+    }
+    var ident = 'http://' + this._currentlySelectedOrigin;
+
     var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
-      this._currentUri, this._currentIdentifier, this._otherOrigins);
+          uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     var rules = {};

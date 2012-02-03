@@ -131,6 +131,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 #rp-main {
   padding: 10px 10px 10px 10px;
+  font-size: 14px;
 }
 
 #rp-origins-destinations {
@@ -150,7 +151,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 .rp-od-item {
   border: 1px solid #ffffff;
   padding: 2px 12px 2px 12px;
-  margin: 1px 12px 1px 4px;
+  margin: 0px 12px 0px 4px;
   border-radius: 3px;
 }
 .rp-od-item:hover {
@@ -159,29 +160,29 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 
 #rp-origins-destinations [selected-origin="true"] {
   border-color: #ddd !important;
-  background-color: #eee;
+  background-color: #eaeaea;
 }
 #rp-origins-destinations [selected-origin="false"]:hover {
   border-color: #eee !important;
-  background-color: #fafafa;
+  background-color: #f1f1f1;
 }
 
 #rp-blocked-destinations [selected-dest="true"] {
   border-color: #edd !important;
-  background-color: #fee;
+  background-color: #ffe1e1;
 }
 #rp-blocked-destinations [selected-dest="false"]:hover {
   border-color: #fee !important;
-  background-color: #fffafa;
+  background-color: #fff1f1;
 }
 
 #rp-allowed-destinations [selected-dest="true"] {
   border-color: #ded !important;
-  background-color: #efe;
+  background-color: #e1ffe1;
 }
 #rp-allowed-destinations [selected-dest="false"]:hover {
   border-color: #efe !important;
-  background-color: #fafffa;
+  background-color: #f1fff1;
 }
 
 #rp-rule-options .rp-od-item:hover {
@@ -230,7 +231,6 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 
 #rp-footer {
   border-top: 1px solid #ddd;
-  font-size: 0.9em;
 }
 #rp-footer-links {
   margin-top: 4px;

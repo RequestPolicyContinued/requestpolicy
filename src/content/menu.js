@@ -49,6 +49,7 @@ requestpolicy.menu = {
   _otherOriginsList : null,
   _blockedDestinationsList : null,
   _allowedDestinationsList : null,
+  _ruleOptionsList : null,
 
   init : function() {
     if (this._initialized == false) {
@@ -67,6 +68,7 @@ requestpolicy.menu = {
             .getElementById("rp-blocked-destinations-list");
       this._allowedDestinationsList = document
             .getElementById("rp-allowed-destinations-list");
+      this._ruleOptionsList = document.getElementById("rp-rule-options");
 
       var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
@@ -107,6 +109,9 @@ requestpolicy.menu = {
       this._otherOrigins = this._otherOriginsReqSet.getAllMergedOrigins();
       this._otherOriginsReqSet.print("_otherOriginsReqSet");
 
+      this._privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
+            && !this._rpService.prefs.getBoolPref("privateBrowsingPermanentWhitelisting");
+
 //      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
 //      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
 //      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
@@ -121,7 +126,6 @@ requestpolicy.menu = {
       this._populateOrigin();
       this._populateOtherOrigins();
       this._activateOriginItem(this._originItem);
-      this._populateDetails();
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -141,7 +145,7 @@ requestpolicy.menu = {
   },
 
   _populateOrigin : function() {
-    this._originItem.setAttribute('value', 'foo.com');
+    this._originItem.setAttribute('value', this._currentBaseDomain);
   },
 
   _populateOtherOrigins : function() {
@@ -156,9 +160,33 @@ requestpolicy.menu = {
   _populateDetails : function() {
     var origin = this._currentlySelectedOrigin;
     var dest = this._currentlySelectedDest;
-    var list = document.getElementById('rp-rule-options');
+    var list = this._ruleOptionsList;
     this._removeChildren(list);
-    var item = this._addListItem(list, 'rp-details-item', 'blah');
+
+    var ruleData = {
+      'o' : {
+        'h' : this._addWildcard(origin)
+      }
+    };
+    if (!this._privateBrowsingEnabled) {
+      var item = this._addMenuItemAllowOrigin(
+            this._ruleOptionsList, ruleData);
+    }
+    var item = this._addMenuItemTemporarilyAllowOrigin(
+          this._ruleOptionsList, ruleData);
+
+    if (dest) {
+      ruleData['d'] = {
+        'h' : this._addWildcard(dest)
+      };
+      if (!this._privateBrowsingEnabled) {
+        var item = this._addMenuItemAllowOriginToDest(
+              this._ruleOptionsList, ruleData);
+      }
+      var item = this._addMenuItemTemporarilyAllowOriginToDest(
+            this._ruleOptionsList, ruleData);
+    }
+
   },
 
   _removeChildren : function(el) {
@@ -207,6 +235,7 @@ requestpolicy.menu = {
     item.setAttribute('selected-origin', 'true');
     this._populateDestinations();
     this._resetSelectedDest();
+    this._populateDetails();
   },
 
   _activateDestinationItem : function(item) {
@@ -219,13 +248,76 @@ requestpolicy.menu = {
 
   itemSelected : function(event) {
     var item = event.target;
+    // TODO: rather than compare IDs, this should probably compare against
+    // the elements we already have stored in variables. That is, assuming
+    // equality comparisons work that way here.
     if (item.id == 'rp-origin' || item.parentNode.id == 'rp-other-origins-list') {
       this._activateOriginItem(item);
-    } else {
+    } else if (item.parentNode.id == 'rp-other-origins-list' ||
+               item.parentNode.id == 'rp-mixed-destinations-list' ||
+               item.parentNode.id == 'rp-blocked-destinations-list' ||
+               item.parentNode.id == 'rp-allowed-destinations-list') {
       this._activateDestinationItem(item);
+    } else if (item.parentNode.id == 'rp-rule-options') {
+      this._processRuleSelection(item);
+    } else {
+      throw 'Hulk confused';
     }
   },
 
+  _processRuleSelection : function(item) {
+    var ruleData = item.requestpolicyRuleData;
+    var ruleAction = item.requestpolicyRuleAction;
+    var ruleTemporary = item.requestpolicyRuleTemporary;
+
+    requestpolicy.mod.Logger.dump("ruleData: " + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
+    requestpolicy.mod.Logger.dump("ruleAction: " + ruleAction);
+    requestpolicy.mod.Logger.dump("ruleTemporary: " + ruleTemporary);
+
+    // TODO: does all of this get replaced with a generic rule processor that
+    // only cares whether it's an allow/deny and temporary and drops the ruleData
+    // argument straight into the ruleset?
+    var origin, dest;
+    if (ruleData['o'] && ruleData['o']['h']) {
+      origin = ruleData['o']['h'];
+    }
+    if (ruleData['d'] && ruleData['d']['h']) {
+      dest = ruleData['d']['h'];
+    }
+    if (ruleAction == 'allow') {
+      if (ruleTemporary == 'true') {
+        if (origin && dest) {
+          requestpolicy.overlay.temporarilyAllowOriginToDestination(origin, dest);
+        } else if (origin) {
+          requestpolicy.overlay.temporarilyAllowOrigin(origin);
+        } else if (dest) {
+          requestpolicy.overlay.temporarilyAllowDestination(dest);
+        } else {
+          throw 'invalid ruleData';
+        }
+      } else {
+        if (origin && dest) {
+          requestpolicy.overlay.allowOriginToDestination(origin, dest);
+        } else if (origin) {
+          requestpolicy.overlay.allowOrigin(origin);
+        } else if (dest) {
+          requestpolicy.overlay.allowDestination(dest);
+        } else {
+          throw 'invalid ruleData';
+        }
+      }
+    } else {
+      if (origin && dest) {
+        requestpolicy.overlay.forbidOriginToDestination(origin, dest);
+      } else if (origin) {
+        requestpolicy.overlay.forbidOrigin(origin);
+      } else if (dest) {
+        requestpolicy.overlay.forbidDestination(dest);
+      } else {
+        throw 'invalid ruleData';
+      }
+    }
+  },
 
 
  // Note to self: It's been too long since I looked at some of the new code.
@@ -266,46 +358,154 @@ requestpolicy.menu = {
     return ['otherorigin.com', Math.random()];
   },
 
+  _sanitizeJsFunctionArg : function(str) {
+    // strip single quotes and backslashes
+    return str.replace(/['\\]/g, "");
+  },
 
-//  _addRejectedRequests : function(menu, currentUri, currentUriObj, currentIdentifier,
-//                                  otherOrigins, privateBrowsingEnabled, currentBaseDomain) {
-//
-//    var currentUri = this._currentUri;
-//    var currentUriObj = this._currentUriObj;
-//    var currentIdentifier = this._currentIdentifier;
-//    var privateBrowsingEnabled = false;
-//    var currentBaseDomain = this._currentBaseDomain;
-//    var otherOrigins = {};
-//
-//    // Get the requests rejected by the current uri.
-//    var rejectedReqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
-//      currentUri, currentIdentifier, otherOrigins);
-//    var rejectedRequests = rejectedReqSet.getAllMergedOrigins();
-//    rejectedReqSet.print("rejectedReqSet");
-//    //requestpolicy.mod.RequestUtil.dumpRequestSet(rejectedRequests,
-//    //    "All rejected requests (including from other origins)");
-//    // TODO: destIdentifier is now supposed to be the base domain, so this
-//    // should be renamed to baseDomain. Right now these are equivalent while
-//    // in base domain strictness mode.
-//    for (var destBase in rejectedRequests) {
-//      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
-//                                    "destBase in rejectedRequests: " + destBase);
-//
-//      // TODO: continue if destIdentifier is an address rather than a domain name.
-//
-//      var ruleData = {"d" : {"h" : this._addWildcard(destBase)} };
-//
-//      if (!requestpolicy.mod.DomainUtil.hasStandardPort(currentUriObj)) {
-//        if (!ruleData["o"]) {
-//          ruleData["o"] = {};
+  _isAddressOrSingleName : function(hostname) {
+    return requestpolicy.mod.DomainUtil.isAddress(hostname) ||
+      hostname.indexOf(".") == -1;
+  },
+
+  _addWildcard : function(hostname) {
+    if (this._isAddressOrSingleName(hostname)) {
+      return hostname;
+    } else {
+      return "*." + hostname;
+    }
+  },
+
+  // TODO: the six _addMenuItem* functions below hopefully can be refactored.
+
+  _addMenuItemForbidOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "forbidOrigin", [originHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'forbid';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    return item;
+  },
+
+  _addMenuItemForbidOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "forbidOriginToDestination", [originHost, destHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'forbid';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    return item;
+  },
+
+  _addMenuItemAllowOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "allowOrigin", [originHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'allow';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    return item;
+  },
+
+  _addMenuItemAllowOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "allowOriginToDestination", [originHost, destHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'allow';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    return item;
+  },
+
+  _addMenuItemTemporarilyAllowOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "allowOriginTemporarily", [originHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleTemporary = true;
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'allow';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
+
+  _addMenuItemTemporarilyAllowOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    var label = this._strbundle.getFormattedString(
+      "allowOriginToDestinationTemporarily", [originHost, destHost]);
+    var item = this._addListItem(list, '', label);
+    item.requestpolicyRuleTemporary = true;
+    item.requestpolicyRuleData = ruleData;
+    item.requestpolicyRuleAction = 'allow';
+    //var statustext = destHost; // TODO
+    // TODO: set a cssClass
+    item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
+
+//  _foo : function() {
+//    var rules = {};
+//    for (var destIdent in this._allowedRequests[destBase]) {
+//      var destinations = allowedRequests[destBase][destIdent];
+//      for (var destUri in destinations) {
+//        var results = destinations[destUri];
+//        for (var i in results.matchedAllowRules) {
+//          var policy, match;
+//          [policy, match] = results.matchedAllowRules[i];
+//          var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+//          var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
+//          // requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+//          //       "matched allow rule: " + rawRuleStr);
+//          // This is how we remove duplicates: if two rules have the same
+//          // canonical string, they'll have in the same key.
+//          rules[rawRuleStr] = rawRule;
 //        }
-//        ruleData["o"]["port"] = currentUriObj.port;
 //      }
-//
-//      var submenu = this.addBlockedDestination(menu,
-//                                               this._blockedDestinationsBeforeReferenceItem, destBase,
-//                                               true);
 //    }
+//    // TODO: sort these into some meaningful order.
+//    for (var i in rules) {
+//      this.addMenuItemRemoveAllowRule(submenu, rules[i]);
+//    }
+//  },
+//
+//  _addMenuItemRemoveAllowRule : function(menu, rawRule) {
+//    var fmtVars = this._ruleDataToFormatVariables(rawRule);
+//
+//    if (rawRule["o"] && rawRule["d"]) {
+//      var fmtName = "stopAllowingOriginToDestination";
+//    } else if (rawRule["o"]) {
+//      fmtName = "stopAllowingOrigin";
+//    } else if (rawRule["d"]) {
+//      fmtName = "stopAllowingDestination";
+//    } else {
+//      throw "Invalid rule data: no origin or destination parts.";
+//    }
+//
+//    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
+//
+//    // TODO: implement removeAllowRule
+//    var command = "requestpolicy.overlay.removeAllowRule(event);";
+//    var statustext = ""; // TODO
+//    var item = this._addListItem(this._ruleOptionsList, '', label);
+//    item.requestpolicyRawRule = rawRule;
+//    // Take an argument to the current function that specifies whether this
+//    // is only a temporary rule.
+//    //item.setAttribute("class", "requestpolicyTemporary");
+//    return item;
 //  },
 
 }

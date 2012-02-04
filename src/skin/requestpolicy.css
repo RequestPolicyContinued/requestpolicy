@@ -262,15 +262,16 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 
 #rp-footer {
   border-top: 1px solid #ddd;
+  padding: 0 5px 2px 5px;
+  -moz-box-pack: end;
 }
 #rp-footer-links {
   margin-top: 4px;
-  margin-left: 540px;
 }
 .rp-footer-link {
   color: #888;
   font-size: 11px;
-  margin-left: 20px;
+  margin: 0 10px 0 10px;
 }
 .rp-footer-link:hover {
   color: #555;

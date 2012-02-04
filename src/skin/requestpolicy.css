@@ -177,6 +177,15 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   background-color: #fff1f1;
 }
 
+#rp-mixed-destinations [selected-dest="true"] {
+  border-color: #F2E2C7 !important;
+  background-color: #FFF3DE;
+}
+#rp-mixed-destinations [selected-dest="false"]:hover {
+  border-color: #FFF3DE !important;
+  background-color: #FFFAF2;
+}
+
 #rp-allowed-destinations [selected-dest="true"] {
   border-color: #ded !important;
   background-color: #e1ffe1;
@@ -227,6 +236,14 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 }
 #rp-blocked-destinations-title {
   color: #caa;
+}
+
+#rp-mixed-destinations {
+  color: #AA7215;
+  margin-top: 1em;
+}
+#rp-mixed-destinations-title {
+  color: #CCAF7D;
 }
 
 #rp-allowed-destinations {

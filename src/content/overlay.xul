@@ -77,30 +77,29 @@
                    onclick="requestpolicy.menu.itemSelected(event);"/>
             <vbox id="rp-other-origins">
               <label id="rp-other-origins-title" value="Other origins" />
-              <vbox id="rp-other-origins-list" class="rp-label-list">
-              </vbox>
+              <vbox id="rp-other-origins-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-blocked-destinations">
               <label id="rp-blocked-destinations-title" value="Blocked destinations" />
-              <vbox id="rp-blocked-destinations-list" class="rp-label-list">
-              </vbox>
+              <vbox id="rp-blocked-destinations-list" class="rp-label-list" />
+            </vbox>
+            <vbox id="rp-mixed-destinations">
+              <label id="rp-mixed-destinations-title" value="Mixed destinations" />
+              <vbox id="rp-mixed-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-allowed-destinations">
               <label id="rp-allowed-destinations-title" value="Allowed destinations" />
-              <vbox id="rp-allowed-destinations-list" class="rp-label-list">
-              </vbox>
+              <vbox id="rp-allowed-destinations-list" class="rp-label-list" />
             </vbox>
           </vbox>
           <vbox id="rp-details">
-            <vbox id="rp-rules-remove">
-              <label value="Stop allowing requests from bbc.co.uk to foo.net" class="rp-od-item" />
-            </vbox>
+            <vbox id="rp-rules-remove" />
             <vbox id="rp-rules-add">
               <hbox>
-                <label value="Allow requests from bbc.co.uk to doubleclick.net" class="rp-od-item" />
+                <label value="Allow requests from example.com to foo.net" class="rp-od-item" />
                 <label value="Allow temporarily" class="rp-od-item rp-temporary" />
               </hbox>
-              <label value="Allow requests from * to doubleclick.net" class="rp-od-item" />
+              <label value="Allow requests from * to foo.net" class="rp-od-item" />
             </vbox>
             <!--
             <label id="rp-rule-options-more" value="+ more options" class="rp-od-item" />

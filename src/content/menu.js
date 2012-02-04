@@ -48,6 +48,7 @@ requestpolicy.menu = {
   _originItem : null,
   _otherOriginsList : null,
   _blockedDestinationsList : null,
+  _mixedDestinationsList : null,
   _allowedDestinationsList : null,
   _removeRulesList : null,
   _addRulesList : null,
@@ -67,6 +68,8 @@ requestpolicy.menu = {
       this._otherOriginsList = document.getElementById("rp-other-origins-list");
       this._blockedDestinationsList = document
             .getElementById("rp-blocked-destinations-list");
+      this._mixedDestinationsList = document
+            .getElementById("rp-mixed-destinations-list");
       this._allowedDestinationsList = document
             .getElementById("rp-allowed-destinations-list");
       this._addRulesList = document.getElementById("rp-rules-add");
@@ -142,6 +145,7 @@ requestpolicy.menu = {
 
   _populateList : function(list, values) {
     this._removeChildren(list);
+    values.sort();
     for (var i in values) {
       this._addListItem(list, 'rp-od-item', values[i]);
     }
@@ -159,13 +163,38 @@ requestpolicy.menu = {
   },
 
   _populateDestinations : function(originIdentifier) {
-    var values = this._getAllowedDestinations();
-    this._populateList(this._allowedDestinationsList, values);
-    document.getElementById('rp-allowed-destinations').hidden = values.length == 0;
+    var rawBlocked = this._getBlockedDestinations();
+    var rawAllowed = this._getAllowedDestinations();
+    var blocked = [];
+    var mixed = [];
+    var allowed = [];
 
-    var values = this._getBlockedDestinations();
-    this._populateList(this._blockedDestinationsList, values);
-    document.getElementById('rp-blocked-destinations').hidden = values.length == 0;
+    // Set operations would be nice. These are small arrays, so keep it simple.
+    for (var i = 0; i < rawBlocked.length; i++) {
+      let dest = rawBlocked[i];
+      if (rawAllowed.indexOf(dest) == -1) {
+        blocked.push(dest);
+      } else {
+        mixed.push(dest);
+      }
+    }
+    for (var i = 0; i < rawAllowed.length; i++) {
+      let dest = rawAllowed[i];
+      if (rawBlocked.indexOf(dest) == -1) {
+        allowed.push(dest);
+      } else if (mixed.indexOf(dest) == -1) {
+        mixed.push(dest);
+      }
+    }
+
+    this._populateList(this._blockedDestinationsList, blocked);
+    document.getElementById('rp-blocked-destinations').hidden = blocked.length == 0;
+
+    this._populateList(this._mixedDestinationsList, mixed);
+    document.getElementById('rp-mixed-destinations').hidden = mixed.length == 0;
+
+    this._populateList(this._allowedDestinationsList, allowed);
+    document.getElementById('rp-allowed-destinations').hidden = allowed.length == 0;
   },
 
   _populateDetails : function() {
@@ -238,6 +267,10 @@ requestpolicy.menu = {
       var child = this._blockedDestinationsList.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
+    for (var i = 0; i < this._mixedDestinationsList.childNodes.length; i++) {
+      var child = this._mixedDestinationsList.childNodes[i];
+      child.setAttribute('selected-dest', 'false');
+    }
     for (var i = 0; i < this._allowedDestinationsList.childNodes.length; i++) {
       var child = this._allowedDestinationsList.childNodes[i];
       child.setAttribute('selected-dest', 'false');
@@ -272,8 +305,8 @@ requestpolicy.menu = {
     if (item.id == 'rp-origin' || item.parentNode.id == 'rp-other-origins-list') {
       this._activateOriginItem(item);
     } else if (item.parentNode.id == 'rp-other-origins-list' ||
-               item.parentNode.id == 'rp-mixed-destinations-list' ||
                item.parentNode.id == 'rp-blocked-destinations-list' ||
+               item.parentNode.id == 'rp-mixed-destinations-list' ||
                item.parentNode.id == 'rp-allowed-destinations-list') {
       this._activateDestinationItem(item);
     } else if (item.parentNode.id == 'rp-rule-options' ||
@@ -358,7 +391,6 @@ requestpolicy.menu = {
     for (var destBase in requests) {
       result.push(destBase);
     }
-    result.sort();
     return result;
   },
 
@@ -379,7 +411,6 @@ requestpolicy.menu = {
     for (var destBase in requests) {
       result.push(destBase);
     }
-    result.sort();
     return result;
   },
 
@@ -404,7 +435,6 @@ requestpolicy.menu = {
         result.push(domain);
       }
     }
-    result.sort();
     return result;
   },
 

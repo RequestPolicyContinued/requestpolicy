@@ -559,6 +559,11 @@ requestpolicy.menu = {
 
     for (var destBase in requests) {
 
+      if (this._currentlySelectedDest &&
+          this._currentlySelectedDest != destBase) {
+        continue;
+      }
+
       for (var destIdent in requests[destBase]) {
 
         var destinations = requests[destBase][destIdent];

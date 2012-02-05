@@ -1901,6 +1901,7 @@ RequestPolicyService.prototype = {
         || aContentLocation.scheme == "data"
         || aContentLocation.scheme == "chrome"
         || aContentLocation.scheme == "moz-icon"
+        || aContentLocation.scheme == "moz-filedata"
         || aContentLocation.scheme == "wyciwyg"
         || aContentLocation.scheme == "javascript") {
       return true;

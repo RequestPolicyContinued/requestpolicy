@@ -694,8 +694,7 @@ RequestPolicyService.prototype = {
       } catch (e) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
-            "Invalid refresh header: <" + refreshString + "> from origin <"
-                + origin + ">");
+            "Invalid refresh header: <" + refreshString + ">");
         if (!this._blockingDisabled) {
           httpChannel.setResponseHeader(headerType, "", false);
         }

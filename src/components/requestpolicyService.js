@@ -199,6 +199,7 @@ RequestPolicyService.prototype = {
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
+    idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
     try {
       // For Firefox <= 3.6.
@@ -295,6 +296,11 @@ RequestPolicyService.prototype = {
             "http://images2.similargroup.com/", ext.name]);
         this._compatibilityRules.push(["http://www.similarweb.com/",
             "http://go.similarsites.com/", ext.name]);
+        break;
+      case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
         break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,

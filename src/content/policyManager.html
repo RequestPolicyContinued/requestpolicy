@@ -1,21 +1,37 @@
+<!doctype html>
 <html>
 <head>
   <title>RequestPolicy - Preferences</title>
   <script src="policyManager.js"></script>
   <!--<link href="policyManager.css" rel="stylesheet" type="text/css" />-->
   <style>
+    html {
+      height: 100%;
+    }
     body {
       font-family: Helvetica, sans-serif;
       font-size: 85%;
-      line-height:1.125em;
+      line-height: 1.125em;
       margin: 0;
       padding: 0;
       height: 100%;
     }
 
-    #header {
-      position: absolute;
-      z-index: 1;
+    table {
+      margin: 0;
+      padding: 0;
+      border-collapse: collapse;
+      height: 100%;
+      width: 100%;
+    }
+    td {
+      vertical-align: top;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+
+    #side {
       height: 100%;
       width: 210px;
       background-color: #ede9e9;
@@ -23,30 +39,30 @@
       text-align: right;
     }
 
-    #header #title {
+    #side #title {
       margin: 20px 18px 30px 15px;
       font-size: 1.6em;
       letter-spacing: 0.03em;
     }
 
-    #header #nav {
+    #side #nav {
       line-height: 30px;
       font-size: 1em;
     }
-    #header #nav ul {
+    #side #nav ul {
       width: 100%;
       margin: 0;
       padding: 0;
       list-style: none;
     }
-    #header #nav li a {
+    #side #nav li a {
       display: block;
       padding: 0px 20px 0px 20px;
       text-decoration: none;
       color: #222;
       outline: none;
     }
-    #header #nav li a[selected="true"] {
+    #side #nav li a[selected="true"] {
       background-color: #E2BABA;
       border-style: solid;
       border-width: 1px 0 1px 0;
@@ -55,7 +71,7 @@
     }
 
     #content {
-      padding: 20px 30px 10px 240px;
+      padding: 20px 30px 10px 30px;
     }
 
     #pagetitle {
@@ -71,43 +87,49 @@
   </style>
 </head>
 <body onload="onload()">
+<table>
+  <tr>
+    <td id="side">
+      <div id="title">RequestPolicy</div>
+      <div id="nav">
+        <ul>
+          <li><a href="#">Preferences</a></li>
+          <li><a href="#" selected="true">Manage Policies</a></li>
+          <li><a href="#">Advanced</a></li>
+          <li><a href="#">Get Help</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </div>
+    </td>
+    <td id="content">
+      <div id="pagetitle">Manage Policies</div>
 
-<div id="header">
-  <div id="title">RequestPolicy</div>
-  <div id="nav">
-    <ul>
-      <li><a href="#">Preferences</a></li>
-      <li><a href="#" selected="true">Manage Policies</a></li>
-      <li><a href="#">Advanced</a></li>
-      <li><a href="#">Get Help</a></li>
-      <li><a href="#">About</a></li>
-    </ul>
-  </div>
-</div>
+      <div id="policy-user">
+        <h2>Your Policy</h2>
 
-<div id="content">
-  <div id="pagetitle">Manage Policies</div>
+        <p class="allow-rule-count"></p>
 
-  <div id="policy-user">
-    <h2>Your Policy</h2>
+        <p class="deny-rule-count"></p>
 
-    <p class="allow-rule-count"></p>
-    <p class="deny-rule-count"></p>
+        <table class="policy">
+        </table>
+      </div>
 
-    <table class="policy">
-    </table>
-  </div>
+      <div id="policy-temp">
+        <h2>Your Temporary Policy</h2>
 
-  <div id="policy-temp">
-    <h2>Your Temporary Policy</h2>
+        <p class="rule-count">There are X rules in this policy.</p>
 
-    <p class="rule-count">There are X rules in this policy.</p>
+        <table class="policy">
+        </table>
+      </div>
 
-    <table class="policy">
-    </table>
-  </div>
+      <p class="rule-count">There are X rules in this policy.</p>
 
-</div>
+      <p class="rule-count">There are X rules in this policy.</p>
+    </td>
+  </tr>
+</table>
 
 </body>
 </html>

@@ -1,0 +1,68 @@
+<html>
+<head>
+  <script src="policyManager.js"></script>
+  <!--<link href="policyManager.css" rel="stylesheet" type="text/css" />-->
+  <style>
+    body {
+      font-family: sans-serif;
+      font-size: 87%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #header {
+      height: 70px;
+    }
+
+    #header {
+      border-bottom: 1px solid #ccd;
+      padding: 0.2em 1.2em 0.2em 1.2em;
+      margin-top : 0;
+      background-color : #EDEBD5;
+      background-image : url("chrome://requestpolicy/skin/requestpolicy-icon-32.png");
+      background-repeat : no-repeat;
+      background-position : 99% 3px;
+    }
+
+    #content {
+      padding: 1em 2em 1em 2em;
+    }
+
+    h1 {
+      font-size: 1.6em;
+    }
+    h2 {
+      font-size: 1.3em;
+    }
+  </style>
+</head>
+<body onload="onload()">
+
+<div id="header">RequestPolicy</div>
+
+<div id="content">
+  <h1>Manage Policies</h1>
+
+  <div id="policy-user">
+    <h2>Your Policy</h2>
+
+    <p class="allow-rule-count"></p>
+    <p class="deny-rule-count"></p>
+
+    <table class="policy">
+    </table>
+  </div>
+
+  <div id="policy-temp">
+    <h2>Your Temporary Policy</h2>
+
+    <p class="rule-count">There are X rules in this policy.</p>
+
+    <table class="policy">
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

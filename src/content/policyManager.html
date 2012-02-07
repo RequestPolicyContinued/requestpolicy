@@ -74,6 +74,7 @@
       padding: 20px 30px 10px 30px;
     }
     #contentcontainer {
+      min-width: 700px;
       max-width: 1000px;
     }
 
@@ -90,6 +91,10 @@
     }
 
     table.policy {
+      table-layout:fixed;
+    }
+    .policyheader #policysearch {
+      float: right;
     }
     table.policy th {
       text-align: left;
@@ -97,6 +102,8 @@
       font-weight: bold;
       font-size: 0.95em;
       padding-bottom: 10px;
+      padding-left: 10px;
+      padding-top: 10px;
     }
     table.policy th:first-child {
       padding-left: 10px;
@@ -107,28 +114,37 @@
     table.policy td {
       padding-top: 11px;
       padding-bottom: 11px;
+      overflow:hidden;
+      word-wrap: break-word;
+      padding-left: 10px;
+    }
+    table.policy td:first-child {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    table.policy td:nth-child(2) {
+      padding-right: 10px;
+    }
+    table.policy td:nth-child(3) {
+      padding-right: 10px;
     }
     table.policy td:first-child {
       padding-left: 10px;
     }
     table.policy td:last-child {
       text-align: right;
+      width: 30px;
     }
     .policydata table.policy tr:hover {
       background-color: #F2DFDF;
     }
     table.policy col.type {
-      width: 200px;
-      padding-left: 10px;
-      margin-left: 10px;
+      width: 100px;
     }
     table.policy col.origin {
-      width: 200px;
+      width: 300px;
     }
     table.policy col.destination {
-    }
-    table.policy col.delete {
-      width: 30px;
     }
     table.policy a.deleterule {
       display: none;
@@ -147,7 +163,8 @@
     }
 
     .policydata {
-      overflow-y: scroll;
+      overflow-y: auto;
+      overflow-x: auto;
       max-height: 400px;
       border: 1px solid #ddd;
     }
@@ -173,60 +190,31 @@
       <div id="contentcontainer">
         <div id="pagetitle">Manage Policies</div>
 
-        <div id="policy-user">
-          <p class="allow-rule-count"></p>
-
-          <p class="deny-rule-count"></p>
-
-          <table class="policy">
-            <colgroup>
-              <col class="type" />
-              <col class="origin" />
-              <col class="destination" />
-              <col class="delete" />
-            </colgroup>
-            <tr>
-              <th>Type</th>
-              <th>Origin</th>
-              <th>Destination</th>
-              <th><input type="search" placeholder="Search" /></th>
-            </tr>
-          </table>
-          <div class="policydata">
+        <div>
+          <div class="policyheader">
+            <div id="policysearch">
+              <input type="search" placeholder="Search" />
+            </div>
             <table class="policy">
               <colgroup>
                 <col class="type" />
                 <col class="origin" />
                 <col class="destination" />
               </colgroup>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
-              <tr><td>Allow</td><td>foo.com</td><td>bar.com</td><td><a href="#" class="deleterule">X</a></td></tr>
+              <tr>
+                <th>Type</th>
+                <th>Origin</th>
+                <th>Destination</th>
+              </tr>
+            </table>
+          </div>
+          <div class="policydata">
+            <table id="policy-user" class="policy">
+              <colgroup>
+                <col class="type" />
+                <col class="origin" />
+                <col class="destination" />
+              </colgroup>
             </table>
          </div>
         </div>

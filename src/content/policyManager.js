@@ -1,15 +1,18 @@
 function addPolicyTableRow(table, type, origin, dest) {
-//  var rowCount = table.rows.length;
-//  var row = table.insertRow(rowCount);
-//
-//  var typeCell = row.insertCell(0);
-//  typeCell.textContent = type;
-//
-//  var originCell = row.insertCell(1);
-//  originCell.textContent = origin;
-//
-//  var destCell = row.insertCell(2);
-//  destCell.textContent = dest;
+  var rowCount = table.rows.length;
+  var row = table.insertRow(rowCount);
+
+  var typeCell = row.insertCell(0);
+  typeCell.textContent = type;
+
+  var originCell = row.insertCell(1);
+  originCell.textContent = origin;
+
+  var destCell = row.insertCell(2);
+  destCell.textContent = dest;
+
+  var destCell = row.insertCell(3);
+  destCell.innerHTML = '<a href="#" class="deleterule">X</a>';
 }
 
 // TODO: remove code duplication with menu.js
@@ -54,7 +57,7 @@ function onload() {
 //  var el = document.getElementById('policy-user').getElementsByClassName('deny-rule-count')[0];
 //  el.textContent = 'There are ' + user.rawPolicy.getDenyRuleCount() + ' "deny" rules in this policy.';
 
-  var table = document.getElementById('policy-user').getElementsByClassName('policy')[0];
+  var table = document.getElementById('policy-user');
 
   var entries = user.rawPolicy.toJSON()['entries'];
 
@@ -62,6 +65,8 @@ function onload() {
     var entry = entries['allow'][i];
     var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
     var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
-    addPolicyTableRow(table, 'allow', origin, dest);
+    addPolicyTableRow(table, 'Allow', origin, dest);
   }
+  addPolicyTableRow(table, 'Allow', 'loooooooooooooooooo/oooooooooooooooooooooooooooooooo/oooooooooooooooooooooooooooooooong',
+                    'ruuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuule');
 }

@@ -483,17 +483,19 @@ requestpolicy.overlay = {
     var notificationButtonDenyKey = this._strbundle
         .getString("deny.accesskey");
 
-    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
-    var optionsPopup = document.getElementById(optionsPopupName);
-    requestpolicy.menu.clearMenu(optionsPopup);
-    var currentIdent = this._rpService
-        .getUriIdentifier(targetDocument.location);
-    var destIdent = this._rpService.getUriIdentifier(redirectTargetUri);
-
-    requestpolicy.menu.addMenuItemTemporarilyAllowOriginToDest(optionsPopup,
-        currentIdent, destIdent);
-    requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
-        destIdent);
+//    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
+//    var optionsPopup = document.getElementById(optionsPopupName);
+//    while (optionsPopup.firstChild) {
+//      optionsPopup.removeChild(optionsPopup.firstChild);
+//    }
+//    var currentIdent = this._rpService
+//        .getUriIdentifier(targetDocument.location);
+//    var destIdent = this._rpService.getUriIdentifier(redirectTargetUri);
+//
+//    requestpolicy.menu.addMenuItemTemporarilyAllowOriginToDest(optionsPopup,
+//        currentIdent, destIdent);
+//    requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
+//        destIdent);
 
     const rpServiceObj = this._rpServiceJSObject;
 
@@ -529,11 +531,11 @@ requestpolicy.overlay = {
             callback : function() {
               // Do nothing. The notification closes when this is called.
             }
-          }, {
-            label : notificationButtonOptions,
-            accessKey : notificationButtonOptionsKey,
-            popup : optionsPopupName,
-            callback : null
+//          }, {
+//            label : notificationButtonOptions,
+//            accessKey : notificationButtonOptionsKey,
+//            popup : optionsPopupName,
+//            callback : null
           }];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
       notificationBox.appendNotification(notificationLabel, notificationValue,

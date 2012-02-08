@@ -90,8 +90,7 @@ requestpolicy.menu = {
       } catch (e) {
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
               "Unable to prepare menu because base domain can't be determined: " + this._currentUri);
-        // TODO: before returning, populate the menu with a useful message and
-        // remove anything confusing that would be been left visible in the menu.
+        this._populateMenuForUncontrollableOrigin();
         return;
       }
 
@@ -102,8 +101,16 @@ requestpolicy.menu = {
       //                              "this._currentUri: " + this._currentUri);
       this._currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(this._currentUri);
 
-//      this._isChromeUri = this._currentUriObj.scheme == "chrome";
-//      this._currentUriIsHttps = currentUriObj.scheme == "https";
+      this._isChromeUri = this._currentUriObj.scheme == "chrome";
+      //this._currentUriIsHttps = this._currentUriObj.scheme == "https";
+
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+                                    "this._currentUri: " + this._currentUri);
+
+      if (this._isChromeUri) {
+        this._populateMenuForUncontrollableOrigin();
+        return;
+      }
 
       // The fact that getOtherOrigins uses documentURI directly from
       // content.document is important because getTopLevelDocumentUri will
@@ -141,6 +148,21 @@ requestpolicy.menu = {
                                       "Unable to prepare menu due to error.");
       throw e;
     }
+  },
+
+  _populateMenuForUncontrollableOrigin : function() {
+    this._originItem.setAttribute('value', '[no origin]');
+    this._removeChildren(this._otherOriginsList);
+    this._removeChildren(this._blockedDestinationsList);
+    this._removeChildren(this._mixedDestinationsList);
+    this._removeChildren(this._allowedDestinationsList);
+    this._removeChildren(this._removeRulesList);
+    this._removeChildren(this._addRulesList);
+    document.getElementById('rp-other-origins').hidden = true;
+    document.getElementById('rp-blocked-destinations').hidden = true;
+    document.getElementById('rp-mixed-destinations').hidden = true;
+    document.getElementById('rp-allowed-destinations').hidden = true;
+    // TODO: show some message about why the menu is empty.
   },
 
   _populateList : function(list, values) {

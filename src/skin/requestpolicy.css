@@ -155,9 +155,6 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   margin: 0px 4px 0px 4px;
   border-radius: 3px;
 }
-.rp-od-item:hover {
-  cursor: pointer;
-}
 
 #rp-origins-destinations [selected-origin="true"] {
   border-color: #ddd !important;

@@ -137,6 +137,7 @@
     }
     .policydata table.policy tr:hover {
       background-color: #F2DFDF;
+      cursor: default;
     }
     table.policy col.type {
       width: 100px;
@@ -193,7 +194,7 @@
         <div>
           <div class="policyheader">
             <div id="policysearch">
-              <input type="search" placeholder="Search" />
+              <input type="search" placeholder="Search" id="rulesearch" />
             </div>
             <table class="policy">
               <colgroup>
@@ -216,6 +217,7 @@
                 <col class="destination" />
               </colgroup>
             </table>
+            <tbody id="rules"></tbody>
          </div>
         </div>
       </div>

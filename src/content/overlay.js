@@ -1630,6 +1630,11 @@ requestpolicy.overlay = {
         null);
   },
 
+  openPolicyManager : function() {
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/policyManager.html');
+    gBrowser.selectedTab = tab;
+  },
+
   clearRequestLog : function() {
     this.requestLogTreeView.clear();
   },

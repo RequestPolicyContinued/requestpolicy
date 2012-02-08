@@ -113,6 +113,9 @@
             <label id="rp-link-prefs" class="rp-footer-link"
                    value="&preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
+            <label id="rp-link-prefs" class="rp-footer-link"
+                   value="Manage policies"
+                   onclick="requestpolicy.overlay.openPolicyManager();"/>
             <label id="rp-link-help" class="rp-footer-link"
                    value="&requestLog.title;"
                    onclick="requestpolicy.overlay.toggleRequestLog(event);"/>

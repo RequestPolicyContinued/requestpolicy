@@ -222,6 +222,8 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 #rp-other-origins {
   color: #444;
   margin-top: 1em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid #eee;
 }
 #rp-other-origins-title {
   color: #aaa;

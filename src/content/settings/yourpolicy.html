@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<title>RequestPolicy - Preferences</title>
+<script src="yourpolicy.js"></script>
+<link href="settings.css" rel="stylesheet" type="text/css" />
+</head>
+<body onload="onload()">
+<table>
+  <tr>
+    <td id="sidepad"></td>
+    <td id="side">
+      <div id="sidecontainer">
+        <div id="requestpolicy">RequestPolicy</div>
+        <div id="mainnav" class="nav">
+          <ul>
+            <li><a href="#">Preferences</a></li>
+            <li><a href="#" selected="true">Manage Policies</a></li>
+            <li><a href="#">Get Help</a></li>
+            <li><a href="#">About</a></li>
+          </ul>
+        </div>
+        <div id="subnav1" class="nav subnav">
+          <ul>
+            <li><a href="#" selected="true">Your Policy</a></li>
+            <li><a href="#">Default Policy</a></li>
+            <li><a href="#">Subscriptions</a></li>
+          </ul>
+        </div>
+      </div>
+    </td>
+    <td id="contentpad"></td>
+    <td id="content">
+      <div id="contentcontainer">
+        <div id="pagetitle">Your Policy</div>
+
+        <div>
+          <div class="policyheader">
+            <div id="policysearch">
+              <input type="search" placeholder="Search" id="rulesearch"/>
+            </div>
+            <table class="policy">
+              <colgroup>
+                <col class="type"/>
+                <col class="origin"/>
+                <col class="destination"/>
+              </colgroup>
+              <tr>
+                <th>Type</th>
+                <th>Origin</th>
+                <th>Destination</th>
+              </tr>
+            </table>
+          </div>
+          <div class="policydata">
+            <table id="policy-user" class="policy">
+              <colgroup>
+                <col class="type"/>
+                <col class="origin"/>
+                <col class="destination"/>
+              </colgroup>
+            </table>
+            <tbody id="rules"></tbody>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

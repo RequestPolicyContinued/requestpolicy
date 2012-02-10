@@ -2048,6 +2048,13 @@ RequestPolicyService.prototype = {
     return false;
   },
 
+  _isAllowedByDefaultPolicy : function(origin, destination) {
+    var originIdentifier = this.getUriIdentifier(origin);
+    var destIdentifier = this.getUriIdentifier(dest);
+
+    return destIdentifier == originIdentifier;
+  },
+
   /**
    * Determines if a request is a duplicate of the last call to shouldLoad(). If
    * it is, the cached result in _lastShouldLoadCheck.result can be used. Not
@@ -2212,16 +2219,6 @@ RequestPolicyService.prototype = {
           return this.accept("User-allowed redirect", args, true);
         }
 
-        var originIdentifier = this.getUriIdentifier(origin);
-        var destIdentifier = this.getUriIdentifier(dest);
-
-        if (destIdentifier == originIdentifier) {
-          return this.accept("same host (at current domain strictness level)",
-              args);
-        }
-
-        // TODO: missing support for temp policies at the moment.
-
         var result = this._policyMgr.checkRequest(aRequestOrigin,
               aContentLocation);
         if (result.isDenied()) {
@@ -2232,9 +2229,6 @@ RequestPolicyService.prototype = {
           return this.accept("allowed by policy (whitelisted)", args, false,
                 result);
         }
-        // If the request is neither blacklisted nor whitelisted, it will be
-        // subject to the user's default allow/deny setting.
-        // TODO: implement a defualt allow/deny setting. 
 
         if (aRequestOrigin.scheme == "chrome") {
           if (aRequestOrigin.asciiHost == "browser") {
@@ -2309,10 +2303,16 @@ RequestPolicyService.prototype = {
           }
         }
 
-        // We didn't match any of the conditions in which to allow the request,
-        // so reject it.
-        return aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
-            this.reject("hosts don't match", args);
+        if (this._isAllowedByDefaultPolicy(origin, destination)) {
+          // TODO: what should the third argument be to accept/reject?
+          return this.accept("Allowed by default policy", args);
+        } else {
+          // We didn't match any of the conditions in which to allow the request,
+          // so reject it.
+          return aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
+                this.reject("Denied by default policy", args);
+        }
+
 
       } catch (e) {
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,

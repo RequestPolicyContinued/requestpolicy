@@ -1,27 +1,21 @@
-html {
-  height: 100%;
-}
 body {
   font-family: Arial, sans-serif;
   font-size: 85%;
   line-height: 1.125em;
   margin: 25px 0 0 0;
   padding: 0;
-  height: 100%;
 }
 
 table {
   margin: 0;
   padding: 0;
   border-collapse: collapse;
-  height: 100%;
   width: 100%;
 }
 td {
   vertical-align: top;
   padding: 0;
   margin: 0;
-  height: 100%;
 }
 
 /* The pads should only take up their declared width when window size allows. */
@@ -33,13 +27,12 @@ td {
 }
 
 #side {
-  height: 100%;
   /* This width will only be achieved when screen width allows. */
   width: 220px;
 }
 #sidecontainer {
   /* By not wrapping text, we get a minimum width that depends on the longest
-     text in the side. */
+text in the side. */
   white-space: nowrap;
   margin-left: 10px;
   margin-right: 20px;

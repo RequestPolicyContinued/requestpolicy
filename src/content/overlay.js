@@ -1633,7 +1633,7 @@ requestpolicy.overlay = {
   },
 
   openPolicyManager : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/policyManager.html');
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/yourpolicy.html');
     gBrowser.selectedTab = tab;
   },
 

@@ -1,205 +1,245 @@
 <!doctype html>
 <html>
 <head>
-  <title>RequestPolicy - Preferences</title>
-  <script src="policyManager.js"></script>
-  <!--<link href="policyManager.css" rel="stylesheet" type="text/css" />-->
-  <style>
-    html {
-      height: 100%;
-    }
-    body {
-      font-family: Helvetica, sans-serif;
-      font-size: 85%;
-      line-height: 1.125em;
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
+<title>RequestPolicy - Preferences</title>
+<script src="policyManager.js"></script>
+<!--<link href="policyManager.css" rel="stylesheet" type="text/css" />-->
+<style>
+html {
+  height: 100%;
+}
+body {
+  font-family: Arial, sans-serif;
+  font-size: 85%;
+  line-height: 1.125em;
+  margin: 25px 0 0 0;
+  padding: 0;
+  height: 100%;
+}
 
-    table {
-      margin: 0;
-      padding: 0;
-      border-collapse: collapse;
-      height: 100%;
-      width: 100%;
-    }
-    td {
-      vertical-align: top;
-      padding: 0;
-      margin: 0;
-      height: 100%;
-    }
+table {
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+  height: 100%;
+  width: 100%;
+}
+td {
+  vertical-align: top;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
 
-    #side {
-      height: 100%;
-      width: 210px;
-      background-color: #ede9e9;
-      border-right: 1px solid #c6c6c6;
-      text-align: right;
-    }
+/* The pads should only take up their declared width when window size allows. */
+#sidepad {
+  width: 18px;
+}
+#contentpad {
+  width: 30px;
+}
 
-    #side #requestpolicy {
-      margin: 20px 18px 30px 15px;
-      font-size: 1.6em;
-      letter-spacing: 0.03em;
-    }
+#side {
+  height: 100%;
+  /* This width will only be achieved when screen width allows. */
+  width: 220px;
+}
+#sidecontainer {
+  /* By not wrapping text, we get a minimum width that depends on the longest
+     text in the side. */
+  white-space: nowrap;
+  margin-left: 10px;
+  margin-right: 20px;
+}
 
-    #side #nav {
-      line-height: 30px;
-      font-size: 1em;
-    }
-    #side #nav ul {
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    #side #nav li a {
-      display: block;
-      padding: 0px 20px 0px 20px;
-      text-decoration: none;
-      color: #222;
-      outline: none;
-    }
-    #side #nav li a[selected="true"] {
-      background-color: #E2BABA;
-      border-style: solid;
-      border-width: 1px 0 1px 0;
-      border-color: #C29797;
-      color: #000;
-    }
+#side #requestpolicy {
+  margin: 0 0 30px 6px;
+  font-size: 1.6em;
+  letter-spacing: 0.03em;
+}
 
-    #content {
-      padding: 20px 30px 10px 30px;
-    }
-    #contentcontainer {
-      min-width: 700px;
-      max-width: 1000px;
-    }
+#side .nav {
+  line-height: 30px;
+  font-size: 1em;
+}
+#side .nav ul {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#side .nav li a {
+  display: inline;
+  line-height: 1.8em;
+  padding: 0 12px 0 6px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: #222;
+}
+#side .nav li a:hover {
+  text-decoration: underline;
+}
+#side .nav li a[selected="true"] {
+  color: #35c;
+  font-weight: bold;
+}
+#side .subnav {
+  margin-top: 20px;
+  padding-top: 20px;
+  border: 1px solid #eee;
+  border-width: 1px 0 0 0;
+  line-height: 20px;
+}
+#side .subnav li a {
+  line-height: 1em;
+}
+#side .subnav li a[selected="true"] {
+  font-weight: bold;
+}
 
-    #pagetitle {
-      font-size: 1.6em;
-      border: 0 solid #eee;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      border-bottom-width: 1px;
-    }
-    h2 {
-      font-size: 1.3em;
-      font-weight: normal;
-    }
+#content {
+  padding: 0 30px 10px 0;
+}
+#contentcontainer {
+  min-width: 700px;
+  max-width: 1000px;
+}
 
-    table.policy {
-      table-layout:fixed;
-    }
-    .policyheader #policysearch {
-      float: right;
-    }
-    table.policy th {
-      text-align: left;
-      vertical-align: bottom;
-      font-weight: bold;
-      font-size: 0.95em;
-      padding-bottom: 10px;
-      padding-left: 10px;
-      padding-top: 10px;
-    }
-    table.policy th:first-child {
-      padding-left: 10px;
-    }
-    table.policy th:last-child input {
-      margin-bottom: 0;
-    }
-    table.policy td {
-      padding-top: 11px;
-      padding-bottom: 11px;
-      overflow:hidden;
-      word-wrap: break-word;
-      padding-left: 10px;
-    }
-    table.policy td:first-child {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-    table.policy td:nth-child(2) {
-      padding-right: 10px;
-    }
-    table.policy td:nth-child(3) {
-      padding-right: 10px;
-    }
-    table.policy td:first-child {
-      padding-left: 10px;
-    }
-    table.policy td:last-child {
-      text-align: right;
-      width: 30px;
-    }
-    .policydata table.policy tr:hover {
-      background-color: #F2DFDF;
-      cursor: default;
-    }
-    table.policy col.type {
-      width: 100px;
-    }
-    table.policy col.origin {
-      width: 300px;
-    }
-    table.policy col.destination {
-    }
-    table.policy a.deleterule {
-      display: none;
-      text-decoration: none;
-      padding: 10px;
-      font-weight: bold;
-      font-size: 0.95em;
-      outline: none;
-    }
-    table.policy tr:hover a.deleterule {
-      display: inline;
-      color: #aaa;
-    }
-    table.policy tr:hover a.deleterule:hover {
-      color: #000;
-    }
+#pagetitle {
+  font-size: 1.6em;
+  border: 0 solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  border-bottom-width: 1px;
+}
+h2 {
+  font-size: 1.3em;
+  font-weight: normal;
+}
 
-    .policydata {
-      overflow-y: auto;
-      overflow-x: auto;
-      max-height: 400px;
-      border: 1px solid #ddd;
-    }
+table.policy {
+  table-layout: fixed;
+}
+.policyheader #policysearch {
+  float: right;
+}
+table.policy th {
+  text-align: left;
+  vertical-align: bottom;
+  font-weight: bold;
+  font-size: 0.95em;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+table.policy th:first-child {
+  padding-left: 10px;
+}
+table.policy th:last-child input {
+  margin-bottom: 0;
+}
+table.policy td {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  overflow: hidden;
+  word-wrap: break-word;
+  padding-left: 10px;
+}
+table.policy td:first-child {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+table.policy td:nth-child(2) {
+  padding-right: 10px;
+}
+table.policy td:nth-child(3) {
+  padding-right: 10px;
+}
+table.policy td:first-child {
+  padding-left: 10px;
+}
+table.policy td:last-child {
+  text-align: right;
+  width: 30px;
+}
+.policydata table.policy tr:hover {
+  background-color: #EAF2FC;
+  cursor: default;
+}
+table.policy col.type {
+  width: 100px;
+}
+table.policy col.origin {
+  width: 300px;
+}
+table.policy col.destination {
+}
+table.policy a.deleterule {
+  display: none;
+  text-decoration: none;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 0.95em;
+  outline: none;
+}
+table.policy tr:hover a.deleterule {
+  display: inline;
+  color: #aaa;
+}
+table.policy tr:hover a.deleterule:hover {
+  color: #000;
+}
 
-  </style>
+.policydata {
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: 400px;
+  border: 1px solid #ddd;
+}
+
+</style>
 </head>
 <body onload="onload()">
 <table>
   <tr>
+    <td id="sidepad"></td>
     <td id="side">
-      <div id="requestpolicy">RequestPolicy</div>
-      <div id="nav">
-        <ul>
-          <li><a href="#">Preferences</a></li>
-          <li><a href="#" selected="true">Manage Policies</a></li>
-          <li><a href="#">Get Help</a></li>
-          <li><a href="#">About</a></li>
-        </ul>
+      <div id="sidecontainer">
+        <div id="requestpolicy">RequestPolicy</div>
+        <div id="mainnav" class="nav">
+          <ul>
+            <li><a href="#">Preferences</a></li>
+            <li><a href="#" selected="true">Manage Policies</a></li>
+            <li><a href="#">Get Help</a></li>
+            <li><a href="#">About</a></li>
+          </ul>
+        </div>
+        <div id="subnav1" class="nav subnav">
+          <ul>
+            <li><a href="#" selected="true">Your Policy</a></li>
+            <li><a href="#">Default Policy</a></li>
+            <li><a href="#">Subscriptions</a></li>
+          </ul>
+        </div>
       </div>
     </td>
+    <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer">
-        <div id="pagetitle">Manage Policies</div>
+        <div id="pagetitle">Your Policy</div>
 
         <div>
           <div class="policyheader">
             <div id="policysearch">
-              <input type="search" placeholder="Search" id="rulesearch" />
+              <input type="search" placeholder="Search" id="rulesearch"/>
             </div>
             <table class="policy">
               <colgroup>
-                <col class="type" />
-                <col class="origin" />
-                <col class="destination" />
+                <col class="type"/>
+                <col class="origin"/>
+                <col class="destination"/>
               </colgroup>
               <tr>
                 <th>Type</th>
@@ -211,13 +251,13 @@
           <div class="policydata">
             <table id="policy-user" class="policy">
               <colgroup>
-                <col class="type" />
-                <col class="origin" />
-                <col class="destination" />
+                <col class="type"/>
+                <col class="origin"/>
+                <col class="destination"/>
               </colgroup>
             </table>
             <tbody id="rules"></tbody>
-         </div>
+          </div>
         </div>
       </div>
     </td>

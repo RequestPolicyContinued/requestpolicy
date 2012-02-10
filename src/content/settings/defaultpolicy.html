@@ -1,9 +1,38 @@
 <!doctype html>
 <html>
 <head>
-<title>RequestPolicy - Default Policy</title>
-<script src="defaultpolicy.js"></script>
-<link href="settings.css" rel="stylesheet" type="text/css" />
+  <title>RequestPolicy - Default Policy</title>
+  <script src="defaultpolicy.js"></script>
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <style>
+    .settings input {
+      margin-right: 10px;
+      /* Vertically align the inputs and labels is annoying trial-and-error. */
+      /* Note: this might be theme-dependent, too. Need to try on windows/mac. */
+      margin-bottom: 5px;
+      vertical-align: middle;
+    }
+    table.settings td {
+      padding-bottom: 15px;
+    }
+    table.settings tr:not(:first-child) td {
+      padding-top: 15px;
+    }
+    table.settings td:first-child {
+      width: 140px;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    table.settings td:nth-child(2) {
+      color: #444;
+    }
+    table.settings tr:not(:first-child) {
+      border-top: 1px solid #eee;
+    }
+    #defaultdenysetting {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body onload="onload()">
 <table>
@@ -23,7 +52,8 @@
         <div id="subnav1" class="nav subnav">
           <ul>
             <li><a href="yourpolicy.html">Your Policy</a></li>
-            <li><a href="defaultpolicy.html" selected="true">Default Policy</a></li>
+            <li><a href="defaultpolicy.html" selected="true">Default Policy</a>
+            </li>
             <li><a href="#">Subscriptions</a></li>
           </ul>
         </div>
@@ -33,7 +63,36 @@
     <td id="content">
       <div id="contentcontainer" class="defaultpolicy">
         <div id="pagetitle">Default Policy</div>
+        <table class="settings">
+          <tr>
+            <td>Default Rule</td>
+            <td>
+              <label><input type="radio" name="defaultrule" id="defaultallow"
+                            value="allow" />Allow</label><br/>
+              <label><input type="radio" name="defaultrule" id="defaultdeny"
+                            value="deny" />Deny</label>
 
+              <div id="defaultdenysetting">
+                <label>
+                  <input type="checkbox" name="allowsamedomain"
+                         id="allowsamedomain" value="true" />
+                  Allow requests to the same domain
+                </label>
+              </div>
+            </td>
+          </tr>
+          <!--
+          <tr>
+            <td>Redirects</td>
+            <td>
+              <label><input type="radio" name="redirects"
+                            value="allow"/>Allow</label><br/>
+              <label><input type="radio" name="redirects"
+                            value="notify"/>Show notification</label>
+            </td>
+          </tr>
+          -->
+        </table>
       </div>
     </td>
   </tr>

@@ -2048,11 +2048,13 @@ RequestPolicyService.prototype = {
     return false;
   },
 
-  _isAllowedByDefaultPolicy : function(origin, destination) {
-    var originIdentifier = this.getUriIdentifier(origin);
-    var destIdentifier = this.getUriIdentifier(dest);
+  _isAllowedByDefaultPolicy : function(origin, dest) {
+    var originDomain = requestpolicy.mod.DomainUtil.getIdentifier(origin,
+          requestpolicy.mod.DomainUtil.LEVEL_DOMAIN);
+    var destDomain = requestpolicy.mod.DomainUtil.getIdentifier(dest,
+          requestpolicy.mod.DomainUtil.LEVEL_DOMAIN);
 
-    return destIdentifier == originIdentifier;
+    return originDomain == destDomain;
   },
 
   /**
@@ -2303,7 +2305,7 @@ RequestPolicyService.prototype = {
           }
         }
 
-        if (this._isAllowedByDefaultPolicy(origin, destination)) {
+        if (this._isAllowedByDefaultPolicy(origin, dest)) {
           // TODO: what should the third argument be to accept/reject?
           return this.accept("Allowed by default policy", args);
         } else {

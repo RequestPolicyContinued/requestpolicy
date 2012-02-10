@@ -1456,13 +1456,6 @@ RequestPolicyService.prototype = {
     // This is not including link clicks, form submissions, and user-allowed
     // redirects.
 
-    var originIdentifier = this.getUriIdentifier(originUri);
-    var destIdentifier = this.getUriIdentifier(destinationUri);
-
-    if (destIdentifier == originIdentifier) {
-      return true;
-    }
-
     var originUriObj = requestpolicy.mod.DomainUtil.getUriObject(originUri);
     var destUriObj = requestpolicy.mod.DomainUtil.getUriObject(destinationUri);
 
@@ -1494,7 +1487,7 @@ RequestPolicyService.prototype = {
       }
     }
 
-    return false;
+    return this._isAllowedByDefaultPolicy(originUri, destinationUri);
   },
 
   /**
@@ -2049,12 +2042,25 @@ RequestPolicyService.prototype = {
   },
 
   _isAllowedByDefaultPolicy : function(origin, dest) {
-    var originDomain = requestpolicy.mod.DomainUtil.getIdentifier(origin,
-          requestpolicy.mod.DomainUtil.LEVEL_DOMAIN);
-    var destDomain = requestpolicy.mod.DomainUtil.getIdentifier(dest,
-          requestpolicy.mod.DomainUtil.LEVEL_DOMAIN);
+    // TODO: don't get prefs here each time this function is called. They
+    // should be available as this._whatever.
+    var defaultAllow = this.prefs.getBoolPref('defaultPolicy.allow');
+    var allowSameDomain = this.prefs.getBoolPref('defaultPolicy.allowSameDomain');
 
-    return originDomain == destDomain;
+    if (defaultAllow) {
+      return true;
+    }
+    if (allowSameDomain) {
+      var originDomain = requestpolicy.mod.DomainUtil.getDomain(origin);
+      var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
+      return originDomain == destDomain;
+    }
+    // TODO: I don't think LEVEL_SOP is exactly what we want.
+    var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin,
+          requestpolicy.mod.DomainUtil.LEVEL_SOP);
+    var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest,
+          requestpolicy.mod.DomainUtil.LEVEL_SOP);
+    return originIdent == destIdent;
   },
 
   /**

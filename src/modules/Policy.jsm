@@ -402,7 +402,7 @@ RawPolicy.prototype = {
         dwarn("Invalid entry type: " + typeStr);
         continue;
       }
-      var ruleType = "allow" ? RULE_TYPE_ALLOW : RULE_TYPE_DENY;
+      var ruleType = typeStr == "allow" ? RULE_TYPE_ALLOW : RULE_TYPE_DENY;
       var entryArray = this._entries[typeStr];
       for (var i in entryArray) {
         //dprint("toPolicy: adding entry");

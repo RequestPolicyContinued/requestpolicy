@@ -64,6 +64,12 @@ DomainUtil.LEVEL_SOP = 3;
 DomainUtil.getIdentifier = function(uri, level) {
   var identifier;
   var identifierGettingFunctionName;
+
+  // We only have one identifier that we're using now: the pre-path / LEVEL_SOP.
+  // TODO: figure out how we want to rename this function and clean up the
+  // unused parts.
+  level = this.LEVEL_SOP;
+
   switch (level) {
     case this.LEVEL_DOMAIN :
       identifierGettingFunctionName = "getDomain";

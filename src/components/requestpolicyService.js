@@ -116,7 +116,7 @@ RequestPolicyService.prototype = {
 
   _requestObservers : [],
 
-  _uriIdentificationLevel : 0,
+  //_uriIdentificationLevel : 0,
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -388,8 +388,8 @@ RequestPolicyService.prototype = {
   _syncFromPrefs : function() {
     // Load the logging preferences before the others.
     this._updateLoggingSettings();
-    this._uriIdentificationLevel = this.prefs
-        .getIntPref("uriIdentificationLevel");
+    //this._uriIdentificationLevel = this.prefs
+    //    .getIntPref("uriIdentificationLevel");
         
     // Note: not deleting this code. We'll need it later when we need to
     // migrate users to the new policy storage.
@@ -619,10 +619,10 @@ RequestPolicyService.prototype = {
       case "log.types" :
         this._updateLoggingSettings();
         break;
-      case "uriIdentificationLevel" :
-        this._uriIdentificationLevel = this.prefs
-            .getIntPref("uriIdentificationLevel");
-        break;
+      //case "uriIdentificationLevel" :
+      //  this._uriIdentificationLevel = this.prefs
+      //      .getIntPref("uriIdentificationLevel");
+      //  break;
       default :
         break;
     }
@@ -1050,7 +1050,8 @@ RequestPolicyService.prototype = {
 
   getUriIdentifier : function getUriIdentifier(uri) {
     return requestpolicy.mod.DomainUtil.getIdentifier(uri,
-        this._uriIdentificationLevel);
+    //    this._uriIdentificationLevel);
+        null);
   },
 
   registerHistoryRequest : function(destinationUrl) {
@@ -2241,14 +2242,14 @@ RequestPolicyService.prototype = {
 
         var result = this._policyMgr.checkRequest(aRequestOrigin,
               aContentLocation);
-//        for (var i = 0; i < result.matchedAllowRules.length; i++) {
-//          requestpolicy.mod.Logger.dump('Matched allow rules');
-//          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
-//        }
-//        for (var i = 0; i < result.matchedDenyRules.length; i++) {
-//          requestpolicy.mod.Logger.dump('Matched deny rules');
-//          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
-//        }
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        for (var i = 0; i < result.matchedDenyRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched deny rules');
+          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
+        }
         // TODO: this isn't right. What if there are both allowed and denied?
         // What if the user policy says one thing and a subscription policy
         // says another? What if the user's temp and non-temp policies disagree?

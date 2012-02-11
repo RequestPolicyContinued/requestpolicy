@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+  <title>RequestPolicy - Subscriptions</title>
+  <script src="subscriptions.js"></script>
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <style>
+  </style>
+</head>
+<body onload="onload()">
+<table>
+  <tr>
+    <td id="sidepad"></td>
+    <td id="side">
+      <div id="sidecontainer">
+        <div id="requestpolicy">RequestPolicy</div>
+        <div id="mainnav" class="nav">
+          <ul>
+            <li><a href="#">Preferences</a></li>
+            <li><a href="#" selected="true">Manage Policies</a></li>
+            <li><a href="#">Get Help</a></li>
+            <li><a href="#">About</a></li>
+          </ul>
+        </div>
+        <div id="subnav1" class="nav subnav">
+          <ul>
+            <li><a href="yourpolicy.html">Your Policy</a></li>
+            <li><a href="defaultpolicy.html">Default Policy</a></li>
+            <li><a href="subscriptions.html" selected="true">Subscriptions</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </td>
+    <td id="contentpad"></td>
+    <td id="content">
+      <div id="contentcontainer" class="subscriptions">
+        <div id="pagetitle">Subscription Policies</div>
+        <table class="settings">
+          <tr>
+            <td>Usability</td>
+            <td>
+              <div>
+                <label>
+                  <input type="checkbox" name="sameorg" id="sub-sameorg"/>
+                  Allow destinations that belong to the same organization as the
+                  origin webpage
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox" name="functionality" id="sub-functionality"/>
+                  Allow requests that are needed for websites to work properly
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox" name="embedded" id="sub-embedded"/>
+                  Allow requests for embedded content such as images and videos
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Privacy</td>
+            <td>
+              <div>
+                <label>
+                  <input type="checkbox" name="trackers" id="sub-trackers"/>
+                  Block destinations that can track you as you browse the web
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Browser</td>
+            <td>
+              <div>
+                <label>
+                  <input type="checkbox" name="mozilla" id="sub-mozilla"/>
+                  Allow requests related to Mozilla and Firefox websites
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox" name="extensions" id="sub-extensions"/>
+                  Allow requests that are needed for other extensions to work
+                  properly
+                </label>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

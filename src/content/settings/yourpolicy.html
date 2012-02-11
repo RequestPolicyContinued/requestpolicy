@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
 <head>
-<title>RequestPolicy - Preferences</title>
-<script src="yourpolicy.js"></script>
-<link href="settings.css" rel="stylesheet" type="text/css" />
+  <title>RequestPolicy - Preferences</title>
+  <script src="yourpolicy.js"></script>
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload="onload()">
 <table>
@@ -59,10 +59,55 @@
                 <col class="origin"/>
                 <col class="destination"/>
               </colgroup>
+              <tbody id="rules"></tbody>
             </table>
-            <tbody id="rules"></tbody>
           </div>
         </div>
+      </div>
+
+      <style>
+        #addrule {
+          margin-top: 20px;
+        }
+        input {
+          font-size: 1em;
+        }
+      </style>
+
+      <div id="addrule">
+
+        <form id="addruleform" onsubmit="return false;">
+          <label>
+            <input type="radio" name="allowdeny" id="allowrule" value="allow"
+                   checked="checked"/>
+            Allow
+          </label>
+          <br/>
+          <label>
+            <input type="radio" name="allowdeny" id="denyrule" value="deny"/>
+            Deny
+          </label>
+          <br/>
+          <label>
+            <input type="checkbox" name="temporary" />
+            Temporary
+          </label>
+          <table>
+            <tr>
+              <td class="origindest">Origin</td>
+              <td class="scheme"><input type="text" name="originscheme" placeholder="scheme"/></td>
+              <td class="host"><input type="text" name="originhost" placeholder="host"/></td>
+              <td class="port"><input type="text" name="originport" placeholder="port"/></td>
+            </tr>
+            <tr>
+              <td class="origindest">Destination</td>
+              <td class="scheme"><input type="text" name="destscheme" placeholder="scheme"/></td>
+              <td class="host"><input type="text" name="desthost" placeholder="host"/></td>
+              <td class="port"><input type="text" name="destport" placeholder="port"/></td>
+            </tr>
+          </table>
+          <input type="submit" value="Add rule" onclick="addRule();"/>
+        </form>
       </div>
     </td>
   </tr>

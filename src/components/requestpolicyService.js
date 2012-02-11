@@ -1164,6 +1164,18 @@ RequestPolicyService.prototype = {
     this._policyMgr.removeRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule);
   },
 
+  addDenyRule : function(rawRule) {
+    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+  },
+
+  addTemporaryDenyRule : function(rawRule) {
+    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+  },
+
+  removeDenyRule : function(rawRule) {
+    this._policyMgr.removeRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+  },
+
   _allowOrigin : function(host, noStore) {
     var ruleData = {"o":{"h":host}};
     this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData,
@@ -2229,6 +2241,19 @@ RequestPolicyService.prototype = {
 
         var result = this._policyMgr.checkRequest(aRequestOrigin,
               aContentLocation);
+//        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+//          requestpolicy.mod.Logger.dump('Matched allow rules');
+//          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+//        }
+//        for (var i = 0; i < result.matchedDenyRules.length; i++) {
+//          requestpolicy.mod.Logger.dump('Matched deny rules');
+//          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
+//        }
+        // TODO: this isn't right. What if there are both allowed and denied?
+        // What if the user policy says one thing and a subscription policy
+        // says another? What if the user's temp and non-temp policies disagree?
+        // Also, it will probably matter whether the user is in default allow
+        // or default deny mode.
         if (result.isDenied()) {
           return this.reject("blocked by policy (blacklisted)", args, false,
                 result);

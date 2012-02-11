@@ -163,7 +163,7 @@ table.policy col.origin {
 table.policy col.destination {
 }
 table.policy a.deleterule {
-  display: none;
+  color: rgba(255, 255, 255, 0);
   text-decoration: none;
   padding: 10px;
   font-weight: bold;
@@ -183,4 +183,22 @@ table.policy tr:hover a.deleterule:hover {
   overflow-x: auto;
   max-height: 400px;
   border: 1px solid #ddd;
+}
+
+#addrule table {
+  width : auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+#addrule .origindest {
+  padding-right: 10px;
+}
+#addrule .scheme input {
+  width: 5em;
+}
+#addrule .host input {
+  width: 15em;
+}
+#addrule .port input {
+  width: 3em;
 }

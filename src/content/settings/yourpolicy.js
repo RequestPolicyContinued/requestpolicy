@@ -1,5 +1,6 @@
 const SEARCH_DELAY = 500;
 
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
 Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
@@ -35,6 +36,17 @@ function populateRuleTable(filter) {
     }
     addPolicyTableRow(table, 'allow', origin, dest, entry);
   }
+  for (var i = 0; i < entries['deny'].length; i++) {
+    var entry = entries['deny'][i];
+    var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
+    var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
+    if (filter) {
+      if (origin.indexOf(filter) == -1 && dest.indexOf(filter) == -1) {
+        continue;
+      }
+    }
+    addPolicyTableRow(table, 'deny', origin, dest, entry);
+  }
 }
 
 function deleteRule(event) {
@@ -43,8 +55,8 @@ function deleteRule(event) {
   var ruleData = anchor.requestpolicyRuleData;
   if (ruleType == 'allow') {
     rpServiceJSObject.removeAllowRule(ruleData);
-  } else if (ruleType == 'deny') {
-    alert('Removing deny rules is not implemented yet.');
+  } else {
+    rpServiceJSObject.removeDenyRule(ruleData);
   }
   var row = anchor.parentNode.parentNode;
   row.parentNode.removeChild(row);
@@ -94,6 +106,73 @@ function ruleDataPartToDisplayString(ruleDataPart) {
   }
   // TODO: path
   return str;
+}
+
+function addRule() {
+  try {
+    addRuleHelper();
+  } catch (e) {
+    alert('Unable to add rule: ' + e.toString());
+    return;
+  }
+  var search = document.getElementById('rulesearch');
+  populateRuleTable(search.value);
+}
+
+function addRuleHelper() {
+  var form = document.forms['addruleform'];
+  var allow = form.elements['allowrule'].checked ? true : false;
+  var temporary = form.elements['temporary'].checked ? true : false;
+  var originScheme = form.elements['originscheme'].value;
+  var originHost = form.elements['originhost'].value;
+  var originPort = form.elements['originport'].value;
+  var destScheme = form.elements['destscheme'].value;
+  var destHost = form.elements['desthost'].value;
+  var destPort = form.elements['destport'].value;
+  // TODO: we either need to sanity check the ruleData here or the policy needs
+  // to do this when it is added. Probably better to do it in the policy code.
+  function ruleInfoToRuleDataPart(scheme, host, port) {
+    if (!scheme && !host && !port) {
+      return null;
+    }
+    var part = {};
+    if (scheme) {
+      part['s'] = scheme;
+    }
+    if (host) {
+      part['h'] = host;
+    }
+    if (port) {
+      part['port'] = port;
+    }
+    return part;
+  }
+  var originPart = ruleInfoToRuleDataPart(originScheme, originHost, originPort);
+  var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
+  if (!originPart && !destPart) {
+    // TODO: don't throw, instead show message in form.
+    throw 'You must specify some rule information';
+  }
+  var ruleData = {};
+  if (originPart) {
+    ruleData['o'] = originPart;
+  }
+  if (destPart) {
+    ruleData['d'] = destPart;
+  }
+  if (allow) {
+    if (temporary) {
+      rpServiceJSObject.addTemporaryAllowRule(ruleData);
+    } else {
+      rpServiceJSObject.addAllowRule(ruleData);
+    }
+  } else {
+    if (temporary) {
+      rpServiceJSObject.addTemporaryDenyRule(ruleData);
+    } else {
+      rpServiceJSObject.addDenyRule(ruleData);
+    }
+  }
 }
 
 function onload() {

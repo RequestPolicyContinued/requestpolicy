@@ -755,7 +755,6 @@ requestpolicy.menu = {
             requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
             continue;
           }
-          requestpolicy.mod.Logger.dump("XXX allowed: " + destUri);
 
           var results = destinations[destUri];
           for (var i in results.matchedAllowRules) {
@@ -763,6 +762,13 @@ requestpolicy.menu = {
             var policy, match;
             [policy, match] = results.matchedAllowRules[i];
             var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+
+            if (!this._currentlySelectedDest) {
+              if (rawRule['d'] && rawRule['d']['h']) {
+                continue;
+              }
+            }
+
             var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
             //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
@@ -824,7 +830,6 @@ requestpolicy.menu = {
             requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
             continue;
           }
-          requestpolicy.mod.Logger.dump("XXX denied: " + destUri);
 
           var results = destinations[destUri];
           for (var i in results.matchedDenyRules) {
@@ -832,6 +837,13 @@ requestpolicy.menu = {
             var policy, match;
             [policy, match] = results.matchedDenyRules[i];
             var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+
+            if (!this._currentlySelectedDest) {
+              if (rawRule['d'] && rawRule['d']['h']) {
+                continue;
+              }
+            }
+
             var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
             //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);

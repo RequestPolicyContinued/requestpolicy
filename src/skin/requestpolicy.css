@@ -200,6 +200,10 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   /* This should probably stay the same color as the allowed destinations. */
   color: #484;
 }
+#rp-details .rp-deny {
+  /* This should probably stay the same color as the blocked destinations. */
+  color: #844;
+}
 #rp-details .rp-temporary {
   font-style: italic;
   font-size: 0.9em;

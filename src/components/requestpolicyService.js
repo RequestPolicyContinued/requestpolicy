@@ -83,6 +83,9 @@ RequestPolicyService.prototype = {
   _initialized : false,
   _profileAfterChangeCompleted : false,
 
+  _defaultAllow : true,
+  _defaultAllowSameDomain : true,
+
   _blockingDisabled : false,
 
   _conflictingExtensions : [],
@@ -414,6 +417,8 @@ RequestPolicyService.prototype = {
     //   "allowedOriginsToDestinations" : this._allowedOriginsToDestinations
     // };
 
+    this._defaultAllow = this.prefs.getBoolPref("defaultPolicy.allow");
+    this._defaultAllowSameDomain = this.prefs.getBoolPref("defaultPolicy.allowSameDomain");
     this._blockingDisabled = this.prefs.getBoolPref("startWithAllowAllEnabled");
 
     // Disable link prefetch.
@@ -618,6 +623,14 @@ RequestPolicyService.prototype = {
       case "log.level" :
       case "log.types" :
         this._updateLoggingSettings();
+        break;
+      case "defaultPolicy.allow" :
+        this._defaultAllow = this.prefs
+              .getBoolPref("defaultPolicy.allow");
+        break;
+      case "defaultPolicy.allowSameDomain" :
+        this._defaultAllowSameDomain = this.prefs
+              .getBoolPref("defaultPolicy.allowSameDomain");
         break;
       //case "uriIdentificationLevel" :
       //  this._uriIdentificationLevel = this.prefs
@@ -1530,6 +1543,14 @@ RequestPolicyService.prototype = {
     } catch (e) {
       return this._rootPrefs.getBoolPref("network.prefetch-next");
     }
+  },
+
+  isDefaultAllow : function isDefaultAllow() {
+    return this._defaultAllow;
+  },
+
+  isDefaultAllowSameDomain : function isDefaultAllowSameDomain() {
+    return this._defaultAllowSameDomain;
   },
 
   isBlockingDisabled : function isBlockingDisabled() {

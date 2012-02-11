@@ -53,6 +53,9 @@ requestpolicy.menu = {
   _removeRulesList : null,
   _addRulesList : null,
 
+  _isCurrentlySelectedDestBlocked : null,
+  _isCurrentlySelectedDestAllowed : null,
+
   init : function() {
     if (this._initialized == false) {
       this._initialized = true;
@@ -234,23 +237,63 @@ requestpolicy.menu = {
     // Note: in PBR we'll need to still use the old string for the temporary
     // rule. We won't be able to use just "allow temporarily".
 
-    if (!this._privateBrowsingEnabled) {
-      var item = this._addMenuItemAllowOrigin(
+    if (!this._currentlySelectedDest) {
+      if (this._rpServiceJSObject.isDefaultAllow()) {
+        // It seems pretty rare that someone will want to add a rule to block all
+        // requests from a given origin.
+        //if (!this._privateBrowsingEnabled) {
+        //  var item = this._addMenuItemDenyOrigin(
+        //    this._addRulesList, ruleData);
+        //}
+        //var item = this._addMenuItemTempDenyOrigin(this._addRulesList, ruleData);
+      } else {
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemAllowOrigin(
             this._addRulesList, ruleData);
+        }
+        var item = this._addMenuItemTempAllowOrigin(this._addRulesList, ruleData);
+      }
     }
-    var item = this._addMenuItemTemporarilyAllowOrigin(
-          this._addRulesList, ruleData);
 
     if (dest) {
       ruleData['d'] = {
         'h' : this._addWildcard(dest)
       };
-      if (!this._privateBrowsingEnabled) {
-        var item = this._addMenuItemAllowOriginToDest(
-              this._addRulesList, ruleData);
-      }
-      var item = this._addMenuItemTemporarilyAllowOriginToDest(
+      var destOnlyRuleData = {
+        'd' : {
+          'h' : this._addWildcard(dest)
+        }
+      };
+      if (this._rpServiceJSObject.isDefaultAllow()) {
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemDenyOriginToDest(
             this._addRulesList, ruleData);
+        }
+        var item = this._addMenuItemTempDenyOriginToDest(
+          this._addRulesList, ruleData);
+
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemDenyDest(
+            this._addRulesList, destOnlyRuleData);
+        }
+        var item = this._addMenuItemTempDenyDest(
+          this._addRulesList, destOnlyRuleData);
+
+      } else {
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemAllowOriginToDest(
+            this._addRulesList, ruleData);
+        }
+        var item = this._addMenuItemTempAllowOriginToDest(
+          this._addRulesList, ruleData);
+
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemAllowDest(
+            this._addRulesList, destOnlyRuleData);
+        }
+        var item = this._addMenuItemTempAllowDest(
+          this._addRulesList, destOnlyRuleData);
+      }
     }
 
     this._populateDetailsRemoveAllowRules(this._removeRulesList);
@@ -314,6 +357,18 @@ requestpolicy.menu = {
 
   _activateDestinationItem : function(item) {
     this._currentlySelectedDest = item.value;
+
+    if (item.parentNode.id == 'rp-blocked-destinations-list') {
+      this._isCurrentlySelectedDestBlocked = true;
+      this._isCurrentlySelectedDestAllowed = false;
+    } else if (item.parentNode.id == 'rp-allowed-destinations-list') {
+      this._isCurrentlySelectedDestBlocked = false;
+      this._isCurrentlySelectedDestAllowed = true;
+    } else {
+      this._isCurrentlySelectedDestBlocked = true;
+      this._isCurrentlySelectedDestAllowed = true;
+    }
+
     this._resetSelectedDest();
     item.setAttribute('selected-dest', 'true');
     this._populateDetails();
@@ -325,10 +380,10 @@ requestpolicy.menu = {
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
-    if (item.id == 'rp-origin' || item.parentNode.id == 'rp-other-origins-list') {
+    if (item.id == 'rp-origin' ||
+        item.parentNode.id == 'rp-other-origins-list') {
       this._activateOriginItem(item);
-    } else if (item.parentNode.id == 'rp-other-origins-list' ||
-               item.parentNode.id == 'rp-blocked-destinations-list' ||
+    } else if (item.parentNode.id == 'rp-blocked-destinations-list' ||
                item.parentNode.id == 'rp-mixed-destinations-list' ||
                item.parentNode.id == 'rp-allowed-destinations-list') {
       this._activateDestinationItem(item);
@@ -370,22 +425,28 @@ requestpolicy.menu = {
       dest = ruleData['d']['h'];
     }
 
-    // TODO: we're going to have more than two types of actions. They should be
-    // constants and are probably the following:
-    // * allow
-    // * allow-temp
-    // * stop-allow
-    // * forbid
-    // * forbid-temp
-    // * stop-forbid
-    if (ruleAction == 'allow') {
-      requestpolicy.overlay.addAllowRule(ruleData);
-    } else if (ruleAction == 'allow-temp') {
+    switch (ruleAction) {
+      case 'allow':
+        requestpolicy.overlay.addAllowRule(ruleData);
+        break;
+      case 'allow-temp':
         requestpolicy.overlay.addTemporaryAllowRule(ruleData);
-    } else if (ruleAction == 'stop-allow') {
-      requestpolicy.overlay.removeAllowRule(ruleData);
-    } else {
-      throw 'action not implemented: ' + ruleAction;
+        break;
+      case 'stop-allow':
+        requestpolicy.overlay.removeAllowRule(ruleData);
+        break;
+      case 'deny':
+        requestpolicy.overlay.addDenyRule(ruleData);
+        break;
+      case 'deny-temp':
+        requestpolicy.overlay.addTemporaryDenyRule(ruleData);
+        break;
+      case 'stop-deny':
+        requestpolicy.overlay.removeDenyRule(ruleData);
+        break;
+      default:
+        throw 'action not implemented: ' + ruleAction;
+        break;
     }
   },
 
@@ -478,81 +539,176 @@ requestpolicy.menu = {
     }
   },
 
-  // TODO: the six _addMenuItem* functions below hopefully can be refactored.
+  // TODO: the 12 _addMenuItem* functions below hopefully can be refactored.
 
-  _addMenuItemForbidOrigin : function(list, ruleData) {
+  // Stop allowing
+
+  _addMenuItemStopAllowingOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "forbidOrigin", [originHost]);
-    var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'stop-allow';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-stop-allow");
-    return item;
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], 'stop-allow', 'rp-stop-allow');
   },
 
-  _addMenuItemForbidOriginToDest : function(list, ruleData) {
+  _addMenuItemStopAllowingDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], 'stop-allow', 'rp-stop-allow');
+  },
+
+  _addMenuItemStopAllowingOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "forbidOriginToDestination", [originHost, destHost]);
-    var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'stop-allow';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-stop-allow");
-    return item;
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], 'stop-allow', 'rp-stop-allow');
   },
+
+  // Allow
 
   _addMenuItemAllowOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "allowOrigin", [originHost]);
-    var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-allow");
-    return item;
+    return this._addMenuItemHelper(list, ruleData, 'allowOrigin', [originHost], 'allow', 'rp-allow');
+  },
+
+  _addMenuItemAllowDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'allowDestination', [destHost], 'allow', 'rp-allow');
   },
 
   _addMenuItemAllowOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "allowOriginToDestination", [originHost, destHost]);
-    var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-allow");
-    return item;
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestination', [originHost, destHost], 'allow', 'rp-allow');
   },
 
-  _addMenuItemTemporarilyAllowOrigin : function(list, ruleData) {
+  // Allow temp
+
+  _addMenuItemTempAllowOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "allowOriginTemporarily", [originHost]);
-    var item = this._addListItem(list, 'rp-od-item', label);
-    item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow-temp';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
-    return item;
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginTemporarily', [originHost], 'allow-temp', 'rp-allow rp-temporary');
   },
 
-  _addMenuItemTemporarilyAllowOriginToDest : function(list, ruleData) {
+  _addMenuItemTempAllowDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'allowDestinationTemporarily', [destHost], 'allow-temp', 'rp-allow rp-temporary');
+  },
+
+  _addMenuItemTempAllowOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    var label = this._strbundle.getFormattedString(
-      "allowOriginToDestinationTemporarily", [originHost, destHost]);
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestinationTemporarily', [originHost, destHost], 'allow-temp', 'rp-allow rp-temporary');
+  },
+
+  // Stop denying
+
+  _addMenuItemStopDenyingOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], 'stop-deny', 'rp-stop-deny');
+  },
+
+  _addMenuItemStopDenyingDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], 'stop-deny', 'rp-stop-deny');
+  },
+
+  _addMenuItemStopDenyingOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], 'stop-deny', 'rp-stop-deny');
+  },
+
+  // Deny
+
+  _addMenuItemDenyOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyOrigin', [originHost], 'deny', 'rp-deny');
+  },
+
+  _addMenuItemDenyDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyDestination', [destHost], 'deny', 'rp-deny');
+  },
+
+  _addMenuItemDenyOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestination', [originHost, destHost], 'deny', 'rp-deny');
+  },
+
+  // Deny temp
+
+  _addMenuItemTempDenyOrigin : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginTemporarily', [originHost], 'deny-temp', 'rp-deny rp-temporary');
+  },
+
+  _addMenuItemTempDenyDest : function(list, ruleData) {
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyDestinationTemporarily', [destHost], 'deny-temp', 'rp-deny rp-temporary');
+  },
+
+  _addMenuItemTempDenyOriginToDest : function(list, ruleData) {
+    var originHost = ruleData["o"]["h"];
+    var destHost = ruleData["d"]["h"];
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestinationTemporarily', [originHost, destHost], 'deny-temp', 'rp-deny rp-temporary');
+  },
+
+  _addMenuItemHelper : function(list, ruleData, fmtStrName, fmtStrArgs, ruleAction, cssClass) {
+    var label = this._strbundle.getFormattedString(fmtStrName, fmtStrArgs);
     var item = this._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
-    item.requestpolicyRuleAction = 'allow-temp';
-    //var statustext = destHost; // TODO
-    item.setAttribute("class", "rp-od-item rp-allow rp-temporary");
+    item.requestpolicyRuleAction = ruleAction;
+    //var statustext = ''; // TODO
+    item.setAttribute('class', 'rp-od-item ' + cssClass);
     return item;
+  },
+
+  _ruleDataPartToDisplayString : function(ruleDataPart) {
+    var str = "";
+    if (ruleDataPart["s"]) {
+      str += ruleDataPart["s"] + "://";
+    }
+    str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+    if (ruleDataPart["port"]) {
+      str += ":" + ruleDataPart["port"];
+    }
+    // TODO: path
+    return str;
+  },
+
+  _ruleDataToFormatVariables : function(rawRule) {
+    var fmtVars = [];
+    if (rawRule["o"]) {
+      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["o"]));
+    }
+    if (rawRule["d"]) {
+      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["d"]));
+    }
+    return fmtVars;
+  },
+
+  _addMenuItemRemoveAllowRule : function(list, rawRule) {
+    var fmtVars = this._ruleDataToFormatVariables(rawRule);
+
+    if (rawRule["o"] && rawRule["d"]) {
+      return this._addMenuItemStopAllowingOriginToDest(list, rawRule);
+    } else if (rawRule["o"]) {
+      return this._addMenuItemStopAllowingOrigin(list, rawRule);
+    } else if (rawRule["d"]) {
+      return this._addMenuItemStopAllowingDest(list, rawRule);
+    } else {
+      throw "Invalid rule data: no origin or destination parts.";
+    }
+  },
+
+  _addMenuItemRemoveDenyRule : function(list, rawRule) {
+    var fmtVars = this._ruleDataToFormatVariables(rawRule);
+
+    if (rawRule["o"] && rawRule["d"]) {
+      return this._addMenuItemStopDenyingOriginToDest(list, rawRule);
+    } else if (rawRule["o"]) {
+      return this._addMenuItemStopDenyingOrigin(list, rawRule);
+    } else if (rawRule["d"]) {
+      return this._addMenuItemStopDenyingDest(list, rawRule);
+    } else {
+      throw "Invalid rule data: no origin or destination parts.";
+    }
   },
 
   _populateDetailsRemoveAllowRules : function(list) {
@@ -691,82 +847,6 @@ requestpolicy.menu = {
     for (var i in rules) {
       this._addMenuItemRemoveDenyRule(list, rules[i]);
     }
-  },
-
-  _ruleDataPartToDisplayString : function(ruleDataPart) {
-    var str = "";
-    if (ruleDataPart["s"]) {
-      str += ruleDataPart["s"] + "://";
-    }
-    str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
-    if (ruleDataPart["port"]) {
-      str += ":" + ruleDataPart["port"];
-    }
-    // TODO: path
-    return str;
-  },
-
-  _ruleDataToFormatVariables : function(rawRule) {
-    var fmtVars = [];
-    if (rawRule["o"]) {
-      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["o"]));
-    }
-    if (rawRule["d"]) {
-      fmtVars.push(this._ruleDataPartToDisplayString(rawRule["d"]));
-    }
-    return fmtVars;
-  },
-
-  _addMenuItemRemoveAllowRule : function(list, rawRule) {
-    var fmtVars = this._ruleDataToFormatVariables(rawRule);
-
-    if (rawRule["o"] && rawRule["d"]) {
-      var fmtName = "stopAllowingOriginToDestination";
-    } else if (rawRule["o"]) {
-      fmtName = "stopAllowingOrigin";
-    } else if (rawRule["d"]) {
-      fmtName = "stopAllowingDestination";
-    } else {
-      throw "Invalid rule data: no origin or destination parts.";
-    }
-
-    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
-
-    //var command = "requestpolicy.overlay.removeAllowRule(event);";
-    //var statustext = ""; // TODO
-    var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
-    item.requestpolicyRuleData = rawRule;
-    item.requestpolicyRuleAction = 'stop-allow';
-    // Take an argument to the current function that specifies whether this
-    // is only a temporary rule.
-    //item.setAttribute("class", "requestpolicyTemporary");
-    return item;
-  },
-
-  _addMenuItemRemoveDenyRule : function(list, rawRule) {
-    var fmtVars = this._ruleDataToFormatVariables(rawRule);
-
-    if (rawRule["o"] && rawRule["d"]) {
-      var fmtName = "stopDenyingOriginToDestination";
-    } else if (rawRule["o"]) {
-      fmtName = "stopDenyingOrigin";
-    } else if (rawRule["d"]) {
-      fmtName = "stopDenyingDestination";
-    } else {
-      throw "Invalid rule data: no origin or destination parts.";
-    }
-
-    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
-
-    //var command = "requestpolicy.overlay.removeAllowRule(event);";
-    //var statustext = ""; // TODO
-    var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
-    item.requestpolicyRuleData = rawRule;
-    item.requestpolicyRuleAction = 'stop-deny';
-    // Take an argument to the current function that specifies whether this
-    // is only a temporary rule.
-    //item.setAttribute("class", "requestpolicyTemporary");
-    return item;
   },
 
 }

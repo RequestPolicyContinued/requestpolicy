@@ -25,6 +25,7 @@ function onload() {
     function(event) {
       var allow = event.target.checked;
       rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
+      rpServiceJSObject._prefService.savePrefFile(null);
       updateDisplay();
     }
   );
@@ -32,6 +33,7 @@ function onload() {
     function(event) {
       var deny = event.target.checked;
       rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
+      rpServiceJSObject._prefService.savePrefFile(null);
       updateDisplay();
     }
   );
@@ -40,6 +42,7 @@ function onload() {
       var allowSameDomain = event.target.checked;
       rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
+      rpServiceJSObject._prefService.savePrefFile(null);
     }
   );
 }

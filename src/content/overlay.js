@@ -1529,6 +1529,30 @@ requestpolicy.overlay = {
   },
 
   /**
+   * TODO: comment
+   */
+  addDenyRule : function(ruleData) {
+    this._rpServiceJSObject.addDenyRule(ruleData);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * TODO: comment
+   */
+  addTemporaryDenyRule : function(ruleData) {
+    this._rpServiceJSObject.addTemporaryDenyRule(ruleData);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
+   * TODO: comment
+   */
+  removeDenyRule : function(ruleData) {
+    this._rpServiceJSObject.removeDenyRule(ruleData);
+    this._conditionallyReloadDocument();
+  },
+
+  /**
    * Revokes all temporary permissions granted during the current session.
    * 
    * @param {Event}

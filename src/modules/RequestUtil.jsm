@@ -244,8 +244,8 @@ var RequestUtil = {
     return result;
   },
 
-  getRejectedRequests : function(currentUri, currentIdentifier, otherOrigins) {
-    this._rpServiceJSObject._rejectedRequests.print("from getRejectedRequests");
+  getDeniedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+    //this._rpServiceJSObject._rejectedRequests.print("from getRejectedRequests");
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
           this._rpServiceJSObject._rejectedRequests.getAll());
   },

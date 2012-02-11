@@ -254,6 +254,7 @@ requestpolicy.menu = {
     }
 
     this._populateDetailsRemoveAllowRules(this._removeRulesList);
+    this._populateDetailsRemoveDenyRules(this._removeRulesList);
   },
 
   _removeChildren : function(el) {
@@ -397,7 +398,7 @@ requestpolicy.menu = {
 
 
   _getBlockedDestinations : function() {
-    // Only pass a uri to getRejectedRequests if this isn't for listing the
+    // Only pass a uri to getDeniedRequests if this isn't for listing the
     // blocked destinations of an other origin.
     var uri = null;
     if (this._currentBaseDomain == this._currentlySelectedOrigin) {
@@ -405,7 +406,7 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getRejectedRequests(
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
           uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
@@ -590,11 +591,15 @@ requestpolicy.menu = {
         var destinations = requests[destBase][destIdent];
         for (var destUri in destinations) {
 
-          // TODO: figure out why destinations[destUri] is undefined sometimes
+          // This will be null when the request was denied because of a default
+          // allow rule. However about any other time?
+          // TODO: we at least in default allow mode, we need to give an option
+          // to add a deny rule for these requests.
           if (!destinations[destUri]) {
             requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
             continue;
           }
+          requestpolicy.mod.Logger.dump("XXX allowed: " + destUri);
 
           var results = destinations[destUri];
           for (var i in results.matchedAllowRules) {
@@ -616,6 +621,75 @@ requestpolicy.menu = {
     // TODO: sort these into some meaningful order.
     for (var i in rules) {
       this._addMenuItemRemoveAllowRule(list, rules[i]);
+    }
+  },
+
+  _populateDetailsRemoveDenyRules : function(list) {
+    // TODO: can we avoid calling getDeniedRequests here and reuse a result
+    // from calling it earlier?
+
+    // Only pass a uri to getDeniedRequests if this isn't for listing the
+    // blocked destinations of an other origin.
+    var uri = null;
+    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
+      uri = this._currentUri;
+    }
+    var ident = 'http://' + this._currentlySelectedOrigin;
+
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+      uri, ident, this._otherOrigins);
+    var requests = reqSet.getAllMergedOrigins();
+
+    var rules = {};
+
+    reqSet.print('deniedRequests');
+
+    // TODO: there is no dest if no dest is selected (origin only).
+    //var destBase = requestpolicy.mod.DomainUtil.getDomain(
+    //      this._currentlySelectedDest);
+
+    for (var destBase in requests) {
+
+      if (this._currentlySelectedDest &&
+        this._currentlySelectedDest != destBase) {
+        continue;
+      }
+
+      for (var destIdent in requests[destBase]) {
+
+        var destinations = requests[destBase][destIdent];
+        for (var destUri in destinations) {
+
+          // This will be null when the request was denied because of a default
+          // deny rule. However about any other time?
+          // TODO: we at least in default deny mode, we need to give an option
+          // to add a allow rule for these requests.
+          if (!destinations[destUri]) {
+            requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
+            continue;
+          }
+          requestpolicy.mod.Logger.dump("XXX denied: " + destUri);
+
+          var results = destinations[destUri];
+          for (var i in results.matchedDenyRules) {
+
+            var policy, match;
+            [policy, match] = results.matchedDenyRules[i];
+            var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+            var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
+            //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+            //       "matched allow rule: " + rawRuleStr);
+            // This is how we remove duplicates: if two rules have the same
+            // canonical string, they'll have in the same key.
+            rules[rawRuleStr] = rawRule;
+          }
+        }
+      }
+    }
+
+    // TODO: sort these into some meaningful order.
+    for (var i in rules) {
+      this._addMenuItemRemoveDenyRule(list, rules[i]);
     }
   },
 
@@ -663,6 +737,32 @@ requestpolicy.menu = {
     var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
     item.requestpolicyRuleData = rawRule;
     item.requestpolicyRuleAction = 'stop-allow';
+    // Take an argument to the current function that specifies whether this
+    // is only a temporary rule.
+    //item.setAttribute("class", "requestpolicyTemporary");
+    return item;
+  },
+
+  _addMenuItemRemoveDenyRule : function(list, rawRule) {
+    var fmtVars = this._ruleDataToFormatVariables(rawRule);
+
+    if (rawRule["o"] && rawRule["d"]) {
+      var fmtName = "stopDenyingOriginToDestination";
+    } else if (rawRule["o"]) {
+      fmtName = "stopDenyingOrigin";
+    } else if (rawRule["d"]) {
+      fmtName = "stopDenyingDestination";
+    } else {
+      throw "Invalid rule data: no origin or destination parts.";
+    }
+
+    var label = this._strbundle.getFormattedString(fmtName, fmtVars);
+
+    //var command = "requestpolicy.overlay.removeAllowRule(event);";
+    //var statustext = ""; // TODO
+    var item = this._addListItem(this._removeRulesList, 'rp-od-item', label);
+    item.requestpolicyRuleData = rawRule;
+    item.requestpolicyRuleAction = 'stop-deny';
     // Take an argument to the current function that specifies whether this
     // is only a temporary rule.
     //item.setAttribute("class", "requestpolicyTemporary");

@@ -1883,7 +1883,7 @@ RequestPolicyService.prototype = {
    * @param unforbidable {Boolean}
    * @param checkRequestResult {CheckRequestResult}
    */
-  accept : function(reason, args, unforbidable, checkRequestResult) {
+  accept : function(reason, args, checkRequestResult, unforbidable) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** ALLOWED ** reason: "
             + reason
@@ -2213,7 +2213,7 @@ RequestPolicyService.prototype = {
           // goes back/forward through their history.
           // delete this._clickedLinks[origin][dest];
           return this
-              .accept("User-initiated request by link click", args, true);
+              .accept("User-initiated request by link click", args, null, true);
 
         } else if (this._submittedForms[origin]
             && this._submittedForms[origin][dest.split("?")[0]]) {
@@ -2224,7 +2224,7 @@ RequestPolicyService.prototype = {
           // goes back/forward through their history.
           // delete this._submittedForms[origin][dest.split("?")[0]];
           return this.accept("User-initiated request by form submission", args,
-              true);
+              null, true);
 
         } else if (this._historyRequests[dest]) {
           // When the user goes back and forward in their history, a request for
@@ -2232,12 +2232,12 @@ RequestPolicyService.prototype = {
           // the page's content. Therefore, we make sure that our cache of
           // blocked requests isn't removed in this case.
           delete this._historyRequests[dest];
-          return this.accept("History request", args, true);
+          return this.accept("History request", args, null, true);
         } else if (this._userAllowedRedirects[origin]
             && this._userAllowedRedirects[origin][dest]) {
           // shouldLoad is called by location.href in overlay.js as of Fx
           // 3.7a5pre and SeaMonkey 2.1a.
-          return this.accept("User-allowed redirect", args, true);
+          return this.accept("User-allowed redirect", args, null, true);
         }
 
         var result = this._policyMgr.checkRequest(aRequestOrigin,
@@ -2256,12 +2256,10 @@ RequestPolicyService.prototype = {
         // Also, it will probably matter whether the user is in default allow
         // or default deny mode.
         if (result.isDenied()) {
-          return this.reject("blocked by policy (blacklisted)", args, false,
-                result);
+          return this.reject("blocked by policy (blacklisted)", args, result);
         }
         if (result.isAllowed()) {
-          return this.accept("allowed by policy (whitelisted)", args, false,
-                result);
+          return this.accept("allowed by policy (whitelisted)", args, result);
         }
 
         if (aRequestOrigin.scheme == "chrome") {
@@ -2296,7 +2294,7 @@ RequestPolicyService.prototype = {
           return this
               .accept(
                   "New window (should probably only be an allowed popup's initial request)",
-                  args, true);
+                  args, null, true);
         }
 
         // XMLHttpRequests made within chrome's context have these origins.
@@ -2305,7 +2303,7 @@ RequestPolicyService.prototype = {
             origin == "resource://gre-resources/hiddenWindow.html") {
           return this.accept(
               "Privileged request (possibly a cross-site XMLHttpRequest)",
-              args, true);
+              args, null, true);
         }
 
         for (var i = 0; i < this._compatibilityRules.length; i++) {
@@ -2315,7 +2313,7 @@ RequestPolicyService.prototype = {
           if (allowOrigin && allowDest) {
             return this.accept(
                 "Extension/application compatibility rule matched [" + rule[2]
-                    + "]", args, true);
+                    + "]", args, null, true);
           }
         }
 
@@ -2339,10 +2337,14 @@ RequestPolicyService.prototype = {
 
         if (this._isAllowedByDefaultPolicy(origin, dest)) {
           // TODO: what should the third argument be to accept/reject?
+          // TODO: do we add a fake checkRequestResult (fourth arg) so that
+          // these show up as rule matched requests by the menu and other code?
           return this.accept("Allowed by default policy", args);
         } else {
           // We didn't match any of the conditions in which to allow the request,
           // so reject it.
+          // TODO: do we add a fake checkRequestResult (fourth arg) so that
+          // these show up as rule matched requests by the menu and other code?
           return aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
                 this.reject("Denied by default policy", args);
         }

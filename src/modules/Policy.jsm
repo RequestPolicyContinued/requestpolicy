@@ -438,8 +438,8 @@ RawPolicy.prototype = {
     // TODO: wrap in try/catch block
     var dataObj = JSON.parse(data);
 
-    dprint(typeof dataObj);
-    dprint(dump(dataObj));
+    //dprint(typeof dataObj);
+    //dprint(dump(dataObj));
     this._checkDataObj(dataObj);
     this._metadata = dataObj.metadata;
     this._entries = dataObj.entries;

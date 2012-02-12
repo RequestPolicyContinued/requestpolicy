@@ -88,7 +88,8 @@ CheckRequestResult.prototype = {
  * policies, checking requests against multiple policies, etc. 
  */
 function PolicyManager() {
-  this._policies = {};
+  this._userPolicies = {};
+  this._subscriptionPolicies = {};
 }
 PolicyManager.prototype = {
   
@@ -137,18 +138,21 @@ PolicyManager.prototype = {
     var rawPolicy;
     for (var name in config["subscriptions"]) {
       try {
+        dprint("PolicyManager::loadPolicies loading subscription policy: " +
+               name);
         rawPolicy = requestpolicy.mod.PolicyStorage
-              .loadRawPolicyFromFile(name + ".json");
+              .loadRawPolicyFromFile('sub-' + name + ".json");
       } catch (e) {
         warn("Unable to load policy from file: " + e);
         continue;
       }
-      this._policies[name] = {"rawPolicy" : rawPolicy,
-                              "policy" : rawPolicy.toPolicy(name)};     
+      this._subscriptionPolicies[name] = {"rawPolicy" : rawPolicy,
+                                          "policy" : rawPolicy.toPolicy(name)};
     }
 
     // Read the user policy from a file.
     try {
+      dprint("PolicyManager::loadPolicies loading user policy");
       rawPolicy = requestpolicy.mod.PolicyStorage
             .loadRawPolicyFromFile("user.json");
     } catch (e) {
@@ -158,8 +162,8 @@ PolicyManager.prototype = {
       // we'll assume this is a new install.
       rawPolicy = new requestpolicy.mod.RawPolicy();
     }
-    this._policies["user"] = {"rawPolicy" : rawPolicy,
-                              "policy" : rawPolicy.toPolicy("user")};
+    this._userPolicies["user"] = {"rawPolicy" : rawPolicy,
+                                  "policy" : rawPolicy.toPolicy("user")};
     
     // Temporary rules. These are never stored.
     // TODO: make sure they're never stored.
@@ -176,12 +180,12 @@ PolicyManager.prototype = {
   addRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
-    this._policies["user"].policy.print();
+    //this._userPolicies["user"].policy.print();
     
     this. _assertRuleType(ruleType);
     // TODO: check rule format validity
-    this._policies["user"].rawPolicy.addRule(ruleType, ruleData,
-          this._policies["user"].policy);
+    this._userPolicies["user"].rawPolicy.addRule(ruleType, ruleData,
+          this._userPolicies["user"].policy);
           
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawPolicy.addRule()| to indicate whether a rule
@@ -190,38 +194,38 @@ PolicyManager.prototype = {
     // become annoying when there is a large file to write.
     if (!noStore) {
         requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
-              this._policies["user"].rawPolicy, "user.json");
+              this._userPolicies["user"].rawPolicy, "user.json");
     }
           
-    this._policies["user"].policy.print();
+    //this._userPolicies["user"].policy.print();
   },
   
   addTemporaryRule : function(ruleType, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
-    this._policies["temp"].policy.print();
+    //this._userPolicies["temp"].policy.print();
     
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
-    this._policies["temp"].rawPolicy.addRule(ruleType, ruleData,
-          this._policies["temp"].policy);
+    this._userPolicies["temp"].rawPolicy.addRule(ruleType, ruleData,
+          this._userPolicies["temp"].policy);
           
-    this._policies["temp"].policy.print();
+    //this._userPolicies["temp"].policy.print();
   },
 
   removeRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::removeRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
-    this._policies["user"].policy.print();
-    this._policies["temp"].policy.print();
+    //this._userPolicies["user"].policy.print();
+    //this._userPolicies["temp"].policy.print();
     
     this. _assertRuleType(ruleType);
     // TODO: check rule format validity
     // TODO: use noStore
-    this._policies["user"].rawPolicy.removeRule(ruleType, ruleData,
-          this._policies["user"].policy);
-    this._policies["temp"].rawPolicy.removeRule(ruleType, ruleData,
-          this._policies["temp"].policy);
+    this._userPolicies["user"].rawPolicy.removeRule(ruleType, ruleData,
+          this._userPolicies["user"].policy);
+    this._userPolicies["temp"].rawPolicy.removeRule(ruleType, ruleData,
+          this._userPolicies["temp"].policy);
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawPolicy.removeRule()| to indicate whether a rule
@@ -230,25 +234,36 @@ PolicyManager.prototype = {
     // become annoying when there is a large file to write.
     if (!noStore) {
         requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
-              this._policies["user"].rawPolicy, "user.json");
+              this._userPolicies["user"].rawPolicy, "user.json");
     }
 
-    this._policies["user"].policy.print();
-    this._policies["temp"].policy.print();
+    //this._userPolicies["user"].policy.print();
+    //this._userPolicies["temp"].policy.print();
   },
 
+  // TODO: rename this to temporaryRulesExist or invert it to
+  // isTemporaryPolicyEmpty()
   temporaryPoliciesExist : function() {
-    return this._policies["temp"].rawPolicy.getAllowRuleCount() ||
-           this._policies["temp"].rawPolicy.getDenyRuleCount();
+    return this._userPolicies["temp"].rawPolicy.getAllowRuleCount() ||
+           this._userPolicies["temp"].rawPolicy.getDenyRuleCount();
   },
 
+  // TODO: rename this to resetTemporaryPolicy
   resetTemporaryPolicies : function() {
     var rawPolicy = new requestpolicy.mod.RawPolicy();
-    this._policies["temp"] = {"rawPolicy" : rawPolicy,
-                              "policy" : rawPolicy.toPolicy("temp")};
+    this._userPolicies["temp"] = {"rawPolicy" : rawPolicy,
+                                  "policy" : rawPolicy.toPolicy("temp")};
   },
 
-  checkRequest : function(origin, dest) {
+  checkRequestAgainstUserPolicies : function(origin, dest) {
+    return this._checkRequest(origin, dest, this._userPolicies);
+  },
+
+  checkRequestAgainstSubscriptionPolicies : function(origin, dest) {
+    return this._checkRequest(origin, dest, this._subscriptionPolicies);
+  },
+
+  _checkRequest : function(origin, dest, policies) {
     if (!(origin instanceof CI.nsIURI)) {
       throw "Origin must be an nsIURI.";
     }
@@ -256,8 +271,8 @@ PolicyManager.prototype = {
       throw "Destination must be an nsIURI.";
     }
     var result = new CheckRequestResult();
-    for (var i in this._policies) {
-      var policy = this._policies[i].policy;
+    for (var i in policies) {
+      var policy = policies[i].policy;
       //policy.setPrintFunction(print);
       //policy.print();
       var tempAllow, tempDeny;
@@ -276,24 +291,3 @@ PolicyManager.prototype = {
   }
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

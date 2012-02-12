@@ -12,14 +12,9 @@ var searchTimeoutId = null;
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
-  var config = {
-    "subscriptions" : {
-    }
-  };
-  var policyMgr = new PolicyManager();
-  policyMgr.loadPolicies(config);
+  var policyMgr = rpServiceJSObject._policyMgr;
 
-  var user = policyMgr._policies['user'];
+  var user = policyMgr._userPolicies['user'];
   var table = document.getElementById('policy-user');
   var entries = user.rawPolicy.toJSON()['entries'];
 

@@ -460,6 +460,12 @@ RequestPolicyService.prototype = {
     // XXX: change to this._config and load from file.
     var config = {
       "subscriptions" : {
+        'embedded' : null,
+        'extensions' : null,
+        'functionality' : null,
+        'mozilla' : null,
+        'sameorg' : null,
+        'trackers' : null
       }
     };
 
@@ -631,6 +637,14 @@ RequestPolicyService.prototype = {
       case "defaultPolicy.allowSameDomain" :
         this._defaultAllowSameDomain = this.prefs
               .getBoolPref("defaultPolicy.allowSameDomain");
+        break;
+      case "subscription.trackers" :
+      case "subscription.sameorg" :
+      case "subscription.functionality" :
+      case "subscription.embedded" :
+      case "subscription.mozilla" :
+      case "subscription.extensions" :
+        // TODO: implement handling of subscription change
         break;
       //case "uriIdentificationLevel" :
       //  this._uriIdentificationLevel = this.prefs
@@ -1485,16 +1499,28 @@ RequestPolicyService.prototype = {
     var originUriObj = requestpolicy.mod.DomainUtil.getUriObject(originUri);
     var destUriObj = requestpolicy.mod.DomainUtil.getUriObject(destinationUri);
 
-    var result = this._policyMgr.checkRequest(originUriObj, destUriObj);
+    var result = this._policyMgr.checkRequestAgainstUserPolicies(originUriObj,
+          destUriObj);
     if (result.isDenied()) {
-      // LOG
+      // TODO: record result
       return false;
     }
     if (result.isAllowed()) {
-      // LOG
+      // TODO: record result
       return true;
     }
-    
+
+    var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
+          originUriObj, destUriObj);
+    if (result.isDenied()) {
+      // TODO: record result
+      return false;
+    }
+    if (result.isAllowed()) {
+      // TODO: record result
+      return true;
+    }
+
     if (destinationUri[0] && destinationUri[0] == '/'
         || destinationUri.indexOf(":") == -1) {
       // Redirect is to a relative url.
@@ -2261,8 +2287,8 @@ RequestPolicyService.prototype = {
           return this.accept("User-allowed redirect", args, null, true);
         }
 
-        var result = this._policyMgr.checkRequest(aRequestOrigin,
-              aContentLocation);
+        var result = this._policyMgr.checkRequestAgainstUserPolicies(
+              aRequestOrigin, aContentLocation);
         for (var i = 0; i < result.matchedAllowRules.length; i++) {
           requestpolicy.mod.Logger.dump('Matched allow rules');
           requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
@@ -2277,10 +2303,32 @@ RequestPolicyService.prototype = {
         // Also, it will probably matter whether the user is in default allow
         // or default deny mode.
         if (result.isDenied()) {
-          return this.reject("blocked by policy (blacklisted)", args, result);
+          return this.reject("blocked by user policy", args, result);
         }
         if (result.isAllowed()) {
-          return this.accept("allowed by policy (whitelisted)", args, result);
+          return this.accept("allowed by user policy", args, result);
+        }
+
+        var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
+          aRequestOrigin, aContentLocation);
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        for (var i = 0; i < result.matchedDenyRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched deny rules');
+          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
+        }
+        // TODO: this isn't right. What if there are both allowed and denied?
+        // What if the user policy says one thing and a subscription policy
+        // says another? What if the user's temp and non-temp policies disagree?
+        // Also, it will probably matter whether the user is in default allow
+        // or default deny mode.
+        if (result.isDenied()) {
+          return this.reject("blocked by subscription policy", args, result);
+        }
+        if (result.isAllowed()) {
+          return this.accept("allowed by subscription policy", args, result);
         }
 
         if (aRequestOrigin.scheme == "chrome") {

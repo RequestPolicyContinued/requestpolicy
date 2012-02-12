@@ -543,20 +543,23 @@ requestpolicy.menu = {
 
   // Stop allowing
 
-  _addMenuItemStopAllowingOrigin : function(list, ruleData) {
+  _addMenuItemStopAllowingOrigin : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], 'stop-allow', 'rp-stop-allow');
+    var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], ruleAction, 'rp-stop-allow');
   },
 
-  _addMenuItemStopAllowingDest : function(list, ruleData) {
+  _addMenuItemStopAllowingDest : function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], 'stop-allow', 'rp-stop-allow');
+    var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], ruleAction, 'rp-stop-allow');
   },
 
-  _addMenuItemStopAllowingOriginToDest : function(list, ruleData) {
+  _addMenuItemStopAllowingOriginToDest : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], 'stop-allow', 'rp-stop-allow');
+    var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-allow');
   },
 
   // Allow
@@ -597,20 +600,23 @@ requestpolicy.menu = {
 
   // Stop denying
 
-  _addMenuItemStopDenyingOrigin : function(list, ruleData) {
+  _addMenuItemStopDenyingOrigin : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], 'stop-deny', 'rp-stop-deny');
+    var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], ruleAction, 'rp-stop-deny');
   },
 
-  _addMenuItemStopDenyingDest : function(list, ruleData) {
+  _addMenuItemStopDenyingDest : function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], 'stop-deny', 'rp-stop-deny');
+    var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], ruleAction, 'rp-stop-deny');
   },
 
-  _addMenuItemStopDenyingOriginToDest : function(list, ruleData) {
+  _addMenuItemStopDenyingOriginToDest : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], 'stop-deny', 'rp-stop-deny');
+    var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-deny');
   },
 
   // Deny
@@ -683,29 +689,29 @@ requestpolicy.menu = {
     return fmtVars;
   },
 
-  _addMenuItemRemoveAllowRule : function(list, rawRule) {
+  _addMenuItemRemoveAllowRule : function(list, rawRule, subscriptionOverride) {
     var fmtVars = this._ruleDataToFormatVariables(rawRule);
 
     if (rawRule["o"] && rawRule["d"]) {
-      return this._addMenuItemStopAllowingOriginToDest(list, rawRule);
+      return this._addMenuItemStopAllowingOriginToDest(list, rawRule, subscriptionOverride);
     } else if (rawRule["o"]) {
-      return this._addMenuItemStopAllowingOrigin(list, rawRule);
+      return this._addMenuItemStopAllowingOrigin(list, rawRule, subscriptionOverride);
     } else if (rawRule["d"]) {
-      return this._addMenuItemStopAllowingDest(list, rawRule);
+      return this._addMenuItemStopAllowingDest(list, rawRule, subscriptionOverride);
     } else {
       throw "Invalid rule data: no origin or destination parts.";
     }
   },
 
-  _addMenuItemRemoveDenyRule : function(list, rawRule) {
+  _addMenuItemRemoveDenyRule : function(list, rawRule, subscriptionOverride) {
     var fmtVars = this._ruleDataToFormatVariables(rawRule);
 
     if (rawRule["o"] && rawRule["d"]) {
-      return this._addMenuItemStopDenyingOriginToDest(list, rawRule);
+      return this._addMenuItemStopDenyingOriginToDest(list, rawRule, subscriptionOverride);
     } else if (rawRule["o"]) {
-      return this._addMenuItemStopDenyingOrigin(list, rawRule);
+      return this._addMenuItemStopDenyingOrigin(list, rawRule, subscriptionOverride);
     } else if (rawRule["d"]) {
-      return this._addMenuItemStopDenyingDest(list, rawRule);
+      return this._addMenuItemStopDenyingDest(list, rawRule, subscriptionOverride);
     } else {
       throw "Invalid rule data: no origin or destination parts.";
     }
@@ -727,7 +733,10 @@ requestpolicy.menu = {
           uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
-    var rules = {};
+    //var rules = {};
+
+    var userRules = {};
+    var subscriptionRules = {};
 
     //reqSet.print('allowedRequests');
 
@@ -774,15 +783,24 @@ requestpolicy.menu = {
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
-            rules[rawRuleStr] = rawRule;
+            if (policy.userPolicy) {
+              userRules[rawRuleStr] = rawRule;
+            } else {
+              subscriptionRules[rawRuleStr] = rawRule;
+            }
           }
         }
       }
     }
 
-    // TODO: sort these into some meaningful order.
-    for (var i in rules) {
-      this._addMenuItemRemoveAllowRule(list, rules[i]);
+    for (var i in userRules) {
+      this._addMenuItemRemoveAllowRule(list, userRules[i], false);
+    }
+    // TODO: for subscription rules, we need the effect of the menu item to be
+    // adding a deny rule instead of removing an allow rule. However, the text
+    // used for the item needs to be the same as removing an allow rule.
+    for (var i in subscriptionRules) {
+      this._addMenuItemRemoveAllowRule(list, subscriptionRules[i], true);
     }
   },
 
@@ -802,7 +820,10 @@ requestpolicy.menu = {
       uri, ident, this._otherOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
-    var rules = {};
+    //var rules = {};
+
+    var userRules = {};
+    var subscriptionRules = {};
 
     reqSet.print('deniedRequests');
 
@@ -849,15 +870,24 @@ requestpolicy.menu = {
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
-            rules[rawRuleStr] = rawRule;
+            if (policy.userPolicy) {
+              userRules[rawRuleStr] = rawRule;
+            } else {
+              subscriptionRules[rawRuleStr] = rawRule;
+            }
           }
         }
       }
     }
 
-    // TODO: sort these into some meaningful order.
-    for (var i in rules) {
-      this._addMenuItemRemoveDenyRule(list, rules[i]);
+    for (var i in userRules) {
+      this._addMenuItemRemoveDenyRule(list, userRules[i], false);
+    }
+    // TODO: for subscription rules, we need the effect of the menu item to be
+    // adding an allow rule instead of removing a deny rule. However, the text
+    // used for the item needs to be the same as removing a deny rule.
+    for (var i in subscriptionRules) {
+      this._addMenuItemRemoveDenyRule(list, subscriptionRules[i], true);
     }
   },
 

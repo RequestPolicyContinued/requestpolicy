@@ -148,6 +148,8 @@ PolicyManager.prototype = {
       }
       this._subscriptionPolicies[name] = {"rawPolicy" : rawPolicy,
                                           "policy" : rawPolicy.toPolicy(name)};
+      this._subscriptionPolicies[name]["policy"].userPolicy = false;
+      this._subscriptionPolicies[name].policy.print();
     }
 
     // Read the user policy from a file.
@@ -164,7 +166,8 @@ PolicyManager.prototype = {
     }
     this._userPolicies["user"] = {"rawPolicy" : rawPolicy,
                                   "policy" : rawPolicy.toPolicy("user")};
-    
+    this._userPolicies["user"]["policy"].userPolicy = true;
+    this._userPolicies["user"].policy.print();
     // Temporary rules. These are never stored.
     // TODO: make sure they're never stored.
     this.resetTemporaryPolicies();
@@ -253,6 +256,7 @@ PolicyManager.prototype = {
     var rawPolicy = new requestpolicy.mod.RawPolicy();
     this._userPolicies["temp"] = {"rawPolicy" : rawPolicy,
                                   "policy" : rawPolicy.toPolicy("temp")};
+    this._userPolicies["temp"]["policy"].userPolicy = true;
   },
 
   checkRequestAgainstUserPolicies : function(origin, dest) {

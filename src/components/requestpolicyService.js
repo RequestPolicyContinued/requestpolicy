@@ -1501,6 +1501,7 @@ RequestPolicyService.prototype = {
 
     var result = this._policyMgr.checkRequestAgainstUserPolicies(originUriObj,
           destUriObj);
+    // For now, we always give priority to deny rules.
     if (result.isDenied()) {
       // TODO: record result
       return false;
@@ -1512,6 +1513,7 @@ RequestPolicyService.prototype = {
 
     var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
           originUriObj, destUriObj);
+    // For now, we always give priority to deny rules.
     if (result.isDenied()) {
       // TODO: record result
       return false;
@@ -2289,19 +2291,15 @@ RequestPolicyService.prototype = {
 
         var result = this._policyMgr.checkRequestAgainstUserPolicies(
               aRequestOrigin, aContentLocation);
-        for (var i = 0; i < result.matchedAllowRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched allow rules');
-          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
-        }
         for (var i = 0; i < result.matchedDenyRules.length; i++) {
           requestpolicy.mod.Logger.dump('Matched deny rules');
           requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
         }
-        // TODO: this isn't right. What if there are both allowed and denied?
-        // What if the user policy says one thing and a subscription policy
-        // says another? What if the user's temp and non-temp policies disagree?
-        // Also, it will probably matter whether the user is in default allow
-        // or default deny mode.
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        // For now, we always give priority to deny rules.
         if (result.isDenied()) {
           return this.reject("blocked by user policy", args, result);
         }
@@ -2311,19 +2309,15 @@ RequestPolicyService.prototype = {
 
         var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
           aRequestOrigin, aContentLocation);
-        for (var i = 0; i < result.matchedAllowRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched allow rules');
-          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
-        }
         for (var i = 0; i < result.matchedDenyRules.length; i++) {
           requestpolicy.mod.Logger.dump('Matched deny rules');
           requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
         }
-        // TODO: this isn't right. What if there are both allowed and denied?
-        // What if the user policy says one thing and a subscription policy
-        // says another? What if the user's temp and non-temp policies disagree?
-        // Also, it will probably matter whether the user is in default allow
-        // or default deny mode.
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        // For now, we always give priority to deny rules.
         if (result.isDenied()) {
           return this.reject("blocked by subscription policy", args, result);
         }

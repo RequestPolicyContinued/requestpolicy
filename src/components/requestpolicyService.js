@@ -458,7 +458,8 @@ RequestPolicyService.prototype = {
   _loadConfigAndPolicies : function() {
     this._subscriptions = new requestpolicy.mod.UserSubscriptions();
     this._policyMgr = new requestpolicy.mod.PolicyManager();
-    var failures = this._policyMgr.loadPolicies(
+    this._policyMgr.loadUserPolicies();
+    var failures = this._policyMgr.loadSubscriptionPolicies(
           this._subscriptions.getSubscriptionInfo());
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
@@ -545,6 +546,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
+    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC, false);
 
     // Listening for uninstall/disable events is done with the AddonManager
     // since Firefox 4.
@@ -564,6 +566,7 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
       os.removeObserver(this, "quit-application");
+      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC);
       if (!AddonManager) {
         os.removeObserver(this, "em-action-requested");
       }
@@ -1753,6 +1756,12 @@ RequestPolicyService.prototype = {
         break;
       case "http-on-modify-request" :
         this._examineHttpRequest(subject);
+        break;
+      case requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC:
+        requestpolicy.mod.Logger.debug(
+          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX: ' + data);
+        var subInfo = JSON.parse(data);
+        var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
         break;
       case HTTPS_EVERYWHERE_REWRITE_TOPIC :
         this._handleHttpsEverywhereUriRewrite(subject, data);

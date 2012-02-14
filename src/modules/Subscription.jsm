@@ -20,12 +20,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["UserSubscriptions", "SubscriptionList", "Subscription"];
+var EXPORTED_SYMBOLS = ["UserSubscriptions", "SubscriptionList", "Subscription",
+      "SUBSCRIPTION_UPDATE_TOPIC"];
 
 Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 Components.utils.import("resource://requestpolicy/Policy.jsm");
 Components.utils.import("resource://requestpolicy/PolicyStorage.jsm");
+
+
+const SUBSCRIPTION_UPDATE_TOPIC = 'requestpolicy-subscription-policy-updated';
 
 
 const OFFICIAL_SUBSCRIPTION_LIST_URL = 'http://localhost/requestpolicy/subscriptions/official.json'
@@ -34,6 +38,10 @@ const OFFICIAL_SUBSCRIPTION_LIST_URL = 'http://localhost/requestpolicy/subscript
 const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
 const SUBSCRIPTION_UPDATE_FAILURE = 'FAILURE';
+
+
+var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
 
 
 function setTimeout(func, delay) {
@@ -371,6 +379,11 @@ Subscription.prototype = {
           setTimeout(function () { errorCallback(self, e.toString()); }, 0);
           return;
         }
+        var subInfo = {};
+        subInfo[self._list] = {};
+        subInfo[self._list][self._name] = true;
+        observerService.notifyObservers(null, SUBSCRIPTION_UPDATE_TOPIC,
+              JSON.stringify(subInfo));
         setTimeout(function () {
               successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);

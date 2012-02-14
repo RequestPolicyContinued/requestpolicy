@@ -94,8 +94,30 @@ function PolicyManager() {
 PolicyManager.prototype = {
   
   //_policies : null,
-  
-  loadPolicies : function(subscriptionInfo) {
+
+  loadUserPolicies : function() {
+    // Read the user policy from a file.
+    try {
+      dprint("PolicyManager::loadPolicies loading user policy");
+      rawPolicy = requestpolicy.mod.PolicyStorage
+        .loadRawPolicyFromFile("user.json");
+    } catch (e) {
+      // TODO: log a message about missing user.json policy file.
+      // There's no user policy. This is either because RP has just been
+      // installed, the file has been deleted, or something is wrong. For now,
+      // we'll assume this is a new install.
+      rawPolicy = new requestpolicy.mod.RawPolicy();
+    }
+    this._userPolicies["user"] = {"rawPolicy" : rawPolicy,
+      "policy" : rawPolicy.toPolicy("user")};
+    this._userPolicies["user"]["policy"].userPolicy = true;
+    this._userPolicies["user"].policy.print();
+    // Temporary rules. These are never stored.
+    // TODO: make sure they're never stored.
+    this.resetTemporaryPolicies();
+  },
+
+  loadSubscriptionPolicies : function(subscriptionInfo) {
     var failures = {};
 
     // Read each subscription from a file.
@@ -125,26 +147,6 @@ PolicyManager.prototype = {
         list[subName].policy.print();
       }
     }
-
-    // Read the user policy from a file.
-    try {
-      dprint("PolicyManager::loadPolicies loading user policy");
-      rawPolicy = requestpolicy.mod.PolicyStorage
-            .loadRawPolicyFromFile("user.json");
-    } catch (e) {
-      // TODO: log a message about missing user.json policy file.
-      // There's no user policy. This is either because RP has just been
-      // installed, the file has been deleted, or something is wrong. For now,
-      // we'll assume this is a new install.
-      rawPolicy = new requestpolicy.mod.RawPolicy();
-    }
-    this._userPolicies["user"] = {"rawPolicy" : rawPolicy,
-                                  "policy" : rawPolicy.toPolicy("user")};
-    this._userPolicies["user"]["policy"].userPolicy = true;
-    this._userPolicies["user"].policy.print();
-    // Temporary rules. These are never stored.
-    // TODO: make sure they're never stored.
-    this.resetTemporaryPolicies();
 
     return failures;
   },

@@ -2117,7 +2117,9 @@ RequestPolicyService.prototype = {
       var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
       return originDomain == destDomain;
     }
-    // TODO: I don't think LEVEL_SOP is exactly what we want.
+    // We probably want to allow requests from http:80 to https:443 of the same
+    // domain. However, maybe this is so uncommon it's not worth any extra
+    // complexity.
     var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin,
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
     var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest,

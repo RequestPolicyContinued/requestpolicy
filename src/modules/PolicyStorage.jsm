@@ -36,38 +36,38 @@ Components.utils.import("resource://requestpolicy/FileUtil.jsm",
 Components.utils.import("resource://requestpolicy/Policy.jsm",
     requestpolicy.mod);
 
-/**
- * Version number of the filter storage file format.
- * @type Integer
- */
-const formatVersion = 3;
-
-/**
- * File that the filter list has been loaded from and should be saved to
- * @type nsIFile
- */
-var sourceFile = null;
-
-//
 var PolicyStorage = {
 
   /**
    * @return {RawPolicy}
    */
-  loadRawPolicyFromFile : function(/**string*/ filename) {
+  loadRawPolicyFromFile : function(/**string*/ filename,
+        /**string*/ subscriptionListName) {
+    // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
     var policyFile = requestpolicy.mod.FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
+    if (subscriptionListName) {
+      policyFile.appendRelativePath('subscriptions');
+      policyFile.appendRelativePath(subscriptionListName);
+    }
     policyFile.appendRelativePath(filename);
     var str = requestpolicy.mod.FileUtil.fileToString(policyFile);
     var rawPolicy = new requestpolicy.mod.RawPolicy(str);
     return rawPolicy;
   },
 
-  saveRawPolicyToFile : function(/**RawPolicy*/ policy, /**string*/ filename) {
+  saveRawPolicyToFile : function(/**RawPolicy*/ policy, /**string*/ filename,
+        /**string*/ subscriptionListName) {
+    // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
-    var policyFile = requestpolicy.mod.FileUtil.getRPUserDir("policies");
+    if (subscriptionListName) {
+      var policyFile = requestpolicy.mod.FileUtil.getRPUserDir("policies",
+            'subscriptions', subscriptionListName);
+    } else {
+      var policyFile = requestpolicy.mod.FileUtil.getRPUserDir("policies");
+    }
     policyFile.appendRelativePath(filename);
     requestpolicy.mod.FileUtil.stringToFile(JSON.stringify(policy), policyFile);
   }

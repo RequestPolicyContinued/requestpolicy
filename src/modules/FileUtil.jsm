@@ -138,11 +138,12 @@ var FileUtil = {
   /**
    * Returns a file object for a path relative to the user's "requestpolicy"
    * under their profile directory. The "requestpolicy" directory is created if
-   * it doesn't already exist.
+   * it doesn't already exist. Each subdir, if specified, is created if it does
+   * not exist.
    * 
    * @return {nsILocalFile}
    */
-  getRPUserDir : function(subdirectory) {
+  getRPUserDir : function(subdir1, subdir2, subdir3) {
     var profileDir = requestpolicy.mod.Services.directoryService
           .get("ProfD", CI.nsIFile);
     var file = profileDir.clone().QueryInterface(CI.nsILocalFile);
@@ -151,10 +152,24 @@ var FileUtil = {
       file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
     }
 
-    if (subdirectory) {
-      file.appendRelativePath(subdirectory);
+    if (subdir1) {
+      file.appendRelativePath(subdir1);
       if(!file.exists()) {
         file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+      }
+
+      if (subdir2) {
+        file.appendRelativePath(subdir2);
+        if(!file.exists()) {
+          file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+        }
+
+        if (subdir3) {
+          file.appendRelativePath(subdir3);
+          if(!file.exists()) {
+            file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+          }
+        }
       }
     }
 

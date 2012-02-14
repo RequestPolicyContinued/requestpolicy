@@ -22,9 +22,18 @@
 
 var EXPORTED_SYMBOLS = ["UserSubscriptions", "SubscriptionList", "Subscription"];
 
+Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 Components.utils.import("resource://requestpolicy/Policy.jsm");
 Components.utils.import("resource://requestpolicy/PolicyStorage.jsm");
+
+
+const OFFICIAL_SUBSCRIPTION_LIST_URL = 'http://localhost/requestpolicy/subscriptions/official.json'
+
+
+const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
+const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
+const SUBSCRIPTION_UPDATE_FAILURE = 'FAILURE';
 
 
 function setTimeout(func, delay) {
@@ -49,33 +58,43 @@ function dwarn(msg) {
   Logger.warning(Logger.TYPE_INTERNAL, msg);
 }
 
-
+/**
+ * Represents all of the subscriptions a user has enabled. This is where user
+ * subscription information is stored and provides the mechanism for updating
+ * subscriptions.
+ */
 function UserSubscriptions() {
-  this._lists = {
-    'official' : {
-      'url' : 'http://localhost/requestpolicy/subscriptions/official.json',
-      'subscriptions' : {
-        'embedded' : {
-          'serial' : 1
-        },
-        'extensions' : {
-          'serial' : 1
-        },
-        'functionality' : {
-          'serial' : 1
-        },
-        'mozilla' : {
-          'serial' : 1
-        },
-        'sameorg' : {
-          'serial' : 1
-        },
-        'trackers' : {
-          'serial' : 1
+  var userSubsFile = FileUtil.getRPUserDir();
+  userSubsFile.appendRelativePath('subscriptions.json');
+  try {
+    var jsonData = FileUtil.fileToString(userSubsFile);
+  } catch (e) {
+    // TODO: make sure this is NS_ERROR_FILE_NOT_FOUND
+    jsonData = '{}';
+  }
+  this._data = JSON.parse(jsonData);
+  if (!this._data['lists']) {
+    // By default, the user is subscribed to all subscriptions in the official
+    // subscription list.
+    // The value that corresponds to each subscription name is an empty object
+    // for now but in the future we may indicate additional information there.
+    // TODO: we should have a pref that disables automatically subscribing to
+    // official lists when the subscriptions.json file is missing.
+    this._data['lists'] = {
+      'official' : {
+        'url' : OFFICIAL_SUBSCRIPTION_LIST_URL,
+        'subscriptions' : {
+          'embedded' : {},
+          'extensions' : {},
+          'functionality' : {},
+          'mozilla' : {},
+          'sameorg' : {},
+          'trackers' : {}
         }
       }
     }
-  };
+  }
+  this._lists = this._data['lists'];
 }
 
 UserSubscriptions.prototype = {
@@ -83,15 +102,45 @@ UserSubscriptions.prototype = {
     return "[UserSubscriptions]";
   },
 
-  updateAll : function (callback) {
+  save : function() {
+    var userSubsFile = FileUtil.getRPUserDir();
+    userSubsFile.appendRelativePath('subscriptions.json');
+    FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
+  },
+
+  getSubscriptionInfo : function() {
+    var lists = this._data['lists'];
+    var result = {};
+    for (var listName in lists) {
+      if (!lists[listName]['subscriptions']) {
+        continue;
+      }
+      result[listName] = {};
+      for (var subName in lists[listName]['subscriptions']) {
+        result[listName][subName] = null;
+      }
+    }
+    return result;
+  },
+
+  // This method kinda sucks. Maybe move this to a worker and write this
+  // procedurally instead of event-driven. That is, the async requests really
+  // make a big fat mess of the code, or more likely I'm just not good at
+  // making it not a mess. On the other hand, this parallelizes the update
+  // requests, though that may not be a great thing in this case.
+  update : function (callback, serials) {
     var updatingLists = {};
     var updateResults = {};
 
-    function recordSubscriptionDone(listName, subName, success) {
-      updateResults[listName][subName] = success;
-      delete updatingLists[listName][subName];
-      for (var i in updatingLists[listName]) {
-        return;
+    function recordDone(listName, subName, result) {
+      dprint('Recording done: ' + listName + ' ' + subName);
+      if (subName) {
+        updateResults[listName][subName] = result;
+        var list = updatingLists[listName];
+        delete list[subName];
+        for (var i in list) {
+          return;
+        }
       }
       delete updatingLists[listName];
       for (var i in updatingLists) {
@@ -100,42 +149,82 @@ UserSubscriptions.prototype = {
       setTimeout(function () { callback(updateResults); }, 0);
     }
 
-    for (var listName in this._lists) {
-      var userSubs = this._lists[listName]['subscriptions'];
-      if (!userSubs) {
+    var listCount = 0;
+    for (var listName in serials) {
+      if (!this._lists[listName] || !this._lists[listName]['subscriptions']) {
+        dprint('Skipping unsubscribed list: ' + listName);
+        continue;
+      }
+      let updateSubs = {};
+      var subCount = 0;
+      for (var subName in serials[listName]) {
+        if (!this._lists[listName]['subscriptions'][subName]) {
+          dprint('Skipping unsubscribed policy: ' + listName + ' ' + subName);
+          continue;
+        }
+        updateSubs[subName] = {'serial' : serials[listName][subName]};
+        subCount++;
+      }
+      if (subCount == 0) {
+        dprint('Skipping list with no subscriptions: ' + listName);
         continue;
       }
       var url = this._lists[listName]['url'];
       var list = new SubscriptionList(listName, url);
-      updatingLists[list._name] = userSubs;
-      updateResults[list._name] = {};
+      updatingLists[listName] = {};
+      for (var subName in updateSubs) {
+        dprint('Will update subscription: ' + listName + ' ' + subName);
+        updatingLists[listName][subName] = true;
+      }
+      updateResults[listName] = {};
 
       function metadataSuccess(list) {
-        function subSuccess(sub) {
+        function subSuccess(sub, status) {
           dprint('Successfully updated subscription ' + sub.toString());
-          recordSubscriptionDone(list._name, sub._name, true);
+          recordDone(list._name, sub._name, status);
         }
 
         function subError(sub, error) {
           dprint('Failed to update subscription ' + sub.toString() + ': ' +
                 error);
-          recordSubscriptionDone(list._name, sub._name, false);
+          recordDone(list._name, sub._name, SUBSCRIPTION_UPDATE_FAILURE);
         }
 
         dprint('Successfully updated list ' + list.toString());
-        list.updateSubscriptions(userSubs, subSuccess, subError);
+        list.updateSubscriptions(updateSubs, subSuccess, subError);
       }
 
       function metadataError(list, error) {
         dprint('Failed to update list: ' + list.toString() + ': ' + error);
         updateResults[listName] = false;
+        recordDone(list._name);
       }
 
+      listCount++;
+      dprint('Will update list: ' + listName);
       list.updateMetadata(metadataSuccess, metadataError);
+    }
+
+    if (listCount == 0) {
+      dprint('No lists to update.');
+      setTimeout(function () { callback(updateResults); }, 0);
     }
   }
 };
 
+
+/**
+ * Represents a list of available subscriptions. Any actual subscription belongs
+ * to a list. Each list has a unique name and within each list every
+ * subscription has a unique name. The available subscriptions in the list is
+ * determined by downloading a metadata file which specifies the subscription
+ * names, the url for each subscription, and the subscription's current serial
+ * number. If the the user's current copy of a subscription policy has a serial
+ * number that is not lower than the one listed, an update isn't necessary.
+ *
+ * @param name
+ * @param url
+ */
 function SubscriptionList(name, url) {
   // TODO: allow only ascii lower letters, digits, and hyphens in name.
   this._name = name;
@@ -174,25 +263,38 @@ SubscriptionList.prototype = {
   },
 
   updateSubscriptions : function (userSubs, successCallback, errorCallback) {
-    var listSubNames = this.getSubscriptionNames();
-    for (var i = 0; i < listSubNames.length; i++) {
-      var subName = listSubNames[i];
-      var serial = this.getSubscriptionSerial(subName);
-      if (serial > userSubs[subName]['serial']) {
+    for (var subName in userSubs) {
+      try {
+        var serial = this.getSubscriptionSerial(subName);
+        dprint('Current serial for ' + this._name + ' ' + subName + ': ' +
+               userSubs[subName]['serial']);
+        dprint('Available serial for ' + this._name + ' ' + subName + ': ' +
+               serial);
         var subUrl = this.getSubscriptionUrl(subName);
         var sub = new Subscription(this._name, subName, subUrl);
-        sub.update(successCallback, errorCallback);
+        if (serial > userSubs[subName]['serial']) {
+          sub.update(successCallback, errorCallback);
+        } else {
+          dprint('No update needed for ' + this._name + ' ' + subName);
+          let curSub = sub;
+          setTimeout(function () {
+            successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
+          }, 0);
+        }
+      } catch (e) {
+        let curSub = sub;
+        setTimeout(function () { errorCallback(curSub, e.toString()); }, 0);
       }
     }
   },
 
-  getSubscriptionNames : function () {
-    var names = [];
-    for (var subName in this._data['subscriptions']) {
-      names.push(subName);
-    }
-    return names;
-  },
+//  getSubscriptionNames : function () {
+//    var names = [];
+//    for (var subName in this._data['subscriptions']) {
+//      names.push(subName);
+//    }
+//    return names;
+//  },
 
   getSubscriptionSerial : function (subName) {
     return this._data['subscriptions'][subName]['serial'];
@@ -204,6 +306,14 @@ SubscriptionList.prototype = {
 };
 
 
+/**
+ * Represents a particular subscription policy available through a given
+ * subscription list.
+ *
+ * @param listName
+ * @param subName
+ * @param subUrl
+ */
 function Subscription(listName, subName, subUrl) {
   // TODO: allow only ascii lower letters, digits, and hyphens in listName.
   this._list = listName;
@@ -261,7 +371,9 @@ Subscription.prototype = {
           setTimeout(function () { errorCallback(self, e.toString()); }, 0);
           return;
         }
-        setTimeout(function () { successCallback(self); }, 0);
+        setTimeout(function () {
+              successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
+        }, 0);
       } catch (e) {
         setTimeout(function () { errorCallback(self, e.toString()); }, 0);
       }

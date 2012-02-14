@@ -142,6 +142,7 @@ RequestPolicyService.prototype = {
     "result" : null
   },
 
+  _subscriptions : null,
   _policyMgr : null,
 
   // _temporarilyAllowedOriginsCount : 0,
@@ -455,22 +456,36 @@ RequestPolicyService.prototype = {
   },
 
   _loadConfigAndPolicies : function() {
-    // TODO: load the config and the policy manager. 
-    
-    // XXX: change to this._config and load from file.
-    var config = {
-      "subscriptions" : {
-        'embedded' : null,
-        'extensions' : null,
-        'functionality' : null,
-        'mozilla' : null,
-        'sameorg' : null,
-        'trackers' : null
-      }
-    };
-
+    this._subscriptions = new requestpolicy.mod.UserSubscriptions();
     this._policyMgr = new requestpolicy.mod.PolicyManager();
-    this._policyMgr.loadPolicies(config);
+    var failures = this._policyMgr.loadPolicies(
+          this._subscriptions.getSubscriptionInfo());
+    // TODO: check a preference that indicates the last time we checked for
+    // updates. Don't do it if we've done it too recently.
+    // TODO: Maybe we should probably ship snapshot versions of the official
+    // policies so that they can be available immediately after installation.
+    var serials = {};
+    for (var listName in failures) {
+      serials[listName] = {};
+      for (var subName in failures[listName]) {
+        serials[listName][subName] = -1;
+      }
+    }
+    var loadedSubs = this._policyMgr._subscriptionPolicies;
+    for (var listName in loadedSubs) {
+      for (var subName in loadedSubs[listName]) {
+        if (!serials[listName]) {
+          serials[listName] = {};
+        }
+        var rawPolicy = loadedSubs[listName][subName].rawPolicy;
+        serials[listName][subName] = rawPolicy._metadata['serial'];
+      }
+    }
+    function updateCompleted(result) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            'Subscription update completed: ' + result);
+    }
+    this._subscriptions.update(updateCompleted, serials);
   },
 
   _updateLoggingSettings : function() {
@@ -657,7 +672,8 @@ RequestPolicyService.prototype = {
 
   _loadLibraries : function() {
     var modules = ["Logger.jsm", "DomainUtil.jsm", "Policy.jsm",
-                   "PolicyManager.jsm", "RequestUtil.jsm", "Util.jsm"];
+                   "PolicyManager.jsm", "RequestUtil.jsm", "Subscription.jsm",
+                   "Util.jsm"];
     for (var i in modules) {
       filename = modules[i];
       try {

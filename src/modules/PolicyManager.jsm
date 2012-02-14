@@ -95,61 +95,35 @@ PolicyManager.prototype = {
   
   //_policies : null,
   
-  loadPolicies : function(config) {
-    if (!config) {
-      config = {};
-    }
-    
-    // The |config| will be some configuration info that includes which
-    // subscriptions the user has, which are enabled, how often they are
-    // checked for updates, what thier update and info URLs are, etc.
-    // The code that creates a PolicyManager would normally read a config
-    // file like requestpolicy/config.json, parse the JSON, change or add
-    // anything that they might want to alter about the config, then pass
-    // the object in here as the argument.
-    // TODO: we won't actually hard code this (overriding the argument that
-    // was passed in), this is just here for development purposes. 
-    // var config = {
-    //   "subscriptions" : {
-    //     "foo" : {
-    //       "name" : "The Foo RP whitelist and blacklist.",
-    //       "updateUrls" : {
-    //         "http://foo.com/rp.json" : {},
-    //       },
-    //       "infoUrls" : {
-    //         "About" : "http://foo.com/about.html", 
-    //       }
-    //     }
-    //   },
-    // };
-    
-    // TODO: read the active subscriptions from a preference.
-    //var activeSubscriptionsPrefValue = "foo|||http://foo/rp.json@@@bar|||@@@";
-    //var subscriptions = activeSubscriptionsPrefValue.split();
+  loadPolicies : function(subscriptionInfo) {
+    var failures = {};
 
-    // We don't allow any subscriptions that are named "user" and would
-    // therefore 
-    if ("user" in config) {
-      // TODO: log something, this subscription is being ignored.
-      delete config["user"];
-    }
-    
     // Read each subscription from a file.
     var rawPolicy;
-    for (var name in config["subscriptions"]) {
-      try {
-        dprint("PolicyManager::loadPolicies loading subscription policy: " +
-               name);
-        rawPolicy = requestpolicy.mod.PolicyStorage
-              .loadRawPolicyFromFile('sub-' + name + ".json");
-      } catch (e) {
-        warn("Unable to load policy from file: " + e);
-        continue;
+    for (var listName in subscriptionInfo) {
+      for (var subName in subscriptionInfo[listName]) {
+        try {
+          dprint("PolicyManager::loadPolicies loading subscription policy: " +
+                 listName + ' / ' + subName);
+          rawPolicy = requestpolicy.mod.PolicyStorage
+                .loadRawPolicyFromFile(subName + ".json", listName);
+        } catch (e) {
+          warn("Unable to load policy from file: " + e);
+          if (!failures[listName]) {
+            failures[listName] = {};
+          }
+          failures[listName][subName] = null;
+          continue;
+        }
+        if (!this._subscriptionPolicies[listName]) {
+          this._subscriptionPolicies[listName] = {};
+        }
+        var list = this._subscriptionPolicies[listName];
+        list[subName] = {"rawPolicy" : rawPolicy,
+                         "policy" : rawPolicy.toPolicy(subName)};
+        list[subName]["policy"].userPolicy = false;
+        list[subName].policy.print();
       }
-      this._subscriptionPolicies[name] = {"rawPolicy" : rawPolicy,
-                                          "policy" : rawPolicy.toPolicy(name)};
-      this._subscriptionPolicies[name]["policy"].userPolicy = false;
-      this._subscriptionPolicies[name].policy.print();
     }
 
     // Read the user policy from a file.
@@ -171,6 +145,8 @@ PolicyManager.prototype = {
     // Temporary rules. These are never stored.
     // TODO: make sure they're never stored.
     this.resetTemporaryPolicies();
+
+    return failures;
   },
 
   _assertRuleType: function(ruleType) {
@@ -264,17 +240,24 @@ PolicyManager.prototype = {
   },
 
   checkRequestAgainstSubscriptionPolicies : function(origin, dest) {
-    return this._checkRequest(origin, dest, this._subscriptionPolicies);
+    var result = new CheckRequestResult();
+    for (var listName in this._subscriptionPolicies) {
+      var policies = this._subscriptionPolicies[listName];
+      return this._checkRequest(origin, dest, policies, result);
+    }
+    return result;
   },
 
-  _checkRequest : function(origin, dest, policies) {
+  _checkRequest : function(origin, dest, policies, result) {
     if (!(origin instanceof CI.nsIURI)) {
       throw "Origin must be an nsIURI.";
     }
     if (!(dest instanceof CI.nsIURI)) {
       throw "Destination must be an nsIURI.";
     }
-    var result = new CheckRequestResult();
+    if (!result) {
+      result = new CheckRequestResult();
+    }
     for (var i in policies) {
       var policy = policies[i].policy;
       //policy.setPrintFunction(print);

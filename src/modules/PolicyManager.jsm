@@ -125,7 +125,7 @@ PolicyManager.prototype = {
     for (var listName in subscriptionInfo) {
       for (var subName in subscriptionInfo[listName]) {
         try {
-          dprint("PolicyManager::loadPolicies loading subscription policy: " +
+          dprint("PolicyManager::loadSubscriptionPolicies: " +
                  listName + ' / ' + subName);
           rawPolicy = requestpolicy.mod.PolicyStorage
                 .loadRawPolicyFromFile(subName + ".json", listName);
@@ -145,6 +145,29 @@ PolicyManager.prototype = {
                          "policy" : rawPolicy.toPolicy(subName)};
         list[subName]["policy"].userPolicy = false;
         list[subName].policy.print();
+      }
+    }
+
+    return failures;
+  },
+
+  unloadSubscriptionPolicies : function(subscriptionInfo) {
+    var failures = {};
+
+    for (var listName in subscriptionInfo) {
+      for (var subName in subscriptionInfo[listName]) {
+        dprint("PolicyManager::unloadSubscriptionPolicies: " +
+                 listName + ' / ' + subName);
+        if (!this._subscriptionPolicies[listName] ||
+            !this._subscriptionPolicies[listName][subName]) {
+          if (!failures[listName]) {
+            failures[listName] = {};
+          }
+          failures[listName][subName] = null;
+          continue;
+        }
+        var list = this._subscriptionPolicies[listName];
+        delete list[subName];
       }
     }
 

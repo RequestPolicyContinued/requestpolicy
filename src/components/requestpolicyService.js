@@ -546,7 +546,9 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
-    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC, false);
+    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC, false);
+    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC, false);
+    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC, false);
 
     // Listening for uninstall/disable events is done with the AddonManager
     // since Firefox 4.
@@ -566,7 +568,9 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
       os.removeObserver(this, "quit-application");
-      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC);
+      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC);
+      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC);
+      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC);
       if (!AddonManager) {
         os.removeObserver(this, "em-action-requested");
       }
@@ -1757,11 +1761,18 @@ RequestPolicyService.prototype = {
       case "http-on-modify-request" :
         this._examineHttpRequest(subject);
         break;
-      case requestpolicy.mod.SUBSCRIPTION_UPDATE_TOPIC:
+      case requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC:
+      case requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC:
         requestpolicy.mod.Logger.debug(
           requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX: ' + data);
         var subInfo = JSON.parse(data);
         var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
+        break;
+      case requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC:
+        requestpolicy.mod.Logger.debug(
+          requestpolicy.mod.Logger.TYPE_INTERNAL, 'YYY: ' + data);
+        var subInfo = JSON.parse(data);
+        var failures = this._policyMgr.unloadSubscriptionPolicies(subInfo);
         break;
       case HTTPS_EVERYWHERE_REWRITE_TOPIC :
         this._handleHttpsEverywhereUriRewrite(subject, data);

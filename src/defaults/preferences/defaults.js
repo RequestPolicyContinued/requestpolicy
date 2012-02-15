@@ -29,10 +29,3 @@ pref("extensions.requestpolicy.contextMenu", true);
 
 pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
-
-pref("extensions.requestpolicy.subscription.sameorg", true);
-pref("extensions.requestpolicy.subscription.functionality", true);
-pref("extensions.requestpolicy.subscription.embedded", true);
-pref("extensions.requestpolicy.subscription.trackers", true);
-pref("extensions.requestpolicy.subscription.mozilla", true);
-pref("extensions.requestpolicy.subscription.extensions", true);

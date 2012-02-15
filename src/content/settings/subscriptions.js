@@ -1,35 +1,64 @@
+Components.utils.import("resource://requestpolicy/Logger.jsm");
+Components.utils.import("resource://requestpolicy/Subscription.jsm");
+
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
       .getService(Components.interfaces.nsIRequestPolicy);
+
 var rpServiceJSObject = rpService.wrappedJSObject;
 
-var subscriptionNames = [
-  'sameorg',
-  'functionality',
-  'embedded',
-  'trackers',
-  'mozilla',
-  'extensions'
-];
+var observerService = Components.classes["@mozilla.org/observer-service;1"]
+      .getService(Components.interfaces.nsIObserverService);
+
 
 function updateDisplay() {
-  for each (var sub in subscriptionNames) {
-    var enabled = rpService.prefs.getBoolPref('subscription.' + sub);
-    document.getElementById('sub-' + sub).checked = enabled;
+  var userSubs = rpServiceJSObject._subscriptions;
+  var subsInfo = userSubs.getSubscriptionInfo();
+  for (var subName in subsInfo['official']) {
+    var el = document.getElementById('sub-' + subName);
+    if (!el) {
+      throw 'Unable to find element with id: sub-' + subName;
+      continue;
+    }
+    el.checked = true;
   }
 }
 
 function onload() {
   updateDisplay();
+  var userSubs = rpServiceJSObject._subscriptions;
+  var subsInfo = userSubs.getSubscriptionInfo();
 
   function handleSubscriptionChange(event) {
-    var sub = event.target.name;
+    var subName = event.target.name;
     var enabled = event.target.checked;
-    rpService.prefs.setBoolPref('subscription.' + sub, enabled);
-    rpServiceJSObject._prefService.savePrefFile(null);
+    var subInfo = {};
+    subInfo['official'] = {};
+    subInfo['official'][subName] = true;
+    if (enabled) {
+      userSubs.addSubscription('official', subName);
+      observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+            JSON.stringify(subInfo));
+    } else {
+      userSubs.removeSubscription('official', subName);
+      observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+            JSON.stringify(subInfo));
+    }
   }
 
-  for each (var sub in subscriptionNames) {
-    document.getElementById('sub-' + sub)
-          .addEventListener('change', handleSubscriptionChange);
+  var available = {
+    'embedded' : {},
+    'extensions' : {},
+    'functionality' : {},
+    'mozilla' : {},
+    'sameorg' : {},
+    'trackers' : {}
+  };
+  for (var subName in available) {
+    var el = document.getElementById('sub-' + subName);
+    if (!el) {
+      Logger.dump('Skipping unexpected official subName: ' + subName);
+      continue;
+    }
+    el.addEventListener('change', handleSubscriptionChange);
   }
 }

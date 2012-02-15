@@ -21,7 +21,8 @@
  */
 
 var EXPORTED_SYMBOLS = ["UserSubscriptions", "SubscriptionList", "Subscription",
-      "SUBSCRIPTION_UPDATE_TOPIC"];
+      "SUBSCRIPTION_UPDATED_TOPIC", "SUBSCRIPTION_ADDED_TOPIC",
+      "SUBSCRIPTION_REMOVED_TOPIC"];
 
 Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
@@ -29,7 +30,9 @@ Components.utils.import("resource://requestpolicy/Policy.jsm");
 Components.utils.import("resource://requestpolicy/PolicyStorage.jsm");
 
 
-const SUBSCRIPTION_UPDATE_TOPIC = 'requestpolicy-subscription-policy-updated';
+const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';
+const SUBSCRIPTION_ADDED_TOPIC = 'requestpolicy-subscription-policy-added';
+const SUBSCRIPTION_REMOVED_TOPIC = 'requestpolicy-subscription-policy-removed';
 
 const DEFAULT_SUBSCRIPTION_LIST_URLS = {
   'official' : 'http://localhost/requestpolicy/subscriptions/official.json'
@@ -128,6 +131,27 @@ UserSubscriptions.prototype = {
       }
     }
     return result;
+  },
+
+  addSubscription : function(listName, subName) {
+    var lists = this._data['lists'];
+    if (!lists[listName]) {
+      lists[listName] = {};
+    }
+    if (!lists[listName]['subscriptions']) {
+      lists[listName]['subscriptions'] = {};
+    }
+    lists[listName]['subscriptions'][subName] = {};
+    this.save();
+  },
+
+  removeSubscription : function(listName, subName) {
+    var lists = this._data['lists'];
+    if (lists[listName] && lists[listName]['subscriptions'] &&
+      lists[listName]['subscriptions'][subName]) {
+      delete lists[listName]['subscriptions'][subName];
+    }
+    this.save();
   },
 
   // This method kinda sucks. Maybe move this to a worker and write this
@@ -388,7 +412,7 @@ Subscription.prototype = {
         var subInfo = {};
         subInfo[self._list] = {};
         subInfo[self._list][self._name] = true;
-        observerService.notifyObservers(null, SUBSCRIPTION_UPDATE_TOPIC,
+        observerService.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
               JSON.stringify(subInfo));
         setTimeout(function () {
               successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);

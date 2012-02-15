@@ -685,6 +685,10 @@ requestpolicy.overlay = {
    * notifications.
    */
   _checkForBlockedContent : function(document) {
+    // TODO: this probably needs to be rewritten or at least thought through
+    // again in light of it being years later and much of RP changing. It's
+    // likely that there's wasted work happening during time-critical page
+    // loading going on in here.
     try {
       var documentUri = requestpolicy.mod.DomainUtil
           .stripFragment(document.documentURI);
@@ -728,15 +732,20 @@ requestpolicy.overlay = {
   },
 
   _indicateBlockedVisibleObjects : function(document) {
-    // TODO: make this work again.
-    return;
-
     if (!this._rpService.prefs.getBoolPref("indicateBlockedObjects")) {
       return;
     }
     var images = document.getElementsByTagName("img");
     var rejectedRequests = requestpolicy.mod.RequestUtil.getDirectRejectedRequests(
         document.location);
+    var blockedUris = {};
+    for (var destBase in rejectedRequests) {
+      for (var destIdent in rejectedRequests[destBase]) {
+        for (var destUri in rejectedRequests[destBase][destIdent]) {
+          blockedUris[destUri] = true;
+        }
+      }
+    }
 
     // Ideally, want the image to be a broken image so that the alt text
     // shows. By default, the blocked image will just not show up at all.
@@ -756,7 +765,7 @@ requestpolicy.overlay = {
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
       // Note: we're no longer checking img.requestpolicyBlocked here.
-      if (!img.requestpolicyIdentified && img.src in rejectedRequests) {
+      if (!img.requestpolicyIdentified && img.src in blockedUris) {
         img.requestpolicyIdentified = true;
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";

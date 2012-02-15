@@ -31,9 +31,9 @@ Components.utils.import("resource://requestpolicy/PolicyStorage.jsm");
 
 const SUBSCRIPTION_UPDATE_TOPIC = 'requestpolicy-subscription-policy-updated';
 
-
-const OFFICIAL_SUBSCRIPTION_LIST_URL = 'http://localhost/requestpolicy/subscriptions/official.json'
-
+const DEFAULT_SUBSCRIPTION_LIST_URLS = {
+  'official' : 'http://localhost/requestpolicy/subscriptions/official.json'
+};
 
 const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
@@ -90,7 +90,6 @@ function UserSubscriptions() {
     // official lists when the subscriptions.json file is missing.
     this._data['lists'] = {
       'official' : {
-        'url' : OFFICIAL_SUBSCRIPTION_LIST_URL,
         'subscriptions' : {
           'embedded' : {},
           'extensions' : {},
@@ -178,6 +177,13 @@ UserSubscriptions.prototype = {
         continue;
       }
       var url = this._lists[listName]['url'];
+      if (!url) {
+        url = DEFAULT_SUBSCRIPTION_LIST_URLS[listName];
+      }
+      if (!url) {
+        dprint('Skipping list without url: ' + listName);
+        continue;
+      }
       var list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
       for (var subName in updateSubs) {

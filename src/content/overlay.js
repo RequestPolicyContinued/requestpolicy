@@ -1289,9 +1289,9 @@ requestpolicy.overlay = {
    *          event
    */
   onPopupShowing : function(event) {
-    if (event.currentTarget != event.originalTarget) {
-      return;
-    }
+//    if (event.currentTarget != event.originalTarget) {
+//      return;
+//    }
     requestpolicy.menu.prepareMenu();
   },
 
@@ -1302,9 +1302,13 @@ requestpolicy.overlay = {
    *          event
    */
   onPopupHiding : function(event) {
-    if (event.currentTarget != event.originalTarget) {
-      return;
+    var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
+    if (rulesChanged) {
+      content.document.location.reload(false);
     }
+//    if (event.currentTarget != event.originalTarget) {
+//      return;
+//    }
     // Leave the popup attached to the context menu, as we consider that the
     // default location for it.
     //this._attachPopupToContextMenu();
@@ -1346,9 +1350,9 @@ requestpolicy.overlay = {
    * be reloaded.
    */
   _conditionallyReloadDocument : function() {
-    if (this._rpService.prefs.getBoolPref("autoReload")) {
-      content.document.location.reload(false);
-    }
+//    if (this._rpService.prefs.getBoolPref("autoReload")) {
+//      content.document.location.reload(false);
+//    }
   },
 
   /**

@@ -210,6 +210,14 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   color: #999;
 }
 
+#rp-details .rp-stop-rule[selected-rule="true"] {
+  text-decoration: line-through;
+}
+
+#rp-details .rp-start-rule[selected-rule="true"] {
+  text-decoration: underline;
+}
+
 #rp-rules-remove label:last-child {
   margin-bottom: 14px;
 }

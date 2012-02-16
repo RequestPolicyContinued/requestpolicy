@@ -56,6 +56,8 @@ requestpolicy.menu = {
   _isCurrentlySelectedDestBlocked : null,
   _isCurrentlySelectedDestAllowed : null,
 
+  _ruleChangeQueues : {},
+
   init : function() {
     if (this._initialized == false) {
       this._initialized = true;
@@ -401,6 +403,14 @@ requestpolicy.menu = {
     var ruleData = item.requestpolicyRuleData;
     var ruleAction = item.requestpolicyRuleAction;
 
+    if (item.getAttribute('selected-rule') == 'true') {
+      item.setAttribute('selected-rule', 'false');
+      var undo = true;
+    } else {
+      item.setAttribute('selected-rule', 'true');
+      var undo = false;
+    }
+
     if (!ruleData) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
             'ruleData is empty in menu._processRuleSelection()');
@@ -411,8 +421,11 @@ requestpolicy.menu = {
                                       'ruleAction is empty in menu._processRuleSelection()');
       return;
     }
-    requestpolicy.mod.Logger.dump("ruleData: " + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
+
+    var canonicalRule = requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData);
+    requestpolicy.mod.Logger.dump("ruleData: " + canonicalRule);
     requestpolicy.mod.Logger.dump("ruleAction: " + ruleAction);
+    requestpolicy.mod.Logger.dump("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
@@ -424,6 +437,35 @@ requestpolicy.menu = {
     if (ruleData['d'] && ruleData['d']['h']) {
       dest = ruleData['d']['h'];
     }
+
+    if (!this._ruleChangeQueues[ruleAction]) {
+      this._ruleChangeQueues[ruleAction] = {};
+    }
+
+    if (undo) {
+      delete this._ruleChangeQueues[ruleAction][canonicalRule];
+    } else {
+      this._ruleChangeQueues[ruleAction][canonicalRule] = ruleData;
+    }
+  },
+
+  processQueuedRuleChanges: function() {
+    var rulesChanged = false;
+    for (var ruleAction in this._ruleChangeQueues) {
+      for (var canonicalRule in this._ruleChangeQueues[ruleAction]) {
+        var ruleData = this._ruleChangeQueues[ruleAction][canonicalRule];
+        this._processRuleChange(ruleAction, ruleData);
+        var rulesChanged = true;
+      }
+    }
+
+    this._ruleChangeQueues = {};
+    return rulesChanged;
+  },
+
+  _processRuleChange: function(ruleAction, ruleData) {
+
+    requestpolicy.overlay._needsReloadOnMenuClose = true;
 
     switch (ruleAction) {
       case 'allow':
@@ -546,56 +588,56 @@ requestpolicy.menu = {
   _addMenuItemStopAllowingOrigin : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], ruleAction, 'rp-stop-allow');
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], ruleAction, 'rp-stop-rule rp-stop-allow');
   },
 
   _addMenuItemStopAllowingDest : function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], ruleAction, 'rp-stop-allow');
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], ruleAction, 'rp-stop-rule rp-stop-allow');
   },
 
   _addMenuItemStopAllowingOriginToDest : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-allow');
+    return this._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-rule rp-stop-allow');
   },
 
   // Allow
 
   _addMenuItemAllowOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowOrigin', [originHost], 'allow', 'rp-allow');
+    return this._addMenuItemHelper(list, ruleData, 'allowOrigin', [originHost], 'allow', 'rp-start-rule rp-allow');
   },
 
   _addMenuItemAllowDest : function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowDestination', [destHost], 'allow', 'rp-allow');
+    return this._addMenuItemHelper(list, ruleData, 'allowDestination', [destHost], 'allow', 'rp-start-rule rp-allow');
   },
 
   _addMenuItemAllowOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestination', [originHost, destHost], 'allow', 'rp-allow');
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestination', [originHost, destHost], 'allow', 'rp-start-rule rp-allow');
   },
 
   // Allow temp
 
   _addMenuItemTempAllowOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowOriginTemporarily', [originHost], 'allow-temp', 'rp-allow rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginTemporarily', [originHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
   },
 
   _addMenuItemTempAllowDest : function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowDestinationTemporarily', [destHost], 'allow-temp', 'rp-allow rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'allowDestinationTemporarily', [destHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
   },
 
   _addMenuItemTempAllowOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestinationTemporarily', [originHost, destHost], 'allow-temp', 'rp-allow rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'allowOriginToDestinationTemporarily', [originHost, destHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
   },
 
   // Stop denying
@@ -603,56 +645,56 @@ requestpolicy.menu = {
   _addMenuItemStopDenyingOrigin : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], ruleAction, 'rp-stop-deny');
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], ruleAction, 'rp-stop-rule rp-stop-deny');
   },
 
   _addMenuItemStopDenyingDest : function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], ruleAction, 'rp-stop-deny');
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], ruleAction, 'rp-stop-rule rp-stop-deny');
   },
 
   _addMenuItemStopDenyingOriginToDest : function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-deny');
+    return this._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-rule rp-stop-deny');
   },
 
   // Deny
 
   _addMenuItemDenyOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyOrigin', [originHost], 'deny', 'rp-deny');
+    return this._addMenuItemHelper(list, ruleData, 'denyOrigin', [originHost], 'deny', 'rp-start-rule rp-deny');
   },
 
   _addMenuItemDenyDest : function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyDestination', [destHost], 'deny', 'rp-deny');
+    return this._addMenuItemHelper(list, ruleData, 'denyDestination', [destHost], 'deny', 'rp-start-rule rp-deny');
   },
 
   _addMenuItemDenyOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestination', [originHost, destHost], 'deny', 'rp-deny');
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestination', [originHost, destHost], 'deny', 'rp-start-rule rp-deny');
   },
 
   // Deny temp
 
   _addMenuItemTempDenyOrigin : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyOriginTemporarily', [originHost], 'deny-temp', 'rp-deny rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginTemporarily', [originHost], 'deny-temp', 'rp-start-rule rp-deny rp-temporary');
   },
 
   _addMenuItemTempDenyDest : function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyDestinationTemporarily', [destHost], 'deny-temp', 'rp-deny rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'denyDestinationTemporarily', [destHost], 'deny-temp', 'rp-start-rule rp-deny rp-temporary');
   },
 
   _addMenuItemTempDenyOriginToDest : function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestinationTemporarily', [originHost, destHost], 'deny-temp', 'rp-deny rp-temporary');
+    return this._addMenuItemHelper(list, ruleData, 'denyOriginToDestinationTemporarily', [originHost, destHost], 'deny-temp', 'rp-start-rule rp-deny rp-temporary');
   },
 
   _addMenuItemHelper : function(list, ruleData, fmtStrName, fmtStrArgs, ruleAction, cssClass) {
@@ -662,6 +704,12 @@ requestpolicy.menu = {
     item.requestpolicyRuleAction = ruleAction;
     //var statustext = ''; // TODO
     item.setAttribute('class', 'rp-od-item ' + cssClass);
+    var canonicalRule = requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData);
+    if (this._ruleChangeQueues[ruleAction]) {
+      if (this._ruleChangeQueues[ruleAction][canonicalRule]) {
+        item.setAttribute('selected-rule', 'true');
+      }
+    }
     return item;
   },
 

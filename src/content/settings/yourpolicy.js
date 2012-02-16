@@ -70,7 +70,7 @@ function addPolicyTableRow(table, type, origin, dest, ruleData) {
   var row = table.insertRow(rowCount);
 
   var typeCell = row.insertCell(0);
-  typeCell.textContent = type == 'allow' ? 'Allow' : 'Deny';
+  typeCell.textContent = type == 'allow' ? 'Allow' : 'Block';
 
   var originCell = row.insertCell(1);
   originCell.textContent = origin;

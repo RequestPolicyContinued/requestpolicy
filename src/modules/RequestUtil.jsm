@@ -210,8 +210,11 @@ var RequestUtil = {
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
     for (var destBase in requests[currentUri]) {
+      Logger.dump("test direct destBase: " + destBase);
       for (var destIdent in requests[currentUri][destBase]) {
+        Logger.dump("test direct destIdent: " + destIdent);
         for (var destUri in requests[currentUri][destBase][destIdent]) {
+          Logger.dump("test direct destUri: " + destUri);
           result.addRequest(currentUri, destUri,
                             requests[currentUri][destBase][destIdent][destUri]);
         }
@@ -245,12 +248,14 @@ var RequestUtil = {
   },
 
   getDeniedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+    Logger.dump("## getDeniedRequests");
     //this._rpServiceJSObject._rejectedRequests.print("from getRejectedRequests");
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
           this._rpServiceJSObject._rejectedRequests.getAll());
   },
 
   getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+    Logger.dump("## getAllowedRequests");
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
           this._rpServiceJSObject._allowedRequests.getAll());
   },
@@ -355,6 +360,31 @@ var RequestUtil = {
             reqSet.addRequest(rootUri, destUri);
             this._getOtherOriginsHelperFromAllowedRequests(destUri, reqSet,
                 checkedOrigins);
+            this._getOtherOriginsHelperFromDeniedRequests(destUri, reqSet,
+                                                           checkedOrigins);
+          }
+        }
+      }
+    }
+  },
+
+  _getOtherOriginsHelperFromDeniedRequests : function(rootUri, reqSet,
+                                                       checkedOrigins) {
+    Logger
+      .dump("Looking for other origins within denied requests from "
+              + rootUri);
+    var requests = this._rpServiceJSObject._rejectedRequests.getOriginUri(rootUri);
+    if (requests) {
+      for (var destBase in requests) {
+        for (var destIdent in requests[destBase]) {
+          for (var destUri in requests[destBase][destIdent]) {
+//            if (checkedOrigins[destUri]) {
+//              continue;
+//            }
+//            checkedOrigins[destUri] = true;
+            Logger.dump("Found denied request to <"
+                          + destUri + "> from <" + rootUri + ">");
+            reqSet.addRequest(rootUri, destUri);
           }
         }
       }

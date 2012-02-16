@@ -1697,7 +1697,7 @@ requestpolicy.overlay = {
     var requestLog = document.getElementById("requestpolicy-requestLog");
     var requestLogSplitter = document.getElementById("requestpolicy-requestLog-splitter");
     var requestLogFrame = document.getElementById("requestpolicy-requestLog-frame");
-    var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
+    //var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.
     //var closeRequestLog = document
@@ -1708,11 +1708,11 @@ requestpolicy.overlay = {
       requestLogFrame.setAttribute("src",
           "chrome://requestpolicy/content/requestLog.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
-      openRequestLog.hidden = true;
+      //openRequestLog.hidden = true;
     } else {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
-      openRequestLog.hidden = false;
+      //openRequestLog.hidden = false;
       this.requestLogTreeView = null;
     }
   }

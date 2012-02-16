@@ -225,6 +225,10 @@ requestpolicy.menu = {
   },
 
   _populateDetails : function() {
+    var policyMgr = this._rpServiceJSObject._policyMgr;
+    const RULE_TYPE_ALLOW = requestpolicy.mod.RULE_TYPE_ALLOW;
+    const RULE_TYPE_DENY = requestpolicy.mod.RULE_TYPE_DENY;
+
     var origin = this._currentlySelectedOrigin;
     var dest = this._currentlySelectedDest;
     this._removeChildren(this._removeRulesList);
@@ -266,35 +270,48 @@ requestpolicy.menu = {
           'h' : this._addWildcard(dest)
         }
       };
-      if (this._rpServiceJSObject.isDefaultAllow()) {
-        if (!this._privateBrowsingEnabled) {
-          var item = this._addMenuItemDenyOriginToDest(
+      //if (this._rpServiceJSObject.isDefaultAllow()) {
+      if (this._isCurrentlySelectedDestAllowed) {
+        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+          if (!this._privateBrowsingEnabled) {
+              var item = this._addMenuItemDenyOriginToDest(
+                this._addRulesList, ruleData);
+          }
+          var item = this._addMenuItemTempDenyOriginToDest(
             this._addRulesList, ruleData);
         }
-        var item = this._addMenuItemTempDenyOriginToDest(
-          this._addRulesList, ruleData);
 
-        if (!this._privateBrowsingEnabled) {
-          var item = this._addMenuItemDenyDest(
+        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+          if (!this._privateBrowsingEnabled) {
+            var item = this._addMenuItemDenyDest(
+              this._addRulesList, destOnlyRuleData);
+          }
+          var item = this._addMenuItemTempDenyDest(
             this._addRulesList, destOnlyRuleData);
         }
-        var item = this._addMenuItemTempDenyDest(
-          this._addRulesList, destOnlyRuleData);
-
-      } else {
-        if (!this._privateBrowsingEnabled) {
-          var item = this._addMenuItemAllowOriginToDest(
+      }
+      if (this._isCurrentlySelectedDestBlocked) {
+        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+          if (!this._privateBrowsingEnabled) {
+            var item = this._addMenuItemAllowOriginToDest(
+              this._addRulesList, ruleData);
+          }
+          var item = this._addMenuItemTempAllowOriginToDest(
             this._addRulesList, ruleData);
         }
-        var item = this._addMenuItemTempAllowOriginToDest(
-          this._addRulesList, ruleData);
 
-        if (!this._privateBrowsingEnabled) {
-          var item = this._addMenuItemAllowDest(
+        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+          if (!this._privateBrowsingEnabled) {
+            var item = this._addMenuItemAllowDest(
+              this._addRulesList, destOnlyRuleData);
+          }
+          var item = this._addMenuItemTempAllowDest(
             this._addRulesList, destOnlyRuleData);
         }
-        var item = this._addMenuItemTempAllowDest(
-          this._addRulesList, destOnlyRuleData);
       }
     }
 

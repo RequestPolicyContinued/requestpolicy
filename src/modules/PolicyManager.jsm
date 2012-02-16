@@ -181,12 +181,30 @@ PolicyManager.prototype = {
     }
   },
 
+  ruleExists : function(ruleType, ruleData) {
+    this._assertRuleType(ruleType);
+    for (var name in this._userPolicies) {
+      if (this._userPolicies[name].rawPolicy.ruleExists(ruleType, ruleData)) {
+        return true;
+      }
+    }
+    for (var listName in this._subscriptionPolicies) {
+      var policies = this._subscriptionPolicies[listName];
+      for (var name in policies) {
+        if (policies[name].rawPolicy.ruleExists(ruleType, ruleData)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  },
+
   addRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["user"].policy.print();
     
-    this. _assertRuleType(ruleType);
+    this._assertRuleType(ruleType);
     // TODO: check rule format validity
     this._userPolicies["user"].rawPolicy.addRule(ruleType, ruleData,
           this._userPolicies["user"].policy);
@@ -223,7 +241,7 @@ PolicyManager.prototype = {
     //this._userPolicies["user"].policy.print();
     //this._userPolicies["temp"].policy.print();
     
-    this. _assertRuleType(ruleType);
+    this._assertRuleType(ruleType);
     // TODO: check rule format validity
     // TODO: use noStore
     this._userPolicies["user"].rawPolicy.removeRule(ruleType, ruleData,

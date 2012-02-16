@@ -193,6 +193,23 @@ RawPolicy.prototype = {
     }
   },
 
+  ruleExists : function(ruleType, ruleData) {
+    var typeStr = {RULE_TYPE_ALLOW:"allow", RULE_TYPE_DENY:"deny"}[ruleType];
+    if (!typeStr) {
+      throw "Invalid ruleType: " + ruleType;
+    }
+
+    var ruleStr = Policy.rawRuleToCanonicalString(ruleData);
+    var entries = this._entries[typeStr];
+    for (var i in entries) {
+      var curRuleStr = Policy.rawRuleToCanonicalString(entries[i]);
+      if (ruleStr == curRuleStr) {
+        return true;
+      }
+    }
+    return false;
+  },
+
   /**
    * Adds the rule to the entries of this |RawPolicy| instance as well as the
    * |Policy| optionally provided as the policy argument.
@@ -209,16 +226,7 @@ RawPolicy.prototype = {
     }
 
     // Only add the raw policy entry if it doesn't already exist.    
-    var ruleStr = Policy.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[typeStr];
-    var entryExists = false;
-    for (var i in entries) {
-      var curRuleStr = Policy.rawRuleToCanonicalString(entries[i]);
-      if (ruleStr == curRuleStr) {
-        entryExists = true;
-      }
-    }
-    if (!entryExists) {
+    if (!this.ruleExists(ruleType, ruleData)) {
       this._entries[typeStr].push(ruleData);
     }
 

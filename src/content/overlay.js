@@ -1665,8 +1665,23 @@ requestpolicy.overlay = {
         null);
   },
 
+  openPrefs : function() {
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/basicprefs.html');
+    gBrowser.selectedTab = tab;
+  },
+
   openPolicyManager : function() {
     var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/yourpolicy.html');
+    gBrowser.selectedTab = tab;
+  },
+
+  openHelp : function() {
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/help.html');
+    gBrowser.selectedTab = tab;
+  },
+
+  openAbout : function() {
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/about.html');
     gBrowser.selectedTab = tab;
   },
 

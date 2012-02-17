@@ -87,6 +87,9 @@ requestpolicy.menu = {
 
   prepareMenu : function() {
     try {
+      var oldRulesExist = this._rpServiceJSObject.oldRulesExist();
+      document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
+
       this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
       try {

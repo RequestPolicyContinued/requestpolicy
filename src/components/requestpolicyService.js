@@ -1612,6 +1612,23 @@ RequestPolicyService.prototype = {
     return this._privateBrowsingEnabled;
   },
 
+  oldRulesExist : function oldRulesExist() {
+    var prefs = this.prefs;
+    function prefEmpty(pref) {
+      try {
+        var value = prefs.getComplexValue(pref, CI.nsISupportsString).data;
+        requestpolicy.mod.Logger.dump(pref + ': ' + value);
+        return value == '';
+      } catch (e) {
+        requestpolicy.mod.Logger.dump(pref + ' exception: ' + e.toString());
+        return true;
+      }
+    }
+    return !(prefEmpty('allowedOrigins') &&
+             prefEmpty('allowedDestinations') &&
+             prefEmpty('allowedOriginsToDestinations'));
+  },
+
   // originHasRejectedRequests : function(originUri) {
   //   
   //   return this._originHasRejectedRequestsHelper(originUri, {});

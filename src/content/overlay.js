@@ -366,7 +366,7 @@ requestpolicy.overlay = {
               // pressing enter when a text input has focus).
               if (event.target.nodeName.toLowerCase() == "input" &&
                   event.target.type.toLowerCase() == "submit" &&
-                  event.target.form.action) {
+                  event.target.form && event.target.form.action) {
                 requestpolicyOverlay._rpService.registerFormSubmitted(
                   event.target.ownerDocument.URL, event.target.form.action);
                 return;
@@ -1686,6 +1686,11 @@ requestpolicy.overlay = {
 
   openAbout : function() {
     var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/about.html');
+    gBrowser.selectedTab = tab;
+  },
+
+  openImportOldRules : function() {
+    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/importoldrules.html');
     gBrowser.selectedTab = tab;
   },
 

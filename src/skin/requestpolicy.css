@@ -271,6 +271,21 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   width: 500px !important;
 }
 
+#rp-import-old-rules {
+  border-top: 1px solid #ddd;
+  padding: 7px 5px 9px 5px;
+  -moz-box-pack: center;
+}
+#rp-import-old-rules label {
+  color: #2550ba;
+  font-size: 14px;
+  margin: 0 10px 0 10px;
+}
+#rp-import-old-rules label:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 #rp-footer {
   border-top: 1px solid #ddd;
   padding: 0 5px 2px 5px;

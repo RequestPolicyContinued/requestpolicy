@@ -119,8 +119,6 @@ RequestPolicyService.prototype = {
 
   _requestObservers : [],
 
-  //_uriIdentificationLevel : 0,
-
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
    * at which the cached results of the last shouldLoad() call are discarded.
@@ -144,18 +142,6 @@ RequestPolicyService.prototype = {
 
   _subscriptions : null,
   _policyMgr : null,
-
-  // _temporarilyAllowedOriginsCount : 0,
-  // _temporarilyAllowedDestinationsCount : 0,
-  // _temporarilyAllowedOriginsToDestinationsCount : 0,
-  // 
-  // _temporarilyAllowedOrigins : {},
-  // _temporarilyAllowedDestinations : {},
-  // _temporarilyAllowedOriginsToDestinations : {},
-  // 
-  // _allowedOrigins : {},
-  // _allowedDestinations : {},
-  // _allowedOriginsToDestinations : {},
 
   _prefNameToObjectMap : null,
 
@@ -392,31 +378,6 @@ RequestPolicyService.prototype = {
   _syncFromPrefs : function() {
     // Load the logging preferences before the others.
     this._updateLoggingSettings();
-    //this._uriIdentificationLevel = this.prefs
-    //    .getIntPref("uriIdentificationLevel");
-        
-    // Note: not deleting this code. We'll need it later when we need to
-    // migrate users to the new policy storage.
-
-    // origins
-    // this._allowedOrigins = this._getPreferenceObj("allowedOrigins");
-    // requestpolicy.mod.Logger.vardump(this._allowedOrigins,
-    //     "this._allowedOrigins");
-    // // destinations
-    // this._allowedDestinations = this._getPreferenceObj("allowedDestinations");
-    // requestpolicy.mod.Logger.vardump(this._allowedDestinations,
-    //     "this._allowedDestinations");
-    // // origins to destinations
-    // this._allowedOriginsToDestinations = this
-    //     ._getPreferenceObj("allowedOriginsToDestinations");
-    // requestpolicy.mod.Logger.vardump(this._allowedOriginsToDestinations,
-    //     "this._allowedOriginsToDestinations");
-    // 
-    // this._prefNameToObjectMap = {
-    //   "allowedOrigins" : this._allowedOrigins,
-    //   "allowedDestinations" : this._allowedDestinations,
-    //   "allowedOriginsToDestinations" : this._allowedOriginsToDestinations
-    // };
 
     this._defaultAllow = this.prefs.getBoolPref("defaultPolicy.allow");
     this._defaultAllowSameDomain = this.prefs.getBoolPref("defaultPolicy.allowSameDomain");
@@ -668,10 +629,6 @@ RequestPolicyService.prototype = {
       case "subscription.extensions" :
         // TODO: implement handling of subscription change
         break;
-      //case "uriIdentificationLevel" :
-      //  this._uriIdentificationLevel = this.prefs
-      //      .getIntPref("uriIdentificationLevel");
-      //  break;
       default :
         break;
     }
@@ -766,16 +723,6 @@ RequestPolicyService.prototype = {
 
     var headerType;
     var dest;
-    
-    //     requestpolicy.mod.Logger.error(
-    //         requestpolicy.mod.Logger.TYPE_INTERNAL,
-    //         "\n\n\n********* Testing\n\n\n");
-    // 
-    // 
-    // var all = httpChannel.getAllResponseHeaders();
-    //     requestpolicy.mod.Logger.warning(
-    //         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
-    //         "All response headers: <" + all + ">");
     
     try {
       // If there is no such header, getResponseHeader() will throw
@@ -1008,44 +955,10 @@ RequestPolicyService.prototype = {
 
   _printAllowedRequests : function() {
     this._allowedRequests.print();
-    // requestpolicy.mod.Logger
-    //     .dump("-------------------------------------------------");
-    // requestpolicy.mod.Logger.dump("Allowed Requests");
-    // for (i in this._allowedRequests) {
-    //   requestpolicy.mod.Logger.dump("\t" + "Origin uri: <" + i + ">");
-    //   for (var j in this._allowedRequests[i]) {
-    //     requestpolicy.mod.Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
-    //     for (var k in this._allowedRequests[i][j]) {
-    //       if (k == "count") {
-    //         continue;
-    //       }
-    //       requestpolicy.mod.Logger.dump("\t\t\t" + k);
-    //     }
-    //   }
-    // }
-    // requestpolicy.mod.Logger
-    //     .dump("-------------------------------------------------");
   },
 
   _printRejectedRequests : function() {
     this._rejectedRequests.print();
-    // requestpolicy.mod.Logger
-    //     .dump("-------------------------------------------------");
-    // requestpolicy.mod.Logger.dump("Rejected Requests");
-    // for (i in this._rejectedRequests) {
-    //   requestpolicy.mod.Logger.dump("\t" + "Origin uri: <" + i + ">");
-    //   for (var j in this._rejectedRequests[i]) {
-    //     requestpolicy.mod.Logger.dump("\t\t" + "Dest identifier: <" + j + ">");
-    //     for (var k in this._rejectedRequests[i][j]) {
-    //       if (k == "count") {
-    //         continue;
-    //       }
-    //       requestpolicy.mod.Logger.dump("\t\t\t" + k);
-    //     }
-    //   }
-    // }
-    // requestpolicy.mod.Logger
-    //     .dump("-------------------------------------------------");
   },
 
   _notifyRequestObserversOfBlockedRequest : function(originUri, destUri,
@@ -1309,13 +1222,6 @@ RequestPolicyService.prototype = {
     this._allowOriginToDestination(originIdentifier, destIdentifier, true);
   },
 
-  // _allowOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
-  //   this._allowedOriginsToDestinations[combinedId] = true;
-  //   if (!noStore) {
-  //     this._storePreferenceList("allowedOriginsToDestinations");
-  //   }
-  // },
-
   isAllowedOriginToDestination : function isAllowedOriginToDestination(
       originIdentifier, destIdentifier) {
     // TODO
@@ -1361,29 +1267,6 @@ RequestPolicyService.prototype = {
     
   },
 
-  // _forbidOrigin : function(host, noStore) {
-  //   throw "NOT_IMPLEMENTED: _forbidOrigin";
-  //   
-  //   if (this._temporarilyAllowedOrigins[host]) {
-  //     this._temporarilyAllowedOriginsCount--;
-  //     delete this._temporarilyAllowedOrigins[host];
-  //   }
-  //   if (this._allowedOrigins[host]) {
-  //     delete this._allowedOrigins[host];
-  //     if (!noStore) {
-  //       this._storePreferenceList("allowedOrigins");
-  //     }
-  //   }
-  // },
-  // 
-  // forbidOrigin : function forbidOrigin(host) {
-  //   this._forbidOrigin(host, false);
-  // },
-  // 
-  // forbidOriginDelayStore : function forbidOriginDelayStore(host) {
-  //   this._forbidOrigin(host, true);
-  // },
-
   _forbidDestination : function(host, noStore) {
     throw "NOT_IMPLEMENTED: _forbidDestination";
 
@@ -1425,19 +1308,6 @@ RequestPolicyService.prototype = {
     this._forbidOriginToDestination(originIdentifier, destIdentifier, true);
   },
 
-  // _forbidOriginToDestinationByCombinedIdentifier : function(combinedId, noStore) {
-  //   if (this._temporarilyAllowedOriginsToDestinations[combinedId]) {
-  //     this._temporarilyAllowedOriginsToDestinationsCount--;
-  //     delete this._temporarilyAllowedOriginsToDestinations[combinedId];
-  //   }
-  //   if (this._allowedOriginsToDestinations[combinedId]) {
-  //     delete this._allowedOriginsToDestinations[combinedId];
-  //     if (!noStore) {
-  //       this._storePreferenceList("allowedOriginsToDestinations");
-  //     }
-  //   }
-  // },
-
   mapDestinations : function(origDestUri, newDestUri) {
     origDestUri = requestpolicy.mod.DomainUtil.stripFragment(origDestUri);
     newDestUri = requestpolicy.mod.DomainUtil.stripFragment(newDestUri);
@@ -1450,28 +1320,6 @@ RequestPolicyService.prototype = {
         requestpolicy.mod.DomainUtil.getUriObject(origDestUri);
   },
 
-  // _storePreferenceList : function(prefName) {
-  //   var setFromObj = this._prefNameToObjectMap[prefName];
-  //   if (setFromObj === undefined) {
-  //     throw "Invalid prefName: " + prefName;
-  //   }
-  //   var value = this._objToPrefString(setFromObj);
-  //   requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-  //       "Setting preference <" + prefName + "> to value <" + value + ">.");
-  // 
-  //   // Not using just setCharPref because these values may contain Unicode
-  //   // strings (e.g. for IDNs).
-  //   var str = CC["@mozilla.org/supports-string;1"]
-  //       .createInstance(CI.nsISupportsString);
-  //   str.data = value;
-  //   this.prefs.setComplexValue(prefName, CI.nsISupportsString, str);
-  // 
-  //   // Flush the prefs so that if the browser crashes, the changes aren't lost.
-  //   // TODO: flush the file once after any changed preferences have been
-  //   // modified, rather than once on each call to the current function.
-  //   this._prefService.savePrefFile(null);
-  // },
-
   storeAllPreferenceLists : function() {
     throw "NOT_IMPLEMENTED: storeAllPreferenceLists";
     
@@ -1479,35 +1327,6 @@ RequestPolicyService.prototype = {
       this._storePreferenceList(prefName);
     }
   },
-
-  // _getPreferenceObj : function(prefName) {
-  //   // Not using just getCharPref because these values may contain Unicode
-  //   // strings (e.g. for IDNs).
-  //   var prefString = this.prefs.getComplexValue(prefName, CI.nsISupportsString).data;
-  //   requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-  //       "Loading preference <" + prefName + "> from value <" + prefString
-  //           + ">.");
-  //   return this._prefStringToObj(prefString);
-  // },
-
-  // _objToPrefString : function(obj) {
-  //   var a = [];
-  //   for (var i in obj) {
-  //     a.push(i);
-  //   }
-  //   return a.join(" ");
-  // },
-
-  // _prefStringToObj : function(prefString) {
-  //   var prefObj = {};
-  //   var prefArray = prefString.split(" ");
-  //   if (prefArray[0] != "") {
-  //     for (var i in prefArray) {
-  //       prefObj[prefArray[i]] = true;
-  //     }
-  //   }
-  //   return prefObj;
-  // },
 
   isAllowedRedirect : function(originUri, destinationUri) {
     // TODO: Find a way to get rid of repitition of code between this and
@@ -1626,74 +1445,6 @@ RequestPolicyService.prototype = {
              prefEmpty('allowedDestinations') &&
              prefEmpty('allowedOriginsToDestinations'));
   },
-
-  // originHasRejectedRequests : function(originUri) {
-  //   
-  //   return this._originHasRejectedRequestsHelper(originUri, {});
-  // },
-
-  // _originHasRejectedRequestsHelper : function(originUri, checkedUris) {
-  //   if (checkedUris[originUri]) {
-  //     return false;
-  //   }
-  //   checkedUris[originUri] = true;
-  // 
-  //   var rejectedRequests = this._rejectedRequests[originUri];
-  //   if (rejectedRequests) {
-  //     for (var i in rejectedRequests) {
-  //       for (var j in rejectedRequests[i]) {
-  //         if (rejectedRequests[i][j]) {
-  //           return true;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   // If this url had an allowed redirect to another url which in turn had a
-  //   // rejected redirect (e.g. installing extensions from AMO with full domain
-  //   // strictness enabled), then it will show up by recursively checking each
-  //   // allowed request.
-  //   // I think this logic will also indicate rejected requests if this
-  //   // origin has rejected requests from other origins within it. I don't
-  //   // believe this will cause a problem.
-  //   var allowedRequests = this._allowedRequests[originUri];
-  //   if (allowedRequests) {
-  //     for (var i in allowedRequests) {
-  //       for (var j in allowedRequests[i]) {
-  //         if (this._originHasRejectedRequestsHelper(j, checkedUris)) {
-  //           return true;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // },
-
-  // _dumpRequestTrackingObject : function(obj, name) {
-  //   function print(msg) {
-  //     requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
-  //         msg);
-  //   }
-  //   print("--------------------------------------------");
-  //   print(name + ":");
-  //   for (var i in obj) {
-  //     print("\t" + i);
-  //     for (var j in obj[i]) {
-  //       print("\t\t" + j);
-  //       for (var k in obj[i][j]) {
-  //         print("\t\t\t" + k);
-  //       }
-  //     }
-  //   }
-  //   print("--------------------------------------------");
-  // },
-  // 
-  // _dumpRejectedRequests : function() {
-  //   this._dumpRequestTrackingObject(this._rejectedRequests, "Rejected requests");
-  // },
-  // 
-  // _dumpAllowedRequests : function() {
-  //   this._dumpRequestTrackingObject(this._allowedRequests, "Allowed requests")
-  // },
 
   /**
    * Add an observer to be notified of all blocked and allowed requests. TODO:
@@ -1930,45 +1681,8 @@ RequestPolicyService.prototype = {
   },
 
   _recordRejectedRequest : function(originUri, destUri, checkRequestResult) {
-    //var destIdentifier = this.getUriIdentifier(destUri);
-
-    // Keep track of the rejected requests by full origin uri, then within each
-    // full origin uri, organize by dest hostnames. This makes it easy to
-    // determine the rejected dest hosts from a given page. The full
-    // dest uri for each rejected dest is then also kept. This
-    // allows showing the number of blocked unique dests to each
-    // dest host.
     this._rejectedRequests.addRequest(originUri, destUri, checkRequestResult);
-    // if (!this._rejectedRequests[originUri]) {
-    //   this._rejectedRequests[originUri] = {};
-    // }
-    // var originRejected = this._rejectedRequests[originUri];
-    // if (!originRejected[destIdentifier]) {
-    //   originRejected[destIdentifier] = {};
-    // }
-    // if (!originRejected[destIdentifier][destUri]) {
-    //   originRejected[destIdentifier][destUri] = (checkRequestResult ?
-    //                                              checkRequestResult : true);
-    //   if (!originRejected[destIdentifier].count) {
-    //     originRejected[destIdentifier].count = 1;
-    //   } else {
-    //     originRejected[destIdentifier].count++;
-    //   }
-    // }
-
-    // Remove this request from the set of allowed requests.
     this._allowedRequests.removeRequest(originUri, destUri);
-    // if (this._allowedRequests[originUri]) {
-    //   var originAllowed = this._allowedRequests[originUri];
-    //   if (originAllowed[destIdentifier]) {
-    //     delete originAllowed[destIdentifier][destUri];
-    //     originAllowed[destIdentifier].count--;
-    //     if (originAllowed[destIdentifier].count == 0) {
-    //       delete originAllowed[destIdentifier];
-    //     }
-    //   }
-    // }
-
     this._notifyRequestObserversOfBlockedRequest(originUri, destUri);
   },
 
@@ -2024,46 +1738,9 @@ RequestPolicyService.prototype = {
     if (!isInsert) {
       this._allowedRequests.removeOriginUri(destUri);
       this._rejectedRequests.removeOriginUri(destUri);
-      // if (this._allowedRequests[destUri]) {
-      //   delete this._allowedRequests[destUri];
-      // }
-      // if (this._rejectedRequests[destUri]) {
-      //   delete this._rejectedRequests[destUri];
-      // }
     }
-
-    // Remove this request from the set of rejected requests.
     this._rejectedRequests.removeRequest(originUri, destUri);
-    // if (this._rejectedRequests[originUri]) {
-    //   var originRejected = this._rejectedRequests[originUri];
-    //   if (originRejected[destIdentifier]) {
-    //     delete originRejected[destIdentifier][destUri];
-    //     originRejected[destIdentifier].count--;
-    //     if (originRejected[destIdentifier].count == 0) {
-    //       delete originRejected[destIdentifier];
-    //     }
-    //   }
-    // }
-
-    // Keep track of the accepted requests.
     this._allowedRequests.addRequest(originUri, destUri, checkRequestResult);
-    // if (!this._allowedRequests[originUri]) {
-    //   this._allowedRequests[originUri] = {};
-    // }
-    // var originAllowed = this._allowedRequests[originUri];
-    // if (!originAllowed[destIdentifier]) {
-    //   originAllowed[destIdentifier] = {};
-    // }
-    // if (!originAllowed[destIdentifier][destUri]) {
-    //   originAllowed[destIdentifier][destUri] = (checkRequestResult ?
-    //                                             checkRequestResult : true);
-    //   if (!originAllowed[destIdentifier].count) {
-    //     originAllowed[destIdentifier].count = 1;
-    //   } else {
-    //     originAllowed[destIdentifier].count++;
-    //   }
-    // }
-
     this._notifyRequestObserversOfAllowedRequest(originUri, destUri,
           checkRequestResult);
   },

@@ -2024,9 +2024,9 @@ RequestPolicyService.prototype = {
         var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
         if (originIdent == destIdent) {
           return this.accept(
-            "Allowing (but not recording) request where origin protocol," +
-              " host, and port are the same as the destination: " + originIdent,
-            args, null, true);
+            "Allowing request where origin protocol, host, and port are the" +
+              " same as the destination: " + originIdent,
+            args, null);
         }
 
         var result = this._policyMgr.checkRequestAgainstUserPolicies(

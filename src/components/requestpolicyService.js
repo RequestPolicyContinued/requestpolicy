@@ -1154,22 +1154,10 @@ RequestPolicyService.prototype = {
     this._allowOrigin(host, true);
   },
 
-  isAllowedOrigin : function isAllowedOrigin(host) {
-    // TODO
-    return true;
-    //return this._allowedOrigins[host] ? true : false;
-  },
-
   temporarilyAllowOrigin : function temporarilyAllowOrigin(host) {
     var ruleData = {"o": {"h" : host}};
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
           ruleData);
-  },
-
-  isTemporarilyAllowedOrigin : function isTemporarilyAllowedOrigin(host) {
-    // TODO
-    return true;
-    //return this._temporarilyAllowedOrigins[host] ? true : false;
   },
 
   _allowDestination : function(host, noStore) {
@@ -1186,22 +1174,9 @@ RequestPolicyService.prototype = {
     this._allowDestination(host, true);
   },
 
-  isAllowedDestination : function isAllowedDestination(host) {
-    // TODO
-    return true;
-    //return this._allowedDestinations[host] ? true : false;
-  },
-
   temporarilyAllowDestination : function temporarilyAllowDestination(host) {
     var ruleData = {"d": {"h" : host}};
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
-  },
-
-  isTemporarilyAllowedDestination : function isTemporarilyAllowedDestination(
-      host) {
-    // TODO
-    return true;
-    //return this._temporarilyAllowedDestinations[host] ? true : false;
   },
 
   _allowOriginToDestination : function(originIdentifier, destIdentifier,
@@ -1222,31 +1197,11 @@ RequestPolicyService.prototype = {
     this._allowOriginToDestination(originIdentifier, destIdentifier, true);
   },
 
-  isAllowedOriginToDestination : function isAllowedOriginToDestination(
-      originIdentifier, destIdentifier) {
-    // TODO
-    return true;
-    //var combinedId = this._getCombinedOriginToDestinationIdentifier(
-    //    originIdentifier, destIdentifier);
-    //return this._allowedOriginsToDestinations[combinedId] ? true : false;
-  },
-
   temporarilyAllowOriginToDestination : function temporarilyAllowOriginToDestination(
       originIdentifier, destIdentifier) {
     var ruleData = {"o": {"h" : originIdentifier},
                     "d": {"h" : destIdentifier}};
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
-  },
-
-  isTemporarilyAllowedOriginToDestination : function isTemporarilyAllowedOriginToDestination(
-      originIdentifier, destIdentifier) {
-    // TODO
-    return true;
-    //var combinedId = this._getCombinedOriginToDestinationIdentifier(
-    //    originIdentifier, destIdentifier);
-    //return this._temporarilyAllowedOriginsToDestinations[combinedId]
-    //    ? true
-    //    : false;
   },
 
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {

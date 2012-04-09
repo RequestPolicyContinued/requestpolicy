@@ -1617,10 +1617,8 @@ RequestPolicyService.prototype = {
     function prefEmpty(pref) {
       try {
         var value = prefs.getComplexValue(pref, CI.nsISupportsString).data;
-        requestpolicy.mod.Logger.dump(pref + ': ' + value);
         return value == '';
       } catch (e) {
-        requestpolicy.mod.Logger.dump(pref + ' exception: ' + e.toString());
         return true;
       }
     }

@@ -14,6 +14,8 @@
     <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
+    <em:updateURL>https://www.requestpolicy.com/update-alpha.rdf</em:updateURL>
+
     <em:contributor>myahoo (French translation)</em:contributor>
     <em:contributor>Team erweiterungen.de (German translation)</em:contributor>
     <em:contributor>Archaeopteryx (German translation)</em:contributor>

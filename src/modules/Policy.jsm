@@ -485,14 +485,14 @@ RuleSet.prototype = {
   _rules : null,
   
   print : function(depth) {
-  	depth = depth ? depth : 0;
+    depth = depth ? depth : 0;
     for (var i = 0, item; item = this._rules[i]; i++) {
       item.print(depth);
     }
   },
   
   getRules : function() {
-  	return this._rules;
+    return this._rules;
   },
   
   isEmpty : function() {
@@ -514,10 +514,10 @@ RuleSet.prototype = {
   },
 
   add : function(scheme, port) {
-  	var rule = new Rule(scheme, port);
+    var rule = new Rule(scheme, port);
     for (var i = 0, item; item = this._rules[i]; i++) {
       if (item.isEqual(rule)) {
-      	return item;
+        return item;
       }
     }
     this._rules.push(rule);
@@ -572,29 +572,29 @@ Rule.prototype = {
   },
   
   print : function(depth) {
-  	depth = depth ? depth : 0;
+    depth = depth ? depth : 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
     if (this.destinations) {
-	    dprint(indent + "  " + "destinations:");
-    	this.destinations.print(depth + 1);
+      dprint(indent + "  " + "destinations:");
+      this.destinations.print(depth + 1);
     }
   },
   
   isEqual : function(otherRule) {
-  	return this.scheme == otherRule.scheme &&
-  	       this.port == otherRule.port &&
-  	       this.path == otherRule.path;
+    return this.scheme == otherRule.scheme &&
+           this.port == otherRule.port &&
+           this.path == otherRule.path;
   },
   
   initDestinations : function() {
     if (this.destinations) {
       return;
     }
-  	this.destinations = new Policy();
+    this.destinations = new Policy();
   },
   
   isMatch : function(uriObj) {
@@ -635,7 +635,7 @@ Rule.prototype = {
 
 function DomainEntry(name, fullName, higher) {
   if (typeof name != "string" && name !== null) {
-  	throw "Invalid type: DomainEntry name must be a string or null.";
+    throw "Invalid type: DomainEntry name must be a string or null.";
   }
   this._name = name;
   this.fullName = fullName;
@@ -902,8 +902,8 @@ Policy.prototype = {
     originouterloop: for (var entry in this.getHostMatches(originHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
-      	//dprint("Checking rule: " + rule);
-      	var ruleMatchedOrigin = rule.isMatch(origin);
+        //dprint("Checking rule: " + rule);
+        var ruleMatchedOrigin = rule.isMatch(origin);
         if (rule.allowOrigin && ruleMatchedOrigin) {
           //dprint("ALLOW origin by rule " + entry + " " + rule);
           matchedAllowRules.push(["origin", entry, rule]);
@@ -912,59 +912,59 @@ Policy.prototype = {
           //dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
-      	// switch(rule.originRuleType) {
-      	//   case RULE_TYPE_ALLOW:
-      	//     if (ruleMatchedOrigin) {
-      	//       dprint("ALLOW origin by rule " + entry + " " + rule);
-      	//       matchedAllowRules.push(["origin", entry, rule]);
-      	//     }
-      	//     break;
-      	//   case RULE_TYPE_DENY:
-      	//     if (ruleMatchedOrigin) {
-      	//         	    dprint("DENY origin by rule " + entry + " " + rule);
-      	//         	    matchedDenyRules.push(["origin", entry, rule]);
-      	//         	    //break originouterloop;
-      	//         	    break;
-      	//         	  }
-      	//         	  break;
-      	// }
-      	// Check if there are origin-to-destination rules from the origin host
-      	// entry we're currently looking at.
-      	if (ruleMatchedOrigin && rule.destinations) {
-      	  //dprint("There are origin-to-destination rules using this origin rule.");
+        // switch(rule.originRuleType) {
+        //   case RULE_TYPE_ALLOW:
+        //     if (ruleMatchedOrigin) {
+        //       dprint("ALLOW origin by rule " + entry + " " + rule);
+        //       matchedAllowRules.push(["origin", entry, rule]);
+        //     }
+        //     break;
+        //   case RULE_TYPE_DENY:
+        //     if (ruleMatchedOrigin) {
+        //               dprint("DENY origin by rule " + entry + " " + rule);
+        //               matchedDenyRules.push(["origin", entry, rule]);
+        //               //break originouterloop;
+        //               break;
+        //             }
+        //             break;
+        // }
+        // Check if there are origin-to-destination rules from the origin host
+        // entry we're currently looking at.
+        if (ruleMatchedOrigin && rule.destinations) {
+          //dprint("There are origin-to-destination rules using this origin rule.");
           for (var destEntry in rule.destinations.getHostMatches(destHost)) {
-      	    //dprint(destEntry);
-      	    for (var destRule in destEntry.rules) {
-      	      //dprint("Checking rule: " + rule);
-      	      if (destRule.allowDestination && destRule.isMatch(dest)) {
+            //dprint(destEntry);
+            for (var destRule in destEntry.rules) {
+              //dprint("Checking rule: " + rule);
+              if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-      	      }
+              }
               if (destRule.denyDestination && destRule.isMatch(dest)) {
                 //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-      	      }
-      	      
-      	      // switch(destRule.destinationRuleType) {
-      	      //   case RULE_TYPE_ALLOW:
-      	      //     if (destRule.isMatch(dest)) {
-      	      //         	          dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-      	      //         	          matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-      	      //         	        }
-      	      //     break;
-      	      //   case RULE_TYPE_DENY:
-      	      //     if (destRule.isMatch(dest)) {
-      	      //         	          dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-      	      //         	          matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-      	      //         	          //break originouterloop;
-      	      //         	          break;
-      	      //         	        }
-      	      //         	        break;
-      	      // }
-      	    }
-      	  }
-      	  //dprint("Done checking origin-to-destination rules using this origin rule.");
-      	} // end: if (rule.destinations)
+              }
+              
+              // switch(destRule.destinationRuleType) {
+              //   case RULE_TYPE_ALLOW:
+              //     if (destRule.isMatch(dest)) {
+              //                     dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+              //                     matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
+              //                   }
+              //     break;
+              //   case RULE_TYPE_DENY:
+              //     if (destRule.isMatch(dest)) {
+              //                     dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+              //                     matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
+              //                     //break originouterloop;
+              //                     break;
+              //                   }
+              //                   break;
+              // }
+            }
+          }
+          //dprint("Done checking origin-to-destination rules using this origin rule.");
+        } // end: if (rule.destinations)
       }
     }
     
@@ -973,7 +973,7 @@ Policy.prototype = {
     destouterloop: for (var entry in this.getHostMatches(destHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
-      	//dprint("Checking rule: " + rule);
+        //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);
           matchedAllowRules.push(["dest", entry, rule]);
@@ -982,22 +982,22 @@ Policy.prototype = {
           //dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
-      	// switch(rule.destinationRuleType) {
-      	//   case RULE_TYPE_ALLOW:
-      	//     if (rule.isMatch(dest)) {
-      	//         	    dprint("ALLOW dest by rule " + entry + " " + rule);
-      	//         	    matchedAllowRules.push(["dest", entry, rule]);
-      	//         	  }
-      	//     break;
-      	//   case RULE_TYPE_DENY:
-      	//     if (rule.isMatch(dest)) {
-      	//       dprint("DENY dest by rule " + entry + " " + rule);
-      	//       matchedDenyRules.push(["dest", entry, rule]);
-      	//       //break destouterloop;
-      	//       break;
-      	//     }
-      	//     break;
-      	// }
+        // switch(rule.destinationRuleType) {
+        //   case RULE_TYPE_ALLOW:
+        //     if (rule.isMatch(dest)) {
+        //               dprint("ALLOW dest by rule " + entry + " " + rule);
+        //               matchedAllowRules.push(["dest", entry, rule]);
+        //             }
+        //     break;
+        //   case RULE_TYPE_DENY:
+        //     if (rule.isMatch(dest)) {
+        //       dprint("DENY dest by rule " + entry + " " + rule);
+        //       matchedDenyRules.push(["dest", entry, rule]);
+        //       //break destouterloop;
+        //       break;
+        //     }
+        //     break;
+        // }
       }
     }
     

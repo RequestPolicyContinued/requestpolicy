@@ -1923,21 +1923,6 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        // Now that we have blacklists, a user could prevent themselves from
-        // being able to reload a page by blocking requests from * to the
-        // destination page. As a simple hack around this, for now we'll always
-        // allow request to the same origin. It would be nice to have a a better
-        // solution but I'm not sure what that solution is.
-        var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin);
-        var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
-        if (originIdent == destIdent) {
-          requestpolicy.mod.Logger.warning(
-            requestpolicy.mod.Logger.TYPE_CONTENT,
-            "Allowing (but not recording) request where origin protocol, host," +
-              " and port are the same as the destination: " + originIdent);
-          return CP_OK;
-        }
-
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aExtra];
 
@@ -2028,9 +2013,20 @@ RequestPolicyService.prototype = {
         // Greasemonkey uses such a method to provide their cross-site xhr.
         if (origin == "resource://gre/res/hiddenWindow.html" ||
             origin == "resource://gre-resources/hiddenWindow.html") {
+        }
+
+        // Now that we have blacklists, a user could prevent themselves from
+        // being able to reload a page by blocking requests from * to the
+        // destination page. As a simple hack around this, for now we'll always
+        // allow request to the same origin. It would be nice to have a a better
+        // solution but I'm not sure what that solution is.
+        var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin);
+        var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
+        if (originIdent == destIdent) {
           return this.accept(
-              "Privileged request (possibly a cross-site XMLHttpRequest)",
-              args, null, true);
+            "Allowing (but not recording) request where origin protocol," +
+              " host, and port are the same as the destination: " + originIdent,
+            args, null, true);
         }
 
         var result = this._policyMgr.checkRequestAgainstUserPolicies(

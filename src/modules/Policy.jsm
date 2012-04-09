@@ -853,7 +853,11 @@ Policy.prototype = {
       // non-host-specific rules that are defined.
       yield this;
     }
-    
+
+    if (!host) {
+      return;
+    }
+
     if (this._isAddress(host)) {
       var addrEntry = this._addr[host];
       if (addrEntry) {
@@ -883,10 +887,19 @@ Policy.prototype = {
   check : function(origin, dest) {
     var matchedAllowRules = [];
     var matchedDenyRules = [];
-    
+    try {
+     var originHost = origin["host"];
+    } catch (e) {
+      var originHost = '';
+    }
+    try {
+      var destHost = dest["host"];
+    } catch (e) {
+      var destHost = '';
+    }
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (var entry in this.getHostMatches(origin["host"])) {
+    originouterloop: for (var entry in this.getHostMatches(originHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
       	//dprint("Checking rule: " + rule);
@@ -919,7 +932,7 @@ Policy.prototype = {
       	// entry we're currently looking at.
       	if (ruleMatchedOrigin && rule.destinations) {
       	  //dprint("There are origin-to-destination rules using this origin rule.");
-      	  for (var destEntry in rule.destinations.getHostMatches(dest["host"])) {
+          for (var destEntry in rule.destinations.getHostMatches(destHost)) {
       	    //dprint(destEntry);
       	    for (var destRule in destEntry.rules) {
       	      //dprint("Checking rule: " + rule);
@@ -957,7 +970,7 @@ Policy.prototype = {
     
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (var entry in this.getHostMatches(dest["host"])) {
+    destouterloop: for (var entry in this.getHostMatches(destHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
       	//dprint("Checking rule: " + rule);

@@ -1923,6 +1923,21 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
+        // Now that we have blacklists, a user could prevent themselves from
+        // being able to reload a page by blocking requests from * to the
+        // destination page. As a simple hack around this, for now we'll always
+        // allow request to the same origin. It would be nice to have a a better
+        // solution but I'm not sure what that solution is.
+        var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin);
+        var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
+        if (originIdent == destIdent) {
+          requestpolicy.mod.Logger.warning(
+            requestpolicy.mod.Logger.TYPE_CONTENT,
+            "Allowing (but not recording) request where origin protocol, host," +
+              " and port are the same as the destination: " + originIdent);
+          return CP_OK;
+        }
+
         var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
             aExtra];
 
@@ -1974,42 +1989,6 @@ RequestPolicyService.prototype = {
           return this.accept("User-allowed redirect", args, null, true);
         }
 
-        var result = this._policyMgr.checkRequestAgainstUserPolicies(
-              aRequestOrigin, aContentLocation);
-        for (var i = 0; i < result.matchedDenyRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched deny rules');
-          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
-        }
-        for (var i = 0; i < result.matchedAllowRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched allow rules');
-          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
-        }
-        // For now, we always give priority to deny rules.
-        if (result.isDenied()) {
-          return this.reject("blocked by user policy", args, result);
-        }
-        if (result.isAllowed()) {
-          return this.accept("allowed by user policy", args, result);
-        }
-
-        var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
-          aRequestOrigin, aContentLocation);
-        for (var i = 0; i < result.matchedDenyRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched deny rules');
-          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
-        }
-        for (var i = 0; i < result.matchedAllowRules.length; i++) {
-          requestpolicy.mod.Logger.dump('Matched allow rules');
-          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
-        }
-        // For now, we always give priority to deny rules.
-        if (result.isDenied()) {
-          return this.reject("blocked by subscription policy", args, result);
-        }
-        if (result.isAllowed()) {
-          return this.accept("allowed by subscription policy", args, result);
-        }
-
         if (aRequestOrigin.scheme == "chrome") {
           if (aRequestOrigin.asciiHost == "browser") {
             // "browser" origin shows up for favicon.ico and an address entered
@@ -2052,6 +2031,42 @@ RequestPolicyService.prototype = {
           return this.accept(
               "Privileged request (possibly a cross-site XMLHttpRequest)",
               args, null, true);
+        }
+
+        var result = this._policyMgr.checkRequestAgainstUserPolicies(
+          aRequestOrigin, aContentLocation);
+        for (var i = 0; i < result.matchedDenyRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched deny rules');
+          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
+        }
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        // For now, we always give priority to deny rules.
+        if (result.isDenied()) {
+          return this.reject("blocked by user policy", args, result);
+        }
+        if (result.isAllowed()) {
+          return this.accept("allowed by user policy", args, result);
+        }
+
+        var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
+          aRequestOrigin, aContentLocation);
+        for (var i = 0; i < result.matchedDenyRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched deny rules');
+          requestpolicy.mod.Logger.vardump(result.matchedDenyRules[i]);
+        }
+        for (var i = 0; i < result.matchedAllowRules.length; i++) {
+          requestpolicy.mod.Logger.dump('Matched allow rules');
+          requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
+        }
+        // For now, we always give priority to deny rules.
+        if (result.isDenied()) {
+          return this.reject("blocked by subscription policy", args, result);
+        }
+        if (result.isAllowed()) {
+          return this.accept("allowed by subscription policy", args, result);
         }
 
         for (var i = 0; i < this._compatibilityRules.length; i++) {

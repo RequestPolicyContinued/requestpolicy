@@ -34,9 +34,7 @@ const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';
 const SUBSCRIPTION_ADDED_TOPIC = 'requestpolicy-subscription-policy-added';
 const SUBSCRIPTION_REMOVED_TOPIC = 'requestpolicy-subscription-policy-removed';
 
-const DEFAULT_SUBSCRIPTION_LIST_URLS = {
-  'official' : 'http://localhost/requestpolicy/subscriptions/official.json'
-};
+const DEFAULT_SUBSCRIPTION_LIST_URL_BASE = 'http://subscription.requestpolicy.com/subs/';
 
 const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
@@ -202,7 +200,7 @@ UserSubscriptions.prototype = {
       }
       var url = this._lists[listName]['url'];
       if (!url) {
-        url = DEFAULT_SUBSCRIPTION_LIST_URLS[listName];
+        url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + '.json';
       }
       if (!url) {
         dprint('Skipping list without url: ' + listName);

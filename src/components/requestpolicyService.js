@@ -1787,15 +1787,10 @@ RequestPolicyService.prototype = {
   },
 
   _isAllowedByDefaultPolicy : function(origin, dest) {
-    // TODO: don't get prefs here each time this function is called. They
-    // should be available as this._whatever.
-    var defaultAllow = this.prefs.getBoolPref('defaultPolicy.allow');
-    var allowSameDomain = this.prefs.getBoolPref('defaultPolicy.allowSameDomain');
-
-    if (defaultAllow) {
+    if (this._defaultAllow) {
       return true;
     }
-    if (allowSameDomain) {
+    if (this._defaultAllowSameDomain) {
       var originDomain = requestpolicy.mod.DomainUtil.getDomain(origin);
       var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
       return originDomain == destDomain;
@@ -2039,12 +2034,28 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.Logger.dump('Matched allow rules');
           requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
         }
-        // For now, we always give priority to deny rules.
-        if (result.isDenied()) {
-          return this.reject("blocked by user policy", args, result);
+        // If there are both allow and deny rules, then fall back on the default
+        // policy. I believe this is effectively the same as giving precedence
+        // to allow rules when in default allow mode and giving precedence to
+        // deny rules when in default deny mode. It's just a different way of
+        // expressing the same logic. Now, whether that's the right logic we
+        // should be using to solve the problem of rule precedence and support
+        // for fine-grained rules overriding course-grained ones is a different
+        // question.
+        if (result.isAllowed() && result.isDenied()) {
+          if (this._defaultAllow) {
+            return this.accept("User policy indicates both allow and block. " +
+                               "Using default allow policy", args, result);
+          } else {
+            return this.reject("User policy indicates both allow and block. " +
+                               "Using default block policy", args, result);
+          }
         }
         if (result.isAllowed()) {
-          return this.accept("allowed by user policy", args, result);
+          return this.accept("Allowed by user policy", args, result);
+        }
+        if (result.isDenied()) {
+          return this.reject("Blocked by user policy", args, result);
         }
 
         var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
@@ -2057,12 +2068,20 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.Logger.dump('Matched allow rules');
           requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
         }
-        // For now, we always give priority to deny rules.
+        if (result.isAllowed() && result.isDenied()) {
+          if (this._defaultAllow) {
+            return this.accept("Subscription policies indicate both allow and block. " +
+                               "Using default allow policy", args, result);
+          } else {
+            return this.reject("Subscription policies indicate both allow and block. " +
+                               "Using default block policy", args, result);
+          }
+        }
         if (result.isDenied()) {
-          return this.reject("blocked by subscription policy", args, result);
+          return this.reject("Blocked by subscription policy", args, result);
         }
         if (result.isAllowed()) {
-          return this.accept("allowed by subscription policy", args, result);
+          return this.accept("Allowed by subscription policy", args, result);
         }
 
         for (var i = 0; i < this._compatibilityRules.length; i++) {

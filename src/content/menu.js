@@ -569,6 +569,7 @@ requestpolicy.menu = {
       if (domain == this._currentBaseDomain) {
         continue;
       }
+
       // TODO: we should prevent chrome://browser/ URLs from getting anywhere
       // near here in the first place.
       // Is this an issue anymore? This may have been slipping through due to
@@ -576,8 +577,21 @@ requestpolicy.menu = {
       //if (domain == 'browser') {
       //  continue;
       //}
-      if (result.indexOf(domain) == -1) {
-        result.push(domain);
+
+      for (var destBase in requests[originUri]) {
+        // For everybody except users with default deny who are not allowing all
+        // requests to the same domain:
+        // Only list other origins where there is a destination from that origin
+        // that is at a different domain, not just a different subdomain.
+        if (this._rpServiceJSObject.isDefaultAllow() ||
+            this._rpServiceJSObject.isDefaultAllowSameDomain()) {
+          if (destBase == domain) {
+            continue;
+          }
+        }
+        if (result.indexOf(domain) == -1) {
+          result.push(domain);
+        }
       }
     }
     return result;

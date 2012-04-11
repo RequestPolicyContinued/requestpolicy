@@ -1975,8 +1975,16 @@ RequestPolicyService.prototype = {
           // Don't delete the _clickedLinks item. We need it for if the user
           // goes back/forward through their history.
           // delete this._clickedLinks[origin][dest];
-          return this
-              .accept("User-initiated request by link click", args, null, true);
+
+          // We used to have this not be recorded so that it wouldn't cause us
+          // to forget blocked/allowed requests. However, when a policy change
+          // causes a page refresh after a link click, it looks like a link
+          // click again and so if we don't forget the previous blocked/allowed
+          // requests, the menu becomes inaccurate. Now the question is: what
+          // are we breaking by clearing the blocked/allowed requests here?
+          return this.accept("User-initiated request by link click", args,
+             null);
+             //null, true);
 
         } else if (this._submittedForms[origin]
             && this._submittedForms[origin][dest.split("?")[0]]) {
@@ -1986,8 +1994,13 @@ RequestPolicyService.prototype = {
           // Don't delete the _clickedLinks item. We need it for if the user
           // goes back/forward through their history.
           // delete this._submittedForms[origin][dest.split("?")[0]];
+
+          // See the note above for link clicks and forgetting blocked/allowed
+          // requests on refresh. I haven't tested if it's the same for forms
+          // but it should be so we're making the same change here.
           return this.accept("User-initiated request by form submission", args,
-              null, true);
+              null);
+              //null, true);
 
         } else if (this._historyRequests[dest]) {
           // When the user goes back and forward in their history, a request for

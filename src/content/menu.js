@@ -555,6 +555,16 @@ requestpolicy.menu = {
 
     var result = [];
     for (var destBase in requests) {
+      // For everybody except users with default deny who are not allowing all
+      // requests to the same domain:
+      // Ignore the selected origin's domain when listing destinations.
+      if (this._rpServiceJSObject.isDefaultAllow() ||
+        this._rpServiceJSObject.isDefaultAllowSameDomain()) {
+        if (destBase == this._currentlySelectedOrigin) {
+          continue;
+        }
+      }
+
       result.push(destBase);
     }
     return result;

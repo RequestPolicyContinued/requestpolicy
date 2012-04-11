@@ -420,8 +420,11 @@ RequestPolicyService.prototype = {
     this._subscriptions = new requestpolicy.mod.UserSubscriptions();
     this._policyMgr = new requestpolicy.mod.PolicyManager();
     this._policyMgr.loadUserPolicies();
+
+    var defaultPolicy = this._defaultAllow ? 'allow' : 'deny';
+
     var failures = this._policyMgr.loadSubscriptionPolicies(
-          this._subscriptions.getSubscriptionInfo());
+          this._subscriptions.getSubscriptionInfo(defaultPolicy));
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
     // TODO: Maybe we should probably ship snapshot versions of the official
@@ -445,9 +448,9 @@ RequestPolicyService.prototype = {
     }
     function updateCompleted(result) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            'Subscription update completed: ' + result);
+            'Subscription updates completed: ' + result);
     }
-    this._subscriptions.update(updateCompleted, serials);
+    this._subscriptions.update(updateCompleted, serials, defaultPolicy);
   },
 
   _updateLoggingSettings : function() {
@@ -1483,18 +1486,49 @@ RequestPolicyService.prototype = {
         this._examineHttpRequest(subject);
         break;
       case requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC:
-      case requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC:
         requestpolicy.mod.Logger.debug(
-          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX: ' + data);
+          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
+        // TODO: check if the subscription is enabled. The user might have
+        // disabled it between the time the update started and when it
+        // completed.
         var subInfo = JSON.parse(data);
         var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
         break;
+
+      case requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC:
+        requestpolicy.mod.Logger.debug(
+          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX added: ' + data);
+        var subInfo = JSON.parse(data);
+        var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
+        var failed = false;
+        for (var listName in failures) {
+          failed = true;
+        }
+        if (failed) {
+          var serials = {};
+          for (var listName in subInfo) {
+            if (!serials[listName]) {
+              serials[listName] = {};
+            }
+            for (var subName in subInfo[listName]) {
+              serials[listName][subName] = -1;
+            }
+          }
+          function updateCompleted(result) {
+            requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+                                          'Subscription update completed: ' + result);
+          }
+          this._subscriptions.update(updateCompleted, serials);
+        }
+        break;
+
       case requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC:
         requestpolicy.mod.Logger.debug(
           requestpolicy.mod.Logger.TYPE_INTERNAL, 'YYY: ' + data);
         var subInfo = JSON.parse(data);
         var failures = this._policyMgr.unloadSubscriptionPolicies(subInfo);
         break;
+
       case HTTPS_EVERYWHERE_REWRITE_TOPIC :
         this._handleHttpsEverywhereUriRewrite(subject, data);
         break;

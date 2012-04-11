@@ -36,54 +36,55 @@
     <td id="content">
       <div id="contentcontainer" class="subscriptions">
         <div id="pagetitle">Subscription Policies</div>
+
         <table class="settings">
-          <tr>
+          <tr data-default-policy="allow">
             <td>Privacy</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="trackers" id="sub-trackers"/>
+                  <input type="checkbox" name="deny_trackers" id="sub-deny_trackers"/>
                   Block destinations that can track you as you browse the web
                 </label>
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-default-policy="deny">
             <td>Usability</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="sameorg" id="sub-sameorg"/>
+                  <input type="checkbox" name="allow_sameorg" id="sub-allow_sameorg"/>
                   Allow destinations that belong to the same organization as the
                   origin webpage
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="functionality" id="sub-functionality"/>
+                  <input type="checkbox" name="allow_functionality" id="sub-allow_functionality"/>
                   Allow requests that are needed for websites to work properly
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="embedded" id="sub-embedded"/>
+                  <input type="checkbox" name="allow_embedded" id="sub-allow_embedded"/>
                   Allow requests for embedded content such as images and videos
                 </label>
               </div>
             </td>
           </tr>
-          <tr>
+          <tr data-default-policy="deny">
             <td>Browser</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="mozilla" id="sub-mozilla"/>
+                  <input type="checkbox" name="allow_mozilla" id="sub-allow_mozilla"/>
                   Allow requests related to Mozilla and Firefox websites
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="extensions" id="sub-extensions"/>
+                  <input type="checkbox" name="allow_extensions" id="sub-allow_extensions"/>
                   Allow requests that are needed for other extensions to work
                   properly
                 </label>

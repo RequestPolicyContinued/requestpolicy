@@ -83,24 +83,18 @@ function UserSubscriptions() {
   }
   this._data = JSON.parse(jsonData);
   if (!this._data['lists']) {
-    // By default, the user is subscribed to all subscriptions in the official
-    // subscription list.
-    // The value that corresponds to each subscription name is an empty object
-    // for now but in the future we may indicate additional information there.
-    // TODO: we should have a pref that disables automatically subscribing to
-    // official lists when the subscriptions.json file is missing.
     this._data['lists'] = {
       'official' : {
         'subscriptions' : {
-          'embedded' : {},
-          'extensions' : {},
-          'functionality' : {},
-          'mozilla' : {},
-          'sameorg' : {},
-          'trackers' : {}
+          'allow_embedded' : {},
+          'allow_extensions' : {},
+          'allow_functionality' : {},
+          'allow_mozilla' : {},
+          'allow_sameorg' : {},
+          'deny_trackers' : {}
         }
       }
-    }
+    };
   }
   this._lists = this._data['lists'];
 }
@@ -116,7 +110,7 @@ UserSubscriptions.prototype = {
     FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
-  getSubscriptionInfo : function() {
+  getSubscriptionInfo : function(defaultPolicy) {
     var lists = this._data['lists'];
     var result = {};
     for (var listName in lists) {
@@ -125,6 +119,12 @@ UserSubscriptions.prototype = {
       }
       result[listName] = {};
       for (var subName in lists[listName]['subscriptions']) {
+        if (defaultPolicy == 'allow' && subName.indexOf('allow_') == 0) {
+          continue;
+        }
+        if (defaultPolicy == 'deny' && subName.indexOf('deny_') == 0) {
+          continue;
+        }
         result[listName][subName] = null;
       }
     }
@@ -157,7 +157,7 @@ UserSubscriptions.prototype = {
   // make a big fat mess of the code, or more likely I'm just not good at
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
-  update : function (callback, serials) {
+  update : function (callback, serials, defaultPolicy) {
     var updatingLists = {};
     var updateResults = {};
 
@@ -181,14 +181,22 @@ UserSubscriptions.prototype = {
     var listCount = 0;
     for (var listName in serials) {
       if (!this._lists[listName] || !this._lists[listName]['subscriptions']) {
-        dprint('Skipping unsubscribed list: ' + listName);
+        dprint('Skipping update of unsubscribed list: ' + listName);
         continue;
       }
       let updateSubs = {};
       var subCount = 0;
       for (var subName in serials[listName]) {
         if (!this._lists[listName]['subscriptions'][subName]) {
-          dprint('Skipping unsubscribed policy: ' + listName + ' ' + subName);
+          dprint('Skipping update of unsubscribed subscription: ' + listName + ' ' + subName);
+          continue;
+        }
+        if (defaultPolicy == 'allow' && subName.indexOf('allow_') == 0) {
+          dprint('Skipping update of subscription that is only used with a default deny policy: ' + subName);
+          continue;
+        }
+        if (defaultPolicy == 'deny' && subName.indexOf('deny_') == 0) {
+          dprint('Skipping update of subscription that is only used with a default allow policy: ' + subName);
           continue;
         }
         updateSubs[subName] = {'serial' : serials[listName][subName]};

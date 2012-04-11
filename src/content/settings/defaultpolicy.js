@@ -1,3 +1,5 @@
+Components.utils.import("resource://requestpolicy/Subscription.jsm");
+
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
   .getService(Components.interfaces.nsIRequestPolicy);
 var rpServiceJSObject = rpService.wrappedJSObject;
@@ -18,6 +20,16 @@ function updateDisplay() {
 }
 
 
+function reloadSubscriptionPolicies() {
+  var subscriptions = new UserSubscriptions();
+  rpServiceJSObject._policyMgr.unloadSubscriptionPolicies(
+    subscriptions.getSubscriptionInfo());
+  var defaultPolicy = rpServiceJSObject._defaultAllow ? 'allow' : 'deny';
+  rpServiceJSObject._policyMgr.loadSubscriptionPolicies(
+    subscriptions.getSubscriptionInfo(defaultPolicy));
+}
+
+
 function onload() {
   updateDisplay();
 
@@ -26,6 +38,9 @@ function onload() {
       var allow = event.target.checked;
       rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
       rpServiceJSObject._prefService.savePrefFile(null);
+      // Reload all subscriptions because it's likely that different
+      // subscriptions will now be active.
+      reloadSubscriptionPolicies();
       updateDisplay();
     }
   );
@@ -34,6 +49,9 @@ function onload() {
       var deny = event.target.checked;
       rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
       rpServiceJSObject._prefService.savePrefFile(null);
+      // Reload all subscriptions because it's likely that different
+      // subscriptions will now be active.
+      reloadSubscriptionPolicies();
       updateDisplay();
     }
   );

@@ -16,7 +16,7 @@ function updateDisplay() {
   for (var subName in subsInfo['official']) {
     var el = document.getElementById('sub-' + subName);
     if (!el) {
-      throw 'Unable to find element with id: sub-' + subName;
+      //throw 'Unable to find element with id: sub-' + subName;
       continue;
     }
     el.checked = true;
@@ -46,12 +46,12 @@ function onload() {
   }
 
   var available = {
-    'embedded' : {},
-    'extensions' : {},
-    'functionality' : {},
-    'mozilla' : {},
-    'sameorg' : {},
-    'trackers' : {}
+    'allow_embedded' : {},
+    'allow_extensions' : {},
+    'allow_functionality' : {},
+    'allow_mozilla' : {},
+    'allow_sameorg' : {},
+    'deny_trackers' : {}
   };
   for (var subName in available) {
     var el = document.getElementById('sub-' + subName);
@@ -60,5 +60,13 @@ function onload() {
       continue;
     }
     el.addEventListener('change', handleSubscriptionChange);
+  }
+
+  var selector = '[data-default-policy=' +
+    (rpServiceJSObject._defaultAllow ? 'deny' : 'allow') + ']';
+  var matches = document.body.querySelectorAll(selector);
+  var hideElements = Array.prototype.slice.call(matches);
+  for (var i = 0; i < hideElements.length; i++) {
+    hideElements[i].style.display = 'none';
   }
 }

@@ -11,7 +11,8 @@
     <em:creator>Justin Samuel</em:creator>
     <em:id>requestpolicy@requestpolicy.com</em:id>
     <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
-    <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
+    <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
+    <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
     <em:updateURL>https://www.requestpolicy.com/update-alpha.rdf</em:updateURL>

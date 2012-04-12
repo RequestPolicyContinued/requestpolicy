@@ -73,7 +73,7 @@ requestpolicy.overlay = {
 
   //_statusbar : null,
   //_rpStatusbar : null,
-  _rpContextMenu : null,
+  //_rpContextMenu : null,
   _toolbox : null,
   _addonbar : null,
   _tabbar : null,
@@ -126,8 +126,8 @@ requestpolicy.overlay = {
 
         //this._statusbar = document.getElementById("status-bar");
         //this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
-        this._rpContextMenu = document
-            .getElementById("requestpolicyContextMenu");
+        //this._rpContextMenu = document
+        //    .getElementById("requestpolicyContextMenu");
         this._toolbox = document.getElementById("navigator-toolbox");
         this._addonbar = document.getElementById("addon-bar");
         this._tabbar = document.getElementById("TabsToolbar");
@@ -152,8 +152,8 @@ requestpolicy.overlay = {
         // object's observerBlockedRequests() method will be called.
         this._rpServiceJSObject.addRequestObserver(this);
 
-        this.setContextMenuEnabled(this._rpService.prefs
-            .getBoolPref("contextMenu"));
+        //this.setContextMenuEnabled(this._rpService.prefs
+        //    .getBoolPref("contextMenu"));
         this._setPermissiveNotification(this._rpService.isBlockingDisabled());
       }
     } catch (e) {
@@ -228,9 +228,9 @@ requestpolicy.overlay = {
     return curSet.indexOf(this._toolbarButtonId) != -1;
   },
 
-  setContextMenuEnabled : function(isEnabled) {
-    this._rpContextMenu.setAttribute("hidden", !isEnabled);
-  },
+  //setContextMenuEnabled : function(isEnabled) {
+  //  this._rpContextMenu.setAttribute("hidden", !isEnabled);
+  //},
 
   onWindowClose : function(event) {
     this._rpServiceJSObject.removeRequestObserver(this);
@@ -722,8 +722,8 @@ requestpolicy.overlay = {
   _setBlockedContentNotification : function(isContentBlocked) {
     //this._rpStatusbar.setAttribute("requestpolicyBlocked", isContentBlocked);
     if (!this._isFennec) {
-      this._rpContextMenu
-          .setAttribute("requestpolicyBlocked", isContentBlocked);
+    //  this._rpContextMenu
+    //      .setAttribute("requestpolicyBlocked", isContentBlocked);
       this._toolbox.setAttribute("requestpolicyBlocked", isContentBlocked);
     }
     if (this._addonbar) {
@@ -755,7 +755,7 @@ requestpolicy.overlay = {
     //this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
     //requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
     if (!this._isFennec) {
-      this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
+      //this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
       this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
     }
     if (this._addonbar) {
@@ -983,21 +983,21 @@ requestpolicy.overlay = {
    * Called as an event listener when popupshowing fires on the
    * contentAreaContextMenu.
    */
-  _contextMenuOnPopupShowing : function() {
-    requestpolicy.overlay._wrapOpenLink();
-    /*requestpolicy.overlay._attachPopupToContextMenu();*/
-  },
+  //_contextMenuOnPopupShowing : function() {
+  //  requestpolicy.overlay._wrapOpenLink();
+  //  /*requestpolicy.overlay._attachPopupToContextMenu();*/
+  //},
 
   /**
    * Called as an event listener when popuphidden fires on the
    * contentAreaContextMenu.
    */
-  _contextMenuOnPopupHidden : function(event) {
-    if (event.currentTarget != event.originalTarget) {
-      return;
-    }
-    /*requestpolicy.overlay._attachPopupToStatusbar();*/
-  },
+  //_contextMenuOnPopupHidden : function(event) {
+  //  if (event.currentTarget != event.originalTarget) {
+  //    return;
+  //  }
+  //  /*requestpolicy.overlay._attachPopupToStatusbar();*/
+  //},
 
   /**
    * Wraps the gContextMenu's openLink() function so that RequestPolicy can be
@@ -1006,16 +1006,18 @@ requestpolicy.overlay = {
    * called when openLinkInTab() is called.
    */
   _wrapOpenLink : function() {
-    const rpService = this._rpService;
-
-    if (!gContextMenu.requestpolicyOrigOpenLink) {
-      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
-      gContextMenu.openLink = function() {
-        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
-            gContextMenu.link.href);
-        return gContextMenu.requestpolicyOrigOpenLink();
-      };
-    }
+    // This method is unused until we add back the context menu.
+    return;
+//    const rpService = this._rpService;
+//
+//    if (!gContextMenu.requestpolicyOrigOpenLink) {
+//      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
+//      gContextMenu.openLink = function() {
+//        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+//            gContextMenu.link.href);
+//        return gContextMenu.requestpolicyOrigOpenLink();
+//      };
+//    }
   },
 
   /**
@@ -1533,26 +1535,28 @@ requestpolicy.overlay = {
         "chrome, close, centerscreen, alwaysRaised");
   },
 
-  _showInitialSetupDialog : function() {
-    if (!this._rpService.prefs.getBoolPref("initialSetupDialogShown")) {
-      this._rpService.prefs.setBoolPref("initialSetupDialogShown", true);
-      this._rpServiceJSObject._prefService.savePrefFile(null);
-      window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
-          "requestpolicyInitialSetupDialogWindow",
-          "chrome, close, centerscreen, alwaysRaised");
-    }
-  },
+// If using this method again, be sure to name the pref something different so
+// that users of version 0.x see the new window.
+//  _showInitialSetupDialog : function() {
+//    if (!this._rpService.prefs.getBoolPref("initialSetupDialogShown")) {
+//      this._rpService.prefs.setBoolPref("initialSetupDialogShown", true);
+//      this._rpServiceJSObject._prefService.savePrefFile(null);
+//      window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
+//          "requestpolicyInitialSetupDialogWindow",
+//          "chrome, close, centerscreen, alwaysRaised");
+//    }
+//  },
 
-  _attachPopupToContextMenu : function() {
-    if (requestpolicy.overlay._isFennec) {
-      return;
-    }
-    // Add the menupopup back to the contextmenu.
-    if (!requestpolicy.overlay._rpContextMenu.firstChild) {
-      requestpolicy.overlay._rpContextMenu.insertBefore(
-          requestpolicy.overlay._menu, null);
-    }
-  },
+//  _attachPopupToContextMenu : function() {
+//    if (requestpolicy.overlay._isFennec) {
+//      return;
+//    }
+//    // Add the menupopup back to the contextmenu.
+//    if (!requestpolicy.overlay._rpContextMenu.firstChild) {
+//      requestpolicy.overlay._rpContextMenu.insertBefore(
+//          requestpolicy.overlay._menu, null);
+//    }
+//  },
 
   //openStatusbarPopup : function(anchor) {
   //  this._attachPopupToStatusbar();

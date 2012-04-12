@@ -46,12 +46,14 @@
     <!-- oncontextmenu="event.preventDefault();" -->
     <!-- onclick="requestpolicy.overlay.openToolbarPopup(this)" -->
 
+  <!--
   <menupopup id="contentAreaContextMenu">
     <menu
       id="requestpolicyContextMenu"
       class="menu-iconic"
       label="RequestPolicy" />
   </menupopup>
+  -->
 
   <!--
   <statusbar id="status-bar">

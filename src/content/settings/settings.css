@@ -105,6 +105,10 @@ h2 {
   font-weight: normal;
 }
 
+p.learnmore {
+  margin-bottom: 24px;
+}
+
 .settings input {
   margin-right: 10px;
   /* Vertically align the inputs and labels is annoying trial-and-error. */
@@ -244,8 +248,4 @@ table.policy tr:hover a.deleterule:hover {
 
 #defaultpolicyword {
   font-weight: bold;
-}
-
-.subscriptions p {
-  margin-bottom: 24px;
 }

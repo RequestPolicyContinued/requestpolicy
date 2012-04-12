@@ -168,6 +168,14 @@ requestpolicy.overlay = {
   _installToolbarButtonOnce : function() {
     var util = requestpolicy.mod.Util;
 
+    // Only do a toolbar button check for Firefox. Seamonkey users will have a
+    // status bar icon by default.
+    if (!util.isFirefox()) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        "Not performing toolbar button check: not Firefox.");
+      return;
+    }
+
     if (util.compareVersions(util.lastAppVersion, "0.0") > 0) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
         "Not performing toolbar button check: we've checked before.");

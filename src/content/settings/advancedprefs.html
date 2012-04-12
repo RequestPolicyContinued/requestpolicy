@@ -33,36 +33,28 @@
       <div id="contentcontainer" class="advancedprefs">
         <div id="pagetitle">Advanced Preferences</div>
 
-        <div style="border: 1px solid #ccc; background-color: #fee;
-                    margin-bottom: 2em; padding: 1em;">
-          This preferences page is currently just a mockup. The preferences
-          indicated are not correct and nothing on this page actually changes
-          your settings.
-        </div>
-
         <table class="settings">
           <tr>
             <td>Link Prefetching</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="link-prefetch-enabled"
-                         id="pref-link-prefetch-enabled"/>
+                  <input type="checkbox"
+                         id="pref-linkPrefetch"/>
                   Enabled
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="link-prefetch-disable-on-startup"
-                         id="pref-link-prefetch-disable-on-startup"/>
+                  <input type="checkbox"
+                         id="pref-prefetch.link.disableOnStartup"/>
                   Disable on startup
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
-                         name="link-prefetch-restore-on-uninstall"
-                         id="pref-link-prefetch-restore-on-uninstall"/>
+                         id="pref-prefetch.link.restoreDefaultOnUninstall"/>
                   Restore default when RequestPolicy is uninstalled
                 </label>
               </div>
@@ -73,23 +65,22 @@
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="dns-prefetch-enabled"
-                         id="pref-dns-prefetch-enabled"/>
+                  <input type="checkbox"
+                         id="pref-dnsPrefetch"/>
                   Enabled
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="checkbox" name="dns-prefetch-disable-on-startup"
-                         id="pref-dns-prefetch-disable-on-startup"/>
+                  <input type="checkbox"
+                         id="pref-prefetch.dns.disableOnStartup"/>
                   Disable on startup
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
-                         name="dns-prefetch-restore-on-uninstall"
-                         id="pref-dns-prefetch-restore-on-uninstall"/>
+                         id="pref-prefetch.dns.restoreDefaultOnUninstall"/>
                   Restore default when RequestPolicy is uninstalled
                 </label>
               </div>

@@ -71,8 +71,8 @@ requestpolicy.overlay = {
   _strbundle : null,
   _menu : null,
 
-  _statusbar : null,
-  _rpStatusbar : null,
+  //_statusbar : null,
+  //_rpStatusbar : null,
   _rpContextMenu : null,
   _toolbox : null,
   _addonbar : null,
@@ -124,8 +124,8 @@ requestpolicy.overlay = {
         this._strbundle = document.getElementById("requestpolicyStrings");
         this._menu = document.getElementById("rp-popup");
 
-        this._statusbar = document.getElementById("status-bar");
-        this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
+        //this._statusbar = document.getElementById("status-bar");
+        //this._rpStatusbar = document.getElementById("requestpolicyStatusbar");
         this._rpContextMenu = document
             .getElementById("requestpolicyContextMenu");
         this._toolbox = document.getElementById("navigator-toolbox");
@@ -168,13 +168,15 @@ requestpolicy.overlay = {
   _installToolbarButtonOnce : function() {
     var util = requestpolicy.mod.Util;
 
-    // Only do a toolbar button check for Firefox. Seamonkey users will have a
-    // status bar icon by default.
-    if (!util.isFirefox()) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-        "Not performing toolbar button check: not Firefox.");
-      return;
-    }
+    // SeaMonkey users have to use a toolbar button now. At the moment I can't
+    // justify a bunch of special cases to support the statusbar when such a
+    // tiny number of users have seamonkey and I can't even be sure that many of
+    // those users want a statusbar icon.
+    //if (!util.isFirefox()) {
+    //  requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    //    "Not performing toolbar button check: not Firefox.");
+    //  return;
+    //}
 
     if (util.compareVersions(util.lastAppVersion, "0.0") > 0) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -718,7 +720,7 @@ requestpolicy.overlay = {
    * Sets the blocked content notifications visible to the user.
    */
   _setBlockedContentNotification : function(isContentBlocked) {
-    this._rpStatusbar.setAttribute("requestpolicyBlocked", isContentBlocked);
+    //this._rpStatusbar.setAttribute("requestpolicyBlocked", isContentBlocked);
     if (!this._isFennec) {
       this._rpContextMenu
           .setAttribute("requestpolicyBlocked", isContentBlocked);
@@ -750,7 +752,7 @@ requestpolicy.overlay = {
    * Sets the permissive status visible to the user for just this window.
    */
   _setPermissiveNotification : function(isPermissive) {
-    this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
+    //this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
     //requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
     if (!this._isFennec) {
       this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
@@ -1580,10 +1582,10 @@ requestpolicy.overlay = {
     }
   },
 
-  openStatusbarPopup : function(anchor) {
-    this._attachPopupToStatusbar();
-    this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
-  },
+  //openStatusbarPopup : function(anchor) {
+  //  this._attachPopupToStatusbar();
+  //  this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
+  //},
 
   openToolbarPopup : function(anchor) {
 //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
@@ -1591,12 +1593,12 @@ requestpolicy.overlay = {
     this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
   },
 
-  _attachPopupToStatusbar : function() {
-    // Add the menupopup to the statusbar as it may be attached to the
-    // contextmenu.
-    requestpolicy.overlay._statusbar.insertBefore(requestpolicy.overlay._menu,
-        null);
-  },
+  //_attachPopupToStatusbar : function() {
+  //  // Add the menupopup to the statusbar as it may be attached to the
+  //  // contextmenu.
+  //  requestpolicy.overlay._statusbar.insertBefore(requestpolicy.overlay._menu,
+  //      null);
+  //},
 
   openPrefs : function() {
     var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/basicprefs.html');

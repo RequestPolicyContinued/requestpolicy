@@ -53,6 +53,7 @@
       label="RequestPolicy" />
   </menupopup>
 
+  <!--
   <statusbar id="status-bar">
     <statusbarpanel
       class="statusbarpanel-menu-iconic"
@@ -63,6 +64,7 @@
       >
     </statusbarpanel>
   </statusbar>
+  -->
 
   <popupset>
     <menupopup id="requestpolicyRedirectNotificationOptions" />

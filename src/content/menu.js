@@ -134,6 +134,8 @@ requestpolicy.menu = {
       this._privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
             && !this._rpService.prefs.getBoolPref("privateBrowsingPermanentWhitelisting");
 
+      this._setPrivateBrowsingStyles();
+
 //      var hidePrefetchInfo = !this._rpService.isPrefetchEnabled();
 //      this._itemPrefetchWarning.hidden = hidePrefetchInfo;
 //      this._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
@@ -340,6 +342,11 @@ requestpolicy.menu = {
   _disableIfNoChildren : function(el) {
     // TODO: this isn't working.
     el.hidden = el.firstChild ? false : true;
+  },
+
+  _setPrivateBrowsingStyles : function() {
+    document.getElementById('rp-details').setAttribute(
+      'class', this._privateBrowsingEnabled ? 'privatebrowsing' : '');
   },
 
   _resetSelectedOrigin : function() {

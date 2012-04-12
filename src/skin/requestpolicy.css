@@ -211,6 +211,18 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   font-size: 0.9em;
   color: #999;
 }
+/* When in private browsing mode, the user only has the option of adding
+   temporary rules. So, don't show them only small, grey text. */
+#rp-details.privatebrowsing .rp-allow {
+  font-size: 1em;
+  color: #484;
+}
+#rp-details.privatebrowsing .rp-deny {
+  font-size: 1em;
+  color: #844;
+}
+
+
 
 #rp-details .rp-stop-rule[selected-rule="true"] {
   text-decoration: line-through;

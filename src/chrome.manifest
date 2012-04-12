@@ -3,20 +3,20 @@ resource   requestpolicy    modules/
 skin       requestpolicy    classic/1.0    skin/
 
 locale     requestpolicy    en-US          locale/en-US/
-locale     requestpolicy    de             locale/de/
-locale     requestpolicy    eo             locale/eo/
-locale     requestpolicy    es-MX          locale/es-MX/
-locale     requestpolicy    fr             locale/fr/
-locale     requestpolicy    ja             locale/ja/
-locale     requestpolicy    ko-KR          locale/ko-KR/
-locale     requestpolicy    nl             locale/nl/
-locale     requestpolicy    pt-BR          locale/pt-BR/
-locale     requestpolicy    ru-RU          locale/ru-RU/
-locale     requestpolicy    sv-SE          locale/sv-SE/
-locale     requestpolicy    tr-TR          locale/tr-TR/
-locale     requestpolicy    uk-UA          locale/uk-UA/
-locale     requestpolicy    zh-CN          locale/zh-CN/
-locale     requestpolicy    zh-TW          locale/zh-TW/
+#locale     requestpolicy    de             locale/de/
+#locale     requestpolicy    eo             locale/eo/
+#locale     requestpolicy    es-MX          locale/es-MX/
+#locale     requestpolicy    fr             locale/fr/
+#locale     requestpolicy    ja             locale/ja/
+#locale     requestpolicy    ko-KR          locale/ko-KR/
+#locale     requestpolicy    nl             locale/nl/
+#locale     requestpolicy    pt-BR          locale/pt-BR/
+#locale     requestpolicy    ru-RU          locale/ru-RU/
+#locale     requestpolicy    sv-SE          locale/sv-SE/
+#locale     requestpolicy    tr-TR          locale/tr-TR/
+#locale     requestpolicy    uk-UA          locale/uk-UA/
+#locale     requestpolicy    zh-CN          locale/zh-CN/
+#locale     requestpolicy    zh-TW          locale/zh-TW/
 
 style      chrome://global/content/customizeToolbar.xul            chrome://requestpolicy/skin/requestpolicy.css
 

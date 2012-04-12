@@ -1235,7 +1235,9 @@ requestpolicy.overlay = {
   onPopupHiding : function(event) {
     var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
     if (rulesChanged) {
-      content.document.location.reload(false);
+      //if (this._rpService.prefs.getBoolPref("autoReload")) {
+        content.document.location.reload(false);
+      //}
     }
 //    if (event.currentTarget != event.originalTarget) {
 //      return;
@@ -1277,16 +1279,6 @@ requestpolicy.overlay = {
   },
 
   /**
-   * Reloads the current document if the user's preferences indicate it should
-   * be reloaded.
-   */
-  _conditionallyReloadDocument : function() {
-//    if (this._rpService.prefs.getBoolPref("autoReload")) {
-//      content.document.location.reload(false);
-//    }
-  },
-
-  /**
    * Toggles disabling of all blocking for the current session.
    * 
    * @param {Event}
@@ -1299,7 +1291,6 @@ requestpolicy.overlay = {
     // would be unexpected to the user if all were reloaded.
     this
         ._setPermissiveNotificationForAllWindows(this._rpServiceJSObject._blockingDisabled);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1308,7 +1299,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowOrigin : function(originHost) {
     this._rpService.temporarilyAllowOrigin(originHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1323,7 +1313,6 @@ requestpolicy.overlay = {
     // "window.target".
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.temporarilyAllowOrigin(host);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1335,7 +1324,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowDestination : function(destHost) {
     this._rpService.temporarilyAllowDestination(destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1349,7 +1337,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowOriginToDestination : function(originHost, destHost) {
     this._rpService.temporarilyAllowOriginToDestination(originHost, destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1357,7 +1344,6 @@ requestpolicy.overlay = {
    */
   allowOrigin : function(originHost) {
     this._rpService.allowOrigin(originHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1370,7 +1356,6 @@ requestpolicy.overlay = {
   allowCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.allowOrigin(host);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1381,7 +1366,6 @@ requestpolicy.overlay = {
    */
   allowDestination : function(destHost) {
     this._rpService.allowDestination(destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1395,7 +1379,6 @@ requestpolicy.overlay = {
    */
   allowOriginToDestination : function(originHost, destHost) {
     this._rpService.allowOriginToDestination(originHost, destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1404,7 +1387,6 @@ requestpolicy.overlay = {
    */
   forbidOrigin : function(originHost) {
     this._rpService.forbidOrigin(originHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1418,7 +1400,6 @@ requestpolicy.overlay = {
   forbidCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.forbidOrigin(host);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1430,7 +1411,6 @@ requestpolicy.overlay = {
    */
   forbidDestination : function(destHost) {
     this._rpService.forbidDestination(destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1445,7 +1425,6 @@ requestpolicy.overlay = {
    */
   forbidOriginToDestination : function(originHost, destHost) {
     this._rpService.forbidOriginToDestination(originHost, destHost);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1453,7 +1432,6 @@ requestpolicy.overlay = {
    */
   addAllowRule : function(ruleData) {
     this._rpServiceJSObject.addAllowRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1461,7 +1439,6 @@ requestpolicy.overlay = {
    */
   addTemporaryAllowRule : function(ruleData) {
     this._rpServiceJSObject.addTemporaryAllowRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1469,7 +1446,6 @@ requestpolicy.overlay = {
    */
   removeAllowRule : function(ruleData) {
     this._rpServiceJSObject.removeAllowRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1477,7 +1453,6 @@ requestpolicy.overlay = {
    */
   addDenyRule : function(ruleData) {
     this._rpServiceJSObject.addDenyRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1485,7 +1460,6 @@ requestpolicy.overlay = {
    */
   addTemporaryDenyRule : function(ruleData) {
     this._rpServiceJSObject.addTemporaryDenyRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1493,7 +1467,6 @@ requestpolicy.overlay = {
    */
   removeDenyRule : function(ruleData) {
     this._rpServiceJSObject.removeDenyRule(ruleData);
-    this._conditionallyReloadDocument();
   },
 
   /**
@@ -1507,7 +1480,6 @@ requestpolicy.overlay = {
     // Revoking temporary permissions disables permissive mode. This is partly
     // because permissive mode is called "temporarily allow all".
     this._setPermissiveNotification(false);
-    this._conditionallyReloadDocument();
   },
 
   _performRedirect : function(document, redirectTargetUri) {

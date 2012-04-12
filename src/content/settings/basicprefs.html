@@ -33,37 +33,33 @@
       <div id="contentcontainer" class="basicprefs">
         <div id="pagetitle">Preferences</div>
 
-        <div style="border: 1px solid #ccc; background-color: #fee;
-                    margin-bottom: 2em; padding: 1em;">
-          This preferences page is currently just a mockup. The preferences
-          indicated are not correct and nothing on this page actually changes
-          your settings.
-        </div>
-
         <table class="settings">
           <tr>
             <td>Web Pages</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="indicate" id="pref-indicate"/>
+                  <input type="checkbox" id="pref-indicateBlockedObjects"/>
                   Indicate blocked images
                 </label>
               </div>
+              <!--
               <div>
                 <label>
-                  <input type="checkbox" name="reload" id="pref-reload"/>
+                  <input type="checkbox" id="pref-autoReload"/>
                   Reload current page when whitelist is changed
                 </label>
               </div>
+              -->
             </td>
           </tr>
           <tr>
-            <td>Miscellaneous</td>
+            <td>Menu</td>
             <td>
               <div>
                 <label>
-                  <input type="checkbox" name="pbr" id="pref-pbr"/>
+                  <input type="checkbox"
+                         id="pref-privateBrowsingPermanentWhitelisting"/>
                   Allow adding non-temporary rules when using Private Browsing
                   Mode
                 </label>

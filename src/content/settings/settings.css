@@ -219,7 +219,7 @@ table.policy tr:hover a.deleterule:hover {
 }
 
 #addrule {
-  border: 1px solid #aaa;
+  border: 1px solid #ddd;
   border-radius: 4px;
   padding: 20px;
   background-color: #fcfcfc;

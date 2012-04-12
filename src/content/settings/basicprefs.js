@@ -12,6 +12,13 @@ function updateDisplay() {
 
   document.getElementById('pref-privateBrowsingPermanentWhitelisting').checked =
     rpService.prefs.getBoolPref('privateBrowsingPermanentWhitelisting');
+
+  if (rpService.prefs.getBoolPref('defaultPolicy.allow')) {
+    var word = 'allow';
+  } else {
+    var word = 'block';
+  }
+  document.getElementById('defaultpolicyword').innerHTML = word;
 }
 
 

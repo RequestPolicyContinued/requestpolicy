@@ -231,3 +231,7 @@ table.policy tr:hover a.deleterule:hover {
 #addrule .port input {
   width: 3em;
 }
+
+#defaultpolicyword {
+  font-weight: bold;
+}

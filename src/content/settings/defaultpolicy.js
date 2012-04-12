@@ -30,6 +30,11 @@ function reloadSubscriptionPolicies() {
 }
 
 
+function showManageSubscriptionsLink() {
+  document.getElementById('subscriptionschanged').style.display = 'block';
+}
+
+
 function onload() {
   updateDisplay();
 
@@ -42,6 +47,7 @@ function onload() {
       // subscriptions will now be active.
       reloadSubscriptionPolicies();
       updateDisplay();
+      showManageSubscriptionsLink();
     }
   );
   document.getElementById('defaultdeny').addEventListener('change',
@@ -53,6 +59,7 @@ function onload() {
       // subscriptions will now be active.
       reloadSubscriptionPolicies();
       updateDisplay();
+      showManageSubscriptionsLink();
     }
   );
   document.getElementById('allowsamedomain').addEventListener('change',

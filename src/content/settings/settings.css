@@ -214,6 +214,12 @@ table.policy tr:hover a.deleterule:hover {
   border: 1px solid #ddd;
 }
 
+#addrule {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #fcfcfc;
+}
 #addrule table {
   width : auto;
   margin-top: 10px;
@@ -231,7 +237,15 @@ table.policy tr:hover a.deleterule:hover {
 #addrule .port input {
   width: 3em;
 }
+#addrule p {
+  margin-top: 20px;
+  margin-bottom: 0;
+}
 
 #defaultpolicyword {
   font-weight: bold;
+}
+
+.subscriptions p {
+  margin-bottom: 24px;
 }

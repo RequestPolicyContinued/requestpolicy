@@ -69,7 +69,7 @@
   -->
 
   <keyset>
-    <key id="rp-menu-key" key="r" modifiers="alt"
+    <key id="rp-menu-key" key="r" modifiers="control alt"
          oncommand="requestpolicy.overlay.openMenuByHotkey()" />
   </keyset>
 

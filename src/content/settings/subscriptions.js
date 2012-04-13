@@ -26,7 +26,6 @@ function updateDisplay() {
 function onload() {
   updateDisplay();
   var userSubs = rpServiceJSObject._subscriptions;
-  var subsInfo = userSubs.getSubscriptionInfo();
 
   function handleSubscriptionChange(event) {
     var subName = event.target.name;

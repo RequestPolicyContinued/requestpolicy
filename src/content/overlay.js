@@ -313,11 +313,11 @@ requestpolicy.overlay = {
 
       // Add an event listener for when the contentAreaContextMenu (generally
       // the right-click menu within the document) is shown.
-      //var contextMenu = document.getElementById("contentAreaContextMenu");
-      //if (contextMenu) {
-      //  contextMenu.addEventListener("popupshowing",
-      //      this._contextMenuOnPopupShowing, false);
-      //}
+      var contextMenu = document.getElementById("contentAreaContextMenu");
+      if (contextMenu) {
+        contextMenu.addEventListener("popupshowing",
+            this._contextMenuOnPopupShowing, false);
+      }
 
       // We consider the default place for the popup to be attached to the
       // context menu, so attach it there.
@@ -983,10 +983,10 @@ requestpolicy.overlay = {
    * Called as an event listener when popupshowing fires on the
    * contentAreaContextMenu.
    */
-  //_contextMenuOnPopupShowing : function() {
-  //  requestpolicy.overlay._wrapOpenLink();
-  //  /*requestpolicy.overlay._attachPopupToContextMenu();*/
-  //},
+  _contextMenuOnPopupShowing : function() {
+    requestpolicy.overlay._wrapOpenLink();
+    /*requestpolicy.overlay._attachPopupToContextMenu();*/
+  },
 
   /**
    * Called as an event listener when popuphidden fires on the
@@ -1006,18 +1006,16 @@ requestpolicy.overlay = {
    * called when openLinkInTab() is called.
    */
   _wrapOpenLink : function() {
-    // This method is unused until we add back the context menu.
-    return;
-//    const rpService = this._rpService;
-//
-//    if (!gContextMenu.requestpolicyOrigOpenLink) {
-//      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
-//      gContextMenu.openLink = function() {
-//        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
-//            gContextMenu.link.href);
-//        return gContextMenu.requestpolicyOrigOpenLink();
-//      };
-//    }
+    const rpService = this._rpService;
+
+    if (!gContextMenu.requestpolicyOrigOpenLink) {
+      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
+      gContextMenu.openLink = function() {
+        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
+            gContextMenu.link.href);
+        return gContextMenu.requestpolicyOrigOpenLink();
+      };
+    }
   },
 
   /**

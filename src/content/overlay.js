@@ -1285,16 +1285,14 @@ requestpolicy.overlay = {
    *          event
    */
   toggleTemporarilyAllowAll : function(event) {
-    // TODO: Refactor to use a function call to disable blocking.
-    this._rpServiceJSObject._blockingDisabled = !this._rpServiceJSObject._blockingDisabled;
+    var disabled = !this._rpServiceJSObject._blockingDisabled;
+    this._rpServiceJSObject.setBlockingDisabled(disabled);
+
     // Change the link displayed in the menu.
-    var disabled = this._rpServiceJSObject._blockingDisabled;
     document.getElementById('rp-link-enable-blocking').hidden = !disabled;
     document.getElementById('rp-link-disable-blocking').hidden = disabled;
-    // Only reloading the current document. Should we reload all? Seems like it
-    // would be unexpected to the user if all were reloaded.
-    this
-        ._setPermissiveNotificationForAllWindows(this._rpServiceJSObject._blockingDisabled);
+
+    this._setPermissiveNotificationForAllWindows(disabled);
   },
 
   /**

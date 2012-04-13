@@ -1119,6 +1119,12 @@ RequestPolicyService.prototype = {
     }
   },
 
+  setBlockingDisabled : function(disabled) {
+    this._blockingDisabled = disabled;
+    this.prefs.setBoolPref('startWithAllowAllEnabled', disabled);
+    this._prefService.savePrefFile(null);
+  },
+
   addAllowRule : function(rawRule) {
     this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule);
   },
@@ -1209,10 +1215,9 @@ RequestPolicyService.prototype = {
 
   revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
     throw "NOT_IMPLEMENTED: revokeTemporaryPermissions";
-    
+
     this._policyMgr.resetTemporaryPolicies();
-    this._blockingDisabled = false;
-    
+
     this._temporarilyAllowedOriginsCount = 0;
     this._temporarilyAllowedOrigins = {};
 

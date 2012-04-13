@@ -1512,6 +1512,13 @@ requestpolicy.overlay = {
     gBrowser.selectedTab = gBrowser.addTab(uri);
   },
 
+  openMenuByHotkey : function() {
+    var popup = document.getElementById('rp-popup');
+    var anchor = document.getElementById('content');
+    // Place it 10k pixels to the right to force it to the right corner.
+    popup.openPopup(anchor, 'overlap', 10000);
+  },
+
   showExtensionConflictInfo : function() {
     var ext = this._rpServiceJSObject.getConflictingExtensions();
     var extJson = requestpolicy.mod.JSON.stringify(ext);

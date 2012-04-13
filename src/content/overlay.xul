@@ -68,6 +68,11 @@
   </statusbar>
   -->
 
+  <keyset>
+    <key id="rp-menu-key" key="r" modifiers="alt"
+         oncommand="requestpolicy.overlay.openMenuByHotkey()" />
+  </keyset>
+
   <popupset>
     <menupopup id="requestpolicyRedirectNotificationOptions" />
 

@@ -318,6 +318,9 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   text-decoration: underline;
   cursor: pointer;
 }
+#rp-link-enable-blocking {
+  color: #966803;
+}
 
 /*********************************************
  * Request Log

@@ -90,6 +90,10 @@ requestpolicy.menu = {
       var oldRulesExist = this._rpServiceJSObject.oldRulesExist();
       document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
 
+      var disabled = this._rpServiceJSObject._blockingDisabled;
+      document.getElementById('rp-link-enable-blocking').hidden = !disabled;
+      document.getElementById('rp-link-disable-blocking').hidden = disabled;
+
       this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
       try {

@@ -2030,6 +2030,16 @@ RequestPolicyService.prototype = {
           aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
         }
 
+        if (aRequestOrigin.scheme == "view-source") {
+          var newOrigin = origin.split(":").slice(1).join(":");
+          requestpolicy.mod.Logger.info(
+            requestpolicy.mod.Logger.TYPE_CONTENT,
+            "Considering view-source origin <"
+              + origin + "> to be origin <" + newOrigin + ">");
+          origin = newOrigin;
+          aRequestOrigin = requestpolicy.mod.DomainUtil.getUriObject(origin);
+        }
+
         if (aContentLocation.scheme == "view-source") {
           var newDest = dest.split(":").slice(1).join(":");
           requestpolicy.mod.Logger.info(

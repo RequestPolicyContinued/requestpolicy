@@ -1516,9 +1516,22 @@ requestpolicy.overlay = {
 
   openMenuByHotkey : function() {
     var popup = document.getElementById('rp-popup');
+    // Ideally we'd put the popup in its normal place based on the rp toolbar
+    // button but let's not count on that being visible. So, we'll be safe and
+    // anchor it within the content element. However, there's no good way to
+    // right-align a popup. So, we can either let it be left aligned or we can
+    // figure out where we think the top-left corner should be. And that's what
+    // we do.
+    // The first time the width will be 0. The default value is determined by
+    // logging it or you can probably figure it out from the CSS which doesn't
+    // directly specify the width of the entire popup.
+    //requestpolicy.mod.Logger.dump('popup width: ' + popup.clientWidth);
+    var popupWidth = popup.clientWidth ? 730 : popup.clientWidth;
     var anchor = document.getElementById('content');
-    // Place it 10k pixels to the right to force it to the right corner.
-    popup.openPopup(anchor, 'overlap', 10000);
+    var contentWidth = anchor.clientWidth;
+    // Take a few pixels off so it doesn't cover the browser chrome's border.
+    var xOffset = contentWidth - popupWidth - 2;
+    popup.openPopup(anchor, 'overlap', xOffset);
   },
 
   showExtensionConflictInfo : function() {

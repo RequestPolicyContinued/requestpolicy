@@ -357,6 +357,8 @@ RequestPolicyService.prototype = {
         "https://www.google.com/recaptcha/api/challenge?", appInfo.vendor]);
     this._compatibilityRules.push(["https://auth.services.mozilla.com/",
         "https://www.google.com/recaptcha/api/", appInfo.vendor]);
+    // Firefox 13 added links from about:newtab
+    this._compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {

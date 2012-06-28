@@ -1,0 +1,73 @@
+<!ENTITY prefetchWarning "Attenzione: il Prefetch è abilitato">
+<!ENTITY prefetchInfo "Maggiori info sul prefetching">
+<!ENTITY prefetchDisablingInstructions "Disabilita il prefetching">
+<!ENTITY temporarilyAllowAll "Permetti temporaneamente tutte le richieste">
+<!ENTITY revokeTemporaryPermissions "Revoca tutti i permessi temporanei">
+<!ENTITY blockedDestinations "Destinazioni bloccate">
+<!ENTITY allowedDestinations "Destinazioni permesse">
+<!ENTITY otherOrigins "Altre origini in questa pagina">
+<!ENTITY menu.openRequestLog.label "Mostra Log Richieste">
+<!ENTITY menu.closeRequestLog.label "Chiudi Log Richieste">
+<!ENTITY rp.origin "Origine">
+<!ENTITY rp.destination "Destinazione">
+<!ENTITY rp.allow "Permetti">
+<!ENTITY preferences "Preferenze">
+<!ENTITY preferences.windowTitle "Preferenze di RequestPolicy">
+<!ENTITY preferences.prefpane.general "Generale">
+<!ENTITY preferences.prefpane.appearance "Aspetto">
+<!ENTITY preferences.prefpane.whitelist "Lista Bianca">
+<!ENTITY preferences.prefpane.import "Importa">
+<!ENTITY preferences.prefpane.export "Esporta">
+<!ENTITY preferences.prefpane.advanced "Avanzate">
+<!ENTITY preferences.strictness "Precisione">
+<!ENTITY preferences.strictness.description "Il livello di classificazione da usare per permettere le richieste dallo stesso sito. Una volta modificato questo, il menu sarà inizialmente vuoto per ogni scheda già aperta.">
+<!ENTITY preferences.baseDomain "Dominio base (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Dominio completo (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Indirizzo completo (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Pagine web">
+<!ENTITY preferences.statusbarIcon "Icona barra di stato">
+<!ENTITY preferences.statusbarIcon.none "Nessuna">
+<!ENTITY preferences.contextMenu "Menu contestuale">
+<!ENTITY preferences.indicateBlockedObjects "Indica le immagini bloccate">
+<!ENTITY preferences.autoReload "Ricarica la pagina corrente quando cambia la Lista Bianca">
+<!ENTITY preferences.openInitialSetup "Apri il setup iniziale">
+<!ENTITY preferences.misc "Altro">
+<!ENTITY preferences.startWithAllowAllEnabled "Abilita 'Permetti Temporaneamente Tutte le Richieste' all'avvio del browser">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Lascia la Lista Bianca permanente quando si usa la Navigazione Anonima">
+<!ENTITY preferences.origins "Origini">
+<!ENTITY preferences.destinations "Destinazioni">
+<!ENTITY preferences.originsToDestinations "Origini-verso-Destinazioni">
+<!ENTITY preferences.temporary "Temporaneo">
+<!ENTITY preferences.removeSelectedSites "Rimuovi Siti Selezionati">
+<!ENTITY preferences.export.caption "Esporta le tue Impostazioni">
+<!ENTITY preferences.export.description "Puoi esportare la tua Lista Bianca in un file di backup. Per configurare un altro computer con la stessa Lista Bianca, sposta il file su quel computer e usa l'opzione Importa.">
+<!ENTITY preferences.export.details.caption "Cosa viene incluso nell'esportazione">
+<!ENTITY preferences.export.details.description "Il file di backup conterrà le origini, destinazioni, e le origini-verso-destinazioni che hai permesso. Non conterrà nulla che tu abbia permesso solo temporaneamente.">
+<!ENTITY preferences.export.button.label "Esporta su File">
+<!ENTITY preferences.import.caption "Importa le tue Impostazioni">
+<!ENTITY preferences.import.description "Puoi importare la tua Lista Bianca da un file di backup creato con l'opzione Esporta.">
+<!ENTITY preferences.import.details.caption "Cosa verrà importato">
+<!ENTITY preferences.import.details.description "L'importazione aggiungerà tutte le origini, destinazioni, e origini-verso-destinazioni elencate nel file di backup. Non verrà rimosso nulla dalla tua Lista Bianca attuale. Quindi effettuando l'importazione verranno solo aggiunti i siti alla tua Lista Bianca, senza sostituire nulla dalla tua lista in uso.">
+<!ENTITY preferences.import.button.label "Importa da File">
+<!ENTITY preferences.prefetch.link "Prefetching dei Link">
+<!ENTITY preferences.prefetch.dns "Prefetching DNS">
+<!ENTITY preferences.enabled "Abilitato">
+<!ENTITY preferences.disableOnStartup "Disabilita all'avvio">
+<!ENTITY preferences.restoreDefaultOnUninstall "Ripristina i predefiniti quando RequestPolicy viene disinstallato">
+<!ENTITY requestLog.title "Log Richieste">
+<!ENTITY requestLog.blocked "Bloccato">
+<!ENTITY requestLog.time "Ora">
+<!ENTITY requestLog.copyOriginToClipboard "Copia Origine negli Appunti">
+<!ENTITY requestLog.copyDestinationToClipboard "Copia Destinazione negli Appunti">
+<!ENTITY requestLog.openOriginInNewTab "Apri Origine in una Nuova Scheda">
+<!ENTITY requestLog.openDestinationInNewTab "Apri Destinazione in una Nuova Scheda">
+<!ENTITY requestLog.clear "Svuota">
+<!ENTITY initialSetup.title "Setup iniziale">
+<!ENTITY initialSetup.whitelist.caption "Aggiungi siti alla tua Lista Bianca cross-site">
+<!ENTITY initialSetup.whitelist.description "I siti in queste liste sono stati scelti sia perché (1) coinvolgono richieste tra siti di proprietà della stessa azienda, o (2) riducono i problemi che potresti incontrare e avere un impatto molto basso sulla privacy e sicurezza.">
+<!ENTITY initialSetup.region.international "Internazionale">
+<!ENTITY initialSetup.region.americas "Americhe">
+<!ENTITY initialSetup.region.asia "Asia">
+<!ENTITY initialSetup.region.usAndCanada "USA e Canada">
+<!ENTITY initialSetup.region.europeAndRussia "Europa e Russia">
+<!ENTITY initialSetup.region.oceania "Oceania">

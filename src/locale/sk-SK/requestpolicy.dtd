@@ -1,0 +1,73 @@
+<!ENTITY prefetchWarning "Upozornenie: Prefetch je povolená">
+<!ENTITY prefetchInfo "Ďalšie informácie o prefetching">
+<!ENTITY prefetchDisablingInstructions "Vypnúť prefetching">
+<!ENTITY temporarilyAllowAll "Dočasne povolí všetky požiadavky">
+<!ENTITY revokeTemporaryPermissions "Odvolať všetky dočasné oprávnenie">
+<!ENTITY blockedDestinations "Blokované ciele">
+<!ENTITY allowedDestinations "Povolené ciele">
+<!ENTITY otherOrigins "Iné zdroje v rámci tejto stránky">
+<!ENTITY menu.openRequestLog.label "Zobraziť protokol požiadaviek">
+<!ENTITY menu.closeRequestLog.label "Zatvoriť protokol požiadaviek">
+<!ENTITY rp.origin "Zdroj">
+<!ENTITY rp.destination "Ciele">
+<!ENTITY rp.allow "Povoliť">
+<!ENTITY preferences "Nastavenia">
+<!ENTITY preferences.windowTitle "Nastavenia RequestPolicy">
+<!ENTITY preferences.prefpane.general "Všeobecné">
+<!ENTITY preferences.prefpane.appearance "Vzhľad">
+<!ENTITY preferences.prefpane.whitelist "Whitelist">
+<!ENTITY preferences.prefpane.import "Importovať">
+<!ENTITY preferences.prefpane.export "Exportovať">
+<!ENTITY preferences.prefpane.advanced "Pokročilé">
+<!ENTITY preferences.strictness "Podrobnosti">
+<!ENTITY preferences.strictness.description "Stupeň utajenia, ktorý umožní použiť rovnaké mieste požiadavky. Po zmene sa bude ponuka spúšťať prázdna pre každú otvorenú kartu.">
+<!ENTITY preferences.baseDomain "Základná doména(requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Celá doména (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Úplná adresa (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Webové stránky">
+<!ENTITY preferences.statusbarIcon "Ikonka stavového riadka">
+<!ENTITY preferences.statusbarIcon.none "Žiadna">
+<!ENTITY preferences.contextMenu "Kontextová ponuka">
+<!ENTITY preferences.indicateBlockedObjects "Uviesť blokované obrázky">
+<!ENTITY preferences.autoReload "Znovu načítať aktuálnu stránku pri zmene whitelist">
+<!ENTITY preferences.openInitialSetup "Otvoriť počiatočné nástroje nastavenia">
+<!ENTITY preferences.misc "Rôzne">
+<!ENTITY preferences.startWithAllowAllEnabled "Zapnúť &quot;Dočasne povoliť všetky požiadavky&quot; pri spustení prehliadača">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Povoliť trvalé whitelisting pri používaní Súkromného ​​prehliadania">
+<!ENTITY preferences.origins "Zdroje">
+<!ENTITY preferences.destinations "Ciele">
+<!ENTITY preferences.originsToDestinations "Zdroje-na-Ciele">
+<!ENTITY preferences.temporary "Dočasný">
+<!ENTITY preferences.removeSelectedSites "Odstrániť vybrané stránky">
+<!ENTITY preferences.export.caption "Exportovať nastavenia">
+<!ENTITY preferences.export.description "Môžete exportovať whitelist do súboru a takvytvoriť zálohu. Ak chcete konfigurovať iný počítač s rovnakým whitelistom, stačí súbor presunúť do počítača a použiť možnosť importovania.">
+<!ENTITY preferences.export.details.caption "Čo je zahrnuté do exportu">
+<!ENTITY preferences.export.details.description "Súbor bude obsahovať zdroj, ciele, a zdroj-na-cieľ, ktoré ste povolili. Nebude obsahovať nič, čo by ste len dočasne povolili.">
+<!ENTITY preferences.export.button.label "Exportovať do súboru">
+<!ENTITY preferences.import.caption "Importovať nastavenia">
+<!ENTITY preferences.import.description "Môžete importovať whitelist zo zálohy, ktorý ste vytvorili.">
+<!ENTITY preferences.import.details.caption "Čo bude robiť import">
+<!ENTITY preferences.import.details.description "Import pridá zdroje, ciele, a zdroj-na-cieľ uvedené v súbore, ktorý ste importovali. Nič nebude v aktuálnom whiteliste odstránené. To znamená, že sa importujú len servery do whitelistu a nenahradí sa aktuálny whitelist.">
+<!ENTITY preferences.import.button.label "Importovať zo súboru">
+<!ENTITY preferences.prefetch.link "Link Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Zapnuté">
+<!ENTITY preferences.disableOnStartup "Vypnúť pri spustení">
+<!ENTITY preferences.restoreDefaultOnUninstall "Obnoviť pôvodné pri odinštalovaní RequestPolicy">
+<!ENTITY requestLog.title "Protokol požiadaviek">
+<!ENTITY requestLog.blocked "Blokované">
+<!ENTITY requestLog.time "Čas">
+<!ENTITY requestLog.copyOriginToClipboard "Kopírovať zdroj do schránky">
+<!ENTITY requestLog.copyDestinationToClipboard "Kopírovať ciele do schránky">
+<!ENTITY requestLog.openOriginInNewTab "Otvoriť zdroj na novej karte">
+<!ENTITY requestLog.openDestinationInNewTab "Otvoriť cieľ na novej karte">
+<!ENTITY requestLog.clear "Vyčistiť">
+<!ENTITY initialSetup.title "Počiatočné nastavenie">
+<!ENTITY initialSetup.whitelist.caption "Pridať stránky do whitelist">
+<!ENTITY initialSetup.whitelist.description "Stránky v týchto zoznamoch boli vybrané preto, že buď (1) zahŕňajú požiadavky medzi lokalitami vo vlastníctve tej istej spoločnosti, alebo (2) znižujú problémy, s ktorými sa môžete stretnúť, a majú veľmi nízky dopad na súkromie a bezpečnosť.">
+<!ENTITY initialSetup.region.international "Medzinárodné">
+<!ENTITY initialSetup.region.americas "Americké">
+<!ENTITY initialSetup.region.asia "Ázia">
+<!ENTITY initialSetup.region.usAndCanada "US a Kanada">
+<!ENTITY initialSetup.region.europeAndRussia "Európa a Rusko">
+<!ENTITY initialSetup.region.oceania "Oceánia">

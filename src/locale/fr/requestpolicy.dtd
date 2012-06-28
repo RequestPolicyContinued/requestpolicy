@@ -53,7 +53,7 @@
 <!ENTITY preferences.prefetch.dns "Préchargement DNS">
 <!ENTITY preferences.enabled "Activé">
 <!ENTITY preferences.disableOnStartup "Désactiver au démarrage">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
+<!ENTITY preferences.restoreDefaultOnUninstall "Rétablir les paramètres par défaut lorsque RequestPolicy est désinstallé">
 <!ENTITY requestLog.title "Journal des requêtes">
 <!ENTITY requestLog.blocked "Bloqué">
 <!ENTITY requestLog.time "Durée">
@@ -63,8 +63,8 @@
 <!ENTITY requestLog.openDestinationInNewTab "Ouvrir la destination dans un nouvel onglet">
 <!ENTITY requestLog.clear "Effacer">
 <!ENTITY initialSetup.title "Installation initiale">
-<!ENTITY initialSetup.whitelist.caption "Add sites to your cross-site whitelist">
-<!ENTITY initialSetup.whitelist.description "The sites in these lists were selected either because (1) they involve requests between sites owned by the same company, or (2) they reduce the problems you may encounter and have a very low impact on privacy and security.">
+<!ENTITY initialSetup.whitelist.caption "Ajouter des sites à votre liste blanche de sites croisés">
+<!ENTITY initialSetup.whitelist.description "Les sites dans ces listes ont été choisis (1) soit parce qu'ils impliquent des requêtes entre des listes appartenant à la même entreprise, (2) soit parce qu'ils réduisent les problèmes que vous pourriez rencontrer et n'ont qu'un faible impact sur la sécurité et les données personnelles.">
 <!ENTITY initialSetup.region.international "International">
 <!ENTITY initialSetup.region.americas "Amérique">
 <!ENTITY initialSetup.region.asia "Asie">

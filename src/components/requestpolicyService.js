@@ -2003,7 +2003,7 @@ RequestPolicyService.prototype = {
 
     // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
-        aContext, aMimeTypeGuess, aExtra) {
+        aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
       try {
 
         if (this._isInternalRequest(aContentLocation, aRequestOrigin)) {
@@ -2019,6 +2019,25 @@ RequestPolicyService.prototype = {
         var dest = requestpolicy.mod.DomainUtil
             .stripFragment(aContentLocation.spec);
 
+        // Fx 16 changed the following: 1) we should be able to count on the
+        // referrer (aRequestOrigin) being set to something besides
+        // moz-nullprincipal when there is a referrer, and 2) the new argument
+        // aRequestPrincipal is provided. This means our hackery to set the
+        // referrer based on aContext when aRequestOrigin is moz-nullprincipal
+        // is now causing requests that don't have a referrer (namely, URLs
+        // entered in the address bar) to be blocked and trigger a top-level
+        // document redirect notification.
+        if (aRequestOrigin.scheme == "moz-nullprincipal" && aRequestPrincipal) {
+          requestpolicy.mod.Logger.warning(
+              requestpolicy.mod.Logger.TYPE_CONTENT,
+              "Allowing request that appears to be a URL entered in the "
+                  + "location bar or some other good explanation: " + dest);
+          return CP_OK;
+        }
+
+        // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
+        // above is correct, this should be able to be removed when Fx < 16 is
+        // no longer supported.
         if (aRequestOrigin.scheme == "moz-nullprincipal" && aContext) {
           var newOrigin = requestpolicy.mod.DomainUtil
                 .stripFragment(aContext.contentDocument.documentURI);

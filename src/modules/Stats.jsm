@@ -232,8 +232,16 @@ function sendRPPreferences() {
 
 function sendBrowserPreferences() {
   try {
+    function getLocalePref() {
+      try {
+        return rp._rootPrefs.getComplexValue('general.useragent.locale',
+            Components.interfaces.nsIPrefLocalizedString).data;
+      } catch (e) {
+        return rp._rootPrefs.getCharPref('general.useragent.locale');
+      }
+    }
     var browserPrefs = {
-      'general_useragent_locale': rp._rootPrefs.getCharPref('general.useragent.locale'),
+      'general_useragent_locale': getLocalePref(),
       'privacy_donottrackheader_enabled': rp._rootPrefs.getBoolPref('privacy.donottrackheader.enabled'),
       'places_history_enabled': rp._rootPrefs.getBoolPref('places.history.enabled'),
       'browser_privatebrowsing_autostart': rp._rootPrefs.getBoolPref('browser.privatebrowsing.autostart'),

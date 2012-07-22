@@ -1,0 +1,73 @@
+<!ENTITY prefetchWarning "Oharra: Prefetch gaituta dago">
+<!ENTITY prefetchInfo "Ikasi prefetchingen inguruan">
+<!ENTITY prefetchDisablingInstructions "Prefetching ezgaitu">
+<!ENTITY temporarilyAllowAll "Eskaera guztiak baimendu aldi batreako">
+<!ENTITY revokeTemporaryPermissions "Aldi baterako baimen guztiak baliogabetu">
+<!ENTITY blockedDestinations "Blokeatutako helmugak">
+<!ENTITY allowedDestinations "Baimendutako helmugak">
+<!ENTITY otherOrigins "Beste jatorri batzuk orri honen barruan">
+<!ENTITY menu.openRequestLog.label "Erakutsi Eskaera Erregistroa">
+<!ENTITY menu.closeRequestLog.label "Itxi Eskaera Erregistroa">
+<!ENTITY rp.origin "Jatorria">
+<!ENTITY rp.destination "Helmuga">
+<!ENTITY rp.allow "Baimendu">
+<!ENTITY preferences "Hobespenak">
+<!ENTITY preferences.windowTitle "RequestPolicy Hobespenak">
+<!ENTITY preferences.prefpane.general "Orokorra">
+<!ENTITY preferences.prefpane.appearance "Itxura">
+<!ENTITY preferences.prefpane.whitelist "Zerrenda-zuria">
+<!ENTITY preferences.prefpane.import "Inportatu">
+<!ENTITY preferences.prefpane.export "Esportatu">
+<!ENTITY preferences.prefpane.advanced "Aurreratua">
+<!ENTITY preferences.strictness "Zorroztasuna">
+<!ENTITY preferences.strictness.description "Gune-bereko eskaerentzako erabili beharreko sailkapen maila. Hau aldatu ondoren, menua hutsik hasiko da oraintxe irekitako fitxa bakoitzean.">
+<!ENTITY preferences.baseDomain "Domeinu oinarria (requestpolicy.com)">
+<!ENTITY preferences.fullDomain "Domeinu osoa (www.requestpolicy.com)">
+<!ENTITY preferences.fullAddress "Helbide osoa (http://www.requestpolicy.com:81)">
+<!ENTITY preferences.webpages "Web orriak">
+<!ENTITY preferences.statusbarIcon "Egoera barra ikonoa">
+<!ENTITY preferences.statusbarIcon.none "Bat ere ez">
+<!ENTITY preferences.contextMenu "Testuinguru menua">
+<!ENTITY preferences.indicateBlockedObjects "Adierazi blokeatutako irudiak">
+<!ENTITY preferences.autoReload "Berritu uneko orria zerrenda-zuria aldatzen denean">
+<!ENTITY preferences.openInitialSetup "Ireki hasierako konfigurazio tresna">
+<!ENTITY preferences.misc "Miszelanea">
+<!ENTITY preferences.startWithAllowAllEnabled "Gaitu 'Eskaera guztiak baimendu aldi baterako' nabigatzailea hasterakoan">
+<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Baimendu aldi osorako zerrenda-zuria Nabigatze Pribatua erabiltzerakoan">
+<!ENTITY preferences.origins "Jatorriak">
+<!ENTITY preferences.destinations "Helmugak">
+<!ENTITY preferences.originsToDestinations "Jatorriak-Helmugetara">
+<!ENTITY preferences.temporary "Aldi baterako">
+<!ENTITY preferences.removeSelectedSites "Kendu hautatutako guneak">
+<!ENTITY preferences.export.caption "Esportatu zure ezarpenak">
+<!ENTITY preferences.export.description "Zure zerrenda-zuria fitxategi batera esporta dezakezu babeskopia gisa. Beste ordenagailu bat zerrenda-zuri berdinarekin konfiguratzeko, fitxategia beste ordenagailu horretara mugitu eta inportatu aukera erabili.">
+<!ENTITY preferences.export.details.caption "Esportatzerakoan sartzen dena">
+<!ENTITY preferences.export.details.description "Esportatze fitxategiak baimendu dituzun jatorriak, helmugak, eta jatorrietatik-helmugetara edukiko ditu. Aldi baterako soilik baimendutako ezer ez da bertan egongo.">
+<!ENTITY preferences.export.button.label "Fitxategi batera esportatu">
+<!ENTITY preferences.import.caption "Inporttau zure ezarpenak">
+<!ENTITY preferences.import.description "Zure zerrenda-zuria inporta dezakezu esportatu tresnarekin egindako babeskopia batetik.">
+<!ENTITY preferences.import.details.caption "Inportatzeak egingo duena">
+<!ENTITY preferences.import.details.description "Inportatzeak inportatzen ari zaren fitxategian zerrendatutako jatorriak, helmugak, eta jatorrietatik-helmugetarak gahituko ditu. Zure uneko zerrenda-zuriko ezer ez da ezabatuko. Hori da, inportatzerakoan bakarrik guneak gehituko ditu zure zerrenda-zurira, ez du erabat zure zerrenda-zuria ordeztuko.">
+<!ENTITY preferences.import.button.label "Inportatu fitxategi batetik">
+<!ENTITY preferences.prefetch.link "Lotura Prefetching">
+<!ENTITY preferences.prefetch.dns "DNS Prefetching">
+<!ENTITY preferences.enabled "Gaituta">
+<!ENTITY preferences.disableOnStartup "Ezgaitu abioan">
+<!ENTITY preferences.restoreDefaultOnUninstall "Leheneratu lehenetsia RequestPolicy desinstalatzerakoan">
+<!ENTITY requestLog.title "Eskaera Erregistroa">
+<!ENTITY requestLog.blocked "Blokeatuta">
+<!ENTITY requestLog.time "Ordua">
+<!ENTITY requestLog.copyOriginToClipboard "Kopiatu Jatorria Arbelera">
+<!ENTITY requestLog.copyDestinationToClipboard "Kopiatu Helmuga Arbelera">
+<!ENTITY requestLog.openOriginInNewTab "Ireki Jatorria Fitxa berri batean">
+<!ENTITY requestLog.openDestinationInNewTab "ireki Helmuga Fitxa berri batean">
+<!ENTITY requestLog.clear "Garbitu">
+<!ENTITY initialSetup.title "Hasierako konfigurazioa">
+<!ENTITY initialSetup.whitelist.caption "Gehitu guneak zure gune-arteko zerrenda-zurira">
+<!ENTITY initialSetup.whitelist.description "Zerrenda hauetako guneak (1) enpresa berdina jabe den guneen artean eskaerak inplikatzen dituelako, edo (2) aurki ditzakezun arazoak murriztu eta pribatutasun eta segurtasunean eragin txikia dutelako aukeratu dira.">
+<!ENTITY initialSetup.region.international "Nazioartea">
+<!ENTITY initialSetup.region.americas "Amerika">
+<!ENTITY initialSetup.region.asia "Asia">
+<!ENTITY initialSetup.region.usAndCanada "AEB eta Kanada">
+<!ENTITY initialSetup.region.europeAndRussia "Eurpa eta Errusia">
+<!ENTITY initialSetup.region.oceania "Ozeania">

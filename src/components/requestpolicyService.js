@@ -200,6 +200,7 @@ RequestPolicyService.prototype = {
     idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
+    idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
     try {
       // For Firefox <= 3.6.
@@ -297,6 +298,11 @@ RequestPolicyService.prototype = {
         this._compatibilityRules.push(["http://www.similarweb.com/",
             "http://go.similarsites.com/", ext.name]);
         break;
+      case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
+        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        this._compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
+        break;
       default :
         requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);
@@ -352,6 +358,8 @@ RequestPolicyService.prototype = {
         "https://www.google.com/recaptcha/api/challenge?", appInfo.vendor]);
     this._compatibilityRules.push(["https://auth.services.mozilla.com/",
         "https://www.google.com/recaptcha/api/", appInfo.vendor]);
+    // Firefox 13 added links from about:newtab
+    this._compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
@@ -747,8 +755,7 @@ RequestPolicyService.prototype = {
       } catch (e) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
-            "Invalid refresh header: <" + refreshString + "> from origin <"
-                + origin + ">");
+            "Invalid refresh header: <" + refreshString + ">");
         if (!this._blockingDisabled) {
           httpChannel.setResponseHeader(headerType, "", false);
         }
@@ -1770,6 +1777,8 @@ RequestPolicyService.prototype = {
         || aContentLocation.scheme == "data"
         || aContentLocation.scheme == "chrome"
         || aContentLocation.scheme == "moz-icon"
+        || aContentLocation.scheme == "moz-filedata"
+        || aContentLocation.scheme == "blob"
         || aContentLocation.scheme == "wyciwyg"
         || aContentLocation.scheme == "javascript") {
       return true;
@@ -1882,7 +1891,7 @@ RequestPolicyService.prototype = {
 
     // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
-        aContext, aMimeTypeGuess, aExtra) {
+        aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
       try {
 
         if (this._isInternalRequest(aContentLocation, aRequestOrigin)) {
@@ -1898,6 +1907,25 @@ RequestPolicyService.prototype = {
         var dest = requestpolicy.mod.DomainUtil
             .stripFragment(aContentLocation.spec);
 
+        // Fx 16 changed the following: 1) we should be able to count on the
+        // referrer (aRequestOrigin) being set to something besides
+        // moz-nullprincipal when there is a referrer, and 2) the new argument
+        // aRequestPrincipal is provided. This means our hackery to set the
+        // referrer based on aContext when aRequestOrigin is moz-nullprincipal
+        // is now causing requests that don't have a referrer (namely, URLs
+        // entered in the address bar) to be blocked and trigger a top-level
+        // document redirect notification.
+        if (aRequestOrigin.scheme == "moz-nullprincipal" && aRequestPrincipal) {
+          requestpolicy.mod.Logger.warning(
+              requestpolicy.mod.Logger.TYPE_CONTENT,
+              "Allowing request that appears to be a URL entered in the "
+                  + "location bar or some other good explanation: " + dest);
+          return CP_OK;
+        }
+
+        // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
+        // above is correct, this should be able to be removed when Fx < 16 is
+        // no longer supported.
         if (aRequestOrigin.scheme == "moz-nullprincipal" && aContext) {
           var newOrigin = requestpolicy.mod.DomainUtil
                 .stripFragment(aContext.contentDocument.documentURI);

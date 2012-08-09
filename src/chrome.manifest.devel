@@ -11,6 +11,7 @@ locale     requestpolicy    fr             locale/fr/
 locale     requestpolicy    it             locale/it/
 locale     requestpolicy    ja             locale/ja/
 locale     requestpolicy    ko-KR          locale/ko-KR/
+locale     requestpolicy    lv-LV          locale/lv-LV/
 locale     requestpolicy    nl             locale/nl/
 locale     requestpolicy    pt-BR          locale/pt-BR/
 locale     requestpolicy    ru-RU          locale/ru-RU/

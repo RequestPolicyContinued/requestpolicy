@@ -3,6 +3,7 @@
 <head>
   <title>RequestPolicy - Setup</title>
   <script src="setup.js"></script>
+  <script src="../jquery.min.js"></script>
   <!--<link href="setup.css" rel="stylesheet" type="text/css"/>-->
   <style>
     html {
@@ -11,7 +12,7 @@
 
     body {
       font-family: Arial, sans-serif;
-      line-height: 1.125em;
+      /*line-height: 1.125em;*/
       padding: 0;
       margin: 25px;
       background-color: rgb(0, 54, 152);
@@ -22,6 +23,7 @@
       background: linear-gradient(to bottom, #4f85bb 0%, #3b7aba 100%); /* W3C */
 
       font-size: 14px;
+      line-height: 22px;
     }
 
     #container {
@@ -38,31 +40,31 @@
     .title {
       font-size: 18px;
       color: #444;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
     .description {
       color: #777;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       line-height: 1.4em;
     }
 
     .pagetitle {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .pagetitle .title {
       font-size: 24px;
-      padding-bottom: 10px;
+      padding-bottom: 0;
       border-bottom: 1px solid #ccc;
     }
 
     .step {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .done {
-      margin-top: 42px;
+      margin-top: 32px;
     }
 
     .done a {
@@ -110,6 +112,10 @@
     }
 
     #configure {
+      display: none;
+    }
+
+    #allowsamedomainblock {
       display: none;
     }
   </style>
@@ -166,6 +172,17 @@
               Block requests by default. (For advanced users. Breaks many
               websites.)
             </label>
+
+            <div id="allowsamedomainblock">
+              <label for="allowsamedomain">
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" name="allowsamedomain"
+                       id="allowsamedomain"
+                       value="yes" checked="checked">
+                Allow requests to the same domain (e.g. www.foo.com ->
+                static.foo.com).
+              </label>
+            </div>
           </td>
         </tr>
       </table>
@@ -184,8 +201,7 @@
             </div>
             <label for="yessubs">
               <input type="radio" id="yessubs" name="subscriptions"
-                     value="allow"
-                     checked="checked">
+                     value="allow" checked="checked">
               Yes, use subscription policies. (Recommended.)
             </label>
             <br/>

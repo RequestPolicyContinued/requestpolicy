@@ -28,6 +28,7 @@
       margin: auto;
       max-width: 800px;
       padding: 25px;
+      padding-bottom: 35px;
       background-color: white;
       border-color: #aaa;
       border-radius: 10px;
@@ -60,18 +61,22 @@
       margin-bottom: 30px;
     }
 
-    .done button {
-      font-size: 20px;
-      padding-left: 10px;
-      padding-right: 10px;
-      margin-right: 20px;
+    .done {
+      margin-top: 42px;
     }
+
     .done a {
       margin-right: 20px;
       margin-left: 10px;
     }
 
-    button.finish {
+    .done .teach {
+      text-decoration: none;
+      font-size: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      margin-right: 20px;
+      margin-left: 0;
       background-color: #7fbf4d;
       background-image: -moz-linear-gradient(top, #7fbf4d, #63a62f);
       background-image: linear-gradient(top, #7fbf4d, #63a62f);
@@ -87,7 +92,7 @@
       text-shadow: 0 -1px 0 #4c9021;
     }
 
-    button.finish:hover {
+    .done .teach:hover {
       background-color: #76b347;
       background-image: -moz-linear-gradient(top, #76b347, #5e9e2e);
       background-image: linear-gradient(top, #76b347, #5e9e2e);
@@ -95,7 +100,7 @@
       cursor: pointer;
     }
 
-    button.finish:active {
+    .done .teach:active {
       border: 1px solid #5b992b;
       border-bottom: 1px solid #538c27;
       box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
@@ -103,6 +108,7 @@
 
     #welcome {
     }
+
     #configure {
       display: none;
     }
@@ -122,12 +128,14 @@
       <p>For most users, RequestPolicy's default settings are ideal.
 
       <p>However, you can configure RequestPolicy to make it much more strict
-      (only recommended for advanced users).</p>
+        (only recommended for advanced users).</p>
     </div>
 
     <div class="done">
-      <button class="finish">Teach me how to use RequestPolicy.</button>
-      <a href="">Return to browsing.</a>
+      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/">Teach
+        me how to use RequestPolicy.</a>
+      <a href="javascript:window.close()" class="returntobrowsing">Return to
+        browsing.</a>
       <a id="showconfigure" href="#">Configure RequestPolicy.</a>
     </div>
   </div>
@@ -146,13 +154,18 @@
               When you don't have any "allow" or "block" that rules match a
               request, this is what RequestPolicy will do.
             </div>
-            <input type="radio" name="defaultpolicy" value="allow"
-                   checked="checked">
-            Allow requests by default.
+            <label for="defaultallow">
+              <input type="radio" name="defaultpolicy" id="defaultallow"
+                     value="allow" checked="checked">
+              Allow requests by default.
+            </label>
             <br/>
-            <input type="radio" name="defaultpolicy" value="deny">
-            Block requests by default. (For advanced users. Breaks many
-            websites.)
+            <label for="defaultdeny">
+              <input type="radio" name="defaultpolicy" id="defaultdeny"
+                     value="deny">
+              Block requests by default. (For advanced users. Breaks many
+              websites.)
+            </label>
           </td>
         </tr>
       </table>
@@ -187,9 +200,10 @@
     </div>
 
     <div class="done">
-      <button class="finish">I'm done. Teach me how to use RequestPolicy.
-      </button>
-      <a href="">I'm done. Return to browsing.</a>
+      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/">I'm
+        done. Teach me how to use RequestPolicy.</a>
+      <a href="javascript:window.close()" class="returntobrowsing">I'm done.
+        Return to browsing.</a>
     </div>
   </div>
 

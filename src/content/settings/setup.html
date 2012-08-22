@@ -40,6 +40,12 @@
       margin-bottom: 20px;
     }
 
+    .description {
+      color: #777;
+      margin-bottom: 16px;
+      line-height: 1.4em;
+    }
+
     .pagetitle {
       margin-bottom: 30px;
     }
@@ -115,8 +121,8 @@
       <div class="title"></div>
       <p>For most users, RequestPolicy's default settings are ideal.
 
-      <p>However, if you want a lot of control (and many broken websites),
-      you can configure RequestPolicy to be very strict.</p>
+      <p>However, you can configure RequestPolicy to make it much more strict
+      (only recommended for advanced users).</p>
     </div>
 
     <div class="done">
@@ -136,12 +142,16 @@
         <tr>
           <td>
             <div class="title">Default Policy</div>
+            <div class="description">
+              When you don't have any "allow" or "block" that rules match a
+              request, this is what RequestPolicy will do.
+            </div>
             <input type="radio" name="defaultpolicy" value="allow"
                    checked="checked">
             Allow requests by default.
             <br/>
             <input type="radio" name="defaultpolicy" value="deny">
-            Deny requests by default. (For advanced users. Breaks many
+            Block requests by default. (For advanced users. Breaks many
             websites.)
           </td>
         </tr>
@@ -153,6 +163,12 @@
         <tr>
           <td>
             <div class="title">Subscription Policies</div>
+            <div class="description">
+              Subscription policies are sets of rules maintained by us with help
+              from the community.
+              These rules are updated automatically and aim to minimize
+              website breakage while blocking requests that impact your privacy.
+            </div>
             <label for="yessubs">
               <input type="radio" id="yessubs" name="subscriptions"
                      value="allow"

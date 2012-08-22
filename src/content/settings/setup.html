@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+  <title>RequestPolicy - Setup</title>
+  <script src="setup.js"></script>
+  <!--<link href="setup.css" rel="stylesheet" type="text/css"/>-->
+  <style>
+    html {
+      height: 100%;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.125em;
+      padding: 0;
+      margin: 25px;
+      background-color: rgb(0, 54, 152);
+      color: #444;
+
+      background: #4f85bb; /* Old browsers */
+      background: -moz-linear-gradient(top, #4f85bb 0%, #3b7aba 100%); /* FF3.6+ */
+      background: linear-gradient(to bottom, #4f85bb 0%, #3b7aba 100%); /* W3C */
+
+      font-size: 14px;
+    }
+
+    #container {
+      margin: auto;
+      max-width: 800px;
+      padding: 25px;
+      background-color: white;
+      border-color: #aaa;
+      border-radius: 10px;
+      box-shadow: inset 0 0 8px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    .title {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    .pagetitle {
+      margin-bottom: 30px;
+    }
+
+    .pagetitle .title {
+      font-size: 24px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .step {
+      margin-bottom: 30px;
+    }
+
+    .done button {
+      font-size: 20px;
+      padding-left: 10px;
+      padding-right: 10px;
+      margin-right: 20px;
+    }
+    .done a {
+      margin-right: 20px;
+      margin-left: 10px;
+    }
+
+    button.finish {
+      background-color: #7fbf4d;
+      background-image: -moz-linear-gradient(top, #7fbf4d, #63a62f);
+      background-image: linear-gradient(top, #7fbf4d, #63a62f);
+      border: 1px solid #63a62f;
+      border-bottom: 1px solid #5b992b;
+      border-radius: 3px;
+      box-shadow: inset 0 1px 0 0 #96ca6d;
+      color: #fff;
+      line-height: 1;
+      padding-top: 7px;
+      padding-bottom: 8px;
+      text-align: center;
+      text-shadow: 0 -1px 0 #4c9021;
+    }
+
+    button.finish:hover {
+      background-color: #76b347;
+      background-image: -moz-linear-gradient(top, #76b347, #5e9e2e);
+      background-image: linear-gradient(top, #76b347, #5e9e2e);
+      box-shadow: inset 0 1px 0 0 #8dbf67;
+      cursor: pointer;
+    }
+
+    button.finish:active {
+      border: 1px solid #5b992b;
+      border-bottom: 1px solid #538c27;
+      box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
+    }
+
+    #customize {
+      display: none;
+    }
+  </style>
+</head>
+<body onload="onload()">
+
+<div id="container">
+
+  <div id="usedefaults">
+    <div class="pagetitle">
+      <div class="title">Welcome to RequestPolicy</div>
+    </div>
+
+    <div class="step">
+      <div class="title"></div>
+      <p>RequestPolicy's default settings are best for non-advanced users.</p>
+    </div>
+
+    <div class="done">
+      <button class="finish">Teach me how to use RequestPolicy.</button>
+      <a href="">Return to browsing.</a>
+      <a href="">Configure RequestPolicy.</a>
+    </div>
+  </div>
+
+  <div id="customize">
+    <div class="pagetitle">
+      <div class="title">Configure Your RequestPolicy</div>
+    </div>
+
+    <div id="step1" class="step">
+      <table>
+        <tr>
+          <td>
+            <div class="title">Default Policy</div>
+            <input type="radio" name="defaultpolicy" value="allow"
+                   checked="checked">
+            Allow requests by default.
+            <br/>
+            <input type="radio" name="defaultpolicy" value="deny">
+            Deny requests by default. (For advanced users. Breaks many
+            websites.)
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div id="step2" class="step">
+      <table>
+        <tr>
+          <td>
+            <div class="title">Subscription Policies</div>
+            <label for="yessubs">
+              <input type="radio" id="yessubs" name="subscriptions"
+                     value="allow"
+                     checked="checked">
+              Yes, use subscription policies. (Recommended.)
+            </label>
+            <br/>
+            <label for="nosubs">
+              <input type="radio" id="nosubs" name="subscriptions" value="deny">
+              No, don't use subscriptions.
+            </label>
+          </td>
+        </tr>
+
+      </table>
+    </div>
+
+    <div id="done">
+      <button class="finish">I'm done. Teach me how to use RequestPolicy.
+      </button>
+      <a href="">I'm done. Return to browsing.</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -95,7 +95,9 @@
       box-shadow: inset 0 0 8px 4px #548c29, 0 1px 0 0 #eeeeee;
     }
 
-    #customize {
+    #welcome {
+    }
+    #configure {
       display: none;
     }
   </style>
@@ -104,26 +106,29 @@
 
 <div id="container">
 
-  <div id="usedefaults">
+  <div id="welcome">
     <div class="pagetitle">
       <div class="title">Welcome to RequestPolicy</div>
     </div>
 
     <div class="step">
       <div class="title"></div>
-      <p>RequestPolicy's default settings are best for non-advanced users.</p>
+      <p>For most users, RequestPolicy's default settings are ideal.
+
+      <p>However, if you want a lot of control (and many broken websites),
+      you can configure RequestPolicy to be very strict.</p>
     </div>
 
     <div class="done">
       <button class="finish">Teach me how to use RequestPolicy.</button>
       <a href="">Return to browsing.</a>
-      <a href="">Configure RequestPolicy.</a>
+      <a id="showconfigure" href="#">Configure RequestPolicy.</a>
     </div>
   </div>
 
-  <div id="customize">
+  <div id="configure">
     <div class="pagetitle">
-      <div class="title">Configure Your RequestPolicy</div>
+      <div class="title">Configure RequestPolicy</div>
     </div>
 
     <div id="step1" class="step">
@@ -165,7 +170,7 @@
       </table>
     </div>
 
-    <div id="done">
+    <div class="done">
       <button class="finish">I'm done. Teach me how to use RequestPolicy.
       </button>
       <a href="">I'm done. Return to browsing.</a>

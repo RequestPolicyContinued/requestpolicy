@@ -10,6 +10,19 @@ var rpServiceJSObject = rpService.wrappedJSObject;
 var observerService = Components.classes["@mozilla.org/observer-service;1"]
     .getService(Components.interfaces.nsIObserverService);
 
+var stringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"]
+    .getService(Components.interfaces.nsIStringBundleService);
+strbundle = stringBundleService.createBundle(
+    "chrome://requestpolicy/locale/requestpolicy.properties");
+
+function _(msg, args) {
+  if (args) {
+    args = Array.prototype.slice.call(arguments, 1);
+    return strbundle.formatStringFromName(msg, args, args.length);
+  } else {
+    return strbundle.GetStringFromName(msg);
+  }
+}
 
 common = {};
 
@@ -20,7 +33,7 @@ common = {};
  then calling this function will disable/enable the correct subscriptions.
  */
 // TODO: rename this function.
-common.switchSubscriptionPolicies = function() {
+common.switchSubscriptionPolicies = function () {
   var subscriptions = new UserSubscriptions();
 
   var newDefaultPolicy = rpServiceJSObject._defaultAllow ? 'allow' : 'deny';
@@ -55,7 +68,7 @@ common.switchSubscriptionPolicies = function() {
   }
 };
 
-common.getOldRulesAsNewRules = function(addHostWildcard) {
+common.getOldRulesAsNewRules = function (addHostWildcard) {
   var origins = common.getPrefObj('allowedOrigins');
   var destinations = common.getPrefObj('allowedDestinations');
   var originsToDestinations = common.getPrefObj('allowedOriginsToDestinations');
@@ -145,7 +158,7 @@ common.getOldRulesAsNewRules = function(addHostWildcard) {
   return rules;
 };
 
-common.getPrefObj = function(pref) {
+common.getPrefObj = function (pref) {
   try {
     var value = rpServiceJSObject.prefs
         .getComplexValue(pref, Components.interfaces.nsISupportsString).data;
@@ -155,7 +168,7 @@ common.getPrefObj = function(pref) {
   return common.prefStringToObj(value);
 };
 
-common.prefStringToObj = function(prefString) {
+common.prefStringToObj = function (prefString) {
   var prefObj = {};
   var prefArray = prefString.split(" ");
   if (prefArray[0] != "") {
@@ -166,7 +179,7 @@ common.prefStringToObj = function(prefString) {
   return prefObj;
 };
 
-common.clearPref = function(pref) {
+common.clearPref = function (pref) {
   try {
     if (rpServiceJSObject.prefs.prefHasUserValue(pref)) {
       rpServiceJSObject.prefs.clearUserPref(pref);
@@ -177,10 +190,23 @@ common.clearPref = function(pref) {
   rpServiceJSObject._prefService.savePrefFile(null);
 };
 
-common.addAllowRules = function(rules) {
+common.addAllowRules = function (rules) {
   for (var i in rules) {
     var ruleData = rules[i];
     rpServiceJSObject.addAllowRule(ruleData, true);
   }
   rpServiceJSObject.storeRules();
 };
+
+common.localize = function () {
+  var stringNames = ['preferences'];
+  stringNames.forEach(function(name) {
+    $('[data-string="' + name + '"]').each(function () {
+      $(this).text(_(name));
+    });
+  });
+};
+
+$(function() {
+  common.localize();
+});

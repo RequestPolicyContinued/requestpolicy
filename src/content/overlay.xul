@@ -38,7 +38,7 @@
   <menupopup id="menu_ToolsPopup">
     <menu label="RequestPolicy" accesskey="r">
       <menupopup>
-        <menuitem label="Manage Policy" accesskey="m"
+        <menuitem label="&managePolicies;" accesskey="m"
                   oncommand="requestpolicy.overlay.openPolicyManager();" />
         <menuitem label="&requestLog.title;" accesskey="l"
                   oncommand="requestpolicy.overlay.toggleRequestLog(event);" />
@@ -76,36 +76,26 @@
             <label id="rp-origin" class="rp-od-item"
                    onclick="requestpolicy.menu.itemSelected(event);"/>
             <vbox id="rp-other-origins">
-              <label id="rp-other-origins-title" value="Other origins" />
+              <label id="rp-other-origins-title" value="&otherOrigins;" />
               <vbox id="rp-other-origins-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-blocked-destinations">
-              <label id="rp-blocked-destinations-title" value="Blocked destinations" />
+              <label id="rp-blocked-destinations-title" value="&blockedDestinations;" />
               <vbox id="rp-blocked-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-mixed-destinations">
-              <label id="rp-mixed-destinations-title" value="Mixed destinations" />
+              <label id="rp-mixed-destinations-title" value="&mixedDestinations;" />
               <vbox id="rp-mixed-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-allowed-destinations">
-              <label id="rp-allowed-destinations-title" value="Allowed destinations" />
+              <label id="rp-allowed-destinations-title" value="&allowedDestinations;" />
               <vbox id="rp-allowed-destinations-list" class="rp-label-list" />
             </vbox>
           </vbox>
           <vbox id="rp-details">
             <vbox id="rp-rules-remove" />
-            <vbox id="rp-rules-add">
-              <hbox>
-                <label value="Allow requests from example.com to foo.net" class="rp-od-item" />
-                <label value="Allow temporarily" class="rp-od-item rp-temporary" />
-              </hbox>
-              <label value="Allow requests from * to foo.net" class="rp-od-item" />
-            </vbox>
-            <!--
-            <label id="rp-rule-options-more" value="+ more options" class="rp-od-item" />
-            -->
-            <vbox id="rp-request-info">
-            </vbox>
+            <vbox id="rp-rules-add" />
+            <vbox id="rp-request-info" />
           </vbox>
         </hbox>
 
@@ -116,22 +106,22 @@
         <hbox id="rp-footer">
           <hbox id="rp-footer-links">
             <label id="rp-link-enable-blocking" class="rp-footer-link"
-                   value="Enable blocking"
+                   value="&menu.enableBlocking;"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
             <label id="rp-link-disable-blocking" class="rp-footer-link"
-                   value="Disable blocking"
+                   value="&menu.disableBlocking;"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
             <label id="rp-link-help" class="rp-footer-link"
-                   value="Help"
+                   value="&help;"
                    onclick="requestpolicy.overlay.openHelp();"/>
             <label id="rp-link-prefs" class="rp-footer-link"
                    value="&preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
             <label id="rp-link-policies" class="rp-footer-link"
-                   value="Manage Policies"
+                   value="&managePolicies;"
                    onclick="requestpolicy.overlay.openPolicyManager();"/>
             <!--<label id="rp-link-about" class="rp-footer-link"-->
-                   <!--value="About"-->
+                   <!--value="&about;"-->
                    <!--onclick="requestpolicy.overlay.openAbout();"/>-->
             <label id="rp-link-request-log" class="rp-footer-link"
                    value="&requestLog.title;"

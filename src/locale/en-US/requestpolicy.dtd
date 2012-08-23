@@ -5,12 +5,18 @@
 <!ENTITY revokeTemporaryPermissions "Revoke all temporary permissions">
 <!ENTITY blockedDestinations "Blocked destinations">
 <!ENTITY allowedDestinations "Allowed destinations">
-<!ENTITY otherOrigins "Other origins within this page">
+<!ENTITY mixedDestinations "Mixed destinations">
+<!ENTITY otherOrigins "Other origins">
 <!ENTITY menu.openRequestLog.label "Show Request Log">
 <!ENTITY menu.closeRequestLog.label "Close Request Log">
+<!ENTITY menu.enableBlocking "Enable blocking">
+<!ENTITY menu.disableBlocking "Disable blocking">
 <!ENTITY rp.origin "Origin">
 <!ENTITY rp.destination "Destination">
 <!ENTITY rp.allow "Allow">
+<!ENTITY help "Help">
+<!ENTITY about "About">
+<!ENTITY managePolicies "Manage Policies">
 <!ENTITY preferences "Preferences">
 <!ENTITY preferences.windowTitle "RequestPolicy Preferences">
 <!ENTITY preferences.prefpane.general "General">

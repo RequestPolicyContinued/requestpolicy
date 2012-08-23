@@ -87,8 +87,8 @@ requestpolicy.menu = {
 
   prepareMenu : function() {
     try {
-      var oldRulesExist = this._rpServiceJSObject.oldRulesExist();
-      document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
+//      var oldRulesExist = this._rpServiceJSObject.oldRulesExist();
+//      document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
 
       var disabled = this._rpServiceJSObject._blockingDisabled;
       document.getElementById('rp-link-enable-blocking').hidden = !disabled;

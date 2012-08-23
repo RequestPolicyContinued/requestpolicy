@@ -109,10 +109,10 @@
           </vbox>
         </hbox>
 
-        <hbox id="rp-import-old-rules" hidden="true">
-            <label value="Import your old RequestPolicy rules"
-                   onclick="requestpolicy.overlay.openImportOldRules();"/>
-        </hbox>
+        <!--<hbox id="rp-import-old-rules" hidden="true">-->
+            <!--<label value="Import your old RequestPolicy rules"-->
+                   <!--onclick="requestpolicy.overlay.openImportOldRules();"/>-->
+        <!--</hbox>-->
         <hbox id="rp-footer">
           <hbox id="rp-footer-links">
             <label id="rp-link-enable-blocking" class="rp-footer-link"

@@ -121,19 +121,19 @@
             <label id="rp-link-disable-blocking" class="rp-footer-link"
                    value="Disable blocking"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
+            <label id="rp-link-help" class="rp-footer-link"
+                   value="Help"
+                   onclick="requestpolicy.overlay.openHelp();"/>
             <label id="rp-link-prefs" class="rp-footer-link"
                    value="&preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
             <label id="rp-link-policies" class="rp-footer-link"
                    value="Manage Policies"
                    onclick="requestpolicy.overlay.openPolicyManager();"/>
-            <label id="rp-link-help" class="rp-footer-link"
-                   value="Help"
-                   onclick="requestpolicy.overlay.openHelp();"/>
-            <label id="rp-link-about" class="rp-footer-link"
-                   value="About"
-                   onclick="requestpolicy.overlay.openAbout();"/>
-            <label id="rp-link-help" class="rp-footer-link"
+            <!--<label id="rp-link-about" class="rp-footer-link"-->
+                   <!--value="About"-->
+                   <!--onclick="requestpolicy.overlay.openAbout();"/>-->
+            <label id="rp-link-request-log" class="rp-footer-link"
                    value="&requestLog.title;"
                    onclick="requestpolicy.overlay.toggleRequestLog(event);"/>
           </hbox>

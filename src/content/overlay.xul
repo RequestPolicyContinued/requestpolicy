@@ -59,28 +59,6 @@
     <!-- oncontextmenu="event.preventDefault();" -->
     <!-- onclick="requestpolicy.overlay.openToolbarPopup(this)" -->
 
-  <!--
-  <menupopup id="contentAreaContextMenu">
-    <menu
-      id="requestpolicyContextMenu"
-      class="menu-iconic"
-      label="RequestPolicy" />
-  </menupopup>
-  -->
-
-  <!--
-  <statusbar id="status-bar">
-    <statusbarpanel
-      class="statusbarpanel-menu-iconic"
-      id="requestpolicyStatusbar"
-      tooltiptext="RequestPolicy"
-      oncontextmenu="event.preventDefault();"
-      onclick="requestpolicy.overlay.openStatusbarPopup(this);"
-      >
-    </statusbarpanel>
-  </statusbar>
-  -->
-
   <keyset>
     <key key="r" modifiers="accel alt"
          oncommand="requestpolicy.overlay.openMenuByHotkey()" />
@@ -162,99 +140,6 @@
         </hbox>
       </vbox>
     </menupopup>
-
-<!--
-    <menupopup
-      id="requestpolicyStatusbarPopup"
-      onpopupshowing="requestpolicy.overlay.onMenuShowing(event);"
-      onpopuphidden="requestpolicy.overlay.onMenuHidden(event);"
-      oncontextmenu="event.preventDefault();"
-      >
-      <menuitem
-        id="requestpolicyOpenPreferences"
-        label="&preferences;"
-        oncommand="requestpolicy.overlay.openOptionsDialog();" />
-      <menuitem
-        id="requestpolicyOpenRequestLog"
-        label="&menu.openRequestLog.label;"
-        oncommand="requestpolicy.overlay.toggleRequestLog();" />
-      <menuitem
-        id="requestpolicyCloseRequestLog"
-        hidden="true"
-        label="&menu.closeRequestLog.label;"
-        oncommand="requestpolicy.overlay.toggleRequestLog();" />
-      <menuseparator id="requestpolicy-preferencesSeparator"/>
-      <menuitem
-        id="requestpolicyExtensionConflictWarning"
-        hidden="true"
-        oncommand="requestpolicy.overlay.showExtensionConflictInfo();" />
-      <menuseparator id="requestpolicyExtensionConflictWarningSeparator" hidden="true" />
-      <menu
-        id="requestpolicyPrefetchWarning"
-        label="&prefetchWarning;">
-        <menupopup>
-          <menuitem
-            id="requestpolicyPrefetchInfo"
-            label="&prefetchInfo;"
-            oncommand="requestpolicy.overlay.showPrefetchInfo();"
-            />
-          <menuitem
-            id="requestpolicyPrefetchDisablingInstructions"
-            label="&prefetchDisablingInstructions;"
-            oncommand="requestpolicy.overlay.showPrefetchDisablingInstructions();"
-            />
-        </menupopup>
-      </menu>
-      <menuseparator id="requestpolicyPrefetchWarningSeparator" />
-      <menuitem
-        id="requestpolicyAllowAllTemporarily"
-        class="requestpolicyTemporary"
-        label="&temporarilyAllowAll;"
-        type="checkbox"
-        checked="false"
-        oncommand="requestpolicy.overlay.toggleTemporarilyAllowAll(event);" />
-      <menuseparator />
-      <menu
-        id="requestpolicyOtherOrigins"
-        label="&otherOrigins;"
-        class="menu-iconic"
-        >
-        <menupopup id="requestpolicyOtherOriginsPopup" />
-      </menu>
-      <menuseparator id="requestpolicyOtherOriginsSeparator" />
-      <menuitem
-        id="requestpolicyBlockedDestinations"
-        label="&blockedDestinations;"
-        class="requestpolicyBlockedHeading"
-        disabled="true"
-        />
-      <menuseparator id="requestpolicyAllowedDestinationsSeparator" />
-      <menuitem
-        id="requestpolicyAllowedDestinations"
-        label="&allowedDestinations;"
-        class="requestpolicyAllowedHeading"
-        disabled="true"
-        />
-      <menuseparator id="requestpolicyOriginSubmenusSeparator" />
-      <menuitem
-        id="requestpolicyRevokeTemporaryPermissions"
-        label="&revokeTemporaryPermissions;"
-        oncommand="requestpolicy.overlay.revokeTemporaryPermissions(event);" />
-      <menuseparator id="requestpolicyRevokeTemporaryPermissionsSeparator" />
-      <menuitem
-        id="requestpolicyAllowOrigin"
-        oncommand="requestpolicy.overlay.allowCurrentOrigin(event);" />
-      <menuitem
-        id="requestpolicyAllowOriginTemporarily"
-        class="requestpolicyTemporary"
-        oncommand="requestpolicy.overlay.temporarilyAllowCurrentOrigin(event);" />
-      <menuitem
-        id="requestpolicyForbidOrigin"
-        oncommand="requestpolicy.overlay.forbidCurrentOrigin(event);" />
-      <menuitem
-        id="requestpolicyUnrestrictedOrigin" />
-    </menupopup>
--->
 
   </popupset>
 

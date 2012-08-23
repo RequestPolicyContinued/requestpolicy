@@ -1558,34 +1558,11 @@ requestpolicy.overlay = {
     }
   },
 
-//  _attachPopupToContextMenu : function() {
-//    if (requestpolicy.overlay._isFennec) {
-//      return;
-//    }
-//    // Add the menupopup back to the contextmenu.
-//    if (!requestpolicy.overlay._rpContextMenu.firstChild) {
-//      requestpolicy.overlay._rpContextMenu.insertBefore(
-//          requestpolicy.overlay._menu, null);
-//    }
-//  },
-
-  //openStatusbarPopup : function(anchor) {
-  //  this._attachPopupToStatusbar();
-  //  this._menu.openPopup(anchor, 'before_start', 0, 0, true, true);
-  //},
-
   openToolbarPopup : function(anchor) {
 //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
 //        null);
     this._menu.openPopup(anchor, 'after_start', 0, 0, true, true);
   },
-
-  //_attachPopupToStatusbar : function() {
-  //  // Add the menupopup to the statusbar as it may be attached to the
-  //  // contextmenu.
-  //  requestpolicy.overlay._statusbar.insertBefore(requestpolicy.overlay._menu,
-  //      null);
-  //},
 
   openPrefs : function() {
     var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/basicprefs.html');

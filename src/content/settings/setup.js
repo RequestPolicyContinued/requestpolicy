@@ -77,15 +77,12 @@ function onload() {
     try {
       var ruleCount = rpServiceJSObject._policyMgr.getUserPolicyRuleCount();
     } catch(e) {
-      // It's possible (though probably unlikely) for this to happen if the
-      // user policy file isn't loaded yet. However, in that case the user
-      // probably has lots of rules so we don't plan to do an import, anyways.
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;
     }
     Logger.dump('Rule count: ' + ruleCount);
-    if (ruleCount == 0) {
-      Logger.dump('No new-style rules. Performing rule import.');
+    if (ruleCount <= 0) {
+      Logger.dump('Performing rule import.');
       var addHostWildcard = identLevel == 1;
       var rules = common.getOldRulesAsNewRules(addHostWildcard);
       common.addAllowRules(rules);

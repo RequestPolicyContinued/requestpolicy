@@ -334,7 +334,7 @@ requestpolicy.overlay = {
         this._addLocationObserver();
         this._addHistoryObserver();
       }
-      //this._showInitialSetupDialog();
+      this._showWelcomeWindow();
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -1555,17 +1555,14 @@ requestpolicy.overlay = {
         "chrome, close, centerscreen, alwaysRaised");
   },
 
-// If using this method again, be sure to name the pref something different so
-// that users of version 0.x see the new window.
-//  _showInitialSetupDialog : function() {
-//    if (!this._rpService.prefs.getBoolPref("initialSetupDialogShown")) {
-//      this._rpService.prefs.setBoolPref("initialSetupDialogShown", true);
-//      this._rpServiceJSObject._prefService.savePrefFile(null);
-//      window.openDialog("chrome://requestpolicy/content/initialSetup.xul",
-//          "requestpolicyInitialSetupDialogWindow",
-//          "chrome, close, centerscreen, alwaysRaised");
-//    }
-//  },
+  _showWelcomeWindow : function() {
+    if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {
+      this._rpService.prefs.setBoolPref("welcomeWindowShown", true);
+      this._rpServiceJSObject._prefService.savePrefFile(null);
+      var tab = gBrowser.addTab("chrome://requestpolicy/content/settings/setup.html");
+      gBrowser.selectedTab = tab;
+    }
+  },
 
 //  _attachPopupToContextMenu : function() {
 //    if (requestpolicy.overlay._isFennec) {

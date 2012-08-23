@@ -2,8 +2,9 @@
 <html>
 <head>
   <title>RequestPolicy - Setup</title>
-  <script src="setup.js"></script>
   <script src="../jquery.min.js"></script>
+  <script src="common.js"></script>
+  <script src="setup.js"></script>
   <!--<link href="setup.css" rel="stylesheet" type="text/css"/>-->
   <style>
     html {
@@ -199,14 +200,15 @@
               These rules are updated automatically and aim to minimize
               website breakage while blocking requests that impact your privacy.
             </div>
-            <label for="yessubs">
-              <input type="radio" id="yessubs" name="subscriptions"
-                     value="allow" checked="checked">
+            <label for="enablesubs">
+              <input type="radio" id="enablesubs" name="subscriptions"
+                     value="yes" checked="checked">
               Yes, use subscription policies. (Recommended.)
             </label>
             <br/>
-            <label for="nosubs">
-              <input type="radio" id="nosubs" name="subscriptions" value="deny">
+            <label for="disablesubs">
+              <input type="radio" id="disablesubs" name="subscriptions"
+                     value="yes">
               No, don't use subscriptions.
             </label>
           </td>

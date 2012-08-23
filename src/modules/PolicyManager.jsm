@@ -95,6 +95,11 @@ PolicyManager.prototype = {
   
   //_policies : null,
 
+  getUserPolicyRuleCount : function() {
+    return this._userPolicies["user"]["rawPolicy"].getAllowRuleCount() +
+        this._userPolicies["user"]["rawPolicy"].getDenyRuleCount();
+  },
+
   loadUserPolicies : function() {
     // Read the user policy from a file.
     try {
@@ -221,7 +226,12 @@ PolicyManager.prototype = {
           
     //this._userPolicies["user"].policy.print();
   },
-  
+
+  storeRules : function() {
+    requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
+        this._userPolicies["user"].rawPolicy, "user.json");
+  },
+
   addTemporaryRule : function(ruleType, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));

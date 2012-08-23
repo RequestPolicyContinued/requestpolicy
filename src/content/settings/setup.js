@@ -57,21 +57,57 @@ function handleSubscriptionsChange() {
 
 function onload() {
   // Populate the form values based on the user's current settings.
-  // TODO: if this setup window is being shown due to an upgrade from 0.x, then
-  // populate the form based off of the relevant 0.x settings.
-  var defaultAllow = rpService.prefs.getBoolPref('defaultPolicy.allow');
-  $('#defaultallow').prop('checked', defaultAllow);
-  $('#defaultdeny').prop('checked', !defaultAllow);
-  if (!defaultAllow) {
+  // If the use has just upgrade from an 0.x version, populate based on the old
+  // preferences and also do a rule import based on the old strictness settings.
+  // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
+  // before this setup window was added.
+  if (Util.compareVersions(Util.lastVersion, '1.0.0a8') <= 0) {
+    if (rpService.prefs.prefHasUserValue('uriIdentificationLevel')) {
+      var identLevel = rpService.prefs.getIntPref('uriIdentificationLevel');
+    } else {
+      var identLevel = 1;
+    }
+    $('#defaultdeny').prop('checked', true);
     $('#allowsamedomainblock').css('display', 'block');
+    $('#allowsamedomain').prop('checked', identLevel == 1);
+
+    // If the user doesn't have any new-style rules, automatically do an import
+    // of the old rules. We check for new-style rules just in case the user has
+    // opened the setup window again after initial upgrade.
+    try {
+      var ruleCount = rpServiceJSObject._policyMgr.getUserPolicyRuleCount();
+    } catch(e) {
+      // It's possible (though probably unlikely) for this to happen if the
+      // user policy file isn't loaded yet. However, in that case the user
+      // probably has lots of rules so we don't plan to do an import, anyways.
+      Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
+      ruleCount = -1;
+    }
+    Logger.dump('Rule count: ' + ruleCount);
+    if (ruleCount == 0) {
+      Logger.dump('No new-style rules. Performing rule import.');
+      var addHostWildcard = identLevel == 1;
+      var rules = common.getOldRulesAsNewRules(addHostWildcard);
+      common.addAllowRules(rules);
+    }
+
+    // Skip the welcome screen.
+    showConfigure();
+  } else {
+    var defaultAllow = rpService.prefs.getBoolPref('defaultPolicy.allow');
+    $('#defaultallow').prop('checked', defaultAllow);
+    $('#defaultdeny').prop('checked', !defaultAllow);
+    if (!defaultAllow) {
+      $('#allowsamedomainblock').css('display', 'block');
+    }
+    $('#allowsamedomain').prop('checked',
+        rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
+    // Subscriptions are only simple here if we assume the user won't open the
+    // setup window again after changing their individual subscriptions through
+    // the preferences. So, let's assume that as the worst case is that the setup
+    // page shows such a setup-page-revisiting user the subscriptions as being
+    // enabled when they really aren't.
   }
-  $('#allowsamedomain').prop('checked',
-      rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
-  // Subscriptions are only simple here if we assume the user won't open the
-  // setup window again after changing their individual subscriptions through
-  // the preferences. So, let's assume that as the worst case is that the setup
-  // page shows such a setup-page-revisiting user the subscriptions as being
-  // enabled when they really aren't.
 
   $('#showconfigure').click(showConfigure);
   $('input[name=defaultpolicy]').change(handleDefaultPolicyChange);

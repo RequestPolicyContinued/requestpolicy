@@ -1132,8 +1132,12 @@ RequestPolicyService.prototype = {
     this._prefService.savePrefFile(null);
   },
 
-  addAllowRule : function(rawRule) {
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule);
+  storeRules : function() {
+    this._policyMgr.storeRules();
+  },
+
+  addAllowRule : function(rawRule, noStore) {
+    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule, noStore);
   },
 
   addTemporaryAllowRule : function(rawRule) {

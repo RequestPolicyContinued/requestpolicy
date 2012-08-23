@@ -1,5 +1,7 @@
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 Components.utils.import("resource://requestpolicy/Subscription.jsm");
+Components.utils.import("resource://requestpolicy/Util.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
     .getService(Components.interfaces.nsIRequestPolicy);
@@ -9,6 +11,8 @@ var observerService = Components.classes["@mozilla.org/observer-service;1"]
     .getService(Components.interfaces.nsIObserverService);
 
 
+common = {};
+
 /*
  Based on the user's current default policy (allow or deny), swaps out which
  subscriptions are enabled. That is, each subscription are either intended to be
@@ -16,7 +20,7 @@ var observerService = Components.classes["@mozilla.org/observer-service;1"]
  then calling this function will disable/enable the correct subscriptions.
  */
 // TODO: rename this function.
-function switchSubscriptionPolicies() {
+common.switchSubscriptionPolicies = function() {
   var subscriptions = new UserSubscriptions();
 
   var newDefaultPolicy = rpServiceJSObject._defaultAllow ? 'allow' : 'deny';
@@ -49,4 +53,134 @@ function switchSubscriptionPolicies() {
           JSON.stringify(subInfo));
     }
   }
-}
+};
+
+common.getOldRulesAsNewRules = function(addHostWildcard) {
+  var origins = common.getPrefObj('allowedOrigins');
+  var destinations = common.getPrefObj('allowedDestinations');
+  var originsToDestinations = common.getPrefObj('allowedOriginsToDestinations');
+  var rules = [];
+
+  function isHostname(host) {
+    return !DomainUtil.isValidUri(host) && !DomainUtil.isAddress(host);
+  }
+
+  for (var origin in origins) {
+    var entry = {};
+    entry['o'] = {};
+    if (DomainUtil.isValidUri(origin)) {
+      var uriObj = DomainUtil.getUriObject(origin);
+      entry['o']['h'] = uriObj.host;
+      entry['o']['s'] = uriObj.scheme;
+      if (uriObj.port != -1) {
+        entry['o']['port'] = uriObj.port;
+      }
+    } else {
+      entry['o']['h'] = origin.split('/')[0];
+    }
+    if (entry['o']['h'] && addHostWildcard && isHostname(entry['o']['h'])) {
+      entry['o']['h'] = '*.' + entry['o']['h']
+    }
+    rules.push(entry);
+  }
+
+  for (var dest in destinations) {
+    entry = {};
+    entry['d'] = {};
+    if (DomainUtil.isValidUri(dest)) {
+      var uriObj = DomainUtil.getUriObject(dest);
+      entry['d']['h'] = uriObj.host;
+      entry['d']['s'] = uriObj.scheme;
+      if (uriObj.port != -1) {
+        entry['d']['port'] = uriObj.port;
+      }
+    } else {
+      entry['d']['h'] = dest.split('/')[0];
+    }
+    if (entry['d']['h'] && addHostWildcard && isHostname(entry['d']['h'])) {
+      entry['d']['h'] = '*.' + entry['d']['h']
+    }
+    rules.push(entry);
+  }
+
+  for (var originToDest in originsToDestinations) {
+    var parts = originToDest.split('|');
+    var origin = parts[0];
+    var dest = parts[1];
+    entry = {};
+    entry['o'] = {};
+    entry['d'] = {};
+
+    if (DomainUtil.isValidUri(origin)) {
+      var uriObj = DomainUtil.getUriObject(origin);
+      entry['o']['h'] = uriObj.host;
+      entry['o']['s'] = uriObj.scheme;
+      if (uriObj.port != -1) {
+        entry['o']['port'] = uriObj.port;
+      }
+    } else {
+      entry['o']['h'] = origin.split('/')[0];
+    }
+    if (entry['o']['h'] && addHostWildcard && isHostname(entry['o']['h'])) {
+      entry['o']['h'] = '*.' + entry['o']['h']
+    }
+
+    if (DomainUtil.isValidUri(dest)) {
+      var uriObj = DomainUtil.getUriObject(dest);
+      entry['d']['h'] = uriObj.host;
+      entry['d']['s'] = uriObj.scheme;
+      if (uriObj.port != -1) {
+        entry['d']['port'] = uriObj.port;
+      }
+    } else {
+      entry['d']['h'] = dest.split('/')[0];
+    }
+    if (entry['d']['h'] && addHostWildcard && isHostname(entry['d']['h'])) {
+      entry['d']['h'] = '*.' + entry['d']['h']
+    }
+
+    rules.push(entry);
+  }
+
+  return rules;
+};
+
+common.getPrefObj = function(pref) {
+  try {
+    var value = rpServiceJSObject.prefs
+        .getComplexValue(pref, Components.interfaces.nsISupportsString).data;
+  } catch (e) {
+    value = '';
+  }
+  return common.prefStringToObj(value);
+};
+
+common.prefStringToObj = function(prefString) {
+  var prefObj = {};
+  var prefArray = prefString.split(" ");
+  if (prefArray[0] != "") {
+    for (var i in prefArray) {
+      prefObj[prefArray[i]] = true;
+    }
+  }
+  return prefObj;
+};
+
+common.clearPref = function(pref) {
+  try {
+    if (rpServiceJSObject.prefs.prefHasUserValue(pref)) {
+      rpServiceJSObject.prefs.clearUserPref(pref);
+    }
+  } catch (e) {
+    Logger.dump('Clearing pref failed: ' + e.toString());
+  }
+  rpServiceJSObject._prefService.savePrefFile(null);
+};
+
+common.addAllowRules = function(rules) {
+  for (var i in rules) {
+    var ruleData = rules[i];
+    rpServiceJSObject.addAllowRule(ruleData, true);
+  }
+  rpServiceJSObject.storeRules();
+};

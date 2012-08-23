@@ -1549,12 +1549,6 @@ requestpolicy.overlay = {
     this._openInNewTab(this._prefetchDisablingInstructionsUri);
   },
 
-  openOptionsDialog : function() {
-    window.openDialog("chrome://requestpolicy/content/prefWindow.xul",
-        "requestpolicyPreferencesDialogWindow",
-        "chrome, close, centerscreen, alwaysRaised");
-  },
-
   _showWelcomeWindow : function() {
     if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {
       this._rpService.prefs.setBoolPref("welcomeWindowShown", true);

@@ -4,6 +4,14 @@ PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'type',
 
 $(function () {
   common.localize(PAGE_STRINGS);
+  // l10n for input placeholders.
+  $('#rulesearch').prop('placeholder', _('search'));
+  $('[name=originscheme]').prop('placeholder', _('scheme'));
+  $('[name=destscheme]').prop('placeholder', _('scheme'));
+  $('[name=originhost]').prop('placeholder', _('host'));
+  $('[name=desthost]').prop('placeholder', _('host'));
+  $('[name=originport]').prop('placeholder', _('port'));
+  $('[name=destport]').prop('placeholder', _('port'));
 });
 
 const SEARCH_DELAY = 500;

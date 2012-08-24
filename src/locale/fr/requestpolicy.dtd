@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Attention : la préextraction est activée">
-<!ENTITY prefetchInfo "En savoir plus à propos de la préextraction">
-<!ENTITY prefetchDisablingInstructions "Désactiver la préextraction">
-<!ENTITY temporarilyAllowAll "Accepter temporairement toutes les requêtes">
-<!ENTITY revokeTemporaryPermissions "Révoquer tous les droits d'accès temporaires">
-<!ENTITY blockedDestinations "Cibles bloquées">
-<!ENTITY allowedDestinations "Cibles autorisées">
-<!ENTITY otherOrigins "Autres origines dans cette page">
-<!ENTITY menu.openRequestLog.label "Voir le journal des requêtes">
-<!ENTITY menu.closeRequestLog.label "Fermer le journal des requêtes">
-<!ENTITY rp.origin "Origine">
-<!ENTITY rp.destination "Destination">
-<!ENTITY rp.allow "Accepter">
-<!ENTITY preferences "Préférences">
-<!ENTITY preferences.windowTitle "Préférences des règles de requêtes">
-<!ENTITY preferences.prefpane.general "Général">
-<!ENTITY preferences.prefpane.appearance "Apparence">
-<!ENTITY preferences.prefpane.whitelist "Liste blanche">
-<!ENTITY preferences.prefpane.import "Importer">
-<!ENTITY preferences.prefpane.export "Exporter">
-<!ENTITY preferences.prefpane.advanced "Avancé">
-<!ENTITY preferences.strictness "Rigueur">
-<!ENTITY preferences.strictness.description "Niveau de classification à utiliser pour autoriser les requêtes depuis un même site. Après avoir modifié cela, le menu apparaîtra vide à l'ouverture de chaque nouvel onglet.">
-<!ENTITY preferences.baseDomain "Domaine basique (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Domaine complet (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Adresse complète (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Pages Web">
-<!ENTITY preferences.statusbarIcon "Icône de la barre d'état">
-<!ENTITY preferences.statusbarIcon.none "Aucun">
-<!ENTITY preferences.contextMenu "Menu contextuel">
-<!ENTITY preferences.indicateBlockedObjects "Indiquer les images bloquées">
-<!ENTITY preferences.autoReload "Actualiser la page en cours lorsque liste blanche est modifiée">
-<!ENTITY preferences.openInitialSetup "Ouvrir l'outil de réglage initial">
-<!ENTITY preferences.misc "Divers">
-<!ENTITY preferences.startWithAllowAllEnabled "Activer « Accepter temporairement toutes les requêtes » quand le navigateur démarre">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Autoriser la mise permanente en liste blanche en utilisant">
-<!ENTITY preferences.origins "Origines">
-<!ENTITY preferences.destinations "Destinations">
-<!ENTITY preferences.originsToDestinations "Origines-vers-destinations">
-<!ENTITY preferences.temporary "Temporaire">
-<!ENTITY preferences.removeSelectedSites "Retirer les sites sélectionnés">
-<!ENTITY preferences.export.caption "Exporter vos préférences">
-<!ENTITY preferences.export.description "Vous pouvez exporter votre liste blanche vers un fichier, et ainsi avoir une sauvegarde. Pour qu'un autre ordinateur dispose de la même configuration, déplacez-y ce fichier et utilisez l'option d'importation.">
-<!ENTITY preferences.export.details.caption "Ce qui est inclus dans l'exportation">
-<!ENTITY preferences.export.details.description "Le fichier exporté contiendra les origines, les destinations, et les « origines-vers-destinations » que vous avez autorisées. Il ne contiendra aucune autre chose que vous avez autorisée temporairement.">
-<!ENTITY preferences.export.button.label "Exporter vers le fichier">
-<!ENTITY preferences.import.caption "Importer vos paramètres">
-<!ENTITY preferences.import.description "Vous pouvez importer votre liste blanche depuis un fichier de sauvegarde ayant été fait depuis l'outil d'exportation.">
-<!ENTITY preferences.import.details.caption "Ce que l'importation va faire">
-<!ENTITY preferences.import.details.description "L'importation ajoutera les origines, les destinations, et les « origines-vers-destinations » contenues dans le fichier importé. Dans votre liste blanche actuelle aucun élément ne sera enlevé : en quelque sorte, cela ne fait qu'ajouter des sites à la liste, et non remplacer complètement la liste actuelle.">
-<!ENTITY preferences.import.button.label "Importer depuis un fichier">
-<!ENTITY preferences.prefetch.link "Préchargement des liens">
-<!ENTITY preferences.prefetch.dns "Préchargement DNS">
-<!ENTITY preferences.enabled "Activé">
-<!ENTITY preferences.disableOnStartup "Désactiver au démarrage">
-<!ENTITY preferences.restoreDefaultOnUninstall "Rétablir les paramètres par défaut lorsque RequestPolicy est désinstallé">
-<!ENTITY requestLog.title "Journal des requêtes">
-<!ENTITY requestLog.blocked "Bloqué">
-<!ENTITY requestLog.time "Durée">
-<!ENTITY requestLog.copyOriginToClipboard "Copier l'original dans le presse-papiers">
-<!ENTITY requestLog.copyDestinationToClipboard "Copier la destination dans le presse-papiers">
-<!ENTITY requestLog.openOriginInNewTab "Ouvrir l'original dans un nouvel onglet">
-<!ENTITY requestLog.openDestinationInNewTab "Ouvrir la destination dans un nouvel onglet">
-<!ENTITY requestLog.clear "Effacer">
-<!ENTITY initialSetup.title "Installation initiale">
-<!ENTITY initialSetup.whitelist.caption "Ajouter des sites à votre liste blanche de sites croisés">
-<!ENTITY initialSetup.whitelist.description "Les sites dans ces listes ont été choisis (1) soit parce qu'ils impliquent des requêtes entre des listes appartenant à la même entreprise, (2) soit parce qu'ils réduisent les problèmes que vous pourriez rencontrer et n'ont qu'un faible impact sur la sécurité et les données personnelles.">
-<!ENTITY initialSetup.region.international "International">
-<!ENTITY initialSetup.region.americas "Amérique">
-<!ENTITY initialSetup.region.asia "Asie">
-<!ENTITY initialSetup.region.usAndCanada "États-Unis et Canada">
-<!ENTITY initialSetup.region.europeAndRussia "Europe et Russie">
-<!ENTITY initialSetup.region.oceania "Océanie">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Révoquer tous les droits d'accès temporaires">
+<!ENTITY rp.menu.blockedDestinations "Cibles bloquées">
+<!ENTITY rp.menu.allowedDestinations "Cibles autorisées">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Autres origines dans cette page">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Préférences">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Journal des requêtes">
+<!ENTITY rp.requestLog.blocked "Bloqué">
+<!ENTITY rp.requestLog.time "Durée">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Copier l'original dans le presse-papiers">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Copier la destination dans le presse-papiers">
+<!ENTITY rp.requestLog.openOriginInNewTab "Ouvrir l'original dans un nouvel onglet">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Ouvrir la destination dans un nouvel onglet">
+<!ENTITY rp.requestLog.clear "Effacer">

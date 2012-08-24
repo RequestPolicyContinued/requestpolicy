@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Averto: estas ŝaltita antaŭakirado (&quot;prefetching&quot;).">
-<!ENTITY prefetchInfo "Legi pri antaŭakirado (angle)">
-<!ENTITY prefetchDisablingInstructions "Kiel malŝalti antaŭakiradon (angle)">
-<!ENTITY temporarilyAllowAll "Provizore permesi ĉiujn petojn">
-<!ENTITY revokeTemporaryPermissions "Malvalidigi ĉiujn provizorajn permesojn.">
-<!ENTITY blockedDestinations "Malpermesitaj celoj">
-<!ENTITY allowedDestinations "Permesitaj celoj">
-<!ENTITY otherOrigins "Aliaj petfontoj en tiu ĉi paĝo">
-<!ENTITY menu.openRequestLog.label "Vidigi protokolilon de petoj">
-<!ENTITY menu.closeRequestLog.label "Kaŝi protokolilon de petoj">
-<!ENTITY rp.origin "Fonto">
-<!ENTITY rp.destination "Celo">
-<!ENTITY rp.allow "Permesi">
-<!ENTITY preferences "Preferoj">
-<!ENTITY preferences.windowTitle "Agordoj de RequestPolicy">
-<!ENTITY preferences.prefpane.general "Ĉefaj">
-<!ENTITY preferences.prefpane.appearance "Aspekto">
-<!ENTITY preferences.prefpane.whitelist "Permesaroj">
-<!ENTITY preferences.prefpane.import "Importi">
-<!ENTITY preferences.prefpane.export "Eksporti">
-<!ENTITY preferences.prefpane.advanced "Spertulaj">
-<!ENTITY preferences.strictness "Distingemo">
-<!ENTITY preferences.strictness.description "La distingonivelo por difini samretejajn petojn por ilin permesi senkondiĉe. Post kiam vi tion ŝanĝos, la menuoj ĉe la nune malfermitaj folioj malplenos ĝis (re)ŝargo.">
-<!ENTITY preferences.baseDomain "Baza domajno (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Tuta domajno (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Tuta adreso (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Retpaĝoj">
-<!ENTITY preferences.statusbarIcon "Aspekto en la stata strio">
-<!ENTITY preferences.statusbarIcon.none "Nenia">
-<!ENTITY preferences.contextMenu "Kunteksta menuo">
-<!ENTITY preferences.indicateBlockedObjects "Indiki blokitajn bildojn">
-<!ENTITY preferences.autoReload "Reŝargi la montratan paĝon ĉe ŝanĝo de permesoj.">
-<!ENTITY preferences.openInitialSetup "Malfermi la aldonilon de antaŭkunmetitaj permesaroj">
-<!ENTITY preferences.misc "Diversaĵoj">
-<!ENTITY preferences.startWithAllowAllEnabled "Aktivigi &quot;Provizore permesi ĉiujn petojn&quot; ĉe starto de la retumilo">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Ebligi neprovizoran permesadon dum Privata retesplorado">
-<!ENTITY preferences.origins "Fontoj">
-<!ENTITY preferences.destinations "Celoj">
-<!ENTITY preferences.originsToDestinations "Fontoj + celoj">
-<!ENTITY preferences.temporary "Provizora">
-<!ENTITY preferences.removeSelectedSites "Forigi la elektitajn permesojn">
-<!ENTITY preferences.export.caption "Eksporto de agordoj">
-<!ENTITY preferences.export.description "Vi povas eligi vian permesaron en dosieron por havi sekurkopion. Por igi alian komputilon uzi la saman permesaron, simple transportu la dosieron al tiu komputilo kaj uzu la importilon.">
-<!ENTITY preferences.export.details.caption "Kion inkluzivas eksportaĵo">
-<!ENTITY preferences.export.details.description "La eksporta dosiero enhavos la konservitajn fontajn, celajn kaj font-al-celajn permesojn. Ĝi ne enhavos la provizorajn permesojn.">
-<!ENTITY preferences.export.button.label "Eksporti al dosiero">
-<!ENTITY preferences.import.caption "Importo de agordoj">
-<!ENTITY preferences.import.description "Vi povas importi vian permesaron el dosiero farita de vi per la eksportilo.">
-<!ENTITY preferences.import.details.caption "Kion faros la importo">
-<!ENTITY preferences.import.details.description "La importo aldonos ĉiujn fontojn, celojn, kaj ties parojn, listigitajn en la dosiero, el kiu vi importas. El via nuna permesaro estos forigita nenio. Tio estas, importo nur aldonos retejojn al via permesaro, ĝi ne anstataŭigos tute la permesaron.">
-<!ENTITY preferences.import.button.label "Importi el dosiero">
-<!ENTITY preferences.prefetch.link "Laŭligila antaŭakirado">
-<!ENTITY preferences.prefetch.dns "DNSa antaŭakirado">
-<!ENTITY preferences.enabled "Ŝaltita">
-<!ENTITY preferences.disableOnStartup "Malŝalti ĉe starto de la programo">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restarigi la defaŭltan agordon ĉe malinstalo de RequestPolicy">
-<!ENTITY requestLog.title "Protokolo de petoj">
-<!ENTITY requestLog.blocked "Blokita">
-<!ENTITY requestLog.time "Tempo">
-<!ENTITY requestLog.copyOriginToClipboard "Kopii la fontadreson en la tondujon">
-<!ENTITY requestLog.copyDestinationToClipboard "Kopii la celadreson en la tondujon">
-<!ENTITY requestLog.openOriginInNewTab "Malfermi la fonton en nova folio">
-<!ENTITY requestLog.openDestinationInNewTab "Malfermi la celon en nova folio">
-<!ENTITY requestLog.clear "Forviŝi">
-<!ENTITY initialSetup.title "Postinstala agordo">
-<!ENTITY initialSetup.whitelist.caption "Aldoni retejojn al via inter-reteja permesaro">
-<!ENTITY initialSetup.whitelist.description "La retejparoj en ĉi tiuj listoj estas elektitaj aŭ ĉar (1) temas pri petoj inter retejoj apartenantaj al la sama societo, aŭ ĉar (2) tio malpliigas eventualajn problemojn sen rimarkinda malbonefiko al privateco kaj sekureco.">
-<!ENTITY initialSetup.region.international "Internacia">
-<!ENTITY initialSetup.region.americas "Amerikoj">
-<!ENTITY initialSetup.region.asia "Azio">
-<!ENTITY initialSetup.region.usAndCanada "Usono kaj Kanado">
-<!ENTITY initialSetup.region.europeAndRussia "Eŭropo kaj Ruslando">
-<!ENTITY initialSetup.region.oceania "Oceanio">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Malvalidigi ĉiujn provizorajn permesojn.">
+<!ENTITY rp.menu.blockedDestinations "Malpermesitaj celoj">
+<!ENTITY rp.menu.allowedDestinations "Permesitaj celoj">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Aliaj petfontoj en tiu ĉi paĝo">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Preferoj">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Protokolo de petoj">
+<!ENTITY rp.requestLog.blocked "Blokita">
+<!ENTITY rp.requestLog.time "Tempo">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Kopii la fontadreson en la tondujon">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Kopii la celadreson en la tondujon">
+<!ENTITY rp.requestLog.openOriginInNewTab "Malfermi la fonton en nova folio">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Malfermi la celon en nova folio">
+<!ENTITY rp.requestLog.clear "Forviŝi">

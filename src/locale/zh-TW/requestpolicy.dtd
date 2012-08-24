@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "警告: 已啟用 Prefetch 技術">
-<!ENTITY prefetchInfo "了解 prefetching 技術">
-<!ENTITY prefetchDisablingInstructions "停用 prefetching 技術">
-<!ENTITY temporarilyAllowAll "暫時允許所有請求">
-<!ENTITY revokeTemporaryPermissions "撤銷所有暫時性的允許">
-<!ENTITY blockedDestinations "已阻擋的目標">
-<!ENTITY allowedDestinations "已允許的目標">
-<!ENTITY otherOrigins "其他在本頁的來源">
-<!ENTITY menu.openRequestLog.label "顯示請求記錄">
-<!ENTITY menu.closeRequestLog.label "關閉請求記錄">
-<!ENTITY rp.origin "來源">
-<!ENTITY rp.destination "目標">
-<!ENTITY rp.allow "允許">
-<!ENTITY preferences "偏好設定">
-<!ENTITY preferences.windowTitle "RequestPolicy 偏好設定">
-<!ENTITY preferences.prefpane.general "一般">
-<!ENTITY preferences.prefpane.appearance "Appearance">
-<!ENTITY preferences.prefpane.whitelist "白名單">
-<!ENTITY preferences.prefpane.import "匯入">
-<!ENTITY preferences.prefpane.export "匯出">
-<!ENTITY preferences.prefpane.advanced "進階">
-<!ENTITY preferences.strictness "精確度">
-<!ENTITY preferences.strictness.description "在您允許同一個來源的請求時，請在以下選擇要使用哪一層級的域名作為判斷標準。 修改設定後，每個目前分頁的 RequestPolicy 清單都會被清空。">
-<!ENTITY preferences.baseDomain "根域名(requestpolicy.com)">
-<!ENTITY preferences.fullDomain "完整的域名(www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "完整的網址(http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "網頁">
-<!ENTITY preferences.statusbarIcon "狀態列圖示">
-<!ENTITY preferences.statusbarIcon.none "None">
-<!ENTITY preferences.contextMenu "Contextual menu">
-<!ENTITY preferences.indicateBlockedObjects "IndicateBlockedObject">
-<!ENTITY preferences.autoReload "更改白名單後重新載入目前頁面">
-<!ENTITY preferences.openInitialSetup "開啟初始設定工具">
-<!ENTITY preferences.misc "雜項">
-<!ENTITY preferences.startWithAllowAllEnabled "在瀏覽器啟動時啟用 '暫時允許所有的請求' 之項目 ">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "私密瀏覽時允許永久性的白名單">
-<!ENTITY preferences.origins "來源">
-<!ENTITY preferences.destinations "目標">
-<!ENTITY preferences.originsToDestinations "來源到目標">
-<!ENTITY preferences.temporary "Temporary">
-<!ENTITY preferences.removeSelectedSites "移除選擇的網站">
-<!ENTITY preferences.export.caption "匯出您的設定">
-<!ENTITY preferences.export.description "您可以匯出白名單，儲存為檔案。如果您要在另一台電腦套用同樣的白名單，只要匯入該檔案即可。">
-<!ENTITY preferences.export.details.caption "匯出的檔案內容為何?">
-<!ENTITY preferences.export.details.description "匯出的檔案只會包含您允許的來源、目標與來源到目標的網站清單，排除任何您暫時允許的網站清單">
-<!ENTITY preferences.export.button.label "匯出到檔案">
-<!ENTITY preferences.import.caption "匯入您的設定">
-<!ENTITY preferences.import.description "您可以匯入任何以匯出工具製作的檔案。">
-<!ENTITY preferences.import.details.caption "匯入工具的作用為何?">
-<!ENTITY preferences.import.details.description "此匯入工具能夠讓您由檔案匯入來源、目標、與來源到目標的白名單。匯入動作只會加入新增的網站，不會取代您現有的白名單">
-<!ENTITY preferences.import.button.label "由檔案匯入">
-<!ENTITY preferences.prefetch.link "Link Prefetching">
-<!ENTITY preferences.prefetch.dns "DNS Prefetching">
-<!ENTITY preferences.enabled "Enabled">
-<!ENTITY preferences.disableOnStartup "Disable on startup">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restore default when RequestPolicy is uninstalled">
-<!ENTITY requestLog.title "請求記錄">
-<!ENTITY requestLog.blocked "已阻擋">
-<!ENTITY requestLog.time "發生時間">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
-<!ENTITY initialSetup.title "初始設定">
-<!ENTITY initialSetup.whitelist.caption "新增網站到您的跨網站白名單">
-<!ENTITY initialSetup.whitelist.description "您勾選的區域已經預設某些網站，因為這些為同一家公司擁有的網站之間的請求，或是能夠減少使用者的不便，而且對隱私與安全性的影響很小。">
-<!ENTITY initialSetup.region.international "國際">
-<!ENTITY initialSetup.region.americas "美洲">
-<!ENTITY initialSetup.region.asia "亞洲">
-<!ENTITY initialSetup.region.usAndCanada "美國與加拿大">
-<!ENTITY initialSetup.region.europeAndRussia "歐洲與俄羅斯">
-<!ENTITY initialSetup.region.oceania "大洋洲">
+<!ENTITY rp.menu.revokeTemporaryPermissions "撤銷所有暫時性的允許">
+<!ENTITY rp.menu.blockedDestinations "已阻擋的目標">
+<!ENTITY rp.menu.allowedDestinations "已允許的目標">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "其他在本頁的來源">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "偏好設定">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "請求記錄">
+<!ENTITY rp.requestLog.blocked "已阻擋">
+<!ENTITY rp.requestLog.time "發生時間">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY rp.requestLog.clear "Clear">

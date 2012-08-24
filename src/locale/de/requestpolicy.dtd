@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Warnung: Vorabruf von Links ist aktiv">
-<!ENTITY prefetchInfo "Mehr über Vorabruf von Links erfahren">
-<!ENTITY prefetchDisablingInstructions "Vorabruf von Links deaktivieren">
-<!ENTITY temporarilyAllowAll "Alle Anfragen temporär erlauben">
-<!ENTITY revokeTemporaryPermissions "Temporäre Berechtigungen aufheben">
-<!ENTITY blockedDestinations "Blockierte Anfragen">
-<!ENTITY allowedDestinations "Erlaubte Anfragen">
-<!ENTITY otherOrigins "Weitere Quellen dieser Seite">
-<!ENTITY menu.openRequestLog.label "Anfragenchronik anzeigen">
-<!ENTITY menu.closeRequestLog.label "Anfragenchronik schließen">
-<!ENTITY rp.origin "Quelle">
-<!ENTITY rp.destination "Ziel">
-<!ENTITY rp.allow "Erlauben">
-<!ENTITY preferences "Einstellungen">
-<!ENTITY preferences.windowTitle "RequestPolicy - Einstellungen">
-<!ENTITY preferences.prefpane.general "Allgemein">
-<!ENTITY preferences.prefpane.appearance "Ansicht">
-<!ENTITY preferences.prefpane.whitelist "Erlaubte Seiten">
-<!ENTITY preferences.prefpane.import "Import">
-<!ENTITY preferences.prefpane.export "Export">
-<!ENTITY preferences.prefpane.advanced "Erweitert">
-<!ENTITY preferences.strictness "Regelstruktur">
-<!ENTITY preferences.strictness.description "Die Ebene zur Behandlung als Anfragen an die gleiche Seite. Nach Veränderung sind die RequestPolicy-Menus für derzeit geöffnete Tabs leer und diese müssen zur Erstellung von Regeln neu geladen werden.">
-<!ENTITY preferences.baseDomain "Domain (z. B. requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Host (z. B. www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Vollständige Adresse (z. B. http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Webseiten">
-<!ENTITY preferences.statusbarIcon "Statusleistensymbol">
-<!ENTITY preferences.statusbarIcon.none "Kein">
-<!ENTITY preferences.contextMenu "Im Kontextmenü anzeigen">
-<!ENTITY preferences.indicateBlockedObjects "Blockierte Grafiken durch Platzhalter ersetzen">
-<!ENTITY preferences.autoReload "Aktuelle Seite beim Ändern der Liste erlaubter Anfragen neu laden">
-<!ENTITY preferences.openInitialSetup "Erstkonfiguration öffnen">
-<!ENTITY preferences.misc "Sonstiges">
-<!ENTITY preferences.startWithAllowAllEnabled "'Alle Anfragen temporär erlauben' beim Browser-Start aktivieren">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Dauerhaftes Erlauben im Privaten Modus ermöglichen">
-<!ENTITY preferences.origins "Quellen">
-<!ENTITY preferences.destinations "Ziele">
-<!ENTITY preferences.originsToDestinations "Quelle-zu-Ziel">
-<!ENTITY preferences.temporary "Temporär">
-<!ENTITY preferences.removeSelectedSites "Ausgewählte Seiten entfernen">
-<!ENTITY preferences.export.caption "Export der Einstellungen">
-<!ENTITY preferences.export.description "Es empfiehlt sich, mittels Export eine Sicherheitskopie der Regeln anzulegen. Um die gleichen Regeln auf einem anderen Computer zu verwenden, muss die exportierte Datei auf jenen Computer kopiert und dann die Regeln aus dieser Datei importiert werden.">
-<!ENTITY preferences.export.details.caption "Was in einer Exportdatei enthalten ist">
-<!ENTITY preferences.export.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln exportiert. Temporäre Berechtigungen werden nicht exportiert.">
-<!ENTITY preferences.export.button.label "Export in Datei">
-<!ENTITY preferences.import.caption "Import der Einstellungen">
-<!ENTITY preferences.import.description "Der Import kann mit Dateien durchgeführt werden, die von der Exportfunktion erstellt worden.">
-<!ENTITY preferences.import.details.caption "Was beim Import durchgeführt wird">
-<!ENTITY preferences.import.details.description "Es werden Quellen-, Ziel- und Quelle-zu-Ziel-Regeln hinzugefügt. Nichts aus der Liste der erlaubten Seiten wird entfernt, sie wird also nicht ersetzt.">
-<!ENTITY preferences.import.button.label "Import aus Datei">
-<!ENTITY preferences.prefetch.link "Link-Prefetching (verlinkte Seite ohne Anforderung durch Nutzer herunterladen)">
-<!ENTITY preferences.prefetch.dns "DNS-Prefetching (IP-Adresse für verlinkte Seiten vor derem Abruf einholen)">
-<!ENTITY preferences.enabled "Aktivieren">
-<!ENTITY preferences.disableOnStartup "Beim Start von Firefox deaktivieren">
-<!ENTITY preferences.restoreDefaultOnUninstall "Bei der Deinstallation von RequestPolicy Standardeinstellung wiederherstellen">
-<!ENTITY requestLog.title "Anfragenchronik">
-<!ENTITY requestLog.blocked "Blockiert">
-<!ENTITY requestLog.time "Zeit">
-<!ENTITY requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">
-<!ENTITY requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
-<!ENTITY requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
-<!ENTITY requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
-<!ENTITY requestLog.clear "Löschen">
-<!ENTITY initialSetup.title "Erstkonfiguration">
-<!ENTITY initialSetup.whitelist.caption "Hinzufügen häufig benutzter Regeln zur Liste erlaubter Anfragen">
-<!ENTITY initialSetup.whitelist.description "Die Regeln in dieser Liste können zugelassen werden, da (1) die Anfrage zwischen zwei Seiten stattfindet, die dem selben Unternehmen gehören, oder (2) sie auftretende Probleme beheben und dabei nur kleinen Einfluss aus Sicherheit und Privatsphäre haben.">
-<!ENTITY initialSetup.region.international "International">
-<!ENTITY initialSetup.region.americas "Amerika">
-<!ENTITY initialSetup.region.asia "Asien">
-<!ENTITY initialSetup.region.usAndCanada "USA und Kanada">
-<!ENTITY initialSetup.region.europeAndRussia "Europa und Russland">
-<!ENTITY initialSetup.region.oceania "Ozeanien">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Temporäre Berechtigungen aufheben">
+<!ENTITY rp.menu.blockedDestinations "Blockierte Anfragen">
+<!ENTITY rp.menu.allowedDestinations "Erlaubte Anfragen">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Weitere Quellen dieser Seite">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Einstellungen">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Anfragenchronik">
+<!ENTITY rp.requestLog.blocked "Blockiert">
+<!ENTITY rp.requestLog.time "Zeit">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
+<!ENTITY rp.requestLog.clear "Löschen">

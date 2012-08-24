@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Aviso: pré-carregamento está ativado">
-<!ENTITY prefetchInfo "Aprenda sobre pré-carregamento">
-<!ENTITY prefetchDisablingInstructions "Desativar pré-carregamento">
-<!ENTITY temporarilyAllowAll "Temporariamente permitir todos os pedidos">
-<!ENTITY revokeTemporaryPermissions "Revogar todas as permissões temporárias">
-<!ENTITY blockedDestinations "Destinos bloqueados">
-<!ENTITY allowedDestinations "Destinos permitidos">
-<!ENTITY otherOrigins "Outras origens nesta página">
-<!ENTITY menu.openRequestLog.label "Exibir lista de pedidos">
-<!ENTITY menu.closeRequestLog.label "Ocultar lista de pedidos">
-<!ENTITY rp.origin "Origem">
-<!ENTITY rp.destination "Destino">
-<!ENTITY rp.allow "Permitir">
-<!ENTITY preferences "Preferências…">
-<!ENTITY preferences.windowTitle "Preferências do RequestPolicy">
-<!ENTITY preferences.prefpane.general "Geral">
-<!ENTITY preferences.prefpane.appearance "Aparência">
-<!ENTITY preferences.prefpane.whitelist "Permissões">
-<!ENTITY preferences.prefpane.import "Importar">
-<!ENTITY preferences.prefpane.export "Exportar">
-<!ENTITY preferences.prefpane.advanced "Avançado">
-<!ENTITY preferences.strictness "Rigidez">
-<!ENTITY preferences.strictness.description "Escolha a rigidez com a qual o RequestPolicy deve decidir se dois endereços são ou não do mesmo servidor. Alterar essa opção limpará o menu do RequestPolicy nas abas abertas do navegador; cada menu será preenchido novamente quando uma nova página for carregada na respectiva aba.">
-<!ENTITY preferences.baseDomain "Domínio base (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Domínio completo (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Endereço completo (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Exibição da página">
-<!ENTITY preferences.statusbarIcon "Aparência na barra de status">
-<!ENTITY preferences.statusbarIcon.none "Nenhuma">
-<!ENTITY preferences.contextMenu "Menu de contexto">
-<!ENTITY preferences.indicateBlockedObjects "Indicar imagens bloqueadas">
-<!ENTITY preferences.autoReload "Recarregar a página logo após modificar a lista de permissões">
-<!ENTITY preferences.openInitialSetup "Abrir ferramenta de configuração inicial">
-<!ENTITY preferences.misc "Diversos">
-<!ENTITY preferences.startWithAllowAllEnabled "'Temp. permitir todos os pedidos' ativo ao abrir o navegador">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Adicionar permissões às listas também durante navegação privativa">
-<!ENTITY preferences.origins "Origens">
-<!ENTITY preferences.destinations "Destinos">
-<!ENTITY preferences.originsToDestinations "Pares origem-destino">
-<!ENTITY preferences.temporary "Temporário">
-<!ENTITY preferences.removeSelectedSites "Remover entradas selecionadas">
-<!ENTITY preferences.export.caption "Exportar as suas configurações">
-<!ENTITY preferences.export.description "Você pode exportar sua lista de permissões para fazer uma cópia de segurança. Para usar a mesma lista em outro computador basta transferir para ele o arquivo exportado e usar o recurso de importação do RequestPolicy.">
-<!ENTITY preferences.export.details.caption "O que será incluído na exportação?">
-<!ENTITY preferences.export.details.description "O arquivo exportado conterá as origens, os destinos e os pares origem-destino que você adicionou à lista de permissões. Não serão incluídas as permissões temporárias.">
-<!ENTITY preferences.export.button.label "Exportar para arquivo">
-<!ENTITY preferences.import.caption "Importar as suas configurações">
-<!ENTITY preferences.import.description "Você pode importar sua lista de permissões a partir da cópia de segurança feita através do recurso de exportação do RequestPolicy.">
-<!ENTITY preferences.import.details.caption "O que a importação alterará na lista de permissões atual?">
-<!ENTITY preferences.import.details.description "A importação adicionará as origens, os destinos e os pares origem-destino presentes no arquivo importado. Nenhuma entrada será removida da lista de permissões atual. Assim, a importação complementará a lista de permissões atual com as entradas do arquivo importado.">
-<!ENTITY preferences.import.button.label "Importar de arquivo">
-<!ENTITY preferences.prefetch.link "Pré-carregamento de links">
-<!ENTITY preferences.prefetch.dns "Pré-busca de nomes de domínio (DNS)">
-<!ENTITY preferences.enabled "Ativo">
-<!ENTITY preferences.disableOnStartup "Desativado ao iniciar o navegador">
-<!ENTITY preferences.restoreDefaultOnUninstall "Restaurar padrão quando RequestPolicy for desinstalado">
-<!ENTITY requestLog.title "Pedidos nesta página">
-<!ENTITY requestLog.blocked "Bloqueado">
-<!ENTITY requestLog.time "Hora">
-<!ENTITY requestLog.copyOriginToClipboard "Copiar origem">
-<!ENTITY requestLog.copyDestinationToClipboard "Copiar destino">
-<!ENTITY requestLog.openOriginInNewTab "Abrir origem em nova aba">
-<!ENTITY requestLog.openDestinationInNewTab "Abrir destino em nova aba">
-<!ENTITY requestLog.clear "Limpar">
-<!ENTITY initialSetup.title "Configuração inicial">
-<!ENTITY initialSetup.whitelist.caption "Adicione a sua lista de permissões algumas entradas comuns">
-<!ENTITY initialSetup.whitelist.description "Estas permissões são aqui sugeridas por (1) envolverem pedidos entre servidores de uma mesma empresa e (2) resolverem problemas que você poderá ter durante a navegação com muito pouco impacto em sua privacidade e segurança.">
-<!ENTITY initialSetup.region.international "Internacional">
-<!ENTITY initialSetup.region.americas "Américas">
-<!ENTITY initialSetup.region.asia "Ásia">
-<!ENTITY initialSetup.region.usAndCanada "Estados Unidos e Canadá">
-<!ENTITY initialSetup.region.europeAndRussia "Europa e Rússia">
-<!ENTITY initialSetup.region.oceania "Oceania">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Revogar todas as permissões temporárias">
+<!ENTITY rp.menu.blockedDestinations "Destinos bloqueados">
+<!ENTITY rp.menu.allowedDestinations "Destinos permitidos">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Outras origens nesta página">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Preferências…">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Pedidos nesta página">
+<!ENTITY rp.requestLog.blocked "Bloqueado">
+<!ENTITY rp.requestLog.time "Hora">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Copiar origem">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Copiar destino">
+<!ENTITY rp.requestLog.openOriginInNewTab "Abrir origem em nova aba">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Abrir destino em nova aba">
+<!ENTITY rp.requestLog.clear "Limpar">

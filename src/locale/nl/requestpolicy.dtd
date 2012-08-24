@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Waarschuwing: vooraf ophalen is ingeschakeld">
-<!ENTITY prefetchInfo "Meer over vooraf ophalen">
-<!ENTITY prefetchDisablingInstructions "Vooraf ophalen uitschakelen">
-<!ENTITY temporarilyAllowAll "Alle verzoeken tijdelijk toestaan">
-<!ENTITY revokeTemporaryPermissions "Alle tijdelijke permissies intrekken">
-<!ENTITY blockedDestinations "Geblokkeerde bestemmingen">
-<!ENTITY allowedDestinations "Toegestane bestemmingen">
-<!ENTITY otherOrigins "Andere oorsprongen op deze pagina">
-<!ENTITY menu.openRequestLog.label "Logbestand verzoeken weergeven">
-<!ENTITY menu.closeRequestLog.label "Logbestand verzoeken sluiten">
-<!ENTITY rp.origin "Oorsprong">
-<!ENTITY rp.destination "Bestemming">
-<!ENTITY rp.allow "Toestaan">
-<!ENTITY preferences "Voorkeuren">
-<!ENTITY preferences.windowTitle "RequestPolicy voorkeuren">
-<!ENTITY preferences.prefpane.general "Algemeen">
-<!ENTITY preferences.prefpane.appearance "Weergave">
-<!ENTITY preferences.prefpane.whitelist "Witte lijst">
-<!ENTITY preferences.prefpane.import "Importeren">
-<!ENTITY preferences.prefpane.export "Exporteren">
-<!ENTITY preferences.prefpane.advanced "Geavanceerd">
-<!ENTITY preferences.strictness "Striktheid">
-<!ENTITY preferences.strictness.description "Het te gebruiken classificatieniveau voor toestaan van zelfde-site-verzoeken. Na wijzigen hiervan start het menu leeg voor elk tabblad dat nu open staat.">
-<!ENTITY preferences.baseDomain "Basisdomein (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Volledig domein (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Volledig adres (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Webpagina’s">
-<!ENTITY preferences.statusbarIcon "Statusbalkpictogram">
-<!ENTITY preferences.statusbarIcon.none "Geen">
-<!ENTITY preferences.contextMenu "Contextmenu">
-<!ENTITY preferences.indicateBlockedObjects "Geblokkeerde afbeeldingen aanduiden">
-<!ENTITY preferences.autoReload "Huidige pagina opnieuw laden wanneer witte lijst wijzigt">
-<!ENTITY preferences.openInitialSetup "Initiële instelwizard openen">
-<!ENTITY preferences.misc "Diversen">
-<!ENTITY preferences.startWithAllowAllEnabled "‘Tijdelijk alle verzoeken toestaan’ inschakelen wanneer browser start">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Permanente witte lijst toestaan bij gebruik Privénavigatie">
-<!ENTITY preferences.origins "Oorsprongen">
-<!ENTITY preferences.destinations "Bestemmingen">
-<!ENTITY preferences.originsToDestinations "Oorsprongen-naar-bestemmingen">
-<!ENTITY preferences.temporary "Tijdelijk">
-<!ENTITY preferences.removeSelectedSites "Geselecteerde sites verwijderen">
-<!ENTITY preferences.export.caption "Uw instellingen exporteren">
-<!ENTITY preferences.export.description "U kunt uw witte lijst naar een bestand exporteren zodat u een back-up heeft. Verplaats het bestand naar een andere computer en gebruik daar de functie ‘Importeren’ om deze in te stellen met dezelfde witte lijst.">
-<!ENTITY preferences.export.details.caption "Wat is opgenomen in het exportbestand">
-<!ENTITY preferences.export.details.description "Het exportbestand bevat de toegestane oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen. Het bevat niets dat u tijdelijk heeft toegestaan.">
-<!ENTITY preferences.export.button.label "Naar bestand exporteren">
-<!ENTITY preferences.import.caption "Uw instellingen importeren">
-<!ENTITY preferences.import.description "U kunt uw witte lijst importeren uit een back-upbestand dat u heeft aangemaakt met de functie ‘Exporteren’.">
-<!ENTITY preferences.import.details.caption "Wat doet het importeren">
-<!ENTITY preferences.import.details.description "Het importeren voegt oorsprongen, bestemmingen en oorsprongen-naar-bestemmingen in het bestand waaruit u exporteert toe. Niets in uw huidige witte lijst wordt verwijderd. Dat wil zeggen dat importeren slechts sites aan uw witte lijst toevoegt, het vervangt niet uw huidige witte lijst.">
-<!ENTITY preferences.import.button.label "Uit bestand importeren">
-<!ENTITY preferences.prefetch.link "Vooraf ophalen koppelingen">
-<!ENTITY preferences.prefetch.dns "Vooraf ophalen DNS">
-<!ENTITY preferences.enabled "Ingeschakeld">
-<!ENTITY preferences.disableOnStartup "Uitschakelen bij opstarten">
-<!ENTITY preferences.restoreDefaultOnUninstall "Standaard herstellen wanneer RequestPolicy is gedeïnstalleerd">
-<!ENTITY requestLog.title "Logbestand verzoeken">
-<!ENTITY requestLog.blocked "Geblokkeerd">
-<!ENTITY requestLog.time "Tijdstip">
-<!ENTITY requestLog.copyOriginToClipboard "Oorsprong naar Klembord kopiëren">
-<!ENTITY requestLog.copyDestinationToClipboard "Doel naar Klembord kopiëren">
-<!ENTITY requestLog.openOriginInNewTab "Oorsprong in nieuw tabblad openen">
-<!ENTITY requestLog.openDestinationInNewTab "Doel in nieuw tabblad openen">
-<!ENTITY requestLog.clear "Wissen">
-<!ENTITY initialSetup.title "Initiële instelling">
-<!ENTITY initialSetup.whitelist.caption "Voeg sites toe aan uw cross-site witte lijst.">
-<!ENTITY initialSetup.whitelist.description "De sites op deze lijsten zijn geselecteerd omdat ze (1) verzoeken betreffen tussen sites van hetzelfde bedrijf, of (2) ze de mogelijke problemen vermijden en weinig impact hebben op privacy en beveiliging.">
-<!ENTITY initialSetup.region.international "Internationaal">
-<!ENTITY initialSetup.region.americas "Amerika’s">
-<!ENTITY initialSetup.region.asia "Azië">
-<!ENTITY initialSetup.region.usAndCanada "VS en Canada">
-<!ENTITY initialSetup.region.europeAndRussia "Europa en Rusland">
-<!ENTITY initialSetup.region.oceania "Oceanië">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Alle tijdelijke permissies intrekken">
+<!ENTITY rp.menu.blockedDestinations "Geblokkeerde bestemmingen">
+<!ENTITY rp.menu.allowedDestinations "Toegestane bestemmingen">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Andere oorsprongen op deze pagina">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Voorkeuren">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Logbestand verzoeken">
+<!ENTITY rp.requestLog.blocked "Geblokkeerd">
+<!ENTITY rp.requestLog.time "Tijdstip">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Oorsprong naar Klembord kopiëren">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Doel naar Klembord kopiëren">
+<!ENTITY rp.requestLog.openOriginInNewTab "Oorsprong in nieuw tabblad openen">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Doel in nieuw tabblad openen">
+<!ENTITY rp.requestLog.clear "Wissen">

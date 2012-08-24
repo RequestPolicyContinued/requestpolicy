@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Внимание: Упреждающая выборка включена">
-<!ENTITY prefetchInfo "Узнать о функции упреждающей выборки">
-<!ENTITY prefetchDisablingInstructions "Отключить упреждающую выборку">
-<!ENTITY temporarilyAllowAll "Временно разрешить все запросы">
-<!ENTITY revokeTemporaryPermissions "Отменить все временные разрешения">
-<!ENTITY blockedDestinations "Блокированные цели">
-<!ENTITY allowedDestinations "Разрешенные цели">
-<!ENTITY otherOrigins "Другие источники на этой странице">
-<!ENTITY menu.openRequestLog.label "Показать Журнал Запросов">
-<!ENTITY menu.closeRequestLog.label "Закрыть Журнал Запросов">
-<!ENTITY rp.origin "Источник">
-<!ENTITY rp.destination "Цель">
-<!ENTITY rp.allow "Разрешить">
-<!ENTITY preferences "Настройки">
-<!ENTITY preferences.windowTitle "Настройки RequestPolicy">
-<!ENTITY preferences.prefpane.general "Общие">
-<!ENTITY preferences.prefpane.appearance "Вид">
-<!ENTITY preferences.prefpane.whitelist "Белый список">
-<!ENTITY preferences.prefpane.import "Импорт">
-<!ENTITY preferences.prefpane.export "Экспорт">
-<!ENTITY preferences.prefpane.advanced "Дополнительно">
-<!ENTITY preferences.strictness "Точность">
-<!ENTITY preferences.strictness.description "Уровень классификации, используемый для разрешения запросов внутри сайта. После изменения настройка будет применена ко всем открытым вкладкам.">
-<!ENTITY preferences.baseDomain "Основной домен (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Полный домен (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Полный адрес (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Веб-страницы">
-<!ENTITY preferences.statusbarIcon "Значок панели статуса">
-<!ENTITY preferences.statusbarIcon.none "Нет">
-<!ENTITY preferences.contextMenu "Контекстное меню">
-<!ENTITY preferences.indicateBlockedObjects "Помечать заблокированные изображения">
-<!ENTITY preferences.autoReload "Перегружать текущую страницу при изменении белого списка">
-<!ENTITY preferences.openInitialSetup "Открыть окно начальной настройки">
-<!ENTITY preferences.misc "Прочее">
-<!ENTITY preferences.startWithAllowAllEnabled "Включить 'Временно Разрешить Все Запросы' при старте браузера">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Всегда использовать белый список в режиме приватного просмотра">
-<!ENTITY preferences.origins "Источники">
-<!ENTITY preferences.destinations "Цели">
-<!ENTITY preferences.originsToDestinations "Источники-Цели">
-<!ENTITY preferences.temporary "Временный">
-<!ENTITY preferences.removeSelectedSites "Удалить Выбранные Сайты">
-<!ENTITY preferences.export.caption "Экспорт настроек">
-<!ENTITY preferences.export.description "Для создания резервной копии белого списка вы можете экспортировать его в файл. Чтобы настроить такой же белый список на другом компьютере просто перенесите этот файл и используйте функцию импорта.">
-<!ENTITY preferences.export.details.caption "Что включается в экспорт">
-<!ENTITY preferences.export.details.description "Файл экспорта включает списки источников, целей и источников-целей, которые вы разрешили. Он не включает ничего, что вы разрешили временно.">
-<!ENTITY preferences.export.button.label "Экспорт в файл">
-<!ENTITY preferences.import.caption "Импорт настроек">
-<!ENTITY preferences.import.description "Вы можете импортировать белый список из файла резервной копии, который вы создали с помощью режима экспорта.">
-<!ENTITY preferences.import.details.caption "Что делает импорт">
-<!ENTITY preferences.import.details.description "Импорт добавляет источники, цели и источники-цели, перечисленные в файле, из которого вы импортируете. Из вашего текущего белого списка ничего не удаляется. Таким образом, запуск импорта только добавит сайты в ваш белый список, а не полностью перепишет его.">
-<!ENTITY preferences.import.button.label "Импорт из файла">
-<!ENTITY preferences.prefetch.link "Предварительная загрузка ссылок">
-<!ENTITY preferences.prefetch.dns "Упреждающее чтение DNS">
-<!ENTITY preferences.enabled "Включено">
-<!ENTITY preferences.disableOnStartup "Отключать при запуске">
-<!ENTITY preferences.restoreDefaultOnUninstall "Восстанавливать по умолчанию при удалении RequestPolicy">
-<!ENTITY requestLog.title "Журнал Запросов">
-<!ENTITY requestLog.blocked "Заблокирован">
-<!ENTITY requestLog.time "Время">
-<!ENTITY requestLog.copyOriginToClipboard "Скопировать источник в буфер обмена">
-<!ENTITY requestLog.copyDestinationToClipboard "Скопировать цель в буфер обмена">
-<!ENTITY requestLog.openOriginInNewTab "Открыть источник в новой вкладке">
-<!ENTITY requestLog.openDestinationInNewTab "Открыть цель в новой вкладке">
-<!ENTITY requestLog.clear "Очистить">
-<!ENTITY initialSetup.title "Начальная настройка">
-<!ENTITY initialSetup.whitelist.caption "Добавьте сайты в ваш белый список">
-<!ENTITY initialSetup.whitelist.description "Сайты из этих списков были выбраны потому, что (1) они включают в себя запросы между сайтами, принадлежащими одной компании (2) их наличие в списке уменьшает возможность появления проблем и не сильно влияет на уровень конфиденциальности и безопасности.">
-<!ENTITY initialSetup.region.international "Международные">
-<!ENTITY initialSetup.region.americas "Южная Америка">
-<!ENTITY initialSetup.region.asia "Азия">
-<!ENTITY initialSetup.region.usAndCanada "США и Канада">
-<!ENTITY initialSetup.region.europeAndRussia "Европа и Россия">
-<!ENTITY initialSetup.region.oceania "Океания">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Отменить все временные разрешения">
+<!ENTITY rp.menu.blockedDestinations "Блокированные цели">
+<!ENTITY rp.menu.allowedDestinations "Разрешенные цели">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Другие источники на этой странице">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Настройки">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Журнал Запросов">
+<!ENTITY rp.requestLog.blocked "Заблокирован">
+<!ENTITY rp.requestLog.time "Время">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Скопировать источник в буфер обмена">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Скопировать цель в буфер обмена">
+<!ENTITY rp.requestLog.openOriginInNewTab "Открыть источник в новой вкладке">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Открыть цель в новой вкладке">
+<!ENTITY rp.requestLog.clear "Очистить">

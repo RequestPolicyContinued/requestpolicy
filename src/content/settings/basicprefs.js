@@ -3,9 +3,6 @@ PAGE_STRINGS = ['basic', 'advanced', 'webPages', 'indicateBlockedImages',
 
 $(function () {
   common.localize(PAGE_STRINGS);
-  $('[data-string=]').each(function () {
-    $(this).text(_(name));
-  });
 });
 
 function updateDisplay() {
@@ -18,12 +15,12 @@ function updateDisplay() {
   document.getElementById('pref-privateBrowsingPermanentWhitelisting').checked =
       rpService.prefs.getBoolPref('privateBrowsingPermanentWhitelisting');
 
-  if (rpService.prefs.getBoolPref('defaultPolicy.allow')) {
-    var word = 'allow';
-  } else {
-    var word = 'block';
-  }
-  document.getElementById('defaultpolicyword').innerHTML = word;
+//  if (rpService.prefs.getBoolPref('defaultPolicy.allow')) {
+//    var word = 'allow';
+//  } else {
+//    var word = 'block';
+//  }
+//  document.getElementById('defaultpolicyword').innerHTML = word;
 }
 
 

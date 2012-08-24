@@ -1,3 +1,16 @@
+PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'learnMore',
+  'subscriptionPolicies', 'subscriptionPoliciesDefinition', 'usability',
+  'privacy', 'browser', 'subscriptionDenyTrackersDescription',
+  'subscriptionAllowSameOrgDescription',
+  'subscriptionAllowFunctionalityDescription',
+  'subscriptionAllowEmbeddedDescription',
+  'subscriptionAllowMozillaDescription',
+  'subscriptionAllowExtensionsDescription'];
+
+$(function () {
+  common.localize(PAGE_STRINGS);
+});
+
 function updateDisplay() {
   var userSubs = rpServiceJSObject._subscriptions;
   var subsInfo = userSubs.getSubscriptionInfo();

@@ -2,6 +2,7 @@ Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
 Components.utils.import("resource://requestpolicy/Subscription.jsm");
 Components.utils.import("resource://requestpolicy/Util.jsm");
+Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
     .getService(Components.interfaces.nsIRequestPolicy);

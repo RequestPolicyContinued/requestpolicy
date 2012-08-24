@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>RequestPolicy - Advanced Preferences</title>
+  <script src="jquery.min.js"></script>
+  <script src="common.js"></script>
   <script src="advancedprefs.js"></script>
   <link href="settings.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -14,16 +16,16 @@
         <div id="requestpolicy">RequestPolicy</div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="basicprefs.html" selected="true">Preferences</a></li>
-            <li><a href="yourpolicy.html">Manage Policies</a></li>
-            <li><a href="help.html">Get Help</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="basicprefs.html" selected="true" data-string="preferences"></a></li>
+            <li><a href="yourpolicy.html" data-string="managePolicies"></a></li>
+            <li><a href="help.html" data-string="help"></a></li>
+            <li><a href="about.html" data-string="about"></a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="basicprefs.html">Basic</a></li>
-            <li><a href="advancedprefs.html" selected="true">Advanced</a></li>
+            <li><a href="basicprefs.html" data-string="basic"></a></li>
+            <li><a href="advancedprefs.html" selected="true" data-string="advanced"></a></li>
           </ul>
         </div>
       </div>
@@ -31,57 +33,57 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="advancedprefs">
-        <div id="pagetitle">Advanced Preferences</div>
+        <div id="pagetitle" data-string="advancedPreferences"></div>
 
         <table class="settings">
           <tr>
-            <td>Link Prefetching</td>
+            <td data-string="linkPrefetching"></td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-linkPrefetch"/>
-                  Enabled
+                  <span data-string="enabled"></span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-prefetch.link.disableOnStartup"/>
-                  Disable on startup
+                  <span data-string="disableOnStartup"></span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-prefetch.link.restoreDefaultOnUninstall"/>
-                  Restore default when RequestPolicy is uninstalled
+                  <span data-string="restoreDefaultOnUninstall"></span>
                 </label>
               </div>
             </td>
           </tr>
           <tr>
-            <td>DNS Prefetching</td>
+            <td data-string="dnsPrefetching"></td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-dnsPrefetch"/>
-                  Enabled
+                  <span data-string="enabled"></span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-prefetch.dns.disableOnStartup"/>
-                  Disable on startup
+                  <span data-string="disableOnStartup"></span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-prefetch.dns.restoreDefaultOnUninstall"/>
-                  Restore default when RequestPolicy is uninstalled
+                  <span data-string="restoreDefaultOnUninstall"></span>
                 </label>
               </div>
             </td>

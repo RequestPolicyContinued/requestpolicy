@@ -1,3 +1,12 @@
+PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'allow',
+  'block', 'defaultRule', 'defaultRuleDefinition', 'learnMore',
+  'allowRequestsToTheSameDomain', 'differentSubscriptionsAreAvailable',
+  'manageSubscriptions'];
+
+$(function () {
+  common.localize(PAGE_STRINGS);
+});
+
 function updateDisplay() {
   var defaultallow = rpService.prefs.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
@@ -26,7 +35,7 @@ function onload() {
       rpServiceJSObject._prefService.savePrefFile(null);
       // Reload all subscriptions because it's likely that different
       // subscriptions will now be active.
-      switchSubscriptionPolicies();
+      common.switchSubscriptionPolicies();
       updateDisplay();
       showManageSubscriptionsLink();
     }
@@ -38,7 +47,7 @@ function onload() {
       rpServiceJSObject._prefService.savePrefFile(null);
       // Reload all subscriptions because it's likely that different
       // subscriptions will now be active.
-      switchSubscriptionPolicies();
+      common.switchSubscriptionPolicies();
       updateDisplay();
       showManageSubscriptionsLink();
     }

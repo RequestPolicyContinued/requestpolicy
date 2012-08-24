@@ -1,11 +1,12 @@
+PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'type',
+  'origin', 'destination', 'allow', 'block', 'temporary', 'addRule',
+  'learnMoreAboutRules'];
+
+$(function () {
+  common.localize(PAGE_STRINGS);
+});
+
 const SEARCH_DELAY = 500;
-
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
-
-var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-  .getService(Components.interfaces.nsIRequestPolicy);
-var rpServiceJSObject = rpService.wrappedJSObject;
 
 var searchTimeoutId = null;
 

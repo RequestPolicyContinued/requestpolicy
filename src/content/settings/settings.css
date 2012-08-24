@@ -249,3 +249,7 @@ table.policy tr:hover a.deleterule:hover {
 #defaultpolicyword {
   font-weight: bold;
 }
+
+#subscriptionschanged {
+  margin-top: 20px;
+}

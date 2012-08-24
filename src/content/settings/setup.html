@@ -127,51 +127,45 @@
 
   <div id="welcome">
     <div class="pagetitle">
-      <div class="title">Welcome to RequestPolicy</div>
+      <div class="title" data-string="welcomeToRequestPolicy"></div>
     </div>
 
     <div class="step">
       <div class="title"></div>
-      <p>For most users, RequestPolicy's default settings are ideal.
-
-      <p>However, you can configure RequestPolicy to make it much more strict
-        (only recommended for advanced users).</p>
+      <p data-string="forMostUsersDefaultsAreIdeal"></p>
+      <p data-string="youCanConfigureRequestPolicyToBeMoreStrict"></p>
     </div>
 
     <div class="done">
-      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/">Teach
-        me how to use RequestPolicy.</a>
-      <a href="javascript:window.close()" class="returntobrowsing">Return to
-        browsing.</a>
-      <a id="showconfigure" href="#">Configure RequestPolicy.</a>
+      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/"
+          data-string="teachMeHowToUseRequestPolicy"></a>
+      <a href="javascript:window.close()" class="returntobrowsing"
+          data-string="returnToBrowsing"></a>
+      <a id="showconfigure" href="#" data-string="configureRequestPolicy"></a>
     </div>
   </div>
 
   <div id="configure">
     <div class="pagetitle">
-      <div class="title">Configure RequestPolicy</div>
+      <div class="title" data-string="configureRequestPolicy"></div>
     </div>
 
     <div id="step1" class="step">
       <table>
         <tr>
           <td>
-            <div class="title">Default Policy</div>
-            <div class="description">
-              When you don't have any "allow" or "block" that rules match a
-              request, this is what RequestPolicy will do.
-            </div>
+            <div class="title" data-string="defaultPolicy"></div>
+            <div class="description" data-string="defaultPolicyDefinition"></div>
             <label for="defaultallow">
               <input type="radio" name="defaultpolicy" id="defaultallow"
                      value="allow" checked="checked">
-              Allow requests by default.
+              <span data-string="allowRequestsByDefault"></span>
             </label>
             <br/>
             <label for="defaultdeny">
               <input type="radio" name="defaultpolicy" id="defaultdeny"
                      value="deny">
-              Block requests by default. (For advanced users. Breaks many
-              websites.)
+              <span data-string="blockRequestsByDefault"></span>
             </label>
 
             <div id="allowsamedomainblock">
@@ -180,8 +174,7 @@
                 <input type="checkbox" name="allowsamedomain"
                        id="allowsamedomain"
                        value="yes" checked="checked">
-                Allow requests to the same domain (e.g. www.example.com ->
-                static.example.com).
+                <span data-string="allowRequestsToTheSameDomain"></span>
               </label>
             </div>
           </td>
@@ -193,23 +186,20 @@
       <table>
         <tr>
           <td>
-            <div class="title">Subscription Policies</div>
+            <div class="title" data-string="subscriptionPolicies"></div>
             <div class="description">
-              Subscription policies are sets of rules maintained by us with help
-              from the community.
-              These rules are updated automatically and aim to minimize
-              website breakage while blocking requests that impact your privacy.
+              <span data-string="subscriptionPoliciesDefinition"></span>
             </div>
             <label for="enablesubs">
               <input type="radio" id="enablesubs" name="subscriptions"
                      value="yes" checked="checked">
-              Yes, use subscription policies. (Recommended.)
+              <span data-string="yesUseSubscriptions"></span>
             </label>
             <br/>
             <label for="disablesubs">
               <input type="radio" id="disablesubs" name="subscriptions"
                      value="yes">
-              No, don't use subscription policies.
+              <span data-string="noDoNotUseSubscriptions"></span>
             </label>
           </td>
         </tr>
@@ -218,10 +208,10 @@
     </div>
 
     <div class="done">
-      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/">I'm
-        done. Teach me how to use RequestPolicy.</a>
-      <a href="javascript:window.close()" class="returntobrowsing">I'm done.
-        Return to browsing.</a>
+      <a class="teach" href="https://www.requestpolicy.com/tutorial/1.0/"
+         data-string="teachMeHowToUseRequestPolicy"></a>
+      <a href="javascript:window.close()" class="returntobrowsing"
+         data-string="returnToBrowsing"></a>
     </div>
   </div>
 

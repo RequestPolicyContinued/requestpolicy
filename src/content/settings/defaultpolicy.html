@@ -37,32 +37,27 @@
         <div id="pagetitle" data-string="defaultPolicy"></div>
 
         <p class="learnmore">
-          <span data-string="defaultRuleDefinition"></span>
+          <span data-string="defaultPolicyDefinition"></span>
           <a href="https://www.requestpolicy.com/help-default-policy.html"
              target="_blank" data-string="learnMore"></a></p>
 
-        <table class="settings">
-          <tr>
-            <td data-string="defaultRule"></td>
-            <td>
-              <label><input type="radio" name="defaultrule" id="defaultallow"
-                            value="allow" />
-                <span data-string="allow"></span>
-              </label><br/>
-              <label><input type="radio" name="defaultrule" id="defaultdeny"
-                            value="deny" />
-                <span data-string="block"></span>
-              </label>
+          <label><input type="radio" name="defaultrule" id="defaultallow"
+                        value="allow" />
+            <span data-string="allowRequestsByDefault"></span>
+          </label><br/>
+          <label><input type="radio" name="defaultrule" id="defaultdeny"
+                        value="deny" />
+            <span data-string="blockRequestsByDefault"></span>
+          </label>
 
-              <div id="defaultdenysetting">
-                <label>
-                  <input type="checkbox" name="allowsamedomain"
-                         id="allowsamedomain" value="true" />
-                  <span data-string="allowRequestsToTheSameDomain"></span>
-                </label>
-              </div>
-            </td>
-          </tr>
+          <div id="defaultdenysetting">
+            <label>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="checkbox" name="allowsamedomain"
+                     id="allowsamedomain" value="true" />
+              <span data-string="allowRequestsToTheSameDomain"></span>
+            </label>
+          </div>
           <!--
           <tr>
             <td>Redirects</td>
@@ -74,7 +69,6 @@
             </td>
           </tr>
           -->
-        </table>
 
         <div id="subscriptionschanged" style="display: none">
           <span data-string="differentSubscriptionsAreAvailable"></span>

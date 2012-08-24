@@ -1,3 +1,15 @@
+PAGE_STRINGS = ['welcomeToRequestPolicy', 'forMostUsersDefaultsAreIdeal',
+  'youCanConfigureRequestPolicyToBeMoreStrict', 'teachMeHowToUseRequestPolicy',
+  'returnToBrowsing', 'configureRequestPolicy', 'defaultPolicy',
+  'defaultPolicyDefinition', 'allowRequestsByDefault', 'blockRequestsByDefault',
+  'allowRequestsToTheSameDomain', 'subscriptionPolicies',
+  'subscriptionPoliciesDefinition', 'yesUseSubscriptions',
+  'noDoNotUseSubscriptions'];
+
+$(function () {
+  common.localize(PAGE_STRINGS);
+});
+
 function showConfigure() {
   $('#welcome').css('display', 'none');
   $('#configure').css('display', 'block');
@@ -76,7 +88,7 @@ function onload() {
     // opened the setup window again after initial upgrade.
     try {
       var ruleCount = rpServiceJSObject._policyMgr.getUserPolicyRuleCount();
-    } catch(e) {
+    } catch (e) {
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;
     }

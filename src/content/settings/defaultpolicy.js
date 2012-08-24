@@ -1,7 +1,7 @@
-PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'allow',
-  'block', 'defaultRule', 'defaultRuleDefinition', 'learnMore',
-  'allowRequestsToTheSameDomain', 'differentSubscriptionsAreAvailable',
-  'manageSubscriptions'];
+PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions',
+  'allowRequestsByDefault', 'blockRequestsByDefault',
+  'defaultPolicyDefinition', 'learnMore', 'allowRequestsToTheSameDomain',
+  'differentSubscriptionsAreAvailable', 'manageSubscriptions'];
 
 $(function () {
   common.localize(PAGE_STRINGS);
@@ -29,35 +29,35 @@ function onload() {
   updateDisplay();
 
   document.getElementById('defaultallow').addEventListener('change',
-    function(event) {
-      var allow = event.target.checked;
-      rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
-      rpServiceJSObject._prefService.savePrefFile(null);
-      // Reload all subscriptions because it's likely that different
-      // subscriptions will now be active.
-      common.switchSubscriptionPolicies();
-      updateDisplay();
-      showManageSubscriptionsLink();
-    }
+      function (event) {
+        var allow = event.target.checked;
+        rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
+        rpServiceJSObject._prefService.savePrefFile(null);
+        // Reload all subscriptions because it's likely that different
+        // subscriptions will now be active.
+        common.switchSubscriptionPolicies();
+        updateDisplay();
+        showManageSubscriptionsLink();
+      }
   );
   document.getElementById('defaultdeny').addEventListener('change',
-    function(event) {
-      var deny = event.target.checked;
-      rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
-      rpServiceJSObject._prefService.savePrefFile(null);
-      // Reload all subscriptions because it's likely that different
-      // subscriptions will now be active.
-      common.switchSubscriptionPolicies();
-      updateDisplay();
-      showManageSubscriptionsLink();
-    }
+      function (event) {
+        var deny = event.target.checked;
+        rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
+        rpServiceJSObject._prefService.savePrefFile(null);
+        // Reload all subscriptions because it's likely that different
+        // subscriptions will now be active.
+        common.switchSubscriptionPolicies();
+        updateDisplay();
+        showManageSubscriptionsLink();
+      }
   );
   document.getElementById('allowsamedomain').addEventListener('change',
-    function(event) {
-      var allowSameDomain = event.target.checked;
-      rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+      function (event) {
+        var allowSameDomain = event.target.checked;
+        rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
-      rpServiceJSObject._prefService.savePrefFile(null);
-    }
+        rpServiceJSObject._prefService.savePrefFile(null);
+      }
   );
 }

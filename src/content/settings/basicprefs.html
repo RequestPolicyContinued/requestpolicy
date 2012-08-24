@@ -17,15 +17,15 @@
         <div id="mainnav" class="nav">
           <ul>
             <li><a href="basicprefs.html" selected="true" data-string="preferences"></a></li>
-            <li><a href="yourpolicy.html">Manage Policies</a></li>
-            <li><a href="help.html">Get Help</a></li>
-            <li><a href="about.html">About</a></li>
+            <li><a href="yourpolicy.html" data-string="managePolicies"></a></li>
+            <li><a href="help.html" data-string="help"></a></li>
+            <li><a href="about.html" data-string="about"></a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="basicprefs.html" selected="true">Basic</a></li>
-            <li><a href="advancedprefs.html">Advanced</a></li>
+            <li><a href="basicprefs.html" selected="true" data-string="basic"></a></li>
+            <li><a href="advancedprefs.html" data-string="advanced"></a></li>
           </ul>
         </div>
       </div>
@@ -33,25 +33,16 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="basicprefs">
-        <div id="pagetitle">Preferences</div>
+        <div id="pagetitle" data-string="preferences"></div>
 
         <table class="settings">
           <tr>
-            <td>Default Policy</td>
-            <td>
-              <div>
-                Your default policy is to <span id="defaultpolicyword"></span> requests.
-                <a href="defaultpolicy.html">Manage default policy.</a>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>Web Pages</td>
+            <td data-string="webPages"></td>
             <td>
               <div>
                 <label>
                   <input type="checkbox" id="pref-indicateBlockedObjects"/>
-                  Indicate blocked images
+                  <span data-string="indicateBlockedImages"></span>
                 </label>
               </div>
               <!--
@@ -65,14 +56,13 @@
             </td>
           </tr>
           <tr>
-            <td>Menu</td>
+            <td data-string="menu"></td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-privateBrowsingPermanentWhitelisting"/>
-                  Allow adding non-temporary rules when using Private Browsing
-                  Mode
+                  <span data-string="allowAddingNonTemporaryRulesInPBM"></span>
                 </label>
               </div>
             </td>

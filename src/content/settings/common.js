@@ -15,6 +15,10 @@ var stringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"]
 strbundle = stringBundleService.createBundle(
     "chrome://requestpolicy/locale/requestpolicy.properties");
 
+const COMMON_STRINGS = ['preferences', 'managePolicies', 'about', 'help',
+  'basic', 'advanced'];
+
+
 function _(msg, args) {
   if (args) {
     args = Array.prototype.slice.call(arguments, 1);
@@ -198,8 +202,7 @@ common.addAllowRules = function (rules) {
   rpServiceJSObject.storeRules();
 };
 
-common.localize = function () {
-  var stringNames = ['preferences'];
+common.localize = function(stringNames) {
   stringNames.forEach(function(name) {
     $('[data-string="' + name + '"]').each(function () {
       $(this).text(_(name));
@@ -208,5 +211,5 @@ common.localize = function () {
 };
 
 $(function() {
-  common.localize();
+  common.localize(COMMON_STRINGS);
 });

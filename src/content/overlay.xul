@@ -38,11 +38,11 @@
   <menupopup id="menu_ToolsPopup">
     <menu label="RequestPolicy" accesskey="r">
       <menupopup>
-        <menuitem label="&managePolicies;" accesskey="m"
+        <menuitem label="&menu.managePolicies;" accesskey="m"
                   oncommand="requestpolicy.overlay.openPolicyManager();" />
         <menuitem label="&requestLog.title;" accesskey="l"
                   oncommand="requestpolicy.overlay.toggleRequestLog(event);" />
-        <menuitem label="&preferences;" accesskey="p"
+        <menuitem label="&menu.preferences;" accesskey="p"
                   oncommand="requestpolicy.overlay.openPrefs(event);" />
       </menupopup>
     </menu>
@@ -76,19 +76,19 @@
             <label id="rp-origin" class="rp-od-item"
                    onclick="requestpolicy.menu.itemSelected(event);"/>
             <vbox id="rp-other-origins">
-              <label id="rp-other-origins-title" value="&otherOrigins;" />
+              <label id="rp-other-origins-title" value="&menu.otherOrigins;" />
               <vbox id="rp-other-origins-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-blocked-destinations">
-              <label id="rp-blocked-destinations-title" value="&blockedDestinations;" />
+              <label id="rp-blocked-destinations-title" value="&menu.blockedDestinations;" />
               <vbox id="rp-blocked-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-mixed-destinations">
-              <label id="rp-mixed-destinations-title" value="&mixedDestinations;" />
+              <label id="rp-mixed-destinations-title" value="&menu.mixedDestinations;" />
               <vbox id="rp-mixed-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-allowed-destinations">
-              <label id="rp-allowed-destinations-title" value="&allowedDestinations;" />
+              <label id="rp-allowed-destinations-title" value="&menu.allowedDestinations;" />
               <vbox id="rp-allowed-destinations-list" class="rp-label-list" />
             </vbox>
           </vbox>
@@ -112,16 +112,16 @@
                    value="&menu.disableBlocking;"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
             <label id="rp-link-help" class="rp-footer-link"
-                   value="&help;"
+                   value="&menu.help;"
                    onclick="requestpolicy.overlay.openHelp();"/>
             <label id="rp-link-prefs" class="rp-footer-link"
-                   value="&preferences;"
+                   value="&menu.preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
             <label id="rp-link-policies" class="rp-footer-link"
-                   value="&managePolicies;"
+                   value="&menu.managePolicies;"
                    onclick="requestpolicy.overlay.openPolicyManager();"/>
             <!--<label id="rp-link-about" class="rp-footer-link"-->
-                   <!--value="&about;"-->
+                   <!--value="&menu.about;"-->
                    <!--onclick="requestpolicy.overlay.openAbout();"/>-->
             <label id="rp-link-request-log" class="rp-footer-link"
                    value="&requestLog.title;"

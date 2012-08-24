@@ -165,7 +165,8 @@ requestpolicy.menu = {
   },
 
   _populateMenuForUncontrollableOrigin : function() {
-    this._originItem.setAttribute('value', '[no origin]');
+    this._originItem.setAttribute('value',
+        this._strbundle.getFormattedString('noOrigin', []));
     this._removeChildren(this._otherOriginsList);
     this._removeChildren(this._blockedDestinationsList);
     this._removeChildren(this._mixedDestinationsList);

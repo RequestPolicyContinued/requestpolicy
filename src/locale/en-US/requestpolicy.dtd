@@ -1,23 +1,18 @@
-<!ENTITY menu.revokeTemporaryPermissions "Revoke all temporary permissions">
-<!ENTITY menu.blockedDestinations "Blocked destinations">
-<!ENTITY menu.allowedDestinations "Allowed destinations">
-<!ENTITY menu.mixedDestinations "Mixed destinations">
-<!ENTITY menu.otherOrigins "Other origins">
-<!ENTITY menu.openRequestLog.label "Show Request Log">
-<!ENTITY menu.closeRequestLog.label "Close Request Log">
-<!ENTITY menu.enableBlocking "Enable blocking">
-<!ENTITY menu.disableBlocking "Disable blocking">
-<!ENTITY menu.origin "Origin">
-<!ENTITY menu.destination "Destination">
-<!ENTITY menu.allow "Allow">
-<!ENTITY menu.help "Help">
-<!ENTITY menu.preferences "Preferences">
-<!ENTITY menu.managePolicies "Manage Policies">
-<!ENTITY requestLog.title "Request Log">
-<!ENTITY requestLog.blocked "Blocked">
-<!ENTITY requestLog.time "Time">
-<!ENTITY requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY requestLog.clear "Clear">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Revoke all temporary permissions">
+<!ENTITY rp.menu.blockedDestinations "Blocked destinations">
+<!ENTITY rp.menu.allowedDestinations "Allowed destinations">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Other origins">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Preferences">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Request Log">
+<!ENTITY rp.requestLog.blocked "Blocked">
+<!ENTITY rp.requestLog.time "Time">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
+<!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY rp.requestLog.clear "Clear">

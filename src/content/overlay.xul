@@ -38,11 +38,11 @@
   <menupopup id="menu_ToolsPopup">
     <menu label="RequestPolicy" accesskey="r">
       <menupopup>
-        <menuitem label="&menu.managePolicies;" accesskey="m"
+        <menuitem label="&rp.menu.managePolicies;" accesskey="m"
                   oncommand="requestpolicy.overlay.openPolicyManager();" />
-        <menuitem label="&requestLog.title;" accesskey="l"
+        <menuitem label="&rp.requestLog.title;" accesskey="l"
                   oncommand="requestpolicy.overlay.toggleRequestLog(event);" />
-        <menuitem label="&menu.preferences;" accesskey="p"
+        <menuitem label="&rp.menu.preferences;" accesskey="p"
                   oncommand="requestpolicy.overlay.openPrefs(event);" />
       </menupopup>
     </menu>
@@ -76,19 +76,19 @@
             <label id="rp-origin" class="rp-od-item"
                    onclick="requestpolicy.menu.itemSelected(event);"/>
             <vbox id="rp-other-origins">
-              <label id="rp-other-origins-title" value="&menu.otherOrigins;" />
+              <label id="rp-other-origins-title" value="&rp.menu.otherOrigins;" />
               <vbox id="rp-other-origins-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-blocked-destinations">
-              <label id="rp-blocked-destinations-title" value="&menu.blockedDestinations;" />
+              <label id="rp-blocked-destinations-title" value="&rp.menu.blockedDestinations;" />
               <vbox id="rp-blocked-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-mixed-destinations">
-              <label id="rp-mixed-destinations-title" value="&menu.mixedDestinations;" />
+              <label id="rp-mixed-destinations-title" value="&rp.menu.mixedDestinations;" />
               <vbox id="rp-mixed-destinations-list" class="rp-label-list" />
             </vbox>
             <vbox id="rp-allowed-destinations">
-              <label id="rp-allowed-destinations-title" value="&menu.allowedDestinations;" />
+              <label id="rp-allowed-destinations-title" value="&rp.menu.allowedDestinations;" />
               <vbox id="rp-allowed-destinations-list" class="rp-label-list" />
             </vbox>
           </vbox>
@@ -106,25 +106,25 @@
         <hbox id="rp-footer">
           <hbox id="rp-footer-links">
             <label id="rp-link-enable-blocking" class="rp-footer-link"
-                   value="&menu.enableBlocking;"
+                   value="&rp.menu.enableBlocking;"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
             <label id="rp-link-disable-blocking" class="rp-footer-link"
-                   value="&menu.disableBlocking;"
+                   value="&rp.menu.disableBlocking;"
                    onclick="requestpolicy.overlay.toggleTemporarilyAllowAll();"/>
             <label id="rp-link-help" class="rp-footer-link"
-                   value="&menu.help;"
+                   value="&rp.menu.help;"
                    onclick="requestpolicy.overlay.openHelp();"/>
             <label id="rp-link-prefs" class="rp-footer-link"
-                   value="&menu.preferences;"
+                   value="&rp.menu.preferences;"
                    onclick="requestpolicy.overlay.openPrefs(event);"/>
             <label id="rp-link-policies" class="rp-footer-link"
-                   value="&menu.managePolicies;"
+                   value="&rp.menu.managePolicies;"
                    onclick="requestpolicy.overlay.openPolicyManager();"/>
             <!--<label id="rp-link-about" class="rp-footer-link"-->
-                   <!--value="&menu.about;"-->
+                   <!--value="&rp.menu.about;"-->
                    <!--onclick="requestpolicy.overlay.openAbout();"/>-->
             <label id="rp-link-request-log" class="rp-footer-link"
-                   value="&requestLog.title;"
+                   value="&rp.requestLog.title;"
                    onclick="requestpolicy.overlay.toggleRequestLog(event);"/>
           </hbox>
         </hbox>
@@ -138,8 +138,8 @@
     <vbox id="requestpolicy-requestLog" height="300" hidden="true" persist="height">
       <toolbox id="requestpolicy-requestLog-header">
         <toolbar id="requestpolicy-requestLog-toolbar" align="center">
-          <label id="requestpolicy-requestLog-title" control="requestpolicy-requestLog-frame" value="&requestLog.title;" crop="end" />
-          <button label="&requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
+          <label id="requestpolicy-requestLog-title" control="requestpolicy-requestLog-frame" value="&rp.requestLog.title;" crop="end" />
+          <button label="&rp.requestLog.clear;" oncommand="requestpolicy.overlay.clearRequestLog();" />
           <vbox flex="1" />
           <toolbarbutton id="requestpolicy-requestLog-close" align="right" oncommand="requestpolicy.overlay.toggleRequestLog()"/>
         </toolbar>

@@ -1,73 +1,18 @@
-<!ENTITY prefetchWarning "Brīdinājums: Priekšnese ir aktivizēta">
-<!ENTITY prefetchInfo "Uzziniet par priekšnesi">
-<!ENTITY prefetchDisablingInstructions "Atslēgt priekšnesi">
-<!ENTITY temporarilyAllowAll "Īslaicīgi atļaut visus pieprasījumus">
-<!ENTITY revokeTemporaryPermissions "Atsaukt visas īslaicīgās atļaujas">
-<!ENTITY blockedDestinations "Bloķētie mērķi">
-<!ENTITY allowedDestinations "Atļautie mērķi">
-<!ENTITY otherOrigins "Citi pirmavoti šajā lapā">
-<!ENTITY menu.openRequestLog.label "Parādīt pieprasījumu žurnālu">
-<!ENTITY menu.closeRequestLog.label "Aizvērt žieprasījumu žurnālu">
-<!ENTITY rp.origin "Pirmavots">
-<!ENTITY rp.destination "Mērķis">
-<!ENTITY rp.allow "Atļaut">
-<!ENTITY preferences "Iestatījumi">
-<!ENTITY preferences.windowTitle "RequestPolicy iestatījumi">
-<!ENTITY preferences.prefpane.general "Vispārēji">
-<!ENTITY preferences.prefpane.appearance "Izskats">
-<!ENTITY preferences.prefpane.whitelist "Baltais saraksts">
-<!ENTITY preferences.prefpane.import "Imports">
-<!ENTITY preferences.prefpane.export "Eksports">
-<!ENTITY preferences.prefpane.advanced "Papildus">
-<!ENTITY preferences.strictness "Precizitāte">
-<!ENTITY preferences.strictness.description "Precizitātes līmenis, kas tiks izmantots, atļaujot pieprasījumus vietnes iekšienē. Pēc izmaiņu veikšanas, izvēlne būs tukša katrai jaunatvērtai cilnei.">
-<!ENTITY preferences.baseDomain "Pamata domēns (requestpolicy.com)">
-<!ENTITY preferences.fullDomain "Pilns domēns (www.requestpolicy.com)">
-<!ENTITY preferences.fullAddress "Pilna adrese (http://www.requestpolicy.com:81)">
-<!ENTITY preferences.webpages "Tīmekļa lapas">
-<!ENTITY preferences.statusbarIcon "Statusa joslas ikona">
-<!ENTITY preferences.statusbarIcon.none "Nav">
-<!ENTITY preferences.contextMenu "Konteksta izvēlne">
-<!ENTITY preferences.indicateBlockedObjects "Atzīmēt bloķetus attēlus">
-<!ENTITY preferences.autoReload "Atjaunināt pašreizējo lapu, kad izmaina balto sarakstu">
-<!ENTITY preferences.openInitialSetup "Atvērt sakotnējās iestatīšanas rīku">
-<!ENTITY preferences.misc "Dažādi">
-<!ENTITY preferences.startWithAllowAllEnabled "Aktivizēt 'Īslaicīgi atļaut visus pieprasījumus' pēc pārlūka iedarbināšanas">
-<!ENTITY preferences.privateBrowsingPermanentWhitelisting "Atļaut paliekošas izmaiņas baltajā sarakstā, kad izmanto privāto pārlūkošanu">
-<!ENTITY preferences.origins "Pirmavoti">
-<!ENTITY preferences.destinations "Mērķi">
-<!ENTITY preferences.originsToDestinations "Pirmavoti-Mērķi">
-<!ENTITY preferences.temporary "Īslaicīgs">
-<!ENTITY preferences.removeSelectedSites "Izņemt atzīmētās vietnes">
-<!ENTITY preferences.export.caption "Iestatījumu eksports">
-<!ENTITY preferences.export.description "Jūs varat eksportēt balto sarakstu datnē, lai izveidotu iestatījumu dublējuma kopiju. Lai nokonfigurētu cita datora pārlūkprogrammu ar tādu pašu balto sarakstu, jums ir jāpārnes datne tajā datorā un jāizmanto importa opciju.">
-<!ENTITY preferences.export.details.caption "Kas tiks eksportēts">
-<!ENTITY preferences.export.details.description "Eksporta datne saturēs pirmavotus, mērķus un to atļautās kombinācijas. Tā nesaturēs īslaicīgas atļaujas.">
-<!ENTITY preferences.export.button.label "Eksportēt datnē">
-<!ENTITY preferences.import.caption "Iestatījumu imports">
-<!ENTITY preferences.import.description "Jūs varat importēt eksistējošo balto sarakstu no dublējuma kopijas datnes.">
-<!ENTITY preferences.import.details.caption "Kas tiks importēts">
-<!ENTITY preferences.import.details.description "Importēšana pievienos pirmavotus, mērķus un to kombinācijas, kas ir minēti importējamā datnē. Pašreizējā baltā saraksta atļaujas netiks aizvietotas.">
-<!ENTITY preferences.import.button.label "Importēt no datnes">
-<!ENTITY preferences.prefetch.link "Saišu priekšnese">
-<!ENTITY preferences.prefetch.dns "Domēna vārdu priekšnese">
-<!ENTITY preferences.enabled "Aktivizēts">
-<!ENTITY preferences.disableOnStartup "Atspējot pēc pārlūka iedarbināšanas">
-<!ENTITY preferences.restoreDefaultOnUninstall "Atjaunot noklusētās vērtības pēc RequestPolicy atinstalēšanas">
-<!ENTITY requestLog.title "Pieprasījumu žurnāls">
-<!ENTITY requestLog.blocked "Bloķēts">
-<!ENTITY requestLog.time "Laiks">
-<!ENTITY requestLog.copyOriginToClipboard "Kopēt pirmavotu starpliktuvē">
-<!ENTITY requestLog.copyDestinationToClipboard "Kopēt mērķi starpliktuvē">
-<!ENTITY requestLog.openOriginInNewTab "Atvērt pirmavotu jaunā cilnē">
-<!ENTITY requestLog.openDestinationInNewTab "Atvērt mērķi jaunā cilnē">
-<!ENTITY requestLog.clear "Notīrīt">
-<!ENTITY initialSetup.title "Sākotnējā iestatīšana">
-<!ENTITY initialSetup.whitelist.caption "Pievienojiet vietnes jūsu starpvietņu baltajā sarakstā">
-<!ENTITY initialSetup.whitelist.description "Sarakstos redzamās vietnes tika izvēlētas tādēļ, ka (1) tās pieprasa datus no viena un tā paša īpašnieka pārvaldītas vietnes, vai (2) samazina sastapto problēmu rašanās risku un maz ietekmē privātumu/drošību.">
-<!ENTITY initialSetup.region.international "Starptautisks">
-<!ENTITY initialSetup.region.americas "Amerikas">
-<!ENTITY initialSetup.region.asia "Āzija">
-<!ENTITY initialSetup.region.usAndCanada "ASV un Kanāda">
-<!ENTITY initialSetup.region.europeAndRussia "Eiropa un Krievija">
-<!ENTITY initialSetup.region.oceania "Okeānija">
+<!ENTITY rp.menu.revokeTemporaryPermissions "Atsaukt visas īslaicīgās atļaujas">
+<!ENTITY rp.menu.blockedDestinations "Bloķētie mērķi">
+<!ENTITY rp.menu.allowedDestinations "Atļautie mērķi">
+<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.otherOrigins "Citi pirmavoti šajā lapā">
+<!ENTITY rp.menu.enableBlocking "Enable blocking">
+<!ENTITY rp.menu.disableBlocking "Disable blocking">
+<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.preferences "Iestatījumi">
+<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.requestLog.title "Pieprasījumu žurnāls">
+<!ENTITY rp.requestLog.blocked "Bloķēts">
+<!ENTITY rp.requestLog.time "Laiks">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Kopēt pirmavotu starpliktuvē">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Kopēt mērķi starpliktuvē">
+<!ENTITY rp.requestLog.openOriginInNewTab "Atvērt pirmavotu jaunā cilnē">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Atvērt mērķi jaunā cilnē">
+<!ENTITY rp.requestLog.clear "Notīrīt">

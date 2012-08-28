@@ -1565,13 +1565,11 @@ requestpolicy.overlay = {
   },
 
   openPrefs : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/basicprefs.html');
-    gBrowser.selectedTab = tab;
+    this.openSettingsTab('chrome://requestpolicy/content/settings/basicprefs.html');
   },
 
   openPolicyManager : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/yourpolicy.html');
-    gBrowser.selectedTab = tab;
+    this.openSettingsTab('chrome://requestpolicy/content/settings/yourpolicy.html');
   },
 
   openHelp : function() {
@@ -1579,14 +1577,44 @@ requestpolicy.overlay = {
     gBrowser.selectedTab = tab;
   },
 
-  openAbout : function() {
-    var tab = gBrowser.addTab('https://www.requestpolicy.com/about.html');
-    gBrowser.selectedTab = tab;
-  },
+//  openAbout : function() {
+//    var tab = gBrowser.addTab('https://www.requestpolicy.com/about.html');
+//    gBrowser.selectedTab = tab;
+//  },
 
   openImportOldRules : function() {
     var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/importoldrules.html');
     gBrowser.selectedTab = tab;
+  },
+
+  openSettingsTab : function (url) {
+    // Modified from the example at
+    // https://developer.mozilla.org/en-US/docs/Code_snippets/Tabbed_browser
+    var attrName = 'RequestPolicySettingsTab';
+    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+        .getService(Components.interfaces.nsIWindowMediator);
+    for (var found = false, index = 0, tabbrowser = wm.getEnumerator('navigator:browser').getNext().gBrowser;
+         index < tabbrowser.tabContainer.childNodes.length && !found;
+         index++) {
+      var currentTab = tabbrowser.tabContainer.childNodes[index];
+      if (currentTab.hasAttribute(attrName)) {
+        gBrowser.getBrowserForTab(currentTab).loadURI(url);
+        tabbrowser.selectedTab = currentTab;
+        // Focus *this* browser window in case another one is currently focused
+        tabbrowser.ownerDocument.defaultView.focus();
+        found = true;
+      }
+    }
+    if (!found) {
+      // Our tab isn't open. Open it now.
+      var browserEnumerator = wm.getEnumerator("navigator:browser");
+      var tabbrowser = browserEnumerator.getNext().gBrowser;
+      var newTab = tabbrowser.addTab(url);
+      newTab.setAttribute(attrName, "xyz");
+      tabbrowser.selectedTab = newTab;
+      // Focus *this* browser window in case another one is currently focused
+      tabbrowser.ownerDocument.defaultView.focus();
+    }
   },
 
   clearRequestLog : function() {

@@ -1548,8 +1548,10 @@ requestpolicy.overlay = {
     if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {
       this._rpService.prefs.setBoolPref("welcomeWindowShown", true);
       this._rpService._prefService.savePrefFile(null);
-      var tab = gBrowser.addTab("chrome://requestpolicy/content/settings/setup.html");
-      gBrowser.selectedTab = tab;
+      window.setTimeout(function() {
+        var tab = gBrowser.addTab("chrome://requestpolicy/content/settings/setup.html");
+        gBrowser.selectedTab = tab;
+      }, 0);
     }
   },
 

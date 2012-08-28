@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Blokované ciele">
 <!ENTITY rp.menu.allowedDestinations "Povolené ciele">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Iné zdroje v rámci tejto stránky">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Blockerade destinationer">
 <!ENTITY rp.menu.allowedDestinations "Tillåtna mål">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Andra källor inom denna sida">
+<!ENTITY rp.menu.otherOrigins "Andra källor">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

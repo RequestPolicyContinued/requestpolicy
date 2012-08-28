@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "차단된 목적지 주소">
 <!ENTITY rp.menu.allowedDestinations "허용된 목적지 주소">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "이 페이지에 있는 다른 출발지 주소">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

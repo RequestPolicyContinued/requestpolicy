@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Malpermesitaj celoj">
 <!ENTITY rp.menu.allowedDestinations "Permesitaj celoj">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Aliaj petfontoj en tiu ĉi paĝo">
+<!ENTITY rp.menu.otherOrigins "Aliaj petfontoj">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Blokeatutako helmugak">
 <!ENTITY rp.menu.allowedDestinations "Baimendutako helmugak">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Beste jatorri batzuk orri honen barruan">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

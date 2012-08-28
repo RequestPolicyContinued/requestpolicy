@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Geblokkeerde bestemmingen">
 <!ENTITY rp.menu.allowedDestinations "Toegestane bestemmingen">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Andere oorsprongen op deze pagina">
+<!ENTITY rp.menu.otherOrigins "Andere oorsprongen">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

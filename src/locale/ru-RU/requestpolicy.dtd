@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Блокированные цели">
 <!ENTITY rp.menu.allowedDestinations "Разрешенные цели">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Другие источники на этой странице">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "Yasaklı sayfalar">
 <!ENTITY rp.menu.allowedDestinations "İzinli sayfalar">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Diğer ana sitelerle ilişkili">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

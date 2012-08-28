@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "阻止目标">
 <!ENTITY rp.menu.allowedDestinations "允许目标">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "在这个页面上的其他来源">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

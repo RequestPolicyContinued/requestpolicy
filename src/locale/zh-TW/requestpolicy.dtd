@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "已阻擋的目標">
 <!ENTITY rp.menu.allowedDestinations "已允許的目標">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "其他在本頁的來源">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

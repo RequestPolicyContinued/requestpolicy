@@ -2,7 +2,7 @@
 <!ENTITY rp.menu.blockedDestinations "禁止されている送信先">
 <!ENTITY rp.menu.allowedDestinations "許可されている送信先">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "このページにある他のオリジン">
+<!ENTITY rp.menu.otherOrigins "Other origins">
 <!ENTITY rp.menu.enableBlocking "Enable blocking">
 <!ENTITY rp.menu.disableBlocking "Disable blocking">
 <!ENTITY rp.menu.help "Help">

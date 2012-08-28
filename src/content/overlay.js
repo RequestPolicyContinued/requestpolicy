@@ -43,10 +43,10 @@ Components.utils.import("resource://requestpolicy/Util.jsm",
  */
 requestpolicy.overlay = {
 
-  _extensionConflictInfoUri : "http://www.requestpolicy.com/conflict?ext=",
+//  _extensionConflictInfoUri : "http://www.requestpolicy.com/conflict?ext=",
 
-  _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
-  _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
+//  _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
+//  _prefetchDisablingInstructionsUri : "http://www.requestpolicy.com/help/prefetch.html#disable",
 
   _toolbarButtonId : "requestpolicyToolbarButton",
 
@@ -1534,20 +1534,20 @@ requestpolicy.overlay = {
     popup.openPopup(anchor, 'overlap', xOffset);
   },
 
-  showExtensionConflictInfo : function() {
-    var ext = this._rpServiceJSObject.getConflictingExtensions();
-    var extJson = requestpolicy.mod.JSON.stringify(ext);
-    this._openInNewTab(this._extensionConflictInfoUri
-        + encodeURIComponent(extJson));
-  },
+//  showExtensionConflictInfo : function() {
+//    var ext = this._rpServiceJSObject.getConflictingExtensions();
+//    var extJson = requestpolicy.mod.JSON.stringify(ext);
+//    this._openInNewTab(this._extensionConflictInfoUri
+//        + encodeURIComponent(extJson));
+//  },
 
-  showPrefetchInfo : function() {
-    this._openInNewTab(this._prefetchInfoUri);
-  },
-
-  showPrefetchDisablingInstructions : function() {
-    this._openInNewTab(this._prefetchDisablingInstructionsUri);
-  },
+//  showPrefetchInfo : function() {
+//    this._openInNewTab(this._prefetchInfoUri);
+//  },
+//
+//  showPrefetchDisablingInstructions : function() {
+//    this._openInNewTab(this._prefetchDisablingInstructionsUri);
+//  },
 
   _showWelcomeWindow : function() {
     if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {

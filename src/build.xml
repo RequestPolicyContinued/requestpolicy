@@ -46,7 +46,6 @@
 
 	<target name="dist" depends="chrome">
 		<copy file="chrome.manifest.packaging" tofile="chrome.manifest" overwrite="true" />
-		<copy file="components/nsIRequestPolicy.idl" tofile="nsIRequestPolicy.idl" overwrite="true" />
 		<delete file="${dist.dir}/${app.name}.xpi" />
 		<zip destfile="${dist.dir}/${app.name}.xpi">
 			<zipfileset file="${dist.dir}/${app.name}.jar" prefix="chrome" />
@@ -64,14 +63,9 @@
 				<exclude name="**/Copy *" />
 				<exclude name="**/*.bak" />
 				<exclude name="**/*.orig" />
-				<!-- Include the idl for reference for other developers, but don't leave it in the
-                     components directory or else it shows up as an error in the error console. -->
-				<include name="nsIRequestPolicy.idl" />
-				<exclude name="components/nsIRequestPolicy.idl" />
 			</fileset>
 		</zip>
 		<copy file="chrome.manifest.devel" tofile="chrome.manifest" overwrite="true" />
-		<delete file="nsIRequestPolicy.idl" />
 	</target>
 
 	<target name="clean">

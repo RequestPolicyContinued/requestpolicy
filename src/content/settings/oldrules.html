@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+  <title>RequestPolicy - Old Rules</title>
+  <script src="jquery.min.js"></script>
+  <script src="common.js"></script>
+  <script src="oldrules.js"></script>
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload="onload()">
+<table>
+  <tr>
+    <td id="sidepad"></td>
+    <td id="side">
+      <div id="sidecontainer">
+        <div id="requestpolicy">RequestPolicy</div>
+      </div>
+    </td>
+    <td id="contentpad"></td>
+    <td id="content">
+      <div id="contentcontainer" class="yourpolicy">
+        <div id="pagetitle" data-string="importOldRules"></div>
+
+        <style>
+          #description {
+            margin-bottom: 1.4em;
+          }
+          #policy {
+            margin-bottom: 1.4em;
+          }
+          #importoptions {
+            margin-bottom: 2.4em;
+          }
+          #moreoptions div {
+            margin-bottom: 1.4em;
+          }
+          #importanddelete {
+            margin-bottom: 1.4em;
+          }
+          #showReimportOptions {
+            margin-top: 20px;
+          }
+          #norules {
+            display: none;
+          }
+          #deletedone {
+            display: none;
+            font-weight: bold;
+          }
+          #importdone {
+            display: none;
+            font-weight: bold;
+          }
+          #reimportOldRules {
+            display: none;
+            margin-bottom: 20px;
+          }
+        </style>
+
+        <div id="hasrules">
+
+          <div id="description">
+            <p>Your old RequestPolicy rules were imported into the new
+              version of RequestPolicy when you upgraded. The old rules are no
+              longer used but the upgrade did not delete your old rules.</p>
+
+            <p>If you believe all of your old rules have been correctly
+              imported, you can delete your old rules.</p>
+
+            <p id="deleteOldRules"><button type="submit" onclick="deleteOldRules()"
+                data-string="deleteOldRules"></button></p>
+
+            <p id="showReimportOptions"><a
+                href="javascript:showReimportOptions()"
+                data-string="showOldRuleReimportOptions"></a></p>
+
+            <div id="deletedone" data-string="yourOldRulesHaveBeenDeleted"></div>
+          </div>
+
+          <div id="reimportOldRules">
+
+            <div id="policy">
+              <div class="policyheader">
+                <table class="policy">
+                  <colgroup>
+                    <col class="type"/>
+                    <col class="origin"/>
+                    <col class="destination"/>
+                  </colgroup>
+                  <tr>
+                    <th data-string="type"></th>
+                    <th data-string="origin"></th>
+                    <th data-string="destination"></th>
+                  </tr>
+                </table>
+              </div>
+              <div class="policydata">
+                <table id="policy-user" class="policy">
+                  <colgroup>
+                    <col class="type"/>
+                    <col class="origin"/>
+                    <col class="destination"/>
+                  </colgroup>
+                  <tbody id="rules"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="importoptions">
+              <label>
+                <input type="checkbox" id="addhostwildcards" checked="checked"/>
+                Add wildcards to origin and destination hostnames
+              </label>
+            </div>
+
+            <div id="doimport">
+              <button onclick="importOldRules()"
+                  data-string="importOldRules"></button>
+            </div>
+            <div id="importdone">
+              Done! Your old rules have been imported into
+              <a href="yourpolicy.html">your policy</a>.
+            </div>
+
+          </div>
+        </div>
+
+        <div id="norules">
+          You don't have any old rules to import.
+        </div>
+
+      </div>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

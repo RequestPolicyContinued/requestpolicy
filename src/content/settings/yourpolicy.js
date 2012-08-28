@@ -1,6 +1,6 @@
 PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'type',
   'origin', 'destination', 'allow', 'block', 'temporary', 'addRule',
-  'learnMoreAboutRules'];
+  'learnMoreAboutRules', 'removeOldRules'];
 
 $(function () {
   common.localize(PAGE_STRINGS);
@@ -190,4 +190,7 @@ function onload() {
     }, SEARCH_DELAY);
   }, false);
   populateRuleTable();
+  if (rpService.oldRulesExist()) {
+    $('#oldrulesexist').show();
+  }
 }

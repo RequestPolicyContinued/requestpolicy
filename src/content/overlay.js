@@ -1577,11 +1577,6 @@ requestpolicy.overlay = {
 //    gBrowser.selectedTab = tab;
 //  },
 
-  openImportOldRules : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/importoldrules.html');
-    gBrowser.selectedTab = tab;
-  },
-
   openSettingsTab : function (url) {
     // Modified from the example at
     // https://developer.mozilla.org/en-US/docs/Code_snippets/Tabbed_browser

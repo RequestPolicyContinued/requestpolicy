@@ -1,3 +1,12 @@
+PAGE_STRINGS = ['importOldRules', 'deleteOldRules',
+  'showOldRuleReimportOptions', 'yourOldRulesHaveBeenDeleted', 'type',
+  'origin', 'destination'];
+
+$(function () {
+  common.localize(PAGE_STRINGS);
+});
+
+
 var rules = null;
 var addHostWildcard = true;
 
@@ -53,7 +62,6 @@ function ruleDataPartToDisplayString(ruleDataPart) {
   if (ruleDataPart["port"]) {
     str += ":" + ruleDataPart["port"];
   }
-  // TODO: path
   return str;
 }
 
@@ -61,31 +69,27 @@ function deleteOldRules() {
   common.clearPref('allowedOrigins');
   common.clearPref('allowedDestinations');
   common.clearPref('allowedOriginsToDestinations');
+  $('#doimport').hide();
+  $('#deletedone').show();
+  $('#showReimportOptions').hide();
+  $('#reimportOldRules').hide();
+  $('#deleteOldRules').hide();
 }
 
-function importNewRulesDeleteOldRules() {
+function showReimportOptions() {
+  $('#showReimportOptions').hide();
+  $('#reimportOldRules').show();
+}
+
+function importOldRules() {
   if (!rules || rules.length == 0) {
     throw 'rules is undefined or empty';
   }
   common.addAllowRules(rules);
-  deleteOldRules();
-  document.getElementById('doimport').hidden = true;
-  document.getElementById('importdone').hidden = false;
-}
-
-function onlyImportNewRules() {
-  if (!rules || rules.length == 0) {
-    throw 'rules is undefined or empty';
-  }
-  common.addAllowRules(rules);
-  document.getElementById('doimport').hidden = true;
-  document.getElementById('importdone').hidden = false;
-}
-
-function onlyDeleteOldRules() {
-  deleteOldRules();
-  document.getElementById('doimport').hidden = true;
-  document.getElementById('deletedone').hidden = false;
+  $('#doimport').hide();
+  $('#policy').hide();
+  $('#importoptions').hide();
+  $('#importdone').show();
 }
 
 function handleAddHostWildcardsChange(event) {
@@ -95,12 +99,12 @@ function handleAddHostWildcardsChange(event) {
 }
 
 function onload() {
-  populateRuleTable();
-  if (rules.length == 0) {
-    document.getElementById('hasrules').hidden = true;
-    document.getElementById('norules').hidden = false;
-  } else {
-    var el = document.getElementById('addhostwildcards');
-    el.addEventListener('change', handleAddHostWildcardsChange);
+  var oldRulesExist = rpService.oldRulesExist();
+  if (!oldRulesExist) {
+    $('#hasrules').hide();
+    $('#norules').show();
+    return;
   }
+  populateRuleTable();
+  $('#addhostwildcards').change(handleAddHostWildcardsChange);
 }

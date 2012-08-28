@@ -923,7 +923,7 @@ requestpolicy.overlay = {
         // just detect when they will be blocked and show a notification. If
         // the docShell has allowMetaRedirects disabled, it will be respected.
         if (!this._rpService._blockingDisabled
-            && !this._rpService.isAllowedRedirect(document.location, dest)) {
+            && !this._rpService.isAllowedRedirect(document.location.href, dest)) {
           // Ignore redirects to javascript. The browser will ignore them, as well.
           if (requestpolicy.mod.DomainUtil.getUriObject(dest)
                 .schemeIs("javascript")) {

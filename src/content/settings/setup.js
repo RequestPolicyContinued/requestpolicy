@@ -73,7 +73,8 @@ function onload() {
   // preferences and also do a rule import based on the old strictness settings.
   // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
   // before this setup window was added.
-  if (Util.compareVersions(Util.lastVersion, '1.0.0a8') <= 0) {
+  if (Util.compareVersions(Util.lastVersion, '0.0') > 0 &&
+      Util.compareVersions(Util.lastVersion, '1.0.0a8') <= 0) {
     if (rpService.prefs.prefHasUserValue('uriIdentificationLevel')) {
       var identLevel = rpService.prefs.getIntPref('uriIdentificationLevel');
     } else {

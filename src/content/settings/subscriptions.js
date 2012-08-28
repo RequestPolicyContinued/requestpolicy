@@ -12,7 +12,7 @@ $(function () {
 });
 
 function updateDisplay() {
-  var userSubs = rpServiceJSObject._subscriptions;
+  var userSubs = rpService._subscriptions;
   var subsInfo = userSubs.getSubscriptionInfo();
   for (var subName in subsInfo['official']) {
     var el = document.getElementById('sub-' + subName);
@@ -26,7 +26,7 @@ function updateDisplay() {
 
 function onload() {
   updateDisplay();
-  var userSubs = rpServiceJSObject._subscriptions;
+  var userSubs = rpService._subscriptions;
 
   function handleSubscriptionChange(event) {
     var subName = event.target.name;
@@ -63,7 +63,7 @@ function onload() {
   }
 
   var selector = '[data-default-policy=' +
-    (rpServiceJSObject._defaultAllow ? 'deny' : 'allow') + ']';
+    (rpService._defaultAllow ? 'deny' : 'allow') + ']';
   var matches = document.body.querySelectorAll(selector);
   var hideElements = Array.prototype.slice.call(matches);
   for (var i = 0; i < hideElements.length; i++) {

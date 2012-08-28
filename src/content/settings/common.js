@@ -5,8 +5,7 @@ Components.utils.import("resource://requestpolicy/Util.jsm");
 Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-    .getService(Components.interfaces.nsIRequestPolicy);
-var rpServiceJSObject = rpService.wrappedJSObject;
+    .getService().wrappedJSObject;
 
 var observerService = Components.classes["@mozilla.org/observer-service;1"]
     .getService(Components.interfaces.nsIObserverService);
@@ -41,8 +40,8 @@ common = {};
 common.switchSubscriptionPolicies = function () {
   var subscriptions = new UserSubscriptions();
 
-  var newDefaultPolicy = rpServiceJSObject._defaultAllow ? 'allow' : 'deny';
-  var oldDefaultPolicy = rpServiceJSObject._defaultAllow ? 'deny' : 'allow';
+  var newDefaultPolicy = rpService._defaultAllow ? 'allow' : 'deny';
+  var oldDefaultPolicy = rpService._defaultAllow ? 'deny' : 'allow';
 
   var oldSubInfo = subscriptions.getSubscriptionInfo(oldDefaultPolicy);
   for (var listName in oldSubInfo) {
@@ -165,7 +164,7 @@ common.getOldRulesAsNewRules = function (addHostWildcard) {
 
 common.getPrefObj = function (pref) {
   try {
-    var value = rpServiceJSObject.prefs
+    var value = rpService.prefs
         .getComplexValue(pref, Components.interfaces.nsISupportsString).data;
   } catch (e) {
     value = '';
@@ -186,21 +185,21 @@ common.prefStringToObj = function (prefString) {
 
 common.clearPref = function (pref) {
   try {
-    if (rpServiceJSObject.prefs.prefHasUserValue(pref)) {
-      rpServiceJSObject.prefs.clearUserPref(pref);
+    if (rpService.prefs.prefHasUserValue(pref)) {
+      rpService.prefs.clearUserPref(pref);
     }
   } catch (e) {
     Logger.dump('Clearing pref failed: ' + e.toString());
   }
-  rpServiceJSObject._prefService.savePrefFile(null);
+  rpService._prefService.savePrefFile(null);
 };
 
 common.addAllowRules = function (rules) {
   for (var i in rules) {
     var ruleData = rules[i];
-    rpServiceJSObject.addAllowRule(ruleData, true);
+    rpService.addAllowRule(ruleData, true);
   }
-  rpServiceJSObject.storeRules();
+  rpService.storeRules();
 };
 
 common.localize = function(stringNames) {

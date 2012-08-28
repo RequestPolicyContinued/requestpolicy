@@ -21,7 +21,7 @@ var searchTimeoutId = null;
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
-  var policyMgr = rpServiceJSObject._policyMgr;
+  var policyMgr = rpService._policyMgr;
 
   var user = policyMgr._userPolicies['user'];
   var table = document.getElementById('policy-user');
@@ -58,9 +58,9 @@ function deleteRule(event) {
   var ruleType = anchor.requestpolicyRuleType;
   var ruleData = anchor.requestpolicyRuleData;
   if (ruleType == 'allow') {
-    rpServiceJSObject.removeAllowRule(ruleData);
+    rpService.removeAllowRule(ruleData);
   } else {
-    rpServiceJSObject.removeDenyRule(ruleData);
+    rpService.removeDenyRule(ruleData);
   }
   var row = anchor.parentNode.parentNode;
   row.parentNode.removeChild(row);
@@ -166,15 +166,15 @@ function addRuleHelper() {
   }
   if (allow) {
     if (temporary) {
-      rpServiceJSObject.addTemporaryAllowRule(ruleData);
+      rpService.addTemporaryAllowRule(ruleData);
     } else {
-      rpServiceJSObject.addAllowRule(ruleData);
+      rpService.addAllowRule(ruleData);
     }
   } else {
     if (temporary) {
-      rpServiceJSObject.addTemporaryDenyRule(ruleData);
+      rpService.addTemporaryDenyRule(ruleData);
     } else {
-      rpServiceJSObject.addDenyRule(ruleData);
+      rpService.addDenyRule(ruleData);
     }
   }
 }

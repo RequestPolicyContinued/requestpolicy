@@ -39,7 +39,6 @@ requestpolicy.menu = {
 
   _initialized : false,
   _rpService : null,
-  _rpServiceJSObject : null,
 
   _strbundle : null,
   addedMenuItems : [],
@@ -63,8 +62,7 @@ requestpolicy.menu = {
       this._initialized = true;
 
       this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-          .getService(Components.interfaces.nsIRequestPolicy);
-      this._rpServiceJSObject = this._rpService.wrappedJSObject;
+          .getService().wrappedJSObject;
 
       this._strbundle = document.getElementById("requestpolicyStrings");
       this._menu = document.getElementById("rp-popup");
@@ -80,17 +78,17 @@ requestpolicy.menu = {
       this._addRulesList = document.getElementById("rp-rules-add");
       this._removeRulesList = document.getElementById("rp-rules-remove");
 
-      var conflictCount = this._rpServiceJSObject.getConflictingExtensions().length;
+      var conflictCount = this._rpService.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
     }
   },
 
   prepareMenu : function() {
     try {
-//      var oldRulesExist = this._rpServiceJSObject.oldRulesExist();
+//      var oldRulesExist = this._rpService.oldRulesExist();
 //      document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
 
-      var disabled = this._rpServiceJSObject._blockingDisabled;
+      var disabled = this._rpService._blockingDisabled;
       document.getElementById('rp-link-enable-blocking').hidden = !disabled;
       document.getElementById('rp-link-disable-blocking').hidden = disabled;
 
@@ -235,7 +233,7 @@ requestpolicy.menu = {
   },
 
   _populateDetails : function() {
-    var policyMgr = this._rpServiceJSObject._policyMgr;
+    var policyMgr = this._rpService._policyMgr;
     const RULE_TYPE_ALLOW = requestpolicy.mod.RULE_TYPE_ALLOW;
     const RULE_TYPE_DENY = requestpolicy.mod.RULE_TYPE_DENY;
 
@@ -254,7 +252,7 @@ requestpolicy.menu = {
     // rule. We won't be able to use just "allow temporarily".
 
     if (!this._currentlySelectedDest) {
-      if (this._rpServiceJSObject.isDefaultAllow()) {
+      if (this._rpService.isDefaultAllow()) {
         // It seems pretty rare that someone will want to add a rule to block all
         // requests from a given origin.
         //if (!this._privateBrowsingEnabled) {
@@ -280,7 +278,7 @@ requestpolicy.menu = {
           'h' : this._addWildcard(dest)
         }
       };
-      //if (this._rpServiceJSObject.isDefaultAllow()) {
+      //if (this._rpService.isDefaultAllow()) {
       if (this._isCurrentlySelectedDestAllowed) {
         if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
             !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
@@ -570,8 +568,8 @@ requestpolicy.menu = {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
-      if (this._rpServiceJSObject.isDefaultAllow() ||
-        this._rpServiceJSObject.isDefaultAllowSameDomain()) {
+      if (this._rpService.isDefaultAllow() ||
+        this._rpService.isDefaultAllowSameDomain()) {
         if (destBase == this._currentlySelectedOrigin) {
           continue;
         }
@@ -605,8 +603,8 @@ requestpolicy.menu = {
         // requests to the same domain:
         // Only list other origins where there is a destination from that origin
         // that is at a different domain, not just a different subdomain.
-        if (this._rpServiceJSObject.isDefaultAllow() ||
-            this._rpServiceJSObject.isDefaultAllowSameDomain()) {
+        if (this._rpService.isDefaultAllow() ||
+            this._rpService.isDefaultAllowSameDomain()) {
           if (destBase == domain) {
             continue;
           }

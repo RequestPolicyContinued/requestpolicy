@@ -30,21 +30,21 @@ function onload() {
   document.getElementById('pref-indicateBlockedObjects').addEventListener('change',
       function (event) {
         rpService.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
-        rpServiceJSObject._prefService.savePrefFile(null);
+        rpService._prefService.savePrefFile(null);
       }
   );
 
 //  document.getElementById('pref-autoReload').addEventListener('change',
 //    function(event) {
 //      rpService.prefs.setBoolPref('autoReload', event.target.checked);
-//      rpServiceJSObject._prefService.savePrefFile(null);
+//      rpService._prefService.savePrefFile(null);
 //    }
 //  );
 
   document.getElementById('pref-privateBrowsingPermanentWhitelisting').addEventListener('change',
       function (event) {
         rpService.prefs.setBoolPref('privateBrowsingPermanentWhitelisting', event.target.checked);
-        rpServiceJSObject._prefService.savePrefFile(null);
+        rpService._prefService.savePrefFile(null);
       }
   );
 }

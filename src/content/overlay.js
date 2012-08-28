@@ -60,10 +60,6 @@ requestpolicy.overlay = {
   _initialized : false,
   _rpService : null,
 
-  // For things we can't do through the nsIRequestPolicy interface, use direct
-  // access to the underlying JS object.
-  _rpServiceJSObject : null,
-
   // This is set by requestLog.js when it is initialized. We don't need to worry
   // about setting it here.
   requestLogTreeView : null,
@@ -118,8 +114,7 @@ requestpolicy.overlay = {
         requestpolicy.menu.init();
 
         this._rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-            .getService(Components.interfaces.nsIRequestPolicy);
-        this._rpServiceJSObject = this._rpService.wrappedJSObject;
+            .getService().wrappedJSObject;
 
         this._strbundle = document.getElementById("requestpolicyStrings");
         this._menu = document.getElementById("rp-popup");
@@ -150,7 +145,7 @@ requestpolicy.overlay = {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        this._rpServiceJSObject.addRequestObserver(this);
+        this._rpService.addRequestObserver(this);
 
         //this.setContextMenuEnabled(this._rpService.prefs
         //    .getBoolPref("contextMenu"));
@@ -233,7 +228,7 @@ requestpolicy.overlay = {
   //},
 
   onWindowClose : function(event) {
-    this._rpServiceJSObject.removeRequestObserver(this);
+    this._rpService.removeRequestObserver(this);
     this._removeHistoryObserver();
     this._removeLocationObserver();
   },
@@ -428,7 +423,7 @@ requestpolicy.overlay = {
 //    requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
 //        destIdent);
 
-    const rpServiceObj = this._rpServiceJSObject;
+    const rpServiceObj = this._rpService;
 
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
@@ -927,7 +922,7 @@ requestpolicy.overlay = {
         // We don't automatically perform any allowed redirects. Instead, we
         // just detect when they will be blocked and show a notification. If
         // the docShell has allowMetaRedirects disabled, it will be respected.
-        if (!this._rpServiceJSObject._blockingDisabled
+        if (!this._rpService._blockingDisabled
             && !this._rpService.isAllowedRedirect(document.location, dest)) {
           // Ignore redirects to javascript. The browser will ignore them, as well.
           if (requestpolicy.mod.DomainUtil.getUriObject(dest)
@@ -966,14 +961,14 @@ requestpolicy.overlay = {
           }, false);
     }
 
-    if (this._rpServiceJSObject._blockedRedirects[document.location]) {
-      var dest = this._rpServiceJSObject._blockedRedirects[document.location];
+    if (this._rpService._blockedRedirects[document.location]) {
+      var dest = this._rpService._blockedRedirects[document.location];
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(document, dest);
-      delete this._rpServiceJSObject._blockedRedirects[document.location];
+      delete this._rpService._blockedRedirects[document.location];
     }
 
     this._wrapWindowOpen(document.defaultView);
@@ -1254,7 +1249,7 @@ requestpolicy.overlay = {
    * @return {String} The current document's identifier.
    */
   getTopLevelDocumentUriIdentifier : function() {
-    return this._rpServiceJSObject.getUriIdentifier(this
+    return this._rpService.getUriIdentifier(this
         .getTopLevelDocumentUri());
   },
 
@@ -1265,7 +1260,7 @@ requestpolicy.overlay = {
     // We don't just retrieve the translations array once during init because
     // we're not sure if it will be fully populated during init. This is
     // especially a concern given the async addon manager API in Firefox 4.
-    var translations = this._rpServiceJSObject.getTopLevelDocTranslations();
+    var translations = this._rpService.getTopLevelDocTranslations();
     if (translations.length) {
       var docURI = content.document.documentURI;
       for (var i = 0; i < translations.length; i++) {
@@ -1285,8 +1280,8 @@ requestpolicy.overlay = {
    *          event
    */
   toggleTemporarilyAllowAll : function(event) {
-    var disabled = !this._rpServiceJSObject._blockingDisabled;
-    this._rpServiceJSObject.setBlockingDisabled(disabled);
+    var disabled = !this._rpService._blockingDisabled;
+    this._rpService.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
     document.getElementById('rp-link-enable-blocking').hidden = !disabled;
@@ -1433,42 +1428,42 @@ requestpolicy.overlay = {
    * TODO: comment
    */
   addAllowRule : function(ruleData) {
-    this._rpServiceJSObject.addAllowRule(ruleData);
+    this._rpService.addAllowRule(ruleData);
   },
 
   /**
    * TODO: comment
    */
   addTemporaryAllowRule : function(ruleData) {
-    this._rpServiceJSObject.addTemporaryAllowRule(ruleData);
+    this._rpService.addTemporaryAllowRule(ruleData);
   },
 
   /**
    * TODO: comment
    */
   removeAllowRule : function(ruleData) {
-    this._rpServiceJSObject.removeAllowRule(ruleData);
+    this._rpService.removeAllowRule(ruleData);
   },
 
   /**
    * TODO: comment
    */
   addDenyRule : function(ruleData) {
-    this._rpServiceJSObject.addDenyRule(ruleData);
+    this._rpService.addDenyRule(ruleData);
   },
 
   /**
    * TODO: comment
    */
   addTemporaryDenyRule : function(ruleData) {
-    this._rpServiceJSObject.addTemporaryDenyRule(ruleData);
+    this._rpService.addTemporaryDenyRule(ruleData);
   },
 
   /**
    * TODO: comment
    */
   removeDenyRule : function(ruleData) {
-    this._rpServiceJSObject.removeDenyRule(ruleData);
+    this._rpService.removeDenyRule(ruleData);
   },
 
   /**
@@ -1535,7 +1530,7 @@ requestpolicy.overlay = {
   },
 
 //  showExtensionConflictInfo : function() {
-//    var ext = this._rpServiceJSObject.getConflictingExtensions();
+//    var ext = this._rpService.getConflictingExtensions();
 //    var extJson = requestpolicy.mod.JSON.stringify(ext);
 //    this._openInNewTab(this._extensionConflictInfoUri
 //        + encodeURIComponent(extJson));
@@ -1552,7 +1547,7 @@ requestpolicy.overlay = {
   _showWelcomeWindow : function() {
     if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {
       this._rpService.prefs.setBoolPref("welcomeWindowShown", true);
-      this._rpServiceJSObject._prefService.savePrefFile(null);
+      this._rpService._prefService.savePrefFile(null);
       var tab = gBrowser.addTab("chrome://requestpolicy/content/settings/setup.html");
       gBrowser.selectedTab = tab;
     }

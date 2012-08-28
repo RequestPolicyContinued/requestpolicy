@@ -18,7 +18,7 @@ function showConfigure() {
 function handleDefaultPolicyChange() {
   rpService.prefs.setBoolPref('defaultPolicy.allow',
       $('#defaultallow').prop('checked'));
-  rpServiceJSObject._prefService.savePrefFile(null);
+  rpService._prefService.savePrefFile(null);
   setAllowSameDomainBlockDisplay();
   handleSubscriptionsChange();
 }
@@ -26,7 +26,7 @@ function handleDefaultPolicyChange() {
 function handleAllowSameDomainChange() {
   rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
       $('#allowsamedomain').prop('checked'));
-  rpServiceJSObject._prefService.savePrefFile(null);
+  rpService._prefService.savePrefFile(null);
 }
 
 function setAllowSameDomainBlockDisplay() {
@@ -49,7 +49,7 @@ function handleSubscriptionsChange() {
     'allow_sameorg':{},
     'deny_trackers':{}
   };
-  var userSubs = rpServiceJSObject._subscriptions;
+  var userSubs = rpService._subscriptions;
   for (var subName in subs) {
     var subInfo = {};
     subInfo['official'] = {};
@@ -87,7 +87,7 @@ function onload() {
     // of the old rules. We check for new-style rules just in case the user has
     // opened the setup window again after initial upgrade.
     try {
-      var ruleCount = rpServiceJSObject._policyMgr.getUserPolicyRuleCount();
+      var ruleCount = rpService._policyMgr.getUserPolicyRuleCount();
     } catch (e) {
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;

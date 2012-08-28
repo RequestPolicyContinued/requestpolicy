@@ -193,7 +193,7 @@ RequestSet.prototype = {
 var RequestUtil = {
 
   setRPService : function (rpService) {
-    this._rpServiceJSObject = rpService;
+    this._rpService = rpService;
   },
 
   /**
@@ -201,7 +201,7 @@ var RequestUtil = {
    */
   getDirectRejectedRequests : function(currentUri) {
     // Let's try this: returning the same data structure we already have.
-    return this._rpServiceJSObject._rejectedRequests.getOriginUri(currentUri);
+    return this._rpService._rejectedRequests.getOriginUri(currentUri);
   },
 
   _getRequestsHelper : function(currentUri, curIdent, otherOrigins, requests) {
@@ -249,15 +249,15 @@ var RequestUtil = {
 
   getDeniedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     Logger.dump("## getDeniedRequests");
-    //this._rpServiceJSObject._rejectedRequests.print("from getRejectedRequests");
+    //this._rpService._rejectedRequests.print("from getRejectedRequests");
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-          this._rpServiceJSObject._rejectedRequests.getAll());
+          this._rpService._rejectedRequests.getAll());
   },
 
   getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
     Logger.dump("## getAllowedRequests");
     return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-          this._rpServiceJSObject._allowedRequests.getAll());
+          this._rpService._allowedRequests.getAll());
   },
 
   /**
@@ -340,7 +340,7 @@ var RequestUtil = {
     Logger
         .dump("Looking for other origins within allowed requests from "
             + rootUri);
-    var allowedRequests = this._rpServiceJSObject._allowedRequests.getOriginUri(rootUri);
+    var allowedRequests = this._rpService._allowedRequests.getOriginUri(rootUri);
     if (allowedRequests) {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
@@ -373,7 +373,7 @@ var RequestUtil = {
     Logger
       .dump("Looking for other origins within denied requests from "
               + rootUri);
-    var requests = this._rpServiceJSObject._rejectedRequests.getOriginUri(rootUri);
+    var requests = this._rpService._rejectedRequests.getOriginUri(rootUri);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {
@@ -401,7 +401,7 @@ var RequestUtil = {
     }
     checkedUris[originUri] = true;
   
-    var rejectedRequests = this._rpServiceJSObject._rejectedRequests.getOriginUri(originUri);
+    var rejectedRequests = this._rpService._rejectedRequests.getOriginUri(originUri);
     if (rejectedRequests) {
       for (var i in rejectedRequests) {
         for (var j in rejectedRequests[i]) {
@@ -418,7 +418,7 @@ var RequestUtil = {
     // I think this logic will also indicate rejected requests if this
     // origin has rejected requests from other origins within it. I don't
     // believe this will cause a problem.
-    var allowedRequests = this._rpServiceJSObject._allowedRequests.getOriginUri(originUri);
+    var allowedRequests = this._rpService._allowedRequests.getOriginUri(originUri);
     if (allowedRequests) {
       for (var i in allowedRequests) {
         for (var j in allowedRequests[i]) {

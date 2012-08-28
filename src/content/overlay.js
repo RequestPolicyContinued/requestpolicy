@@ -1575,12 +1575,12 @@ requestpolicy.overlay = {
   },
 
   openHelp : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/help.html');
+    var tab = gBrowser.addTab('https://www.requestpolicy.com/help-1.0.html');
     gBrowser.selectedTab = tab;
   },
 
   openAbout : function() {
-    var tab = gBrowser.addTab('chrome://requestpolicy/content/settings/about.html');
+    var tab = gBrowser.addTab('https://www.requestpolicy.com/about.html');
     gBrowser.selectedTab = tab;
   },
 

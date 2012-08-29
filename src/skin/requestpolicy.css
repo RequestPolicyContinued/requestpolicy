@@ -225,7 +225,7 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
 
 
 #rp-details .rp-stop-rule[selected-rule="true"] {
-  text-decoration: line-through;
+  text-decoration: underline;
 }
 
 #rp-details .rp-start-rule[selected-rule="true"] {

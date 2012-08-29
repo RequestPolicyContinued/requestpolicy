@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Preferencias">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Registro de peticiones">
+<!ENTITY rp.requestLog.origin "Origen">
+<!ENTITY rp.requestLog.destination "Destino">
 <!ENTITY rp.requestLog.blocked "Bloqueado">
 <!ENTITY rp.requestLog.time "Hora">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Copiar el origen al portapapeles">

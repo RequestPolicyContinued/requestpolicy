@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Iestatījumi">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Pieprasījumu žurnāls">
+<!ENTITY rp.requestLog.origin "Pirmavots">
+<!ENTITY rp.requestLog.destination "Mērķis">
 <!ENTITY rp.requestLog.blocked "Bloķēts">
 <!ENTITY rp.requestLog.time "Laiks">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Kopēt pirmavotu starpliktuvē">

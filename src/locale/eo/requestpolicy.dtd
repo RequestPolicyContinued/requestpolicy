@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Preferoj">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Protokolo de petoj">
+<!ENTITY rp.requestLog.origin "Fonto">
+<!ENTITY rp.requestLog.destination "Celo">
 <!ENTITY rp.requestLog.blocked "Blokita">
 <!ENTITY rp.requestLog.time "Tempo">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Kopii la fontadreson en la tondujon">

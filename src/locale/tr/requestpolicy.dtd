@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Seçenekler">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Kayıtlar">
+<!ENTITY rp.requestLog.origin "Ana">
+<!ENTITY rp.requestLog.destination "Hedef">
 <!ENTITY rp.requestLog.blocked "Yasaklı">
 <!ENTITY rp.requestLog.time "Zaman">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Ana adresi hafızaya kopyala">

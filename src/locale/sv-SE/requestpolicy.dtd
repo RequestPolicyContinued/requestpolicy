@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Alternativ">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Förfrågningslogg">
+<!ENTITY rp.requestLog.origin "Källa">
+<!ENTITY rp.requestLog.destination "Mål">
 <!ENTITY rp.requestLog.blocked "Blockerad">
 <!ENTITY rp.requestLog.time "Tid">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Kopiera källa till urklipp">

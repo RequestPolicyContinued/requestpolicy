@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Einstellungen">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Anfragenchronik">
+<!ENTITY rp.requestLog.origin "Quelle">
+<!ENTITY rp.requestLog.destination "Ziel">
 <!ENTITY rp.requestLog.blocked "Blockiert">
 <!ENTITY rp.requestLog.time "Zeit">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">

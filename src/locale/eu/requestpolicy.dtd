@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Hobespenak">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Eskaera Erregistroa">
+<!ENTITY rp.requestLog.origin "Jatorria">
+<!ENTITY rp.requestLog.destination "Helmuga">
 <!ENTITY rp.requestLog.blocked "Blokeatuta">
 <!ENTITY rp.requestLog.time "Ordua">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Kopiatu Jatorria Arbelera">

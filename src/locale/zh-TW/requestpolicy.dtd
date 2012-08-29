@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "偏好設定">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "請求記錄">
+<!ENTITY rp.requestLog.origin "來源">
+<!ENTITY rp.requestLog.destination "目標">
 <!ENTITY rp.requestLog.blocked "已阻擋">
 <!ENTITY rp.requestLog.time "發生時間">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Copy Origin to Clipboard">

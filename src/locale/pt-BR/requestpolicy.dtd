@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Preferências…">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Pedidos nesta página">
+<!ENTITY rp.requestLog.origin "Origem">
+<!ENTITY rp.requestLog.destination "Destino">
 <!ENTITY rp.requestLog.blocked "Bloqueado">
 <!ENTITY rp.requestLog.time "Hora">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Copiar origem">

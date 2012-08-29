@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "首选项">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "请求日志">
+<!ENTITY rp.requestLog.origin "来源">
+<!ENTITY rp.requestLog.destination "目标">
 <!ENTITY rp.requestLog.blocked "阻止">
 <!ENTITY rp.requestLog.time "时间">
 <!ENTITY rp.requestLog.copyOriginToClipboard "复制“来源”到剪贴板">

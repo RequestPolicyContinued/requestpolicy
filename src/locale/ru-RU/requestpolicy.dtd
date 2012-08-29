@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Настройки">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Журнал Запросов">
+<!ENTITY rp.requestLog.origin "Источник">
+<!ENTITY rp.requestLog.destination "Цель">
 <!ENTITY rp.requestLog.blocked "Заблокирован">
 <!ENTITY rp.requestLog.time "Время">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Скопировать источник в буфер обмена">

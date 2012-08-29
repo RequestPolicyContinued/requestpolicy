@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Nastavenia">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Protokol požiadaviek">
+<!ENTITY rp.requestLog.origin "Zdroj">
+<!ENTITY rp.requestLog.destination "Ciele">
 <!ENTITY rp.requestLog.blocked "Blokované">
 <!ENTITY rp.requestLog.time "Čas">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Kopírovať zdroj do schránky">

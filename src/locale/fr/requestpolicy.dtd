@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Préférences">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Journal des requêtes">
+<!ENTITY rp.requestLog.origin "Origine">
+<!ENTITY rp.requestLog.destination "Destination">
 <!ENTITY rp.requestLog.blocked "Bloqué">
 <!ENTITY rp.requestLog.time "Durée">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Copier l'original dans le presse-papiers">

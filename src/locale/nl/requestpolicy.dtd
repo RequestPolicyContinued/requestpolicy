@@ -9,6 +9,8 @@
 <!ENTITY rp.menu.preferences "Voorkeuren">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Logbestand verzoeken">
+<!ENTITY rp.requestLog.origin "Oorsprong">
+<!ENTITY rp.requestLog.destination "Bestemming">
 <!ENTITY rp.requestLog.blocked "Geblokkeerd">
 <!ENTITY rp.requestLog.time "Tijdstip">
 <!ENTITY rp.requestLog.copyOriginToClipboard "Oorsprong naar Klembord kopiëren">

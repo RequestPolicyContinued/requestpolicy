@@ -1233,47 +1233,6 @@ RequestPolicyService.prototype = {
     
   },
 
-  _forbidDestination : function(host, noStore) {
-    throw "NOT_IMPLEMENTED: _forbidDestination";
-
-    if (this._temporarilyAllowedDestinations[host]) {
-      this._temporarilyAllowedDestinationsCount--;
-      delete this._temporarilyAllowedDestinations[host];
-    }
-    if (this._allowedDestinations[host]) {
-      delete this._allowedDestinations[host];
-      if (!noStore) {
-        this._storePreferenceList("allowedDestinations");
-      }
-    }
-  },
-
-  forbidDestination : function forbidDestination(host) {
-    this._forbidDestination(host, false);
-  },
-
-  forbidDestinationDelayStore : function forbidDestinationDelayStore(host) {
-    this._forbidDestination(host, true);
-  },
-
-  _forbidOriginToDestination : function(originIdentifier, destIdentifier,
-      noStore) {
-    throw "NOT_IMPLEMENTED: _forbidOriginToDestination";
-    var combinedId = this._getCombinedOriginToDestinationIdentifier(
-        originIdentifier, destIdentifier);
-    this._forbidOriginToDestinationByCombinedIdentifier(combinedId);
-  },
-
-  forbidOriginToDestination : function forbidOriginToDestination(
-      originIdentifier, destIdentifier) {
-    this._forbidOriginToDestination(originIdentifier, destIdentifier, false);
-  },
-
-  forbidOriginToDestinationDelayStore : function forbidOriginToDestinationDelayStore(
-      originIdentifier, destIdentifier) {
-    this._forbidOriginToDestination(originIdentifier, destIdentifier, true);
-  },
-
   mapDestinations : function(origDestUri, newDestUri) {
     origDestUri = requestpolicy.mod.DomainUtil.stripFragment(origDestUri);
     newDestUri = requestpolicy.mod.DomainUtil.stripFragment(newDestUri);
@@ -1284,14 +1243,6 @@ RequestPolicyService.prototype = {
     }
     this._mappedDestinations[newDestUri][origDestUri] =
         requestpolicy.mod.DomainUtil.getUriObject(origDestUri);
-  },
-
-  storeAllPreferenceLists : function() {
-    throw "NOT_IMPLEMENTED: storeAllPreferenceLists";
-    
-    for (var prefName in this._prefNameToObjectMap) {
-      this._storePreferenceList(prefName);
-    }
   },
 
   isAllowedRedirect : function(originUri, destinationUri) {

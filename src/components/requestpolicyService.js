@@ -632,14 +632,6 @@ RequestPolicyService.prototype = {
         this._defaultAllowSameDomain = this.prefs
               .getBoolPref("defaultPolicy.allowSameDomain");
         break;
-      case "subscription.trackers" :
-      case "subscription.sameorg" :
-      case "subscription.functionality" :
-      case "subscription.embedded" :
-      case "subscription.mozilla" :
-      case "subscription.extensions" :
-        // TODO: implement handling of subscription change
-        break;
       default :
         break;
     }

@@ -118,8 +118,7 @@ PolicyManager.prototype = {
     this._userPolicies["user"]["policy"].userPolicy = true;
     this._userPolicies["user"].policy.print();
     // Temporary rules. These are never stored.
-    // TODO: make sure they're never stored.
-    this.resetTemporaryPolicies();
+    this.resetTemporaryPolicy();
   },
 
   loadSubscriptionPolicies : function(subscriptionInfo) {
@@ -273,15 +272,12 @@ PolicyManager.prototype = {
     //this._userPolicies["temp"].policy.print();
   },
 
-  // TODO: rename this to temporaryRulesExist or invert it to
-  // isTemporaryPolicyEmpty()
-  temporaryPoliciesExist : function() {
+  temporaryRulesExist : function() {
     return this._userPolicies["temp"].rawPolicy.getAllowRuleCount() ||
            this._userPolicies["temp"].rawPolicy.getDenyRuleCount();
   },
 
-  // TODO: rename this to resetTemporaryPolicy
-  resetTemporaryPolicies : function() {
+  resetTemporaryPolicy : function() {
     var rawPolicy = new requestpolicy.mod.RawPolicy();
     this._userPolicies["temp"] = {"rawPolicy" : rawPolicy,
                                   "policy" : rawPolicy.toPolicy("temp")};

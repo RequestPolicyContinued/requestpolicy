@@ -1216,21 +1216,12 @@ RequestPolicyService.prototype = {
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
   },
 
-  revokeTemporaryPermissions : function revokeTemporaryPermissions(host) {
-    throw "NOT_IMPLEMENTED: revokeTemporaryPermissions";
+  temporaryRulesExist : function temporaryRulesExist() {
+    return this._policyMgr.temporaryRulesExist();
+  },
 
-    this._policyMgr.resetTemporaryPolicies();
-
-    this._temporarilyAllowedOriginsCount = 0;
-    this._temporarilyAllowedOrigins = {};
-
-    this._temporarilyAllowedDestinationsCount = 0;
-    this._temporarilyAllowedDestinations = {};
-
-    this._temporarilyAllowedOriginsToDestinationsCount = 0;
-    this._temporarilyAllowedOriginsToDestinations = {};
-
-    
+  revokeTemporaryPermissions : function revokeTemporaryPermissions() {
+    this._policyMgr.resetTemporaryPolicy();
   },
 
   mapDestinations : function(origDestUri, newDestUri) {

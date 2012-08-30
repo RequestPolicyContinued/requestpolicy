@@ -1229,11 +1229,12 @@ requestpolicy.overlay = {
    */
   onPopupHiding : function(event) {
     var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
-    if (rulesChanged) {
+    if (rulesChanged || this._needsReloadOnMenuClose) {
       //if (this._rpService.prefs.getBoolPref("autoReload")) {
         content.document.location.reload(false);
       //}
     }
+    this._needsReloadOnMenuClose = false;
 //    if (event.currentTarget != event.originalTarget) {
 //      return;
 //    }
@@ -1424,44 +1425,26 @@ requestpolicy.overlay = {
     this._rpService.forbidOriginToDestination(originHost, destHost);
   },
 
-  /**
-   * TODO: comment
-   */
   addAllowRule : function(ruleData) {
     this._rpService.addAllowRule(ruleData);
   },
 
-  /**
-   * TODO: comment
-   */
   addTemporaryAllowRule : function(ruleData) {
     this._rpService.addTemporaryAllowRule(ruleData);
   },
 
-  /**
-   * TODO: comment
-   */
   removeAllowRule : function(ruleData) {
     this._rpService.removeAllowRule(ruleData);
   },
 
-  /**
-   * TODO: comment
-   */
   addDenyRule : function(ruleData) {
     this._rpService.addDenyRule(ruleData);
   },
 
-  /**
-   * TODO: comment
-   */
   addTemporaryDenyRule : function(ruleData) {
     this._rpService.addTemporaryDenyRule(ruleData);
   },
 
-  /**
-   * TODO: comment
-   */
   removeDenyRule : function(ruleData) {
     this._rpService.removeDenyRule(ruleData);
   },
@@ -1474,9 +1457,9 @@ requestpolicy.overlay = {
    */
   revokeTemporaryPermissions : function(event) {
     this._rpService.revokeTemporaryPermissions();
-    // Revoking temporary permissions disables permissive mode. This is partly
-    // because permissive mode is called "temporarily allow all".
-    this._setPermissiveNotification(false);
+    this._needsReloadOnMenuClose = true;
+    var popup = document.getElementById('rp-popup');
+    popup.hidePopup();
   },
 
   _performRedirect : function(document, redirectTargetUri) {

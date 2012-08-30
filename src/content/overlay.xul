@@ -99,6 +99,10 @@
           </vbox>
         </hbox>
 
+        <hbox id="rp-revoke-temporary-permissions" hidden="true">
+            <label value="&rp.menu.revokeTemporaryPermissions;"
+               onclick="requestpolicy.overlay.revokeTemporaryPermissions();"/>
+        </hbox>
         <hbox id="rp-footer">
           <hbox id="rp-footer-links">
             <label id="rp-link-enable-blocking" class="rp-footer-link"

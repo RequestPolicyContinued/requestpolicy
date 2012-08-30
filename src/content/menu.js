@@ -85,12 +85,12 @@ requestpolicy.menu = {
 
   prepareMenu : function() {
     try {
-//      var oldRulesExist = this._rpService.oldRulesExist();
-//      document.getElementById('rp-import-old-rules').hidden = !oldRulesExist;
-
       var disabled = this._rpService._blockingDisabled;
       document.getElementById('rp-link-enable-blocking').hidden = !disabled;
       document.getElementById('rp-link-disable-blocking').hidden = disabled;
+
+      document.getElementById('rp-revoke-temporary-permissions').hidden =
+          !this._rpService.temporaryRulesExist();
 
       this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
@@ -494,8 +494,6 @@ requestpolicy.menu = {
   },
 
   _processRuleChange: function(ruleAction, ruleData) {
-
-    requestpolicy.overlay._needsReloadOnMenuClose = true;
 
     switch (ruleAction) {
       case 'allow':

@@ -285,17 +285,17 @@ toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarB
   width: 500px !important;
 }
 
-#rp-import-old-rules {
+#rp-revoke-temporary-permissions {
   border-top: 1px solid #ddd;
   padding: 7px 5px 9px 5px;
   -moz-box-pack: center;
 }
-#rp-import-old-rules label {
+#rp-revoke-temporary-permissions label {
   color: #2550ba;
   font-size: 14px;
   margin: 0 10px 0 10px;
 }
-#rp-import-old-rules label:hover {
+#rp-revoke-temporary-permissions label:hover {
   text-decoration: underline;
   cursor: pointer;
 }

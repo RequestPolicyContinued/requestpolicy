@@ -323,6 +323,13 @@ requestpolicy.menu = {
       }
     }
 
+    if (this._currentlySelectedDest) {
+      if (!this._rpService.isDefaultAllow() &&
+          !this._rpService.isDefaultAllowSameDomain()) {
+        this._populateDetailsAddSubdomainAllowRules(this._addRulesList);
+      }
+    }
+
     this._populateDetailsRemoveAllowRules(this._removeRulesList);
     this._populateDetailsRemoveDenyRules(this._removeRulesList);
   },
@@ -989,6 +996,76 @@ requestpolicy.menu = {
     for (var i in subscriptionRules) {
       this._addMenuItemRemoveDenyRule(list, subscriptionRules[i], true);
     }
+  },
+
+  _populateDetailsAddSubdomainAllowRules : function(list) {
+    var policyMgr = this._rpService._policyMgr;
+    const RULE_TYPE_ALLOW = requestpolicy.mod.RULE_TYPE_ALLOW;
+    const RULE_TYPE_DENY = requestpolicy.mod.RULE_TYPE_DENY;
+
+    var origin = this._currentlySelectedOrigin;
+
+    // TODO: can we avoid calling getDeniedRequests here and reuse a result
+    // from calling it earlier?
+
+    // Only pass a uri to getDeniedRequests if this isn't for listing the
+    // blocked destinations of an other origin.
+    var uri = null;
+    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
+      uri = this._currentUri;
+    }
+    var ident = 'http://' + this._currentlySelectedOrigin;
+
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+        uri, ident, this._otherOrigins);
+    var requests = reqSet.getAllMergedOrigins();
+
+    var destHosts = {};
+
+    for (var destBase in requests) {
+      if (this._currentlySelectedDest &&
+          this._currentlySelectedDest != destBase) {
+        continue;
+      }
+      for (var destIdent in requests[destBase]) {
+        var destinations = requests[destBase][destIdent];
+        for (var destUri in destinations) {
+          destHosts[requestpolicy.mod.DomainUtil.getHost(destUri)] = null;
+        }
+      }
+    }
+
+    for (var destHost in destHosts) {
+      var ruleData = {
+        'o' : {
+          'h' : this._addWildcard(origin)
+        },
+        'd' : {
+          'h': destHost
+        }
+      };
+      if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
+          !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemAllowOriginToDest(list, ruleData);
+        }
+        var item = this._addMenuItemTempAllowOriginToDest(list, ruleData);
+      }
+
+      var destOnlyRuleData = {
+        'd' : {
+          'h': destHost
+        }
+      };
+      if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
+          !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+        if (!this._privateBrowsingEnabled) {
+          var item = this._addMenuItemAllowDest(list, destOnlyRuleData);
+        }
+        var item = this._addMenuItemTempAllowDest(list, destOnlyRuleData);
+      }
+    }
+
   },
 
 }

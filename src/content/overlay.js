@@ -34,8 +34,6 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Stats.jsm",
-    requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Util.jsm",
     requestpolicy.mod);
 
@@ -1281,17 +1279,6 @@ requestpolicy.overlay = {
       return;
     }
     requestpolicy.menu.prepareMenu();
-    try {
-      // TODO: include details of what's in the menu
-      var blockedDests = requestpolicy.menu._blockedDestinationsItems.length;
-      var allowedDests = requestpolicy.menu._allowedDestinationsItems.length;
-      var otherOrigins = requestpolicy.menu.stats_otherOriginMenuCount;
-      requestpolicy.mod.Logger.dump('otherOrigins: ' + otherOrigins);
-      requestpolicy.mod.Stats.menuOpened(
-        this.getTopLevelDocumentUri(), blockedDests, allowedDests, otherOrigins);
-    } catch (e) {
-      requestpolicy.mod.Logger.dump('error calling Stats.menuOpened: ' + e);
-    }
   },
 
   /**
@@ -1307,7 +1294,6 @@ requestpolicy.overlay = {
     // Leave the popup attached to the context menu, as we consider that the
     // default location for it.
     this._attachPopupToContextMenu();
-    requestpolicy.mod.Stats.menuClosed(this.getTopLevelDocumentUri());
   },
 
   /**
@@ -1364,15 +1350,6 @@ requestpolicy.overlay = {
     // would be unexpected to the user if all were reloaded.
     this
         ._setPermissiveNotificationForAllWindows(this._rpServiceJSObject._blockingDisabled);
-
-    if (this._rpServiceJSObject._blockingDisabled) {
-      requestpolicy.mod.Stats.menuActionTempAllowAllEnabled(
-        this.getTopLevelDocumentUri());
-    } else {
-      requestpolicy.mod.Stats.menuActionTempAllowAllDisabled(
-        this.getTopLevelDocumentUri());
-    }
-
     this._conditionallyReloadDocument();
   },
 
@@ -1382,12 +1359,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowOrigin : function(originHost) {
     this._rpService.temporarilyAllowOrigin(originHost);
-
-    // TODO: should we indicate in stats that this is for an "other origin"?
-    // If so, we should be tracking that for other menu selections, as well.
-    requestpolicy.mod.Stats.menuActionTempAllowOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1403,10 +1374,6 @@ requestpolicy.overlay = {
     // "window.target".
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.temporarilyAllowOrigin(host);
-
-    requestpolicy.mod.Stats.menuActionTempAllowOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1419,10 +1386,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowDestination : function(destHost) {
     this._rpService.temporarilyAllowDestination(destHost);
-
-    requestpolicy.mod.Stats.menuActionTempAllowDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1437,10 +1400,6 @@ requestpolicy.overlay = {
    */
   temporarilyAllowOriginToDestination : function(originHost, destHost) {
     this._rpService.temporarilyAllowOriginToDestination(originHost, destHost);
-
-    requestpolicy.mod.Stats.menuActionTempAllowOriginToDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1449,10 +1408,6 @@ requestpolicy.overlay = {
    */
   allowOrigin : function(originHost) {
     this._rpService.allowOrigin(originHost);
-
-    requestpolicy.mod.Stats.menuActionAllowOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1466,10 +1421,6 @@ requestpolicy.overlay = {
   allowCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.allowOrigin(host);
-
-    requestpolicy.mod.Stats.menuActionAllowOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1481,10 +1432,6 @@ requestpolicy.overlay = {
    */
   allowDestination : function(destHost) {
     this._rpService.allowDestination(destHost);
-
-    requestpolicy.mod.Stats.menuActionAllowDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1499,10 +1446,6 @@ requestpolicy.overlay = {
    */
   allowOriginToDestination : function(originHost, destHost) {
     this._rpService.allowOriginToDestination(originHost, destHost);
-
-    requestpolicy.mod.Stats.menuActionAllowOriginToDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1512,10 +1455,6 @@ requestpolicy.overlay = {
    */
   forbidOrigin : function(originHost) {
     this._rpService.forbidOrigin(originHost);
-
-    requestpolicy.mod.Stats.menuActionForbidOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1530,10 +1469,6 @@ requestpolicy.overlay = {
   forbidCurrentOrigin : function(event) {
     var host = this.getTopLevelDocumentUriIdentifier();
     this._rpService.forbidOrigin(host);
-
-    requestpolicy.mod.Stats.menuActionForbidOrigin(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1546,10 +1481,6 @@ requestpolicy.overlay = {
    */
   forbidDestination : function(destHost) {
     this._rpService.forbidDestination(destHost);
-
-    requestpolicy.mod.Stats.menuActionForbidDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1565,10 +1496,6 @@ requestpolicy.overlay = {
    */
   forbidOriginToDestination : function(originHost, destHost) {
     this._rpService.forbidOriginToDestination(originHost, destHost);
-
-    requestpolicy.mod.Stats.menuActionForbidOriginToDest(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1583,10 +1510,6 @@ requestpolicy.overlay = {
     // Revoking temporary permissions disables permissive mode. This is partly
     // because permissive mode is called "temporarily allow all".
     this._setPermissiveNotification(false);
-
-    requestpolicy.mod.Stats.menuActionRevokeTempPerms(
-      this.getTopLevelDocumentUri());
-
     this._conditionallyReloadDocument();
   },
 
@@ -1639,9 +1562,6 @@ requestpolicy.overlay = {
     window.openDialog("chrome://requestpolicy/content/prefWindow.xul",
         "requestpolicyPreferencesDialogWindow",
         "chrome, close, centerscreen, alwaysRaised");
-
-    requestpolicy.mod.Stats.menuActionPrefsOpened(
-      this.getTopLevelDocumentUri());
   },
 
   _showInitialSetupDialog : function() {
@@ -1700,27 +1620,13 @@ requestpolicy.overlay = {
           "chrome://requestpolicy/content/requestLog.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
       openRequestLog.hidden = true;
-
-      requestpolicy.mod.Stats.menuActionRequestLogOpened(
-        this.getTopLevelDocumentUri());
     } else {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
       openRequestLog.hidden = false;
       this.requestLogTreeView = null;
-
-      requestpolicy.mod.Stats.menuActionRequestLogClosed(
-        this.getTopLevelDocumentUri());
     }
   },
-
-  openStudyParticipationWindow : function() {
-    this._openInNewTab("chrome://requestpolicy/content/consentForm.html");
-  },
-
-  endParticipationInStudy : function() {
-    this._rpServiceJSObject.endParticipationInStudy();
-  }
 };
 
 // Initialize the requestpolicy.overlay object when the window DOM is loaded.

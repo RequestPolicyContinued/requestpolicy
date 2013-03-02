@@ -32,8 +32,6 @@ Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Prompter.jsm",
     requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Stats.jsm",
-    requestpolicy.mod);
 
 requestpolicy.prefWindow = {
 
@@ -95,19 +93,16 @@ requestpolicy.prefWindow = {
 
       this._originsList.forbid = function(origin) {
         requestpolicy.prefWindow._rpService.forbidOriginDelayStore(origin);
-        requestpolicy.mod.Stats.prefWindowForbidOrigin();
       };
       this._destinationsList.forbid = function(destination) {
         requestpolicy.prefWindow._rpService
             .forbidDestinationDelayStore(destination);
-        requestpolicy.mod.Stats.prefWindowForbidDest();
       };
       this._originsToDestinationsList.forbid = function(originToDestIdentifier) {
         // Third param is "delay store".
         requestpolicy.prefWindow._rpServiceJSObject
             ._forbidOriginToDestinationByCombinedIdentifier(
                 originToDestIdentifier, true);
-        requestpolicy.mod.Stats.prefWindowForbidOriginToDest();
       };
 
       // Each "allow" button has an array of its associated textboxes.
@@ -130,7 +125,6 @@ requestpolicy.prefWindow = {
         // removed.
         requestpolicy.prefWindow._rpServiceJSObject.forbidOrigin(origin);
         requestpolicy.prefWindow._rpServiceJSObject.allowOrigin(origin);
-        requestpolicy.mod.Stats.prefWindowAllowOrigin();
       };
       this._addDestinationButton.allow = function() {
         var dest = requestpolicy.prefWindow._addDestinationButton.textboxes[0].value;
@@ -138,7 +132,6 @@ requestpolicy.prefWindow = {
         // removed.
         requestpolicy.prefWindow._rpServiceJSObject.forbidDestination(dest);
         requestpolicy.prefWindow._rpServiceJSObject.allowDestination(dest);
-        requestpolicy.mod.Stats.prefWindowAllowDest();
       };
       this._addOriginToDestinationButton.allow = function() {
         var origin = requestpolicy.prefWindow._addOriginToDestinationButton.textboxes[0].value;
@@ -149,11 +142,9 @@ requestpolicy.prefWindow = {
             origin, dest);
         requestpolicy.prefWindow._rpServiceJSObject.allowOriginToDestination(
             origin, dest);
-        requestpolicy.mod.Stats.prefWindowAllowOriginToDest();
       };
 
       this._populateWhitelists();
-      requestpolicy.mod.Stats.prefWindowLoaded();
     }
   },
 
@@ -407,8 +398,6 @@ requestpolicy.prefWindow = {
   },
 
   _import : function(file) {
-    requestpolicy.mod.Stats.prefWindowImport();
-
     requestpolicy.mod.Logger.dump("Starting import from " + file.path);
     var groupToFunctionMap = {
       "origins" : "allowOrigin",
@@ -454,8 +443,6 @@ requestpolicy.prefWindow = {
   },
 
   _export : function(file) {
-    requestpolicy.mod.Stats.prefWindowExport();
-
     requestpolicy.mod.Logger.dump("Starting export to " + file.path);
     var lines = [];
     lines.push("[origins]");
@@ -516,5 +503,4 @@ addEventListener("unload", function(event) {
       extra = {'textRemainingInRuleCreationTextbox': true};
     }
   }
-  requestpolicy.mod.Stats.prefWindowClosed(extra);
 }, false);

@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "警告：预取已启用">
 <!ENTITY prefetchInfo "了解有关预取">
 <!ENTITY prefetchDisablingInstructions "禁用预取">

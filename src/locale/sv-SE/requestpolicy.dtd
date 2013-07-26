@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Varning: Förhämtning är aktiverad">
 <!ENTITY prefetchInfo "Lär dig mer om förhämtning">
 <!ENTITY prefetchDisablingInstructions "Inaktivera förhämtning">

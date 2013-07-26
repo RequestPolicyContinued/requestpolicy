@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Warning: Prefetch is enabled">
 <!ENTITY prefetchInfo "Learn about prefetching">
 <!ENTITY prefetchDisablingInstructions "Disable prefetching">

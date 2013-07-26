@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "警告: プリフェッチがオンになっています">
 <!ENTITY prefetchInfo "プリフェッチについて">
 <!ENTITY prefetchDisablingInstructions "プリフェッチを禁止する">

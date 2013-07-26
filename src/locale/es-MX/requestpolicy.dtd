@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Advertencia: La pre carga esta habilitada">
 <!ENTITY prefetchInfo "¿Que es la pre carga?">
 <!ENTITY prefetchDisablingInstructions "Deshabilitar la pre carga">

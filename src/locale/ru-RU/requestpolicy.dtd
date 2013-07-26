@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Внимание: Упреждающая выборка включена">
 <!ENTITY prefetchInfo "Узнать о функции упреждающей выборки">
 <!ENTITY prefetchDisablingInstructions "Отключить упреждающую выборку">

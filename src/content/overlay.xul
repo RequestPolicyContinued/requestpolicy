@@ -95,6 +95,10 @@
         hidden="true"
         label="&menu.closeRequestLog.label;"
         oncommand="requestpolicy.overlay.toggleRequestLog();" />
+      <menuitem
+        id="requestpolicyOpenSupportRP"
+        label="&supportRequestPolicy;"
+        oncommand="requestpolicy.overlay.openSupportRP();" />
       <menuseparator id="requestpolicy-preferencesSeparator"/>
       <menuitem
         id="requestpolicyExtensionConflictWarning"

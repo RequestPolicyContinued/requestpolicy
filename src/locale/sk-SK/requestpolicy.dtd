@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Upozornenie: Prefetch je povolená">
 <!ENTITY prefetchInfo "Ďalšie informácie o prefetching">
 <!ENTITY prefetchDisablingInstructions "Vypnúť prefetching">

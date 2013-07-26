@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Prefetch 가 활성화되었습니다.">
 <!ENTITY prefetchInfo "Prefetch 란?">
 <!ENTITY prefetchDisablingInstructions "Prefetch 비활성화">

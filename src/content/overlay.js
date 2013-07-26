@@ -43,6 +43,8 @@ Components.utils.import("resource://requestpolicy/Util.jsm",
  */
 requestpolicy.overlay = {
 
+  supportRequestPolicyURL : "https://www.requestpolicy.com/support-requestpolicy.html",
+
   _extensionConflictInfoUri : "http://www.requestpolicy.com/conflict?ext=",
 
   _prefetchInfoUri : "http://www.requestpolicy.com/help/prefetch.html",
@@ -1548,6 +1550,10 @@ requestpolicy.overlay = {
     var extJson = requestpolicy.mod.JSON.stringify(ext);
     this._openInNewTab(this._extensionConflictInfoUri
         + encodeURIComponent(extJson));
+  },
+
+  openSupportRP : function() {
+    this._openInNewTab(this.supportRequestPolicyURL);
   },
 
   showPrefetchInfo : function() {

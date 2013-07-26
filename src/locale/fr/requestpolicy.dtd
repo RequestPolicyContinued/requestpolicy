@@ -1,3 +1,4 @@
+<!ENTITY supportRequestPolicy "Support RequestPolicy">
 <!ENTITY prefetchWarning "Attention : la préextraction est activée">
 <!ENTITY prefetchInfo "En savoir plus à propos de la préextraction">
 <!ENTITY prefetchDisablingInstructions "Désactiver la préextraction">

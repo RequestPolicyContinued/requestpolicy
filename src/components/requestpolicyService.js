@@ -47,6 +47,8 @@ if (!requestpolicy) {
 }
 
 function RequestPolicyService() {
+  // If you only need to access your component from Javascript, uncomment the following line:
+  // https://developer.mozilla.org/en-US/docs/wrappedJSObject
   this.wrappedJSObject = this;
 }
 
@@ -1494,7 +1496,7 @@ RequestPolicyService.prototype = {
 
         // We call _init() here because gecko 1.9.3 states that extensions will
         // no longer be able to receive app-startup.
-        this._init();
+        this._init(); // app-startup still exists (Sept 2013)
         // "profile-after-change" means that user preferences are now
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.

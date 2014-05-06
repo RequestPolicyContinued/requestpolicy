@@ -7,7 +7,7 @@
 <!ENTITY rp.menu.disableBlocking "禁用阻止">
 <!ENTITY rp.menu.help "帮助">
 <!ENTITY rp.menu.preferences "首选项">
-<!ENTITY rp.menu.managePolicies "设置">
+<!ENTITY rp.menu.managePolicies "管理策略">
 <!ENTITY rp.requestLog.title "请求日志">
 <!ENTITY rp.requestLog.origin "来源">
 <!ENTITY rp.requestLog.destination "目标">

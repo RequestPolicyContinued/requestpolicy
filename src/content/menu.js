@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -279,7 +279,12 @@ requestpolicy.menu = {
         }
       };
       //if (this._rpService.isDefaultAllow()) {
-      if (this._isCurrentlySelectedDestAllowed) {
+      if (this._isCurrentlySelectedDestAllowed ||
+           (!policyMgr.ruleExists(RULE_TYPE_DENY, ruleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData))) {
+        // show "Block requests" if the request was allowed
+        // OR if there's no blocking rule (i.e. the request was blocked "by default")
+        //  -- this enables support for blacklisting.
         if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
             !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
           if (!this._privateBrowsingEnabled) {

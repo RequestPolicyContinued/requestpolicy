@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2009 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -124,7 +124,7 @@ RequestPolicyService.prototype = {
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
    * at which the cached results of the last shouldLoad() call are discarded.
-   * 
+   *
    * @type Number
    */
   _lastShouldLoadCheckTimeout : 200,
@@ -616,7 +616,7 @@ RequestPolicyService.prototype = {
 
   /**
    * Take necessary actions when preferences are updated.
-   * 
+   *
    * @paramString{} prefName NAme of the preference that was updated.
    */
   _updatePref : function(prefName) {
@@ -728,7 +728,7 @@ RequestPolicyService.prototype = {
 
     var headerType;
     var dest;
-    
+
     try {
       // If there is no such header, getResponseHeader() will throw
       // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
@@ -816,7 +816,8 @@ RequestPolicyService.prototype = {
       return;
     }
 
-    if (this.isAllowedRedirect(origin, dest)) {
+    var result = this.checkRedirect(origin, dest);
+    if (true === result.isAllowed) {
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
               + headerType + "' header to <" + dest + "> " + "from <" + origin
@@ -916,14 +917,14 @@ RequestPolicyService.prototype = {
           // else.
           // We set the "isInsert" parameter so we don't clobber the existing
           // info about allowed and deleted requests.
-          this._recordAllowedRequest(sourcePage, initialOrigin, true);
+          this._recordAllowedRequest(sourcePage, initialOrigin, true, result);
         }
 
         // if (this._submittedFormsReverse[initialOrigin]) {
         // // TODO: implement for form submissions whose redirects are blocked
         // }
 
-        this._recordRejectedRequest(origin, dest);
+        this._recordRejectedRequest(origin, dest, result);
       }
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
@@ -1239,6 +1240,10 @@ RequestPolicyService.prototype = {
   },
 
   isAllowedRedirect : function(originUri, destinationUri) {
+    return (true === this.checkRedirect(originUri, destinationUri).isAllowed);
+  },
+
+  checkRedirect : function(originUri, destinationUri) {
     // TODO: Find a way to get rid of repitition of code between this and
     // shouldLoad().
 
@@ -1253,32 +1258,35 @@ RequestPolicyService.prototype = {
 
     var result = this._policyMgr.checkRequestAgainstUserPolicies(originUriObj,
           destUriObj);
+    result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
     // For now, we always give priority to deny rules.
-    if (result.isDenied()) {
-      // TODO: record result
-      return false;
+    if (result.denyRulesExist()) {
+      result.isAllowed = false;
+      return result;
     }
-    if (result.isAllowed()) {
-      // TODO: record result
-      return true;
+    if (result.allowRulesExist()) {
+      result.isAllowed = true;
+      return result;
     }
 
     var result = this._policyMgr.checkRequestAgainstSubscriptionPolicies(
           originUriObj, destUriObj);
+    result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
     // For now, we always give priority to deny rules.
-    if (result.isDenied()) {
-      // TODO: record result
-      return false;
+    if (result.denyRulesExist()) {
+      result.isAllowed = false;
+      return result;
     }
-    if (result.isAllowed()) {
-      // TODO: record result
-      return true;
+    if (result.allowRulesExist()) {
+      result.isAllowed = true;
+      return result;
     }
 
     if (destinationUri[0] && destinationUri[0] == '/'
         || destinationUri.indexOf(":") == -1) {
       // Redirect is to a relative url.
-      return true;
+      // ==> allow.
+      return new requestpolicy.mod.CheckRequestResult(true, requestpolicy.mod.REQUEST_TYPE_REDIRECT);
     }
 
     for (var i = 0; i < this._compatibilityRules.length; i++) {
@@ -1286,20 +1294,25 @@ RequestPolicyService.prototype = {
       var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
       var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
       if (allowOrigin && allowDest) {
-        // TODO: Give the reason the request was allowed.
         // return this.accept("Extension compatibility rule matched [" + rule[2]
         // + "]", arguments, true);
-        return true;
+        return new requestpolicy.mod.CheckRequestResult(
+          true,
+          requestpolicy.mod.REQUEST_TYPE_REDIRECT,
+          requestpolicy.mod.REQUEST_REASON_COMPATIBILITY
+        );
       }
     }
 
-    return this._isAllowedByDefaultPolicy(originUri, destinationUri);
+    var result = this._checkByDefaultPolicy(originUri, destinationUri);
+    result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
+    return result;
   },
 
   /**
    * Determines whether the user has granted any temporary permissions. This
    * does not include temporarily disabling all blocking.
-   * 
+   *
    * @return {Boolean} true if any temporary permissions have been granted,
    *         false otherwise.
    */
@@ -1359,7 +1372,7 @@ RequestPolicyService.prototype = {
   /**
    * Add an observer to be notified of all blocked and allowed requests. TODO:
    * This should be made to accept instances of a defined interface.
-   * 
+   *
    * @param {}
    *          observer
    */
@@ -1375,7 +1388,7 @@ RequestPolicyService.prototype = {
 
   /**
    * Remove an observer added through addRequestObserver().
-   * 
+   *
    * @param {}
    *          observer
    */
@@ -1630,7 +1643,7 @@ RequestPolicyService.prototype = {
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
   // cases we just return CP_OK rather than return this function which
-  // ultimately returns CP_OK. Third param, "unforbidable", is set to true if
+  // ultimately returns CP_OK. Fourth param, "unforbidable", is set to true if
   // this request shouldn't be recorded as an allowed request.
   /**
    * @param reason {String}
@@ -1696,7 +1709,7 @@ RequestPolicyService.prototype = {
 
   /**
    * Determines if a request is only related to internal resources.
-   * 
+   *
    * @param {}
    *          aContentLocation
    * @param {}
@@ -1774,14 +1787,16 @@ RequestPolicyService.prototype = {
     return false;
   },
 
-  _isAllowedByDefaultPolicy : function(origin, dest) {
+  _checkByDefaultPolicy : function(origin, dest) {
     if (this._defaultAllow) {
-      return true;
+      var result = new requestpolicy.mod.CheckRequestResult(true);
+      result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY;
+      return result;
     }
     if (this._defaultAllowSameDomain) {
       var originDomain = requestpolicy.mod.DomainUtil.getDomain(origin);
       var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
-      return originDomain == destDomain;
+      return new requestpolicy.mod.CheckRequestResult(originDomain == destDomain, undefined, requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
     }
     // We probably want to allow requests from http:80 to https:443 of the same
     // domain. However, maybe this is so uncommon it's not worth any extra
@@ -1790,7 +1805,7 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
     var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest,
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
-    return originIdent == destIdent;
+    return new requestpolicy.mod.CheckRequestResult(originIdent == destIdent);
   },
 
   /**
@@ -1798,7 +1813,7 @@ RequestPolicyService.prototype = {
    * it is, the cached result in _lastShouldLoadCheck.result can be used. Not
    * sure why, it seems that there are duplicates so using this simple cache of
    * the last call to shouldLoad() keeps duplicates out of log data.
-   * 
+   *
    * @param {}
    *          aContentLocation
    * @param {}
@@ -2072,19 +2087,26 @@ RequestPolicyService.prototype = {
         // should be using to solve the problem of rule precedence and support
         // for fine-grained rules overriding course-grained ones is a different
         // question.
-        if (result.isAllowed() && result.isDenied()) {
+        if (result.allowRulesExist() && result.denyRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
           if (this._defaultAllow) {
+            result.isAllowed = true;
             return this.accept("User policy indicates both allow and block. " +
                                "Using default allow policy", args, result);
           } else {
+            result.isAllowed = false;
             return this.reject("User policy indicates both allow and block. " +
                                "Using default block policy", args, result);
           }
         }
-        if (result.isAllowed()) {
+        if (result.allowRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
+          result.isAllowed = true;
           return this.accept("Allowed by user policy", args, result);
         }
-        if (result.isDenied()) {
+        if (result.denyRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
+          result.isAllowed = false;
           return this.reject("Blocked by user policy", args, result);
         }
 
@@ -2098,19 +2120,26 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.Logger.dump('Matched allow rules');
           requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
         }
-        if (result.isAllowed() && result.isDenied()) {
+        if (result.allowRulesExist() && result.denyRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
           if (this._defaultAllow) {
+            result.isAllowed = true;
             return this.accept("Subscription policies indicate both allow and block. " +
                                "Using default allow policy", args, result);
           } else {
+            result.isAllowed = false;
             return this.reject("Subscription policies indicate both allow and block. " +
                                "Using default block policy", args, result);
           }
         }
-        if (result.isDenied()) {
+        if (result.denyRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
+          result.isAllowed = false;
           return this.reject("Blocked by subscription policy", args, result);
         }
-        if (result.isAllowed()) {
+        if (result.allowRulesExist()) {
+          result.requestReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
+          result.isAllowed = true;
           return this.accept("Allowed by subscription policy", args, result);
         }
 
@@ -2143,18 +2172,14 @@ RequestPolicyService.prototype = {
           }
         }
 
-        if (this._isAllowedByDefaultPolicy(origin, dest)) {
-          // TODO: what should the third argument be to accept/reject?
-          // TODO: do we add a fake checkRequestResult (fourth arg) so that
-          // these show up as rule matched requests by the menu and other code?
-          return this.accept("Allowed by default policy", args);
+        var result = this._checkByDefaultPolicy(origin, dest);
+        if (result.isAllowed) {
+          return this.accept("Allowed by default policy", args, result);
         } else {
           // We didn't match any of the conditions in which to allow the request,
           // so reject it.
-          // TODO: do we add a fake checkRequestResult (fourth arg) so that
-          // these show up as rule matched requests by the menu and other code?
           return aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
-                this.reject("Denied by default policy", args);
+                this.reject("Denied by default policy", args, result);
         }
 
 

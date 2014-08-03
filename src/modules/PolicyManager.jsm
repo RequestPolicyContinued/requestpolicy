@@ -1,26 +1,35 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2011 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["PolicyManager"];
+var EXPORTED_SYMBOLS = ["PolicyManager", "CheckRequestResult", "Destination",
+  "REQUEST_TYPE_NORMAL",
+  "REQUEST_TYPE_REDIRECT",
+  "REQUEST_REASON_USER_POLICY",
+  "REQUEST_REASON_SUBSCRIPTION_POLICY",
+  "REQUEST_REASON_DEFAULT_POLICY",
+  "REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES",
+  "REQUEST_REASON_DEFAULT_SAME_DOMAIN",
+  "REQUEST_REASON_COMPATIBILITY"
+];
 
 const CI = Components.interfaces;
 const CC = Components.classes;
@@ -66,33 +75,128 @@ function warn(msg) {
 // after an update.
 
 
-function CheckRequestResult() {
+const REQUEST_TYPE_NORMAL = 1;
+const REQUEST_TYPE_REDIRECT = 2;
+const REQUEST_REASON_USER_POLICY         = 1;
+const REQUEST_REASON_SUBSCRIPTION_POLICY = 2;
+const REQUEST_REASON_DEFAULT_POLICY      = 3;
+const REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES = 4; // if there are allow _and_ deny rules for the same request
+const REQUEST_REASON_DEFAULT_SAME_DOMAIN = 5;
+const REQUEST_REASON_COMPATIBILITY       = 6;
+// TODO: add more types
+
+
+/**
+ * CheckRequestResult objects are used to hand over the result of a check
+ * whether a request is allowed or not. Sometimes only the boolean value of
+ * isAllowed is needed; in that case the other arguments may be unused.
+ */
+function CheckRequestResult(isAllowed, requestType, resultReason) {
   this.matchedAllowRules = [];
   this.matchedDenyRules = [];
+
+  this.isAllowed = isAllowed;
+  this.requestType = requestType;
+  this.resultReason = resultReason;
 }
 CheckRequestResult.prototype = {
-  matchedAllowRules : null, 
+  matchedAllowRules : null,
   matchedDenyRules : null,
-  
-  isAllowed : function() {
+
+  isAllowed : undefined,  // whether the request will be or has been allowed
+  requestType : undefined,
+  resultReason : undefined,
+
+  allowRulesExist : function() {
     return this.matchedAllowRules.length > 0;
   },
-  isDenied : function () {
+  denyRulesExist : function () {
     return this.matchedDenyRules.length > 0;
+  },
+
+  isDefaultPolicyUsed : function () {
+    // returns whether the default policy has been or will be used for this request.
+    return (this.resultReason == REQUEST_REASON_DEFAULT_POLICY ||
+            this.resultReason == REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
+            this.resultReason == REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   }
 };
 
 
+
+/**
+ * Destination objects are used to hand over not only "destination" strings, like
+ * "example.com", but also properties which might be useful to display more
+ * information on the GUI.
+ */
+function Destination(dest, properties) {
+  this.dest = dest;
+
+  if (properties != undefined) {
+    this.properties = properties;
+  } else {
+    this.properties = [];
+  }
+}
+Destination.prototype = {
+  dest : null,
+  properties : null
+};
+
+/**
+ * @static
+ */
+Destination.existsInArray = function (destString, dests) {
+  // check if the Array of Destination objects (dests) contains the destination string.
+  if (destString instanceof Destination) {
+    destString = destString.dest;
+  }
+  for (var i in dests) {
+    if (dests[i].dest == destString) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * compare function used to sort an Array of Destination objects.
+ *
+ * @static
+ */
+Destination.compareFunction = function (a, b) {
+  var a_default = (a.properties.numDefaultPolicyRequests > 0);
+  var b_default = (b.properties.numDefaultPolicyRequests > 0);
+
+  if (a_default !== b_default) {
+    if (a_default === true) {
+      // default-policy destinations first.
+      return -1;
+    } else {
+      return 1
+    }
+  }
+  if (a.dest > b.dest) {
+    return 1;
+  }
+  if (a.dest < b.dest) {
+    return -1;
+  }
+  return 0;
+}
+
+
+
 /**
  * Provides a simplified interface to handling multiple
- * policies, checking requests against multiple policies, etc. 
+ * policies, checking requests against multiple policies, etc.
  */
 function PolicyManager() {
   this._userPolicies = {};
   this._subscriptionPolicies = {};
 }
 PolicyManager.prototype = {
-  
+
   //_policies : null,
 
   getUserPolicyRuleCount : function() {
@@ -179,7 +283,7 @@ PolicyManager.prototype = {
   },
 
   _assertRuleType: function(ruleType) {
-    if (ruleType != requestpolicy.mod.RULE_TYPE_ALLOW && 
+    if (ruleType != requestpolicy.mod.RULE_TYPE_ALLOW &&
         ruleType != requestpolicy.mod.RULE_TYPE_DENY) {
       throw "Invalid rule type: " + ruleType;
     }
@@ -207,12 +311,12 @@ PolicyManager.prototype = {
     dprint("PolicyManager::addRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["user"].policy.print();
-    
+
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
     this._userPolicies["user"].rawPolicy.addRule(ruleType, ruleData,
           this._userPolicies["user"].policy);
-          
+
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawPolicy.addRule()| to indicate whether a rule
     // was added.
@@ -222,7 +326,7 @@ PolicyManager.prototype = {
         requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
               this._userPolicies["user"].rawPolicy, "user.json");
     }
-          
+
     //this._userPolicies["user"].policy.print();
   },
 
@@ -235,12 +339,12 @@ PolicyManager.prototype = {
     dprint("PolicyManager::addTemporaryRule " + ruleType + " "
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["temp"].policy.print();
-    
+
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
     this._userPolicies["temp"].rawPolicy.addRule(ruleType, ruleData,
           this._userPolicies["temp"].policy);
-          
+
     //this._userPolicies["temp"].policy.print();
   },
 
@@ -249,7 +353,7 @@ PolicyManager.prototype = {
            + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["user"].policy.print();
     //this._userPolicies["temp"].policy.print();
-    
+
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
     // TODO: use noStore

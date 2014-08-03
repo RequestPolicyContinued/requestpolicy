@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2009 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -236,7 +236,7 @@ requestpolicy.overlay = {
   /**
    * Perform the actions required once the window has loaded. This just sets a
    * listener for when the content of the window has changed (a page is loaded).
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -343,7 +343,7 @@ requestpolicy.overlay = {
   /**
    * Shows a notification that a redirect was requested by a page (meta refresh
    * or with headers).
-   * 
+   *
    * @param {document}
    *          targetDocument
    * @param {String}
@@ -471,7 +471,7 @@ requestpolicy.overlay = {
 
   /**
    * Determines if documentToCheck is the main document loaded in any tab.
-   * 
+   *
    * @param {document}
    *          documentToCheck
    * @return {Boolean}
@@ -489,7 +489,7 @@ requestpolicy.overlay = {
   /**
    * Determines if documentToCheck is the main document loaded in the currently
    * active tab.
-   * 
+   *
    * @param {document}
    *          documentToCheck
    * @return {Boolean}
@@ -510,7 +510,7 @@ requestpolicy.overlay = {
 
   /**
    * Things to do when a page has loaded (after images, etc., have been loaded).
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -564,7 +564,7 @@ requestpolicy.overlay = {
 
   /**
    * Things to do when a page or a frame within the page has loaded.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -763,7 +763,7 @@ requestpolicy.overlay = {
    * This function is called when any allowed requests happen. This must be as
    * fast as possible because request processing blocks until this function
    * returns.
-   * 
+   *
    * @param {}
    *          originUri
    * @param {}
@@ -779,7 +779,7 @@ requestpolicy.overlay = {
    * This function is called when any blocked requests happen. This must be as
    * fast as possible because request processing blocks until this function
    * returns.
-   * 
+   *
    * @param {}
    *          originUri
    * @param {}
@@ -875,7 +875,7 @@ requestpolicy.overlay = {
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1057,7 +1057,7 @@ requestpolicy.overlay = {
 
   /**
    * This is called by the modified addTab().
-   * 
+   *
    * @param {String}
    *          url
    * @param {nsIURI/hash}
@@ -1088,7 +1088,7 @@ requestpolicy.overlay = {
    * was to also add the 'if(aContext.nodeName == "xul:browser" &&
    * aContext.currentURI && aContext.currentURI.spec == "about:blank")' to
    * shouldLoad().
-   * 
+   *
    * @param {Window}
    *          window
    */
@@ -1210,7 +1210,7 @@ requestpolicy.overlay = {
 
   /**
    * Called before the popup menu is shown.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1223,7 +1223,7 @@ requestpolicy.overlay = {
 
   /**
    * Called after the popup menu is hidden.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1246,7 +1246,7 @@ requestpolicy.overlay = {
   /**
    * Determines the top-level document's uri identifier based on the current
    * identifier level setting.
-   * 
+   *
    * @return {String} The current document's identifier.
    */
   getTopLevelDocumentUriIdentifier : function() {
@@ -1276,7 +1276,7 @@ requestpolicy.overlay = {
 
   /**
    * Toggles disabling of all blocking for the current session.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1302,7 +1302,7 @@ requestpolicy.overlay = {
   /**
    * Allows the current document's origin to request from any destination for
    * the duration of the browser session.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1316,7 +1316,7 @@ requestpolicy.overlay = {
   /**
    * Allows a destination to be requested from any origin for the duration of
    * the browser session.
-   * 
+   *
    * @param {String}
    *          destHost
    */
@@ -1327,7 +1327,7 @@ requestpolicy.overlay = {
   /**
    * Allows a destination to be requested from a single origin for the duration
    * of the browser session.
-   * 
+   *
    * @param {String}
    *          originHost
    * @param {String}
@@ -1347,7 +1347,7 @@ requestpolicy.overlay = {
   /**
    * Allows the current document's origin to request from any destination,
    * including in future browser sessions.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1358,7 +1358,7 @@ requestpolicy.overlay = {
 
   /**
    * Allows requests to a destination, including in future browser sessions.
-   * 
+   *
    * @param {String}
    *          destHost
    */
@@ -1369,7 +1369,7 @@ requestpolicy.overlay = {
   /**
    * Allows requests to a destination from a single origin, including in future
    * browser sessions.
-   * 
+   *
    * @param {String}
    *          originHost
    * @param {String}
@@ -1391,7 +1391,7 @@ requestpolicy.overlay = {
    * Forbids the current document's origin from requesting from any destination.
    * This revoke's temporary or permanent request permissions the origin had
    * been given.
-   * 
+   *
    * @param {Event}
    *          event
    */
@@ -1403,7 +1403,7 @@ requestpolicy.overlay = {
   /**
    * Forbids a destination from being requested by any origin. This revoke's
    * temporary or permanent request permissions the destination had been given.
-   * 
+   *
    * @param {String}
    *          destHost
    */
@@ -1415,7 +1415,7 @@ requestpolicy.overlay = {
    * Forbids a destination from being requested by a single origin. This
    * revoke's temporary or permanent request permissions the destination had
    * been given.
-   * 
+   *
    * @param {String}
    *          originHost
    * @param {String}
@@ -1451,7 +1451,7 @@ requestpolicy.overlay = {
 
   /**
    * Revokes all temporary permissions granted during the current session.
-   * 
+   *
    * @param {Event}
    *          event
    */

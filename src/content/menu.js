@@ -34,6 +34,8 @@ Components.utils.import("resource://requestpolicy/Policy.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
+    requestpolicy.mod);
 
 requestpolicy.menu = {
 
@@ -180,9 +182,18 @@ requestpolicy.menu = {
 
   _populateList : function(list, values) {
     this._removeChildren(list);
-    values.sort();
-    for (var i in values) {
-      this._addListItem(list, 'rp-od-item', values[i]);
+    if (values[0] && values[0] instanceof requestpolicy.mod.Destination) {
+      values.sort(requestpolicy.mod.Destination.compareFunction);
+      for (var i in values) {
+        var newitem = this._addListItem(list, 'rp-od-item', values[i].dest);
+        newitem.setAttribute("default-policy",
+                            (values[i].properties.numDefaultPolicyRequests > 0 ? "true" : "false"));
+      }
+    } else {
+      values.sort();
+      for (var i in values) {
+        var newitem = this._addListItem(list, 'rp-od-item', values[i]);
+      }
     }
     //this._disableIfNoChildren(list);
   },
@@ -207,7 +218,7 @@ requestpolicy.menu = {
     // Set operations would be nice. These are small arrays, so keep it simple.
     for (var i = 0; i < rawBlocked.length; i++) {
       let dest = rawBlocked[i];
-      if (rawAllowed.indexOf(dest) == -1) {
+      if (false === requestpolicy.mod.Destination.existsInArray(dest, rawAllowed)) {
         blocked.push(dest);
       } else {
         mixed.push(dest);
@@ -215,7 +226,7 @@ requestpolicy.menu = {
     }
     for (var i = 0; i < rawAllowed.length; i++) {
       let dest = rawAllowed[i];
-      if (rawBlocked.indexOf(dest) == -1) {
+      if (false === requestpolicy.mod.Destination.existsInArray(dest, rawBlocked)) {
         allowed.push(dest);
       } else if (mixed.indexOf(dest) == -1) {
         mixed.push(dest);
@@ -540,6 +551,25 @@ requestpolicy.menu = {
 
 
 
+  /* This function iterates through all requests of a destBase, looks for
+   * properties and returns them.
+   */
+  _extractRequestProperties : function(request) {
+    var properties = {};
+    properties.numRequests = 0;
+    properties.numDefaultPolicyRequests = 0;
+
+    for (var destIdent in request) {
+      for (var destUri in request[destIdent]) {
+        ++properties.numRequests;
+        if ( request[destIdent][destUri].isDefaultPolicyUsed() ) {
+          ++properties.numDefaultPolicyRequests;
+        }
+      }
+    }
+    return properties;
+  },
+
   _getBlockedDestinations : function() {
     // Only pass a uri to getDeniedRequests if this isn't for listing the
     // blocked destinations of an other origin.
@@ -555,7 +585,10 @@ requestpolicy.menu = {
 
     var result = [];
     for (var destBase in requests) {
-      result.push(destBase);
+      var properties = this._extractRequestProperties(requests[destBase]);
+      result.push(new requestpolicy.mod.Destination(destBase, properties));
+      //requestpolicy.mod.Logger.dump("destBase : "+destBase);
+      //requestpolicy.mod.Logger.vardump(properties, "properties");
     }
     return result;
   },
@@ -585,7 +618,7 @@ requestpolicy.menu = {
         }
       }
 
-      result.push(destBase);
+      result.push(new requestpolicy.mod.Destination(destBase));
     }
     return result;
   },

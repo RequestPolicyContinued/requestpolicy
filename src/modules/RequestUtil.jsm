@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -49,7 +49,7 @@ function RequestSet() {
 }
 RequestSet.prototype = {
   _origins : null,
-  
+
   print : function(name) {
     var log = Logger;
     log.dump("-------------------------------------------------");
@@ -117,7 +117,7 @@ RequestSet.prototype = {
       this._origins[originUri] = {};
     }
     var dests = this._origins[originUri];
-    
+
     var destBase = getBaseDomain(destUri);
     if (!dests[destBase]) {
       dests[destBase] = {};
@@ -143,7 +143,7 @@ RequestSet.prototype = {
       // TODO: append rules, removing duplicates.
     }
   },
-  
+
   /**
    */
   removeRequest : function(originUri, destUri) {
@@ -151,7 +151,7 @@ RequestSet.prototype = {
       return;
     }
     var dests = this._origins[originUri];
-    
+
     var destBase = getBaseDomain(destUri);
     if (!dests[destBase]) {
       return;
@@ -166,7 +166,7 @@ RequestSet.prototype = {
       return;
     }
     delete dests[destBase][destIdent][destUri];
-    
+
     if (Object.getOwnPropertyNames(dests[destBase][destIdent]).length > 0) {
       return;
     }
@@ -176,13 +176,13 @@ RequestSet.prototype = {
       return;
     }
     delete dests[destBase];
-    
+
     if (Object.getOwnPropertyNames(dests).length > 0) {
       return;
     }
     delete this._origins[originUri];
   },
-  
+
   /**
    */
   removeOriginUri : function(originUri) {
@@ -271,7 +271,7 @@ var RequestUtil = {
    * only have in the recorded requests from a source uri the destinations from
    * the most recent iframe that loaded that source uri. It may also help in
    * cases where the user has multiple tabs/windows open to the same page.
-   * 
+   *
    * @param {}
    *          document
    * @return {}
@@ -349,7 +349,7 @@ var RequestUtil = {
               continue;
             }
             checkedOrigins[destUri] = true;
-  
+
             Logger.dump("Found allowed request to <"
                 + destUri + "> from <" + rootUri + ">");
             // var allowedUriIdent = getUriIdentifier(allowedUri);
@@ -394,19 +394,21 @@ var RequestUtil = {
   originHasRejectedRequests : function(originUri) {
     return this._originHasRejectedRequestsHelper(originUri, {});
   },
-  
+
   _originHasRejectedRequestsHelper : function(originUri, checkedUris) {
     if (checkedUris[originUri]) {
       return false;
     }
     checkedUris[originUri] = true;
-  
+
     var rejectedRequests = this._rpService._rejectedRequests.getOriginUri(originUri);
     if (rejectedRequests) {
       for (var i in rejectedRequests) {
         for (var j in rejectedRequests[i]) {
-          if (rejectedRequests[i][j]) {
-            return true;
+          for (var k in rejectedRequests[i][j]) {
+            if( rejectedRequests[i][j][k].isDefaultPolicyUsed() ) {
+              return true;
+            }
           }
         }
       }

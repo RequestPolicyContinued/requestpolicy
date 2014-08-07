@@ -160,11 +160,14 @@ Destination.existsInArray = function (destString, dests) {
 }
 
 /**
- * compare function used to sort an Array of Destination objects.
+ * compare functions used to sort an Array of Destination objects.
  *
  * @static
  */
-Destination.compareFunction = function (a, b) {
+Destination.sortByNumRequestsCompareFunction = function (a, b) {
+  return Destination.compareFunction(a, b, "sortByNumRequests");
+}
+Destination.compareFunction = function (a, b, sortType) {
   var a_default = (a.properties.numDefaultPolicyRequests > 0);
   var b_default = (b.properties.numDefaultPolicyRequests > 0);
 
@@ -176,6 +179,17 @@ Destination.compareFunction = function (a, b) {
       return 1
     }
   }
+
+  if (sortType == "sortByNumRequests") {
+    if (a.properties.numRequests > b.properties.numRequests) {
+      return -1;
+    }
+    if (a.properties.numRequests < b.properties.numRequests) {
+      return 1;
+    }
+  }
+
+
   if (a.dest > b.dest) {
     return 1;
   }

@@ -183,11 +183,21 @@ requestpolicy.menu = {
   _populateList : function(list, values) {
     this._removeChildren(list);
     if (values[0] && values[0] instanceof requestpolicy.mod.Destination) {
-      values.sort(requestpolicy.mod.Destination.compareFunction);
+      var sorting = this._rpService.prefs.getCharPref('menu.sorting');
+      if (sorting == "numRequests") {
+        values.sort(requestpolicy.mod.Destination.sortByNumRequestsCompareFunction);
+      } else if (sorting == "destName") {
+        values.sort(requestpolicy.mod.Destination.compareFunction);
+      }
       for (var i in values) {
-        var newitem = this._addListItem(list, 'rp-od-item', values[i].dest);
+        var value = values[i];
+        if (true === this._rpService.prefs.getBoolPref('menu.info.showNumRequests')) {
+          var newitem = this._addListItem(list, 'rp-od-item', value.dest, value.properties.numRequests);
+        } else {
+          var newitem = this._addListItem(list, 'rp-od-item', value.dest);
+        }
         newitem.setAttribute("default-policy",
-                            (values[i].properties.numDefaultPolicyRequests > 0 ? "true" : "false"));
+                            (value.properties.numDefaultPolicyRequests > 0 ? "true" : "false"));
       }
     } else {
       values.sort();
@@ -356,13 +366,26 @@ requestpolicy.menu = {
     }
   },
 
-  _addListItem : function(list, cssClass, value) {
-    var item = document.createElement("label");
-    item.setAttribute("value", value);
-    item.setAttribute("class", cssClass);
-    item.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
-    list.insertBefore(item, null);
-    return item;
+  _addListItem : function(list, cssClass, value, numRequests) {
+    var hbox = document.createElement("hbox");
+    hbox.setAttribute("class", cssClass);
+    hbox.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
+    list.insertBefore(hbox, null);
+
+    var destLabel = document.createElement("label");
+    destLabel.setAttribute("value", value);
+    destLabel.setAttribute("class", "destination");
+    destLabel.setAttribute("flex", "2");
+    hbox.insertBefore(destLabel, null);
+
+    if (numRequests) {
+      var numReqLabel = document.createElement("label");
+      numReqLabel.setAttribute("value", numRequests);
+      numReqLabel.setAttribute("class", "numRequests");
+      hbox.insertBefore(numReqLabel, null);
+    }
+
+    return hbox;
   },
 
   _disableIfNoChildren : function(el) {
@@ -411,7 +434,7 @@ requestpolicy.menu = {
   },
 
   _activateDestinationItem : function(item) {
-    this._currentlySelectedDest = item.value;
+    this._currentlySelectedDest = item.getElementsByClassName("destination")[0].value;
 
     if (item.parentNode.id == 'rp-blocked-destinations-list') {
       this._isCurrentlySelectedDestBlocked = true;
@@ -435,6 +458,10 @@ requestpolicy.menu = {
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
+    if (item.nodeName == "label" && item.parentNode.nodeName == "hbox") {
+      // item should be the <hbox>
+      item = item.parentNode;
+    }
     if (item.id == 'rp-origin' ||
         item.parentNode.id == 'rp-other-origins-list') {
       this._activateOriginItem(item);

@@ -1,5 +1,8 @@
 PAGE_STRINGS = ['basic', 'advanced', 'advancedPreferences', 'linkPrefetching',
-  'dnsPrefetching', 'enabled', 'disableOnStartup', 'restoreDefaultOnUninstall'];
+  'dnsPrefetching', 'enabled', 'disableOnStartup', 'restoreDefaultOnUninstall',
+  'menuPreferences', 'menuSorting', 'sortByNumRequests', 'sortByDestName', 'noSorting',
+  'hint', 'menuSortingHint',
+  'menuIndicatedInformation', 'menuIndicateNumRequests'];
 
 $(function () {
   common.localize(PAGE_STRINGS);
@@ -25,6 +28,25 @@ function updateDisplay() {
 
   document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').checked =
       rpService.prefs.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
+
+  var sorting = rpService.prefs.getCharPref('menu.sorting');
+
+  if (sorting == document.getElementById('sortByNumRequests').value) {
+    document.getElementById('sortByNumRequests').checked = true;
+    document.getElementById('sortByDestName').checked = false;
+    document.getElementById('noSorting').checked = false;
+  } else if (sorting == document.getElementById('noSorting').value) {
+    document.getElementById('sortByNumRequests').checked = false;
+    document.getElementById('sortByDestName').checked = false;
+    document.getElementById('noSorting').checked = true;
+  } else {
+    document.getElementById('sortByNumRequests').checked = false;
+    document.getElementById('sortByDestName').checked = true;
+    document.getElementById('noSorting').checked = false;
+  }
+
+  document.getElementById('menu.info.showNumRequests').checked =
+      rpService.prefs.getBoolPref('menu.info.showNumRequests');
 }
 
 
@@ -71,6 +93,21 @@ function onload() {
   document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').addEventListener('change',
       function (event) {
         rpService.prefs.setBoolPref('prefetch.dns.restoreDefaultOnUninstall', event.target.checked);
+        rpService._prefService.savePrefFile(null);
+      }
+  );
+
+  var sortingListener = function (event) {
+    rpService.prefs.setCharPref('menu.sorting', event.target.value);
+    rpService._prefService.savePrefFile(null);
+  };
+  document.getElementById('sortByNumRequests').addEventListener('change', sortingListener);
+  document.getElementById('sortByDestName').addEventListener('change', sortingListener);
+  document.getElementById('noSorting').addEventListener('change', sortingListener);
+
+  document.getElementById('menu.info.showNumRequests').addEventListener('change',
+      function (event) {
+        rpService.prefs.setBoolPref('menu.info.showNumRequests', event.target.checked);
         rpService._prefService.savePrefFile(null);
       }
   );

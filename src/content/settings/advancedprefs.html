@@ -90,6 +90,47 @@
           </tr>
         </table>
 
+        <div id="page-subsection" data-string="menuPreferences"></div>
+
+        <table class="settings">
+          <tr>
+            <td data-string="menuSorting"></td>
+            <td>
+              <div>
+                <label><input type="radio" name="menu.sorting" id="sortByNumRequests"
+                              value="numRequests" />
+                  <span data-string="sortByNumRequests"></span>
+                </label><br/>
+                <label><input type="radio" name="menu.sorting" id="sortByDestName"
+                              value="destName" />
+                  <span data-string="sortByDestName"></span>
+                </label><br/>
+                <label><input type="radio" name="menu.sorting" id="noSorting"
+                              value="none" />
+                  <span data-string="noSorting"></span>
+                </label>
+
+                <p>
+                  <span data-string="hint" style="font-weight:bold;"></span> <span data-string="menuSortingHint"></span>
+                </p>
+              </div>
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td data-string="menuIndicatedInformation"></td>
+            <td>
+              <div>
+                <label>
+                  <input type="checkbox"
+                         id="menu.info.showNumRequests"/>
+                  <span data-string="menuIndicateNumRequests"></span>
+                </label>
+              </div>
+            </td>
+          </tr>
+        </table>
       </div>
     </td>
   </tr>

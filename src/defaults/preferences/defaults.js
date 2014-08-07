@@ -21,6 +21,9 @@ pref("extensions.requestpolicy.prefetch.link.restoreDefaultOnUninstall", true);
 pref("extensions.requestpolicy.prefetch.dns.disableOnStartup", false);
 pref("extensions.requestpolicy.prefetch.dns.restoreDefaultOnUninstall", true);
 
+pref("extensions.requestpolicy.menu.sorting", "numRequests");
+pref("extensions.requestpolicy.menu.info.showNumRequests", true);
+
 pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
 

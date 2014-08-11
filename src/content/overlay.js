@@ -136,10 +136,6 @@ requestpolicy.overlay = {
           // Set an attribute for CSS usage.
           this._menu.setAttribute("fennec", "true");
           this._menu.setAttribute("position", "after_end");
-          // Remove extra items from the menu.
-          document.getElementById("requestpolicyOpenPreferences").hidden = true;
-          document.getElementById("requestpolicyOpenRequestLog").hidden = true;
-          document.getElementById("requestpolicy-preferencesSeparator").hidden = true;
         }
 
         // Register this window with the requestpolicy service so that we can be
@@ -715,15 +711,9 @@ requestpolicy.overlay = {
    * Sets the blocked content notifications visible to the user.
    */
   _setBlockedContentNotification : function(isContentBlocked) {
-    //this._rpStatusbar.setAttribute("requestpolicyBlocked", isContentBlocked);
-    if (!this._isFennec) {
-    //  this._rpContextMenu
-    //      .setAttribute("requestpolicyBlocked", isContentBlocked);
-      this._toolbox.setAttribute("requestpolicyBlocked", isContentBlocked);
-    }
-    if (this._addonbar) {
-      this._addonbar.setAttribute("requestpolicyBlocked", isContentBlocked);
-      this._tabbar.setAttribute("requestpolicyBlocked", isContentBlocked);
+    var button = document.getElementById(this._toolbarButtonId);
+    if (button) {
+      button.setAttribute("requestpolicyBlocked", isContentBlocked);
     }
   },
 
@@ -747,15 +737,9 @@ requestpolicy.overlay = {
    * Sets the permissive status visible to the user for just this window.
    */
   _setPermissiveNotification : function(isPermissive) {
-    //this._rpStatusbar.setAttribute("requestpolicyPermissive", isPermissive);
-    //requestpolicy.menu.setItemAllowAllTemporarilyChecked(isPermissive);
-    if (!this._isFennec) {
-      //this._rpContextMenu.setAttribute("requestpolicyPermissive", isPermissive);
-      this._toolbox.setAttribute("requestpolicyPermissive", isPermissive);
-    }
-    if (this._addonbar) {
-      this._addonbar.setAttribute("requestpolicyPermissive", isPermissive);
-      this._tabbar.setAttribute("requestpolicyPermissive", isPermissive);
+    var button = document.getElementById(this._toolbarButtonId);
+    if (button) {
+      button.setAttribute("requestpolicyPermissive", isPermissive);
     }
   },
 

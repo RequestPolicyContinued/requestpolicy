@@ -72,9 +72,13 @@ toolbar #requestpolicyToolbarButton dropmarker {
   display: none !important;
 }
 
-#palette-box #requestpolicyToolbarButton {
+/* The icon in <about:customizing>. Not sure if the selector should be:
+ * ``` #palette-box #requestpolicyToolbarButton ```
+ * -- this didn't work as of summer 2014.
+ */
+#requestpolicyToolbarButton {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
+    url(chrome://requestpolicy/skin/requestpolicy-icon-32.png);
 }
 
 toolbar #requestpolicyToolbarButton {
@@ -82,21 +86,12 @@ toolbar #requestpolicyToolbarButton {
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
 }
 
-/* The reason for the two similar descriptions:
- *  1) "toolbar[state=whatever]" is for the addons bar.
- *  2) "[state=whatever] toolbar" is for the tabbox, status bar, navbar,
- *     bookmarks toolbars.
- * We could probably avoid this by changing overlay.js to set attributes
- * on a parent of the addons bar rather than the addons bar itself.
- */
-toolbar[requestpolicyBlocked="true"] #requestpolicyToolbarButton,
-[requestpolicyBlocked="true"] toolbar #requestpolicyToolbarButton {
+toolbar #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
 }
 
-toolbar[requestpolicyPermissive="true"] #requestpolicyToolbarButton,
-[requestpolicyPermissive="true"] toolbar #requestpolicyToolbarButton {
+toolbar #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
 }
@@ -106,16 +101,12 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton {
     url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
 }
 
-toolbar[iconsize="small"][requestpolicyBlocked="true"] #requestpolicyToolbarButton,
-[requestpolicyBlocked="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton
-  {
+toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
 }
 
-toolbar[iconsize="small"][requestpolicyPermissive="true"] #requestpolicyToolbarButton,
-[requestpolicyPermissive="true"] toolbar[iconsize="small"] #requestpolicyToolbarButton
-  {
+toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
 }

@@ -1,13 +1,13 @@
 <!ENTITY rp.menu.revokeTemporaryPermissions "撤销所有临时允许">
 <!ENTITY rp.menu.blockedDestinations "阻止目标">
 <!ENTITY rp.menu.allowedDestinations "允许目标">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.mixedDestinations "混合目标">
+<!ENTITY rp.menu.otherOrigins "其他来源">
+<!ENTITY rp.menu.enableBlocking "启用阻止">
+<!ENTITY rp.menu.disableBlocking "禁用阻止">
+<!ENTITY rp.menu.help "帮助">
 <!ENTITY rp.menu.preferences "首选项">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.menu.managePolicies "管理策略">
 <!ENTITY rp.requestLog.title "请求日志">
 <!ENTITY rp.requestLog.origin "来源">
 <!ENTITY rp.requestLog.destination "目标">

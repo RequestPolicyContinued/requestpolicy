@@ -5,38 +5,40 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy</em:name>
-    <em:version>1.0.1a1-myrdd</em:version>
+    <em:version>1.0.0b4</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:creator>Justin Samuel</em:creator>
+    <em:developer>myrdd</em:developer>
     <em:id>requestpolicy@requestpolicy.com</em:id>
-    <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
+    <em:homepageURL>https://sslsites.de/requestpolicy.256k.de/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
-    <em:updateURL>https://www.requestpolicy.com/update-1.x.rdf</em:updateURL>
+    <em:updateURL>https://sslsites.de/requestpolicy.256k.de/update-1.x-beta.rdf.php</em:updateURL>
 
-    <em:contributor>myahoo (French translation)</em:contributor>
-    <em:contributor>Team erweiterungen.de (German translation)</em:contributor>
-    <em:contributor>Archaeopteryx (German translation)</em:contributor>
-    <em:contributor>petruc (Portuguese [Brazil] translation)</em:contributor>
-    <em:contributor>Sumin Byeon (Korean translation)</em:contributor>
-    <em:contributor>pedro arana matus (Spanish [Mexico] translation)</em:contributor>
-    <em:contributor>Володимир Савчук / Volodymyr Savchuk (Ukrainian translation)</em:contributor>
-    <em:contributor>markh van BabelZilla.org (Dutch translation)</em:contributor>
-    <em:contributor>alpmild (Russian translation)</em:contributor>
-    <em:contributor>yfdyh000 (Chinese [simplified] translation)</em:contributor>
-    <em:contributor>nikneyim (Turkish translation)</em:contributor>
-    <em:contributor>Anonymous (Japanese translation)</em:contributor>
-    <em:contributor>Aleksej R. Serdjukov kaj babilejanoj (Esperanto translation)</em:contributor>
-    <em:contributor>Natanael_L01 (Swedish translation)</em:contributor>
-    <em:contributor>James (Silencer) (Chinese [traditional] translation)</em:contributor>
-    <em:contributor>Antxon Baldarra (Basque translation)</em:contributor>
-    <em:contributor>Random (Italian translation)</em:contributor>
-    <em:contributor>Jacen (Slovak translation)</em:contributor>
-    <em:contributor>Brad Horrocks</em:contributor>
-    <em:contributor>Aleksandrs Ļedovskis (Latvian translation)</em:contributor>
+    <em:translator>myahoo (French)</em:translator>
+    <em:translator>Team erweiterungen.de (German)</em:translator>
+    <em:translator>Archaeopteryx (German)</em:translator>
+    <em:translator>petruc (Portuguese [Brazil])</em:translator>
+    <em:translator>Sumin Byeon (Korean)</em:translator>
+    <em:translator>pedro arana matus (Spanish [Mexico])</em:translator>
+    <em:translator>Володимир Савчук / Volodymyr Savchuk (Ukrainian)</em:translator>
+    <em:translator>markh van BabelZilla.org (Dutch)</em:translator>
+    <em:translator>alpmild (Russian)</em:translator>
+    <em:translator>wenketel (Chinese [simplified])</em:translator>
+    <em:translator>yfdyh000 (Chinese [simplified])</em:translator>
+    <em:translator>nikneyim (Turkish)</em:translator>
+    <em:translator>Anonymous (Japanese)</em:translator>
+    <em:translator>Aleksej R. Serdjukov kaj babilejanoj (Esperanto)</em:translator>
+    <em:translator>Natanael_L01 (Swedish)</em:translator>
+    <em:translator>James (Silencer) (Chinese [traditional])</em:translator>
+    <em:translator>Antxon Baldarra (Basque)</em:translator>
+    <em:translator>Random (Italian)</em:translator>
+    <em:translator>Jacen (Slovak)</em:translator>
+    <em:translator>Brad Horrocks</em:translator>
+    <em:translator>Aleksandrs Ļedovskis (Latvian)</em:translator>
 
     <!-- Firefox (Flock will recognize this, too) -->
     <em:targetApplication>

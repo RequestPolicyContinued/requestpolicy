@@ -1,44 +1,3 @@
-/*********************************************
- * Statusbar
- *********************************************/
-/*
-#requestpolicyStatusbar {
-  padding-left: 3px;
-  padding-right: 3px;
-  cursor: pointer;
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
-}
-
-#requestpolicyStatusbar[requestpolicyBlocked="true"] {
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
-}
-
-#requestpolicyStatusbar[requestpolicyPermissive="true"] {
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
-}
-
-#requestpolicyStatusbar[iconStyle="large"] {
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-statusbar-allowed.png);
-}
-
-#requestpolicyStatusbar[iconStyle="large"][requestpolicyBlocked="true"] {
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-statusbar-blocked.png);
-}
-
-#requestpolicyStatusbar[iconStyle="large"][requestpolicyPermissive="true"] {
-  list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-statusbar-disabled.png);
-}
-
-#requestpolicyStatusbar[iconStyle="none"] {
-  display : none;
-}
-*/
 
 /*********************************************
  * Context menu
@@ -61,9 +20,26 @@
 }
 
 /*********************************************
+ * The icon in <about:customizing>
+ *********************************************/
+#requestpolicyToolbarButton[isCustomizingPage="true"],
+#palette-box #requestpolicyToolbarButton {
+  list-style-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-32.png) !important;
+}
+toolbar #requestpolicyToolbarButton[isCustomizingPage="true"] {
+  list-style-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png) !important;
+}
+toolbar[iconsize="small"] #requestpolicyToolbarButton[isCustomizingPage="true"] {
+  list-style-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png) !important;
+}
+
+/*********************************************
  * Toolbar
  *********************************************/
-toolbar #requestpolicyToolbarButton dropmarker {
+#requestpolicyToolbarButton dropmarker {
   /* Don't display a "down arrow" next to the button. We might actually
      want to display this, but I couldn't get rid of the down arrow
      appearing to be a separate button on mouseover. I'd rather there
@@ -72,14 +48,19 @@ toolbar #requestpolicyToolbarButton dropmarker {
   display: none !important;
 }
 
-/* The icon in <about:customizing>. Not sure if the selector should be:
- * ``` #palette-box #requestpolicyToolbarButton ```
- * -- this didn't work as of summer 2014.
- */
-#requestpolicyToolbarButton {
+#requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-32.png);
+    url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
 }
+#requestpolicyToolbarButton[requestpolicyBlocked="true"] {
+  list-style-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
+}
+#requestpolicyToolbarButton[requestpolicyPermissive="true"] {
+  list-style-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
+}
+
 
 toolbar #requestpolicyToolbarButton {
   list-style-image:

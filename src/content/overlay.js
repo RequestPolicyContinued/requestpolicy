@@ -616,6 +616,7 @@ requestpolicy.overlay = {
           .stripFragment(document.documentURI);
       requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Checking for blocked content from page <" + documentUri + ">");
+      this._setCustomizingPageNotification((documentUri == "about:customizing"));
       this._blockedContentCheckLastTime = (new Date()).getTime();
       this._stopBlockedContentCheckTimeout();
       if (requestpolicy.mod.RequestUtil.originHasRejectedRequests(documentUri)) {
@@ -740,6 +741,16 @@ requestpolicy.overlay = {
     var button = document.getElementById(this._toolbarButtonId);
     if (button) {
       button.setAttribute("requestpolicyPermissive", isPermissive);
+    }
+  },
+
+  /**
+   * Sets whether the current page is <about:customizing>.
+   */
+  _setCustomizingPageNotification : function(isCustomizingPage) {
+    var button = document.getElementById(this._toolbarButtonId);
+    if (button) {
+      button.setAttribute("isCustomizingPage", isCustomizingPage);
     }
   },
 

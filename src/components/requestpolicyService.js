@@ -822,7 +822,7 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
               + headerType + "' header to <" + dest + "> " + "from <" + origin
               + ">. Same hosts or allowed origin/destination.");
-      this._recordAllowedRequest(origin, dest);
+      this._recordAllowedRequest(origin, dest, false, result);
       this._allowedRedirectsReverse[dest] = origin;
 
       // If this was a link click or a form submission, we register an
@@ -1294,8 +1294,6 @@ RequestPolicyService.prototype = {
       var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
       var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
       if (allowOrigin && allowDest) {
-        // return this.accept("Extension compatibility rule matched [" + rule[2]
-        // + "]", arguments, true);
         return new requestpolicy.mod.CheckRequestResult(
           true,
           requestpolicy.mod.REQUEST_TYPE_REDIRECT,
@@ -1790,13 +1788,16 @@ RequestPolicyService.prototype = {
   _checkByDefaultPolicy : function(origin, dest) {
     if (this._defaultAllow) {
       var result = new requestpolicy.mod.CheckRequestResult(true);
-      result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY;
+      result.resultReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY;
       return result;
     }
     if (this._defaultAllowSameDomain) {
       var originDomain = requestpolicy.mod.DomainUtil.getDomain(origin);
       var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
-      return new requestpolicy.mod.CheckRequestResult(originDomain == destDomain, undefined, requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+      return new requestpolicy.mod.CheckRequestResult(
+          originDomain == destDomain,
+          undefined,
+          requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
     }
     // We probably want to allow requests from http:80 to https:443 of the same
     // domain. However, maybe this is so uncommon it's not worth any extra
@@ -1980,8 +1981,11 @@ RequestPolicyService.prototype = {
           // click again and so if we don't forget the previous blocked/allowed
           // requests, the menu becomes inaccurate. Now the question is: what
           // are we breaking by clearing the blocked/allowed requests here?
-          return this.accept("User-initiated request by link click", args,
-             null);
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_LINK_CLICK);
+          return this.accept("User-initiated request by link click", args, result);
              //null, true);
 
         } else if (this._submittedForms[origin]
@@ -1996,8 +2000,11 @@ RequestPolicyService.prototype = {
           // See the note above for link clicks and forgetting blocked/allowed
           // requests on refresh. I haven't tested if it's the same for forms
           // but it should be so we're making the same change here.
-          return this.accept("User-initiated request by form submission", args,
-              null);
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_FORM_SUBMISSION);
+          return this.accept("User-initiated request by form submission", args, result);
               //null, true);
 
         } else if (this._historyRequests[dest]) {
@@ -2006,21 +2013,33 @@ RequestPolicyService.prototype = {
           // the page's content. Therefore, we make sure that our cache of
           // blocked requests isn't removed in this case.
           delete this._historyRequests[dest];
-          return this.accept("History request", args, null, true);
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_HISTORY_REQUEST);
+          return this.accept("History request", args, result, true);
         } else if (this._userAllowedRedirects[origin]
             && this._userAllowedRedirects[origin][dest]) {
           // shouldLoad is called by location.href in overlay.js as of Fx
           // 3.7a5pre and SeaMonkey 2.1a.
-          return this.accept("User-allowed redirect", args, null, true);
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_USER_ALLOWED_REDIRECT);
+          return this.accept("User-allowed redirect", args, result, true);
         }
 
         if (aRequestOrigin.scheme == "chrome") {
           if (aRequestOrigin.asciiHost == "browser") {
             // "browser" origin shows up for favicon.ico and an address entered
             // in address bar.
+            var result = new requestpolicy.mod.CheckRequestResult(
+                true,
+                undefined,
+                requestpolicy.mod.REQUEST_REASON_USER_ACTION);
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", args);
+                    + "explanation (e.g. new window/tab opened)", args, result);
           } else {
             // TODO: It seems sketchy to allow all requests from chrome. If I
             // had to put my money on a possible bug (in terms of not blocking
@@ -2029,9 +2048,13 @@ RequestPolicyService.prototype = {
             // that originate from their xul files. If you're reading this and
             // you know of a way to use this to evade RequestPolicy, please let
             // me know, I will be very grateful.
+            var result = new requestpolicy.mod.CheckRequestResult(
+                true,
+                undefined,
+                requestpolicy.mod.REQUEST_REASON_USER_ACTION);
             return this.accept(
                 "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", args);
+                    + "explanation (e.g. new window/tab opened)", args, result);
           }
         }
 
@@ -2043,10 +2066,14 @@ RequestPolicyService.prototype = {
         // removed if we can find a better solution for the allowed popup case.
         if (aContext && aContext.nodeName == "xul:browser" && aContext.currentURI
             && aContext.currentURI.spec == "about:blank") {
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_NEW_WINDOW);
           return this
               .accept(
                   "New window (should probably only be an allowed popup's initial request)",
-                  args, null, true);
+                  args, result, true);
         }
 
         // XMLHttpRequests made within chrome's context have these origins.
@@ -2063,10 +2090,14 @@ RequestPolicyService.prototype = {
         var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin);
         var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
         if (originIdent == destIdent) {
+          var result = new requestpolicy.mod.CheckRequestResult(
+              true,
+              undefined,
+              requestpolicy.mod.REQUEST_REASON_IDENTICAL_IDENTIFIER);
           return this.accept(
             "Allowing request where origin protocol, host, and port are the" +
               " same as the destination: " + originIdent,
-            args, null);
+            args, result);
         }
 
         var result = this._policyMgr.checkRequestAgainstUserPolicies(
@@ -2088,7 +2119,7 @@ RequestPolicyService.prototype = {
         // for fine-grained rules overriding course-grained ones is a different
         // question.
         if (result.allowRulesExist() && result.denyRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
           if (this._defaultAllow) {
             result.isAllowed = true;
             return this.accept("User policy indicates both allow and block. " +
@@ -2100,12 +2131,12 @@ RequestPolicyService.prototype = {
           }
         }
         if (result.allowRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
           result.isAllowed = true;
           return this.accept("Allowed by user policy", args, result);
         }
         if (result.denyRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_USER_POLICY;
           result.isAllowed = false;
           return this.reject("Blocked by user policy", args, result);
         }
@@ -2121,7 +2152,7 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.Logger.vardump(result.matchedAllowRules[i]);
         }
         if (result.allowRulesExist() && result.denyRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
           if (this._defaultAllow) {
             result.isAllowed = true;
             return this.accept("Subscription policies indicate both allow and block. " +
@@ -2133,12 +2164,12 @@ RequestPolicyService.prototype = {
           }
         }
         if (result.denyRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
           result.isAllowed = false;
           return this.reject("Blocked by subscription policy", args, result);
         }
         if (result.allowRulesExist()) {
-          result.requestReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
+          result.resultReason = requestpolicy.mod.REQUEST_REASON_SUBSCRIPTION_POLICY;
           result.isAllowed = true;
           return this.accept("Allowed by subscription policy", args, result);
         }
@@ -2148,9 +2179,13 @@ RequestPolicyService.prototype = {
           var allowOrigin = rule[0] ? origin.indexOf(rule[0]) == 0 : true;
           var allowDest = rule[1] ? dest.indexOf(rule[1]) == 0 : true;
           if (allowOrigin && allowDest) {
+            var result = new requestpolicy.mod.CheckRequestResult(
+                true,
+                undefined,
+                requestpolicy.mod.REQUEST_REASON_COMPATIBILITY);
             return this.accept(
                 "Extension/application compatibility rule matched [" + rule[2]
-                    + "]", args, null, true);
+                    + "]", args, result, true);
           }
         }
 

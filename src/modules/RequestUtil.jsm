@@ -113,6 +113,14 @@ RequestSet.prototype = {
    * @param {Array} rules The rules that were triggered by this request.
    */
   addRequest : function(originUri, destUri, checkRequestResult) {
+    if (checkRequestResult == undefined) {
+      Logger.warning(Logger.TYPE_INTERNAL,
+          "A request was added without a checkRequestResult object!\n"
+          +"\torigin: <"+originUri+">\n"
+          +"\tdestination: <"+destUri+">"
+      );
+    }
+
     if (!this._origins[originUri]) {
       this._origins[originUri] = {};
     }

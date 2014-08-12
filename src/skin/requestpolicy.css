@@ -140,13 +140,18 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="t
 }
 
 
-#rp-blocked-destinations [default-policy="true"] {
+#rp-blocked-destinations [default-policy="true"],
+#rp-allowed-destinations [default-policy="true"] {
   background-image: url(chrome://requestpolicy/skin/menu-default.svg);
 }
 #rp-blocked-destinations [default-policy="false"] {
   background-image: url(chrome://requestpolicy/skin/menu-blocked.svg);
 }
-#rp-blocked-destinations [default-policy] {
+#rp-allowed-destinations [default-policy="false"] {
+  background-image: url(chrome://requestpolicy/skin/menu-allowed.svg);
+}
+#rp-blocked-destinations [default-policy],
+#rp-allowed-destinations [default-policy] {
   background-position: left center;
   background-repeat: no-repeat;
   background-size: 14px 14px;

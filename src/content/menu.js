@@ -183,15 +183,19 @@ requestpolicy.menu = {
   _populateList : function(list, values) {
     this._removeChildren(list);
     if (values[0] && values[0] instanceof requestpolicy.mod.Destination) {
+      // get prefs
       var sorting = this._rpService.prefs.getCharPref('menu.sorting');
+      var showNumRequests = this._rpService.prefs.getBoolPref('menu.info.showNumRequests')
+
       if (sorting == "numRequests") {
         values.sort(requestpolicy.mod.Destination.sortByNumRequestsCompareFunction);
       } else if (sorting == "destName") {
         values.sort(requestpolicy.mod.Destination.compareFunction);
       }
+
       for (var i in values) {
         var value = values[i];
-        if (true === this._rpService.prefs.getBoolPref('menu.info.showNumRequests')) {
+        if (true === showNumRequests) {
           var newitem = this._addListItem(list, 'rp-od-item', value.dest, value.properties.numRequests);
         } else {
           var newitem = this._addListItem(list, 'rp-od-item', value.dest);
@@ -231,7 +235,11 @@ requestpolicy.menu = {
       if (false === requestpolicy.mod.Destination.existsInArray(dest, rawAllowed)) {
         blocked.push(dest);
       } else {
-        mixed.push(dest);
+        // we assume that `dest` is a Destination getUriObject.
+        // we need to create a new Destination object because the properties
+        // are not merged.
+        // TODO: merge the properties of the blocked and allowed Destination objects.
+        mixed.push(new requestpolicy.mod.Destination(dest.dest));
       }
     }
     for (var i = 0; i < rawAllowed.length; i++) {
@@ -239,7 +247,8 @@ requestpolicy.menu = {
       if (false === requestpolicy.mod.Destination.existsInArray(dest, rawBlocked)) {
         allowed.push(dest);
       } else if (mixed.indexOf(dest) == -1) {
-        mixed.push(dest);
+        // see comments above
+        mixed.push(new requestpolicy.mod.Destination(dest.dest));
       }
     }
 
@@ -594,6 +603,8 @@ requestpolicy.menu = {
     for (var destIdent in request) {
       for (var destUri in request[destIdent]) {
         ++properties.numRequests;
+//        requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
+//            + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
         if ( request[destIdent][destUri].isDefaultPolicyUsed() ) {
           ++properties.numDefaultPolicyRequests;
         }
@@ -650,7 +661,8 @@ requestpolicy.menu = {
         }
       }
 
-      result.push(new requestpolicy.mod.Destination(destBase));
+      var properties = this._extractRequestProperties(requests[destBase]);
+      result.push(new requestpolicy.mod.Destination(destBase, properties));
     }
     return result;
   },

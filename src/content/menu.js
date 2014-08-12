@@ -303,7 +303,7 @@ requestpolicy.menu = {
       if (this._isCurrentlySelectedDestAllowed ||
            (!policyMgr.ruleExists(RULE_TYPE_DENY, ruleData) &&
             !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData))) {
-        // show "Block requests" if the request was allowed
+        // show "Block requests" if the destination was allowed
         // OR if there's no blocking rule (i.e. the request was blocked "by default")
         //  -- this enables support for blacklisting.
         if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
@@ -326,7 +326,12 @@ requestpolicy.menu = {
             this._addRulesList, destOnlyRuleData);
         }
       }
-      if (this._isCurrentlySelectedDestBlocked) {
+      if (this._isCurrentlySelectedDestBlocked ||
+           (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData))) {
+        // show "Allow requests" if the destination was blocked
+        // OR if there's no allow-rule (i.e. the request was allowed "by default")
+        //  -- this enables support for whitelisting.
         if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
             !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
           if (!this._privateBrowsingEnabled) {

@@ -388,7 +388,7 @@ requestpolicy.menu = {
 
     var destLabel = document.createElement("label");
     destLabel.setAttribute("value", value);
-    destLabel.setAttribute("class", "destination");
+    destLabel.setAttribute("class", "domainname");
     destLabel.setAttribute("flex", "2");
     hbox.insertBefore(destLabel, null);
 
@@ -436,7 +436,13 @@ requestpolicy.menu = {
   },
 
   _activateOriginItem : function(item) {
-    this._currentlySelectedOrigin = item.value;
+    if (item.id == 'rp-origin') {
+      // it's _the_ origin
+      this._currentlySelectedOrigin = item.value;
+    } else if (item.parentNode.id == 'rp-other-origins-list') {
+      // it's an otherOrigin
+      this._currentlySelectedOrigin = item.getElementsByClassName("domainname")[0].value;
+    }
     this._currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
     // activated, then regenerate the other origins list, as well.
@@ -448,7 +454,7 @@ requestpolicy.menu = {
   },
 
   _activateDestinationItem : function(item) {
-    this._currentlySelectedDest = item.getElementsByClassName("destination")[0].value;
+    this._currentlySelectedDest = item.getElementsByClassName("domainname")[0].value;
 
     if (item.parentNode.id == 'rp-blocked-destinations-list') {
       this._isCurrentlySelectedDestBlocked = true;

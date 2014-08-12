@@ -410,7 +410,7 @@ PolicyManager.prototype = {
     var result = new CheckRequestResult();
     for (var listName in this._subscriptionPolicies) {
       var policies = this._subscriptionPolicies[listName];
-      return this._checkRequest(origin, dest, policies, result);
+      this._checkRequest(origin, dest, policies, result);
     }
     return result;
   },

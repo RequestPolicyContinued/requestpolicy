@@ -35,7 +35,8 @@ var EXPORTED_SYMBOLS = ["PolicyManager", "CheckRequestResult", "Destination",
   "REQUEST_REASON_USER_ALLOWED_REDIRECT",
   "REQUEST_REASON_USER_ACTION",
   "REQUEST_REASON_NEW_WINDOW",
-  "REQUEST_REASON_IDENTICAL_IDENTIFIER"
+  "REQUEST_REASON_IDENTICAL_IDENTIFIER",
+  "REQUEST_REASON_RELATIVE_URL"
 ];
 
 const CI = Components.interfaces;
@@ -103,6 +104,8 @@ const REQUEST_REASON_USER_ACTION           = 11;
 const REQUEST_REASON_NEW_WINDOW            = 12;
 const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
+const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
+
 
 /**
  * CheckRequestResult objects are used to hand over the result of a check
@@ -164,17 +167,59 @@ Destination.prototype = {
 /**
  * @static
  */
+Destination.merge = function (dest1, dest2) {
+  // we assume: dest1.dest == dest2.dest
+  var dest = new Destination(dest1.dest);
+  dest.properties = {};
+
+  var destCounterProperties = [
+    "numRequests",
+    "numDefaultPolicyRequests",
+    "numBlockedRequests",
+    "numAllowedRequests"
+  ];
+
+  for (var i in destCounterProperties) {
+    var p = destCounterProperties[i];
+    dest.properties[p] = 0;
+
+    if (dest1.properties[p]) {
+      dest.properties[p] += dest1.properties[p];
+    }
+    if (dest2.properties[p]) {
+      dest.properties[p] += dest2.properties[p];
+    }
+  }
+
+  return dest;
+}
+
+/**
+ * @static
+ */
 Destination.existsInArray = function (destString, dests) {
-  // check if the Array of Destination objects (dests) contains the destination string.
+  return (Destination.indexOfDestInArray(destString, dests) != -1);
+}
+
+/**
+ * @static
+ * @param {String}
+ *          destString The destination saved in Destination.dest
+ * @param {String}
+ *          dests Array of Destination objects
+ * @return {int} The index of the first Destination object which contains the
+ *          specified destString. If it doesn't exist, it returns -1.
+ */
+Destination.indexOfDestInArray = function (destString, dests) {
   if (destString instanceof Destination) {
     destString = destString.dest;
   }
   for (var i in dests) {
     if (dests[i].dest == destString) {
-      return true;
+      return i;
     }
   }
-  return false;
+  return -1;
 }
 
 /**

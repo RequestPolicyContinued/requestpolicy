@@ -1286,7 +1286,10 @@ RequestPolicyService.prototype = {
         || destinationUri.indexOf(":") == -1) {
       // Redirect is to a relative url.
       // ==> allow.
-      return new requestpolicy.mod.CheckRequestResult(true, requestpolicy.mod.REQUEST_TYPE_REDIRECT);
+      return new requestpolicy.mod.CheckRequestResult(
+          true,
+          requestpolicy.mod.REQUEST_TYPE_REDIRECT,
+          requestpolicy.mod.REQUEST_REASON_RELATIVE_URL);
     }
 
     for (var i = 0; i < this._compatibilityRules.length; i++) {
@@ -1787,8 +1790,10 @@ RequestPolicyService.prototype = {
 
   _checkByDefaultPolicy : function(origin, dest) {
     if (this._defaultAllow) {
-      var result = new requestpolicy.mod.CheckRequestResult(true);
-      result.resultReason = requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY;
+      var result = new requestpolicy.mod.CheckRequestResult(
+          true,
+          undefined,
+          requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
     if (this._defaultAllowSameDomain) {
@@ -1806,7 +1811,10 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
     var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest,
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
-    return new requestpolicy.mod.CheckRequestResult(originIdent == destIdent);
+    return new requestpolicy.mod.CheckRequestResult(
+        (originIdent == destIdent),
+        undefined,
+        requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   },
 
   /**

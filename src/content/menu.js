@@ -196,7 +196,14 @@ requestpolicy.menu = {
       for (var i in values) {
         var value = values[i];
         if (true === showNumRequests) {
-          var newitem = this._addListItem(list, 'rp-od-item', value.dest, value.properties.numRequests);
+          if (value.properties.numAllowedRequests > 0 && value.properties.numBlockedRequests > 0) {
+            var counters = value.properties.numRequests
+                + " (" + value.properties.numBlockedRequests
+                + "+" + value.properties.numAllowedRequests + ")";
+          } else {
+            var counters = value.properties.numRequests;
+          }
+          var newitem = this._addListItem(list, 'rp-od-item', value.dest, counters);
         } else {
           var newitem = this._addListItem(list, 'rp-od-item', value.dest);
         }
@@ -236,19 +243,28 @@ requestpolicy.menu = {
         blocked.push(dest);
       } else {
         // we assume that `dest` is a Destination getUriObject.
-        // we need to create a new Destination object because the properties
-        // are not merged.
-        // TODO: merge the properties of the blocked and allowed Destination objects.
-        mixed.push(new requestpolicy.mod.Destination(dest.dest));
+        mixed.push(dest);
       }
     }
     for (var i = 0; i < rawAllowed.length; i++) {
       let dest = rawAllowed[i];
-      if (false === requestpolicy.mod.Destination.existsInArray(dest, rawBlocked)) {
+      var indexRawBlocked = requestpolicy.mod.Destination.indexOfDestInArray(dest, rawBlocked);
+      var indexMixed = requestpolicy.mod.Destination.indexOfDestInArray(dest, mixed);
+
+      if (indexRawBlocked == -1) {
         allowed.push(dest);
-      } else if (mixed.indexOf(dest) == -1) {
-        // see comments above
-        mixed.push(new requestpolicy.mod.Destination(dest.dest));
+      } else {
+        if (indexMixed != -1) {
+          requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+              "Merging dest: <" + dest.dest + ">");
+          mixed[indexMixed] = requestpolicy.mod.Destination.merge(dest, mixed[indexMixed]);
+        } else {
+          // if the dest is in rawBlocked and rawAllowed, but not in mixed.
+          // this should never happen, the mixed destination should be added in the rawBlocked-loop.
+          requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
+              "mixed dest was not added to `mixed` list: <" + dest.dest + ">");
+          mixed.push(dest);
+        }
       }
     }
 
@@ -601,21 +617,41 @@ requestpolicy.menu = {
   /* This function iterates through all requests of a destBase, looks for
    * properties and returns them.
    */
-  _extractRequestProperties : function(request) {
-    var properties = {};
-    properties.numRequests = 0;
-    properties.numDefaultPolicyRequests = 0;
+  _extractRequestProperties : function(request, ruleType) {
+    var properties = {
+      numRequests : 0,
+      numDefaultPolicyRequests : 0,
+      numAllowedRequests : 0,
+      numBlockedRequests : 0
+    };
+
+    var ruleTypeCounter = 0;
 
     for (var destIdent in request) {
       for (var destUri in request[destIdent]) {
         ++properties.numRequests;
-//        requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
-//            + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
+        ++ruleTypeCounter;
+        //requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
+        //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
         if ( request[destIdent][destUri].isDefaultPolicyUsed() ) {
           ++properties.numDefaultPolicyRequests;
         }
       }
     }
+
+    switch (ruleType) {
+      case requestpolicy.mod.RULE_TYPE_ALLOW:
+        properties.numAllowedRequests = ruleTypeCounter;
+        break;
+
+      case requestpolicy.mod.RULE_TYPE_DENY:
+        properties.numBlockedRequests = ruleTypeCounter;
+        break;
+
+      default:
+        break;
+    }
+
     return properties;
   },
 
@@ -634,7 +670,8 @@ requestpolicy.menu = {
 
     var result = [];
     for (var destBase in requests) {
-      var properties = this._extractRequestProperties(requests[destBase]);
+      var properties = this._extractRequestProperties(requests[destBase],
+                                                      requestpolicy.mod.RULE_TYPE_DENY);
       result.push(new requestpolicy.mod.Destination(destBase, properties));
       //requestpolicy.mod.Logger.dump("destBase : "+destBase);
       //requestpolicy.mod.Logger.vardump(properties, "properties");
@@ -667,7 +704,8 @@ requestpolicy.menu = {
         }
       }
 
-      var properties = this._extractRequestProperties(requests[destBase]);
+      var properties = this._extractRequestProperties(requests[destBase],
+                                                      requestpolicy.mod.RULE_TYPE_ALLOW);
       result.push(new requestpolicy.mod.Destination(destBase, properties));
     }
     return result;

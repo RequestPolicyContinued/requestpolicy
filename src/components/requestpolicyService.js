@@ -206,8 +206,7 @@ RequestPolicyService.prototype = {
 
     try {
       // For Firefox <= 3.6.
-      var em = Components.classes["@mozilla.org/extensions/manager;1"]
-          .getService(Components.interfaces.nsIExtensionManager);
+      var em = CC["@mozilla.org/extensions/manager;1"].getService(CI.nsIExtensionManager);
       var ext;
       for (var i = 0; i < idArray.length; i++) {
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -313,8 +312,7 @@ RequestPolicyService.prototype = {
   },
 
   _initializeApplicationCompatibility : function() {
-    var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
-        .getService(Components.interfaces.nsIXULAppInfo);
+    var appInfo = CC["@mozilla.org/xre/app-info;1"].getService(CI.nsIXULAppInfo);
 
     // Mozilla updates (doing this for all applications, not just individual
     // applications from the Mozilla community that I'm aware of).
@@ -511,8 +509,7 @@ RequestPolicyService.prototype = {
   },
 
   _register : function() {
-    var os = CC['@mozilla.org/observer-service;1']
-        .getService(CI.nsIObserverService);
+    var os = CC['@mozilla.org/observer-service;1'].getService(CI.nsIObserverService);
     os.addObserver(this, "http-on-examine-response", false);
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
@@ -535,8 +532,7 @@ RequestPolicyService.prototype = {
 
   _unregister : function() {
     try {
-      var os = CC['@mozilla.org/observer-service;1']
-          .getService(CI.nsIObserverService);
+      var os = CC['@mozilla.org/observer-service;1'].getService(CI.nsIObserverService);
       os.removeObserver(this, "http-on-examine-response");
       os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
@@ -559,8 +555,7 @@ RequestPolicyService.prototype = {
 
   _initializePrefSystem : function() {
     // Get the preferences branch and setup the preferences observer.
-    this._prefService = Components.classes["@mozilla.org/preferences-service;1"]
-        .getService(Components.interfaces.nsIPrefService);
+    this._prefService = CC["@mozilla.org/preferences-service;1"].getService(CI.nsIPrefService);
 
     this.prefs = this._prefService.getBranch("extensions.requestpolicy.")
         .QueryInterface(CI.nsIPrefBranch2);
@@ -595,8 +590,7 @@ RequestPolicyService.prototype = {
             }
           });
       } else {
-        var em = Components.classes["@mozilla.org/extensions/manager;1"]
-                 .getService(Components.interfaces.nsIExtensionManager);
+        var em = CC["@mozilla.org/extensions/manager;1"].getService(CI.nsIExtensionManager);
         var addon = em.getItemForID(EXTENSION_ID);
         this.prefs.setCharPref("lastVersion", addon.version);
         util.curVersion = addon.version;
@@ -671,8 +665,7 @@ RequestPolicyService.prototype = {
 
   _initializePrivateBrowsing : function() {
     try {
-      var pbs = Components.classes["@mozilla.org/privatebrowsing;1"]
-          .getService(Components.interfaces.nsIPrivateBrowsingService);
+      var pbs = CC["@mozilla.org/privatebrowsing;1"].getService(CI.nsIPrivateBrowsingService);
       this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
     } catch (e) {
       // Ignore exceptions from browsers that do not support private browsing.
@@ -723,8 +716,7 @@ RequestPolicyService.prototype = {
     // TODO: Make user aware of blocked headers so they can allow them if
     // desired.
 
-    var httpChannel = observedSubject
-        .QueryInterface(Components.interfaces.nsIHttpChannel);
+    var httpChannel = observedSubject.QueryInterface(CI.nsIHttpChannel);
 
     var headerType;
     var dest;
@@ -943,8 +935,7 @@ RequestPolicyService.prototype = {
    * which we currently can't stop.
    */
   _examineHttpRequest : function(observedSubject) {
-    var httpChannel = observedSubject
-        .QueryInterface(Components.interfaces.nsIHttpChannel);
+    var httpChannel = observedSubject.QueryInterface(CI.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
       if (httpChannel.getRequestHeader("X-moz") == "prefetch") {

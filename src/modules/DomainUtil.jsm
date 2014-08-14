@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -117,7 +117,7 @@ DomainUtil.identifierIsInUri = function(identifier, uri, level) {
 
 /**
  * Returns the hostname from a uri string.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {String} The hostname of the uri or throws an exception if it is an
@@ -131,7 +131,7 @@ DomainUtil.getHost = function(uri) {
  * Returns an nsIURI object from a uri string. Note that nsIURI objects will
  * automatically convert ACE formatting to UTF8 for IDNs in the various
  * attributes of the object that are available.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {nsIURI} The nsIURI object created from the uri, or throws an
@@ -151,7 +151,7 @@ DomainUtil.getUriObject = function(uri) {
 
 /**
  * Determines whether a uri string represents a valid uri.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {boolean} True if the uri is valid, false otherwise.
@@ -167,7 +167,7 @@ DomainUtil.isValidUri = function(uri) {
 
 /**
  * Returns the domain from a uri string.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {String} The domain of the uri.
@@ -196,7 +196,7 @@ DomainUtil.getDomain = function(uri) {
 
 /**
  * Determine whether a hostname is an address.
- * 
+ *
  * @param {String} host
  * @return {Boolean} True if |host| is an address rather than a name.
  */
@@ -226,7 +226,7 @@ DomainUtil.getPath = function(uri) {
  * Returns the prePath from a uri string. Note that this will return a prePath in
  * UTF8 format for all IDNs, even if the uri passed to the function is ACE
  * formatted.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {String} The prePath of the uri.
@@ -237,7 +237,7 @@ DomainUtil.getPrePath = function(uri) {
 
 /**
  * Strips any "www." from the beginning of a hostname.
- * 
+ *
  * @param {String}
  *          hostname The hostname to strip.
  * @return {String} The hostname with any leading "www." removed.
@@ -248,7 +248,7 @@ DomainUtil.stripWww = function(hostname) {
 
 /**
  * Determine if two hostnames are the same if any "www." prefix is ignored.
- * 
+ *
  * @param {String}
  *          destinationHost The destination hostname.
  * @param {String}
@@ -272,7 +272,7 @@ DomainUtil.stripFragment = function(uri) {
  * "images.example.com" is subdomain of both "www.example.com" and
  * "example.com", but "www.example.com " and "example.com" are not subdomains of
  * "images.example.com".
- * 
+ *
  * @param {String}
  *          destinationHost The destination hostname.
  * @param {String}
@@ -297,7 +297,7 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
 // TODO: Maybe this should have a different home.
 /**
  * Gets the relevant pieces out of a meta refresh or header refresh string.
- * 
+ *
  * @param {String}
  *          refreshString The original content of a refresh header or meta tag.
  * @return {Array} First element is the delay in seconds, second element is the
@@ -332,7 +332,7 @@ DomainUtil.parseRefresh = function(refreshString) {
  * Adds a path of "/" to the uri if it doesn't have one. That is,
  * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return the origin
  * uri if the provided one is not valid.
- * 
+ *
  * @param {String}
  *          uri
  * @return {String}
@@ -350,7 +350,7 @@ DomainUtil.ensureUriHasPath = function(uri) {
  * formatted if it's an IDN that Mozilla supports displaying in UTF8 format. See
  * http://www.mozilla.org/projects/security/tld-idn-policy-list.html for more
  * info.
- * 
+ *
  * @param {String}
  *          uri The uri.
  * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
@@ -370,7 +370,7 @@ DomainUtil.formatIDNUri = function(uri) {
  * takes into account whether the destPath is a full URI, an absolute path
  * (starts with a slash), a protocol relative path (starts with two slashes),
  * or is relative to the originUri path.
- * 
+ *
  * @param {String}
  *          originUri
  * @param {String}
@@ -382,13 +382,13 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
   var urlType = CI.nsIStandardURL.URLTYPE_AUTHORITY;
   var newUri = CC[STANDARDURL_CONTRACTID].createInstance(CI.nsIStandardURL);
   newUri.init(urlType, 0, destPath, null, baseUri);
-  var resolvedUri = newUri.QueryInterface(Components.interfaces.nsIURI);
+  var resolvedUri = newUri.QueryInterface(CI.nsIURI);
   return resolvedUri.spec;
 }
 
 /**
  * Determines whether a URI uses the standard port for its scheme.
- * 
+ *
  * @param {nsIURI}
  *          uri
  * @return {Boolean}

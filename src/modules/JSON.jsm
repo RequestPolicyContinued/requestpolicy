@@ -60,12 +60,10 @@
 
 let EXPORTED_SYMBOLS = ["JSON"];
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
+const CC = Components.classes;
+const CI = Components.interfaces;
 
-let appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
+let appInfo = CC["@mozilla.org/xre/app-info;1"].getService(CI.nsIXULAppInfo);
 
 // Iceweasel 3.0 has a bug where it reports its platform version as 1.9 instead
 // of 1.9.0.n; we work around the bug by checking for 1.9 in addition to 1.9.0.n
@@ -79,5 +77,5 @@ if (appInfo.platformVersion.indexOf("1.9.0") == 0 ||
       parse: function(jsonString) { return this.JSON.fromString(jsonString) },
       stringify: function(jsObject) { return this.JSON.toString(jsObject) }
   }
-  Cu.import("resource://gre/modules/JSON.jsm", JSON);
+  Components.utils.import("resource://gre/modules/JSON.jsm", JSON);
 }

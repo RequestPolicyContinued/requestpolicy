@@ -1,22 +1,22 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
- * 
+ *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2011 Justin Samuel
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * ***** END LICENSE BLOCK *****
  */
 
@@ -82,15 +82,15 @@ exampleRawDataObj = {
 function dump(arr,level) {
   var dumped_text = "";
   if(!level) level = 0;
-  
+
   //The padding given at the beginning of the line.
   var level_padding = "";
   for(var j=0;j<level+1;j++) level_padding += "    ";
-  
-  if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+
+  if(typeof(arr) == 'object') { //Array/Hashes/Objects
     for(var item in arr) {
       var value = arr[item];
-      
+
       if(typeof(value) == 'object') { //If it is an array,
         dumped_text += level_padding + "'" + item + "' ...\n";
         dumped_text += dump(value,level+1);
@@ -129,7 +129,7 @@ RawPolicy.prototype = {
   getAllowRuleCount : function() {
     return this._entries["allow"].length;
   },
-  
+
   getDenyRuleCount : function() {
     return this._entries["deny"].length;
   },
@@ -138,11 +138,11 @@ RawPolicy.prototype = {
     if (entryPart["h"]) {
       var rules = policy.addHost(entryPart["h"]).rules;
     } else {
-      rules = policy.rules; 
+      rules = policy.rules;
     }
     var r = rules.add(entryPart["s"], entryPart["port"]);
     if (entryPart["pathPre"]) {
-      r.pathPre = entryPart["pathPre"];  
+      r.pathPre = entryPart["pathPre"];
     } else if (entryPart["pathRegex"]) {
       r.pathRegex = new RegExP(entryPart["pathRegex"]);
     }
@@ -155,9 +155,9 @@ RawPolicy.prototype = {
     var o = entry["o"];
     var d = entry["d"];
     var rules, r;
-  
+
     //dprint("_addEntryToPolicy: " + o + " " + d + " " + ruleType);
-    
+
     if (o && d) {
       [rules, r] = this._addEntryHelper(o, policy);
       r.initDestinations();
@@ -177,7 +177,7 @@ RawPolicy.prototype = {
       } else {
         r.denyOrigin = true;
       }
-      
+
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
       //r.destinationRuleType = ruleType;
@@ -186,9 +186,9 @@ RawPolicy.prototype = {
       } else {
         r.denyDestination = true;
       }
-      
+
     } else {
-      // TODO: Issue warning about bad entry and return or throw error. 
+      // TODO: Issue warning about bad entry and return or throw error.
       return;
     }
   },
@@ -213,7 +213,7 @@ RawPolicy.prototype = {
   /**
    * Adds the rule to the entries of this |RawPolicy| instance as well as the
    * |Policy| optionally provided as the policy argument.
-   * 
+   *
    * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
    * @param ruleData
    */
@@ -225,7 +225,7 @@ RawPolicy.prototype = {
       throw "Invalid ruleType: " + ruleType;
     }
 
-    // Only add the raw policy entry if it doesn't already exist.    
+    // Only add the raw policy entry if it doesn't already exist.
     if (!this.ruleExists(ruleType, ruleData)) {
       this._entries[typeStr].push(ruleData);
     }
@@ -254,9 +254,9 @@ RawPolicy.prototype = {
     var o = entry["o"];
     var d = entry["d"];
     var rules, r;
-  
+
     // TODO: refactor like done with _addEntryToPolicy
-    
+
     if (o && d) {
       if (o["h"]) {
         var originEntry = policy.getHost(o["h"]);
@@ -271,7 +271,7 @@ RawPolicy.prototype = {
       if (!r || !r.destinations) {
         return;
       }
-      
+
       if (d["h"]) {
         var destEntry = r.destinations.getHost(d["h"]);
         if (!destEntry) {
@@ -285,7 +285,7 @@ RawPolicy.prototype = {
       if (!r) {
         return;
       }
-      
+
       // if (r.destinationRuleType == ruleType) {
       //   r.destinationRuleType = null;
       // }
@@ -297,7 +297,7 @@ RawPolicy.prototype = {
       } else {
         throw "Invalid rule type: " + ruleType;
       }
-      
+
     } else if (o && !d) {
       if (o["h"]) {
         var originEntry = policy.getHost(o["h"]);
@@ -323,7 +323,7 @@ RawPolicy.prototype = {
       } else {
         throw "Invalid rule type: " + ruleType;
       }
-      
+
     } else if (!o && d) {
       if (d["h"]) {
         var originEntry = policy.getHost(d["h"]);
@@ -349,9 +349,9 @@ RawPolicy.prototype = {
       } else {
         throw "Invalid rule type: " + ruleType;
       }
-      
+
     } else {
-      // TODO: Issue warning about bad entry and return or throw error. 
+      // TODO: Issue warning about bad entry and return or throw error.
       return;
     }
   },
@@ -359,7 +359,7 @@ RawPolicy.prototype = {
   /**
    * Removes the rule from the entries of this |RawPolicy| instance as well as the
    * |Policy| optionally provided as the policy argument.
-   * 
+   *
    * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
    * @param ruleData
    */
@@ -399,7 +399,7 @@ RawPolicy.prototype = {
 
   /**
    * Returns a |Policy| object initialized to reflect the contents of this
-   * |RawPolicy|. 
+   * |RawPolicy|.
    */
   toPolicy : function(name) {
     var policy = new Policy(name);
@@ -417,10 +417,10 @@ RawPolicy.prototype = {
         this._addEntryToPolicy(entryArray[i], ruleType, policy);
       }
     }
-    
+
     return policy;
   },
-  
+
   _checkDataObj : function(dataObj) {
     if (!("metadata" in dataObj)) {
       throw "Invalid policy data: no 'metadata' key";
@@ -436,7 +436,7 @@ RawPolicy.prototype = {
       throw "Invalid policy data: no 'entries' key";
     }
   },
-  
+
   /**
    * Initializes this |RawPolicy| from JSON data.
    */
@@ -452,11 +452,11 @@ RawPolicy.prototype = {
     this._metadata = dataObj.metadata;
     this._entries = dataObj.entries;
   },
-  
+
   /**
    * Returns a simple object representing this |RawPolicy|. This function
    * is automatically invoked when |JSON.stringify(rawPolicyObj)| is called and
-   * the result is passed through stringify before being returned. 
+   * the result is passed through stringify before being returned.
    */
   toJSON : function() {
     // Note: unrecognized keys in the metadata and entries are preserved.
@@ -483,22 +483,22 @@ function RuleSet() {
 
 RuleSet.prototype = {
   _rules : null,
-  
+
   print : function(depth) {
     depth = depth ? depth : 0;
     for (var i = 0, item; item = this._rules[i]; i++) {
       item.print(depth);
     }
   },
-  
+
   getRules : function() {
     return this._rules;
   },
-  
+
   isEmpty : function() {
     return this._rules.length == 0;
   },
-  
+
   __iterator__ : function() {
     return new RuleIterator(this._rules);
   },
@@ -556,7 +556,7 @@ Rule.prototype = {
   allowDestination : null,
   denyDestination : null,
 
-  // For origin-to-destination rules, these are the destinations. 
+  // For origin-to-destination rules, these are the destinations.
   destinations : null,
 
   toString : function() {
@@ -570,7 +570,7 @@ Rule.prototype = {
            + "denyDestination:" + this.denyDestination + " "
            + "]";
   },
-  
+
   print : function(depth) {
     depth = depth ? depth : 0;
     var indent = "";
@@ -583,20 +583,20 @@ Rule.prototype = {
       this.destinations.print(depth + 1);
     }
   },
-  
+
   isEqual : function(otherRule) {
     return this.scheme == otherRule.scheme &&
            this.port == otherRule.port &&
            this.path == otherRule.path;
   },
-  
+
   initDestinations : function() {
     if (this.destinations) {
       return;
     }
     this.destinations = new Policy();
   },
-  
+
   isMatch : function(uriObj) {
     if (this.scheme && this.scheme != uriObj.scheme) {
       dprint("isMatch: wrong scheme");
@@ -613,7 +613,7 @@ Rule.prototype = {
     } else {
       if (!requestpolicy.mod.DomainUtil.hasStandardPort(uriObj)) {
         dprint("isMatch: wrong port (not the default port and the rule assumes default)");
-        return false;        
+        return false;
       }
     }
     if (this.path) {
@@ -658,7 +658,7 @@ DomainEntry.prototype = {
   toString : function() {
     return "[DomainEntry '" + this._name + " (" + this.fullName + ")']";
   },
-  
+
   print : function(depth) {
     depth = depth ? depth : 0;
     var indent = "";
@@ -738,7 +738,7 @@ Policy.prototype = {
   toString : function() {
     return "[Policy " + this._name + "]";
   },
-  
+
   print : function(depth) {
     depth = depth ? depth : 0;
     var indent = "";
@@ -750,7 +750,7 @@ Policy.prototype = {
     //this._addr.print(depth + 1);
     this.rules.print(depth + 1);
   },
-  
+
   _isAddress : function(host) {
     // Check if it's an IPv6 address.
     if (host.indexOf(":") != -1) {
@@ -835,11 +835,11 @@ Policy.prototype = {
       return this._addDomain(host);
     }
   },
-  
+
   /**
    * Yields all matching hosts. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
-   * 
+   *
    * @param string
    *          host The host to get matching entries for.
    * @return DomainEntry|AddressEntry
@@ -944,7 +944,7 @@ Policy.prototype = {
                 //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
               }
-              
+
               // switch(destRule.destinationRuleType) {
               //   case RULE_TYPE_ALLOW:
               //     if (destRule.isMatch(dest)) {
@@ -967,7 +967,7 @@ Policy.prototype = {
         } // end: if (rule.destinations)
       }
     }
-    
+
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
     destouterloop: for (var entry in this.getHostMatches(destHost)) {
@@ -1000,7 +1000,7 @@ Policy.prototype = {
         // }
       }
     }
-    
+
     return [matchedAllowRules, matchedDenyRules];
   }
 }

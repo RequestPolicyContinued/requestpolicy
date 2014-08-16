@@ -190,22 +190,35 @@ requestpolicy.requestLogTreeView = {
   },
 
   getRowProperties : function(index, props) {
-    if (this._getVisibleItemAtIndex(index)[2]) {
-      props.AppendElement(this._aserv.getAtom("blocked"));
+    var returnValue = (this._getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
+
+    if (props) {
+      // Gecko version < 22
+      props.AppendElement(this._aserv.getAtom(returnValue));
     } else {
-      props.AppendElement(this._aserv.getAtom("allowed"));
+      // Gecko version >= 22
+      return returnValue;
     }
   },
 
   getCellProperties : function(index, column, props) {
     if (this._columnNameToIndexMap[column.id] == 2) {
       if (this._getVisibleItemAtIndex(index)[2]) {
-        props.AppendElement(this._aserv.getAtom("blocked"));
+        if (props) {
+          // Gecko version < 22
+          props.AppendElement(this._aserv.getAtom("blocked"));
+        } else {
+          // Gecko version >= 22
+          return "blocked";
+        }
       }
     }
   },
 
   getColumnProperties : function(column, props) {
+    if (!props) {
+      return "";
+    }
   }
 
 };

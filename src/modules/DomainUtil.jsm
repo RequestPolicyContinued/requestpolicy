@@ -195,12 +195,12 @@ DomainUtil.getDomain = function(uri) {
 
 
 /**
- * Determine whether a hostname is an address.
+ * Determine whether a hostname is an IP address.
  *
  * @param {String} host
- * @return {Boolean} True if |host| is an address rather than a name.
+ * @return {Boolean} True if |host| is an IP address rather than a name.
  */
-DomainUtil.isAddress = function(host) {
+DomainUtil.isIPAddress = function(host) {
   try {
     var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
   } catch (e) {

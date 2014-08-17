@@ -687,14 +687,14 @@ DomainEntry.prototype = {
 };
 
 
-function AddressEntry(address) {
+function IPAddressEntry(address) {
   this.address = address;
   this.rules = new RuleSet();
 }
 
-AddressEntry.prototype = {
+IPAddressEntry.prototype = {
   toString : function() {
-    return "[AddressEntry '" + this.address + "']";
+    return "[IPAddressEntry '" + this.address + "']";
   },
 
   print : function(depth) {
@@ -720,7 +720,7 @@ function Policy(name) {
   // Start off with an "empty" top-level domain entry. This will never have
   // its own rules. Non-host-specific rules go in |this.rules|.
   this._domain = new DomainEntry(null, null, null);
-  this._addr = {};
+  this._ipAddr = {};
   this.rules = new RuleSet();
 }
 
@@ -732,7 +732,7 @@ function Policy(name) {
 Policy.prototype = {
   _name : null,
   _domain : null,
-  _addr : null,
+  _ipAddr : null,
   rules : null,
 
   toString : function() {
@@ -747,11 +747,11 @@ Policy.prototype = {
     }
     dprint(indent + this.toString());
     this._domain.print(depth + 1);
-    //this._addr.print(depth + 1);
+    //this._ipAddr.print(depth + 1);
     this.rules.print(depth + 1);
   },
 
-  _isAddress : function(host) {
+  _isIPAddress : function(host) {
     // Check if it's an IPv6 address.
     if (host.indexOf(":") != -1) {
       return true;
@@ -765,17 +765,17 @@ Policy.prototype = {
     return true;
   },
 
-  _getAddress : function(address) {
+  _getIPAddress : function(address) {
     // TODO: Canonicalize IPv6 addresses.
-    return this._addr[address];
+    return this._ipAddr[address];
   },
 
-  _addAddress : function(address) {
+  _addIPAddress : function(address) {
     // TODO: Canonicalize IPv6 addresses.
-    if (!this._addr[address]) {
-      this._addr[address] = new AddressEntry(address);
+    if (!this._ipAddr[address]) {
+      this._ipAddr[address] = new IPAddressEntry(address);
     }
-    return this._addr[address];
+    return this._ipAddr[address];
   },
 
   _getDomain : function(domain) {
@@ -818,8 +818,8 @@ Policy.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isAddress(host)) {
-      return this._getAddress(host);
+    if (this._isIPAddress(host)) {
+      return this._getIPAddress(host);
     } else {
       return this._getDomain(host);
     }
@@ -829,8 +829,8 @@ Policy.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isAddress(host)) {
-      return this._addAddress(host);
+    if (this._isIPAddress(host)) {
+      return this._addIPAddress(host);
     } else {
       return this._addDomain(host);
     }
@@ -842,7 +842,7 @@ Policy.prototype = {
    *
    * @param string
    *          host The host to get matching entries for.
-   * @return DomainEntry|AddressEntry
+   * @return DomainEntry|IPAddressEntry
    */
   getHostMatches : function(host) {
     if (!this.rules.isEmpty()) {
@@ -858,8 +858,8 @@ Policy.prototype = {
       return;
     }
 
-    if (this._isAddress(host)) {
-      var addrEntry = this._addr[host];
+    if (this._isIPAddress(host)) {
+      var addrEntry = this._ipAddr[host];
       if (addrEntry) {
         yield addrEntry;
       }
@@ -1012,7 +1012,7 @@ Policy._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
   if (entry instanceof DomainEntry && entry.fullName) {
     rawRule[originOrDest]["h"] = entry.fullName;
-  } else if (entry instanceof AddressEntry) {
+  } else if (entry instanceof IPAddressEntry) {
     rawRule[originOrDest]["h"] = entry.address;
   }
   if (rule.scheme) {

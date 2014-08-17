@@ -753,13 +753,13 @@ requestpolicy.menu = {
     return str.replace(/['\\]/g, "");
   },
 
-  _isAddressOrSingleName : function(hostname) {
-    return requestpolicy.mod.DomainUtil.isAddress(hostname) ||
+  _isIPAddressOrSingleName : function(hostname) {
+    return requestpolicy.mod.DomainUtil.isIPAddress(hostname) ||
       hostname.indexOf(".") == -1;
   },
 
   _addWildcard : function(hostname) {
-    if (this._isAddressOrSingleName(hostname)) {
+    if (this._isIPAddressOrSingleName(hostname)) {
       return hostname;
     } else {
       return "*." + hostname;

@@ -79,7 +79,7 @@ common.getOldRulesAsNewRules = function (addHostWildcard) {
   var rules = [];
 
   function isHostname(host) {
-    return !DomainUtil.isValidUri(host) && !DomainUtil.isAddress(host);
+    return !DomainUtil.isValidUri(host) && !DomainUtil.isIPAddress(host);
   }
 
   for (var origin in origins) {

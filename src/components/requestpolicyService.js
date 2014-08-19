@@ -1904,12 +1904,21 @@ RequestPolicyService.prototype = {
 
         if (aContentLocation.scheme == "view-source") {
           var newDest = dest.split(":").slice(1).join(":");
-          requestpolicy.mod.Logger.info(
-              requestpolicy.mod.Logger.TYPE_CONTENT,
-              "Considering view-source destination <"
-                  + dest + "> to be destination <" + newDest + ">");
-          dest = newDest;
-          aContentLocation = requestpolicy.mod.DomainUtil.getUriObject(dest);
+          if (newDest.indexOf("data:text/html") == 0) {
+            // "View Selection Source" has been clicked
+            requestpolicy.mod.Logger.info(
+                requestpolicy.mod.Logger.TYPE_CONTENT,
+                "Allowing \"data:text/html\" view-source destination"
+                    + " (Selection Source)");
+            return CP_OK;
+          } else {
+            requestpolicy.mod.Logger.info(
+                requestpolicy.mod.Logger.TYPE_CONTENT,
+                "Considering view-source destination <"
+                    + dest + "> to be destination <" + newDest + ">");
+            dest = newDest;
+            aContentLocation = requestpolicy.mod.DomainUtil.getUriObject(dest);
+          }
         }
 
         if (origin == "about:blank" && aContext) {

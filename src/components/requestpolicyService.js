@@ -1847,6 +1847,8 @@ RequestPolicyService.prototype = {
     // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
         aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
+      //requestpolicy.mod.Logger.vardump(aRequestOrigin);
+      //requestpolicy.mod.Logger.vardump(aContentLocation);
       try {
 
         if (this._isInternalRequest(aContentLocation, aRequestOrigin)) {
@@ -1857,10 +1859,8 @@ RequestPolicyService.prototype = {
         // that they'll automatically be converted to UTF8 format before we
         // even get here, as long as they're valid and Mozilla allows the TLD
         // to have UTF8 formatted IDNs.
-        var origin = requestpolicy.mod.DomainUtil
-            .stripFragment(aRequestOrigin.spec);
-        var dest = requestpolicy.mod.DomainUtil
-            .stripFragment(aContentLocation.spec);
+        var origin = aRequestOrigin.specIgnoringRef;
+        var dest = aContentLocation.specIgnoringRef;
 
         // Fx 16 changed the following: 1) we should be able to count on the
         // referrer (aRequestOrigin) being set to something besides

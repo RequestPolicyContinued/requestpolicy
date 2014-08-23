@@ -990,21 +990,51 @@ requestpolicy.overlay = {
   //},
 
   /**
-   * Wraps the gContextMenu's openLink() function so that RequestPolicy can be
-   * aware of the window being opened. The openLinkInTab() method doesn't need
-   * to be wrapped because addTab() is wrapped elsewhere and that ends up being
-   * called when openLinkInTab() is called.
+   * Wraps (overrides) the following methods of gContextMenu
+   * - openLink()
+   * - openLinkInPrivateWindow()
+   * - openLinkInCurrent()
+   * so that RequestPolicy can register a link-click.
+   *
+   * The original methods are defined in Firefox' nsContextMenu.js:
+   * http://mxr.mozilla.org/mozilla-central/source/browser/base/content/nsContextMenu.js
+   *
+   * The openLinkInTab() method doesn't need to be wrapped because new tabs are already
+   * recognized by tabAdded(), which is wrapped elsewhere. The tabAdded() function ends up
+   * being called when openLinkInTab() is called.
+   *
+   * TODO: There are even more similar methods in gContextMenu (frame-specific),
+   *       and perhaps the number will increase in future. Frame-specific contextMenu-
+   *       entries are working, but are registered e.g. as "new window opened" by
+   *       the subsequent shouldLoad() call.
    */
   _wrapOpenLink : function() {
     const rpService = this._rpService;
 
-    if (!gContextMenu.requestpolicyOrigOpenLink) {
-      gContextMenu.requestpolicyOrigOpenLink = gContextMenu.openLink;
+    if (!gContextMenu.requestpolicyMethodsOverridden) {
+      gContextMenu.requestpolicyMethodsOverridden = true;
+
       gContextMenu.openLink = function() {
-        rpService.registerLinkClicked(gContextMenu.link.ownerDocument.URL,
-            gContextMenu.link.href);
-        return gContextMenu.requestpolicyOrigOpenLink();
+        rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+        return this.__proto__.openLink.call(this); // call the overridden method
       };
+
+      // Below, we check whether the functions exist before overriding it, because
+      // those functions have been introduced in later versions of Firefox than openLink().
+
+      if (gContextMenu.openLinkInPrivateWindow) {
+        gContextMenu.openLinkInPrivateWindow = function() {
+          rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+          return this.__proto__.openLinkInPrivateWindow.call(this);
+        };
+      }
+
+      if (gContextMenu.openLinkInCurrent) {
+        gContextMenu.openLinkInCurrent = function() {
+          rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+          return this.__proto__.openLinkInCurrent.call(this);
+        };
+      }
     }
   },
 

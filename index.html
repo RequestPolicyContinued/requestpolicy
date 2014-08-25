@@ -1,0 +1,312 @@
+<!doctype html>
+<html>
+	<head>
+		<title>RequestPolicy - Firefox addon for Privacy and Security</title>
+		<meta charset="utf-8" />
+		<link rel="stylesheet" type="text/css" href="res/simplegrid.css" />
+		<link rel="stylesheet" type="text/css" href="res/style.css" />
+	</head>
+	<body>
+		<!-- Grid 1/2 -->
+		<div class="grid grid-pad mainheader">
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content centered">
+					<h1>RequestPolicy</h1>
+				</div>
+			</div>
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content centered">
+					<p><a href="#faq">FAQ</a> |
+					<a href="#privacy">Privacy</a> |
+					<a href="#security">Security</a> |
+					<a href="https://github.com/RequestPolicyContinued/requestpolicy/">Github</a> | 
+					<a href="https://github.com/RequestPolicyContinued/requestpolicy/issues">Issues</a> |
+					<a href="#about">About</a>
+					</p>
+				</div>
+			</div>
+			
+			<div class="col-2-3 mobile-col-1-1">
+				<div class="content">
+					<h2>Be in control</h2>
+					<p>RequestPolicy is an extension for Mozilla browsers that increases your browsing privacy, security, and speed by giving you control over cross-site requests on pages you visit.</p>
+				</div>
+			</div>
+			<div class="col-1-3 mobile-col-1-1">
+				<div class="content download centered" style="height: 140px; color: #fff;" onClick='document.location.href="https://github.com/RequestPolicyContinued/requestpolicy/releases"'>
+					<h2>Download</h2>
+					<p>addon for Mozilla Firefox<p>
+				</div>
+			</div>
+			<div class="col-1-2 mobile-col-1-2 hide-on-mobile">
+				<div class="content">
+				</div>
+			</div>
+			<div class="col-1-2 mobile-col-1-2 hide-on-mobile">
+				<div class="content">
+				</div>
+			</div>
+		</div>
+		<!-- Grid 1/3 -->
+		<div class="grid grid-pad">
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content centered">
+					<img src="res/rp-1.png"></img>
+				</div>
+			</div>
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content">
+					<p>With RequestPolicy installed, you will see a new flag icon normally at the top-right of your browser. This flag turns red when RequestPolicy has blocked requests from the current website you are viewing. Clicking on the icon opens the RequestPolicy menu.</p>
+				</div>
+			</div>
+		</div>
+		<div class="grid grid-pad">
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content centered">
+					<img src="res/rp-2.png"></img>
+				</div>
+			</div>
+			<div class="col-1-2 mobile-col-1-1">
+				<div class="content">
+					<p>The menu indicates destination domains from the current site that have either been blocked or allowed. Each of the destination domains listed have their own menus which give you options about which requests to allow..</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="grid grid-pad">
+			<div class="col-1-1 mobile-col-1-1">
+				<div class="content">
+					<hr>
+
+					<h2 id="faq">Frequently Asked Questions</h2>
+
+					<ul>
+						<li><a href="#faq-cross-site-requests">What are cross-site requests?</a></li>
+						<li><a href="#faq-privacy">What are the privacy benefits of using RequestPolicy?</a></li>
+						<li><a href="#faq-security">What are the security benefits of using RequestPolicy?</a></li>
+						<li><a href="#faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</a></li>
+						<li><a href="#faq-blocked">Which kinds of requests are blocked?</a></li>
+						<li><a href="#faq-third-party-sites">How are sites classified as "third-party sites"?</a></li>
+						<li><a href="#after-uninstall">What changes to my browser are left behind after uninstalling RequestPolicy?</a></li>
+						<li><a href="#detecting">Can websites detect that you are using RequestPolicy?</a></li>
+						<li><a href="#faq-chrome">Is there a RequestPolicy for Chrome?</a></li>
+					</ul>
+
+					<h3 id="faq-cross-site-requests">What are cross-site requests?</h2>
+
+					<p>Cross-site requests are requests that your browser is told to make by a website you are visiting to a completely different website. Though usually legitimate requests, they often result in advertising companies and other websites knowing your browsing habits, including specific pages you view throughout the day.</p>
+
+					<p>Cross-site requests are also used in attacks on users who are browsing the web. Among the attacks that cross-site requests are used in, they are particularly dangerous with <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery" rel="external">Cross-Site Request Forgery</a> (CSRF) attacks where your browser is told to make a request to another website and that other website thinks you (the person) meant to make the request.</p>
+
+					<h3 id="faq-privacy">What are the privacy benefits of using RequestPolicy?</h2>
+
+					<p>See <a href="#privacy">privacy benefits</a>.</p>
+
+					<h3 id="faq-security">What are the security benefits of using RequestPolicy?</h2>
+
+					<p>See <a href="#security">security benefits</a>.</p>
+
+					<h3 id="faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</h2>
+
+					<p>No! :)</p>
+
+					<p><a href="http://www.noscript.net/" rel="external">NoScript</a> is a tool that gives you a <a href="http://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a> policy for <b>JavaScript, Java, Flash and other plugins</b>. NoScript allows you to whitelist scripts and objects from domains you trust.</p>
+
+					<p>RequestPolicy is a tool that gives you a	<a href="http://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a>
+					policy for <b>cross-site requests</b>. RequestPolicy allows you to whitelist <a href="#faq-cross-site-requests">cross-site requests</a> you trust.</p>
+
+					<p>RequestPolicy will protect you from various attacks that NoScript will not (such as CSRF attacks, though there some special cases that NoScript protects against) and will give you <a href="#privacy">greater privacy</a> while browsing.</p>
+
+					<p>Also, RequestPolicy will give you finer-grained control over JavaScript and plugins when you use it with NoScript. For example, if you whitelist a domain with NoScript to allow it to run JavaScript, then that domain will also be allowed to run JavaScript when you are on any other site that you have whitelisted with NoScript. RequestPolicy makes sure that when it is JavaScript from a third-party site, it will still be restricted unless you have allowed those cross-site requests.</p>
+
+					<p>Conversely, NoScript gives you protection that RequestPolicy does not. RequestPolicy will not keep you safe from malicious JavaScript or vulnerable plugins on the current site you are visiting, So, NoScript is absolutely essential for browser security.</p>
+
+					<p>Having two separate tools that each do their specific jobs well is the best approach. NoScript is an amazing extension and is absolutely essential (like RequestPolicy) to using Firefox securely. It is best to use both RequestPolicy and NoScript.</p>
+
+					<h3 id="faq-blocked">Which kinds of requests are blocked?</h2>
+
+					<p>By default, any request the browser makes from the current site a user is on to a third-party site is blocked. Users can then whitelist specific sites (with various levels of granularity) to allow requests they approve of.</p>
+
+					<p>Note that <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Online_Certificate_Status_Protocol" rel="external">OCSP queries</a> and <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Certificate_revocation_list" rel="external">CRL updates</a> are not blocked. This means that RequestPolicy will not interfere with your browser's attempts to determine whether SSL certificates have been revoked.</p>
+
+					Request that are blocked include:
+
+					<ul>
+						<li><b>Content of the current page that is from a different site:</b> Various tags in an HTML page tell the browser that more content is needed to display the current page. Normally, the browser immediately makes requests to third-party sites to obtain this content. The content can include images, JavaScript files, style sheet files, and many others.</li>
+						<li><b>Redirections from the current site to a different site:</b> Redirects tell your browser to load an entirely different website address than the one you are on or requested. Redirections can be caused by JavaScript, META refresh tags, and  on headers.</li>
+						<li><b>Content a page tells your browser to "prefetch":</b> Some browsers, such as Firefox, allow any webpage to tell your browser to load other pages in the background. This is intended to allow a website to improve your browsing experience by guessing which pages you are likely to visit next so that those pages will load faster when you visit them.</li>
+					</ul>
+
+					<p>In Firefox 3.1, DNS prefetching was also added. DNS prefetching is where your browser tries to speed up future requests by resolving the IP address of every link on webpages you visit (just in case you decide to click on them).</p>
+
+					<p>For more information on link prefetching in Mozilla browsers (such as Firefox), see the <a rel="external" href="https://developer.mozilla.org/En/Link_prefetching_FAQ"> Mozilla link prefetching FAQ</a>.</p>
+
+					<p>For more information on DNS prefetching in Mozilla browsers (such as Firefox), see the <a rel="external" href="http://bitsup.blogspot.com/2008/11/dns-prefetching-for-firefox.html">Pat McManus' blog post</a>.</p>
+
+					<h3 id="faq-third-party-sites">How are sites classified as "third-party sites"?</h2>
+
+					<p>A site is considered a third-party site if its registered domain name is different than the registered domain of the page that initiated the request. For example, the domains:</p>
+
+					<ul>
+						<li><tt>example.com</tt></li>
+						<li><tt>www.example.com</tt></li>
+						<li><tt>a.b.c.example.com</tt></li>
+					</ul>
+
+					<p>all have the same registered domain name (<tt>example.com</tt>) and so are considered the same site.</p>
+
+					<p>There is <a href="#trusting-subdomains">some risk</a> posed by this default, but this level of granularity is the one with the optimal tradeoff of usability for privacy and security according to the needs of most users.</p>
+
+					<p>If you want protection against attacks that use subdomains, you can enable more strict site classification through the RequestPolicy preferences. Instead of classifying sites as the same based on the registered domain, you can choose to base it on the full domain (e.g. <tt>a.b.c.example.com</tt>) or even on the complete protocol + domain + port (e.g. <tt>http://a.b.c.example.com:81</tt>).</p>
+
+					<h3 id="after-uninstall">What changes to my browser are left behind after uninstalling RequestPolicy?</h2>
+
+					<p>By default, when you uninstall or disable RequestPolicy, all changes RequestPolicy made to your browser's settings will be undone. Primarily this means that your default <a href="#prefetching">prefetching</a> settings are restored to the browser's default settings. That is, DNS and link prefetching will be re-enabled when you uninstall RequestPolicy.</p>
+
+					<p>However, if you have gone to RequestPolicy's preference window and under the "Advanced" preferences you have disabled the options to "Restore default when RequestPolicy is uninstalled", then your browser's default prefetch settings will not be restored when you disable or uninstall RequestPolicy.</p>
+
+					<p><b>Privacy note:</b> RequestPolicy will leave various RequestPolicy-specific settings and configuration files in your browser profile even after it has been uninstalled. For example, your whitelist will still be available to other people who have access to your computer. This is a known bug (see <a href="https://github.com/RequestPolicy/requestpolicy/issues/227">ticket #227</a>). A future version of RequestPolicy will attempt to delete all RequestPolicy whitelist data, etc., when RequestPolicy is uninstalled. </p>
+
+					<p>In the mean time, if you are looking to remove all RequestPolicy-related files and configurations, you should go to the page <tt>about:config</tt> in your browser and "reset" every preference that starts with "extensions.requestpolicy". Starting with RequestPolicy version 0.6, you also should delete the "requestpolicy" directory which was created in your browser's profile directory (if you used multiple browser profiles, you will need to locate the one where you had installed RequestPolicy). If you have questions about verifying that you have correctly removed RequestPolicy data, please don't hesitate to <a href="https://github.com/RequestPolicyContinued/requestpolicy/issues">contact us</a>.
+
+					</p><h3 id="detecting">Can websites detect that you are using RequestPolicy?</h2>
+
+					<p>Yes, they can. For more information, see <a href="#detecting-rp">detecting RequestPolicy</a>.</p>
+
+					<h3 id="faq-chrome">Is there a RequestPolicy for Chrome?</h2>
+
+					<p>Not yet. Until 2012, Google Chrome did not have the necessary APIs so that extensions could reliably block requests. Now that they've added those, there just needs to be someone with hundreds of hours of time to figure out if those APIs are sufficient and to try to port RequestPolicy to Chrome. :)</p>
+
+					<hr></hr>
+
+					<h1 id="privacy">Privacy Benefits</h1>
+
+					<h2>Many companies know your personal browsing habits</h3>
+
+					<p>Maybe today you read a post on your favorite blog and the article had a YouTube video available with it (which you didn't watch), and then you looked at a few friends' profiles on MySpace, and then you shopped for political books on Amazon. Of course, you know that the blog knows which article you read, and MySpace knows who your friends are, and Amazon knows the types of books you were looking at.</p>
+
+					<p><b>However, even though you never used Google today, Google knows the article you read, the friends whose profiles you looked at, and the books you are thinking about buying.</b></p>
+
+					<p>How does Google know? Your browser told them.</p>
+
+					<p>When you read that blog post, the blog's website told your browser to request files from YouTube even though you didn't watch the video. YouTube is, of course, owned by Google. So, your browser dutifully let YouTube know which article you were reading as it grabbed files from YouTube (such as the still image to display to entice you to
+					watch the video). And when you were on MySpace looking at friends' profiles, MySpace told your browser to request files from Google Analytics, a web traffic analysis service run by Google. So, your browser then told Google Analytics about each MySpace page that you visited. And then, when you were browsing for political books at Amazon, your browser was told to make requests to DoubleClick, an advertising company owned by Google, and Google got to know which books you are interested in.</p>
+
+					<h2>Take back control</h2>
+
+					<p>It makes sense that your browser would only be communicating with the website whose domain you see in the address bar at the top of your browser. However, as we can see, that's not the case. We can, though, with a little extra effort, take back control over which websites our browsers communicate with.</p>
+
+					<p>This browser extension, RequestPolicy, makes it so that you decide when your browser should obey commands by one website to make requests to other websites. By being able to decide this, you have more control over which companies know your browsing habits, your interests, and the great amount of other information that can be determined based on knowing how you spend your time online.</p>
+
+
+
+					<h2>Is Google evil? Are they the only one?</h2>
+
+					<p>No, Google isn't evil. And, no, they aren't the only company doing this.</p>
+
+					<p>Google wants to know everything that happens. They're amoral, not immoral. The data is useful to their company and they'll use it if you give it to them. You just might not want to be part of their data set.</p>
+
+					<p>And Google isn't the only one, by far. Yahoo and Microsoft have similar ways of knowing about people's browsing habits through their own ad networks	and other services that rely on browsers making third-party website	requests that are destined for their websites. There are also many other smaller companies and websites that are in similar positions to be able to know some of your browsing habits.</p>
+
+					<hr></hr>
+
+					<h1 id="security">Security Benefits</h1>
+
+					<h2>Cross-Site Request Forgery</h2>
+
+					<p>Cross-Site Request Forgery (CSRF) is an attack that takes advantage of the fact that a website that receives a request from your browser may not be able to tell that you, the human user, didn't actually intend to make that request. When you are at a website, say evil-site.com, the content of the page that you are viewing can tell your browser to make a request to your-bank.com. When your-bank.com receives the request, it may not know that you didn't really intend to make that request!</p>
+
+					<p>This attack, CSRF, is sometimes also called "session-riding", but that only describes certain types of CSRF attacks and so can be misleading. Some types of CSRF attacks, for example, actually join the victim to an attacker's session. CSRF attacks can also be used to cause the client to download illegal content or make other requests which will, by their apparent legal or ethical ramifications, cause problems in the user's life (legal problems, employment problems, relationship problems, etc.). It is considered one of the 25 most dangerous programming errors by SANS/CWE.</p>
+
+					<p>How can you stay safe against CSRF attacks? Until now, protecting against CSRF attacks required the user to trust that every website protects itself against CSRF attacks (and, of course, many don't). Users had very limited ability to protect themselves (e.g. always logging out of services that require login, not being logged into two websites simultaneously, or using completely separate browsers or browser instances for different websites). These protections, however, were only effective in certain cases.</p>
+
+					<p>This extension, RequestPolicy, allows you to protect yourself. With RequestPolicy, cross-site requests are disallowed unless you choose to allow them. You won't have to just hope that you don't fall victim to CSRF attacks -- you'll be safe.</p>
+
+					<h2>Clickjacking</h2>
+
+					<p>One of the more recently discovered browser/web application security flaws is clickjacking.</p>
+
+					<p>In most cases, clickjacking attacks require that a malicious (or exploited) website be able to load other websites in IFRAMEs (small browser windows embedded within the main browser window).</p>
+
+					<p>The RequestPolicy extension protects you from these types of attacks because cross-site requests will not be allowed unless you explicitly allow them. So, for example, if you are on evil-site.com, the evil-site.com webpage will not be able to tell your browser to load a page from your-bank.com unless you choose to allow that.
+					Network attacks and scans</p>
+
+					<p>Using RequestPolicy will also help prevent your browser from being used with various types of network attacks and network scanning. For example, if a website you visit tries to use your browser to perform a scan of your network, those requests will be blocked.
+					What RequestPolicy cannot help with</p>
+
+					<p>It's important to understand that RequestPolicy can only stop requests that the browser knows about. It is possible for browser plugins such as Flash, Java, and Silverlight to bypass the web browser in making requests. Even though some requests made by these plugins are controlled by RequestPolicy, it's good to be aware that third-party plugins such as these may bypass the browser and, therefore, also bypass RequestPolicy.</p>
+
+					<p>In addition to disallowing these plugins by default, there are also plenty of security reasons to disallow JavaScript on websites you visit unless you are sure you want to allow it. To help you control when plugins and JavaScript run on website you visit, we suggest using the NoScript Firefox extension. Using NoScript in addition to RequestPolicy will give you a highly secure browser.
+					</p>
+
+					<hr>
+
+					<h2 id="trusting-subdomains">Risk of Trusting Subdomains</h2>
+
+					<p>The general risk is based around the fact that it is possible for a site to direct traffic for a subdomain of theirs to a different company's IP address.</p>
+
+					<p>This could be used to send client request for cdn.example.com to a content distribution network used by example.com, or to direct traffic for ads.example.com to a company that serves ads for example.com. This situation appears to be fairly uncommon at the current time. This is a real threat to privacy and is currently in use on various popular sites.</p>
+
+					<p>Aside from possible privacy issues, attackers can also use this technique. For example, if you visit www.evilsite.com, there may be attacks launched from that site which target your private network (the network behind your router and likely within your firewall). It could do this by using a subdomain such as attack.evilsite.com whose IP address resolves as a private network address such as 192.168.1.1.</p>
+
+					<p><p>The same technique could be used to attack sites not on your local network by pointing a subdomain to the IP address of another server not affiliated with evilsite.com. In such a case, your browser will not send along cookies that belong to the other site because the name being used is attack.evilsite.com rather than the name of other other site. This makes the attack less useful in most situations.</p>
+
+					<p>RequestPolicy will likely implement protection against such attacks on a local network in a future release even without the need to use stricter domain classification than registered domain name.</p>
+
+					<h2 id="prefetching">What is Prefetching?</h2>
+
+					<p>There are two types of prefetching:</p>
+
+					<ul>
+						<li><b>Link prefetching</b> is where a web page tells your browser that you are likely to visit a certain page next so your browser should immediately request that next page even though you haven't actually gone there yet. More info at the Mozilla link prefetching FAQ.</li>
+						<li><b>DNS prefetching</b> is where your browser tries to speed up future requests by resolving the IP address of every link on webpages you visit (just in case you decide to click on them). More info at the Mozilla DNS prefetching FAQ.</li>
+					</ul>
+
+					<p>An example of web page prefetching is when searching with Google. Google search results pages will sometimes tell your browser to prefetch the first result from your search. Even if you decide not to click on that link, your browser still requested that page.</p>
+
+					<p>Unfortunately, with the way prefetching is currently implemented in Firefox, it is not possible to selectively block prefetch requests in the same way that other cross-site requests can be blocked. The only option is to disable prefetching completely.</p>
+
+
+
+					<h2 id="detecting-rp">Detecting RequestPolicy</h2>
+
+					<p>It is possible for a website to detect that a user has RequestPolicy installed. There are at least two ways to do this, neither of which are specific to RequestPolicy (that is, it's an issue for many other extensions, as well).</p>
+
+				    <p>A website can look at which interfaces are available through Components.interfaces.</p>
+
+				    <p>This is a known privacy bug in Mozilla/Firefox (bug 429070) that seems likely to be fixed in 2012. Essentially, any extension that provides an XPCOM interface is identifiable through JavaScript. A site can test for RequestPolicy using the following JavaScript:</p>
+
+				    <pre>if ("nsIRequestPolicy" in Components.interfaces) {
+				        alert("RequestPolicy is installed.");
+				    }</pre>
+
+				    <p>The above approach will not work if JavaScript is disabled.</p>
+
+				    <p>A website can look at which cross-site requests are blocked and make an educated guess that RequestPolicy is doing the blocking.</p>
+
+				    <p>More generally, a fingerprinting risk exists for users of any extension that modifies the behavior of the web browser on a web page or the content of the web page itself.</p>
+
+					<hr>
+
+				</div>
+			</div>
+
+			<div class="grid grid-pad">
+				<div class="col-2-3 mobile-col-1-1">
+					<div class="content">
+						<h2 id="about">About RequestPolicy</h2>
+						<p>RequestPolicy was originally developped by <a href="https://github.com/jsamuel">Justin Samuel</a>. Please support the developper by telling PHP developers and hosting companies about his company, <a href="http://www.serverpilot.com/">ServerPilot</a>, a secure control panel for PHP developers, and follow <a href="https://twitter.com/serverpilot">@ServerPilot</a> on Twitter!</p>
+					</div>
+				</div>
+
+				<div class="col-1-3 mobile-col-1-1">
+					<div class="content">
+						<div id="contributors"></div>
+					</div>
+				</div>
+
+			</div>
+			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+			<script type="text/javascript" src="res/contributors.js"></script>
+		</body>
+	</html>

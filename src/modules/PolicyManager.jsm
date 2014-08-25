@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["PolicyManager", "CheckRequestResult", "Destination",
+var EXPORTED_SYMBOLS = ["PolicyManager", "RequestResult", "Destination",
   "REQUEST_TYPE_NORMAL",
   "REQUEST_TYPE_REDIRECT",
   "REQUEST_REASON_USER_POLICY",
@@ -108,11 +108,11 @@ const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control abou
 
 
 /**
- * CheckRequestResult objects are used to hand over the result of a check
+ * RequestResult objects are used to hand over the result of a check
  * whether a request is allowed or not. Sometimes only the boolean value of
  * isAllowed is needed; in that case the other arguments may be unused.
  */
-function CheckRequestResult(isAllowed, requestType, resultReason) {
+function RequestResult(isAllowed, requestType, resultReason) {
   this.matchedAllowRules = [];
   this.matchedDenyRules = [];
 
@@ -120,7 +120,7 @@ function CheckRequestResult(isAllowed, requestType, resultReason) {
   this.requestType = requestType;
   this.resultReason = resultReason;
 }
-CheckRequestResult.prototype = {
+RequestResult.prototype = {
   matchedAllowRules : null,
   matchedDenyRules : null,
 
@@ -470,7 +470,7 @@ PolicyManager.prototype = {
   },
 
   checkRequestAgainstSubscriptionPolicies : function(origin, dest) {
-    var result = new CheckRequestResult();
+    var result = new RequestResult();
     for (var listName in this._subscriptionPolicies) {
       var policies = this._subscriptionPolicies[listName];
       this._checkRequest(origin, dest, policies, result);
@@ -486,7 +486,7 @@ PolicyManager.prototype = {
       throw "Destination must be an nsIURI.";
     }
     if (!result) {
-      result = new CheckRequestResult();
+      result = new RequestResult();
     }
     for (var i in policies) {
       var policy = policies[i].policy;

@@ -112,10 +112,10 @@ RequestSet.prototype = {
   /**
    * @param {Array} rules The rules that were triggered by this request.
    */
-  addRequest : function(originUri, destUri, checkRequestResult) {
-    if (checkRequestResult == undefined) {
+  addRequest : function(originUri, destUri, requestResult) {
+    if (requestResult == undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
-          "A request was added without a checkRequestResult object!\n"
+          "A request was added without a requestResult object!\n"
           +"\torigin: <"+originUri+">\n"
           +"\tdestination: <"+destUri+">"
       );
@@ -146,7 +146,7 @@ RequestSet.prototype = {
       // that were already here? Arguably if we are told to add the
       // same origin and dest pair, this will happen. Is that supposed
       // to be possible?
-      dests[destBase][destIdent][destUri] = checkRequestResult;
+      dests[destBase][destIdent][destUri] = requestResult;
     } else {
       // TODO: append rules, removing duplicates.
     }

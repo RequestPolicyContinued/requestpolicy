@@ -958,24 +958,24 @@ RequestPolicyService.prototype = {
   },
 
   _notifyRequestObserversOfBlockedRequest : function(originUri, destUri,
-        checkRequestResult) {
+        requestResult) {
     for (var i = 0; i < this._requestObservers.length; i++) {
       if (!this._requestObservers[i]) {
         continue;
       }
       this._requestObservers[i].observeBlockedRequest(originUri, destUri,
-            checkRequestResult);
+            requestResult);
     }
   },
 
   _notifyRequestObserversOfAllowedRequest : function(originUri, destUri,
-        checkRequestResult) {
+        requestResult) {
     for (var i = 0; i < this._requestObservers.length; i++) {
       if (!this._requestObservers[i]) {
         continue;
       }
       this._requestObservers[i].observeAllowedRequest(originUri, destUri,
-            checkRequestResult);
+            requestResult);
     }
   },
 
@@ -1277,7 +1277,7 @@ RequestPolicyService.prototype = {
         || destinationUri.indexOf(":") == -1) {
       // Redirect is to a relative url.
       // ==> allow.
-      return new requestpolicy.mod.CheckRequestResult(
+      return new requestpolicy.mod.RequestResult(
           true,
           requestpolicy.mod.REQUEST_TYPE_REDIRECT,
           requestpolicy.mod.REQUEST_REASON_RELATIVE_URL);
@@ -1288,7 +1288,7 @@ RequestPolicyService.prototype = {
       var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
       var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
       if (allowOrigin && allowDest) {
-        return new requestpolicy.mod.CheckRequestResult(
+        return new requestpolicy.mod.RequestResult(
           true,
           requestpolicy.mod.REQUEST_TYPE_REDIRECT,
           requestpolicy.mod.REQUEST_REASON_COMPATIBILITY
@@ -1594,7 +1594,7 @@ RequestPolicyService.prototype = {
   },
 
   // We always call this from shouldLoad to reject a request.
-  reject : function(reason, args, checkRequestResult) {
+  reject : function(reason, args, requestResult) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** BLOCKED ** reason: "
             + reason
@@ -1613,21 +1613,21 @@ RequestPolicyService.prototype = {
     args[3].requestpolicyBlocked = true;
 
     this._cacheShouldLoadResult(CP_REJECT, origin, dest);
-    this._recordRejectedRequest(origin, dest, checkRequestResult);
+    this._recordRejectedRequest(origin, dest, requestResult);
 
     var aContentType = args[0];
     if (CI.nsIContentPolicy.TYPE_DOCUMENT == aContentType) {
       // This was a blocked top-level document request. This may be due to
       // a blocked attempt by javascript to set the document location.
-      // TODO: pass checkRequestResult?
+      // TODO: pass requestResult?
       this._notifyBlockedTopLevelDocRequest(origin, dest);
     }
 
     return CP_REJECT;
   },
 
-  _recordRejectedRequest : function(originUri, destUri, checkRequestResult) {
-    this._rejectedRequests.addRequest(originUri, destUri, checkRequestResult);
+  _recordRejectedRequest : function(originUri, destUri, requestResult) {
+    this._rejectedRequests.addRequest(originUri, destUri, requestResult);
     this._allowedRequests.removeRequest(originUri, destUri);
     this._notifyRequestObserversOfBlockedRequest(originUri, destUri);
   },
@@ -1641,9 +1641,9 @@ RequestPolicyService.prototype = {
    * @param reason {String}
    * @param args
    * @param unforbidable {Boolean}
-   * @param checkRequestResult {CheckRequestResult}
+   * @param requestResult {RequestResult}
    */
-  accept : function(reason, args, checkRequestResult, unforbidable) {
+  accept : function(reason, args, requestResult, unforbidable) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** ALLOWED ** reason: "
             + reason
@@ -1659,17 +1659,17 @@ RequestPolicyService.prototype = {
     // want it to still show up in the request log.
     if (unforbidable) {
       this._notifyRequestObserversOfAllowedRequest(origin, dest,
-            checkRequestResult);
+            requestResult);
     } else {
       this._recordAllowedRequest(origin, dest, false,
-            checkRequestResult);
+            requestResult);
     }
 
     return CP_OK;
   },
 
   _recordAllowedRequest : function(originUri, destUri, isInsert,
-        checkRequestResult) {
+        requestResult) {
     var destIdentifier = this.getUriIdentifier(destUri);
 
     if (isInsert == undefined) {
@@ -1686,9 +1686,9 @@ RequestPolicyService.prototype = {
       this._rejectedRequests.removeOriginUri(destUri);
     }
     this._rejectedRequests.removeRequest(originUri, destUri);
-    this._allowedRequests.addRequest(originUri, destUri, checkRequestResult);
+    this._allowedRequests.addRequest(originUri, destUri, requestResult);
     this._notifyRequestObserversOfAllowedRequest(originUri, destUri,
-          checkRequestResult);
+          requestResult);
   },
 
   _cacheShouldLoadResult : function(result, originUri, destUri) {
@@ -1781,7 +1781,7 @@ RequestPolicyService.prototype = {
 
   _checkByDefaultPolicy : function(origin, dest) {
     if (this._defaultAllow) {
-      var result = new requestpolicy.mod.CheckRequestResult(
+      var result = new requestpolicy.mod.RequestResult(
           true,
           undefined,
           requestpolicy.mod.REQUEST_REASON_DEFAULT_POLICY);
@@ -1790,7 +1790,7 @@ RequestPolicyService.prototype = {
     if (this._defaultAllowSameDomain) {
       var originDomain = requestpolicy.mod.DomainUtil.getDomain(origin);
       var destDomain = requestpolicy.mod.DomainUtil.getDomain(dest);
-      return new requestpolicy.mod.CheckRequestResult(
+      return new requestpolicy.mod.RequestResult(
           originDomain == destDomain,
           undefined,
           requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
@@ -1802,7 +1802,7 @@ RequestPolicyService.prototype = {
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
     var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest,
           requestpolicy.mod.DomainUtil.LEVEL_SOP);
-    return new requestpolicy.mod.CheckRequestResult(
+    return new requestpolicy.mod.RequestResult(
         (originIdent == destIdent),
         undefined,
         requestpolicy.mod.REQUEST_REASON_DEFAULT_SAME_DOMAIN);
@@ -1989,7 +1989,7 @@ RequestPolicyService.prototype = {
           // click again and so if we don't forget the previous blocked/allowed
           // requests, the menu becomes inaccurate. Now the question is: what
           // are we breaking by clearing the blocked/allowed requests here?
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_LINK_CLICK);
@@ -2008,7 +2008,7 @@ RequestPolicyService.prototype = {
           // See the note above for link clicks and forgetting blocked/allowed
           // requests on refresh. I haven't tested if it's the same for forms
           // but it should be so we're making the same change here.
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_FORM_SUBMISSION);
@@ -2021,7 +2021,7 @@ RequestPolicyService.prototype = {
           // the page's content. Therefore, we make sure that our cache of
           // blocked requests isn't removed in this case.
           delete this._historyRequests[dest];
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_HISTORY_REQUEST);
@@ -2030,7 +2030,7 @@ RequestPolicyService.prototype = {
             && this._userAllowedRedirects[origin][dest]) {
           // shouldLoad is called by location.href in overlay.js as of Fx
           // 3.7a5pre and SeaMonkey 2.1a.
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_USER_ALLOWED_REDIRECT);
@@ -2041,7 +2041,7 @@ RequestPolicyService.prototype = {
           if (aRequestOrigin.asciiHost == "browser") {
             // "browser" origin shows up for favicon.ico and an address entered
             // in address bar.
-            var result = new requestpolicy.mod.CheckRequestResult(
+            var result = new requestpolicy.mod.RequestResult(
                 true,
                 undefined,
                 requestpolicy.mod.REQUEST_REASON_USER_ACTION);
@@ -2056,7 +2056,7 @@ RequestPolicyService.prototype = {
             // that originate from their xul files. If you're reading this and
             // you know of a way to use this to evade RequestPolicy, please let
             // me know, I will be very grateful.
-            var result = new requestpolicy.mod.CheckRequestResult(
+            var result = new requestpolicy.mod.RequestResult(
                 true,
                 undefined,
                 requestpolicy.mod.REQUEST_REASON_USER_ACTION);
@@ -2074,7 +2074,7 @@ RequestPolicyService.prototype = {
         // removed if we can find a better solution for the allowed popup case.
         if (aContext && aContext.nodeName == "xul:browser" && aContext.currentURI
             && aContext.currentURI.spec == "about:blank") {
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_NEW_WINDOW);
@@ -2098,7 +2098,7 @@ RequestPolicyService.prototype = {
         var originIdent = requestpolicy.mod.DomainUtil.getIdentifier(origin);
         var destIdent = requestpolicy.mod.DomainUtil.getIdentifier(dest);
         if (originIdent == destIdent) {
-          var result = new requestpolicy.mod.CheckRequestResult(
+          var result = new requestpolicy.mod.RequestResult(
               true,
               undefined,
               requestpolicy.mod.REQUEST_REASON_IDENTICAL_IDENTIFIER);
@@ -2187,7 +2187,7 @@ RequestPolicyService.prototype = {
           var allowOrigin = rule[0] ? origin.indexOf(rule[0]) == 0 : true;
           var allowDest = rule[1] ? dest.indexOf(rule[1]) == 0 : true;
           if (allowOrigin && allowDest) {
-            var result = new requestpolicy.mod.CheckRequestResult(
+            var result = new requestpolicy.mod.RequestResult(
                 true,
                 undefined,
                 requestpolicy.mod.REQUEST_REASON_COMPATIBILITY);

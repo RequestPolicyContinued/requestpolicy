@@ -124,16 +124,18 @@ requestpolicy.menu = {
         return;
       }
 
-      // The fact that getOtherOrigins uses documentURI directly from
+      // The fact that getAllRequestsOnDocument uses documentURI directly from
       // content.document is important because getTopLevelDocumentUri will
       // not return the real documentURI if there is an applicable
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      this._otherOriginsReqSet = requestpolicy.mod.RequestUtil
-            .getOtherOrigins(content.document);
-      this._otherOrigins = this._otherOriginsReqSet.getAllMergedOrigins();
-      this._otherOriginsReqSet.print("_otherOriginsReqSet");
+      this._allRequestsOnDocument = requestpolicy.mod.RequestUtil
+            .getAllRequestsOnDocument(content.document);
+      // TODO: do the caching of the merged origins in RequestSet, not here.
+      this._allRequestsOnDocument_mergedOrigins =
+            this._allRequestsOnDocument.getAllMergedOrigins();
+      this._allRequestsOnDocument.print("_allRequestsOnDocument");
 
       this._privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
             && !this._rpService.prefs.getBoolPref("privateBrowsingPermanentWhitelisting");
@@ -629,12 +631,14 @@ requestpolicy.menu = {
 
     for (var destIdent in request) {
       for (var destUri in request[destIdent]) {
-        ++properties.numRequests;
-        ++ruleTypeCounter;
-        //requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
-        //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
-        if ( request[destIdent][destUri].isDefaultPolicyUsed() ) {
-          ++properties.numDefaultPolicyRequests;
+        for (var i in request[destIdent][destUri]) {
+          ++properties.numRequests;
+          ++ruleTypeCounter;
+          //requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
+          //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
+          if ( request[destIdent][destUri][i].isDefaultPolicyUsed() ) {
+            ++properties.numDefaultPolicyRequests;
+          }
         }
       }
     }
@@ -664,8 +668,8 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
-          uri, ident, this._otherOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil
+          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
@@ -688,8 +692,8 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
-          uri, ident, this._otherOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil
+          .getAllowedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
@@ -712,7 +716,10 @@ requestpolicy.menu = {
   },
 
   _getOtherOrigins : function() {
-    var requests = this._otherOriginsReqSet.getAll();
+    var requests = this._allRequestsOnDocument.getAll();
+
+    var allowSameDomain = this._rpService.isDefaultAllow() ||
+          this._rpService.isDefaultAllowSameDomain();
 
     var result = [];
     for (var originUri in requests) {
@@ -734,11 +741,8 @@ requestpolicy.menu = {
         // requests to the same domain:
         // Only list other origins where there is a destination from that origin
         // that is at a different domain, not just a different subdomain.
-        if (this._rpService.isDefaultAllow() ||
-            this._rpService.isDefaultAllowSameDomain()) {
-          if (destBase == domain) {
-            continue;
-          }
+        if (allowSameDomain && destBase == domain) {
+          continue;
         }
         if (result.indexOf(domain) == -1) {
           result.push(domain);
@@ -962,8 +966,8 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
-          uri, ident, this._otherOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil
+          .getAllowedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
@@ -998,7 +1002,11 @@ requestpolicy.menu = {
             continue;
           }
 
-          var results = destinations[destUri];
+
+          var results = destinations[destUri][0]; // TODO: Do not look only
+          // at the first RequestResult object, but at all. (there might be
+          // several requests with identical origin and destination URI.)
+
           for (var i in results.matchedAllowRules) {
 
             var policy, match;
@@ -1049,8 +1057,8 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
-      uri, ident, this._otherOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil
+          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
@@ -1085,7 +1093,10 @@ requestpolicy.menu = {
             continue;
           }
 
-          var results = destinations[destUri];
+          var results = destinations[destUri][0]; // TODO: Do not look only
+          // at the first RequestResult object, but at all. (there may be
+          // several requests with identical origin and destination URI.)
+
           for (var i in results.matchedDenyRules) {
 
             var policy, match;
@@ -1142,8 +1153,8 @@ requestpolicy.menu = {
     }
     var ident = 'http://' + this._currentlySelectedOrigin;
 
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
-        uri, ident, this._otherOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil
+          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
     var requests = reqSet.getAllMergedOrigins();
 
     var destHosts = {};

@@ -24,6 +24,7 @@ var EXPORTED_SYMBOLS = ["RequestUtil", "RequestSet"];
 
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
+Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
 
 function getUriObject(uri) {
   return DomainUtil.getUriObject(uri);
@@ -65,8 +66,11 @@ RequestSet.prototype = {
           log.dump("          " + "Dest identifier: <" + dIdent + ">");
           for (var dUri in dests[dBase][dIdent]) {
             log.dump("            " + "Dest uri: <" + dUri + ">");
-            for (var ruleStr in dests[dBase][dIdent][dUri]) {
-              log.dump("              " + "Rule: <" + ruleStr + ">");
+            for (var i in dests[dBase][dIdent][dUri]) {
+              log.dump("              " + "#: " + i);
+              for (var ruleStr in dests[dBase][dIdent][dUri][i]) {
+                log.dump("                " + "Rule: <" + ruleStr + ">");
+              }
             }
           }
         }
@@ -95,9 +99,13 @@ RequestSet.prototype = {
              result[destBase][destIdent] = {};
           }
           for (var destUri in dests[destBase][destIdent]) {
-            // TODO: handle the case where we encounter the uri more than
-            // once (that is, we need to merge the triggered rules).
-            result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];
+            if (!result[destBase][destIdent][destUri]) {
+              result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];
+            } else {
+              result[destBase][destIdent][destUri] =
+                    result[destBase][destIdent][destUri]
+                    .concat(dests[destBase][destIdent][destUri]);
+            }
           }
         }
       }
@@ -115,10 +123,12 @@ RequestSet.prototype = {
   addRequest : function(originUri, destUri, requestResult) {
     if (requestResult == undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
-          "A request was added without a requestResult object!\n"
+          "addRequest() was called without a requestResult object!"
+          +" Creating a new one.\n"
           +"\torigin: <"+originUri+">\n"
           +"\tdestination: <"+destUri+">"
       );
+      requestResult = new RequestResult();
     }
 
     if (!this._origins[originUri]) {
@@ -140,7 +150,7 @@ RequestSet.prototype = {
     //   throw "addRequest 'rules' argument must be an object where each " +
     //         "key/val is ruleStr/rule";
     // }
-
+/*
     if (!dests[destBase][destIdent][destUri]) {
       // TODO: this is a little sketchy. What if we clobber rules
       // that were already here? Arguably if we are told to add the
@@ -149,6 +159,17 @@ RequestSet.prototype = {
       dests[destBase][destIdent][destUri] = requestResult;
     } else {
       // TODO: append rules, removing duplicates.
+    }
+    */
+    if (!dests[destBase][destIdent][destUri]) {
+      dests[destBase][destIdent][destUri] = [];
+    }
+    if (requestResult instanceof Array) {
+      dests[destBase][destIdent][destUri] =
+            dests[destBase][destIdent][destUri]
+            .concat(requestResult);
+    } else {
+      dests[destBase][destIdent][destUri].push(requestResult);
     }
   },
 
@@ -195,6 +216,25 @@ RequestSet.prototype = {
    */
   removeOriginUri : function(originUri) {
     delete this._origins[originUri];
+  },
+
+  containsBlockedRequests : function() {
+    var origins = this.origins
+    for (var originURI in origins) {
+      for (var destBase in origins[originURI]) {
+        for (var destIdent in origins[originURI][destBase]) {
+          for (var destURI in origins[originURI][destBase][destIdent]) {
+            for (var i in origins[originURI][destBase][destIdent][destURI]) {
+              if (true !==
+                  origins[originURI][destBase][destIdent][destURI][i].isAllowed) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return false;
   }
 };
 
@@ -202,14 +242,6 @@ var RequestUtil = {
 
   setRPService : function (rpService) {
     this._rpService = rpService;
-  },
-
-  /**
-   * Returns an object whose keys are the rejected URIs from |currentUri|.
-   */
-  getDirectRejectedRequests : function(currentUri) {
-    // Let's try this: returning the same data structure we already have.
-    return this._rpService._rejectedRequests.getOriginUri(currentUri);
   },
 
   _getRequestsHelper : function(currentUri, curIdent, otherOrigins, requests) {
@@ -223,6 +255,7 @@ var RequestUtil = {
         Logger.dump("test direct destIdent: " + destIdent);
         for (var destUri in requests[currentUri][destBase][destIdent]) {
           Logger.dump("test direct destUri: " + destUri);
+          // TODO: there are faster methods than calling addRequest()
           result.addRequest(currentUri, destUri,
                             requests[currentUri][destBase][destIdent][destUri]);
         }
@@ -269,11 +302,15 @@ var RequestUtil = {
   },
 
   /**
+   * TODO: This comment is quite old. It might not be necessary anymore to
+   * check the DOM since all requests are recorded, like:
+   *    RequestSet._origins[originURI][destBase][destIdent][destURI][i]
+   *
    * This will look both at the DOM as well as the recorded allowed requests to
    * determine which other origins exist within the document. This includes
-   * other origins that have the same domain. The returned format is an object
-   * with properties that are URI identifiers and the properties of those are
-   * the actual other URIs (i.e. origin[uriIdent][uri]). The reason for also
+   * other origins that have the same domain.
+   *
+   * The reason for also
    * needing to check the DOM is that some sites (like gmail) will make multiple
    * requests to the same uri for different iframes and this will cause us to
    * only have in the recorded requests from a source uri the destinations from
@@ -283,8 +320,9 @@ var RequestUtil = {
    * @param {}
    *          document
    * @return {}
+   *          RequestSet
    */
-  getOtherOrigins : function(document) {
+  getAllRequestsOnDocument : function(document) {
     //var origins = {};
     var reqSet = new RequestSet();
 
@@ -294,8 +332,8 @@ var RequestUtil = {
     // main allowed/denied request sets before adding them.
     //this._getOtherOriginsHelperFromDOM(document, reqSet);
 
-    this._getOtherOriginsHelperFromAllowedRequests(DomainUtil
-            .stripFragment(document.documentURI), reqSet, {});
+    var documentURI = DomainUtil.stripFragment(document.documentURI);
+    this._addAllRequestsFromURI(documentURI, reqSet, {});
     return reqSet;
   },
 
@@ -343,102 +381,49 @@ var RequestUtil = {
 //    }
 //  },
 
-  _getOtherOriginsHelperFromAllowedRequests : function(rootUri, reqSet,
-      checkedOrigins) {
-    Logger
-        .dump("Looking for other origins within allowed requests from "
-            + rootUri);
-    var allowedRequests = this._rpService._allowedRequests.getOriginUri(rootUri);
+  _addAllRequestsFromURI : function(originURI, reqSet, checkedOrigins) {
+    Logger.dump("Looking for other origins within allowed requests from "
+            + originURI);
+    var allowedRequests = this._rpService._allowedRequests.getOriginUri(originURI);
     if (allowedRequests) {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
-          for (var destUri in allowedRequests[destBase][destIdent]) {
-            if (checkedOrigins[destUri]) {
-              continue;
-            }
-            checkedOrigins[destUri] = true;
-
+          for (var destURI in allowedRequests[destBase][destIdent]) {
             Logger.dump("Found allowed request to <"
-                + destUri + "> from <" + rootUri + ">");
-            // var allowedUriIdent = getUriIdentifier(allowedUri);
-            // if (!origins[allowedUriIdent]) {
-            //   origins[allowedUriIdent] = {};
-            // }
-            // origins[allowedUriIdent][allowedUri] = true;
-            reqSet.addRequest(rootUri, destUri);
-            this._getOtherOriginsHelperFromAllowedRequests(destUri, reqSet,
-                checkedOrigins);
-            this._getOtherOriginsHelperFromDeniedRequests(destUri, reqSet,
-                                                           checkedOrigins);
+                + destURI + "> from <" + originURI + ">");
+            reqSet.addRequest(originURI, destURI,
+                              allowedRequests[destBase][destIdent][destURI]);
+
+            if (!checkedOrigins[destURI]) {
+              // only check the destination URI if it hasn't been checked yet.
+              checkedOrigins[destURI] = true;
+
+              this._addAllRequestsFromURI(destURI, reqSet, checkedOrigins);
+              this._addAllDeniedRequestsFromURI(destURI, reqSet);
+            }
           }
         }
       }
     }
   },
 
-  _getOtherOriginsHelperFromDeniedRequests : function(rootUri, reqSet,
-                                                       checkedOrigins) {
+  _addAllDeniedRequestsFromURI : function(originURI, reqSet) {
     Logger
       .dump("Looking for other origins within denied requests from "
-              + rootUri);
-    var requests = this._rpService._rejectedRequests.getOriginUri(rootUri);
+              + originURI);
+    var requests = this._rpService._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {
           for (var destUri in requests[destBase][destIdent]) {
-//            if (checkedOrigins[destUri]) {
-//              continue;
-//            }
-//            checkedOrigins[destUri] = true;
             Logger.dump("Found denied request to <"
-                          + destUri + "> from <" + rootUri + ">");
-            reqSet.addRequest(rootUri, destUri);
+                          + destUri + "> from <" + originURI + ">");
+            reqSet.addRequest(originURI, destUri,
+                              requests[destBase][destIdent][destUri]);
           }
         }
       }
     }
-  },
-
-  originHasRejectedRequests : function(originUri) {
-    return this._originHasRejectedRequestsHelper(originUri, {});
-  },
-
-  _originHasRejectedRequestsHelper : function(originUri, checkedUris) {
-    if (checkedUris[originUri]) {
-      return false;
-    }
-    checkedUris[originUri] = true;
-
-    var rejectedRequests = this._rpService._rejectedRequests.getOriginUri(originUri);
-    if (rejectedRequests) {
-      for (var i in rejectedRequests) {
-        for (var j in rejectedRequests[i]) {
-          for (var k in rejectedRequests[i][j]) {
-            if( rejectedRequests[i][j][k].isDefaultPolicyUsed() ) {
-              return true;
-            }
-          }
-        }
-      }
-    }
-    // If this url had an allowed redirect to another url which in turn had a
-    // rejected redirect (e.g. installing extensions from AMO with full domain
-    // strictness enabled), then it will show up by recursively checking each
-    // allowed request.
-    // I think this logic will also indicate rejected requests if this
-    // origin has rejected requests from other origins within it. I don't
-    // believe this will cause a problem.
-    var allowedRequests = this._rpService._allowedRequests.getOriginUri(originUri);
-    if (allowedRequests) {
-      for (var i in allowedRequests) {
-        for (var j in allowedRequests[i]) {
-          if (this._originHasRejectedRequestsHelper(j, checkedUris)) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
   },
 
 };

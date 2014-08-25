@@ -615,35 +615,25 @@ requestpolicy.overlay = {
       var documentUri = requestpolicy.mod.DomainUtil
           .stripFragment(document.documentURI);
       requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
-          "Checking for blocked content from page <" + documentUri + ">");
+          "Checking for blocked requests from page <" + documentUri + ">");
       this._setCustomizingPageNotification((documentUri == "about:customizing"));
       this._blockedContentCheckLastTime = (new Date()).getTime();
       this._stopBlockedContentCheckTimeout();
-      if (requestpolicy.mod.RequestUtil.originHasRejectedRequests(documentUri)) {
+
+      var allRequestsOnDocument = requestpolicy.mod.RequestUtil
+          .getAllRequestsOnDocument(document);
+
+      if (true === allRequestsOnDocument.containsBlockedRequests()) {
         requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            "Main document <" + documentUri + "> has rejected requests.");
+            "Requests have been blocked.");
         this._setBlockedContentNotification(true);
         this._indicateBlockedVisibleObjects(document);
         return;
+      } else {
+        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+            "No requests have been blocked.");
+        this._setBlockedContentNotification(false);
       }
-      var otherOrigins = requestpolicy.mod.RequestUtil
-          .getOtherOrigins(document);
-      for (var i in otherOrigins) {
-        for (var j in otherOrigins[i]) {
-          requestpolicy.mod.Logger.dump("Checking for blocked content from "
-              + j);
-          if (requestpolicy.mod.RequestUtil.originHasRejectedRequests(j)) {
-            requestpolicy.mod.Logger.debug(
-                requestpolicy.mod.Logger.TYPE_INTERNAL, "Other origin <" + j
-                    + "> of main document <" + documentUri
-                    + "> has rejected requests.");
-            this._setBlockedContentNotification(true);
-            this._indicateBlockedVisibleObjects(document);
-            return;
-          }
-        }
-      }
-      this._setBlockedContentNotification(false);
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
@@ -659,8 +649,8 @@ requestpolicy.overlay = {
       return;
     }
     var images = document.getElementsByTagName("img");
-    var rejectedRequests = requestpolicy.mod.RequestUtil.getDirectRejectedRequests(
-        document.location);
+    var rejectedRequests = this._rpService
+          ._rejectedRequests.getOriginUri(document.location);
     var blockedUris = {};
     for (var destBase in rejectedRequests) {
       for (var destIdent in rejectedRequests[destBase]) {

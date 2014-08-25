@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   src: local('Open Sans'), local('OpenSans'),
-        url('res/OpenSans-Regular.ttf') format('truetype'),
+        url('OpenSans-Regular.ttf') format('truetype'),
 }
 
 body {

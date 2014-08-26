@@ -130,21 +130,15 @@
 
 					<p>By default, any request the browser makes from the current site a user is on to a third-party site is blocked. Users can then whitelist specific sites (with various levels of granularity) to allow requests they approve of.</p>
 
-					<p>Note that <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Online_Certificate_Status_Protocol" rel="external">OCSP queries</a> and <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Certificate_revocation_list" rel="external">CRL updates</a> are not blocked. This means that RequestPolicy will not interfere with your browser's attempts to determine whether SSL certificates have been revoked.</p>
-
 					Request that are blocked include:
 
 					<ul>
 						<li><b>Content of the current page that is from a different site:</b> Various tags in an HTML page tell the browser that more content is needed to display the current page. Normally, the browser immediately makes requests to third-party sites to obtain this content. The content can include images, JavaScript files, style sheet files, and many others.</li>
 						<li><b>Redirections from the current site to a different site:</b> Redirects tell your browser to load an entirely different website address than the one you are on or requested. Redirections can be caused by JavaScript, META refresh tags, and  on headers.</li>
-						<li><b>Content a page tells your browser to "prefetch":</b> Some browsers, such as Firefox, allow any webpage to tell your browser to load other pages in the background. This is intended to allow a website to improve your browsing experience by guessing which pages you are likely to visit next so that those pages will load faster when you visit them.</li>
+						<li><b>Content a page tells your browser to "prefetch":</b> Some browsers, such as Firefox, allow any webpage to tell your browser to load other pages in the background. This is intended to allow a website to improve your browsing experience by guessing which pages you are likely to visit next so that those pages will load faster when you visit them. In Firefox 3.1, DNS prefetching was also added. DNS prefetching is where your browser tries to speed up future requests by resolving the IP address of every link on webpages you visit (just in case you decide to click on them). <a href="#prefetching">Read more about prefetching...</a></li>
 					</ul>
 
-					<p>In Firefox 3.1, DNS prefetching was also added. DNS prefetching is where your browser tries to speed up future requests by resolving the IP address of every link on webpages you visit (just in case you decide to click on them).</p>
-
-					<p>For more information on link prefetching in Mozilla browsers (such as Firefox), see the <a rel="external" href="https://developer.mozilla.org/En/Link_prefetching_FAQ"> Mozilla link prefetching FAQ</a>.</p>
-
-					<p>For more information on DNS prefetching in Mozilla browsers (such as Firefox), see the <a rel="external" href="https://bitsup.blogspot.com/2008/11/dns-prefetching-for-firefox.html">Pat McManus' blog post</a>.</p>
+					<p><i>Note that <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Online_Certificate_Status_Protocol" rel="external">OCSP queries</a> and <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Certificate_revocation_list" rel="external">CRL updates</a> are not blocked. This means that RequestPolicy will not interfere with your browser's attempts to determine whether SSL certificates have been revoked.</i></p>
 
 					<h3 id="faq-third-party-sites">How are sites classified as "third-party sites"?</h2>
 
@@ -256,6 +250,8 @@
 
 					<p>RequestPolicy will likely implement protection against such attacks on a local network in a future release even without the need to use stricter domain classification than registered domain name.</p>
 
+					<hr>
+
 					<h2 id="prefetching">What is Prefetching?</h2>
 
 					<p>There are two types of prefetching:</p>
@@ -269,7 +265,9 @@
 
 					<p>Unfortunately, with the way prefetching is currently implemented in Firefox, it is not possible to selectively block prefetch requests in the same way that other cross-site requests can be blocked. The only option is to disable prefetching completely.</p>
 
+					<p>For more information on link prefetching in Mozilla browsers (such as Firefox), see the <a rel="external" href="https://developer.mozilla.org/En/Link_prefetching_FAQ"> Mozilla link prefetching FAQ</a> and <a rel="external" href="https://bitsup.blogspot.com/2008/11/dns-prefetching-for-firefox.html">Pat McManus' blog post</a>.</p>
 
+					<hr>
 
 					<h2 id="detecting-rp">Detecting RequestPolicy</h2>
 

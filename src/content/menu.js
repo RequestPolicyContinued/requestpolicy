@@ -132,9 +132,6 @@ requestpolicy.menu = {
       // menu showing relevant info when using the Update Scanner extension.
       this._allRequestsOnDocument = requestpolicy.mod.RequestUtil
             .getAllRequestsOnDocument(content.document);
-      // TODO: do the caching of the merged origins in RequestSet, not here.
-      this._allRequestsOnDocument_mergedOrigins =
-            this._allRequestsOnDocument.getAllMergedOrigins();
       this._allRequestsOnDocument.print("_allRequestsOnDocument");
 
       this._privateBrowsingEnabled = this._rpService.isPrivateBrowsingEnabled()
@@ -660,16 +657,8 @@ requestpolicy.menu = {
   },
 
   _getBlockedDestinations : function() {
-    // Only pass a uri to getDeniedRequests if this isn't for listing the
-    // blocked destinations of an other origin.
-    var uri = null;
-    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
-      uri = this._currentUri;
-    }
-    var ident = 'http://' + this._currentlySelectedOrigin;
-
-    var reqSet = requestpolicy.mod.RequestUtil
-          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+          this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
@@ -684,16 +673,8 @@ requestpolicy.menu = {
   },
 
   _getAllowedDestinations : function() {
-    // Only pass a uri to getAllowedRequests if this isn't for listing the
-    // blocked destinations of an other origin.
-    var uri = null;
-    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
-      uri = this._currentUri;
-    }
-    var ident = 'http://' + this._currentlySelectedOrigin;
-
-    var reqSet = requestpolicy.mod.RequestUtil
-          .getAllowedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+          this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
@@ -723,8 +704,8 @@ requestpolicy.menu = {
 
     var result = [];
     for (var originUri in requests) {
-      var domain = requestpolicy.mod.DomainUtil.getDomain(originUri);
-      if (domain == this._currentBaseDomain) {
+      var originBase = requestpolicy.mod.DomainUtil.getDomain(originUri);
+      if (originBase == this._currentBaseDomain) {
         continue;
       }
 
@@ -732,20 +713,25 @@ requestpolicy.menu = {
       // near here in the first place.
       // Is this an issue anymore? This may have been slipping through due to
       // a bug that has since been fixed. Disabling for now.
-      //if (domain == 'browser') {
+      //if (originBase == 'browser') {
       //  continue;
       //}
 
       for (var destBase in requests[originUri]) {
+        // Search for a destBase which wouldn't be allowed by the default policy.
+        // TODO: some users might want to know those "other origins" as well.
+        //       this should be made possible.
+
         // For everybody except users with default deny who are not allowing all
         // requests to the same domain:
         // Only list other origins where there is a destination from that origin
         // that is at a different domain, not just a different subdomain.
-        if (allowSameDomain && destBase == domain) {
+        if (allowSameDomain && destBase == originBase) {
           continue;
         }
-        if (result.indexOf(domain) == -1) {
-          result.push(domain);
+        if (result.indexOf(originBase) == -1) {
+          result.push(originBase);
+          break;
         }
       }
     }
@@ -958,16 +944,8 @@ requestpolicy.menu = {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    // Only pass a uri to getAllowedRequests if this isn't for listing the
-    // blocked destinations of an other origin.
-    var uri = null;
-    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
-      uri = this._currentUri;
-    }
-    var ident = 'http://' + this._currentlySelectedOrigin;
-
-    var reqSet = requestpolicy.mod.RequestUtil
-          .getAllowedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+          this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
@@ -1049,16 +1027,8 @@ requestpolicy.menu = {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    // Only pass a uri to getDeniedRequests if this isn't for listing the
-    // blocked destinations of an other origin.
-    var uri = null;
-    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
-      uri = this._currentUri;
-    }
-    var ident = 'http://' + this._currentlySelectedOrigin;
-
-    var reqSet = requestpolicy.mod.RequestUtil
-          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+          this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
@@ -1145,16 +1115,8 @@ requestpolicy.menu = {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    // Only pass a uri to getDeniedRequests if this isn't for listing the
-    // blocked destinations of an other origin.
-    var uri = null;
-    if (this._currentBaseDomain == this._currentlySelectedOrigin) {
-      uri = this._currentUri;
-    }
-    var ident = 'http://' + this._currentlySelectedOrigin;
-
-    var reqSet = requestpolicy.mod.RequestUtil
-          .getDeniedRequests(uri, ident, this._allRequestsOnDocument_mergedOrigins);
+    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+          this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     var destHosts = {};

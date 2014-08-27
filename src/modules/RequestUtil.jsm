@@ -219,7 +219,7 @@ RequestSet.prototype = {
   },
 
   containsBlockedRequests : function() {
-    var origins = this.origins
+    var origins = this._origins
     for (var originURI in origins) {
       for (var destBase in origins[originURI]) {
         for (var destIdent in origins[originURI][destBase]) {
@@ -244,40 +244,32 @@ var RequestUtil = {
     this._rpService = rpService;
   },
 
-  _getRequestsHelper : function(currentUri, curIdent, otherOrigins, requests) {
+  _getRequestsHelper : function(currentlySelectedOrigin, allRequestsOnDocument, isAllowed) {
     var result = new RequestSet();
+    var requests = allRequestsOnDocument.getAll();
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
-    for (var destBase in requests[currentUri]) {
-      Logger.dump("test direct destBase: " + destBase);
-      for (var destIdent in requests[currentUri][destBase]) {
-        Logger.dump("test direct destIdent: " + destIdent);
-        for (var destUri in requests[currentUri][destBase][destIdent]) {
-          Logger.dump("test direct destUri: " + destUri);
-          // TODO: there are faster methods than calling addRequest()
-          result.addRequest(currentUri, destUri,
-                            requests[currentUri][destBase][destIdent][destUri]);
-        }
+    for (var originUri in requests) {
+      if (getBaseDomain(originUri) != currentlySelectedOrigin) {
+        // only return requests from the given base domain
+        continue;
       }
-    }
-
-    // Add the rejected requests from other origins within this page that have
-    // the same uriIdentifier as the current page.
-    //Logger.dump("test xxx: " + "originUri");
-    if (curIdent) {
-      var curBase = getBaseDomain(curIdent);
-      Logger.dump("test curBase: " + curBase);
-      for (var curIdent in otherOrigins[curBase]) {
-        Logger.dump("test curIdent: " + curIdent);
-        for (var originUri in otherOrigins[curBase][curIdent]) {
-          Logger.dump("test originUri: " + originUri);
-          for (var destBase in requests[originUri]) {
-            Logger.dump("test destBase: " + destBase);
-            for (var destIdent in requests[originUri][destBase]) {
-              for (var destUri in requests[originUri][destBase][destIdent]) {
-                result.addRequest(originUri, destUri,
-                                  requests[originUri][destBase][destIdent][destUri]);
+      Logger.dump("test destBase: " + destBase);
+      for (var destBase in requests[originUri]) {
+        Logger.dump("test destBase: " + destBase);
+        for (var destIdent in requests[originUri][destBase]) {
+          Logger.dump("test destIdent: " + destIdent);
+          for (var destUri in requests[originUri][destBase][destIdent]) {
+            Logger.dump("test destUri: " + destUri);
+            var dest = requests[originUri][destBase][destIdent][destUri];
+            for (var i in dest) {
+              // TODO: This variable could have been created easily already in
+              //       getAllRequestsOnDocument(). ==> rewrite RequestSet to
+              //       contain a blocked list, an allowed list (and maybe a list
+              //       of all requests).
+              if (isAllowed === dest[i].isAllowed) {
+                result.addRequest(originUri, destUri, dest[i]);
               }
             }
           }
@@ -288,23 +280,22 @@ var RequestUtil = {
     return result;
   },
 
-  getDeniedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+  getDeniedRequests : function(currentlySelectedOrigin, allRequestsOnDocument) {
     Logger.dump("## getDeniedRequests");
-    //this._rpService._rejectedRequests.print("from getRejectedRequests");
-    return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-          this._rpService._rejectedRequests.getAll());
+    return this._getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument, false);
   },
 
-  getAllowedRequests : function(currentUri, currentIdentifier, otherOrigins) {
+  getAllowedRequests : function(currentlySelectedOrigin, allRequestsOnDocument) {
     Logger.dump("## getAllowedRequests");
-    return this._getRequestsHelper(currentUri, currentIdentifier, otherOrigins,
-          this._rpService._allowedRequests.getAll());
+    return this._getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument, true);
   },
 
   /**
    * TODO: This comment is quite old. It might not be necessary anymore to
-   * check the DOM since all requests are recorded, like:
-   *    RequestSet._origins[originURI][destBase][destIdent][destURI][i]
+   *       check the DOM since all requests are recorded, like:
+   *       RequestSet._origins[originURI][destBase][destIdent][destURI][i]
+   * Info: As soon as requests are saved per Tab, this function isn't needed
+   *       anymore.
    *
    * This will look both at the DOM as well as the recorded allowed requests to
    * determine which other origins exist within the document. This includes
@@ -333,7 +324,7 @@ var RequestUtil = {
     //this._getOtherOriginsHelperFromDOM(document, reqSet);
 
     var documentURI = DomainUtil.stripFragment(document.documentURI);
-    this._addAllRequestsFromURI(documentURI, reqSet, {});
+    this._addRecursivelyAllRequestsFromURI(documentURI, reqSet, {});
     return reqSet;
   },
 
@@ -381,9 +372,14 @@ var RequestUtil = {
 //    }
 //  },
 
-  _addAllRequestsFromURI : function(originURI, reqSet, checkedOrigins) {
+  _addRecursivelyAllRequestsFromURI : function(originURI, reqSet, checkedOrigins) {
     Logger.dump("Looking for other origins within allowed requests from "
             + originURI);
+    if (!checkedOrigins[originURI]) {
+      // this "if" is needed for the first call of this function.
+      checkedOrigins[originURI] = true;
+    }
+    this._addAllDeniedRequestsFromURI(originURI, reqSet);
     var allowedRequests = this._rpService._allowedRequests.getOriginUri(originURI);
     if (allowedRequests) {
       for (var destBase in allowedRequests) {
@@ -398,8 +394,7 @@ var RequestUtil = {
               // only check the destination URI if it hasn't been checked yet.
               checkedOrigins[destURI] = true;
 
-              this._addAllRequestsFromURI(destURI, reqSet, checkedOrigins);
-              this._addAllDeniedRequestsFromURI(destURI, reqSet);
+              this._addRecursivelyAllRequestsFromURI(destURI, reqSet, checkedOrigins);
             }
           }
         }

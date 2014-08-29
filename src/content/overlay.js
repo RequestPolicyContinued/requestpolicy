@@ -1237,12 +1237,12 @@ requestpolicy.overlay = {
   },
 
   /**
-   * Called after the popup menu is hidden.
+   * Called after the popup menu has been hidden.
    *
    * @param {Event}
    *          event
    */
-  onPopupHiding : function(event) {
+  onPopupHidden : function(event) {
     var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
     if (rulesChanged || this._needsReloadOnMenuClose) {
       //if (this._rpService.prefs.getBoolPref("autoReload")) {

@@ -69,7 +69,7 @@
 
     <menupopup id="rp-popup" noautohide="true" position="after_start"
                onpopupshowing="requestpolicy.overlay.onPopupShowing(event);"
-               onpopuphiding="requestpolicy.overlay.onPopupHiding(event);">
+               onpopuphidden="requestpolicy.overlay.onPopupHidden(event);">
       <vbox id="rp-contents">
         <hbox id="rp-main">
           <vbox id="rp-origins-destinations">

@@ -1570,6 +1570,8 @@ requestpolicy.overlay = {
   openHelp : function() {
     var tab = gBrowser.addTab('https://www.requestpolicy.com/help-1.0.html');
     gBrowser.selectedTab = tab;
+    var popup = document.getElementById('rp-popup');
+    popup.hidePopup();
   },
 
 //  openAbout : function() {
@@ -1605,6 +1607,8 @@ requestpolicy.overlay = {
       // Focus *this* browser window in case another one is currently focused
       tabbrowser.ownerDocument.defaultView.focus();
     }
+    var popup = document.getElementById('rp-popup');
+    popup.hidePopup();
   },
 
   clearRequestLog : function() {

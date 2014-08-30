@@ -5,18 +5,18 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy</em:name>
-    <em:version>1.0.0b6</em:version>
+    <em:version>1.0.0b7</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:creator>Justin Samuel</em:creator>
     <em:developer>myrdd</em:developer>
     <em:id>requestpolicy@requestpolicy.com</em:id>
-    <em:homepageURL>https://sslsites.de/requestpolicy.256k.de/</em:homepageURL>
+    <em:homepageURL>https://github.com/RequestPolicyContinued/requestpolicy</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
-    <em:updateURL>https://sslsites.de/requestpolicy.256k.de/update-1.x-beta.rdf.php</em:updateURL>
+    <em:updateURL>https://requestpolicycontinued.github.io/requestpolicy/xpi/update-1.x-beta.rdf</em:updateURL>
 
     <em:translator>myahoo (French)</em:translator>
     <em:translator>Team erweiterungen.de (German)</em:translator>

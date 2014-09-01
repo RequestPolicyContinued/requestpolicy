@@ -265,3 +265,20 @@ table.policy tr:hover a.deleterule:hover {
 #subscriptionschanged {
   margin-top: 20px;
 }
+
+/* yourpolicy.html */
+
+.policy-table-options {
+  padding: 10px;
+  color: #A6B2A9;
+}
+
+.allow.highlight {
+  background-color: #CCE6C2;
+  color: #007F00;
+}
+
+.block.highlight {
+  background-color: #EBCCCC;
+  color: #7F0000;
+}

@@ -26,7 +26,7 @@ $(function () {
 
 });
 
-const SEARCH_DELAY = 500;
+const SEARCH_DELAY = 100;
 
 var searchTimeoutId = null;
 
@@ -35,33 +35,36 @@ function populateRuleTable(filter) {
 
   var policyMgr = rpService._policyMgr;
 
-  var user = policyMgr._userPolicies['user'];
   var table = document.getElementById('policy-user');
-  var entries = user.rawPolicy.toJSON()['entries'];
 
   clearPolicyTable(table);
 
-  for (var i = 0; i < entries['allow'].length; i++) {
-    var entry = entries['allow'][i];
-    var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
-    var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
-    if (filter) {
-      if (origin.indexOf(filter) == -1 && dest.indexOf(filter) == -1) {
-        continue;
+  // Get and display user policies
+  var user = policyMgr._userPolicies['user'];
+  var entries = user.rawPolicy.toJSON()['entries'];
+  addPolicies(entries, 'User', filter);
+
+  // Get and display temorary policies
+  var temp = policyMgr._userPolicies['temp'];
+  var entries = temp.rawPolicy.toJSON()['entries'];
+  addPolicies(entries, 'Temporary', filter);
+
+}
+
+function addPolicies(entries, source, filter) {
+  var table = document.getElementById('policy-user');
+  for (var entry_type in entries) {
+    for (var i = 0; i < entries[entry_type].length; i++) {
+      var entry = entries[entry_type][i];
+      var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
+      var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
+      if (filter) {
+        if (origin.indexOf(filter) == -1 && dest.indexOf(filter) == -1) {
+          continue;
+        }
       }
+      addPolicyTableRow(table, entry_type, origin, dest, entry, source);
     }
-    addPolicyTableRow(table, 'allow', origin, dest, entry);
-  }
-  for (var i = 0; i < entries['deny'].length; i++) {
-    var entry = entries['deny'][i];
-    var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
-    var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
-    if (filter) {
-      if (origin.indexOf(filter) == -1 && dest.indexOf(filter) == -1) {
-        continue;
-      }
-    }
-    addPolicyTableRow(table, 'deny', origin, dest, entry);
   }
 }
 
@@ -86,7 +89,7 @@ function clearPolicyTable(table) {
   }
 }
 
-function addPolicyTableRow(table, type, origin, dest, ruleData) {
+function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
   var rowCount = table.rows.length;
   var row = table.insertRow(rowCount);
 
@@ -102,15 +105,18 @@ function addPolicyTableRow(table, type, origin, dest, ruleData) {
   var destCell = row.insertCell(2);
   destCell.textContent = dest;
 
-  var destCell = row.insertCell(3);
-  //destCell.innerHTML = '<a href="#" class="deleterule">X</a>';
+  // Source Cell
+  var sourceCell = row.insertCell(3);
+  sourceCell.textContent = source;
+
+  var removeCell = row.insertCell(4);
   var anchor = document.createElement('a');
   anchor.appendChild(document.createTextNode('X'));
   anchor.setAttribute('class', 'deleterule');
   anchor.setAttribute('onclick', 'deleteRule(event);');
   anchor.requestpolicyRuleType = type;
   anchor.requestpolicyRuleData = ruleData;
-  destCell.appendChild(anchor);
+  removeCell.appendChild(anchor);
 }
 
 // TODO: remove code duplication with menu.js

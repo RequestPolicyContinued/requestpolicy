@@ -23,6 +23,18 @@ $(function () {
   $('[name=desthost]').prop('placeholder', _('host'));
   $('[name=originport]').prop('placeholder', _('port'));
   $('[name=destport]').prop('placeholder', _('port'));
+
+  var rows_highlighted = false;
+
+  $('#highlight_rows').change(function () {
+    rows_highlighted = !rows_highlighted;
+    if (rows_highlighted) {
+      $('#policy-user tr').addClass('highlight');
+    } else {
+      $('#policy-user tr').removeClass('highlight');
+    }
+  });
+
 });
 
 const SEARCH_DELAY = 500;
@@ -88,6 +100,9 @@ function clearPolicyTable(table) {
 function addPolicyTableRow(table, type, origin, dest, ruleData) {
   var rowCount = table.rows.length;
   var row = table.insertRow(rowCount);
+
+  var type_class = type == 'allow' ? 'allow' : 'block';
+  row.setAttribute('class', type_class);
 
   var typeCell = row.insertCell(0);
   typeCell.textContent = type == 'allow' ? 'Allow' : 'Block';

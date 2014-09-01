@@ -87,9 +87,9 @@
 						<li><a href="#faq-cross-site-requests">What are cross-site requests?</a></li>
 						<li><a href="#faq-privacy">What are the privacy benefits of using RequestPolicy?</a></li>
 						<li><a href="#faq-security">What are the security benefits of using RequestPolicy?</a></li>
-						<li><a href="#faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</a></li>
 						<li><a href="#faq-blocked">Which kinds of requests are blocked?</a></li>
 						<li><a href="#faq-third-party-sites">How are sites classified as "third-party sites"?</a></li>
+						<li><a href="#faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</a></li>
 						<li><a href="#after-uninstall">What changes to my browser are left behind after uninstalling RequestPolicy?</a></li>
 						<li><a href="#detecting">Can websites detect that you are using RequestPolicy?</a></li>
 						<li><a href="#faq-chrome">Is there a RequestPolicy for Chrome?</a></li>
@@ -109,22 +109,7 @@
 
 					<p>See <a href="#security">security benefits</a>.</p>
 
-					<h3 id="faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</h2>
-
-					<p>No! :)</p>
-
-					<p><a href="https://www.noscript.net/" rel="external">NoScript</a> is a tool that gives you a <a href="https://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a> policy for <b>JavaScript, Java, Flash and other plugins</b>. NoScript allows you to whitelist scripts and objects from domains you trust.</p>
-
-					<p>RequestPolicy is a tool that gives you a	<a href="https://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a>
-					policy for <b>cross-site requests</b>. RequestPolicy allows you to whitelist <a href="#faq-cross-site-requests">cross-site requests</a> you trust.</p>
-
-					<p>RequestPolicy will protect you from various attacks that NoScript will not (such as CSRF attacks, though there some special cases that NoScript protects against) and will give you <a href="#privacy">greater privacy</a> while browsing.</p>
-
-					<p>Also, RequestPolicy will give you finer-grained control over JavaScript and plugins when you use it with NoScript. For example, if you whitelist a domain with NoScript to allow it to run JavaScript, then that domain will also be allowed to run JavaScript when you are on any other site that you have whitelisted with NoScript. RequestPolicy makes sure that when it is JavaScript from a third-party site, it will still be restricted unless you have allowed those cross-site requests.</p>
-
-					<p>Conversely, NoScript gives you protection that RequestPolicy does not. RequestPolicy will not keep you safe from malicious JavaScript or vulnerable plugins on the current site you are visiting, So, NoScript is absolutely essential for browser security.</p>
-
-					<p>Having two separate tools that each do their specific jobs well is the best approach. NoScript is an amazing extension and is absolutely essential (like RequestPolicy) to using Firefox securely. It is best to use both RequestPolicy and NoScript.</p>
+					
 
 					<h3 id="faq-blocked">Which kinds of requests are blocked?</h2>
 
@@ -155,6 +140,23 @@
 					<p>There is <a href="#trusting-subdomains">some risk</a> posed by this default, but this level of granularity is the one with the optimal tradeoff of usability for privacy and security according to the needs of most users.</p>
 
 					<p>If you want protection against attacks that use subdomains, you can enable more strict site classification through the RequestPolicy preferences. Instead of classifying sites as the same based on the registered domain, you can choose to base it on the full domain (e.g. <tt>a.b.c.example.com</tt>) or even on the complete protocol + domain + port (e.g. <tt>http://a.b.c.example.com:81</tt>).</p>
+
+					<h3 id="faq-noscript">Is RequestPolicy an alternative or competitor to NoScript?</h2>
+
+					<p>No! :)</p>
+
+					<p><a href="https://www.noscript.net/" rel="external">NoScript</a> is a tool that gives you a <a href="https://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a> policy for <b>JavaScript, Java, Flash and other plugins</b>. NoScript allows you to whitelist scripts and objects from domains you trust.</p>
+
+					<p>RequestPolicy is a tool that gives you a	<a href="https://en.wikipedia.org/wiki/Security_engineering#Security_Stance" rel="external">default deny</a>
+					policy for <b>cross-site requests</b>. RequestPolicy allows you to whitelist <a href="#faq-cross-site-requests">cross-site requests</a> you trust.</p>
+
+					<p>RequestPolicy will protect you from various attacks that NoScript will not (such as CSRF attacks, though there some special cases that NoScript protects against) and will give you <a href="#privacy">greater privacy</a> while browsing.</p>
+
+					<p>Also, RequestPolicy will give you finer-grained control over JavaScript and plugins when you use it with NoScript. For example, if you whitelist a domain with NoScript to allow it to run JavaScript, then that domain will also be allowed to run JavaScript when you are on any other site that you have whitelisted with NoScript. RequestPolicy makes sure that when it is JavaScript from a third-party site, it will still be restricted unless you have allowed those cross-site requests.</p>
+
+					<p>Conversely, NoScript gives you protection that RequestPolicy does not. RequestPolicy will not keep you safe from malicious JavaScript or vulnerable plugins on the current site you are visiting, So, NoScript is absolutely essential for browser security.</p>
+
+					<p>Having two separate tools that each do their specific jobs well is the best approach. NoScript is an amazing extension and is absolutely essential (like RequestPolicy) to using Firefox securely. It is best to use both RequestPolicy and NoScript.</p>
 
 					<h3 id="after-uninstall">What changes to my browser are left behind after uninstalling RequestPolicy?</h2>
 

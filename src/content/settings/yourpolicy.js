@@ -26,18 +26,6 @@ $(function () {
   $('[name=desthost]').prop('placeholder', _('host'));
   $('[name=originport]').prop('placeholder', _('port'));
   $('[name=destport]').prop('placeholder', _('port'));
-
-  var rows_highlighted = false;
-
-  $('#highlight_rows').change(function () {
-    rows_highlighted = !rows_highlighted;
-    if (rows_highlighted) {
-      $('#policy-user tr').addClass('highlight');
-    } else {
-      $('#policy-user tr').removeClass('highlight');
-    }
-  });
-
 });
 
 const SEARCH_DELAY = 100;
@@ -114,7 +102,7 @@ function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
   );
 
   var anchor = $('<a>');
-  anchor.text('X').addClass('deleterule');
+  anchor.text('x').addClass('deleterule');
   anchor.click(function () {
     if (type == 'allow') {
       rpService.removeAllowRule(ruleData);

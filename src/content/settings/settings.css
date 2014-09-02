@@ -202,7 +202,6 @@ table.settings tr:not(:first-child) {
 }
 
 #policy-user tbody {
-  max-height: 400px;
   border: 1px solid #ddd;
 }
 
@@ -218,7 +217,7 @@ table.settings tr:not(:first-child) {
 }
 
 #policy-user col.source {
-  width: 150px;
+  width: 200px;
 }
 
 #policy-user col.remove {

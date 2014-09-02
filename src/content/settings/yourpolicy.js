@@ -10,7 +10,10 @@ PAGE_STRINGS = [
   'temporary',
   'addRule',
   'learnMoreAboutRules',
-  'removeOldRules'
+  'removeOldRules',
+  'source',
+  'highlightRules',
+  'filterRules'
 ];
 
 $(function () {
@@ -46,7 +49,7 @@ function populateRuleTable(filter) {
 
   var policyMgr = rpService._policyMgr;
 
-  var table = document.getElementById('policy-user');
+  var table = document.getElementById('rules');
 
   clearPolicyTable(table);
 
@@ -63,7 +66,7 @@ function populateRuleTable(filter) {
 }
 
 function addPolicies(entries, source, filter) {
-  var table = document.getElementById('policy-user');
+  var table = $('#rules');
   for (var entry_type in entries) {
     for (var i = 0; i < entries[entry_type].length; i++) {
       var entry = entries[entry_type][i];
@@ -79,19 +82,6 @@ function addPolicies(entries, source, filter) {
   }
 }
 
-function deleteRule(event) {
-  var anchor = event.target;
-  var ruleType = anchor.requestpolicyRuleType;
-  var ruleData = anchor.requestpolicyRuleData;
-  if (ruleType == 'allow') {
-    rpService.removeAllowRule(ruleData);
-  } else {
-    rpService.removeDenyRule(ruleData);
-  }
-  var row = anchor.parentNode.parentNode;
-  row.parentNode.removeChild(row);
-}
-
 function clearPolicyTable(table) {
   var children = table.getElementsByTagName('tr');
   while (children.length) {
@@ -101,33 +91,31 @@ function clearPolicyTable(table) {
 }
 
 function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
-  var rowCount = table.rows.length;
-  var row = table.insertRow(rowCount);
 
   var type_class = type == 'allow' ? 'allow' : 'block';
-  row.setAttribute('class', type_class);
+  var rule_type = type == 'allow' ? _('allow') : _('block');
 
-  var typeCell = row.insertCell(0);
-  typeCell.textContent = type == 'allow' ? 'Allow' : 'Block';
+  var row = $('<tr>').addClass(type_class).appendTo(table);
 
-  var originCell = row.insertCell(1);
-  originCell.textContent = origin;
+  row.append(
+    $('<td>').text(rule_type).addClass('type'),
+    $('<td>').text(origin),
+    $('<td>').text(dest),
+    $('<td>').text(source)
+  );
 
-  var destCell = row.insertCell(2);
-  destCell.textContent = dest;
+  var anchor = $('<a>');
+  anchor.text('X').addClass('deleterule');
+  anchor.click(function () {
+    if (type == 'allow') {
+      rpService.removeAllowRule(ruleData);
+    } else {
+      rpService.removeDenyRule(ruleData);
+    }
+    row.remove();
+  });
 
-  // Source Cell
-  var sourceCell = row.insertCell(3);
-  sourceCell.textContent = source;
-
-  var removeCell = row.insertCell(4);
-  var anchor = document.createElement('a');
-  anchor.appendChild(document.createTextNode('X'));
-  anchor.setAttribute('class', 'deleterule');
-  anchor.setAttribute('onclick', 'deleteRule(event);');
-  anchor.requestpolicyRuleType = type;
-  anchor.requestpolicyRuleData = ruleData;
-  removeCell.appendChild(anchor);
+  row.append($('<td>').append(anchor).addClass('remove'));
 }
 
 // TODO: remove code duplication with menu.js

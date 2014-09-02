@@ -39,34 +39,28 @@
         <div>
           <div class="policyheader">
             <div id="policysearch">
+              <label for="rulesearch" data-string="filterRules"></label>
               <input type="search" id="rulesearch"/>
             </div>
-            <table class="policy">
-              <colgroup>
-                <col class="type"/>
-                <col class="origin"/>
-                <col class="destination"/>
-                <col class="source"/>
-                <col class="remove"/>
-              </colgroup>
-              <tr>
-                <th data-string="type"></th>
-                <th data-string="origin"></th>
-                <th data-string="destination"></th>
-                <th data-string="source"></th>
-                <th data-string="remove"></th>
-              </tr>
-            </table>
           </div>
           <div class="policydata">
             <table id="policy-user" class="policy">
               <colgroup>
-                <col class="type"/>
-                <col class="origin"/>
-                <col class="destination"/>
-                <col class="source"/>
-                <col class="remove"/>
+                <col class="type">
+                <col class="origin">
+                <col class="destination">
+                <col class="source">
+                <col class="remove">
               </colgroup>
+              <thead>
+                <tr>
+                  <th data-string="type"></th>
+                  <th data-string="origin"></th>
+                  <th data-string="destination"></th>
+                  <th data-string="source"></th>
+                  <th data-string="remove"></th>
+                </tr>
+              </thead>
               <tbody id="rules"></tbody>
             </table>
           </div>
@@ -75,7 +69,7 @@
 
       <div class="policy-table-options">
         <form>
-          <label for="highlight_rows">Highlight Rule Types</label>
+          <label for="highlight_rows" data-string="highlightRules"></label>
           <input type="checkbox" id="highlight_rows">
         </form>
       </div>

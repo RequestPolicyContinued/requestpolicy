@@ -63,6 +63,15 @@ function populateRuleTable(filter) {
   var entries = temp.rawPolicy.toJSON()['entries'];
   addPolicies(entries, 'Temporary', filter);
 
+  // Get and display subscription policies
+  var subscription_lists = policyMgr._subscriptionPolicies;
+  for (subscription_list in subscription_lists) {
+    for (subscription in subscription_lists[subscription_list]) {
+      entries = subscription_lists[subscription_list][subscription].rawPolicy.toJSON()['entries'];
+      addPolicies(entries, subscription, filter);
+    }
+  }
+
 }
 
 function addPolicies(entries, source, filter) {

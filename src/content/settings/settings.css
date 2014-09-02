@@ -232,34 +232,31 @@ a.deleterule {
   color: rgba(255, 255, 255, 0);
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.95em;
+  font-size: 1.2em;
   outline: none;
-}
-
-#policy-user tbody tr:hover {
-  background-color: #EAF2FC;
 }
 
 #policy-user tr:hover a.deleterule {
   display: inline;
-  color: #aaa;
+  color: #EA3556;
 }
 
 #policy-user tr:hover a.deleterule:hover {
   color: #000;
 }
 
-.policy-table-options {
-  padding: 10px;
-  color: #A6B2A9;
+#policy-user tbody tr:nth-child(odd) {
+   background-color: #FAFAFA;
 }
 
-.allow.highlight {
-  background-color: #CCE6C2;
+#policy-user tbody tr:hover {
+  background-color: #B9D3EE;
+}
+
+.allow {
   color: #007F00;
 }
 
-.block.highlight {
-  background-color: #EBCCCC;
+.block {
   color: #7F0000;
 }

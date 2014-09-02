@@ -13,7 +13,8 @@ PAGE_STRINGS = [
   'removeOldRules',
   'source',
   'highlightRules',
-  'filterRules'
+  'filterRules',
+  'ruleType'
 ];
 
 $(function () {

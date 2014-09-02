@@ -36,6 +36,56 @@
       <div id="contentcontainer" class="yourpolicy">
         <div id="pagetitle" data-string="yourPolicy"></div>
 
+        <h2>Create Rule</h2>
+          <div id="addrule">
+            <p>
+              <a href="https://www.requestpolicy.com/help-rules.html" target="_blank" data-string="learnMoreAboutRules"></a>
+            </p>
+            <form id="addruleform" onsubmit="return false;">
+              <ul>
+                <li class="input-label">
+                  <label data-string="ruleType"></label>
+                </li>
+                <li class="rule-type">
+                  <label class="allow">
+                    <span data-string="allow"></span>
+                    <input type="radio" name="allowdeny" id="allowrule" value="allow" checked="checked"/>
+                  </label>
+                  <label class="block">
+                    <span data-string="block"></span>
+                    <input type="radio" name="allowdeny" id="denyrule" value="deny"/>
+                  </label>
+                </li>
+                <li class="input-label">
+                  <label data-string="origin"></label>
+                </li>
+                <li>
+                  <input type="text" name="originscheme"/>
+                  <input type="text" name="originhost"/>
+                  <input type="text" name="originport"/>
+                </li>
+                <li class="input-label">
+                  <label data-string="destination"></label>
+                </li>
+                <li>
+                  <input type="text" name="destscheme"/>
+                  <input type="text" name="desthost"/>
+                  <input type="text" name="destport"/>
+                </li>
+                <li class="input-label">
+                  <label for="temporary" data-string="temporary"></label>
+                  <input type="checkbox" name="temporary" id="temporary" />
+                </li>
+                <li class="input-label">
+                  <button onclick="addRule();" data-string="addRule"></button>
+                </li>
+              </ul>
+            </form>
+
+          </div>
+
+        <h2>Active Rules</h2>
+
         <div>
           <div class="policyheader">
             <div id="policysearch">
@@ -65,54 +115,6 @@
             </table>
           </div>
         </div>
-      </div>
-
-      <style>
-        #addrule {
-          margin-top: 20px;
-        }
-        input {
-          font-size: 1em;
-        }
-      </style>
-
-      <div id="addrule">
-
-        <form id="addruleform" onsubmit="return false;">
-          <label>
-            <input type="radio" name="allowdeny" id="allowrule" value="allow"
-                   checked="checked"/>
-            <span data-string="allow"></span>
-          </label>
-          <br/>
-          <label>
-            <input type="radio" name="allowdeny" id="denyrule" value="deny"/>
-            <span data-string="block"></span>
-          </label>
-          <br/>
-          <label>
-            <input type="checkbox" name="temporary" />
-            <span data-string="temporary"></span>
-          </label>
-          <table>
-            <tr>
-              <td class="origindest" data-string="origin"></td>
-              <td class="scheme"><input type="text" name="originscheme"/></td>
-              <td class="host"><input type="text" name="originhost"/></td>
-              <td class="port"><input type="text" name="originport"/></td>
-            </tr>
-            <tr>
-              <td class="origindest" data-string="destination"></td>
-              <td class="scheme"><input type="text" name="destscheme"/></td>
-              <td class="host"><input type="text" name="desthost"/></td>
-              <td class="port"><input type="text" name="destport"/></td>
-            </tr>
-          </table>
-          <button onclick="addRule();" data-string="addRule"></button>
-        </form>
-
-        <p><a href="https://www.requestpolicy.com/help-rules.html"
-              target="_blank" data-string="learnMoreAboutRules"></a></p>
       </div>
 
       <style>

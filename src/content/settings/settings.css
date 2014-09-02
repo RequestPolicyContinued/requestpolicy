@@ -150,34 +150,6 @@ table.settings tr:not(:first-child) {
   margin-top: 10px;
 }
 
-#addrule {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 20px;
-  background-color: #fcfcfc;
-}
-#addrule table {
-  width : auto;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-#addrule .origindest {
-  padding-right: 10px;
-}
-#addrule .scheme input {
-  width: 5em;
-}
-#addrule .host input {
-  width: 15em;
-}
-#addrule .port input {
-  width: 3em;
-}
-#addrule p {
-  margin-top: 20px;
-  margin-bottom: 0;
-}
-
 #defaultpolicyword {
   font-weight: bold;
 }
@@ -188,9 +160,64 @@ table.settings tr:not(:first-child) {
 
 /* yourpolicy.html */
 
+#addrule {
+  background-color: #F7F7F7;
+  padding: 10px;
+  margin-bottom: 30px;
+}
+
+#addrule ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#addrule ul li {
+  padding: 5px;
+  margin-left: 10px;
+}
+
+#addrule input[type="text"] {
+  border: 1px solid #ddd;
+  padding: 5px;
+}
+
+#addrule .input-label {
+  font-weight: bold;
+  margin-left: 0;
+}
+
+#addrule .rule-type {
+  font-weight: bold;
+}
+
+#addrule p {
+  padding-left: 5px;
+  float: right;
+}
+
+#addrule a {
+  color: #35c;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#addrule button {
+  width: 25%;
+}
+
 #policysearch {
   text-align: right;
-  color: #A6B2A9;
+  font-weight: bold;
+  margin-bottom: 10px;
+  background-color: #F7F7F7;
+  padding: 10px;
+}
+
+#policysearch input {
+  padding: 5px;
+  border: 1px solid #ddd;
+  width: 25%;
 }
 
 #policy-user {
@@ -259,4 +286,9 @@ a.deleterule {
 
 .block {
   color: #7F0000;
+}
+
+.yourpolicy h2 {
+  border-bottom: 2px solid #E2E5EE;
+  padding-bottom: 5px;
 }

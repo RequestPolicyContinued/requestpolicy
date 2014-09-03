@@ -221,7 +221,6 @@ table.settings tr:not(:first-child) {
 }
 
 #policy-user {
-  table-layout: fixed;
 }
 
 #policy-user th {
@@ -239,20 +238,9 @@ table.settings tr:not(:first-child) {
   word-wrap: break-word;
 }
 
-#policy-user col.type {
-  width: 100px;
-}
-
-#policy-user col.source {
-  width: 200px;
-}
-
-#policy-user col.remove {
-  width: 50px;
-}
-
-#policy-user tbody td.remove {
-  text-align: right;
+#policy-user tbody tr td:nth-child(2),
+#policy-user tbody tr td:nth-child(3) {
+  width: 50%;
 }
 
 a.deleterule {

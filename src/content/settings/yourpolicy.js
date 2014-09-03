@@ -44,25 +44,25 @@ function populateRuleTable(filter) {
   // Get and display user policies
   var user = policyMgr._userPolicies['user'];
   var entries = user.rawPolicy.toJSON()['entries'];
-  addPolicies(entries, 'User', filter);
+  addPolicies(entries, 'User', filter, false);
 
   // Get and display temorary policies
   var temp = policyMgr._userPolicies['temp'];
   var entries = temp.rawPolicy.toJSON()['entries'];
-  addPolicies(entries, 'Temporary', filter);
+  addPolicies(entries, 'Temporary', filter, false);
 
   // Get and display subscription policies
   var subscription_lists = policyMgr._subscriptionPolicies;
   for (subscription_list in subscription_lists) {
     for (subscription in subscription_lists[subscription_list]) {
       entries = subscription_lists[subscription_list][subscription].rawPolicy.toJSON()['entries'];
-      addPolicies(entries, subscription, filter);
+      addPolicies(entries, subscription, filter, true);
     }
   }
 
 }
 
-function addPolicies(entries, source, filter) {
+function addPolicies(entries, source, filter, read_only) {
   var table = $('#rules');
   for (var entry_type in entries) {
     for (var i = 0; i < entries[entry_type].length; i++) {
@@ -74,7 +74,7 @@ function addPolicies(entries, source, filter) {
           continue;
         }
       }
-      addPolicyTableRow(table, entry_type, origin, dest, entry, source);
+      addPolicyTableRow(table, entry_type, origin, dest, entry, source, read_only);
     }
   }
 }
@@ -87,7 +87,7 @@ function clearPolicyTable(table) {
   }
 }
 
-function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
+function addPolicyTableRow(table, type, origin, dest, ruleData, source, read_only) {
 
   var type_class = type == 'allow' ? 'allow' : 'block';
   var rule_type = type == 'allow' ? _('allow') : _('block');
@@ -101,18 +101,22 @@ function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
     $('<td>').text(source)
   );
 
-  var anchor = $('<a>');
-  anchor.text('x').addClass('deleterule');
-  anchor.click(function () {
-    if (type == 'allow') {
-      rpService.removeAllowRule(ruleData);
-    } else {
-      rpService.removeDenyRule(ruleData);
-    }
-    row.remove();
-  });
+  if (!read_only) {
+    var anchor = $('<a>');
+    anchor.text('x').addClass('deleterule');
+    anchor.click(function () {
+      if (type == 'allow') {
+        rpService.removeAllowRule(ruleData);
+      } else {
+        rpService.removeDenyRule(ruleData);
+      }
+      row.remove();
+    });
 
-  row.append($('<td>').append(anchor));
+    row.append($('<td>').append(anchor));
+  } else {
+    row.append($('<td>'));
+  }
 }
 
 // TODO: remove code duplication with menu.js

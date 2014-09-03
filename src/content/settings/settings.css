@@ -244,7 +244,7 @@ table.settings tr:not(:first-child) {
 }
 
 a.deleterule {
-  color: rgba(255, 255, 255, 0);
+  color: #D0D0D0;
   text-decoration: none;
   font-weight: bold;
   font-size: 1.2em;

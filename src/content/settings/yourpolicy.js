@@ -96,7 +96,7 @@ function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
   var row = $('<tr>').addClass(type_class).appendTo(table);
 
   row.append(
-    $('<td>').text(rule_type).addClass('type'),
+    $('<td>').text(rule_type),
     $('<td>').text(origin),
     $('<td>').text(dest),
     $('<td>').text(source)
@@ -113,7 +113,7 @@ function addPolicyTableRow(table, type, origin, dest, ruleData, source) {
     row.remove();
   });
 
-  row.append($('<td>').append(anchor).addClass('remove'));
+  row.append($('<td>').append(anchor));
 }
 
 // TODO: remove code duplication with menu.js

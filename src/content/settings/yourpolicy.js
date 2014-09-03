@@ -79,6 +79,18 @@ function addPolicies(entries, source, filter, read_only) {
   }
 }
 
+function deleteRule(event) {
+  var anchor = $(event.target);
+  var ruleType = anchor.data('requestpolicyRuleType');
+  var ruleData = anchor.data('requestpolicyRuleData');
+  if (ruleType == 'allow') {
+    rpService.removeAllowRule(ruleData);
+  } else {
+    rpService.removeDenyRule(ruleData);
+  }
+  anchor.closest('tr').remove();
+}
+
 function clearPolicyTable(table) {
   var children = table.getElementsByTagName('tr');
   while (children.length) {
@@ -104,15 +116,9 @@ function addPolicyTableRow(table, type, origin, dest, ruleData, source, read_onl
   if (!read_only) {
     var anchor = $('<a>');
     anchor.text('x').addClass('deleterule');
-    anchor.click(function () {
-      if (type == 'allow') {
-        rpService.removeAllowRule(ruleData);
-      } else {
-        rpService.removeDenyRule(ruleData);
-      }
-      row.remove();
-    });
-
+    anchor.data('requestpolicyRuleType', type);
+    anchor.data('requestpolicyRuleData', ruleData);
+    anchor.click(deleteRule);
     row.append($('<td>').append(anchor));
   } else {
     row.append($('<td>'));

@@ -11,8 +11,7 @@ PAGE_STRINGS = [
   'addRule',
   'learnMoreAboutRules',
   'removeOldRules',
-  'source',
-  'highlightRules',
+  'policyList',
   'filterRules',
   'ruleType'
 ];

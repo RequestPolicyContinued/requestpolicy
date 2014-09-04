@@ -238,11 +238,13 @@
 
 					<p>In most cases, clickjacking attacks require that a malicious (or exploited) website be able to load other websites in IFRAMEs (small browser windows embedded within the main browser window).</p>
 
-					<p>The RequestPolicy extension protects you from these types of attacks because cross-site requests will not be allowed unless you explicitly allow them. So, for example, if you are on evil-site.com, the evil-site.com webpage will not be able to tell your browser to load a page from your-bank.com unless you choose to allow that.
-					Network attacks and scans</p>
+					<p>The RequestPolicy extension protects you from these types of attacks because cross-site requests will not be allowed unless you explicitly allow them. So, for example, if you are on evil-site.com, the evil-site.com webpage will not be able to tell your browser to load a page from your-bank.com unless you choose to allow that.</p>
 
-					<p>Using RequestPolicy will also help prevent your browser from being used with various types of network attacks and network scanning. For example, if a website you visit tries to use your browser to perform a scan of your network, those requests will be blocked.
-					What RequestPolicy cannot help with</p>
+					<h2>Network attacks and scans</h2>
+
+					<p>Using RequestPolicy will also help prevent your browser from being used with various types of network attacks and network scanning. For example, if a website you visit tries to use your browser to perform a scan of your network, those requests will be blocked.</p>
+
+					<h2>What RequestPolicy cannot help with</h2>
 
 					<p>It's important to understand that RequestPolicy can only stop requests that the browser knows about. It is possible for browser plugins such as Flash, Java, and Silverlight to bypass the web browser in making requests. Even though some requests made by these plugins are controlled by RequestPolicy, it's good to be aware that third-party plugins such as these may bypass the browser and, therefore, also bypass RequestPolicy.</p>
 

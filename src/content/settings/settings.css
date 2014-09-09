@@ -238,8 +238,8 @@ table.settings tr:not(:first-child) {
   word-wrap: break-word;
 }
 
-#policy-user tbody tr td:nth-child(2),
-#policy-user tbody tr td:nth-child(3) {
+#policy-user col.origin,
+#policy-user col.destination {
   width: 50%;
 }
 

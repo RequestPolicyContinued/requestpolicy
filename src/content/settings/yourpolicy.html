@@ -44,7 +44,7 @@
             <form id="addruleform" onsubmit="return false;">
               <ul>
                 <li class="input-label">
-                  <label data-string="ruleType"></label>
+                  <label data-string="policy"></label>
                 </li>
                 <li class="rule-type">
                   <label class="allow">
@@ -95,12 +95,19 @@
           </div>
           <div class="policydata">
             <table id="policy-user">
+              <colgroup>
+                <col class="type">
+                <col class="origin">
+                <col class="destination">
+                <col class="ruleset">
+                <col class="remove">
+              </colgroup>
               <thead>
                 <tr>
-                  <th data-string="type"></th>
+                  <th data-string="policy"></th>
                   <th data-string="origin"></th>
                   <th data-string="destination"></th>
-                  <th data-string="policyList"></th>
+                  <th data-string="ruleSet"></th>
                   <th data-string="remove"></th>
                 </tr>
               </thead>

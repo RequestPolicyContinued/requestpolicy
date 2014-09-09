@@ -11,9 +11,9 @@ PAGE_STRINGS = [
   'addRule',
   'learnMoreAboutRules',
   'removeOldRules',
-  'policyList',
+  'ruleSet',
   'filterRules',
-  'ruleType'
+  'policy'
 ];
 
 $(function () {
@@ -52,21 +52,21 @@ function populateRuleTable(filter) {
   addPolicies(entries, 'Temporary', filter, false);
 
   // Get and display subscription policies
-  var subscription_lists = policyMgr._subscriptionPolicies;
-  for (subscription_list in subscription_lists) {
-    for (subscription in subscription_lists[subscription_list]) {
-      entries = subscription_lists[subscription_list][subscription].rawPolicy.toJSON()['entries'];
+  var subscriptionLists = policyMgr._subscriptionPolicies;
+  for (subscriptionList in subscriptionLists) {
+    for (subscription in subscriptionLists[subscriptionList]) {
+      entries = subscriptionLists[subscriptionList][subscription].rawPolicy.toJSON()['entries'];
       addPolicies(entries, subscription, filter, true);
     }
   }
 
 }
 
-function addPolicies(entries, source, filter, read_only) {
+function addPolicies(entries, source, filter, readOnly) {
   var table = $('#rules');
-  for (var entry_type in entries) {
-    for (var i = 0; i < entries[entry_type].length; i++) {
-      var entry = entries[entry_type][i];
+  for (var entryType in entries) {
+    for (var i = 0; i < entries[entryType].length; i++) {
+      var entry = entries[entryType][i];
       var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
       var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
       if (filter) {
@@ -74,7 +74,7 @@ function addPolicies(entries, source, filter, read_only) {
           continue;
         }
       }
-      addPolicyTableRow(table, entry_type, origin, dest, entry, source, read_only);
+      addPolicyTableRow(table, entryType, origin, dest, entry, source, readOnly);
     }
   }
 }
@@ -99,21 +99,21 @@ function clearPolicyTable(table) {
   }
 }
 
-function addPolicyTableRow(table, type, origin, dest, ruleData, source, read_only) {
+function addPolicyTableRow(table, type, origin, dest, ruleData, source, readOnly) {
 
-  var type_class = type == 'allow' ? 'allow' : 'block';
-  var rule_type = type == 'allow' ? _('allow') : _('block');
+  var typeClass = type == 'allow' ? 'allow' : 'block';
+  var ruleType = type == 'allow' ? _('allow') : _('block');
 
-  var row = $('<tr>').addClass(type_class).appendTo(table);
+  var row = $('<tr>').addClass(typeClass).appendTo(table);
 
   row.append(
-    $('<td>').text(rule_type),
+    $('<td>').text(ruleType),
     $('<td>').text(origin),
     $('<td>').text(dest),
     $('<td>').text(source)
   );
 
-  if (!read_only) {
+  if (!readOnly) {
     var anchor = $('<a>');
     anchor.text('x').addClass('deleterule');
     anchor.data('requestpolicyRuleType', type);

@@ -26,14 +26,6 @@
  *   to be distinguished: different icon sizes
  *   as well as different RP states.
  *********************************************/
-#requestpolicyToolbarButton dropmarker {
-  /* Don't display a "down arrow" next to the button. We might actually
-     want to display this, but I couldn't get rid of the down arrow
-     appearing to be a separate button on mouseover. I'd rather there
-     be no dropmarker than the separate clickable dropmarker that does
-     the same thing. */
-  display: none !important;
-}
 
 /*
  * On <about:customizing>, always show a red flag.

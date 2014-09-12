@@ -80,27 +80,20 @@
           <div id="reimportOldRules">
 
             <div id="policy">
-              <div class="policyheader">
-                <table class="policy">
-                  <colgroup>
-                    <col class="type"/>
-                    <col class="origin"/>
-                    <col class="destination"/>
-                  </colgroup>
-                  <tr>
-                    <th data-string="type"></th>
-                    <th data-string="origin"></th>
-                    <th data-string="destination"></th>
-                  </tr>
-                </table>
-              </div>
               <div class="policydata">
-                <table id="policy-user" class="policy">
+                <table id="policy-user">
                   <colgroup>
-                    <col class="type"/>
-                    <col class="origin"/>
-                    <col class="destination"/>
+                    <col class="type">
+                    <col class="origin">
+                    <col class="destination">
                   </colgroup>
+                  <thead>
+                    <tr>
+                      <th data-string="policy"></th>
+                      <th data-string="origin"></th>
+                      <th data-string="destination"></th>
+                    </tr>
+                  </thead>
                   <tbody id="rules"></tbody>
                 </table>
               </div>

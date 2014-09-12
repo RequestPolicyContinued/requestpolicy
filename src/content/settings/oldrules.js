@@ -18,7 +18,7 @@ var addHostWildcard = true;
 
 
 function clearPolicyTable() {
-  var table = document.getElementById('policy-user');
+  var table = document.getElementById('rules');
   var children = table.getElementsByTagName('tr');
   while (children.length) {
     var child = children.item(0);
@@ -27,7 +27,7 @@ function clearPolicyTable() {
 }
 
 function populateRuleTable() {
-  var table = document.getElementById('policy-user');
+  var table = document.getElementById('rules');
   // Setting the global rules var here.
   rules = common.getOldRulesAsNewRules(addHostWildcard);
 
@@ -40,22 +40,16 @@ function populateRuleTable() {
 }
 
 function addPolicyTableRow(table, type, origin, dest, ruleData) {
-  var rowCount = table.rows.length;
-  var row = table.insertRow(rowCount);
+  var typeClass = type == 'allow' ? 'allow' : 'block';
+  var ruleType = type == 'allow' ? _('allow') : _('block');
 
-  var typeCell = row.insertCell(0);
-  typeCell.textContent = type == 'allow' ? 'Allow' : 'Block';
+  var row = $('<tr>').addClass(typeClass).appendTo(table);
 
-  var originCell = row.insertCell(1);
-  originCell.textContent = origin;
-
-  var destCell = row.insertCell(2);
-  destCell.textContent = dest;
-
-  var destCell = row.insertCell(3);
-  var anchor = document.createElement('a');
-  anchor.appendChild(document.createTextNode(''));
-  destCell.appendChild(anchor);
+  row.append(
+    $('<td>').text(ruleType),
+    $('<td>').text(origin),
+    $('<td>').text(dest)
+  );
 }
 
 // TODO: remove code duplication with menu.js

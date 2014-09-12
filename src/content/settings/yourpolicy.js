@@ -1,6 +1,17 @@
-PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'type',
-  'origin', 'destination', 'allow', 'block', 'temporary', 'addRule',
-  'learnMoreAboutRules', 'removeOldRules'];
+PAGE_STRINGS = [
+  'yourPolicy',
+  'defaultPolicy',
+  'subscriptions',
+  'type',
+  'origin',
+  'destination',
+  'allow',
+  'block',
+  'temporary',
+  'addRule',
+  'learnMoreAboutRules',
+  'removeOldRules'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

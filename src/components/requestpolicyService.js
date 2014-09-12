@@ -41,9 +41,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 // Scope for imported modules.
 if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+  var requestpolicy = {mod : {}};
 }
 
 function RequestPolicyService() {
@@ -58,15 +56,13 @@ RequestPolicyService.prototype = {
   contractID : "@requestpolicy.com/requestpolicy-service;1",
   // For info about the change from app-startup to profile-after-change, see:
   // https://developer.mozilla.org/en/XPCOM/XPCOM_changes_in_Gecko_1.9.3
-  _xpcom_categories : [{
-        category : "app-startup"
-      }, {
-        category : "profile-after-change"
-      }, {
-        category : "content-policy"
-      }],
-  QueryInterface : XPCOMUtils.generateQI([CI.nsIRequestPolicy, CI.nsIObserver,
-      CI.nsIContentPolicy]),
+  _xpcom_categories : [
+    {category : "app-startup"},
+    {category : "profile-after-change"},
+    {category : "content-policy"}
+  ],
+  QueryInterface : XPCOMUtils.generateQI(
+      [CI.nsIRequestPolicy, CI.nsIObserver, CI.nsIContentPolicy]),
 
   /* Factory that creates a singleton instance of the component */
   _xpcom_factory : {
@@ -244,29 +240,32 @@ RequestPolicyService.prototype = {
       case "greasefire@skrul.com" : // Greasefire
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
-        this._compatibilityRules.push(["file://", "http://userscripts.org/",
-            ext.name]);
-        this._compatibilityRules.push(["file://",
-            "http://static.userscripts.org/", ext.name]);
+        this._compatibilityRules.push(
+            ["file://", "http://userscripts.org/", ext.name]);
+        this._compatibilityRules.push(
+            ["file://", "http://static.userscripts.org/", ext.name]);
         break;
       case "{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}" : // Sage-Too
       case "{899DF1F8-2F43-4394-8315-37F6744E6319}" : // NewsFox
       case "brief@mozdev.org" : // Brief
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Conflicting extension: " + ext.name);
-        this._compatibilityRules.push(["resource://brief-content/", null,
-            ext.name]);
+        this._compatibilityRules.push(
+            ["resource://brief-content/", null, ext.name]);
         this._conflictingExtensions.push({
-              "id" : ext.id,
-              "name" : ext.name,
-              "version" : ext.version
-            });
+          "id" : ext.id,
+          "name" : ext.name,
+          "version" : ext.version
+        });
         break;
       case "foxmarks@kei.com" : // Xmarks Sync
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
-        this._compatibilityRules.push(["https://login.xmarks.com/",
-            "https://static.xmarks.com/", ext.name]);
+        this._compatibilityRules.push([
+          "https://login.xmarks.com/",
+          "https://static.xmarks.com/",
+          ext.name
+        ]);
         break;
       case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
       case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
@@ -279,10 +278,13 @@ RequestPolicyService.prototype = {
       case "{c45c406e-ab73-11d8-be73-000a95be3b12}" : // Web Developer
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
-        this._compatibilityRules.push(["about:blank",
-            "http://jigsaw.w3.org/css-validator/validator", ext.name]);
-        this._compatibilityRules.push(["about:blank",
-            "http://validator.w3.org/check", ext.name]);
+        this._compatibilityRules.push([
+          "about:blank",
+          "http://jigsaw.w3.org/css-validator/validator",
+          ext.name
+        ]);
+        this._compatibilityRules.push(
+            ["about:blank", "http://validator.w3.org/check", ext.name]);
         break;
       case "{c07d1a49-9894-49ff-a594-38960ede8fb9}" : // Update Scanner
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -294,10 +296,16 @@ RequestPolicyService.prototype = {
       case "FirefoxAddon@similarWeb.com" : // SimilarWeb
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
-        this._compatibilityRules.push(["http://api2.similarsites.com/",
-            "http://images2.similargroup.com/", ext.name]);
-        this._compatibilityRules.push(["http://www.similarweb.com/",
-            "http://go.similarsites.com/", ext.name]);
+        this._compatibilityRules.push([
+          "http://api2.similarsites.com/",
+          "http://images2.similargroup.com/",
+          ext.name
+        ]);
+        this._compatibilityRules.push([
+          "http://www.similarweb.com/",
+          "http://go.similarsites.com/",
+          ext.name
+        ]);
         break;
       case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
         requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -318,46 +326,71 @@ RequestPolicyService.prototype = {
     // applications from the Mozilla community that I'm aware of).
     // At least the http url is needed for Firefox updates, adding the https
     // one as well to be safe.
-    this._compatibilityRules.push(["http://download.mozilla.org/", null,
-        appInfo.vendor]);
-    this._compatibilityRules.push(["https://download.mozilla.org/", null,
-        appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["http://download.mozilla.org/", null, appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["https://download.mozilla.org/", null, appInfo.vendor]);
     // There are redirects from 'addons' to 'releases' when installing addons
     // from AMO. Adding the origin of 'releases' to be safe in case those
     // start redirecting elsewhere at some point.
-    this._compatibilityRules.push(["http://addons.mozilla.org/", null,
-        appInfo.vendor]);
-    this._compatibilityRules.push(["https://addons.mozilla.org/", null,
-        appInfo.vendor]);
-    this._compatibilityRules.push(["http://releases.mozilla.org/", null,
-        appInfo.vendor]);
-    this._compatibilityRules.push(["https://releases.mozilla.org/", null,
-        appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["http://addons.mozilla.org/", null, appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["https://addons.mozilla.org/", null, appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["http://releases.mozilla.org/", null, appInfo.vendor]);
+    this._compatibilityRules.push(
+        ["https://releases.mozilla.org/", null, appInfo.vendor]);
     // Firefox 4 has the about:addons page open an iframe to the mozilla site.
     // That opened page grabs content from other mozilla domains.
-    this._compatibilityRules.push(["about:addons",
-        "https://services.addons.mozilla.org/", appInfo.vendor]);
-    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
-        "https://static.addons.mozilla.net/", appInfo.vendor]);
-    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
-        "https://addons.mozilla.org/", appInfo.vendor]);
-    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
-        "https://www.mozilla.com/", appInfo.vendor]);
-    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
-        "https://www.getpersonas.com/", appInfo.vendor]);
-    this._compatibilityRules.push(["https://services.addons.mozilla.org/",
-        "https://static-cdn.addons.mozilla.net/", appInfo.vendor]);
+    this._compatibilityRules.push([
+      "about:addons",
+      "https://services.addons.mozilla.org/",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://services.addons.mozilla.org/",
+      "https://static.addons.mozilla.net/",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://services.addons.mozilla.org/",
+      "https://addons.mozilla.org/",
+      appInfo.vendor]);
+    this._compatibilityRules.push([
+      "https://services.addons.mozilla.org/",
+      "https://www.mozilla.com/",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://services.addons.mozilla.org/",
+      "https://www.getpersonas.com/",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://services.addons.mozilla.org/",
+      "https://static-cdn.addons.mozilla.net/",
+      appInfo.vendor
+    ]);
     // Firefox 4 uses an about:home page that is locally stored but can be
     // the origin for remote requests. See bug #140 for more info.
     this._compatibilityRules.push(["about:home", null, appInfo.vendor]);
     // Firefox Sync uses a google captcha.
-    this._compatibilityRules.push(["https://auth.services.mozilla.com/",
-        "https://api-secure.recaptcha.net/challenge?", appInfo.vendor]);
     this._compatibilityRules.push([
-        "https://api-secure.recaptcha.net/challenge?",
-        "https://www.google.com/recaptcha/api/challenge?", appInfo.vendor]);
-    this._compatibilityRules.push(["https://auth.services.mozilla.com/",
-        "https://www.google.com/recaptcha/api/", appInfo.vendor]);
+      "https://auth.services.mozilla.com/",
+      "https://api-secure.recaptcha.net/challenge?",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://api-secure.recaptcha.net/challenge?",
+      "https://www.google.com/recaptcha/api/challenge?",
+      appInfo.vendor
+    ]);
+    this._compatibilityRules.push([
+      "https://auth.services.mozilla.com/",
+      "https://www.google.com/recaptcha/api/",
+      appInfo.vendor
+    ]);
     // Firefox 13 added links from about:newtab
     this._compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
@@ -365,13 +398,19 @@ RequestPolicyService.prototype = {
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Application detected: " + appInfo.vendor);
-      this._compatibilityRules.push(["about:myworld", "http://www.flock.com/",
-          appInfo.vendor]);
+      this._compatibilityRules.push(
+          ["about:myworld", "http://www.flock.com/", appInfo.vendor]);
       this._compatibilityRules.push(["about:flock", null, appInfo.vendor]);
-      this._compatibilityRules.push(["http://www.flock.com/rss",
-          "http://feeds.feedburner.com/flock", appInfo.vendor]);
-      this._compatibilityRules.push(["http://feeds.feedburner.com/",
-          "http://www.flock.com/", appInfo.vendor]);
+      this._compatibilityRules.push([
+        "http://www.flock.com/rss",
+        "http://feeds.feedburner.com/flock",
+        appInfo.vendor
+      ]);
+      this._compatibilityRules.push([
+        "http://feeds.feedburner.com/",
+        "http://www.flock.com/",
+        appInfo.vendor
+      ]);
     }
 
     // Seamonkey
@@ -413,9 +452,11 @@ RequestPolicyService.prototype = {
     }
 
     // Clean up old, unused prefs (removed in 0.2.0).
-    deletePrefs = ["temporarilyAllowedOrigins",
-        "temporarilyAllowedDestinations",
-        "temporarilyAllowedOriginsToDestinations"];
+    deletePrefs = [
+      "temporarilyAllowedOrigins",
+      "temporarilyAllowedDestinations",
+      "temporarilyAllowedOriginsToDestinations"
+    ];
     for (var i = 0; i < deletePrefs.length; i++) {
       if (this.prefs.prefHasUserValue(deletePrefs[i])) {
         this.prefs.clearUserPref(deletePrefs[i]);
@@ -634,9 +675,15 @@ RequestPolicyService.prototype = {
   },
 
   _loadLibraries : function() {
-    var modules = ["Logger.jsm", "DomainUtil.jsm", "Policy.jsm",
-                   "PolicyManager.jsm", "RequestUtil.jsm", "Subscription.jsm",
-                   "Util.jsm"];
+    var modules = [
+      "Logger.jsm",
+      "DomainUtil.jsm",
+      "Policy.jsm",
+      "PolicyManager.jsm",
+      "RequestUtil.jsm",
+      "Subscription.jsm",
+      "Util.jsm"
+    ];
     for (var i in modules) {
       filename = modules[i];
       try {
@@ -1187,8 +1234,10 @@ RequestPolicyService.prototype = {
 
   _allowOriginToDestination : function(originIdentifier, destIdentifier,
       noStore) {
-    var ruleData = {"o": {"h" : originIdentifier},
-                    "d": {"h" : destIdentifier}};
+    var ruleData = {
+      "o": {"h" : originIdentifier},
+      "d": {"h" : destIdentifier}
+    };
     this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData,
           noStore);
   },
@@ -1205,8 +1254,10 @@ RequestPolicyService.prototype = {
 
   temporarilyAllowOriginToDestination : function temporarilyAllowOriginToDestination(
       originIdentifier, destIdentifier) {
-    var ruleData = {"o": {"h" : originIdentifier},
-                    "d": {"h" : destIdentifier}};
+    var ruleData = {
+      "o": {"h" : originIdentifier},
+      "d": {"h" : destIdentifier}
+    };
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
   },
 
@@ -1959,8 +2010,14 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        var args = [aContentType, dest, origin, aContext, aMimeTypeGuess,
-            aExtra];
+        var args = [
+          aContentType,
+          dest,
+          origin,
+          aContext,
+          aMimeTypeGuess,
+          aExtra
+        ];
 
         if (aContext && aContext.nodeName == "LINK" &&
             (aContext.rel == "icon" || aContext.rel == "shortcut icon")) {

@@ -1,8 +1,22 @@
-PAGE_STRINGS = ['basic', 'advanced', 'advancedPreferences', 'linkPrefetching',
-  'dnsPrefetching', 'enabled', 'disableOnStartup', 'restoreDefaultOnUninstall',
-  'menuPreferences', 'menuSorting', 'sortByNumRequests', 'sortByDestName', 'noSorting',
-  'hint', 'menuSortingHint',
-  'menuIndicatedInformation', 'menuIndicateNumRequests'];
+PAGE_STRINGS = [
+  'basic',
+  'advanced',
+  'advancedPreferences',
+  'linkPrefetching',
+  'dnsPrefetching',
+  'enabled',
+  'disableOnStartup',
+  'restoreDefaultOnUninstall',
+  'menuPreferences',
+  'menuSorting',
+  'sortByNumRequests',
+  'sortByDestName',
+  'noSorting',
+  'hint',
+  'menuSortingHint',
+  'menuIndicatedInformation',
+  'menuIndicateNumRequests'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

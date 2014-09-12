@@ -71,8 +71,12 @@ requestpolicy.requestLogTreeView = {
       this._emptyMessageDisplayed = false;
       this._treebox.rowCountChanged(0, -1);
     }
-    this._visibleData.push([originUri, destUri, false,
-        (new Date()).toLocaleTimeString()]);
+    this._visibleData.push([
+      originUri,
+      destUri,
+      false,
+      (new Date()).toLocaleTimeString()
+    ]);
     if (!this._treebox) {
       return;
     }
@@ -87,8 +91,12 @@ requestpolicy.requestLogTreeView = {
       this._emptyMessageDisplayed = false;
       this._treebox.rowCountChanged(0, -1);
     }
-    this._visibleData.push([originUri, destUri, true,
-        (new Date()).toLocaleTimeString()]);
+    this._visibleData.push([
+      originUri,
+      destUri,
+      true,
+      (new Date()).toLocaleTimeString()
+    ]);
     if (!this._treebox) {
       return;
     }

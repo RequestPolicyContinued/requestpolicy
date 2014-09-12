@@ -20,8 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["Policy", "RawPolicy", "RULE_TYPE_ALLOW",
-                        "RULE_TYPE_DENY"];
+var EXPORTED_SYMBOLS = [
+  "Policy",
+  "RawPolicy",
+  "RULE_TYPE_ALLOW",
+  "RULE_TYPE_DENY"
+];
 
 if (!requestpolicy) {
   var requestpolicy = {

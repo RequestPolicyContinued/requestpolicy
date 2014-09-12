@@ -1,11 +1,20 @@
-PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions', 'learnMore',
-  'subscriptionPolicies', 'subscriptionPoliciesDefinition', 'usability',
-  'privacy', 'browser', 'subscriptionDenyTrackersDescription',
+PAGE_STRINGS = [
+  'yourPolicy',
+  'defaultPolicy',
+  'subscriptions',
+  'learnMore',
+  'subscriptionPolicies',
+  'subscriptionPoliciesDefinition',
+  'usability',
+  'privacy',
+  'browser',
+  'subscriptionDenyTrackersDescription',
   'subscriptionAllowSameOrgDescription',
   'subscriptionAllowFunctionalityDescription',
   'subscriptionAllowEmbeddedDescription',
   'subscriptionAllowMozillaDescription',
-  'subscriptionAllowExtensionsDescription'];
+  'subscriptionAllowExtensionsDescription'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

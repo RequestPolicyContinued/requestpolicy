@@ -1,5 +1,11 @@
-PAGE_STRINGS = ['basic', 'advanced', 'webPages', 'indicateBlockedImages',
-  'menu', 'allowAddingNonTemporaryRulesInPBM'];
+PAGE_STRINGS = [
+  'basic',
+  'advanced',
+  'webPages',
+  'indicateBlockedImages',
+  'menu',
+  'allowAddingNonTemporaryRulesInPBM'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

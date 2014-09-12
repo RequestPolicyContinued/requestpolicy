@@ -1,6 +1,12 @@
-PAGE_STRINGS = ['importOldRules', 'deleteOldRules',
-  'showOldRuleReimportOptions', 'yourOldRulesHaveBeenDeleted', 'type',
-  'origin', 'destination'];
+PAGE_STRINGS = [
+  'importOldRules',
+  'deleteOldRules',
+  'showOldRuleReimportOptions',
+  'yourOldRulesHaveBeenDeleted',
+  'type',
+  'origin',
+  'destination'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

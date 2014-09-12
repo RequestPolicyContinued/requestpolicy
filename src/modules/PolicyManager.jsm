@@ -20,7 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["PolicyManager", "RequestResult", "Destination",
+var EXPORTED_SYMBOLS = [
+  "PolicyManager",
+  "RequestResult",
+  "Destination",
   "REQUEST_TYPE_NORMAL",
   "REQUEST_TYPE_REDIRECT",
   "REQUEST_REASON_USER_POLICY",
@@ -294,8 +297,10 @@ PolicyManager.prototype = {
       // we'll assume this is a new install.
       rawPolicy = new requestpolicy.mod.RawPolicy();
     }
-    this._userPolicies["user"] = {"rawPolicy" : rawPolicy,
-      "policy" : rawPolicy.toPolicy("user")};
+    this._userPolicies["user"] = {
+      "rawPolicy" : rawPolicy,
+      "policy" : rawPolicy.toPolicy("user")
+    };
     this._userPolicies["user"]["policy"].userPolicy = true;
     this._userPolicies["user"].policy.print();
     // Temporary rules. These are never stored.
@@ -326,8 +331,10 @@ PolicyManager.prototype = {
           this._subscriptionPolicies[listName] = {};
         }
         var list = this._subscriptionPolicies[listName];
-        list[subName] = {"rawPolicy" : rawPolicy,
-                         "policy" : rawPolicy.toPolicy(subName)};
+        list[subName] = {
+          "rawPolicy" : rawPolicy,
+          "policy" : rawPolicy.toPolicy(subName)
+        };
         list[subName]["policy"].userPolicy = false;
         list[subName].policy.print();
       }
@@ -460,8 +467,10 @@ PolicyManager.prototype = {
 
   resetTemporaryPolicy : function() {
     var rawPolicy = new requestpolicy.mod.RawPolicy();
-    this._userPolicies["temp"] = {"rawPolicy" : rawPolicy,
-                                  "policy" : rawPolicy.toPolicy("temp")};
+    this._userPolicies["temp"] = {
+      "rawPolicy" : rawPolicy,
+      "policy" : rawPolicy.toPolicy("temp")
+    };
     this._userPolicies["temp"]["policy"].userPolicy = true;
   },
 

@@ -1,10 +1,20 @@
-PAGE_STRINGS = ['welcomeToRequestPolicy', 'forMostUsersDefaultsAreIdeal',
-  'youCanConfigureRequestPolicyToBeMoreStrict', 'teachMeHowToUseRequestPolicy',
-  'returnToBrowsing', 'configureRequestPolicy', 'defaultPolicy',
-  'defaultPolicyDefinition', 'allowRequestsByDefault', 'blockRequestsByDefault',
-  'allowRequestsToTheSameDomain', 'subscriptionPolicies',
-  'subscriptionPoliciesDefinition', 'yesUseSubscriptions',
-  'noDoNotUseSubscriptions'];
+PAGE_STRINGS = [
+  'welcomeToRequestPolicy',
+  'forMostUsersDefaultsAreIdeal',
+  'youCanConfigureRequestPolicyToBeMoreStrict',
+  'teachMeHowToUseRequestPolicy',
+  'returnToBrowsing',
+  'configureRequestPolicy',
+  'defaultPolicy',
+  'defaultPolicyDefinition',
+  'allowRequestsByDefault',
+  'blockRequestsByDefault',
+  'allowRequestsToTheSameDomain',
+  'subscriptionPolicies',
+  'subscriptionPoliciesDefinition',
+  'yesUseSubscriptions',
+  'noDoNotUseSubscriptions'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

@@ -175,8 +175,13 @@ requestpolicy.overlay = {
       return;
     }
 
-    var toolbars = ["addon-bar", "nav-bar", "toolbar-menubar",
-                    "PersonalToolbar", "TabsToolbar"];
+    var toolbars = [
+      "addon-bar",
+      "nav-bar",
+      "toolbar-menubar",
+      "PersonalToolbar",
+      "TabsToolbar"
+    ];
     for (var i in toolbars) {
       var toolbarName = toolbars[i];
       if (this._isButtonInToolbar(toolbarName)) {
@@ -426,39 +431,43 @@ requestpolicy.overlay = {
     if (notification) {
       notification.label = notificationLabel;
     } else {
-      var buttons = [{
-            label : notificationButtonAllow,
-            accessKey : notificationButtonAllowKey,
-            popup : null,
-            callback : function() {
-              var location = targetDocument.location;
-              // When refreshing a page that wants to redirect, sometimes the
-              // targetDocument.location is null. If that's the case, just use
-              // do the redirection in the current content pane.
-              if (targetDocument.location == null) {
-                requestpolicy.mod.Logger
-                    .dump("in callback: targetDocument.location == null, "
-                        + "using content.location instead");
-                location = content.location;
-              }
-              // Fx 3.7a5+ calls shouldLoad for location.href changes.
-              rpServiceObj.registerAllowedRedirect(location.href,
-                  redirectTargetUri);
-              location.href = redirectTargetUri;
+      var buttons = [
+        {
+          label : notificationButtonAllow,
+          accessKey : notificationButtonAllowKey,
+          popup : null,
+          callback : function() {
+            var location = targetDocument.location;
+            // When refreshing a page that wants to redirect, sometimes the
+            // targetDocument.location is null. If that's the case, just use
+            // do the redirection in the current content pane.
+            if (targetDocument.location == null) {
+              requestpolicy.mod.Logger
+                  .dump("in callback: targetDocument.location == null, "
+                      + "using content.location instead");
+              location = content.location;
             }
-          }, {
-            label : notificationButtonDeny,
-            accessKey : notificationButtonDenyKey,
-            popup : null,
-            callback : function() {
-              // Do nothing. The notification closes when this is called.
-            }
-//          }, {
-//            label : notificationButtonOptions,
-//            accessKey : notificationButtonOptionsKey,
-//            popup : optionsPopupName,
-//            callback : null
-          }];
+            // Fx 3.7a5+ calls shouldLoad for location.href changes.
+            rpServiceObj.registerAllowedRedirect(location.href,
+                redirectTargetUri);
+            location.href = redirectTargetUri;
+          }
+        },
+        {
+          label : notificationButtonDeny,
+          accessKey : notificationButtonDenyKey,
+          popup : null,
+          callback : function() {
+            // Do nothing. The notification closes when this is called.
+          }
+//      },
+//      {
+//        label : notificationButtonOptions,
+//        accessKey : notificationButtonOptionsKey,
+//        popup : optionsPopupName,
+//        callback : null
+        }
+      ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
       notificationBox.appendNotification(notificationLabel, notificationValue,
           "chrome://browser/skin/Info.png", priority, buttons);

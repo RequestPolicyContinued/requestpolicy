@@ -15,8 +15,14 @@ var stringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"]
 strbundle = stringBundleService.createBundle(
     "chrome://requestpolicy/locale/requestpolicy.properties");
 
-const COMMON_STRINGS = ['preferences', 'managePolicies', 'about', 'help',
-  'basic', 'advanced'];
+const COMMON_STRINGS = [
+  'preferences',
+  'managePolicies',
+  'about',
+  'help',
+  'basic',
+  'advanced'
+];
 
 
 function _(msg, args) {

@@ -20,9 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["UserSubscriptions", "SubscriptionList", "Subscription",
-      "SUBSCRIPTION_UPDATED_TOPIC", "SUBSCRIPTION_ADDED_TOPIC",
-      "SUBSCRIPTION_REMOVED_TOPIC"];
+var EXPORTED_SYMBOLS = [
+  "UserSubscriptions",
+  "SubscriptionList",
+  "Subscription",
+  "SUBSCRIPTION_UPDATED_TOPIC",
+  "SUBSCRIPTION_ADDED_TOPIC",
+  "SUBSCRIPTION_REMOVED_TOPIC"
+];
 
 Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");

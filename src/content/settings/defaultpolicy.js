@@ -1,7 +1,15 @@
-PAGE_STRINGS = ['yourPolicy', 'defaultPolicy', 'subscriptions',
-  'allowRequestsByDefault', 'blockRequestsByDefault',
-  'defaultPolicyDefinition', 'learnMore', 'allowRequestsToTheSameDomain',
-  'differentSubscriptionsAreAvailable', 'manageSubscriptions'];
+PAGE_STRINGS = [
+  'yourPolicy',
+  'defaultPolicy',
+  'subscriptions',
+  'allowRequestsByDefault',
+  'blockRequestsByDefault',
+  'defaultPolicyDefinition',
+  'learnMore',
+  'allowRequestsToTheSameDomain',
+  'differentSubscriptionsAreAvailable',
+  'manageSubscriptions'
+];
 
 $(function () {
   common.localize(PAGE_STRINGS);

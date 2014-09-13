@@ -33,6 +33,7 @@
 
   <script type="application/x-javascript" src="overlay.js" />
   <script type="application/x-javascript" src="menu.js" />
+  <script type="application/x-javascript" src="classicmenu.js" />
   <script type="application/x-javascript" src="test.js" />
 
   <menupopup id="menu_ToolsPopup">

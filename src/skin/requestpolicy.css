@@ -324,6 +324,17 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="t
 }
 
 /*********************************************
+* ClassicMenu contents
+*********************************************/
+.requestpolicyTemporary {
+  font-style: italic;
+}
+
+.requestpolicyAllowOriginToDest {
+  font-weight: bold;
+}
+
+/*********************************************
  * Request Log
  *********************************************/
 #requestpolicy-requestLog-close {

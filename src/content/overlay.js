@@ -410,19 +410,33 @@ requestpolicy.overlay = {
     var notificationButtonDenyKey = this._strbundle
         .getString("deny.accesskey");
 
-//    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
-//    var optionsPopup = document.getElementById(optionsPopupName);
-//    while (optionsPopup.firstChild) {
-//      optionsPopup.removeChild(optionsPopup.firstChild);
-//    }
-//    var currentIdent = this._rpService
-//        .getUriIdentifier(targetDocument.location);
-//    var destIdent = this._rpService.getUriIdentifier(redirectTargetUri);
-//
-//    requestpolicy.menu.addMenuItemTemporarilyAllowOriginToDest(optionsPopup,
-//        currentIdent, destIdent);
-//    requestpolicy.menu.addMenuItemAllowOriginToDest(optionsPopup, currentIdent,
-//        destIdent);
+    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
+    var optionsPopup = document.getElementById(optionsPopupName);
+    while (optionsPopup.firstChild) {
+      optionsPopup.removeChild(optionsPopup.firstChild);
+    }
+
+    var origin = requestpolicy.menu._addWildcard(
+        requestpolicy.mod.DomainUtil.getDomain(this.getTopLevelDocumentUri()));
+    var dest = requestpolicy.menu._addWildcard(
+        requestpolicy.mod.DomainUtil.getDomain(redirectTargetUri));
+
+    requestpolicy.classicmenu.
+        addMenuItemTemporarilyAllowDest(optionsPopup, dest);
+    requestpolicy.classicmenu.addMenuItemAllowDest(optionsPopup, dest);
+    requestpolicy.classicmenu.addMenuSeparator(optionsPopup);
+
+    requestpolicy.classicmenu.
+        addMenuItemTemporarilyAllowOrigin(optionsPopup, origin);
+    requestpolicy.classicmenu.addMenuItemAllowOrigin(optionsPopup, origin);
+    requestpolicy.classicmenu.addMenuSeparator(optionsPopup);
+
+    requestpolicy.classicmenu.
+        addMenuItemTemporarilyAllowOriginToDest(optionsPopup, origin, dest);
+    requestpolicy.classicmenu.
+        addMenuItemAllowOriginToDest(optionsPopup, origin, dest);
+
+
 
     const rpServiceObj = this._rpService;
 
@@ -460,12 +474,12 @@ requestpolicy.overlay = {
           callback : function() {
             // Do nothing. The notification closes when this is called.
           }
-//      },
-//      {
-//        label : notificationButtonOptions,
-//        accessKey : notificationButtonOptionsKey,
-//        popup : optionsPopupName,
-//        callback : null
+        },
+        {
+          label : notificationButtonOptions,
+          accessKey : notificationButtonOptionsKey,
+          popup : optionsPopupName,
+          callback : null
         }
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;

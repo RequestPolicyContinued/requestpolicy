@@ -32,6 +32,8 @@ const SEARCH_DELAY = 100;
 
 var searchTimeoutId = null;
 
+var rulesChangedObserver = null;
+
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
@@ -147,7 +149,8 @@ function addRule() {
     return;
   }
   var search = document.getElementById('rulesearch');
-  populateRuleTable(search.value);
+
+  // the table is repopulated through the RulesChangedObserver
 }
 
 function addRuleHelper() {
@@ -206,6 +209,25 @@ function addRuleHelper() {
   }
 }
 
+function RulesChangedObserver()
+{
+  this.register();
+}
+RulesChangedObserver.prototype.observe = function(subject, topic, data) {
+  var search = document.getElementById('rulesearch');
+  populateRuleTable(search.value);
+};
+RulesChangedObserver.prototype.register = function() {
+  var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
+  observerService.addObserver(this, "requestpolicy-rules-changed", false);
+};
+RulesChangedObserver.prototype.unregister = function() {
+  var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
+  observerService.removeObserver(this, "requestpolicy-rules-changed");
+};
+
 function onload() {
   var search = document.getElementById('rulesearch');
   search.addEventListener('keyup', function (event) {
@@ -220,4 +242,9 @@ function onload() {
   if (rpService.oldRulesExist()) {
     $('#oldrulesexist').show();
   }
+  rulesChangedObserver = new RulesChangedObserver();
+}
+
+function onunload() {
+  rulesChangedObserver.unregister();
 }

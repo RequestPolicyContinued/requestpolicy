@@ -22,6 +22,7 @@
 
 var EXPORTED_SYMBOLS = [
   "PolicyManager",
+  "RULES_CHANGED_TOPIC",
   "RequestResult",
   "Destination",
   "REQUEST_TYPE_NORMAL",
@@ -44,6 +45,8 @@ var EXPORTED_SYMBOLS = [
 
 const CI = Components.interfaces;
 const CC = Components.classes;
+
+const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 
 if (!requestpolicy) {
   var requestpolicy = {
@@ -69,6 +72,12 @@ function dprint(msg) {
 
 function warn(msg) {
   requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_POLICY, msg);
+}
+
+function notifyRulesChanged() {
+  var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
+  observerService.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
 
@@ -305,6 +314,8 @@ PolicyManager.prototype = {
     this._userPolicies["user"].policy.print();
     // Temporary rules. These are never stored.
     this.resetTemporaryPolicy();
+
+    notifyRulesChanged();
   },
 
   loadSubscriptionPolicies : function(subscriptionInfo) {
@@ -340,6 +351,8 @@ PolicyManager.prototype = {
       }
     }
 
+    notifyRulesChanged();
+
     return failures;
   },
 
@@ -362,6 +375,8 @@ PolicyManager.prototype = {
         delete list[subName];
       }
     }
+
+    notifyRulesChanged();
 
     return failures;
   },
@@ -412,6 +427,8 @@ PolicyManager.prototype = {
     }
 
     //this._userPolicies["user"].policy.print();
+
+    notifyRulesChanged();
   },
 
   storeRules : function() {
@@ -430,6 +447,8 @@ PolicyManager.prototype = {
           this._userPolicies["temp"].policy);
 
     //this._userPolicies["temp"].policy.print();
+
+    notifyRulesChanged();
   },
 
   removeRule : function(ruleType, ruleData, noStore) {
@@ -458,6 +477,8 @@ PolicyManager.prototype = {
 
     //this._userPolicies["user"].policy.print();
     //this._userPolicies["temp"].policy.print();
+
+    notifyRulesChanged();
   },
 
   temporaryRulesExist : function() {
@@ -472,6 +493,8 @@ PolicyManager.prototype = {
       "policy" : rawPolicy.toPolicy("temp")
     };
     this._userPolicies["temp"]["policy"].userPolicy = true;
+
+    notifyRulesChanged();
   },
 
   checkRequestAgainstUserPolicies : function(origin, dest) {

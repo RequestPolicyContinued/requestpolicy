@@ -216,7 +216,7 @@ function onload() {
       populateRuleTable(event.target.value)
     }, SEARCH_DELAY);
   }, false);
-  populateRuleTable();
+  populateRuleTable(search.value);
   if (rpService.oldRulesExist()) {
     $('#oldrulesexist').show();
   }

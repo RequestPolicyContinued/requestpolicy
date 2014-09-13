@@ -1054,7 +1054,7 @@ RequestPolicyService.prototype = {
 
   prefs : null,
 
-  getUriIdentifier : function getUriIdentifier(uri) {
+  getUriIdentifier : function(uri) {
     return requestpolicy.mod.DomainUtil.getIdentifier(uri,
     //    this._uriIdentificationLevel);
         null);
@@ -1069,8 +1069,7 @@ RequestPolicyService.prototype = {
         "History item requested: <" + destinationUrl + ">.");
   },
 
-  registerFormSubmitted : function registerFormSubmitted(originUrl,
-      destinationUrl) {
+  registerFormSubmitted : function(originUrl, destinationUrl) {
     var originUrl = requestpolicy.mod.DomainUtil
         .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
     var destinationUrl = requestpolicy.mod.DomainUtil
@@ -1103,7 +1102,7 @@ RequestPolicyService.prototype = {
     }
   },
 
-  registerLinkClicked : function registerLinkClicked(originUrl, destinationUrl) {
+  registerLinkClicked : function(originUrl, destinationUrl) {
     var originUrl = requestpolicy.mod.DomainUtil
         .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
     var destinationUrl = requestpolicy.mod.DomainUtil
@@ -1139,8 +1138,7 @@ RequestPolicyService.prototype = {
     }
   },
 
-  registerAllowedRedirect : function registerAllowedRedirect(originUrl,
-      destinationUrl) {
+  registerAllowedRedirect : function(originUrl, destinationUrl) {
     var originUrl = requestpolicy.mod.DomainUtil
         .ensureUriHasPath(requestpolicy.mod.DomainUtil.stripFragment(originUrl));
     var destinationUrl = requestpolicy.mod.DomainUtil
@@ -1199,15 +1197,15 @@ RequestPolicyService.prototype = {
           noStore);
   },
 
-  allowOrigin : function allowOrigin(host) {
+  allowOrigin : function(host) {
     this._allowOrigin(host, false);
   },
 
-  allowOriginDelayStore : function allowOriginDelayStore(host) {
+  allowOriginDelayStore : function(host) {
     this._allowOrigin(host, true);
   },
 
-  temporarilyAllowOrigin : function temporarilyAllowOrigin(host) {
+  temporarilyAllowOrigin : function(host) {
     var ruleData = {"o": {"h" : host}};
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
           ruleData);
@@ -1219,15 +1217,15 @@ RequestPolicyService.prototype = {
           noStore);
   },
 
-  allowDestination : function allowDestination(host) {
+  allowDestination : function(host) {
     this._allowDestination(host, false);
   },
 
-  allowDestinationDelayStore : function allowDestinationDelayStore(host) {
+  allowDestinationDelayStore : function(host) {
     this._allowDestination(host, true);
   },
 
-  temporarilyAllowDestination : function temporarilyAllowDestination(host) {
+  temporarilyAllowDestination : function(host) {
     var ruleData = {"d": {"h" : host}};
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
   },
@@ -1242,18 +1240,17 @@ RequestPolicyService.prototype = {
           noStore);
   },
 
-  allowOriginToDestination : function allowOriginToDestination(
-      originIdentifier, destIdentifier) {
+  allowOriginToDestination : function(originIdentifier, destIdentifier) {
     this._allowOriginToDestination(originIdentifier, destIdentifier, false);
   },
 
-  allowOriginToDestinationDelayStore : function allowOriginToDestinationDelayStore(
-      originIdentifier, destIdentifier) {
+  allowOriginToDestinationDelayStore : function(originIdentifier,
+                                                destIdentifier) {
     this._allowOriginToDestination(originIdentifier, destIdentifier, true);
   },
 
-  temporarilyAllowOriginToDestination : function temporarilyAllowOriginToDestination(
-      originIdentifier, destIdentifier) {
+  temporarilyAllowOriginToDestination : function(originIdentifier,
+                                                 destIdentifier) {
     var ruleData = {
       "o": {"h" : originIdentifier},
       "d": {"h" : destIdentifier}
@@ -1261,11 +1258,11 @@ RequestPolicyService.prototype = {
     this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData);
   },
 
-  temporaryRulesExist : function temporaryRulesExist() {
+  temporaryRulesExist : function() {
     return this._policyMgr.temporaryRulesExist();
   },
 
-  revokeTemporaryPermissions : function revokeTemporaryPermissions() {
+  revokeTemporaryPermissions : function() {
     this._policyMgr.resetTemporaryPolicy();
   },
 
@@ -1359,19 +1356,19 @@ RequestPolicyService.prototype = {
    * @return {Boolean} true if any temporary permissions have been granted,
    *         false otherwise.
    */
-  areTemporaryPermissionsGranted : function areTemporaryPermissionsGranted() {
+  areTemporaryPermissionsGranted : function() {
     return this._policyMgr.temporaryPoliciesExist();
   },
 
-  getConflictingExtensions : function getConflictingExtensions() {
+  getConflictingExtensions : function() {
     return this._conflictingExtensions;
   },
 
-  getTopLevelDocTranslations : function getTopLevelDocTranslations() {
+  getTopLevelDocTranslations : function() {
     return this._topLevelDocTranslationRules;
   },
 
-  isPrefetchEnabled : function isPrefetchEnabled() {
+  isPrefetchEnabled : function() {
     // network.dns.disablePrefetch only exists starting in Firefox 3.1
     try {
       return this._rootPrefs.getBoolPref("network.prefetch-next")
@@ -1381,23 +1378,23 @@ RequestPolicyService.prototype = {
     }
   },
 
-  isDefaultAllow : function isDefaultAllow() {
+  isDefaultAllow : function() {
     return this._defaultAllow;
   },
 
-  isDefaultAllowSameDomain : function isDefaultAllowSameDomain() {
+  isDefaultAllowSameDomain : function() {
     return this._defaultAllowSameDomain;
   },
 
-  isBlockingDisabled : function isBlockingDisabled() {
+  isBlockingDisabled : function() {
     return this._blockingDisabled;
   },
 
-  isPrivateBrowsingEnabled : function isPrivateBrowsingEnabled() {
+  isPrivateBrowsingEnabled : function() {
     return this._privateBrowsingEnabled;
   },
 
-  oldRulesExist : function oldRulesExist() {
+  oldRulesExist : function() {
     var prefs = this.prefs;
     function prefEmpty(pref) {
       try {
@@ -1419,7 +1416,7 @@ RequestPolicyService.prototype = {
    * @param {}
    *          observer
    */
-  addRequestObserver : function addRequestObserver(observer) {
+  addRequestObserver : function(observer) {
     if (!("observeBlockedRequest" in observer)) {
       throw "Observer passed to addRequestObserver does "
           + "not have an observeBlockedRequest() method.";
@@ -1435,7 +1432,7 @@ RequestPolicyService.prototype = {
    * @param {}
    *          observer
    */
-  removeRequestObserver : function removeRequestObserver(observer) {
+  removeRequestObserver : function(observer) {
     for (var i = 0; i < this._requestObservers.length; i++) {
       if (this._requestObservers[i] == observer) {
         requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
@@ -1455,7 +1452,7 @@ RequestPolicyService.prototype = {
    * @param nsIURI oldURI
    * @param string newSpec
    */
-  _handleHttpsEverywhereUriRewrite: function(oldURI, newSpec) {
+  _handleHttpsEverywhereUriRewrite : function(oldURI, newSpec) {
     oldURI = oldURI.QueryInterface(CI.nsIURI);
     this.mapDestinations(oldURI.spec, newSpec);
   },
@@ -1720,7 +1717,7 @@ RequestPolicyService.prototype = {
   },
 
   _recordAllowedRequest : function(originUri, destUri, isInsert,
-        requestResult) {
+                                   requestResult) {
     var destIdentifier = this.getUriIdentifier(destUri);
 
     if (isInsert == undefined) {

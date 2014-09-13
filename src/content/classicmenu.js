@@ -44,9 +44,9 @@ requestpolicy.classicmenu = {
   * be reloaded.
   */
   _conditionallyReloadDocument : function() {
-//     if (requestpolicy.menu._rpService.prefs.getBoolPref("autoReload")) {
-    content.document.location.reload(false);
-//     }
+    if (requestpolicy.overlay._rpService.prefs.getBoolPref("autoReload")) {
+      content.document.location.reload(false);
+    }
   },
 
 

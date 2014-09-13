@@ -1268,9 +1268,9 @@ requestpolicy.overlay = {
   onPopupHidden : function(event) {
     var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
     if (rulesChanged || this._needsReloadOnMenuClose) {
-      //if (this._rpService.prefs.getBoolPref("autoReload")) {
+      if (this._rpService.prefs.getBoolPref("autoReload")) {
         content.document.location.reload(false);
-      //}
+      }
     }
     this._needsReloadOnMenuClose = false;
 //    if (event.currentTarget != event.originalTarget) {

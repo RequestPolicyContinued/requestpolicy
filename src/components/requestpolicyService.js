@@ -1625,50 +1625,43 @@ RequestPolicyService.prototype = {
     }
   },
 
-  _argumentsToString : function(aContentType, dest, origin, aContext,
-      aMimeTypeGuess, aExtra) {
+  _argumentsToString : function(args) {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
     return "type: "
-        + aContentType
+        + args.aContentType
         + ", destination: "
-        + dest
+        + args.dest
         + ", origin: "
-        + origin
+        + args.origin
         + ", context: "
-        + ((aContext instanceof CI.nsIDOMHTMLElement)
+        + ((args.aContext) instanceof (CI.nsIDOMHTMLElement)
             ? "<HTML Element>"
-            : aContext) + ", mime: " + aMimeTypeGuess + ", " + aExtra;
+            : args.aContext)
+        + ", mime: " + args.aMimeTypeGuess
+        + ", " + args.aExtra;
   },
 
   // We always call this from shouldLoad to reject a request.
   reject : function(reason, args, requestResult) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** BLOCKED ** reason: "
-            + reason
-            + ". "
-            + this._argumentsToString(args[0], args[1], args[2], args[3],
-                args[4], args[5]));
+        + reason + ". " + this._argumentsToString(args));
 
     if (this._blockingDisabled) {
       return CP_OK;
     }
 
-    var origin = args[2];
-    var dest = args[1];
+    args.aContext.requestpolicyBlocked = true;
 
-    // args[3] is the context
-    args[3].requestpolicyBlocked = true;
+    this._cacheShouldLoadResult(CP_REJECT, args.origin, args.dest);
+    this._recordRejectedRequest(args.origin, args.dest, requestResult);
 
-    this._cacheShouldLoadResult(CP_REJECT, origin, dest);
-    this._recordRejectedRequest(origin, dest, requestResult);
-
-    var aContentType = args[0];
-    if (CI.nsIContentPolicy.TYPE_DOCUMENT == aContentType) {
+    if (CI.nsIContentPolicy.TYPE_DOCUMENT == args.aContentType) {
       // This was a blocked top-level document request. This may be due to
       // a blocked attempt by javascript to set the document location.
       // TODO: pass requestResult?
-      this._notifyBlockedTopLevelDocRequest(origin, dest);
+      this._notifyBlockedTopLevelDocRequest(args.origin, args.dest);
     }
 
     return CP_REJECT;
@@ -1694,23 +1687,16 @@ RequestPolicyService.prototype = {
   accept : function(reason, args, requestResult, unforbidable) {
     requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
         "** ALLOWED ** reason: "
-            + reason
-            + ". "
-            + this._argumentsToString(args[0], args[1], args[2], args[3],
-                args[4], args[5]));
+        + reason + ". " + this._argumentsToString(args));
 
-    var origin = args[2];
-    var dest = args[1];
-
-    this._cacheShouldLoadResult(CP_OK, origin, dest);
+    this._cacheShouldLoadResult(CP_OK, args.origin, args.dest);
     // We aren't recording the request so it doesn't show up in the menu, but we
     // want it to still show up in the request log.
     if (unforbidable) {
-      this._notifyRequestObserversOfAllowedRequest(origin, dest,
-            requestResult);
+      this._notifyRequestObserversOfAllowedRequest(args.origin, args.dest,
+          requestResult);
     } else {
-      this._recordAllowedRequest(origin, dest, false,
-            requestResult);
+      this._recordAllowedRequest(args.origin, args.dest, false, requestResult);
     }
 
     return CP_OK;
@@ -2007,14 +1993,14 @@ RequestPolicyService.prototype = {
           return CP_OK;
         }
 
-        var args = [
-          aContentType,
-          dest,
-          origin,
-          aContext,
-          aMimeTypeGuess,
-          aExtra
-        ];
+        var args = {
+          aContentType: aContentType,
+          dest: dest,
+          origin: origin,
+          aContext: aContext,
+          aMimeTypeGuess: aMimeTypeGuess,
+          aExtra: aExtra
+        };
 
         if (aContext && aContext.nodeName == "LINK" &&
             (aContext.rel == "icon" || aContext.rel == "shortcut icon")) {

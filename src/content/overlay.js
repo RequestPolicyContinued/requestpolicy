@@ -880,6 +880,14 @@ requestpolicy.overlay = {
     return docShell.allowMetaRedirects;
   },
 
+  _htmlAnchorTagClicked : function(event) {
+    // Note: need to use currentTarget so that it is the link, not
+    // something else within the link that got clicked, it seems.
+    requestpolicy.overlay._rpService.
+        registerLinkClicked(event.currentTarget.ownerDocument.URL,
+            event.currentTarget.href);
+  }
+
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
@@ -960,13 +968,8 @@ requestpolicy.overlay = {
     // tag.
     var anchorTags = document.getElementsByTagName("a");
     for (var i = 0; i < anchorTags.length; i++) {
-      anchorTags[i].addEventListener("click", function(event) {
-            // Note: need to use currentTarget so that it is the link, not
-            // something else within the link that got clicked, it seems.
-            requestpolicy.overlay._rpService
-                .registerLinkClicked(event.currentTarget.ownerDocument.URL,
-                    event.currentTarget.href);
-          }, false);
+      anchorTags[i].addEventListener("click", this._htmlAnchorTagClicked,
+          false);
     }
 
     // TODO: implement a function in RequestProcessor for this

@@ -119,6 +119,8 @@ const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
 
 
+// TODO: merge this Class with the "Request" class and/or some kind of
+// "RememberedRequest" or "RequestInfo" class.
 /**
  * RequestResult objects are used to hand over the result of a check
  * whether a request is allowed or not. Sometimes only the boolean value of

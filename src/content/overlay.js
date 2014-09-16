@@ -141,7 +141,7 @@ requestpolicy.overlay = {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        this._rpService.addRequestObserver(this);
+        this._rpService._requestProcessor.addRequestObserver(this);
 
         //this.setContextMenuEnabled(this._rpService.prefs
         //    .getBoolPref("contextMenu"));
@@ -229,7 +229,7 @@ requestpolicy.overlay = {
   //},
 
   onWindowClose : function(event) {
-    this._rpService.removeRequestObserver(this);
+    this._rpService._requestProcessor.removeRequestObserver(this);
     this._removeHistoryObserver();
     this._removeLocationObserver();
   },
@@ -672,8 +672,8 @@ requestpolicy.overlay = {
       return;
     }
     var images = document.getElementsByTagName("img");
-    var rejectedRequests = this._rpService
-          ._rejectedRequests.getOriginUri(document.location);
+    var rejectedRequests = this._rpService._requestProcessor.
+        _rejectedRequests.getOriginUri(document.location);
     var blockedUris = {};
     for (var destBase in rejectedRequests) {
       for (var destIdent in rejectedRequests[destBase]) {
@@ -969,14 +969,17 @@ requestpolicy.overlay = {
           }, false);
     }
 
-    if (this._rpService._blockedRedirects[document.location]) {
-      var dest = this._rpService._blockedRedirects[document.location];
+    // TODO: implement a function in RequestProcessor for this
+    if (this._rpService._requestProcessor.
+        _blockedRedirects[document.location]) {
+      var dest = this._rpService._requestProcessor.
+          _blockedRedirects[document.location];
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(document, dest);
-      delete this._rpService._blockedRedirects[document.location];
+      delete this._rpService._requestProcessor._blockedRedirects[document.location];
     }
 
     this._wrapWindowOpen(document.defaultView);

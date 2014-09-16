@@ -380,7 +380,8 @@ var RequestUtil = {
       checkedOrigins[originURI] = true;
     }
     this._addAllDeniedRequestsFromURI(originURI, reqSet);
-    var allowedRequests = this._rpService._allowedRequests.getOriginUri(originURI);
+    var allowedRequests = this._rpService._requestProcessor.
+        _allowedRequests.getOriginUri(originURI);
     if (allowedRequests) {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
@@ -406,7 +407,7 @@ var RequestUtil = {
     Logger
       .dump("Looking for other origins within denied requests from "
               + originURI);
-    var requests = this._rpService._rejectedRequests.getOriginUri(originURI);
+    var requests = this._rpService._requestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {

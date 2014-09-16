@@ -15,6 +15,9 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+var prefsChangedObserver = null;
+
+
 function updateDisplay() {
   var defaultallow = rpService.prefs.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
@@ -68,4 +71,12 @@ function onload() {
         rpService._prefService.savePrefFile(null);
       }
   );
+
+  prefsChangedObserver = new common.PrefsChangedObserver(
+      function(subject, topic, data) {
+        updateDisplay();
+      });
+  window.addEventListener("beforeunload", function(event) {
+    prefsChangedObserver.unregister();
+  });
 }

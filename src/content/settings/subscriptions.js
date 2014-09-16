@@ -20,6 +20,9 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+var prefsChangedObserver = null;
+
+
 function updateDisplay() {
   var userSubs = rpService._subscriptions;
   var subsInfo = userSubs.getSubscriptionInfo();
@@ -78,4 +81,12 @@ function onload() {
   for (var i = 0; i < hideElements.length; i++) {
     hideElements[i].style.display = 'none';
   }
+
+  prefsChangedObserver = new common.PrefsChangedObserver(
+      function(subject, topic, data) {
+        updateDisplay();
+      });
+  window.addEventListener("beforeunload", function(event) {
+    prefsChangedObserver.unregister();
+  });
 }

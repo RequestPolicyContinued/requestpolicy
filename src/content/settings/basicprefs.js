@@ -12,6 +12,9 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+var prefsChangedObserver = null;
+
+
 function updateDisplay() {
   document.getElementById('pref-indicateBlockedObjects').checked =
       rpService.prefs.getBoolPref('indicateBlockedObjects');
@@ -54,4 +57,12 @@ function onload() {
         rpService._prefService.savePrefFile(null);
       }
   );
+
+  prefsChangedObserver = new common.PrefsChangedObserver(
+      function(subject, topic, data) {
+        updateDisplay();
+      });
+  window.addEventListener("beforeunload", function(event) {
+    prefsChangedObserver.unregister();
+  });
 }

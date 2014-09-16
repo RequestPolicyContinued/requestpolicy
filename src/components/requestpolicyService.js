@@ -609,6 +609,8 @@ RequestPolicyService.prototype = {
 
     this._rootPrefs = this._prefService.getBranch("")
         .QueryInterface(CI.nsIPrefBranch2);
+    this._rootPrefs.addObserver("network.prefetch-next", this, false);
+    this._rootPrefs.addObserver("network.dns.disablePrefetch", this, false);
   },
 
   _initVersionInfo : function() {
@@ -677,6 +679,9 @@ RequestPolicyService.prototype = {
       default :
         break;
     }
+    var observerService = CC['@mozilla.org/observer-service;1'].
+        getService(CI.nsIObserverService);
+    observerService.notifyObservers(null, "requestpolicy-prefs-changed", null);
   },
 
   _loadLibraries : function() {

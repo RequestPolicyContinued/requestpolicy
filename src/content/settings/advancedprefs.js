@@ -22,6 +22,9 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+var prefsChangedObserver = null;
+
+
 function updateDisplay() {
   // Link prefetch.
   document.getElementById('pref-linkPrefetch').checked =
@@ -43,6 +46,8 @@ function updateDisplay() {
   document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').checked =
       rpService.prefs.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
 
+  // TODO: Create a class which acts as an API for preferences and which ensures
+  // that the returned value is always a valid value for "string" preferences.
   var sorting = rpService.prefs.getCharPref('menu.sorting');
 
   if (sorting == document.getElementById('sortByNumRequests').value) {
@@ -126,4 +131,11 @@ function onload() {
       }
   );
 
+  prefsChangedObserver = new common.PrefsChangedObserver(
+      function(subject, topic, data) {
+        updateDisplay();
+      });
+  window.addEventListener("beforeunload", function(event) {
+    prefsChangedObserver.unregister();
+  });
 }

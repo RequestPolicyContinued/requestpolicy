@@ -211,22 +211,13 @@ function addRuleHelper() {
 
 function RulesChangedObserver()
 {
-  this.register();
+  common.Observer.call(this, function(subject, topic, data) {
+    var search = document.getElementById('rulesearch');
+    populateRuleTable(search.value);
+  }, "requestpolicy-rules-changed");
 }
-RulesChangedObserver.prototype.observe = function(subject, topic, data) {
-  var search = document.getElementById('rulesearch');
-  populateRuleTable(search.value);
-};
-RulesChangedObserver.prototype.register = function() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.addObserver(this, "requestpolicy-rules-changed", false);
-};
-RulesChangedObserver.prototype.unregister = function() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.removeObserver(this, "requestpolicy-rules-changed");
-};
+RulesChangedObserver.prototype = Object.create(common.Observer.prototype);
+RulesChangedObserver.prototype.constructor = RulesChangedObserver;
 
 function onload() {
   var search = document.getElementById('rulesearch');
@@ -242,9 +233,9 @@ function onload() {
   if (rpService.oldRulesExist()) {
     $('#oldrulesexist').show();
   }
-  rulesChangedObserver = new RulesChangedObserver();
-}
 
-function onunload() {
-  rulesChangedObserver.unregister();
+  rulesChangedObserver = new RulesChangedObserver();
+  window.addEventListener("beforeunload", function(event) {
+    rulesChangedObserver.unregister();
+  });
 }

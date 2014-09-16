@@ -216,6 +216,30 @@ common.localize = function(stringNames) {
   });
 };
 
+
+common.Observer = function(functionToCall, aTopic) {
+  this.topic = aTopic;
+  this.observe = functionToCall;
+  this.register();
+}
+common.Observer.prototype.register = function() {
+  var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
+  observerService.addObserver(this, this.topic, false);
+};
+common.Observer.prototype.unregister = function() {
+  var observerService = Components.classes["@mozilla.org/observer-service;1"].
+      getService(Components.interfaces.nsIObserverService);
+  observerService.removeObserver(this, this.topic);
+};
+
+common.PrefsChangedObserver = function(functionToCall)
+{
+  common.Observer.call(this, functionToCall, "requestpolicy-prefs-changed");
+}
+common.PrefsChangedObserver.prototype = Object.create(common.Observer.prototype);
+common.PrefsChangedObserver.prototype.constructor = common.PrefsChangedObserver;
+
 $(function() {
   common.localize(COMMON_STRINGS);
 });

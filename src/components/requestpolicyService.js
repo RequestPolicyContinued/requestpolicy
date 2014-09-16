@@ -162,19 +162,24 @@ RequestPolicyService.prototype = {
     try {
       this._loadLibraries();
 
-      this._rejectedRequests = new requestpolicy.mod.RequestSet();
-      this._allowedRequests = new requestpolicy.mod.RequestSet();
+      try {
+        this._rejectedRequests = new requestpolicy.mod.RequestSet();
+        this._allowedRequests = new requestpolicy.mod.RequestSet();
 
-      this._initContentPolicy();
-      this._register();
-      this._initializePrefSystem();
-      this._initializePrivateBrowsing();
-      // Note that we don't load user preferences at this point because the user
-      // preferences may not be ready. If we tried right now, we may get the
-      // default preferences.
-    } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_POLICY,
-          "exception from _init(): " + e);
+        this._initContentPolicy();
+        this._register();
+        this._initializePrefSystem();
+        this._initializePrivateBrowsing();
+        // Note that we don't load user preferences at this point because the user
+        // preferences may not be ready. If we tried right now, we may get the
+        // default preferences.
+      } catch (e) {
+        requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_POLICY,
+            "exception from _init(): " + e);
+      }
+    } catch(e) {
+      // in case the libraries could not be loaded, the Logger is not available
+      dump("[RequestPolicy] [SEVERE] [POLICY] exception from _init(): " + e + "\n");
     }
   },
 

@@ -52,7 +52,7 @@ requestpolicy.requestLogTreeView = {
   },
 
   clear : function(e) {
-    var count = this._getRowCount();
+    var count = this.rowCount;
     if (count == 0) {
       return;
     }
@@ -108,16 +108,27 @@ requestpolicy.requestLogTreeView = {
   },
 
   // Start of interface.
+  // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
 
-  // rowCount --- we define _getRowCount() as an (old-style) getter for this.
-  _getRowCount : function() {
+  /**
+   * "This property should be set to the total number of rows in the tree."
+   * (getter function)
+   */
+  get rowCount () {
     return this._visibleData.length;
   },
 
+  /**
+   * "This method should return the text contents at the specified row and
+   * column."
+   */
   setTree : function(_treebox) {
     this._treebox = _treebox;
   },
 
+  /**
+   * This method is called once to set the tree element on the view.
+   */
   getCellText : function(index, column) {
     // Row 0 is actually the last element in the array so that we don't have to
     // unshift() the array and can just push().
@@ -230,10 +241,6 @@ requestpolicy.requestLogTreeView = {
   }
 
 };
-
-requestpolicy.requestLogTreeView.__defineGetter__("rowCount", function() {
-      return this._getRowCount();
-    });
 
 // Initialize when the window DOM is loaded.
 addEventListener("load", function(event) {

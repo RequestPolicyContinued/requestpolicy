@@ -886,7 +886,7 @@ requestpolicy.overlay = {
     requestpolicy.overlay._rpService.
         registerLinkClicked(event.currentTarget.ownerDocument.URL,
             event.currentTarget.href);
-  }
+  },
 
   /**
    * Perform the actions required once the DOM is loaded. This may be being

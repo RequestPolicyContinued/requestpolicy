@@ -665,26 +665,32 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
     dest = destAsUri;
   }
 
+  var request = new requestpolicy.mod.RedirectRequest(originURI, dest);
+  this.processRedirect(request, httpChannel);
+};
+
+RequestProcessor.prototype.processRedirect = function(request, httpChannel) {
+  var originURI = request.originURI;
+  var destURI = request.destURI;
+
   // Ignore redirects to javascript. The browser will ignore them, as well.
-  if (requestpolicy.mod.DomainUtil.getUriObject(dest)
+  if (requestpolicy.mod.DomainUtil.getUriObject(destURI)
         .schemeIs("javascript")) {
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
-        "Ignoring redirect to javascript URI <" + dest + ">");
+        "Ignoring redirect to javascript URI <" + destURI + ">");
     return;
   }
-
-  var request = new requestpolicy.mod.RedirectRequest(originURI, dest);
 
   request.requestResult = this.checkRedirect(request);
   if (true === request.requestResult.isAllowed) {
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-            + headerType + "' header to <" + dest + "> " + "from <" + originURI
+            + headerType + "' header to <" + destURI + "> " + "from <" + originURI
             + ">. Same hosts or allowed origin/destination.");
-    this._recordAllowedRequest(request.originURI, request.destURI, false,
+    this._recordAllowedRequest(originURI, destURI, false,
         request.requestResult);
-    this._allowedRedirectsReverse[dest] = originURI;
+    this._allowedRedirectsReverse[destURI] = originURI;
 
     // If this was a link click or a form submission, we register an
     // additional click/submit with the original source but with a new
@@ -699,18 +705,18 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
             "This redirect was from a link click."
-                + " Registering an additional click to <" + dest + "> "
+                + " Registering an additional click to <" + destURI + "> "
                 + "from <" + realOrigin + ">");
-        this.registerLinkClicked(realOrigin, dest);
+        this.registerLinkClicked(realOrigin, destURI);
 
       } else if (this._submittedForms[realOrigin]
           && this._submittedForms[realOrigin][originURI.split("?")[0]]) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
             "This redirect was from a form submission."
-                + " Registering an additional form submission to <" + dest
+                + " Registering an additional form submission to <" + destURI
                 + "> " + "from <" + realOrigin + ">");
-        this.registerFormSubmitted(realOrigin, dest);
+        this.registerFormSubmitted(realOrigin, destURI);
       }
     }
 
@@ -721,7 +727,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
   try {
     if (!this._rpService._blockingDisabled) {
       httpChannel.setResponseHeader(headerType, "", false);
-      this._blockedRedirects[originURI] = dest;
+      this._blockedRedirects[originURI] = destURI;
 
       try {
         contentDisp = httpChannel.getResponseHeader("Content-Disposition");
@@ -747,7 +753,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
       // submission if we can. It may indicate, for example, a link that
       // was to download a file but a redirect got blocked at some point.
       var initialOrigin = originURI;
-      var initialDest = dest;
+      var initialDest = destURI;
       // To prevent infinite loops, bound the number of iterations.
       // Note that an apparent redirect loop doesn't mean a problem with a
       // website as the site may be using other information, such as cookies
@@ -770,7 +776,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
         }
 
         this._notifyRequestObserversOfBlockedLinkClickRedirect(sourcePage,
-            originURI, dest);
+            originURI, destURI);
 
         // Maybe we just record the clicked link and each step in between as
         // an allowed request, and the final blocked one as a blocked request.
@@ -785,16 +791,16 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
       // // TODO: implement for form submissions whose redirects are blocked
       // }
 
-      this._recordRejectedRequest(originURI, dest, result);
+      this._recordRejectedRequest(originURI, destURI, result);
     }
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
-            + headerType + "' header to <" + dest + ">"
+            + headerType + "' header to <" + destURI + ">"
             + " found in response from <" + originURI + ">");
   } catch (e) {
     requestpolicy.mod.Logger.severe(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "Failed removing "
-            + "'" + headerType + "' header to <" + dest + ">"
+            + "'" + headerType + "' header to <" + destURI + ">"
             + "  in response from <" + originURI + ">." + e);
   }
 };

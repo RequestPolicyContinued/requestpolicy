@@ -20,15 +20,73 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["Request"];
+var EXPORTED_SYMBOLS = [
+  "Request",
+  "NormalRequest",
+  "RedirectRequest",
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
-Components.utils.import("resource://requestpolicy/Logger.jsm");
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
+  "REQUEST_TYPE_NORMAL",
+  "REQUEST_TYPE_REDIRECT"
+];
+
+const CI = Components.interfaces;
+const CC = Components.classes;
+
+const REQUEST_TYPE_NORMAL = 1;
+const REQUEST_TYPE_REDIRECT = 2;
 
 
-function Request(aContentType, aContentLocation, aRequestOrigin, aContext,
+if (!requestpolicy) {
+  var requestpolicy = {
+    mod : {}
+  };
+}
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
+    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm",
+    requestpolicy.mod);
+
+
+
+
+function Request(originURI, destURI, requestType) {
+  this.originURI = originURI;
+  this.destURI = destURI;
+  this.requestType = requestType;
+
+  // TODO: Merge "RequestResult" into this class.
+  this.requestResult = undefined;
+}
+
+Request.prototype.setOriginURI = function(originURI) {
+  this.originURI = originURI;
+};
+
+Request.prototype.setDestURI = function(destURI) {
+  this.destURI = destURI;
+};
+
+Request.prototype.detailsToString = function() {
+  // Note: try not to cause side effects of toString() during load, so "<HTML
+  // Element>" is hard-coded.
+  return "destination: " + this.destURI + ", origin: " + this.originURI;
+};
+
+
+
+
+function NormalRequest(aContentType, aContentLocation, aRequestOrigin, aContext,
     aMimeTypeGuess, aExtra, aRequestPrincipal) {
+  Request.call(this,
+      // About originURI and destURI:
+      // We don't need to worry about ACE formatted IDNs because it seems
+      // that they'll automatically be converted to UTF8 format before we
+      // even get here, as long as they're valid and Mozilla allows the TLD
+      // to have UTF8 formatted IDNs.
+      aRequestOrigin ? aRequestOrigin.specIgnoringRef : undefined, // originURI
+      aContentLocation.specIgnoringRef, // destURI
+      REQUEST_TYPE_NORMAL);
+
   this.aContentType = aContentType;
   this.aContentLocation = aContentLocation;
   this.aRequestOrigin = aRequestOrigin;
@@ -38,10 +96,34 @@ function Request(aContentType, aContentLocation, aRequestOrigin, aContext,
   this.aRequestPrincipal = aRequestPrincipal;
 
   this.shouldLoadResult = undefined;
-
-  // TODO: Merge "RequestResult" into this class.
-  this.requestResult = undefined;
 }
+NormalRequest.prototype = Object.create(Request.prototype);
+NormalRequest.prototype.constructor = Request;
+
+NormalRequest.prototype.setOriginURI = function(originURI) {
+  this.originURI = originURI;
+  this.aRequestOrigin = requestpolicy.mod.DomainUtil.
+          getUriObject(originURI);
+};
+
+NormalRequest.prototype.setDestURI = function(destURI) {
+  this.destURI = destURI;
+  this.aContentLocation = requestpolicy.mod.DomainUtil.
+      getUriObject(destURI);
+};
+
+NormalRequest.prototype.detailsToString = function() {
+  // Note: try not to cause side effects of toString() during load, so "<HTML
+  // Element>" is hard-coded.
+  return "type: " + this.aContentType +
+      ", destination: " + this.destURI +
+      ", origin: " + this.originURI +
+      ", context: " + ((this.aContext) instanceof (CI.nsIDOMHTMLElement)
+          ? "<HTML Element>"
+          : this.aContext) +
+      ", mime: " + this.aMimeTypeGuess +
+      ", " + this.aExtra;
+};
 
 /**
   * Determines if a request is only related to internal resources.
@@ -49,7 +131,7 @@ function Request(aContentType, aContentLocation, aRequestOrigin, aContext,
   * @return {Boolean} true if the request is only related to internal
   *         resources.
   */
-Request.prototype.isInternal = function() {
+NormalRequest.prototype.isInternal = function() {
   // Note: Don't OK the origin scheme "moz-nullprincipal" without further
   // understanding. It appears to be the source when test8.html is used. That
   // is, javascript redirect to a "javascript:" url that creates the entire
@@ -119,3 +201,12 @@ Request.prototype.isInternal = function() {
 
   return false;
 };
+
+
+
+
+function RedirectRequest(originURI, destURI) {
+  Request.call(this, originURI, destURI, REQUEST_TYPE_REDIRECT);
+}
+RedirectRequest.prototype = Object.create(Request.prototype);
+RedirectRequest.prototype.constructor = Request;

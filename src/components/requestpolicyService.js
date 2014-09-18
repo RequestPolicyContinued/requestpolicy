@@ -1079,7 +1079,7 @@ RequestPolicyService.prototype = {
     // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
         aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-      var request = new requestpolicy.mod.Request(
+      var request = new requestpolicy.mod.NormalRequest(
           aContentType, aContentLocation, aRequestOrigin, aContext,
           aMimeTypeGuess, aExtra, aRequestPrincipal);
       return this._requestProcessor.process(request);

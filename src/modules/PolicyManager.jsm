@@ -25,8 +25,6 @@ var EXPORTED_SYMBOLS = [
   "RULES_CHANGED_TOPIC",
   "RequestResult",
   "Destination",
-  "REQUEST_TYPE_NORMAL",
-  "REQUEST_TYPE_REDIRECT",
   "REQUEST_REASON_USER_POLICY",
   "REQUEST_REASON_SUBSCRIPTION_POLICY",
   "REQUEST_REASON_DEFAULT_POLICY",
@@ -94,11 +92,6 @@ function notifyRulesChanged() {
 // at load time and having to remove them, then having to remove them again
 // after an update.
 
-
-// Note: request types are neither fully implemented nor used yet
-// TODO: implement when needed
-const REQUEST_TYPE_NORMAL = 1;
-const REQUEST_TYPE_REDIRECT = 2;
 
 
 const REQUEST_REASON_USER_POLICY           = 1;

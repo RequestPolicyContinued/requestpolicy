@@ -46,6 +46,8 @@ Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Request.jsm",
+    requestpolicy.mod);
 
 
 
@@ -103,6 +105,12 @@ function RequestProcessor(rpService) {
 
   this._requestObservers = [];
 }
+
+/**
+ * Process a NormalRequest.
+ *
+ * @param {NormalRequest} request
+ */
 RequestProcessor.prototype.process = function(request) {
   //requestpolicy.mod.Logger.vardump(request.aRequestOrigin);
   //requestpolicy.mod.Logger.vardump(request.aContentLocation);
@@ -112,12 +120,8 @@ RequestProcessor.prototype.process = function(request) {
       return CP_OK;
     }
 
-    // We don't need to worry about ACE formatted IDNs because it seems
-    // that they'll automatically be converted to UTF8 format before we
-    // even get here, as long as they're valid and Mozilla allows the TLD
-    // to have UTF8 formatted IDNs.
-    var originURI = request.aRequestOrigin.specIgnoringRef;
-    var destURI = request.aContentLocation.specIgnoringRef;
+    var originURI = request.originURI;
+    var destURI = request.destURI;
 
     // Fx 16 changed the following: 1) we should be able to count on the
     // referrer (aRequestOrigin) being set to something besides
@@ -148,8 +152,7 @@ RequestProcessor.prototype.process = function(request) {
           "Considering moz-nullprincipal origin <"
               + originURI + "> to be origin <" + newOriginURI + ">");
       originURI = newOriginURI;
-      request.aRequestOrigin = requestpolicy.mod.DomainUtil.
-          getUriObject(originURI);
+      request.setOriginURI(originURI);
     }
 
     if (request.aRequestOrigin.scheme == "view-source") {
@@ -159,8 +162,7 @@ RequestProcessor.prototype.process = function(request) {
         "Considering view-source origin <"
           + originURI + "> to be origin <" + newOriginURI + ">");
       originURI = newOriginURI;
-      request.aRequestOrigin = requestpolicy.mod.DomainUtil.
-          getUriObject(originURI);
+      request.setOriginURI(originURI);
     }
 
     if (request.aContentLocation.scheme == "view-source") {
@@ -178,8 +180,7 @@ RequestProcessor.prototype.process = function(request) {
             "Considering view-source destination <"
                 + destURI + "> to be destination <" + newDestURI + ">");
         destURI = newDestURI;
-        request.aContentLocation = requestpolicy.mod.DomainUtil.
-            getUriObject(destURI);
+        request.setDestURI(destURI);
       }
     }
 
@@ -199,14 +200,9 @@ RequestProcessor.prototype.process = function(request) {
             requestpolicy.mod.Logger.TYPE_CONTENT, "Considering origin <"
                 + originURI + "> to be origin <" + newOriginURI + ">");
         originURI = newOriginURI;
-        request.aRequestOrigin = requestpolicy.mod.DomainUtil.
-            getUriObject(originURI);
+        request.setOriginURI(originURI);
       }
     }
-
-    // originURI and destURI are not changed anymore
-    request.destURI = destURI;
-    request.originURI = originURI;
 
 
     if (this._isDuplicateRequest(request)) {
@@ -626,7 +622,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
 
   // For origins that are IDNs, this will always be in ACE format. We want
   // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
-  var origin = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name);
+  var originURI = requestpolicy.mod.DomainUtil.formatIDNUri(httpChannel.name);
 
   // Allow redirects of requests from privileged code.
   if (!this._isContentRequest(httpChannel)) {
@@ -635,20 +631,20 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
     var originPath = requestpolicy.mod.DomainUtil.getPath(httpChannel.name);
     // We always have to check "/favicon.ico" because Firefox will use this
     // as a default path and that request won't pass through shouldLoad().
-    if (originPath == "/favicon.ico" || this._faviconRequests[origin]) {
+    if (originPath == "/favicon.ico" || this._faviconRequests[originURI]) {
       // If the redirected request is allowed, we need to know that was a
       // favicon request in case it is further redirected.
       this._faviconRequests[dest] = true;
       requestpolicy.mod.Logger.info(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "'" + headerType
-              + "' header to <" + dest + "> " + "from <" + origin
+              + "' header to <" + dest + "> " + "from <" + originURI
               + "> appears to be a redirected favicon request. "
               + "This will be treated as a content request.");
     } else {
       requestpolicy.mod.Logger.warning(
           requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
               + headerType + "' header to <" + dest + "> " + "from <"
-              + origin + ">. Original request is from privileged code.");
+              + originURI + ">. Original request is from privileged code.");
       return;
     }
   }
@@ -659,12 +655,12 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
   // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
   // We add this to fix https://www.requestpolicy.com/dev/ticket/39.
   if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
-    var destAsUri = requestpolicy.mod.DomainUtil.determineRedirectUri(origin,
+    var destAsUri = requestpolicy.mod.DomainUtil.determineRedirectUri(originURI,
         dest);
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
         "Redirect destination is not a valid uri, assuming dest <" + dest
-            + "> from origin <" + origin + "> is actually dest <" + destAsUri
+            + "> from origin <" + originURI + "> is actually dest <" + destAsUri
             + ">.");
     dest = destAsUri;
   }
@@ -678,14 +674,17 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
     return;
   }
 
-  var result = this.checkRedirect(origin, dest);
-  if (true === result.isAllowed) {
+  var request = new requestpolicy.mod.RedirectRequest(originURI, dest);
+
+  request.requestResult = this.checkRedirect(request);
+  if (true === request.requestResult.isAllowed) {
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-            + headerType + "' header to <" + dest + "> " + "from <" + origin
+            + headerType + "' header to <" + dest + "> " + "from <" + originURI
             + ">. Same hosts or allowed origin/destination.");
-    this._recordAllowedRequest(origin, dest, false, result);
-    this._allowedRedirectsReverse[dest] = origin;
+    this._recordAllowedRequest(request.originURI, request.destURI, false,
+        request.requestResult);
+    this._allowedRedirectsReverse[dest] = originURI;
 
     // If this was a link click or a form submission, we register an
     // additional click/submit with the original source but with a new
@@ -696,7 +695,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
       var realOrigin = httpChannel.referrer.spec;
 
       if (this._clickedLinks[realOrigin]
-          && this._clickedLinks[realOrigin][origin]) {
+          && this._clickedLinks[realOrigin][originURI]) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
             "This redirect was from a link click."
@@ -705,7 +704,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
         this.registerLinkClicked(realOrigin, dest);
 
       } else if (this._submittedForms[realOrigin]
-          && this._submittedForms[realOrigin][origin.split("?")[0]]) {
+          && this._submittedForms[realOrigin][originURI.split("?")[0]]) {
         requestpolicy.mod.Logger.warning(
             requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
             "This redirect was from a form submission."
@@ -722,7 +721,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
   try {
     if (!this._rpService._blockingDisabled) {
       httpChannel.setResponseHeader(headerType, "", false);
-      this._blockedRedirects[origin] = dest;
+      this._blockedRedirects[originURI] = dest;
 
       try {
         contentDisp = httpChannel.getResponseHeader("Content-Disposition");
@@ -747,7 +746,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
       // We try to trace the blocked redirect back to a link click or form
       // submission if we can. It may indicate, for example, a link that
       // was to download a file but a redirect got blocked at some point.
-      var initialOrigin = origin;
+      var initialOrigin = originURI;
       var initialDest = dest;
       // To prevent infinite loops, bound the number of iterations.
       // Note that an apparent redirect loop doesn't mean a problem with a
@@ -771,7 +770,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
         }
 
         this._notifyRequestObserversOfBlockedLinkClickRedirect(sourcePage,
-            origin, dest);
+            originURI, dest);
 
         // Maybe we just record the clicked link and each step in between as
         // an allowed request, and the final blocked one as a blocked request.
@@ -786,17 +785,17 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
       // // TODO: implement for form submissions whose redirects are blocked
       // }
 
-      this._recordRejectedRequest(origin, dest, result);
+      this._recordRejectedRequest(originURI, dest, result);
     }
     requestpolicy.mod.Logger.warning(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "** BLOCKED ** '"
             + headerType + "' header to <" + dest + ">"
-            + " found in response from <" + origin + ">");
+            + " found in response from <" + originURI + ">");
   } catch (e) {
     requestpolicy.mod.Logger.severe(
         requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT, "Failed removing "
             + "'" + headerType + "' header to <" + dest + ">"
-            + "  in response from <" + origin + ">." + e);
+            + "  in response from <" + originURI + ">." + e);
   }
 };
 
@@ -979,12 +978,12 @@ RequestProcessor.prototype.registerAllowedRedirect = function(originUrl,
   }
 };
 
-RequestProcessor.prototype.isAllowedRedirect = function(originUri,
-    destinationUri) {
-  return (true === this.checkRedirect(originUri, destinationUri).isAllowed);
+RequestProcessor.prototype.isAllowedRedirect = function(originURI, destURI) {
+  var request = new requestpolicy.mod.RedirectRequest(originURI, destURI);
+  return (true === this.checkRedirect(request).isAllowed);
 };
 
-RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
+RequestProcessor.prototype.checkRedirect = function(request) {
   // TODO: Find a way to get rid of repitition of code between this and
   // shouldLoad().
 
@@ -994,11 +993,14 @@ RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
   // This is not including link clicks, form submissions, and user-allowed
   // redirects.
 
-  var originUriObj = requestpolicy.mod.DomainUtil.getUriObject(originUri);
-  var destUriObj = requestpolicy.mod.DomainUtil.getUriObject(destinationUri);
+  var originURI = request.originURI;
+  var destURI = request.destURI;
+
+  var originURIObj = requestpolicy.mod.DomainUtil.getUriObject(originURI);
+  var destURIObj = requestpolicy.mod.DomainUtil.getUriObject(destURI);
 
   var result = this._rpService._policyMgr.checkRequestAgainstUserPolicies(
-      originUriObj, destUriObj);
+      originURIObj, destURIObj);
   result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
   // For now, we always give priority to deny rules.
   if (result.denyRulesExist()) {
@@ -1011,7 +1013,7 @@ RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
   }
 
   var result = this._rpService._policyMgr.
-      checkRequestAgainstSubscriptionPolicies(originUriObj, destUriObj);
+      checkRequestAgainstSubscriptionPolicies(originURIObj, destURIObj);
   result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
   // For now, we always give priority to deny rules.
   if (result.denyRulesExist()) {
@@ -1023,8 +1025,8 @@ RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
     return result;
   }
 
-  if (destinationUri[0] && destinationUri[0] == '/'
-      || destinationUri.indexOf(":") == -1) {
+  if (destURI[0] && destURI[0] == '/'
+      || destURI.indexOf(":") == -1) {
     // Redirect is to a relative url.
     // ==> allow.
     return new requestpolicy.mod.RequestResult(
@@ -1035,8 +1037,8 @@ RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
 
   for (var i = 0; i < this._rpService._compatibilityRules.length; i++) {
     var rule = this._rpService._compatibilityRules[i];
-    var allowOrigin = rule[0] ? originUri.indexOf(rule[0]) == 0 : true;
-    var allowDest = rule[1] ? destinationUri.indexOf(rule[1]) == 0 : true;
+    var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
+    var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
     if (allowOrigin && allowDest) {
       return new requestpolicy.mod.RequestResult(
         true,
@@ -1046,7 +1048,7 @@ RequestProcessor.prototype.checkRedirect = function(originUri, destinationUri) {
     }
   }
 
-  var result = this._checkByDefaultPolicy(originUri, destinationUri);
+  var result = this._checkByDefaultPolicy(originURI, destURI);
   result.requestType = requestpolicy.mod.REQUEST_TYPE_REDIRECT;
   return result;
 };
@@ -1088,24 +1090,10 @@ RequestProcessor.prototype.removeRequestObserver = function(observer) {
 
 
 
-RequestProcessor.prototype._requestDetailsToString = function(request) {
-  // Note: try not to cause side effects of toString() during load, so "<HTML
-  // Element>" is hard-coded.
-  return "type: " + request.aContentType +
-      ", destination: " + request.dest +
-      ", origin: " + request.origin +
-      ", context: " + ((request.aContext) instanceof (CI.nsIDOMHTMLElement)
-          ? "<HTML Element>"
-          : request.aContext) +
-      ", mime: " + request.aMimeTypeGuess +
-      ", " + request.aExtra;
-};
-
 // We always call this from shouldLoad to reject a request.
 RequestProcessor.prototype.reject = function(reason, request) {
   requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
-      "** BLOCKED ** reason: "
-      + reason + ". " + this._requestDetailsToString(request));
+      "** BLOCKED ** reason: " + reason + ". " + request.detailsToString());
 
   if (this._rpService._blockingDisabled) {
     return CP_OK;
@@ -1145,8 +1133,7 @@ RequestProcessor.prototype._recordRejectedRequest = function(request) {
  */
 RequestProcessor.prototype.accept = function(reason, request, unforbidable) {
   requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_CONTENT,
-      "** ALLOWED ** reason: "
-      + reason + ". " + this._requestDetailsToString(request));
+      "** ALLOWED ** reason: " + reason + ". " + request.detailsToString());
 
   this._cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
   // We aren't recording the request so it doesn't show up in the menu, but we
@@ -1164,18 +1151,12 @@ RequestProcessor.prototype.accept = function(reason, request, unforbidable) {
 
 RequestProcessor.prototype._recordAllowedRequest = function(originUri, destUri,
     isInsert, requestResult) {
-  var destIdentifier = this._rpService.getUriIdentifier(destUri);
-
-  if (isInsert == undefined) {
-    isInsert = false;
-  }
-
   // Reset the accepted and rejected requests originating from this
   // destination. That is, if this accepts a request to a uri that may itself
   // originate further requests, reset the information about what that page is
   // accepting and rejecting.
   // If "isInsert" is set, then we don't want to clear the destUri info.
-  if (!isInsert) {
+  if (true !== isInsert) {
     this._allowedRequests.removeOriginUri(destUri);
     this._rejectedRequests.removeOriginUri(destUri);
   }

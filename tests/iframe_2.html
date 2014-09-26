@@ -2,13 +2,13 @@
 <head>
 
 <script language="JavaScript" type="text/javascript">
-	function makeFrame(url) {
-		ifrm = document.createElement("iframe");
-		ifrm.setAttribute("src", url);
-		ifrm.style.width = 300 + "px";
-		ifrm.style.height = 200 + "px";
-		document.body.appendChild(ifrm);
-	}
+  function makeFrame(url) {
+    ifrm = document.createElement("iframe");
+    ifrm.setAttribute("src", url);
+    ifrm.style.width = 300 + "px";
+    ifrm.style.height = 200 + "px";
+    document.body.appendChild(ifrm);
+  }
 </script>
 </head>
 <body>
@@ -17,14 +17,14 @@
 with a cross-site url.</p>
 
 <script>
-	makeFrame("same-site-request-from-javascript-generated-iframe.html");
+  makeFrame("same-site-request-from-javascript-generated-iframe.html");
 </script>
 
 <br />
 <br />
 
 <script>
-	makeFrame("http://127.0.0.1/cross-site-request-from-javascript-generated-iframe.html");
+  makeFrame("http://www.otherdomain.test/cross-site-request-from-javascript-generated-iframe.html");
 </script>
 
 </body>

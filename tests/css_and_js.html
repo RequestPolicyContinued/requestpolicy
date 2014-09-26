@@ -5,19 +5,19 @@
 
 <p>On this page there are:</p>
 <ul>
-	<li>CSS-initiated @import requests</li>
-	<li>JavaScript-initiated non-XHR requests</li>
+  <li>CSS-initiated @import requests</li>
+  <li>JavaScript-initiated non-XHR requests</li>
 </ul>
 
 <style>
-	@import "local-css-imported-file.css";
-	@import "http://127.0.0.1/remote-css-imported-file.css";
+  @import "local-css-imported-file.css";
+  @import "http://www.otherdomain.test/remote-css-imported-file.css";
 </style>
 
 <script>
-	img = new Image();
-	img.src = "local-javascript-loaded-image.jpg";
-	img.src = "http://127.0.0.1/remote-javascript-loaded-image.jpg";
+  img = new Image();
+  img.src = "local-javascript-loaded-image.jpg";
+  img.src = "http://www.otherdomain.test/remote-javascript-loaded-image.jpg";
 </script>
 
 </body>

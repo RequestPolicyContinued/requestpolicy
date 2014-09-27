@@ -4,13 +4,13 @@
 
 "use strict";
 
-var {assert, expect} = require("../../../../../../lib/assertions");
-var prefs = require("../../../../../lib/prefs");
-var tabs = require("../../../../../lib/tabs");
-var utils = require("../../../../../../lib/utils");
+var {assert, expect} = require("../../../../../../../lib/assertions");
+var prefs = require("../../../../../../lib/prefs");
+var tabs = require("../../../../../../lib/tabs");
+var utils = require("../../../../../../../lib/utils");
 
-var rpUtils = require("../../lib/rp-utils");
-var rpConst = require("../../lib/constants");
+var rpUtils = require("../../../lib/rp-utils");
+var rpConst = require("../../../lib/constants");
 
 const TEST_URL = "http://www.maindomain.test/link_1.html";
 

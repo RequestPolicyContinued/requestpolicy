@@ -700,19 +700,19 @@ RequestPolicyService.prototype = {
   },
 
   registerHistoryRequest : function(destinationUrl) {
-    this._requestProcessor.registerHistoryRequest;
+    this._requestProcessor.registerHistoryRequest(destinationUrl);
   },
 
   registerFormSubmitted : function(originUrl, destinationUrl) {
-    this._requestProcessor.registerFormSubmitted;
+    this._requestProcessor.registerFormSubmitted(originUrl, destinationUrl);
   },
 
   registerLinkClicked : function(originUrl, destinationUrl) {
-    this._requestProcessor.registerLinkClicked;
+    this._requestProcessor.registerLinkClicked(originUrl, destinationUrl);
   },
 
   registerAllowedRedirect : function(originUrl, destinationUrl) {
-    this._requestProcessor.registerAllowedRedirect;
+    this._requestProcessor.registerAllowedRedirect(originUrl, destinationUrl);
   },
 
   setBlockingDisabled : function(disabled) {

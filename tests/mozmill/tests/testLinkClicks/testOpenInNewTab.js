@@ -9,9 +9,8 @@ var prefs = require("../../../../../lib/prefs");
 var tabs = require("../../../../../lib/tabs");
 var utils = require("../../../../../../lib/utils");
 
-const PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow";
+var rpConst = require("../../lib/constants");
 
-const REDIRECT_NOTIFICATION_VALUE = "request-policy-meta-redirect";
 const TEST_URL = "http://www.maindomain.test/link_1.html";
 
 
@@ -21,11 +20,11 @@ var setupModule = function(aModule) {
   aModule.tabBrowser = new tabs.tabBrowser(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 
-  prefs.preferences.setPref(PREF_DEFAULT_ALLOW, false);
+  prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
 }
 
 var teardownModule = function(aModule) {
-  prefs.preferences.clearUserPref(PREF_DEFAULT_ALLOW);
+  prefs.preferences.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
   utils.closeContentAreaContextMenu(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 }
@@ -103,7 +102,7 @@ var assertCorrectLocations = function(linkURL) {
 var assertNoRedirects = function() {
   for (let index = 0; index < tabBrowser.length; ++index) {
     var panel = tabBrowser.getTabPanelElement(index,
-        '/{"value":"' + REDIRECT_NOTIFICATION_VALUE + '"}');
+        '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
     assert.ok(false === panel.exists(),
         "Following the link didn't cause a redirect");
   }

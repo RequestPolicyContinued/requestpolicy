@@ -9,9 +9,9 @@ var prefs = require("../../../../../lib/prefs");
 var tabs = require("../../../../../lib/tabs");
 var utils = require("../../../../../../lib/utils");
 
-const PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow";
+var rpUtils = require("../../lib/rp-utils");
+var rpConst = require("../../lib/constants");
 
-const REDIRECT_NOTIFICATION_VALUE = "request-policy-meta-redirect";
 const TEST_URL = "http://www.maindomain.test/link_1.html";
 
 
@@ -23,11 +23,11 @@ var setupModule = function(aModule) {
   aModule.tabBrowser.closeAllTabs();
   aModule.otherTabBrowser = null;
 
-  prefs.preferences.setPref(PREF_DEFAULT_ALLOW, false);
+  prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
 };
 
 var teardownModule = function(aModule) {
-  prefs.preferences.clearUserPref(PREF_DEFAULT_ALLOW);
+  prefs.preferences.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
   utils.closeContentAreaContextMenu(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 
@@ -57,13 +57,7 @@ var testOpenInNewWindow = function () {
       return !!otherController;
     }, "Newly opened browser window has been found.");
 
-    // sleep as a workaround because the "busy" attribute is not present
-    // immediately.
-    controller.sleep(100);
-
-    assert.waitFor(function() {
-      return !otherTabBrowser.getTab(0).getNode().hasAttribute("busy");
-    }, "The tab has loaded");
+    rpUtils.waitForTabLoad(controller, otherTabBrowser.getTab(0));
 
     assert.equal(otherController.tabs.activeTab.location.href, linkURL,
         "The location in the new window is correct.");
@@ -139,7 +133,7 @@ var assertNoRedirects = function() {
 
   for (let i = 0; i < tabBrowsers.length; ++i) {
     var panel = tabBrowsers[i].getTabPanelElement(0,
-        '/{"value":"' + REDIRECT_NOTIFICATION_VALUE + '"}');
+        '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
     assert.ok(false === panel.exists(),
         "Following the link didn't cause a redirect");
   }

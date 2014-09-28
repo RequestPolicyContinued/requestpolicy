@@ -16,5 +16,14 @@ function waitForTabLoad(_controller, tab) {
   }, "The tab has loaded");
 }
 
+function selectText(_tabBrowser, text) {
+  var findBar = _tabBrowser.findBar;
+  findBar.open();
+  findBar.search(text);
+  findBar.value = "";
+  findBar.close(true);
+}
+
 // Export of functions
 exports.waitForTabLoad = waitForTabLoad;
+exports.selectText = selectText;

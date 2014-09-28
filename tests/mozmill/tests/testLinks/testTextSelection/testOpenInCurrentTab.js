@@ -28,33 +28,28 @@ var teardownModule = function(aModule) {
 }
 
 
-var testLinkClick = function() {
+var testOpenInCurrentTab = function() {
+  var tabIndex = tabBrowser.selectedIndex;
+
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let link = getLink();
-  let linkURL = link.getNode().href;
+  let textURL = findElement.ID(controller.window.document, "text_url_1");
+  let textURLValue = textURL.getNode().textContent;
 
-  link.click();
+  rpUtils.selectText(tabBrowser, textURLValue);
 
-  rpUtils.waitForTabLoad(controller, tabBrowser.getTab(0));
+  // perform right-click and entry selection
+  var contextMenu = controller.getMenu("#contentAreaContextMenu");
+  contextMenu.select("#context-openlinkincurrent", textURL);
 
-  var panel = tabBrowser.getTabPanelElement(0,
+  rpUtils.waitForTabLoad(controller, tabBrowser.getTab(tabIndex));
+
+  var panel = tabBrowser.getTabPanelElement(tabIndex,
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
   assert.ok(false === panel.exists(),
-      "Following the link didn't cause a redirect");
+      "Following the URL didn't cause a redirect");
 
-  assert.equal(controller.tabs.activeTab.location.href, linkURL,
+  assert.equal(controller.tabs.activeTab.location.href, textURLValue,
       "The location is correct.");
-}
-
-
-/**
- * @return {MozMillElement} The link to click on.
- */
-var getLink = function() {
-  let links = controller.window.content.document.getElementsByTagName("a");
-  assert.notEqual(links.length, 0, "A link has been found on the test page.");
-
-  return findElement.Elem(links[0]);
 }

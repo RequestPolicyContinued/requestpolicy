@@ -119,12 +119,11 @@ const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control abou
  * whether a request is allowed or not. Sometimes only the boolean value of
  * isAllowed is needed; in that case the other arguments may be unused.
  */
-function RequestResult(isAllowed, requestType, resultReason) {
+function RequestResult(isAllowed, resultReason) {
   this.matchedAllowRules = [];
   this.matchedDenyRules = [];
 
   this.isAllowed = isAllowed;
-  this.requestType = requestType;
   this.resultReason = resultReason;
 }
 RequestResult.prototype = {
@@ -132,7 +131,6 @@ RequestResult.prototype = {
   matchedDenyRules : null,
 
   isAllowed : undefined,  // whether the request will be or has been allowed
-  requestType : undefined,
   resultReason : undefined,
 
   allowRulesExist : function() {

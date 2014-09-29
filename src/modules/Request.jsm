@@ -205,8 +205,10 @@ NormalRequest.prototype.isInternal = function() {
 
 
 
-function RedirectRequest(originURI, destURI) {
+function RedirectRequest(originURI, destURI, httpHeader) {
   Request.call(this, originURI, destURI, REQUEST_TYPE_REDIRECT);
+
+  this.httpHeader = httpHeader;
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;

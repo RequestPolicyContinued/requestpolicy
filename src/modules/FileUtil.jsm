@@ -67,6 +67,7 @@ var FileUtil = {
   fileToString : function(file) {
     var stream = CC["@mozilla.org/network/file-input-stream;1"]
         .createInstance(CI.nsIFileInputStream);
+    // TODO: Handle NS_ERROR_FILE_NOT_FOUND
     stream.init(file, 0x01, 0444, 0);
     stream.QueryInterface(CI.nsILineInputStream);
 

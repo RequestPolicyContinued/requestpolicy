@@ -330,7 +330,6 @@ requestpolicy.overlay = {
         this._addLocationObserver();
         this._addHistoryObserver();
       }
-      this._showWelcomeWindow();
 
     } catch (e) {
       requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
@@ -1570,17 +1569,6 @@ requestpolicy.overlay = {
 //  showPrefetchDisablingInstructions : function() {
 //    this._openInNewTab(this._prefetchDisablingInstructionsUri);
 //  },
-
-  _showWelcomeWindow : function() {
-    if (!this._rpService.prefs.getBoolPref("welcomeWindowShown")) {
-      this._rpService.prefs.setBoolPref("welcomeWindowShown", true);
-      this._rpService._prefService.savePrefFile(null);
-      window.setTimeout(function() {
-        var tab = gBrowser.addTab("chrome://requestpolicy/content/settings/setup.html");
-        gBrowser.selectedTab = tab;
-      }, 0);
-    }
-  },
 
   openToolbarPopup : function(anchor) {
 //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,

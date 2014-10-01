@@ -512,6 +512,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
+    os.addObserver(this, "sessionstore-windows-restored", false);
     os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
@@ -536,6 +537,7 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
+      os.removeObserver(this, "sessionstore-windows-restored");
       os.removeObserver(this, "quit-application");
       os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC);
       os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC);
@@ -684,6 +686,27 @@ RequestPolicyService.prototype = {
       this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
     } catch (e) {
       // Ignore exceptions from browsers that do not support private browsing.
+    }
+  },
+
+  _showWelcomeWindow : function() {
+    if (!this.prefs.getBoolPref("welcomeWindowShown")) {
+      var url = "chrome://requestpolicy/content/settings/setup.html";
+
+      var wm = CC['@mozilla.org/appshell/window-mediator;1'].
+          getService(CI.nsIWindowMediator);
+      var windowtype = 'navigator:browser';
+      var mostRecentWindow  = wm.getMostRecentWindow(windowtype);
+
+      // the gBrowser object of the firefox window
+      var _gBrowser = mostRecentWindow.getBrowser();
+
+      if (typeof(_gBrowser.addTab) != "function") return;
+
+      _gBrowser.selectedTab = _gBrowser.addTab(url);
+
+      this.prefs.setBoolPref("welcomeWindowShown", true);
+      this._prefService.savePrefFile(null);
     }
   },
 
@@ -1008,6 +1031,9 @@ RequestPolicyService.prototype = {
         // what is needed to allow their requests.
         this._initializeExtensionCompatibility();
         this._initializeApplicationCompatibility();
+        break;
+      case "sessionstore-windows-restored":
+        this._showWelcomeWindow();
         break;
       case "private-browsing" :
         if (data == "enter") {

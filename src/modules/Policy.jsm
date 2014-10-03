@@ -38,9 +38,8 @@ Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
 Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
 
-// TODO: change these to ints. This is just useful for printing.
-const RULE_TYPE_ALLOW = "RULE_TYPE_ALLOW";
-const RULE_TYPE_DENY = "RULE_TYPE_DENY";
+const RULE_TYPE_ALLOW = 1;
+const RULE_TYPE_DENY = 2;
 
 
 function dprint(msg) {

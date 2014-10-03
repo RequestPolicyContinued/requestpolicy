@@ -481,11 +481,11 @@ RuleIterator.prototype.next = function() {
 }
 
 
-function RuleSet() {
+function Rules() {
   this._rules = [];
 }
 
-RuleSet.prototype = {
+Rules.prototype = {
   _rules : null,
 
   print : function(depth) {
@@ -645,7 +645,7 @@ function DomainEntry(name, fullName, higher) {
   this.fullName = fullName;
   this._higher = higher;
   this._lower = {};
-  this.rules = new RuleSet();
+  this.rules = new Rules();
 }
 
 DomainEntry.prototype = {
@@ -693,7 +693,7 @@ DomainEntry.prototype = {
 
 function IPAddressEntry(address) {
   this.address = address;
-  this.rules = new RuleSet();
+  this.rules = new Rules();
 }
 
 IPAddressEntry.prototype = {
@@ -725,7 +725,7 @@ function Policy(name) {
   // its own rules. Non-host-specific rules go in |this.rules|.
   this._domain = new DomainEntry(null, null, null);
   this._ipAddr = {};
-  this.rules = new RuleSet();
+  this.rules = new Rules();
 }
 
 // TODO: remove

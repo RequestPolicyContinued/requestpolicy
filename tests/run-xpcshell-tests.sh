@@ -12,7 +12,7 @@ if [ -z "$1" ]; then
   ARGUMENTS=""
 elif [ "$1" = "--help" ]; then
   echo "Usage:"
-  echo "  $0 [test_filename.js]     (run one or all tests)"
+  echo "  $0 [test_filename.js]     (run all tests or just one.)"
   exit
 else
   ARGUMENTS=" --test-path=$1 "

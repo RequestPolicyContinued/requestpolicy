@@ -42,7 +42,7 @@ Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm",
     requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
+Components.utils.import("resource://requestpolicy/RequestResult.jsm",
     requestpolicy.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
     requestpolicy.mod);

@@ -635,7 +635,8 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
   // The way we have things written currently, without this check the full
   // dest string will get treated as the destination and displayed in the
   // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
-  // We add this to fix https://www.requestpolicy.com/dev/ticket/39.
+  // We add this to fix issue #39:
+  // https://github.com/RequestPolicyContinued/requestpolicy/issues/39
   if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
     var destAsUri = requestpolicy.mod.DomainUtil.determineRedirectUri(originURI,
         dest);

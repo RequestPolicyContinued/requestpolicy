@@ -1074,7 +1074,7 @@ requestpolicy.overlay = {
       // aAllowThirdPartyFixup) {";
       // where it's possible that only two arguments are used and aReferrerURI
       // is a hash of the other arguments as well as new ones.
-      // See https://www.requestpolicy.com/dev/ticket/38
+      // See https://github.com/RequestPolicyContinued/requestpolicy/issues/38
 
       // In order to keep our code from breaking if the signature of addTab
       // changes (even just a change in variable names, for example), we'll
@@ -1108,7 +1108,7 @@ requestpolicy.overlay = {
    */
   tabAdded : function(url, referrerURI) {
     // The second argument to addTab was changed to a hash.
-    // See https://www.requestpolicy.com/dev/ticket/38
+    // See https://github.com/RequestPolicyContinued/requestpolicy/issues/38
     if (referrerURI && !(referrerURI instanceof Components.interfaces.nsIURI)) {
       if ("referrerURI" in referrerURI) {
         referrerURI = referrerURI.referrerURI;
@@ -1585,7 +1585,7 @@ requestpolicy.overlay = {
   },
 
   openHelp : function() {
-    var tab = gBrowser.addTab('https://www.requestpolicy.com/help-1.0.html');
+    var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
     gBrowser.selectedTab = tab;
     var popup = document.getElementById('rp-popup');
     popup.hidePopup();

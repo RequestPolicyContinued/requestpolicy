@@ -28,7 +28,7 @@ Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/GUILocation.jsm", rp.mod);
 
 requestpolicy.menu = {
 
@@ -40,6 +40,9 @@ requestpolicy.menu = {
   _menu : null,
 
   _originItem : null,
+  _originDomainnameItem : null,
+  _originNumRequestsItem : null,
+
   _otherOriginsList : null,
   _blockedDestinationsList : null,
   _mixedDestinationsList : null,
@@ -63,6 +66,9 @@ requestpolicy.menu = {
       this._menu = document.getElementById("rp-popup");
 
       this._originItem = document.getElementById("rp-origin");
+      this._originDomainnameItem = document.getElementById('rp-origin-domainname');
+      this._originNumRequestsItem = document.getElementById('rp-origin-num-requests');
+
       this._otherOriginsList = document.getElementById("rp-other-origins-list");
       this._blockedDestinationsList = document
             .getElementById("rp-blocked-destinations-list");
@@ -157,8 +163,12 @@ requestpolicy.menu = {
   },
 
   _populateMenuForUncontrollableOrigin : function() {
-    this._originItem.setAttribute('value',
+    this._originDomainnameItem.setAttribute('value',
         this._strbundle.getFormattedString('noOrigin', []));
+    this._originNumRequestsItem.setAttribute('value', '');
+    this._originItem.removeAttribute("default-policy");
+    this._originItem.removeAttribute("requests-blocked");
+
     this._removeChildren(this._otherOriginsList);
     this._removeChildren(this._blockedDestinationsList);
     this._removeChildren(this._mixedDestinationsList);
@@ -174,100 +184,140 @@ requestpolicy.menu = {
 
   _populateList : function(list, values) {
     this._removeChildren(list);
-    if (values[0] && values[0] instanceof rp.mod.Destination) {
+
+    // check whether there are objects of GUILocation or just strings
+    var guiLocations = values[0] && (values[0] instanceof rp.mod.GUILocation);
+
+    if (true === guiLocations) {
       // get prefs
       var sorting = this._rpService.prefs.getCharPref('menu.sorting');
-      var showNumRequests = this._rpService.prefs.getBoolPref('menu.info.showNumRequests')
+      var showNumRequests = this._rpService.prefs.
+          getBoolPref('menu.info.showNumRequests');
 
       if (sorting == "numRequests") {
-        values.sort(rp.mod.Destination.sortByNumRequestsCompareFunction);
+        values.sort(rp.mod.GUILocation.sortByNumRequestsCompareFunction);
       } else if (sorting == "destName") {
-        values.sort(rp.mod.Destination.compareFunction);
+        values.sort(rp.mod.GUILocation.compareFunction);
       }
 
       for (var i in values) {
-        var value = values[i];
+        var guiLocation = values[i];
+        var props = guiLocation.properties;
+
+        var num = undefined;
         if (true === showNumRequests) {
-          if (value.properties.numAllowedRequests > 0 && value.properties.numBlockedRequests > 0) {
-            var counters = value.properties.numRequests
-                + " (" + value.properties.numBlockedRequests
-                + "+" + value.properties.numAllowedRequests + ")";
-          } else {
-            var counters = value.properties.numRequests;
+          num = props.numRequests;
+          if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
+            num += " (" + props.numBlockedRequests +
+                "+" + props.numAllowedRequests + ")";
           }
-          var newitem = this._addListItem(list, 'rp-od-item', value.dest, counters);
-        } else {
-          var newitem = this._addListItem(list, 'rp-od-item', value.dest);
         }
+        var newitem = this._addListItem(list, 'rp-od-item', guiLocation, num);
+
         newitem.setAttribute("default-policy",
-                            (value.properties.numDefaultPolicyRequests > 0 ? "true" : "false"));
+            (props.numDefaultPolicyRequests > 0 ? "true" : "false"));
+        newitem.setAttribute("requests-blocked",
+            (props.numBlockedRequests > 0 ? "true" : "false"));
       }
     } else {
       values.sort();
       for (var i in values) {
-        var newitem = this._addListItem(list, 'rp-od-item', values[i]);
+        this._addListItem(list, 'rp-od-item', values[i]);
       }
     }
-    //this._disableIfNoChildren(list);
   },
 
   _populateOrigin : function() {
-    this._originItem.setAttribute('value', this._currentBaseDomain);
+    this._originDomainnameItem.setAttribute("value", this._currentBaseDomain);
+
+    var showNumRequests = this._rpService.prefs.
+        getBoolPref('menu.info.showNumRequests');
+
+    var props = this._getOriginGUILocationProperties();
+
+    var numRequests = '';
+    if (true === showNumRequests) {
+      if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
+        numRequests = props.numRequests + " (" +
+            props.numBlockedRequests + "+" + props.numAllowedRequests + ")";
+      } else {
+        numRequests = props.numRequests;
+      }
+    }
+    this._originNumRequestsItem.setAttribute("value", numRequests);
+
+    this._originItem.setAttribute("default-policy",
+        (props.numDefaultPolicyRequests > 0 ? "true" : "false"));
+    this._originItem.setAttribute("requests-blocked",
+        (props.numBlockedRequests > 0 ? "true" : "false"));
   },
 
   _populateOtherOrigins : function() {
-    var values = this._getOtherOrigins();
-    this._populateList(this._otherOriginsList, values);
-    document.getElementById('rp-other-origins').hidden = values.length == 0;
+    var guiOrigins = this._getOtherOriginsAsGUILocations();
+    this._populateList(this._otherOriginsList, guiOrigins);
+    document.getElementById('rp-other-origins').hidden = guiOrigins.length == 0;
   },
 
   _populateDestinations : function(originIdentifier) {
-    var rawBlocked = this._getBlockedDestinations();
-    var rawAllowed = this._getAllowedDestinations();
-    var blocked = [];
-    var mixed = [];
-    var allowed = [];
+    var destsWithBlockedRequests = this._getBlockedDestinationsAsGUILocations();
+    var destsWithAllowedRequests = this._getAllowedDestinationsAsGUILocations();
+
+    var destsWithSolelyBlockedRequests = [];
+    var destsMixed = [];
+    var destsWithSolelyAllowedRequests = [];
 
     // Set operations would be nice. These are small arrays, so keep it simple.
-    for (var i = 0; i < rawBlocked.length; i++) {
-      let dest = rawBlocked[i];
-      if (false === rp.mod.Destination.existsInArray(dest, rawAllowed)) {
-        blocked.push(dest);
+    for (var i = 0; i < destsWithBlockedRequests.length; i++) {
+      let blockedGUIDest = destsWithBlockedRequests[i];
+
+      if (false === rp.mod.GUILocation.existsInArray(blockedGUIDest,
+          destsWithAllowedRequests)) {
+        destsWithSolelyBlockedRequests.push(blockedGUIDest);
       } else {
-        // we assume that `dest` is a Destination getUriObject.
-        mixed.push(dest);
+        destsMixed.push(blockedGUIDest);
       }
     }
-    for (var i = 0; i < rawAllowed.length; i++) {
-      let dest = rawAllowed[i];
-      var indexRawBlocked = rp.mod.Destination.indexOfDestInArray(dest, rawBlocked);
-      var indexMixed = rp.mod.Destination.indexOfDestInArray(dest, mixed);
+    for (var i = 0; i < destsWithAllowedRequests.length; i++) {
+      let allowedGUIDest = destsWithAllowedRequests[i];
+
+      var indexRawBlocked = rp.mod.GUIDestination.
+          indexOfDestInArray(allowedGUIDest, destsWithBlockedRequests);
+      var destsMixedIndex = rp.mod.GUIDestination.
+          indexOfDestInArray(allowedGUIDest, destsMixed);
 
       if (indexRawBlocked == -1) {
-        allowed.push(dest);
+        destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
-        if (indexMixed != -1) {
+        if (destsMixedIndex != -1) {
           rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
-              "Merging dest: <" + dest.dest + ">");
-          mixed[indexMixed] = rp.mod.Destination.merge(dest, mixed[indexMixed]);
+              "Merging dest: <" + allowedGUIDest + ">");
+          destsMixed[destsMixedIndex] = rp.mod.GUIDestination.merge(
+              allowedGUIDest, destsMixed[destsMixedIndex]);
         } else {
-          // if the dest is in rawBlocked and rawAllowed, but not in mixed.
-          // this should never happen, the mixed destination should be added in the rawBlocked-loop.
-          rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL,
-              "mixed dest was not added to `mixed` list: <" + dest.dest + ">");
-          mixed.push(dest);
+          // If the allowedGUIDest is in destsWithBlockedRequests and
+          // destsWithAllowedRequests, but not in destsMixed.
+          // This should never happen, the destsMixed destination should have
+          // been added in the destsWithBlockedRequests-loop.
+          rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL, "mixed dest was" +
+              " not added to `destsMixed` list: <" + dest.dest + ">");
+          destsMixed.push(allowedGUIDest);
         }
       }
     }
 
-    this._populateList(this._blockedDestinationsList, blocked);
-    document.getElementById('rp-blocked-destinations').hidden = blocked.length == 0;
+    this._populateList(this._blockedDestinationsList,
+        destsWithSolelyBlockedRequests);
+    document.getElementById('rp-blocked-destinations').hidden =
+        destsWithSolelyBlockedRequests.length == 0;
 
-    this._populateList(this._mixedDestinationsList, mixed);
-    document.getElementById('rp-mixed-destinations').hidden = mixed.length == 0;
+    this._populateList(this._mixedDestinationsList, destsMixed);
+    document.getElementById('rp-mixed-destinations').hidden =
+        destsMixed.length == 0;
 
-    this._populateList(this._allowedDestinationsList, allowed);
-    document.getElementById('rp-allowed-destinations').hidden = allowed.length == 0;
+    this._populateList(this._allowedDestinationsList,
+        destsWithSolelyAllowedRequests);
+    document.getElementById('rp-allowed-destinations').hidden =
+        destsWithSolelyAllowedRequests.length == 0;
   },
 
   _populateDetails : function() {
@@ -446,7 +496,7 @@ requestpolicy.menu = {
   _activateOriginItem : function(item) {
     if (item.id == 'rp-origin') {
       // it's _the_ origin
-      this._currentlySelectedOrigin = item.value;
+      this._currentlySelectedOrigin = this._originDomainnameItem.value;
     } else if (item.parentNode.id == 'rp-other-origins-list') {
       // it's an otherOrigin
       this._currentlySelectedOrigin = item.getElementsByClassName("domainname")[0].value;
@@ -605,67 +655,21 @@ requestpolicy.menu = {
  // else there will be errors from within RequestUtil.
 
 
-
-  /* This function iterates through all requests of a destBase, looks for
-   * properties and returns them.
-   */
-  _extractRequestProperties : function(request, ruleAction) {
-    var properties = {
-      numRequests : 0,
-      numDefaultPolicyRequests : 0,
-      numAllowedRequests : 0,
-      numBlockedRequests : 0
-    };
-
-    var ruleActionCounter = 0;
-
-    for (var destIdent in request) {
-      for (var destUri in request[destIdent]) {
-        for (var i in request[destIdent][destUri]) {
-          ++properties.numRequests;
-          ++ruleActionCounter;
-          //rp.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
-          //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
-          if ( request[destIdent][destUri][i].isDefaultPolicyUsed() ) {
-            ++properties.numDefaultPolicyRequests;
-          }
-        }
-      }
-    }
-
-    switch (ruleAction) {
-      case rp.mod.RULE_ACTION_ALLOW:
-        properties.numAllowedRequests = ruleActionCounter;
-        break;
-
-      case rp.mod.RULE_ACTION_DENY:
-        properties.numBlockedRequests = ruleActionCounter;
-        break;
-
-      default:
-        break;
-    }
-
-    return properties;
-  },
-
-  _getBlockedDestinations : function() {
+  _getBlockedDestinationsAsGUILocations : function() {
     var reqSet = rp.mod.RequestUtil.getDeniedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
     for (var destBase in requests) {
-      var properties = this._extractRequestProperties(requests[destBase],
-                                                      rp.mod.RULE_ACTION_DENY);
-      result.push(new rp.mod.Destination(destBase, properties));
-      //rp.mod.Logger.dump("destBase : "+destBase);
-      //rp.mod.Logger.vardump(properties, "properties");
+      var properties = new rp.mod.GUILocationProperties();
+      properties.accumulate(requests[destBase], rp.mod.RULE_ACTION_DENY);
+      result.push(new rp.mod.GUIDestination(destBase, properties));
     }
     return result;
   },
 
-  _getAllowedDestinations : function() {
+  _getAllowedDestinationsAsGUILocations : function() {
     var reqSet = rp.mod.RequestUtil.getAllowedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
@@ -682,21 +686,49 @@ requestpolicy.menu = {
         }
       }
 
-      var properties = this._extractRequestProperties(requests[destBase],
-                                                      rp.mod.RULE_ACTION_ALLOW);
-      result.push(new rp.mod.Destination(destBase, properties));
+      var properties = new rp.mod.GUILocationProperties();
+      properties.accumulate(requests[destBase], rp.mod.RULE_ACTION_ALLOW);
+      result.push(new rp.mod.GUIDestination(destBase, properties));
     }
     return result;
   },
 
-  _getOtherOrigins : function() {
-    var requests = this._allRequestsOnDocument.getAll();
+  /**
+   * TODO: optimize this for performance (_getOriginGUILocationProperties and
+   * _getOtherOriginsAsGUILocations could be merged.)
+   *
+   * @return {GUILocationProperties}
+   *         the properties of the "main" origin (the one in the location bar).
+   */
+  _getOriginGUILocationProperties : function() {
+    var allRequests = this._allRequestsOnDocument.getAll();
 
     var allowSameDomain = this._rpService.isDefaultAllow() ||
           this._rpService.isDefaultAllowSameDomain();
 
-    var result = [];
-    for (var originUri in requests) {
+    var properties = new rp.mod.GUILocationProperties();
+
+    for (var originUri in allRequests) {
+      var originBase = rp.mod.DomainUtil.getDomain(originUri);
+      if (originBase != this._currentBaseDomain) {
+        continue;
+      }
+
+      for (var destBase in allRequests[originUri]) {
+        properties.accumulate(allRequests[originUri][destBase]);
+      }
+    }
+    return properties;
+  },
+
+  _getOtherOriginsAsGUILocations : function() {
+    var allRequests = this._allRequestsOnDocument.getAll();
+
+    var allowSameDomain = this._rpService.isDefaultAllow() ||
+          this._rpService.isDefaultAllowSameDomain();
+
+    var guiOrigins = [];
+    for (var originUri in allRequests) {
       var originBase = rp.mod.DomainUtil.getDomain(originUri);
       if (originBase == this._currentBaseDomain) {
         continue;
@@ -710,25 +742,35 @@ requestpolicy.menu = {
       //  continue;
       //}
 
-      for (var destBase in requests[originUri]) {
+      var guiOriginsIndex = rp.mod.GUIOrigin.indexOfOriginInArray(originBase,
+          guiOrigins);
+      var properties;
+      if (guiOriginsIndex == -1) {
+        properties = new rp.mod.GUILocationProperties();
+      } else {
+        properties = guiOrigins[guiOriginsIndex].properties;
+      }
+
+      for (var destBase in allRequests[originUri]) {
         // Search for a destBase which wouldn't be allowed by the default policy.
         // TODO: some users might want to know those "other origins" as well.
         //       this should be made possible.
 
         // For everybody except users with default deny who are not allowing all
-        // requests to the same domain:
+        // guiOrigins to the same domain:
         // Only list other origins where there is a destination from that origin
         // that is at a different domain, not just a different subdomain.
         if (allowSameDomain && destBase == originBase) {
           continue;
         }
-        if (result.indexOf(originBase) == -1) {
-          result.push(originBase);
-          break;
-        }
+        properties.accumulate(allRequests[originUri][destBase]);
+      }
+
+      if (guiOriginsIndex == -1) {
+        guiOrigins.push(new rp.mod.GUIOrigin(originBase, properties));
       }
     }
-    return result;
+    return guiOrigins;
   },
 
   _sanitizeJsFunctionArg : function(str) {

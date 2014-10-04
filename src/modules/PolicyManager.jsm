@@ -22,8 +22,7 @@
 
 var EXPORTED_SYMBOLS = [
   "PolicyManager",
-  "RULES_CHANGED_TOPIC",
-  "Destination"
+  "RULES_CHANGED_TOPIC"
 ];
 
 const CI = Components.interfaces;
@@ -74,124 +73,6 @@ function notifyRulesChanged() {
 // after an update.
 
 
-
-
-/**
- * Destination objects are used to hand over not only "destination" strings, like
- * "example.com", but also properties which might be useful to display more
- * information on the GUI.
- */
-function Destination(dest, properties) {
-  this.dest = dest;
-
-  if (properties != undefined) {
-    this.properties = properties;
-  } else {
-    this.properties = [];
-  }
-}
-Destination.prototype = {
-  dest : null,
-  properties : null
-};
-
-/**
- * @static
- */
-Destination.merge = function (dest1, dest2) {
-  // we assume: dest1.dest == dest2.dest
-  var dest = new Destination(dest1.dest);
-  dest.properties = {};
-
-  var destCounterProperties = [
-    "numRequests",
-    "numDefaultPolicyRequests",
-    "numBlockedRequests",
-    "numAllowedRequests"
-  ];
-
-  for (var i in destCounterProperties) {
-    var p = destCounterProperties[i];
-    dest.properties[p] = 0;
-
-    if (dest1.properties[p]) {
-      dest.properties[p] += dest1.properties[p];
-    }
-    if (dest2.properties[p]) {
-      dest.properties[p] += dest2.properties[p];
-    }
-  }
-
-  return dest;
-}
-
-/**
- * @static
- */
-Destination.existsInArray = function (destString, dests) {
-  return (Destination.indexOfDestInArray(destString, dests) != -1);
-}
-
-/**
- * @static
- * @param {String}
- *          destString The destination saved in Destination.dest
- * @param {String}
- *          dests Array of Destination objects
- * @return {int} The index of the first Destination object which contains the
- *          specified destString. If it doesn't exist, it returns -1.
- */
-Destination.indexOfDestInArray = function (destString, dests) {
-  if (destString instanceof Destination) {
-    destString = destString.dest;
-  }
-  for (var i in dests) {
-    if (dests[i].dest == destString) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-/**
- * compare functions used to sort an Array of Destination objects.
- *
- * @static
- */
-Destination.sortByNumRequestsCompareFunction = function (a, b) {
-  return Destination.compareFunction(a, b, "sortByNumRequests");
-}
-Destination.compareFunction = function (a, b, sortType) {
-  var a_default = (a.properties.numDefaultPolicyRequests > 0);
-  var b_default = (b.properties.numDefaultPolicyRequests > 0);
-
-  if (a_default !== b_default) {
-    if (a_default === true) {
-      // default-policy destinations first.
-      return -1;
-    } else {
-      return 1
-    }
-  }
-
-  if (sortType == "sortByNumRequests") {
-    if (a.properties.numRequests > b.properties.numRequests) {
-      return -1;
-    }
-    if (a.properties.numRequests < b.properties.numRequests) {
-      return 1;
-    }
-  }
-
-
-  if (a.dest > b.dest) {
-    return 1;
-  }
-  if (a.dest < b.dest) {
-    return -1;
-  }
-  return 0;
-}
 
 
 

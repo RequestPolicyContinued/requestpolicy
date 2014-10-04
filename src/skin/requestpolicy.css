@@ -234,10 +234,28 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="t
   margin-bottom: 14px;
 }
 
-#rp-origin {
+#rp-origin #rp-origin-domainname {
   font-size: 1.2em;
   color : #555;
   padding-right: 10px;
+}
+#rp-origin #rp-origin-num-requests {
+  font-size: 1.2em;
+  color: #777;
+}
+#rp-origin[requests-blocked="true"] {
+  background-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+}
+#rp-origin[requests-blocked="false"] {
+  background-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+}
+#rp-origin[requests-blocked] {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  padding-left: 20px;
 }
 
 .rp-label-list {
@@ -249,6 +267,21 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="t
   padding-bottom: 1em;
   border-bottom: 1px solid #eee;
 }
+#rp-other-origins [requests-blocked="true"] {
+  background-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+}
+#rp-other-origins [requests-blocked="false"] {
+  background-image:
+    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+}
+#rp-other-origins [requests-blocked] {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  padding-left: 20px;
+}
+
 #rp-other-origins-title {
   color: #aaa;
 }

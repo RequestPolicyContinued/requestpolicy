@@ -73,8 +73,11 @@
       <vbox id="rp-contents">
         <hbox id="rp-main">
           <vbox id="rp-origins-destinations">
-            <label id="rp-origin" class="rp-od-item"
-                   onclick="requestpolicy.menu.itemSelected(event);"/>
+            <hbox id="rp-origin" class="rp-od-item"
+                  onclick="requestpolicy.menu.itemSelected(event);">
+              <label id="rp-origin-domainname" class="domainname" flex="2" />
+              <label id="rp-origin-num-requests" class="numRequests" />
+            </hbox>
             <vbox id="rp-other-origins">
               <label id="rp-other-origins-title" value="&rp.menu.otherOrigins;" />
               <vbox id="rp-other-origins-list" class="rp-label-list" />

@@ -23,8 +23,8 @@
 var EXPORTED_SYMBOLS = [
   "Ruleset",
   "RawRuleset",
-  "RULE_TYPE_ALLOW",
-  "RULE_TYPE_DENY"
+  "RULE_ACTION_ALLOW",
+  "RULE_ACTION_DENY"
 ];
 
 if (!rp) {
@@ -34,8 +34,8 @@ if (!rp) {
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
 
-const RULE_TYPE_ALLOW = 1;
-const RULE_TYPE_DENY = 2;
+const RULE_ACTION_ALLOW = 1;
+const RULE_ACTION_DENY = 2;
 
 
 function dprint(msg) {
@@ -148,21 +148,21 @@ RawRuleset.prototype = {
     return [rules, r];
   },
 
-  _addEntryToRuleset : function(entry, ruleType, policy) {
+  _addEntryToRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry["o"];
     var d = entry["d"];
     var rules, r;
 
-    //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleType);
+    //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
     if (o && d) {
       [rules, r] = this._addEntryHelper(o, policy);
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
-      //r.destinationRuleType = ruleType;
-      if (ruleType == RULE_TYPE_ALLOW) {
+      //r.destinationRuleAction = ruleAction;
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -170,8 +170,8 @@ RawRuleset.prototype = {
 
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
-      //r.originRuleType = ruleType;
-      if (ruleType == RULE_TYPE_ALLOW) {
+      //r.originRuleAction = ruleAction;
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
         r.denyOrigin = true;
@@ -179,8 +179,8 @@ RawRuleset.prototype = {
 
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
-      //r.destinationRuleType = ruleType;
-      if (ruleType == RULE_TYPE_ALLOW) {
+      //r.destinationRuleAction = ruleAction;
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -192,15 +192,15 @@ RawRuleset.prototype = {
     }
   },
 
-  ruleExists : function(ruleType, ruleData) {
-    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
-        ruleType == RULE_TYPE_DENY ? "deny" : "";
-    if (!typeStr) {
-      throw "Invalid ruleType: " + ruleType;
+  ruleExists : function(ruleAction, ruleData) {
+    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    if (!actionStr) {
+      throw "Invalid ruleAction: " + ruleAction;
     }
 
     var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[typeStr];
+    var entries = this._entries[actionStr];
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr == curRuleStr) {
@@ -214,25 +214,25 @@ RawRuleset.prototype = {
    * Adds the rule to the entries of this |RawRuleset| instance as well as the
    * |Ruleset| optionally provided as the policy argument.
    *
-   * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
+   * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
    * @param ruleData
    */
-  addRule : function(ruleType, ruleData, policy) {
+  addRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
-    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
-        ruleType == RULE_TYPE_DENY ? "deny" : "";
-    if (!typeStr) {
-      throw "Invalid ruleType: " + ruleType;
+    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    if (!actionStr) {
+      throw "Invalid ruleAction: " + ruleAction;
     }
 
     // Only add the raw policy entry if it doesn't already exist.
-    if (!this.ruleExists(ruleType, ruleData)) {
-      this._entries[typeStr].push(ruleData);
+    if (!this.ruleExists(ruleAction, ruleData)) {
+      this._entries[actionStr].push(ruleData);
     }
 
     if (policy) {
-      this._addEntryToRuleset(ruleData, ruleType, policy);
+      this._addEntryToRuleset(ruleData, ruleAction, policy);
     }
   },
 
@@ -249,7 +249,7 @@ RawRuleset.prototype = {
   //     return rules.get(entryPart["s"], entryPart["port"]);
   // },
 
-  _removeEntryFromRuleset : function(entry, ruleType, policy) {
+  _removeEntryFromRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry["o"];
@@ -287,16 +287,16 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.destinationRuleType == ruleType) {
-      //   r.destinationRuleType = null;
+      // if (r.destinationRuleAction == ruleAction) {
+      //   r.destinationRuleAction = null;
       // }
       //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
-      if (ruleType == RULE_TYPE_ALLOW) {
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleType == RULE_TYPE_DENY) {
+      } else if (ruleAction == RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
-        throw "Invalid rule type: " + ruleType;
+        throw "Invalid rule type: " + ruleAction;
       }
 
     } else if (o && !d) {
@@ -314,15 +314,15 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.originRuleType == ruleType) {
-      //   r.originRuleType = null;
+      // if (r.originRuleAction == ruleAction) {
+      //   r.originRuleAction = null;
       // }
-      if (ruleType == RULE_TYPE_ALLOW) {
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowOrigin = null;
-      } else if (ruleType == RULE_TYPE_DENY) {
+      } else if (ruleAction == RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
-        throw "Invalid rule type: " + ruleType;
+        throw "Invalid rule type: " + ruleAction;
       }
 
     } else if (!o && d) {
@@ -340,15 +340,15 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.destinationRuleType == ruleType) {
-      //   r.destinationRuleType = null;
+      // if (r.destinationRuleAction == ruleAction) {
+      //   r.destinationRuleAction = null;
       // }
-      if (ruleType == RULE_TYPE_ALLOW) {
+      if (ruleAction == RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleType == RULE_TYPE_DENY) {
+      } else if (ruleAction == RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
-        throw "Invalid rule type: " + ruleType;
+        throw "Invalid rule type: " + ruleAction;
       }
 
     } else {
@@ -361,19 +361,19 @@ RawRuleset.prototype = {
    * Removes the rule from the entries of this |RawRuleset| instance as well as the
    * |Ruleset| optionally provided as the policy argument.
    *
-   * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
+   * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
    * @param ruleData
    */
-  removeRule : function(ruleType, ruleData, policy) {
+  removeRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
-    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
-        ruleType == RULE_TYPE_DENY ? "deny" : "";
-    if (!typeStr) {
-      throw "Invalid ruleType: " + ruleType;
+    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    if (!actionStr) {
+      throw "Invalid ruleAction: " + ruleAction;
     }
     var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[typeStr];
+    var entries = this._entries[actionStr];
     var removeIndex = false;
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
@@ -391,11 +391,11 @@ RawRuleset.prototype = {
       if (begin.length + end.length + 1 != entries.length) {
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
-      this._entries[typeStr] = begin.concat(end);
+      this._entries[actionStr] = begin.concat(end);
     }
 
     if (policy) {
-      this._removeEntryFromRuleset(ruleData, ruleType, policy);
+      this._removeEntryFromRuleset(ruleData, ruleAction, policy);
     }
   },
 
@@ -406,17 +406,17 @@ RawRuleset.prototype = {
   toRuleset : function(name) {
     var policy = new Ruleset(name);
 
-    for (var typeStr in this._entries) {
-      //dprint("typeStr: " + typeStr);
-      if (typeStr != "allow" && typeStr != "deny") {
-        dwarn("Invalid entry type: " + typeStr);
+    for (var actionStr in this._entries) {
+      //dprint("actionStr: " + actionStr);
+      if (actionStr != "allow" && actionStr != "deny") {
+        dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleType = typeStr == "allow" ? RULE_TYPE_ALLOW : RULE_TYPE_DENY;
-      var entryArray = this._entries[typeStr];
+      var ruleAction = actionStr == "allow" ? RULE_ACTION_ALLOW : RULE_ACTION_DENY;
+      var entryArray = this._entries[actionStr];
       for (var i in entryArray) {
         //dprint("toRuleset: adding entry");
-        this._addEntryToRuleset(entryArray[i], ruleType, policy);
+        this._addEntryToRuleset(entryArray[i], ruleAction, policy);
       }
     }
 
@@ -549,9 +549,9 @@ Rule.prototype = {
   port : null,
   path : null,
 
-  // Either null, RULE_TYPE_ALLOW, or RULE_TYPE_DENY.
-  // originRuleType : null,
-  // destinationRuleType : null,
+  // Either null, RULE_ACTION_ALLOW, or RULE_ACTION_DENY.
+  // originRuleAction : null,
+  // destinationRuleAction : null,
 
   allowOrigin : null,
   denyOrigin : null,
@@ -564,8 +564,8 @@ Rule.prototype = {
   toString : function() {
     return "[Rule " + this.scheme + " " + this.port + " " + this.path + " "
     // TODO
-           // + "originRuleType:" + this.originRuleType + " "
-           // + "destinationRuleType:" + this.destinationRuleType + " "
+           // + "originRuleAction:" + this.originRuleAction + " "
+           // + "destinationRuleAction:" + this.destinationRuleAction + " "
            + "allowOrigin:" + this.allowOrigin + " "
            + "denyOrigin:" + this.denyOrigin + " "
            + "allowDestination:" + this.allowDestination + " "
@@ -914,14 +914,14 @@ Ruleset.prototype = {
           //dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
-        // switch(rule.originRuleType) {
-        //   case RULE_TYPE_ALLOW:
+        // switch(rule.originRuleAction) {
+        //   case RULE_ACTION_ALLOW:
         //     if (ruleMatchedOrigin) {
         //       dprint("ALLOW origin by rule " + entry + " " + rule);
         //       matchedAllowRules.push(["origin", entry, rule]);
         //     }
         //     break;
-        //   case RULE_TYPE_DENY:
+        //   case RULE_ACTION_DENY:
         //     if (ruleMatchedOrigin) {
         //               dprint("DENY origin by rule " + entry + " " + rule);
         //               matchedDenyRules.push(["origin", entry, rule]);
@@ -947,14 +947,14 @@ Ruleset.prototype = {
                 matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
               }
 
-              // switch(destRule.destinationRuleType) {
-              //   case RULE_TYPE_ALLOW:
+              // switch(destRule.destinationRuleAction) {
+              //   case RULE_ACTION_ALLOW:
               //     if (destRule.isMatch(dest)) {
               //                     dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
               //                     matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
               //                   }
               //     break;
-              //   case RULE_TYPE_DENY:
+              //   case RULE_ACTION_DENY:
               //     if (destRule.isMatch(dest)) {
               //                     dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
               //                     matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
@@ -984,14 +984,14 @@ Ruleset.prototype = {
           //dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
-        // switch(rule.destinationRuleType) {
-        //   case RULE_TYPE_ALLOW:
+        // switch(rule.destinationRuleAction) {
+        //   case RULE_ACTION_ALLOW:
         //     if (rule.isMatch(dest)) {
         //               dprint("ALLOW dest by rule " + entry + " " + rule);
         //               matchedAllowRules.push(["dest", entry, rule]);
         //             }
         //     break;
-        //   case RULE_TYPE_DENY:
+        //   case RULE_ACTION_DENY:
         //     if (rule.isMatch(dest)) {
         //       dprint("DENY dest by rule " + entry + " " + rule);
         //       matchedDenyRules.push(["dest", entry, rule]);
@@ -1031,26 +1031,26 @@ Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
  */
 Ruleset.matchToRawRule = function(match) {
   // The matches are in the format
-  //     [typeStr, entry, rule]
+  //     [actionStr, entry, rule]
   // or
-  //     [typeStr, originEntry, originRule, destEntry, destRule]
+  //     [actionStr, originEntry, originRule, destEntry, destRule]
   // as returned by calls to |Ruleset.check()|.
   var rawRule = {};
   var entry, rule, destEntry, destRule;
-  var typeStr = match[0];
+  var actionStr = match[0];
 
-  if (typeStr == "origin") {
-    [typeStr, entry, rule] = match;
+  if (actionStr == "origin") {
+    [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
-  } else if (typeStr == "dest") {
-    [typeStr, entry, rule] = match;
+  } else if (actionStr == "dest") {
+    [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
-  } else if (typeStr == "origin-to-dest") {
-    [typeStr, entry, rule, destEntry, destRule] = match;
+  } else if (actionStr == "origin-to-dest") {
+    [actionStr, entry, rule, destEntry, destRule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
-    throw "[matchToRawRule] Invalid match type: " + typeStr
+    throw "[matchToRawRule] Invalid match type: " + actionStr
           + " from match: " + match;
   }
 

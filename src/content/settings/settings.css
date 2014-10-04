@@ -187,7 +187,7 @@ table.settings tr:not(:first-child) {
   margin-left: 0;
 }
 
-#addrule .rule-type {
+#addrule .rule-action {
   font-weight: bold;
 }
 

@@ -299,24 +299,24 @@ PolicyManager.prototype = {
     return failures;
   },
 
-  _assertRuleType: function(ruleType) {
-    if (ruleType != rp.mod.RULE_TYPE_ALLOW &&
-        ruleType != rp.mod.RULE_TYPE_DENY) {
-      throw "Invalid rule type: " + ruleType;
+  _assertRuleAction : function(ruleAction) {
+    if (ruleAction != rp.mod.RULE_ACTION_ALLOW &&
+        ruleAction != rp.mod.RULE_ACTION_DENY) {
+      throw "Invalid rule type: " + ruleAction;
     }
   },
 
-  ruleExists : function(ruleType, ruleData) {
-    this._assertRuleType(ruleType);
+  ruleExists : function(ruleAction, ruleData) {
+    this._assertRuleAction(ruleAction);
     for (var name in this._userRulesets) {
-      if (this._userRulesets[name].rawRuleset.ruleExists(ruleType, ruleData)) {
+      if (this._userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
       }
     }
     for (var listName in this._subscriptionRulesets) {
       var rulesets = this._subscriptionRulesets[listName];
       for (var name in rulesets) {
-        if (rulesets[name].rawRuleset.ruleExists(ruleType, ruleData)) {
+        if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
         }
       }
@@ -324,14 +324,14 @@ PolicyManager.prototype = {
     return false;
   },
 
-  addRule : function(ruleType, ruleData, noStore) {
-    dprint("PolicyManager::addRule " + ruleType + " "
+  addRule : function(ruleAction, ruleData, noStore) {
+    dprint("PolicyManager::addRule " + ruleAction + " "
            + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
     //this._userRulesets["user"].ruleset.print();
 
-    this._assertRuleType(ruleType);
+    this._assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    this._userRulesets["user"].rawRuleset.addRule(ruleType, ruleData,
+    this._userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
           this._userRulesets["user"].ruleset);
 
     // TODO: only save if we actually added a rule. This will require
@@ -354,14 +354,14 @@ PolicyManager.prototype = {
         this._userRulesets["user"].rawRuleset, "user.json");
   },
 
-  addTemporaryRule : function(ruleType, ruleData) {
-    dprint("PolicyManager::addTemporaryRule " + ruleType + " "
+  addTemporaryRule : function(ruleAction, ruleData) {
+    dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
            + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
     //this._userRulesets["temp"].ruleset.print();
 
-    this._assertRuleType(ruleType);
+    this._assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    this._userRulesets["temp"].rawRuleset.addRule(ruleType, ruleData,
+    this._userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
           this._userRulesets["temp"].ruleset);
 
     //this._userRulesets["temp"].ruleset.print();
@@ -369,18 +369,18 @@ PolicyManager.prototype = {
     notifyRulesChanged();
   },
 
-  removeRule : function(ruleType, ruleData, noStore) {
-    dprint("PolicyManager::removeRule " + ruleType + " "
+  removeRule : function(ruleAction, ruleData, noStore) {
+    dprint("PolicyManager::removeRule " + ruleAction + " "
            + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
     //this._userRulesets["user"].ruleset.print();
     //this._userRulesets["temp"].ruleset.print();
 
-    this._assertRuleType(ruleType);
+    this._assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    this._userRulesets["user"].rawRuleset.removeRule(ruleType, ruleData,
+    this._userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
           this._userRulesets["user"].ruleset);
-    this._userRulesets["temp"].rawRuleset.removeRule(ruleType, ruleData,
+    this._userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
           this._userRulesets["temp"].ruleset);
 
     // TODO: only save if we actually removed a rule. This will require

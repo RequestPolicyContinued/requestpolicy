@@ -272,8 +272,8 @@ requestpolicy.menu = {
 
   _populateDetails : function() {
     var policyMgr = this._rpService._policyMgr;
-    const RULE_TYPE_ALLOW = rp.mod.RULE_TYPE_ALLOW;
-    const RULE_TYPE_DENY = rp.mod.RULE_TYPE_DENY;
+    const RULE_ACTION_ALLOW = rp.mod.RULE_ACTION_ALLOW;
+    const RULE_ACTION_DENY = rp.mod.RULE_ACTION_DENY;
 
     var origin = this._currentlySelectedOrigin;
     var dest = this._currentlySelectedDest;
@@ -318,13 +318,13 @@ requestpolicy.menu = {
       };
       //if (this._rpService.isDefaultAllow()) {
       if (this._isCurrentlySelectedDestAllowed ||
-           (!policyMgr.ruleExists(RULE_TYPE_DENY, ruleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData))) {
+           (!policyMgr.ruleExists(RULE_ACTION_DENY, ruleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_DENY, destOnlyRuleData))) {
         // show "Block requests" if the destination was allowed
         // OR if there's no blocking rule (i.e. the request was blocked "by default")
         //  -- this enables support for blacklisting.
-        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+        if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_DENY, ruleData)) {
           if (!this._privateBrowsingEnabled) {
               var item = this._addMenuItemDenyOriginToDest(
                 this._addRulesList, ruleData);
@@ -333,8 +333,8 @@ requestpolicy.menu = {
             this._addRulesList, ruleData);
         }
 
-        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+        if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
           if (!this._privateBrowsingEnabled) {
             var item = this._addMenuItemDenyDest(
               this._addRulesList, destOnlyRuleData);
@@ -344,13 +344,13 @@ requestpolicy.menu = {
         }
       }
       if (this._isCurrentlySelectedDestBlocked ||
-           (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData))) {
+           (!policyMgr.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData))) {
         // show "Allow requests" if the destination was blocked
         // OR if there's no allow-rule (i.e. the request was allowed "by default")
         //  -- this enables support for whitelisting.
-        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+        if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_DENY, ruleData)) {
           if (!this._privateBrowsingEnabled) {
             var item = this._addMenuItemAllowOriginToDest(
               this._addRulesList, ruleData);
@@ -359,8 +359,8 @@ requestpolicy.menu = {
             this._addRulesList, ruleData);
         }
 
-        if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
-            !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+        if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !policyMgr.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
           if (!this._privateBrowsingEnabled) {
             var item = this._addMenuItemAllowDest(
               this._addRulesList, destOnlyRuleData);
@@ -609,7 +609,7 @@ requestpolicy.menu = {
   /* This function iterates through all requests of a destBase, looks for
    * properties and returns them.
    */
-  _extractRequestProperties : function(request, ruleType) {
+  _extractRequestProperties : function(request, ruleAction) {
     var properties = {
       numRequests : 0,
       numDefaultPolicyRequests : 0,
@@ -617,13 +617,13 @@ requestpolicy.menu = {
       numBlockedRequests : 0
     };
 
-    var ruleTypeCounter = 0;
+    var ruleActionCounter = 0;
 
     for (var destIdent in request) {
       for (var destUri in request[destIdent]) {
         for (var i in request[destIdent][destUri]) {
           ++properties.numRequests;
-          ++ruleTypeCounter;
+          ++ruleActionCounter;
           //rp.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
           //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
           if ( request[destIdent][destUri][i].isDefaultPolicyUsed() ) {
@@ -633,13 +633,13 @@ requestpolicy.menu = {
       }
     }
 
-    switch (ruleType) {
-      case rp.mod.RULE_TYPE_ALLOW:
-        properties.numAllowedRequests = ruleTypeCounter;
+    switch (ruleAction) {
+      case rp.mod.RULE_ACTION_ALLOW:
+        properties.numAllowedRequests = ruleActionCounter;
         break;
 
-      case rp.mod.RULE_TYPE_DENY:
-        properties.numBlockedRequests = ruleTypeCounter;
+      case rp.mod.RULE_ACTION_DENY:
+        properties.numBlockedRequests = ruleActionCounter;
         break;
 
       default:
@@ -657,7 +657,7 @@ requestpolicy.menu = {
     var result = [];
     for (var destBase in requests) {
       var properties = this._extractRequestProperties(requests[destBase],
-                                                      rp.mod.RULE_TYPE_DENY);
+                                                      rp.mod.RULE_ACTION_DENY);
       result.push(new rp.mod.Destination(destBase, properties));
       //rp.mod.Logger.dump("destBase : "+destBase);
       //rp.mod.Logger.vardump(properties, "properties");
@@ -683,7 +683,7 @@ requestpolicy.menu = {
       }
 
       var properties = this._extractRequestProperties(requests[destBase],
-                                                      rp.mod.RULE_TYPE_ALLOW);
+                                                      rp.mod.RULE_ACTION_ALLOW);
       result.push(new rp.mod.Destination(destBase, properties));
     }
     return result;
@@ -1100,8 +1100,8 @@ requestpolicy.menu = {
 
   _populateDetailsAddSubdomainAllowRules : function(list) {
     var policyMgr = this._rpService._policyMgr;
-    const RULE_TYPE_ALLOW = rp.mod.RULE_TYPE_ALLOW;
-    const RULE_TYPE_DENY = rp.mod.RULE_TYPE_DENY;
+    const RULE_ACTION_ALLOW = rp.mod.RULE_ACTION_ALLOW;
+    const RULE_ACTION_DENY = rp.mod.RULE_ACTION_DENY;
 
     var origin = this._currentlySelectedOrigin;
 
@@ -1136,8 +1136,8 @@ requestpolicy.menu = {
           'h': destHost
         }
       };
-      if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, ruleData) &&
-          !policyMgr.ruleExists(RULE_TYPE_DENY, ruleData)) {
+      if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
+          !policyMgr.ruleExists(RULE_ACTION_DENY, ruleData)) {
         if (!this._privateBrowsingEnabled) {
           var item = this._addMenuItemAllowOriginToDest(list, ruleData);
         }
@@ -1149,8 +1149,8 @@ requestpolicy.menu = {
           'h': destHost
         }
       };
-      if (!policyMgr.ruleExists(RULE_TYPE_ALLOW, destOnlyRuleData) &&
-          !policyMgr.ruleExists(RULE_TYPE_DENY, destOnlyRuleData)) {
+      if (!policyMgr.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
+          !policyMgr.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
         if (!this._privateBrowsingEnabled) {
           var item = this._addMenuItemAllowDest(list, destOnlyRuleData);
         }

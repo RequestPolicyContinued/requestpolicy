@@ -4,13 +4,13 @@ var policy = new Ruleset();
 dprint("== Allow all requests from origin www.foo.com ==");
 var host = policy.addHost("www.foo.com");
 var r = host.rules.add();
-r.originRuleType = RULE_TYPE_ALLOW;
+r.originRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Deny all requests to destination www.foo.com ==");
 var host = policy.addHost("www.foo.com");
 var r = host.rules.add();
-r.destinationRuleType = RULE_TYPE_DENY;
+r.destinationRuleAction = RULE_ACTION_DENY;
 dprint("=======");
 
 dprint("== Allow all requests from https://www.foo.com to https://* ==");
@@ -18,7 +18,7 @@ var host = policy.addHost("www.foo.com");
 var r = host.rules.add("https");
 r.initDestinations();
 var destRule = r.destinations.rules.add("https");
-destRule.destinationRuleType = RULE_TYPE_ALLOW;
+destRule.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Allow all requests from *.foo.com to *.bar.com ==");
@@ -27,19 +27,19 @@ var r = host.rules.add();
 r.initDestinations();
 var barHost = r.destinations.addHost("*.bar.com");
 var destRule = barHost.rules.add();
-destRule.destinationRuleType = RULE_TYPE_ALLOW;
+destRule.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Allow all requests to https:// ==");
 var r = policy.rules.add("https");
-r.destinationRuleType = RULE_TYPE_ALLOW;
+r.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Allow all requests to https://localhost:8888/baz ==");
 var host = policy.addHost("localhost");
 var r = host.rules.add("https", 8888);
 r.path = "/baz";
-r.destinationRuleType = RULE_TYPE_ALLOW;
+r.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 

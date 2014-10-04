@@ -749,34 +749,34 @@ RequestPolicyService.prototype = {
   },
 
   addAllowRule : function(rawRule, noStore) {
-    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, rawRule,
+    this._policyMgr.addRule(rp.mod.RULE_ACTION_ALLOW, rawRule,
         noStore);
   },
 
   addTemporaryAllowRule : function(rawRule) {
-    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_ACTION_ALLOW,
         rawRule);
   },
 
   removeAllowRule : function(rawRule) {
-    this._policyMgr.removeRule(rp.mod.RULE_TYPE_ALLOW, rawRule);
+    this._policyMgr.removeRule(rp.mod.RULE_ACTION_ALLOW, rawRule);
   },
 
   addDenyRule : function(rawRule) {
-    this._policyMgr.addRule(rp.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.addRule(rp.mod.RULE_ACTION_DENY, rawRule);
   },
 
   addTemporaryDenyRule : function(rawRule) {
-    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_ACTION_DENY, rawRule);
   },
 
   removeDenyRule : function(rawRule) {
-    this._policyMgr.removeRule(rp.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.removeRule(rp.mod.RULE_ACTION_DENY, rawRule);
   },
 
   _allowOrigin : function(host, noStore) {
     var ruleData = {"o":{"h":host}};
-    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_ACTION_ALLOW, ruleData,
           noStore);
   },
 
@@ -790,13 +790,13 @@ RequestPolicyService.prototype = {
 
   temporarilyAllowOrigin : function(host) {
     var ruleData = {"o": {"h" : host}};
-    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_ACTION_ALLOW,
           ruleData);
   },
 
   _allowDestination : function(host, noStore) {
     var ruleData = {"d": {"h" : host}};
-    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_ACTION_ALLOW, ruleData,
           noStore);
   },
 
@@ -810,7 +810,7 @@ RequestPolicyService.prototype = {
 
   temporarilyAllowDestination : function(host) {
     var ruleData = {"d": {"h" : host}};
-    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_ACTION_ALLOW,
         ruleData);
   },
 
@@ -820,7 +820,7 @@ RequestPolicyService.prototype = {
       "o": {"h" : originIdentifier},
       "d": {"h" : destIdentifier}
     };
-    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_ACTION_ALLOW, ruleData,
           noStore);
   },
 
@@ -839,7 +839,7 @@ RequestPolicyService.prototype = {
       "o": {"h" : originIdentifier},
       "d": {"h" : destIdentifier}
     };
-    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_ACTION_ALLOW,
         ruleData);
   },
 

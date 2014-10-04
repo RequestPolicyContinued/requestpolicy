@@ -7,7 +7,7 @@ var r = host.rules.add();
 r.initDestinations();
 barHost = r.destinations.addHost("*.bar.com");
 var destRule = barHost.rules.add();
-destRule.destinationRuleType = RULE_TYPE_ALLOW;
+destRule.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Deny all requests from https://*.foo.com to http://*.bar.com ==");
@@ -16,7 +16,7 @@ var r = host.rules.add("https");
 r.initDestinations();
 barHost = r.destinations.addHost("*.bar.com");
 var destRule = barHost.rules.add("http");
-destRule.destinationRuleType = RULE_TYPE_DENY;
+destRule.destinationRuleAction = RULE_ACTION_DENY;
 dprint("=======");
 
 

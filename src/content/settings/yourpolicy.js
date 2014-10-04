@@ -83,9 +83,9 @@ function addRules(entries, source, filter, readOnly) {
 
 function deleteRule(event) {
   var anchor = $(event.target);
-  var ruleType = anchor.data('requestpolicyRuleType');
+  var ruleAction = anchor.data('requestpolicyRuleAction');
   var ruleData = anchor.data('requestpolicyRuleData');
-  if (ruleType == 'allow') {
+  if (ruleAction == 'allow') {
     rpService.removeAllowRule(ruleData);
   } else {
     rpService.removeDenyRule(ruleData);
@@ -101,15 +101,15 @@ function clearRulesTable(table) {
   }
 }
 
-function addRulesTableRow(table, type, origin, dest, ruleData, source, readOnly) {
+function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, readOnly) {
 
-  var typeClass = type == 'allow' ? 'allow' : 'block';
-  var ruleType = type == 'allow' ? _('allow') : _('block');
+  var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
+  var action = ruleAction == 'allow' ? _('allow') : _('block');
 
-  var row = $('<tr>').addClass(typeClass).appendTo(table);
+  var row = $('<tr>').addClass(actionClass).appendTo(table);
 
   row.append(
-    $('<td>').text(ruleType),
+    $('<td>').text(action),
     $('<td>').text(origin),
     $('<td>').text(dest),
     $('<td>').text(source)
@@ -118,7 +118,7 @@ function addRulesTableRow(table, type, origin, dest, ruleData, source, readOnly)
   if (!readOnly) {
     var anchor = $('<a>');
     anchor.text('x').addClass('deleterule');
-    anchor.data('requestpolicyRuleType', type);
+    anchor.data('requestpolicyRuleAction', action);
     anchor.data('requestpolicyRuleData', ruleData);
     anchor.click(deleteRule);
     row.append($('<td>').append(anchor));

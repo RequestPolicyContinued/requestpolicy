@@ -39,14 +39,14 @@ function populateRuleTable() {
   }
 }
 
-function addRulesTableRow(table, type, origin, dest, ruleData) {
-  var typeClass = type == 'allow' ? 'allow' : 'block';
-  var ruleType = type == 'allow' ? _('allow') : _('block');
+function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
+  var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
+  var action = ruleAction == 'allow' ? _('allow') : _('block');
 
-  var row = $('<tr>').addClass(typeClass).appendTo(table);
+  var row = $('<tr>').addClass(actionClass).appendTo(table);
 
   row.append(
-    $('<td>').text(ruleType),
+    $('<td>').text(action),
     $('<td>').text(origin),
     $('<td>').text(dest)
   );

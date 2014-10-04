@@ -5,7 +5,7 @@ dprint("== Allow all requests to https://127.0.0.1:8888/baz ==");
 var host = policy.addHost("127.0.0.1");
 var r = host.rules.add("https", 8888);
 r.path = "/baz";
-r.destinationRuleType = RULE_TYPE_ALLOW;
+r.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 dprint("== Allow all requests from [::1] to https://[a:b::c] ==");
@@ -14,7 +14,7 @@ var r = host.rules.add();
 r.initDestinations();
 var destHost = r.destinations.addHost("a:b::c");
 var destRule = destHost.rules.add("https");
-destRule.destinationRuleType = RULE_TYPE_ALLOW;
+destRule.destinationRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 

@@ -5,7 +5,7 @@ dprint("== Allow all requests from https://localhost:8888/baz ==");
 var host = policy.addHost("localhost");
 var r = host.rules.add("https", 8888);
 r.path = "/baz";
-r.originRuleType = RULE_TYPE_ALLOW;
+r.originRuleAction = RULE_ACTION_ALLOW;
 dprint("=======");
 
 

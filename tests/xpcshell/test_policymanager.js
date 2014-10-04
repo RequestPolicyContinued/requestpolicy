@@ -104,7 +104,7 @@ function test_1() {
     print("Starting: " + i);
     var rawRule = rules[i];
     // Add a rule we just added.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -112,7 +112,7 @@ function test_1() {
     do_check_eq(result.matchedAllowRules.length, 1);
 
     // Remove the rule we just added.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -124,7 +124,7 @@ function test_1() {
     do_check_false(result.isAllowed());
 
     // Remove the same rule twice in a row.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -136,7 +136,7 @@ function test_1() {
     }
 
     // Add the original allow rule back.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -148,7 +148,7 @@ function test_1() {
     do_check_true(result.isAllowed());
 
     // Add the same rule details but as a deny rule.
-    manager.addRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -160,7 +160,7 @@ function test_1() {
     do_check_true(result.isAllowed());
 
     // Add the same rule again.
-    manager.addRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_true(result.isDenied());
@@ -168,7 +168,7 @@ function test_1() {
     do_check_eq(result.matchedDenyRules.length, 1);
 
     // Add same rule as an allow rule.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -180,8 +180,8 @@ function test_1() {
     do_check_true(result.isAllowed());
 
     // Remove both rules.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.removeRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -219,7 +219,7 @@ function test_2() {
     print("Starting: " + i);
     var rawRule = rules[i];
     // Add a rule we just added.
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -227,7 +227,7 @@ function test_2() {
     do_check_eq(result.matchedAllowRules.length, 1);
 
     // Remove the rule we just added.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -239,7 +239,7 @@ function test_2() {
     do_check_false(result.isAllowed());
 
     // Remove the same rule twice in a row.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -251,7 +251,7 @@ function test_2() {
     }
 
     // Add the original allow rule back.
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -263,7 +263,7 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Add the same rule details but as a deny rule.
-    manager.addTemporaryRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -275,7 +275,7 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Add the same rule again.
-    manager.addTemporaryRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_true(result.isDenied());
@@ -283,7 +283,7 @@ function test_2() {
     do_check_eq(result.matchedDenyRules.length, 1);
 
     // Add same rule as an allow rule.
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -295,8 +295,8 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Remove both rules.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.removeRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -336,8 +336,8 @@ function test_2() {
     print("Starting: " + i);
     var rawRule = rules[i];
     // Add a rule as both persistent and temporary.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -345,7 +345,7 @@ function test_2() {
     do_check_eq(result.matchedAllowRules.length, 2);
 
     // Remove the rule we just added.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -357,7 +357,7 @@ function test_2() {
     do_check_false(result.isAllowed());
 
     // Remove the same rule twice in a row.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());
@@ -369,8 +369,8 @@ function test_2() {
     }
 
     // Add the original allow rules back.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -382,8 +382,8 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Add the same rule details but as a deny rule.
-    manager.addRule(RULE_TYPE_DENY, rawRule, noStore);
-    manager.addTemporaryRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addRule(RULE_ACTION_DENY, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -395,8 +395,8 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Add the same rule again.
-    manager.addRule(RULE_TYPE_DENY, rawRule, noStore);
-    manager.addTemporaryRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.addRule(RULE_ACTION_DENY, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_true(result.isDenied());
@@ -404,8 +404,8 @@ function test_2() {
     do_check_eq(result.matchedDenyRules.length, 2);
 
     // Add same rule as an allow rule.
-    manager.addRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.addTemporaryRule(RULE_TYPE_ALLOW, rawRule, noStore);
+    manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (var i in manager._rulesets) {
       print("print ruleset: " + i);
@@ -417,8 +417,8 @@ function test_2() {
     do_check_true(result.isAllowed());
 
     // Remove both rules.
-    manager.removeRule(RULE_TYPE_ALLOW, rawRule, noStore);
-    manager.removeRule(RULE_TYPE_DENY, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
+    manager.removeRule(RULE_ACTION_DENY, rawRule, noStore);
 
     result = manager.checkRequest(origin, dest);
     do_check_false(result.isDenied());

@@ -31,8 +31,8 @@ var EXPORTED_SYMBOLS = [
 
 Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 Components.utils.import("resource://requestpolicy/Logger.jsm");
-Components.utils.import("resource://requestpolicy/Policy.jsm");
-Components.utils.import("resource://requestpolicy/PolicyStorage.jsm");
+Components.utils.import("resource://requestpolicy/Ruleset.jsm");
+Components.utils.import("resource://requestpolicy/RulesetStorage.jsm");
 
 
 const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';
@@ -398,23 +398,23 @@ Subscription.prototype = {
         self._data = JSON.parse(req.responseText);
         // Make sure there's a ['metadata']['serial'] key as a way of sanity
         // checking the parsed JSON as well as enforcing the use of serial
-        // numbers in subscription policies.
+        // numbers in subscription rulesets.
         try {
           var serial = self._data['metadata']['serial'];
         } catch (e) {
-          var error = 'Policy has no serial number';
+          var error = 'Ruleset has no serial number';
           setTimeout(function () { errorCallback(self, error); }, 0);
           return;
         }
         if (typeof serial != 'number' || serial % 1 != 0) {
-          var error = 'Policy has invalid serial number: ' + serial;
+          var error = 'Ruleset has invalid serial number: ' + serial;
           setTimeout(function () { errorCallback(self, error); }, 0);
           return;
         }
-        // The rest of the sanity checking is done by RawPolicy().
+        // The rest of the sanity checking is done by RawRuleset().
         try {
-          var rawPolicy = new RawPolicy(self._rawData);
-          PolicyStorage.saveRawPolicyToFile(rawPolicy, self._name + '.json',
+          var rawRuleset = new RawRuleset(self._rawData);
+          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + '.json',
                 self._list);
         } catch (e) {
           setTimeout(function () { errorCallback(self, e.toString()); }, 0);

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["PolicyStorage"];
+var EXPORTED_SYMBOLS = ["RulesetStorage"];
 
 
 if (!rp) {
@@ -28,14 +28,14 @@ if (!rp) {
 }
 
 Components.utils.import("resource://requestpolicy/FileUtil.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
 
-var PolicyStorage = {
+var RulesetStorage = {
 
   /**
-   * @return {RawPolicy}
+   * @return {RawRuleset}
    */
-  loadRawPolicyFromFile : function(/**string*/ filename,
+  loadRawRulesetFromFile : function(/**string*/ filename,
         /**string*/ subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
@@ -48,11 +48,11 @@ var PolicyStorage = {
     }
     policyFile.appendRelativePath(filename);
     var str = rp.mod.FileUtil.fileToString(policyFile);
-    var rawPolicy = new rp.mod.RawPolicy(str);
-    return rawPolicy;
+    var rawRuleset = new rp.mod.RawRuleset(str);
+    return rawRuleset;
   },
 
-  saveRawPolicyToFile : function(/**RawPolicy*/ policy, /**string*/ filename,
+  saveRawRulesetToFile : function(/**RawRuleset*/ policy, /**string*/ filename,
         /**string*/ subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.

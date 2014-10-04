@@ -30,7 +30,7 @@ var jsonData = JSON.stringify(exampleRawDataObj);
 tprint("typeof jsonData: " + typeof jsonData);
 tprint(jsonData);
 
-var raw1 = new RawPolicy(jsonData);
+var raw1 = new RawRuleset(jsonData);
 tprint(raw1);
 
 tprint("");
@@ -39,5 +39,5 @@ var jsonData2 = JSON.stringify(raw1);
 tprint("typeof jsonData2: " + typeof jsonData2);
 tprint(jsonData2);
 
-var raw2 = new RawPolicy(jsonData2);
+var raw2 = new RawRuleset(jsonData2);
 tprint(raw2);

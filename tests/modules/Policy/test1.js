@@ -1,5 +1,5 @@
 
-var policy = new Policy();
+var policy = new Ruleset();
 
 dprint("== Allow all requests from origin www.foo.com ==");
 var host = policy.addHost("www.foo.com");

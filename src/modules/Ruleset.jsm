@@ -21,8 +21,8 @@
  */
 
 var EXPORTED_SYMBOLS = [
-  "Policy",
-  "RawPolicy",
+  "Ruleset",
+  "RawRuleset",
   "RULE_TYPE_ALLOW",
   "RULE_TYPE_DENY"
 ];
@@ -103,7 +103,7 @@ function dump(arr,level) {
   return dumped_text;
 }
 
-function RawPolicy(jsonData) {
+function RawRuleset(jsonData) {
   this._metadata = {"version" : 1};
   this._entries = {};
   if (jsonData) {
@@ -117,12 +117,12 @@ function RawPolicy(jsonData) {
   }
 }
 
-RawPolicy.prototype = {
+RawRuleset.prototype = {
   _metadata : null,
   _entries : null,
 
   toString : function() {
-    return "[RawPolicy " + this._metadata + " " + this._entries + "]";
+    return "[RawRuleset " + this._metadata + " " + this._entries + "]";
   },
 
   getAllowRuleCount : function() {
@@ -148,14 +148,14 @@ RawPolicy.prototype = {
     return [rules, r];
   },
 
-  _addEntryToPolicy : function(entry, ruleType, policy) {
+  _addEntryToRuleset : function(entry, ruleType, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry["o"];
     var d = entry["d"];
     var rules, r;
 
-    //dprint("_addEntryToPolicy: " + o + " " + d + " " + ruleType);
+    //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleType);
 
     if (o && d) {
       [rules, r] = this._addEntryHelper(o, policy);
@@ -193,15 +193,16 @@ RawPolicy.prototype = {
   },
 
   ruleExists : function(ruleType, ruleData) {
-    var typeStr = {RULE_TYPE_ALLOW:"allow", RULE_TYPE_DENY:"deny"}[ruleType];
+    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
+        ruleType == RULE_TYPE_DENY ? "deny" : "";
     if (!typeStr) {
       throw "Invalid ruleType: " + ruleType;
     }
 
-    var ruleStr = Policy.rawRuleToCanonicalString(ruleData);
+    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
     var entries = this._entries[typeStr];
     for (var i in entries) {
-      var curRuleStr = Policy.rawRuleToCanonicalString(entries[i]);
+      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr == curRuleStr) {
         return true;
       }
@@ -210,8 +211,8 @@ RawPolicy.prototype = {
   },
 
   /**
-   * Adds the rule to the entries of this |RawPolicy| instance as well as the
-   * |Policy| optionally provided as the policy argument.
+   * Adds the rule to the entries of this |RawRuleset| instance as well as the
+   * |Ruleset| optionally provided as the policy argument.
    *
    * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
    * @param ruleData
@@ -219,7 +220,8 @@ RawPolicy.prototype = {
   addRule : function(ruleType, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
-    var typeStr = {RULE_TYPE_ALLOW:"allow", RULE_TYPE_DENY:"deny"}[ruleType];
+    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
+        ruleType == RULE_TYPE_DENY ? "deny" : "";
     if (!typeStr) {
       throw "Invalid ruleType: " + ruleType;
     }
@@ -230,7 +232,7 @@ RawPolicy.prototype = {
     }
 
     if (policy) {
-      this._addEntryToPolicy(ruleData, ruleType, policy);
+      this._addEntryToRuleset(ruleData, ruleType, policy);
     }
   },
 
@@ -247,14 +249,14 @@ RawPolicy.prototype = {
   //     return rules.get(entryPart["s"], entryPart["port"]);
   // },
 
-  _removeEntryFromPolicy : function(entry, ruleType, policy) {
+  _removeEntryFromRuleset : function(entry, ruleType, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry["o"];
     var d = entry["d"];
     var rules, r;
 
-    // TODO: refactor like done with _addEntryToPolicy
+    // TODO: refactor like done with _addEntryToRuleset
 
     if (o && d) {
       if (o["h"]) {
@@ -288,7 +290,7 @@ RawPolicy.prototype = {
       // if (r.destinationRuleType == ruleType) {
       //   r.destinationRuleType = null;
       // }
-      //dprint("_removeEntryFromPolicy: got rule to alter: " + r.toString());
+      //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
       if (ruleType == RULE_TYPE_ALLOW) {
         r.allowDestination = null;
       } else if (ruleType == RULE_TYPE_DENY) {
@@ -356,8 +358,8 @@ RawPolicy.prototype = {
   },
 
   /**
-   * Removes the rule from the entries of this |RawPolicy| instance as well as the
-   * |Policy| optionally provided as the policy argument.
+   * Removes the rule from the entries of this |RawRuleset| instance as well as the
+   * |Ruleset| optionally provided as the policy argument.
    *
    * @param ruleType RULE_TYPE_ALLOW|RULE_TYPE_DENY
    * @param ruleData
@@ -365,15 +367,16 @@ RawPolicy.prototype = {
   removeRule : function(ruleType, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
-    var typeStr = {RULE_TYPE_ALLOW:"allow", RULE_TYPE_DENY:"deny"}[ruleType];
+    var typeStr = ruleType == RULE_TYPE_ALLOW ? "allow" :
+        ruleType == RULE_TYPE_DENY ? "deny" : "";
     if (!typeStr) {
       throw "Invalid ruleType: " + ruleType;
     }
-    var ruleStr = Policy.rawRuleToCanonicalString(ruleData);
+    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
     var entries = this._entries[typeStr];
     var removeIndex = false;
     for (var i in entries) {
-      var curRuleStr = Policy.rawRuleToCanonicalString(entries[i]);
+      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr == curRuleStr) {
         // |i| is a string which will cause bugs when we use it in arithmetic
         // expressions below. Why does this form of iterator give us string
@@ -392,16 +395,16 @@ RawPolicy.prototype = {
     }
 
     if (policy) {
-      this._removeEntryFromPolicy(ruleData, ruleType, policy);
+      this._removeEntryFromRuleset(ruleData, ruleType, policy);
     }
   },
 
   /**
-   * Returns a |Policy| object initialized to reflect the contents of this
-   * |RawPolicy|.
+   * Returns a |Ruleset| object initialized to reflect the contents of this
+   * |RawRuleset|.
    */
-  toPolicy : function(name) {
-    var policy = new Policy(name);
+  toRuleset : function(name) {
+    var policy = new Ruleset(name);
 
     for (var typeStr in this._entries) {
       //dprint("typeStr: " + typeStr);
@@ -412,8 +415,8 @@ RawPolicy.prototype = {
       var ruleType = typeStr == "allow" ? RULE_TYPE_ALLOW : RULE_TYPE_DENY;
       var entryArray = this._entries[typeStr];
       for (var i in entryArray) {
-        //dprint("toPolicy: adding entry");
-        this._addEntryToPolicy(entryArray[i], ruleType, policy);
+        //dprint("toRuleset: adding entry");
+        this._addEntryToRuleset(entryArray[i], ruleType, policy);
       }
     }
 
@@ -437,7 +440,7 @@ RawPolicy.prototype = {
   },
 
   /**
-   * Initializes this |RawPolicy| from JSON data.
+   * Initializes this |RawRuleset| from JSON data.
    */
   _fromJSON : function(data) {
     // TODO: sanity check imported data, decide whether to ignore unrecognized
@@ -453,8 +456,8 @@ RawPolicy.prototype = {
   },
 
   /**
-   * Returns a simple object representing this |RawPolicy|. This function
-   * is automatically invoked when |JSON.stringify(rawPolicyObj)| is called and
+   * Returns a simple object representing this |RawRuleset|. This function
+   * is automatically invoked when |JSON.stringify(rawRulesetObj)| is called and
    * the result is passed through stringify before being returned.
    */
   toJSON : function() {
@@ -593,7 +596,7 @@ Rule.prototype = {
     if (this.destinations) {
       return;
     }
-    this.destinations = new Policy();
+    this.destinations = new Ruleset();
   },
 
   isMatch : function(uriObj) {
@@ -714,7 +717,7 @@ IPAddressEntry.prototype = {
 };
 
 
-function Policy(name) {
+function Ruleset(name) {
   this._name = name ? name : null;
   // Start off with an "empty" top-level domain entry. This will never have
   // its own rules. Non-host-specific rules go in |this.rules|.
@@ -728,14 +731,14 @@ function Policy(name) {
 //  var print;
 //}
 
-Policy.prototype = {
+Ruleset.prototype = {
   _name : null,
   _domain : null,
   _ipAddr : null,
   rules : null,
 
   toString : function() {
-    return "[Policy " + this._name + "]";
+    return "[Ruleset " + this._name + "]";
   },
 
   print : function(depth) {
@@ -1007,7 +1010,7 @@ Policy.prototype = {
 /**
  * @static
  */
-Policy._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
+Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
   if (entry instanceof DomainEntry && entry.fullName) {
     rawRule[originOrDest]["h"] = entry.fullName;
@@ -1026,26 +1029,26 @@ Policy._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
 /**
  * @static
  */
-Policy.matchToRawRule = function(match) {
+Ruleset.matchToRawRule = function(match) {
   // The matches are in the format
   //     [typeStr, entry, rule]
   // or
   //     [typeStr, originEntry, originRule, destEntry, destRule]
-  // as returned by calls to |Policy.check()|.
+  // as returned by calls to |Ruleset.check()|.
   var rawRule = {};
   var entry, rule, destEntry, destRule;
   var typeStr = match[0];
 
   if (typeStr == "origin") {
     [typeStr, entry, rule] = match;
-    Policy._matchToRawRuleHelper(rawRule, "o", entry, rule);
+    Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
   } else if (typeStr == "dest") {
     [typeStr, entry, rule] = match;
-    Policy._matchToRawRuleHelper(rawRule, "d", entry, rule);
+    Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
   } else if (typeStr == "origin-to-dest") {
     [typeStr, entry, rule, destEntry, destRule] = match;
-    Policy._matchToRawRuleHelper(rawRule, "o", entry, rule);
-    Policy._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
+    Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
+    Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
     throw "[matchToRawRule] Invalid match type: " + typeStr
           + " from match: " + match;
@@ -1057,7 +1060,7 @@ Policy.matchToRawRule = function(match) {
 /**
  * @static
  */
-Policy._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts) {
+Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts) {
   if (rawRule[originOrDest]) {
     parts.push('"' + originOrDest + '":{');
     var needComma = false;
@@ -1084,16 +1087,16 @@ Policy._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts) 
   return parts.join("");
 }
 
-Policy.rawRuleToCanonicalString = function(rawRule) {
+Ruleset.rawRuleToCanonicalString = function(rawRule) {
   var parts = ['{'];
   if (rawRule["d"]) {
-    Policy._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
+    Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }
   if (rawRule["d"] && rawRule["o"]) {
     parts.push(',');
   }
   if (rawRule["o"]) {
-    Policy._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
+    Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
   }
   parts.push('}');
   return parts.join("");
@@ -1102,8 +1105,8 @@ Policy.rawRuleToCanonicalString = function(rawRule) {
 /**
  * @static
  */
-// Policy.rawRulesAreEqual = function(first, second) {
-//   var firstStr = Policy.rawRuleToCanonicalString(first);
-//   var secondStr = Policy.rawRuleToCanonicalString(second);
+// Ruleset.rawRulesAreEqual = function(first, second) {
+//   var firstStr = Ruleset.rawRuleToCanonicalString(first);
+//   var secondStr = Ruleset.rawRuleToCanonicalString(second);
 //   return firstStr == secondStr;
 // }

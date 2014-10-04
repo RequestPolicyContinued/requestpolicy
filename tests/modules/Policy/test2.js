@@ -1,5 +1,5 @@
 
-var policy = new Policy();
+var policy = new Ruleset();
 
 dprint("== Allow all requests to https://localhost:8888/baz ==");
 var host = policy.addHost("localhost");

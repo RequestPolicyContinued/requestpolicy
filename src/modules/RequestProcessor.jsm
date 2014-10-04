@@ -342,7 +342,7 @@ RequestProcessor.prototype.process = function(request) {
     }
 
     request.requestResult = this._rpService._policyMgr.
-        checkRequestAgainstUserPolicies(request.aRequestOrigin,
+        checkRequestAgainstUserRules(request.aRequestOrigin,
             request.aContentLocation);
     for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
       rp.mod.Logger.dump('Matched deny rules');
@@ -386,7 +386,7 @@ RequestProcessor.prototype.process = function(request) {
     }
 
     request.requestResult = this._rpService._policyMgr.
-        checkRequestAgainstSubscriptionPolicies(request.aRequestOrigin,
+        checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
             request.aContentLocation);
     for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
       rp.mod.Logger.dump('Matched deny rules');
@@ -405,12 +405,12 @@ RequestProcessor.prototype.process = function(request) {
       if (this._rpService._defaultAllow) {
         request.requestResult.isAllowed = true;
         return this.accept(
-            "Subscription policies indicate both allow and block. " +
+            "Subscription rules indicate both allow and block. " +
             "Using default allow policy", request);
       } else {
         request.requestResult.isAllowed = false;
         return this.reject(
-            "Subscription policies indicate both allow and block. " +
+            "Subscription rules indicate both allow and block. " +
             "Using default block policy", request);
       }
     }
@@ -956,7 +956,7 @@ RequestProcessor.prototype.checkRedirect = function(request) {
   var originURIObj = rp.mod.DomainUtil.getUriObject(originURI);
   var destURIObj = rp.mod.DomainUtil.getUriObject(destURI);
 
-  var result = this._rpService._policyMgr.checkRequestAgainstUserPolicies(
+  var result = this._rpService._policyMgr.checkRequestAgainstUserRules(
       originURIObj, destURIObj);
   // For now, we always give priority to deny rules.
   if (result.denyRulesExist()) {
@@ -969,7 +969,7 @@ RequestProcessor.prototype.checkRedirect = function(request) {
   }
 
   var result = this._rpService._policyMgr.
-      checkRequestAgainstSubscriptionPolicies(originURIObj, destURIObj);
+      checkRequestAgainstSubscriptionRules(originURIObj, destURIObj);
   // For now, we always give priority to deny rules.
   if (result.denyRulesExist()) {
     result.isAllowed = false;

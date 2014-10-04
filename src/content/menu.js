@@ -26,7 +26,7 @@ if (!rp) {
 
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/PolicyManager.jsm", rp.mod);
 
@@ -530,7 +530,7 @@ requestpolicy.menu = {
       return;
     }
 
-    var canonicalRule = rp.mod.Policy.rawRuleToCanonicalString(ruleData);
+    var canonicalRule = rp.mod.Ruleset.rawRuleToCanonicalString(ruleData);
     rp.mod.Logger.dump("ruleData: " + canonicalRule);
     rp.mod.Logger.dump("ruleAction: " + ruleAction);
     rp.mod.Logger.dump("undo: " + undo);
@@ -872,7 +872,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleAction = ruleAction;
     //var statustext = ''; // TODO
     item.setAttribute('class', 'rp-od-item ' + cssClass);
-    var canonicalRule = rp.mod.Policy.rawRuleToCanonicalString(ruleData);
+    var canonicalRule = rp.mod.Ruleset.rawRuleToCanonicalString(ruleData);
     if (this._ruleChangeQueues[ruleAction]) {
       if (this._ruleChangeQueues[ruleAction][canonicalRule]) {
         item.setAttribute('selected-rule', 'true');
@@ -980,9 +980,9 @@ requestpolicy.menu = {
 
           for (var i in results.matchedAllowRules) {
 
-            var policy, match;
-            [policy, match] = results.matchedAllowRules[i];
-            var rawRule = rp.mod.Policy.matchToRawRule(match);
+            var ruleset, match;
+            [ruleset, match] = results.matchedAllowRules[i];
+            var rawRule = rp.mod.Ruleset.matchToRawRule(match);
 
             if (!this._currentlySelectedDest) {
               if (rawRule['d'] && rawRule['d']['h']) {
@@ -990,12 +990,12 @@ requestpolicy.menu = {
               }
             }
 
-            var rawRuleStr = rp.mod.Policy.rawRuleToCanonicalString(rawRule);
+            var rawRuleStr = rp.mod.Ruleset.rawRuleToCanonicalString(rawRule);
             //rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
-            if (policy.userPolicy) {
+            if (ruleset.userRuleset) {
               userRules[rawRuleStr] = rawRule;
             } else {
               subscriptionRules[rawRuleStr] = rawRule;
@@ -1062,9 +1062,9 @@ requestpolicy.menu = {
 
           for (var i in results.matchedDenyRules) {
 
-            var policy, match;
-            [policy, match] = results.matchedDenyRules[i];
-            var rawRule = rp.mod.Policy.matchToRawRule(match);
+            var ruleset, match;
+            [ruleset, match] = results.matchedDenyRules[i];
+            var rawRule = rp.mod.Ruleset.matchToRawRule(match);
 
             if (!this._currentlySelectedDest) {
               if (rawRule['d'] && rawRule['d']['h']) {
@@ -1072,12 +1072,12 @@ requestpolicy.menu = {
               }
             }
 
-            var rawRuleStr = rp.mod.Policy.rawRuleToCanonicalString(rawRule);
+            var rawRuleStr = rp.mod.Ruleset.rawRuleToCanonicalString(rawRule);
             //rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
-            if (policy.userPolicy) {
+            if (ruleset.userRuleset) {
               userRules[rawRuleStr] = rawRule;
             } else {
               subscriptionRules[rawRuleStr] = rawRule;

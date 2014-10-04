@@ -41,30 +41,30 @@ function populateRuleTable(filter) {
 
   var table = document.getElementById('rules');
 
-  clearPolicyTable(table);
+  clearRulesTable(table);
 
-  // Get and display user policies
-  var user = policyMgr._userPolicies['user'];
-  var entries = user.rawPolicy.toJSON()['entries'];
-  addPolicies(entries, 'User', filter, false);
+  // Get and display user rules
+  var user = policyMgr._userRulesets['user'];
+  var entries = user.rawRuleset.toJSON()['entries'];
+  addRules(entries, 'User', filter, false);
 
-  // Get and display temorary policies
-  var temp = policyMgr._userPolicies['temp'];
-  var entries = temp.rawPolicy.toJSON()['entries'];
-  addPolicies(entries, 'Temporary', filter, false);
+  // Get and display temorary rules
+  var temp = policyMgr._userRulesets['temp'];
+  var entries = temp.rawRuleset.toJSON()['entries'];
+  addRules(entries, 'Temporary', filter, false);
 
-  // Get and display subscription policies
-  var subscriptionLists = policyMgr._subscriptionPolicies;
+  // Get and display subscription rules
+  var subscriptionLists = policyMgr._subscriptionRulesets;
   for (subscriptionList in subscriptionLists) {
     for (subscription in subscriptionLists[subscriptionList]) {
-      entries = subscriptionLists[subscriptionList][subscription].rawPolicy.toJSON()['entries'];
-      addPolicies(entries, subscription, filter, true);
+      entries = subscriptionLists[subscriptionList][subscription].rawRuleset.toJSON()['entries'];
+      addRules(entries, subscription, filter, true);
     }
   }
 
 }
 
-function addPolicies(entries, source, filter, readOnly) {
+function addRules(entries, source, filter, readOnly) {
   var table = $('#rules');
   for (var entryType in entries) {
     for (var i = 0; i < entries[entryType].length; i++) {
@@ -76,7 +76,7 @@ function addPolicies(entries, source, filter, readOnly) {
           continue;
         }
       }
-      addPolicyTableRow(table, entryType, origin, dest, entry, source, readOnly);
+      addRulesTableRow(table, entryType, origin, dest, entry, source, readOnly);
     }
   }
 }
@@ -93,7 +93,7 @@ function deleteRule(event) {
   anchor.closest('tr').remove();
 }
 
-function clearPolicyTable(table) {
+function clearRulesTable(table) {
   var children = table.getElementsByTagName('tr');
   while (children.length) {
     var child = children.item(0);
@@ -101,7 +101,7 @@ function clearPolicyTable(table) {
   }
 }
 
-function addPolicyTableRow(table, type, origin, dest, ruleData, source, readOnly) {
+function addRulesTableRow(table, type, origin, dest, ruleData, source, readOnly) {
 
   var typeClass = type == 'allow' ? 'allow' : 'block';
   var ruleType = type == 'allow' ? _('allow') : _('block');

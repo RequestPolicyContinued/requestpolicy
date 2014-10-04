@@ -98,7 +98,7 @@ function onload() {
     // of the old rules. We check for new-style rules just in case the user has
     // opened the setup window again after initial upgrade.
     try {
-      var ruleCount = rpService._policyMgr.getUserPolicyRuleCount();
+      var ruleCount = rpService._policyMgr.getUserRuleCount();
     } catch (e) {
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;

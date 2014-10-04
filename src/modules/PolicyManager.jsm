@@ -36,8 +36,8 @@ if (!rp) {
 }
 
 Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/PolicyStorage.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/RulesetStorage.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/RequestResult.jsm", rp.mod);
 
 
@@ -197,76 +197,75 @@ Destination.compareFunction = function (a, b, sortType) {
 
 /**
  * Provides a simplified interface to handling multiple
- * policies, checking requests against multiple policies, etc.
+ * rulesets, checking requests against multiple rulesets, etc.
  */
 function PolicyManager() {
-  this._userPolicies = {};
-  this._subscriptionPolicies = {};
+  this._userRulesets = {};
+  this._subscriptionRulesets = {};
 }
 PolicyManager.prototype = {
 
-  //_policies : null,
+  //_rulesets : null,
 
-  getUserPolicyRuleCount : function() {
-    return this._userPolicies["user"]["rawPolicy"].getAllowRuleCount() +
-        this._userPolicies["user"]["rawPolicy"].getDenyRuleCount();
+  getUserRuleCount : function() {
+    return this._userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
+        this._userRulesets["user"]["rawRuleset"].getDenyRuleCount();
   },
 
-  loadUserPolicies : function() {
-    // Read the user policy from a file.
+  loadUserRules : function() {
+    // Read the user rules from a file.
     try {
-      dprint("PolicyManager::loadPolicies loading user policy");
-      rawPolicy = rp.mod.PolicyStorage
-        .loadRawPolicyFromFile("user.json");
+      dprint("PolicyManager::loadUserRules loading user rules");
+      rawRuleset = rp.mod.RulesetStorage.loadRawRulesetFromFile("user.json");
     } catch (e) {
-      // TODO: log a message about missing user.json policy file.
-      // There's no user policy. This is either because RP has just been
+      // TODO: log a message about missing user.json ruleset file.
+      // There's no user ruleset. This is either because RP has just been
       // installed, the file has been deleted, or something is wrong. For now,
       // we'll assume this is a new install.
-      rawPolicy = new rp.mod.RawPolicy();
+      rawRuleset = new rp.mod.RawRuleset();
     }
-    this._userPolicies["user"] = {
-      "rawPolicy" : rawPolicy,
-      "policy" : rawPolicy.toPolicy("user")
+    this._userRulesets["user"] = {
+      "rawRuleset" : rawRuleset,
+      "ruleset" : rawRuleset.toRuleset("user")
     };
-    this._userPolicies["user"]["policy"].userPolicy = true;
-    this._userPolicies["user"].policy.print();
+    this._userRulesets["user"]["ruleset"].userRuleset = true;
+    this._userRulesets["user"].ruleset.print();
     // Temporary rules. These are never stored.
-    this.resetTemporaryPolicy();
+    this.revokeTemporaryRules();
 
     notifyRulesChanged();
   },
 
-  loadSubscriptionPolicies : function(subscriptionInfo) {
+  loadSubscriptionRules : function(subscriptionInfo) {
     var failures = {};
 
     // Read each subscription from a file.
-    var rawPolicy;
+    var rawRuleset;
     for (var listName in subscriptionInfo) {
       for (var subName in subscriptionInfo[listName]) {
         try {
-          dprint("PolicyManager::loadSubscriptionPolicies: " +
+          dprint("PolicyManager::loadSubscriptionRules: " +
                  listName + ' / ' + subName);
-          rawPolicy = rp.mod.PolicyStorage
-                .loadRawPolicyFromFile(subName + ".json", listName);
+          rawRuleset = rp.mod.RulesetStorage
+              .loadRawRulesetFromFile(subName + ".json", listName);
         } catch (e) {
-          warn("Unable to load policy from file: " + e);
+          warn("Unable to load ruleset from file: " + e);
           if (!failures[listName]) {
             failures[listName] = {};
           }
           failures[listName][subName] = null;
           continue;
         }
-        if (!this._subscriptionPolicies[listName]) {
-          this._subscriptionPolicies[listName] = {};
+        if (!this._subscriptionRulesets[listName]) {
+          this._subscriptionRulesets[listName] = {};
         }
-        var list = this._subscriptionPolicies[listName];
+        var list = this._subscriptionRulesets[listName];
         list[subName] = {
-          "rawPolicy" : rawPolicy,
-          "policy" : rawPolicy.toPolicy(subName)
+          "rawRuleset" : rawRuleset,
+          "ruleset" : rawRuleset.toRuleset(subName)
         };
-        list[subName]["policy"].userPolicy = false;
-        list[subName].policy.print();
+        list[subName]["ruleset"].userRuleset = false;
+        list[subName].ruleset.print();
       }
     }
 
@@ -275,22 +274,22 @@ PolicyManager.prototype = {
     return failures;
   },
 
-  unloadSubscriptionPolicies : function(subscriptionInfo) {
+  unloadSubscriptionRules : function(subscriptionInfo) {
     var failures = {};
 
     for (var listName in subscriptionInfo) {
       for (var subName in subscriptionInfo[listName]) {
-        dprint("PolicyManager::unloadSubscriptionPolicies: " +
+        dprint("PolicyManager::unloadSubscriptionRules: " +
                  listName + ' / ' + subName);
-        if (!this._subscriptionPolicies[listName] ||
-            !this._subscriptionPolicies[listName][subName]) {
+        if (!this._subscriptionRulesets[listName] ||
+            !this._subscriptionRulesets[listName][subName]) {
           if (!failures[listName]) {
             failures[listName] = {};
           }
           failures[listName][subName] = null;
           continue;
         }
-        var list = this._subscriptionPolicies[listName];
+        var list = this._subscriptionRulesets[listName];
         delete list[subName];
       }
     }
@@ -309,15 +308,15 @@ PolicyManager.prototype = {
 
   ruleExists : function(ruleType, ruleData) {
     this._assertRuleType(ruleType);
-    for (var name in this._userPolicies) {
-      if (this._userPolicies[name].rawPolicy.ruleExists(ruleType, ruleData)) {
+    for (var name in this._userRulesets) {
+      if (this._userRulesets[name].rawRuleset.ruleExists(ruleType, ruleData)) {
         return true;
       }
     }
-    for (var listName in this._subscriptionPolicies) {
-      var policies = this._subscriptionPolicies[listName];
-      for (var name in policies) {
-        if (policies[name].rawPolicy.ruleExists(ruleType, ruleData)) {
+    for (var listName in this._subscriptionRulesets) {
+      var rulesets = this._subscriptionRulesets[listName];
+      for (var name in rulesets) {
+        if (rulesets[name].rawRuleset.ruleExists(ruleType, ruleData)) {
           return true;
         }
       }
@@ -327,109 +326,109 @@ PolicyManager.prototype = {
 
   addRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleType + " "
-           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
-    //this._userPolicies["user"].policy.print();
+           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
+    //this._userRulesets["user"].ruleset.print();
 
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
-    this._userPolicies["user"].rawPolicy.addRule(ruleType, ruleData,
-          this._userPolicies["user"].policy);
+    this._userRulesets["user"].rawRuleset.addRule(ruleType, ruleData,
+          this._userRulesets["user"].ruleset);
 
     // TODO: only save if we actually added a rule. This will require
-    // modifying |RawPolicy.addRule()| to indicate whether a rule
+    // modifying |RawRuleset.addRule()| to indicate whether a rule
     // was added.
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        rp.mod.PolicyStorage.saveRawPolicyToFile(
-              this._userPolicies["user"].rawPolicy, "user.json");
+        rp.mod.RulesetStorage.saveRawRulesetToFile(
+            this._userRulesets["user"].rawRuleset, "user.json");
     }
 
-    //this._userPolicies["user"].policy.print();
+    //this._userRulesets["user"].ruleset.print();
 
     notifyRulesChanged();
   },
 
   storeRules : function() {
-    rp.mod.PolicyStorage.saveRawPolicyToFile(
-        this._userPolicies["user"].rawPolicy, "user.json");
+    rp.mod.RulesetStorage.saveRawRulesetToFile(
+        this._userRulesets["user"].rawRuleset, "user.json");
   },
 
   addTemporaryRule : function(ruleType, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleType + " "
-           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
-    //this._userPolicies["temp"].policy.print();
+           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
+    //this._userRulesets["temp"].ruleset.print();
 
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
-    this._userPolicies["temp"].rawPolicy.addRule(ruleType, ruleData,
-          this._userPolicies["temp"].policy);
+    this._userRulesets["temp"].rawRuleset.addRule(ruleType, ruleData,
+          this._userRulesets["temp"].ruleset);
 
-    //this._userPolicies["temp"].policy.print();
+    //this._userRulesets["temp"].ruleset.print();
 
     notifyRulesChanged();
   },
 
   removeRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::removeRule " + ruleType + " "
-           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
-    //this._userPolicies["user"].policy.print();
-    //this._userPolicies["temp"].policy.print();
+           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
+    //this._userRulesets["user"].ruleset.print();
+    //this._userRulesets["temp"].ruleset.print();
 
     this._assertRuleType(ruleType);
     // TODO: check rule format validity
     // TODO: use noStore
-    this._userPolicies["user"].rawPolicy.removeRule(ruleType, ruleData,
-          this._userPolicies["user"].policy);
-    this._userPolicies["temp"].rawPolicy.removeRule(ruleType, ruleData,
-          this._userPolicies["temp"].policy);
+    this._userRulesets["user"].rawRuleset.removeRule(ruleType, ruleData,
+          this._userRulesets["user"].ruleset);
+    this._userRulesets["temp"].rawRuleset.removeRule(ruleType, ruleData,
+          this._userRulesets["temp"].ruleset);
 
     // TODO: only save if we actually removed a rule. This will require
-    // modifying |RawPolicy.removeRule()| to indicate whether a rule
+    // modifying |RawRuleset.removeRule()| to indicate whether a rule
     // was removed.
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        rp.mod.PolicyStorage.saveRawPolicyToFile(
-              this._userPolicies["user"].rawPolicy, "user.json");
+        rp.mod.RulesetStorage.saveRawRulesetToFile(
+              this._userRulesets["user"].rawRuleset, "user.json");
     }
 
-    //this._userPolicies["user"].policy.print();
-    //this._userPolicies["temp"].policy.print();
+    //this._userRulesets["user"].ruleset.print();
+    //this._userRulesets["temp"].ruleset.print();
 
     notifyRulesChanged();
   },
 
   temporaryRulesExist : function() {
-    return this._userPolicies["temp"].rawPolicy.getAllowRuleCount() ||
-           this._userPolicies["temp"].rawPolicy.getDenyRuleCount();
+    return this._userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
+           this._userRulesets["temp"].rawRuleset.getDenyRuleCount();
   },
 
-  resetTemporaryPolicy : function() {
-    var rawPolicy = new rp.mod.RawPolicy();
-    this._userPolicies["temp"] = {
-      "rawPolicy" : rawPolicy,
-      "policy" : rawPolicy.toPolicy("temp")
+  revokeTemporaryRules : function() {
+    var rawRuleset = new rp.mod.RawRuleset();
+    this._userRulesets["temp"] = {
+      "rawRuleset" : rawRuleset,
+      "ruleset" : rawRuleset.toRuleset("temp")
     };
-    this._userPolicies["temp"]["policy"].userPolicy = true;
+    this._userRulesets["temp"]["ruleset"].userRuleset = true;
 
     notifyRulesChanged();
   },
 
-  checkRequestAgainstUserPolicies : function(origin, dest) {
-    return this._checkRequest(origin, dest, this._userPolicies);
+  checkRequestAgainstUserRules : function(origin, dest) {
+    return this._checkRequest(origin, dest, this._userRulesets);
   },
 
-  checkRequestAgainstSubscriptionPolicies : function(origin, dest) {
+  checkRequestAgainstSubscriptionRules : function(origin, dest) {
     var result = new rp.mod.RequestResult();
-    for (var listName in this._subscriptionPolicies) {
-      var policies = this._subscriptionPolicies[listName];
-      this._checkRequest(origin, dest, policies, result);
+    for (var listName in this._subscriptionRulesets) {
+      var ruleset = this._subscriptionRulesets[listName];
+      this._checkRequest(origin, dest, ruleset, result);
     }
     return result;
   },
 
-  _checkRequest : function(origin, dest, policies, result) {
+  _checkRequest : function(origin, dest, aRuleset, result) {
     if (!(origin instanceof CI.nsIURI)) {
       throw "Origin must be an nsIURI.";
     }
@@ -439,20 +438,20 @@ PolicyManager.prototype = {
     if (!result) {
       result = new rp.mod.RequestResult();
     }
-    for (var i in policies) {
-      var policy = policies[i].policy;
-      //policy.setPrintFunction(print);
-      //policy.print();
+    for (var i in aRuleset) {
+      var ruleset = aRuleset[i].ruleset;
+      //ruleset.setPrintFunction(print);
+      //ruleset.print();
       var tempAllow, tempDeny;
       // TODO wrap this in a try/catch.
-      [tempAllow, tempDeny] = policy.check(origin, dest);
-      // I'm not convinced I like appending these [policy, matchedRule] arrays,
+      [tempAllow, tempDeny] = ruleset.check(origin, dest);
+      // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
       // but it works for now.
       for (var i in tempAllow) {
-        result.matchedAllowRules.push([policy, tempAllow[i]]);
+        result.matchedAllowRules.push([ruleset, tempAllow[i]]);
       }
       for (var i in tempDeny) {
-        result.matchedDenyRules.push([policy, tempDeny[i]]);
+        result.matchedDenyRules.push([ruleset, tempDeny[i]]);
       }
     }
     return result;

@@ -1,5 +1,5 @@
 
-var policy = new Policy();
+var policy = new Ruleset();
 
 dprint("== Allow all requests from *.foo.com to *.bar.com ==");
 var host = policy.addHost("*.foo.com");

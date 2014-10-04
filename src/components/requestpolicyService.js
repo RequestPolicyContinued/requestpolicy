@@ -421,19 +421,19 @@ RequestPolicyService.prototype = {
     this._prefService.savePrefFile(null);
   },
 
-  _loadConfigAndPolicies : function() {
+  _loadConfigAndRules : function() {
     this._subscriptions = new rp.mod.UserSubscriptions();
     this._policyMgr = new rp.mod.PolicyManager();
-    this._policyMgr.loadUserPolicies();
+    this._policyMgr.loadUserRules();
 
     var defaultPolicy = this._defaultAllow ? 'allow' : 'deny';
 
-    var failures = this._policyMgr.loadSubscriptionPolicies(
+    var failures = this._policyMgr.loadSubscriptionRules(
           this._subscriptions.getSubscriptionInfo(defaultPolicy));
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
     // TODO: Maybe we should probably ship snapshot versions of the official
-    // policies so that they can be available immediately after installation.
+    // rulesets so that they can be available immediately after installation.
     var serials = {};
     for (var listName in failures) {
       serials[listName] = {};
@@ -441,14 +441,14 @@ RequestPolicyService.prototype = {
         serials[listName][subName] = -1;
       }
     }
-    var loadedSubs = this._policyMgr._subscriptionPolicies;
+    var loadedSubs = this._policyMgr._subscriptionRulesets;
     for (var listName in loadedSubs) {
       for (var subName in loadedSubs[listName]) {
         if (!serials[listName]) {
           serials[listName] = {};
         }
-        var rawPolicy = loadedSubs[listName][subName].rawPolicy;
-        serials[listName][subName] = rawPolicy._metadata['serial'];
+        var rawRuleset = loadedSubs[listName][subName].rawRuleset;
+        serials[listName][subName] = rawRuleset._metadata['serial'];
       }
     }
     function updateCompleted(result) {
@@ -645,7 +645,7 @@ RequestPolicyService.prototype = {
     var modules = [
       "Logger.jsm",
       "DomainUtil.jsm",
-      "Policy.jsm",
+      "Ruleset.jsm",
       "PolicyManager.jsm",
       "Request.jsm",
       "RequestProcessor.jsm",
@@ -848,7 +848,7 @@ RequestPolicyService.prototype = {
   },
 
   revokeTemporaryPermissions : function() {
-    this._policyMgr.resetTemporaryPolicy();
+    this._policyMgr.revokeTemporaryRules();
   },
 
   isAllowedRedirect : function(originUri, destinationUri) {
@@ -863,7 +863,7 @@ RequestPolicyService.prototype = {
    *         false otherwise.
    */
   areTemporaryPermissionsGranted : function() {
-    return this._policyMgr.temporaryPoliciesExist();
+    return this._policyMgr.temporaryRulesExist();
   },
 
   getConflictingExtensions : function() {
@@ -967,14 +967,14 @@ RequestPolicyService.prototype = {
         // disabled it between the time the update started and when it
         // completed.
         var subInfo = JSON.parse(data);
-        var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
+        var failures = this._policyMgr.loadSubscriptionRules(subInfo);
         break;
 
       case rp.mod.SUBSCRIPTION_ADDED_TOPIC:
         rp.mod.Logger.debug(
           rp.mod.Logger.TYPE_INTERNAL, 'XXX added: ' + data);
         var subInfo = JSON.parse(data);
-        var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
+        var failures = this._policyMgr.loadSubscriptionRules(subInfo);
         var failed = false;
         for (var listName in failures) {
           failed = true;
@@ -1002,7 +1002,7 @@ RequestPolicyService.prototype = {
         rp.mod.Logger.debug(
           rp.mod.Logger.TYPE_INTERNAL, 'YYY: ' + data);
         var subInfo = JSON.parse(data);
-        var failures = this._policyMgr.unloadSubscriptionPolicies(subInfo);
+        var failures = this._policyMgr.unloadSubscriptionRules(subInfo);
         break;
 
       case HTTPS_EVERYWHERE_REWRITE_TOPIC :
@@ -1025,7 +1025,7 @@ RequestPolicyService.prototype = {
         // accessible. If we tried to load preferences before this, we would get
         // default preferences rather than user preferences.
         this._syncFromPrefs();
-        this._loadConfigAndPolicies();
+        this._loadConfigAndRules();
         this._initVersionInfo();
         // Detect other installed extensions and the current application and do
         // what is needed to allow their requests.

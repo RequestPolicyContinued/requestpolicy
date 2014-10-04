@@ -8,4 +8,4 @@ if [ ! -f "$1" ]; then
   exit 1
 fi
 
-../../run-xpcshell.sh -f helper.js -f $SRC_DIR/modules/Policy.jsm $1
+../../run-xpcshell.sh -f helper.js -f $SRC_DIR/modules/Ruleset.jsm $1

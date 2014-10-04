@@ -1,6 +1,6 @@
 Components.utils.import("resource://requestpolicy/FileUtil.jsm");
 
-function copyPolicyFileToProfile(filename, destFilename) {
+function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {
     destFilename = "";
   }
@@ -16,7 +16,7 @@ function copyPolicyFileToProfile(filename, destFilename) {
 }
 
 /*
- * @throws If the file to delete doesn't exist. 
+ * @throws If the file to delete doesn't exist.
  */
 function deleteFileFromProfile(filename) {
   var profilePolicyDir = FileUtil.getRPUserDir("policies");
@@ -27,7 +27,7 @@ function deleteFileFromProfile(filename) {
 
 /**
  * Compares to objects recursively to see if they have the same keys
- * and values. 
+ * and values.
  */
 function objectsAreEqual(objA, objB) {
   print("%%%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -42,7 +42,7 @@ function objectsAreEqual(objA, objB) {
   // different than our Object, and thus objects created in modules and
   // passed back to the test didn't have the equals method. I'm sure a
   // JavaScript master could have sorted it out, but for our purposes
-  // comparing "canonical" string representations works fine. 
+  // comparing "canonical" string representations works fine.
   var result = objToStr(objA) == objToStr(objB);
   return result;
 }
@@ -65,8 +65,8 @@ function objToStr(object, depth, max){
   var output = "{";
 
   var keys = Object.keys(object);
-  keys.sort(); 
-  
+  keys.sort();
+
   for (var i in keys) {
     var key = keys[i];
     output += "\n" + indent + '"' + key + '" : ';
@@ -77,18 +77,18 @@ function objToStr(object, depth, max){
       case "function": output += "function";
         break;
       default: output += object[key];
-        break;        
+        break;
     }
     if (i < keys.length - 1) {
       output += ",";
     }
   }
-  
+
   var indent = "";
   for (var i = 0; i < depth - 1; i++) {
     indent += "  ";
   }
-  
+
   output +="\n" + indent + "}";
   return output;
 }

@@ -1,5 +1,5 @@
 
-var policy = new Policy();
+var policy = new Ruleset();
 
 dprint("== Allow all requests to https://127.0.0.1:8888/baz ==");
 var host = policy.addHost("127.0.0.1");

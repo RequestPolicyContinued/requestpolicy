@@ -26,7 +26,7 @@
 //
 // Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
 // Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-// Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+// Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
 // Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
 // Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
 //     rp.mod);

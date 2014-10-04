@@ -17,7 +17,7 @@ var rules = null;
 var addHostWildcard = true;
 
 
-function clearPolicyTable() {
+function clearRulesTable() {
   var table = document.getElementById('rules');
   var children = table.getElementsByTagName('tr');
   while (children.length) {
@@ -35,11 +35,11 @@ function populateRuleTable() {
     var entry = rules[i];
     var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
     var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
-    addPolicyTableRow(table, 'allow', origin, dest, entry);
+    addRulesTableRow(table, 'allow', origin, dest, entry);
   }
 }
 
-function addPolicyTableRow(table, type, origin, dest, ruleData) {
+function addRulesTableRow(table, type, origin, dest, ruleData) {
   var typeClass = type == 'allow' ? 'allow' : 'block';
   var ruleType = type == 'allow' ? _('allow') : _('block');
 
@@ -94,7 +94,7 @@ function importOldRules() {
 
 function handleAddHostWildcardsChange(event) {
   addHostWildcard = event.target.checked;
-  clearPolicyTable();
+  clearRulesTable();
   populateRuleTable();
 }
 

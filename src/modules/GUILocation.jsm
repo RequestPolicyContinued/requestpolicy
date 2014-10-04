@@ -89,7 +89,7 @@ GUILocation.indexOfLocationInArray = function (locationString, locations) {
  * @static
  */
 GUILocation.sortByNumRequestsCompareFunction = function (a, b) {
-  return GUIDestination.compareFunction(a, b, "sortByNumRequests");
+  return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
 GUILocation.compareFunction = function (a, b, sortType) {
   var a_default = (a.properties.numDefaultPolicyRequests > 0);

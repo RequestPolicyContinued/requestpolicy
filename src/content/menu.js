@@ -750,6 +750,7 @@ requestpolicy.menu = {
       } else {
         properties = guiOrigins[guiOriginsIndex].properties;
       }
+      var addThisOriginBase = false;
 
       for (var destBase in allRequests[originUri]) {
         // Search for a destBase which wouldn't be allowed by the default policy.
@@ -763,10 +764,11 @@ requestpolicy.menu = {
         if (allowSameDomain && destBase == originBase) {
           continue;
         }
+        addThisOriginBase = true;
         properties.accumulate(allRequests[originUri][destBase]);
       }
 
-      if (guiOriginsIndex == -1) {
+      if (addThisOriginBase && guiOriginsIndex == -1) {
         guiOrigins.push(new rp.mod.GUIOrigin(originBase, properties));
       }
     }

@@ -16,15 +16,18 @@
 <p>Javascript creates two iframes, one with a same-site url and one
 with a cross-site url.</p>
 
+
+<p><b>same-site request from javascript generated iframe</b></p>
 <script>
-  makeFrame("same-site-request-from-javascript-generated-iframe.html");
+  makeFrame("destination.html");
 </script>
 
 <br />
 <br />
 
+<p><b>cross site request from javascript generated iframe:</b></p>
 <script>
-  makeFrame("http://www.otherdomain.test/cross-site-request-from-javascript-generated-iframe.html");
+  makeFrame("http://www.otherdomain.test/destination.html");
 </script>
 
 </body>

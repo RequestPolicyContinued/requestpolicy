@@ -20,16 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Prompter.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Prompter.jsm", rp.mod);
 
 requestpolicy.requestLog = {
 
@@ -77,7 +73,7 @@ requestpolicy.requestLog = {
 
     var forbidden = true;
     try {
-      var uri = requestpolicy.mod.DomainUtil.getUriObject(content);
+      var uri = rp.mod.DomainUtil.getUriObject(content);
       if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
         forbidden = false;
       }
@@ -88,7 +84,7 @@ requestpolicy.requestLog = {
       var alertTitle = this._strbundle.getString("actionForbidden");
       var alertText = this._strbundle
           .getString("urlCanOnlyBeCopiedToClipboard");
-      requestpolicy.mod.Prompter.alert(alertTitle, alertText);
+      rp.mod.Prompter.alert(alertTitle, alertText);
       return;
     }
 

@@ -25,14 +25,11 @@ var EXPORTED_SYMBOLS = ["FileUtil"]
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Services.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Services.jsm", rp.mod);
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
@@ -145,7 +142,7 @@ var FileUtil = {
    * @return {nsILocalFile}
    */
   getRPUserDir : function(subdir1, subdir2, subdir3) {
-    var profileDir = requestpolicy.mod.Services.directoryService
+    var profileDir = rp.mod.Services.directoryService
           .get("ProfD", CI.nsIFile);
     var file = profileDir.clone().QueryInterface(CI.nsILocalFile);
     file.appendRelativePath(REQUESTPOLICY_DIR);

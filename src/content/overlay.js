@@ -20,22 +20,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
+if (!rp) {
+  var rp = {mod : {}};
+}
 if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+  var requestpolicy = {};
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/JSON.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Util.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/JSON.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Util.jsm", rp.mod);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -132,7 +128,7 @@ requestpolicy.overlay = {
         this._isFennec = (appInfo.ID == "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
 
         if (this._isFennec) {
-          requestpolicy.mod.Logger.dump("Detected Fennec.");
+          rp.mod.Logger.dump("Detected Fennec.");
           // Set an attribute for CSS usage.
           this._menu.setAttribute("fennec", "true");
           this._menu.setAttribute("position", "after_end");
@@ -148,29 +144,29 @@ requestpolicy.overlay = {
         this._setPermissiveNotification(this._rpService.isBlockingDisabled());
       }
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Unable to initialize requestpolicy.overlay.");
       throw e;
     }
   },
 
   _installToolbarButtonOnce : function() {
-    var util = requestpolicy.mod.Util;
+    var util = rp.mod.Util;
 
     // SeaMonkey users have to use a toolbar button now. At the moment I can't
     // justify a bunch of special cases to support the statusbar when such a
     // tiny number of users have seamonkey and I can't even be sure that many of
     // those users want a statusbar icon.
     //if (!util.isFirefox()) {
-    //  requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    //  rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
     //    "Not performing toolbar button check: not Firefox.");
     //  return;
     //}
 
     if (util.compareVersions(util.lastAppVersion, "0.0") > 0) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
         "Not performing toolbar button check: we've checked before.");
       return;
     }
@@ -185,7 +181,7 @@ requestpolicy.overlay = {
     for (var i in toolbars) {
       var toolbarName = toolbars[i];
       if (this._isButtonInToolbar(toolbarName)) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
           "Button already in toolbar: " + toolbarName);
         return;
       }
@@ -201,13 +197,13 @@ requestpolicy.overlay = {
     toolbar.setAttribute("currentset", toolbar.currentSet);
 
     document.persist(toolbar.id, "currentset");
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
       "Adding toolbar button.");
     try {
       BrowserToolboxCustomizeDone(true);
     }
     catch (e) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
         "Adding toolbar button failed: " + e);
     }
   },
@@ -332,9 +328,9 @@ requestpolicy.overlay = {
       }
 
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Unable to complete requestpolicy.overlay.onLoad actions.");
       throw e;
     }
@@ -367,7 +363,7 @@ requestpolicy.overlay = {
     // Line: 260
 
     if (this._isFennec) {
-      requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL,
           "Should have shown redirect notification to <" + redirectTargetUri
               + ">, but it's not implemented yet on Fennec.");
       return;
@@ -389,7 +385,7 @@ requestpolicy.overlay = {
     if (redirectTargetUri.length < maxLength) {
       var shortUri = redirectTargetUri;
     } else {
-      var prePathLength = requestpolicy.mod.DomainUtil
+      var prePathLength = rp.mod.DomainUtil
           .getPrePath(redirectTargetUri).length
           + 1;
       shortUri = redirectTargetUri.substring(0, Math.max(prePathLength,
@@ -416,9 +412,9 @@ requestpolicy.overlay = {
     }
 
     var origin = requestpolicy.menu._addWildcard(
-        requestpolicy.mod.DomainUtil.getDomain(this.getTopLevelDocumentUri()));
+        rp.mod.DomainUtil.getDomain(this.getTopLevelDocumentUri()));
     var dest = requestpolicy.menu._addWildcard(
-        requestpolicy.mod.DomainUtil.getDomain(redirectTargetUri));
+        rp.mod.DomainUtil.getDomain(redirectTargetUri));
 
     requestpolicy.classicmenu.
         addMenuItemTemporarilyAllowDest(optionsPopup, dest);
@@ -455,7 +451,7 @@ requestpolicy.overlay = {
             // targetDocument.location is null. If that's the case, just use
             // do the redirection in the current content pane.
             if (targetDocument.location == null) {
-              requestpolicy.mod.Logger
+              rp.mod.Logger
                   .dump("in callback: targetDocument.location == null, "
                       + "using content.location instead");
               location = content.location;
@@ -548,7 +544,7 @@ requestpolicy.overlay = {
         // isn't set on new tab open when this is called.
         return;
       }
-      requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL,
           "onAppContentLoaded called for " + document.documentURI);
 
       this._onDOMContentLoaded(document);
@@ -571,10 +567,10 @@ requestpolicy.overlay = {
         this._setBlockedContentCheckTimeout();
       }
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger
-          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger
+          .severe(rp.mod.Logger.TYPE_ERROR,
               "Unable to complete requestpolicy.overlay.onAppContentLoaded actions.");
       throw e;
     }
@@ -597,7 +593,7 @@ requestpolicy.overlay = {
       if (iframe.contentDocument === undefined) {
         return;
       }
-      requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
           "onAppFrameContentLoaded called for <"
               + iframe.contentDocument.documentURI + "> in <"
               + iframe.ownerDocument.documentURI + ">");
@@ -615,10 +611,10 @@ requestpolicy.overlay = {
         this._checkForBlockedContent(iframe.ownerDocument);
       }
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger
-          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger
+          .severe(rp.mod.Logger.TYPE_ERROR,
               "Unable to complete requestpolicy.overlay.onAppFrameContentLoaded actions.");
       throw e;
     }
@@ -634,33 +630,33 @@ requestpolicy.overlay = {
     // likely that there's wasted work happening during time-critical page
     // loading going on in here.
     try {
-      var documentUri = requestpolicy.mod.DomainUtil
+      var documentUri = rp.mod.DomainUtil
           .stripFragment(document.documentURI);
-      requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
           "Checking for blocked requests from page <" + documentUri + ">");
       this._setCustomizingPageNotification((documentUri == "about:customizing"));
       this._blockedContentCheckLastTime = (new Date()).getTime();
       this._stopBlockedContentCheckTimeout();
 
-      var allRequestsOnDocument = requestpolicy.mod.RequestUtil
+      var allRequestsOnDocument = rp.mod.RequestUtil
           .getAllRequestsOnDocument(document);
 
       if (true === allRequestsOnDocument.containsBlockedRequests()) {
-        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
             "Requests have been blocked.");
         this._setBlockedContentNotification(true);
         this._indicateBlockedVisibleObjects(document);
         return;
       } else {
-        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
             "No requests have been blocked.");
         this._setBlockedContentNotification(false);
       }
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger
-          .severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger
+          .severe(rp.mod.Logger.TYPE_ERROR,
               "Unable to complete requestpolicy.overlay._checkForBlockedContent actions.");
       throw e;
     }
@@ -805,8 +801,8 @@ requestpolicy.overlay = {
     // least be showing up in the menu the first time it happens. After that,
     // some caching issues seem to get in the way and the blocked request
     // isn't tried again, so there's no awareness of it.
-    requestpolicy.mod.Logger.warning(
-        requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+    rp.mod.Logger.warning(
+        rp.mod.Logger.TYPE_HEADER_REDIRECT,
         "Observed blocked link click redirect from page <" + sourcePageUri
             + "> with redirect origin <" + linkDestUri
             + "> and redirect dest <" + blockedRedirectUri
@@ -895,7 +891,7 @@ requestpolicy.overlay = {
    *          event
    */
   _onDOMContentLoaded : function(document) {
-    requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL,
         "_onDOMContentLoaded called.");
 
     // Find all meta redirects.
@@ -906,31 +902,31 @@ requestpolicy.overlay = {
         // TODO: Register meta redirects so we can tell which blocked requests
         // were meta redirects in the statusbar menu.
         // TODO: move this logic to the requestpolicy service.
-        var parts = requestpolicy.mod.DomainUtil
+        var parts = rp.mod.DomainUtil
             .parseRefresh(metaTags[i].content);
         var delay = parts[0];
         // The dest may be empty if the origin is what should be refreshed. This
         // will be handled by DomainUtil.determineRedirectUri().
         var dest = parts[1];
-        requestpolicy.mod.Logger.info(
-            requestpolicy.mod.Logger.TYPE_META_REFRESH, "meta refresh to <"
+        rp.mod.Logger.info(
+            rp.mod.Logger.TYPE_META_REFRESH, "meta refresh to <"
                 + dest + "> (" + delay
                 + " second delay) found in document at <" + document.location
                 + ">");
         // If dest isn't a valid uri, assume it's a relative uri.
-        if (!requestpolicy.mod.DomainUtil.isValidUri(dest)) {
+        if (!rp.mod.DomainUtil.isValidUri(dest)) {
           var origDest = dest;
           dest = document.documentURIObject.resolve(dest);
-          requestpolicy.mod.Logger.info(
-              requestpolicy.mod.Logger.TYPE_META_REFRESH,
+          rp.mod.Logger.info(
+              rp.mod.Logger.TYPE_META_REFRESH,
               "meta refresh destination <" + origDest
                   + "> appeared to be relative to <" + document.documentURI
                   + ">, so it has been resolved to <" + dest + ">");
         }
 
         if (!this._getDocShellAllowMetaRedirects(document)) {
-          requestpolicy.mod.Logger.warning(
-              requestpolicy.mod.Logger.TYPE_META_REFRESH,
+          rp.mod.Logger.warning(
+              rp.mod.Logger.TYPE_META_REFRESH,
               "Another extension disabled docShell.allowMetaRedirects.");
         }
 
@@ -940,10 +936,10 @@ requestpolicy.overlay = {
         if (!this._rpService._blockingDisabled
             && !this._rpService.isAllowedRedirect(document.location.href, dest)) {
           // Ignore redirects to javascript. The browser will ignore them, as well.
-          if (requestpolicy.mod.DomainUtil.getUriObject(dest)
+          if (rp.mod.DomainUtil.getUriObject(dest)
                 .schemeIs("javascript")) {
-            requestpolicy.mod.Logger.warning(
-                requestpolicy.mod.Logger.TYPE_META_REFRESH,
+            rp.mod.Logger.warning(
+                rp.mod.Logger.TYPE_META_REFRESH,
                 "Ignoring redirect to javascript URI <" + dest + ">");
             continue;
           }
@@ -976,8 +972,8 @@ requestpolicy.overlay = {
         _blockedRedirects[document.location]) {
       var dest = this._rpService._requestProcessor.
           _blockedRedirects[document.location];
-      requestpolicy.mod.Logger.warning(
-          requestpolicy.mod.Logger.TYPE_HEADER_REDIRECT,
+      rp.mod.Logger.warning(
+          rp.mod.Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest + "> "
               + "from <" + document.location + ">");
       this._showRedirectNotification(document, dest);
@@ -1313,7 +1309,7 @@ requestpolicy.overlay = {
         }
       }
     }
-    return requestpolicy.mod.DomainUtil
+    return rp.mod.DomainUtil
         .stripFragment(content.document.documentURI);
   },
 
@@ -1508,7 +1504,7 @@ requestpolicy.overlay = {
   _performRedirect : function(document, redirectTargetUri) {
     try {
       if (redirectTargetUri[0] == '/') {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Redirecting to relative path <" + redirectTargetUri + "> from <"
                 + document.documentURI + ">");
         document.location.pathname = redirectTargetUri;
@@ -1519,7 +1515,7 @@ requestpolicy.overlay = {
           var curDir = document.documentURI.split("/").slice(0, -1).join("/");
           redirectTargetUri = curDir + "/" + redirectTargetUri;
         }
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Redirecting to <" + redirectTargetUri + "> from <"
                 + document.documentURI + ">");
         document.location.href = redirectTargetUri;
@@ -1546,7 +1542,7 @@ requestpolicy.overlay = {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    //requestpolicy.mod.Logger.dump('popup width: ' + popup.clientWidth);
+    //rp.mod.Logger.dump('popup width: ' + popup.clientWidth);
     var popupWidth = popup.clientWidth ? 730 : popup.clientWidth;
     var anchor = document.getElementById('content');
     var contentWidth = anchor.clientWidth;
@@ -1557,7 +1553,7 @@ requestpolicy.overlay = {
 
 //  showExtensionConflictInfo : function() {
 //    var ext = this._rpService.getConflictingExtensions();
-//    var extJson = requestpolicy.mod.JSON.stringify(ext);
+//    var extJson = rp.mod.JSON.stringify(ext);
 //    this._openInNewTab(this._extensionConflictInfoUri
 //        + encodeURIComponent(extJson));
 //  },

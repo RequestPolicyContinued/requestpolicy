@@ -36,15 +36,11 @@ const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
 
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
 
 
 
@@ -102,13 +98,13 @@ NormalRequest.prototype.constructor = Request;
 
 NormalRequest.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
-  this.aRequestOrigin = requestpolicy.mod.DomainUtil.
+  this.aRequestOrigin = rp.mod.DomainUtil.
           getUriObject(originURI);
 };
 
 NormalRequest.prototype.setDestURI = function(destURI) {
   this.destURI = destURI;
-  this.aContentLocation = requestpolicy.mod.DomainUtil.
+  this.aContentLocation = rp.mod.DomainUtil.
       getUriObject(destURI);
 };
 
@@ -171,7 +167,7 @@ NormalRequest.prototype.isInternal = function() {
   }
 
   if (missingSpecOrHost) {
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_CONTENT,
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
         "No asciiHost or empty spec on either aRequestOrigin <"
             + this.aRequestOrigin.spec + "> or aContentLocation <"
             + this.aContentLocation.spec + ">");

@@ -20,22 +20,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// if (!requestpolicy) {
-//   var requestpolicy = {
-//     mod : {}
-//   };
+// if (!rp) {
+//   var rp = {mod : {}};
 // }
 //
-// Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-//     requestpolicy.mod);
-// Components.utils.import("resource://requestpolicy/Logger.jsm",
-//     requestpolicy.mod);
-// Components.utils.import("resource://requestpolicy/Policy.jsm",
-//     requestpolicy.mod);
-// Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
-//     requestpolicy.mod);
+// Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+// Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+// Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+// Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
 // Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
-//     requestpolicy.mod);
+//     rp.mod);
 
 requestpolicy.classicmenu = {
 

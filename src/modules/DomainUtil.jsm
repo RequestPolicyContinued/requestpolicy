@@ -32,14 +32,11 @@ var EXPORTED_SYMBOLS = ["DomainUtil"]
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
 
 var DomainUtil = {};
 
@@ -104,7 +101,7 @@ DomainUtil.getIdentifier = function(uri, level) {
       var identifier = uri.split(",")[0];
       return identifier.split(";")[0];
     }
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
         "Unable to getIdentifier from uri " + uri + " using identifier level "
             + level + ".");
     return uri;
@@ -144,7 +141,7 @@ DomainUtil.getUriObject = function(uri) {
   } catch (e) {
     var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> "
       + ". Exception was: " + e;
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL, msg);
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL, msg);
     throw e;
   }
 };

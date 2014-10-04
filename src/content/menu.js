@@ -20,22 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Policy.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/RequestUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/PolicyManager.jsm", rp.mod);
 
 requestpolicy.menu = {
 
@@ -97,10 +90,10 @@ requestpolicy.menu = {
       this._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
       try {
-        this._currentBaseDomain = requestpolicy.mod.DomainUtil.getDomain(
+        this._currentBaseDomain = rp.mod.DomainUtil.getDomain(
               this._currentUri);
       } catch (e) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
               "Unable to prepare menu because base domain can't be determined: " + this._currentUri);
         this._populateMenuForUncontrollableOrigin();
         return;
@@ -109,14 +102,14 @@ requestpolicy.menu = {
       this._currentIdentifier = requestpolicy.overlay
             .getTopLevelDocumentUriIdentifier();
 
-      //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+      //rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY,
       //                              "this._currentUri: " + this._currentUri);
-      this._currentUriObj = requestpolicy.mod.DomainUtil.getUriObject(this._currentUri);
+      this._currentUriObj = rp.mod.DomainUtil.getUriObject(this._currentUri);
 
       this._isChromeUri = this._currentUriObj.scheme == "chrome";
       //this._currentUriIsHttps = this._currentUriObj.scheme == "https";
 
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
                                     "this._currentUri: " + this._currentUri);
 
       if (this._isChromeUri) {
@@ -130,7 +123,7 @@ requestpolicy.menu = {
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      this._allRequestsOnDocument = requestpolicy.mod.RequestUtil
+      this._allRequestsOnDocument = rp.mod.RequestUtil
             .getAllRequestsOnDocument(content.document);
       this._allRequestsOnDocument.print("_allRequestsOnDocument");
 
@@ -155,10 +148,10 @@ requestpolicy.menu = {
       this._activateOriginItem(this._originItem);
 
     } catch (e) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-                                      "Fatal Error, " + e + ", stack was: " + e.stack);
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-                                      "Unable to prepare menu due to error.");
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
+          "Unable to prepare menu due to error.");
       throw e;
     }
   },
@@ -181,15 +174,15 @@ requestpolicy.menu = {
 
   _populateList : function(list, values) {
     this._removeChildren(list);
-    if (values[0] && values[0] instanceof requestpolicy.mod.Destination) {
+    if (values[0] && values[0] instanceof rp.mod.Destination) {
       // get prefs
       var sorting = this._rpService.prefs.getCharPref('menu.sorting');
       var showNumRequests = this._rpService.prefs.getBoolPref('menu.info.showNumRequests')
 
       if (sorting == "numRequests") {
-        values.sort(requestpolicy.mod.Destination.sortByNumRequestsCompareFunction);
+        values.sort(rp.mod.Destination.sortByNumRequestsCompareFunction);
       } else if (sorting == "destName") {
-        values.sort(requestpolicy.mod.Destination.compareFunction);
+        values.sort(rp.mod.Destination.compareFunction);
       }
 
       for (var i in values) {
@@ -238,7 +231,7 @@ requestpolicy.menu = {
     // Set operations would be nice. These are small arrays, so keep it simple.
     for (var i = 0; i < rawBlocked.length; i++) {
       let dest = rawBlocked[i];
-      if (false === requestpolicy.mod.Destination.existsInArray(dest, rawAllowed)) {
+      if (false === rp.mod.Destination.existsInArray(dest, rawAllowed)) {
         blocked.push(dest);
       } else {
         // we assume that `dest` is a Destination getUriObject.
@@ -247,20 +240,20 @@ requestpolicy.menu = {
     }
     for (var i = 0; i < rawAllowed.length; i++) {
       let dest = rawAllowed[i];
-      var indexRawBlocked = requestpolicy.mod.Destination.indexOfDestInArray(dest, rawBlocked);
-      var indexMixed = requestpolicy.mod.Destination.indexOfDestInArray(dest, mixed);
+      var indexRawBlocked = rp.mod.Destination.indexOfDestInArray(dest, rawBlocked);
+      var indexMixed = rp.mod.Destination.indexOfDestInArray(dest, mixed);
 
       if (indexRawBlocked == -1) {
         allowed.push(dest);
       } else {
         if (indexMixed != -1) {
-          requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
               "Merging dest: <" + dest.dest + ">");
-          mixed[indexMixed] = requestpolicy.mod.Destination.merge(dest, mixed[indexMixed]);
+          mixed[indexMixed] = rp.mod.Destination.merge(dest, mixed[indexMixed]);
         } else {
           // if the dest is in rawBlocked and rawAllowed, but not in mixed.
           // this should never happen, the mixed destination should be added in the rawBlocked-loop.
-          requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          rp.mod.Logger.warning(rp.mod.Logger.TYPE_INTERNAL,
               "mixed dest was not added to `mixed` list: <" + dest.dest + ">");
           mixed.push(dest);
         }
@@ -279,8 +272,8 @@ requestpolicy.menu = {
 
   _populateDetails : function() {
     var policyMgr = this._rpService._policyMgr;
-    const RULE_TYPE_ALLOW = requestpolicy.mod.RULE_TYPE_ALLOW;
-    const RULE_TYPE_DENY = requestpolicy.mod.RULE_TYPE_DENY;
+    const RULE_TYPE_ALLOW = rp.mod.RULE_TYPE_ALLOW;
+    const RULE_TYPE_DENY = rp.mod.RULE_TYPE_DENY;
 
     var origin = this._currentlySelectedOrigin;
     var dest = this._currentlySelectedDest;
@@ -509,7 +502,7 @@ requestpolicy.menu = {
                item.parentNode.id == 'rp-rules-add') {
       this._processRuleSelection(item);
     } else {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
             'Unable to figure out which item type was selected.');
     }
   },
@@ -527,20 +520,20 @@ requestpolicy.menu = {
     }
 
     if (!ruleData) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-            'ruleData is empty in menu._processRuleSelection()');
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
+          'ruleData is empty in menu._processRuleSelection()');
       return;
     }
     if (!ruleAction) {
-      requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_ERROR,
-                                      'ruleAction is empty in menu._processRuleSelection()');
+      rp.mod.Logger.severe(rp.mod.Logger.TYPE_ERROR,
+          'ruleAction is empty in menu._processRuleSelection()');
       return;
     }
 
-    var canonicalRule = requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData);
-    requestpolicy.mod.Logger.dump("ruleData: " + canonicalRule);
-    requestpolicy.mod.Logger.dump("ruleAction: " + ruleAction);
-    requestpolicy.mod.Logger.dump("undo: " + undo);
+    var canonicalRule = rp.mod.Policy.rawRuleToCanonicalString(ruleData);
+    rp.mod.Logger.dump("ruleData: " + canonicalRule);
+    rp.mod.Logger.dump("ruleAction: " + ruleAction);
+    rp.mod.Logger.dump("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
@@ -631,7 +624,7 @@ requestpolicy.menu = {
         for (var i in request[destIdent][destUri]) {
           ++properties.numRequests;
           ++ruleTypeCounter;
-          //requestpolicy.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
+          //rp.mod.Logger.dump("reason: "+ request[destIdent][destUri].resultReason
           //    + " -- default: "+request[destIdent][destUri].isDefaultPolicyUsed());
           if ( request[destIdent][destUri][i].isDefaultPolicyUsed() ) {
             ++properties.numDefaultPolicyRequests;
@@ -641,11 +634,11 @@ requestpolicy.menu = {
     }
 
     switch (ruleType) {
-      case requestpolicy.mod.RULE_TYPE_ALLOW:
+      case rp.mod.RULE_TYPE_ALLOW:
         properties.numAllowedRequests = ruleTypeCounter;
         break;
 
-      case requestpolicy.mod.RULE_TYPE_DENY:
+      case rp.mod.RULE_TYPE_DENY:
         properties.numBlockedRequests = ruleTypeCounter;
         break;
 
@@ -657,23 +650,23 @@ requestpolicy.menu = {
   },
 
   _getBlockedDestinations : function() {
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+    var reqSet = rp.mod.RequestUtil.getDeniedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
     var result = [];
     for (var destBase in requests) {
       var properties = this._extractRequestProperties(requests[destBase],
-                                                      requestpolicy.mod.RULE_TYPE_DENY);
-      result.push(new requestpolicy.mod.Destination(destBase, properties));
-      //requestpolicy.mod.Logger.dump("destBase : "+destBase);
-      //requestpolicy.mod.Logger.vardump(properties, "properties");
+                                                      rp.mod.RULE_TYPE_DENY);
+      result.push(new rp.mod.Destination(destBase, properties));
+      //rp.mod.Logger.dump("destBase : "+destBase);
+      //rp.mod.Logger.vardump(properties, "properties");
     }
     return result;
   },
 
   _getAllowedDestinations : function() {
-    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+    var reqSet = rp.mod.RequestUtil.getAllowedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
@@ -690,8 +683,8 @@ requestpolicy.menu = {
       }
 
       var properties = this._extractRequestProperties(requests[destBase],
-                                                      requestpolicy.mod.RULE_TYPE_ALLOW);
-      result.push(new requestpolicy.mod.Destination(destBase, properties));
+                                                      rp.mod.RULE_TYPE_ALLOW);
+      result.push(new rp.mod.Destination(destBase, properties));
     }
     return result;
   },
@@ -704,7 +697,7 @@ requestpolicy.menu = {
 
     var result = [];
     for (var originUri in requests) {
-      var originBase = requestpolicy.mod.DomainUtil.getDomain(originUri);
+      var originBase = rp.mod.DomainUtil.getDomain(originUri);
       if (originBase == this._currentBaseDomain) {
         continue;
       }
@@ -744,7 +737,7 @@ requestpolicy.menu = {
   },
 
   _isIPAddressOrSingleName : function(hostname) {
-    return requestpolicy.mod.DomainUtil.isIPAddress(hostname) ||
+    return rp.mod.DomainUtil.isIPAddress(hostname) ||
       hostname.indexOf(".") == -1;
   },
 
@@ -879,7 +872,7 @@ requestpolicy.menu = {
     item.requestpolicyRuleAction = ruleAction;
     //var statustext = ''; // TODO
     item.setAttribute('class', 'rp-od-item ' + cssClass);
-    var canonicalRule = requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData);
+    var canonicalRule = rp.mod.Policy.rawRuleToCanonicalString(ruleData);
     if (this._ruleChangeQueues[ruleAction]) {
       if (this._ruleChangeQueues[ruleAction][canonicalRule]) {
         item.setAttribute('selected-rule', 'true');
@@ -944,7 +937,7 @@ requestpolicy.menu = {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = requestpolicy.mod.RequestUtil.getAllowedRequests(
+    var reqSet = rp.mod.RequestUtil.getAllowedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
@@ -956,7 +949,7 @@ requestpolicy.menu = {
     //reqSet.print('allowedRequests');
 
     // TODO: there is no dest if no dest is selected (origin only).
-    //var destBase = requestpolicy.mod.DomainUtil.getDomain(
+    //var destBase = rp.mod.DomainUtil.getDomain(
     //      this._currentlySelectedDest);
 
     for (var destBase in requests) {
@@ -976,7 +969,7 @@ requestpolicy.menu = {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
+            rp.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
             continue;
           }
 
@@ -989,7 +982,7 @@ requestpolicy.menu = {
 
             var policy, match;
             [policy, match] = results.matchedAllowRules[i];
-            var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+            var rawRule = rp.mod.Policy.matchToRawRule(match);
 
             if (!this._currentlySelectedDest) {
               if (rawRule['d'] && rawRule['d']['h']) {
@@ -997,8 +990,8 @@ requestpolicy.menu = {
               }
             }
 
-            var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
-            //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+            var rawRuleStr = rp.mod.Policy.rawRuleToCanonicalString(rawRule);
+            //rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
@@ -1027,7 +1020,7 @@ requestpolicy.menu = {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+    var reqSet = rp.mod.RequestUtil.getDeniedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
@@ -1039,7 +1032,7 @@ requestpolicy.menu = {
     reqSet.print('deniedRequests');
 
     // TODO: there is no dest if no dest is selected (origin only).
-    //var destBase = requestpolicy.mod.DomainUtil.getDomain(
+    //var destBase = rp.mod.DomainUtil.getDomain(
     //      this._currentlySelectedDest);
 
     for (var destBase in requests) {
@@ -1059,7 +1052,7 @@ requestpolicy.menu = {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            requestpolicy.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
+            rp.mod.Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
             continue;
           }
 
@@ -1071,7 +1064,7 @@ requestpolicy.menu = {
 
             var policy, match;
             [policy, match] = results.matchedDenyRules[i];
-            var rawRule = requestpolicy.mod.Policy.matchToRawRule(match);
+            var rawRule = rp.mod.Policy.matchToRawRule(match);
 
             if (!this._currentlySelectedDest) {
               if (rawRule['d'] && rawRule['d']['h']) {
@@ -1079,8 +1072,8 @@ requestpolicy.menu = {
               }
             }
 
-            var rawRuleStr = requestpolicy.mod.Policy.rawRuleToCanonicalString(rawRule);
-            //requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY,
+            var rawRuleStr = rp.mod.Policy.rawRuleToCanonicalString(rawRule);
+            //rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
@@ -1107,15 +1100,15 @@ requestpolicy.menu = {
 
   _populateDetailsAddSubdomainAllowRules : function(list) {
     var policyMgr = this._rpService._policyMgr;
-    const RULE_TYPE_ALLOW = requestpolicy.mod.RULE_TYPE_ALLOW;
-    const RULE_TYPE_DENY = requestpolicy.mod.RULE_TYPE_DENY;
+    const RULE_TYPE_ALLOW = rp.mod.RULE_TYPE_ALLOW;
+    const RULE_TYPE_DENY = rp.mod.RULE_TYPE_DENY;
 
     var origin = this._currentlySelectedOrigin;
 
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = requestpolicy.mod.RequestUtil.getDeniedRequests(
+    var reqSet = rp.mod.RequestUtil.getDeniedRequests(
           this._currentlySelectedOrigin, this._allRequestsOnDocument);
     var requests = reqSet.getAllMergedOrigins();
 
@@ -1129,7 +1122,7 @@ requestpolicy.menu = {
       for (var destIdent in requests[destBase]) {
         var destinations = requests[destBase][destIdent];
         for (var destUri in destinations) {
-          destHosts[requestpolicy.mod.DomainUtil.getHost(destUri)] = null;
+          destHosts[rp.mod.DomainUtil.getHost(destUri)] = null;
         }
       }
     }

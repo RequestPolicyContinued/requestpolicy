@@ -31,32 +31,26 @@ const CC = Components.classes;
 
 const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Policy.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/PolicyStorage.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/RequestResult.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Policy.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/PolicyStorage.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/RequestResult.jsm", rp.mod);
 
 
 function dprint(msg) {
   if (typeof print == "function") {
     print(msg);
   } else {
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY, msg);
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY, msg);
   }
 }
 
 function warn(msg) {
-  requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_POLICY, msg);
+  rp.mod.Logger.warning(rp.mod.Logger.TYPE_POLICY, msg);
 }
 
 function notifyRulesChanged() {
@@ -222,14 +216,14 @@ PolicyManager.prototype = {
     // Read the user policy from a file.
     try {
       dprint("PolicyManager::loadPolicies loading user policy");
-      rawPolicy = requestpolicy.mod.PolicyStorage
+      rawPolicy = rp.mod.PolicyStorage
         .loadRawPolicyFromFile("user.json");
     } catch (e) {
       // TODO: log a message about missing user.json policy file.
       // There's no user policy. This is either because RP has just been
       // installed, the file has been deleted, or something is wrong. For now,
       // we'll assume this is a new install.
-      rawPolicy = new requestpolicy.mod.RawPolicy();
+      rawPolicy = new rp.mod.RawPolicy();
     }
     this._userPolicies["user"] = {
       "rawPolicy" : rawPolicy,
@@ -253,7 +247,7 @@ PolicyManager.prototype = {
         try {
           dprint("PolicyManager::loadSubscriptionPolicies: " +
                  listName + ' / ' + subName);
-          rawPolicy = requestpolicy.mod.PolicyStorage
+          rawPolicy = rp.mod.PolicyStorage
                 .loadRawPolicyFromFile(subName + ".json", listName);
         } catch (e) {
           warn("Unable to load policy from file: " + e);
@@ -307,8 +301,8 @@ PolicyManager.prototype = {
   },
 
   _assertRuleType: function(ruleType) {
-    if (ruleType != requestpolicy.mod.RULE_TYPE_ALLOW &&
-        ruleType != requestpolicy.mod.RULE_TYPE_DENY) {
+    if (ruleType != rp.mod.RULE_TYPE_ALLOW &&
+        ruleType != rp.mod.RULE_TYPE_DENY) {
       throw "Invalid rule type: " + ruleType;
     }
   },
@@ -333,7 +327,7 @@ PolicyManager.prototype = {
 
   addRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleType + " "
-           + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
+           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["user"].policy.print();
 
     this._assertRuleType(ruleType);
@@ -347,7 +341,7 @@ PolicyManager.prototype = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
+        rp.mod.PolicyStorage.saveRawPolicyToFile(
               this._userPolicies["user"].rawPolicy, "user.json");
     }
 
@@ -357,13 +351,13 @@ PolicyManager.prototype = {
   },
 
   storeRules : function() {
-    requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
+    rp.mod.PolicyStorage.saveRawPolicyToFile(
         this._userPolicies["user"].rawPolicy, "user.json");
   },
 
   addTemporaryRule : function(ruleType, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleType + " "
-           + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
+           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["temp"].policy.print();
 
     this._assertRuleType(ruleType);
@@ -378,7 +372,7 @@ PolicyManager.prototype = {
 
   removeRule : function(ruleType, ruleData, noStore) {
     dprint("PolicyManager::removeRule " + ruleType + " "
-           + requestpolicy.mod.Policy.rawRuleToCanonicalString(ruleData));
+           + rp.mod.Policy.rawRuleToCanonicalString(ruleData));
     //this._userPolicies["user"].policy.print();
     //this._userPolicies["temp"].policy.print();
 
@@ -396,7 +390,7 @@ PolicyManager.prototype = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        requestpolicy.mod.PolicyStorage.saveRawPolicyToFile(
+        rp.mod.PolicyStorage.saveRawPolicyToFile(
               this._userPolicies["user"].rawPolicy, "user.json");
     }
 
@@ -412,7 +406,7 @@ PolicyManager.prototype = {
   },
 
   resetTemporaryPolicy : function() {
-    var rawPolicy = new requestpolicy.mod.RawPolicy();
+    var rawPolicy = new rp.mod.RawPolicy();
     this._userPolicies["temp"] = {
       "rawPolicy" : rawPolicy,
       "policy" : rawPolicy.toPolicy("temp")
@@ -427,7 +421,7 @@ PolicyManager.prototype = {
   },
 
   checkRequestAgainstSubscriptionPolicies : function(origin, dest) {
-    var result = new requestpolicy.mod.RequestResult();
+    var result = new rp.mod.RequestResult();
     for (var listName in this._subscriptionPolicies) {
       var policies = this._subscriptionPolicies[listName];
       this._checkRequest(origin, dest, policies, result);
@@ -443,7 +437,7 @@ PolicyManager.prototype = {
       throw "Destination must be an nsIURI.";
     }
     if (!result) {
-      result = new requestpolicy.mod.RequestResult();
+      result = new rp.mod.RequestResult();
     }
     for (var i in policies) {
       var policy = policies[i].policy;

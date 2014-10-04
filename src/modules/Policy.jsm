@@ -27,16 +27,12 @@ var EXPORTED_SYMBOLS = [
   "RULE_TYPE_DENY"
 ];
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!rp) {
+  var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm",
-    requestpolicy.mod);
-Components.utils.import("resource://requestpolicy/Logger.jsm",
-    requestpolicy.mod);
+Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
 
 const RULE_TYPE_ALLOW = 1;
 const RULE_TYPE_DENY = 2;
@@ -46,12 +42,12 @@ function dprint(msg) {
   if (typeof print == "function") {
     print(msg);
   } else {
-    requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_POLICY, msg);
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY, msg);
   }
 }
 
 function dwarn(msg) {
-  requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_POLICY, msg);
+  rp.mod.Logger.warning(rp.mod.Logger.TYPE_POLICY, msg);
 }
 
 /*
@@ -614,7 +610,7 @@ Rule.prototype = {
         return false;
       }
     } else {
-      if (!requestpolicy.mod.DomainUtil.hasStandardPort(uriObj)) {
+      if (!rp.mod.DomainUtil.hasStandardPort(uriObj)) {
         dprint("isMatch: wrong port (not the default port and the rule assumes default)");
         return false;
       }

@@ -36,8 +36,8 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 // Scope for imported modules.
-if (!requestpolicy) {
-  var requestpolicy = {mod : {}};
+if (!rp) {
+  var rp = {mod : {}};
 }
 
 function RequestPolicyService() {
@@ -122,7 +122,7 @@ RequestPolicyService.prototype = {
         // preferences may not be ready. If we tried right now, we may get the
         // default preferences.
       } catch (e) {
-        requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_POLICY,
+        rp.mod.Logger.severe(rp.mod.Logger.TYPE_POLICY,
             "exception from _init(): " + e);
       }
     } catch(e) {
@@ -159,7 +159,7 @@ RequestPolicyService.prototype = {
           getService(CI.nsIExtensionManager);
       var ext;
       for (var i = 0; i < idArray.length; i++) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Extension old-style check: " + idArray[i]);
         this._initializeExtCompatCallback(em.getItemForID(idArray[i]));
       }
@@ -170,7 +170,7 @@ RequestPolicyService.prototype = {
         rpService._initializeExtCompatCallback(ext)
       };
       for (var i = 0; i < idArray.length; i++) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Extension new-style check: " + idArray[i]);
         AddonManager.getAddonByID(idArray[i], callback);
       }
@@ -185,14 +185,14 @@ RequestPolicyService.prototype = {
     // As of Firefox 3.7, we can easily whether addons are disabled.
     // The isActive property won't exist before 3.7, so it will be null.
     if (ext.isActive == false) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
           "Extension is not active: " + ext.name);
       return;
     }
 
     switch (ext.id) {
       case "greasefire@skrul.com" : // Greasefire
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push(
             ["file://", "http://userscripts.org/", ext.name]);
@@ -202,7 +202,7 @@ RequestPolicyService.prototype = {
       case "{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}" : // Sage-Too
       case "{899DF1F8-2F43-4394-8315-37F6744E6319}" : // NewsFox
       case "brief@mozdev.org" : // Brief
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Conflicting extension: " + ext.name);
         this._compatibilityRules.push(
             ["resource://brief-content/", null, ext.name]);
@@ -213,7 +213,7 @@ RequestPolicyService.prototype = {
         });
         break;
       case "foxmarks@kei.com" : // Xmarks Sync
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([
           "https://login.xmarks.com/",
@@ -224,13 +224,13 @@ RequestPolicyService.prototype = {
       case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
       case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
       case "{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}" : // Norton Toolbar
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([null, "symnst:", ext.name]);
         this._compatibilityRules.push([null, "symres:", ext.name]);
         break;
       case "{c45c406e-ab73-11d8-be73-000a95be3b12}" : // Web Developer
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([
           "about:blank",
@@ -241,14 +241,14 @@ RequestPolicyService.prototype = {
             ["about:blank", "http://validator.w3.org/check", ext.name]);
         break;
       case "{c07d1a49-9894-49ff-a594-38960ede8fb9}" : // Update Scanner
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         var orig = "chrome://updatescan/content/diffPage.xul";
         var translated = "data:text/html";
         this._topLevelDocTranslationRules.push([orig, translated]);
         break;
       case "FirefoxAddon@similarWeb.com" : // SimilarWeb
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([
           "http://api2.similarsites.com/",
@@ -262,12 +262,12 @@ RequestPolicyService.prototype = {
         ]);
         break;
       case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         this._compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
         break;
       default :
-        requestpolicy.mod.Logger.severe(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.severe(rp.mod.Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);
         break;
     }
@@ -351,7 +351,7 @@ RequestPolicyService.prototype = {
 
     // Flock
     if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
           "Application detected: " + appInfo.vendor);
       this._compatibilityRules.push(
           ["about:myworld", "http://www.flock.com/", appInfo.vendor]);
@@ -370,7 +370,7 @@ RequestPolicyService.prototype = {
 
     // Seamonkey
     if (appInfo.ID == "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
           "Application detected: Seamonkey");
       this._compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
       this._compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
@@ -390,7 +390,7 @@ RequestPolicyService.prototype = {
     if (this.prefs.getBoolPref("prefetch.link.disableOnStartup")) {
       if (this._rootPrefs.getBoolPref("network.prefetch-next")) {
         this._rootPrefs.setBoolPref("network.prefetch-next", false);
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Disabled link prefetch.");
       }
     }
@@ -402,7 +402,7 @@ RequestPolicyService.prototype = {
       if (!this._rootPrefs.prefHasUserValue("network.dns.disablePrefetch") ||
           !this._rootPrefs.getBoolPref("network.dns.disablePrefetch")) {
         this._rootPrefs.setBoolPref("network.dns.disablePrefetch", true);
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             "Disabled DNS prefetch.");
       }
     }
@@ -422,8 +422,8 @@ RequestPolicyService.prototype = {
   },
 
   _loadConfigAndPolicies : function() {
-    this._subscriptions = new requestpolicy.mod.UserSubscriptions();
-    this._policyMgr = new requestpolicy.mod.PolicyManager();
+    this._subscriptions = new rp.mod.UserSubscriptions();
+    this._policyMgr = new rp.mod.PolicyManager();
     this._policyMgr.loadUserPolicies();
 
     var defaultPolicy = this._defaultAllow ? 'allow' : 'deny';
@@ -452,16 +452,16 @@ RequestPolicyService.prototype = {
       }
     }
     function updateCompleted(result) {
-      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
             'Subscription updates completed: ' + result);
     }
     this._subscriptions.update(updateCompleted, serials, defaultPolicy);
   },
 
   _updateLoggingSettings : function() {
-    requestpolicy.mod.Logger.enabled = this.prefs.getBoolPref("log");
-    requestpolicy.mod.Logger.level = this.prefs.getIntPref("log.level");
-    requestpolicy.mod.Logger.types = this.prefs.getIntPref("log.types");
+    rp.mod.Logger.enabled = this.prefs.getBoolPref("log");
+    rp.mod.Logger.level = this.prefs.getIntPref("log.level");
+    rp.mod.Logger.types = this.prefs.getIntPref("log.types");
   },
 
   _registerAddonListener : function() {
@@ -471,7 +471,7 @@ RequestPolicyService.prototype = {
         if (addon.id != EXTENSION_ID) {
           return;
         }
-        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
             "Addon set to be disabled.");
         rpService._uninstall = true;
       },
@@ -479,7 +479,7 @@ RequestPolicyService.prototype = {
         if (addon.id != EXTENSION_ID) {
           return;
         }
-        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
             "Addon set to be uninstalled.");
         rpService._uninstall = true;
       },
@@ -487,7 +487,7 @@ RequestPolicyService.prototype = {
         if (addon.id != EXTENSION_ID) {
           return;
         }
-        requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
             "Addon operation cancelled.");
         // Just because an operation was cancelled doesn't mean there isn't
         // a pending operation we care about. For example, a user can choose
@@ -496,7 +496,7 @@ RequestPolicyService.prototype = {
         var pending = addon.pendingOperations &
             (AddonManager.PENDING_DISABLE | AddonManager.PENDING_UNINSTALL);
         if (!pending) {
-          requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
               "No pending uninstall or disable.");
           rpService._uninstall = false;
         }
@@ -516,9 +516,9 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
-    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC, false);
-    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC, false);
-    os.addObserver(this, requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC, false);
+    os.addObserver(this, rp.mod.SUBSCRIPTION_UPDATED_TOPIC, false);
+    os.addObserver(this, rp.mod.SUBSCRIPTION_ADDED_TOPIC, false);
+    os.addObserver(this, rp.mod.SUBSCRIPTION_REMOVED_TOPIC, false);
 
     // Listening for uninstall/disable events is done with the AddonManager
     // since Firefox 4.
@@ -539,14 +539,14 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "profile-after-change");
       os.removeObserver(this, "sessionstore-windows-restored");
       os.removeObserver(this, "quit-application");
-      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC);
-      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC);
-      os.removeObserver(this, requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC);
+      os.removeObserver(this, rp.mod.SUBSCRIPTION_UPDATED_TOPIC);
+      os.removeObserver(this, rp.mod.SUBSCRIPTION_ADDED_TOPIC);
+      os.removeObserver(this, rp.mod.SUBSCRIPTION_REMOVED_TOPIC);
       if (!AddonManager) {
         os.removeObserver(this, "em-action-requested");
       }
     } catch (e) {
-      requestpolicy.mod.Logger.dump(e + " while unregistering.");
+      rp.mod.Logger.dump(e + " while unregistering.");
     }
   },
 
@@ -571,7 +571,7 @@ RequestPolicyService.prototype = {
 
   _initVersionInfo : function() {
     try {
-      const util = requestpolicy.mod.Util;
+      const util = rp.mod.Util;
 
       // Set the last version values in the Util module based on the prefs.
       util.lastVersion = this.prefs.getCharPref("lastVersion");
@@ -608,7 +608,7 @@ RequestPolicyService.prototype = {
         this._prefService.savePrefFile(null);
       }
     } catch (e) {
-        requestpolicy.mod.Logger.error(requestpolicy.mod.Logger.TYPE_INTERNAL,
+        rp.mod.Logger.error(rp.mod.Logger.TYPE_INTERNAL,
             "_initVersionInfo failed: " + e);
     }
   },
@@ -657,7 +657,7 @@ RequestPolicyService.prototype = {
       filename = modules[i];
       try {
         Components.utils.import("resource://requestpolicy/" + filename,
-            requestpolicy.mod);
+            rp.mod);
       } catch(e) {
         // Indicate the filename because the exception doesn't have that
         // in the string.
@@ -676,7 +676,7 @@ RequestPolicyService.prototype = {
     }
 
     // Give the RequestUtil singleton a reference to us.
-    requestpolicy.mod.RequestUtil.setRPService(this);
+    rp.mod.RequestUtil.setRPService(this);
   },
 
   _initializePrivateBrowsing : function() {
@@ -717,7 +717,7 @@ RequestPolicyService.prototype = {
   prefs : null,
 
   getUriIdentifier : function(uri) {
-    return requestpolicy.mod.DomainUtil.getIdentifier(uri,
+    return rp.mod.DomainUtil.getIdentifier(uri,
     //    this._uriIdentificationLevel);
         null);
   },
@@ -749,34 +749,34 @@ RequestPolicyService.prototype = {
   },
 
   addAllowRule : function(rawRule, noStore) {
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule,
+    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, rawRule,
         noStore);
   },
 
   addTemporaryAllowRule : function(rawRule) {
-    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
         rawRule);
   },
 
   removeAllowRule : function(rawRule) {
-    this._policyMgr.removeRule(requestpolicy.mod.RULE_TYPE_ALLOW, rawRule);
+    this._policyMgr.removeRule(rp.mod.RULE_TYPE_ALLOW, rawRule);
   },
 
   addDenyRule : function(rawRule) {
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.addRule(rp.mod.RULE_TYPE_DENY, rawRule);
   },
 
   addTemporaryDenyRule : function(rawRule) {
-    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_DENY, rawRule);
   },
 
   removeDenyRule : function(rawRule) {
-    this._policyMgr.removeRule(requestpolicy.mod.RULE_TYPE_DENY, rawRule);
+    this._policyMgr.removeRule(rp.mod.RULE_TYPE_DENY, rawRule);
   },
 
   _allowOrigin : function(host, noStore) {
     var ruleData = {"o":{"h":host}};
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
           noStore);
   },
 
@@ -790,13 +790,13 @@ RequestPolicyService.prototype = {
 
   temporarilyAllowOrigin : function(host) {
     var ruleData = {"o": {"h" : host}};
-    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
           ruleData);
   },
 
   _allowDestination : function(host, noStore) {
     var ruleData = {"d": {"h" : host}};
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
           noStore);
   },
 
@@ -810,7 +810,7 @@ RequestPolicyService.prototype = {
 
   temporarilyAllowDestination : function(host) {
     var ruleData = {"d": {"h" : host}};
-    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
         ruleData);
   },
 
@@ -820,7 +820,7 @@ RequestPolicyService.prototype = {
       "o": {"h" : originIdentifier},
       "d": {"h" : destIdentifier}
     };
-    this._policyMgr.addRule(requestpolicy.mod.RULE_TYPE_ALLOW, ruleData,
+    this._policyMgr.addRule(rp.mod.RULE_TYPE_ALLOW, ruleData,
           noStore);
   },
 
@@ -839,7 +839,7 @@ RequestPolicyService.prototype = {
       "o": {"h" : originIdentifier},
       "d": {"h" : destIdentifier}
     };
-    this._policyMgr.addTemporaryRule(requestpolicy.mod.RULE_TYPE_ALLOW,
+    this._policyMgr.addTemporaryRule(rp.mod.RULE_TYPE_ALLOW,
         ruleData);
   },
 
@@ -928,7 +928,7 @@ RequestPolicyService.prototype = {
   },
 
   _handleUninstallOrDisable : function() {
-    requestpolicy.mod.Logger.debug(requestpolicy.mod.Logger.TYPE_INTERNAL,
+    rp.mod.Logger.debug(rp.mod.Logger.TYPE_INTERNAL,
         "Performing 'disable' operations.");
     var resetLinkPrefetch = this.prefs.getBoolPref(
         "prefetch.link.restoreDefaultOnUninstall");
@@ -960,9 +960,9 @@ RequestPolicyService.prototype = {
       case "http-on-modify-request" :
         this._requestProcessor._examineHttpRequest(subject);
         break;
-      case requestpolicy.mod.SUBSCRIPTION_UPDATED_TOPIC:
-        requestpolicy.mod.Logger.debug(
-          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
+      case rp.mod.SUBSCRIPTION_UPDATED_TOPIC:
+        rp.mod.Logger.debug(
+          rp.mod.Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -970,9 +970,9 @@ RequestPolicyService.prototype = {
         var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
         break;
 
-      case requestpolicy.mod.SUBSCRIPTION_ADDED_TOPIC:
-        requestpolicy.mod.Logger.debug(
-          requestpolicy.mod.Logger.TYPE_INTERNAL, 'XXX added: ' + data);
+      case rp.mod.SUBSCRIPTION_ADDED_TOPIC:
+        rp.mod.Logger.debug(
+          rp.mod.Logger.TYPE_INTERNAL, 'XXX added: ' + data);
         var subInfo = JSON.parse(data);
         var failures = this._policyMgr.loadSubscriptionPolicies(subInfo);
         var failed = false;
@@ -990,17 +990,17 @@ RequestPolicyService.prototype = {
             }
           }
           function updateCompleted(result) {
-            requestpolicy.mod.Logger.info(
-                requestpolicy.mod.Logger.TYPE_INTERNAL,
+            rp.mod.Logger.info(
+                rp.mod.Logger.TYPE_INTERNAL,
                 'Subscription update completed: ' + result);
           }
           this._subscriptions.update(updateCompleted, serials);
         }
         break;
 
-      case requestpolicy.mod.SUBSCRIPTION_REMOVED_TOPIC:
-        requestpolicy.mod.Logger.debug(
-          requestpolicy.mod.Logger.TYPE_INTERNAL, 'YYY: ' + data);
+      case rp.mod.SUBSCRIPTION_REMOVED_TOPIC:
+        rp.mod.Logger.debug(
+          rp.mod.Logger.TYPE_INTERNAL, 'YYY: ' + data);
         var subInfo = JSON.parse(data);
         var failures = this._policyMgr.unloadSubscriptionPolicies(subInfo);
         break;
@@ -1054,8 +1054,8 @@ RequestPolicyService.prototype = {
             && subject.id == EXTENSION_ID) {
           if (data == "item-uninstalled" || data == "item-disabled") {
             this._uninstall = true;
-            requestpolicy.mod.Logger.debug(
-                requestpolicy.mod.Logger.TYPE_INTERNAL, "Disabled");
+            rp.mod.Logger.debug(
+                rp.mod.Logger.TYPE_INTERNAL, "Disabled");
           } else if (data == "item-cancel-action") {
             // This turns out to be correct. Unlike with the AddonManager
             // in Firefox 4, here if the user does a "disable" followed by
@@ -1064,8 +1064,8 @@ RequestPolicyService.prototype = {
             // appears to send an "item-disabled" and only if the user click
             // "undo" a second time does the "item-cancel-action" event occur.
             this._uninstall = false;
-            requestpolicy.mod.Logger.debug(
-                requestpolicy.mod.Logger.TYPE_INTERNAL, "Enabled");
+            rp.mod.Logger.debug(
+                rp.mod.Logger.TYPE_INTERNAL, "Enabled");
           }
         }
         break;
@@ -1075,7 +1075,7 @@ RequestPolicyService.prototype = {
         }
         break;
       default :
-        requestpolicy.mod.Logger.warning(requestpolicy.mod.Logger.TYPE_ERROR,
+        rp.mod.Logger.warning(rp.mod.Logger.TYPE_ERROR,
             "uknown topic observed: " + topic);
     }
   },
@@ -1090,7 +1090,7 @@ RequestPolicyService.prototype = {
 
   // enable our actual shouldLoad function
   _initContentPolicy : function() {
-    this._requestProcessor = new requestpolicy.mod.RequestProcessor(this);
+    this._requestProcessor = new rp.mod.RequestProcessor(this);
     this.shouldLoad = this.mainContentPolicy.shouldLoad;
     if (!this.mimeService) {
       // this.rejectCode = typeof(/ /) == "object" ? -4 : -3;
@@ -1105,7 +1105,7 @@ RequestPolicyService.prototype = {
     // https://developer.mozilla.org/en/nsIContentPolicy
     shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
         aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-      var request = new requestpolicy.mod.NormalRequest(
+      var request = new rp.mod.NormalRequest(
           aContentType, aContentLocation, aRequestOrigin, aContext,
           aMimeTypeGuess, aExtra, aRequestPrincipal);
       return this._requestProcessor.process(request);

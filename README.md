@@ -1,30 +1,33 @@
 # RequestPolicy (continued)
 
+## About RequestPolicy
+
 RequestPolicy is a Firefox extension that gives you control over cross-site
 requests. It does this through user-defined whitelists and blacklists. Users
 can also subscribe to policies (whitelists and blacklists) maintained by
 others.
 
-For more information about RequestPolicy and cross-site requests, have a look at
+For more information about RequestPolicy and cross-site requests, have a look at our website:
 https://requestpolicycontinued.github.io/requestpolicy/
 
-The RequestPolicy "Continued" project is in fact a fork of
+## Questions? – Feedback, Bugs etc.
+
+If you have any questions or ideas, please post them in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484) or create a new [issue](https://github.com/RequestPolicyContinued/requestpolicy/issues). If you've found a bug, please create directly a new issue.
+
+## This project
+
+The RequestPolicy "Continued" project is a fork of
 [RequestPolicy](https://github.com/RequestPolicy/requestpolicy), which had been
-developed by [Justin Samuel](https://github.com/jsamuel) until 2012.
-To continue development, this fork has been created. Note that we're using the
-same name for the software itself, "RequestPolicy", and we continue the version
-numbering.
+developed by [Justin Samuel](https://github.com/jsamuel) until 2012. Currently we aim at releasing our first stable version – 1.0 – but there is still much to do. If you want to be informed about this milestone, you could subscribe to [this issue](https://github.com/RequestPolicyContinued/requestpolicy/issues/446). If you're interested, [here](https://github.com/RequestPolicyContinued/requestpolicy/milestones/1.0)  you can find a list of all open issues for version 1.0.
 
 ## License
 
 GPL v3
 
-## Communication and Issues
+## Development
 
-We use just one place for all discussions, bugs and feature request:
-https://github.com/RequestPolicyContinued/requestpolicy/issues
+You'd like to get more into RequestPolicy? Great! Just take a look at the issues, say hello in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484) issue or simply browse the code. A good first step is getting the code – see below. For more information, please take a look at our [Development Wiki](https://github.com/RequestPolicyContinued/requestpolicy/wiki).
 
-# Development
 
 ## Getting the Source Code
 
@@ -34,8 +37,5 @@ control system, you can do so with:
 ```bash
 git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 ```
-
-Documentation for developers is at
-https://github.com/RequestPolicyContinued/requestpolicy/wiki
 
 You can also `git clone https://github.com/RequestPolicyContinued/requestpolicy.wiki.git`

@@ -28,6 +28,8 @@ GPL v3
 
 You'd like to get more into RequestPolicy? Great! Just take a look at the issues, say hello in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484) issue or simply browse the code. A good first step is getting the code – see below. For more information, please take a look at our [Development Wiki](https://github.com/RequestPolicyContinued/requestpolicy/wiki).
 
+The wiki can be cloned locally with `git clone https://github.com/RequestPolicyContinued/requestpolicy.wiki.git`. It is included as a git [submodule](http://git-scm.com/book/en/Git-Tools-Submodules) of the main repository, so you can clone both the source and developement wiki in one step with `git clone --recursive https://github.com/RequestPolicyContinued/requestpolicy` or by running `git submodule update --init` inside your copy of the repository.
+
 
 ## Getting the Source Code
 
@@ -38,4 +40,3 @@ control system, you can do so with:
 git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 ```
 
-You can also `git clone https://github.com/RequestPolicyContinued/requestpolicy.wiki.git`

@@ -7,7 +7,7 @@
 <!ENTITY rp.menu.disableBlocking "Disabilita blocco">
 <!ENTITY rp.menu.help "Aiuto">
 <!ENTITY rp.menu.preferences "Preferenze">
-<!ENTITY rp.menu.managePolicies "Gestisci Politiche">
+<!ENTITY rp.menu.managePolicies "Gestisci Regole">
 <!ENTITY rp.requestLog.title "Log Richieste">
 <!ENTITY rp.requestLog.origin "Origine">
 <!ENTITY rp.requestLog.destination "Destinazione">

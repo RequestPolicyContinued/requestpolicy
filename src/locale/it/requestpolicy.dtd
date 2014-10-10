@@ -1,13 +1,13 @@
 <!ENTITY rp.menu.revokeTemporaryPermissions "Revoca tutti i permessi temporanei">
 <!ENTITY rp.menu.blockedDestinations "Destinazioni bloccate">
 <!ENTITY rp.menu.allowedDestinations "Destinazioni permesse">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.mixedDestinations "Destinazioni miste">
 <!ENTITY rp.menu.otherOrigins "Altre origini">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.enableBlocking "Abilita blocco">
+<!ENTITY rp.menu.disableBlocking "Disabilita blocco">
+<!ENTITY rp.menu.help "Aiuto">
 <!ENTITY rp.menu.preferences "Preferenze">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.menu.managePolicies "Gestisci Regole">
 <!ENTITY rp.requestLog.title "Log Richieste">
 <!ENTITY rp.requestLog.origin "Origine">
 <!ENTITY rp.requestLog.destination "Destinazione">

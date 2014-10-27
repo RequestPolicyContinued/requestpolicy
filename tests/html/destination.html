@@ -1,8 +1,30 @@
 <html>
 <head>
   <title>Destination page</title>
+  <script src="inc/jquery.min.js"></script>
 </head>
 <body>
+
+<script>
+  // change this value if more or less scripts/whatever is placed on this page.
+  // this value is read out by MozMill tests
+  var numAdditionalSamedomainRequests = 1;
+
+  $('body').prepend('<p>' + location.hostname + '</p>');
+  if (location.search) {
+    var text = location.search.substr(1);
+    $('body').prepend('<p>' + text + '</p>');
+  }
+
+  $('body').append('<p>This page makes ' +
+      '<span id="num-additional-samedomain-requests">' +
+      numAdditionalSamedomainRequests +'</span> additional request ' +
+      '(a javascript file) to the same domain.</p>');
+</script>
+
+<noscript>
+  Please enable JavaScript for this test.
+</noscript>
 
 <p>
   This is the destination page. Other test pages link to this page.
@@ -11,6 +33,5 @@
 <p>
   <a href="javascript:history.back()">go back</a>
 </p>
-
 </body>
 </html>

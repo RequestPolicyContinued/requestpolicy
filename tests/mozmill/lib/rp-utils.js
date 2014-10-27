@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+"use strict";
+
 /**
  * @param {MozMillController} _controller
  * @param {ElemBase} tab
@@ -24,6 +26,13 @@ function selectText(_tabBrowser, text) {
   findBar.close(true);
 }
 
+function getElementById(ancestor, id) {
+  var element = ancestor.getElementById(id);
+  assert.ok(element, 'element #' + id + ' has been found.');
+  return element;
+}
+
 // Export of functions
 exports.waitForTabLoad = waitForTabLoad;
 exports.selectText = selectText;
+exports.getElementById = getElementById;

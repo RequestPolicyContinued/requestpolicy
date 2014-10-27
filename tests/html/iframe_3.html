@@ -1,0 +1,54 @@
+<html>
+<head>
+  <script src="inc/jquery.min.js"></script>
+  <script src="inc/global.js"></script>
+</head>
+<body>
+
+<script>
+  // change this value if more or less scripts/whatever is placed on this page.
+  var numAdditionalSamedomainRequests = 2;
+
+  $(document).ready(function() {
+    $('body').prepend('<h1>' + location.hostname + '</h1>');
+    var domains = wwwDomains;
+
+    // take location's hostname and convert:
+    // www.*.*    -->  sub-1.*.*    -- for outer page
+    // sub-1.*.*  -->  sub-2.*.*    -- for inner page (in iframe)
+    domains.push(location.hostname.replace('sub-1', 'sub-2').
+        replace('www', 'sub-1'));
+    for (var i = 0; i < domains.length; i++) {
+      var domain = domains[i];
+
+      var width = '600';
+      var height = '400';
+      var path = '/iframe_3.html?inner';
+      var id = 'iframe_' + i;
+      if (location.search == '?inner') {
+        width = '250';
+        height = '150';
+        path = '/destination.html';
+      }
+      var src = 'http://' + domain + path;
+
+      var html = '<b>' + domain + ':</b><br />' +
+          '<iframe id="' + id + '" src="' + src + '" ' +
+          ' width="'+width+'" height="'+height+'"></iframe><br />';
+      $('body').append(html);
+    }
+
+    $('body').append('<p>In addition to the iframe requests this page makes ' +
+        '<span id="num-additional-samedomain-requests">' +
+        numAdditionalSamedomainRequests +'</span> additional requests ' +
+        '(javascript files) to the same domain.</p>');
+  });
+</script>
+
+<noscript>
+  Please enable JavaScript for this test.
+</noscript>
+
+
+</body>
+</html>

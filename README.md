@@ -24,13 +24,6 @@ developed by [Justin Samuel](https://github.com/jsamuel) until 2012. Currently w
 
 GPL v3
 
-## Development
-
-You'd like to get more into RequestPolicy? Great! Just take a look at the issues, say hello in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484) issue or simply browse the code. A good first step is getting the code – see below. For more information, please take a look at our [Development Wiki](https://github.com/RequestPolicyContinued/requestpolicy/wiki).
-
-The wiki can be cloned locally with `git clone https://github.com/RequestPolicyContinued/requestpolicy.wiki.git`. It is included as a git [submodule](http://git-scm.com/book/en/Git-Tools-Submodules) of the main repository, so you can clone both the source and developement wiki in one step with `git clone --recursive https://github.com/RequestPolicyContinued/requestpolicy` or by running `git submodule update --init` inside your copy of the repository.
-
-
 ## Getting the Source Code
 
 If you'd like to download the RequestPolicy source code from our version
@@ -40,3 +33,16 @@ control system, you can do so with:
 git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 ```
 
+Then you can change to the `src/` directory and run
+
+```bash
+ant
+```
+
+to create a [XPI](https://developer.mozilla.org/en-US/docs/XPI) file. It will be created at `src/dist/requestpolicy.xpi` and can be used for easy installation of RP into your web browser (Firefox).
+
+## Development
+
+You'd like to get more into RequestPolicy? Great! If you simply want to know what's going on in our community, check the [issues list](https://github.com/RequestPolicyContinued/requestpolicy/issues). If you want to get more into the source code, please take a look at our [Development Wiki](https://github.com/RequestPolicyContinued/requestpolicy/wiki). In any case, we would be pleased if you say hello in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484) "issue".
+
+By the way, the wiki can be cloned locally with `git clone https://github.com/RequestPolicyContinued/requestpolicy.wiki.git`. It is included as a git [submodule](http://git-scm.com/book/en/Git-Tools-Submodules) of the main repository, so you can clone both the source and developement wiki in one step with `git clone --recursive https://github.com/RequestPolicyContinued/requestpolicy` or by running `git submodule update --init` inside your copy of the repository.

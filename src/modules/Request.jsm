@@ -147,30 +147,28 @@ NormalRequest.prototype.isInternal = function() {
     return true;
   }
 
-  if (this.aRequestOrigin == undefined || this.aRequestOrigin == null) {
+  if (this.aRequestOrigin === undefined || this.aRequestOrigin === null) {
     return true;
   }
 
-  var missingSpecOrHost;
-  try {
-    // The asciiHost values will exist but be empty strings for the "file"
-    // scheme, so we don't want to allow just because they are empty strings,
-    // only if not set at all.
-    this.aRequestOrigin.asciiHost;
-    this.aContentLocation.asciiHost;
+  if (this.aRequestOrigin.spec === "") {
     // The spec can be empty if odd things are going on, like the Refcontrol
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
-    missingSpecOrHost = this.aRequestOrigin.spec === "";
-  } catch (e) {
-    missingSpecOrHost = true;
+    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
+        "Allowing request with empty aRequestOrigin spec!");
+    return true;
   }
 
-  if (missingSpecOrHost) {
+  if (this.aRequestOrigin.asciiHost === undefined ||
+      this.aContentLocation.asciiHost === undefined) {
+    // The asciiHost values will exist but be empty strings for the "file"
+    // scheme, so we don't want to allow just because they are empty strings,
+    // only if not set at all.
     rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
-        "No asciiHost or empty spec on either aRequestOrigin <"
-            + this.aRequestOrigin.spec + "> or aContentLocation <"
-            + this.aContentLocation.spec + ">");
+        "Allowing request with no asciiHost on either aRequestOrigin <" +
+        this.aRequestOrigin.spec + "> or aContentLocation <" +
+        this.aContentLocation.spec + ">");
     return true;
   }
 
@@ -182,16 +180,17 @@ NormalRequest.prototype.isInternal = function() {
     return true;
   }
 
-  if (this.aRequestOrigin.scheme == 'about'
-      && this.aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
+  // see issue #180
+  if (this.aRequestOrigin.scheme == 'about' &&
+      this.aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
     return true;
   }
 
   // If there are entities in the document, they may trigger a local file
   // request. We'll only allow requests to .dtd files, though, so we don't
   // open up all file:// destinations.
-  if (this.aContentLocation.scheme == "file"
-      && /.\.dtd$/.test(this.aContentLocation.path)) {
+  if (this.aContentLocation.scheme == "file" &&
+      this.aContentType == CI.nsIContentPolicy.TYPE_DTD) {
     return true;
   }
 

@@ -174,21 +174,27 @@ RequestProcessor.prototype.process = function(request) {
     }
 
     if (originURI == "about:blank" && request.aContext) {
-      var newOriginURI;
-      if (request.aContext.documentURI &&
-          request.aContext.documentURI != "about:blank") {
-        newOriginURI = request.aContext.documentURI;
-      } else if (request.aContext.ownerDocument &&
-          request.aContext.ownerDocument.documentURI &&
-          request.aContext.ownerDocument.documentURI != "about:blank") {
-        newOriginURI = request.aContext.ownerDocument.documentURI;
-      }
-      if (newOriginURI) {
-        newOriginURI = rp.mod.DomainUtil.stripFragment(newOriginURI);
-        rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT, "Considering origin <" +
-            originURI + "> to be origin <" + newOriginURI + ">");
-        originURI = newOriginURI;
-        request.setOriginURI(originURI);
+      let domNode;
+      try {
+        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+      } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+      if (domNode && domNode.nodeType == CI.nsIDOMNode.DOCUMENT_NODE) {
+        var newOriginURI;
+        if (request.aContext.documentURI &&
+            request.aContext.documentURI != "about:blank") {
+          newOriginURI = request.aContext.documentURI;
+        } else if (request.aContext.ownerDocument &&
+            request.aContext.ownerDocument.documentURI &&
+            request.aContext.ownerDocument.documentURI != "about:blank") {
+          newOriginURI = request.aContext.ownerDocument.documentURI;
+        }
+        if (newOriginURI) {
+          newOriginURI = rp.mod.DomainUtil.stripFragment(newOriginURI);
+          rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT, "Considering origin <" +
+              originURI + "> to be origin <" + newOriginURI + ">");
+          originURI = newOriginURI;
+          request.setOriginURI(originURI);
+        }
       }
     }
 
@@ -213,10 +219,16 @@ RequestProcessor.prototype.process = function(request) {
 
 
 
-    if (request.aContext && request.aContext.nodeName == "LINK" &&
-        (request.aContext.rel == "icon" ||
-            request.aContext.rel == "shortcut icon")) {
-      this._faviconRequests[destURI] = true;
+    if (request.aContext) {
+      let domNode;
+      try {
+        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+      } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+
+      if (domNode && domNode.nodeName == "LINK" &&
+          (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
+        this._faviconRequests[destURI] = true;
+      }
     }
 
     // Note: If changing the logic here, also make necessary changes to
@@ -311,13 +323,19 @@ RequestProcessor.prototype.process = function(request) {
     // window.open() and we can't find a better way to register the source
     // and destination before the request is made. This should be able to be
     // removed if we can find a better solution for the allowed popup case.
-    if (request.aContext && request.aContext.nodeName == "xul:browser" &&
-        request.aContext.currentURI &&
-        request.aContext.currentURI.spec == "about:blank") {
-      request.requestResult = new rp.mod.RequestResult(true,
-          rp.mod.REQUEST_REASON_NEW_WINDOW);
-      return this.accept("New window (should probably only be an allowed " +
-          "popup's initial request)", request, true);
+    if (request.aContext) {
+      let domNode;
+      try {
+        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+      } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+
+      if (domNode && domNode.nodeName == "xul:browser" &&
+          domNode.currentURI && domNode.currentURI.spec == "about:blank") {
+        request.requestResult = new rp.mod.RequestResult(true,
+            rp.mod.REQUEST_REASON_NEW_WINDOW);
+        return this.accept("New window (should probably only be an allowed " +
+            "popup's initial request)", request, true);
+      }
     }
 
     // XMLHttpRequests made within chrome's context have these origins.
@@ -1047,7 +1065,9 @@ RequestProcessor.prototype.reject = function(reason, request) {
     return CP_OK;
   }
 
-  request.aContext.requestpolicyBlocked = true;
+  if (request.aContext) {
+    request.aContext.requestpolicyBlocked = true;
+  }
 
   this._cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
   this._recordRejectedRequest(request);

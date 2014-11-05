@@ -90,5 +90,11 @@ RequestResult.prototype = {
     return (this.resultReason == REQUEST_REASON_DEFAULT_POLICY ||
             this.resultReason == REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
             this.resultReason == REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+  },
+
+  isOnBlacklist: function() {
+    // TODO: implement a real blacklist. currently, if a request is blocked
+    // *not* by the default policy it's by a blacklist
+    return this.isAllowed ? false : !this.isDefaultPolicyUsed();
   }
 };

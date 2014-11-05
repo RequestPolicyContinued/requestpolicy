@@ -3,7 +3,7 @@ PAGE_STRINGS = [
   'advanced',
   'webPages',
   'indicateBlockedImages',
-  'indicateBlacklistedImages',
+  'dontIndicateBlacklisted',
   'autoReload',
   'menu',
   'allowAddingNonTemporaryRulesInPBM'
@@ -17,11 +17,12 @@ var prefsChangedObserver = null;
 
 
 function updateDisplay() {
-  document.getElementById('pref-indicateBlockedObjects').checked =
-      rpService.prefs.getBoolPref('indicateBlockedObjects');
+  var indicate = rpService.prefs.getBoolPref('indicateBlockedObjects');
+  document.getElementById('pref-indicateBlockedObjects').checked = indicate;
+  document.getElementById('indicateBlockedImages-details').hidden = !indicate;
 
-  document.getElementById('pref-indicateBlacklistedObjects').checked =
-      rpService.prefs.getBoolPref('indicateBlacklistedObjects');
+  document.getElementById('pref-dontIndicateBlacklistedObjects').checked =
+      !rpService.prefs.getBoolPref('indicateBlacklistedObjects');
 
   document.getElementById('pref-autoReload').checked =
       rpService.prefs.getBoolPref('autoReload');
@@ -45,13 +46,15 @@ function onload() {
       function (event) {
         rpService.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
         rpService._prefService.savePrefFile(null);
+        updateDisplay();
       }
   );
 
-  document.getElementById('pref-indicateBlacklistedObjects').addEventListener('change',
+  document.getElementById('pref-dontIndicateBlacklistedObjects').addEventListener('change',
       function (event) {
-        rpService.prefs.setBoolPref('indicateBlacklistedObjects', event.target.checked);
+        rpService.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
         rpService._prefService.savePrefFile(null);
+        updateDisplay();
       }
   );
 
@@ -59,6 +62,7 @@ function onload() {
     function(event) {
       rpService.prefs.setBoolPref('autoReload', event.target.checked);
       rpService._prefService.savePrefFile(null);
+      updateDisplay();
     }
   );
 
@@ -66,6 +70,7 @@ function onload() {
       function (event) {
         rpService.prefs.setBoolPref('privateBrowsingPermanentWhitelisting', event.target.checked);
         rpService._prefService.savePrefFile(null);
+        updateDisplay();
       }
   );
 

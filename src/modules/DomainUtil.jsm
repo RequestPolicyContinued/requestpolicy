@@ -297,9 +297,9 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  *
  * @param {String}
  *          refreshString The original content of a refresh header or meta tag.
- * @return {Array} First element is the delay in seconds, second element is the
- *         url to refresh to. The url may be an empty string if the current url
- *         should be refreshed.
+ * @return {Object} The delay in seconds and the url to refresh to.
+ *                  The url may be an empty string if the current url should be
+ *                  refreshed.
  * @throws Generic
  *           exception if the refreshString has an invalid format, including if
  *           the seconds can't be parsed as a float.
@@ -322,7 +322,7 @@ DomainUtil.parseRefresh = function(refreshString) {
       url = url.substring(1, url.length - 1);
     }
   }
-  return [delay, url];
+  return {delay: delay, destURI: url};
 }
 
 /**

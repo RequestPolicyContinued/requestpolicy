@@ -662,23 +662,45 @@ requestpolicy.overlay = {
     }
   },
 
+  _containsNonBlacklistedRequests : function(requests) {
+    for (let i = 0, len = requests.length; i < len; i++) {
+      if (!requests[i].isOnBlacklist()) {
+        // This request has not benn blocked by the blacklist
+        return true;
+      }
+    }
+    return false;
+  },
+
   _indicateBlockedVisibleObjects : function(document) {
     if (!this._rpService.prefs.getBoolPref("indicateBlockedObjects")) {
       return;
     }
+    var indicateBlacklisted = this._rpService.prefs
+        .getBoolPref("indicateBlacklistedObjects");
+
     var images = document.getElementsByTagName("img");
     var rejectedRequests = this._rpService._requestProcessor.
         _rejectedRequests.getOriginUri(document.location);
-    var blockedUris = {};
+    var blockedUrisToIndicate = {};
     for (var destBase in rejectedRequests) {
       for (var destIdent in rejectedRequests[destBase]) {
         for (var destUri in rejectedRequests[destBase][destIdent]) {
-          var shouldPlacehold = this._rpService.prefs.getBoolPref("indicateBlacklistedObjects");
-          var results = rejectedRequests[destBase][destIdent][destUri];
-          for(var i=0; i < results.length && !shouldPlacehold; i++)
-            shouldPlacehold = results[i].isDefaultPolicyUsed(); // if a request is blocked not by the default policy it's by a blacklist
-          if(shouldPlacehold)
-            blockedUris[destUri] = true;
+          // case 1: indicateBlacklisted == true
+          //         ==> indicate the object has been blocked
+          //
+          // case 2: indicateBlacklisted == false
+          // case 2a: all requests have been blocked because of a blacklist
+          //          ==> do *not* indicate
+          //
+          // case 2b: at least one of the blocked (identical) requests has been
+          //          blocked by a rule *other than* the blacklist
+          //          ==> *do* indicate
+          let requests = rejectedRequests[destBase][destIdent][destUri];
+          if (indicateBlacklisted ||
+              this._containsNonBlacklistedRequests(requests)) {
+            blockedUrisToIndicate[destUri] = true;
+          }
         }
       }
     }
@@ -701,7 +723,7 @@ requestpolicy.overlay = {
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
       // Note: we're no longer checking img.requestpolicyBlocked here.
-      if (!img.requestpolicyIdentified && img.src in blockedUris) {
+      if (!img.requestpolicyIdentified && img.src in blockedUrisToIndicate) {
         img.requestpolicyIdentified = true;
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";

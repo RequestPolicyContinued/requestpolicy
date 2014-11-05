@@ -673,7 +673,12 @@ requestpolicy.overlay = {
     for (var destBase in rejectedRequests) {
       for (var destIdent in rejectedRequests[destBase]) {
         for (var destUri in rejectedRequests[destBase][destIdent]) {
-          blockedUris[destUri] = true;
+          var shouldPlacehold = false; // = pref(show placeholder for blacklisted images)
+          var results = rejectedRequests[destBase][destIdent][destUri];
+          for(var i=0; i < results.length && !shouldPlacehold; i++)
+            shouldPlacehold = results[i].isDefaultPolicyUsed(); // if a request is blocked not by the default policy it's by a blacklist
+          if(shouldPlacehold)
+            blockedUris[destUri] = true;
         }
       }
     }

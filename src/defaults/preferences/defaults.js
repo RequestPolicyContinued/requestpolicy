@@ -13,6 +13,7 @@ pref("extensions.requestpolicy.defaultPolicy.allowSameDomain", true);
 pref("extensions.requestpolicy.welcomeWindowShown", false);
 
 pref("extensions.requestpolicy.indicateBlockedObjects", true);
+pref("extensions.requestpolicy.indicateBlacklistedObjects", true);
 pref("extensions.requestpolicy.startWithAllowAllEnabled", false);
 pref("extensions.requestpolicy.privateBrowsingPermanentWhitelisting", false);
 

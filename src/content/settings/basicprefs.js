@@ -3,6 +3,7 @@ PAGE_STRINGS = [
   'advanced',
   'webPages',
   'indicateBlockedImages',
+  'indicateBlacklistedImages',
   'autoReload',
   'menu',
   'allowAddingNonTemporaryRulesInPBM'
@@ -18,6 +19,9 @@ var prefsChangedObserver = null;
 function updateDisplay() {
   document.getElementById('pref-indicateBlockedObjects').checked =
       rpService.prefs.getBoolPref('indicateBlockedObjects');
+
+  document.getElementById('pref-indicateBlacklistedObjects').checked =
+      rpService.prefs.getBoolPref('indicateBlacklistedObjects');
 
   document.getElementById('pref-autoReload').checked =
       rpService.prefs.getBoolPref('autoReload');
@@ -40,6 +44,13 @@ function onload() {
   document.getElementById('pref-indicateBlockedObjects').addEventListener('change',
       function (event) {
         rpService.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
+        rpService._prefService.savePrefFile(null);
+      }
+  );
+
+  document.getElementById('pref-indicateBlacklistedObjects').addEventListener('change',
+      function (event) {
+        rpService.prefs.setBoolPref('indicateBlacklistedObjects', event.target.checked);
         rpService._prefService.savePrefFile(null);
       }
   );

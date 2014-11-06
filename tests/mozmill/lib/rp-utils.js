@@ -32,7 +32,18 @@ function getElementById(ancestor, id) {
   return element;
 }
 
+/**
+ * @param {MozMillController} _controller
+ * @return {MozMillElement} The link to click on.
+ */
+function getLink(_controller) {
+  let links = _controller.window.content.document.getElementsByTagName("a");
+  assert.notEqual(links.length, 0, "A link has been found on the test page.");
+  return findElement.Elem(links[0]);
+}
+
 // Export of functions
 exports.waitForTabLoad = waitForTabLoad;
 exports.selectText = selectText;
 exports.getElementById = getElementById;
+exports.getLink = getLink;

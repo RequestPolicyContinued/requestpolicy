@@ -4,14 +4,14 @@
 
 "use strict";
 
-var {assert, expect} = require("../../../../../../../lib/assertions");
-var prefs = require("../../../../../../lib/prefs");
-var tabs = require("../../../../../../lib/tabs");
+var {assert, expect} = require("../../../../../../lib/assertions");
+var prefs = require("../../../../../lib/prefs");
+var tabs = require("../../../../../lib/tabs");
 
-var rpUtils = require("../../../lib/rp-utils");
-var rpConst = require("../../../lib/constants");
+var rpUtils = require("../../lib/rp-utils");
+var rpConst = require("../../lib/constants");
 
-const TEST_URL = "http://www.maindomain.test/link_1.html";
+var TEST_URL = "http://www.maindomain.test/redirect-js-document-location-link.html";
 
 
 var setupModule = function(aModule) {
@@ -28,22 +28,18 @@ var teardownModule = function(aModule) {
 }
 
 
-var testLinkClick = function() {
+var testOpenInCurrentTab = function() {
+  let tabIndex = tabBrowser.selectedIndex;
+
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let link = rpUtils.getLink(controller);
-  let linkURL = link.getNode().href;
-
-  link.click();
+  rpUtils.getLink(controller).click();
 
   rpUtils.waitForTabLoad(controller, tabBrowser.getTab(0));
 
-  var panel = tabBrowser.getTabPanelElement(0,
+  var panel = tabBrowser.getTabPanelElement(tabIndex,
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
-  assert.ok(false === panel.exists(),
-      "Following the link didn't cause a redirect");
 
-  assert.equal(controller.tabs.activeTab.location.href, linkURL,
-      "The location is correct.");
+  assert.ok(panel.exists(), "The redirect has been blocked.");
 }

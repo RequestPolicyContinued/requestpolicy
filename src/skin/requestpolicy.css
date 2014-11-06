@@ -68,9 +68,8 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="true
  * Case: nothing has been blocked.
  */
 #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
-  /* TODO: create a 32px "allowed" icon */
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
+    url(chrome://requestpolicy/skin/requestpolicy-icon-32-allowed.png);
 }
 toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
@@ -85,9 +84,8 @@ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="fals
  * Case: blocking is disabled.
  */
 #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
-  /* TODO: create a 32px "disabled" icon */
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
+    url(chrome://requestpolicy/skin/requestpolicy-icon-32-disabled.png);
 }
 toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:

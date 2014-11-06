@@ -39,7 +39,7 @@
         <div id="pagetitle" data-string="subscriptionPolicies"></div>
 
         <p class="learnmore">
-          <span data-string="subscriptionPoliciesDefinition"></span>
+          <span data-string="subscriptionPoliciesDefinition"/>
           <a href="https://www.requestpolicy.com/help-subscriptions.html"
              target="_blank" data-string="learnMore"></a></p>
 
@@ -47,10 +47,10 @@
           <tr data-default-policy="allow">
             <td data-string="privacy"></td>
             <td>
-              <div>
+              <div id="deny_trackers" class="subscription">
                 <label>
-                  <input type="checkbox" name="deny_trackers" id="sub-deny_trackers"/>
-                  <span data-string="subscriptionDenyTrackersDescription"></span>
+                  <input type="checkbox" name="deny_trackers"/>
+                  <span data-string="subscriptionDenyTrackersDescription"/>
                 </label>
               </div>
             </td>
@@ -58,22 +58,22 @@
           <tr data-default-policy="deny">
             <td data-string="usability"></td>
             <td>
-              <div>
+              <div id="allow_sameorg" class="subscription">
                 <label>
-                  <input type="checkbox" name="allow_sameorg" id="sub-allow_sameorg"/>
-                  <span data-string="subscriptionAllowSameOrgDescription"></span>
+                  <input type="checkbox" name="allow_sameorg"/>
+                  <span data-string="subscriptionAllowSameOrgDescription"/>
                 </label>
               </div>
-              <div>
+              <div id="allow_functionality" class="subscription">
                 <label>
-                  <input type="checkbox" name="allow_functionality" id="sub-allow_functionality"/>
-                  <span data-string="subscriptionAllowFunctionalityDescription"></span>
+                  <input type="checkbox" name="allow_functionality"/>
+                  <span data-string="subscriptionAllowFunctionalityDescription"/>
                 </label>
               </div>
-              <div>
+              <div id="allow_embedded" class="subscription">
                 <label>
-                  <input type="checkbox" name="allow_embedded" id="sub-allow_embedded"/>
-                  <span data-string="subscriptionAllowEmbeddedDescription"></span>
+                  <input type="checkbox" name="allow_embedded"/>
+                  <span data-string="subscriptionAllowEmbeddedDescription"/>
                 </label>
               </div>
             </td>
@@ -81,16 +81,16 @@
           <tr data-default-policy="deny">
             <td data-string="browser"></td>
             <td>
-              <div>
+              <div id="allow_mozilla" class="subscription">
                 <label>
-                  <input type="checkbox" name="allow_mozilla" id="sub-allow_mozilla"/>
-                  <span data-string="subscriptionAllowMozillaDescription"></span>
+                  <input type="checkbox" name="allow_mozilla"/>
+                  <span data-string="subscriptionAllowMozillaDescription"/>
                 </label>
               </div>
-              <div>
+              <div id="allow_extensions" class="subscription">
                 <label>
-                  <input type="checkbox" name="allow_extensions" id="sub-allow_extensions"/>
-                  <span data-string="subscriptionAllowExtensionsDescription"></span>
+                  <input type="checkbox" name="allow_extensions"/>
+                  <span data-string="subscriptionAllowExtensionsDescription"/>
                 </label>
               </div>
             </td>

@@ -3,9 +3,9 @@
 <!ENTITY rp.menu.allowedDestinations "Cibles autorisées">
 <!ENTITY rp.menu.mixedDestinations "Mixed destinations">
 <!ENTITY rp.menu.otherOrigins "Autres origines">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.enableBlocking "Activer le blocage">
+<!ENTITY rp.menu.disableBlocking "Désactiver le blocage">
+<!ENTITY rp.menu.help "Aide">
 <!ENTITY rp.menu.preferences "Préférences">
 <!ENTITY rp.menu.managePolicies "Manage Policies">
 <!ENTITY rp.requestLog.title "Journal des requêtes">

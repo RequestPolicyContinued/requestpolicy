@@ -652,7 +652,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
 RequestProcessor.prototype.processRedirect = function(request, httpChannel) {
   var originURI = request.originURI;
   var destURI = request.destURI;
-  var headerType = request.headerType;
+  var headerType = request.httpHeader;
 
   // Ignore redirects to javascript. The browser will ignore them, as well.
   if (rp.mod.DomainUtil.getUriObject(destURI).schemeIs("javascript")) {

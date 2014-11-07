@@ -8,44 +8,62 @@
     <em:version>1.0.0b7</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
-    <em:creator>Justin Samuel</em:creator>
-    <em:developer>myrdd</em:developer>
     <em:id>requestpolicy@requestpolicy.com</em:id>
-    <em:homepageURL>https://github.com/RequestPolicyContinued/requestpolicy</em:homepageURL>
+    <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
     <em:updateURL>https://requestpolicycontinued.github.io/requestpolicy/xpi/update-1.x-beta.rdf</em:updateURL>
 
-    <em:translator>myahoo (French)</em:translator>
-    <em:translator>Team erweiterungen.de (German)</em:translator>
-    <em:translator>Archaeopteryx (German)</em:translator>
-    <em:translator>petruc (Portuguese [Brazil])</em:translator>
-    <em:translator>Sumin Byeon (Korean)</em:translator>
-    <em:translator>pedro arana matus (Spanish [Mexico])</em:translator>
-    <em:translator>Володимир Савчук / Volodymyr Savchuk (Ukrainian)</em:translator>
-    <em:translator>markh van BabelZilla.org (Dutch)</em:translator>
-    <em:translator>alpmild (Russian)</em:translator>
+    <em:creator>RequestPolicy Continued Team</em:creator>
+
+    <em:developer>Justin Samuel (original author)</em:developer>
+    <em:developer>Martin Kimmerle (main developer)</em:developer>
+
+    <em:contributor>Brad Horrocks</em:contributor>
+    <em:contributor>Beichuan Zhang</em:contributor>
+    <em:contributor>Christoph Langguth</em:contributor>
+    <em:contributor>Christopher Bura</em:contributor>
+    <em:contributor>Gaetan Gilbert</em:contributor>
+    <em:contributor>John Hartman</em:contributor>
+    <em:contributor>Justin Cappos</em:contributor>
+    <em:contributor>Mike Cardwell</em:contributor>
+    <em:contributor>nodiscc</em:contributor>
+    <em:contributor>Robert Hansen (RSnake)</em:contributor>
+    <em:contributor>Vern Paxson</em:contributor>
+
+    <em:translator>Antxon Baldarra (Basque)</em:translator>
     <em:translator>wenketel (Chinese [simplified])</em:translator>
     <em:translator>yfdyh000 (Chinese [simplified])</em:translator>
-    <em:translator>nikneyim (Turkish)</em:translator>
-    <em:translator>Anonymous (Japanese)</em:translator>
-    <em:translator>Aleksej R. Serdjukov kaj babilejanoj (Esperanto)</em:translator>
-    <em:translator>Natanael_L01 (Swedish)</em:translator>
     <em:translator>James (Silencer) (Chinese [traditional])</em:translator>
-    <em:translator>Antxon Baldarra (Basque)</em:translator>
+    <em:translator>markh van BabelZilla.org (Dutch)</em:translator>
+    <em:translator>Aleksej R. Serdjukov kaj babilejanoj (Esperanto)</em:translator>
+    <em:translator>Gaetan Gilbert (French)</em:translator>
+    <em:translator>myahoo (French)</em:translator>
+    <em:translator>nodiscc (French)</em:translator>
+    <em:translator>Team erweiterungen.de (German)</em:translator>
+    <em:translator>Archaeopteryx (German)</em:translator>
+    <em:translator>anthologist (Italian)</em:translator>
     <em:translator>Random (Italian)</em:translator>
-    <em:translator>Jacen (Slovak)</em:translator>
-    <em:translator>Brad Horrocks</em:translator>
+    <em:translator>Anonymous (Japanese)</em:translator>
+    <em:translator>Sumin Byeon (Korean)</em:translator>
     <em:translator>Aleksandrs Ļedovskis (Latvian)</em:translator>
+    <em:translator>petruc (Portuguese [Brazil])</em:translator>
+    <em:translator>alpmild (Russian)</em:translator>
+    <em:translator>Jacen (Slovak)</em:translator>
+    <em:translator>pedro arana matus (Spanish [Mexico])</em:translator>
+    <em:translator>Natanael_L01 (Swedish)</em:translator>
+    <em:translator>nikneyim (Turkish)</em:translator>
+    <em:translator>Володимир Савчук / Volodymyr Savchuk (Ukrainian)</em:translator>
+    <em:translator>Brad Horrocks</em:translator>
 
     <!-- Firefox (Flock will recognize this, too) -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>4.0</em:minVersion>
-        <em:maxVersion>18.0a1</em:maxVersion>
+        <em:maxVersion>36.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
 

@@ -1,13 +1,13 @@
 <!ENTITY rp.menu.revokeTemporaryPermissions "Atsaukt visas īslaicīgās atļaujas">
 <!ENTITY rp.menu.blockedDestinations "Bloķētie mērķi">
 <!ENTITY rp.menu.allowedDestinations "Atļautie mērķi">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.mixedDestinations "Jauktie mērķi">
+<!ENTITY rp.menu.otherOrigins "Citi mērķi">
+<!ENTITY rp.menu.enableBlocking "Aktivizēt bloķēšanu">
+<!ENTITY rp.menu.disableBlocking "Deaktivizēt bloķēšanu">
+<!ENTITY rp.menu.help "Palīdzība">
 <!ENTITY rp.menu.preferences "Iestatījumi">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.menu.managePolicies "Pārvaldīt politikas">
 <!ENTITY rp.requestLog.title "Pieprasījumu žurnāls">
 <!ENTITY rp.requestLog.origin "Pirmavots">
 <!ENTITY rp.requestLog.destination "Mērķis">

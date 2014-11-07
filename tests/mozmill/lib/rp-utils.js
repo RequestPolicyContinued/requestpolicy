@@ -36,10 +36,15 @@ function getElementById(ancestor, id) {
  * @param {MozMillController} _controller
  * @return {MozMillElement} The link to click on.
  */
-function getLink(_controller) {
+function getLink(_controller, i) {
+  i = i || 0;
   let links = _controller.window.content.document.getElementsByTagName("a");
-  assert.notEqual(links.length, 0, "A link has been found on the test page.");
-  return findElement.Elem(links[0]);
+  assert.ok(links.length >= i, "The page contains at least " + i + " links.");
+  return findElement.Elem(links[i]);
+}
+
+function getNumLinks(_controller) {
+  return _controller.window.content.document.getElementsByTagName("a").length;
 }
 
 // Export of functions
@@ -47,3 +52,4 @@ exports.waitForTabLoad = waitForTabLoad;
 exports.selectText = selectText;
 exports.getElementById = getElementById;
 exports.getLink = getLink;
+exports.getNumLinks = getNumLinks;

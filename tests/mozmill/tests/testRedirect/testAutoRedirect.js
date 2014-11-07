@@ -10,10 +10,22 @@ var tabs = require("../../../../../lib/tabs");
 
 var rpConst = require("../../lib/constants");
 
-var testURLs = [
-  "http://www.maindomain.test/redirect-http-location-header.php",
-  "http://www.maindomain.test/redirect-http-refresh-header.php",
-  "http://www.maindomain.test/redirect-js-document-location-auto.html"
+var testURLPrePath = "http://www.maindomain.test/";
+var urlsWithRedirect = [
+  // [shouldBeAllowed, url]
+  [false, "redirect-http-location-header.php"],
+  [false, "redirect-http-refresh-header.php"],
+  [false, "redirect-js-document-location-auto.html"],
+  [false, "redirect-meta-tag-01-immediate.html"],
+  [false, "redirect-meta-tag-02-delayed.html"],
+  [false, "redirect-meta-tag-03-multiple.html"],
+  [false, "redirect-meta-tag-08.html"],
+
+  [true, "redirect-meta-tag-04-relative-without-slash.html"],
+  [true, "redirect-meta-tag-05-relative-with-slash.html"],
+  [true, "redirect-meta-tag-06-different-formatting.html"],
+  [true, "redirect-meta-tag-07-different-formatting-delayed.html"],
+  [true, "redirect-meta-tag-09-relative.html"]
 ];
 
 
@@ -31,20 +43,43 @@ var teardownModule = function(aModule) {
 }
 
 
-var testOpenInCurrentTab = function() {
+var testAutoRedirect = function() {
   var tabIndex = tabBrowser.selectedIndex;
 
   var panel = tabBrowser.getTabPanelElement(tabIndex,
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
-  for (let testURL of testURLs) {
-    dump("Testing " + testURL + "\n");
+  for (let [shouldBeAllowed, testURL] of urlsWithRedirect) {
+    testURL = testURLPrePath + testURL;
+    dump("Testing " + testURL + ". The redirect should be " +
+         (shouldBeAllowed ? "allowed" : "blocked") + ".\n");
 
     controller.open(testURL);
     controller.waitForPageLoad();
 
-    assert.ok(panel.exists(), "The redirect has been blocked.");
+    if (shouldBeAllowed) {
+      controller.waitFor(function() {
+          return controller.window.content.document.location.href !== testURL;
+      }, "The URL in the urlbar has changed.");
+      assert.ok(!panel.exists(), "The redirect has been allowed.");
+    } else {
+      assert.ok(panel.exists(), "The redirect has been blocked.");
+      assert.ok(controller.window.content.document.location.href === testURL,
+                "The URL in the urlbar hasn't changed.");
+    }
 
     tabBrowser.closeAllTabs();
+
+    // the following sleep is a workaround against the error:
+    // *************************
+    // A coding exception was thrown in a Promise resolution callback.
+    // See https://developer.mozilla.org/Mozilla/JavaScript_code_modules/Promise.jsm/Promise
+    //
+    // Full message: TypeError: this.options is undefined
+    // Full stack: Capture.prototype.start@resource://gre/modules/BackgroundPageThumbs.jsm:289:19
+    // BackgroundPageThumbs._processCaptureQueue@resource://gre/modules/BackgroundPageThumbs.jsm:222:5
+    // BackgroundPageThumbs.capture@resource://gre/modules/BackgroundPageThumbs.jsm:73:5
+    // (...)
+    controller.sleep(100);
   }
 }

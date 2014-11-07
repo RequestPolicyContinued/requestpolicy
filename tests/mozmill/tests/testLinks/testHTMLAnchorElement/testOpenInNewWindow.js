@@ -38,7 +38,7 @@ var testOpenInNewWindow = function () {
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let link = getLink();
+  let link = rpUtils.getLink();
   let linkURL = link.getNode().href;
 
   let i = 1;
@@ -77,15 +77,6 @@ var closeWindow = function(_controller) {
 };
 
 
-/**
- * @return {MozMillElement} The link to click on.
- */
-var getLink = function() {
-  let links = controller.window.content.document.getElementsByTagName("a");
-  assert.notEqual(links.length, 0, "A link has been found on the test page.");
-
-  return findElement.Elem(links[0]);
-};
 
 /**
  * Opens the next tab.

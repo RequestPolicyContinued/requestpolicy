@@ -11,7 +11,10 @@ var tabs = require("../../../../../lib/tabs");
 var rpUtils = require("../../lib/rp-utils");
 var rpConst = require("../../lib/constants");
 
-var TEST_URL = "http://www.maindomain.test/redirect-js-document-location-link.html";
+var testURLs = [
+  "http://www.maindomain.test/redirect-js-document-location-link.html",
+  "http://www.maindomain.test/redirect-links.html"
+];
 
 
 var setupModule = function(aModule) {
@@ -28,18 +31,45 @@ var teardownModule = function(aModule) {
 }
 
 
-var testOpenInCurrentTab = function() {
+var testLinkClickRedirect = function() {
   let tabIndex = tabBrowser.selectedIndex;
 
-  controller.open(TEST_URL);
-  controller.waitForPageLoad();
+  for (let testURL of testURLs) {
+    dump("Visiting " + testURL + ".\n");
 
-  rpUtils.getLink(controller).click();
+    controller.open(testURL);
+    controller.waitForPageLoad();
 
-  rpUtils.waitForTabLoad(controller, tabBrowser.getTab(0));
+    let len = rpUtils.getNumLinks(controller);
 
-  var panel = tabBrowser.getTabPanelElement(tabIndex,
-      '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
+    for (let i = 0; i < len; ++i) {
+      dump("Testing link " + i + ".\n");
 
-  assert.ok(panel.exists(), "The redirect has been blocked.");
+      controller.open(testURL);
+      controller.waitForPageLoad();
+
+      let link = rpUtils.getLink(controller, i);
+      let classNode = link.getNode().attributes.class;
+      let redirectShouldBeAllowed = classNode ?
+          classNode.nodeValue.indexOf("redirectShouldBeAllowed") >= 0 : false;
+      let url = link.getNode().href;
+      link.click();
+
+      rpUtils.waitForTabLoad(controller, tabBrowser.getTab(0));
+
+      var panel = tabBrowser.getTabPanelElement(tabIndex,
+          '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
+
+      if (redirectShouldBeAllowed) {
+        controller.waitFor(function() {
+            return controller.window.content.document.location.href !== url;
+        }, "The URL in the urlbar has changed.");
+        assert.ok(!panel.exists(), "The redirect has been allowed.");
+      } else {
+        assert.ok(panel.exists(), "The redirect has been blocked.");
+      }
+
+      tabBrowser.closeAllTabs();
+    }
+  }
 }

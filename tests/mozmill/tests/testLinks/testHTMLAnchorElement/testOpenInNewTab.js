@@ -9,6 +9,7 @@ var prefs = require("../../../../../../lib/prefs");
 var tabs = require("../../../../../../lib/tabs");
 var utils = require("../../../../../../../lib/utils");
 
+var rpUtils = require("../../../lib/rp-utils");
 var rpConst = require("../../../lib/constants");
 
 const TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -34,7 +35,7 @@ var testOpenInNewTab = function() {
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let link = getLink();
+  let link = rpUtils.getLink();
   let linkURL = link.getNode().href;
 
   let i = 1;
@@ -51,15 +52,6 @@ var testOpenInNewTab = function() {
 }
 
 
-/**
- * @return {MozMillElement} The link to click on.
- */
-var getLink = function() {
-  let links = controller.window.content.document.getElementsByTagName("a");
-  assert.notEqual(links.length, 0, "A link has been found on the test page.");
-
-  return findElement.Elem(links[0]);
-}
 
 /**
  * Opens the next tab.

@@ -759,14 +759,15 @@ RequestProcessor.prototype.processRedirect = function(request, httpChannel) {
         // else.
         // We set the "isInsert" parameter so we don't clobber the existing
         // info about allowed and deleted requests.
-        this._recordAllowedRequest(sourcePage, initialOrigin, true, result);
+        this._recordAllowedRequest(sourcePage, initialOrigin, true,
+                                   request.requestResult);
       }
 
       // if (this._submittedFormsReverse[initialOrigin]) {
       // // TODO: implement for form submissions whose redirects are blocked
       // }
 
-      this._recordRejectedRequest(originURI, destURI, result);
+      this._recordRejectedRequest(request);
     }
     rp.mod.Logger.warning(rp.mod.Logger.TYPE_HEADER_REDIRECT,
         "** BLOCKED ** '" + headerType + "' header to <" + destURI + ">" +

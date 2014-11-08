@@ -232,6 +232,13 @@ RequestProcessor.prototype.process = function(request) {
       }
     }
 
+
+    if (request.checkURISchemes().shouldLoad === true) {
+      return CP_OK;
+    }
+
+
+
     // Note: If changing the logic here, also make necessary changes to
     // isAllowedRedirect).
 

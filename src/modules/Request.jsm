@@ -42,6 +42,7 @@ if (!rp) {
 }
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Util.jsm", rp.mod);
 
 
 
@@ -196,6 +197,125 @@ NormalRequest.prototype.isInternal = function() {
   }
 
   return false;
+};
+
+/**
+ * Get the nsIDOMWindow related to this request.
+ */
+NormalRequest.prototype.getWindow = function() {
+  let context = this.aContext;
+  if (!context) {
+    return null;
+  }
+
+  let win;
+  try {
+    win = context.QueryInterface(CI.nsIDOMWindow);
+  } catch (e) {
+    let doc;
+    try {
+      doc = context.QueryInterface(CI.nsIDOMDocument);
+    } catch (e) {
+      try {
+        doc = context.QueryInterface(CI.nsIDOMNode).ownerDocument;
+      } catch(e) {
+        return null;
+      }
+    }
+    win = doc.defaultView;
+  }
+  return win;
+};
+
+
+// see https://github.com/RequestPolicyContinued/requestpolicy/issues/447
+var knownSchemesWithoutHost = [
+  // common schemes
+  "about",
+  "feed",
+  "mediasource",
+  "mailto",
+
+  // custom schemes
+  "magnet",
+  "UT2004"
+];
+
+function isKnownSchemeWithoutHost(scheme) {
+  for (let i = 0, len = knownSchemesWithoutHost.length; i < len; ++i) {
+    if (scheme == knownSchemesWithoutHost[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+NormalRequest.prototype.checkURISchemes = function() {
+/**
+  * This is a workaround to the problem that RequestPolicy currently cannot
+  * handle some URIs. This workaround should be removed not later than for
+  * the stable 1.0 release.
+  *
+  * see https://github.com/RequestPolicyContinued/requestpolicy/issues/447
+  *
+  * TODO: solve this problem and remove this workaround.
+  */
+  let uris = [this.aContentLocation, this.aRequestOrigin];
+  for (let i = 0; i < 2; ++i) {
+    let uri = uris[i];
+
+    // filter URIs which *do* have a host
+    try {
+      // this might throw NS_ERROR_FAILURE
+      if (uri.host) {
+        continue;
+      }
+    } catch(e) {}
+
+    // ensure that the URI has a scheme
+    try {
+      if (!uri.scheme) {
+        throw "no scheme!";
+      }
+    } catch(e) {
+      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+          "URI <" + uri.spec + "> has no scheme!");
+      continue;
+    }
+
+    let scheme = uri.scheme;
+    if (scheme == "file") {
+      continue;
+    }
+
+    if (isKnownSchemeWithoutHost(scheme)) {
+      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+          "RequestPolicy currently cannot handle '" + scheme + "' schemes. " +
+          "Therefore the request from <" + this.originURI + "> to <" +
+          this.destURI + "> is allowed (but not recorded).");
+      // tell shouldLoad() to return CP_OK:
+      return {shouldLoad: true};
+    }
+
+    // if we get here, the scheme is unknown. try to show a notification.
+    rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+        "uncatched scheme '" + scheme + "'. The request is from <" +
+        this.originURI + "> to <" + this.destURI + "> ");
+    try {
+      let win = this.getWindow();
+      if (!win) {
+        throw "The window could not be extracted from aContext.";
+      }
+      rp.mod.Util.getChromeWindow(win).requestpolicy.overlay
+          .showSchemeNotification(win, scheme);
+    } catch (e) {
+      rp.mod.Logger.warning(rp.mod.Logger.TYPE_ERROR,
+                            "The user could not be informed about the " +
+                            "unknown scheme. Error was: " + e);
+    }
+  }
+
+  return {shouldLoad: null};
 };
 
 

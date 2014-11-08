@@ -338,6 +338,56 @@ requestpolicy.overlay = {
   },
 
   /**
+   * Shows a notification that an unknown scheme has been detected.
+   * This notification in only necessary for 1.0 beta versions until custom
+   * URI schemes are supported in RequestPolicy.
+   *
+   * issue: https://github.com/RequestPolicyContinued/requestpolicy/issues/447
+   *
+   * @param {nsIDOMWindow} contentWindow
+   * @param {String} scheme
+   */
+  showSchemeNotification : function(contentWindow, scheme) {
+    let browser = gBrowser.getBrowserForContentWindow(contentWindow);
+    let notificationBox = gBrowser.getNotificationBox(browser)
+    let notificationValue = "requestpolicy-scheme-notification";
+
+    let notification = notificationBox
+        .getNotificationWithValue(notificationValue);
+
+    var notificationLabel = "This page contains a request with a '" + scheme +
+        "' scheme which is unknown to RequestPolicy. Please report it.";
+
+    if (notification) {
+      notification.label = notificationLabel;
+    } else {
+      var buttons = [
+        {
+          label : "report this / more info",
+          accessKey : "r",
+          popup : null,
+          callback : function() {
+            let url = "https://github.com/RequestPolicyContinued/requestpolicy/issues/447";
+            window.openUILinkIn(url, "tab", {relatedToCurrent: true});
+          }
+        },
+        {
+          label : "hide",
+          accessKey : "h",
+          popup : null,
+          callback : function() {
+            // Do nothing. The notification closes when this is called.
+          }
+        }
+      ];
+      const priority = notificationBox.PRIORITY_WARNING_LOW;
+      let iconURI = "chrome://requestpolicy/skin/requestpolicy-icon-blocked.png";
+      notificationBox.appendNotification(notificationLabel, notificationValue,
+                                         iconURI, priority, buttons);
+    }
+  },
+
+  /**
    * Shows a notification that a redirect was requested by a page (meta refresh
    * or with headers).
    *

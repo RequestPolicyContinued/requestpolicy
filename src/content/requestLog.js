@@ -26,6 +26,7 @@ if (!rp) {
 }
 
 Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
+Components.utils.import("resource://requestpolicy/Util.jsm", rp.mod);
 Components.utils.import("resource://requestpolicy/Prompter.jsm", rp.mod);
 
 requestpolicy.requestLog = {
@@ -89,15 +90,8 @@ requestpolicy.requestLog = {
       return;
     }
 
-    var mainWindow = window
-        .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-        .getInterface(Components.interfaces.nsIWebNavigation)
-        .QueryInterface(Components.interfaces.nsIDocShellTreeItem).rootTreeItem
-        .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-        .getInterface(Components.interfaces.nsIDOMWindow);
-    mainWindow.gBrowser.addTab(content);
+    rp.mod.Util.getChromeWindow(window).gBrowser.addTab(content);
   }
-
 };
 
 addEventListener("load", function(event) {

@@ -53,5 +53,14 @@ var Util = {
 
   isFirefox : function() {
     return this.appInfo.ID == FIREFOX_ID;
+  },
+
+  getChromeWindow : function(aContentWindow) {
+    return aContentWindow.QueryInterface(CI.nsIInterfaceRequestor)
+                         .getInterface(CI.nsIWebNavigation)
+                         .QueryInterface(CI.nsIDocShellTreeItem)
+                         .rootTreeItem
+                         .QueryInterface(CI.nsIInterfaceRequestor)
+                         .getInterface(CI.nsIDOMWindow);
   }
 }

@@ -35,7 +35,7 @@ var testOpenInNewTab = function() {
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let link = rpUtils.getLink();
+  let link = rpUtils.getLink(controller);
   let linkURL = link.getNode().href;
 
   let i = 1;

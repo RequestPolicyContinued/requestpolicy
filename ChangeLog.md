@@ -25,12 +25,15 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
   * Subscriptions are now downloaded from
     https://github.com/RequestPolicyContinued/subscriptions
     You are very welcome to help working on the list!
-* updated translation (fr, it, zh-CN)
+* updated translation (fr, it, lv-LV, zh-CN)
 * several links to requestpolicy.com have been replaced
 * bugfixes
   * The initial setup didn't appear when firefox was set to restore the previous
     session on startup (#479, dd7a707)
   * NewsFox extension: Links inside articles not working (#503, 7ceef9f)
+  * temporary bugfix against some non-host URI schemes, such as `mailto`,
+    `feed` and `mediasource`. RP currently cannot handle URIs not containing a
+    host. Solving this cleanly is milestoned for version 1.0 stable. (#447)
 
 #### Version 1.0.0b7 (changes since 1.0.0b3)
 * forked version 1.0.0b3 from

@@ -8,14 +8,14 @@
         <!-- Each li is a different version of the same add-on -->
         <RDF:li>
           <RDF:Description>
-            <em:version>1.0.0b7</em:version>
+            <em:version>1.0.beta8</em:version>
             <!-- Firefox -->
             <em:targetApplication>
               <RDF:Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>4.0</em:minVersion>
-                <em:maxVersion>31.0</em:maxVersion>
-                <em:updateLink>https://github.com/RequestPolicyContinued/requestpolicy/releases/download/v1.0.0b7/requestpolicy-1-0-0b7.xpi</em:updateLink>
+                <em:maxVersion>36.0a1</em:maxVersion>
+                <em:updateLink>https://github.com/RequestPolicyContinued/requestpolicy/releases/download/v1.0.beta8/requestpolicy-1-0-beta8.xpi</em:updateLink>
               </RDF:Description>
             </em:targetApplication>
             <!-- SeaMonkey -->
@@ -24,7 +24,7 @@
                 <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
                 <em:minVersion>2.1</em:minVersion>
                 <em:maxVersion>2.15a1</em:maxVersion>
-                <em:updateLink>https://github.com/RequestPolicyContinued/requestpolicy/releases/download/v1.0.0b7/requestpolicy-1-0-0b7.xpi</em:updateLink>
+                <em:updateLink>https://github.com/RequestPolicyContinued/requestpolicy/releases/download/v1.0.beta8/requestpolicy-1-0-beta8.xpi</em:updateLink>
               </RDF:Description>
             </em:targetApplication>
           </RDF:Description>

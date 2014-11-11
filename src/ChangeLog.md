@@ -2,6 +2,10 @@
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
 
+#### Version 1.0.beta8.1 (bugfix)
+* it was not possible to delete rules (#514)
+
+
 #### Version 1.0.beta8
 * The functionality of `shouldLoad()` has been moved to `RequestProcessor`.
   `shouldLoad()` creates an object of the new `NormalRequest` prototype and

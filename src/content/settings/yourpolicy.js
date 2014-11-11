@@ -82,6 +82,9 @@ function addRules(entries, source, filter, readOnly) {
 }
 
 function deleteRule(event) {
+  // TODO: the rule should not be referenced by the rule data but by some
+  //       unique identifier. Currently, if there's exactly the same rule twice,
+  //       (one of them might be a temporary rule), both will get removed.
   var anchor = $(event.target);
   var ruleAction = anchor.data('requestpolicyRuleAction');
   var ruleData = anchor.data('requestpolicyRuleData');
@@ -103,13 +106,17 @@ function clearRulesTable(table) {
 
 function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, readOnly) {
 
-  var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
-  var action = ruleAction == 'allow' ? _('allow') : _('block');
 
-  var row = $('<tr>').addClass(actionClass).appendTo(table);
+  if (ruleAction != 'allow') {
+    ruleAction = 'block';
+  }
+  ruleAction = ruleAction == 'allow' ? 'allow' : 'block';
+  var ruleActionString = ruleAction == 'allow' ? _('allow') : _('block');
+
+  var row = $('<tr>').addClass(ruleAction).appendTo(table);
 
   row.append(
-    $('<td>').text(action),
+    $('<td>').text(ruleActionString),
     $('<td>').text(origin),
     $('<td>').text(dest),
     $('<td>').text(source)
@@ -118,7 +125,7 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
   if (!readOnly) {
     var anchor = $('<a>');
     anchor.text('x').addClass('deleterule');
-    anchor.data('requestpolicyRuleAction', action);
+    anchor.data('requestpolicyRuleAction', ruleAction);
     anchor.data('requestpolicyRuleData', ruleData);
     anchor.click(deleteRule);
     row.append($('<td>').append(anchor));

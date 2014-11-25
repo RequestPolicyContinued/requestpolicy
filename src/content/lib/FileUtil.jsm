@@ -26,11 +26,7 @@ var EXPORTED_SYMBOLS = ["FileUtil"]
 const CI = Components.interfaces;
 const CC = Components.classes;
 
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/Services.jsm", rp.mod);
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
@@ -140,12 +136,11 @@ var FileUtil = {
    * it doesn't already exist. Each subdir, if specified, is created if it does
    * not exist.
    *
-   * @return {nsILocalFile}
+   * @return {nsIFile}
    */
   getRPUserDir : function(subdir1, subdir2, subdir3) {
-    var profileDir = rp.mod.Services.directoryService
-          .get("ProfD", CI.nsIFile);
-    var file = profileDir.clone().QueryInterface(CI.nsILocalFile);
+    var profileDir = Services.dirsvc.get("ProfD", CI.nsIFile);
+    var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if(!file.exists()) {
       file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);

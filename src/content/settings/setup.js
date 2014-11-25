@@ -20,23 +20,25 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+Cu.import("resource://gre/modules/Services.jsm");
+
 function showConfigure() {
   $('#welcome').css('display', 'none');
   $('#configure').css('display', 'block');
 }
 
 function handleDefaultPolicyChange() {
-  rpService.prefs.setBoolPref('defaultPolicy.allow',
+  Prefs.prefs.setBoolPref('defaultPolicy.allow',
       $('#defaultallow').prop('checked'));
-  rpService._prefService.savePrefFile(null);
+  Services.prefs.savePrefFile(null);
   setAllowSameDomainBlockDisplay();
   handleSubscriptionsChange();
 }
 
 function handleAllowSameDomainChange() {
-  rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+  Prefs.prefs.setBoolPref('defaultPolicy.allowSameDomain',
       $('#allowsamedomain').prop('checked'));
-  rpService._prefService.savePrefFile(null);
+  Services.prefs.savePrefFile(null);
 }
 
 function setAllowSameDomainBlockDisplay() {
@@ -59,7 +61,7 @@ function handleSubscriptionsChange() {
     'allow_sameorg':{},
     'deny_trackers':{}
   };
-  var userSubs = rpService._subscriptions;
+  var userSubs = Prefs.getSubscriptions();
   for (var subName in subs) {
     var subInfo = {};
     subInfo['official'] = {};
@@ -83,10 +85,10 @@ function onload() {
   // preferences and also do a rule import based on the old strictness settings.
   // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
   // before this setup window was added.
-  if (Utils.compareVersions(Utils.lastVersion, '0.0') > 0 &&
-      Utils.compareVersions(Utils.lastVersion, '1.0.0a8') <= 0) {
-    if (rpService.prefs.prefHasUserValue('uriIdentificationLevel')) {
-      var identLevel = rpService.prefs.getIntPref('uriIdentificationLevel');
+  if (Services.vc.compare(Utils.info.lastRPVersion, '0.0') > 0 &&
+      Services.vc.compare(Utils.info.lastRPVersion, '1.0.0a8') <= 0) {
+    if (Prefs.prefs.prefHasUserValue('uriIdentificationLevel')) {
+      var identLevel = Prefs.prefs.getIntPref('uriIdentificationLevel');
     } else {
       var identLevel = 1;
     }
@@ -98,7 +100,7 @@ function onload() {
     // of the old rules. We check for new-style rules just in case the user has
     // opened the setup window again after initial upgrade.
     try {
-      var ruleCount = rpService._policyMgr.getUserRuleCount();
+      var ruleCount = PolicyManager.getUserRuleCount();
     } catch (e) {
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;
@@ -114,14 +116,14 @@ function onload() {
     // Skip the welcome screen.
     showConfigure();
   } else {
-    var defaultAllow = rpService.prefs.getBoolPref('defaultPolicy.allow');
+    var defaultAllow = prefs.getBoolPref('defaultPolicy.allow');
     $('#defaultallow').prop('checked', defaultAllow);
     $('#defaultdeny').prop('checked', !defaultAllow);
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
     $('#allowsamedomain').prop('checked',
-        rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
+        prefs.getBoolPref('defaultPolicy.allowSameDomain'));
     // Subscriptions are only simple here if we assume the user won't open the
     // setup window again after changing their individual subscriptions through
     // the preferences. So, let's assume that as the worst case is that the setup

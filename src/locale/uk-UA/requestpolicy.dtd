@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Revoke all temporary permissions">
-<!ENTITY rp.menu.blockedDestinations "Blocked destinations">
-<!ENTITY rp.menu.allowedDestinations "Allowed destinations">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Вподобання">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Request Log">
 <!ENTITY rp.requestLog.origin "Origin">
 <!ENTITY rp.requestLog.destination "Destination">
 <!ENTITY rp.requestLog.blocked "Blocked">
@@ -17,4 +6,3 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
 <!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY rp.requestLog.clear "Clear">

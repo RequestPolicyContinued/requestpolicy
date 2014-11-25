@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "撤销所有临时允许">
-<!ENTITY rp.menu.blockedDestinations "阻止目标">
-<!ENTITY rp.menu.allowedDestinations "允许目标">
-<!ENTITY rp.menu.mixedDestinations "混合目标">
-<!ENTITY rp.menu.otherOrigins "其他来源">
-<!ENTITY rp.menu.enableBlocking "启用阻止">
-<!ENTITY rp.menu.disableBlocking "禁用阻止">
-<!ENTITY rp.menu.help "帮助">
-<!ENTITY rp.menu.preferences "设置">
-<!ENTITY rp.menu.managePolicies "管理策略">
-<!ENTITY rp.requestLog.title "请求日志">
 <!ENTITY rp.requestLog.origin "来源">
 <!ENTITY rp.requestLog.destination "目标">
 <!ENTITY rp.requestLog.blocked "阻止">
@@ -17,4 +6,3 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "复制“目标”到剪贴板">
 <!ENTITY rp.requestLog.openOriginInNewTab "在新标签页打开“来源”">
 <!ENTITY rp.requestLog.openDestinationInNewTab "在新标签页打开“目标”">
-<!ENTITY rp.requestLog.clear "清除">

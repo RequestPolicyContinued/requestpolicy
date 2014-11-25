@@ -21,97 +21,113 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["Logger"]
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["Logger"];
+
+Cu.import("resource://gre/modules/Services.jsm");
 
 /**
  * Provides logging methods
  */
-Logger = new function() {
+let Logger = (function() {
+  // private variables and functions
 
-  this.TYPE_CONTENT = 1; // content whose origin isn't known more specifically
-  this.TYPE_META_REFRESH = 2; // info related to meta refresh
-  this.TYPE_HEADER_REDIRECT = 4; // info related to header redirects
-  this.TYPE_INTERNAL = 8; // internal happenings of the extension
-  this.TYPE_ERROR = 16; // errors
-  this.TYPE_POLICY = 32; // Policy changes, storage, etc.
-  this.TYPE_ALL = 0x0 - 1; // all
+  function doLog(level, type, message, e) {
+    if (self.enabled && level >= self.level && self.types & type) {
+      let levelName = self._LEVEL_NAMES[level.toString()];
+      let typeName = self._TYPE_NAMES[type.toString()];
 
-  this.LEVEL_OFF = Number.MAX_VALUE; // no logging
-  this.LEVEL_SEVERE = 1000;
-  this.LEVEL_WARNING = 900;
-  this.LEVEL_INFO = 800;
-  this.LEVEL_DEBUG = 700;
-  this.LEVEL_ALL = Number.MIN_VALUE; // log everything
+      let stack = (e && e.stack) ? ", stack was:\n" + e.stack : "";
+      self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
+          + message + stack + "\n");
 
-  this._TYPE_NAMES = {};
-  this._TYPE_NAMES[this.TYPE_CONTENT.toString()] = "CONTENT";
-  this._TYPE_NAMES[this.TYPE_META_REFRESH.toString()] = "META_REFRESH";
-  this._TYPE_NAMES[this.TYPE_HEADER_REDIRECT.toString()] = "HEADER_REDIRECT";
-  this._TYPE_NAMES[this.TYPE_INTERNAL.toString()] = "INTERNAL";
-  this._TYPE_NAMES[this.TYPE_ERROR.toString()] = "ERROR";
-  this._TYPE_NAMES[this.TYPE_POLICY.toString()] = "POLICY";
+      if (level == self.LEVEL_SEVERE && type == self.TYPE_ERROR) {
+        let windowtype = 'navigator:browser';
+        let mostRecentWindow  = Services.wm.getMostRecentWindow(windowtype);
 
-  this._LEVEL_NAMES = {};
-  this._LEVEL_NAMES[this.LEVEL_SEVERE.toString()] = "SEVERE";
-  this._LEVEL_NAMES[this.LEVEL_WARNING.toString()] = "WARNING";
-  this._LEVEL_NAMES[this.LEVEL_INFO.toString()] = "INFO";
-  this._LEVEL_NAMES[this.LEVEL_DEBUG.toString()] = "DEBUG";
+        if (mostRecentWindow) {
+          mostRecentWindow.alert("Sorry, RequestPolicy crashed! " + message);
+        }
+      }
+    }
+  }
+
+
+
+  let self = {
+    // public attributes and methods
+
+    TYPE_CONTENT: 1, // content whose origin isn't known more specifically
+    TYPE_META_REFRESH: 2, // info related to meta refresh
+    TYPE_HEADER_REDIRECT: 4, // info related to header redirects
+    TYPE_INTERNAL: 8, // internal happenings of the extension
+    TYPE_ERROR: 16, // errors
+    TYPE_POLICY: 32, // Policy changes, storage, etc.
+    TYPE_ALL: 0x0 - 1, // all
+
+    LEVEL_OFF: Number.MAX_VALUE, // no logging
+    LEVEL_SEVERE: 1000,
+    LEVEL_WARNING: 900,
+    LEVEL_INFO: 800,
+    LEVEL_DEBUG: 700,
+    LEVEL_ALL: Number.MIN_VALUE, // log everything
+  };
+
+  self._TYPE_NAMES = {};
+  self._TYPE_NAMES[self.TYPE_CONTENT.toString()] = "CONTENT";
+  self._TYPE_NAMES[self.TYPE_META_REFRESH.toString()] = "META_REFRESH";
+  self._TYPE_NAMES[self.TYPE_HEADER_REDIRECT.toString()] = "HEADER_REDIRECT";
+  self._TYPE_NAMES[self.TYPE_INTERNAL.toString()] = "INTERNAL";
+  self._TYPE_NAMES[self.TYPE_ERROR.toString()] = "ERROR";
+  self._TYPE_NAMES[self.TYPE_POLICY.toString()] = "POLICY";
+
+  self._LEVEL_NAMES = {};
+  self._LEVEL_NAMES[self.LEVEL_SEVERE.toString()] = "SEVERE";
+  self._LEVEL_NAMES[self.LEVEL_WARNING.toString()] = "WARNING";
+  self._LEVEL_NAMES[self.LEVEL_INFO.toString()] = "INFO";
+  self._LEVEL_NAMES[self.LEVEL_DEBUG.toString()] = "DEBUG";
 
   // These can be set to change logging level, what types of messages are
   // logged, and to enable/disable logging.
-  this.level = this.LEVEL_INFO;
-  this.types = this.TYPE_ALL;
-  this.enabled = true;
+  self.level = self.LEVEL_INFO;
+  self.types = self.TYPE_ALL;
+  // enable logging before RP finished initializing
+  self.enabled = true;
 
-  this.printFunc = dump;
-};
+  // function to use to print out the log
+  self.printFunc = dump;
 
-Logger._doLog = function(level, type, message) {
-  if (this.enabled && level >= this.level && this.types & type) {
-    var levelName = this._LEVEL_NAMES[level.toString()];
-    var typeName = this._TYPE_NAMES[type.toString()];
-    this.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
-        + message + "\n");
-  }
-};
+  self.severe = doLog.bind(self, self.LEVEL_SEVERE);
+  self.severeError = doLog.bind(self, self.LEVEL_SEVERE, self.TYPE_ERROR);
+  self.warning = doLog.bind(self, self.LEVEL_WARNING);
+  self.info = doLog.bind(self, self.LEVEL_INFO);
+  self.debug = doLog.bind(self, self.LEVEL_DEBUG);
+  self.dump = doLog.bind(self, self.LEVEL_DEBUG, self.TYPE_INTERNAL);
 
-Logger.severe = function(type, message) {
-  this._doLog(this.LEVEL_SEVERE, type, message);
-};
-
-Logger.warning = function(type, message) {
-  this._doLog(this.LEVEL_WARNING, type, message);
-};
-
-Logger.info = function(type, message) {
-  this._doLog(this.LEVEL_INFO, type, message);
-};
-
-Logger.debug = function(type, message) {
-  this._doLog(this.LEVEL_DEBUG, type, message);
-};
-
-Logger.dump = function(message) {
-  this.info(this.TYPE_INTERNAL, message);
-}
-
-Logger.vardump = function(obj, name, ignoreFunctions) {
-  if (name != undefined) {
-    this.dump(name + " : " + obj);
-  } else {
-    this.dump(obj);
-  }
-  for (var i in obj) {
-    try {
-      if (typeof obj[i] == 'function') {
-        if (!ignoreFunctions) {
-          this.dump("    => key: " + i + " / value: instanceof Function");
+  self.vardump = function(obj, name, ignoreFunctions) {
+    if (name != undefined) {
+      self.dump(name + " : " + obj);
+    } else {
+      self.dump(obj);
+    }
+    for (var i in obj) {
+      try {
+        if (typeof obj[i] == 'function') {
+          if (!ignoreFunctions) {
+            self.dump("    => key: " + i + " / value: instanceof Function");
+          }
+        } else {
+          self.dump("    => key: " + i + " / value: " + obj[i]);
         }
-      } else {
-        this.dump("    => key: " + i + " / value: " + obj[i]);
+      } catch (e) {
+        self.dump("    => key: " + i + " / value: [unable to access value]");
       }
-    } catch (e) {
-      this.dump("    => key: " + i + " / value: [unable to access value]");
     }
   }
-}
+
+
+  return self;
+}());

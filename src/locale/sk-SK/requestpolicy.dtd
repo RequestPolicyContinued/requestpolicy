@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Odvolať všetky dočasné oprávnenie">
-<!ENTITY rp.menu.blockedDestinations "Blokované ciele">
-<!ENTITY rp.menu.allowedDestinations "Povolené ciele">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Nastavenia">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Protokol požiadaviek">
 <!ENTITY rp.requestLog.origin "Zdroj">
 <!ENTITY rp.requestLog.destination "Ciele">
 <!ENTITY rp.requestLog.blocked "Blokované">
@@ -17,4 +6,3 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopírovať ciele do schránky">
 <!ENTITY rp.requestLog.openOriginInNewTab "Otvoriť zdroj na novej karte">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Otvoriť cieľ na novej karte">
-<!ENTITY rp.requestLog.clear "Vyčistiť">

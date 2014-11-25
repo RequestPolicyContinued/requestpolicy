@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Malvalidigi ĉiujn provizorajn permesojn.">
-<!ENTITY rp.menu.blockedDestinations "Malpermesitaj celoj">
-<!ENTITY rp.menu.allowedDestinations "Permesitaj celoj">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Aliaj petfontoj">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Preferoj">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Protokolo de petoj">
 <!ENTITY rp.requestLog.origin "Fonto">
 <!ENTITY rp.requestLog.destination "Celo">
 <!ENTITY rp.requestLog.blocked "Blokita">
@@ -17,4 +6,3 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopii la celadreson en la tondujon">
 <!ENTITY rp.requestLog.openOriginInNewTab "Malfermi la fonton en nova folio">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Malfermi la celon en nova folio">
-<!ENTITY rp.requestLog.clear "Forviŝi">

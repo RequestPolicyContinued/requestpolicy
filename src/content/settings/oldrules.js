@@ -58,7 +58,7 @@ function ruleDataPartToDisplayString(ruleDataPart) {
   if (ruleDataPart["s"]) {
     str += ruleDataPart["s"] + "://";
   }
-  str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+  str += ruleDataPart["h"] || "*";
   if (ruleDataPart["port"]) {
     str += ":" + ruleDataPart["port"];
   }

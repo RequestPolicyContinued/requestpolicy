@@ -21,229 +21,240 @@
  * ***** END LICENSE BLOCK *****
  */
 
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+if (!window.requestpolicy) {
+  window.requestpolicy = {};
 }
 
-requestpolicy.requestLogTreeView = {
+window.requestpolicy.requestLogTreeView = (function () {
 
-  _treebox : null,
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cu = Components.utils;
 
-  _emptyMessageDisplayed : true,
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+  ScriptLoader.importModules(["utils"], this);
 
-  _visibleData : [],
 
-  _columnNameToIndexMap : {
-    "requestpolicy-requestLog-origin" : 0,
-    "requestpolicy-requestLog-destination" : 1,
-    "requestpolicy-requestLog-blocked" : 2,
-    "requestpolicy-requestLog-time" : 3
-  },
 
-  _aserv : Components.classes["@mozilla.org/atom-service;1"]
-      .getService(Components.interfaces.nsIAtomService),
+  let self = {
 
-  init : function(e) {
-    var strBundle = document.getElementById("requestpolicyStrings");
-    var message = strBundle.getString("requestLogIsEmpty");
-    var directions = strBundle.getString("requestLogDirections");
-    this._visibleData.push([message, directions, false, ""]);
-  },
+    _treebox : null,
 
-  clear : function(e) {
-    var count = this.rowCount;
-    if (count == 0) {
-      return;
-    }
-    this._visibleData = [];
-    if (!this._treebox) {
-      return;
-    }
-    this._treebox.rowCountChanged(0, -count);
-  },
+    _emptyMessageDisplayed : true,
 
-  addAllowedRequest : function(originUri, destUri) {
-    if (this._emptyMessageDisplayed) {
-      // If this were to be called in a multithreaded manner, there's probably
-      // a race condition here.
-      this._visibleData.shift();
-      this._emptyMessageDisplayed = false;
-      this._treebox.rowCountChanged(0, -1);
-    }
-    this._visibleData.push([
-      originUri,
-      destUri,
-      false,
-      (new Date()).toLocaleTimeString()
-    ]);
-    if (!this._treebox) {
-      return;
-    }
-    this._treebox.rowCountChanged(0, 1);
-  },
+    _visibleData : [],
 
-  addBlockedRequest : function(originUri, destUri) {
-    if (this._emptyMessageDisplayed) {
-      // If this were to be called in a multithreaded manner, there's probably
-      // a race condition here.
-      this._visibleData.shift();
-      this._emptyMessageDisplayed = false;
-      this._treebox.rowCountChanged(0, -1);
-    }
-    this._visibleData.push([
-      originUri,
-      destUri,
-      true,
-      (new Date()).toLocaleTimeString()
-    ]);
-    if (!this._treebox) {
-      return;
-    }
-    this._treebox.rowCountChanged(0, 1);
-  },
+    _columnNameToIndexMap : {
+      "requestpolicy-requestLog-origin" : 0,
+      "requestpolicy-requestLog-destination" : 1,
+      "requestpolicy-requestLog-blocked" : 2,
+      "requestpolicy-requestLog-time" : 3
+    },
 
-  _getVisibleItemAtIndex : function(index) {
-    return this._visibleData[this._visibleData.length - index - 1];
-  },
+    _aserv : Components.classes["@mozilla.org/atom-service;1"]
+        .getService(Components.interfaces.nsIAtomService),
 
-  // Start of interface.
-  // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
+    init : function(e) {
+      var message = Utils.strbundle.GetStringFromName("requestLogIsEmpty");
+      var directions = Utils.strbundle
+          .GetStringFromName("requestLogDirections");
+      this._visibleData.push([message, directions, false, ""]);
+    },
 
-  /**
-   * "This property should be set to the total number of rows in the tree."
-   * (getter function)
-   */
-  get rowCount () {
-    return this._visibleData.length;
-  },
-
-  /**
-   * "This method should return the text contents at the specified row and
-   * column."
-   */
-  setTree : function(_treebox) {
-    this._treebox = _treebox;
-  },
-
-  /**
-   * This method is called once to set the tree element on the view.
-   */
-  getCellText : function(index, column) {
-    // Row 0 is actually the last element in the array so that we don't have to
-    // unshift() the array and can just push().
-    // TODO: Do an actual speed test with push vs. unshift to see if it matters
-    // with this javascript array implementation, though I'm assuming it does.
-    var columnIndex = this._columnNameToIndexMap[column.id];
-    if (columnIndex != 2) {
-      return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]];
-    }
-  },
-
-  isContainer : function(index) {
-    return false;
-  },
-
-  isContainerOpen : function(index) {
-    return false;
-  },
-
-  isContainerEmpty : function(index) {
-    return false;
-  },
-
-  isSeparator : function(index) {
-    return false;
-  },
-
-  isSorted : function() {
-    return false;
-  },
-
-  isEditable : function(index, column) {
-    return false;
-  },
-
-  getParentIndex : function(index) {
-    return -1;
-  },
-
-  getLevel : function(index) {
-    return 0;
-  },
-
-  hasNextSibling : function(index, after) {
-    return false;
-  },
-
-  toggleOpenState : function(index) {
-  },
-
-  getImageSrc : function(index, column) {
-    if (this._columnNameToIndexMap[column.id] == 2) {
-      if (this._getVisibleItemAtIndex(index)[2]) {
-        return "chrome://requestpolicy/skin/dot.png";
+    clear : function(e) {
+      var count = this.rowCount;
+      if (count == 0) {
+        return;
       }
-    }
-  },
+      this._visibleData = [];
+      if (!this._treebox) {
+        return;
+      }
+      this._treebox.rowCountChanged(0, -count);
+    },
 
-  getProgressMode : function(index, column) {
-  },
+    addAllowedRequest : function(originUri, destUri) {
+      if (this._emptyMessageDisplayed) {
+        // If this were to be called in a multithreaded manner, there's probably
+        // a race condition here.
+        this._visibleData.shift();
+        this._emptyMessageDisplayed = false;
+        this._treebox.rowCountChanged(0, -1);
+      }
+      this._visibleData.push([
+        originUri,
+        destUri,
+        false,
+        (new Date()).toLocaleTimeString()
+      ]);
+      if (!this._treebox) {
+        return;
+      }
+      this._treebox.rowCountChanged(0, 1);
+    },
 
-  getCellValue : function(index, column) {
-  },
+    addBlockedRequest : function(originUri, destUri) {
+      if (this._emptyMessageDisplayed) {
+        // If this were to be called in a multithreaded manner, there's probably
+        // a race condition here.
+        this._visibleData.shift();
+        this._emptyMessageDisplayed = false;
+        this._treebox.rowCountChanged(0, -1);
+      }
+      this._visibleData.push([
+        originUri,
+        destUri,
+        true,
+        (new Date()).toLocaleTimeString()
+      ]);
+      if (!this._treebox) {
+        return;
+      }
+      this._treebox.rowCountChanged(0, 1);
+    },
 
-  cycleHeader : function(col, elem) {
-  },
+    _getVisibleItemAtIndex : function(index) {
+      return this._visibleData[this._visibleData.length - index - 1];
+    },
 
-  selectionChanged : function() {
-  },
+    // Start of interface.
+    // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
 
-  cycleCell : function(index, column) {
-  },
+    /**
+     * "This property should be set to the total number of rows in the tree."
+     * (getter function)
+     */
+    get rowCount () {
+      return this._visibleData.length;
+    },
 
-  performAction : function(action) {
-  },
+    /**
+     * "This method should return the text contents at the specified row and
+     * column."
+     */
+    setTree : function(_treebox) {
+      this._treebox = _treebox;
+    },
 
-  performActionOnCell : function(action, index, column) {
-  },
+    /**
+     * This method is called once to set the tree element on the view.
+     */
+    getCellText : function(index, column) {
+      // Row 0 is actually the last element in the array so that we don't have to
+      // unshift() the array and can just push().
+      // TODO: Do an actual speed test with push vs. unshift to see if it matters
+      // with this javascript array implementation, though I'm assuming it does.
+      var columnIndex = this._columnNameToIndexMap[column.id];
+      if (columnIndex != 2) {
+        return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]];
+      }
+    },
 
-  getRowProperties : function(index, props) {
-    var returnValue = (this._getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
+    isContainer : function(index) {
+      return false;
+    },
 
-    if (props) {
-      // Gecko version < 22
-      props.AppendElement(this._aserv.getAtom(returnValue));
-    } else {
-      // Gecko version >= 22
-      return returnValue;
-    }
-  },
+    isContainerOpen : function(index) {
+      return false;
+    },
 
-  getCellProperties : function(index, column, props) {
-    if (this._columnNameToIndexMap[column.id] == 2) {
-      if (this._getVisibleItemAtIndex(index)[2]) {
-        if (props) {
-          // Gecko version < 22
-          props.AppendElement(this._aserv.getAtom("blocked"));
-        } else {
-          // Gecko version >= 22
-          return "blocked";
+    isContainerEmpty : function(index) {
+      return false;
+    },
+
+    isSeparator : function(index) {
+      return false;
+    },
+
+    isSorted : function() {
+      return false;
+    },
+
+    isEditable : function(index, column) {
+      return false;
+    },
+
+    getParentIndex : function(index) {
+      return -1;
+    },
+
+    getLevel : function(index) {
+      return 0;
+    },
+
+    hasNextSibling : function(index, after) {
+      return false;
+    },
+
+    toggleOpenState : function(index) {
+    },
+
+    getImageSrc : function(index, column) {
+      if (this._columnNameToIndexMap[column.id] == 2) {
+        if (this._getVisibleItemAtIndex(index)[2]) {
+          return "chrome://requestpolicy/skin/dot.png";
         }
       }
-    }
-  },
+    },
 
-  getColumnProperties : function(column, props) {
-    if (!props) {
-      return "";
-    }
-  }
+    getProgressMode : function(index, column) {
+    },
 
-};
+    getCellValue : function(index, column) {
+    },
+
+    cycleHeader : function(col, elem) {
+    },
+
+    selectionChanged : function() {
+    },
+
+    cycleCell : function(index, column) {
+    },
+
+    performAction : function(action) {
+    },
+
+    performActionOnCell : function(action, index, column) {
+    },
+
+    getRowProperties : function(index, props) {
+      var returnValue = (this._getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
+
+      if (props) {
+        // Gecko version < 22
+        props.AppendElement(this._aserv.getAtom(returnValue));
+      } else {
+        // Gecko version >= 22
+        return returnValue;
+      }
+    },
+
+    getCellProperties : function(index, column, props) {
+      if (this._columnNameToIndexMap[column.id] == 2) {
+        if (this._getVisibleItemAtIndex(index)[2]) {
+          if (props) {
+            // Gecko version < 22
+            props.AppendElement(this._aserv.getAtom("blocked"));
+          } else {
+            // Gecko version >= 22
+            return "blocked";
+          }
+        }
+      }
+    },
+
+    getColumnProperties : function(column, props) {
+      if (!props) {
+        return "";
+      }
+    }
+
+  };
+  return self;
+}());
 
 // Initialize when the window DOM is loaded.
 addEventListener("load", function(event) {
-      requestpolicy.requestLogTreeView.init();
-    }, false);
+    window.requestpolicy.requestLogTreeView.init();
+}, false);

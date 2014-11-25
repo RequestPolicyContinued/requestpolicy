@@ -21,6 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["DomainUtil"];
+
+Cu.import("resource://gre/modules/Services.jsm");
+
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["logger"], this);
+
 /*
  * It's worth noting that many of the functions in this module will convert ACE
  * formatted IDNs to UTF8 formatted values. This is done automatically when
@@ -28,24 +39,9 @@
  * which Mozilla supports UTF8 IDNs.
  */
 
-var EXPORTED_SYMBOLS = ["DomainUtil"]
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
 
 var DomainUtil = {};
-
-DomainUtil._ios = Cc["@mozilla.org/network/io-service;1"]
-    .getService(Ci.nsIIOService);
-
-DomainUtil._eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"]
-    .getService(Ci.nsIEffectiveTLDService);
 
 DomainUtil._idnService = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);
@@ -102,9 +98,8 @@ DomainUtil.getIdentifier = function(uri, level) {
       var identifier = uri.split(",")[0];
       return identifier.split(";")[0];
     }
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
-        "Unable to getIdentifier from uri " + uri + " using identifier level "
-            + level + ".");
+    Logger.info(Logger.TYPE_INTERNAL, "Unable to getIdentifier from uri " +
+        uri + " using identifier level " + level + ".");
     return uri;
   }
 };
@@ -138,11 +133,11 @@ DomainUtil.getHost = function(uri) {
 DomainUtil.getUriObject = function(uri) {
   // Throws an exception if uri is invalid.
   try {
-    return this._ios.newURI(uri, null, null);
+    return Services.io.newURI(uri, null, null);
   } catch (e) {
     var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> "
       + ". Exception was: " + e;
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL, msg);
+    Logger.info(Logger.TYPE_INTERNAL, msg);
     throw e;
   }
 };
@@ -170,11 +165,11 @@ DomainUtil.isValidUri = function(uri) {
  *          uri The uri.
  * @return {String} The domain of the uri.
  */
-DomainUtil.getDomain = function(uri) {
+DomainUtil.getBaseDomain = function(uri) {
   var host = this.getHost(uri);
   try {
     // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
-    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
     // Note: we use convertToDisplayIDN rather than convertACEtoUTF8() because
     // we want to only convert IDNs that that are in Mozilla's IDN whitelist.
     // The second argument will have the property named "value" set to true if
@@ -200,7 +195,7 @@ DomainUtil.getDomain = function(uri) {
  */
 DomainUtil.isIPAddress = function(host) {
   try {
-    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
   } catch (e) {
     if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return true;

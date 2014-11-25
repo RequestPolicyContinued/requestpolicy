@@ -21,34 +21,33 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "Ruleset",
-  "RawRuleset",
-  "RULE_ACTION_ALLOW",
-  "RULE_ACTION_DENY"
+  "RawRuleset"
 ];
 
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-
-const RULE_ACTION_ALLOW = 1;
-const RULE_ACTION_DENY = 2;
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "logger",
+  "domain-util",
+  "constants"
+], this);
 
 
 function dprint(msg) {
   if (typeof print == "function") {
     print(msg);
   } else {
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY, msg);
+    Logger.info(Logger.TYPE_POLICY, msg);
   }
 }
 
 function dwarn(msg) {
-  rp.mod.Logger.warning(rp.mod.Logger.TYPE_POLICY, msg);
+  Logger.warning(Logger.TYPE_POLICY, msg);
 }
 
 /*
@@ -488,7 +487,7 @@ Rules.prototype = {
   _rules : null,
 
   print : function(depth) {
-    depth = depth ? depth : 0;
+    depth = depth || 0;
     for (var i = 0, item; item = this._rules[i]; i++) {
       item.print(depth);
     }
@@ -540,8 +539,8 @@ Rules.prototype = {
  *     the regular expression (that is, |.test()| returns true).
  */
 function Rule(scheme, port) {
-  this.scheme = scheme ? scheme : null;
-  this.port = port ? port : null;
+  this.scheme = scheme || null;
+  this.port = port || null;
 }
 
 Rule.prototype = {
@@ -575,7 +574,7 @@ Rule.prototype = {
   },
 
   print : function(depth) {
-    depth = depth ? depth : 0;
+    depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
       indent += "  ";
@@ -614,7 +613,7 @@ Rule.prototype = {
         return false;
       }
     } else {
-      if (!rp.mod.DomainUtil.hasStandardPort(uriObj)) {
+      if (!DomainUtil.hasStandardPort(uriObj)) {
         dprint("isMatch: wrong port (not the default port and the rule assumes default)");
         return false;
       }
@@ -663,7 +662,7 @@ DomainEntry.prototype = {
   },
 
   print : function(depth) {
-    depth = depth ? depth : 0;
+    depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
       indent += "  ";
@@ -685,7 +684,7 @@ DomainEntry.prototype = {
   },
 
   getLowerLevel : function(name) {
-    return this._lower[name];
+    return this._lower[name] || null;
   }
 };
 
@@ -701,7 +700,7 @@ IPAddressEntry.prototype = {
   },
 
   print : function(depth) {
-    depth = depth ? depth : 0;
+    depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
       indent += "  ";
@@ -719,7 +718,7 @@ IPAddressEntry.prototype = {
 
 
 function Ruleset(name) {
-  this._name = name ? name : null;
+  this._name = name || null;
   // Start off with an "empty" top-level domain entry. This will never have
   // its own rules. Non-host-specific rules go in |this.rules|.
   this._domain = new DomainEntry(null, null, null);
@@ -743,7 +742,7 @@ Ruleset.prototype = {
   },
 
   print : function(depth) {
-    depth = depth ? depth : 0;
+    depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
       indent += "  ";

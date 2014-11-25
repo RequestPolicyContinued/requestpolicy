@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Återkalla alla tillfälliga tillstånd">
-<!ENTITY rp.menu.blockedDestinations "Blockerade destinationer">
-<!ENTITY rp.menu.allowedDestinations "Tillåtna mål">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Andra källor">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Alternativ">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Förfrågningslogg">
 <!ENTITY rp.requestLog.origin "Källa">
 <!ENTITY rp.requestLog.destination "Mål">
 <!ENTITY rp.requestLog.blocked "Blockerad">
@@ -17,4 +6,3 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiera mål till urklipp">
 <!ENTITY rp.requestLog.openOriginInNewTab "Öppna källa i ny flik">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Öppna mål i ny flik">
-<!ENTITY rp.requestLog.clear "Rensa">

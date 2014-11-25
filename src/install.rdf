@@ -9,6 +9,11 @@
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:id>requestpolicy@requestpolicy.com</em:id>
+
+    <em:unpack>false</em:unpack>
+    <em:bootstrap>true</em:bootstrap>
+    <em:multiprocessCompatible>false</em:multiprocessCompatible>
+
     <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
     <em:optionsType>3</em:optionsType>
@@ -62,7 +67,7 @@
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>4.0</em:minVersion>
+        <em:minVersion>10.0</em:minVersion>
         <em:maxVersion>36.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>

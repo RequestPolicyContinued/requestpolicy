@@ -13,6 +13,8 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+Cu.import("resource://gre/modules/Services.jsm");
+
 var prefsChangedObserver = null;
 
 
@@ -25,12 +27,12 @@ function updateDisplay() {
       !rpService.prefs.getBoolPref('indicateBlacklistedObjects');
 
   document.getElementById('pref-autoReload').checked =
-      rpService.prefs.getBoolPref('autoReload');
+      Prefs.prefs.getBoolPref('autoReload');
 
   document.getElementById('pref-privateBrowsingPermanentWhitelisting').checked =
-      rpService.prefs.getBoolPref('privateBrowsingPermanentWhitelisting');
+      Prefs.prefs.getBoolPref('privateBrowsingPermanentWhitelisting');
 
-//  if (rpService.prefs.getBoolPref('defaultPolicy.allow')) {
+//  if (Prefs.prefs.getBoolPref('defaultPolicy.allow')) {
 //    var word = 'allow';
 //  } else {
 //    var word = 'block';
@@ -44,32 +46,32 @@ function onload() {
 
   document.getElementById('pref-indicateBlockedObjects').addEventListener('change',
       function (event) {
-        rpService.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
-        rpService._prefService.savePrefFile(null);
+        Prefs.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
+        Services.prefs.savePrefFile(null);
         updateDisplay();
       }
   );
 
   document.getElementById('pref-dontIndicateBlacklistedObjects').addEventListener('change',
       function (event) {
-        rpService.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
-        rpService._prefService.savePrefFile(null);
+        Prefs.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
+        Services.prefs.savePrefFile(null);
         updateDisplay();
       }
   );
 
   document.getElementById('pref-autoReload').addEventListener('change',
     function(event) {
-      rpService.prefs.setBoolPref('autoReload', event.target.checked);
-      rpService._prefService.savePrefFile(null);
+      Prefs.prefs.setBoolPref('autoReload', event.target.checked);
+      Services.prefs.savePrefFile(null);
       updateDisplay();
     }
   );
 
   document.getElementById('pref-privateBrowsingPermanentWhitelisting').addEventListener('change',
       function (event) {
-        rpService.prefs.setBoolPref('privateBrowsingPermanentWhitelisting', event.target.checked);
-        rpService._prefService.savePrefFile(null);
+        Prefs.prefs.setBoolPref('privateBrowsingPermanentWhitelisting', event.target.checked);
+        Services.prefs.savePrefFile(null);
         updateDisplay();
       }
   );

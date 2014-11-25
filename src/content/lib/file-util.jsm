@@ -21,12 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["FileUtil"];
-
 const Ci = Components.interfaces;
 const Cc = Components.classes;
+const Cu = Components.utils;
 
-Components.utils.import("resource://gre/modules/Services.jsm");
+let EXPORTED_SYMBOLS = ["FileUtil"];
+
+Cu.import("resource://gre/modules/Services.jsm");
 
 /**
  * creates an integer from the arguments

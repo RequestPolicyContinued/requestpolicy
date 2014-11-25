@@ -44,7 +44,9 @@ compDir.append("src");
 Components.manager instanceof Ci.nsIComponentRegistrar;
 Components.manager.autoRegister(compDir);
 
-// Setup resource://requestpolicy (since chrome.manifest wasn't loaded).
+// TODO: Since resource://requestpolicy/ is not used anymore, we might have to
+//       change code here.
+// Setup resource://requestpolicy/
 let ioService = Cc["@mozilla.org/network/io-service;1"]
     .getService(Ci.nsIIOService);
 let resProt = ioService.getProtocolHandler("resource")
@@ -53,10 +55,17 @@ let aliasFile = Cc["@mozilla.org/file/local;1"]
     .createInstance(Ci.nsILocalFile);
 let modulesDir = cwd.parent.parent.clone();
 modulesDir.append("src");
+modulesDir.append("content");
 modulesDir.append("modules");
 aliasFile.initWithPath(modulesDir.path);
 let aliasURI = ioService.newFileURI(aliasFile);
 resProt.setSubstitution("requestpolicy", aliasURI);
+
+// register chrome://* URIs
+let cr = Components.classes["@mozilla.org/chrome/chrome-registry;1"]
+    .getService(Components.interfaces.nsIChromeRegistry);
+cr.checkForNewChrome();
+
 
 // Setup the Logger module to use |print| instead of |dump| because that's
 // what's available for xpcshell tests.

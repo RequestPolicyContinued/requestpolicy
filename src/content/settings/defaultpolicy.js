@@ -15,11 +15,13 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+Cu.import("resource://gre/modules/Services.jsm");
+
 var prefsChangedObserver = null;
 
 
 function updateDisplay() {
-  var defaultallow = rpService.prefs.getBoolPref('defaultPolicy.allow');
+  var defaultallow = Prefs.prefs.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
     document.getElementById('defaultallow').checked = true;
     document.getElementById('defaultdenysetting').hidden = true;
@@ -28,7 +30,7 @@ function updateDisplay() {
     document.getElementById('defaultdenysetting').hidden = false;
   }
 
-  var allowsamedomain = rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain');
+  var allowsamedomain = Prefs.prefs.getBoolPref('defaultPolicy.allowSameDomain');
   document.getElementById('allowsamedomain').checked = allowsamedomain;
 }
 
@@ -42,8 +44,8 @@ function onload() {
   document.getElementById('defaultallow').addEventListener('change',
       function (event) {
         var allow = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
-        rpService._prefService.savePrefFile(null);
+        Prefs.prefs.setBoolPref('defaultPolicy.allow', allow);
+        Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
         common.switchSubscriptionPolicies();
@@ -54,8 +56,8 @@ function onload() {
   document.getElementById('defaultdeny').addEventListener('change',
       function (event) {
         var deny = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
-        rpService._prefService.savePrefFile(null);
+        Prefs.prefs.setBoolPref('defaultPolicy.allow', !deny);
+        Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
         common.switchSubscriptionPolicies();
@@ -66,9 +68,9 @@ function onload() {
   document.getElementById('allowsamedomain').addEventListener('change',
       function (event) {
         var allowSameDomain = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+        Prefs.prefs.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
-        rpService._prefService.savePrefFile(null);
+        Services.prefs.savePrefFile(null);
       }
   );
 

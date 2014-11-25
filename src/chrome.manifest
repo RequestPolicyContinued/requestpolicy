@@ -20,18 +20,3 @@ locale     requestpolicy    tr             locale/tr/
 locale     requestpolicy    uk-UA          locale/uk-UA/
 locale     requestpolicy    zh-CN          locale/zh-CN/
 locale     requestpolicy    zh-TW          locale/zh-TW/
-
-style      chrome://global/content/customizeToolbar.xul            chrome://requestpolicy/skin/requestpolicy.css
-
-# Firefox
-overlay    chrome://browser/content/browser.xul                    chrome://requestpolicy/content/ui/overlay.xul
-# Seamonkey
-overlay    chrome://navigator/content/navigatorOverlay.xul         chrome://requestpolicy/content/ui/overlay.xul
-# Songbird
-overlay    chrome://songbird/content/xul/mainScriptsOverlay.xul    chrome://requestpolicy/content/ui/overlay.xul
-
-# Gecko 2 requires component and category registration via chrome.manifest.
-component {14027e96-1afb-4066-8846-e6c89b5faf3b} components/requestpolicyService.js
-contract @requestpolicy.com/requestpolicy-service;1 {14027e96-1afb-4066-8846-e6c89b5faf3b}
-category profile-after-change RequestPolicyService @requestpolicy.com/requestpolicy-service;1
-category content-policy RequestPolicyService @requestpolicy.com/requestpolicy-service;1

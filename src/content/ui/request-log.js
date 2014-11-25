@@ -21,78 +21,85 @@
  * ***** END LICENSE BLOCK *****
  */
 
-if (!rp) {
-  var rp = {mod : {}};
-}
 
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm", rp.mod);
+window.requestpolicy.requestLog = (function () {
 
-requestpolicy.requestLog = {
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cu = Components.utils;
 
-  _initialized : false,
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+  ScriptLoader.importModules([
+    "domain-util",
+    "utils"
+  ], this);
 
-  _tree : null,
 
-  _strbundle : null,
+  let initialized = false;
+  let tree = null;
 
-  init : function() {
-    if (this._initialized) {
-      return;
-    }
-    this._initialized = true;
 
-    this._strbundle = document.getElementById("requestpolicyStrings");
+  let self = {
 
-    this._tree = document.getElementById("requestpolicy-requestLog-tree");
-    this._tree.view = window.requestpolicy.requestLogTreeView;
-
-    // Give the requestpolicyOverlay direct access to the tree view.
-    window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
-  },
-
-  /**
-   * Copy the content of a cell to the clipboard. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  copyToClipboard : function(columnName) {
-    var content = this._tree.view.getCellText(this._tree.currentIndex,
-        this._tree.columns.getNamedColumn(columnName));
-
-    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-        .getService(Components.interfaces.nsIClipboardHelper);
-    clipboardHelper.copyString(content);
-  },
-
-  /**
-   * Open the content of a cell in a new tab. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  openInNewTab : function(columnName) {
-    var content = this._tree.view.getCellText(this._tree.currentIndex,
-        this._tree.columns.getNamedColumn(columnName));
-
-    var forbidden = true;
-    try {
-      var uri = rp.mod.DomainUtil.getUriObject(content);
-      if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
-        forbidden = false;
+    init: function() {
+      if (initialized) {
+        return;
       }
-    } catch (e) {
+      initialized = true;
+
+      tree = document.getElementById("requestpolicy-requestLog-tree");
+      tree.view = window.requestpolicy.requestLogTreeView;
+
+      // Give the requestpolicyOverlay direct access to the tree view.
+      window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
+    },
+
+    /**
+     * Copy the content of a cell to the clipboard. The row used will be the one
+     * selected when the context menu was opened.
+     */
+    copyToClipboard: function(columnName) {
+      var content = tree.view.getCellText(tree.currentIndex,
+          tree.columns.getNamedColumn(columnName));
+
+      const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+          .getService(Components.interfaces.nsIClipboardHelper);
+      clipboardHelper.copyString(content);
+    },
+
+    /**
+     * Open the content of a cell in a new tab. The row used will be the one
+     * selected when the context menu was opened.
+     */
+    openInNewTab: function(columnName) {
+      var content = tree.view.getCellText(tree.currentIndex,
+          tree.columns.getNamedColumn(columnName));
+
+      var forbidden = true;
+      try {
+        var uri = DomainUtil.getUriObject(content);
+        if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
+          forbidden = false;
+        }
+      } catch (e) {
+      }
+
+      if (forbidden) {
+        var alertTitle = Utils.strbundle.GetStringFromName("actionForbidden");
+        var alertText = Utils.strbundle
+            .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
+        Services.prompt.alert(null, alertTitle, alertText);
+        return;
+      }
+
+      Utils.getChromeWindow(window).gBrowser.addTab(content);
     }
 
-    if (forbidden) {
-      var alertTitle = this._strbundle.getString("actionForbidden");
-      var alertText = this._strbundle
-          .getString("urlCanOnlyBeCopiedToClipboard");
-      Services.prompt.alert(null, alertTitle, alertText);
-      return;
-    }
+  };
 
-    rp.mod.Utils.getChromeWindow(window).gBrowser.addTab(content);
-  }
-};
+  return self;
+}());
 
 addEventListener("load", function(event) {
-      requestpolicy.requestLog.init(event);
-    }, false);
+    window.requestpolicy.requestLog.init(event);
+}, false);

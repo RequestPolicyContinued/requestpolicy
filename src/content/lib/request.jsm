@@ -21,29 +21,28 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "Request",
   "NormalRequest",
   "RedirectRequest",
-
   "REQUEST_TYPE_NORMAL",
   "REQUEST_TYPE_REDIRECT"
 ];
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "logger",
+  "domain-util",
+  "utils"
+], this);
+
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
-
-
-if (!rp) {
-  var rp = {mod : {}};
-}
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm", rp.mod);
-
 
 
 
@@ -100,14 +99,12 @@ NormalRequest.prototype.constructor = Request;
 
 NormalRequest.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
-  this.aRequestOrigin = rp.mod.DomainUtil.
-          getUriObject(originURI);
+  this.aRequestOrigin = DomainUtil.getUriObject(originURI);
 };
 
 NormalRequest.prototype.setDestURI = function(destURI) {
   this.destURI = destURI;
-  this.aContentLocation = rp.mod.DomainUtil.
-      getUriObject(destURI);
+  this.aContentLocation = DomainUtil.getUriObject(destURI);
 };
 
 NormalRequest.prototype.detailsToString = function() {
@@ -157,7 +154,7 @@ NormalRequest.prototype.isInternal = function() {
     // The spec can be empty if odd things are going on, like the Refcontrol
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
+    Logger.info(Logger.TYPE_CONTENT,
         "Allowing request with empty aRequestOrigin spec!");
     return true;
   }
@@ -167,7 +164,7 @@ NormalRequest.prototype.isInternal = function() {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
+    Logger.info(Logger.TYPE_CONTENT,
         "Allowing request with no asciiHost on either aRequestOrigin <" +
         this.aRequestOrigin.spec + "> or aContentLocation <" +
         this.aContentLocation.spec + ">");
@@ -278,7 +275,7 @@ NormalRequest.prototype.checkURISchemes = function() {
         throw "no scheme!";
       }
     } catch(e) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+      Logger.warning(Logger.TYPE_CONTENT,
           "URI <" + uri.spec + "> has no scheme!");
       continue;
     }
@@ -289,7 +286,7 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
 
     if (isKnownSchemeWithoutHost(scheme)) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+      Logger.warning(Logger.TYPE_CONTENT,
           "RequestPolicy currently cannot handle '" + scheme + "' schemes. " +
           "Therefore the request from <" + this.originURI + "> to <" +
           this.destURI + "> is allowed (but not recorded).");
@@ -298,7 +295,7 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
 
     // if we get here, the scheme is unknown. try to show a notification.
-    rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+    Logger.warning(Logger.TYPE_CONTENT,
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
     try {
@@ -306,12 +303,12 @@ NormalRequest.prototype.checkURISchemes = function() {
       if (!win) {
         throw "The window could not be extracted from aContext.";
       }
-      rp.mod.Utils.getChromeWindow(win).requestpolicy.overlay
-          .showSchemeNotification(win, scheme);
+      Utils.getChromeWindow(win).requestpolicy.overlay
+           .showSchemeNotification(win, scheme);
     } catch (e) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_ERROR,
-                            "The user could not be informed about the " +
-                            "unknown scheme. Error was: " + e);
+      Logger.warning(Logger.TYPE_ERROR,
+                     "The user could not be informed about the " +
+                     "unknown scheme. Error was: " + e);
     }
   }
 

@@ -37,24 +37,22 @@ var rulesChangedObserver = null;
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
-  var policyMgr = rpService._policyMgr;
-
   var table = document.getElementById('rules');
 
   clearRulesTable(table);
 
   // Get and display user rules
-  var user = policyMgr._userRulesets['user'];
+  var user = PolicyManager._userRulesets['user'];
   var entries = user.rawRuleset.toJSON()['entries'];
   addRules(entries, 'User', filter, false);
 
   // Get and display temorary rules
-  var temp = policyMgr._userRulesets['temp'];
+  var temp = PolicyManager._userRulesets['temp'];
   var entries = temp.rawRuleset.toJSON()['entries'];
   addRules(entries, 'Temporary', filter, false);
 
   // Get and display subscription rules
-  var subscriptionLists = policyMgr._subscriptionRulesets;
+  var subscriptionLists = PolicyManager._subscriptionRulesets;
   for (subscriptionList in subscriptionLists) {
     for (subscription in subscriptionLists[subscriptionList]) {
       entries = subscriptionLists[subscriptionList][subscription].rawRuleset.toJSON()['entries'];
@@ -140,7 +138,7 @@ function ruleDataPartToDisplayString(ruleDataPart) {
   if (ruleDataPart["s"]) {
     str += ruleDataPart["s"] + "://";
   }
-  str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+  str += ruleDataPart["h"] || "*";
   if (ruleDataPart["port"]) {
     str += ":" + ruleDataPart["port"];
   }

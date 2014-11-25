@@ -89,7 +89,7 @@ requestpolicy.requestLog = {
       return;
     }
 
-    rp.mod.Util.getChromeWindow(window).gBrowser.addTab(content);
+    rp.mod.Utils.getChromeWindow(window).gBrowser.addTab(content);
   }
 };
 

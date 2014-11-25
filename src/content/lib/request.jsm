@@ -306,7 +306,7 @@ NormalRequest.prototype.checkURISchemes = function() {
       if (!win) {
         throw "The window could not be extracted from aContext.";
       }
-      rp.mod.Util.getChromeWindow(win).requestpolicy.overlay
+      rp.mod.Utils.getChromeWindow(win).requestpolicy.overlay
           .showSchemeNotification(win, scheme);
     } catch (e) {
       rp.mod.Logger.warning(rp.mod.Logger.TYPE_ERROR,

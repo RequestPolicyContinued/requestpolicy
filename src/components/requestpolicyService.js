@@ -577,9 +577,9 @@ RequestPolicyService.prototype = {
 
   _initVersionInfo : function() {
     try {
-      const util = rp.mod.Util;
+      const util = rp.mod.Utils;
 
-      // Set the last version values in the Util module based on the prefs.
+      // Set the last version values in the Utils module based on the prefs.
       util.lastVersion = this.prefs.getCharPref("lastVersion");
       util.lastAppVersion = this.prefs.getCharPref("lastAppVersion");
 

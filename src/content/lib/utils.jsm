@@ -21,14 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["Util"];
+var EXPORTED_SYMBOLS = ["Utils"];
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 
 const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 
-var Util = {
+var Utils = {
   _versionComparator : Cc["@mozilla.org/xpcom/version-comparator;1"]
       .getService(Ci.nsIVersionComparator),
 
@@ -40,7 +40,7 @@ var Util = {
   lastVersion : "0.0",
   lastAppVersion : "0.0",
 
-  // This is initialized by calling Util.initCurAppVersion().
+  // This is initialized by calling Utils.initCurAppVersion().
   curAppVersion : "0.0",
 
   initCurAppVersion : function() {

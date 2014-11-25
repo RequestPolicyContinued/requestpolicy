@@ -153,7 +153,7 @@ requestpolicy.overlay = {
   },
 
   _installToolbarButtonOnce : function() {
-    var util = rp.mod.Util;
+    var util = rp.mod.Utils;
 
     // SeaMonkey users have to use a toolbar button now. At the moment I can't
     // justify a bunch of special cases to support the statusbar when such a

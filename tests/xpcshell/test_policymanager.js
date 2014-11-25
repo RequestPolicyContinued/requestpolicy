@@ -1,4 +1,4 @@
-Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm");
 

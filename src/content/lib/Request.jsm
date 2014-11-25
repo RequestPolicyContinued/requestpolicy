@@ -40,7 +40,7 @@ const REQUEST_TYPE_REDIRECT = 2;
 if (!rp) {
   var rp = {mod : {}};
 }
-Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
 

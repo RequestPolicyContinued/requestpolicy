@@ -37,7 +37,7 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 if (!rp) {
   var rp = {mod : {}};
 }
-Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RequestResult.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);

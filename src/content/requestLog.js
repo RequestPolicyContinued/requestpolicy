@@ -25,7 +25,7 @@ if (!rp) {
   var rp = {mod : {}};
 }
 
-Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
 
 requestpolicy.requestLog = {

@@ -25,7 +25,7 @@ var EXPORTED_SYMBOLS = ["RequestUtil", "RequestSet"];
 
 Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/RequestResult.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/request-result.jsm");
 
 function getUriObject(uri) {
   return DomainUtil.getUriObject(uri);

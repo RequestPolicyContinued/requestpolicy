@@ -71,7 +71,6 @@ function updateDisplay() {
   var userSubs = rpService._subscriptions;
   var subsInfo = userSubs.getSubscriptionInfo();
   var allSubElements = getAllSubscriptionElements();
-  debugger;
   for (var i = 0, len = allSubElements.length; i < len; ++i) {
     var element = allSubElements[i];
     element.input.checked = (element.id in subsInfo['official']);
@@ -127,11 +126,13 @@ function onload() {
     el.addEventListener('change', handleSubscriptionCheckboxChange);
   }
 
-  prefsChangedObserver = new common.PrefsChangedObserver(
-      function(subject, topic, data) {
-        updateDisplay();
-      });
+  subAddedObserver = new common.Observer(updateDisplay,
+                                         SUBSCRIPTION_ADDED_TOPIC);
+  subRemovedObserver = new common.Observer(updateDisplay,
+                                           SUBSCRIPTION_REMOVED_TOPIC);
+
   window.addEventListener("beforeunload", function(event) {
-    prefsChangedObserver.unregister();
+    subAddedObserver.unregister();
+    subRemovedObserver.unregister();
   });
 }

@@ -2,7 +2,7 @@ Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Subscription.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/policy-manager.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
     .getService().wrappedJSObject;

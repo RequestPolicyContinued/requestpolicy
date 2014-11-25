@@ -652,7 +652,7 @@ RequestPolicyService.prototype = {
       "logger.jsm",
       "domain-util.jsm",
       "Ruleset.jsm",
-      "PolicyManager.jsm",
+      "policy-manager.jsm",
       "Request.jsm",
       "RequestProcessor.jsm",
       "RequestUtil.jsm",

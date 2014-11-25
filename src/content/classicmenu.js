@@ -29,7 +29,7 @@
 // Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
 // Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
 // Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);
-// Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm",
+// Components.utils.import("chrome://requestpolicy/content/lib/policy-manager.jsm",
 //     rp.mod);
 
 requestpolicy.classicmenu = {

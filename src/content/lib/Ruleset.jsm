@@ -33,7 +33,7 @@ if (!rp) {
 }
 
 Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
 
 const RULE_ACTION_ALLOW = 1;
 const RULE_ACTION_DENY = 2;

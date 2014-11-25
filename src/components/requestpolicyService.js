@@ -649,7 +649,7 @@ RequestPolicyService.prototype = {
 
   _loadLibraries : function() {
     var modules = [
-      "Logger.jsm",
+      "logger.jsm",
       "domain-util.jsm",
       "Ruleset.jsm",
       "PolicyManager.jsm",

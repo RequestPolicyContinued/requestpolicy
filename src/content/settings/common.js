@@ -1,5 +1,5 @@
 Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Subscription.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm");

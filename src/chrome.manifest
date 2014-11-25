@@ -1,5 +1,4 @@
 content    requestpolicy    content/
-resource   requestpolicy    modules/
 skin       requestpolicy    classic/1.0    skin/
 
 locale     requestpolicy    en-US          locale/en-US/

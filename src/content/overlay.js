@@ -28,11 +28,11 @@ if (!requestpolicy) {
   var requestpolicy = {};
 }
 
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/JSON.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Util.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/JSON.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for

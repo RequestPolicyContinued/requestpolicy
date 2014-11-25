@@ -1,4 +1,4 @@
-Components.utils.import("resource://requestpolicy/FileUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/FileUtil.jsm");
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {

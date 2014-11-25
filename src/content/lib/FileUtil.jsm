@@ -30,7 +30,7 @@ if (!rp) {
   var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Services.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Services.jsm", rp.mod);
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 

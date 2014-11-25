@@ -35,10 +35,10 @@ if (!rp) {
   var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/RulesetStorage.jsm", rp.mod);
-Components.utils.import("resource://requestpolicy/RequestResult.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/RulesetStorage.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/RequestResult.jsm", rp.mod);
 
 
 function dprint(msg) {

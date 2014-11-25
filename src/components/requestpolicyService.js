@@ -662,7 +662,7 @@ RequestPolicyService.prototype = {
     for (var i in modules) {
       filename = modules[i];
       try {
-        Components.utils.import("resource://requestpolicy/" + filename,
+        Components.utils.import("chrome://requestpolicy/content/lib/" + filename,
             rp.mod);
       } catch(e) {
         // Indicate the filename because the exception doesn't have that

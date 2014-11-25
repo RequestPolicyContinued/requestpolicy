@@ -1,8 +1,8 @@
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
-Components.utils.import("resource://requestpolicy/Logger.jsm");
-Components.utils.import("resource://requestpolicy/Subscription.jsm");
-Components.utils.import("resource://requestpolicy/Util.jsm");
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Subscription.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm");
 
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
     .getService().wrappedJSObject;

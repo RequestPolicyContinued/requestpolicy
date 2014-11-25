@@ -30,10 +30,10 @@ var EXPORTED_SYMBOLS = [
   "SUBSCRIPTION_REMOVED_TOPIC"
 ];
 
-Components.utils.import("resource://requestpolicy/FileUtil.jsm");
-Components.utils.import("resource://requestpolicy/Logger.jsm");
-Components.utils.import("resource://requestpolicy/Ruleset.jsm");
-Components.utils.import("resource://requestpolicy/RulesetStorage.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/FileUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/RulesetStorage.jsm");
 
 
 const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';

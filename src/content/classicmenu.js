@@ -25,11 +25,11 @@
 //   var rp = {mod : {}};
 // }
 //
-// Components.utils.import("resource://requestpolicy/DomainUtil.jsm", rp.mod);
-// Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
-// Components.utils.import("resource://requestpolicy/Ruleset.jsm", rp.mod);
-// Components.utils.import("resource://requestpolicy/RequestUtil.jsm", rp.mod);
-// Components.utils.import("resource://requestpolicy/PolicyManager.jsm",
+// Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
+// Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
+// Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
+// Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);
+// Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm",
 //     rp.mod);
 
 requestpolicy.classicmenu = {

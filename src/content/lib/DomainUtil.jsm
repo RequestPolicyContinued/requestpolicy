@@ -37,7 +37,7 @@ if (!rp) {
   var rp = {mod : {}};
 }
 
-Components.utils.import("resource://requestpolicy/Logger.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
 
 var DomainUtil = {};
 

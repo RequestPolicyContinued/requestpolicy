@@ -1,6 +1,6 @@
-Components.utils.import("resource://requestpolicy/DomainUtil.jsm");
-Components.utils.import("resource://requestpolicy/Ruleset.jsm");
-Components.utils.import("resource://requestpolicy/PolicyManager.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/PolicyManager.jsm");
 
 
 var config = {

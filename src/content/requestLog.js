@@ -27,7 +27,6 @@ if (!rp) {
 
 Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Prompter.jsm", rp.mod);
 
 requestpolicy.requestLog = {
 
@@ -86,7 +85,7 @@ requestpolicy.requestLog = {
       var alertTitle = this._strbundle.getString("actionForbidden");
       var alertText = this._strbundle
           .getString("urlCanOnlyBeCopiedToClipboard");
-      rp.mod.Prompter.alert(alertTitle, alertText);
+      Services.prompt.alert(null, alertTitle, alertText);
       return;
     }
 

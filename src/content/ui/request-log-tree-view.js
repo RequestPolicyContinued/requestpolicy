@@ -31,8 +31,10 @@ window.requestpolicy.requestLogTreeView = (function () {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-  ScriptLoader.importModules(["utils"], this);
+  let mod = {};
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+  mod.ScriptLoader.importModules(["utils"], mod);
+  let Utils = mod.Utils;
 
 
 
@@ -58,63 +60,63 @@ window.requestpolicy.requestLogTreeView = (function () {
       var message = Utils.strbundle.GetStringFromName("requestLogIsEmpty");
       var directions = Utils.strbundle
           .GetStringFromName("requestLogDirections");
-      this._visibleData.push([message, directions, false, ""]);
+      self._visibleData.push([message, directions, false, ""]);
     },
 
     clear : function(e) {
-      var count = this.rowCount;
+      var count = self.rowCount;
       if (count == 0) {
         return;
       }
-      this._visibleData = [];
-      if (!this._treebox) {
+      self._visibleData = [];
+      if (!self._treebox) {
         return;
       }
-      this._treebox.rowCountChanged(0, -count);
+      self._treebox.rowCountChanged(0, -count);
     },
 
     addAllowedRequest : function(originUri, destUri) {
-      if (this._emptyMessageDisplayed) {
+      if (self._emptyMessageDisplayed) {
         // If this were to be called in a multithreaded manner, there's probably
         // a race condition here.
-        this._visibleData.shift();
-        this._emptyMessageDisplayed = false;
-        this._treebox.rowCountChanged(0, -1);
+        self._visibleData.shift();
+        self._emptyMessageDisplayed = false;
+        self._treebox.rowCountChanged(0, -1);
       }
-      this._visibleData.push([
+      self._visibleData.push([
         originUri,
         destUri,
         false,
         (new Date()).toLocaleTimeString()
       ]);
-      if (!this._treebox) {
+      if (!self._treebox) {
         return;
       }
-      this._treebox.rowCountChanged(0, 1);
+      self._treebox.rowCountChanged(0, 1);
     },
 
     addBlockedRequest : function(originUri, destUri) {
-      if (this._emptyMessageDisplayed) {
+      if (self._emptyMessageDisplayed) {
         // If this were to be called in a multithreaded manner, there's probably
         // a race condition here.
-        this._visibleData.shift();
-        this._emptyMessageDisplayed = false;
-        this._treebox.rowCountChanged(0, -1);
+        self._visibleData.shift();
+        self._emptyMessageDisplayed = false;
+        self._treebox.rowCountChanged(0, -1);
       }
-      this._visibleData.push([
+      self._visibleData.push([
         originUri,
         destUri,
         true,
         (new Date()).toLocaleTimeString()
       ]);
-      if (!this._treebox) {
+      if (!self._treebox) {
         return;
       }
-      this._treebox.rowCountChanged(0, 1);
+      self._treebox.rowCountChanged(0, 1);
     },
 
     _getVisibleItemAtIndex : function(index) {
-      return this._visibleData[this._visibleData.length - index - 1];
+      return self._visibleData[self._visibleData.length - index - 1];
     },
 
     // Start of interface.
@@ -125,7 +127,7 @@ window.requestpolicy.requestLogTreeView = (function () {
      * (getter function)
      */
     get rowCount () {
-      return this._visibleData.length;
+      return self._visibleData.length;
     },
 
     /**
@@ -133,7 +135,7 @@ window.requestpolicy.requestLogTreeView = (function () {
      * column."
      */
     setTree : function(_treebox) {
-      this._treebox = _treebox;
+      self._treebox = _treebox;
     },
 
     /**
@@ -144,9 +146,9 @@ window.requestpolicy.requestLogTreeView = (function () {
       // unshift() the array and can just push().
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
-      var columnIndex = this._columnNameToIndexMap[column.id];
+      var columnIndex = self._columnNameToIndexMap[column.id];
       if (columnIndex != 2) {
-        return this._getVisibleItemAtIndex(index)[this._columnNameToIndexMap[column.id]];
+        return self._getVisibleItemAtIndex(index)[self._columnNameToIndexMap[column.id]];
       }
     },
 
@@ -190,8 +192,8 @@ window.requestpolicy.requestLogTreeView = (function () {
     },
 
     getImageSrc : function(index, column) {
-      if (this._columnNameToIndexMap[column.id] == 2) {
-        if (this._getVisibleItemAtIndex(index)[2]) {
+      if (self._columnNameToIndexMap[column.id] == 2) {
+        if (self._getVisibleItemAtIndex(index)[2]) {
           return "chrome://requestpolicy/skin/dot.png";
         }
       }
@@ -219,11 +221,11 @@ window.requestpolicy.requestLogTreeView = (function () {
     },
 
     getRowProperties : function(index, props) {
-      var returnValue = (this._getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
+      var returnValue = (self._getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
 
       if (props) {
         // Gecko version < 22
-        props.AppendElement(this._aserv.getAtom(returnValue));
+        props.AppendElement(self._aserv.getAtom(returnValue));
       } else {
         // Gecko version >= 22
         return returnValue;
@@ -231,11 +233,11 @@ window.requestpolicy.requestLogTreeView = (function () {
     },
 
     getCellProperties : function(index, column, props) {
-      if (this._columnNameToIndexMap[column.id] == 2) {
-        if (this._getVisibleItemAtIndex(index)[2]) {
+      if (self._columnNameToIndexMap[column.id] == 2) {
+        if (self._getVisibleItemAtIndex(index)[2]) {
           if (props) {
             // Gecko version < 22
-            props.AppendElement(this._aserv.getAtom("blocked"));
+            props.AppendElement(self._aserv.getAtom("blocked"));
           } else {
             // Gecko version >= 22
             return "blocked";

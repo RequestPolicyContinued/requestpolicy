@@ -28,11 +28,14 @@ window.requestpolicy.requestLog = (function () {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-  ScriptLoader.importModules([
+  let mod = {};
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+  Cu.import("resource://gre/modules/Services.jsm", mod);
+  mod.ScriptLoader.importModules([
     "domain-util",
     "utils"
-  ], this);
+  ], mod);
+  let Services = mod.Services, DomainUtil = mod.DomainUtil, Utils = mod.Utils;
 
 
   let initialized = false;

@@ -640,15 +640,15 @@ requestpolicy.overlay = (function() {
     },
 
     _indicateBlockedVisibleObjects: function(document) {
-      if (!this._rpService.prefs.getBoolPref("indicateBlockedObjects")) {
+      if (!Prefs.prefs.getBoolPref("indicateBlockedObjects")) {
         return;
       }
-      var indicateBlacklisted = this._rpService.prefs
+      var indicateBlacklisted = Prefs.prefs
           .getBoolPref("indicateBlacklistedObjects");
 
       var images = document.getElementsByTagName("img");
-      var rejectedRequests = this._rpService._requestProcessor.
-          _rejectedRequests.getOriginUri(document.location);
+      var rejectedRequests = RequestProcessor._rejectedRequests
+          .getOriginUri(document.location);
       var blockedUrisToIndicate = {};
       for (var destBase in rejectedRequests) {
         for (var destIdent in rejectedRequests[destBase]) {
@@ -665,7 +665,7 @@ requestpolicy.overlay = (function() {
             //          ==> *do* indicate
             let requests = rejectedRequests[destBase][destIdent][destUri];
             if (indicateBlacklisted ||
-                this._containsNonBlacklistedRequests(requests)) {
+                self._containsNonBlacklistedRequests(requests)) {
               blockedUrisToIndicate[destUri] = true;
             }
           }

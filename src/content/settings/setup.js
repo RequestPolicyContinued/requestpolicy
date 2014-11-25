@@ -116,14 +116,14 @@ function onload() {
     // Skip the welcome screen.
     showConfigure();
   } else {
-    var defaultAllow = prefs.getBoolPref('defaultPolicy.allow');
+    var defaultAllow = Prefs.prefs.getBoolPref('defaultPolicy.allow');
     $('#defaultallow').prop('checked', defaultAllow);
     $('#defaultdeny').prop('checked', !defaultAllow);
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
     $('#allowsamedomain').prop('checked',
-        prefs.getBoolPref('defaultPolicy.allowSameDomain'));
+        Prefs.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
     // Subscriptions are only simple here if we assume the user won't open the
     // setup window again after changing their individual subscriptions through
     // the preferences. So, let's assume that as the worst case is that the setup

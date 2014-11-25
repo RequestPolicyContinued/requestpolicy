@@ -126,12 +126,12 @@ let Utils = (function() {
       Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
 
   self.getChromeWindow = function(aContentWindow) {
-    return aContentWindow.QueryInterface(CI.nsIInterfaceRequestor)
-                         .getInterface(CI.nsIWebNavigation)
-                         .QueryInterface(CI.nsIDocShellTreeItem)
+    return aContentWindow.QueryInterface(Ci.nsIInterfaceRequestor)
+                         .getInterface(Ci.nsIWebNavigation)
+                         .QueryInterface(Ci.nsIDocShellTreeItem)
                          .rootTreeItem
-                         .QueryInterface(CI.nsIInterfaceRequestor)
-                         .getInterface(CI.nsIDOMWindow);
+                         .QueryInterface(Ci.nsIInterfaceRequestor)
+                         .getInterface(Ci.nsIDOMWindow);
   };
 
   return self;

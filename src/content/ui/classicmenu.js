@@ -71,7 +71,7 @@ requestpolicy.classicmenu = (function() {
           [originHost], 1);
       var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
-      var item = this.addMenuItem(menu, label, command);
+      var item = self.addMenuItem(menu, label, command);
       item.setAttribute("class", "requestpolicyTemporary");
       return item;
     },
@@ -81,7 +81,7 @@ requestpolicy.classicmenu = (function() {
           [originHost], 1);
       var command = "requestpolicy.overlay.allowOrigin('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
-      return this.addMenuItem(menu, label, command);
+      return self.addMenuItem(menu, label, command);
     },
 
 
@@ -92,7 +92,7 @@ requestpolicy.classicmenu = (function() {
       var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-      var item = this.addMenuItem(menu, label, command);
+      var item = self.addMenuItem(menu, label, command);
       item.setAttribute("class", "requestpolicyTemporary");
       return item;
     },
@@ -103,7 +103,7 @@ requestpolicy.classicmenu = (function() {
       var command = "requestpolicy.overlay.allowOriginToDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-      var item = this.addMenuItem(menu, label, command);
+      var item = self.addMenuItem(menu, label, command);
       item.setAttribute("class", "requestpolicyAllowOriginToDest");
       return item;
     },
@@ -114,7 +114,7 @@ requestpolicy.classicmenu = (function() {
           "allowDestinationTemporarily", [destHost], 1);
       var command = "requestpolicy.overlay.temporarilyAllowDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-      var item = this.addMenuItem(menu, label, command);
+      var item = self.addMenuItem(menu, label, command);
       item.setAttribute("class", "requestpolicyTemporary");
       return item;
     },
@@ -124,7 +124,7 @@ requestpolicy.classicmenu = (function() {
           [destHost], 1);
       var command = "requestpolicy.overlay.allowDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-      return this.addMenuItem(menu, label, command);
+      return self.addMenuItem(menu, label, command);
     }
   };
 

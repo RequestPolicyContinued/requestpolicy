@@ -22,7 +22,7 @@
  */
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_NOP = function() {
@@ -156,7 +156,7 @@ RequestPolicyService.prototype = {
 
     try {
       // For Firefox <= 3.6.
-      var em = CC["@mozilla.org/extensions/manager;1"].
+      var em = Cc["@mozilla.org/extensions/manager;1"].
           getService(Ci.nsIExtensionManager);
       var ext;
       for (var i = 0; i < idArray.length; i++) {
@@ -275,7 +275,7 @@ RequestPolicyService.prototype = {
   },
 
   _initializeApplicationCompatibility : function() {
-    var appInfo = CC["@mozilla.org/xre/app-info;1"].
+    var appInfo = Cc["@mozilla.org/xre/app-info;1"].
         getService(Ci.nsIXULAppInfo);
 
     // Mozilla updates (doing this for all applications, not just individual
@@ -512,7 +512,7 @@ RequestPolicyService.prototype = {
   },
 
   _register : function() {
-    var os = CC['@mozilla.org/observer-service;1'].
+    var os = Cc['@mozilla.org/observer-service;1'].
         getService(Ci.nsIObserverService);
     os.addObserver(this, "http-on-examine-response", false);
     os.addObserver(this, "http-on-modify-request", false);
@@ -537,7 +537,7 @@ RequestPolicyService.prototype = {
 
   _unregister : function() {
     try {
-      var os = CC['@mozilla.org/observer-service;1'].
+      var os = Cc['@mozilla.org/observer-service;1'].
           getService(Ci.nsIObserverService);
       os.removeObserver(this, "http-on-examine-response");
       os.removeObserver(this, "http-on-modify-request");
@@ -562,7 +562,7 @@ RequestPolicyService.prototype = {
 
   _initializePrefSystem : function() {
     // Get the preferences branch and setup the preferences observer.
-    this._prefService = CC["@mozilla.org/preferences-service;1"].
+    this._prefService = Cc["@mozilla.org/preferences-service;1"].
         getService(Ci.nsIPrefService);
 
     this.prefs = this._prefService.getBranch("extensions.requestpolicy.")
@@ -600,7 +600,7 @@ RequestPolicyService.prototype = {
             }
           });
       } else {
-        var em = CC["@mozilla.org/extensions/manager;1"].
+        var em = Cc["@mozilla.org/extensions/manager;1"].
             getService(Ci.nsIExtensionManager);
         var addon = em.getItemForID(EXTENSION_ID);
         this.prefs.setCharPref("lastVersion", addon.version);
@@ -642,7 +642,7 @@ RequestPolicyService.prototype = {
       default :
         break;
     }
-    var observerService = CC['@mozilla.org/observer-service;1'].
+    var observerService = Cc['@mozilla.org/observer-service;1'].
         getService(Ci.nsIObserverService);
     observerService.notifyObservers(null, "requestpolicy-prefs-changed", null);
   },
@@ -687,7 +687,7 @@ RequestPolicyService.prototype = {
 
   _initializePrivateBrowsing : function() {
     try {
-      var pbs = CC["@mozilla.org/privatebrowsing;1"].
+      var pbs = Cc["@mozilla.org/privatebrowsing;1"].
           getService(Ci.nsIPrivateBrowsingService);
       this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
     } catch (e) {
@@ -699,7 +699,7 @@ RequestPolicyService.prototype = {
     if (!this.prefs.getBoolPref("welcomeWindowShown")) {
       var url = "chrome://requestpolicy/content/settings/setup.html";
 
-      var wm = CC['@mozilla.org/appshell/window-mediator;1'].
+      var wm = Cc['@mozilla.org/appshell/window-mediator;1'].
           getService(Ci.nsIWindowMediator);
       var windowtype = 'navigator:browser';
       var mostRecentWindow  = wm.getMostRecentWindow(windowtype);
@@ -1102,7 +1102,7 @@ RequestPolicyService.prototype = {
       // this.rejectCode = typeof(/ /) == "object" ? -4 : -3;
       this.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
       this.mimeService =
-          CC['@mozilla.org/uriloader/external-helper-app-service;1']
+          Cc['@mozilla.org/uriloader/external-helper-app-service;1']
           .getService(Ci.nsIMIMEService);
     }
   },

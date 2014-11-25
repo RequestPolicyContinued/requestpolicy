@@ -24,15 +24,15 @@
 var EXPORTED_SYMBOLS = ["Util"];
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 
 var Util = {
-  _versionComparator : CC["@mozilla.org/xpcom/version-comparator;1"]
+  _versionComparator : Cc["@mozilla.org/xpcom/version-comparator;1"]
       .getService(Ci.nsIVersionComparator),
 
-  appInfo : CC["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo),
+  appInfo : Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo),
 
   // These need to be set externally. Right now they're set from
   // RequestPolicyService._initVersionInfo().

@@ -24,7 +24,7 @@
 var EXPORTED_SYMBOLS = ["RequestProcessor"];
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;

@@ -31,7 +31,7 @@ var EXPORTED_SYMBOLS = [
 ];
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;

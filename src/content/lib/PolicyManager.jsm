@@ -27,7 +27,7 @@ var EXPORTED_SYMBOLS = [
 ];
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 

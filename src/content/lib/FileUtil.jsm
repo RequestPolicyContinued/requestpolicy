@@ -24,7 +24,7 @@
 var EXPORTED_SYMBOLS = ["FileUtil"]
 
 const Ci = Components.interfaces;
-const CC = Components.classes;
+const Cc = Components.classes;
 
 Components.utils.import("resource://gre/modules/Services.jsm");
 
@@ -39,7 +39,7 @@ var FileUtil = {
    *          file
    */
   fileToArray : function(file) {
-    var stream = CC["@mozilla.org/network/file-input-stream;1"]
+    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, 0444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
@@ -59,13 +59,13 @@ var FileUtil = {
    *          file
    */
   fileToString : function(file) {
-    var stream = CC["@mozilla.org/network/file-input-stream;1"]
+    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     // TODO: Handle NS_ERROR_FILE_NOT_FOUND
     stream.init(file, 0x01, 0444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
 
-    var cstream = CC["@mozilla.org/intl/converter-input-stream;1"].
+    var cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
                   createInstance(Ci.nsIConverterInputStream);
     cstream.init(stream, "UTF-8", 0, 0);
 
@@ -91,12 +91,12 @@ var FileUtil = {
    *          file
    */
   arrayToFile : function(lines, file) {
-    var stream = CC["@mozilla.org/network/file-output-stream;1"]
+    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = CC["@mozilla.org/intl/converter-output-stream;1"]
+    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
 
@@ -117,12 +117,12 @@ var FileUtil = {
    *          file
    */
   stringToFile : function(str, file) {
-    var stream = CC["@mozilla.org/network/file-output-stream;1"]
+    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = CC["@mozilla.org/intl/converter-output-stream;1"]
+    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
     cos.writeString(str);

@@ -655,7 +655,7 @@ RequestPolicyService.prototype = {
       "policy-manager.jsm",
       "request.jsm",
       "request-processor.jsm",
-      "RequestUtil.jsm",
+      "request-util.jsm",
       "Subscription.jsm",
       "Util.jsm"
     ];

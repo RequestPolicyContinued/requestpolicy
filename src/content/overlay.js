@@ -29,7 +29,6 @@ if (!requestpolicy) {
 }
 
 Components.utils.import("chrome://requestpolicy/content/lib/DomainUtil.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/JSON.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
@@ -1631,7 +1630,7 @@ requestpolicy.overlay = {
 
 //  showExtensionConflictInfo : function() {
 //    var ext = this._rpService.getConflictingExtensions();
-//    var extJson = rp.mod.JSON.stringify(ext);
+//    var extJson = JSON.stringify(ext);
 //    this._openInNewTab(this._extensionConflictInfoUri
 //        + encodeURIComponent(extJson));
 //  },

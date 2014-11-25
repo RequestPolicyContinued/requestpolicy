@@ -21,14 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
-const CP_OK = CI.nsIContentPolicy.ACCEPT;
+const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_NOP = function() {
   return CP_OK;
 };
-const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
+const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
 const EXTENSION_ID = "requestpolicy@requestpolicy.com";
 
@@ -59,7 +59,7 @@ RequestPolicyService.prototype = {
     {category : "content-policy"}
   ],
   QueryInterface : XPCOMUtils.generateQI(
-      [CI.nsIRequestPolicy, CI.nsIObserver, CI.nsIContentPolicy]),
+      [Ci.nsIRequestPolicy, Ci.nsIObserver, Ci.nsIContentPolicy]),
 
   /* Factory that creates a singleton instance of the component */
   _xpcom_factory : {
@@ -157,7 +157,7 @@ RequestPolicyService.prototype = {
     try {
       // For Firefox <= 3.6.
       var em = CC["@mozilla.org/extensions/manager;1"].
-          getService(CI.nsIExtensionManager);
+          getService(Ci.nsIExtensionManager);
       var ext;
       for (var i = 0; i < idArray.length; i++) {
         rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
@@ -276,7 +276,7 @@ RequestPolicyService.prototype = {
 
   _initializeApplicationCompatibility : function() {
     var appInfo = CC["@mozilla.org/xre/app-info;1"].
-        getService(CI.nsIXULAppInfo);
+        getService(Ci.nsIXULAppInfo);
 
     // Mozilla updates (doing this for all applications, not just individual
     // applications from the Mozilla community that I'm aware of).
@@ -513,7 +513,7 @@ RequestPolicyService.prototype = {
 
   _register : function() {
     var os = CC['@mozilla.org/observer-service;1'].
-        getService(CI.nsIObserverService);
+        getService(Ci.nsIObserverService);
     os.addObserver(this, "http-on-examine-response", false);
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
@@ -538,7 +538,7 @@ RequestPolicyService.prototype = {
   _unregister : function() {
     try {
       var os = CC['@mozilla.org/observer-service;1'].
-          getService(CI.nsIObserverService);
+          getService(Ci.nsIObserverService);
       os.removeObserver(this, "http-on-examine-response");
       os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
@@ -563,14 +563,14 @@ RequestPolicyService.prototype = {
   _initializePrefSystem : function() {
     // Get the preferences branch and setup the preferences observer.
     this._prefService = CC["@mozilla.org/preferences-service;1"].
-        getService(CI.nsIPrefService);
+        getService(Ci.nsIPrefService);
 
     this.prefs = this._prefService.getBranch("extensions.requestpolicy.")
-        .QueryInterface(CI.nsIPrefBranch2);
+        .QueryInterface(Ci.nsIPrefBranch2);
     this.prefs.addObserver("", this, false);
 
     this._rootPrefs = this._prefService.getBranch("")
-        .QueryInterface(CI.nsIPrefBranch2);
+        .QueryInterface(Ci.nsIPrefBranch2);
     this._rootPrefs.addObserver("network.prefetch-next", this, false);
     this._rootPrefs.addObserver("network.dns.disablePrefetch", this, false);
   },
@@ -601,7 +601,7 @@ RequestPolicyService.prototype = {
           });
       } else {
         var em = CC["@mozilla.org/extensions/manager;1"].
-            getService(CI.nsIExtensionManager);
+            getService(Ci.nsIExtensionManager);
         var addon = em.getItemForID(EXTENSION_ID);
         this.prefs.setCharPref("lastVersion", addon.version);
         util.curVersion = addon.version;
@@ -643,7 +643,7 @@ RequestPolicyService.prototype = {
         break;
     }
     var observerService = CC['@mozilla.org/observer-service;1'].
-        getService(CI.nsIObserverService);
+        getService(Ci.nsIObserverService);
     observerService.notifyObservers(null, "requestpolicy-prefs-changed", null);
   },
 
@@ -688,7 +688,7 @@ RequestPolicyService.prototype = {
   _initializePrivateBrowsing : function() {
     try {
       var pbs = CC["@mozilla.org/privatebrowsing;1"].
-          getService(CI.nsIPrivateBrowsingService);
+          getService(Ci.nsIPrivateBrowsingService);
       this._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
     } catch (e) {
       // Ignore exceptions from browsers that do not support private browsing.
@@ -700,7 +700,7 @@ RequestPolicyService.prototype = {
       var url = "chrome://requestpolicy/content/settings/setup.html";
 
       var wm = CC['@mozilla.org/appshell/window-mediator;1'].
-          getService(CI.nsIWindowMediator);
+          getService(Ci.nsIWindowMediator);
       var windowtype = 'navigator:browser';
       var mostRecentWindow  = wm.getMostRecentWindow(windowtype);
 
@@ -910,7 +910,7 @@ RequestPolicyService.prototype = {
     var prefs = this.prefs;
     function prefEmpty(pref) {
       try {
-        var value = prefs.getComplexValue(pref, CI.nsISupportsString).data;
+        var value = prefs.getComplexValue(pref, Ci.nsISupportsString).data;
         return value == '';
       } catch (e) {
         return true;
@@ -929,7 +929,7 @@ RequestPolicyService.prototype = {
    * @param string newSpec
    */
   _handleHttpsEverywhereUriRewrite : function(oldURI, newSpec) {
-    oldURI = oldURI.QueryInterface(CI.nsIURI);
+    oldURI = oldURI.QueryInterface(Ci.nsIURI);
     this._requestProcessor.mapDestinations(oldURI.spec, newSpec);
   },
 
@@ -1056,7 +1056,7 @@ RequestPolicyService.prototype = {
         this._shutdown();
         break;
       case "em-action-requested" :
-        if ((subject instanceof CI.nsIUpdateItem)
+        if ((subject instanceof Ci.nsIUpdateItem)
             && subject.id == EXTENSION_ID) {
           if (data == "item-uninstalled" || data == "item-disabled") {
             this._uninstall = true;
@@ -1100,10 +1100,10 @@ RequestPolicyService.prototype = {
     this.shouldLoad = this.mainContentPolicy.shouldLoad;
     if (!this.mimeService) {
       // this.rejectCode = typeof(/ /) == "object" ? -4 : -3;
-      this.rejectCode = CI.nsIContentPolicy.REJECT_SERVER;
+      this.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
       this.mimeService =
           CC['@mozilla.org/uriloader/external-helper-app-service;1']
-          .getService(CI.nsIMIMEService);
+          .getService(Ci.nsIMIMEService);
     }
   },
 

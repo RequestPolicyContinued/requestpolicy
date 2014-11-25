@@ -23,11 +23,11 @@
 
 var EXPORTED_SYMBOLS = ["RequestProcessor"];
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
-const CP_OK = CI.nsIContentPolicy.ACCEPT;
-const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
+const CP_OK = Ci.nsIContentPolicy.ACCEPT;
+const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
 // A value intended to not conflict with aExtra passed to shouldLoad() by any
 // other callers. Was chosen randomly.
@@ -177,9 +177,9 @@ RequestProcessor.prototype.process = function(request) {
     if (originURI == "about:blank" && request.aContext) {
       let domNode;
       try {
-        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
       } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
-      if (domNode && domNode.nodeType == CI.nsIDOMNode.DOCUMENT_NODE) {
+      if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
         var newOriginURI;
         if (request.aContext.documentURI &&
             request.aContext.documentURI != "about:blank") {
@@ -223,7 +223,7 @@ RequestProcessor.prototype.process = function(request) {
     if (request.aContext) {
       let domNode;
       try {
-        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
       } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
 
       if (domNode && domNode.nodeName == "LINK" &&
@@ -334,7 +334,7 @@ RequestProcessor.prototype.process = function(request) {
     if (request.aContext) {
       let domNode;
       try {
-        domNode = request.aContext.QueryInterface(CI.nsIDOMNode);
+        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
       } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
 
       if (domNode && domNode.nodeName == "xul:browser" &&
@@ -540,14 +540,14 @@ RequestProcessor.prototype._isContentRequest = function(channel) {
     var callback = callbacks[i];
     try {
       // For Gecko 1.9.1
-      return callback.getInterface(CI.nsILoadContext).isContent;
+      return callback.getInterface(Ci.nsILoadContext).isContent;
     } catch (e) {
     }
     try {
       // For Gecko 1.9.0
-      var itemType = callback.getInterface(CI.nsIWebNavigation)
-          .QueryInterface(CI.nsIDocShellTreeItem).itemType;
-      return itemType == CI.nsIDocShellTreeItem.typeContent;
+      var itemType = callback.getInterface(Ci.nsIWebNavigation)
+          .QueryInterface(Ci.nsIDocShellTreeItem).itemType;
+      return itemType == Ci.nsIDocShellTreeItem.typeContent;
     } catch (e) {
     }
   }
@@ -572,7 +572,7 @@ RequestProcessor.prototype._examineHttpResponse = function(observedSubject) {
   // TODO: Make user aware of blocked headers so they can allow them if
   // desired.
 
-  var httpChannel = observedSubject.QueryInterface(CI.nsIHttpChannel);
+  var httpChannel = observedSubject.QueryInterface(Ci.nsIHttpChannel);
 
   var headerType;
   var dest;
@@ -795,7 +795,7 @@ RequestProcessor.prototype.processRedirect = function(request, httpChannel) {
  * which we currently can't stop.
  */
 RequestProcessor.prototype._examineHttpRequest = function(observedSubject) {
-  var httpChannel = observedSubject.QueryInterface(CI.nsIHttpChannel);
+  var httpChannel = observedSubject.QueryInterface(Ci.nsIHttpChannel);
   try {
     // Determine if prefetch requests are slipping through.
     if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
@@ -1081,7 +1081,7 @@ RequestProcessor.prototype.reject = function(reason, request) {
   this._cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
   this._recordRejectedRequest(request);
 
-  if (CI.nsIContentPolicy.TYPE_DOCUMENT == request.aContentType) {
+  if (Ci.nsIContentPolicy.TYPE_DOCUMENT == request.aContentType) {
     // This was a blocked top-level document request. This may be due to
     // a blocked attempt by javascript to set the document location.
     // TODO: pass requestResult?

@@ -30,7 +30,7 @@
 
 var EXPORTED_SYMBOLS = ["DomainUtil"]
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
 if (!rp) {
@@ -42,13 +42,13 @@ Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm", rp.mod)
 var DomainUtil = {};
 
 DomainUtil._ios = CC["@mozilla.org/network/io-service;1"]
-    .getService(CI.nsIIOService);
+    .getService(Ci.nsIIOService);
 
 DomainUtil._eTLDService = CC["@mozilla.org/network/effective-tld-service;1"]
-    .getService(CI.nsIEffectiveTLDService);
+    .getService(Ci.nsIEffectiveTLDService);
 
 DomainUtil._idnService = CC["@mozilla.org/network/idn-service;1"]
-    .getService(CI.nsIIDNService);
+    .getService(Ci.nsIIDNService);
 
 const STANDARDURL_CONTRACTID = "@mozilla.org/network/standard-url;1";
 
@@ -377,10 +377,10 @@ DomainUtil.formatIDNUri = function(uri) {
  */
 DomainUtil.determineRedirectUri = function(originUri, destPath) {
   var baseUri = this.getUriObject(originUri);
-  var urlType = CI.nsIStandardURL.URLTYPE_AUTHORITY;
-  var newUri = CC[STANDARDURL_CONTRACTID].createInstance(CI.nsIStandardURL);
+  var urlType = Ci.nsIStandardURL.URLTYPE_AUTHORITY;
+  var newUri = CC[STANDARDURL_CONTRACTID].createInstance(Ci.nsIStandardURL);
   newUri.init(urlType, 0, destPath, null, baseUri);
-  var resolvedUri = newUri.QueryInterface(CI.nsIURI);
+  var resolvedUri = newUri.QueryInterface(Ci.nsIURI);
   return resolvedUri.spec;
 }
 

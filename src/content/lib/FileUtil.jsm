@@ -23,7 +23,7 @@
 
 var EXPORTED_SYMBOLS = ["FileUtil"]
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
 Components.utils.import("resource://gre/modules/Services.jsm");
@@ -40,9 +40,9 @@ var FileUtil = {
    */
   fileToArray : function(file) {
     var stream = CC["@mozilla.org/network/file-input-stream;1"]
-        .createInstance(CI.nsIFileInputStream);
+        .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, 0444, 0);
-    stream.QueryInterface(CI.nsILineInputStream);
+    stream.QueryInterface(Ci.nsILineInputStream);
     var line = {}, lines = [], hasmore;
     do {
       hasmore = stream.readLine(line);
@@ -60,13 +60,13 @@ var FileUtil = {
    */
   fileToString : function(file) {
     var stream = CC["@mozilla.org/network/file-input-stream;1"]
-        .createInstance(CI.nsIFileInputStream);
+        .createInstance(Ci.nsIFileInputStream);
     // TODO: Handle NS_ERROR_FILE_NOT_FOUND
     stream.init(file, 0x01, 0444, 0);
-    stream.QueryInterface(CI.nsILineInputStream);
+    stream.QueryInterface(Ci.nsILineInputStream);
 
     var cstream = CC["@mozilla.org/intl/converter-input-stream;1"].
-                  createInstance(CI.nsIConverterInputStream);
+                  createInstance(Ci.nsIConverterInputStream);
     cstream.init(stream, "UTF-8", 0, 0);
 
     var str = "";
@@ -92,12 +92,12 @@ var FileUtil = {
    */
   arrayToFile : function(lines, file) {
     var stream = CC["@mozilla.org/network/file-output-stream;1"]
-        .createInstance(CI.nsIFileOutputStream);
+        .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
     var cos = CC["@mozilla.org/intl/converter-output-stream;1"]
-        .createInstance(CI.nsIConverterOutputStream);
+        .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
 
     for (var i = 0; i < lines.length; i++) {
@@ -118,12 +118,12 @@ var FileUtil = {
    */
   stringToFile : function(str, file) {
     var stream = CC["@mozilla.org/network/file-output-stream;1"]
-        .createInstance(CI.nsIFileOutputStream);
+        .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
     var cos = CC["@mozilla.org/intl/converter-output-stream;1"]
-        .createInstance(CI.nsIConverterOutputStream);
+        .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
     cos.writeString(str);
     cos.close();
@@ -139,29 +139,29 @@ var FileUtil = {
    * @return {nsIFile}
    */
   getRPUserDir : function(subdir1, subdir2, subdir3) {
-    var profileDir = Services.dirsvc.get("ProfD", CI.nsIFile);
+    var profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
     var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if(!file.exists()) {
-      file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+      file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
     }
 
     if (subdir1) {
       file.appendRelativePath(subdir1);
       if(!file.exists()) {
-        file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+        file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
       }
 
       if (subdir2) {
         file.appendRelativePath(subdir2);
         if(!file.exists()) {
-          file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+          file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
         }
 
         if (subdir3) {
           file.appendRelativePath(subdir3);
           if(!file.exists()) {
-            file.create(CI.nsIFile.DIRECTORY_TYPE, 0700);
+            file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
           }
         }
       }

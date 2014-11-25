@@ -26,7 +26,7 @@ var EXPORTED_SYMBOLS = [
   "RULES_CHANGED_TOPIC"
 ];
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
 const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
@@ -311,10 +311,10 @@ PolicyManager.prototype = {
   },
 
   _checkRequest : function(origin, dest, aRuleset, result) {
-    if (!(origin instanceof CI.nsIURI)) {
+    if (!(origin instanceof Ci.nsIURI)) {
       throw "Origin must be an nsIURI.";
     }
-    if (!(dest instanceof CI.nsIURI)) {
+    if (!(dest instanceof Ci.nsIURI)) {
       throw "Destination must be an nsIURI.";
     }
     if (!result) {

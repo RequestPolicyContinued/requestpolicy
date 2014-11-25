@@ -30,7 +30,7 @@ var EXPORTED_SYMBOLS = [
   "REQUEST_TYPE_REDIRECT"
 ];
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
 const REQUEST_TYPE_NORMAL = 1;
@@ -116,7 +116,7 @@ NormalRequest.prototype.detailsToString = function() {
   return "type: " + this.aContentType +
       ", destination: " + this.destURI +
       ", origin: " + this.originURI +
-      ", context: " + ((this.aContext) instanceof (CI.nsIDOMHTMLElement)
+      ", context: " + ((this.aContext) instanceof (Ci.nsIDOMHTMLElement)
           ? "<HTML Element>"
           : this.aContext) +
       ", mime: " + this.aMimeTypeGuess +
@@ -192,7 +192,7 @@ NormalRequest.prototype.isInternal = function() {
   // request. We'll only allow requests to .dtd files, though, so we don't
   // open up all file:// destinations.
   if (this.aContentLocation.scheme == "file" &&
-      this.aContentType == CI.nsIContentPolicy.TYPE_DTD) {
+      this.aContentType == Ci.nsIContentPolicy.TYPE_DTD) {
     return true;
   }
 
@@ -210,14 +210,14 @@ NormalRequest.prototype.getWindow = function() {
 
   let win;
   try {
-    win = context.QueryInterface(CI.nsIDOMWindow);
+    win = context.QueryInterface(Ci.nsIDOMWindow);
   } catch (e) {
     let doc;
     try {
-      doc = context.QueryInterface(CI.nsIDOMDocument);
+      doc = context.QueryInterface(Ci.nsIDOMDocument);
     } catch (e) {
       try {
-        doc = context.QueryInterface(CI.nsIDOMNode).ownerDocument;
+        doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
       } catch(e) {
         return null;
       }

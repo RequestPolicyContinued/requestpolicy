@@ -23,16 +23,16 @@
 
 var EXPORTED_SYMBOLS = ["Util"];
 
-const CI = Components.interfaces;
+const Ci = Components.interfaces;
 const CC = Components.classes;
 
 const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 
 var Util = {
   _versionComparator : CC["@mozilla.org/xpcom/version-comparator;1"]
-      .getService(CI.nsIVersionComparator),
+      .getService(Ci.nsIVersionComparator),
 
-  appInfo : CC["@mozilla.org/xre/app-info;1"].getService(CI.nsIXULAppInfo),
+  appInfo : CC["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo),
 
   // These need to be set externally. Right now they're set from
   // RequestPolicyService._initVersionInfo().
@@ -56,11 +56,11 @@ var Util = {
   },
 
   getChromeWindow : function(aContentWindow) {
-    return aContentWindow.QueryInterface(CI.nsIInterfaceRequestor)
-                         .getInterface(CI.nsIWebNavigation)
-                         .QueryInterface(CI.nsIDocShellTreeItem)
+    return aContentWindow.QueryInterface(Ci.nsIInterfaceRequestor)
+                         .getInterface(Ci.nsIWebNavigation)
+                         .QueryInterface(Ci.nsIDocShellTreeItem)
                          .rootTreeItem
-                         .QueryInterface(CI.nsIInterfaceRequestor)
-                         .getInterface(CI.nsIDOMWindow);
+                         .QueryInterface(Ci.nsIInterfaceRequestor)
+                         .getInterface(Ci.nsIDOMWindow);
   }
 }

@@ -42,7 +42,7 @@ if (!rp) {
 }
 Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Util.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm", rp.mod);
 
 
 

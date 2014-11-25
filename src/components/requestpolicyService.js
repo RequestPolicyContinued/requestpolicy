@@ -657,7 +657,7 @@ RequestPolicyService.prototype = {
       "request-processor.jsm",
       "request-util.jsm",
       "subscription.jsm",
-      "Util.jsm"
+      "utils.jsm"
     ];
     for (var i in modules) {
       filename = modules[i];

@@ -126,13 +126,7 @@ function onload() {
     el.addEventListener('change', handleSubscriptionCheckboxChange);
   }
 
-  subAddedObserver = new common.Observer(updateDisplay,
-                                         SUBSCRIPTION_ADDED_TOPIC);
-  subRemovedObserver = new common.Observer(updateDisplay,
-                                           SUBSCRIPTION_REMOVED_TOPIC);
-
-  window.addEventListener("beforeunload", function(event) {
-    subAddedObserver.unregister();
-    subRemovedObserver.unregister();
-  });
+  // call updateDisplay() every time a subscription is added or removed
+  ObserverManager.observe(SUBSCRIPTION_ADDED_TOPIC, updateDisplay);
+  ObserverManager.observe(SUBSCRIPTION_REMOVED_TOPIC, updateDisplay);
 }

@@ -216,15 +216,7 @@ function addRuleHelper() {
   }
 }
 
-function RulesChangedObserver()
-{
-  common.Observer.call(this, function(subject, topic, data) {
-    var search = document.getElementById('rulesearch');
-    populateRuleTable(search.value);
-  }, "requestpolicy-rules-changed");
-}
-RulesChangedObserver.prototype = Object.create(common.Observer.prototype);
-RulesChangedObserver.prototype.constructor = RulesChangedObserver;
+
 
 function onload() {
   var search = document.getElementById('rulesearch');
@@ -241,7 +233,13 @@ function onload() {
     $('#oldrulesexist').show();
   }
 
-  rulesChangedObserver = new RulesChangedObserver();
+  // observe rule changes and update the table then
+  ObserverManager.observe("requestpolicy-rules-changed",
+      function(subject, topic, data) {
+        var search = document.getElementById('rulesearch');
+        populateRuleTable(search.value);
+      });
+
   window.addEventListener("beforeunload", function(event) {
     rulesChangedObserver.unregister();
   });

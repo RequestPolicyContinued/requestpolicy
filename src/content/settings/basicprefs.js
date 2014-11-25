@@ -74,11 +74,6 @@ function onload() {
       }
   );
 
-  prefsChangedObserver = new common.PrefsChangedObserver(
-      function(subject, topic, data) {
-        updateDisplay();
-      });
-  window.addEventListener("beforeunload", function(event) {
-    prefsChangedObserver.unregister();
-  });
+  // call updateDisplay() every time a preference gets changed
+  ObserverManager.observePrefChanges(updateDisplay);
 }

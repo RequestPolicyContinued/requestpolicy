@@ -4,6 +4,8 @@ Components.utils.import("chrome://requestpolicy/content/lib/subscription.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/policy-manager.jsm");
 
+Components.utils.import("resource://gre/modules/Services.jsm");
+
 var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
     .getService().wrappedJSObject;
 
@@ -34,7 +36,7 @@ function _(msg, args) {
   }
 }
 
-common = {};
+var common = {};
 
 /*
  Based on the user's current default policy (allow or deny), swaps out which
@@ -217,28 +219,9 @@ common.localize = function(stringNames) {
 };
 
 
-common.Observer = function(functionToCall, aTopic) {
-  this.topic = aTopic;
-  this.observe = functionToCall;
-  this.register();
-}
-common.Observer.prototype.register = function() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.addObserver(this, this.topic, false);
-};
-common.Observer.prototype.unregister = function() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.removeObserver(this, this.topic);
-};
+Services.scriptloader.loadSubScript(
+    "chrome://requestpolicy/content/settings/common.observer-manager.js", this);
 
-common.PrefsChangedObserver = function(functionToCall)
-{
-  common.Observer.call(this, functionToCall, "requestpolicy-prefs-changed");
-}
-common.PrefsChangedObserver.prototype = Object.create(common.Observer.prototype);
-common.PrefsChangedObserver.prototype.constructor = common.PrefsChangedObserver;
 
 $(function() {
   common.localize(COMMON_STRINGS);

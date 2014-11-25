@@ -1658,7 +1658,7 @@ requestpolicy.overlay = {
   },
 
   openHelp : function() {
-    var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
+    var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers');
     gBrowser.selectedTab = tab;
     var popup = document.getElementById('rp-popup');
     popup.hidePopup();

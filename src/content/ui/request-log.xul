@@ -32,8 +32,8 @@
     <stringbundle id="requestpolicyStrings" src="chrome://requestpolicy/locale/requestpolicy.properties"/>
   </stringbundleset>
 
-  <script type="application/x-javascript" src="requestLogTreeView.js" />
-  <script type="application/x-javascript" src="requestLog.js" />
+  <script type="application/x-javascript" src="request-log-tree-view.js" />
+  <script type="application/x-javascript" src="request-log.js" />
 
   <popupset>
     <menupopup id="requestpolicyRequestLogContext">

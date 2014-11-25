@@ -56,7 +56,7 @@ requestpolicy.overlay = {
   _initialized : false,
   _rpService : null,
 
-  // This is set by requestLog.js when it is initialized. We don't need to worry
+  // This is set by request-log.js when it is initialized. We don't need to worry
   // about setting it here.
   requestLogTreeView : null,
 
@@ -1718,7 +1718,7 @@ requestpolicy.overlay = {
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
-          "chrome://requestpolicy/content/ui/requestLog.xul");
+          "chrome://requestpolicy/content/ui/request-log.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {

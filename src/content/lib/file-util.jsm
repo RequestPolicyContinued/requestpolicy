@@ -21,12 +21,29 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["FileUtil"]
+var EXPORTED_SYMBOLS = ["FileUtil"];
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+
+/**
+ * creates an integer from the arguments
+ *
+ * The reason for this function is that octal integer literals (integer with
+ * leading zero like 0700) are deprecated. Using them would cause a JavaScript
+ * strict warning. See http://www.ecma-international.org/ecma-262/5.1/#sec-B.1
+ */
+function getOctalInt() {
+  let result = 0;
+  for (let i = 0, len = arguments.length; i < len; ++i) {
+    result += arguments[len - i - 1] * Math.pow(8, i);
+  }
+  return result;
+}
+const octal444 = getOctalInt(4,4,4); // octal: 0444
+const octal700 = getOctalInt(7,0,0); // octal: 0700
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
@@ -41,7 +58,7 @@ var FileUtil = {
   fileToArray : function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
-    stream.init(file, 0x01, 0444, 0);
+    stream.init(file, 0x01, octal444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
     var line = {}, lines = [], hasmore;
     do {
@@ -55,14 +72,12 @@ var FileUtil = {
   /**
    * Returns the contents of the file as a string.
    *
-   * @param {nsIFile}
-   *          file
+   * @param {nsIFile} file
    */
   fileToString : function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
-    // TODO: Handle NS_ERROR_FILE_NOT_FOUND
-    stream.init(file, 0x01, 0444, 0);
+    stream.init(file, 0x01, octal444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
 
     var cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
@@ -71,6 +86,7 @@ var FileUtil = {
 
     var str = "";
     var data = {};
+    let read;
     do {
       // Read as much as we can and put it in |data.value|.
       read = cstream.readString(0xffffffff, data);
@@ -143,25 +159,25 @@ var FileUtil = {
     var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if(!file.exists()) {
-      file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
+      file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
     }
 
     if (subdir1) {
       file.appendRelativePath(subdir1);
       if(!file.exists()) {
-        file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
+        file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
       }
 
       if (subdir2) {
         file.appendRelativePath(subdir2);
         if(!file.exists()) {
-          file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
+          file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
         }
 
         if (subdir3) {
           file.appendRelativePath(subdir3);
           if(!file.exists()) {
-            file.create(Ci.nsIFile.DIRECTORY_TYPE, 0700);
+            file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
           }
         }
       }

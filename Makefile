@@ -42,18 +42,14 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 all_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
 
 javascript_files := $(filter %.js %.jsm,$(all_files))
-chrome_manifest := $(filter %chrome.manifest,$(all_files))
-other_files := $(filter-out $(javascript_files) $(chrome_manifest),$(all_files))
-
-all_files_inside_jar := $(filter $(build_path)content/% $(build_path)locale/% $(build_path)skin/%,$(all_files))
-all_files_outside_jar := $(filter-out $(all_files_inside_jar),$(all_files))
+other_files := $(filter-out $(javascript_files),$(all_files))
 
 # detect deleted files and empty directories
 deleted_files :=
 empty_dirs :=
 ifneq "$(wildcard $(build_path))" ""
 # files that have been deleted but still exist in the build directory.
-deleted_files := $(shell find $(build_path) -type f | grep -F -v $(addprefix -e ,$(all_files) $(jar_file)))
+deleted_files := $(shell find $(build_path) -type f | grep -F -v $(addprefix -e ,$(all_files)))
 # empty directories. -mindepth 1 to exclude the build directory itself.
 empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
 endif
@@ -90,18 +86,12 @@ dist: $(xpi_file)
 # Note: We add the build path as a prerequisite, not the phony "build" target.
 #       This way we avoid re-packaging in case nothing has changed.
 #       Also $(all_files) is needed as prerequisite, so that the xpi gets updated
-$(xpi_file): $(build_path) $(jar_file) $(all_files) | $(dist_path)
+$(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	@rm -f $(xpi_file)
 	@echo "Creating XPI file."
 	@cd $(build_path) && \
-	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(jar_file) $(all_files_outside_jar))
+	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
 	@echo "Creating XPI file: Done!"
-
-$(jar_file): $(all_files_inside_jar)
-	@mkdir -p $(dir $(jar_file))
-	@rm -f $(jar_file)
-	@cd $(build_path) && \
-	$(ZIP) $(abspath $(jar_file)) $(patsubst $(build_path)%,%,$(all_files_inside_jar))
 
 # ___________________
 # processing of files
@@ -114,11 +104,6 @@ $(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
 	@# In case javascript files should be processed, it should be done here.
-
-# Copy chrome.manifest.packaging (src) to chrome.manifest (build).
-$(chrome_manifest): $(source_path)chrome.manifest.packaging
-	@mkdir -p $(dir $@)
-	cp $(source_path)chrome.manifest.packaging $@
 
 $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)

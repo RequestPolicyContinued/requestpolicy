@@ -30,7 +30,7 @@ var EXPORTED_SYMBOLS = [
   "SUBSCRIPTION_REMOVED_TOPIC"
 ];
 
-Components.utils.import("chrome://requestpolicy/content/lib/FileUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Logger.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/RulesetStorage.jsm");

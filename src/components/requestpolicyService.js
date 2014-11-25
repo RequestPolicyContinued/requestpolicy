@@ -656,7 +656,7 @@ RequestPolicyService.prototype = {
       "request.jsm",
       "request-processor.jsm",
       "request-util.jsm",
-      "Subscription.jsm",
+      "subscription.jsm",
       "Util.jsm"
     ];
     for (var i in modules) {

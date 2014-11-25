@@ -36,7 +36,7 @@ if (!rp) {
 }
 
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RulesetStorage.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/request-result.jsm", rp.mod);
 

@@ -29,7 +29,7 @@ if (!rp) {
 }
 
 Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
 
 var RulesetStorage = {
 

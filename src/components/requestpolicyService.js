@@ -651,7 +651,7 @@ RequestPolicyService.prototype = {
     var modules = [
       "logger.jsm",
       "domain-util.jsm",
-      "Ruleset.jsm",
+      "ruleset.jsm",
       "policy-manager.jsm",
       "request.jsm",
       "request-processor.jsm",

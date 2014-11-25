@@ -32,7 +32,7 @@ var EXPORTED_SYMBOLS = [
 
 Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/RulesetStorage.jsm");
 
 

@@ -33,7 +33,7 @@ if (!rp) {
   var rp = {mod : {}};
 }
 
-Components.utils.import("chrome://requestpolicy/content/lib/Ruleset.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
 
 
 

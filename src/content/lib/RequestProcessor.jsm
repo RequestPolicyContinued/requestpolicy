@@ -41,7 +41,7 @@ Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp
 Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RequestResult.jsm", rp.mod);
 Components.utils.import("chrome://requestpolicy/content/lib/RequestUtil.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/Request.jsm", rp.mod);
+Components.utils.import("chrome://requestpolicy/content/lib/request.jsm", rp.mod);
 
 
 

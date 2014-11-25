@@ -653,7 +653,7 @@ RequestPolicyService.prototype = {
       "domain-util.jsm",
       "Ruleset.jsm",
       "policy-manager.jsm",
-      "Request.jsm",
+      "request.jsm",
       "RequestProcessor.jsm",
       "RequestUtil.jsm",
       "Subscription.jsm",

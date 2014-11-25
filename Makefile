@@ -89,7 +89,8 @@ $(dist_path):
 dist: $(xpi_file)
 # Note: We add the build path as a prerequisite, not the phony "build" target.
 #       This way we avoid re-packaging in case nothing has changed.
-$(xpi_file): $(build_path) $(jar_file) | $(dist_path)
+#       Also $(all_files) is needed as prerequisite, so that the xpi gets updated
+$(xpi_file): $(build_path) $(jar_file) $(all_files) | $(dist_path)
 	@rm -f $(xpi_file)
 	@echo "Creating XPI file."
 	@cd $(build_path) && \
@@ -106,7 +107,10 @@ $(jar_file): $(all_files_inside_jar)
 # processing of files
 #
 
-$(javascript_files): $(patsubst $(build_path)%,$(source_path)%,$@)
+# enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
+.SECONDEXPANSION:
+
+$(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
 	@# In case javascript files should be processed, it should be done here.
@@ -116,7 +120,7 @@ $(chrome_manifest): $(source_path)chrome.manifest.packaging
 	@mkdir -p $(dir $@)
 	cp $(source_path)chrome.manifest.packaging $@
 
-$(other_files): $(patsubst $(build_path)%,$(source_path)%,$@)
+$(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
 

@@ -1718,7 +1718,7 @@ requestpolicy.overlay = {
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
-          "chrome://requestpolicy/content/requestLog.xul");
+          "chrome://requestpolicy/content/ui/requestLog.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {

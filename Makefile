@@ -32,7 +32,7 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/README \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
-		$(wildcard $(source_dirname)/content/*.xul) \
+		$(wildcard $(source_dirname)/content/ui/*.xul) \
 		$(wildcard $(source_dirname)/locale/*/*.dtd) \
 		$(wildcard $(source_dirname)/locale/*/*.properties) \
 		$(wildcard $(source_dirname)/skin/*.css) \

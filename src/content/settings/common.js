@@ -60,7 +60,7 @@ common.switchSubscriptionPolicies = function () {
       var subInfo = {};
       subInfo[listName] = {};
       subInfo[listName][subName] = true;
-      observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo));
     }
   }
@@ -74,7 +74,7 @@ common.switchSubscriptionPolicies = function () {
       var subInfo = {};
       subInfo[listName] = {};
       subInfo[listName][subName] = true;
-      observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo));
     }
   }

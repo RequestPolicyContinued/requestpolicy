@@ -97,11 +97,11 @@ function handleSubscriptionCheckboxChange(event) {
   subInfo['official'][subName] = true;
   if (enabled) {
     userSubs.addSubscription('official', subName);
-    observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+    Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo));
   } else {
     userSubs.removeSubscription('official', subName);
-    observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+    Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo));
   }
 }

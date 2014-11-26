@@ -29,6 +29,8 @@ let EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
 
 const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 
+Cu.import("resource://gre/modules/Services.jsm");
+
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
@@ -52,9 +54,7 @@ function warn(msg) {
 }
 
 function notifyRulesChanged() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.notifyObservers(null, RULES_CHANGED_TOPIC, null);
+  Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
 

@@ -34,6 +34,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
+  "constants", // e.g. CP_OK
   "logger",
   "request",
   "utils",

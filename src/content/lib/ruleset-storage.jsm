@@ -51,10 +51,16 @@ let RulesetStorage = {
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
-    let str;
-    if (policyFile.exists()) {
-      str = FileUtil.fileToString(policyFile);
-    }
+    // Important note: Do not catch the error thrown by the fileToString!
+    // There is no check for the existence of the file, because
+    // loadSubscriptionRules catches errors and then knows if a file
+    // existed or not. This is a bad implementation.
+    // TODO: solve this mess
+    let str = FileUtil.fileToString(policyFile);
+    //let str;
+    //if (policyFile.exists()) {
+    //  str = FileUtil.fileToString(policyFile);
+    //}
     return new RawRuleset(str);
   },
 

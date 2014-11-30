@@ -543,13 +543,6 @@ RequestProcessor.prototype._isContentRequest = function(channel) {
       return callback.getInterface(Ci.nsILoadContext).isContent;
     } catch (e) {
     }
-    try {
-      // For Gecko 1.9.0
-      var itemType = callback.getInterface(Ci.nsIWebNavigation)
-          .QueryInterface(Ci.nsIDocShellTreeItem).itemType;
-      return itemType == Ci.nsIDocShellTreeItem.typeContent;
-    } catch (e) {
-    }
   }
 
   return false;

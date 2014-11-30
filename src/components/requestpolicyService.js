@@ -154,27 +154,14 @@ RequestPolicyService.prototype = {
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
-    try {
-      // For Firefox <= 3.6.
-      var em = Cc["@mozilla.org/extensions/manager;1"].
-          getService(Ci.nsIExtensionManager);
-      var ext;
-      for (var i = 0; i < idArray.length; i++) {
-        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
-            "Extension old-style check: " + idArray[i]);
-        this._initializeExtCompatCallback(em.getItemForID(idArray[i]));
-      }
-    } catch (e) {
-      // As of Firefox 3.7, the extension manager has been replaced.
-      const rpService = this;
-      var callback = function(ext) {
-        rpService._initializeExtCompatCallback(ext)
-      };
-      for (var i = 0; i < idArray.length; i++) {
-        rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
-            "Extension new-style check: " + idArray[i]);
-        AddonManager.getAddonByID(idArray[i], callback);
-      }
+    const rpService = this;
+    var callback = function(ext) {
+      rpService._initializeExtCompatCallback(ext)
+    };
+    for (var i = 0; i < idArray.length; i++) {
+      rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
+          "Extension new-style check: " + idArray[i]);
+      AddonManager.getAddonByID(idArray[i], callback);
     }
   },
 
@@ -183,8 +170,6 @@ RequestPolicyService.prototype = {
       return;
     }
 
-    // As of Firefox 3.7, we can easily whether addons are disabled.
-    // The isActive property won't exist before 3.7, so it will be null.
     if (ext.isActive == false) {
       rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
           "Extension is not active: " + ext.name);
@@ -526,13 +511,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, rp.mod.SUBSCRIPTION_ADDED_TOPIC, false);
     os.addObserver(this, rp.mod.SUBSCRIPTION_REMOVED_TOPIC, false);
 
-    // Listening for uninstall/disable events is done with the AddonManager
-    // since Firefox 4.
-    if (AddonManager) {
-      this._registerAddonListener();
-    } else {
-      os.addObserver(this, "em-action-requested", false);
-    }
+    this._registerAddonListener();
   },
 
   _unregister : function() {
@@ -548,9 +527,6 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, rp.mod.SUBSCRIPTION_UPDATED_TOPIC);
       os.removeObserver(this, rp.mod.SUBSCRIPTION_ADDED_TOPIC);
       os.removeObserver(this, rp.mod.SUBSCRIPTION_REMOVED_TOPIC);
-      if (!AddonManager) {
-        os.removeObserver(this, "em-action-requested");
-      }
     } catch (e) {
       rp.mod.Logger.dump(e + " while unregistering.");
     }
@@ -588,27 +564,16 @@ RequestPolicyService.prototype = {
       this.prefs.setCharPref("lastAppVersion", util.curAppVersion);
 
       var versionChanged = false;
-      if (AddonManager) {
-        const usePrefs = this.prefs;
-        const prefService = this._prefService;
-        AddonManager.getAddonByID(EXTENSION_ID,
-          function(addon) {
-            usePrefs.setCharPref("lastVersion", addon.version);
-            util.curVersion = addon.version;
-            if (util.lastVersion != util.curVersion) {
-              prefService.savePrefFile(null);
-            }
-          });
-      } else {
-        var em = Cc["@mozilla.org/extensions/manager;1"].
-            getService(Ci.nsIExtensionManager);
-        var addon = em.getItemForID(EXTENSION_ID);
-        this.prefs.setCharPref("lastVersion", addon.version);
-        util.curVersion = addon.version;
-        if (util.lastVersion != util.curVersion) {
-          versionChanged = true;
-        }
-      }
+      const usePrefs = this.prefs;
+      const prefService = this._prefService;
+      AddonManager.getAddonByID(EXTENSION_ID,
+        function(addon) {
+          usePrefs.setCharPref("lastVersion", addon.version);
+          util.curVersion = addon.version;
+          if (util.lastVersion != util.curVersion) {
+            prefService.savePrefFile(null);
+          }
+        });
 
       if (versionChanged || util.lastAppVersion != util.curAppVersion) {
         this._prefService.savePrefFile(null);
@@ -674,12 +639,7 @@ RequestPolicyService.prototype = {
         throw msg;
       }
     }
-    try {
-      Components.utils.import("resource://gre/modules/AddonManager.jsm");
-    } catch (e) {
-      // We'll be using the old (pre-Firefox 4) addon manager.
-      AddonManager = null;
-    }
+    Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
     // Give the RequestUtil singleton a reference to us.
     rp.mod.RequestUtil.setRPService(this);
@@ -1055,26 +1015,6 @@ RequestPolicyService.prototype = {
       case "xpcom-shutdown" :
         this._shutdown();
         break;
-      case "em-action-requested" :
-        if ((subject instanceof Ci.nsIUpdateItem)
-            && subject.id == EXTENSION_ID) {
-          if (data == "item-uninstalled" || data == "item-disabled") {
-            this._uninstall = true;
-            rp.mod.Logger.debug(
-                rp.mod.Logger.TYPE_INTERNAL, "Disabled");
-          } else if (data == "item-cancel-action") {
-            // This turns out to be correct. Unlike with the AddonManager
-            // in Firefox 4, here if the user does a "disable" followed by
-            // "uninstall" followed by a single "undo", rather than the
-            // "undo" triggering a"n "item-cancel-action", the first "undo"
-            // appears to send an "item-disabled" and only if the user click
-            // "undo" a second time does the "item-cancel-action" event occur.
-            this._uninstall = false;
-            rp.mod.Logger.debug(
-                rp.mod.Logger.TYPE_INTERNAL, "Enabled");
-          }
-        }
-        break;
       case "quit-application" :
         if (this._uninstall) {
           this._handleUninstallOrDisable();
@@ -1127,11 +1067,4 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 };
 
-/**
- * XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
- * XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
- */
-if (XPCOMUtils.generateNSGetFactory)
-  var NSGetFactory = XPCOMUtils.generateNSGetFactory([RequestPolicyService]);
-else
-  var NSGetModule = XPCOMUtils.generateNSGetModule([RequestPolicyService]);
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([RequestPolicyService]);

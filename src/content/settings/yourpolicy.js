@@ -42,17 +42,17 @@ function populateRuleTable(filter) {
   clearRulesTable(table);
 
   // Get and display user rules
-  var user = PolicyManager._userRulesets['user'];
+  var user = PolicyManager.getUserRulesets()['user'];
   var entries = user.rawRuleset.toJSON()['entries'];
   addRules(entries, 'User', filter, false);
 
   // Get and display temorary rules
-  var temp = PolicyManager._userRulesets['temp'];
+  var temp = PolicyManager.getUserRulesets()['temp'];
   var entries = temp.rawRuleset.toJSON()['entries'];
   addRules(entries, 'Temporary', filter, false);
 
   // Get and display subscription rules
-  var subscriptionLists = PolicyManager._subscriptionRulesets;
+  var subscriptionLists = PolicyManager.getSubscriptionRulesets();
   for (subscriptionList in subscriptionLists) {
     for (subscription in subscriptionLists[subscriptionList]) {
       entries = subscriptionLists[subscriptionList][subscription].rawRuleset.toJSON()['entries'];

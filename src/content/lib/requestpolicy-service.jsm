@@ -364,7 +364,7 @@ let rpService = (function() {
         serials[listName][subName] = -1;
       }
     }
-    var loadedSubs = PolicyManager._subscriptionRulesets;
+    var loadedSubs = PolicyManager.getSubscriptionRulesets();
     for (var listName in loadedSubs) {
       for (var subName in loadedSubs[listName]) {
         if (!serials[listName]) {

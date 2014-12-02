@@ -80,268 +80,262 @@ function notifyRulesChanged() {
  * rulesets, checking requests against multiple rulesets, etc.
  */
 let PolicyManager = (function() {
-  // private variables and functions
+  let self = {};
 
 
+  self._userRulesets = {};
+  self._subscriptionRulesets = {};
 
-  let self = {
-    // public attributes and methods
+  //self._rulesets = null;
 
-    _userRulesets: {},
-    _subscriptionRulesets: {},
+  self.getUserRuleCount = function() {
+    return self._userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
+        self._userRulesets["user"]["rawRuleset"].getDenyRuleCount();
+  };
 
-    //_rulesets : null,
+  self.loadUserRules = function() {
+    let rawRuleset;
+    // Read the user rules from a file.
+    try {
+      dprint("PolicyManager::loadUserRules loading user rules");
+      rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
+    } catch (e) {
+      // TODO: log a message about missing user.json ruleset file.
+      // There's no user ruleset. This is either because RP has just been
+      // installed, the file has been deleted, or something is wrong. For now,
+      // we'll assume this is a new install.
+      rawRuleset = new RawRuleset();
+    }
+    self._userRulesets["user"] = {
+      "rawRuleset" : rawRuleset,
+      "ruleset" : rawRuleset.toRuleset("user")
+    };
+    self._userRulesets["user"]["ruleset"].userRuleset = true;
+    self._userRulesets["user"].ruleset.print();
+    // Temporary rules. These are never stored.
+    self.revokeTemporaryRules();
 
-    getUserRuleCount : function() {
-      return self._userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
-          self._userRulesets["user"]["rawRuleset"].getDenyRuleCount();
-    },
+    notifyRulesChanged();
+  };
 
-    loadUserRules : function() {
-      let rawRuleset;
-      // Read the user rules from a file.
-      try {
-        dprint("PolicyManager::loadUserRules loading user rules");
-        rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
-      } catch (e) {
-        // TODO: log a message about missing user.json ruleset file.
-        // There's no user ruleset. This is either because RP has just been
-        // installed, the file has been deleted, or something is wrong. For now,
-        // we'll assume this is a new install.
-        rawRuleset = new RawRuleset();
-      }
-      self._userRulesets["user"] = {
-        "rawRuleset" : rawRuleset,
-        "ruleset" : rawRuleset.toRuleset("user")
-      };
-      self._userRulesets["user"]["ruleset"].userRuleset = true;
-      self._userRulesets["user"].ruleset.print();
-      // Temporary rules. These are never stored.
-      self.revokeTemporaryRules();
+  self.loadSubscriptionRules = function(subscriptionInfo) {
+    var failures = {};
 
-      notifyRulesChanged();
-    },
-
-    loadSubscriptionRules : function(subscriptionInfo) {
-      var failures = {};
-
-      // Read each subscription from a file.
-      var rawRuleset;
-      for (var listName in subscriptionInfo) {
-        for (var subName in subscriptionInfo[listName]) {
-          try {
-            dprint("PolicyManager::loadSubscriptionRules: " +
-                   listName + ' / ' + subName);
-            rawRuleset = RulesetStorage
-                .loadRawRulesetFromFile(subName + ".json", listName);
-          } catch (e) {
-            warn("Unable to load ruleset from file: " + e);
-            if (!failures[listName]) {
-              failures[listName] = {};
-            }
-            failures[listName][subName] = null;
-            continue;
+    // Read each subscription from a file.
+    var rawRuleset;
+    for (var listName in subscriptionInfo) {
+      for (var subName in subscriptionInfo[listName]) {
+        try {
+          dprint("PolicyManager::loadSubscriptionRules: " +
+                 listName + ' / ' + subName);
+          rawRuleset = RulesetStorage
+              .loadRawRulesetFromFile(subName + ".json", listName);
+        } catch (e) {
+          warn("Unable to load ruleset from file: " + e);
+          if (!failures[listName]) {
+            failures[listName] = {};
           }
-          if (!self._subscriptionRulesets[listName]) {
-            self._subscriptionRulesets[listName] = {};
-          }
-          var list = self._subscriptionRulesets[listName];
-          list[subName] = {
-            "rawRuleset" : rawRuleset,
-            "ruleset" : rawRuleset.toRuleset(subName)
-          };
-          list[subName]["ruleset"].userRuleset = false;
-          list[subName].ruleset.print();
+          failures[listName][subName] = null;
+          continue;
         }
-      }
-
-      notifyRulesChanged();
-
-      return failures;
-    },
-
-    unloadSubscriptionRules : function(subscriptionInfo) {
-      var failures = {};
-
-      for (var listName in subscriptionInfo) {
-        for (var subName in subscriptionInfo[listName]) {
-          dprint("PolicyManager::unloadSubscriptionRules: " +
-                   listName + ' / ' + subName);
-          if (!self._subscriptionRulesets[listName] ||
-              !self._subscriptionRulesets[listName][subName]) {
-            if (!failures[listName]) {
-              failures[listName] = {};
-            }
-            failures[listName][subName] = null;
-            continue;
-          }
-          var list = self._subscriptionRulesets[listName];
-          delete list[subName];
+        if (!self._subscriptionRulesets[listName]) {
+          self._subscriptionRulesets[listName] = {};
         }
+        var list = self._subscriptionRulesets[listName];
+        list[subName] = {
+          "rawRuleset" : rawRuleset,
+          "ruleset" : rawRuleset.toRuleset(subName)
+        };
+        list[subName]["ruleset"].userRuleset = false;
+        list[subName].ruleset.print();
       }
+    }
 
-      notifyRulesChanged();
+    notifyRulesChanged();
 
-      return failures;
-    },
+    return failures;
+  };
 
-    _assertRuleAction : function(ruleAction) {
-      if (ruleAction != RULE_ACTION_ALLOW && ruleAction != RULE_ACTION_DENY) {
-        throw "Invalid rule type: " + ruleAction;
+  self.unloadSubscriptionRules = function(subscriptionInfo) {
+    var failures = {};
+
+    for (var listName in subscriptionInfo) {
+      for (var subName in subscriptionInfo[listName]) {
+        dprint("PolicyManager::unloadSubscriptionRules: " +
+                 listName + ' / ' + subName);
+        if (!self._subscriptionRulesets[listName] ||
+            !self._subscriptionRulesets[listName][subName]) {
+          if (!failures[listName]) {
+            failures[listName] = {};
+          }
+          failures[listName][subName] = null;
+          continue;
+        }
+        var list = self._subscriptionRulesets[listName];
+        delete list[subName];
       }
-    },
+    }
 
-    ruleExists : function(ruleAction, ruleData) {
-      self._assertRuleAction(ruleAction);
-      for (var name in self._userRulesets) {
-        if (self._userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
+    notifyRulesChanged();
+
+    return failures;
+  };
+
+  self._assertRuleAction = function(ruleAction) {
+    if (ruleAction != RULE_ACTION_ALLOW && ruleAction != RULE_ACTION_DENY) {
+      throw "Invalid rule type: " + ruleAction;
+    }
+  };
+
+  self.ruleExists = function(ruleAction, ruleData) {
+    self._assertRuleAction(ruleAction);
+    for (var name in self._userRulesets) {
+      if (self._userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
+        return true;
+      }
+    }
+    for (var listName in self._subscriptionRulesets) {
+      var rulesets = self._subscriptionRulesets[listName];
+      for (var name in rulesets) {
+        if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
         }
       }
-      for (var listName in self._subscriptionRulesets) {
-        var rulesets = self._subscriptionRulesets[listName];
-        for (var name in rulesets) {
-          if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    },
+    }
+    return false;
+  };
 
-    addRule : function(ruleAction, ruleData, noStore) {
-      dprint("PolicyManager::addRule " + ruleAction + " "
-             + Ruleset.rawRuleToCanonicalString(ruleData));
-      //self._userRulesets["user"].ruleset.print();
+  self.addRule = function(ruleAction, ruleData, noStore) {
+    dprint("PolicyManager::addRule " + ruleAction + " "
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //self._userRulesets["user"].ruleset.print();
 
-      self._assertRuleAction(ruleAction);
-      // TODO: check rule format validity
-      self._userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
-            self._userRulesets["user"].ruleset);
+    self._assertRuleAction(ruleAction);
+    // TODO: check rule format validity
+    self._userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
+          self._userRulesets["user"].ruleset);
 
-      // TODO: only save if we actually added a rule. This will require
-      // modifying |RawRuleset.addRule()| to indicate whether a rule
-      // was added.
-      // TODO: can we do this in the background and add some locking? It will
-      // become annoying when there is a large file to write.
-      if (!noStore) {
-          RulesetStorage.saveRawRulesetToFile(
-              self._userRulesets["user"].rawRuleset, "user.json");
-      }
-
-      //self._userRulesets["user"].ruleset.print();
-
-      notifyRulesChanged();
-    },
-
-    storeRules : function() {
-      RulesetStorage.saveRawRulesetToFile(
-          self._userRulesets["user"].rawRuleset, "user.json");
-    },
-
-    addTemporaryRule : function(ruleAction, ruleData) {
-      dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
-             + Ruleset.rawRuleToCanonicalString(ruleData));
-      //self._userRulesets["temp"].ruleset.print();
-
-      self._assertRuleAction(ruleAction);
-      // TODO: check rule format validity
-      self._userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
-            self._userRulesets["temp"].ruleset);
-
-      //self._userRulesets["temp"].ruleset.print();
-
-      notifyRulesChanged();
-    },
-
-    removeRule : function(ruleAction, ruleData, noStore) {
-      dprint("PolicyManager::removeRule " + ruleAction + " "
-             + Ruleset.rawRuleToCanonicalString(ruleData));
-      //self._userRulesets["user"].ruleset.print();
-      //self._userRulesets["temp"].ruleset.print();
-
-      self._assertRuleAction(ruleAction);
-      // TODO: check rule format validity
-      // TODO: use noStore
-      self._userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
-            self._userRulesets["user"].ruleset);
-      self._userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
-            self._userRulesets["temp"].ruleset);
-
-      // TODO: only save if we actually removed a rule. This will require
-      // modifying |RawRuleset.removeRule()| to indicate whether a rule
-      // was removed.
-      // TODO: can we do this in the background and add some locking? It will
-      // become annoying when there is a large file to write.
-      if (!noStore) {
-          RulesetStorage.saveRawRulesetToFile(
-              self._userRulesets["user"].rawRuleset, "user.json");
-      }
-
-      //self._userRulesets["user"].ruleset.print();
-      //self._userRulesets["temp"].ruleset.print();
-
-      notifyRulesChanged();
-    },
-
-    temporaryRulesExist : function() {
-      return self._userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
-             self._userRulesets["temp"].rawRuleset.getDenyRuleCount();
-    },
-
-    revokeTemporaryRules : function() {
-      var rawRuleset = new RawRuleset();
-      self._userRulesets["temp"] = {
-        "rawRuleset" : rawRuleset,
-        "ruleset" : rawRuleset.toRuleset("temp")
-      };
-      self._userRulesets["temp"]["ruleset"].userRuleset = true;
-
-      notifyRulesChanged();
-    },
-
-    checkRequestAgainstUserRules : function(origin, dest) {
-      return self._checkRequest(origin, dest, self._userRulesets);
-    },
-
-    checkRequestAgainstSubscriptionRules : function(origin, dest) {
-      var result = new RequestResult();
-      for (var listName in self._subscriptionRulesets) {
-        var ruleset = self._subscriptionRulesets[listName];
-        self._checkRequest(origin, dest, ruleset, result);
-      }
-      return result;
-    },
-
-    _checkRequest : function(origin, dest, aRuleset, result) {
-      if (!(origin instanceof Ci.nsIURI)) {
-        throw "Origin must be an nsIURI.";
-      }
-      if (!(dest instanceof Ci.nsIURI)) {
-        throw "Destination must be an nsIURI.";
-      }
-      if (!result) {
-        result = new RequestResult();
-      }
-      for (var i in aRuleset) {
-        var ruleset = aRuleset[i].ruleset;
-        //ruleset.setPrintFunction(print);
-        //ruleset.print();
-        var tempAllow, tempDeny;
-        // TODO wrap this in a try/catch.
-        [tempAllow, tempDeny] = ruleset.check(origin, dest);
-        // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
-        // but it works for now.
-        for (var i in tempAllow) {
-          result.matchedAllowRules.push([ruleset, tempAllow[i]]);
-        }
-        for (var i in tempDeny) {
-          result.matchedDenyRules.push([ruleset, tempDeny[i]]);
-        }
-      }
-      return result;
+    // TODO: only save if we actually added a rule. This will require
+    // modifying |RawRuleset.addRule()| to indicate whether a rule
+    // was added.
+    // TODO: can we do this in the background and add some locking? It will
+    // become annoying when there is a large file to write.
+    if (!noStore) {
+        RulesetStorage.saveRawRulesetToFile(
+            self._userRulesets["user"].rawRuleset, "user.json");
     }
 
+    //self._userRulesets["user"].ruleset.print();
+
+    notifyRulesChanged();
+  };
+
+  self.storeRules = function() {
+    RulesetStorage.saveRawRulesetToFile(
+        self._userRulesets["user"].rawRuleset, "user.json");
+  };
+
+  self.addTemporaryRule = function(ruleAction, ruleData) {
+    dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //self._userRulesets["temp"].ruleset.print();
+
+    self._assertRuleAction(ruleAction);
+    // TODO: check rule format validity
+    self._userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
+          self._userRulesets["temp"].ruleset);
+
+    //self._userRulesets["temp"].ruleset.print();
+
+    notifyRulesChanged();
+  };
+
+  self.removeRule = function(ruleAction, ruleData, noStore) {
+    dprint("PolicyManager::removeRule " + ruleAction + " "
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //self._userRulesets["user"].ruleset.print();
+    //self._userRulesets["temp"].ruleset.print();
+
+    self._assertRuleAction(ruleAction);
+    // TODO: check rule format validity
+    // TODO: use noStore
+    self._userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
+          self._userRulesets["user"].ruleset);
+    self._userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
+          self._userRulesets["temp"].ruleset);
+
+    // TODO: only save if we actually removed a rule. This will require
+    // modifying |RawRuleset.removeRule()| to indicate whether a rule
+    // was removed.
+    // TODO: can we do this in the background and add some locking? It will
+    // become annoying when there is a large file to write.
+    if (!noStore) {
+        RulesetStorage.saveRawRulesetToFile(
+            self._userRulesets["user"].rawRuleset, "user.json");
+    }
+
+    //self._userRulesets["user"].ruleset.print();
+    //self._userRulesets["temp"].ruleset.print();
+
+    notifyRulesChanged();
+  };
+
+  self.temporaryRulesExist = function() {
+    return self._userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
+           self._userRulesets["temp"].rawRuleset.getDenyRuleCount();
+  };
+
+  self.revokeTemporaryRules = function() {
+    var rawRuleset = new RawRuleset();
+    self._userRulesets["temp"] = {
+      "rawRuleset" : rawRuleset,
+      "ruleset" : rawRuleset.toRuleset("temp")
+    };
+    self._userRulesets["temp"]["ruleset"].userRuleset = true;
+
+    notifyRulesChanged();
+  };
+
+  self.checkRequestAgainstUserRules = function(origin, dest) {
+    return self._checkRequest(origin, dest, self._userRulesets);
+  };
+
+  self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
+    var result = new RequestResult();
+    for (var listName in self._subscriptionRulesets) {
+      var ruleset = self._subscriptionRulesets[listName];
+      self._checkRequest(origin, dest, ruleset, result);
+    }
+    return result;
+  };
+
+  self._checkRequest = function(origin, dest, aRuleset, result) {
+    if (!(origin instanceof Ci.nsIURI)) {
+      throw "Origin must be an nsIURI.";
+    }
+    if (!(dest instanceof Ci.nsIURI)) {
+      throw "Destination must be an nsIURI.";
+    }
+    if (!result) {
+      result = new RequestResult();
+    }
+    for (var i in aRuleset) {
+      var ruleset = aRuleset[i].ruleset;
+      //ruleset.setPrintFunction(print);
+      //ruleset.print();
+      var tempAllow, tempDeny;
+      // TODO wrap this in a try/catch.
+      [tempAllow, tempDeny] = ruleset.check(origin, dest);
+      // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
+      // but it works for now.
+      for (var i in tempAllow) {
+        result.matchedAllowRules.push([ruleset, tempAllow[i]]);
+      }
+      for (var i in tempDeny) {
+        result.matchedDenyRules.push([ruleset, tempDeny[i]]);
+      }
+    }
+    return result;
   };
 
   return self;

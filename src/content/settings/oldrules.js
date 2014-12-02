@@ -99,7 +99,7 @@ function handleAddHostWildcardsChange(event) {
 }
 
 function onload() {
-  var oldRulesExist = rpService.oldRulesExist();
+  var oldRulesExist = Prefs.oldRulesExist();
   if (!oldRulesExist) {
     $('#hasrules').hide();
     $('#norules').show();

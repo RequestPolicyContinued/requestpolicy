@@ -204,9 +204,9 @@ common.clearPref = function (pref) {
 common.addAllowRules = function (rules) {
   for (var i in rules) {
     var ruleData = rules[i];
-    rpService.addAllowRule(ruleData, true);
+    PolicyManager.addAllowRule(ruleData, true);
   }
-  rpService.storeRules();
+  PolicyManager.storeRules();
 };
 
 common.localize = function(stringNames) {

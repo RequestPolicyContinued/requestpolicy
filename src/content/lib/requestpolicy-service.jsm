@@ -496,161 +496,12 @@ let rpService = (function() {
     // nsIRequestPolicy interface
     // /////////////////////////////////////////////////////////////////////////
 
-    getUriIdentifier : function(uri) {
-      return DomainUtil.getIdentifier(uri);
-    },
-
-    registerHistoryRequest : function(destinationUrl) {
-      RequestProcessor.registerHistoryRequest(destinationUrl);
-    },
-
-    registerFormSubmitted : function(originUrl, destinationUrl) {
-      RequestProcessor.registerFormSubmitted(originUrl, destinationUrl);
-    },
-
-    registerLinkClicked : function(originUrl, destinationUrl) {
-      RequestProcessor.registerLinkClicked(originUrl, destinationUrl);
-    },
-
-    registerAllowedRedirect : function(originUrl, destinationUrl) {
-      RequestProcessor.registerAllowedRedirect(originUrl, destinationUrl);
-    },
-
-    storeRules : function() {
-      PolicyManager.storeRules();
-    },
-
-    addAllowRule : function(rawRule, noStore) {
-      PolicyManager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
-    },
-
-    addTemporaryAllowRule : function(rawRule) {
-      PolicyManager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule);
-    },
-
-    removeAllowRule : function(rawRule) {
-      PolicyManager.removeRule(RULE_ACTION_ALLOW, rawRule);
-    },
-
-    addDenyRule : function(rawRule) {
-      PolicyManager.addRule(RULE_ACTION_DENY, rawRule);
-    },
-
-    addTemporaryDenyRule : function(rawRule) {
-      PolicyManager.addTemporaryRule(RULE_ACTION_DENY, rawRule);
-    },
-
-    removeDenyRule : function(rawRule) {
-      PolicyManager.removeRule(RULE_ACTION_DENY, rawRule);
-    },
-
-    _allowOrigin : function(host, noStore) {
-      var ruleData = {"o":{"h":host}};
-      PolicyManager.addRule(RULE_ACTION_ALLOW, ruleData, noStore);
-    },
-
-    allowOrigin : function(host) {
-      self._allowOrigin(host, false);
-    },
-
-    allowOriginDelayStore : function(host) {
-      self._allowOrigin(host, true);
-    },
-
-    temporarilyAllowOrigin : function(host) {
-      var ruleData = {"o": {"h" : host}};
-      PolicyManager.addTemporaryRule(RULE_ACTION_ALLOW, ruleData);
-    },
-
-    _allowDestination : function(host, noStore) {
-      var ruleData = {"d": {"h" : host}};
-      PolicyManager.addRule(RULE_ACTION_ALLOW, ruleData, noStore);
-    },
-
-    allowDestination : function(host) {
-      self._allowDestination(host, false);
-    },
-
-    allowDestinationDelayStore : function(host) {
-      self._allowDestination(host, true);
-    },
-
-    temporarilyAllowDestination : function(host) {
-      var ruleData = {"d": {"h" : host}};
-      PolicyManager.addTemporaryRule(RULE_ACTION_ALLOW, ruleData);
-    },
-
-    _allowOriginToDestination : function(originIdentifier, destIdentifier,
-        noStore) {
-      var ruleData = {
-        "o": {"h" : originIdentifier},
-        "d": {"h" : destIdentifier}
-      };
-      PolicyManager.addRule(RULE_ACTION_ALLOW, ruleData, noStore);
-    },
-
-    allowOriginToDestination : function(originIdentifier, destIdentifier) {
-      self._allowOriginToDestination(originIdentifier, destIdentifier, false);
-    },
-
-    allowOriginToDestinationDelayStore : function(originIdentifier,
-                                                  destIdentifier) {
-      self._allowOriginToDestination(originIdentifier, destIdentifier, true);
-    },
-
-    temporarilyAllowOriginToDestination : function(originIdentifier,
-                                                   destIdentifier) {
-      var ruleData = {
-        "o": {"h" : originIdentifier},
-        "d": {"h" : destIdentifier}
-      };
-      PolicyManager.addTemporaryRule(RULE_ACTION_ALLOW, ruleData);
-    },
-
-    temporaryRulesExist : function() {
-      return PolicyManager.temporaryRulesExist();
-    },
-
-    revokeTemporaryPermissions : function() {
-      PolicyManager.revokeTemporaryRules();
-    },
-
-    isAllowedRedirect : function(originUri, destinationUri) {
-      return RequestProcessor.isAllowedRedirect(originUri, destinationUri);
-    },
-
-    /**
-     * Determines whether the user has granted any temporary permissions. This
-     * does not include temporarily disabling all blocking.
-     *
-     * @return {Boolean} true if any temporary permissions have been granted,
-     *         false otherwise.
-     */
-    areTemporaryPermissionsGranted : function() {
-      return PolicyManager.temporaryRulesExist();
-    },
-
     getConflictingExtensions : function() {
       return conflictingExtensions;
     },
 
     getTopLevelDocTranslations : function() {
       return topLevelDocTranslationRules;
-    },
-
-    oldRulesExist : function() {
-      function prefEmpty(pref) {
-        try {
-          var value = Prefs.prefs
-              .getComplexValue(pref, Ci.nsISupportsString).data;
-          return value == '';
-        } catch (e) {
-          return true;
-        }
-      }
-      return !(prefEmpty('allowedOrigins') &&
-               prefEmpty('allowedDestinations') &&
-               prefEmpty('allowedOriginsToDestinations'));
     },
 
     /**
@@ -732,7 +583,7 @@ let rpService = (function() {
             self._privateBrowsingEnabled = true;
           } else if (data == "exit") {
             self._privateBrowsingEnabled = false;
-            self.revokeTemporaryPermissions();
+            PolicyManager.revokeTemporaryRules();
           }
           break;
         default :

@@ -115,7 +115,7 @@ requestpolicy.menu = (function() {
         document.getElementById('rp-link-disable-blocking').hidden = disabled;
 
         document.getElementById('rp-revoke-temporary-permissions').hidden =
-            !rpService.temporaryRulesExist();
+            !PolicyManager.temporaryRulesExist();
 
         self._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
 
@@ -641,22 +641,22 @@ requestpolicy.menu = (function() {
 
       switch (ruleAction) {
         case 'allow':
-          requestpolicy.overlay.addAllowRule(ruleData);
+          PolicyManager.addAllowRule(ruleData);
           break;
         case 'allow-temp':
-          requestpolicy.overlay.addTemporaryAllowRule(ruleData);
+          PolicyManager.addTemporaryAllowRule(ruleData);
           break;
         case 'stop-allow':
-          requestpolicy.overlay.removeAllowRule(ruleData);
+          PolicyManager.removeAllowRule(ruleData);
           break;
         case 'deny':
-          requestpolicy.overlay.addDenyRule(ruleData);
+          PolicyManager.addDenyRule(ruleData);
           break;
         case 'deny-temp':
-          requestpolicy.overlay.addTemporaryDenyRule(ruleData);
+          PolicyManager.addTemporaryDenyRule(ruleData);
           break;
         case 'stop-deny':
-          requestpolicy.overlay.removeDenyRule(ruleData);
+          PolicyManager.removeDenyRule(ruleData);
           break;
         default:
           throw 'action not implemented: ' + ruleAction;

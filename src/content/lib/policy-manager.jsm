@@ -79,8 +79,7 @@ function notifyRulesChanged() {
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-let PolicyManager = (function() {
-  let self = {};
+let PolicyManager = (function(self) {
 
 
   let userRulesets = {};
@@ -343,7 +342,11 @@ let PolicyManager = (function() {
       }
     }
     return result;
-  }
+  };
 
   return self;
-}());
+}(PolicyManager || {}));
+
+
+Services.scriptloader.loadSubScript(
+    "chrome://requestpolicy/content/lib/policy-manager.alias-functions.js");

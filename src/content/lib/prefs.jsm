@@ -112,6 +112,7 @@ let DefaultPrefInit = (function() {
 
 
 let Prefs = (function() {
+  let self = {};
 
 
   let defaultAllow = true;
@@ -223,12 +224,10 @@ let Prefs = (function() {
     syncFromPrefs();
   }
 
-  let self = {
-    prefs: null,
-    prefsRoot: null,
-    save: function() {
-      Services.prefs.savePrefFile(null);
-    }
+  self.prefs = null;
+  self.prefsRoot = null;
+  self.save = function() {
+    Services.prefs.savePrefFile(null);
   };
 
   self.isDefaultAllow = function() {
@@ -254,6 +253,23 @@ let Prefs = (function() {
       return self.prefsRoot.getBoolPref("network.prefetch-next");
     }
   };
+
+
+  function isPrefEmpty(pref) {
+    try {
+      let value = self.prefs.getComplexValue(pref, Ci.nsISupportsString).data;
+      return value == '';
+    } catch (e) {
+      return true;
+    }
+  }
+
+  self.oldRulesExist = function() {
+    return !(isPrefEmpty('allowedOrigins') &&
+             isPrefEmpty('allowedDestinations') &&
+             isPrefEmpty('allowedOriginsToDestinations'));
+  };
+
 
   init();
 

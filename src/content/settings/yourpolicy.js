@@ -87,9 +87,9 @@ function deleteRule(event) {
   var ruleAction = anchor.data('requestpolicyRuleAction');
   var ruleData = anchor.data('requestpolicyRuleData');
   if (ruleAction == 'allow') {
-    rpService.removeAllowRule(ruleData);
+    PolicyManager.removeAllowRule(ruleData);
   } else {
-    rpService.removeDenyRule(ruleData);
+    PolicyManager.removeDenyRule(ruleData);
   }
   anchor.closest('tr').remove();
 }
@@ -201,15 +201,15 @@ function addRuleHelper() {
   }
   if (allow) {
     if (temporary) {
-      rpService.addTemporaryAllowRule(ruleData);
+      PolicyManager.addTemporaryAllowRule(ruleData);
     } else {
-      rpService.addAllowRule(ruleData);
+      PolicyManager.addAllowRule(ruleData);
     }
   } else {
     if (temporary) {
-      rpService.addTemporaryDenyRule(ruleData);
+      PolicyManager.addTemporaryDenyRule(ruleData);
     } else {
-      rpService.addDenyRule(ruleData);
+      PolicyManager.addDenyRule(ruleData);
     }
   }
 }
@@ -227,7 +227,7 @@ function onload() {
     }, SEARCH_DELAY);
   }, false);
   populateRuleTable(search.value);
-  if (rpService.oldRulesExist()) {
+  if (Prefs.oldRulesExist()) {
     $('#oldrulesexist').show();
   }
 

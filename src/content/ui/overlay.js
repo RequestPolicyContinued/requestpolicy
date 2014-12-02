@@ -42,11 +42,13 @@ requestpolicy.overlay = (function() {
     "request-processor",
     "domain-util",
     "utils",
-    "requestpolicy-service"
+    "requestpolicy-service",
+    "policy-manager"
   ], mod);
   let Logger = mod.Logger, Prefs = mod.Prefs,
       RequestProcessor = mod.RequestProcessor, DomainUtil = mod.DomainUtil,
-      Utils = mod.Utils, rpService = mod.rpService;
+      Utils = mod.Utils, rpService = mod.rpService,
+      PolicyManager = mod.PolicyManager;
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
 
@@ -211,7 +213,7 @@ requestpolicy.overlay = (function() {
             // I believe an empty href always gets filled in with the current URL so
             // it will never actually be empty. However, I don't know this for certain.
             if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
-              rpService.registerLinkClicked(
+              RequestProcessor.registerLinkClicked(
                   event.target.ownerDocument.URL, event.target.href);
               return;
             }
@@ -221,7 +223,7 @@ requestpolicy.overlay = (function() {
             if (event.target.nodeName.toLowerCase() == "input" &&
                 event.target.type.toLowerCase() == "submit" &&
                 event.target.form && event.target.form.action) {
-              rpService.registerFormSubmitted(
+              RequestProcessor.registerFormSubmitted(
                 event.target.ownerDocument.URL, event.target.form.action);
               return;
             }
@@ -431,7 +433,8 @@ requestpolicy.overlay = (function() {
                 location = content.location;
               }
               // Fx 3.7a5+ calls shouldLoad for location.href changes.
-              rpService.registerAllowedRedirect(location.href, redirectTargetUri);
+              RequestProcessor.registerAllowedRedirect(location.href,
+                                                       redirectTargetUri);
               location.href = redirectTargetUri;
             }
           },
@@ -858,7 +861,7 @@ requestpolicy.overlay = (function() {
     _htmlAnchorTagClicked: function(event) {
       // Note: need to use currentTarget so that it is the link, not
       // something else within the link that got clicked, it seems.
-      rpService.registerLinkClicked(event.currentTarget.ownerDocument.URL,
+      RequestProcessor.registerLinkClicked(event.currentTarget.ownerDocument.URL,
           event.currentTarget.href);
     },
 
@@ -907,7 +910,7 @@ requestpolicy.overlay = (function() {
           // just detect when they will be blocked and show a notification. If
           // the docShell has allowMetaRedirects disabled, it will be respected.
           if (!Prefs.isBlockingDisabled()
-              && !rpService.isAllowedRedirect(document.location.href, dest)) {
+              && !RequestProcessor.isAllowedRedirect(document.location.href, dest)) {
             // Ignore redirects to javascript. The browser will ignore them, as well.
             if (DomainUtil.getUriObject(dest).schemeIs("javascript")) {
               Logger.warning(Logger.TYPE_META_REFRESH,
@@ -995,7 +998,7 @@ requestpolicy.overlay = (function() {
         gContextMenu.requestpolicyMethodsOverridden = true;
 
         gContextMenu.openLink = function() {
-          rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
           return this.__proto__.openLink.call(this); // call the overridden method
         };
 
@@ -1004,14 +1007,14 @@ requestpolicy.overlay = (function() {
 
         if (gContextMenu.openLinkInPrivateWindow) {
           gContextMenu.openLinkInPrivateWindow = function() {
-            rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+            RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
             return this.__proto__.openLinkInPrivateWindow.call(this);
           };
         }
 
         if (gContextMenu.openLinkInCurrent) {
           gContextMenu.openLinkInCurrent = function() {
-            rpService.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
+            RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
             return this.__proto__.openLinkInCurrent.call(this);
           };
         }
@@ -1079,7 +1082,7 @@ requestpolicy.overlay = (function() {
         }
       }
       if (referrerURI) {
-        rpService.registerLinkClicked(referrerURI.spec, url);
+        RequestProcessor.registerLinkClicked(referrerURI.spec, url);
       }
     },
 
@@ -1101,7 +1104,7 @@ requestpolicy.overlay = (function() {
       if (!window.requestpolicyOrigOpen) {
         window.requestpolicyOrigOpen = window.open;
         window.open = function(url, windowName, windowFeatures) {
-          rpService.registerLinkClicked(window.document.documentURI, url);
+          RequestProcessor.registerLinkClicked(window.document.documentURI, url);
           return window.requestpolicyOrigOpen(url, windowName, windowFeatures);
         };
       }
@@ -1110,7 +1113,7 @@ requestpolicy.overlay = (function() {
         window.requestpolicyOrigOpenDialog = window.openDialog;
         window.openDialog = function() {
           // openDialog(url, name, features, arg1, arg2, ...)
-          rpService.registerLinkClicked(window.document.documentURI,
+          RequestProcessor.registerLinkClicked(window.document.documentURI,
               arguments[0]);
           return window.requestpolicyOrigOpenDialog.apply(window, arguments);
         };
@@ -1154,18 +1157,18 @@ requestpolicy.overlay = (function() {
       // Implements nsISHistoryListener (and nsISupportsWeakReference)
       self.historyListener = {
         OnHistoryGoBack : function(backURI) {
-          rpService.registerHistoryRequest(backURI.asciiSpec);
+          RequestProcessor.registerHistoryRequest(backURI.asciiSpec);
           return true;
         },
 
         OnHistoryGoForward : function(forwardURI) {
-          rpService.registerHistoryRequest(forwardURI.asciiSpec);
+          RequestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
           return true;
         },
 
         OnHistoryGotoIndex : function(index, gotoURI) {
-          rpService.registerHistoryRequest(gotoURI.asciiSpec);
-          return true;
+          RequestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
+   return true;
         },
 
         OnHistoryNewEntry : function(newURI) {
@@ -1312,7 +1315,7 @@ requestpolicy.overlay = (function() {
      * duration of the browser session.
      */
     temporarilyAllowOrigin: function(originHost) {
-      rpService.temporarilyAllowOrigin(originHost);
+      PolicyManager.temporarilyAllowOrigin(originHost);
     },
 
     /**
@@ -1326,7 +1329,7 @@ requestpolicy.overlay = (function() {
       // Note: the available variable "content" is different than the avaialable
       // "window.target".
       var host = self.getTopLevelDocumentUriIdentifier();
-      rpService.temporarilyAllowOrigin(host);
+      PolicyManager.temporarilyAllowOrigin(host);
     },
 
     /**
@@ -1337,7 +1340,7 @@ requestpolicy.overlay = (function() {
      *          destHost
      */
     temporarilyAllowDestination: function(destHost) {
-      rpService.temporarilyAllowDestination(destHost);
+      PolicyManager.temporarilyAllowDestination(destHost);
     },
 
     /**
@@ -1350,14 +1353,14 @@ requestpolicy.overlay = (function() {
      *          destHost
      */
     temporarilyAllowOriginToDestination: function(originHost, destHost) {
-      rpService.temporarilyAllowOriginToDestination(originHost, destHost);
+      PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
     },
 
     /**
      * Allows requests from an origin, including in future browser sessions.
      */
     allowOrigin: function(originHost) {
-      rpService.allowOrigin(originHost);
+      PolicyManager.allowOrigin(originHost);
     },
 
     /**
@@ -1369,7 +1372,7 @@ requestpolicy.overlay = (function() {
      */
     allowCurrentOrigin: function(event) {
       var host = self.getTopLevelDocumentUriIdentifier();
-      rpService.allowOrigin(host);
+      PolicyManager.allowOrigin(host);
     },
 
     /**
@@ -1379,7 +1382,7 @@ requestpolicy.overlay = (function() {
      *          destHost
      */
     allowDestination: function(destHost) {
-      rpService.allowDestination(destHost);
+      PolicyManager.allowDestination(destHost);
     },
 
     /**
@@ -1392,7 +1395,7 @@ requestpolicy.overlay = (function() {
      *          destHost
      */
     allowOriginToDestination: function(originHost, destHost) {
-      rpService.allowOriginToDestination(originHost, destHost);
+      PolicyManager.allowOriginToDestination(originHost, destHost);
     },
 
     /**
@@ -1441,30 +1444,6 @@ requestpolicy.overlay = (function() {
       rpService.forbidOriginToDestination(originHost, destHost);
     },
 
-    addAllowRule: function(ruleData) {
-      rpService.addAllowRule(ruleData);
-    },
-
-    addTemporaryAllowRule: function(ruleData) {
-      rpService.addTemporaryAllowRule(ruleData);
-    },
-
-    removeAllowRule: function(ruleData) {
-      rpService.removeAllowRule(ruleData);
-    },
-
-    addDenyRule: function(ruleData) {
-      rpService.addDenyRule(ruleData);
-    },
-
-    addTemporaryDenyRule: function(ruleData) {
-      rpService.addTemporaryDenyRule(ruleData);
-    },
-
-    removeDenyRule: function(ruleData) {
-      rpService.removeDenyRule(ruleData);
-    },
-
     /**
      * Revokes all temporary permissions granted during the current session.
      *
@@ -1472,7 +1451,7 @@ requestpolicy.overlay = (function() {
      *          event
      */
     revokeTemporaryPermissions: function(event) {
-      rpService.revokeTemporaryPermissions();
+      PolicyManager.revokeTemporaryRules();
       self._needsReloadOnMenuClose = true;
       var popup = document.getElementById('rp-popup');
       popup.hidePopup();

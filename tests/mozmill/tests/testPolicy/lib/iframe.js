@@ -44,8 +44,12 @@ Iframe.prototype.doChecks = function() {
   assert.ok(hasRequestBeenAllowed === shouldRequestHaveBeenAllowed, text);
 };
 Iframe.prototype.accumulateNumRequests = function(numRequestCounter) {
+  let isAllowed = this.hasIframeRequestBeenAllowed();
   numRequestCounter.accumulate(this.ownerHostname, this.iframeSrcHostname, 1,
-      this.hasIframeRequestBeenAllowed());
+      isAllowed);
+  //if (isAllowed) {
+  //  NumRequestsCounter.accumulateAdditionalRequestsToSamedomain(doc);
+  //}
 };
 
 
@@ -64,6 +68,26 @@ function* allIframesOnDocument(doc) {
   }
 }
 
+function* recursivelyGetAllDocs(aDoc) {
+  yield aDoc;
+
+  for (let iframe of allIframesOnDocument(aDoc)) {
+    if (iframe.hasIframeRequestBeenAllowed()) {
+      yield* recursivelyGetAllDocs(iframe.getContentDocument());
+    }
+  }
+}
+
+function* recursivelyGetAllDOMNodesWithRequests(aDoc) {
+  for (let doc of allIframesOnDocument(aDoc)) {
+    for (let node of doc.querySelectorAll("[src]")) {
+      yield node;
+    }
+  }
+}
 
 exports.Iframe = Iframe;
 exports.allIframesOnDocument = allIframesOnDocument;
+exports.recursivelyGetAllDocs = recursivelyGetAllDocs;
+exports.recursivelyGetAllDOMNodesWithRequests =
+    recursivelyGetAllDOMNodesWithRequests;

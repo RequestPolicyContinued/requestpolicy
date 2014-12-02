@@ -23,21 +23,23 @@
 
 let EXPORTED_SYMBOLS = ["rpWindowManager"];
 
+let globalScope = this;
+
 let rpWindowManager = (function(self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  Cu.import("resource://gre/modules/Services.jsm", this);
-  Cu.import("resource://gre/modules/XPCOMUtils.jsm", this);
+  Cu.import("resource://gre/modules/Services.jsm", globalScope);
+  Cu.import("resource://gre/modules/XPCOMUtils.jsm", globalScope);
 
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", this);
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
     "utils",
     "xul-utils",
     "constants"
-  ], this);
+  ], globalScope);
 
   let styleSheets = [
     "chrome://requestpolicy/skin/requestpolicy.css",
@@ -89,7 +91,6 @@ let rpWindowManager = (function(self) {
 
     // create a scope variable for RP for this window
     window.requestpolicy = {};
-
     Services.scriptloader.loadSubScript(
         "chrome://requestpolicy/content/ui/overlay.js", window);
     Services.scriptloader.loadSubScript(
@@ -103,6 +104,8 @@ let rpWindowManager = (function(self) {
     // everything else is ready
     window.requestpolicy.overlay.init();
     window.requestpolicy.overlay.onWindowLoad();
+    window.messageManager.loadFrameScript(
+        "chrome://requestpolicy/content/ui/frame.js", true);
   }
 
   function unloadFromWindow(window) {
@@ -180,4 +183,5 @@ let rpWindowManager = (function(self) {
 
 // extend rpWindowManager
 Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/lib/window-manager-toolbarbutton.js", this);
+    "chrome://requestpolicy/content/lib/window-manager-toolbarbutton.js",
+    globalScope);

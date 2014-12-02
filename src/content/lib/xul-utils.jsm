@@ -28,7 +28,7 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["logger", "utils"], this);
+ScriptLoader.importModules(["logger", "string-utils"], this);
 
 let EXPORTED_SYMBOLS = ["XULUtils"];
 
@@ -79,7 +79,7 @@ function getAttrValue(element, attr) {
   let value = element[attr];
   if (value.charAt(0) == "&" && value.charAt(value.length-1) == ";") {
     try {
-      value = Utils.strbundle
+      value = StringUtils.strbundle
           .GetStringFromName(value.substr(1, value.length-2));
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR, e, e);

@@ -15,7 +15,7 @@
     <em:multiprocessCompatible>false</em:multiprocessCompatible>
 
     <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
-    <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
+    <em:optionsURL>about:requestpolicy</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 

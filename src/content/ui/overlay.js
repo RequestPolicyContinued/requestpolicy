@@ -35,20 +35,21 @@ requestpolicy.overlay = (function() {
   Cu.import("resource://gre/modules/Services.jsm");
 
   let mod = {};
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-  ScriptLoader.importModules([
+  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+  mod.ScriptLoader.importModules([
+    "constants",
     "logger",
     "prefs",
     "request-processor",
     "domain-util",
-    "utils",
+    "string-utils",
     "requestpolicy-service",
     "policy-manager"
   ], mod);
-  let Logger = mod.Logger, Prefs = mod.Prefs,
-      RequestProcessor = mod.RequestProcessor, DomainUtil = mod.DomainUtil,
-      Utils = mod.Utils, rpService = mod.rpService,
-      PolicyManager = mod.PolicyManager;
+  let MMID = mod.MMID, Logger = mod.Logger, rpPrefBranch = mod.rpPrefBranch,
+      Prefs = mod.Prefs, RequestProcessor = mod.RequestProcessor,
+      DomainUtil = mod.DomainUtil, StringUtils = mod.StringUtils,
+      rpService = mod.rpService, PolicyManager = mod.PolicyManager;
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
 
@@ -62,7 +63,7 @@ requestpolicy.overlay = (function() {
 
   let overlayId = 0;
 
-  let blockedContentCheckTimeoutDelay = 250; // milliseconds
+  let blockedContentStateUpdateDelay = 250; // milliseconds
   let blockedContentCheckTimeoutId = null;
   let blockedContentCheckMinWaitOnObservedBlockedRequest = 500;
   let blockedContentCheckLastTime = 0;
@@ -78,28 +79,6 @@ requestpolicy.overlay = (function() {
   let toolbox = null;
 
   let isFennec = false;
-
-  let missingImageDataUri = "data:image/png;base64,"
-      + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c"
-      + "6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0"
-      + "SU1FB9gMFRANL5LXnioAAAJWSURBVDjLnZI/ixtXFMV/972ZNzPSrmTtalex"
-      + "lsWBGMfEYOzaVciXyKdIkW/hFKnS22WafIDUxk0g2AQSgm0csIPWK42ktaSR"
-      + "NPP+pRBK5SLOqS7cew7ccw4xxrPJ+8XdHx4+7AE8e3Cj++zLm71fvrqT8x+Q"
-      + "AK35dJr2n/x89urTa+eDm/cS+eI2y3eT+Lx/bt8u1vNqfDH++teXdk/6ThAf"
-      + "UUBIgL9ku75z/8WL7LOlhXIGJ0Pyw75wMcnGv//xSQ2DH4ddu9k01dXWsWzc"
-      + "ofhYaiiViLjiWi9UWQa1gzcjWF7hgfzzW5ydnXB62JLjg0PTLfJertNepnQS"
-      + "IA+gE4Cs03UuNYYQYP4e5jPogmSG9vA6rrjC+0AxN2i5Qk0DpXVJhCQB0EVR"
-      + "rzqdFgB1DZfvCDHixiV2NqO6LHHKIKnQMoaWbFBgIrQVgIXaDc+JCHgP5QRZ"
-      + "r4jzGWFbo6yncRYviiiQKUhBRch3Lyix4bgPWsAkcDkmZAV2OiE0DaI1WoES"
-      + "hRKF3sWnmt01pFBnJydEpZDEwHSGt47lYsls43AIXjTWV9R1Qx0DGahqLyAh"
-      + "bqrj0/ib0nRzXNoyCo0Kkor2llV0eKOwdUMg4pSQA7JPQXvnJv1B+GlwOvrG"
-      + "laXB6fV2lb5t6qOtike56DSJgYDGBQcOAsQAfueBMeHR48fhadb1j/58HWAR"
-      + "dt6yBv7+/vpBe2o5OogxlcaKdt5aKCNsk309W0WxKQjmQ33/9mJVAdWHdmo/"
-      + "tNvtRZIkfCz+ZQwGg6rT6Zj/LTAajTbD4bD5WIF/AAseEisPFO8uAAAAAElF"
-      + "TkSuQmCC";
-
-  let transparentImageDataUri = "data:image/gif;base64,R0lGODlhAQABAIAAA"
-      + "AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 
 
@@ -147,7 +126,7 @@ requestpolicy.overlay = (function() {
           // object's observerBlockedRequests() method will be called.
           RequestProcessor.addRequestObserver(self);
 
-          //self.setContextMenuEnabled(Prefs.prefs.getBoolPref("contextMenu"));
+          //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
           self._setPermissiveNotification(Prefs.isBlockingDisabled());
         }
       } catch (e) {
@@ -177,64 +156,126 @@ requestpolicy.overlay = (function() {
      *          event
      */
     onWindowLoad: function() {
-      try {
+      //try {
         // Info on detecting page load at:
         // http://developer.mozilla.org/En/Code_snippets/On_page_load
         var appcontent = document.getElementById("appcontent"); // browser
         const requestpolicyOverlay = this;
         if (appcontent) {
-          appcontent.addEventListener("DOMContentLoaded", function(event) {
-            requestpolicyOverlay.onAppContentLoaded(event);
-          }, true);
-
-          // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
-          // enclosed frames.
-          appcontent.addEventListener("DOMFrameContentLoaded", function(event) {
-            requestpolicyOverlay.onAppFrameContentLoaded(event);
-          }, true);
-
-          // Listen for click events so that we can allow requests that result from
-          // user-initiated link clicks and form submissions.
-          appcontent.addEventListener("click", function(event) {
-            // If mozInputSource is undefined or zero, then this was a javascript-generated event.
-            // If there is a way to forge mozInputSource from javascript, then that could be used
-            // to bypass RequestPolicy.
-            if (!event.mozInputSource) {
-              return;
-            }
-            // The following show up as button value 0 for links and form input submit buttons:
-            // * left-clicks
-            // * enter key while focused
-            // * space bar while focused (no event sent for links in this case)
-            if (event.button != 0) {
-              return;
-            }
-            // Link clicked.
-            // I believe an empty href always gets filled in with the current URL so
-            // it will never actually be empty. However, I don't know this for certain.
-            if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
-              RequestProcessor.registerLinkClicked(
-                  event.target.ownerDocument.URL, event.target.href);
-              return;
-            }
-            // Form submit button clicked. This can either be directly (e.g. mouseclick,
-            // enter/space while the the submit button has focus) or indirectly (e.g.
-            // pressing enter when a text input has focus).
-            if (event.target.nodeName.toLowerCase() == "input" &&
-                event.target.type.toLowerCase() == "submit" &&
-                event.target.form && event.target.form.action) {
-              RequestProcessor.registerFormSubmitted(
-                event.target.ownerDocument.URL, event.target.form.action);
-              return;
-            }
-          }, true);
-
           if (isFennec) {
             appcontent.addEventListener("TabSelect", function(event) {
               requestpolicyOverlay.tabChanged();
             }, false);
           }
         }
+
+
+
+        messageManager.addMessageListener(
+            MMID + ":notifyDocumentLoaded",
+            function(message) {
+              dump("notifyDocumentLoaded\n\n");
+              let {docID, documentURI} = message.data;
+
+              // the <browser> element of the corresponding tab.
+              let browser = message.target;
+
+              if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
+                var indicateBlacklisted = rpPrefBranch
+                    .getBoolPref("indicateBlacklistedObjects");
+
+                var rejectedRequests = RequestProcessor._rejectedRequests
+                    .getOriginUri(documentURI);
+                let blockedURIs = {};
+                for (var destBase in rejectedRequests) {
+                  for (var destIdent in rejectedRequests[destBase]) {
+                    for (var destUri in rejectedRequests[destBase][destIdent]) {
+                      // case 1: indicateBlacklisted == true
+                      //         ==> indicate the object has been blocked
+                      //
+                      // case 2: indicateBlacklisted == false
+                      // case 2a: all requests have been blocked because of a blacklist
+                      //          ==> do *not* indicate
+                      //
+                      // case 2b: at least one of the blocked (identical) requests has been
+                      //          blocked by a rule *other than* the blacklist
+                      //          ==> *do* indicate
+                      let requests = rejectedRequests[destBase][destIdent][destUri];
+                      if (indicateBlacklisted ||
+                          requestpolicyOverlay._containsNonBlacklistedRequests(
+                              requests)) {
+                        blockedURIs[destUri] = blockedURIs[destUri] ||
+                            {identifier: DomainUtil.getIdentifier(destUri)};
+                      }
+                    }
+                  }
+                }
+                message.target.messageManager.sendAsyncMessage(
+                    MMID + ":indicateBlockedVisibleObjects",
+                    {blockedURIs: blockedURIs, docID: docID});
+              }
+
+              if ("requestpolicy" in browser &&
+                  documentURI in browser.requestpolicy.blockedRedirects) {
+                var dest = browser.requestpolicy.blockedRedirects[documentURI];
+                Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+                    "Showing notification for blocked redirect. To <" + dest +
+                    "> " + "from <" + documentURI + ">");
+                self._showRedirectNotification(browser, dest);
+
+                delete browser.requestpolicy.blockedRedirects[documentURI];
+              }
+            });
+
+        messageManager.addMessageListener(
+            MMID + ":notifyTopLevelDocumentLoaded",
+            function (message) {
+              // Clear any notifications that may have been present.
+              self._setContentBlockedState(false);
+              // We don't do this immediately anymore because slow systems might have
+              // this slow down the loading of the page, which is noticable
+              // especially with CSS loading delays (it's not unlikely that slow
+              // webservers have a hand in this, too).
+              // Note that the change to _updateBlockedContentStateAfterTimeout seems to have
+              // added a bug where opening a blank tab and then quickly switching back
+              // to the original tab can cause the original tab's blocked content
+              // notification to be cleared. A simple compensation was to decrease
+              // the timeout from 1000ms to 250ms, making it much less likely the tab
+              // switch can be done in time for a blank opened tab. This isn't a real
+              // solution, though.
+              self._updateBlockedContentStateAfterTimeout();
+            });
+
+        messageManager.addMessageListener(
+            MMID + ":notifyDOMFrameContentLoaded",
+            function (message) {
+              // This has an advantage over just relying on the
+              // observeBlockedRequest() call in that this will clear a blocked
+              // content notification if there no longer blocked content. Another way
+              // to solve this would be to observe allowed requests as well as blocked
+              // requests.
+              blockedContentCheckLastTime = (new Date()).getTime();
+              self._stopBlockedContentCheckTimeout();
+              self._updateBlockedContentState(message.target);
+            });
+
+        messageManager.addMessageListener(MMID + ":handleMetaRefreshes",
+                                          self.handleMetaRefreshes);
+
+        messageManager.addMessageListener(
+            MMID + ":notifyLinkClicked", function (message) {
+                RequestProcessor.registerLinkClicked(message.data.origin,
+                                                     message.data.dest);
+            });
+
+        messageManager.addMessageListener(
+            MMID + ":notifyFormSubmitted", function (message) {
+                RequestProcessor.registerFormSubmitted(message.data.origin,
+                                                       message.data.dest);
+            });
+
+
+
 
         // Add an event listener for when the contentAreaContextMenu (generally
         // the right-click menu within the document) is shown.
@@ -260,10 +301,45 @@ requestpolicy.overlay = (function() {
           self._addHistoryObserver();
         }
 
-      } catch (e) {
-        Logger.severeError("Fatal Error, " + e, e);
-        Logger.severeError(
-            "Unable to complete requestpolicy.overlay.onWindowLoad actions.");
+      //} catch (e) {
+      //  Logger.severeError("Fatal Error, " + e, e);
+      //  Logger.severeError(
+      //      "Unable to complete requestpolicy.overlay.onWindowLoad actions.");
+      //}
+    },
+
+    handleMetaRefreshes: function(message) {
+      let {documentURI, metaRefreshes} = message.data;
+      let browser = message.target;
+
+      for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
+        let {delay, destURI, originalDestURI} = metaRefreshes[i];
+
+        Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <" +
+            destURI + "> (" + delay + " second delay) found in document at <" +
+            documentURI + ">");
+
+        if (originalDestURI) {
+          Logger.info(Logger.TYPE_META_REFRESH,
+              "meta refresh destination <" + originalDestURI + "> " +
+              "appeared to be relative to <" + documentURI + ">, so " +
+              "it has been resolved to <" + destURI + ">");
+        }
+
+        // We don't automatically perform any allowed redirects. Instead, we
+        // just detect when they will be blocked and show a notification. If
+        // the docShell has allowMetaRedirects disabled, it will be respected.
+        if (!Prefs.isBlockingDisabled()
+            && !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
+          // Ignore redirects to javascript. The browser will ignore them, as well.
+          if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
+            Logger.warning(Logger.TYPE_META_REFRESH,
+                "Ignoring redirect to javascript URI <" + destURI + ">");
+            continue;
+          }
+          // The request will be blocked by shouldLoad.
+          self._showRedirectNotification(browser, destURI, delay);
+        }
       }
     },
 
@@ -321,14 +397,13 @@ requestpolicy.overlay = (function() {
      * Shows a notification that a redirect was requested by a page (meta refresh
      * or with headers).
      *
-     * @param {document}
-     *          targetDocument
+     * @param {<browser> element} browser
      * @param {String}
      *          redirectTargetUri
      * @param {int}
      *          delay
      */
-    _showRedirectNotification: function(targetDocument, redirectTargetUri, delay) {
+    _showRedirectNotification: function(browser, redirectTargetUri, delay) {
       // TODO: Do something with the delay. Not sure what the best thing to do is
       // without complicating the UI.
 
@@ -350,13 +425,7 @@ requestpolicy.overlay = (function() {
         return;
       }
 
-      if (!self._isTopLevelDocument(targetDocument)) {
-        // Don't show notification if this isn't the main document of a tab;
-        return;
-      }
-
-      var targetBrowser = gBrowser.getBrowserForDocument(targetDocument);
-      var notificationBox = gBrowser.getNotificationBox(targetBrowser)
+      var notificationBox = gBrowser.getNotificationBox(browser)
       var notificationValue = "request-policy-meta-redirect";
 
       // There doesn't seem to be a way to use the xul crop attribute with the
@@ -370,17 +439,17 @@ requestpolicy.overlay = (function() {
         shortUri = redirectTargetUri
             .substring(0, Math.max(prePathLength, maxLength)) + "...";
       }
-      var notificationLabel = Utils.strbundle.formatStringFromName(
+      var notificationLabel = StringUtils.strbundle.formatStringFromName(
           "redirectNotification", [shortUri], 1);
 
-      var notificationButtonOptions = Utils.strbundle.GetStringFromName("more");
-      var notificationButtonOptionsKey = Utils.strbundle
+      var notificationButtonOptions = StringUtils.strbundle.GetStringFromName("more");
+      var notificationButtonOptionsKey = StringUtils.strbundle
           .GetStringFromName("more.accesskey");
-      var notificationButtonAllow = Utils.strbundle.GetStringFromName("allow");
-      var notificationButtonAllowKey = Utils.strbundle
+      var notificationButtonAllow = StringUtils.strbundle.GetStringFromName("allow");
+      var notificationButtonAllowKey = StringUtils.strbundle
           .GetStringFromName("allow.accesskey");
-      var notificationButtonDeny = Utils.strbundle.GetStringFromName("deny");
-      var notificationButtonDenyKey = Utils.strbundle
+      var notificationButtonDeny = StringUtils.strbundle.GetStringFromName("deny");
+      var notificationButtonDenyKey = StringUtils.strbundle
           .GetStringFromName("deny.accesskey");
 
       var optionsPopupName = "requestpolicyRedirectNotificationOptions";
@@ -423,19 +492,12 @@ requestpolicy.overlay = (function() {
             accessKey : notificationButtonAllowKey,
             popup : null,
             callback : function() {
-              var location = targetDocument.location;
-              // When refreshing a page that wants to redirect, sometimes the
-              // targetDocument.location is null. If that's the case, just use
-              // do the redirection in the current content pane.
-              if (targetDocument.location == null) {
-                Logger.dump("in callback: targetDocument.location == null, " +
-                    "using content.location instead");
-                location = content.location;
-              }
               // Fx 3.7a5+ calls shouldLoad for location.href changes.
-              RequestProcessor.registerAllowedRedirect(location.href,
-                                                       redirectTargetUri);
-              location.href = redirectTargetUri;
+              RequestProcessor.registerAllowedRedirect(
+                  browser.documentURI.specIgnoringRef, redirectTargetUri);
+
+              browser.messageManager.sendAsyncMessage(MMID + ":setLocation",
+                  {uri: redirectTargetUri});
             }
           },
           {
@@ -459,34 +521,6 @@ requestpolicy.overlay = (function() {
       }
     },
 
-    /**
-     * Determines if documentToCheck is the main document loaded in any tab.
-     *
-     * @param {document}
-     *          documentToCheck
-     * @return {Boolean}
-     */
-    _isTopLevelDocument: function(documentToCheck) {
-      var num = gBrowser.browsers.length;
-      for (var i = 0; i < num; i++) {
-        if (gBrowser.getBrowserAtIndex(i).contentDocument == documentToCheck) {
-          return true;
-        }
-      }
-      return false;
-    },
-
-    /**
-     * Determines if documentToCheck is the main document loaded in the currently
-     * active tab.
-     *
-     * @param {document}
-     *          documentToCheck
-     * @return {Boolean}
-     */
-    _isActiveTopLevelDocument: function(documentToCheck) {
-      return documentToCheck == content.document;
-    },
 
     /**
      * Performs actions required to be performed after a tab change.
@@ -495,141 +529,7 @@ requestpolicy.overlay = (function() {
       // TODO: verify the Fennec and all supported browser versions update the
       // status bar properly with only the ProgressListener. Once verified,
       // remove calls to tabChanged();
-      // self._checkForBlockedContent(content.document);
-    },
-
-    /**
-     * Things to do when a page has loaded (after images, etc., have been loaded).
-     *
-     * @param {Event}
-     *          event
-     */
-    onAppContentLoaded: function(event) {
-      // TODO: This is getting called multiple times for a page, should only be
-      // called once.
-      try {
-        if (event.originalTarget.nodeName != "#document") {
-          // It's a favicon. See the note at
-          // http://developer.mozilla.org/En/Code_snippets/On_page_load
-          return;
-        }
-
-        var document = event.target;
-        if (!document) {
-          // onAppContentLoaded getting called more often than it should? document
-          // isn't set on new tab open when this is called.
-          return;
-        }
-        Logger.warning(Logger.TYPE_INTERNAL,
-            "onAppContentLoaded called for " + document.documentURI);
-
-        self._onDOMContentLoaded(document);
-
-        if (self._isActiveTopLevelDocument(document)) {
-          // Clear any notifications that may have been present.
-          self._setBlockedContentNotification(false);
-          // We don't do this immediately anymore because slow systems might have
-          // this slow down the loading of the page, which is noticable
-          // especially with CSS loading delays (it's not unlikely that slow
-          // webservers have a hand in this, too).
-          // Note that the change to _setBlockedContentCheckTimeout seems to have
-          // added a bug where opening a blank tab and then quickly switching back
-          // to the original tab can cause the original tab's blocked content
-          // notification to be cleared. A simple compensation was to decrease
-          // the timeout from 1000ms to 250ms, making it much less likely the tab
-          // switch can be done in time for a blank opened tab. This isn't a real
-          // solution, though.
-          // self._checkForBlockedContent(document);
-          self._setBlockedContentCheckTimeout();
-        }
-      } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR,
-            "Fatal Error, " + e + ", stack was: " + e.stack);
-        Logger.severe(Logger.TYPE_ERROR,
-            "Unable to complete requestpolicy.overlay.onAppContentLoaded actions.");
-        throw e;
-      }
-    },
-
-    /**
-     * Things to do when a page or a frame within the page has loaded.
-     *
-     * @param {Event}
-     *          event
-     */
-    onAppFrameContentLoaded: function(event) {
-      // TODO: This only works for (i)frames that are direct children of the main
-      // document, not (i)frames within those (i)frames.
-      try {
-        var iframe = event.target;
-        // Flock's special home page is about:myworld. It has (i)frames in it
-        // that have no contentDocument. It's probably related to the fact that
-        // that is an xul page.
-        if (iframe.contentDocument === undefined) {
-          return;
-        }
-        Logger.debug(Logger.TYPE_INTERNAL,
-            "onAppFrameContentLoaded called for <" +
-            iframe.contentDocument.documentURI + "> in <" +
-            iframe.ownerDocument.documentURI + ">");
-        // TODO: maybe this can check if the iframe's documentURI is in the other
-        // origins of the current document, and that way not just be limited to
-        // direct children of the main document. That would require building the
-        // other origins every time an iframe is loaded. Maybe, then, this should
-        // use a timeout like observerBlockedRequests does.
-        if (self._isActiveTopLevelDocument(iframe.ownerDocument)) {
-          // This has an advantage over just relying on the
-          // observeBlockedRequest() call in that this will clear a blocked
-          // content notification if there no longer blocked content. Another way
-          // to solve this would be to observe allowed requests as well as blocked
-          // requests.
-          self._checkForBlockedContent(iframe.ownerDocument);
-        }
-      } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR,
-            "Fatal Error, " + e + ", stack was: " + e.stack);
-        Logger.severe(Logger.TYPE_ERROR, "Unable to complete " +
-            "requestpolicy.overlay.onAppFrameContentLoaded actions.");
-        throw e;
-      }
-    },
-
-    /**
-     * Checks if the document has blocked content and shows appropriate
-     * notifications.
-     */
-    _checkForBlockedContent: function(document) {
-      // TODO: this probably needs to be rewritten or at least thought through
-      // again in light of it being years later and much of RP changing. It's
-      // likely that there's wasted work happening during time-critical page
-      // loading going on in here.
-      try {
-        var documentUri = DomainUtil
-            .stripFragment(document.documentURI);
-        Logger.debug(Logger.TYPE_INTERNAL,
-            "Checking for blocked requests from page <" + documentUri + ">");
-        blockedContentCheckLastTime = (new Date()).getTime();
-        self._stopBlockedContentCheckTimeout();
-
-        var allRequestsOnDocument = RequestProcessor
-            .getAllRequestsOnDocument(document);
-
-        if (true === allRequestsOnDocument.containsBlockedRequests()) {
-          Logger.debug(Logger.TYPE_INTERNAL, "Requests have been blocked.");
-          self._setBlockedContentNotification(true);
-          self._indicateBlockedVisibleObjects(document);
-          return;
-        } else {
-          Logger.debug(Logger.TYPE_INTERNAL, "No requests have been blocked.");
-          self._setBlockedContentNotification(false);
-        }
-      } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR,
-            "Fatal Error, " + e + ", stack was: " + e.stack);
-        Logger.severe(Logger.TYPE_ERROR, "Unable to complete " +
-            "requestpolicy.overlay._checkForBlockedContent actions.");
-        throw e;
-      }
+      // self._updateBlockedContentState(content.document);
     },
 
     _containsNonBlacklistedRequests: function(requests) {
@@ -642,81 +542,37 @@ requestpolicy.overlay = (function() {
       return false;
     },
 
-    _indicateBlockedVisibleObjects: function(document) {
-      if (!Prefs.prefs.getBoolPref("indicateBlockedObjects")) {
-        return;
-      }
-      var indicateBlacklisted = Prefs.prefs
-          .getBoolPref("indicateBlacklistedObjects");
+    /**
+     * Checks if the document has blocked content and shows appropriate
+     * notifications.
+     */
+    _updateBlockedContentState: function() {
+      try {
+        let browser = gBrowser.selectedBrowser;
+        let uri = DomainUtil.stripFragment(browser.currentURI.spec);
+        Logger.debug(Logger.TYPE_INTERNAL,
+            "Checking for blocked requests from page <" + uri + ">");
 
-      var images = document.getElementsByTagName("img");
-      var rejectedRequests = RequestProcessor._rejectedRequests
-          .getOriginUri(document.location);
-      var blockedUrisToIndicate = {};
-      for (var destBase in rejectedRequests) {
-        for (var destIdent in rejectedRequests[destBase]) {
-          for (var destUri in rejectedRequests[destBase][destIdent]) {
-            // case 1: indicateBlacklisted == true
-            //         ==> indicate the object has been blocked
-            //
-            // case 2: indicateBlacklisted == false
-            // case 2a: all requests have been blocked because of a blacklist
-            //          ==> do *not* indicate
-            //
-            // case 2b: at least one of the blocked (identical) requests has been
-            //          blocked by a rule *other than* the blacklist
-            //          ==> *do* indicate
-            let requests = rejectedRequests[destBase][destIdent][destUri];
-            if (indicateBlacklisted ||
-                self._containsNonBlacklistedRequests(requests)) {
-              blockedUrisToIndicate[destUri] = true;
-            }
-          }
-        }
-      }
+        // TODO: this needs to be rewritten. checking if there is blocked
+        // content could be done much more efficiently.
+        let documentContainsBlockedContent = RequestProcessor
+            .getAllRequestsInBrowser(browser).containsBlockedRequests();
+        self._setContentBlockedState(documentContainsBlockedContent);
 
-      // Ideally, want the image to be a broken image so that the alt text
-      // shows. By default, the blocked image will just not show up at all.
-      // Setting img.src to a broken resource:// causes "save page as" to fail
-      // for some earlier Fx 3.x versions. Also, using a broken resource://
-      // causes our width setting to be ignored, as does using null for img.src.
-      // With Firefox 4, setting img.src to null doesn't work reliably for
-      // having the rest of the styles (e.g. background and border) applied.
-      // So, for now we're punting on trying to display alt text. We'll just use
-      // a transparent image as the replacement image.
-      // Note that with our changes to the image here, "save page as" works but
-      // different data is saved depending on what type of "save page as" the
-      // user performs. With "save all files", the saved source includes the
-      // original, blocked image src. With "web page, complete" the saved source
-      // has changes we make here to show the blocked request indicator.
-
-      for (var i = 0; i < images.length; i++) {
-        var img = images[i];
-        // Note: we're no longer checking img.requestpolicyBlocked here.
-        if (!img.requestpolicyIdentified && img.src in blockedUrisToIndicate) {
-          img.requestpolicyIdentified = true;
-          img.style.border = "solid 1px #fcc";
-          img.style.backgroundRepeat = "no-repeat";
-          img.style.backgroundPosition = "center center";
-          img.style.backgroundImage = "url('" + missingImageDataUri + "')";
-          if (!img.width) {
-            img.width = 50;
-          }
-          if (!img.height) {
-            img.height = 50;
-          }
-          img.title = "[" + DomainUtil.getIdentifier(img.src) + "]"
-              + (img.title ? " " + img.title : "")
-              + (img.alt ? " " + img.alt : "");
-          img.src = transparentImageDataUri;
-        }
+        let logText = documentContainsBlockedContent ?
+                      "Requests have been blocked." :
+                      "No requests have been blocked.";
+        Logger.debug(Logger.TYPE_INTERNAL, logText);
+      } catch (e) {
+        Logger.severeError(
+            "Unable to complete _updateBlockedContentState actions: " + e, e);
       }
     },
 
     /**
      * Sets the blocked content notifications visible to the user.
      */
-    _setBlockedContentNotification: function(isContentBlocked) {
+    _setContentBlockedState: function(isContentBlocked) {
       var button = document.getElementById(toolbarButtonId);
       if (button) {
         button.setAttribute("requestpolicyBlocked", isContentBlocked);
@@ -808,21 +664,20 @@ requestpolicy.overlay = (function() {
      * window separately to look for a document to show a notification in.
      */
     observeBlockedTopLevelDocRequest: function (originUri, destUri) {
-      const document = self._getDocumentAtUri(originUri);
-      if (!document) {
+      const browser = self._getBrowserAtUri(originUri);
+      if (!browser) {
         return;
       }
       // We're called indirectly from shouldLoad so we can't block.
       window.setTimeout(function() {
-        requestpolicy.overlay._showRedirectNotification(document, destUri, 0);
+        requestpolicy.overlay._showRedirectNotification(browser, destUri, 0);
       }, 0);
     },
 
-    _getDocumentAtUri: function(uri) {
-      var num = gBrowser.browsers.length;
-      for (var i = 0; i < num; i++) {
+    _getBrowserAtUri: function(uri) {
+      for (let i = 0, len = gBrowser.browsers.length; i < len; i++) {
         if (gBrowser.getBrowserAtIndex(i).currentURI.spec == uri) {
-          return gBrowser.getBrowserAtIndex(i).contentDocument;
+          return gBrowser.getBrowserAtIndex(i);
         }
       }
       return null;
@@ -832,15 +687,15 @@ requestpolicy.overlay = (function() {
 
     _updateNotificationDueToBlockedContent: function() {
       if (!blockedContentCheckTimeoutId) {
-        self._setBlockedContentCheckTimeout();
+        self._updateBlockedContentStateAfterTimeout();
       }
     },
 
-    _setBlockedContentCheckTimeout: function() {
-      const document = content.document;
+    _updateBlockedContentStateAfterTimeout: function() {
+      const browser = gBrowser.selectedBrowser;
       blockedContentCheckTimeoutId = window.setTimeout(function() {
-        requestpolicy.overlay._checkForBlockedContent(document);
-      }, blockedContentCheckTimeoutDelay);
+        requestpolicy.overlay._updateBlockedContentState(browser);
+      }, blockedContentStateUpdateDelay);
     },
 
     _stopBlockedContentCheckTimeout: function() {
@@ -848,110 +703,6 @@ requestpolicy.overlay = (function() {
         window.clearTimeout(blockedContentCheckTimeoutId);
         blockedContentCheckTimeoutId = null;
       }
-    },
-
-    _getDocShellAllowMetaRedirects: function(document) {
-      var docShell = document.defaultView
-          .QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-          .getInterface(Components.interfaces.nsIWebNavigation)
-          .QueryInterface(Components.interfaces.nsIDocShell);
-      return docShell.allowMetaRedirects;
-    },
-
-    _htmlAnchorTagClicked: function(event) {
-      // Note: need to use currentTarget so that it is the link, not
-      // something else within the link that got clicked, it seems.
-      RequestProcessor.registerLinkClicked(event.currentTarget.ownerDocument.URL,
-          event.currentTarget.href);
-    },
-
-    /**
-     * Perform the actions required once the DOM is loaded. This may be being
-     * called for more than just the page content DOM. It seems to work for now.
-     *
-     * @param {Event}
-     *          event
-     */
-    _onDOMContentLoaded: function(document) {
-      Logger.warning(Logger.TYPE_INTERNAL, "_onDOMContentLoaded called.");
-
-      // Find all meta redirects.
-      var metaTags = document.getElementsByTagName("meta");
-      for (var i = 0; i < metaTags.length; i++) {
-        if (metaTags[i].httpEquiv
-            && metaTags[i].httpEquiv.toLowerCase() == "refresh") {
-          // TODO: Register meta redirects so we can tell which blocked requests
-          // were meta redirects in the statusbar menu.
-          // TODO: move this logic to the requestpolicy service.
-          var parts = DomainUtil.parseRefresh(metaTags[i].content);
-          var delay = parts[0];
-          // The dest may be empty if the origin is what should be refreshed. This
-          // will be handled by DomainUtil.determineRedirectUri().
-          var dest = parts[1];
-          Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <" +
-              dest + "> (" + delay + " second delay) found in document at <" +
-              document.location + ">");
-          // If dest isn't a valid uri, assume it's a relative uri.
-          if (!DomainUtil.isValidUri(dest)) {
-            var origDest = dest;
-            dest = document.documentURIObject.resolve(dest);
-            Logger.info(Logger.TYPE_META_REFRESH,
-                "meta refresh destination <" + origDest
-                    + "> appeared to be relative to <" + document.documentURI
-                    + ">, so it has been resolved to <" + dest + ">");
-          }
-
-          if (!self._getDocShellAllowMetaRedirects(document)) {
-            Logger.warning(Logger.TYPE_META_REFRESH,
-                "Another extension disabled docShell.allowMetaRedirects.");
-          }
-
-          // We don't automatically perform any allowed redirects. Instead, we
-          // just detect when they will be blocked and show a notification. If
-          // the docShell has allowMetaRedirects disabled, it will be respected.
-          if (!Prefs.isBlockingDisabled()
-              && !RequestProcessor.isAllowedRedirect(document.location.href, dest)) {
-            // Ignore redirects to javascript. The browser will ignore them, as well.
-            if (DomainUtil.getUriObject(dest).schemeIs("javascript")) {
-              Logger.warning(Logger.TYPE_META_REFRESH,
-                  "Ignoring redirect to javascript URI <" + dest + ">");
-              continue;
-            }
-            // The request will be blocked by shouldLoad.
-            self._showRedirectNotification(document, dest, delay);
-          }
-        }
-      }
-
-      // Find all anchor tags and add click events (which also fire when enter
-      // is pressed while the element has focus).
-      // This seems to be a safe approach in that the MDC states that javascript
-      // can't be used to initiate a click event on a link:
-      // http://developer.mozilla.org/en/DOM/element.click
-      // We keep this even though we have the document looking for clicks because
-      // for certain links the target will not be the link (and we can't use the
-      // currentTarget in the other case it seems, as we can here). There probably
-      // is some solution when handling the click events at the document level,
-      // but I just don't know what it is. For now, there remains the risk of
-      // dynamically added links whose target of the click event isn't the anchor
-      // tag.
-      var anchorTags = document.getElementsByTagName("a");
-      for (var i = 0; i < anchorTags.length; i++) {
-        anchorTags[i].addEventListener("click", self._htmlAnchorTagClicked,
-            false);
-      }
-
-      // TODO: implement a function in RequestProcessor for this
-      if (RequestProcessor._blockedRedirects[document.location]) {
-        var dest = RequestProcessor._blockedRedirects[document.location];
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "Showing notification for blocked redirect. To <" + dest + "> " +
-            "from <" + document.location + ">");
-        self._showRedirectNotification(document, dest);
-        delete RequestProcessor._blockedRedirects[document.location];
-      }
-
-      self._wrapWindowOpen(document.defaultView);
     },
 
     /**
@@ -1086,40 +837,6 @@ requestpolicy.overlay = (function() {
       }
     },
 
-    /**
-     * Wraps the window's open() method so that RequestPolicy can know the origin
-     * and destination URLs of the window being opened. Assume that if
-     * window.open() calls have made it this far, it's a window the user wanted
-     * open (e.g. they have allowed the popup). Unfortunately, this method (or our
-     * timing of doing self) doesn't seem to work for popups that are allowed
-     * popups (the user has allowed popups from the domain). So, the workaround
-     * was to also add the 'if(aContext.nodeName == "xul:browser" &&
-     * aContext.currentURI && aContext.currentURI.spec == "about:blank")' to
-     * shouldLoad().
-     *
-     * @param {Window}
-     *          window
-     */
-    _wrapWindowOpen: function(window) {
-      if (!window.requestpolicyOrigOpen) {
-        window.requestpolicyOrigOpen = window.open;
-        window.open = function(url, windowName, windowFeatures) {
-          RequestProcessor.registerLinkClicked(window.document.documentURI, url);
-          return window.requestpolicyOrigOpen(url, windowName, windowFeatures);
-        };
-      }
-
-      if (!window.requestpolicyOrigOpenDialog) {
-        window.requestpolicyOrigOpenDialog = window.openDialog;
-        window.openDialog = function() {
-          // openDialog(url, name, features, arg1, arg2, ...)
-          RequestProcessor.registerLinkClicked(window.document.documentURI,
-              arguments[0]);
-          return window.requestpolicyOrigOpenDialog.apply(window, arguments);
-        };
-      }
-    },
-
     _addLocationObserver: function() {
       self.locationListener = {
         onLocationChange : function(aProgress, aRequest, aURI) {
@@ -1127,7 +844,8 @@ requestpolicy.overlay = (function() {
           // The timer is running on the main window, not the document's window,
           // so we want to stop the timer when the tab is changed.
           requestpolicy.overlay._stopBlockedContentCheckTimeout();
-          requestpolicy.overlay._checkForBlockedContent(content.document);
+          requestpolicy.overlay
+              ._updateBlockedContentState(gBrowser.selectedBrowser);
         },
         // Though unnecessary for Gecko 2.0, I'm leaving in onSecurityChange for
         // SeaMonkey because of https://bugzilla.mozilla.org/show_bug.cgi?id=685466
@@ -1168,7 +886,7 @@ requestpolicy.overlay = (function() {
 
         OnHistoryGotoIndex : function(index, gotoURI) {
           RequestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
-   return true;
+          return true;
         },
 
         OnHistoryNewEntry : function(newURI) {
@@ -1251,8 +969,9 @@ requestpolicy.overlay = (function() {
     onPopupHidden: function(event) {
       var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
       if (rulesChanged || self._needsReloadOnMenuClose) {
-        if (Prefs.prefs.getBoolPref("autoReload")) {
-          content.document.location.reload(false);
+        if (rpPrefBranch.getBoolPref("autoReload")) {
+          let mm = gBrowser.selectedBrowser.messageManager;
+          mm.sendAsyncMessage(MMID + ":reload");
         }
       }
       self._needsReloadOnMenuClose = false;
@@ -1278,19 +997,9 @@ requestpolicy.overlay = (function() {
      * Get the top-level document's uri.
      */
     getTopLevelDocumentUri: function() {
-      // We don't just retrieve the translations array once during init because
-      // we're not sure if it will be fully populated during init. This is
-      // especially a concern given the async addon manager API in Firefox 4.
-      var translations = rpService.getTopLevelDocTranslations();
-      if (translations.length) {
-        var docURI = content.document.documentURI;
-        for (var i = 0; i < translations.length; i++) {
-          if (docURI.indexOf(translations[i][0]) == 0) {
-            return translations[i][1];
-          }
-        }
-      }
-      return DomainUtil.stripFragment(content.document.documentURI);
+      let uri = gBrowser.selectedBrowser.currentURI.spec;
+      return rpService.getTopLevelDocTranslation(uri) ||
+          DomainUtil.stripFragment(uri);
     },
 
     /**
@@ -1457,32 +1166,6 @@ requestpolicy.overlay = (function() {
       popup.hidePopup();
     },
 
-    _performRedirect: function(document, redirectTargetUri) {
-      try {
-        if (redirectTargetUri[0] == '/') {
-          Logger.info(Logger.TYPE_INTERNAL,
-              "Redirecting to relative path <" + redirectTargetUri + "> from <"
-                  + document.documentURI + ">");
-          document.location.pathname = redirectTargetUri;
-        } else {
-          // If there is no scheme, treat it as relative to the current directory.
-          if (redirectTargetUri.indexOf(":") == -1) {
-            // TODO: Move this logic to DomainUtil.
-            var curDir = document.documentURI.split("/").slice(0, -1).join("/");
-            redirectTargetUri = curDir + "/" + redirectTargetUri;
-          }
-          Logger.info(Logger.TYPE_INTERNAL,
-              "Redirecting to <" + redirectTargetUri + "> from <"
-                  + document.documentURI + ">");
-          document.location.href = redirectTargetUri;
-        }
-      } catch (e) {
-        if (e.name != "NS_ERROR_FILE_NOT_FOUND") {
-          throw e;
-        }
-      }
-    },
-
     _openInNewTab: function(uri) {
       gBrowser.selectedTab = gBrowser.addTab(uri);
     },
@@ -1529,15 +1212,15 @@ requestpolicy.overlay = (function() {
     },
 
     openPrefs: function() {
-      self.openSettingsTab('chrome://requestpolicy/content/settings/basicprefs.html');
+      self.openSettingsTab('about:requestpolicy');
     },
 
     openPolicyManager: function() {
-      self.openSettingsTab('chrome://requestpolicy/content/settings/yourpolicy.html');
+      self.openSettingsTab('about:requestpolicy?yourpolicy');
     },
 
     openHelp: function() {
-      var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers');
+      var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
       gBrowser.selectedTab = tab;
       var popup = document.getElementById('rp-popup');
       popup.hidePopup();

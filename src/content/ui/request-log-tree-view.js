@@ -33,8 +33,8 @@ window.requestpolicy.requestLogTreeView = (function () {
 
   let mod = {};
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  mod.ScriptLoader.importModules(["utils"], mod);
-  let Utils = mod.Utils;
+  mod.ScriptLoader.importModules(["string-utils"], mod);
+  let StringUtils = mod.StringUtils;
 
 
 
@@ -57,8 +57,8 @@ window.requestpolicy.requestLogTreeView = (function () {
         .getService(Components.interfaces.nsIAtomService),
 
     init : function(e) {
-      var message = Utils.strbundle.GetStringFromName("requestLogIsEmpty");
-      var directions = Utils.strbundle
+      var message = StringUtils.strbundle.GetStringFromName("requestLogIsEmpty");
+      var directions = StringUtils.strbundle
           .GetStringFromName("requestLogDirections");
       self._visibleData.push([message, directions, false, ""]);
     },

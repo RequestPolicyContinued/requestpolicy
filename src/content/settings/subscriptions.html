@@ -2,10 +2,11 @@
 <html>
 <head>
   <title>RequestPolicy - Subscriptions</title>
-  <script src="jquery.min.js"></script>
-  <script src="common.js"></script>
-  <script src="subscriptions.js"></script>
-  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <script src="chrome://requestpolicy/content/settings/jquery.min.js"></script>
+  <script src="chrome://requestpolicy/content/settings/common.js"></script>
+  <script src="chrome://requestpolicy/content/settings/subscriptions.js"></script>
+  <link href="chrome://requestpolicy/content/settings/settings.css"
+        rel="stylesheet" type="text/css"/>
   <style>
   </style>
 </head>
@@ -18,17 +19,17 @@
         <div id="requestpolicy">RequestPolicy</div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="basicprefs.html" data-string="preferences"></a></li>
-            <li><a href="yourpolicy.html" selected="true" data-string="managePolicies"></a></li>
+            <li><a href="about:requestpolicy?basicprefs" data-string="preferences"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy" selected="true" data-string="managePolicies"></a></li>
             <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers" data-string="help" target="_blank"></a></li>
             <li><a href="https://requestpolicycontinued.github.io/#about" data-string="about" target="_blank"></a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="yourpolicy.html" data-string="yourPolicy"></a></li>
-            <li><a href="defaultpolicy.html" data-string="defaultPolicy"></a></li>
-            <li><a href="subscriptions.html" selected="true" data-string="subscriptions"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy" data-string="yourPolicy"></a></li>
+            <li><a href="about:requestpolicy?defaultpolicy" data-string="defaultPolicy"></a></li>
+            <li><a href="about:requestpolicy?subscriptions" selected="true" data-string="subscriptions"></a></li>
           </ul>
         </div>
       </div>
@@ -44,7 +45,7 @@
              target="_blank" data-string="learnMore"></a></p>
 
         <table class="settings">
-          <tr data-default-policy="allow">
+          <tr data-defaultpolicy="allow">
             <td data-string="privacy"></td>
             <td>
               <div id="deny_trackers" class="subscription">
@@ -55,7 +56,7 @@
               </div>
             </td>
           </tr>
-          <tr data-default-policy="deny">
+          <tr data-defaultpolicy="deny">
             <td data-string="usability"></td>
             <td>
               <div id="allow_sameorg" class="subscription">
@@ -78,7 +79,7 @@
               </div>
             </td>
           </tr>
-          <tr data-default-policy="deny">
+          <tr data-defaultpolicy="deny">
             <td data-string="browser"></td>
             <td>
               <div id="allow_mozilla" class="subscription">

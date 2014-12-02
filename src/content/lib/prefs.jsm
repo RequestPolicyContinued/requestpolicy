@@ -21,211 +21,46 @@
  * ***** END LICENSE BLOCK *****
  */
 
+debugger;
+
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-let EXPORTED_SYMBOLS = ['prefs', 'prefsRoot', 'Prefs'];
+let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["logger"], this);
+let {isMainProcess} = ScriptLoader.importModule("utils/process-info");
+
+let prefManagerScope = {};
 
 
-let DefaultPrefInit = (function() {
-  function getGenericPref(branch, prefName) {
-    switch (branch.getPrefType(prefName)) {
-      case 32:
-        // PREF_STRING
-        return getUCharPref(prefName, branch);
+if (isMainProcess) {
+  // if it's the main process (the chrome process). We will get here on startup.
+  // initialize preferences:
+  let uri = "chrome://requestpolicy/content/lib/pref-manager.js";
+  Services.scriptloader.loadSubScript(uri, prefManagerScope);
+}
 
-      case 64:
-        // PREF_INT
-        return branch.getIntPref(prefName);
+let rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
+    .QueryInterface(Ci.nsIPrefBranch2);
+let rootPrefBranch = Services.prefs.getBranch("")
+    .QueryInterface(Ci.nsIPrefBranch2);
 
-      case 128:
-        // PREF_BOOL
-        return branch.getBoolPref(prefName);
 
-      case 0:
-      default:
-        // PREF_INVALID
-        return undefined;
-    }
-  }
-
-  function setGenericPref(branch, prefName, prefValue) {
-    switch (typeof prefValue) {
-      case "string":
-        setUCharPref(prefName, prefValue, branch);
-        return;
-      case "number":
-        branch.setIntPref(prefName, prefValue);
-        return;
-      case "boolean":
-        branch.setBoolPref(prefName, prefValue);
-        return;
-    }
-  }
-
-  function setDefaultPref(prefName, prefValue) {
-    var defaultBranch = Services.prefs.getDefaultBranch(null);
-    setGenericPref(defaultBranch, prefName, prefValue);
-  }
-
-  function getUCharPref(prefName, branch) {  // Unicode getCharPref
-    branch = branch || Services.prefs;
-    return branch.getComplexValue(prefName, Ci.nsISupportsString).data;
-  }
-
-  function setUCharPref(prefName, text, branch) { // Unicode setCharPref
-    var string = Cc["@mozilla.org/supports-string;1"]
-        .createInstance(Ci.nsISupportsString);
-    string.data = text;
-    branch = branch || Services.prefs;
-    branch.setComplexValue(prefName, Ci.nsISupportsString, string);
-  }
-
-  let initialized = false;
-
-  let self = {
-    init: function() {
-      if (!initialized) {
-        initialized = true;
-        try {
-          // this is necessary for restartless extensions:
-          // ( See https://developer.mozilla.org/en-US/Add-ons/
-          //   How_to_convert_an_overlay_extension_to_restartless
-          //   #Step_4.3A_Manually_handle_default_preferences )
-          Services.scriptloader.loadSubScript(
-              "chrome://requestpolicy/content/lib/default-preferences.js",
-              {pref: setDefaultPref, setGenericPref: setGenericPref,
-                  setUCharPref: setUCharPref});
-        } catch (e) {
-        }
-      }
-    }
-  };
-  return self;
-}());
 
 
 let Prefs = (function() {
   let self = {};
-
 
   let defaultAllow = true;
   let defaultAllowSameDomain = true;
   let blockingDisabled = false;
 
 
-  function updateLoggingSettings() {
-    Logger.enabled = self.prefs.getBoolPref("log");
-    Logger.level = self.prefs.getIntPref("log.level");
-    Logger.types = self.prefs.getIntPref("log.types");
-  }
 
-  /**
-   * Take necessary actions when preferences are updated.
-   *
-   * @paramString{} prefName NAme of the preference that was updated.
-   */
-  function prefChanged(prefName) {
-    switch (prefName) {
-      case "log" :
-      case "log.level" :
-      case "log.types" :
-        updateLoggingSettings();
-        break;
-      case "defaultPolicy.allow" :
-        defaultAllow = self.prefs.getBoolPref("defaultPolicy.allow");
-        break;
-      case "defaultPolicy.allowSameDomain" :
-        defaultAllowSameDomain = self.prefs.getBoolPref(
-            "defaultPolicy.allowSameDomain");
-        break;
-      default :
-        break;
-    }
-    Services.obs.notifyObservers(null, "requestpolicy-prefs-changed", null);
-  }
-
-  function syncFromPrefs() {
-    // Load the logging preferences before the others.
-    updateLoggingSettings();
-
-    defaultAllow = self.prefs.getBoolPref("defaultPolicy.allow");
-    defaultAllowSameDomain = self.prefs.getBoolPref("defaultPolicy.allowSameDomain");
-    blockingDisabled = self.prefs.getBoolPref("startWithAllowAllEnabled");
-
-    // Disable link prefetch.
-    if (self.prefs.getBoolPref("prefetch.link.disableOnStartup")) {
-      if (self.prefsRoot.getBoolPref("network.prefetch-next")) {
-        self.prefsRoot.setBoolPref("network.prefetch-next", false);
-        Logger.info(Logger.TYPE_INTERNAL, "Disabled link prefetch.");
-      }
-    }
-    // Disable DNS prefetch.
-    if (self.prefs.getBoolPref("prefetch.dns.disableOnStartup")) {
-      // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
-      // doesn't have a default value, at least in 3.1b2, but if and when it
-      // does have a default it will be false).
-      if (!self.prefsRoot.prefHasUserValue("network.dns.disablePrefetch") ||
-          !self.prefsRoot.getBoolPref("network.dns.disablePrefetch")) {
-        self.prefsRoot.setBoolPref("network.dns.disablePrefetch", true);
-        Logger.info(Logger.TYPE_INTERNAL, "Disabled DNS prefetch.");
-      }
-    }
-
-    // Clean up old, unused prefs (removed in 0.2.0).
-    let deletePrefs = [
-      "temporarilyAllowedOrigins",
-      "temporarilyAllowedDestinations",
-      "temporarilyAllowedOriginsToDestinations"
-    ];
-    for (var i = 0; i < deletePrefs.length; i++) {
-      if (self.prefs.prefHasUserValue(deletePrefs[i])) {
-        self.prefs.clearUserPref(deletePrefs[i]);
-      }
-    }
-    Services.prefs.savePrefFile(null);
-  }
-
-  let prefObserver = {
-    observe: function(subject, topic, data) {
-      switch (topic) {
-        case "nsPref:changed":
-          prefChanged(data);
-          break;
-        default:
-          break;
-      }
-    }
-  };
-
-  function init() {
-    // the DefaultPrefInit is needed in restartless addons. see:
-    // https://developer.mozilla.org/en-US/Add-ons/
-    // How_to_convert_an_overlay_extension_to_restartless
-    // #Step_4.3A_Manually_handle_default_preferences
-    DefaultPrefInit.init();
-
-    self.prefs = Services.prefs.getBranch("extensions.requestpolicy.")
-        .QueryInterface(Ci.nsIPrefBranch2);
-    self.prefs.addObserver("", prefObserver, false);
-
-    self.prefsRoot = Services.prefs.getBranch("")
-        .QueryInterface(Ci.nsIPrefBranch2);
-    self.prefsRoot.addObserver("network.prefetch-next", prefObserver, false);
-    self.prefsRoot.addObserver("network.dns.disablePrefetch", prefObserver,
-        false);
-
-    syncFromPrefs();
-  }
-
-  self.prefs = null;
-  self.prefsRoot = null;
   self.save = function() {
     Services.prefs.savePrefFile(null);
   };
@@ -241,23 +76,43 @@ let Prefs = (function() {
   };
   self.setBlockingDisabled = function(disabled) {
     blockingDisabled = disabled;
-    self.prefs.setBoolPref('startWithAllowAllEnabled', disabled);
+    rootPrefBranch.setBoolPref('startWithAllowAllEnabled', disabled);
     self.save();
   };
   self.isPrefetchEnabled = function() {
     // network.dns.disablePrefetch only exists starting in Firefox 3.1
     try {
-      return self.prefsRoot.getBoolPref("network.prefetch-next")
-          || !self.prefsRoot.getBoolPref("network.dns.disablePrefetch");
+      return rootPrefBranch.getBoolPref("network.prefetch-next")
+          || !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
     } catch (e) {
-      return self.prefsRoot.getBoolPref("network.prefetch-next");
+      return rootPrefBranch.getBoolPref("network.prefetch-next");
     }
   };
 
 
+  /**
+   * Take necessary actions when preferences are updated.
+   *
+   * @paramString{} prefName name of the preference that was updated.
+   */
+  function prefChanged(prefName) {
+    switch (prefName) {
+      case "defaultPolicy.allow" :
+        defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
+        break;
+      case "defaultPolicy.allowSameDomain" :
+        defaultAllowSameDomain = rpPrefBranch.getBoolPref(
+            "defaultPolicy.allowSameDomain");
+        break;
+      default:
+        break;
+    }
+    Services.obs.notifyObservers(null, "requestpolicy-prefs-changed", null);
+  }
+
   function isPrefEmpty(pref) {
     try {
-      let value = self.prefs.getComplexValue(pref, Ci.nsISupportsString).data;
+      let value = rpPrefBranch.getComplexValue(pref, Ci.nsISupportsString).data;
       return value == '';
     } catch (e) {
       return true;
@@ -270,6 +125,23 @@ let Prefs = (function() {
              isPrefEmpty('allowedOriginsToDestinations'));
   };
 
+  function init() {
+    defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
+    defaultAllowSameDomain = rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
+    blockingDisabled = rpPrefBranch.getBoolPref("startWithAllowAllEnabled");
+  }
+
+  let prefObserver = {
+    observe: function(subject, topic, data) {
+      if (topic == "nsPref:changed") {
+        prefChanged(data);
+      }
+    }
+  };
+
+  rpPrefBranch.addObserver("", prefObserver, false);
+  rootPrefBranch.addObserver("network.prefetch-next", prefObserver, false);
+  rootPrefBranch.addObserver("network.dns.disablePrefetch", prefObserver, false);
 
   init();
 

@@ -30,27 +30,27 @@ var prefsChangedObserver = null;
 function updateDisplay() {
   // Link prefetch.
   document.getElementById('pref-linkPrefetch').checked =
-      Prefs.prefsRoot.getBoolPref('network.prefetch-next');
+      rootPrefBranch.getBoolPref('network.prefetch-next');
 
   document.getElementById('pref-prefetch.link.disableOnStartup').checked =
-      Prefs.prefs.getBoolPref('prefetch.link.disableOnStartup');
+      rpPrefBranch.getBoolPref('prefetch.link.disableOnStartup');
 
   document.getElementById('pref-prefetch.link.restoreDefaultOnUninstall').checked =
-      Prefs.prefs.getBoolPref('prefetch.link.restoreDefaultOnUninstall');
+      rpPrefBranch.getBoolPref('prefetch.link.restoreDefaultOnUninstall');
 
   // DNS prefetch.
   document.getElementById('pref-dnsPrefetch').checked =
-      !Prefs.prefsRoot.getBoolPref('network.dns.disablePrefetch');
+      !rootPrefBranch.getBoolPref('network.dns.disablePrefetch');
 
   document.getElementById('pref-prefetch.dns.disableOnStartup').checked =
-      Prefs.prefs.getBoolPref('prefetch.dns.disableOnStartup');
+      rpPrefBranch.getBoolPref('prefetch.dns.disableOnStartup');
 
   document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').checked =
-      Prefs.prefs.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
+      rpPrefBranch.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
 
   // TODO: Create a class which acts as an API for preferences and which ensures
   // that the returned value is always a valid value for "string" preferences.
-  var sorting = Prefs.prefs.getCharPref('menu.sorting');
+  var sorting = rpPrefBranch.getCharPref('menu.sorting');
 
   if (sorting == document.getElementById('sortByNumRequests').value) {
     document.getElementById('sortByNumRequests').checked = true;
@@ -67,7 +67,7 @@ function updateDisplay() {
   }
 
   document.getElementById('menu.info.showNumRequests').checked =
-      Prefs.prefs.getBoolPref('menu.info.showNumRequests');
+      rpPrefBranch.getBoolPref('menu.info.showNumRequests');
 }
 
 
@@ -77,14 +77,14 @@ function onload() {
   // Link prefetch.
   document.getElementById('pref-linkPrefetch').addEventListener('change',
       function (event) {
-        Prefs.prefsRoot.setBoolPref('network.prefetch-next', event.target.checked);
+        rootPrefBranch.setBoolPref('network.prefetch-next', event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );
 
   document.getElementById('pref-prefetch.link.disableOnStartup').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('prefetch.link.disableOnStartup',
+        rpPrefBranch.setBoolPref('prefetch.link.disableOnStartup',
             event.target.checked);
         Services.prefs.savePrefFile(null);
       }
@@ -92,7 +92,7 @@ function onload() {
 
   document.getElementById('pref-prefetch.link.restoreDefaultOnUninstall').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('prefetch.link.restoreDefaultOnUninstall', event.target.checked);
+        rpPrefBranch.setBoolPref('prefetch.link.restoreDefaultOnUninstall', event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );
@@ -100,27 +100,27 @@ function onload() {
   // DNS prefetch.
   document.getElementById('pref-dnsPrefetch').addEventListener('change',
       function (event) {
-        Prefs.prefsRoot.setBoolPref('network.dns.disablePrefetch', !event.target.checked);
+        rootPrefBranch.setBoolPref('network.dns.disablePrefetch', !event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );
 
   document.getElementById('pref-prefetch.dns.disableOnStartup').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('prefetch.dns.disableOnStartup', event.target.checked);
+        rpPrefBranch.setBoolPref('prefetch.dns.disableOnStartup', event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );
 
   document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('prefetch.dns.restoreDefaultOnUninstall', event.target.checked);
+        rpPrefBranch.setBoolPref('prefetch.dns.restoreDefaultOnUninstall', event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );
 
   var sortingListener = function (event) {
-    Prefs.prefs.setCharPref('menu.sorting', event.target.value);
+    rpPrefBranch.setCharPref('menu.sorting', event.target.value);
     Services.prefs.savePrefFile(null);
   };
   document.getElementById('sortByNumRequests').addEventListener('change', sortingListener);
@@ -129,7 +129,7 @@ function onload() {
 
   document.getElementById('menu.info.showNumRequests').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('menu.info.showNumRequests', event.target.checked);
+        rpPrefBranch.setBoolPref('menu.info.showNumRequests', event.target.checked);
         Services.prefs.savePrefFile(null);
       }
   );

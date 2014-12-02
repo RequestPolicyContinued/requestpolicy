@@ -101,7 +101,7 @@ let PolicyImplementation = (function() {
 
     // https://developer.mozilla.org/en/nsIContentPolicy
 
-    shouldLoad : function(aContentType, aContentLocation, aRequestOrigin,
+    shouldLoad: function(aContentType, aContentLocation, aRequestOrigin,
         aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
       var request = new NormalRequest(
           aContentType, aContentLocation, aRequestOrigin, aContext,
@@ -112,7 +112,7 @@ let PolicyImplementation = (function() {
       //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
     },
 
-    shouldProcess : (() => CP_OK),
+    shouldProcess: (() => CP_OK),
 
     //
     // nsIFactory interface implementation

@@ -28,6 +28,7 @@ const Cu = Components.utils;
 let EXPORTED_SYMBOLS = [
   "EXTENSION_ID",
   "FIREFOX_ID",
+  "MMID",
 
   "APP_STARTUP",
   "APP_SHUTDOWN",
@@ -47,6 +48,7 @@ let EXPORTED_SYMBOLS = [
 
 const EXTENSION_ID = "requestpolicy@requestpolicy.com";
 const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
+const MMID = EXTENSION_ID; // message manager ID
 
 // reason constants for startup(), shutdown(), install() and uninstall()
 // see https://developer.mozilla.org/en-US/Add-ons/Bootstrapped_extensions#Reason_constants

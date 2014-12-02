@@ -33,9 +33,10 @@ window.requestpolicy.requestLog = (function () {
   Cu.import("resource://gre/modules/Services.jsm", mod);
   mod.ScriptLoader.importModules([
     "domain-util",
-    "utils"
+    "string-utils"
   ], mod);
-  let Services = mod.Services, DomainUtil = mod.DomainUtil, Utils = mod.Utils;
+  let Services = mod.Services, DomainUtil = mod.DomainUtil,
+      StringUtils = mod.StringUtils;
 
 
   let initialized = false;
@@ -88,8 +89,8 @@ window.requestpolicy.requestLog = (function () {
       }
 
       if (forbidden) {
-        var alertTitle = Utils.strbundle.GetStringFromName("actionForbidden");
-        var alertText = Utils.strbundle
+        var alertTitle = StringUtils.strbundle.GetStringFromName("actionForbidden");
+        var alertText = StringUtils.strbundle
             .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
         Services.prompt.alert(null, alertTitle, alertText);
         return;

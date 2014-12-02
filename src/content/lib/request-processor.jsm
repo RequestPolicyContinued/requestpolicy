@@ -23,6 +23,7 @@
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
+const Cr = Components.results;
 const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["RequestProcessor"];
@@ -44,6 +45,7 @@ ScriptLoader.importModules([
   "prefs",
   "policy-manager",
   "domain-util",
+  "utils",
   "request",
   "request-result",
   "request-set"
@@ -204,7 +206,42 @@ let RequestProcessor = (function() {
     try {
       if (!Prefs.isBlockingDisabled()) {
         httpChannel.setResponseHeader(headerType, "", false);
-        self._blockedRedirects[originURI] = destURI;
+
+        /* start - do not edit here */
+        let interfaceRequestor = httpChannel.notificationCallbacks
+            .QueryInterface(Ci.nsIInterfaceRequestor);
+        let loadContext = null;
+        try {
+          loadContext = interfaceRequestor.getInterface(Ci.nsILoadContext);
+        } catch (ex) {
+          try {
+            loadContext = aSubject.loadGroup.notificationCallbacks
+                .getInterface(Ci.nsILoadContext);
+          } catch (ex2) {}
+        }
+        /*end do not edit here*/
+
+
+        let browser;
+        try {
+          if (loadContext.topFrameElement) {
+            // the top frame element should be already the browser element
+            browser = loadContext.topFrameElement;
+          } else {
+            // we hope the associated window is available. in multiprocessor
+            // firefox it's not available.
+            browser = Utils.getBrowserForWindow(loadContext.topWindow);
+          }
+          // save all blocked redirects directly in the browser element. the
+          // blocked elements will be checked later when the DOM content
+          // finished loading.
+          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
+          browser.requestpolicy.blockedRedirects[originURI] = destURI;
+        } catch (e) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
+                         "Load Context couldn't be found! " + e);
+        }
+
 
         try {
           contentDisp = httpChannel.getResponseHeader("Content-Disposition");
@@ -235,15 +272,13 @@ let RequestProcessor = (function() {
         // that get set in the redirection process, to stop the redirection.
         var iterations = 0;
         const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
-        while (allowedRedirectsReverse[initialOrigin]) {
-          if (iterations++ >= ASSUME_REDIRECT_LOOP) {
-            break;
-          }
+        while (initialOrigin in allowedRedirectsReverse &&
+               iterations++ < ASSUME_REDIRECT_LOOP) {
           initialDest = initialOrigin;
           initialOrigin = allowedRedirectsReverse[initialOrigin];
         }
 
-        if (clickedLinksReverse[initialOrigin]) {
+        if (initialOrigin in clickedLinksReverse) {
           for (var i in clickedLinksReverse[initialOrigin]) {
             // We hope there's only one possibility of a source page (that is,
             // ideally there will be one iteration of this loop).
@@ -557,7 +592,7 @@ let RequestProcessor = (function() {
             var dest = requests[originUri][destBase][destIdent][destUri];
             for (var i in dest) {
               // TODO: This variable could have been created easily already in
-              //       getAllRequestsOnDocument(). ==> rewrite RequestSet to
+              //       getAllRequestsInBrowser(). ==> rewrite RequestSet to
               //       contain a blocked list, an allowed list (and maybe a list
               //       of all requests).
               if (isAllowed === dest[i].isAllowed) {
@@ -684,8 +719,6 @@ let RequestProcessor = (function() {
     _rejectedRequests: new RequestSet(),
     _allowedRequests: new RequestSet(),
 
-    // TODO: make it private
-    _blockedRedirects: {},
 
 
     /**
@@ -705,35 +738,49 @@ let RequestProcessor = (function() {
         var originURI = request.originURI;
         var destURI = request.destURI;
 
-        // Fx 16 changed the following: 1) we should be able to count on the
-        // referrer (aRequestOrigin) being set to something besides
-        // moz-nullprincipal when there is a referrer, and 2) the new argument
-        // aRequestPrincipal is provided. This means our hackery to set the
-        // referrer based on aContext when aRequestOrigin is moz-nullprincipal
-        // is now causing requests that don't have a referrer (namely, URLs
-        // entered in the address bar) to be blocked and trigger a top-level
-        // document redirect notification.
-        if (request.aRequestOrigin.scheme == "moz-nullprincipal" &&
-            request.aRequestPrincipal) {
-          Logger.warning(
-              Logger.TYPE_CONTENT,
-              "Allowing request that appears to be a URL entered in the "
-                  + "location bar or some other good explanation: " + destURI);
-          return CP_OK;
-        }
+        if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
+          let browser = null;
 
-        // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
-        // above is correct, this should be able to be removed when Fx < 16 is
-        // no longer supported.
-        if (request.aRequestOrigin.scheme == "moz-nullprincipal" &&
-            request.aContext) {
-          var newOriginURI = DomainUtil
-                .stripFragment(request.aContext.contentDocument.documentURI);
-          Logger.info(Logger.TYPE_CONTENT,
-              "Considering moz-nullprincipal origin <"
-                  + originURI + "> to be origin <" + newOriginURI + ">");
-          originURI = newOriginURI;
-          request.setOriginURI(originURI);
+          // Fx 16 changed the following: 1) we should be able to count on the
+          // referrer (aRequestOrigin) being set to something besides
+          // moz-nullprincipal when there is a referrer, and 2) the new argument
+          // aRequestPrincipal is provided. This means our hackery to set the
+          // referrer based on aContext when aRequestOrigin is moz-nullprincipal
+          // is now causing requests that don't have a referrer (namely, URLs
+          // entered in the address bar) to be blocked and trigger a top-level
+          // document redirect notification.
+          if (request.aRequestPrincipal) {
+            Logger.warning(
+                Logger.TYPE_CONTENT,
+                "Allowing request that appears to be a URL entered in the " +
+                "location bar or some other good explanation: " + destURI);
+            return CP_OK;
+          }
+
+          // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
+          // above is correct, this should be able to be removed when Fx < 16 is
+          // no longer supported.
+          if (request.aContext) {
+            try {
+              let domElement = request.aContext.QueryInterface(Ci.nsIDOMElement);
+              if (domElement && domElement.tagName == "") {
+                var newOriginURI = DomainUtil
+                      .stripFragment(request.aContext.contentDocument.documentURI);
+                Logger.info(Logger.TYPE_CONTENT,
+                    "Considering moz-nullprincipal origin <"
+                        + originURI + "> to be origin <" + newOriginURI + ">");
+                originURI = newOriginURI;
+                request.setOriginURI(originURI);
+              }
+            } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {
+              try {
+                let domWin = request.aContext.QueryInterface(Ci.nsIDOMWindow);
+            return CP_OK;
+                if (domWin && domWin.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
+                }
+              } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+            }
+          }
         }
 
         if (request.aRequestOrigin.scheme == "view-source") {
@@ -766,7 +813,7 @@ let RequestProcessor = (function() {
           let domNode;
           try {
             domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
           if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
             var newOriginURI;
             if (request.aContext.documentURI &&
@@ -812,7 +859,7 @@ let RequestProcessor = (function() {
           let domNode;
           try {
             domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
 
           if (domNode && domNode.nodeName == "LINK" &&
               (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
@@ -923,7 +970,7 @@ let RequestProcessor = (function() {
           let domNode;
           try {
             domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Components.results.NS_ERROR_NO_INTERFACE) {}
+          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
 
           if (domNode && domNode.nodeName == "xul:browser" &&
               domNode.currentURI && domNode.currentURI.spec == "about:blank") {
@@ -1105,7 +1152,7 @@ let RequestProcessor = (function() {
      * available on the channel. The response can be accessed and modified via
      * nsITraceableChannel.
      */
-    _examineHttpResponse: function(observedSubject) {
+    _examineHttpResponse: function(aSubject) {
       // Currently, if a user clicks a link to download a file and that link
       // redirects and is subsequently blocked, the user will see the blocked
       // destination in the menu. However, after they have allowed it from
@@ -1117,7 +1164,7 @@ let RequestProcessor = (function() {
       // TODO: Make user aware of blocked headers so they can allow them if
       // desired.
 
-      var httpChannel = observedSubject.QueryInterface(Ci.nsIHttpChannel);
+      var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 
       var headerType;
       var dest;
@@ -1138,7 +1185,11 @@ let RequestProcessor = (function() {
           return;
         }
         try {
-          var parts = DomainUtil.parseRefresh(refreshString);
+          // We can ignore the delay because we aren't manually doing
+          // the refreshes. Allowed refreshes we still leave to the browser.
+          // The dest may be empty if the origin is what should be refreshed.
+          // This will be handled by DomainUtil.determineRedirectUri().
+          var dest = DomainUtil.parseRefresh(refreshString).destURI;
         } catch (e) {
           Logger.warning(Logger.TYPE_HEADER_REDIRECT,
               "Invalid refresh header: <" + refreshString + ">");
@@ -1147,11 +1198,6 @@ let RequestProcessor = (function() {
           }
           return;
         }
-        // We can ignore the delay (parts[0]) because we aren't manually doing
-        // the refreshes. Allowed refreshes we still leave to the browser.
-        // The dest may be empty if the origin is what should be refreshed. This
-        // will be handled by DomainUtil.determineRedirectUri().
-        dest = parts[1];
       }
 
       // For origins that are IDNs, this will always be in ACE format. We want
@@ -1209,8 +1255,8 @@ let RequestProcessor = (function() {
      * Currently this just looks for prefetch requests that are getting through
      * which we currently can't stop.
      */
-    _examineHttpRequest: function(observedSubject) {
-      var httpChannel = observedSubject.QueryInterface(Ci.nsIHttpChannel);
+    _examineHttpRequest: function(aSubject) {
+      var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
       try {
         // Determine if prefetch requests are slipping through.
         if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
@@ -1398,11 +1444,11 @@ let RequestProcessor = (function() {
      * cases where the user has multiple tabs/windows open to the same page.
      *
      * @param {}
-     *          document
+     *          browser
      * @return {}
      *          RequestSet
      */
-    getAllRequestsOnDocument: function(document) {
+    getAllRequestsInBrowser: function(browser) {
       //var origins = {};
       var reqSet = new RequestSet();
 
@@ -1412,8 +1458,8 @@ let RequestProcessor = (function() {
       // main allowed/denied request sets before adding them.
       //_getOtherOriginsHelperFromDOM(document, reqSet);
 
-      var documentURI = DomainUtil.stripFragment(document.documentURI);
-      _addRecursivelyAllRequestsFromURI(documentURI, reqSet, {});
+      var uri = DomainUtil.stripFragment(browser.currentURI.spec);
+      _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
       return reqSet;
     }
   };

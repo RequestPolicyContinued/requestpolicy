@@ -38,8 +38,7 @@ var testDefaultPolicies = function() {
   controller.open(TEST_URL);
   controller.waitForPageLoad();
 
-  let itDefaultPolicy = makeDefaultPolicyIterator();
-  while (!itDefaultPolicy.next().done) {
+  for (let defaultPolicySetting of makeDefaultPolicyIterator()) {
     DefaultPolicyManager.dumpState();
 
     // reload the page with the new preferences

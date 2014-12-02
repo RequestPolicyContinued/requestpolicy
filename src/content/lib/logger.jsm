@@ -29,37 +29,18 @@ let EXPORTED_SYMBOLS = ["Logger"];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
+
+// We can't import the ScriptLoader when the Logger is loaded, because the
+// Logger gets imported by the ScriptLoader itself on startup.
+let ScriptLoader = null;
+
+
 /**
  * Provides logging methods
  */
 let Logger = (function() {
-  // private variables and functions
-
-  function doLog(level, type, message, e) {
-    if (self.enabled && level >= self.level && self.types & type) {
-      let levelName = self._LEVEL_NAMES[level.toString()];
-      let typeName = self._TYPE_NAMES[type.toString()];
-
-      let stack = (e && e.stack) ? ", stack was:\n" + e.stack : "";
-      self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
-          + message + stack + "\n");
-
-      if (level == self.LEVEL_SEVERE && type == self.TYPE_ERROR) {
-        let windowtype = 'navigator:browser';
-        let mostRecentWindow  = Services.wm.getMostRecentWindow(windowtype);
-
-        if (mostRecentWindow) {
-          mostRecentWindow.alert("Sorry, RequestPolicy crashed! " + message);
-        }
-      }
-    }
-  }
-
-
 
   let self = {
-    // public attributes and methods
-
     TYPE_CONTENT: 1, // content whose origin isn't known more specifically
     TYPE_META_REFRESH: 2, // info related to meta refresh
     TYPE_HEADER_REDIRECT: 4, // info related to header redirects
@@ -90,15 +71,98 @@ let Logger = (function() {
   self._LEVEL_NAMES[self.LEVEL_INFO.toString()] = "INFO";
   self._LEVEL_NAMES[self.LEVEL_DEBUG.toString()] = "DEBUG";
 
-  // These can be set to change logging level, what types of messages are
-  // logged, and to enable/disable logging.
-  self.level = self.LEVEL_INFO;
-  self.types = self.TYPE_ALL;
-  // enable logging before RP finished initializing
-  self.enabled = true;
-
   // function to use to print out the log
   self.printFunc = dump;
+
+
+
+
+  let initialized = false;
+  let rpPrefBranch = null;
+
+  // initially, enable logging. later the logging preferences of the user will
+  // will be loaded.
+  let enabled = true;
+  // These can be set to change logging level, what types of messages are
+  // logged, and to enable/disable logging.
+  let level = self.LEVEL_INFO;
+  let types = self.TYPE_ALL;
+
+  function updateLoggingSettings(rp) {
+    enabled = rpPrefBranch.getBoolPref("log");
+    level = rpPrefBranch.getIntPref("log.level");
+    types = rpPrefBranch.getIntPref("log.types");
+  }
+
+  let prefObserver = {
+    observe: function(subject, topic, data) {
+      if (topic == "nsPref:changed") {
+        updateLoggingSettings();
+      }
+    }
+  };
+
+  function displayMessageNotInitiallized() {
+    dump("[RequestPolicy] [INFO] [INTERNAL] preferences are not available " +
+         "yet, so logging is still enabled.\n");
+  }
+
+  function init() {
+    if (!ScriptLoader) {
+      // try to import the ScriptLoader
+      try {
+        // We can't import the ScriptLoader when the Logger is loaded, because the
+        // Logger gets imported by the ScriptLoader itself on startup.
+        let mod = {};
+        Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+        ScriptLoader = mod.ScriptLoader;
+      } catch (e) {
+        ScriptLoader = null;
+        displayMessageNotInitiallized();
+        return;
+      }
+    }
+    let prefScope = ScriptLoader.importModule("prefs");
+    if (!("rpPrefBranch" in prefScope)) {
+      displayMessageNotInitiallized();
+      return;
+    }
+    rpPrefBranch = prefScope.rpPrefBranch;
+    initialized = true;
+    rpPrefBranch.addObserver("log", prefObserver, false);
+    updateLoggingSettings();
+  }
+
+
+
+
+  function doLog(aLevel, aType, aMessage, aError) {
+    if (!initialized) {
+      init();
+    }
+
+    if (enabled && aLevel >= level && types & aType) {
+      let levelName = self._LEVEL_NAMES[aLevel.toString()];
+      let typeName = self._TYPE_NAMES[aType.toString()];
+
+      let stack = (aError && aError.stack) ?
+                  ", stack was:\n" + aError.stack : "";
+      self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
+          + aMessage + stack + "\n");
+
+      // TODO: remove the following after finishing e10s
+      if (aLevel == self.LEVEL_SEVERE && aType == self.TYPE_ERROR) {
+        let windowtype = 'navigator:browser';
+        let mostRecentWindow  = Services.wm.getMostRecentWindow(windowtype);
+
+        if (mostRecentWindow) {
+          mostRecentWindow.alert("Sorry, RequestPolicy crashed! " + message);
+        }
+      }
+    }
+  }
+
+
 
   self.severe = doLog.bind(self, self.LEVEL_SEVERE);
   self.severeError = doLog.bind(self, self.LEVEL_SEVERE, self.TYPE_ERROR);

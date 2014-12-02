@@ -61,10 +61,10 @@ var testAutoRedirect = function() {
       controller.waitFor(function() {
           return controller.window.content.document.location.href !== testURL;
       }, "The URL in the urlbar has changed.");
-      assert.ok(!panel.exists(), "The redirect has been allowed.");
+      expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
     } else {
-      assert.ok(panel.exists(), "The redirect has been blocked.");
-      assert.ok(controller.window.content.document.location.href === testURL,
+      expect.ok(panel.exists(), "The redirect notification bar is displayed.");
+      expect.ok(controller.window.content.document.location.href === testURL,
                 "The URL in the urlbar hasn't changed.");
     }
 

@@ -39,18 +39,18 @@ requestpolicy.menu = (function() {
     "domain-util",
     "ruleset",
     "gui-location",
-    "utils",
+    "string-utils",
 
     "requestpolicy-service",
     "constants"
   ], mod);
-  let Logger = mod.Logger, Prefs = mod.Prefs,
+  let Logger = mod.Logger, rpPrefBranch = mod.rpPrefBranch, Prefs = mod.Prefs,
       RequestProcessor = mod.RequestProcessor,
       PolicyManager = mod.PolicyManager, DomainUtil = mod.DomainUtil,
       Ruleset = mod.Ruleset, GUILocation = mod.GUILocation,
       GUIOrigin = mod.GUIOrigin, GUIDestination = mod.GUIDestination,
       GUILocationProperties = mod.GUILocationProperties,
-      Utils = mod.Utils, rpService = mod.rpService;
+      StringUtils = mod.StringUtils, rpService = mod.rpService;
 
 
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
@@ -146,18 +146,18 @@ requestpolicy.menu = (function() {
           return;
         }
 
-        // The fact that getAllRequestsOnDocument uses documentURI directly from
-        // content.document is important because getTopLevelDocumentUri will
-        // not return the real documentURI if there is an applicable
+        // The fact that getAllRequestsInBrowser uses currentURI.spec directly
+        // from the browser is important because getTopLevelDocumentUri will
+        // not return the real URI if there is an applicable
         // top-level document translation rule (these are used sometimes
         // for extension compatibility). For example, this is essential to the
         // menu showing relevant info when using the Update Scanner extension.
         self._allRequestsOnDocument = RequestProcessor
-              .getAllRequestsOnDocument(content.document);
+              .getAllRequestsInBrowser(gBrowser.selectedBrowser);
         self._allRequestsOnDocument.print("_allRequestsOnDocument");
 
         self._privateBrowsingEnabled = rpService.isPrivateBrowsingEnabled()
-            && !Prefs.prefs.getBoolPref("privateBrowsingPermanentWhitelisting");
+            && !rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
 
         self._setPrivateBrowsingStyles();
 
@@ -166,8 +166,9 @@ requestpolicy.menu = (function() {
     //      self._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
     //
     //      if (isChromeUri) {
-    //        self._itemUnrestrictedOrigin.setAttribute("label", Utils.strbundle
-    //          .formatStringFromName("unrestrictedOrigin", ["chrome://"]), 1);
+    //        self._itemUnrestrictedOrigin.setAttribute("label",
+    //            StringUtils.strbundle.formatStringFromName(
+    //                "unrestrictedOrigin", ["chrome://"]), 1);
     //        self._itemUnrestrictedOrigin.hidden = false;
     //        return;
     //      }
@@ -186,7 +187,7 @@ requestpolicy.menu = (function() {
 
     _populateMenuForUncontrollableOrigin: function() {
       self._originDomainnameItem.setAttribute('value',
-          Utils.strbundle.GetStringFromName('noOrigin'));
+          StringUtils.strbundle.GetStringFromName('noOrigin'));
       self._originNumRequestsItem.setAttribute('value', '');
       self._originItem.removeAttribute("default-policy");
       self._originItem.removeAttribute("requests-blocked");
@@ -212,8 +213,8 @@ requestpolicy.menu = (function() {
 
       if (true === guiLocations) {
         // get prefs
-        var sorting = Prefs.prefs.getCharPref('menu.sorting');
-        var showNumRequests = Prefs.prefs.getBoolPref('menu.info.showNumRequests');
+        var sorting = rpPrefBranch.getCharPref('menu.sorting');
+        var showNumRequests = rpPrefBranch.getBoolPref('menu.info.showNumRequests');
 
         if (sorting == "numRequests") {
           values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -251,7 +252,7 @@ requestpolicy.menu = (function() {
     _populateOrigin: function() {
       self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
 
-      var showNumRequests = Prefs.prefs
+      var showNumRequests = rpPrefBranch
           .getBoolPref('menu.info.showNumRequests');
 
       var props = self._getOriginGUILocationProperties();
@@ -928,7 +929,7 @@ requestpolicy.menu = (function() {
 
     _addMenuItemHelper: function(list, ruleData, fmtStrName, fmtStrArgs,
         ruleAction, cssClass) {
-      var label = Utils.strbundle.formatStringFromName(fmtStrName, fmtStrArgs,
+      var label = StringUtils.strbundle.formatStringFromName(fmtStrName, fmtStrArgs,
           fmtStrArgs.length);
       var item = self._addListItem(list, 'rp-od-item', label);
       item.requestpolicyRuleData = ruleData;

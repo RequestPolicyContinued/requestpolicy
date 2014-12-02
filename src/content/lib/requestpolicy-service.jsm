@@ -59,7 +59,7 @@ let rpService = (function() {
 
   let conflictingExtensions = [];
   let compatibilityRules = [];
-  let topLevelDocTranslationRules = [];
+  let topLevelDocTranslationRules = {};
 
   let subscriptions = null;
 
@@ -76,19 +76,19 @@ let rpService = (function() {
 
   function handleUninstallOrDisable() {
     Logger.debug(Logger.TYPE_INTERNAL, "Performing 'disable' operations.");
-    var resetLinkPrefetch = Prefs.prefs.getBoolPref(
+    var resetLinkPrefetch = rpPrefBranch.getBoolPref(
         "prefetch.link.restoreDefaultOnUninstall");
-    var resetDNSPrefetch = Prefs.prefs.getBoolPref(
+    var resetDNSPrefetch = rpPrefBranch.getBoolPref(
         "prefetch.dns.restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
-      if (Prefs.prefsRoot.prefHasUserValue("network.prefetch-next")) {
-        Prefs.prefsRoot.clearUserPref("network.prefetch-next");
+      if (rootPrefBranch.prefHasUserValue("network.prefetch-next")) {
+        rootPrefBranch.clearUserPref("network.prefetch-next");
       }
     }
     if (resetDNSPrefetch) {
-      if (Prefs.prefsRoot.prefHasUserValue("network.dns.disablePrefetch")) {
-        Prefs.prefsRoot.clearUserPref("network.dns.disablePrefetch");
+      if (rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch")) {
+        rootPrefBranch.clearUserPref("network.dns.disablePrefetch");
       }
     }
     Services.prefs.savePrefFile(null);
@@ -209,7 +209,7 @@ let rpService = (function() {
             "Using extension compatibility rules for: " + ext.name);
         var orig = "chrome://updatescan/content/diffPage.xul";
         var translated = "data:text/html";
-        topLevelDocTranslationRules.push([orig, translated]);
+        topLevelDocTranslationRules[orig] = translated;
         break;
       case "FirefoxAddon@similarWeb.com" : // SimilarWeb
         Logger.info(Logger.TYPE_INTERNAL,
@@ -349,7 +349,8 @@ let rpService = (function() {
     subscriptions = new UserSubscriptions();
     PolicyManager.loadUserRules();
 
-    var defaultPolicy = Prefs.prefs.defaultAllow ? 'allow' : 'deny';
+    Prefs.isDefaultAllow;
+    var defaultPolicy = rpPrefBranch.defaultAllow ? 'allow' : 'deny';
 
     var failures = PolicyManager.loadSubscriptionRules(
           subscriptions.getSubscriptionInfo(defaultPolicy));
@@ -419,8 +420,8 @@ let rpService = (function() {
   }
 
   function showWelcomeWindow() {
-    if (!Prefs.prefs.getBoolPref("welcomeWindowShown")) {
-      var url = "chrome://requestpolicy/content/settings/setup.html";
+    if (!rpPrefBranch.getBoolPref("welcomeWindowShown")) {
+      var url = "about:requestpolicy?setup";
 
       var wm = Cc['@mozilla.org/appshell/window-mediator;1'].
           getService(Ci.nsIWindowMediator);
@@ -434,7 +435,7 @@ let rpService = (function() {
 
       _gBrowser.selectedTab = _gBrowser.addTab(url);
 
-      Prefs.prefs.setBoolPref("welcomeWindowShown", true);
+      rpPrefBranch.setBoolPref("welcomeWindowShown", true);
       Services.prefs.savePrefFile(null);
     }
   }
@@ -500,8 +501,10 @@ let rpService = (function() {
       return conflictingExtensions;
     },
 
-    getTopLevelDocTranslations : function() {
-      return topLevelDocTranslationRules;
+    getTopLevelDocTranslation : function(uri) {
+      // We're not sure if the array will be fully populated during init. This
+      // is especially a concern given the async addon manager API in Firefox 4.
+      return topLevelDocTranslationRules[uri] || null;
     },
 
     /**

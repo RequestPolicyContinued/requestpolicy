@@ -249,7 +249,7 @@ let PolicyManager = (function(self) {
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
     userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
-        userRulesets["temp"].ruleset);
+          userRulesets["temp"].ruleset);
 
     //userRulesets["temp"].ruleset.print();
 
@@ -266,9 +266,9 @@ let PolicyManager = (function(self) {
     // TODO: check rule format validity
     // TODO: use noStore
     userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
-        userRulesets["user"].ruleset);
+          userRulesets["user"].ruleset);
     userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
-        userRulesets["temp"].ruleset);
+          userRulesets["temp"].ruleset);
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawRuleset.removeRule()| to indicate whether a rule

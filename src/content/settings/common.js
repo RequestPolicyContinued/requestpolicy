@@ -7,7 +7,8 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "utils",
+  "constants",
+  "string-utils",
   "prefs",
   "domain-util",
   "logger",
@@ -15,6 +16,8 @@ ScriptLoader.importModules([
   "policy-manager",
   "requestpolicy-service"
 ], this);
+
+Logger.dump("  p!! ");
 
 
 const COMMON_STRINGS = [
@@ -30,9 +33,9 @@ const COMMON_STRINGS = [
 function _(msg, args) {
   if (args) {
     args = Array.prototype.slice.call(arguments, 1);
-    return Utils.strbundle.formatStringFromName(msg, args, args.length);
+    return StringUtils.strbundle.formatStringFromName(msg, args, args.length);
   } else {
-    return Utils.strbundle.GetStringFromName(msg);
+    return StringUtils.strbundle.GetStringFromName(msg);
   }
 }
 
@@ -192,8 +195,8 @@ common.prefStringToObj = function (prefString) {
 
 common.clearPref = function (pref) {
   try {
-    if (Prefs.prefs.prefHasUserValue(pref)) {
-      Prefs.prefs.clearUserPref(pref);
+    if (rpPrefBranch.prefHasUserValue(pref)) {
+      rpPrefBranch.clearUserPref(pref);
     }
   } catch (e) {
     Logger.dump('Clearing pref failed: ' + e.toString());

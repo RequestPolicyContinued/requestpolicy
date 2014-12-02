@@ -303,8 +303,10 @@ NormalRequest.prototype.checkURISchemes = function() {
       if (!win) {
         throw "The window could not be extracted from aContext.";
       }
-      Utils.getChromeWindow(win).requestpolicy.overlay
-           .showSchemeNotification(win, scheme);
+      let overlay = Utils.getChromeWindow(win).requestpolicy.overlay;
+      Utils.runAsync(function() {
+        overlay.showSchemeNotification(win, scheme);
+      });
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "The user could not be informed about the " +

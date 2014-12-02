@@ -30,10 +30,9 @@ requestpolicy.classicmenu = (function() {
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
   ScriptLoader.importModules([
     "prefs",
-    "utils",
-    "requestpolicy-service"
+    "string-utils"
   ], mod);
-  let Prefs = mod.Prefs, Utils = mod.Utils, rpService = mod.rpService;
+  let rpPrefBranch = mod.rpPrefBranch, StringUtils = mod.StringUtils;
 
 
   let self = {
@@ -42,7 +41,7 @@ requestpolicy.classicmenu = (function() {
     * be reloaded.
     */
     _conditionallyReloadDocument : function() {
-      if (rpService.Prefs.getBoolPref("autoReload")) {
+      if (rpPrefBranch.getBoolPref("autoReload")) {
         content.document.location.reload(false);
       }
     },
@@ -67,7 +66,7 @@ requestpolicy.classicmenu = (function() {
 
 
     addMenuItemTemporarilyAllowOrigin : function(menu, originHost) {
-      var label = Utils.strbundle.formatStringFromName("allowOriginTemporarily",
+      var label = StringUtils.strbundle.formatStringFromName("allowOriginTemporarily",
           [originHost], 1);
       var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
@@ -77,7 +76,7 @@ requestpolicy.classicmenu = (function() {
     },
 
     addMenuItemAllowOrigin : function(menu, originHost) {
-      var label = Utils.strbundle.formatStringFromName("allowOrigin",
+      var label = StringUtils.strbundle.formatStringFromName("allowOrigin",
           [originHost], 1);
       var command = "requestpolicy.overlay.allowOrigin('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
@@ -87,7 +86,7 @@ requestpolicy.classicmenu = (function() {
 
     addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost,
                                                        destHost) {
-      var label = Utils.strbundle.formatStringFromName(
+      var label = StringUtils.strbundle.formatStringFromName(
           "allowOriginToDestinationTemporarily", [originHost, destHost], 2);
       var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
@@ -98,7 +97,7 @@ requestpolicy.classicmenu = (function() {
     },
 
     addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
-      var label = Utils.strbundle.formatStringFromName(
+      var label = StringUtils.strbundle.formatStringFromName(
           "allowOriginToDestination", [originHost, destHost], 2);
       var command = "requestpolicy.overlay.allowOriginToDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
@@ -110,7 +109,7 @@ requestpolicy.classicmenu = (function() {
 
 
     addMenuItemTemporarilyAllowDest : function(menu, destHost) {
-      var label = Utils.strbundle.formatStringFromName(
+      var label = StringUtils.strbundle.formatStringFromName(
           "allowDestinationTemporarily", [destHost], 1);
       var command = "requestpolicy.overlay.temporarilyAllowDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
@@ -120,7 +119,7 @@ requestpolicy.classicmenu = (function() {
     },
 
     addMenuItemAllowDest : function(menu, destHost) {
-      var label = Utils.strbundle.formatStringFromName("allowDestination",
+      var label = StringUtils.strbundle.formatStringFromName("allowDestination",
           [destHost], 1);
       var command = "requestpolicy.overlay.allowDestination('"
           + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";

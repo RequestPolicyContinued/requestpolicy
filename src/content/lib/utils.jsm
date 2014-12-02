@@ -39,41 +39,17 @@ ScriptLoader.importModules(["prefs", "constants"], this);
 
 
 let Utils = (function() {
-  // private variables and functions
-
   let self = {};
 
-  XPCOMUtils.defineLazyGetter(self, "strbundle", function() {
-    return loadPropertiesFile(
-        "chrome://requestpolicy/locale/requestpolicy.properties");
-  });
-  // from https://developer.mozilla.org/en-US/Add-ons/
-  // How_to_convert_an_overlay_extension_to_restartless
-  // #Step_10.3A_Bypass_cache_when_loading_properties_files
-  function loadPropertiesFile(path)
-  {
-    /* HACK: The string bundle cache is cleared on addon shutdown, however it
-     * doesn't appear to do so reliably. Errors can erratically happen on next
-     * load of the same file in certain instances. (at minimum, when strings are
-     * added/removed) The apparently accepted solution to reliably load new
-     * versions is to always create bundles with a unique URL so as to bypass the
-     * cache. This is accomplished by passing a random number in a parameter after
-     * a '?'. (this random ID is otherwise ignored) The loaded string bundle is
-     * still cached on startup and should still be cleared out of the cache on
-     * addon shutdown. This just bypasses the built-in cache for repeated loads of
-     * the same path so that a newly installed update loads cleanly. */
-    return Services.strings.createBundle(path + "?" + Math.random());
-  }
-
-
   /**
-   * (taken from Adblock Plus, see
-   *  https://hg.adblockplus.org/adblockplus/file/0d76ad7eb80b/lib/utils.js)
    * Posts an action to the event queue of the current thread to run it
    * asynchronously. Any additional parameters to this function are passed
    * as parameters to the callback.
+   *
+   * @param {Function} callback
+   * @param {Object} thisPtr
    */
-  self.runAsync = function(/**Function*/ callback, /**Object*/ thisPtr) {
+  self.runAsync = function(callback, thisPtr) {
     let params = Array.prototype.slice.call(arguments, 2);
     let runnable = {
       run: function() {
@@ -95,12 +71,12 @@ let Utils = (function() {
 
   // get/set last/current RP version
   {
-    self.info.lastRPVersion = Prefs.prefs.getCharPref("lastVersion");
+    self.info.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
 
     self.info.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
     AddonManager.getAddonByID(EXTENSION_ID, function(addon) {
-      Prefs.prefs.setCharPref("lastVersion", addon.version);
+      rpPrefBranch.setCharPref("lastVersion", addon.version);
       self.info.curRPVersion = addon.version;
       if (self.info.lastRPVersion != self.info.curRPVersion) {
         Services.prefs.savePrefFile(null);
@@ -110,11 +86,11 @@ let Utils = (function() {
 
   // get/set last/current app (e.g. firefox) version
   {
-    self.info.lastAppVersion = Prefs.prefs.getCharPref("lastAppVersion");
+    self.info.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
 
     let curAppVersion = Services.appinfo.version;
     self.info.curAppVersion = curAppVersion;
-    Prefs.prefs.setCharPref("lastAppVersion", curAppVersion);
+    rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
 
     if (self.info.lastAppVersion != self.info.curAppVersion) {
       Services.prefs.savePrefFile(null);
@@ -126,12 +102,25 @@ let Utils = (function() {
       Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
 
   self.getChromeWindow = function(aContentWindow) {
-    return aContentWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-                         .getInterface(Ci.nsIWebNavigation)
-                         .QueryInterface(Ci.nsIDocShellTreeItem)
-                         .rootTreeItem
-                         .QueryInterface(Ci.nsIInterfaceRequestor)
-                         .getInterface(Ci.nsIDOMWindow);
+    return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
+                             .getInterface(Ci.nsIWebNavigation)
+                             .QueryInterface(Ci.nsIDocShellTreeItem)
+                             .rootTreeItem
+                             .QueryInterface(Ci.nsIInterfaceRequestor)
+                             .getInterface(Ci.nsIDOMWindow);
+  };
+
+  self.getBrowserForWindow = function(aContentWindow) {
+    let win = self.getChromeWindow(aContentWindow);
+    let tab = win.gBrowser._getTabForContentWindow(aContentWindow.top);
+    return tab.linkedBrowser;
+  }
+
+  self.getChromeWindowForDocShell = function(aDocShell) {
+    return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
+                    .rootTreeItem
+                    .QueryInterface(Ci.nsIInterfaceRequestor)
+                    .getInterface(Ci.nsIDOMWindow);
   };
 
   return self;

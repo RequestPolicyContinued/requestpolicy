@@ -21,7 +21,8 @@ let bootstrapper = (function() {
   let managers = {
     // id     :   object name of the manager
     'requestpolicy-service': 'rpService',
-    'window-manager': 'rpWindowManager'
+    'window-manager': 'rpWindowManager',
+    'about-uri': 'AboutRequestPolicy'
   };
 
   /**
@@ -70,6 +71,7 @@ let bootstrapper = (function() {
       ScriptLoader.importModule("logger", globalScope);
       ScriptLoader.importModule("requestpolicy-service", globalScope);
       ScriptLoader.importModule("window-manager", globalScope);
+      ScriptLoader.importModule("about-uri", globalScope);
     },
 
     finish: function() {

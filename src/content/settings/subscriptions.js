@@ -27,7 +27,7 @@ var prefsChangedObserver = null;
  *                 "allow" or "deny"
  */
 function getDefaultPolicyElements(policy) {
-  var selector = '[data-default-policy=' + policy + ']';
+  var selector = '[data-defaultpolicy=' + policy + ']';
   var matches = document.body.querySelectorAll(selector);
   var elements = Array.prototype.slice.call(matches);
   return elements;
@@ -126,7 +126,7 @@ function onload() {
     el.addEventListener('change', handleSubscriptionCheckboxChange);
   }
 
-  var selector = '[data-default-policy=' +
+  var selector = '[data-defaultpolicy=' +
     (Prefs.isDefaultAllow() ? 'deny' : 'allow') + ']';
   var matches = document.body.querySelectorAll(selector);
   var hideElements = Array.prototype.slice.call(matches);

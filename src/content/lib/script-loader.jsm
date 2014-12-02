@@ -39,7 +39,25 @@ function getModuleURI(id) {
 let loggerURI = getModuleURI("logger");
 Cu.import(loggerURI);
 
+/*
+// remove
 
+might be helpful. This will import an arbitrary module into a
+singleton object, which it returns. If the argument is not an
+absolute path, the module is imported relative to the caller's
+filename.
+
+function module(uri) {
+  if (!/^[a-z-]+:/.exec(uri)) {
+    uri = /([^ ]+\/)[^\/]+$/.exec(Components.stack.caller.filename)[1] + uri + ".jsm";
+  }
+
+  let obj = {};
+  Components.utils.import(uri, obj);
+  return obj;
+}
+
+*/
 
 let ScriptLoader = (function() {
   /*let modules = [
@@ -68,6 +86,10 @@ let ScriptLoader = (function() {
   importedModuleURIs[loggerURI] = true;
 
   let scopes = {};
+
+  // contains the module IDs that are currently being imported initially and
+  // have not finished importing yet.
+  let modulesCurrentlyBeingImported = {};
 
 
   let self = {
@@ -99,10 +121,28 @@ let ScriptLoader = (function() {
     importModule: function(moduleID, scope) {
       scope = scope || {};
 
-      let uri = getModuleURI(moduleID);
-      Cu.import(uri, scope);
-      importedModuleURIs[uri] = true;
+      // avoid import loops.
+      if (moduleID in modulesCurrentlyBeingImported) {
+        return scope;
+      }
 
+      let uri = getModuleURI(moduleID);
+      try {
+        if (!(uri in importedModuleURIs)) {
+          // the module hasn't been imported yet
+          modulesCurrentlyBeingImported[moduleID] = true;
+        }
+
+        Cu.import(uri, scope);
+        importedModuleURIs[uri] = true;
+
+        if (moduleID in modulesCurrentlyBeingImported) {
+          delete modulesCurrentlyBeingImported[moduleID];
+        }
+      } catch (e) {
+        Logger.severeError("Failed to import module \"" + moduleID + "\": " + e,
+                           e);
+      }
       return scope;
     },
 

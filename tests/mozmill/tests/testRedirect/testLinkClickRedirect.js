@@ -64,9 +64,9 @@ var testLinkClickRedirect = function() {
         controller.waitFor(function() {
             return controller.window.content.document.location.href !== url;
         }, "The URL in the urlbar has changed.");
-        assert.ok(!panel.exists(), "The redirect has been allowed.");
+        expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
       } else {
-        assert.ok(panel.exists(), "The redirect has been blocked.");
+        expect.ok(panel.exists(), "The redirect notification bar is displayed.");
       }
 
       tabBrowser.closeAllTabs();

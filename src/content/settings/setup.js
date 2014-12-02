@@ -28,7 +28,7 @@ function showConfigure() {
 }
 
 function handleDefaultPolicyChange() {
-  Prefs.prefs.setBoolPref('defaultPolicy.allow',
+  rpPrefBranch.setBoolPref('defaultPolicy.allow',
       $('#defaultallow').prop('checked'));
   Services.prefs.savePrefFile(null);
   setAllowSameDomainBlockDisplay();
@@ -36,7 +36,7 @@ function handleDefaultPolicyChange() {
 }
 
 function handleAllowSameDomainChange() {
-  Prefs.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+  rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
       $('#allowsamedomain').prop('checked'));
   Services.prefs.savePrefFile(null);
 }
@@ -79,16 +79,35 @@ function handleSubscriptionsChange() {
   }
 }
 
+/*
+function getArguments(args) {
+  let urlQuery = document.location.search || "";
+  if (urlQuery.length > 1) {
+    urlQuery = decodeURIComponent(urlQuery.substr(1));
+  }
+  let queryArgs = split("&");
+  for (let i in queryArgs) {
+    let tmp = queryArgs.split("=");
+    if (args.hasOwnProperty(tmp)) {
+      args[tmp[0]] = tmp[1];
+    }
+  }
+  return args;
+}*/
+
 function onload() {
+  var lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
+
   // Populate the form values based on the user's current settings.
   // If the use has just upgrade from an 0.x version, populate based on the old
   // preferences and also do a rule import based on the old strictness settings.
   // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
   // before this setup window was added.
-  if (Services.vc.compare(Utils.info.lastRPVersion, '0.0') > 0 &&
-      Services.vc.compare(Utils.info.lastRPVersion, '1.0.0a8') <= 0) {
-    if (Prefs.prefs.prefHasUserValue('uriIdentificationLevel')) {
-      var identLevel = Prefs.prefs.getIntPref('uriIdentificationLevel');
+  if (lastRPVersion &&
+      Services.vc.compare(lastRPVersion, '0.0') > 0 &&
+      Services.vc.compare(lastRPVersion, '1.0.0a8') <= 0) {
+    if (rpPrefBranch.prefHasUserValue('uriIdentificationLevel')) {
+      var identLevel = rpPrefBranch.getIntPref('uriIdentificationLevel');
     } else {
       var identLevel = 1;
     }
@@ -116,14 +135,14 @@ function onload() {
     // Skip the welcome screen.
     showConfigure();
   } else {
-    var defaultAllow = Prefs.prefs.getBoolPref('defaultPolicy.allow');
+    var defaultAllow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
     $('#defaultallow').prop('checked', defaultAllow);
     $('#defaultdeny').prop('checked', !defaultAllow);
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
     $('#allowsamedomain').prop('checked',
-        Prefs.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
+        rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain'));
     // Subscriptions are only simple here if we assume the user won't open the
     // setup window again after changing their individual subscriptions through
     // the preferences. So, let's assume that as the worst case is that the setup

@@ -21,7 +21,7 @@ var prefsChangedObserver = null;
 
 
 function updateDisplay() {
-  var defaultallow = Prefs.prefs.getBoolPref('defaultPolicy.allow');
+  var defaultallow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
     document.getElementById('defaultallow').checked = true;
     document.getElementById('defaultdenysetting').hidden = true;
@@ -30,7 +30,7 @@ function updateDisplay() {
     document.getElementById('defaultdenysetting').hidden = false;
   }
 
-  var allowsamedomain = Prefs.prefs.getBoolPref('defaultPolicy.allowSameDomain');
+  var allowsamedomain = rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
   document.getElementById('allowsamedomain').checked = allowsamedomain;
 }
 
@@ -44,7 +44,7 @@ function onload() {
   document.getElementById('defaultallow').addEventListener('change',
       function (event) {
         var allow = event.target.checked;
-        Prefs.prefs.setBoolPref('defaultPolicy.allow', allow);
+        rpPrefBranch.setBoolPref('defaultPolicy.allow', allow);
         Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
@@ -56,7 +56,7 @@ function onload() {
   document.getElementById('defaultdeny').addEventListener('change',
       function (event) {
         var deny = event.target.checked;
-        Prefs.prefs.setBoolPref('defaultPolicy.allow', !deny);
+        rpPrefBranch.setBoolPref('defaultPolicy.allow', !deny);
         Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
@@ -68,7 +68,7 @@ function onload() {
   document.getElementById('allowsamedomain').addEventListener('change',
       function (event) {
         var allowSameDomain = event.target.checked;
-        Prefs.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+        rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
         Services.prefs.savePrefFile(null);
       }

@@ -8,7 +8,7 @@ can also subscribe to policies (whitelists and blacklists) maintained by
 others.
 
 For more information about RequestPolicy and cross-site requests, have a look at our website:
-https://requestpolicycontinued.github.io/requestpolicy/
+https://requestpolicycontinued.github.io/
 
 ## Questions? – Feedback, Bugs etc.
 

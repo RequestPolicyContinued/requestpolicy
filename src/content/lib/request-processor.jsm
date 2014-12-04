@@ -139,15 +139,7 @@ let RequestProcessor = (function() {
     for (var i = 0; i < callbacks.length; i++) {
       var callback = callbacks[i];
       try {
-        // For Gecko 1.9.1
         return callback.getInterface(Ci.nsILoadContext).isContent;
-      } catch (e) {
-      }
-      try {
-        // For Gecko 1.9.0
-        var itemType = callback.getInterface(Ci.nsIWebNavigation)
-            .QueryInterface(Ci.nsIDocShellTreeItem).itemType;
-        return itemType == Ci.nsIDocShellTreeItem.typeContent;
       } catch (e) {
       }
     }

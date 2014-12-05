@@ -246,3 +246,10 @@ let ScriptLoader = (function() {
 
   return self;
 }());
+
+let {BootstrapManager} = ScriptLoader.importModule("bootstrap-manager");
+
+BootstrapManager.registerShutdownFunction(function() {
+  ScriptLoader.unloadAllLibraries();
+  ScriptLoader.unloadAllModules();
+});

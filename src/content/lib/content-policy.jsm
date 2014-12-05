@@ -38,7 +38,8 @@ ScriptLoader.importModules([
   "logger",
   "request",
   "utils",
-  "request-processor"
+  "request-processor",
+  "bootstrap-manager"
 ], globalScope);
 
 
@@ -49,81 +50,85 @@ let PolicyImplementation = (function() {
   let self = {
     classDescription: "RequestPolicy JavaScript XPCOM Component",
     classID:          Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
-    contractID:       "@requestpolicy.com/requestpolicy-service;1",
+    contractID:       "@requestpolicy.com/requestpolicy-service;1"
+  };
 
-    /**
-     * Registers the content policy on startup.
-     */
-    init: function() {
-      Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-          .registerFactory(self.classID, self.classDescription, self.contractID,
-              self);
+  /**
+   * Registers the content policy on startup.
+   */
+  self.init = function() {
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
+                      .registerFactory(self.classID, self.classDescription,
+                                       self.contractID, self);
 
-      let catMan = Utils.categoryManager;
-      for each (let category in xpcom_categories) {
-        catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
-            true);
-      }
-
-      if (!self.mimeService) {
-        // self.rejectCode = typeof(/ /) == "object" ? -4 : -3;
-        self.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
-        self.mimeService =
-            Cc['@mozilla.org/uriloader/external-helper-app-service;1']
-            .getService(Ci.nsIMIMEService);
-      }
-    },
-
-    shutdown: function() {
-      let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
-      let catMan = Utils.categoryManager;
-
-      for (let category in xpcom_categories) {
-        catMan.deleteCategoryEntry(category, self.contractID, false);
-      }
-
-      // This needs to run asynchronously, see bug 753687
-      Utils.runAsync(function() {
-        registrar.unregisterFactory(self.classID, self);
-      });
-    },
-
-    //
-    // nsISupports interface implementation
-    //
-
-    QueryInterface: XPCOMUtils.generateQI([Ci.nsIContentPolicy, Ci.nsIObserver,
-      Ci.nsIFactory, Ci.nsISupportsWeakReference]),
-
-    //
-    // nsIContentPolicy interface implementation
-    //
-
-    // https://developer.mozilla.org/en/nsIContentPolicy
-
-    shouldLoad: function(aContentType, aContentLocation, aRequestOrigin,
-        aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-      var request = new NormalRequest(
-          aContentType, aContentLocation, aRequestOrigin, aContext,
-          aMimeTypeGuess, aExtra, aRequestPrincipal);
-      return RequestProcessor.process(request);
-      // TODO: implement the following
-      // return request.shouldLoad(aContentType, aContentLocation, aRequestOrigin,
-      //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
-    },
-
-    shouldProcess: (() => CP_OK),
-
-    //
-    // nsIFactory interface implementation
-    //
-
-    createInstance: function(outer, iid) {
-      if (outer) {
-        throw Cr.NS_ERROR_NO_AGGREGATION;
-      }
-      return self.QueryInterface(iid);
+    let catMan = Utils.categoryManager;
+    for each (let category in xpcom_categories) {
+      catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
+          true);
     }
-  }
+
+    if (!self.mimeService) {
+      // self.rejectCode = typeof(/ /) == "object" ? -4 : -3;
+      self.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
+      self.mimeService =
+          Cc['@mozilla.org/uriloader/external-helper-app-service;1']
+          .getService(Ci.nsIMIMEService);
+    }
+  };
+
+
+  BootstrapManager.registerShutdownFunction(function() {
+    let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+    let catMan = Utils.categoryManager;
+
+    for (let category in xpcom_categories) {
+      catMan.deleteCategoryEntry(category, self.contractID, false);
+    }
+
+    // This needs to run asynchronously, see bug 753687
+    Utils.runAsync(function() {
+      registrar.unregisterFactory(self.classID, self);
+    });
+  });
+
+  //
+  // nsISupports interface implementation
+  //
+
+  self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
+                                               Ci.nsIObserver,
+                                               Ci.nsIFactory,
+                                               Ci.nsISupportsWeakReference]);
+
+  //
+  // nsIContentPolicy interface implementation
+  //
+
+  // https://developer.mozilla.org/en/nsIContentPolicy
+
+  self.shouldLoad = function(aContentType, aContentLocation, aRequestOrigin,
+      aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
+    var request = new NormalRequest(
+        aContentType, aContentLocation, aRequestOrigin, aContext,
+        aMimeTypeGuess, aExtra, aRequestPrincipal);
+    return RequestProcessor.process(request);
+    // TODO: implement the following
+    // return request.shouldLoad(aContentType, aContentLocation, aRequestOrigin,
+    //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
+  };
+
+  self.shouldProcess = (() => CP_OK);
+
+  //
+  // nsIFactory interface implementation
+  //
+
+  self.createInstance = function(outer, iid) {
+    if (outer) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
+    }
+    return self.QueryInterface(iid);
+  };
+
   return self;
 }());

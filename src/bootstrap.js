@@ -61,9 +61,9 @@ function shutdown(data, reason) {
 }
 
 function install(data, reason) {
-  // do not call managers, as the addon might be not activated
+  // note: the addon might be not activated
 }
 
 function uninstall(data, reason) {
-  // do not call managers, as the addon might be not activated
+  // note: the addon might be not activated
 }

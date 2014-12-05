@@ -31,114 +31,83 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 let globalScope = this;
 let scriptLoaderURI = "chrome://requestpolicy/content/lib/script-loader.jsm";
-let ScriptLoader = null;
-let Logger = null;
-let rpService = null;
-let WindowManager = null;
 // TODO: implement. see https://github.com/RequestPolicyContinued/requestpolicy/issues/486
 //let SevereErrorHandler = {};
-
 
 
 
 let BootstrapManager = (function() {
   let self = {};
 
-  let managers = {
-    // id     :   object name of the manager
-    'requestpolicy-service': 'rpService',
-    'window-manager': 'rpWindowManager',
-    'about-uri': 'AboutRequestPolicy'
-  };
 
-  //let startupFunctions = [];
-  //let shutdownFunctions = [];
+  let startupFunctionStack = [];
+  let shutdownFunctionStack = [];
+  //let installFunctionStack = [];
+  //let uninstallFunctionStack = [];
 
   /**
-   * this function calls another function with functionName
+   * The functions in one of the arrays above will be called. Not that the list
+   * itself might get even more entries while it is being called; therefore
+   * pop() is used.
    */
-  function callBootstrapFunction(managerID, functionName, data, reason) {
-    let scope = {};
-    let managerName = managers[managerID];
-    //let manager = ScriptLoader.require(managerID)[managerName];
-    //let manager = ScriptLoader.importModule(managerID, scope)[managerName];
-    let manager = globalScope[managerName];
-
-    // if manager (e.g. "rpService") doesn't exist or doesn't have the function to be
-    // called, just skip without an error
-    if (manager && manager[functionName] &&
-        (typeof manager[functionName]) == 'function') {
-      manager[functionName](data, reason);
+  let callBootstrapFunctions = function(functions, data, reason) {
+    // pop the topmost function as long as there is one.
+    //
+    // The combination of push() and pop() leads to FILO (first in, last out)
+    // for the shutdown process. In other words, it's a stack
+    for (let f = functions.pop(); !!f; f = functions.pop()) {
+      f(data, reason);
     }
   };
-  function forEachManager(functionToCall, args) {
-    for (let managerID in managers) {
-      if (!managers.hasOwnProperty(managerID)) {
-        continue;
-      }
-      try {
-        let functionArgs = [managerID].concat(args);
-        functionToCall.apply(null, functionArgs);
-      } catch (e) {
-        Logger.severeError("error catched in bootstrap script: " + e, e);
-      }
-    }
+  let callStartupFunctions = callBootstrapFunctions.bind(this, startupFunctionStack);
+  let callShutdownFunctions = callBootstrapFunctions.bind(this, shutdownFunctionStack);
+  //let callInstallFunctions = callBootstrapFunctions.bind(this, installFunctionStack);
+  //let callUninstallFunctions = callBootstrapFunctions.bind(this, uninstallFunctionStack);
+
+  /**
+   * This set of functions can be used for adding startup/shutdown functions.
+   * Note: the first startup function to be executed will import all modules so
+   * that all subsequent startup-functions get called *after* all modules have
+   * been loaded.
+   */
+  let registerFunction = function(target, f) {
+    target.push(f);
   };
+  self.registerStartupFunction = registerFunction.bind(this, startupFunctionStack);
+  self.registerShutdownFunction = registerFunction.bind(this, shutdownFunctionStack);
+  //self.registerInstallFunction = registerFunction.bind(this, installFunctionStack);
+  //self.registerUninstallFunction = registerFunction.bind(this, uninstallFunctionStack);
 
 
 
-
-
-
-
-  function importScriptLoader() {
+  /**
+   * Import main modules on startup. This will be the first function that will
+   * be called, and as the modules depend on all other modules recursively, all
+   * modules will be loaded already when the second startup function gets
+   * called.
+   */
+  self.registerStartupFunction(function() {
+    // manually load the ScriptLoader
     Cu.import(scriptLoaderURI, globalScope);
-  }
+    ScriptLoader.importModules(["logger", "requestpolicy-service",
+                                "window-manager", "about-uri"], globalScope);
+  });
 
-  function init() {
-    importScriptLoader();
-    ScriptLoader.importModule("logger", globalScope);
-    ScriptLoader.importModule("requestpolicy-service", globalScope);
-    ScriptLoader.importModule("window-manager", globalScope);
-    ScriptLoader.importModule("about-uri", globalScope);
-  }
-
-  function finish() {
+  self.registerShutdownFunction(function() {
     // HACK WARNING: The Addon Manager does not properly clear all addon
     //               related caches on update; in order to fully update
     //               images and locales, their caches need clearing here.
     Services.obs.notifyObservers(null, "chrome-flush-caches", null);
 
-    ScriptLoader.unloadAllLibraries();
-    ScriptLoader.unloadAllModules();
-
+    // manually unload the ScriptLoader
     Cu.unload(scriptLoaderURI);
-    ScriptLoader = null;
-    Logger = null;
-    rpService = null;
-    WindowManager = null;
-  }
-
-  function startupManagers(data, reason) {
-    // call the startup function of all managers
-    forEachManager(callBootstrapFunction, ['startup', data, reason]);
-  }
-
-  function shutdownManagers(data, reason) {
-    forEachManager(callBootstrapFunction, ['shutdown', data, reason]);
-  }
+  });
 
 
 
-  self.startup = function(data, reason) {
-    init();
-    startupManagers(data, reason);
-  };
-
-  self.shutdown = function(data, reason) {
-    shutdownManagers(data, reason);
-    finish();
-  };
+  // when startup() and shutdown() are called, simply call all
+  self.startup = callStartupFunctions.bind(this);
+  self.shutdown = callShutdownFunctions.bind(this);
 
   return self;
 }());

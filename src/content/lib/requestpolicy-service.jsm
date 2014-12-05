@@ -43,7 +43,8 @@ ScriptLoader.importModules([
   "subscription",
   "utils",
   "content-policy",
-  "constants"
+  "constants",
+  "bootstrap-manager"
 ], this);
 
 
@@ -444,6 +445,36 @@ let rpService = (function() {
 
 
 
+  // /////////////////////////////////////////////////////////////////////////
+  // Bootstrap functions
+  // /////////////////////////////////////////////////////////////////////////
+
+  BootstrapManager.registerStartupFunction(function() {
+    init();
+
+    loadConfigAndRules();
+    // Detect other installed extensions and the current application and do
+    // what is needed to allow their requests.
+    initializeExtensionCompatibility();
+    initializeApplicationCompatibility();
+  });
+
+  BootstrapManager.registerShutdownFunction(function(data, reason) {
+    if (reason == ADDON_DISABLE || reason == ADDON_UNINSTALL) {
+      handleUninstallOrDisable();
+    }
+    unregister();
+    PolicyImplementation.shutdown(data, reason);
+    rpServiceInitialized = false;
+  });
+
+  //BootstrapManager.registerUninstallFunction(function(data, reason) {
+  //  handleUninstallOrDisable();
+  //});
+
+
+
+
 
 
   self = {
@@ -459,35 +490,6 @@ let rpService = (function() {
     },
     getCompatibilityRules: function() {
       return compatibilityRules;
-    },
-
-
-
-    // /////////////////////////////////////////////////////////////////////////
-    // Bootstrap methods
-    // /////////////////////////////////////////////////////////////////////////
-
-    startup: function() {
-      init();
-
-      loadConfigAndRules();
-      // Detect other installed extensions and the current application and do
-      // what is needed to allow their requests.
-      initializeExtensionCompatibility();
-      initializeApplicationCompatibility();
-    },
-    shutdown: function(data, reason) {
-      if (reason == ADDON_DISABLE || reason == ADDON_UNINSTALL) {
-        handleUninstallOrDisable();
-      }
-      unregister();
-      PolicyImplementation.shutdown(data, reason);
-      rpServiceInitialized = false;
-    },
-    install: function(data, reason) {
-    },
-    uninstall: function(data, reason) {
-      handleUninstallOrDisable();
     },
 
 

@@ -31,6 +31,9 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModule("bootstrap-manager", this);
+
 var filenames = {
   "basicprefs": "basicprefs.html",
   "advancedprefs": "advancedprefs.html",
@@ -74,23 +77,6 @@ let AboutRequestPolicy = (function() {
       return channel;
     },
 
-
-
-    startup: function() {
-      Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-          .registerFactory(self.classID, self.classDescription, self.contractID,
-              self);
-    },
-
-    shutdown: function() {
-      let registrar = Components.manager
-          .QueryInterface(Ci.nsIComponentRegistrar);
-      // This needs to run asynchronously, see bug 753687
-      Utils.runAsync(function() {
-        registrar.unregisterFactory(self.classID, self);
-      });
-    },
-
     //
     // nsIFactory interface implementation
     //
@@ -101,6 +87,24 @@ let AboutRequestPolicy = (function() {
       }
       return self.QueryInterface(iid);
     }
-  }
+  };
+
+
+
+  BootstrapManager.registerStartupFunction(function() {
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
+        .registerFactory(self.classID, self.classDescription, self.contractID,
+            self);
+  });
+
+  BootstrapManager.registerShutdownFunction(function() {
+    let registrar = Components.manager
+        .QueryInterface(Ci.nsIComponentRegistrar);
+    // This needs to run asynchronously, see bug 753687
+    Utils.runAsync(function() {
+      registrar.unregisterFactory(self.classID, self);
+    });
+  });
+
   return self;
 }());

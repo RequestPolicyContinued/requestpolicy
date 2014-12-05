@@ -38,7 +38,8 @@ let rpWindowManager = (function(self) {
   ScriptLoader.importModules([
     "utils",
     "xul-utils",
-    "constants"
+    "constants",
+    "bootstrap-manager"
   ], globalScope);
 
   let styleSheets = [
@@ -125,19 +126,19 @@ let rpWindowManager = (function(self) {
 
 
 
-  self.startup = function(data, reason) {
+  BootstrapManager.registerStartupFunction(function(data, reason) {
     forEachOpenWindow(loadIntoWindow);
     Services.wm.addListener(WindowListener);
 
     loadStyleSheets();
-  };
+  });
 
-  self.shutdown = function() {
+  BootstrapManager.registerShutdownFunction(function() {
     forEachOpenWindow(unloadFromWindow);
     Services.wm.removeListener(WindowListener);
 
     unloadStyleSheets();
-  };
+  });
 
 
 

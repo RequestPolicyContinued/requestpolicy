@@ -39,25 +39,24 @@ if (Utils.info.isAustralis) {
 
 let rpWindowManager = (function(self) {
 
+  let isAustralis = Utils.info.isAustralis;
 
-  self.addToolbarButtonToWindow = function(win) {
-    if (Utils.info.isAustralis) {
-      addToolbarButtonToAustralis(win);
-    } else {
-      XULUtils.addTreeElementsToWindow(win, "toolbarbutton");
-      addToolbarButtonToNavBar(win);
-    }
-  };
+  //
+  // Case 1: Australis (Gecko >= 29)
+  //
 
-  self.removeToolbarButtonFromWindow = function(win) {
-    if (Utils.info.isAustralis) {
-      CustomizableUI.destroyWidget(toolbarButtonId);
-    } else {
-      XULUtils.removeTreeElementsFromWindow(win, "toolbarbutton");
-    }
-  };
+  if (isAustralis) {
+    BootstrapManager.registerStartupFunction(function() {
+      addToolbarButtonToAustralis();
+    });
 
-  function addToolbarButtonToAustralis(win) {
+    BootstrapManager.registerShutdownFunction(function() {
+      let tbb = XULUtils.xulTrees.toolbarbutton[0];
+      CustomizableUI.destroyWidget(tbb.id);
+    });
+  }
+
+  function addToolbarButtonToAustralis() {
     let tbb = XULUtils.xulTrees.toolbarbutton[0];
     CustomizableUI.createWidget({
       id: tbb.id,
@@ -65,10 +64,32 @@ let rpWindowManager = (function(self) {
       label: tbb.label,
       tooltiptext: tbb.tooltiptext,
       onCommand : function(aEvent) {
+        // Bad smell
+        let win = aEvent.target.ownerDocument.defaultView;
         win.requestpolicy.overlay.openToolbarPopup(aEvent.target);
       }
     });
   }
+
+
+  //
+  // Case 2: Gecko < 29
+  //
+
+
+  // this function can be deleted if Gecko < 29 isn't supported anymore
+  self.addToolbarButtonToWindow = function(win) {
+    if (!isAustralis) {
+      XULUtils.addTreeElementsToWindow(win, "toolbarbutton");
+      addToolbarButtonToNavBar(win);
+    }
+  };
+
+  self.removeToolbarButtonFromWindow = function(win) {
+    if (!isAustralis) {
+      XULUtils.removeTreeElementsFromWindow(win, "toolbarbutton");
+    }
+  };
 
 
   function addToolbarButtonToNavBar(win) {

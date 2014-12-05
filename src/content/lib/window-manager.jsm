@@ -88,25 +88,50 @@ let rpWindowManager = (function(self) {
   }
 
   function loadIntoWindow(window) {
-    XULUtils.addTreeElementsToWindow(window, "mainTree");
+    try {
+      XULUtils.addTreeElementsToWindow(window, "mainTree");
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR,
+                     "Couldn't add tree elements to window.");
+    }
 
-    // create a scope variable for RP for this window
-    window.requestpolicy = {};
-    Services.scriptloader.loadSubScript(
-        "chrome://requestpolicy/content/ui/overlay.js", window);
-    Services.scriptloader.loadSubScript(
-        "chrome://requestpolicy/content/ui/menu.js", window);
-    Services.scriptloader.loadSubScript(
-        "chrome://requestpolicy/content/ui/classicmenu.js", window);
+    try {
+      // create a scope variable for RP for this window
+      window.requestpolicy = {};
+      Services.scriptloader.loadSubScript(
+          "chrome://requestpolicy/content/ui/overlay.js", window);
+      Services.scriptloader.loadSubScript(
+          "chrome://requestpolicy/content/ui/menu.js", window);
+      Services.scriptloader.loadSubScript(
+          "chrome://requestpolicy/content/ui/classicmenu.js", window);
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR,
+                     "Error loading subscripts for window: "+e, e);
+    }
 
-    self.addToolbarButtonToWindow(window);
+    try {
+      self.addToolbarButtonToWindow(window);
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR, "Error while adding the toolbar " +
+                     "button to the window: "+e, e);
+    }
 
-    // init and onWindowLoad must be called last, because they assume that
-    // everything else is ready
-    window.requestpolicy.overlay.init();
-    window.requestpolicy.overlay.onWindowLoad();
-    window.messageManager.loadFrameScript(
-        "chrome://requestpolicy/content/ui/frame.js", true);
+    try {
+      // init and onWindowLoad must be called last, because they assume that
+      // everything else is ready
+      window.requestpolicy.overlay.init();
+      window.requestpolicy.overlay.onWindowLoad();
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR,
+                     "An error occurred while initializing the overlay: "+e, e);
+    }
+
+    try {
+      window.messageManager.loadFrameScript(
+          "chrome://requestpolicy/content/ui/frame.js", true);
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR, "Error loading the frame script: "+e,e);
+    }
   }
 
   function unloadFromWindow(window) {
@@ -119,8 +144,6 @@ let rpWindowManager = (function(self) {
 
     delete window.requestpolicy;
   }
-
-
 
 
 

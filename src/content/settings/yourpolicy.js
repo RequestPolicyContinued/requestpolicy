@@ -32,8 +32,6 @@ const SEARCH_DELAY = 100;
 
 var searchTimeoutId = null;
 
-var rulesChangedObserver = null;
-
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
@@ -237,8 +235,4 @@ function onload() {
         var search = document.getElementById('rulesearch');
         populateRuleTable(search.value);
       });
-
-  window.addEventListener("beforeunload", function(event) {
-    rulesChangedObserver.unregister();
-  });
 }

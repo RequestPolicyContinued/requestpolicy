@@ -39,7 +39,11 @@ let WindowManager = null;
 //let SevereErrorHandler = {};
 
 
+
+
 let BootstrapManager = (function() {
+  let self = {};
+
   let managers = {
     // id     :   object name of the manager
     'requestpolicy-service': 'rpService',
@@ -66,7 +70,7 @@ let BootstrapManager = (function() {
         (typeof manager[functionName]) == 'function') {
       manager[functionName](data, reason);
     }
-  }
+  };
   function forEachManager(functionToCall, args) {
     for (let managerID in managers) {
       if (!managers.hasOwnProperty(managerID)) {
@@ -79,60 +83,61 @@ let BootstrapManager = (function() {
         Logger.severeError("error catched in bootstrap script: " + e, e);
       }
     }
+  };
+
+
+
+
+
+
+
+  function importScriptLoader() {
+    Cu.import(scriptLoaderURI, globalScope);
+  }
+
+  function init() {
+    importScriptLoader();
+    ScriptLoader.importModule("logger", globalScope);
+    ScriptLoader.importModule("requestpolicy-service", globalScope);
+    ScriptLoader.importModule("window-manager", globalScope);
+    ScriptLoader.importModule("about-uri", globalScope);
+  }
+
+  function finish() {
+    // HACK WARNING: The Addon Manager does not properly clear all addon
+    //               related caches on update; in order to fully update
+    //               images and locales, their caches need clearing here.
+    Services.obs.notifyObservers(null, "chrome-flush-caches", null);
+
+    ScriptLoader.unloadAllLibraries();
+    ScriptLoader.unloadAllModules();
+
+    Cu.unload(scriptLoaderURI);
+    ScriptLoader = null;
+    Logger = null;
+    rpService = null;
+    WindowManager = null;
+  }
+
+  function startupManagers(data, reason) {
+    // call the startup function of all managers
+    forEachManager(callBootstrapFunction, ['startup', data, reason]);
+  }
+
+  function shutdownManagers(data, reason) {
+    forEachManager(callBootstrapFunction, ['shutdown', data, reason]);
   }
 
 
 
+  self.startup = function(data, reason) {
+    init();
+    startupManagers(data, reason);
+  };
 
-
-  let self = {
-
-    importScriptLoader: function() {
-      Cu.import(scriptLoaderURI, globalScope);
-    },
-
-    init: function() {
-      self.importScriptLoader();
-      ScriptLoader.importModule("logger", globalScope);
-      ScriptLoader.importModule("requestpolicy-service", globalScope);
-      ScriptLoader.importModule("window-manager", globalScope);
-      ScriptLoader.importModule("about-uri", globalScope);
-    },
-
-    finish: function() {
-      // HACK WARNING: The Addon Manager does not properly clear all addon
-      //               related caches on update; in order to fully update
-      //               images and locales, their caches need clearing here.
-      Services.obs.notifyObservers(null, "chrome-flush-caches", null);
-
-      ScriptLoader.unloadAllLibraries();
-      ScriptLoader.unloadAllModules();
-
-      Cu.unload(scriptLoaderURI);
-      ScriptLoader = null;
-      Logger = null;
-      rpService = null;
-      WindowManager = null;
-    },
-
-    startupManagers: function(data, reason) {
-      // call the startup function of all managers
-      forEachManager(callBootstrapFunction, ['startup', data, reason]);
-    },
-
-    shutdownManagers: function(data, reason) {
-      forEachManager(callBootstrapFunction, ['shutdown', data, reason]);
-    },
-
-    startup: function(data, reason) {
-      self.init();
-      self.startupManagers(data, reason);
-    },
-
-    shutdown: function(data, reason) {
-      self.shutdownManagers(data, reason);
-      self.finish();
-    }
+  self.shutdown = function(data, reason) {
+    shutdownManagers(data, reason);
+    finish();
   };
 
   return self;

@@ -150,13 +150,18 @@ let Logger = (function() {
       self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
           + aMessage + stack + "\n");
 
+      if (aError) {
+        // if an error was provided, report it to the browser console
+        Cu.reportError(aError);
+      }
+
       // TODO: remove the following after finishing e10s
       if (aLevel == self.LEVEL_SEVERE && aType == self.TYPE_ERROR) {
         let windowtype = 'navigator:browser';
         let mostRecentWindow  = Services.wm.getMostRecentWindow(windowtype);
 
         if (mostRecentWindow) {
-          mostRecentWindow.alert("Sorry, RequestPolicy crashed! " + message);
+          mostRecentWindow.alert("Sorry, RequestPolicy crashed! " + aMessage);
         }
       }
     }

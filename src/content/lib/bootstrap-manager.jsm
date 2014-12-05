@@ -47,6 +47,9 @@ let BootstrapManager = (function() {
     'about-uri': 'AboutRequestPolicy'
   };
 
+  //let startupFunctions = [];
+  //let shutdownFunctions = [];
+
   /**
    * this function calls another function with functionName
    */
@@ -119,6 +122,16 @@ let BootstrapManager = (function() {
 
     shutdownManagers: function(data, reason) {
       forEachManager(callBootstrapFunction, ['shutdown', data, reason]);
+    },
+
+    startup: function(data, reason) {
+      self.init();
+      self.startupManagers(data, reason);
+    },
+
+    shutdown: function(data, reason) {
+      self.shutdownManagers(data, reason);
+      self.finish();
     }
   };
 

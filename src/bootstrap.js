@@ -37,8 +37,7 @@ function startup(data, reason) {
 
   try {
     Cu.import(bootstrapManagerURI);
-    BootstrapManager.init();
-    BootstrapManager.startupManagers(data, reason);
+    BootstrapManager.startup(data, reason);
   } catch(e) {
     let msg = "startup() failed! " + e;
     dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
@@ -52,8 +51,7 @@ function shutdown(data, reason) {
   }
 
   try {
-    BootstrapManager.shutdownManagers(data, reason);
-    BootstrapManager.finish();
+    BootstrapManager.shutdown(data, reason);
     Cu.unload(bootstrapManagerURI);
   } catch(e) {
     let msg = "shutdown() failed! " + e;

@@ -63,7 +63,6 @@ requestpolicy.menu = (function() {
 
   let self = {
     addedMenuItems : [],
-    _menu : null,
 
     _originItem : null,
     _originDomainnameItem : null,
@@ -85,8 +84,6 @@ requestpolicy.menu = (function() {
   self.init = function() {
     if (initialized === false) {
       initialized = true;
-
-      self._menu = document.getElementById("rp-popup");
 
       self._originItem = document.getElementById("rp-origin");
       self._originDomainnameItem = document.getElementById('rp-origin-domainname');

@@ -68,7 +68,7 @@ requestpolicy.overlay = (function() {
   let blockedContentCheckMinWaitOnObservedBlockedRequest = 500;
   let blockedContentCheckLastTime = 0;
 
-  let menu = null;
+  let popupElement = null;
 
   //let statusbar = null;
 
@@ -104,7 +104,7 @@ requestpolicy.overlay = (function() {
 
         requestpolicy.menu.init();
 
-        menu = document.getElementById("rp-popup");
+        popupElement = document.getElementById("rp-popup");
 
         //statusbar = document.getElementById("status-bar");
         //rpContextMenu = document
@@ -118,8 +118,8 @@ requestpolicy.overlay = (function() {
         if (isFennec) {
           Logger.dump("Detected Fennec.");
           // Set an attribute for CSS usage.
-          menu.setAttribute("fennec", "true");
-          menu.setAttribute("position", "after_end");
+          popupElement.setAttribute("fennec", "true");
+          popupElement.setAttribute("position", "after_end");
         }
 
         // Register this window with the requestpolicy service so that we can be
@@ -1163,8 +1163,7 @@ requestpolicy.overlay = (function() {
   self.revokeTemporaryPermissions = function(event) {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
-    var popup = document.getElementById('rp-popup');
-    popup.hidePopup();
+    popupElement.hidePopup();
   };
 
   self._openInNewTab = function(uri) {
@@ -1172,7 +1171,6 @@ requestpolicy.overlay = (function() {
   };
 
   self.openMenuByHotkey = function() {
-    var popup = document.getElementById('rp-popup');
     // Ideally we'd put the popup in its normal place based on the rp toolbar
     // button but let's not count on that being visible. So, we'll be safe and
     // anchor it within the content element. However, there's no good way to
@@ -1183,12 +1181,12 @@ requestpolicy.overlay = (function() {
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
     //Logger.dump('popup width: ' + popup.clientWidth);
-    var popupWidth = popup.clientWidth ? 730 : popup.clientWidth;
+    var popupWidth = popupElement.clientWidth ? 730 : popupElement.clientWidth;
     var anchor = document.getElementById('content');
     var contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
     var xOffset = contentWidth - popupWidth - 2;
-    popup.openPopup(anchor, 'overlap', xOffset);
+    popupElement.openPopup(anchor, 'overlap', xOffset);
   };
 
   //  showExtensionConflictInfo : function() {
@@ -1207,62 +1205,22 @@ requestpolicy.overlay = (function() {
   //  },
 
   self.openToolbarPopup = function(anchor) {
-  //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay._menu,
+  //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay.popupElement,
   //        null);
-    menu.openPopup(anchor, 'after_start', 0, 0, true, true);
+    popupElement.openPopup(anchor, 'after_start', 0, 0, true, true);
   };
 
-  self.openPrefs = function() {
-    self.openSettingsTab('about:requestpolicy');
-  };
+  function openLinkInNewTab(url, relatedToCurrent) {
+    window.openUILinkIn(url, "tab", {relatedToCurrent: !!relatedToCurrent});
+    popupElement.hidePopup();
+  }
 
-  self.openPolicyManager = function() {
-    self.openSettingsTab('about:requestpolicy?yourpolicy');
-  };
+  self.openPrefs = openLinkInNewTab.bind(this, 'about:requestpolicy', true);
+  self.openPolicyManager = openLinkInNewTab.bind(this,
+      'about:requestpolicy?yourpolicy', true);
+  self.openHelp = openLinkInNewTab.bind(this,
+      'https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
 
-  self.openHelp = function() {
-    var tab = gBrowser.addTab('https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
-    gBrowser.selectedTab = tab;
-    var popup = document.getElementById('rp-popup');
-    popup.hidePopup();
-  };
-
-  //  openAbout : function() {
-  //    var tab = gBrowser.addTab('https://www.requestpolicy.com/about.html');
-  //    gBrowser.selectedTab = tab;
-  //  },
-
-  self.openSettingsTab = function (url) {
-    // Modified from the example at
-    // https://developer.mozilla.org/en-US/docs/Code_snippets/Tabbed_browser
-    var attrName = 'RequestPolicySettingsTab';
-    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-        .getService(Components.interfaces.nsIWindowMediator);
-    for (var found = false, index = 0, tabbrowser = wm.getEnumerator('navigator:browser').getNext().gBrowser;
-         index < tabbrowser.tabContainer.childNodes.length && !found;
-         index++) {
-      var currentTab = tabbrowser.tabContainer.childNodes[index];
-      if (currentTab.hasAttribute(attrName)) {
-        gBrowser.getBrowserForTab(currentTab).loadURI(url);
-        tabbrowser.selectedTab = currentTab;
-        // Focus *this* browser window in case another one is currently focused
-        tabbrowser.ownerDocument.defaultView.focus();
-        found = true;
-      }
-    }
-    if (!found) {
-      // Our tab isn't open. Open it now.
-      var browserEnumerator = wm.getEnumerator("navigator:browser");
-      var tabbrowser = browserEnumerator.getNext().gBrowser;
-      var newTab = tabbrowser.addTab(url);
-      newTab.setAttribute(attrName, "xyz");
-      tabbrowser.selectedTab = newTab;
-      // Focus *this* browser window in case another one is currently focused
-      tabbrowser.ownerDocument.defaultView.focus();
-    }
-    var popup = document.getElementById('rp-popup');
-    popup.hidePopup();
-  };
 
   self.clearRequestLog = function() {
     self.requestLogTreeView.clear();

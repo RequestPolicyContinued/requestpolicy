@@ -33,13 +33,13 @@ control system, you can do so with:
 git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 ```
 
-Then you can change to the `src/` directory and run
+Then from the repository's root directory run
 
 ```bash
-ant
+make
 ```
 
-to create a [XPI](https://developer.mozilla.org/en-US/docs/XPI) file. It will be created at `src/dist/requestpolicy.xpi` and can be used for easy installation of RP into your web browser (Firefox).
+to create a [XPI](https://developer.mozilla.org/en-US/docs/XPI) file. It will be created at `dist/requestpolicy.xpi` and can be used for easy installation of RP into your web browser (Firefox).
 
 ## Development
 

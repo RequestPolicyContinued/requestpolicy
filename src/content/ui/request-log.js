@@ -22,7 +22,7 @@
  */
 
 
-window.requestpolicy.requestLog = (function () {
+window.requestpolicy.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -43,66 +43,63 @@ window.requestpolicy.requestLog = (function () {
   let tree = null;
 
 
-  let self = {
 
-    init: function() {
-      if (initialized) {
-        return;
+  self.init = function() {
+    if (initialized) {
+      return;
+    }
+    initialized = true;
+
+    tree = document.getElementById("requestpolicy-requestLog-tree");
+    tree.view = window.requestpolicy.requestLogTreeView;
+
+    // Give the requestpolicyOverlay direct access to the tree view.
+    window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
+  };
+
+  /**
+   * Copy the content of a cell to the clipboard. The row used will be the one
+   * selected when the context menu was opened.
+   */
+  self.copyToClipboard = function(columnName) {
+    var content = tree.view.getCellText(tree.currentIndex,
+        tree.columns.getNamedColumn(columnName));
+
+    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+        .getService(Components.interfaces.nsIClipboardHelper);
+    clipboardHelper.copyString(content);
+  };
+
+  /**
+   * Open the content of a cell in a new tab. The row used will be the one
+   * selected when the context menu was opened.
+   */
+  self.openInNewTab = function(columnName) {
+    var content = tree.view.getCellText(tree.currentIndex,
+        tree.columns.getNamedColumn(columnName));
+
+    var forbidden = true;
+    try {
+      var uri = DomainUtil.getUriObject(content);
+      if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
+        forbidden = false;
       }
-      initialized = true;
-
-      tree = document.getElementById("requestpolicy-requestLog-tree");
-      tree.view = window.requestpolicy.requestLogTreeView;
-
-      // Give the requestpolicyOverlay direct access to the tree view.
-      window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
-    },
-
-    /**
-     * Copy the content of a cell to the clipboard. The row used will be the one
-     * selected when the context menu was opened.
-     */
-    copyToClipboard: function(columnName) {
-      var content = tree.view.getCellText(tree.currentIndex,
-          tree.columns.getNamedColumn(columnName));
-
-      const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-          .getService(Components.interfaces.nsIClipboardHelper);
-      clipboardHelper.copyString(content);
-    },
-
-    /**
-     * Open the content of a cell in a new tab. The row used will be the one
-     * selected when the context menu was opened.
-     */
-    openInNewTab: function(columnName) {
-      var content = tree.view.getCellText(tree.currentIndex,
-          tree.columns.getNamedColumn(columnName));
-
-      var forbidden = true;
-      try {
-        var uri = DomainUtil.getUriObject(content);
-        if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
-          forbidden = false;
-        }
-      } catch (e) {
-      }
-
-      if (forbidden) {
-        var alertTitle = StringUtils.strbundle.GetStringFromName("actionForbidden");
-        var alertText = StringUtils.strbundle
-            .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
-        Services.prompt.alert(null, alertTitle, alertText);
-        return;
-      }
-
-      Utils.getChromeWindow(window).gBrowser.addTab(content);
+    } catch (e) {
     }
 
+    if (forbidden) {
+      var alertTitle = StringUtils.strbundle.GetStringFromName("actionForbidden");
+      var alertText = StringUtils.strbundle
+          .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
+      Services.prompt.alert(null, alertTitle, alertText);
+      return;
+    }
+
+    Utils.getChromeWindow(window).gBrowser.addTab(content);
   };
 
   return self;
-}());
+}(window.requestpolicy.requestLog || {}));
 
 addEventListener("load", function(event) {
     window.requestpolicy.requestLog.init(event);

@@ -52,15 +52,23 @@
     </menupopup>
   </popupset>
 
-  <tree id="requestpolicy-requestLog-tree" flex="1" flags="dont-build-content" seltype="single" context="requestpolicyRequestLogContext">
+  <tree id="requestpolicy-requestLog-tree" flex="1" flags="dont-build-content"
+        seltype="single" context="requestpolicyRequestLogContext">
     <treecols>
-      <treecol id="requestpolicy-requestLog-origin" label="&rp.requestLog.origin;" flex="1" crop="center" persist="width ordinal hidden"/>
+      <treecol id="requestpolicy-requestLog-origin"
+               label="&rp.requestLog.origin;" flex="1" crop="center"
+               persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-destination" label="&rp.requestLog.destination;" flex="1" crop="center" persist="width ordinal hidden"/>
+      <treecol id="requestpolicy-requestLog-destination"
+               label="&rp.requestLog.destination;" flex="1" crop="center"
+               persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-blocked" label="&rp.requestLog.blocked;" width="80" persist="width ordinal hidden"/>
+      <treecol id="requestpolicy-requestLog-blocked"
+               label="&rp.requestLog.blocked;" width="80"
+               persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-time" label="&rp.requestLog.time;" width="120" persist="width ordinal hidden"/>
+      <treecol id="requestpolicy-requestLog-time" label="&rp.requestLog.time;"
+               width="120" persist="width ordinal hidden"/>
     </treecols>
 
     <treechildren/>

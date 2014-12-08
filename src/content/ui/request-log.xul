@@ -28,8 +28,9 @@
 
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/x-javascript" src="request-log-tree-view.js" />
   <script type="application/x-javascript" src="request-log.js" />
+  <script type="application/x-javascript" src="request-log.interface.js" />
+  <script type="application/x-javascript" src="request-log-tree-view.js" />
 
   <popupset>
     <menupopup id="requestpolicyRequestLogContext">

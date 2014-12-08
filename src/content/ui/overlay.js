@@ -85,7 +85,7 @@ requestpolicy.overlay = (function() {
   let self = {
     // This is set by request-log.js when it is initialized. We don't need to worry
     // about setting it here.
-    requestLogTreeView : null
+    requestLog: null
   };
 
 
@@ -617,8 +617,8 @@ requestpolicy.overlay = (function() {
    *          destUri
    */
   self.observeAllowedRequest = function(originUri, destUri) {
-    if (self.requestLogTreeView) {
-      self.requestLogTreeView.addAllowedRequest(originUri, destUri);
+    if (self.requestLog) {
+      self.requestLog.addAllowedRequest(originUri, destUri);
     }
   };
 
@@ -634,8 +634,8 @@ requestpolicy.overlay = (function() {
    */
   self.observeBlockedRequest = function(originUri, destUri) {
     self._updateNotificationDueToBlockedContent();
-    if (self.requestLogTreeView) {
-      self.requestLogTreeView.addBlockedRequest(originUri, destUri);
+    if (self.requestLog) {
+      self.requestLog.addBlockedRequest(originUri, destUri);
     }
   };
 
@@ -1223,7 +1223,7 @@ requestpolicy.overlay = (function() {
 
 
   self.clearRequestLog = function() {
-    self.requestLogTreeView.clear();
+    self.requestLog.clear();
   };
 
   self.toggleRequestLog = function() {
@@ -1246,7 +1246,7 @@ requestpolicy.overlay = (function() {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
       //openRequestLog.hidden = false;
-      self.requestLogTreeView = null;
+      self.requestLog = null;
     }
   };
 

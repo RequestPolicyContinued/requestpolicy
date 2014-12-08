@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+window.requestpolicy = window.requestpolicy || {};
 
 window.requestpolicy.requestLog = (function (self) {
 
@@ -30,77 +31,48 @@ window.requestpolicy.requestLog = (function (self) {
 
   let mod = {};
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  Cu.import("resource://gre/modules/Services.jsm", mod);
   mod.ScriptLoader.importModules([
-    "domain-util",
     "string-utils"
   ], mod);
-  let Services = mod.Services, DomainUtil = mod.DomainUtil,
-      StringUtils = mod.StringUtils;
+  let StringUtils = mod.StringUtils;
 
 
   let initialized = false;
-  let tree = null;
+  self.isEmptyMessageDisplayed = true;
+
+  self.tree = null;
+
+  self.visibleData = [];
 
 
+  function showLogIsEmptyMessage() {
+    var message = StringUtils.strbundle.GetStringFromName("requestLogIsEmpty");
+    var directions = StringUtils.strbundle
+        .GetStringFromName("requestLogDirections");
+    self.visibleData.push([message, directions, false, ""]);
+  };
 
-  self.init = function() {
+
+  function init() {
     if (initialized) {
       return;
     }
     initialized = true;
 
-    tree = document.getElementById("requestpolicy-requestLog-tree");
-    tree.view = window.requestpolicy.requestLogTreeView;
+    self.tree = document.getElementById("requestpolicy-requestLog-tree");
+    self.tree.view = self.treeView;
 
-    // Give the requestpolicyOverlay direct access to the tree view.
-    window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
+    // Give the requestpolicy overlay direct access to the the request log.
+    window.parent.requestpolicy.overlay.requestLog = self;
+
+    showLogIsEmptyMessage();
   };
 
-  /**
-   * Copy the content of a cell to the clipboard. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  self.copyToClipboard = function(columnName) {
-    var content = tree.view.getCellText(tree.currentIndex,
-        tree.columns.getNamedColumn(columnName));
+  window.addEventListener("load", function(event) {
+    init(event);
+  }, false);
 
-    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-        .getService(Components.interfaces.nsIClipboardHelper);
-    clipboardHelper.copyString(content);
-  };
 
-  /**
-   * Open the content of a cell in a new tab. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  self.openInNewTab = function(columnName) {
-    var content = tree.view.getCellText(tree.currentIndex,
-        tree.columns.getNamedColumn(columnName));
-
-    var forbidden = true;
-    try {
-      var uri = DomainUtil.getUriObject(content);
-      if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
-        forbidden = false;
-      }
-    } catch (e) {
-    }
-
-    if (forbidden) {
-      var alertTitle = StringUtils.strbundle.GetStringFromName("actionForbidden");
-      var alertText = StringUtils.strbundle
-          .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
-      Services.prompt.alert(null, alertTitle, alertText);
-      return;
-    }
-
-    Utils.getChromeWindow(window).gBrowser.addTab(content);
-  };
 
   return self;
 }(window.requestpolicy.requestLog || {}));
-
-addEventListener("load", function(event) {
-    window.requestpolicy.requestLog.init(event);
-}, false);

@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "复制“目标”到剪贴板">
 <!ENTITY rp.requestLog.openOriginInNewTab "在新标签页打开“来源”">
 <!ENTITY rp.requestLog.openDestinationInNewTab "在新标签页打开“目标”">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

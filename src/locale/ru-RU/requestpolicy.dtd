@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Скопировать цель в буфер обмена">
 <!ENTITY rp.requestLog.openOriginInNewTab "Открыть источник в новой вкладке">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Открыть цель в новой вкладке">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

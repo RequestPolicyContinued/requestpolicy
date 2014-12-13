@@ -32,45 +32,42 @@ window.requestpolicy.requestLog = (function (self) {
   let mod = {};
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
   mod.ScriptLoader.importModules([
-    "string-utils"
+    "string-utils",
+    "utils"
   ], mod);
-  let StringUtils = mod.StringUtils;
+  let StringUtils = mod.StringUtils, Utils = mod.Utils;
 
 
-  let initialized = false;
   self.isEmptyMessageDisplayed = true;
+  self.rows = [];
+  self.visibleRows = [];
 
-  self.tree = null;
 
-  self.visibleData = [];
+
+  let init = function() {
+    // callback function – gets called when the tree is available.
+    self.tree.view = self.treeView;
+
+    showLogIsEmptyMessage();
+
+    // Give the requestpolicy overlay direct access to the the request log.
+    window.parent.requestpolicy.overlay.requestLog = self;
+  }
+
+  Utils.getElementsByIdOnLoad(window, {
+        tree: "requestpolicy-requestLog-tree"
+      }, self, init);
+
+
 
 
   function showLogIsEmptyMessage() {
     var message = StringUtils.strbundle.GetStringFromName("requestLogIsEmpty");
     var directions = StringUtils.strbundle
         .GetStringFromName("requestLogDirections");
-    self.visibleData.push([message, directions, false, ""]);
+    self.visibleRows.push([message, directions, false, ""]);
+    self.treebox.rowCountChanged(0, 1);
   };
-
-
-  function init() {
-    if (initialized) {
-      return;
-    }
-    initialized = true;
-
-    self.tree = document.getElementById("requestpolicy-requestLog-tree");
-    self.tree.view = self.treeView;
-
-    // Give the requestpolicy overlay direct access to the the request log.
-    window.parent.requestpolicy.overlay.requestLog = self;
-
-    showLogIsEmptyMessage();
-  };
-
-  window.addEventListener("load", function(event) {
-    init(event);
-  }, false);
 
 
 

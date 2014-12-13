@@ -43,12 +43,13 @@ window.requestpolicy.requestLog = (function (self) {
 
 
 
-  self.clear = function(e) {
-    var count = self.rowCount;
+  self.clear = function() {
+    var count = self.treeView.rowCount;
     if (count == 0) {
       return;
     }
-    self.visibleData = [];
+    self.rows = [];
+    self.visibleRows = [];
     if (!self.treebox) {
       return;
     }
@@ -99,29 +100,34 @@ window.requestpolicy.requestLog = (function (self) {
 
 
 
-  function addRequest(request) {
-    if (self.isEmptyMessageDisplayed) {
-      // If this were to be called in a multithreaded manner, there's probably
-      // a race condition here.
-      self.visibleData.shift();
-      self.isEmptyMessageDisplayed = false;
-      self.treebox.rowCountChanged(0, -1);
-    }
-    self.visibleData.push(request);
+  function addRow(aRow) {
+    self.rows.push(aRow);
 
-    if (!self.treebox) {
-      return;
-    }
+    if (!self.isRowFilteredOut(aRow)) {
+      if (self.isEmptyMessageDisplayed) {
+        // If this were to be called in a multithreaded manner, there's probably
+        // a race condition here.
+        self.visibleRows.shift();
+        self.isEmptyMessageDisplayed = false;
+        self.treebox.rowCountChanged(0, -1);
+      }
 
-    self.treebox.rowCountChanged(0, 1);
+      self.visibleRows.push(aRow);
+
+      if (!self.treebox) {
+        return;
+      }
+
+      self.treebox.rowCountChanged(0, 1);
+    }
   }
 
   self.addAllowedRequest = function(originURI, destURI) {
-    addRequest([originURI, destURI, false, (new Date()).toLocaleTimeString()]);
+    addRow([originURI, destURI, false, (new Date()).toLocaleTimeString()]);
   };
 
   self.addBlockedRequest = function(originURI, destURI) {
-    addRequest([originURI, destURI, true, (new Date()).toLocaleTimeString()]);
+    addRow([originURI, destURI, true, (new Date()).toLocaleTimeString()]);
   };
 
 

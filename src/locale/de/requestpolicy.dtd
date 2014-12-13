@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
 <!ENTITY rp.requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

@@ -123,5 +123,31 @@ let Utils = (function() {
                     .getInterface(Ci.nsIDOMWindow);
   };
 
+
+  //
+  // DOM utilities
+  //
+
+  /**
+   * Wait for a window to be loaded and then add a list of Elements „by ID“ to
+   * a scope. The scope is optional, but in any case will be returned.
+   *
+   * @returns {Object} the scope of the elements
+   */
+  self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
+                                        aCallback) {
+    let scope = aScope || {};
+    let document = aWindow.document;
+    aWindow.addEventListener("load", function() {
+      for (let elementName in aElementIDs) {
+        scope[elementName] = document.getElementById(aElementIDs[elementName]);
+      }
+      if (aCallback) {
+        aCallback();
+      }
+    });
+    return scope;
+  };
+
   return self;
 }());

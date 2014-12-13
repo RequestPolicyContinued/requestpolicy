@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiatu Helmuga Arbelera">
 <!ENTITY rp.requestLog.openOriginInNewTab "Ireki Jatorria Fitxa berri batean">
 <!ENTITY rp.requestLog.openDestinationInNewTab "ireki Helmuga Fitxa berri batean">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

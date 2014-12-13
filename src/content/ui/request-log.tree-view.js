@@ -49,57 +49,61 @@ window.requestpolicy.requestLog = (function (self) {
   let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
 
 
-  function getVisibleItemAtIndex(index) {
-    return self.visibleData[self.visibleData.length - index - 1];
+  function getVisibleRowAtIndex(index) {
+    return self.visibleRows[self.visibleRows.length - index - 1];
   };
 
+
+
+  //
   // the interface.
   // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
+  //
 
   self.treeView = {
     /**
      * "This property should be set to the total number of rows in the tree."
      * (getter function)
      */
-    get: function() {
-      return self.visibleData.length;
+    get rowCount () {
+      return self.visibleRows.length;
     },
 
     /**
      * "This method should return the text contents at the specified row and
      * column."
      */
-    setTree: function(_treebox) {
-      self.treebox = _treebox;
+    setTree: function(aTreebox) {
+      self.treebox = aTreebox;
     },
 
     /**
      * This method is called once to set the tree element on the view.
      */
-    getCellText: function(index, column) {
+    getCellText: function(aIndex, aColumn) {
       // Row 0 is actually the last element in the array so that we don't have to
       // unshift() the array and can just push().
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
-      var columnIndex = self.columnNameToIndexMap[column.id];
+      var columnIndex = self.columnNameToIndexMap[aColumn.id];
       if (columnIndex != 2) {
-        return getVisibleItemAtIndex(index)[self.columnNameToIndexMap[column.id]];
+        return getVisibleRowAtIndex(aIndex)[self.columnNameToIndexMap[aColumn.id]];
       }
     },
 
-    isContainer: function(index) {
+    isContainer: function(aIndex) {
       return false;
     },
 
-    isContainerOpen: function(index) {
+    isContainerOpen: function(aIndex) {
       return false;
     },
 
-    isContainerEmpty: function(index) {
+    isContainerEmpty: function(aIndex) {
       return false;
     },
 
-    isSeparator: function(index) {
+    isSeparator: function(aIndex) {
       return false;
     },
 
@@ -107,58 +111,58 @@ window.requestpolicy.requestLog = (function (self) {
       return false;
     },
 
-    isEditable: function(index, column) {
+    isEditable: function(aIndex, aColumn) {
       return false;
     },
 
-    getParentIndex: function(index) {
+    getParentIndex: function(aIndex) {
       return -1;
     },
 
-    getLevel: function(index) {
+    getLevel: function(aIndex) {
       return 0;
     },
 
-    hasNextSibling: function(index, after) {
+    hasNextSibling: function(aIndex, aAfter) {
       return false;
     },
 
-    toggleOpenState: function(index) {},
+    toggleOpenState: function(aIndex) {},
 
-    getImageSrc: function(index, column) {
-      if (self.columnNameToIndexMap[column.id] == 2) {
-        if (getVisibleItemAtIndex(index)[2]) {
+    getImageSrc: function(aIndex, aColumn) {
+      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+        if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://requestpolicy/skin/dot.png";
         }
       }
     },
 
-    getProgressMode: function(index, column) {},
-    getCellValue: function(index, column) {},
+    getProgressMode: function(aIndex, aColumn) {},
+    getCellValue: function(aIndex, aColumn) {},
     cycleHeader: function(col, elem) {},
     selectionChanged: function() {},
-    cycleCell: function(index, column) {},
+    cycleCell: function(aIndex, aColumn) {},
     performAction: function(action) {},
-    performActionOnCell: function(action, index, column) {},
+    performActionOnCell: function(action, aIndex, aColumn) {},
 
-    getRowProperties: function(index, props) {
-      var returnValue = (getVisibleItemAtIndex(index)[2]) ? "blocked" : "allowed";
+    getRowProperties: function(aIndex, aProps) {
+      var returnValue = (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
 
-      if (props) {
+      if (aProps) {
         // Gecko version < 22
-        props.AppendElement(aserv.getAtom(returnValue));
+        aProps.AppendElement(aserv.getAtom(returnValue));
       } else {
         // Gecko version >= 22
         return returnValue;
       }
     },
 
-    getCellProperties: function(index, column, props) {
-      if (self.columnNameToIndexMap[column.id] == 2) {
-        if (getVisibleItemAtIndex(index)[2]) {
-          if (props) {
+    getCellProperties: function(aIndex, aColumn, aProps) {
+      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+        if (getVisibleRowAtIndex(aIndex)[2]) {
+          if (aProps) {
             // Gecko version < 22
-            props.AppendElement(aserv.getAtom("blocked"));
+            aProps.AppendElement(aserv.getAtom("blocked"));
           } else {
             // Gecko version >= 22
             return "blocked";
@@ -167,8 +171,8 @@ window.requestpolicy.requestLog = (function (self) {
       }
     },
 
-    getColumnProperties: function(column, props) {
-      if (!props) {
+    getColumnProperties: function(aColumn, aProps) {
+      if (!aProps) {
         return "";
       }
     }
@@ -176,4 +180,3 @@ window.requestpolicy.requestLog = (function (self) {
 
   return self;
 }(window.requestpolicy.requestLog || {}));
-

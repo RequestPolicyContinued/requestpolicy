@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopírovať ciele do schránky">
 <!ENTITY rp.requestLog.openOriginInNewTab "Otvoriť zdroj na novej karte">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Otvoriť cieľ na novej karte">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

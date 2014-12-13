@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopēt mērķi starpliktuvē">
 <!ENTITY rp.requestLog.openOriginInNewTab "Atvērt pirmavotu jaunā cilnē">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Atvērt mērķi jaunā cilnē">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

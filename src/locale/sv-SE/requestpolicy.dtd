@@ -6,3 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiera mål till urklipp">
 <!ENTITY rp.requestLog.openOriginInNewTab "Öppna källa i ny flik">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Öppna mål i ny flik">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

@@ -23,6 +23,7 @@ jar_file := $(build_path)chrome/$(extension_name).jar
 
 # the path of the target XPI file
 xpi_file := $(dist_path)$(extension_name).xpi
+signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
 
 # collect files that are part of the source code
 source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
@@ -49,10 +50,13 @@ deleted_files :=
 empty_dirs :=
 ifneq "$(wildcard $(build_path))" ""
 # files that have been deleted but still exist in the build directory.
-deleted_files := $(shell find $(build_path) -type f | grep -F -v $(addprefix -e ,$(all_files)))
+deleted_files := $(shell find $(build_path) -type f | \
+		grep -v "META-INF" | \
+		grep -F -v $(addprefix -e ,$(all_files)))
 # empty directories. -mindepth 1 to exclude the build directory itself.
 empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
 endif
+
 
 
 
@@ -75,6 +79,12 @@ all: $(xpi_file)
 build: $(build_path)
 $(build_path): $(all_files) $(deleted_files) $(empty_dirs)
 
+$(build_path)/META-INF/: $(build_path) $(all_files)
+	mkdir -p $(build_path)/META-INF
+	signtool -d .signing \
+		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
+		$(build_path)
+
 
 # create the dist directory
 $(dist_path):
@@ -92,6 +102,16 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	@cd $(build_path) && \
 	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
 	@echo "Creating XPI file: Done!"
+
+.PHONY: sign
+sign $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
+	@rm -f $(signed_xpi_file)
+	@cd $(build_path) && \
+	$(ZIP) $(abspath $(signed_xpi_file)) \
+		META-INF/zigbert.rsa && \
+	$(ZIP) -r -D $(abspath $(signed_xpi_file)) \
+		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
+		-x META-INF/zigbert.rsa
 
 # ___________________
 # processing of files

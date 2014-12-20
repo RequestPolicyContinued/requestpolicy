@@ -117,7 +117,7 @@ let PolicyManager = (function(self) {
       "ruleset" : rawRuleset.toRuleset("user")
     };
     userRulesets["user"]["ruleset"].userRuleset = true;
-    userRulesets["user"].ruleset.print();
+    //userRulesets["user"].ruleset.print();
     // Temporary rules. These are never stored.
     self.revokeTemporaryRules();
 
@@ -153,7 +153,7 @@ let PolicyManager = (function(self) {
           "ruleset" : rawRuleset.toRuleset(subName)
         };
         list[subName]["ruleset"].userRuleset = false;
-        list[subName].ruleset.print();
+        //list[subName].ruleset.print();
       }
     }
 

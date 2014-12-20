@@ -27,6 +27,10 @@
 requestpolicy.classicmenu = (function() {
   let self = {};
 
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cu = Components.utils;
+
 
   let mod = {};
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");

@@ -902,7 +902,7 @@ Ruleset.prototype = {
     }
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (var entry in this.getHostMatches(originHost)) {
+    for (var entry in this.getHostMatches(originHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -940,7 +940,7 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (var entry in this.getHostMatches(destHost)) {
+    for (var entry in this.getHostMatches(destHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -952,22 +952,6 @@ Ruleset.prototype = {
           //dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
-        // switch(rule.destinationRuleAction) {
-        //   case RULE_ACTION_ALLOW:
-        //     if (rule.isMatch(dest)) {
-        //               dprint("ALLOW dest by rule " + entry + " " + rule);
-        //               matchedAllowRules.push(["dest", entry, rule]);
-        //             }
-        //     break;
-        //   case RULE_ACTION_DENY:
-        //     if (rule.isMatch(dest)) {
-        //       dprint("DENY dest by rule " + entry + " " + rule);
-        //       matchedDenyRules.push(["dest", entry, rule]);
-        //       //break destouterloop;
-        //       break;
-        //     }
-        //     break;
-        // }
       }
     }
 

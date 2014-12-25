@@ -662,10 +662,11 @@ requestpolicy.menu = (function() {
   };
 
 
-  // Note to self: It's been too long since I looked at some of the new code.
-  // I think I may have assumed that I'd get rid of the different strictness
-  // levels and just use what is currently called LEVEL_SOP. If using anything
-  // else there will be errors from within getDeniedRequests().
+  // Note by @jsamuel:
+  // „It's been too long since I looked at some of the new code.
+  //  I think I may have assumed that I'd get rid of the different strictness
+  //  levels and just use what is currently called LEVEL_SOP. If using anything
+  //  else there will be errors from within getDeniedRequests().“
 
 
   self._getBlockedDestinationsAsGUILocations = function() {

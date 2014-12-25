@@ -179,7 +179,7 @@ run: $(xpi_file)
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-mozmill_tests_path := /moz/mozmill-tests/
+mozmill_tests_path := .mozilla/mozmill-tests/
 mozmill_manifest := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/manifest.ini
 
 .PHONY: check test mozmill

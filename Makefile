@@ -25,6 +25,10 @@ jar_file := $(build_path)chrome/$(extension_name).jar
 xpi_file := $(dist_path)$(extension_name).xpi
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
 
+binary_firefox_nightly := .mozilla/software/firefox/nightly/firefox
+mozrunner_prefs_ini := tests/mozrunner-prefs.ini
+
+
 # collect files that are part of the source code
 source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/chrome.manifest \
@@ -151,6 +155,23 @@ $(deleted_files): FORCE
 	@# delete parent dirs if empty:
 	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
 
+# ___________
+# run firefox
+#
+
+# $(mozrunner_prefs) is a workaround for Mozilla Bug 1100363
+# see https://bugzilla.mozilla.org/show_bug.cgi?id=1100363
+mozrunner_prefs += --pref=extensions.requestpolicy.defaultPolicy.allow:false \
+	--pref=general.warnOnAboutConfig:false \
+	--pref=browser.displayedE10SNotice:3
+
+.PHONY: run
+run: $(xpi_file)
+	mozrunner -a $(xpi_file) -b $(binary_firefox_nightly) \
+		--preferences=$(mozrunner_prefs_ini):dev \
+		$(mozrunner_prefs)
+
+
 # ____________
 # unit testing
 #
@@ -158,7 +179,6 @@ $(deleted_files): FORCE
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-firefox_bin := /moz/firefox/nightly/firefox
 mozmill_tests_path := /moz/mozmill-tests/
 mozmill_manifest := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/manifest.ini
 
@@ -166,7 +186,7 @@ mozmill_manifest := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/
 check test: mozmill
 
 mozmill: $(xpi_file)
-	mozmill -a $(xpi_file) -b $(firefox_bin) -m $(mozmill_manifest)
+	mozmill -a $(xpi_file) -b $(binary_firefox_nightly) -m $(mozmill_manifest)
 
 
 # ________________

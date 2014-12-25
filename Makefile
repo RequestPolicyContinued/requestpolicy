@@ -163,7 +163,8 @@ $(deleted_files): FORCE
 # see https://bugzilla.mozilla.org/show_bug.cgi?id=1100363
 mozrunner_prefs += --pref=extensions.requestpolicy.defaultPolicy.allow:false \
 	--pref=general.warnOnAboutConfig:false \
-	--pref=browser.displayedE10SNotice:3
+	--pref=browser.displayedE10SNotice:3 \
+	--pref=extensions.requestpolicy.welcomeWindowShown:true
 
 .PHONY: run
 run: $(xpi_file)

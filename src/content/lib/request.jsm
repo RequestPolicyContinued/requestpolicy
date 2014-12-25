@@ -197,7 +197,7 @@ NormalRequest.prototype.isInternal = function() {
 };
 
 /**
- * Get the nsIDOMWindow related to this request.
+ * Get the content window (nsIDOMWindow) related to this request.
  */
 NormalRequest.prototype.getContentWindow = function() {
   let context = this.aContext;
@@ -226,6 +226,30 @@ NormalRequest.prototype.getContentWindow = function() {
     win = doc.defaultView;
   }
   return win;
+};
+
+/**
+ * Get the chrome window (nsIDOMWindow) related to this request.
+ */
+NormalRequest.prototype.getChromeWindow = function() {
+  let contentWindow = this.getContentWindow();
+  if (!!contentWindow) {
+    return Utils.getChromeWindow(contentWindow);
+  } else {
+    return null;
+  }
+};
+
+/**
+ * Get the <browser> (nsIDOMXULElement) related to this request.
+ */
+NormalRequest.prototype.getBrowser = function() {
+  let context = this.aContext;
+  if (context instanceof Ci.nsIDOMXULElement && context.tagName === "browser") {
+    return context;
+  } else {
+    return Utils.getBrowserForWindow(this.getContentWindow());
+  }
 };
 
 
@@ -303,11 +327,11 @@ NormalRequest.prototype.checkURISchemes = function() {
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
     try {
-      let win = this.getContentWindow();
-      if (!win) {
-        throw "The window could not be extracted from aContext.";
+      let chromeWin = this.getChromeWindow();
+      if (!chromeWin) {
+        throw "The chrome window could not be extracted from aContext.";
       }
-      let overlay = Utils.getChromeWindow(win).requestpolicy.overlay;
+      let overlay = chromeWin.requestpolicy.overlay;
       Utils.runAsync(function() {
         overlay.showSchemeNotification(win, scheme);
       });

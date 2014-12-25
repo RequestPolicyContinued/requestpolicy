@@ -199,10 +199,14 @@ NormalRequest.prototype.isInternal = function() {
 /**
  * Get the nsIDOMWindow related to this request.
  */
-NormalRequest.prototype.getWindow = function() {
+NormalRequest.prototype.getContentWindow = function() {
   let context = this.aContext;
   if (!context) {
     return null;
+  }
+
+  if (context instanceof Ci.nsIDOMXULElement && context.tagName === "browser") {
+    return context.contentWindow;
   }
 
   let win;
@@ -299,7 +303,7 @@ NormalRequest.prototype.checkURISchemes = function() {
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
     try {
-      let win = this.getWindow();
+      let win = this.getContentWindow();
       if (!win) {
         throw "The window could not be extracted from aContext.";
       }

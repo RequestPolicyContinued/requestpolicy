@@ -58,7 +58,7 @@ ScriptLoader.defineLazyModuleGetters({
 
 
 let RequestProcessor = (function() {
-  // private variables and functions
+  let self = {};
 
 
   /**
@@ -706,754 +706,753 @@ let RequestProcessor = (function() {
 
 
 
-  let self = {
+
     // TODO: make them private
-    _rejectedRequests: new RequestSet(),
-    _allowedRequests: new RequestSet(),
+  self._rejectedRequests = new RequestSet();
+  self._allowedRequests = new RequestSet();
 
 
 
-    /**
-     * Process a NormalRequest.
-     *
-     * @param {NormalRequest} request
-     */
-    process: function(request) {
-      //Logger.vardump(request.aRequestOrigin);
-      //Logger.vardump(request.aContentLocation);
-      try {
+  /**
+   * Process a NormalRequest.
+   *
+   * @param {NormalRequest} request
+   */
+  self.process = function(request) {
+    //Logger.vardump(request.aRequestOrigin);
+    //Logger.vardump(request.aContentLocation);
+    try {
 
-        if (request.isInternal()) {
+      if (request.isInternal()) {
+        return CP_OK;
+      }
+
+      var originURI = request.originURI;
+      var destURI = request.destURI;
+
+      if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
+        let browser = null;
+
+        // Fx 16 changed the following: 1) we should be able to count on the
+        // referrer (aRequestOrigin) being set to something besides
+        // moz-nullprincipal when there is a referrer, and 2) the new argument
+        // aRequestPrincipal is provided. This means our hackery to set the
+        // referrer based on aContext when aRequestOrigin is moz-nullprincipal
+        // is now causing requests that don't have a referrer (namely, URLs
+        // entered in the address bar) to be blocked and trigger a top-level
+        // document redirect notification.
+        if (request.aRequestPrincipal) {
+          Logger.warning(
+              Logger.TYPE_CONTENT,
+              "Allowing request that appears to be a URL entered in the " +
+              "location bar or some other good explanation: " + destURI);
           return CP_OK;
         }
 
-        var originURI = request.originURI;
-        var destURI = request.destURI;
-
-        if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
-          let browser = null;
-
-          // Fx 16 changed the following: 1) we should be able to count on the
-          // referrer (aRequestOrigin) being set to something besides
-          // moz-nullprincipal when there is a referrer, and 2) the new argument
-          // aRequestPrincipal is provided. This means our hackery to set the
-          // referrer based on aContext when aRequestOrigin is moz-nullprincipal
-          // is now causing requests that don't have a referrer (namely, URLs
-          // entered in the address bar) to be blocked and trigger a top-level
-          // document redirect notification.
-          if (request.aRequestPrincipal) {
-            Logger.warning(
-                Logger.TYPE_CONTENT,
-                "Allowing request that appears to be a URL entered in the " +
-                "location bar or some other good explanation: " + destURI);
-            return CP_OK;
-          }
-
-          // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
-          // above is correct, this should be able to be removed when Fx < 16 is
-          // no longer supported.
-          if (request.aContext) {
-            try {
-              let domElement = request.aContext.QueryInterface(Ci.nsIDOMElement);
-              if (domElement && domElement.tagName == "") {
-                var newOriginURI = DomainUtil
-                      .stripFragment(request.aContext.contentDocument.documentURI);
-                Logger.info(Logger.TYPE_CONTENT,
-                    "Considering moz-nullprincipal origin <"
-                        + originURI + "> to be origin <" + newOriginURI + ">");
-                originURI = newOriginURI;
-                request.setOriginURI(originURI);
-              }
-            } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {
-              try {
-                let domWin = request.aContext.QueryInterface(Ci.nsIDOMWindow);
-            return CP_OK;
-                if (domWin && domWin.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
-                }
-              } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-            }
-          }
-        }
-
-        if (request.aRequestOrigin.scheme == "view-source") {
-          var newOriginURI = originURI.split(":").slice(1).join(":");
-          Logger.info(Logger.TYPE_CONTENT,
-            "Considering view-source origin <"
-              + originURI + "> to be origin <" + newOriginURI + ">");
-          originURI = newOriginURI;
-          request.setOriginURI(originURI);
-        }
-
-        if (request.aContentLocation.scheme == "view-source") {
-          var newDestURI = destURI.split(":").slice(1).join(":");
-          if (newDestURI.indexOf("data:text/html") == 0) {
-            // "View Selection Source" has been clicked
-            Logger.info(Logger.TYPE_CONTENT,
-                "Allowing \"data:text/html\" view-source destination"
-                    + " (Selection Source)");
-            return CP_OK;
-          } else {
-            Logger.info(Logger.TYPE_CONTENT,
-                "Considering view-source destination <"
-                    + destURI + "> to be destination <" + newDestURI + ">");
-            destURI = newDestURI;
-            request.setDestURI(destURI);
-          }
-        }
-
-        if (originURI == "about:blank" && request.aContext) {
-          let domNode;
+        // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
+        // above is correct, this should be able to be removed when Fx < 16 is
+        // no longer supported.
+        if (request.aContext) {
           try {
-            domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-          if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
-            var newOriginURI;
-            if (request.aContext.documentURI &&
-                request.aContext.documentURI != "about:blank") {
-              newOriginURI = request.aContext.documentURI;
-            } else if (request.aContext.ownerDocument &&
-                request.aContext.ownerDocument.documentURI &&
-                request.aContext.ownerDocument.documentURI != "about:blank") {
-              newOriginURI = request.aContext.ownerDocument.documentURI;
-            }
-            if (newOriginURI) {
-              newOriginURI = DomainUtil.stripFragment(newOriginURI);
-              Logger.info(Logger.TYPE_CONTENT, "Considering origin <" +
-                          originURI + "> to be origin <" + newOriginURI + ">");
+            let domElement = request.aContext.QueryInterface(Ci.nsIDOMElement);
+            if (domElement && domElement.tagName == "") {
+              var newOriginURI = DomainUtil
+                    .stripFragment(request.aContext.contentDocument.documentURI);
+              Logger.info(Logger.TYPE_CONTENT,
+                  "Considering moz-nullprincipal origin <"
+                      + originURI + "> to be origin <" + newOriginURI + ">");
               originURI = newOriginURI;
               request.setOriginURI(originURI);
             }
-          }
-        }
-
-
-        if (isDuplicateRequest(request)) {
-          return lastShouldLoadCheck.result;
-        }
-
-        // Sometimes, clicking a link to a fragment will result in a request
-        // where the origin is the same as the destination, but none of the
-        // additional content of the page is again requested. The result is that
-        // nothing ends up showing for blocked or allowed destinations because
-        // all of that data was cleared due to the new request.
-        // Example to test with: Click on "expand all" at
-        // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
-        if (originURI == destURI) {
-          Logger.warning(Logger.TYPE_CONTENT,
-              "Allowing (but not recording) request "
-                  + "where origin is the same as the destination: " + originURI);
+          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {
+            try {
+              let domWin = request.aContext.QueryInterface(Ci.nsIDOMWindow);
           return CP_OK;
-        }
-
-
-
-        if (request.aContext) {
-          let domNode;
-          try {
-            domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-
-          if (domNode && domNode.nodeName == "LINK" &&
-              (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
-            faviconRequests[destURI] = true;
+              if (domWin && domWin.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
+              }
+            } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
           }
         }
+      }
 
+      if (request.aRequestOrigin.scheme == "view-source") {
+        var newOriginURI = originURI.split(":").slice(1).join(":");
+        Logger.info(Logger.TYPE_CONTENT,
+          "Considering view-source origin <"
+            + originURI + "> to be origin <" + newOriginURI + ">");
+        originURI = newOriginURI;
+        request.setOriginURI(originURI);
+      }
 
-        if (request.checkURISchemes().shouldLoad === true) {
+      if (request.aContentLocation.scheme == "view-source") {
+        var newDestURI = destURI.split(":").slice(1).join(":");
+        if (newDestURI.indexOf("data:text/html") == 0) {
+          // "View Selection Source" has been clicked
+          Logger.info(Logger.TYPE_CONTENT,
+              "Allowing \"data:text/html\" view-source destination"
+                  + " (Selection Source)");
           return CP_OK;
+        } else {
+          Logger.info(Logger.TYPE_CONTENT,
+              "Considering view-source destination <"
+                  + destURI + "> to be destination <" + newDestURI + ">");
+          destURI = newDestURI;
+          request.setDestURI(destURI);
         }
+      }
 
-
-
-        // Note: If changing the logic here, also make necessary changes to
-        // isAllowedRedirect).
-
-        // Checking for link clicks, form submissions, and history requests
-        // should be done before other checks. Specifically, when link clicks
-        // were done after allowed-origin and other checks, then links that
-        // were allowed due to other checks would end up recorded in the origin
-        // url's allowed requests, and woud then show up on one tab if link
-        // was opened in a new tab but that link would have been allowed
-        // regardless of the link click. The original tab would then show it
-        // in its menu.
-        if (clickedLinks[originURI] &&
-            clickedLinks[originURI][destURI]) {
-          // Don't delete the clickedLinks item. We need it for if the user
-          // goes back/forward through their history.
-          // delete clickedLinks[originURI][destURI];
-
-          // We used to have this not be recorded so that it wouldn't cause us
-          // to forget blocked/allowed requests. However, when a policy change
-          // causes a page refresh after a link click, it looks like a link
-          // click again and so if we don't forget the previous blocked/allowed
-          // requests, the menu becomes inaccurate. Now the question is: what
-          // are we breaking by clearing the blocked/allowed requests here?
-          request.requestResult = new RequestResult(true,
-              REQUEST_REASON_LINK_CLICK);
-          return accept("User-initiated request by link click", request);
-
-        } else if (submittedForms[originURI] &&
-            submittedForms[originURI][destURI.split("?")[0]]) {
-          // Note: we dropped the query string from the destURI because form GET
-          // requests will have that added on here but the original action of
-          // the form may not have had it.
-          // Don't delete the clickedLinks item. We need it for if the user
-          // goes back/forward through their history.
-          // delete submittedForms[originURI][destURI.split("?")[0]];
-
-          // See the note above for link clicks and forgetting blocked/allowed
-          // requests on refresh. I haven't tested if it's the same for forms
-          // but it should be so we're making the same change here.
-          request.requestResult = new RequestResult(true,
-              REQUEST_REASON_FORM_SUBMISSION);
-          return accept("User-initiated request by form submission", request);
-
-        } else if (historyRequests[destURI]) {
-          // When the user goes back and forward in their history, a request for
-          // the url comes through but is not followed by requests for any of
-          // the page's content. Therefore, we make sure that our cache of
-          // blocked requests isn't removed in this case.
-          delete historyRequests[destURI];
-          request.requestResult = new RequestResult(true,
-              REQUEST_REASON_HISTORY_REQUEST);
-          return accept("History request", request, true);
-        } else if (userAllowedRedirects[originURI]
-            && userAllowedRedirects[originURI][destURI]) {
-          // shouldLoad is called by location.href in overlay.js as of Fx
-          // 3.7a5pre and SeaMonkey 2.1a.
-          request.requestResult = new RequestResult(true,
-              REQUEST_REASON_USER_ALLOWED_REDIRECT);
-          return accept("User-allowed redirect", request, true);
-        }
-
-        if (request.aRequestOrigin.scheme == "chrome") {
-          if (request.aRequestOrigin.asciiHost == "browser") {
-            // "browser" origin shows up for favicon.ico and an address entered
-            // in address bar.
-            request.requestResult = new RequestResult(true,
-                REQUEST_REASON_USER_ACTION);
-            return accept(
-                "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", request);
-          } else {
-            // TODO: It seems sketchy to allow all requests from chrome. If I
-            // had to put my money on a possible bug (in terms of not blocking
-            // requests that should be), I'd put it here. Doing this, however,
-            // saves a lot of blocking of legitimate requests from extensions
-            // that originate from their xul files. If you're reading this and
-            // you know of a way to use this to evade RequestPolicy, please let
-            // me know, I will be very grateful.
-            request.requestResult = new RequestResult(true,
-                REQUEST_REASON_USER_ACTION);
-            return accept(
-                "User action (e.g. address entered in address bar) or other good "
-                    + "explanation (e.g. new window/tab opened)", request);
+      if (originURI == "about:blank" && request.aContext) {
+        let domNode;
+        try {
+          domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
+        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+        if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
+          var newOriginURI;
+          if (request.aContext.documentURI &&
+              request.aContext.documentURI != "about:blank") {
+            newOriginURI = request.aContext.documentURI;
+          } else if (request.aContext.ownerDocument &&
+              request.aContext.ownerDocument.documentURI &&
+              request.aContext.ownerDocument.documentURI != "about:blank") {
+            newOriginURI = request.aContext.ownerDocument.documentURI;
+          }
+          if (newOriginURI) {
+            newOriginURI = DomainUtil.stripFragment(newOriginURI);
+            Logger.info(Logger.TYPE_CONTENT, "Considering origin <" +
+                        originURI + "> to be origin <" + newOriginURI + ">");
+            originURI = newOriginURI;
+            request.setOriginURI(originURI);
           }
         }
+      }
 
-        // This is mostly here for the case of popup windows where the user has
-        // allowed popups for the domain. In that case, the window.open() call
-        // that made the popup isn't calling the wrapped version of
-        // window.open() and we can't find a better way to register the source
-        // and destination before the request is made. This should be able to be
-        // removed if we can find a better solution for the allowed popup case.
-        if (request.aContext) {
-          let domNode;
-          try {
-            domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
 
-          if (domNode && domNode.nodeName == "xul:browser" &&
-              domNode.currentURI && domNode.currentURI.spec == "about:blank") {
-            request.requestResult = new RequestResult(true,
-                REQUEST_REASON_NEW_WINDOW);
-            return accept("New window (should probably only be an allowed " +
-                "popup's initial request)", request, true);
-          }
+      if (isDuplicateRequest(request)) {
+        return lastShouldLoadCheck.result;
+      }
+
+      // Sometimes, clicking a link to a fragment will result in a request
+      // where the origin is the same as the destination, but none of the
+      // additional content of the page is again requested. The result is that
+      // nothing ends up showing for blocked or allowed destinations because
+      // all of that data was cleared due to the new request.
+      // Example to test with: Click on "expand all" at
+      // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
+      if (originURI == destURI) {
+        Logger.warning(Logger.TYPE_CONTENT,
+            "Allowing (but not recording) request "
+                + "where origin is the same as the destination: " + originURI);
+        return CP_OK;
+      }
+
+
+
+      if (request.aContext) {
+        let domNode;
+        try {
+          domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
+        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+
+        if (domNode && domNode.nodeName == "LINK" &&
+            (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
+          faviconRequests[destURI] = true;
         }
+      }
 
-        // XMLHttpRequests made within chrome's context have these origins.
-        // Greasemonkey uses such a method to provide their cross-site xhr.
-        if (originURI == "resource://gre/res/hiddenWindow.html" ||
-            originURI == "resource://gre-resources/hiddenWindow.html") {
-        }
 
-        // Now that we have blacklists, a user could prevent themselves from
-        // being able to reload a page by blocking requests from * to the
-        // destination page. As a simple hack around this, for now we'll always
-        // allow request to the same origin. It would be nice to have a a better
-        // solution but I'm not sure what that solution is.
-        var originIdent = DomainUtil.getIdentifier(originURI);
-        var destIdent = DomainUtil.getIdentifier(destURI);
-        if (originIdent == destIdent) {
+      if (request.checkURISchemes().shouldLoad === true) {
+        return CP_OK;
+      }
+
+
+
+      // Note: If changing the logic here, also make necessary changes to
+      // isAllowedRedirect).
+
+      // Checking for link clicks, form submissions, and history requests
+      // should be done before other checks. Specifically, when link clicks
+      // were done after allowed-origin and other checks, then links that
+      // were allowed due to other checks would end up recorded in the origin
+      // url's allowed requests, and woud then show up on one tab if link
+      // was opened in a new tab but that link would have been allowed
+      // regardless of the link click. The original tab would then show it
+      // in its menu.
+      if (clickedLinks[originURI] &&
+          clickedLinks[originURI][destURI]) {
+        // Don't delete the clickedLinks item. We need it for if the user
+        // goes back/forward through their history.
+        // delete clickedLinks[originURI][destURI];
+
+        // We used to have this not be recorded so that it wouldn't cause us
+        // to forget blocked/allowed requests. However, when a policy change
+        // causes a page refresh after a link click, it looks like a link
+        // click again and so if we don't forget the previous blocked/allowed
+        // requests, the menu becomes inaccurate. Now the question is: what
+        // are we breaking by clearing the blocked/allowed requests here?
+        request.requestResult = new RequestResult(true,
+            REQUEST_REASON_LINK_CLICK);
+        return accept("User-initiated request by link click", request);
+
+      } else if (submittedForms[originURI] &&
+          submittedForms[originURI][destURI.split("?")[0]]) {
+        // Note: we dropped the query string from the destURI because form GET
+        // requests will have that added on here but the original action of
+        // the form may not have had it.
+        // Don't delete the clickedLinks item. We need it for if the user
+        // goes back/forward through their history.
+        // delete submittedForms[originURI][destURI.split("?")[0]];
+
+        // See the note above for link clicks and forgetting blocked/allowed
+        // requests on refresh. I haven't tested if it's the same for forms
+        // but it should be so we're making the same change here.
+        request.requestResult = new RequestResult(true,
+            REQUEST_REASON_FORM_SUBMISSION);
+        return accept("User-initiated request by form submission", request);
+
+      } else if (historyRequests[destURI]) {
+        // When the user goes back and forward in their history, a request for
+        // the url comes through but is not followed by requests for any of
+        // the page's content. Therefore, we make sure that our cache of
+        // blocked requests isn't removed in this case.
+        delete historyRequests[destURI];
+        request.requestResult = new RequestResult(true,
+            REQUEST_REASON_HISTORY_REQUEST);
+        return accept("History request", request, true);
+      } else if (userAllowedRedirects[originURI]
+          && userAllowedRedirects[originURI][destURI]) {
+        // shouldLoad is called by location.href in overlay.js as of Fx
+        // 3.7a5pre and SeaMonkey 2.1a.
+        request.requestResult = new RequestResult(true,
+            REQUEST_REASON_USER_ALLOWED_REDIRECT);
+        return accept("User-allowed redirect", request, true);
+      }
+
+      if (request.aRequestOrigin.scheme == "chrome") {
+        if (request.aRequestOrigin.asciiHost == "browser") {
+          // "browser" origin shows up for favicon.ico and an address entered
+          // in address bar.
           request.requestResult = new RequestResult(true,
-              REQUEST_REASON_IDENTICAL_IDENTIFIER);
+              REQUEST_REASON_USER_ACTION);
           return accept(
-              "Allowing request where origin protocol, host, and port are the" +
-              " same as the destination: " + originIdent, request);
-        }
-
-        request.requestResult = PolicyManager.checkRequestAgainstUserRules(
-            request.aRequestOrigin, request.aContentLocation);
-        for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
-          Logger.dump('Matched deny rules');
-          Logger.vardump(request.requestResult.matchedDenyRules[i]);
-        }
-        for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
-          Logger.dump('Matched allow rules');
-          Logger.vardump(request.requestResult.matchedAllowRules[i]);
-        }
-        // If there are both allow and deny rules, then fall back on the default
-        // policy. I believe this is effectively the same as giving precedence
-        // to allow rules when in default allow mode and giving precedence to
-        // deny rules when in default deny mode. It's just a different way of
-        // expressing the same logic. Now, whether that's the right logic we
-        // should be using to solve the problem of rule precedence and support
-        // for fine-grained rules overriding course-grained ones is a different
-        // question.
-        if (request.requestResult.allowRulesExist() &&
-            request.requestResult.denyRulesExist()) {
-          request.requestResult.resultReason =
-              REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-          if (Prefs.isDefaultAllow()) {
-            request.requestResult.isAllowed = true;
-            return accept("User policy indicates both allow and block. " +
-                "Using default allow policy", request);
-          } else {
-            request.requestResult.isAllowed = false;
-            return reject("User policy indicates both allow and block. " +
-                "Using default block policy", request);
-          }
-        }
-        if (request.requestResult.allowRulesExist()) {
-          request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
-          request.requestResult.isAllowed = true;
-          return accept("Allowed by user policy", request);
-        }
-        if (request.requestResult.denyRulesExist()) {
-          request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
-          request.requestResult.isAllowed = false;
-          return reject("Blocked by user policy", request);
-        }
-
-        request.requestResult = PolicyManager
-            .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
-                request.aContentLocation);
-        for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
-          Logger.dump('Matched deny rules');
-          Logger.vardump(
-              request.requestResult.matchedDenyRules[i]);
-        }
-        for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
-          Logger.dump('Matched allow rules');
-          Logger.vardump(
-              request.requestResult.matchedAllowRules[i]);
-        }
-        if (request.requestResult.allowRulesExist() &&
-            request.requestResult.denyRulesExist()) {
-          request.requestResult.resultReason =
-              REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-          if (Prefs.isDefaultAllow()) {
-            request.requestResult.isAllowed = true;
-            return accept(
-                "Subscription rules indicate both allow and block. " +
-                "Using default allow policy", request);
-          } else {
-            request.requestResult.isAllowed = false;
-            return reject("Subscription rules indicate both allow and block. " +
-                "Using default block policy", request);
-          }
-        }
-        if (request.requestResult.denyRulesExist()) {
-          request.requestResult.resultReason =
-              REQUEST_REASON_SUBSCRIPTION_POLICY;
-          request.requestResult.isAllowed = false;
-          return reject("Blocked by subscription policy", request);
-        }
-        if (request.requestResult.allowRulesExist()) {
-          request.requestResult.resultReason =
-              REQUEST_REASON_SUBSCRIPTION_POLICY;
-          request.requestResult.isAllowed = true;
-          return accept("Allowed by subscription policy", request);
-        }
-
-        let compatibilityRules = rpService.getCompatibilityRules();
-        for (var i = 0; i < compatibilityRules.length; i++) {
-          var rule = compatibilityRules[i];
-          var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-          var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
-          if (allowOrigin && allowDest) {
-            request.requestResult = new RequestResult(true,
-                REQUEST_REASON_COMPATIBILITY);
-            return accept(
-                "Extension/application compatibility rule matched [" + rule[2] +
-                "]", request, true);
-          }
-        }
-
-        // If the destination has a mapping (i.e. it was originally a different
-        // destination but was changed into the current one), accept this
-        // request if the original destination would have been accepted.
-        // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
-        if (request.aExtra != CP_MAPPEDDESTINATION &&
-            mappedDestinations[destURI]) {
-          for (var mappedDest in mappedDestinations[destURI]) {
-            var mappedDestUriObj = mappedDestinations[destURI][mappedDest];
-            Logger.warning(Logger.TYPE_CONTENT,
-                "Checking mapped destination: " + mappedDest);
-            var mappedResult = PolicyImplementation.shouldLoad(
-                request.aContentType, mappedDestUriObj, request.aRequestOrigin,
-                request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
-            if (mappedResult == CP_OK) {
-              return CP_OK;
-            }
-          }
-        }
-
-        request.requestResult = checkByDefaultPolicy(originURI, destURI);
-        if (request.requestResult.isAllowed) {
-          return accept("Allowed by default policy", request);
+              "User action (e.g. address entered in address bar) or other good "
+                  + "explanation (e.g. new window/tab opened)", request);
         } else {
-          // We didn't match any of the conditions in which to allow the request,
-          // so reject it.
-          return request.aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
-              reject("Denied by default policy", request);
-        }
-
-
-      } catch (e) {
-        Logger.severe(Logger.TYPE_ERROR,
-            "Fatal Error, " + e + ", stack was: " + e.stack);
-        Logger.severe(Logger.TYPE_CONTENT,
-            "Rejecting request due to internal error.");
-        return Prefs.isBlockingDisabled() ? CP_OK : CP_REJECT;
-      }
-    },
-
-    // RequestProcessor.finishProcessing = function(request, result) {
-    //   request.shouldLoadResult = result;
-    // };
-
-
-
-
-
-    /**
-     * Called after a response has been received from the web server. Headers are
-     * available on the channel. The response can be accessed and modified via
-     * nsITraceableChannel.
-     */
-    _examineHttpResponse: function(aSubject) {
-      // Currently, if a user clicks a link to download a file and that link
-      // redirects and is subsequently blocked, the user will see the blocked
-      // destination in the menu. However, after they have allowed it from
-      // the menu and attempted the download again, they won't see the allowed
-      // request in the menu. Fixing that might be a pain and also runs the
-      // risk of making the menu cluttered and confusing with destinations of
-      // followed links from the current page.
-
-      // TODO: Make user aware of blocked headers so they can allow them if
-      // desired.
-
-      var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-
-      var headerType;
-      var dest;
-
-      try {
-        // If there is no such header, getResponseHeader() will throw
-        // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
-        // the one that will be used.
-        headerType = "Location";
-        dest = httpChannel.getResponseHeader(headerType);
-      } catch (e) {
-        // No location header. Look for a Refresh header.
-        try {
-          headerType = "Refresh";
-          var refreshString = httpChannel.getResponseHeader(headerType);
-        } catch (e) {
-          // No Location header or Refresh header.
-          return;
-        }
-        try {
-          // We can ignore the delay because we aren't manually doing
-          // the refreshes. Allowed refreshes we still leave to the browser.
-          // The dest may be empty if the origin is what should be refreshed.
-          // This will be handled by DomainUtil.determineRedirectUri().
-          var dest = DomainUtil.parseRefresh(refreshString).destURI;
-        } catch (e) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "Invalid refresh header: <" + refreshString + ">");
-          if (!Prefs.isBlockingDisabled()) {
-            httpChannel.setResponseHeader(headerType, "", false);
-          }
-          return;
+          // TODO: It seems sketchy to allow all requests from chrome. If I
+          // had to put my money on a possible bug (in terms of not blocking
+          // requests that should be), I'd put it here. Doing this, however,
+          // saves a lot of blocking of legitimate requests from extensions
+          // that originate from their xul files. If you're reading this and
+          // you know of a way to use this to evade RequestPolicy, please let
+          // me know, I will be very grateful.
+          request.requestResult = new RequestResult(true,
+              REQUEST_REASON_USER_ACTION);
+          return accept(
+              "User action (e.g. address entered in address bar) or other good "
+                  + "explanation (e.g. new window/tab opened)", request);
         }
       }
 
-      // For origins that are IDNs, this will always be in ACE format. We want
-      // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
-      var originURI = DomainUtil.formatIDNUri(httpChannel.name);
+      // This is mostly here for the case of popup windows where the user has
+      // allowed popups for the domain. In that case, the window.open() call
+      // that made the popup isn't calling the wrapped version of
+      // window.open() and we can't find a better way to register the source
+      // and destination before the request is made. This should be able to be
+      // removed if we can find a better solution for the allowed popup case.
+      if (request.aContext) {
+        let domNode;
+        try {
+          domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
+        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
 
-      // Allow redirects of requests from privileged code.
-      if (!isContentRequest(httpChannel)) {
-        // However, favicon requests that are redirected appear as non-content
-        // requests. So, check if the original request was for a favicon.
-        var originPath = DomainUtil.getPath(httpChannel.name);
-        // We always have to check "/favicon.ico" because Firefox will use this
-        // as a default path and that request won't pass through shouldLoad().
-        if (originPath == "/favicon.ico" || faviconRequests[originURI]) {
-          // If the redirected request is allowed, we need to know that was a
-          // favicon request in case it is further redirected.
-          faviconRequests[dest] = true;
-          Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + headerType
-                  + "' header to <" + dest + "> " + "from <" + originURI
-                  + "> appears to be a redirected favicon request. "
-                  + "This will be treated as a content request.");
+        if (domNode && domNode.nodeName == "xul:browser" &&
+            domNode.currentURI && domNode.currentURI.spec == "about:blank") {
+          request.requestResult = new RequestResult(true,
+              REQUEST_REASON_NEW_WINDOW);
+          return accept("New window (should probably only be an allowed " +
+              "popup's initial request)", request, true);
+        }
+      }
+
+      // XMLHttpRequests made within chrome's context have these origins.
+      // Greasemonkey uses such a method to provide their cross-site xhr.
+      if (originURI == "resource://gre/res/hiddenWindow.html" ||
+          originURI == "resource://gre-resources/hiddenWindow.html") {
+      }
+
+      // Now that we have blacklists, a user could prevent themselves from
+      // being able to reload a page by blocking requests from * to the
+      // destination page. As a simple hack around this, for now we'll always
+      // allow request to the same origin. It would be nice to have a a better
+      // solution but I'm not sure what that solution is.
+      var originIdent = DomainUtil.getIdentifier(originURI);
+      var destIdent = DomainUtil.getIdentifier(destURI);
+      if (originIdent == destIdent) {
+        request.requestResult = new RequestResult(true,
+            REQUEST_REASON_IDENTICAL_IDENTIFIER);
+        return accept(
+            "Allowing request where origin protocol, host, and port are the" +
+            " same as the destination: " + originIdent, request);
+      }
+
+      request.requestResult = PolicyManager.checkRequestAgainstUserRules(
+          request.aRequestOrigin, request.aContentLocation);
+      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
+        Logger.dump('Matched deny rules');
+        Logger.vardump(request.requestResult.matchedDenyRules[i]);
+      }
+      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
+        Logger.dump('Matched allow rules');
+        Logger.vardump(request.requestResult.matchedAllowRules[i]);
+      }
+      // If there are both allow and deny rules, then fall back on the default
+      // policy. I believe this is effectively the same as giving precedence
+      // to allow rules when in default allow mode and giving precedence to
+      // deny rules when in default deny mode. It's just a different way of
+      // expressing the same logic. Now, whether that's the right logic we
+      // should be using to solve the problem of rule precedence and support
+      // for fine-grained rules overriding course-grained ones is a different
+      // question.
+      if (request.requestResult.allowRulesExist() &&
+          request.requestResult.denyRulesExist()) {
+        request.requestResult.resultReason =
+            REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+        if (Prefs.isDefaultAllow()) {
+          request.requestResult.isAllowed = true;
+          return accept("User policy indicates both allow and block. " +
+              "Using default allow policy", request);
         } else {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "** ALLOWED ** '" + headerType + "' header to <" + dest + "> " +
-              "from <" + originURI +
-              ">. Original request is from privileged code.");
-          return;
+          request.requestResult.isAllowed = false;
+          return reject("User policy indicates both allow and block. " +
+              "Using default block policy", request);
+        }
+      }
+      if (request.requestResult.allowRulesExist()) {
+        request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+        request.requestResult.isAllowed = true;
+        return accept("Allowed by user policy", request);
+      }
+      if (request.requestResult.denyRulesExist()) {
+        request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+        request.requestResult.isAllowed = false;
+        return reject("Blocked by user policy", request);
+      }
+
+      request.requestResult = PolicyManager
+          .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
+              request.aContentLocation);
+      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
+        Logger.dump('Matched deny rules');
+        Logger.vardump(
+            request.requestResult.matchedDenyRules[i]);
+      }
+      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
+        Logger.dump('Matched allow rules');
+        Logger.vardump(
+            request.requestResult.matchedAllowRules[i]);
+      }
+      if (request.requestResult.allowRulesExist() &&
+          request.requestResult.denyRulesExist()) {
+        request.requestResult.resultReason =
+            REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+        if (Prefs.isDefaultAllow()) {
+          request.requestResult.isAllowed = true;
+          return accept(
+              "Subscription rules indicate both allow and block. " +
+              "Using default allow policy", request);
+        } else {
+          request.requestResult.isAllowed = false;
+          return reject("Subscription rules indicate both allow and block. " +
+              "Using default block policy", request);
+        }
+      }
+      if (request.requestResult.denyRulesExist()) {
+        request.requestResult.resultReason =
+            REQUEST_REASON_SUBSCRIPTION_POLICY;
+        request.requestResult.isAllowed = false;
+        return reject("Blocked by subscription policy", request);
+      }
+      if (request.requestResult.allowRulesExist()) {
+        request.requestResult.resultReason =
+            REQUEST_REASON_SUBSCRIPTION_POLICY;
+        request.requestResult.isAllowed = true;
+        return accept("Allowed by subscription policy", request);
+      }
+
+      let compatibilityRules = rpService.getCompatibilityRules();
+      for (var i = 0; i < compatibilityRules.length; i++) {
+        var rule = compatibilityRules[i];
+        var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
+        var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
+        if (allowOrigin && allowDest) {
+          request.requestResult = new RequestResult(true,
+              REQUEST_REASON_COMPATIBILITY);
+          return accept(
+              "Extension/application compatibility rule matched [" + rule[2] +
+              "]", request, true);
         }
       }
 
-      // If it's not a valid uri, the redirect is relative to the origin host.
-      // The way we have things written currently, without this check the full
-      // dest string will get treated as the destination and displayed in the
-      // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
-      // We add this to fix issue #39:
-      // https://github.com/RequestPolicyContinued/requestpolicy/issues/39
-      if (!DomainUtil.isValidUri(dest)) {
-        var destAsUri = DomainUtil.determineRedirectUri(originURI, dest);
-        Logger.warning(
-            Logger.TYPE_HEADER_REDIRECT,
-            "Redirect destination is not a valid uri, assuming dest <" + dest
-                + "> from origin <" + originURI + "> is actually dest <" + destAsUri
-                + ">.");
-        dest = destAsUri;
-      }
-
-      var request = new RedirectRequest(originURI, dest, headerType);
-      processRedirect(request, httpChannel);
-    },
-
-    /**
-     * Called as a http request is made. The channel is available to allow you to
-     * modify headers and such.
-     *
-     * Currently this just looks for prefetch requests that are getting through
-     * which we currently can't stop.
-     */
-    _examineHttpRequest: function(aSubject) {
-      var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-      try {
-        // Determine if prefetch requests are slipping through.
-        if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
-          // Seems to be too late to block it at this point. Calling the
-          // cancel(status) method didn't stop it.
+      // If the destination has a mapping (i.e. it was originally a different
+      // destination but was changed into the current one), accept this
+      // request if the original destination would have been accepted.
+      // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
+      if (request.aExtra != CP_MAPPEDDESTINATION &&
+          mappedDestinations[destURI]) {
+        for (var mappedDest in mappedDestinations[destURI]) {
+          var mappedDestUriObj = mappedDestinations[destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
-              "Discovered prefetch request being sent to: " + httpChannel.name);
-        }
-      } catch (e) {
-        // No X-moz header.
-      }
-    },
-
-    _printAllowedRequests: function() {
-      self._allowedRequests.print();
-    },
-
-    _printRejectedRequests: function() {
-      self._rejectedRequests.print();
-    },
-
-
-
-
-
-
-    registerHistoryRequest: function(destinationUrl) {
-      destinationUrl = DomainUtil.ensureUriHasPath(
-          DomainUtil.stripFragment(destinationUrl));
-      historyRequests[destinationUrl] = true;
-      Logger.info(Logger.TYPE_INTERNAL,
-          "History item requested: <" + destinationUrl + ">.");
-    },
-
-    registerFormSubmitted: function(originUrl, destinationUrl) {
-      originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
-      destinationUrl = DomainUtil.ensureUriHasPath(
-          DomainUtil.stripFragment(destinationUrl));
-
-      Logger.info(Logger.TYPE_INTERNAL,
-          "Form submitted from <" + originUrl + "> to <" + destinationUrl + ">.");
-
-      // Drop the query string from the destination url because form GET requests
-      // will end up with a query string on them when shouldLoad is called, so
-      // we'll need to be dropping the query string there.
-      destinationUrl = destinationUrl.split("?")[0];
-
-      if (submittedForms[originUrl] == undefined) {
-        submittedForms[originUrl] = {};
-      }
-      if (submittedForms[originUrl][destinationUrl] == undefined) {
-        // TODO: See timestamp note for registerLinkClicked.
-        submittedForms[originUrl][destinationUrl] = true;
-      }
-
-      // Keep track of a destination-indexed map, as well.
-      if (submittedFormsReverse[destinationUrl] == undefined) {
-        submittedFormsReverse[destinationUrl] = {};
-      }
-      if (submittedFormsReverse[destinationUrl][originUrl] == undefined) {
-        // TODO: See timestamp note for registerLinkClicked.
-        submittedFormsReverse[destinationUrl][originUrl] = true;
-      }
-    },
-
-    registerLinkClicked: function(originUrl, destinationUrl) {
-      originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
-      destinationUrl = DomainUtil.ensureUriHasPath(
-          DomainUtil.stripFragment(destinationUrl));
-
-      Logger.info(Logger.TYPE_INTERNAL,
-          "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
-
-      if (clickedLinks[originUrl] == undefined) {
-        clickedLinks[originUrl] = {};
-      }
-      if (clickedLinks[originUrl][destinationUrl] == undefined) {
-        // TODO: Possibly set the value to a timestamp that can be used elsewhere
-        // to determine if this is a recent click. This is probably necessary as
-        // multiple calls to shouldLoad get made and we need a way to allow
-        // multiple in a short window of time. Alternately, as it seems to always
-        // be in order (repeats are always the same as the last), the last one
-        // could be tracked and always allowed (or allowed within a small period
-        // of time). This would have the advantage that we could delete items from
-        // the clickedLinks object. One of these approaches would also reduce log
-        // clutter, which would be good.
-        clickedLinks[originUrl][destinationUrl] = true;
-      }
-
-      // Keep track of a destination-indexed map, as well.
-      if (clickedLinksReverse[destinationUrl] == undefined) {
-        clickedLinksReverse[destinationUrl] = {};
-      }
-      if (clickedLinksReverse[destinationUrl][originUrl] == undefined) {
-        // TODO: Possibly set the value to a timestamp, as described above.
-        clickedLinksReverse[destinationUrl][originUrl] = true;
-      }
-    },
-
-    registerAllowedRedirect: function(originUrl, destinationUrl) {
-      originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
-      destinationUrl = DomainUtil.ensureUriHasPath(
-          DomainUtil.stripFragment(destinationUrl));
-
-      Logger.info(Logger.TYPE_INTERNAL, "User-allowed redirect from <" +
-          originUrl + "> to <" + destinationUrl + ">.");
-
-      if (userAllowedRedirects[originUrl] == undefined) {
-        userAllowedRedirects[originUrl] = {};
-      }
-      if (userAllowedRedirects[originUrl][destinationUrl] == undefined) {
-        userAllowedRedirects[originUrl][destinationUrl] = true;
-      }
-    },
-
-    isAllowedRedirect: function(originURI, destURI) {
-      var request = new RedirectRequest(originURI, destURI);
-      return (true === checkRedirect(request).isAllowed);
-    },
-
-    /**
-     * Add an observer to be notified of all blocked and allowed requests. TODO:
-     * This should be made to accept instances of a defined interface.
-     *
-     * @param {Object} observer
-     */
-    addRequestObserver: function(observer) {
-      if (!("observeBlockedRequest" in observer)) {
-        throw "Observer passed to addRequestObserver does "
-            + "not have an observeBlockedRequest() method.";
-      }
-      Logger.debug(Logger.TYPE_INTERNAL,
-          "Adding request observer: " + observer.toString());
-      requestObservers.push(observer);
-    },
-
-    /**
-     * Remove an observer added through addRequestObserver().
-     *
-     * @param {Object} observer
-     */
-    removeRequestObserver: function(observer) {
-      for (var i = 0; i < requestObservers.length; i++) {
-        if (requestObservers[i] == observer) {
-          Logger.debug(Logger.TYPE_INTERNAL,
-              "Removing request observer: " + observer.toString());
-          delete requestObservers[i];
-          return;
+              "Checking mapped destination: " + mappedDest);
+          var mappedResult = PolicyImplementation.shouldLoad(
+              request.aContentType, mappedDestUriObj, request.aRequestOrigin,
+              request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
+          if (mappedResult == CP_OK) {
+            return CP_OK;
+          }
         }
       }
-      Logger.warning(Logger.TYPE_INTERNAL,
-          "Could not find observer to remove " + "in removeRequestObserver()");
-    },
+
+      request.requestResult = checkByDefaultPolicy(originURI, destURI);
+      if (request.requestResult.isAllowed) {
+        return accept("Allowed by default policy", request);
+      } else {
+        // We didn't match any of the conditions in which to allow the request,
+        // so reject it.
+        return request.aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
+            reject("Denied by default policy", request);
+      }
 
 
-
-    getDeniedRequests: function(currentlySelectedOrigin, allRequestsOnDocument) {
-      Logger.dump("## getDeniedRequests");
-      return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
-          false);
-    },
-
-    getAllowedRequests: function(currentlySelectedOrigin, allRequestsOnDocument) {
-      Logger.dump("## getAllowedRequests");
-      return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
-          true);
-    },
-
-    /**
-     * TODO: This comment is quite old. It might not be necessary anymore to
-     *       check the DOM since all requests are recorded, like:
-     *       RequestSet._origins[originURI][destBase][destIdent][destURI][i]
-     * Info: As soon as requests are saved per Tab, this function isn't needed
-     *       anymore.
-     *
-     * This will look both at the DOM as well as the recorded allowed requests to
-     * determine which other origins exist within the document. This includes
-     * other origins that have the same domain.
-     *
-     * The reason for also
-     * needing to check the DOM is that some sites (like gmail) will make multiple
-     * requests to the same uri for different iframes and this will cause us to
-     * only have in the recorded requests from a source uri the destinations from
-     * the most recent iframe that loaded that source uri. It may also help in
-     * cases where the user has multiple tabs/windows open to the same page.
-     *
-     * @param {}
-     *          browser
-     * @return {}
-     *          RequestSet
-     */
-    getAllRequestsInBrowser: function(browser) {
-      //var origins = {};
-      var reqSet = new RequestSet();
-
-      // If we get these from the DOM, then we won't know the relevant
-      // rules that were involved with allowing/denying the request.
-      // Maybe just look up the allowed/blocked requests in the
-      // main allowed/denied request sets before adding them.
-      //_getOtherOriginsHelperFromDOM(document, reqSet);
-
-      var uri = DomainUtil.stripFragment(browser.currentURI.spec);
-      _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
-      return reqSet;
+    } catch (e) {
+      Logger.severe(Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      Logger.severe(Logger.TYPE_CONTENT,
+          "Rejecting request due to internal error.");
+      return Prefs.isBlockingDisabled() ? CP_OK : CP_REJECT;
     }
+  };
+
+  // RequestProcessor.finishProcessing = function(request, result) {
+  //   request.shouldLoadResult = result;
+  // };
+
+
+
+
+
+  /**
+   * Called after a response has been received from the web server. Headers are
+   * available on the channel. The response can be accessed and modified via
+   * nsITraceableChannel.
+   */
+  self._examineHttpResponse = function(aSubject) {
+    // Currently, if a user clicks a link to download a file and that link
+    // redirects and is subsequently blocked, the user will see the blocked
+    // destination in the menu. However, after they have allowed it from
+    // the menu and attempted the download again, they won't see the allowed
+    // request in the menu. Fixing that might be a pain and also runs the
+    // risk of making the menu cluttered and confusing with destinations of
+    // followed links from the current page.
+
+    // TODO: Make user aware of blocked headers so they can allow them if
+    // desired.
+
+    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+
+    var headerType;
+    var dest;
+
+    try {
+      // If there is no such header, getResponseHeader() will throw
+      // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
+      // the one that will be used.
+      headerType = "Location";
+      dest = httpChannel.getResponseHeader(headerType);
+    } catch (e) {
+      // No location header. Look for a Refresh header.
+      try {
+        headerType = "Refresh";
+        var refreshString = httpChannel.getResponseHeader(headerType);
+      } catch (e) {
+        // No Location header or Refresh header.
+        return;
+      }
+      try {
+        // We can ignore the delay because we aren't manually doing
+        // the refreshes. Allowed refreshes we still leave to the browser.
+        // The dest may be empty if the origin is what should be refreshed.
+        // This will be handled by DomainUtil.determineRedirectUri().
+        var dest = DomainUtil.parseRefresh(refreshString).destURI;
+      } catch (e) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "Invalid refresh header: <" + refreshString + ">");
+        if (!Prefs.isBlockingDisabled()) {
+          httpChannel.setResponseHeader(headerType, "", false);
+        }
+        return;
+      }
+    }
+
+    // For origins that are IDNs, this will always be in ACE format. We want
+    // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
+    var originURI = DomainUtil.formatIDNUri(httpChannel.name);
+
+    // Allow redirects of requests from privileged code.
+    if (!isContentRequest(httpChannel)) {
+      // However, favicon requests that are redirected appear as non-content
+      // requests. So, check if the original request was for a favicon.
+      var originPath = DomainUtil.getPath(httpChannel.name);
+      // We always have to check "/favicon.ico" because Firefox will use this
+      // as a default path and that request won't pass through shouldLoad().
+      if (originPath == "/favicon.ico" || faviconRequests[originURI]) {
+        // If the redirected request is allowed, we need to know that was a
+        // favicon request in case it is further redirected.
+        faviconRequests[dest] = true;
+        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + headerType
+                + "' header to <" + dest + "> " + "from <" + originURI
+                + "> appears to be a redirected favicon request. "
+                + "This will be treated as a content request.");
+      } else {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "** ALLOWED ** '" + headerType + "' header to <" + dest + "> " +
+            "from <" + originURI +
+            ">. Original request is from privileged code.");
+        return;
+      }
+    }
+
+    // If it's not a valid uri, the redirect is relative to the origin host.
+    // The way we have things written currently, without this check the full
+    // dest string will get treated as the destination and displayed in the
+    // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
+    // We add this to fix issue #39:
+    // https://github.com/RequestPolicyContinued/requestpolicy/issues/39
+    if (!DomainUtil.isValidUri(dest)) {
+      var destAsUri = DomainUtil.determineRedirectUri(originURI, dest);
+      Logger.warning(
+          Logger.TYPE_HEADER_REDIRECT,
+          "Redirect destination is not a valid uri, assuming dest <" + dest
+              + "> from origin <" + originURI + "> is actually dest <" + destAsUri
+              + ">.");
+      dest = destAsUri;
+    }
+
+    var request = new RedirectRequest(originURI, dest, headerType);
+    processRedirect(request, httpChannel);
+  };
+
+  /**
+   * Called as a http request is made. The channel is available to allow you to
+   * modify headers and such.
+   *
+   * Currently this just looks for prefetch requests that are getting through
+   * which we currently can't stop.
+   */
+  self._examineHttpRequest = function(aSubject) {
+    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    try {
+      // Determine if prefetch requests are slipping through.
+      if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
+        // Seems to be too late to block it at this point. Calling the
+        // cancel(status) method didn't stop it.
+        Logger.warning(Logger.TYPE_CONTENT,
+            "Discovered prefetch request being sent to: " + httpChannel.name);
+      }
+    } catch (e) {
+      // No X-moz header.
+    }
+  };
+
+  self._printAllowedRequests = function() {
+    self._allowedRequests.print();
+  };
+
+  self._printRejectedRequests = function() {
+    self._rejectedRequests.print();
+  };
+
+
+
+
+
+
+  self.registerHistoryRequest = function(destinationUrl) {
+    destinationUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(destinationUrl));
+    historyRequests[destinationUrl] = true;
+    Logger.info(Logger.TYPE_INTERNAL,
+        "History item requested: <" + destinationUrl + ">.");
+  };
+
+  self.registerFormSubmitted = function(originUrl, destinationUrl) {
+    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    destinationUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(destinationUrl));
+
+    Logger.info(Logger.TYPE_INTERNAL,
+        "Form submitted from <" + originUrl + "> to <" + destinationUrl + ">.");
+
+    // Drop the query string from the destination url because form GET requests
+    // will end up with a query string on them when shouldLoad is called, so
+    // we'll need to be dropping the query string there.
+    destinationUrl = destinationUrl.split("?")[0];
+
+    if (submittedForms[originUrl] == undefined) {
+      submittedForms[originUrl] = {};
+    }
+    if (submittedForms[originUrl][destinationUrl] == undefined) {
+      // TODO: See timestamp note for registerLinkClicked.
+      submittedForms[originUrl][destinationUrl] = true;
+    }
+
+    // Keep track of a destination-indexed map, as well.
+    if (submittedFormsReverse[destinationUrl] == undefined) {
+      submittedFormsReverse[destinationUrl] = {};
+    }
+    if (submittedFormsReverse[destinationUrl][originUrl] == undefined) {
+      // TODO: See timestamp note for registerLinkClicked.
+      submittedFormsReverse[destinationUrl][originUrl] = true;
+    }
+  };
+
+  self.registerLinkClicked = function(originUrl, destinationUrl) {
+    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    destinationUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(destinationUrl));
+
+    Logger.info(Logger.TYPE_INTERNAL,
+        "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
+
+    if (clickedLinks[originUrl] == undefined) {
+      clickedLinks[originUrl] = {};
+    }
+    if (clickedLinks[originUrl][destinationUrl] == undefined) {
+      // TODO: Possibly set the value to a timestamp that can be used elsewhere
+      // to determine if this is a recent click. This is probably necessary as
+      // multiple calls to shouldLoad get made and we need a way to allow
+      // multiple in a short window of time. Alternately, as it seems to always
+      // be in order (repeats are always the same as the last), the last one
+      // could be tracked and always allowed (or allowed within a small period
+      // of time). This would have the advantage that we could delete items from
+      // the clickedLinks object. One of these approaches would also reduce log
+      // clutter, which would be good.
+      clickedLinks[originUrl][destinationUrl] = true;
+    }
+
+    // Keep track of a destination-indexed map, as well.
+    if (clickedLinksReverse[destinationUrl] == undefined) {
+      clickedLinksReverse[destinationUrl] = {};
+    }
+    if (clickedLinksReverse[destinationUrl][originUrl] == undefined) {
+      // TODO: Possibly set the value to a timestamp, as described above.
+      clickedLinksReverse[destinationUrl][originUrl] = true;
+    }
+  };
+
+  self.registerAllowedRedirect = function(originUrl, destinationUrl) {
+    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    destinationUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(destinationUrl));
+
+    Logger.info(Logger.TYPE_INTERNAL, "User-allowed redirect from <" +
+        originUrl + "> to <" + destinationUrl + ">.");
+
+    if (userAllowedRedirects[originUrl] == undefined) {
+      userAllowedRedirects[originUrl] = {};
+    }
+    if (userAllowedRedirects[originUrl][destinationUrl] == undefined) {
+      userAllowedRedirects[originUrl][destinationUrl] = true;
+    }
+  };
+
+  self.isAllowedRedirect = function(originURI, destURI) {
+    var request = new RedirectRequest(originURI, destURI);
+    return (true === checkRedirect(request).isAllowed);
+  };
+
+  /**
+   * Add an observer to be notified of all blocked and allowed requests. TODO:
+   * This should be made to accept instances of a defined interface.
+   *
+   * @param {Object} observer
+   */
+  self.addRequestObserver = function(observer) {
+    if (!("observeBlockedRequest" in observer)) {
+      throw "Observer passed to addRequestObserver does "
+          + "not have an observeBlockedRequest() method.";
+    }
+    Logger.debug(Logger.TYPE_INTERNAL,
+        "Adding request observer: " + observer.toString());
+    requestObservers.push(observer);
+  };
+
+  /**
+   * Remove an observer added through addRequestObserver().
+   *
+   * @param {Object} observer
+   */
+  self.removeRequestObserver = function(observer) {
+    for (var i = 0; i < requestObservers.length; i++) {
+      if (requestObservers[i] == observer) {
+        Logger.debug(Logger.TYPE_INTERNAL,
+            "Removing request observer: " + observer.toString());
+        delete requestObservers[i];
+        return;
+      }
+    }
+    Logger.warning(Logger.TYPE_INTERNAL,
+        "Could not find observer to remove " + "in removeRequestObserver()");
+  };
+
+
+
+  self.getDeniedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+    Logger.dump("## getDeniedRequests");
+    return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
+        false);
+  };
+
+  self.getAllowedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+    Logger.dump("## getAllowedRequests");
+    return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
+        true);
+  };
+
+  /**
+   * TODO: This comment is quite old. It might not be necessary anymore to
+   *       check the DOM since all requests are recorded, like:
+   *       RequestSet._origins[originURI][destBase][destIdent][destURI][i]
+   * Info: As soon as requests are saved per Tab, this function isn't needed
+   *       anymore.
+   *
+   * This will look both at the DOM as well as the recorded allowed requests to
+   * determine which other origins exist within the document. This includes
+   * other origins that have the same domain.
+   *
+   * The reason for also
+   * needing to check the DOM is that some sites (like gmail) will make multiple
+   * requests to the same uri for different iframes and this will cause us to
+   * only have in the recorded requests from a source uri the destinations from
+   * the most recent iframe that loaded that source uri. It may also help in
+   * cases where the user has multiple tabs/windows open to the same page.
+   *
+   * @param {}
+   *          browser
+   * @return {}
+   *          RequestSet
+   */
+  self.getAllRequestsInBrowser = function(browser) {
+    //var origins = {};
+    var reqSet = new RequestSet();
+
+    // If we get these from the DOM, then we won't know the relevant
+    // rules that were involved with allowing/denying the request.
+    // Maybe just look up the allowed/blocked requests in the
+    // main allowed/denied request sets before adding them.
+    //_getOtherOriginsHelperFromDOM(document, reqSet);
+
+    var uri = DomainUtil.stripFragment(browser.currentURI.spec);
+    _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
+    return reqSet;
   };
 
   return self;

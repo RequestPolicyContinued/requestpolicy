@@ -27,8 +27,6 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["rpService"];
 
-const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
-
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
@@ -385,11 +383,9 @@ let rpService = (function() {
 
   function register() {
     let obs = Services.obs;
-    obs.addObserver(self, "http-on-examine-response", false);
     obs.addObserver(self, "http-on-modify-request", false);
     obs.addObserver(self, "sessionstore-windows-restored", false);
     obs.addObserver(self, "private-browsing", false);
-    obs.addObserver(self, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
     obs.addObserver(self, SUBSCRIPTION_UPDATED_TOPIC, false);
     obs.addObserver(self, SUBSCRIPTION_ADDED_TOPIC, false);
     obs.addObserver(self, SUBSCRIPTION_REMOVED_TOPIC, false);
@@ -399,7 +395,6 @@ let rpService = (function() {
 
   function unregister() {
     let obs = Services.obs;
-    obs.removeObserver(self, "http-on-examine-response");
     obs.removeObserver(self, "http-on-modify-request");
     obs.removeObserver(self, "sessionstore-windows-restored");
     obs.removeObserver(self, SUBSCRIPTION_UPDATED_TOPIC);
@@ -509,18 +504,6 @@ let rpService = (function() {
       return topLevelDocTranslationRules[uri] || null;
     },
 
-    /**
-     * Handles observer notifications sent by the HTTPS Everywhere extension
-     * that inform us of URIs that extension has rewritten.
-     *
-     * @param nsIURI oldURI
-     * @param string newSpec
-     */
-    _handleHttpsEverywhereUriRewrite : function(oldURI, newSpec) {
-      oldURI = oldURI.QueryInterface(Ci.nsIURI);
-      RequestProcessor.mapDestinations(oldURI.spec, newSpec);
-    },
-
 
 
 
@@ -530,9 +513,6 @@ let rpService = (function() {
 
     observe: function(subject, topic, data) {
       switch (topic) {
-        case "http-on-examine-response" :
-          RequestProcessor._examineHttpResponse(subject);
-          break;
         case "http-on-modify-request" :
           RequestProcessor._examineHttpRequest(subject);
           break;
@@ -577,9 +557,6 @@ let rpService = (function() {
           var failures = PolicyManager.unloadSubscriptionRules(subInfo);
           break;
 
-        case HTTPS_EVERYWHERE_REWRITE_TOPIC :
-          self._handleHttpsEverywhereUriRewrite(subject, data);
-          break;
         case "sessionstore-windows-restored":
           showWelcomeWindow();
           break;

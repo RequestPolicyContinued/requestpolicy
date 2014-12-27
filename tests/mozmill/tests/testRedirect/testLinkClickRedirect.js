@@ -61,15 +61,25 @@ var testLinkClickRedirect = function() {
           '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
       if (redirectShouldBeAllowed) {
+        // fixme: find a better waitFor-function that ensures that the part of
+        //        RP which is responsible for showing the panel *really* has
+        //        finished.
         controller.waitFor(function() {
             return controller.window.content.document.location.href !== url;
         }, "The URL in the urlbar has changed.");
         expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
       } else {
-        expect.ok(panel.exists(), "The redirect notification bar is displayed.");
+        controller.waitFor((() => panel.exists()), "The redirect " +
+                           "notification bar has been displayed.");
       }
 
       tabBrowser.closeAllTabs();
+
+      // It's necessary to wait for the notification panel to be closed. If we
+      // don't wait for that to happen, the next URL in urlsWithRedirect might
+      // already be displayed while the panel is still there.
+      controller.waitFor((() => !panel.exists()), "No panel is being " +
+                         "displayed because all tabs have been closed.");
     }
   }
 }

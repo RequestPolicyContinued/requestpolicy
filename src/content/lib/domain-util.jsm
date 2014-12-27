@@ -131,6 +131,9 @@ DomainUtil.getHost = function(uri) {
  *         exception if it is an invalid uri.
  */
 DomainUtil.getUriObject = function(uri) {
+  // fixme: if `uri` is relative, `newURI()` throws NS_ERROR_MALFORMED_URI.
+  // possible solution: use nsIURI.resolve() instead for relative uris
+
   // Throws an exception if uri is invalid.
   try {
     return Services.io.newURI(uri, null, null);

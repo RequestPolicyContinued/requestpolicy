@@ -70,7 +70,19 @@ var testAutoRedirect = function() {
 
     tabBrowser.closeAllTabs();
 
-    // the following sleep is a workaround against the error:
+    // It's necessary to wait for the notification panel to be closed. If we
+    // don't wait for that to happen, the next URL in urlsWithRedirect might
+    // already be displayed while the panel is still there.
+    controller.waitFor((() => !panel.exists()), "No panel is being displayed " +
+                       "because all tabs have been closed.");
+
+    //
+    // The `sleep` below has been a workaround against the following exception:
+    //
+    // --> Note: This workaround is probably not needed anymore -- if the
+    //           problem occurres again, uncomment the `sleep`. Otherwise,
+    //           remove this comment after some time.
+    //           (comment by @myrdd, 27.12.2014)
     // *************************
     // A coding exception was thrown in a Promise resolution callback.
     // See https://developer.mozilla.org/Mozilla/JavaScript_code_modules/Promise.jsm/Promise
@@ -80,6 +92,6 @@ var testAutoRedirect = function() {
     // BackgroundPageThumbs._processCaptureQueue@resource://gre/modules/BackgroundPageThumbs.jsm:222:5
     // BackgroundPageThumbs.capture@resource://gre/modules/BackgroundPageThumbs.jsm:73:5
     // (...)
-    controller.sleep(100);
+    //controller.sleep(100);
   }
 }

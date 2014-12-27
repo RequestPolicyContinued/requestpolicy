@@ -40,7 +40,7 @@ let ManagerForDOMContentLoaded = (function() {
     sendSyncMessage(MMID + ":notifyLinkClicked",
                     {origin: event.currentTarget.ownerDocument.URL,
                      dest: event.currentTarget.href});
-    dump("<a> clicked\n");
+    //dump("<a> clicked\n");
   }
 
 
@@ -76,7 +76,7 @@ let ManagerForDOMContentLoaded = (function() {
       // isn't set on new tab open when this is called.
       return;
     }*/
-    dump("onDOMContentLoaded called for " + doc.documentURI + "\n");
+    //dump("onDOMContentLoaded called for " + doc.documentURI + "\n");
 
     onDocumentLoaded(doc);
     let docID = DocManager.generateDocID(doc);
@@ -167,7 +167,7 @@ let ManagerForDOMContentLoaded = (function() {
     }
 
     if (metaRefreshes.length > 0) {
-      dump("meta refreshes found.\n");
+      //dump("meta refreshes found.\n");
 
       var docShell = document.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)

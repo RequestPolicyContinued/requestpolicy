@@ -32,7 +32,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["prefs", "constants"], this);
+ScriptLoader.importModules(["prefs", "constants", "bootstrap-manager"], this);
 
 
 
@@ -147,6 +147,51 @@ let Utils = (function() {
       }
     });
     return scope;
+  };
+
+
+
+  self.observeNotifications = function(observer, observerTopics) {
+    BootstrapManager.registerStartupFunction(function() {
+      for (let i = 0, len = observerTopics.length; i < len; ++i) {
+        Services.obs.addObserver(observer, observerTopics[i], false);
+      }
+    });
+    BootstrapManager.registerShutdownFunction(function(data, reason) {
+      for (let i = 0, len = observerTopics.length; i < len; ++i) {
+        Services.obs.removeObserver(observer, observerTopics[i], false);
+      }
+    });
+  };
+  self.unregisterObservers = function(observer, observerTopics) {
+  };
+
+
+
+  /**
+   * This function returns and eventually creates a module's `internal`
+   * variable. The `internal` can be accessed from all submodules of that
+   * module (which might be in different files).
+   *
+   * The `internal` is added to `self`, and as soon as all modules have been
+   * loaded, i.e. when the startup functions are called, the `internal` is
+   * removed from `self` (the module is „sealed“).
+   *
+   *   This function can be used as follows:
+   *   let MyModule = (function(self) {
+   *     let internal = Utils.moduleInternal(self);
+   *   }(MyModule || {}));
+   *
+   * @param {Object} aModuleScope
+   * @returns {Object} the module's `internal`
+   */
+  self.moduleInternal = function(aModuleScope) {
+    aModuleScope.internal = aModuleScope.internal || {};
+    let sealInternal = function() {
+      delete aModuleScope.internal;
+    };
+    BootstrapManager.registerStartupFunction(sealInternal);
+    return aModuleScope.internal;
   };
 
   return self;

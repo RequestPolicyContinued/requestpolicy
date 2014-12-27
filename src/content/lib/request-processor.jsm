@@ -28,8 +28,6 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["RequestProcessor"];
 
-let globalScope = this;
-
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
@@ -38,6 +36,7 @@ const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 const CP_MAPPEDDESTINATION = 0x178c40bf;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
@@ -48,17 +47,18 @@ ScriptLoader.importModules([
   "utils",
   "request",
   "request-result",
-  "request-set"
+  "request-set",
+  "bootstrap-manager"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "content-policy": ["PolicyImplementation"],
   "requestpolicy-service": ["rpService"]
-}, globalScope);
+}, this);
 
 
 
-let RequestProcessor = (function() {
-  let self = {};
+let RequestProcessor = (function(self) {
+  let internal = Utils.moduleInternal(self);
 
 
   /**
@@ -83,273 +83,57 @@ let RequestProcessor = (function() {
     "result" : null
   };
 
-  /**
-   * These are redirects that the user allowed when presented with a redirect
-   * notification.
-   */
-  let userAllowedRedirects = {};
-
-  let allowedRedirectsReverse = {};
-
   let historyRequests = {};
 
-  let submittedForms = {};
-  let submittedFormsReverse = {};
+  internal.submittedForms = {};
+  internal.submittedFormsReverse = {};
 
-  let clickedLinks = {};
-  let clickedLinksReverse = {};
+  internal.clickedLinks = {};
+  internal.clickedLinksReverse = {};
 
-  let faviconRequests = {};
+  internal.faviconRequests = {};
 
-  let mappedDestinations = {};
+  internal.mappedDestinations = {};
 
-  let requestObservers = [];
-
-
-
-
-  function mapDestinations(origDestUri, newDestUri) {
-    origDestUri = DomainUtil.stripFragment(origDestUri);
-    newDestUri = DomainUtil.stripFragment(newDestUri);
-    Logger.info(Logger.TYPE_INTERNAL,
-        "Mapping destination <" + origDestUri + "> to <" + newDestUri + ">.");
-    if (!mappedDestinations[newDestUri]) {
-      mappedDestinations[newDestUri] = {};
-    }
-    mappedDestinations[newDestUri][origDestUri] =
-        DomainUtil.getUriObject(origDestUri);
-  }
+  internal.requestObservers = [];
 
 
 
 
-  /**
-   * Checks whether a request is initiated by a content window. If it's from a
-   * content window, then it's from unprivileged code.
-   */
-  function isContentRequest(channel) {
-    var callbacks = [];
-    if (channel.notificationCallbacks) {
-      callbacks.push(channel.notificationCallbacks);
-    }
-    if (channel.loadGroup && channel.loadGroup.notificationCallbacks) {
-      callbacks.push(channel.loadGroup.notificationCallbacks);
-    }
 
-    for (var i = 0; i < callbacks.length; i++) {
-      var callback = callbacks[i];
-      try {
-        return callback.getInterface(Ci.nsILoadContext).isContent;
-      } catch (e) {
-      }
-    }
-
-    return false;
-  }
-  function processRedirect(request, httpChannel) {
-    var originURI = request.originURI;
-    var destURI = request.destURI;
-    var headerType = request.httpHeader;
-
-    // Ignore redirects to javascript. The browser will ignore them, as well.
-    if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "Ignoring redirect to javascript URI <" + destURI + ">");
-      return;
-    }
-
-    request.requestResult = checkRedirect(request);
-    if (true === request.requestResult.isAllowed) {
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-          + headerType + "' header to <" + destURI + "> " + "from <" + originURI
-          + ">. Same hosts or allowed origin/destination.");
-      recordAllowedRequest(originURI, destURI, false, request.requestResult);
-      allowedRedirectsReverse[destURI] = originURI;
-
-      // If this was a link click or a form submission, we register an
-      // additional click/submit with the original source but with a new
-      // destination of the target of the redirect. This is because future
-      // requests (such as using back/forward) might show up as directly from
-      // the initial origin to the ultimate redirected destination.
-      if (httpChannel.referrer) {
-        var realOrigin = httpChannel.referrer.spec;
-
-        if (clickedLinks[realOrigin] && clickedLinks[realOrigin][originURI]) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "This redirect was from a link click." +
-              " Registering an additional click to <" + destURI + "> " +
-              "from <" + realOrigin + ">");
-          self.registerLinkClicked(realOrigin, destURI);
-
-        } else if (submittedForms[realOrigin]
-            && submittedForms[realOrigin][originURI.split("?")[0]]) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-              "This redirect was from a form submission." +
-              " Registering an additional form submission to <" + destURI +
-              "> " + "from <" + realOrigin + ">");
-          self.registerFormSubmitted(realOrigin, destURI);
-        }
-      }
-
-      return;
-    }
-
-    // The header isn't allowed, so remove it.
-    try {
-      if (!Prefs.isBlockingDisabled()) {
-        httpChannel.setResponseHeader(headerType, "", false);
-
-        /* start - do not edit here */
-        let interfaceRequestor = httpChannel.notificationCallbacks
-            .QueryInterface(Ci.nsIInterfaceRequestor);
-        let loadContext = null;
-        try {
-          loadContext = interfaceRequestor.getInterface(Ci.nsILoadContext);
-        } catch (ex) {
-          try {
-            loadContext = aSubject.loadGroup.notificationCallbacks
-                .getInterface(Ci.nsILoadContext);
-          } catch (ex2) {}
-        }
-        /*end do not edit here*/
-
-
-        let browser;
-        try {
-          if (loadContext.topFrameElement) {
-            // the top frame element should be already the browser element
-            browser = loadContext.topFrameElement;
-          } else {
-            // we hope the associated window is available. in multiprocessor
-            // firefox it's not available.
-            browser = Utils.getBrowserForWindow(loadContext.topWindow);
-          }
-          // save all blocked redirects directly in the browser element. the
-          // blocked elements will be checked later when the DOM content
-          // finished loading.
-          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
-          browser.requestpolicy.blockedRedirects[originURI] = destURI;
-        } catch (e) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
-                         "Load Context couldn't be found! " + e);
-        }
-
-
-        try {
-          contentDisp = httpChannel.getResponseHeader("Content-Disposition");
-          if (contentDisp.indexOf("attachment") != -1) {
-            try {
-              httpChannel.setResponseHeader("Content-Disposition", "", false);
-              Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                  "Removed 'Content-Disposition: attachment' header to " +
-                  "prevent display of about:neterror.");
-            } catch (e) {
-              Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                  "Unable to remove 'Content-Disposition: attachment' header " +
-                  "to prevent display of about:neterror. " + e);
-            }
-          }
-        } catch (e) {
-          // No Content-Disposition header.
-        }
-
-        // We try to trace the blocked redirect back to a link click or form
-        // submission if we can. It may indicate, for example, a link that
-        // was to download a file but a redirect got blocked at some point.
-        var initialOrigin = originURI;
-        var initialDest = destURI;
-        // To prevent infinite loops, bound the number of iterations.
-        // Note that an apparent redirect loop doesn't mean a problem with a
-        // website as the site may be using other information, such as cookies
-        // that get set in the redirection process, to stop the redirection.
-        var iterations = 0;
-        const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
-        while (initialOrigin in allowedRedirectsReverse &&
-               iterations++ < ASSUME_REDIRECT_LOOP) {
-          initialDest = initialOrigin;
-          initialOrigin = allowedRedirectsReverse[initialOrigin];
-        }
-
-        if (initialOrigin in clickedLinksReverse) {
-          for (var i in clickedLinksReverse[initialOrigin]) {
-            // We hope there's only one possibility of a source page (that is,
-            // ideally there will be one iteration of this loop).
-            var sourcePage = i;
-          }
-
-          notifyRequestObserversOfBlockedLinkClickRedirect(sourcePage,
-              originURI, destURI);
-
-          // Maybe we just record the clicked link and each step in between as
-          // an allowed request, and the final blocked one as a blocked request.
-          // That is, make it show up in the requestpolicy menu like anything
-          // else.
-          // We set the "isInsert" parameter so we don't clobber the existing
-          // info about allowed and deleted requests.
-          recordAllowedRequest(sourcePage, initialOrigin, true,
-                               request.requestResult);
-        }
-
-        // if (submittedFormsReverse[initialOrigin]) {
-        // // TODO: implement for form submissions whose redirects are blocked
-        // }
-
-        recordRejectedRequest(request);
-      }
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "** BLOCKED ** '" + headerType + "' header to <" + destURI + ">" +
-          " found in response from <" + originURI + ">");
-    } catch (e) {
-      Logger.severe(
-          Logger.TYPE_HEADER_REDIRECT, "Failed removing " +
-          "'" + headerType + "' header to <" + destURI + ">" +
-          "  in response from <" + originURI + ">." + e);
-    }
-  }
 
 
 
 
 
   function notifyRequestObserversOfBlockedRequest(request) {
-    for (var i = 0; i < requestObservers.length; i++) {
-      if (!requestObservers[i]) {
+    for (var i = 0; i < internal.requestObservers.length; i++) {
+      if (!internal.requestObservers[i]) {
         continue;
       }
-      requestObservers[i].observeBlockedRequest(request.originURI,
+      internal.requestObservers[i].observeBlockedRequest(request.originURI,
           request.destURI, request.requestResult);
     }
   }
 
   function notifyRequestObserversOfAllowedRequest(originUri,
       destUri, requestResult) {
-    for (var i = 0; i < requestObservers.length; i++) {
-      if (!requestObservers[i]) {
+    for (var i = 0; i < internal.requestObservers.length; i++) {
+      if (!internal.requestObservers[i]) {
         continue;
       }
-      requestObservers[i].observeAllowedRequest(originUri, destUri,
+      internal.requestObservers[i].observeAllowedRequest(originUri, destUri,
           requestResult);
-    }
-  }
-
-  function notifyRequestObserversOfBlockedLinkClickRedirect(sourcePageUri,
-      linkDestUri, blockedRedirectUri) {
-    for (var i = 0; i < requestObservers.length; i++) {
-      if (!requestObservers[i]) {
-        continue;
-      }
-      requestObservers[i].observeBlockedLinkClickRedirect(sourcePageUri,
-          linkDestUri, blockedRedirectUri);
     }
   }
 
   function notifyBlockedTopLevelDocRequest(originUri, destUri) {
     // TODO: this probably could be done async.
-    for (var i = 0; i < requestObservers.length; i++) {
-      if (!requestObservers[i]) {
+    for (var i = 0; i < internal.requestObservers.length; i++) {
+      if (!internal.requestObservers[i]) {
         continue;
       }
-      requestObservers[i].observeBlockedTopLevelDocRequest(originUri,
+      internal.requestObservers[i].observeBlockedTopLevelDocRequest(originUri,
           destUri);
     }
   }
@@ -357,68 +141,6 @@ let RequestProcessor = (function() {
 
 
 
-
-  function checkRedirect(request) {
-    // TODO: Find a way to get rid of repitition of code between this and
-    // shouldLoad().
-
-    // Note: If changing the logic here, also make necessary changes to
-    // shouldLoad().
-
-    // This is not including link clicks, form submissions, and user-allowed
-    // redirects.
-
-    var originURI = request.originURI;
-    var destURI = request.destURI;
-
-    var originURIObj = DomainUtil.getUriObject(originURI);
-    var destURIObj = DomainUtil.getUriObject(destURI);
-
-    var result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
-        destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
-    }
-
-    var result = PolicyManager.checkRequestAgainstSubscriptionRules(
-        originURIObj, destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
-    }
-
-    if (destURI[0] && destURI[0] == '/'
-        || destURI.indexOf(":") == -1) {
-      // Redirect is to a relative url.
-      // ==> allow.
-      return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
-    }
-
-    let compatibilityRules = rpService.getCompatibilityRules();
-    for (var i = 0; i < compatibilityRules.length; i++) {
-      var rule = compatibilityRules[i];
-      var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-      var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
-      if (allowOrigin && allowDest) {
-        return new RequestResult(true,
-            REQUEST_REASON_COMPATIBILITY);
-      }
-    }
-
-    var result = checkByDefaultPolicy(originURI, destURI);
-    return result;
-  }
 
 
 
@@ -436,7 +158,7 @@ let RequestProcessor = (function() {
     }
 
     cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
-    recordRejectedRequest(request);
+    internal.recordRejectedRequest(request);
 
     if (Ci.nsIContentPolicy.TYPE_DOCUMENT == request.aContentType) {
       // This was a blocked top-level document request. This may be due to
@@ -448,7 +170,7 @@ let RequestProcessor = (function() {
     return CP_REJECT;
   }
 
-  function recordRejectedRequest(request) {
+  internal.recordRejectedRequest = function(request) {
     self._rejectedRequests.addRequest(request.originURI, request.destURI,
         request.requestResult);
     self._allowedRequests.removeRequest(request.originURI, request.destURI);
@@ -476,8 +198,8 @@ let RequestProcessor = (function() {
       notifyRequestObserversOfAllowedRequest(request.originURI, request.destURI,
           request.requestResult);
     } else {
-      recordAllowedRequest(request.originURI, request.destURI, false,
-          request.requestResult);
+      internal.recordAllowedRequest(request.originURI, request.destURI, false,
+                                    request.requestResult);
     }
 
     return CP_OK;
@@ -497,6 +219,7 @@ let RequestProcessor = (function() {
     self._allowedRequests.addRequest(originUri, destUri, requestResult);
     notifyRequestObserversOfAllowedRequest(originUri, destUri, requestResult);
   }
+  internal.recordAllowedRequest = recordAllowedRequest;
 
   function cacheShouldLoadResult(result, originUri, destUri) {
     var date = new Date();
@@ -506,7 +229,7 @@ let RequestProcessor = (function() {
     lastShouldLoadCheck.result = result;
   }
 
-  function checkByDefaultPolicy(originUri, destUri) {
+  internal.checkByDefaultPolicy = function(originUri, destUri) {
     if (Prefs.isDefaultAllow()) {
       var result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
@@ -528,7 +251,7 @@ let RequestProcessor = (function() {
         DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent == destIdent,
         REQUEST_REASON_DEFAULT_SAME_DOMAIN);
-  }
+  };
 
   /**
    * Determines if a request is a duplicate of the last call to shouldLoad(). If
@@ -855,7 +578,7 @@ let RequestProcessor = (function() {
 
         if (domNode && domNode.nodeName == "LINK" &&
             (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
-          faviconRequests[destURI] = true;
+          internal.faviconRequests[destURI] = true;
         }
       }
 
@@ -877,11 +600,11 @@ let RequestProcessor = (function() {
       // was opened in a new tab but that link would have been allowed
       // regardless of the link click. The original tab would then show it
       // in its menu.
-      if (clickedLinks[originURI] &&
-          clickedLinks[originURI][destURI]) {
+      if (internal.clickedLinks[originURI] &&
+          internal.clickedLinks[originURI][destURI]) {
         // Don't delete the clickedLinks item. We need it for if the user
         // goes back/forward through their history.
-        // delete clickedLinks[originURI][destURI];
+        // delete internal.clickedLinks[originURI][destURI];
 
         // We used to have this not be recorded so that it wouldn't cause us
         // to forget blocked/allowed requests. However, when a policy change
@@ -893,14 +616,14 @@ let RequestProcessor = (function() {
             REQUEST_REASON_LINK_CLICK);
         return accept("User-initiated request by link click", request);
 
-      } else if (submittedForms[originURI] &&
-          submittedForms[originURI][destURI.split("?")[0]]) {
+      } else if (internal.submittedForms[originURI] &&
+          internal.submittedForms[originURI][destURI.split("?")[0]]) {
         // Note: we dropped the query string from the destURI because form GET
         // requests will have that added on here but the original action of
         // the form may not have had it.
         // Don't delete the clickedLinks item. We need it for if the user
         // goes back/forward through their history.
-        // delete submittedForms[originURI][destURI.split("?")[0]];
+        // delete internal.submittedForms[originURI][destURI.split("?")[0]];
 
         // See the note above for link clicks and forgetting blocked/allowed
         // requests on refresh. I haven't tested if it's the same for forms
@@ -918,8 +641,8 @@ let RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_HISTORY_REQUEST);
         return accept("History request", request, true);
-      } else if (userAllowedRedirects[originURI]
-          && userAllowedRedirects[originURI][destURI]) {
+      } else if (internal.userAllowedRedirects[originURI]
+          && internal.userAllowedRedirects[originURI][destURI]) {
         // shouldLoad is called by location.href in overlay.js as of Fx
         // 3.7a5pre and SeaMonkey 2.1a.
         request.requestResult = new RequestResult(true,
@@ -1097,9 +820,9 @@ let RequestProcessor = (function() {
       // request if the original destination would have been accepted.
       // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
       if (request.aExtra != CP_MAPPEDDESTINATION &&
-          mappedDestinations[destURI]) {
-        for (var mappedDest in mappedDestinations[destURI]) {
-          var mappedDestUriObj = mappedDestinations[destURI][mappedDest];
+          internal.mappedDestinations[destURI]) {
+        for (var mappedDest in internal.mappedDestinations[destURI]) {
+          var mappedDestUriObj = internal.mappedDestinations[destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
           var mappedResult = PolicyImplementation.shouldLoad(
@@ -1111,7 +834,7 @@ let RequestProcessor = (function() {
         }
       }
 
-      request.requestResult = checkByDefaultPolicy(originURI, destURI);
+      request.requestResult = internal.checkByDefaultPolicy(originURI, destURI);
       if (request.requestResult.isAllowed) {
         return accept("Allowed by default policy", request);
       } else {
@@ -1138,107 +861,6 @@ let RequestProcessor = (function() {
 
 
 
-
-  /**
-   * Called after a response has been received from the web server. Headers are
-   * available on the channel. The response can be accessed and modified via
-   * nsITraceableChannel.
-   */
-  self._examineHttpResponse = function(aSubject) {
-    // Currently, if a user clicks a link to download a file and that link
-    // redirects and is subsequently blocked, the user will see the blocked
-    // destination in the menu. However, after they have allowed it from
-    // the menu and attempted the download again, they won't see the allowed
-    // request in the menu. Fixing that might be a pain and also runs the
-    // risk of making the menu cluttered and confusing with destinations of
-    // followed links from the current page.
-
-    // TODO: Make user aware of blocked headers so they can allow them if
-    // desired.
-
-    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-
-    var headerType;
-    var dest;
-
-    try {
-      // If there is no such header, getResponseHeader() will throw
-      // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
-      // the one that will be used.
-      headerType = "Location";
-      dest = httpChannel.getResponseHeader(headerType);
-    } catch (e) {
-      // No location header. Look for a Refresh header.
-      try {
-        headerType = "Refresh";
-        var refreshString = httpChannel.getResponseHeader(headerType);
-      } catch (e) {
-        // No Location header or Refresh header.
-        return;
-      }
-      try {
-        // We can ignore the delay because we aren't manually doing
-        // the refreshes. Allowed refreshes we still leave to the browser.
-        // The dest may be empty if the origin is what should be refreshed.
-        // This will be handled by DomainUtil.determineRedirectUri().
-        var dest = DomainUtil.parseRefresh(refreshString).destURI;
-      } catch (e) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "Invalid refresh header: <" + refreshString + ">");
-        if (!Prefs.isBlockingDisabled()) {
-          httpChannel.setResponseHeader(headerType, "", false);
-        }
-        return;
-      }
-    }
-
-    // For origins that are IDNs, this will always be in ACE format. We want
-    // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
-    var originURI = DomainUtil.formatIDNUri(httpChannel.name);
-
-    // Allow redirects of requests from privileged code.
-    if (!isContentRequest(httpChannel)) {
-      // However, favicon requests that are redirected appear as non-content
-      // requests. So, check if the original request was for a favicon.
-      var originPath = DomainUtil.getPath(httpChannel.name);
-      // We always have to check "/favicon.ico" because Firefox will use this
-      // as a default path and that request won't pass through shouldLoad().
-      if (originPath == "/favicon.ico" || faviconRequests[originURI]) {
-        // If the redirected request is allowed, we need to know that was a
-        // favicon request in case it is further redirected.
-        faviconRequests[dest] = true;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + headerType
-                + "' header to <" + dest + "> " + "from <" + originURI
-                + "> appears to be a redirected favicon request. "
-                + "This will be treated as a content request.");
-      } else {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** ALLOWED ** '" + headerType + "' header to <" + dest + "> " +
-            "from <" + originURI +
-            ">. Original request is from privileged code.");
-        return;
-      }
-    }
-
-    // If it's not a valid uri, the redirect is relative to the origin host.
-    // The way we have things written currently, without this check the full
-    // dest string will get treated as the destination and displayed in the
-    // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
-    // We add this to fix issue #39:
-    // https://github.com/RequestPolicyContinued/requestpolicy/issues/39
-    if (!DomainUtil.isValidUri(dest)) {
-      var destAsUri = DomainUtil.determineRedirectUri(originURI, dest);
-      Logger.warning(
-          Logger.TYPE_HEADER_REDIRECT,
-          "Redirect destination is not a valid uri, assuming dest <" + dest
-              + "> from origin <" + originURI + "> is actually dest <" + destAsUri
-              + ">.");
-      dest = destAsUri;
-    }
-
-    var request = new RedirectRequest(originURI, dest, headerType);
-    processRedirect(request, httpChannel);
-  };
 
   /**
    * Called as a http request is made. The channel is available to allow you to
@@ -1296,21 +918,21 @@ let RequestProcessor = (function() {
     // we'll need to be dropping the query string there.
     destinationUrl = destinationUrl.split("?")[0];
 
-    if (submittedForms[originUrl] == undefined) {
-      submittedForms[originUrl] = {};
+    if (internal.submittedForms[originUrl] == undefined) {
+      internal.submittedForms[originUrl] = {};
     }
-    if (submittedForms[originUrl][destinationUrl] == undefined) {
+    if (internal.submittedForms[originUrl][destinationUrl] == undefined) {
       // TODO: See timestamp note for registerLinkClicked.
-      submittedForms[originUrl][destinationUrl] = true;
+      internal.submittedForms[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (submittedFormsReverse[destinationUrl] == undefined) {
-      submittedFormsReverse[destinationUrl] = {};
+    if (internal.submittedFormsReverse[destinationUrl] == undefined) {
+      internal.submittedFormsReverse[destinationUrl] = {};
     }
-    if (submittedFormsReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.submittedFormsReverse[destinationUrl][originUrl] == undefined) {
       // TODO: See timestamp note for registerLinkClicked.
-      submittedFormsReverse[destinationUrl][originUrl] = true;
+      internal.submittedFormsReverse[destinationUrl][originUrl] = true;
     }
   };
 
@@ -1322,10 +944,10 @@ let RequestProcessor = (function() {
     Logger.info(Logger.TYPE_INTERNAL,
         "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
 
-    if (clickedLinks[originUrl] == undefined) {
-      clickedLinks[originUrl] = {};
+    if (internal.clickedLinks[originUrl] == undefined) {
+      internal.clickedLinks[originUrl] = {};
     }
-    if (clickedLinks[originUrl][destinationUrl] == undefined) {
+    if (internal.clickedLinks[originUrl][destinationUrl] == undefined) {
       // TODO: Possibly set the value to a timestamp that can be used elsewhere
       // to determine if this is a recent click. This is probably necessary as
       // multiple calls to shouldLoad get made and we need a way to allow
@@ -1335,16 +957,16 @@ let RequestProcessor = (function() {
       // of time). This would have the advantage that we could delete items from
       // the clickedLinks object. One of these approaches would also reduce log
       // clutter, which would be good.
-      clickedLinks[originUrl][destinationUrl] = true;
+      internal.clickedLinks[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (clickedLinksReverse[destinationUrl] == undefined) {
-      clickedLinksReverse[destinationUrl] = {};
+    if (internal.clickedLinksReverse[destinationUrl] == undefined) {
+      internal.clickedLinksReverse[destinationUrl] = {};
     }
-    if (clickedLinksReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.clickedLinksReverse[destinationUrl][originUrl] == undefined) {
       // TODO: Possibly set the value to a timestamp, as described above.
-      clickedLinksReverse[destinationUrl][originUrl] = true;
+      internal.clickedLinksReverse[destinationUrl][originUrl] = true;
     }
   };
 
@@ -1356,17 +978,12 @@ let RequestProcessor = (function() {
     Logger.info(Logger.TYPE_INTERNAL, "User-allowed redirect from <" +
         originUrl + "> to <" + destinationUrl + ">.");
 
-    if (userAllowedRedirects[originUrl] == undefined) {
-      userAllowedRedirects[originUrl] = {};
+    if (internal.userAllowedRedirects[originUrl] == undefined) {
+      internal.userAllowedRedirects[originUrl] = {};
     }
-    if (userAllowedRedirects[originUrl][destinationUrl] == undefined) {
-      userAllowedRedirects[originUrl][destinationUrl] = true;
+    if (internal.userAllowedRedirects[originUrl][destinationUrl] == undefined) {
+      internal.userAllowedRedirects[originUrl][destinationUrl] = true;
     }
-  };
-
-  self.isAllowedRedirect = function(originURI, destURI) {
-    var request = new RedirectRequest(originURI, destURI);
-    return (true === checkRedirect(request).isAllowed);
   };
 
   /**
@@ -1382,7 +999,7 @@ let RequestProcessor = (function() {
     }
     Logger.debug(Logger.TYPE_INTERNAL,
         "Adding request observer: " + observer.toString());
-    requestObservers.push(observer);
+    internal.requestObservers.push(observer);
   };
 
   /**
@@ -1391,11 +1008,11 @@ let RequestProcessor = (function() {
    * @param {Object} observer
    */
   self.removeRequestObserver = function(observer) {
-    for (var i = 0; i < requestObservers.length; i++) {
-      if (requestObservers[i] == observer) {
+    for (var i = 0; i < internal.requestObservers.length; i++) {
+      if (internal.requestObservers[i] == observer) {
         Logger.debug(Logger.TYPE_INTERNAL,
             "Removing request observer: " + observer.toString());
-        delete requestObservers[i];
+        delete internal.requestObservers[i];
         return;
       }
     }
@@ -1456,4 +1073,7 @@ let RequestProcessor = (function() {
   };
 
   return self;
-}());
+}(RequestProcessor || {}));
+
+Services.scriptloader.loadSubScript('chrome://requestpolicy/content/lib/' +
+                                    'request-processor.redirects.js');

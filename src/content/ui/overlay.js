@@ -218,6 +218,7 @@ requestpolicy.overlay = (function() {
 
             if ("requestpolicy" in browser &&
                 documentURI in browser.requestpolicy.blockedRedirects) {
+              // bad smell: do not save blocked requests in the <browser> obj
               var dest = browser.requestpolicy.blockedRedirects[documentURI];
               Logger.warning(Logger.TYPE_HEADER_REDIRECT,
                   "Showing notification for blocked redirect. To <" + dest +
@@ -404,7 +405,11 @@ requestpolicy.overlay = (function() {
    * @param {int}
    *          delay
    */
-  self._showRedirectNotification = function(browser, redirectTargetUri, delay) {
+  // TODO, bad smell: Instead of the <browser> etc. hand over a `Request`
+  //                  object that contains everything. This requires
+  //                  e.g. a `MetaRedirectRequest` class.
+  self._showRedirectNotification = function(browser, redirectTargetUri, delay,
+                                            redirectOriginUri) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
 
@@ -419,11 +424,14 @@ requestpolicy.overlay = (function() {
     // Source file: chrome://global/content/bindings/notification.xml
     // Line: 260
 
+    // redirectOriginUri is optional and is not necessary for <meta> redirects.
+    redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
+
     if (isFennec) {
       Logger.warning(Logger.TYPE_INTERNAL,
           "Should have shown redirect notification to <" + redirectTargetUri +
           ">, but it's not implemented yet on Fennec.");
-      return;
+      return false;
     }
 
     var notificationBox = gBrowser.getNotificationBox(browser)
@@ -440,6 +448,9 @@ requestpolicy.overlay = (function() {
       shortUri = redirectTargetUri
           .substring(0, Math.max(prePathLength, maxLength)) + "...";
     }
+
+    // TODO: different label when redirectNotification is specified.
+    //       e.g. „An url redirection from X to Y has been blocked.“
     var notificationLabel = StringUtils.strbundle.formatStringFromName(
         "redirectNotification", [shortUri], 1);
 
@@ -460,7 +471,7 @@ requestpolicy.overlay = (function() {
     }
 
     var origin = requestpolicy.menu._addWildcard(
-        DomainUtil.getBaseDomain(self.getTopLevelDocumentUri()));
+        DomainUtil.getBaseDomain(redirectOriginUri));
     var dest = requestpolicy.menu._addWildcard(
         DomainUtil.getBaseDomain(redirectTargetUri));
 
@@ -494,6 +505,13 @@ requestpolicy.overlay = (function() {
           popup : null,
           callback : function() {
             // Fx 3.7a5+ calls shouldLoad for location.href changes.
+
+            // TODO: currently the allow button ignores any additional
+            //       HTTP response headers [1]. Maybe there is a way to take
+            //       those headers into account (e.g. `Set-Cookie`?), or maybe
+            //       this is not necessary at all.
+            // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
+
             RequestProcessor.registerAllowedRedirect(
                 browser.documentURI.specIgnoringRef, redirectTargetUri);
 
@@ -515,11 +533,14 @@ requestpolicy.overlay = (function() {
           popup : optionsPopupName,
           callback : null
         }
+        // TODO: add a „read more about URL redirection“ button, targetting to
+        //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
       notificationBox.appendNotification(notificationLabel, notificationValue,
           "chrome://browser/skin/Info.png", priority, buttons);
     }
+    return true;
   };
 
 

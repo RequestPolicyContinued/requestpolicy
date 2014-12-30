@@ -23,6 +23,7 @@
 
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
+Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
@@ -33,7 +34,8 @@ ScriptLoader.importModules([
   "domain-util",
   "utils",
   "request",
-  "request-result"
+  "request-result",
+  "http-response"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "requestpolicy-service": ["rpService"]
@@ -169,17 +171,21 @@ let RequestProcessor = (function(self) {
 
 
   self.isAllowedRedirect = function(originURI, destURI) {
-    var request = new RedirectRequest(originURI, destURI);
+    var request = new Request(originURI, destURI);
     return (true === checkRedirect(request).isAllowed);
   };
 
-  function processRedirect(request, httpChannel) {
+
+
+  function processUrlRedirection(request) {
+    let httpResponse = request.httpResponse;
+    let httpChannel = httpResponse.httpChannel;
     var originURI = request.originURI;
     var destURI = request.destURI;
-    var headerType = request.httpHeader;
+    var headerType = httpResponse.redirHeaderType;
 
     // Ignore redirects to javascript. The browser will ignore them, as well.
-    if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
+    if (httpResponse.destURI.schemeIs("javascript")) {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
           "Ignoring redirect to javascript URI <" + destURI + ">");
       return;
@@ -226,61 +232,28 @@ let RequestProcessor = (function(self) {
     // The header isn't allowed, so remove it.
     try {
       if (!Prefs.isBlockingDisabled()) {
-        httpChannel.setResponseHeader(headerType, "", false);
+        httpResponse.removeResponseHeader();
 
-        /* start - do not edit here */
-        let interfaceRequestor = httpChannel.notificationCallbacks
-            .QueryInterface(Ci.nsIInterfaceRequestor);
-        let loadContext = null;
-        try {
-          loadContext = interfaceRequestor.getInterface(Ci.nsILoadContext);
-        } catch (ex) {
-          try {
-            loadContext = aSubject.loadGroup.notificationCallbacks
-                .getInterface(Ci.nsILoadContext);
-          } catch (ex2) {}
-        }
-        /*end do not edit here*/
+        let browser = request.browser;
 
+        // TODO: use WeakMap instead of putting data into the <browser> object
+        // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
 
-        let browser;
-        try {
-          if (loadContext.topFrameElement) {
-            // the top frame element should be already the browser element
-            browser = loadContext.topFrameElement;
-          } else {
-            // we hope the associated window is available. in multiprocessor
-            // firefox it's not available.
-            browser = Utils.getBrowserForWindow(loadContext.topWindow);
-          }
-          // save all blocked redirects directly in the browser element. the
-          // blocked elements will be checked later when the DOM content
-          // finished loading.
-          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
-          browser.requestpolicy.blockedRedirects[originURI] = destURI;
-        } catch (e) {
-          Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
-                         "Load Context couldn't be found! " + e);
-        }
+        // save all blocked redirects directly in the browser element. the
+        // blocked elements will be checked later when the DOM content
+        // finished loading.
+        browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
+        browser.requestpolicy.blockedRedirects[originURI] = destURI;
 
+        // Cancel the request. As of Fx 37, this causes the location bar to
+        // show the URL of the previously displayed page.
+        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
-        try {
-          let contentDisp = httpChannel.getResponseHeader("Content-Disposition");
-          if (contentDisp.indexOf("attachment") != -1) {
-            try {
-              httpChannel.setResponseHeader("Content-Disposition", "", false);
-              Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                  "Removed 'Content-Disposition: attachment' header to " +
-                  "prevent display of about:neterror.");
-            } catch (e) {
-              Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                  "Unable to remove 'Content-Disposition: attachment' header " +
-                  "to prevent display of about:neterror. " + e);
-            }
-          }
-        } catch (e) {
-          // No Content-Disposition header.
-        }
+        showRedirectNotification(request) || Logger.warning(
+            Logger.TYPE_HEADER_REDIRECT,
+            "A redirect has been observed, but it was not possible to notify " +
+            "the user! The redirect was from page <" + request.originURI + "> " +
+            "to <" + request.destURI + ">.");
 
         // We try to trace the blocked redirect back to a link click or form
         // submission if we can. It may indicate, for example, a link that
@@ -305,9 +278,6 @@ let RequestProcessor = (function(self) {
             // ideally there will be one iteration of this loop).
             var sourcePage = i;
           }
-
-          notifyRequestObserversOfBlockedLinkClickRedirect(sourcePage,
-              originURI, destURI);
 
           // Maybe we just record the clicked link and each step in between as
           // an allowed request, and the final blocked one as a blocked request.
@@ -336,16 +306,20 @@ let RequestProcessor = (function(self) {
     }
   }
 
-  function notifyRequestObserversOfBlockedLinkClickRedirect(sourcePageUri,
-      linkDestUri, blockedRedirectUri) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
-        continue;
-      }
-      internal.requestObservers[i].observeBlockedLinkClickRedirect(
-          sourcePageUri, linkDestUri, blockedRedirectUri);
+  function showRedirectNotification(request) {
+    let browser = request.browser;
+    if (browser === null) {
+      return false;
     }
+
+    let window = browser.ownerGlobal;
+    let overlay = window.requestpolicy.overlay;
+    return overlay._showRedirectNotification(browser, request.destURI, 0,
+                                             request.originURI);
+    return true;
   }
+
+
 
 
 
@@ -366,88 +340,45 @@ let RequestProcessor = (function(self) {
     // TODO: Make user aware of blocked headers so they can allow them if
     // desired.
 
-    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    let httpResponse = new HttpResponse(httpChannel);
 
-    var headerType;
-    var dest;
+    // the "raw" dest string might be a relative or absolute URI
+    let rawDestString = httpResponse.rawDestString;
 
-    try {
-      // If there is no such header, getResponseHeader() will throw
-      // NS_ERROR_NOT_AVAILABLE. If there is more than header, the last one is
-      // the one that will be used.
-      headerType = "Location";
-      dest = httpChannel.getResponseHeader(headerType);
-    } catch (e) {
-      // No location header. Look for a Refresh header.
-      try {
-        headerType = "Refresh";
-        var refreshString = httpChannel.getResponseHeader(headerType);
-      } catch (e) {
-        // No Location header or Refresh header.
-        return;
-      }
-      try {
-        // We can ignore the delay because we aren't manually doing
-        // the refreshes. Allowed refreshes we still leave to the browser.
-        // The dest may be empty if the origin is what should be refreshed.
-        // This will be handled by DomainUtil.determineRedirectUri().
-        var dest = DomainUtil.parseRefresh(refreshString).destURI;
-      } catch (e) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "Invalid refresh header: <" + refreshString + ">");
-        if (!Prefs.isBlockingDisabled()) {
-          httpChannel.setResponseHeader(headerType, "", false);
-        }
-        return;
-      }
+    if (httpResponse.containsRedirection === false || rawDestString === null) {
+      return;
     }
 
-    // For origins that are IDNs, this will always be in ACE format. We want
-    // it in UTF8 format if it's a TLD that Mozilla allows to be in UTF8.
-    var originURI = DomainUtil.formatIDNUri(httpChannel.name);
+    let originString = httpResponse.originURI.specIgnoringRef;
 
     // Allow redirects of requests from privileged code.
     if (!isContentRequest(httpChannel)) {
       // However, favicon requests that are redirected appear as non-content
       // requests. So, check if the original request was for a favicon.
-      var originPath = DomainUtil.getPath(httpChannel.name);
+      var originPath = httpResponse.originURI.path;
       // We always have to check "/favicon.ico" because Firefox will use this
       // as a default path and that request won't pass through shouldLoad().
-      if (originPath == "/favicon.ico" || internal.faviconRequests[originURI]) {
+      if (originPath == "/favicon.ico" || internal.faviconRequests[originString]) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
-        internal.faviconRequests[dest] = true;
+        internal.faviconRequests[rawDestString] = true;
         Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + headerType
-                + "' header to <" + dest + "> " + "from <" + originURI
+                + "' header to <" + rawDestString + "> " + "from <" + originString
                 + "> appears to be a redirected favicon request. "
                 + "This will be treated as a content request.");
       } else {
         Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** ALLOWED ** '" + headerType + "' header to <" + dest + "> " +
-            "from <" + originURI +
+            "** ALLOWED ** '" + httpResponse.redirHeaderType +
+            "' header to <" + rawDestString + "> " +
+            "from <" + originString +
             ">. Original request is from privileged code.");
         return;
       }
     }
 
-    // If it's not a valid uri, the redirect is relative to the origin host.
-    // The way we have things written currently, without this check the full
-    // dest string will get treated as the destination and displayed in the
-    // menu because DomainUtil.getIdentifier() doesn't raise exceptions.
-    // We add this to fix issue #39:
-    // https://github.com/RequestPolicyContinued/requestpolicy/issues/39
-    if (!DomainUtil.isValidUri(dest)) {
-      var destAsUri = DomainUtil.determineRedirectUri(originURI, dest);
-      Logger.warning(
-          Logger.TYPE_HEADER_REDIRECT,
-          "Redirect destination is not a valid uri, assuming dest <" + dest
-              + "> from origin <" + originURI + "> is actually dest <" + destAsUri
-              + ">.");
-      dest = destAsUri;
-    }
-
-    var request = new RedirectRequest(originURI, dest, headerType);
-    processRedirect(request, httpChannel);
+    var request = new RedirectRequest(httpResponse);
+    processUrlRedirection(request);
   };
 
 

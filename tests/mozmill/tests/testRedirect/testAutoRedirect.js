@@ -8,6 +8,7 @@ var {assert, expect} = require("../../../../../../lib/assertions");
 var prefs = require("../../../../../lib/prefs");
 var tabs = require("../../../../../lib/tabs");
 
+var rpUtils = require("../../lib/rp-utils");
 var rpConst = require("../../lib/constants");
 
 var testURLPrePath = "http://www.maindomain.test/";
@@ -50,12 +51,17 @@ var testAutoRedirect = function() {
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
   for (let [shouldBeAllowed, testURL] of urlsWithRedirect) {
+    let initialURI = controller.window.content.document.location.href;
     testURL = testURLPrePath + testURL;
     dump("Testing " + testURL + ". The redirect should be " +
          (shouldBeAllowed ? "allowed" : "blocked") + ".\n");
 
     controller.open(testURL);
-    controller.waitForPageLoad();
+
+    // Wait for the tab to be loaded. The function `waitForPageLoad()` will not
+    // work here, because if a redirect is blocked by cancelling the channel's
+    // associated request, the `waitForPageLoad` would wait infinitely.
+    rpUtils.waitForTabLoad(controller, tabBrowser.getTab(tabIndex));
 
     if (shouldBeAllowed) {
       controller.waitFor(function() {
@@ -63,8 +69,10 @@ var testAutoRedirect = function() {
       }, "The URL in the urlbar has changed.");
       expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
     } else {
-      expect.ok(panel.exists(), "The redirect notification bar is displayed.");
-      expect.ok(controller.window.content.document.location.href === testURL,
+      controller.waitFor((() => panel.exists()), "The redirect " +
+                           "notification bar has been displayed.");
+      let finalURI = controller.window.content.document.location.href;
+      expect.ok(finalURI === testURL || finalURI === initialURI,
                 "The URL in the urlbar hasn't changed.");
     }
 

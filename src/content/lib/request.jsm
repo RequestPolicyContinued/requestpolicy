@@ -33,6 +33,8 @@ let EXPORTED_SYMBOLS = [
   "REQUEST_TYPE_REDIRECT"
 ];
 
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
@@ -47,6 +49,7 @@ const REQUEST_TYPE_REDIRECT = 2;
 
 
 function Request(originURI, destURI, requestType) {
+  // TODO: save a nsIURI objects here instead of strings
   this.originURI = originURI;
   this.destURI = destURI;
   this.requestType = requestType;
@@ -348,10 +351,16 @@ NormalRequest.prototype.checkURISchemes = function() {
 
 
 
-function RedirectRequest(originURI, destURI, httpHeader) {
-  Request.call(this, originURI, destURI, REQUEST_TYPE_REDIRECT);
+function RedirectRequest(httpResponse) {
+  Request.call(this, httpResponse.originURI.specIgnoringRef,
+               httpResponse.destURI.specIgnoringRef, REQUEST_TYPE_REDIRECT);
+  this.httpResponse = httpResponse;
 
-  this.httpHeader = httpHeader;
+  XPCOMUtils.defineLazyGetter(this, "browser", getBrowser);
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;
+
+function getBrowser() {
+  return this.httpResponse.browser;
+}

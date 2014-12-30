@@ -660,20 +660,6 @@ requestpolicy.overlay = (function() {
     }
   };
 
-  self.observeBlockedLinkClickRedirect = function(sourcePageUri, linkDestUri,
-      blockedRedirectUri) {
-    // TODO: Figure out a good way to notify the user. For now, it should at
-    // least be showing up in the menu the first time it happens. After that,
-    // some caching issues seem to get in the way and the blocked request
-    // isn't tried again, so there's no awareness of it.
-    Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-        "Observed blocked link click redirect from page <" + sourcePageUri
-            + "> with redirect origin <" + linkDestUri
-            + "> and redirect dest <" + blockedRedirectUri
-            + ">. --- WARNING: other than the menu "
-            + "showing this blocked request, there is no other indication.");
-  };
-
   /**
    * If the RP service noticed a blocked top-level document request, look for
    * a tab where the current location is the same as the origin of the blocked

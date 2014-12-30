@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-debugger;
-
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;

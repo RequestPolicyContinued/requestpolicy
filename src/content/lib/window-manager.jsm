@@ -37,7 +37,7 @@ let rpWindowManager = (function(self) {
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
     "utils",
-    "xul-utils",
+    "utils/xul",
     "constants",
     "bootstrap-manager"
   ], globalScope);

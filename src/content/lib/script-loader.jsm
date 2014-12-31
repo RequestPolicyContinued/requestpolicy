@@ -78,7 +78,7 @@ let ScriptLoader = (function() {
     "subscription",
     "utils",
     "window-manager",
-    "xul-utils"
+    "utils/xul"
   ];*/
 
   // the logger is always imported

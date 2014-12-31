@@ -40,7 +40,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
   "ruleset",
-  "file-util",
+  "utils/files",
   "ruleset-storage"
 ], this);
 

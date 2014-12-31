@@ -63,7 +63,7 @@ let ScriptLoader = (function() {
   /*let modules = [
     "content-policy",
     "utils/domains",
-    "file-util",
+    "utils/files",
     "gui-location",
     "logger",
     "policy-manager",

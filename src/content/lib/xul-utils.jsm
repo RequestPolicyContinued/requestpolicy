@@ -37,7 +37,7 @@ let XULUtils = {};
 let xulTrees = XULUtils.xulTrees = {};
 // TODO: convert to JSON
 Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/lib/xul-trees.js', xulTrees);
+    'chrome://requestpolicy/content/ui/xul-trees.js', xulTrees);
 
 
 function getParentElement(doc, element) {

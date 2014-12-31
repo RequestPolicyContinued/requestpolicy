@@ -61,5 +61,12 @@ let StringUtils = (function() {
     return Services.strings.createBundle(path + "?" + Math.random());
   }
 
+  self.$str = function() {
+    let f = arguments.length > 1 ?
+        self.strbundle.formatStringFromName :
+        self.strbundle.GetStringFromName;
+    return f.apply(null, arguments);
+  };
+
   return self;
 }());

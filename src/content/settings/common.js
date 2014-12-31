@@ -33,9 +33,9 @@ const COMMON_STRINGS = [
 function _(msg, args) {
   if (args) {
     args = Array.prototype.slice.call(arguments, 1);
-    return StringUtils.strbundle.formatStringFromName(msg, args, args.length);
+    return StringUtils.$str(msg, args, args.length);
   } else {
-    return StringUtils.strbundle.GetStringFromName(msg);
+    return StringUtils.$str(msg);
   }
 }
 

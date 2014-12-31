@@ -466,18 +466,16 @@ requestpolicy.overlay = (function() {
 
     // TODO: different label when redirectNotification is specified.
     //       e.g. „An url redirection from X to Y has been blocked.“
-    var notificationLabel = StringUtils.strbundle.formatStringFromName(
-        "redirectNotification", [cropUri(redirectTargetUri)], 1);
+    var notificationLabel = StringUtils.$str("redirectNotification",
+                                             [cropUri(redirectTargetUri, 50)],
+                                             1);
 
-    var notificationButtonOptions = StringUtils.strbundle.GetStringFromName("more");
-    var notificationButtonOptionsKey = StringUtils.strbundle
-        .GetStringFromName("more.accesskey");
-    var notificationButtonAllow = StringUtils.strbundle.GetStringFromName("allow");
-    var notificationButtonAllowKey = StringUtils.strbundle
-        .GetStringFromName("allow.accesskey");
-    var notificationButtonDeny = StringUtils.strbundle.GetStringFromName("deny");
-    var notificationButtonDenyKey = StringUtils.strbundle
-        .GetStringFromName("deny.accesskey");
+    var notificationButtonOptions = StringUtils.$str("more");
+    var notificationButtonOptionsKey = StringUtils.$str("more.accesskey");
+    var notificationButtonAllow = StringUtils.$str("allow");
+    var notificationButtonAllowKey = StringUtils.$str("allow.accesskey");
+    var notificationButtonDeny = StringUtils.$str("deny");
+    var notificationButtonDenyKey = StringUtils.$str("deny.accesskey");
 
     var optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);

@@ -79,8 +79,7 @@ function getAttrValue(element, attr) {
   let value = element[attr];
   if (value.charAt(0) == "&" && value.charAt(value.length-1) == ";") {
     try {
-      value = StringUtils.strbundle
-          .GetStringFromName(value.substr(1, value.length-2));
+      value = StringUtils.$str(value.substr(1, value.length-2));
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR, e, e);
       return false;

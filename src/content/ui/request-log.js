@@ -62,9 +62,8 @@ window.requestpolicy.requestLog = (function (self) {
 
 
   function showLogIsEmptyMessage() {
-    var message = StringUtils.strbundle.GetStringFromName("requestLogIsEmpty");
-    var directions = StringUtils.strbundle
-        .GetStringFromName("requestLogDirections");
+    var message = StringUtils.$str("requestLogIsEmpty");
+    var directions = StringUtils.$str("requestLogDirections");
     self.visibleRows.push([message, directions, false, ""]);
     self.treebox.rowCountChanged(0, 1);
   };

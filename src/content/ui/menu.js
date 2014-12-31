@@ -163,8 +163,7 @@ requestpolicy.menu = (function() {
   //
   //      if (isChromeUri) {
   //        self._itemUnrestrictedOrigin.setAttribute("label",
-  //            StringUtils.strbundle.formatStringFromName(
-  //                "unrestrictedOrigin", ["chrome://"]), 1);
+  //            StringUtils.$str("unrestrictedOrigin", ["chrome://"]), 1);
   //        self._itemUnrestrictedOrigin.hidden = false;
   //        return;
   //      }
@@ -183,7 +182,7 @@ requestpolicy.menu = (function() {
 
   self._populateMenuForUncontrollableOrigin = function() {
     self._originDomainnameItem.setAttribute('value',
-        StringUtils.strbundle.GetStringFromName('noOrigin'));
+        StringUtils.$str('noOrigin'));
     self._originNumRequestsItem.setAttribute('value', '');
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
@@ -926,8 +925,7 @@ requestpolicy.menu = (function() {
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
       ruleAction, cssClass) {
-    var label = StringUtils.strbundle.formatStringFromName(fmtStrName, fmtStrArgs,
-        fmtStrArgs.length);
+    var label = StringUtils.$str(fmtStrName, fmtStrArgs, fmtStrArgs.length);
     var item = self._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;

@@ -87,9 +87,8 @@ window.requestpolicy.requestLog = (function (self) {
     }
 
     if (forbidden) {
-      var alertTitle = StringUtils.strbundle.GetStringFromName("actionForbidden");
-      var alertText = StringUtils.strbundle
-          .GetStringFromName("urlCanOnlyBeCopiedToClipboard");
+      var alertTitle = StringUtils.$str("actionForbidden");
+      var alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

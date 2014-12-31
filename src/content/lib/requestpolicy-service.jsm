@@ -35,7 +35,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
   "prefs",
-  "domain-util",
+  "utils/domains",
   "policy-manager",
   "request-processor",
   "subscription",

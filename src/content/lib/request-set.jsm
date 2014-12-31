@@ -30,7 +30,7 @@ let EXPORTED_SYMBOLS = ["RequestSet"];
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
-  "domain-util",
+  "utils/domains",
   "request-result"
 ], this);
 

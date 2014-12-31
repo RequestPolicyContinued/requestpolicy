@@ -36,7 +36,7 @@ requestpolicy.menu = (function() {
     "prefs",
     "request-processor",
     "policy-manager",
-    "domain-util",
+    "utils/domains",
     "ruleset",
     "gui-location",
     "utils/strings",

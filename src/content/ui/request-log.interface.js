@@ -34,7 +34,7 @@ window.requestpolicy.requestLog = (function (self) {
   Cu.import("resource://gre/modules/Services.jsm", mod);
   mod.ScriptLoader.importModules([
     "utils/strings",
-    "domain-util",
+    "utils/domains",
     "utils"
   ], mod);
   let Services = mod.Services, StringUtils = mod.StringUtils,

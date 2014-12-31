@@ -43,7 +43,7 @@ ScriptLoader.importModules([
   "logger",
   "prefs",
   "policy-manager",
-  "domain-util",
+  "utils/domains",
   "utils",
   "request",
   "request-result",

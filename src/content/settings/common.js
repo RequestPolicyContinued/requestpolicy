@@ -10,7 +10,7 @@ ScriptLoader.importModules([
   "constants",
   "utils/strings",
   "prefs",
-  "domain-util",
+  "utils/domains",
   "logger",
   "subscription",
   "policy-manager",

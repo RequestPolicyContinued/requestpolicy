@@ -38,7 +38,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "logger",
-  "domain-util",
+  "utils/domains",
   "utils"
 ], this);
 

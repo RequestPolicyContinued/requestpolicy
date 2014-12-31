@@ -41,7 +41,7 @@ requestpolicy.overlay = (function() {
     "logger",
     "prefs",
     "request-processor",
-    "domain-util",
+    "utils/domains",
     "utils/strings",
     "utils/dom",
     "requestpolicy-service",

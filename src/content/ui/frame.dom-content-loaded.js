@@ -31,7 +31,7 @@ let ManagerForDOMContentLoaded = (function() {
   const Cc = Components.classes;
   const Cu = Components.utils;
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  mod.ScriptLoader.importModules(["domain-util", "logger"], mod);
+  mod.ScriptLoader.importModules(["utils/domains", "logger"], mod);
 
 
   function htmlAnchorTagClicked(event) {

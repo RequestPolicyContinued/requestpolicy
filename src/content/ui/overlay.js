@@ -43,12 +43,14 @@ requestpolicy.overlay = (function() {
     "request-processor",
     "domain-util",
     "string-utils",
+    "utils/dom",
     "requestpolicy-service",
     "policy-manager"
   ], mod);
   let MMID = mod.MMID, Logger = mod.Logger, rpPrefBranch = mod.rpPrefBranch,
       Prefs = mod.Prefs, RequestProcessor = mod.RequestProcessor,
       DomainUtil = mod.DomainUtil, StringUtils = mod.StringUtils,
+      DOMUtils = mod.DOMUtils,
       rpService = mod.rpService, PolicyManager = mod.PolicyManager;
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
@@ -470,12 +472,9 @@ requestpolicy.overlay = (function() {
                                              [cropUri(redirectTargetUri, 50)],
                                              1);
 
-    // TODO: create `XULUtils.removeAllChildren`
     var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
     var addRulePopup = document.getElementById(addRuleMenuName);
-    while (addRulePopup.firstChild) {
-      addRulePopup.removeChild(addRulePopup.firstChild);
-    }
+    DOMUtils.removeChildren(addRulePopup);
 
     let m = requestpolicy.menu;
     var origin = m._addWildcard(DomainUtil.getBaseDomain(redirectOriginUri));

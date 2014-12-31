@@ -40,6 +40,7 @@ requestpolicy.menu = (function() {
     "ruleset",
     "gui-location",
     "string-utils",
+    "utils/dom",
 
     "requestpolicy-service",
     "constants"
@@ -50,7 +51,8 @@ requestpolicy.menu = (function() {
       Ruleset = mod.Ruleset, GUILocation = mod.GUILocation,
       GUIOrigin = mod.GUIOrigin, GUIDestination = mod.GUIDestination,
       GUILocationProperties = mod.GUILocationProperties,
-      StringUtils = mod.StringUtils, rpService = mod.rpService;
+      StringUtils = mod.StringUtils, DOMUtils = mod.DOMUtils,
+      rpService = mod.rpService;
 
 
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
@@ -187,12 +189,13 @@ requestpolicy.menu = (function() {
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
 
-    self._removeChildren(self._otherOriginsList);
-    self._removeChildren(self._blockedDestinationsList);
-    self._removeChildren(self._mixedDestinationsList);
-    self._removeChildren(self._allowedDestinationsList);
-    self._removeChildren(self._removeRulesList);
-    self._removeChildren(self._addRulesList);
+    DOMUtils.removeChildren([
+        self._otherOriginsList,
+        self._blockedDestinationsList,
+        self._mixedDestinationsList,
+        self._allowedDestinationsList,
+        self._removeRulesList,
+        self._addRulesList]);
     document.getElementById('rp-other-origins').hidden = true;
     document.getElementById('rp-blocked-destinations').hidden = true;
     document.getElementById('rp-mixed-destinations').hidden = true;
@@ -201,7 +204,7 @@ requestpolicy.menu = (function() {
   };
 
   self._populateList = function(list, values) {
-    self._removeChildren(list);
+    DOMUtils.removeChildren(list);
 
     // check whether there are objects of GUILocation or just strings
     var guiLocations = values[0] && (values[0] instanceof GUILocation);
@@ -340,8 +343,7 @@ requestpolicy.menu = (function() {
   self._populateDetails = function() {
     var origin = self._currentlySelectedOrigin;
     var dest = self._currentlySelectedDest;
-    self._removeChildren(self._removeRulesList);
-    self._removeChildren(self._addRulesList);
+    DOMUtils.removeChildren([self._removeRulesList, self._addRulesList]);
 
     var ruleData = {
       'o' : {
@@ -442,12 +444,6 @@ requestpolicy.menu = (function() {
 
     self._populateDetailsRemoveAllowRules(self._removeRulesList);
     self._populateDetailsRemoveDenyRules(self._removeRulesList);
-  };
-
-  self._removeChildren = function(el) {
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
   };
 
   self._addListItem = function(list, cssClass, value, numRequests) {

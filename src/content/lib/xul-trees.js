@@ -59,7 +59,7 @@ let mainTree = [
   {parent: {special: {type: "__window__"}},
       tag: "popupset", id: "requestpolicyPopupset",
   children: [
-    {tag: "menupopup", id: "requestpolicyRedirectNotificationOptions"},
+    {tag: "menupopup", id: "requestpolicyRedirectAddRuleMenu"},
     {tag: "menupopup", id: "rp-popup", noautohide: "true",
         position: "after_start",
         onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",

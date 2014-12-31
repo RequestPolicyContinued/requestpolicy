@@ -470,10 +470,11 @@ requestpolicy.overlay = (function() {
                                              [cropUri(redirectTargetUri, 50)],
                                              1);
 
-    var optionsPopupName = "requestpolicyRedirectNotificationOptions";
-    var optionsPopup = document.getElementById(optionsPopupName);
-    while (optionsPopup.firstChild) {
-      optionsPopup.removeChild(optionsPopup.firstChild);
+    // TODO: create `XULUtils.removeAllChildren`
+    var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
+    var addRulePopup = document.getElementById(addRuleMenuName);
+    while (addRulePopup.firstChild) {
+      addRulePopup.removeChild(addRulePopup.firstChild);
     }
 
     let m = requestpolicy.menu;
@@ -481,16 +482,16 @@ requestpolicy.overlay = (function() {
     var dest = m._addWildcard(DomainUtil.getBaseDomain(redirectTargetUri));
 
     let cm = requestpolicy.classicmenu;
-    cm.addMenuItemTemporarilyAllowDest(optionsPopup, dest);
-    cm.addMenuItemAllowDest(optionsPopup, dest);
-    cm.addMenuSeparator(optionsPopup);
+    cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
+    cm.addMenuItemAllowDest(addRulePopup, dest);
+    cm.addMenuSeparator(addRulePopup);
 
-    cm.addMenuItemTemporarilyAllowOrigin(optionsPopup, origin);
-    cm.addMenuItemAllowOrigin(optionsPopup, origin);
-    cm.addMenuSeparator(optionsPopup);
+    cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
+    cm.addMenuItemAllowOrigin(addRulePopup, origin);
+    cm.addMenuSeparator(addRulePopup);
 
-    cm.addMenuItemTemporarilyAllowOriginToDest(optionsPopup, origin, dest);
-    cm.addMenuItemAllowOriginToDest(optionsPopup, origin, dest);
+    cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
+    cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
 
 
 
@@ -530,9 +531,9 @@ requestpolicy.overlay = (function() {
           }
         },
         {
-          label: StringUtils.$str("more"),
-          accessKey: StringUtils.$str("more.accesskey"),
-          popup: optionsPopupName,
+          label: StringUtils.$str("addRule"),
+          accessKey: StringUtils.$str("addRule.accesskey"),
+          popup: addRuleMenuName,
           callback: null
         }
         // TODO: add a „read more about URL redirection“ button, targetting to

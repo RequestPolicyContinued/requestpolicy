@@ -454,6 +454,7 @@ requestpolicy.overlay = (function() {
     // Line: 260
 
     // redirectOriginUri is optional and is not necessary for <meta> redirects.
+    isOriginUndefined = redirectOriginUri === undefined;
     redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {
@@ -466,11 +467,16 @@ requestpolicy.overlay = (function() {
     var notificationBox = gBrowser.getNotificationBox(browser);
     var notificationValue = "request-policy-meta-redirect";
 
-    // TODO: different label when redirectNotification is specified.
-    //       e.g. „An url redirection from X to Y has been blocked.“
-    var notificationLabel = StringUtils.$str("redirectNotification",
-                                             [cropUri(redirectTargetUri, 50)],
-                                             1);
+    // prepare the notification's label
+    let notificationLabel;
+    if (isOriginUndefined) {
+      notificationLabel = StringUtils.$str("redirectNotification",
+          [cropUri(redirectTargetUri, 50)], 1);
+    } else {
+      notificationLabel = StringUtils.$str("redirectNotificationWithOrigin",
+          [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)], 2);
+    }
+
 
     var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
     var addRulePopup = document.getElementById(addRuleMenuName);

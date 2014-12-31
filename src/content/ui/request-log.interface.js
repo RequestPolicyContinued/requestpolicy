@@ -33,7 +33,7 @@ window.requestpolicy.requestLog = (function (self) {
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
   Cu.import("resource://gre/modules/Services.jsm", mod);
   mod.ScriptLoader.importModules([
-    "string-utils",
+    "utils/strings",
     "domain-util",
     "utils"
   ], mod);

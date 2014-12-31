@@ -42,7 +42,7 @@ requestpolicy.overlay = (function() {
     "prefs",
     "request-processor",
     "domain-util",
-    "string-utils",
+    "utils/strings",
     "utils/dom",
     "requestpolicy-service",
     "policy-manager"

@@ -39,7 +39,7 @@ requestpolicy.menu = (function() {
     "domain-util",
     "ruleset",
     "gui-location",
-    "string-utils",
+    "utils/strings",
     "utils/dom",
 
     "requestpolicy-service",

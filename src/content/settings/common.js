@@ -8,7 +8,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "constants",
-  "string-utils",
+  "utils/strings",
   "prefs",
   "domain-util",
   "logger",

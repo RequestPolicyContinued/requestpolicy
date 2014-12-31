@@ -36,7 +36,7 @@ requestpolicy.classicmenu = (function() {
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
   ScriptLoader.importModules([
     "prefs",
-    "string-utils"
+    "utils/strings"
   ], mod);
   let rpPrefBranch = mod.rpPrefBranch, StringUtils = mod.StringUtils;
 

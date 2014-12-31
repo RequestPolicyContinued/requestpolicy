@@ -38,7 +38,7 @@ let prefManagerScope = {};
 if (isMainProcess) {
   // if it's the main process (the chrome process). We will get here on startup.
   // initialize preferences:
-  let uri = "chrome://requestpolicy/content/lib/pref-manager.js";
+  let uri = "chrome://requestpolicy/content/lib/prefs.manager.js";
   Services.scriptloader.loadSubScript(uri, prefManagerScope);
 }
 

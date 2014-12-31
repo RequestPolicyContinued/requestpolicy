@@ -514,6 +514,8 @@ let rpService = (function() {
     observe: function(subject, topic, data) {
       switch (topic) {
         case "http-on-modify-request" :
+          // TODO: observe "http-on-modify-request" not here, but in
+          //       RequestProcessor
           RequestProcessor._examineHttpRequest(subject);
           break;
         case SUBSCRIPTION_UPDATED_TOPIC:

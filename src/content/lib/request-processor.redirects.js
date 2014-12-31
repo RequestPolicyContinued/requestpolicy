@@ -249,6 +249,16 @@ let RequestProcessor = (function(self) {
         // show the URL of the previously displayed page.
         httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
+        // TODO: show the redirect notification *only* when
+        //           a) a link has been clicked
+        //           b) an url has been entered.
+        //       In any other case the redirect should *not* cause a notific.
+        //       bar to be displayed, because the redirect hasn't been caused by
+        //       *explicit* user interaction.
+        //       Examples for such other cases are inline elements whose
+        //       destination causes a redirect (via a HTTP Header), e.g. <img>.
+        //    Note: As soon as this is fixed, enable this mozmill test:
+        //          tests/mozmill/tests/testRedirect/testInlineRedirect.js
         showRedirectNotification(request) || Logger.warning(
             Logger.TYPE_HEADER_REDIRECT,
             "A redirect has been observed, but it was not possible to notify " +

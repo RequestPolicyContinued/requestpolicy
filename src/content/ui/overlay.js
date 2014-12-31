@@ -461,7 +461,7 @@ requestpolicy.overlay = (function() {
       return false;
     }
 
-    var notificationBox = gBrowser.getNotificationBox(browser)
+    var notificationBox = gBrowser.getNotificationBox(browser);
     var notificationValue = "request-policy-meta-redirect";
 
     // TODO: different label when redirectNotification is specified.
@@ -470,38 +470,27 @@ requestpolicy.overlay = (function() {
                                              [cropUri(redirectTargetUri, 50)],
                                              1);
 
-    var notificationButtonOptions = StringUtils.$str("more");
-    var notificationButtonOptionsKey = StringUtils.$str("more.accesskey");
-    var notificationButtonAllow = StringUtils.$str("allow");
-    var notificationButtonAllowKey = StringUtils.$str("allow.accesskey");
-    var notificationButtonDeny = StringUtils.$str("deny");
-    var notificationButtonDenyKey = StringUtils.$str("deny.accesskey");
-
     var optionsPopupName = "requestpolicyRedirectNotificationOptions";
     var optionsPopup = document.getElementById(optionsPopupName);
     while (optionsPopup.firstChild) {
       optionsPopup.removeChild(optionsPopup.firstChild);
     }
 
-    var origin = requestpolicy.menu._addWildcard(
-        DomainUtil.getBaseDomain(redirectOriginUri));
-    var dest = requestpolicy.menu._addWildcard(
-        DomainUtil.getBaseDomain(redirectTargetUri));
+    let m = requestpolicy.menu;
+    var origin = m._addWildcard(DomainUtil.getBaseDomain(redirectOriginUri));
+    var dest = m._addWildcard(DomainUtil.getBaseDomain(redirectTargetUri));
 
-    requestpolicy.classicmenu.
-        addMenuItemTemporarilyAllowDest(optionsPopup, dest);
-    requestpolicy.classicmenu.addMenuItemAllowDest(optionsPopup, dest);
-    requestpolicy.classicmenu.addMenuSeparator(optionsPopup);
+    let cm = requestpolicy.classicmenu;
+    cm.addMenuItemTemporarilyAllowDest(optionsPopup, dest);
+    cm.addMenuItemAllowDest(optionsPopup, dest);
+    cm.addMenuSeparator(optionsPopup);
 
-    requestpolicy.classicmenu.
-        addMenuItemTemporarilyAllowOrigin(optionsPopup, origin);
-    requestpolicy.classicmenu.addMenuItemAllowOrigin(optionsPopup, origin);
-    requestpolicy.classicmenu.addMenuSeparator(optionsPopup);
+    cm.addMenuItemTemporarilyAllowOrigin(optionsPopup, origin);
+    cm.addMenuItemAllowOrigin(optionsPopup, origin);
+    cm.addMenuSeparator(optionsPopup);
 
-    requestpolicy.classicmenu.
-        addMenuItemTemporarilyAllowOriginToDest(optionsPopup, origin, dest);
-    requestpolicy.classicmenu.
-        addMenuItemAllowOriginToDest(optionsPopup, origin, dest);
+    cm.addMenuItemTemporarilyAllowOriginToDest(optionsPopup, origin, dest);
+    cm.addMenuItemAllowOriginToDest(optionsPopup, origin, dest);
 
 
 
@@ -513,10 +502,10 @@ requestpolicy.overlay = (function() {
     } else {
       var buttons = [
         {
-          label : notificationButtonAllow,
-          accessKey : notificationButtonAllowKey,
-          popup : null,
-          callback : function() {
+          label: StringUtils.$str("allow"),
+          accessKey: StringUtils.$str("allow.accesskey"),
+          popup: null,
+          callback: function() {
             // Fx 3.7a5+ calls shouldLoad for location.href changes.
 
             // TODO: currently the allow button ignores any additional
@@ -533,18 +522,18 @@ requestpolicy.overlay = (function() {
           }
         },
         {
-          label : notificationButtonDeny,
-          accessKey : notificationButtonDenyKey,
-          popup : null,
-          callback : function() {
+          label: StringUtils.$str("deny"),
+          accessKey: StringUtils.$str("deny.accesskey"),
+          popup: null,
+          callback: function() {
             // Do nothing. The notification closes when this is called.
           }
         },
         {
-          label : notificationButtonOptions,
-          accessKey : notificationButtonOptionsKey,
-          popup : optionsPopupName,
-          callback : null
+          label: StringUtils.$str("more"),
+          accessKey: StringUtils.$str("more.accesskey"),
+          popup: optionsPopupName,
+          callback: null
         }
         // TODO: add a „read more about URL redirection“ button, targetting to
         //       https://en.wikipedia.org/wiki/URL_redirection

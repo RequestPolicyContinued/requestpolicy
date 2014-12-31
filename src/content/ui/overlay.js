@@ -395,6 +395,33 @@ requestpolicy.overlay = (function() {
     }
   };
 
+
+  /**
+   * Takes an URI, crops it if necessary, and returns it.
+   * It's ensured that the returned URI isn't longer than a specified length,
+   * but the prePath is never cropped, so that the resulting string might be
+   * longer than aMaxLength.
+   *
+   * (There doesn't seem to be a way to use the xul crop attribute with the
+   * notification.)
+   *
+   * @param {String} aUri
+   * @param {Int} aMaxLength
+   *
+   * @returns {String} the URI, eventually cropped
+   *
+   */
+  function cropUri(aUri, aMaxLength) {
+    if (aUri.length < aMaxLength) {
+      return aUri;
+    } else {
+      let prePathLength = DomainUtil.getPrePath(aUri).length + 1;
+      let len = Math.max(prePathLength, aMaxLength);
+      return aUri.substring(0, len) + "...";
+    }
+  }
+
+
   /**
    * Shows a notification that a redirect was requested by a page (meta refresh
    * or with headers).
@@ -437,22 +464,10 @@ requestpolicy.overlay = (function() {
     var notificationBox = gBrowser.getNotificationBox(browser)
     var notificationValue = "request-policy-meta-redirect";
 
-    // There doesn't seem to be a way to use the xul crop attribute with the
-    // notification, so do our own cropping, showing at a minimum the entire
-    // prePath.
-    const maxLength = 50;
-    if (redirectTargetUri.length < maxLength) {
-      var shortUri = redirectTargetUri;
-    } else {
-      var prePathLength = DomainUtil.getPrePath(redirectTargetUri).length + 1;
-      shortUri = redirectTargetUri
-          .substring(0, Math.max(prePathLength, maxLength)) + "...";
-    }
-
     // TODO: different label when redirectNotification is specified.
     //       e.g. „An url redirection from X to Y has been blocked.“
     var notificationLabel = StringUtils.strbundle.formatStringFromName(
-        "redirectNotification", [shortUri], 1);
+        "redirectNotification", [cropUri(redirectTargetUri)], 1);
 
     var notificationButtonOptions = StringUtils.strbundle.GetStringFromName("more");
     var notificationButtonOptionsKey = StringUtils.strbundle

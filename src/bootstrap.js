@@ -34,7 +34,7 @@ const bootstrapManagerURI = "chrome://requestpolicy/content/lib/" +
  */
 function logSevereError(msg, stack) {
   dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-       (stack ? ", stack was: " + stack : ""));
+       (stack ? ", stack was: " + stack : "") + "\n");
 }
 
 function startup(data, reason) {

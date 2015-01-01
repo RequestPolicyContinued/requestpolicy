@@ -46,7 +46,7 @@ function getModuleURI(id) {
  */
 function logSevereError(msg, stack) {
   dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-       (stack ? ", stack was: " + stack : ""));
+       (stack ? ", stack was: " + stack : "") + "\n");
 }
 
 

@@ -29,10 +29,8 @@ let EXPORTED_SYMBOLS = ["Logger"];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-
-// We can't import the ScriptLoader when the Logger is loaded, because the
-// Logger gets imported by the ScriptLoader itself on startup.
-let ScriptLoader = null;
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["bootstrap-manager"], this)
 
 
 /**
@@ -107,40 +105,50 @@ let Logger = (function() {
          "yet, so logging is still enabled.\n");
   }
 
+  /**
+   * init() is called by doLog() until initialization was successful.
+   * For the case that nothing is logged at all, init is registered as a
+   * startup-function.
+   */
   function init() {
-    if (!ScriptLoader) {
-      // try to import the ScriptLoader
-      try {
-        // We can't import the ScriptLoader when the Logger is loaded, because
-        // the Logger gets imported by the ScriptLoader itself on startup.
-        let mod = {};
-        Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-        ScriptLoader = mod.ScriptLoader;
-      } catch (e) {
-        ScriptLoader = null;
-        displayMessageNotInitiallized();
-        return;
-      }
+    if (initialized === true) {
+      // don't initialize several times
+      return;
     }
+
+    // Try to get rpPrefBranch.
+    // That pref branch might not be available when init() is called, e.g. when
+    // prefs.jsm logs something on initialization.
     let prefScope = ScriptLoader.importModule("prefs");
     if (!("rpPrefBranch" in prefScope)) {
       displayMessageNotInitiallized();
+      // cancel init()
       return;
     }
     rpPrefBranch = prefScope.rpPrefBranch;
-    initialized = true;
     rpPrefBranch.addObserver("log", prefObserver, false);
     updateLoggingSettings();
+
+    // don't call init() anymore when doLog() is called
+    doLog = log;
+
+    initialized = true;
   }
 
+  BootstrapManager.registerStartupFunction(init);
 
 
 
-  function doLog(aLevel, aType, aMessage, aError) {
-    if (!initialized) {
-      init();
-    }
 
+  /**
+   * This function will be called in case Logger isn't fully initialized yet.
+   */
+  let initialLog = function() {
+    init();
+    log.apply(this, arguments);
+  };
+
+  let log = function(aLevel, aType, aMessage, aError) {
     if (enabled && aLevel >= level && types & aType) {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
       let typeName = self._TYPE_NAMES[aType.toString()];
@@ -165,7 +173,13 @@ let Logger = (function() {
         }
       }
     }
-  }
+  };
+
+  /**
+   * Initially call initialLog() on doLog().
+   * After initialization it will be log().
+   */
+  let doLog = initialLog;
 
 
 

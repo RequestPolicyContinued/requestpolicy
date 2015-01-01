@@ -49,7 +49,6 @@ let rootPrefBranch = Services.prefs.getBranch("")
 
 
 
-
 let Prefs = (function() {
   let self = {};
 
@@ -91,7 +90,7 @@ let Prefs = (function() {
   /**
    * Take necessary actions when preferences are updated.
    *
-   * @paramString{} prefName name of the preference that was updated.
+   * @param {String} prefName name of the preference that was updated.
    */
   function prefChanged(prefName) {
     switch (prefName) {

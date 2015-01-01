@@ -27,8 +27,13 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["ScriptLoader"];
 
+// import some modules
+// NOTICE: This file should NOT import any of RP's modules when it is loaded!
+//         Doing so would be a bad practice, and might produce import() loops
+//         when the module to be imported wants to import ScriptLoader.
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
 
 const rpChromeContentURI = 'chrome://requestpolicy/content/';
 
@@ -36,34 +41,19 @@ function getModuleURI(id) {
   return rpChromeContentURI + "lib/" + id + ".jsm";
 }
 
-let loggerURI = getModuleURI("logger");
-Cu.import(loggerURI);
-
-/*
-// remove
-
-might be helpful. This will import an arbitrary module into a
-singleton object, which it returns. If the argument is not an
-absolute path, the module is imported relative to the caller's
-filename.
-
-function module(uri) {
-  if (!/^[a-z-]+:/.exec(uri)) {
-    uri = /([^ ]+\/)[^\/]+$/.exec(Components.stack.caller.filename)[1] + uri + ".jsm";
-  }
-
-  let obj = {};
-  Components.utils.import(uri, obj);
-  return obj;
+/**
+ * If the ScriptLoader catches an Exception, it will be a severe error.
+ */
+function logSevereError(msg, stack) {
+  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
+       (stack ? ", stack was: " + stack : ""));
 }
 
-*/
+
 
 let ScriptLoader = (function() {
 
-  // the logger is always imported
   let importedModuleURIs = {};
-  importedModuleURIs[loggerURI] = true;
 
   let scopes = {};
 
@@ -118,8 +108,8 @@ let ScriptLoader = (function() {
           delete modulesCurrentlyBeingImported[moduleID];
         }
       } catch (e) {
-        Logger.severeError("Failed to import module \"" + moduleID + "\": " + e,
-                           e);
+        logSevereError("Failed to import module \"" + moduleID + "\": " + e,
+                       e.stack);
       }
       return scope;
     },

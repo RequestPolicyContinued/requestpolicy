@@ -60,26 +60,6 @@ function module(uri) {
 */
 
 let ScriptLoader = (function() {
-  /*let modules = [
-    "content-policy",
-    "utils/domains",
-    "utils/files",
-    "gui-location",
-    "logger",
-    "policy-manager",
-    "prefs",
-    "request-processor",
-    "request-result",
-    "request-set",
-    "request",
-    "requestpolicy-service",
-    "ruleset-storage",
-    "ruleset",
-    "subscription",
-    "utils",
-    "window-manager",
-    "utils/xul"
-  ];*/
 
   // the logger is always imported
   let importedModuleURIs = {};
@@ -93,8 +73,6 @@ let ScriptLoader = (function() {
 
 
   let self = {
-    // public attributes and methods
-
     unloadAllLibraries: function() {
       scopes = {};
     },
@@ -206,42 +184,7 @@ let ScriptLoader = (function() {
       }
 
       return scope;
-    },
-
-    /*require: function(id) {
-      try {
-        if (!scriptFilenames[id]) {
-          throw new Error("the script does not exist");
-        }
-        if (!scopes[id]) {
-          scopes[id] = {
-            exports: {},
-            require: self.require,
-            Ci: Ci, Cc: Cc, Cu: Cu,
-            scriptFinishedLoading: false
-          };
-          let uri = rpChromeContentURI + 'lib/' + scriptFilenames[id] + '.js';
-          try {
-            Services.scriptloader.loadSubScript(uri, scopes[id]);
-          } catch (e) {
-            throw new Error('loadSubScript("' + uri + '", scope) failed!' +
-                (e ? " Error was: " + e : ""));
-          }
-          scopes[id].scriptFinishedLoading = true;
-        } else if (scopes[id].scriptFinishedLoading === false) {
-          throw new Error('Loop detected! "' + id + '" is required but is' +
-              ' itself still loading!');
-        }
-        return scopes[id].exports;
-      } catch (e) {
-        // Indicate the filename because the exception doesn't have that
-        // in the string.
-        Logger.severeError("require(" + id + ") failed: " + (e ? e : ""), e);
-        // TODO: indicate to the user that RP's broken.
-        delete scopes[id];
-        return {};
-      }
-    }*/
+    }
   };
 
   return self;

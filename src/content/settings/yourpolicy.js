@@ -230,9 +230,10 @@ function onload() {
   }
 
   // observe rule changes and update the table then
-  ObserverManager.observe("requestpolicy-rules-changed",
-      function(subject, topic, data) {
-        var search = document.getElementById('rulesearch');
-        populateRuleTable(search.value);
-      });
+  ObserverManager.observe({
+    "requestpolicy-rules-changed": function(subject, topic, data) {
+      var search = document.getElementById('rulesearch');
+      populateRuleTable(search.value);
+    }
+  });
 }

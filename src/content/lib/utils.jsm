@@ -151,23 +151,6 @@ let Utils = (function() {
 
 
 
-  self.observeNotifications = function(observer, observerTopics) {
-    BootstrapManager.registerStartupFunction(function() {
-      for (let i = 0, len = observerTopics.length; i < len; ++i) {
-        Services.obs.addObserver(observer, observerTopics[i], false);
-      }
-    });
-    BootstrapManager.registerShutdownFunction(function(data, reason) {
-      for (let i = 0, len = observerTopics.length; i < len; ++i) {
-        Services.obs.removeObserver(observer, observerTopics[i], false);
-      }
-    });
-  };
-  self.unregisterObservers = function(observer, observerTopics) {
-  };
-
-
-
   /**
    * This function returns and eventually creates a module's `internal`
    * variable. The `internal` can be accessed from all submodules of that

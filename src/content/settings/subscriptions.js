@@ -135,6 +135,6 @@ function onload() {
   }
 
   // call updateDisplay() every time a subscription is added or removed
-  ObserverManager.observe(SUBSCRIPTION_ADDED_TOPIC, updateDisplay);
-  ObserverManager.observe(SUBSCRIPTION_REMOVED_TOPIC, updateDisplay);
+  ObserverManager.observe({SUBSCRIPTION_ADDED_TOPIC: updateDisplay});
+  ObserverManager.observe({SUBSCRIPTION_REMOVED_TOPIC: updateDisplay});
 }

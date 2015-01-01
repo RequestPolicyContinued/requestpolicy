@@ -35,7 +35,8 @@ ScriptLoader.importModules([
   "utils",
   "request",
   "request-result",
-  "http-response"
+  "http-response",
+  "observer-manager"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "requestpolicy-service": ["rpService"]
@@ -57,30 +58,14 @@ let RequestProcessor = (function(self) {
 
 
 
-  Utils.observeNotifications(
-    // the observer
-    {
-      observe: function(subject, topic, data) {
-        switch (topic) {
-          case "http-on-examine-response":
-            examineHttpResponse(subject);
-            break;
-
-          case HTTPS_EVERYWHERE_REWRITE_TOPIC:
-            handleHttpsEverywhereUriRewrite(subject, data);
-            break;
-        }
-      }
+  ObserverManager.observe({
+    "http-on-examine-response": function(subject) {
+      examineHttpResponse(subject);
     },
-    // observer topics
-    [
-      "http-on-examine-response",
-      HTTPS_EVERYWHERE_REWRITE_TOPIC
-    ]
-  );
-
-
-
+    HTTPS_EVERYWHERE_REWRITE_TOPIC: function(subject, topic, data) {
+      handleHttpsEverywhereUriRewrite(subject, data);
+    }
+  });
 
 
 

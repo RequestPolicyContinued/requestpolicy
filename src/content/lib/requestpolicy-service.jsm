@@ -42,7 +42,8 @@ ScriptLoader.importModules([
   "utils",
   "content-policy",
   "constants",
-  "bootstrap-manager"
+  "bootstrap-manager",
+  "observer-manager"
 ], this);
 
 
@@ -382,25 +383,18 @@ let rpService = (function() {
   }
 
   function register() {
-    let obs = Services.obs;
-    obs.addObserver(self, "http-on-modify-request", false);
-    obs.addObserver(self, "sessionstore-windows-restored", false);
-    obs.addObserver(self, "private-browsing", false);
-    obs.addObserver(self, SUBSCRIPTION_UPDATED_TOPIC, false);
-    obs.addObserver(self, SUBSCRIPTION_ADDED_TOPIC, false);
-    obs.addObserver(self, SUBSCRIPTION_REMOVED_TOPIC, false);
-
+    ObserverManager.observe({
+      "http-on-modify-request": self.observe,
+      "sessionstore-windows-restored": self.observe,
+      "private-browsing": self.observe,
+      SUBSCRIPTION_UPDATED_TOPIC: self.observe,
+      SUBSCRIPTION_ADDED_TOPIC: self.observe,
+      SUBSCRIPTION_REMOVED_TOPIC: self.observe
+    });
     AddonManager.addAddonListener(addonListener);
   }
 
   function unregister() {
-    let obs = Services.obs;
-    obs.removeObserver(self, "http-on-modify-request");
-    obs.removeObserver(self, "sessionstore-windows-restored");
-    obs.removeObserver(self, SUBSCRIPTION_UPDATED_TOPIC);
-    obs.removeObserver(self, SUBSCRIPTION_ADDED_TOPIC);
-    obs.removeObserver(self, SUBSCRIPTION_REMOVED_TOPIC);
-
     AddonManager.removeAddonListener(addonListener);
   }
 

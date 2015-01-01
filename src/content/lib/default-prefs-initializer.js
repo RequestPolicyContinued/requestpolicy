@@ -20,18 +20,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// This file has to be called only once. It handles the default preferences [1],
+// so it has to be called quite early at the extension startup.
+//
+// Note that this script may *only* be loaded from the main process!
+// Also note that if possible this script shouldn't import any other of RP's
+// modules, e.g. to prevent import() loops.
+//
+// [1] https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
+
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const MMID = "requestpolicy@requestpolicy.com";
-
-let EXPORTED_SYMBOLS = [];
-
 Cu.import("resource://gre/modules/Services.jsm");
-
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["logger"], this);
 
 
 
@@ -125,7 +127,7 @@ var rootPrefBranch = Services.prefs.getBranch("")
 if (rpPrefBranch.getBoolPref("prefetch.link.disableOnStartup")) {
   if (rootPrefBranch.getBoolPref("network.prefetch-next")) {
     rootPrefBranch.setBoolPref("network.prefetch-next", false);
-    Logger.info(Logger.TYPE_INTERNAL, "Disabled link prefetch.");
+    //dump("Disabled link prefetch.\n");
   }
 }
 // Disable DNS prefetch.
@@ -136,7 +138,7 @@ if (rpPrefBranch.getBoolPref("prefetch.dns.disableOnStartup")) {
   if (!rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch") ||
       !rootPrefBranch.getBoolPref("network.dns.disablePrefetch")) {
     rootPrefBranch.setBoolPref("network.dns.disablePrefetch", true);
-    Logger.info(Logger.TYPE_INTERNAL, "Disabled DNS prefetch.");
+    //dump("Disabled DNS prefetch.\n");
   }
 }
 
@@ -152,33 +154,3 @@ for (var i = 0; i < deletePrefs.length; i++) {
   }
 }
 Services.prefs.savePrefFile(null);
-
-
-function setPref(aPrefBranch, aPrefName, aDataType, aValue) {
-  let functionName;
-  switch (aDataType) {
-    case Services.prefs.PREF_BOOL:
-      functionName = "setBoolPref";
-      break;
-    case Services.prefs.PREF_INT:
-      functionName = "setIntPref";
-      break;
-    case Services.prefs.PREF_STRING:
-    default:
-      functionName = "setCharPref";
-      break;
-  }
-  aPrefBranch[functionName](aPrefName, aValue);
-}
-
-let globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
-    .getService(Ci.nsIMessageListenerManager);
-
-globalMM.addMessageListener(MMID + ":setPref", function(message) {
-    let {name, dataType, value} = message.data;
-    setPref(rpPrefBranch, name, dataType, value);
-  });
-globalMM.addMessageListener(MMID + ":setRootPref", function(message) {
-    let {name, dataType, value} = message.data;
-    setPref(rootPrefBranch, name, dataType, value);
-  });

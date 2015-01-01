@@ -30,7 +30,10 @@ let EXPORTED_SYMBOLS = ["Logger"];
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["bootstrap-manager"], this)
+ScriptLoader.importModules([
+  "bootstrap-manager",
+  "prefs"
+], this);
 
 
 /**
@@ -76,7 +79,6 @@ let Logger = (function() {
 
 
   let initialized = false;
-  let rpPrefBranch = null;
 
   // initially, enable logging. later the logging preferences of the user will
   // will be loaded.
@@ -100,11 +102,6 @@ let Logger = (function() {
     }
   };
 
-  function displayMessageNotInitiallized() {
-    dump("[RequestPolicy] [INFO] [INTERNAL] preferences are not available " +
-         "yet, so logging is still enabled.\n");
-  }
-
   /**
    * init() is called by doLog() until initialization was successful.
    * For the case that nothing is logged at all, init is registered as a
@@ -116,16 +113,6 @@ let Logger = (function() {
       return;
     }
 
-    // Try to get rpPrefBranch.
-    // That pref branch might not be available when init() is called, e.g. when
-    // prefs.jsm logs something on initialization.
-    let prefScope = ScriptLoader.importModule("prefs");
-    if (!("rpPrefBranch" in prefScope)) {
-      displayMessageNotInitiallized();
-      // cancel init()
-      return;
-    }
-    rpPrefBranch = prefScope.rpPrefBranch;
     rpPrefBranch.addObserver("log", prefObserver, false);
     updateLoggingSettings();
 

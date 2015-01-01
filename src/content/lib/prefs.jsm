@@ -29,18 +29,7 @@ let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-let {isMainProcess} = ScriptLoader.importModule("utils/process-info");
 
-let prefManagerScope = {};
-
-
-if (isMainProcess) {
-  // if it's the main process (the chrome process). We will get here on startup.
-  // initialize preferences:
-  let uri = "chrome://requestpolicy/content/lib/prefs.manager.js";
-  Services.scriptloader.loadSubScript(uri, prefManagerScope);
-}
 
 let rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
     .QueryInterface(Ci.nsIPrefBranch2);

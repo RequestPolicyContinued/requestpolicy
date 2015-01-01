@@ -98,8 +98,13 @@ let BootstrapManager = (function() {
     // which wouldn't be available if BootstrapManager is *itself* still being
     // loaded. This would be an "import()-loop".
     {
-      // import the Logger first so that its startup-function will be called
-      // after this one
+      // At first initialize the preferences. Its scope doesn't need to be
+      // remembered.
+      Services.scriptloader.loadSubScript(
+          "chrome://requestpolicy/content/lib/default-prefs-initializer.js",
+          {});
+      // import the Logger as the first module so that its startup-function
+      // will be called after this one
       ScriptLoader.importModule("logger");
       ScriptLoader.importModules(["requestpolicy-service", "window-manager",
                                   "about-uri"], globalScope);

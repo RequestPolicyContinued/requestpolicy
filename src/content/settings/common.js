@@ -222,7 +222,7 @@ common.localize = function(stringNames) {
 
 
 Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/settings/common.observer-manager.js", this);
+    "chrome://requestpolicy/content/lib/observer-manager.js", this);
 
 
 $(function() {

@@ -41,14 +41,15 @@ var ObserverManager = (function() {
   };
 
 
-  // unregister all observers before the window is unloaded
-  window.addEventListener("beforeunload", function(event) {
+  let unregisterObservers = function(event) {
     while (observers.length > 0) {
       var observer = observers.pop();
       Logger.dump("Unregistering observer for topic " + observer.topic);
       observer.unregister();
     }
-  });
+  };
+  // unregister all observers before the window is unloaded
+  window.addEventListener("unload", unregisterObservers);
 
 
   self.observe = function(aTopic, aFunctionToCall) {

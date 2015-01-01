@@ -35,12 +35,12 @@ let ManagerForDOMContentLoaded = (function() {
 
 
   function htmlAnchorTagClicked(event) {
-    // Note: need to use currentTarget so that it is the <a> element. See:
+    // Notify the main thread that a link has been clicked.
+    // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
     sendSyncMessage(MMID + ":notifyLinkClicked",
                     {origin: event.currentTarget.ownerDocument.URL,
                      dest: event.currentTarget.href});
-    //dump("<a> clicked\n");
   }
 
 
@@ -48,8 +48,7 @@ let ManagerForDOMContentLoaded = (function() {
    * Determines if documentToCheck is the main document loaded in the currently
    * active tab.
    *
-   * @param {document}
-   *          documentToCheck
+   * @param {document} documentToCheck
    * @return {Boolean}
    */
   function isActiveTopLevelDocument(documentToCheck) {
@@ -59,24 +58,18 @@ let ManagerForDOMContentLoaded = (function() {
   /**
    * Things to do when a page has loaded (after images, etc., have been loaded).
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   function onDOMContentLoaded(event) {
     // TODO: This is getting called multiple times for a page, should only be
     // called once.
+    //    <--- the above comment is very old – is it still true that
+    //         onDOMContentLoaded is eventually called multiple times?
     let doc = event.originalTarget;
     if (doc.nodeName != "#document") {
       // only documents
       return;
     }
-/*
-    if (!doc) {
-      // onDOMContentLoaded getting called more often than it should? document
-      // isn't set on new tab open when this is called.
-      return;
-    }*/
-    //dump("onDOMContentLoaded called for " + doc.documentURI + "\n");
 
     onDocumentLoaded(doc);
     let docID = DocManager.generateDocID(doc);
@@ -104,9 +97,6 @@ let ManagerForDOMContentLoaded = (function() {
     if (iframe.contentDocument === undefined) {
       return;
     }
-    //dump("onDOMFrameContentLoaded called for <" +
-    //    iframe.contentDocument.documentURI + "> in <" +
-    //    iframe.ownerDocument.documentURI + ">");
 
     // TODO: maybe this can check if the iframe's documentURI is in the other
     // origins of the current document, and that way not just be limited to
@@ -167,7 +157,7 @@ let ManagerForDOMContentLoaded = (function() {
     }
 
     if (metaRefreshes.length > 0) {
-      //dump("meta refreshes found.\n");
+      // meta refreshes have been found.
 
       var docShell = document.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)

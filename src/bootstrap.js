@@ -28,6 +28,14 @@ const Cu = Components.utils;
 const bootstrapManagerURI = "chrome://requestpolicy/content/lib/" +
     "bootstrap-manager.jsm";
 
+/**
+ * If any Exception gets into bootstrap.js, it will be a severe error.
+ * The Logger can't be used, as it might not be available.
+ */
+function logSevereError(msg, stack) {
+  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
+       (stack ? ", stack was: " + stack : ""));
+}
 
 function startup(data, reason) {
   // if the Browser Toolbox is open when enabling RP, stop here.
@@ -36,12 +44,16 @@ function startup(data, reason) {
   //debugger;
 
   try {
+    // Import the BootstrapManager and call its startup() function, that's all
+    // what has to be done here.
+    // It is IMPORTANT that BootstrapManager is the FIRST module that is
+    // imported! The reason is that many modules call
+    // `BootstrapManager.registerStartupFunction()` at **load-time**, so
+    // BootstrapManager has to be available.
     Cu.import(bootstrapManagerURI);
     BootstrapManager.startup(data, reason);
   } catch(e) {
-    let msg = "startup() failed! " + e;
-    dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-        (e.stack ? ", stack was: " + e.stack : ""));
+    logSevereError("startup() failed! " + e, e.stack);
   }
 }
 
@@ -54,16 +66,14 @@ function shutdown(data, reason) {
     BootstrapManager.shutdown(data, reason);
     Cu.unload(bootstrapManagerURI);
   } catch(e) {
-    let msg = "shutdown() failed! " + e;
-    dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-        (e.stack ? ", stack was: " + e.stack : ""));
+    logSevereError("shutdown() failed! " + e, e.stack);
   }
 }
 
 function install(data, reason) {
-  // note: the addon might be not activated
+  // note: the addon might be not activated when this function gets called
 }
 
 function uninstall(data, reason) {
-  // note: the addon might be not activated
+  // note: the addon might be not activated when this function gets called
 }

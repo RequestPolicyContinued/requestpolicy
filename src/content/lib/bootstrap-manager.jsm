@@ -87,10 +87,23 @@ let BootstrapManager = (function() {
    * called.
    */
   self.registerStartupFunction(function() {
-    // manually load the ScriptLoader
+    // Manually load the ScriptLoader. It has to be unloded manually as well!
     Cu.import(scriptLoaderURI, globalScope);
-    ScriptLoader.importModules(["logger", "requestpolicy-service",
-                                "window-manager", "about-uri"], globalScope);
+
+    // Next, import essential modules. Dependencies will be imported as well.
+    //
+    // It's IMPORTANT that those modules are imported in a startup-function
+    // and NOT when BootstrapManager itself gets loaded. The reason is that many
+    // modules call `BootstrapManager.registerStartupFunction()` at load-time,
+    // which wouldn't be available if BootstrapManager is *itself* still being
+    // loaded. This would be an "import()-loop".
+    {
+      // import the Logger first so that its startup-function will be called
+      // after this one
+      ScriptLoader.importModule("logger");
+      ScriptLoader.importModules(["requestpolicy-service", "window-manager",
+                                  "about-uri"], globalScope);
+    }
   });
 
   self.registerShutdownFunction(function() {

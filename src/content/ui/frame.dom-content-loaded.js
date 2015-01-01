@@ -26,12 +26,18 @@ var MMID = "requestpolicy@requestpolicy.com";
 let ManagerForDOMContentLoaded = (function() {
   let self = {};
 
-  let mod = {};
   const Ci = Components.interfaces;
   const Cc = Components.classes;
   const Cu = Components.utils;
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  mod.ScriptLoader.importModules(["utils/domains", "logger"], mod);
+
+  let ScriptLoader;
+  {
+    let mod = {};
+    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    ScriptLoader = mod.ScriptLoader;
+  }
+  let {DomainUtil} = ScriptLoader.importModule("utils/domains");
+  let {Logger} = ScriptLoader.importModule("logger");
 
 
   function htmlAnchorTagClicked(event) {
@@ -144,10 +150,10 @@ let ManagerForDOMContentLoaded = (function() {
 
       // The dest may be empty if the origin is what should be refreshed. This
       // will be handled by DomainUtil.determineRedirectUri().
-      let {delay, destURI} = mod.DomainUtil.parseRefresh(metaTag.content);
+      let {delay, destURI} = DomainUtil.parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.
-      if (!mod.DomainUtil.isValidUri(destURI)) {
+      if (!DomainUtil.isValidUri(destURI)) {
         originalDestURI = destURI;
         destURI = document.documentURIObject.resolve(destURI);
       }

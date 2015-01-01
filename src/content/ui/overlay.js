@@ -34,24 +34,23 @@ requestpolicy.overlay = (function() {
 
   Cu.import("resource://gre/modules/Services.jsm");
 
-  let mod = {};
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  mod.ScriptLoader.importModules([
-    "constants",
-    "logger",
-    "prefs",
-    "request-processor",
-    "utils/domains",
-    "utils/strings",
-    "utils/dom",
-    "requestpolicy-service",
-    "policy-manager"
-  ], mod);
-  let MMID = mod.MMID, Logger = mod.Logger, rpPrefBranch = mod.rpPrefBranch,
-      Prefs = mod.Prefs, RequestProcessor = mod.RequestProcessor,
-      DomainUtil = mod.DomainUtil, StringUtils = mod.StringUtils,
-      DOMUtils = mod.DOMUtils,
-      rpService = mod.rpService, PolicyManager = mod.PolicyManager;
+  let ScriptLoader;
+  {
+    let mod = {};
+    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    ScriptLoader = mod.ScriptLoader;
+  }
+  // iMod: Alias for ScriptLoader.importModule
+  let iMod = ScriptLoader.importModule;
+  let {Logger} = iMod("logger");
+  let {rpPrefBranch, Prefs} = iMod("prefs");
+  let {RequestProcessor} = iMod("request-processor");
+  let {PolicyManager} = iMod("policy-manager");
+  let {DomainUtil} = iMod("utils/domains");
+  let {StringUtils} = iMod("utils/strings");
+  let {DOMUtils} = iMod("utils/dom");
+  let {rpService} = iMod("requestpolicy-service");
+  let {MMID} = iMod("constants");
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
 

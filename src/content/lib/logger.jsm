@@ -111,8 +111,8 @@ let Logger = (function() {
     if (!ScriptLoader) {
       // try to import the ScriptLoader
       try {
-        // We can't import the ScriptLoader when the Logger is loaded, because the
-        // Logger gets imported by the ScriptLoader itself on startup.
+        // We can't import the ScriptLoader when the Logger is loaded, because
+        // the Logger gets imported by the ScriptLoader itself on startup.
         let mod = {};
         Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
         ScriptLoader = mod.ScriptLoader;

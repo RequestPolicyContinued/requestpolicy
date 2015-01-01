@@ -29,13 +29,14 @@ window.requestpolicy.requestLog = (function (self) {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  let mod = {};
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-  mod.ScriptLoader.importModules([
-    "utils/strings",
-    "utils"
-  ], mod);
-  let StringUtils = mod.StringUtils, Utils = mod.Utils;
+  let ScriptLoader;
+  {
+    let mod = {};
+    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    ScriptLoader = mod.ScriptLoader;
+  }
+  let {StringUtils} = ScriptLoader.importModule("utils/strings");
+  let {Utils} = ScriptLoader.importModule("utils");
 
 
   self.isEmptyMessageDisplayed = true;

@@ -39,7 +39,7 @@ let rpWindowManager = (function(self) {
     "utils",
     "utils/xul",
     "constants",
-    "bootstrap-manager"
+    "process-environment"
   ], globalScope);
 
   let styleSheets = [
@@ -149,14 +149,14 @@ let rpWindowManager = (function(self) {
 
 
 
-  BootstrapManager.registerStartupFunction(function(data, reason) {
+  ProcessEnvironment.enqueueStartupFunction(function(data, reason) {
     forEachOpenWindow(loadIntoWindow);
     Services.wm.addListener(WindowListener);
 
     loadStyleSheets();
   });
 
-  BootstrapManager.registerShutdownFunction(function() {
+  ProcessEnvironment.pushShutdownFunction(function() {
     forEachOpenWindow(unloadFromWindow);
     Services.wm.removeListener(WindowListener);
 

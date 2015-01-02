@@ -25,8 +25,8 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const bootstrapManagerURI = "chrome://requestpolicy/content/lib/" +
-    "bootstrap-manager.jsm";
+const procEnvURI = "chrome://requestpolicy/content/lib/" +
+    "process-environment.jsm";
 
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.
@@ -44,14 +44,13 @@ function startup(data, reason) {
   //debugger;
 
   try {
-    // Import the BootstrapManager and call its startup() function, that's all
-    // what has to be done here.
-    // It is IMPORTANT that BootstrapManager is the FIRST module that is
-    // imported! The reason is that many modules call
-    // `BootstrapManager.registerStartupFunction()` at **load-time**, so
-    // BootstrapManager has to be available.
-    Cu.import(bootstrapManagerURI);
-    BootstrapManager.startup(data, reason);
+    // Import the ProcessEnvironment and call its startup() function.
+    // Note: It is IMPORTANT that ProcessEnvironment is the FIRST module to be
+    //       imported! The reason is that many modules call
+    //       `ProcessEnvironment.enqueueStartupFunction()` at *load-time*, so
+    //       ProcessEnvironment has to be available.
+    Cu.import(procEnvURI);
+    ProcessEnvironment.startup(data, reason);
   } catch(e) {
     logSevereError("startup() failed! " + e, e.stack);
   }
@@ -63,8 +62,10 @@ function shutdown(data, reason) {
   }
 
   try {
-    BootstrapManager.shutdown(data, reason);
-    Cu.unload(bootstrapManagerURI);
+    // shutdown, unset and unload.
+    ProcessEnvironment.shutdown(data, reason);
+    ProcessEnvironment = null;
+    Cu.unload(procEnvURI);
   } catch(e) {
     logSevereError("shutdown() failed! " + e, e.stack);
   }

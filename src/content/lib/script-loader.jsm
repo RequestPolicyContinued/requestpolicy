@@ -55,24 +55,22 @@ let ScriptLoader = (function() {
 
   let importedModuleURIs = {};
 
-  let scopes = {};
-
   // contains the module IDs that are currently being imported initially and
   // have not finished importing yet.
   let modulesCurrentlyBeingImported = {};
 
 
   let self = {
-    unloadAllLibraries: function() {
-      scopes = {};
-    },
-
+    /**
+     * Unload all modules that have been imported.
+     * See https://developer.mozilla.org/en-US/docs/Components.utils.unload
+     * The Process Environment of the main process takes care of calling this
+     * function.
+     */
     unloadAllModules: function() {
       for (let uri in importedModuleURIs) {
         if (importedModuleURIs.hasOwnProperty(uri)) {
-          //dump("unloading " + uri + "  ...  ");
           Cu.unload(uri);
-          //dump("ok.\n");
           delete importedModuleURIs[uri];
         }
       }
@@ -179,10 +177,3 @@ let ScriptLoader = (function() {
 
   return self;
 }());
-
-let {BootstrapManager} = ScriptLoader.importModule("bootstrap-manager");
-
-BootstrapManager.registerShutdownFunction(function() {
-  ScriptLoader.unloadAllLibraries();
-  ScriptLoader.unloadAllModules();
-});

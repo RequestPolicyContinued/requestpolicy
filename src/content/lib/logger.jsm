@@ -31,7 +31,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "bootstrap-manager",
+  "process-environment",
   "prefs"
 ], this);
 
@@ -122,7 +122,7 @@ let Logger = (function() {
     initialized = true;
   }
 
-  BootstrapManager.registerStartupFunction(init);
+  ProcessEnvironment.enqueueStartupFunction(init);
 
 
 

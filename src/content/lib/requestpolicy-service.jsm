@@ -42,7 +42,7 @@ ScriptLoader.importModules([
   "utils",
   "content-policy",
   "constants",
-  "bootstrap-manager",
+  "process-environment",
   "observer-manager"
 ], this);
 
@@ -435,10 +435,10 @@ let rpService = (function() {
 
 
   // /////////////////////////////////////////////////////////////////////////
-  // Bootstrap functions
+  // startup and shutdown functions
   // /////////////////////////////////////////////////////////////////////////
 
-  BootstrapManager.registerStartupFunction(function() {
+  ProcessEnvironment.enqueueStartupFunction(function() {
     init();
 
     loadConfigAndRules();
@@ -448,7 +448,7 @@ let rpService = (function() {
     initializeApplicationCompatibility();
   });
 
-  BootstrapManager.registerShutdownFunction(function(data, reason) {
+  ProcessEnvironment.pushShutdownFunction(function(data, reason) {
     if (reason == ADDON_DISABLE || reason == ADDON_UNINSTALL) {
       handleUninstallOrDisable();
     }
@@ -457,7 +457,9 @@ let rpService = (function() {
     rpServiceInitialized = false;
   });
 
-  //BootstrapManager.registerUninstallFunction(function(data, reason) {
+  // TODO: Handle uninstallation in bootstrap.js, not here, RP might be disabled
+  //       when being uninstalled.
+  //ProcessEnvironment.registerUninstallFunction(function(data, reason) {
   //  handleUninstallOrDisable();
   //});
 

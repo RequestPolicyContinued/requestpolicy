@@ -23,6 +23,49 @@
 var MMID = "requestpolicy@requestpolicy.com";
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+
+
+
+/**
+ * This function gets a Environment variable that has the same lifespan like
+ * the content window, i.e. the Environment's shutdown() function will be called
+ * when the content window is unloaded.
+ *
+ * There are two cases:
+ *
+ * If this is the main process:
+ *     A new Environment is created.
+ *
+ * If this is *not* the main process:
+ *     `ProcessEnvironment` will be used. This ensures that this script will
+ *     have the same Environment as the modules that will be loaded.
+ */
+var WinEnv = (function getWindowEnvironment() {
+  var {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
+
+  let env;
+
+  // Check if this is the main process.
+  if (ProcessEnvironment.isMainProcess === true) {
+    // This is the main process. The `ProcessEnvironment` can't be used as the
+    // content window's Environment, so a new Environment has to be created.
+    let {Environment} = ScriptLoader.importModules(["environment"]);
+    env = new Environment();
+  } else {
+    // This is a child process. The `ProcessEnvironment` can be used for this
+    // window's Environment.
+    env = ProcessEnvironment;
+  }
+
+  // Tell the Environment to shut down when the content window is unloaded.
+  // Note that this is necessary in any of the above cases.
+  env.shutdownOnWindowUnload(content);
+
+  return env;
+}());
+
+
 
 // fixme: It's unclear whether it's necessary to listen for *any* click in
 //        the window. Originally the following code has been part of
@@ -66,6 +109,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
     }
   }, true);*/
 
+WinEnv.enqueueStartupFunction(function() {
   addMessageListener(MMID + ":reload", function() {
     content.document.location.reload(false);
   });
@@ -73,10 +117,16 @@ Components.utils.import("resource://gre/modules/Services.jsm");
   addMessageListener(MMID + ":setLocation", function(message) {
     content.document.location.href = message.data.uri;
   });
+});
 
-Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/ui/frame.blocked-content.js');
-Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js');
-Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/ui/frame.doc-manager.js');
+
+WinEnv.enqueueStartupFunction(function() {
+  Services.scriptloader.loadSubScript(
+      'chrome://requestpolicy/content/ui/frame.blocked-content.js');
+  Services.scriptloader.loadSubScript(
+      'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js');
+  Services.scriptloader.loadSubScript(
+      'chrome://requestpolicy/content/ui/frame.doc-manager.js');
+});
+
+WinEnv.startup();

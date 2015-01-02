@@ -32,7 +32,11 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["prefs", "constants", "bootstrap-manager"], this);
+ScriptLoader.importModules([
+  "prefs",
+  "constants",
+  "process-environment"
+], this);
 
 
 
@@ -173,7 +177,7 @@ let Utils = (function() {
     let sealInternal = function() {
       delete aModuleScope.internal;
     };
-    BootstrapManager.registerStartupFunction(sealInternal);
+    ProcessEnvironment.enqueueStartupFunction(sealInternal);
     return aModuleScope.internal;
   };
 

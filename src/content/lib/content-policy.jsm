@@ -39,7 +39,7 @@ ScriptLoader.importModules([
   "request",
   "utils",
   "request-processor",
-  "bootstrap-manager"
+  "process-environment"
 ], globalScope);
 
 
@@ -77,7 +77,7 @@ let PolicyImplementation = (function() {
   };
 
 
-  BootstrapManager.registerShutdownFunction(function() {
+  ProcessEnvironment.pushShutdownFunction(function() {
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
 

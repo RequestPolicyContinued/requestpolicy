@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// TODO: convert this file into a module, as we now have `ProcessEnvironment`
+//       which handles startup and shutdown and can be imported from anywhere.
 
 /**
  * The ObserverManager provides an interface to `nsIObserverService` which takes
@@ -48,9 +50,8 @@ var ObserverManager = ObserverManager || (function() {
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
     ScriptLoader = mod.ScriptLoader;
   }
-  let {isMainProcess} = ScriptLoader.importModule("utils/process-info");
-  let {Logger} = ScriptLoader.importModule("logger");
-
+  let Logger;
+  let {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
 
 
   /**
@@ -83,6 +84,9 @@ var ObserverManager = ObserverManager || (function() {
   };
 
 
+
+
+
   // an object holding all observers for unregistering when unloading the page
   let observers = [];
 
@@ -103,50 +107,24 @@ var ObserverManager = ObserverManager || (function() {
       "requestpolicy-prefs-changed");
 
 
-  //
-  // The following section is about unregistering the observers.
-  //
-  {
-    /**
-     * This function unregisters all registered observers. It will be called
-     * before the obserers and their enironment is destroyed, see below.
-     */
-    let unregisterObservers = function(event) {
-      while (observers.length > 0) {
-        let observer = observers.pop();
-        Logger.dump("Unregistering observer for topic " + observer.topic);
-        observer.unregister();
-      }
-    };
 
-    // Now it's necessary to detect the environment. Two possibilities:
-    // (a) Either the script has been loaded directly into a window's scope
-    // (b) or it has been loaded by a *.jsm file.
-    //
-    // In case (a) the Observers will be unregistered at the window's `unload`, in
-    // the other case this will happen on RP shutdown.
-    if (typeof content !== 'undefined') {
-      // case (a), a `content` object exists
-      // (see https://developer.mozilla.org/en-US/docs/Web/API/window.content)
-      content.addEventListener("unload", unregisterObservers);
-    } else {
-      // case (b)
 
-      // if: Is this a child process or the main process?
-      if (!isMainProcess) {
-        Logger.warning(Logger.TYPE_INTERNAL, "It won't be possible to " +
-                       "unregister the observers; this is a child process, " +
-                       "so there has to be a `content` object in " +
-                       "ObserverManager's environment, but there is no " +
-                       "`content` object!",
-                       new Error());
-      } else {
-        // it's the main process
-        let {BootstrapManager} = ScriptLoader.importModule("bootstrap-manager");
-        BootstrapManager.registerShutdownFunction(unregisterObservers);
-      }
+
+  ProcessEnvironment.enqueueStartupFunction(function() {
+    // Load the Logger now, not earlier. Otherwise it could be null.
+    Logger = ScriptLoader.importModule("logger").Logger;
+  });
+
+  /**
+   * The function will unregister all registered observers.
+   */
+  ProcessEnvironment.pushShutdownFunction(function() {
+    while (observers.length > 0) {
+      let observer = observers.pop();
+      Logger.dump("Unregistering observer for topic " + observer.topic);
+      observer.unregister();
     }
-  }
+  });
 
   return self;
 }());

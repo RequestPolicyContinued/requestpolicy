@@ -32,7 +32,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModule("bootstrap-manager", this);
+ScriptLoader.importModule("process-environment", this);
 
 var filenames = {
   "basicprefs": "basicprefs.html",
@@ -91,13 +91,13 @@ let AboutRequestPolicy = (function() {
 
 
 
-  BootstrapManager.registerStartupFunction(function() {
+  ProcessEnvironment.enqueueStartupFunction(function() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
         .registerFactory(self.classID, self.classDescription, self.contractID,
             self);
   });
 
-  BootstrapManager.registerShutdownFunction(function() {
+  ProcessEnvironment.pushShutdownFunction(function() {
     let registrar = Components.manager
         .QueryInterface(Ci.nsIComponentRegistrar);
     // This needs to run asynchronously, see bug 753687

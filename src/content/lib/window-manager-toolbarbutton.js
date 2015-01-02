@@ -46,11 +46,11 @@ let rpWindowManager = (function(self) {
   //
 
   if (isAustralis) {
-    BootstrapManager.registerStartupFunction(function() {
+    ProcessEnvironment.enqueueStartupFunction(function() {
       addToolbarButtonToAustralis();
     });
 
-    BootstrapManager.registerShutdownFunction(function() {
+    ProcessEnvironment.pushShutdownFunction(function() {
       let tbb = XULUtils.xulTrees.toolbarbutton[0];
       CustomizableUI.destroyWidget(tbb.id);
     });

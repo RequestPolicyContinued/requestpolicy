@@ -47,8 +47,7 @@ ScriptLoader.importModules([
   "utils",
   "request",
   "request-result",
-  "request-set",
-  "bootstrap-manager"
+  "request-set"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "content-policy": ["PolicyImplementation"],

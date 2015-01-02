@@ -23,13 +23,11 @@
 var MMID = "requestpolicy@requestpolicy.com";
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+
+// fixme: It's unclear whether it's necessary to listen for *any* click in
+//        the window. Originally the following code has been part of
+//        overlay.onLoad and has been moved here in order to support e10s.
 /*
-let scope = (function() {
-  let self = {};
-
-
-
-
   // Listen for click events so that we can allow requests that result from
   // user-initiated link clicks and form submissions.
   addEventListener("click", function(event) {
@@ -73,20 +71,8 @@ let scope = (function() {
   });
 
   addMessageListener(MMID + ":setLocation", function(message) {
-    let location = content.document.location;
-    // When refreshing a page that wants to redirect, sometimes the
-    // targetDocument.location is null. If that's the case, just use
-    // do the redirection in the current content pane.
-    if (location == null) {
-      //dump("in setLocation: content.document.location == null, " +
-      //    "using content.location instead");
-      location = content.location;
-    }
-    location.href = message.data.uri;
+    content.document.location.href = message.data.uri;
   });
-/*
-  return self;
-}());*/
 
 Services.scriptloader.loadSubScript(
     'chrome://requestpolicy/content/ui/frame.blocked-content.js');

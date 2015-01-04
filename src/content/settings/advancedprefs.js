@@ -135,5 +135,5 @@ function onload() {
   );
 
   // call updateDisplay() every time a preference gets changed
-  ObserverManager.observePrefChanges(updateDisplay);
+  WinEnv.obMan.observePrefChanges(updateDisplay);
 }

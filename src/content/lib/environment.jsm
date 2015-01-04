@@ -27,6 +27,17 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["Environment"];
 
+let globalScope = this;
+
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(globalScope, "ScriptLoader",
+    "chrome://requestpolicy/content/lib/script-loader.jsm");
+XPCOMUtils.defineLazyGetter(globalScope, "ObserverManager", function() {
+  return ScriptLoader.importModule("observer-manager").ObserverManager;
+});
+
+
 
 /**
  * The `Environment` class can take care of the "startup" (=initialization) and
@@ -67,6 +78,13 @@ function Environment() {
   // The function queues
   self.startupFnQueue = [];
   self.shutdownFnStack = [];
+
+  // Define a Lazy Getter to get an ObserverManager for this Environment.
+  // Using that Getter is more convenient than doing it manually, as the
+  // Environment has to be created *before* the ObserverManager.
+  XPCOMUtils.defineLazyGetter(self, "obMan", function() {
+    return new ObserverManager(self);
+  });
 }
 
 Environment.STATE_SHUT_DOWN = 0;

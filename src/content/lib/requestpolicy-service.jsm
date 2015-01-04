@@ -42,8 +42,7 @@ ScriptLoader.importModules([
   "utils",
   "content-policy",
   "constants",
-  "process-environment",
-  "observer-manager"
+  "process-environment"
 ], this);
 
 
@@ -383,7 +382,7 @@ let rpService = (function() {
   }
 
   function register() {
-    ObserverManager.observe({
+    ProcessEnvironment.obMan.observe({
       "http-on-modify-request": self.observe,
       "sessionstore-windows-restored": self.observe,
       "private-browsing": self.observe,

@@ -15,8 +15,12 @@ ScriptLoader.importModules([
   "subscription",
   "policy-manager",
   "requestpolicy-service",
-  "observer-manager"
+  "environment"
 ], this);
+
+// create a new Environment for this window
+var WinEnv = new Environment();
+WinEnv.shutdownOnWindowUnload(content);
 
 
 const COMMON_STRINGS = [

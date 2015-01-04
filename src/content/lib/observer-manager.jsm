@@ -33,87 +33,99 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 let {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
 
 // Load the Logger at startup-time, not at load-time!
-// ( On load-time Looger might be null. )
+// ( On load-time Logger might be null. )
 let Logger;
 ProcessEnvironment.enqueueStartupFunction(function() {
   Logger = ScriptLoader.importModule("logger").Logger;
 });
 
 
+
 /**
- * The ObserverManager provides an interface to `nsIObserverService` which takes
- * care of unregistering the observed topics.
+ * An instance of this class registers itself to `nsIObserverService` on behalf
+ * of some other object.
  */
-let ObserverManager = (function() {
-  let self = {};
+function SingleTopicObserver(aTopic, aFunctionToCall) {
+  // save the parameters
+  this.topic = aTopic;
+  // As the `observe` function, take directly the parameter.
+  this.observe = aFunctionToCall;
 
-  /**
-   * This Object registers itself to `nsIObserverService` on behalf of some other
-   * object.
-   */
-  function SingleTopicObserver(aTopic, aFunctionToCall) {
-    // save the parameters
-    this.topic = aTopic;
-    // As the `observe` function, take directly the parameter.
-    this.observe = aFunctionToCall;
+  // currently this obserer is not rgistered yet
+  this.isRegistered = false;
 
-    // currently this obserer is not rgistered yet
-    this.isRegistered = false;
-
-    // register this observer
-    this.register();
+  // register this observer
+  this.register();
+}
+SingleTopicObserver.prototype.register = function() {
+  if (!this.isRegistered) {
+    Services.obs.addObserver(this, this.topic, false);
+    this.isRegistered = true;
   }
-  SingleTopicObserver.prototype.register = function() {
-    if (!this.isRegistered) {
-      Services.obs.addObserver(this, this.topic, false);
-      this.isRegistered = true;
+};
+SingleTopicObserver.prototype.unregister = function() {
+  if (this.isRegistered) {
+    Services.obs.removeObserver(this, this.topic);
+    this.isRegistered = false;
+  }
+};
+
+
+
+/**
+ * An ObserverManager provides an interface to `nsIObserverService` which takes
+ * care of unregistering the observed topics. Every ObserverManager is bound to
+ * an environment.
+ */
+function ObserverManager(aEnv) {
+  let self = this;
+
+  self.environment = aEnv;
+
+  if (!!aEnv) {
+    self.environment.pushShutdownFunction(function() {
+      self.unregisterAllObservers();
+    });
+  } else {
+    // aEnv is not defined! Try to report an error.
+    if (!!Logger) {
+      Logger.warning(Logger.TYPE_INTERNAL, "No Environment was specified for " +
+                     "a new ObserverManager! This means that the observers " +
+                     "won't be unregistered!");
     }
-  };
-  SingleTopicObserver.prototype.unregister = function() {
-    if (this.isRegistered) {
-      Services.obs.removeObserver(this, this.topic);
-      this.isRegistered = false;
-    }
-  };
-
-
-
-
+  }
 
   // an object holding all observers for unregistering when unloading the page
-  let observers = [];
+  self.observers = [];
+}
 
-  /**
-   * This function can be called from anywhere; the caller hands over an object
-   * with the keys being the *topic* and the values being the function that
-   * should be called when the topic is observed.
-   */
-  self.observe = function(aList) {
-    for (let topic in aList) {
-      if (aList.hasOwnProperty(topic)) {
-        observers.push(new SingleTopicObserver(topic, aList[topic]));
-      }
+/**
+ * This function can be called from anywhere; the caller hands over an object
+ * with the keys being the *topic* and the values being the function that
+ * should be called when the topic is observed.
+ */
+ObserverManager.prototype.observe = function(aList) {
+  let self = this;
+  for (let topic in aList) {
+    if (aList.hasOwnProperty(topic)) {
+      self.observers.push(new SingleTopicObserver(topic, aList[topic]));
     }
-  };
+  }
+};
 
-  self.observePrefChanges = self.observe.bind(self,
-      "requestpolicy-prefs-changed");
+ObserverManager.prototype.observePrefChanges = function(aFunctionToCall) {
+  let self = this;
+  self.observe({"requestpolicy-prefs-changed": aFunctionToCall});
+};
 
-
-
-
-
-
-  /**
-   * The function will unregister all registered observers.
-   */
-  ProcessEnvironment.pushShutdownFunction(function() {
-    while (observers.length > 0) {
-      let observer = observers.pop();
-      Logger.dump("Unregistering observer for topic " + observer.topic);
-      observer.unregister();
-    }
-  });
-
-  return self;
-}());
+/**
+ * The function will unregister all registered observers.
+ */
+ObserverManager.prototype.unregisterAllObservers = function() {
+  let self = this;
+  while (self.observers.length > 0) {
+    let observer = self.observers.pop();
+    Logger.dump("Unregistering observer for topic " + observer.topic);
+    observer.unregister();
+  }
+};

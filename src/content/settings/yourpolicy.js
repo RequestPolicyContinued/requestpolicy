@@ -230,7 +230,7 @@ function onload() {
   }
 
   // observe rule changes and update the table then
-  ObserverManager.observe({
+  WinEnv.obMan.observe({
     "requestpolicy-rules-changed": function(subject, topic, data) {
       var search = document.getElementById('rulesearch');
       populateRuleTable(search.value);

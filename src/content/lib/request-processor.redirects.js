@@ -36,7 +36,7 @@ ScriptLoader.importModules([
   "request",
   "request-result",
   "http-response",
-  "observer-manager"
+  "process-environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "requestpolicy-service": ["rpService"]
@@ -58,7 +58,7 @@ let RequestProcessor = (function(self) {
 
 
 
-  ObserverManager.observe({
+  ProcessEnvironment.obMan.observe({
     "http-on-examine-response": function(subject) {
       examineHttpResponse(subject);
     },

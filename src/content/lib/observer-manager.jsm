@@ -21,47 +21,40 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// TODO: convert this file into a module, as we now have `ProcessEnvironment`
-//       which handles startup and shutdown and can be imported from anywhere.
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["ObserverManager"];
+
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+
+let {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
+
+// Load the Logger at startup-time, not at load-time!
+// ( On load-time Looger might be null. )
+let Logger;
+ProcessEnvironment.enqueueStartupFunction(function() {
+  Logger = ScriptLoader.importModule("logger").Logger;
+});
+
 
 /**
  * The ObserverManager provides an interface to `nsIObserverService` which takes
  * care of unregistering the observed topics.
- * There are two ways how to get an instance of this manager.
- *   (a) if the topics should be observed only as long as a DOM Window lives,
- *       then this *.js file should be loaded **directly** into that window.
- *   (b) if the topics should be observed as long as RP is activated, then the
- *       **module** `observer-manager.jsm` has to be used instead.
- *
- * Note that when this file is loaded directly (case (a)), the ObserverManager
- * is created only once, i.e. if it is not existant yet!
  */
-var ObserverManager = ObserverManager || (function() {
+let ObserverManager = (function() {
   let self = {};
-
-
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
-
-  let ScriptLoader;
-  {
-    let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-    ScriptLoader = mod.ScriptLoader;
-  }
-  let Logger;
-  let {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
-
 
   /**
    * This Object registers itself to `nsIObserverService` on behalf of some other
-   * object. The `observe` function called by `nsIObserverService` is handed over
-   * by the *real* observer.
+   * object.
    */
   function SingleTopicObserver(aTopic, aFunctionToCall) {
     // save the parameters
     this.topic = aTopic;
+    // As the `observe` function, take directly the parameter.
     this.observe = aFunctionToCall;
 
     // currently this obserer is not rgistered yet
@@ -110,10 +103,6 @@ var ObserverManager = ObserverManager || (function() {
 
 
 
-  ProcessEnvironment.enqueueStartupFunction(function() {
-    // Load the Logger now, not earlier. Otherwise it could be null.
-    Logger = ScriptLoader.importModule("logger").Logger;
-  });
 
   /**
    * The function will unregister all registered observers.

@@ -14,10 +14,9 @@ ScriptLoader.importModules([
   "logger",
   "subscription",
   "policy-manager",
-  "requestpolicy-service"
+  "requestpolicy-service",
+  "observer-manager"
 ], this);
-
-Logger.dump("  p!! ");
 
 
 const COMMON_STRINGS = [
@@ -220,9 +219,6 @@ common.localize = function(stringNames) {
   });
 };
 
-
-Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/lib/observer-manager.js", this);
 
 
 $(function() {

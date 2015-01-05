@@ -31,8 +31,8 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "process-environment",
-  "prefs"
+  "lib/process-environment",
+  "lib/prefs"
 ], this);
 
 

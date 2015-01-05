@@ -32,9 +32,9 @@ let EXPORTED_SYMBOLS = [
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "utils/domains",
-  "constants"
+  "lib/logger",
+  "lib/utils/domains",
+  "lib/constants"
 ], this);
 
 

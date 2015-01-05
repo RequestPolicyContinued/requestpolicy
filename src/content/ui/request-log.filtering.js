@@ -36,7 +36,7 @@ window.requestpolicy.requestLog = (function (self) {
     ScriptLoader = mod.ScriptLoader;
     Services = mod.Services;
   }
-  let {Utils} = ScriptLoader.importModule("utils");
+  let {Utils} = ScriptLoader.importModule("lib/utils");
 
   let filterText = null;
 

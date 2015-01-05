@@ -38,10 +38,10 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "ruleset",
-  "utils/files",
-  "ruleset-storage"
+  "lib/logger",
+  "lib/ruleset",
+  "lib/utils/files",
+  "lib/ruleset-storage"
 ], this);
 
 const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';

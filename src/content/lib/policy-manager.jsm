@@ -33,11 +33,11 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "request-result",
-  "ruleset",
-  "ruleset-storage",
-  "constants"
+  "lib/logger",
+  "lib/request-result",
+  "lib/ruleset",
+  "lib/ruleset-storage",
+  "lib/constants"
 ], this);
 
 

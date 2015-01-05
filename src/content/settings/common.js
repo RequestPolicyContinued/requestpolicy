@@ -7,15 +7,15 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "constants",
-  "utils/strings",
-  "prefs",
-  "utils/domains",
-  "logger",
-  "subscription",
-  "policy-manager",
-  "requestpolicy-service",
-  "environment"
+  "lib/constants",
+  "lib/utils/strings",
+  "lib/prefs",
+  "lib/utils/domains",
+  "lib/logger",
+  "lib/subscription",
+  "lib/policy-manager",
+  "lib/requestpolicy-service",
+  "lib/environment"
 ], this);
 
 // create a new Environment for this window

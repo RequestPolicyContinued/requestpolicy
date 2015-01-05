@@ -33,9 +33,9 @@ Cu.import("resource://gre/modules/AddonManager.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "prefs",
-  "constants",
-  "process-environment"
+  "lib/prefs",
+  "lib/constants",
+  "lib/process-environment"
 ], this);
 
 

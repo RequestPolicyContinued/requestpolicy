@@ -37,10 +37,10 @@ let rpWindowManager = (function(self) {
 
   Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
-    "utils",
-    "utils/xul",
-    "constants",
-    "process-environment"
+    "lib/utils",
+    "lib/utils/xul",
+    "lib/constants",
+    "lib/process-environment"
   ], globalScope);
 
   // import the WindowListener

@@ -42,15 +42,15 @@ requestpolicy.overlay = (function() {
   }
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
-  let {Logger} = iMod("logger");
-  let {rpPrefBranch, Prefs} = iMod("prefs");
-  let {RequestProcessor} = iMod("request-processor");
-  let {PolicyManager} = iMod("policy-manager");
-  let {DomainUtil} = iMod("utils/domains");
-  let {StringUtils} = iMod("utils/strings");
-  let {DOMUtils} = iMod("utils/dom");
-  let {rpService} = iMod("requestpolicy-service");
-  let {MMID} = iMod("constants");
+  let {Logger} = iMod("lib/logger");
+  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
+  let {RequestProcessor} = iMod("lib/request-processor");
+  let {PolicyManager} = iMod("lib/policy-manager");
+  let {DomainUtil} = iMod("lib/utils/domains");
+  let {StringUtils} = iMod("lib/utils/strings");
+  let {DOMUtils} = iMod("lib/utils/dom");
+  let {rpService} = iMod("lib/requestpolicy-service");
+  let {MMID} = iMod("lib/constants");
 
   let $ = function(id) {
     return document.getElementById(id);

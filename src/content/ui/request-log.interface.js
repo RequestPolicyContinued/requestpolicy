@@ -37,9 +37,9 @@ window.requestpolicy.requestLog = (function (self) {
     ScriptLoader = mod.ScriptLoader;
     Services = mod.Services;
   }
-  let {DomainUtil} = ScriptLoader.importModule("utils/domains");
-  let {StringUtils} = ScriptLoader.importModule("utils/strings");
-  let {Utils} = ScriptLoader.importModule("utils");
+  let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
+  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
+  let {Utils} = ScriptLoader.importModule("lib/utils");
 
 
 

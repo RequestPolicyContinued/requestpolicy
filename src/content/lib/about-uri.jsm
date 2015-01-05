@@ -32,7 +32,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModule("process-environment", this);
+ScriptLoader.importModule("lib/process-environment", this);
 
 var filenames = {
   "basicprefs": "basicprefs.html",

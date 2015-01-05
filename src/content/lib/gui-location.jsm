@@ -33,7 +33,7 @@ let EXPORTED_SYMBOLS = [
 ];
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["constants"], this);
+ScriptLoader.importModules(["lib/constants"], this);
 
 
 function GUILocation(value, properties) {

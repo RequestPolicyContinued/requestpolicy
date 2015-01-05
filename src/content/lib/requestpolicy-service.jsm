@@ -33,16 +33,16 @@ Cu.import("resource://gre/modules/AddonManager.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "prefs",
-  "utils/domains",
-  "policy-manager",
-  "request-processor",
-  "subscription",
-  "utils",
-  "content-policy",
-  "constants",
-  "process-environment"
+  "lib/logger",
+  "lib/prefs",
+  "lib/utils/domains",
+  "lib/policy-manager",
+  "lib/request-processor",
+  "lib/subscription",
+  "lib/utils",
+  "lib/content-policy",
+  "lib/constants",
+  "lib/process-environment"
 ], this);
 
 

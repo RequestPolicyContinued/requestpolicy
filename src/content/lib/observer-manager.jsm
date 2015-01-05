@@ -30,13 +30,13 @@ let EXPORTED_SYMBOLS = ["ObserverManager"];
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 
-let {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
+let {ProcessEnvironment} = ScriptLoader.importModule("lib/process-environment");
 
 // Load the Logger at startup-time, not at load-time!
 // ( On load-time Logger might be null. )
 let Logger;
 ProcessEnvironment.enqueueStartupFunction(function() {
-  Logger = ScriptLoader.importModule("logger").Logger;
+  Logger = ScriptLoader.importModule("lib/logger").Logger;
 });
 
 

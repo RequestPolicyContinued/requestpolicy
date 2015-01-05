@@ -28,18 +28,18 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "prefs",
-  "policy-manager",
-  "utils/domains",
-  "utils",
-  "request",
-  "request-result",
-  "http-response",
-  "process-environment"
+  "lib/logger",
+  "lib/prefs",
+  "lib/policy-manager",
+  "lib/utils/domains",
+  "lib/utils",
+  "lib/request",
+  "lib/request-result",
+  "lib/http-response",
+  "lib/process-environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
-  "requestpolicy-service": ["rpService"]
+  "lib/requestpolicy-service": ["rpService"]
 }, this);
 
 

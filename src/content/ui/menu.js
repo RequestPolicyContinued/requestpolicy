@@ -37,23 +37,18 @@ requestpolicy.menu = (function() {
   }
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
-  let {Logger} = iMod("logger");
-  let {rpPrefBranch, Prefs} = iMod("prefs");
-  let {RequestProcessor} = iMod("request-processor");
-  let {PolicyManager} = iMod("policy-manager");
-  let {DomainUtil} = iMod("utils/domains");
-  let {Ruleset} = iMod("ruleset");
+  let {Logger} = iMod("lib/logger");
+  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
+  let {RequestProcessor} = iMod("lib/request-processor");
+  let {PolicyManager} = iMod("lib/policy-manager");
+  let {DomainUtil} = iMod("lib/utils/domains");
+  let {Ruleset} = iMod("lib/ruleset");
   let {GUIOrigin, GUIDestination,
-       GUILocation, GUILocationProperties} = iMod("gui-location");
-  let {StringUtils} = iMod("utils/strings");
-  let {DOMUtils} = iMod("utils/dom");
-  let {rpService} = iMod("requestpolicy-service");
-  let {RULE_ACTION_ALLOW, RULE_ACTION_DENY} = iMod("constants");
-
-
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-  ScriptLoader.importModules([
-  ], this);
+       GUILocation, GUILocationProperties} = iMod("lib/gui-location");
+  let {StringUtils} = iMod("lib/utils/strings");
+  let {DOMUtils} = iMod("lib/utils/dom");
+  let {rpService} = iMod("lib/requestpolicy-service");
+  let {RULE_ACTION_ALLOW, RULE_ACTION_DENY} = iMod("lib/constants");
 
 
   let initialized = false;

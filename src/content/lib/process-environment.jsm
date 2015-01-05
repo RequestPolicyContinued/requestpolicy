@@ -61,7 +61,7 @@ Cu.import(scriptLoaderURI, globalScope);
 // =======================================
 // Step 2: load the Environment class
 // ----------------------------------
-ScriptLoader.importModule("environment", globalScope);
+ScriptLoader.importModule("lib/environment", globalScope);
 // =======================================
 
 
@@ -120,9 +120,9 @@ if (ProcessEnvironment.isMainProcess) {
 
       // import the Logger as the first module so that its startup-function
       // will be called after this one
-      ScriptLoader.importModule("logger", globalScope);
-      ScriptLoader.importModules(["requestpolicy-service", "window-manager",
-                                  "about-uri"], globalScope);
+      ScriptLoader.importModule("lib/logger", globalScope);
+      ScriptLoader.importModules(["lib/requestpolicy-service", "lib/window-manager",
+                                  "lib/about-uri"], globalScope);
     }
   });
   // =======================================

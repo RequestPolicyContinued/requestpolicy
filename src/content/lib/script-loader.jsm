@@ -38,7 +38,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 const rpChromeContentURI = 'chrome://requestpolicy/content/';
 
 function getModuleURI(id) {
-  return rpChromeContentURI + "lib/" + id + ".jsm";
+  return rpChromeContentURI + id + ".jsm";
 }
 
 /**

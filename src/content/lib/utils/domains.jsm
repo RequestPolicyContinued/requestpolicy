@@ -30,7 +30,7 @@ let EXPORTED_SYMBOLS = ["DomainUtil"];
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["logger"], this);
+ScriptLoader.importModules(["lib/logger"], this);
 
 /*
  * It's worth noting that many of the functions in this module will convert ACE

@@ -28,7 +28,7 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["logger", "utils/strings"], this);
+ScriptLoader.importModules(["lib/logger", "lib/utils/strings"], this);
 
 let EXPORTED_SYMBOLS = ["XULUtils"];
 

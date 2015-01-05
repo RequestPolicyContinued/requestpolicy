@@ -29,7 +29,7 @@ const toolbarButtonId = "requestpolicyToolbarButton";
 
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["utils/xul", "utils", "logger"], this);
+ScriptLoader.importModules(["lib/utils/xul", "lib/utils", "lib/logger"], this);
 
 if (Utils.info.isAustralis) {
   Components.utils.import("resource:///modules/CustomizableUI.jsm");

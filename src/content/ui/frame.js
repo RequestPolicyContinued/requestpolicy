@@ -42,7 +42,7 @@ Components.utils.import("chrome://requestpolicy/content/lib/script-loader.jsm");
  *     have the same Environment as the modules that will be loaded.
  */
 var WinEnv = (function getWindowEnvironment() {
-  var {ProcessEnvironment} = ScriptLoader.importModule("process-environment");
+  var {ProcessEnvironment} = ScriptLoader.importModule("lib/process-environment");
 
   let env;
 
@@ -50,7 +50,7 @@ var WinEnv = (function getWindowEnvironment() {
   if (ProcessEnvironment.isMainProcess === true) {
     // This is the main process. The `ProcessEnvironment` can't be used as the
     // content window's Environment, so a new Environment has to be created.
-    let {Environment} = ScriptLoader.importModules(["environment"]);
+    let {Environment} = ScriptLoader.importModules(["lib/environment"]);
     env = new Environment();
   } else {
     // This is a child process. The `ProcessEnvironment` can be used for this

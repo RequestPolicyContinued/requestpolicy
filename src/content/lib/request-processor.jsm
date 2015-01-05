@@ -40,18 +40,18 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "prefs",
-  "policy-manager",
-  "utils/domains",
-  "utils",
-  "request",
-  "request-result",
-  "request-set"
+  "lib/logger",
+  "lib/prefs",
+  "lib/policy-manager",
+  "lib/utils/domains",
+  "lib/utils",
+  "lib/request",
+  "lib/request-result",
+  "lib/request-set"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
-  "content-policy": ["PolicyImplementation"],
-  "requestpolicy-service": ["rpService"]
+  "lib/content-policy": ["PolicyImplementation"],
+  "lib/requestpolicy-service": ["rpService"]
 }, this);
 
 

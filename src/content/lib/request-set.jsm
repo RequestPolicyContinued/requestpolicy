@@ -29,9 +29,9 @@ let EXPORTED_SYMBOLS = ["RequestSet"];
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "logger",
-  "utils/domains",
-  "request-result"
+  "lib/logger",
+  "lib/utils/domains",
+  "lib/request-result"
 ], this);
 
 

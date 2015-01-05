@@ -34,7 +34,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 XPCOMUtils.defineLazyModuleGetter(globalScope, "ScriptLoader",
     "chrome://requestpolicy/content/lib/script-loader.jsm");
 XPCOMUtils.defineLazyGetter(globalScope, "ObserverManager", function() {
-  return ScriptLoader.importModule("observer-manager").ObserverManager;
+  return ScriptLoader.importModule("lib/observer-manager").ObserverManager;
 });
 
 

@@ -52,6 +52,10 @@ requestpolicy.overlay = (function() {
   let {rpService} = iMod("requestpolicy-service");
   let {MMID} = iMod("constants");
 
+  let $ = function(id) {
+    return document.getElementById(id);
+  }
+
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
 
   //let _prefetchInfoUri = "http://www.requestpolicy.com/help/prefetch.html";
@@ -148,6 +152,10 @@ requestpolicy.overlay = (function() {
     RequestProcessor.removeRequestObserver(self);
     self._removeHistoryObserver();
     self._removeLocationObserver();
+
+    if ($("requestpolicy-requestLog").hidden === false) {
+      self.toggleRequestLog();
+    }
   };
 
   /**

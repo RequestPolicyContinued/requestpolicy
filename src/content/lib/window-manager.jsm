@@ -25,6 +25,7 @@ let EXPORTED_SYMBOLS = ["rpWindowManager"];
 
 let globalScope = this;
 
+
 let rpWindowManager = (function(self) {
 
   const Ci = Components.interfaces;
@@ -42,6 +43,11 @@ let rpWindowManager = (function(self) {
     "process-environment"
   ], globalScope);
 
+  // import the WindowListener
+  Services.scriptloader.loadSubScript("chrome://requestpolicy/content/lib/" +
+                                      "window-manager.listener.js",
+                                      globalScope);
+
   let styleSheets = [
     "chrome://requestpolicy/skin/requestpolicy.css",
     "chrome://requestpolicy/skin/toolbarbutton.css"
@@ -49,45 +55,10 @@ let rpWindowManager = (function(self) {
 
 
 
-  let WindowListener = {
-    onOpenWindow: function(xulWindow) {
-      let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-          .getInterface(Ci.nsIDOMWindow);
-      addEventListenersToWindow(window);
-    },
-    onCloseWindow: function(xulWindow) {},
-    onWindowTitleChange: function(xulWindow, newTitle) {}
-  }
-
-  function addEventListenersToWindow(window) {
-    function onLoad(event) {
-      window.removeEventListener("load", onLoad);
-      if (window.document.documentElement.getAttribute("windowtype") ==
-          "navigator:browser") {
-        loadIntoWindow(window);
-      } else {
-        window.removeEventListener("unload", onUnload);
-      }
-    }
-
-    function onUnload(event) {
-      window.removeEventListener("unload", onUnload);
-      if (window.document.documentElement.getAttribute("windowtype") ==
-          "navigator:browser") {
-        unloadFromWindow(window);
-      }
-    }
-
-    // Event handler for when the window is closed. We listen for "unload"
-    // rather than "close" because "close" will fire when a print preview
-    // opened from this window is closed.
-    window.addEventListener("unload", onUnload, false);
-
-    // Registers event handlers for documents loaded in the window.
-    window.addEventListener("load", onLoad, false);
-  }
-
   function loadIntoWindow(window) {
+    // ==================================
+    // # 1 : add all XUL elements
+    // --------------------------
     try {
       XULUtils.addTreeElementsToWindow(window, "mainTree");
     } catch (e) {
@@ -95,9 +66,17 @@ let rpWindowManager = (function(self) {
                      "Couldn't add tree elements to window.");
     }
 
+
+    // ==================================
+    // # 2 : create a scope variable for RP for this window
+    // ----------------------------------------------------
+    window.requestpolicy = {};
+
+
+    // ==================================
+    // # 3 : load the overlay's and menu's javascript
+    // ----------------------------------------------
     try {
-      // create a scope variable for RP for this window
-      window.requestpolicy = {};
       Services.scriptloader.loadSubScript(
           "chrome://requestpolicy/content/ui/overlay.js", window);
       Services.scriptloader.loadSubScript(
@@ -109,6 +88,10 @@ let rpWindowManager = (function(self) {
                      "Error loading subscripts for window: "+e, e);
     }
 
+
+    // ==================================
+    // # 4 : toolbar button
+    // --------------------
     try {
       self.addToolbarButtonToWindow(window);
     } catch (e) {
@@ -116,6 +99,10 @@ let rpWindowManager = (function(self) {
                      "button to the window: "+e, e);
     }
 
+
+    // ==================================
+    // # 5 : init the overlay
+    // ----------------------
     try {
       // init and onWindowLoad must be called last, because they assume that
       // everything else is ready
@@ -126,6 +113,8 @@ let rpWindowManager = (function(self) {
                      "An error occurred while initializing the overlay: "+e, e);
     }
 
+    // ==================================
+    // # 6 : load frame scripts
     try {
       window.messageManager.loadFrameScript(
           "chrome://requestpolicy/content/ui/frame.js", true);
@@ -135,14 +124,32 @@ let rpWindowManager = (function(self) {
   }
 
   function unloadFromWindow(window) {
+    // # 6 : unload frame scripts
+    // --------------------------
+    // not needed
+
+
+    // # 5 : "shutdown" the overlay
+    // ----------------------------
     if (window.requestpolicy) {
       window.requestpolicy.overlay.onWindowUnload();
     }
 
-    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
+
+    // # 4 : remove the toolbarbutton
+    // ------------------------------
     self.removeToolbarButtonFromWindow(window);
 
+
+    // # 3 and 2 : remove the `requestpolicy` variable from the window
+    // ---------------------------------------------------------
+    // This wouldn't be needed when the window is closed, but this has to be
+    // done when RP is being disabled.
     delete window.requestpolicy;
+
+
+    // # 1 : remove all XUL elements
+    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
   }
 
 
@@ -151,14 +158,16 @@ let rpWindowManager = (function(self) {
 
   ProcessEnvironment.enqueueStartupFunction(function(data, reason) {
     forEachOpenWindow(loadIntoWindow);
-    Services.wm.addListener(WindowListener);
+    WindowListener.setLoadFunction(loadIntoWindow);
+    WindowListener.setUnloadFunction(unloadFromWindow);
+    WindowListener.startListening();
 
     loadStyleSheets();
   });
 
   ProcessEnvironment.pushShutdownFunction(function() {
     forEachOpenWindow(unloadFromWindow);
-    Services.wm.removeListener(WindowListener);
+    WindowListener.stopListening();
 
     unloadStyleSheets();
   });

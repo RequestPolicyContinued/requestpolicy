@@ -45,7 +45,7 @@ ScriptLoader.importModules([
 
 
 let rpService = (function() {
-  let self;
+  let self = {};
 
   // /////////////////////////////////////////////////////////////////////////
   // Internal Data
@@ -179,76 +179,74 @@ let rpService = (function() {
 
 
 
-  self = {
-    getSubscriptions: function() {
-      return subscriptions;
-    },
+  self.getSubscriptions = function() {
+    return subscriptions;
+  };
 
 
 
 
-    // /////////////////////////////////////////////////////////////////////////
-    // nsIObserver interface
-    // /////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////
+  // nsIObserver interface
+  // /////////////////////////////////////////////////////////////////////////
 
-    observe: function(subject, topic, data) {
-      switch (topic) {
-        case SUBSCRIPTION_UPDATED_TOPIC:
-          Logger.debug(Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
-          // TODO: check if the subscription is enabled. The user might have
-          // disabled it between the time the update started and when it
-          // completed.
-          var subInfo = JSON.parse(data);
-          var failures = PolicyManager.loadSubscriptionRules(subInfo);
-          break;
+  self.observe = function(subject, topic, data) {
+    switch (topic) {
+      case SUBSCRIPTION_UPDATED_TOPIC:
+        Logger.debug(Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
+        // TODO: check if the subscription is enabled. The user might have
+        // disabled it between the time the update started and when it
+        // completed.
+        var subInfo = JSON.parse(data);
+        var failures = PolicyManager.loadSubscriptionRules(subInfo);
+        break;
 
-        case SUBSCRIPTION_ADDED_TOPIC:
-          Logger.debug(Logger.TYPE_INTERNAL, 'XXX added: ' + data);
-          var subInfo = JSON.parse(data);
-          var failures = PolicyManager.loadSubscriptionRules(subInfo);
-          var failed = false;
-          for (var listName in failures) {
-            failed = true;
-          }
-          if (failed) {
-            var serials = {};
-            for (var listName in subInfo) {
-              if (!serials[listName]) {
-                serials[listName] = {};
-              }
-              for (var subName in subInfo[listName]) {
-                serials[listName][subName] = -1;
-              }
+      case SUBSCRIPTION_ADDED_TOPIC:
+        Logger.debug(Logger.TYPE_INTERNAL, 'XXX added: ' + data);
+        var subInfo = JSON.parse(data);
+        var failures = PolicyManager.loadSubscriptionRules(subInfo);
+        var failed = false;
+        for (var listName in failures) {
+          failed = true;
+        }
+        if (failed) {
+          var serials = {};
+          for (var listName in subInfo) {
+            if (!serials[listName]) {
+              serials[listName] = {};
             }
-            let updateCompleted = function(result) {
-              Logger.info(Logger.TYPE_INTERNAL,
-                  'Subscription update completed: ' + result);
+            for (var subName in subInfo[listName]) {
+              serials[listName][subName] = -1;
             }
-            subscriptions.update(updateCompleted, serials);
           }
-          break;
-
-        case SUBSCRIPTION_REMOVED_TOPIC:
-          Logger.debug(Logger.TYPE_INTERNAL, 'YYY: ' + data);
-          var subInfo = JSON.parse(data);
-          var failures = PolicyManager.unloadSubscriptionRules(subInfo);
-          break;
-
-        case "sessionstore-windows-restored":
-          showWelcomeWindow();
-          break;
-
-        // support for old browsers (Firefox <20)
-        case "private-browsing" :
-          if (data == "exit") {
-            PolicyManager.revokeTemporaryRules();
+          let updateCompleted = function(result) {
+            Logger.info(Logger.TYPE_INTERNAL,
+                'Subscription update completed: ' + result);
           }
-          break;
+          subscriptions.update(updateCompleted, serials);
+        }
+        break;
 
-        default :
-          Logger.warning(Logger.TYPE_ERROR, "unknown topic observed: " + topic);
-      }
-    },
+      case SUBSCRIPTION_REMOVED_TOPIC:
+        Logger.debug(Logger.TYPE_INTERNAL, 'YYY: ' + data);
+        var subInfo = JSON.parse(data);
+        var failures = PolicyManager.unloadSubscriptionRules(subInfo);
+        break;
+
+      case "sessionstore-windows-restored":
+        showWelcomeWindow();
+        break;
+
+      // support for old browsers (Firefox <20)
+      case "private-browsing" :
+        if (data == "exit") {
+          PolicyManager.revokeTemporaryRules();
+        }
+        break;
+
+      default :
+        Logger.warning(Logger.TYPE_ERROR, "unknown topic observed: " + topic);
+    }
   };
 
   return self;

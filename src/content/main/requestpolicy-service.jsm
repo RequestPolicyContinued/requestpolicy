@@ -40,7 +40,6 @@ ScriptLoader.importModules([
   "lib/request-processor",
   "lib/subscription",
   "lib/utils",
-  "lib/content-policy",
   "lib/utils/constants",
   "lib/process-environment"
 ], this);
@@ -53,8 +52,6 @@ let rpService = (function() {
   // /////////////////////////////////////////////////////////////////////////
   // Internal Data
   // /////////////////////////////////////////////////////////////////////////
-
-  let rpServiceInitialized = false;
 
   let conflictingExtensions = [];
   let compatibilityRules = [];
@@ -91,28 +88,6 @@ let rpService = (function() {
       }
     }
     Services.prefs.savePrefFile(null);
-  }
-
-  function init() {
-    if (rpServiceInitialized) {
-      return;
-    }
-    rpServiceInitialized = true;
-
-    try {
-      PolicyImplementation.init();
-      register();
-
-      // TODO:
-      //initializePrivateBrowsing();
-
-      // Note that we don't load user preferences at this point because the user
-      // preferences may not be ready. If we tried right now, we may get the
-      // default preferences.
-    } catch(e) {
-      // in case the libraries could not be loaded, the Logger is not available
-      Logger.severeError("exception from init(): " + e, e);
-    }
   }
 
 
@@ -381,22 +356,6 @@ let rpService = (function() {
     subscriptions.update(updateCompleted, serials, defaultPolicy);
   }
 
-  function register() {
-    ProcessEnvironment.obMan.observe({
-      "http-on-modify-request": self.observe,
-      "sessionstore-windows-restored": self.observe,
-      "private-browsing": self.observe,
-      SUBSCRIPTION_UPDATED_TOPIC: self.observe,
-      SUBSCRIPTION_ADDED_TOPIC: self.observe,
-      SUBSCRIPTION_REMOVED_TOPIC: self.observe
-    });
-    AddonManager.addAddonListener(addonListener);
-  }
-
-  function unregister() {
-    AddonManager.removeAddonListener(addonListener);
-  }
-
   // TODO: fix this
   function initializePrivateBrowsing() {
     try {
@@ -437,9 +396,8 @@ let rpService = (function() {
   // startup and shutdown functions
   // /////////////////////////////////////////////////////////////////////////
 
+  // prepare back-end
   ProcessEnvironment.enqueueStartupFunction(function() {
-    init();
-
     loadConfigAndRules();
     // Detect other installed extensions and the current application and do
     // what is needed to allow their requests.
@@ -447,20 +405,31 @@ let rpService = (function() {
     initializeApplicationCompatibility();
   });
 
-  ProcessEnvironment.pushShutdownFunction(function(data, reason) {
-    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
-      handleUninstallOrDisable();
-    }
-    unregister();
-    PolicyImplementation.shutdown(data, reason);
-    rpServiceInitialized = false;
+  // start observers / listeners
+  ProcessEnvironment.enqueueStartupFunction(function() {
+    ProcessEnvironment.obMan.observe({
+      "http-on-modify-request": self.observe,
+      "sessionstore-windows-restored": self.observe,
+      "private-browsing": self.observe,
+      SUBSCRIPTION_UPDATED_TOPIC: self.observe,
+      SUBSCRIPTION_ADDED_TOPIC: self.observe,
+      SUBSCRIPTION_REMOVED_TOPIC: self.observe
+    });
+    AddonManager.addAddonListener(addonListener);
   });
 
-  // TODO: Handle uninstallation in bootstrap.js, not here, RP might be disabled
-  //       when being uninstalled.
-  //ProcessEnvironment.registerUninstallFunction(function(data, reason) {
-  //  handleUninstallOrDisable();
-  //});
+  // stop observers / listeners
+  ProcessEnvironment.pushShutdownFunction(function() {
+    AddonManager.removeAddonListener(addonListener);
+  });
+
+  ProcessEnvironment.pushShutdownFunction(function(data, reason) {
+    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
+      // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
+      //       disabled when being uninstalled.
+      handleUninstallOrDisable();
+    }
+  });
 
 
 

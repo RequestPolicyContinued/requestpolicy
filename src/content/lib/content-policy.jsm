@@ -56,7 +56,7 @@ let PolicyImplementation = (function() {
   /**
    * Registers the content policy on startup.
    */
-  self.init = function() {
+  ProcessEnvironment.enqueueStartupFunction(function() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
                       .registerFactory(self.classID, self.classDescription,
                                        self.contractID, self);
@@ -74,7 +74,7 @@ let PolicyImplementation = (function() {
           Cc['@mozilla.org/uriloader/external-helper-app-service;1']
           .getService(Ci.nsIMIMEService);
     }
-  };
+  });
 
 
   ProcessEnvironment.pushShutdownFunction(function() {

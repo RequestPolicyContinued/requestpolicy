@@ -25,7 +25,7 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-let EXPORTED_SYMBOLS = ["ProcessEnvironment"];
+let EXPORTED_SYMBOLS = ["ProcessEnvironment", "Environment"];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
@@ -123,6 +123,7 @@ if (ProcessEnvironment.isMainProcess) {
       ScriptLoader.importModule("lib/logger", globalScope);
       ScriptLoader.importModules([
         "main/requestpolicy-service",
+        "lib/content-policy",
         "main/window-manager",
         "main/about-uri"
       ], globalScope);

@@ -55,6 +55,39 @@ let WindowUtils = (function() {
                     .getInterface(Ci.nsIDOMWindow);
   };
 
+  //
+  // Private Browsing
+  //
+
+  // depending on the Firefox vesion, create the `isWindowPrivate` function
+  self.isWindowPrivate = (function() {
+    try {
+      // Firefox 20+
+      Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+
+      return (function(aWindow) {
+        return PrivateBrowsingUtils.isWindowPrivate(aWindow)
+      });
+    } catch(e) {
+      // pre Firefox 20
+      try {
+        let pbs = Cc["@mozilla.org/privatebrowsing;1"]
+            .getService(Ci.nsIPrivateBrowsingService);
+
+        return (function(aWindow) {
+          return pbs.privateBrowsingEnabled;
+        });
+      } catch(e) {
+        Components.utils.reportError(e);
+        // It's uncertain if private browsing is possible at all, so assume
+        // that Private Browsing is not possible.
+        return (function(aWindow) {
+          return true;
+        });
+      }
+    }
+  }());
+
 
   //
   // Window & DOM utilities

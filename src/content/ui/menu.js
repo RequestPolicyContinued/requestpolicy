@@ -47,6 +47,7 @@ requestpolicy.menu = (function() {
        GUILocation, GUILocationProperties} = iMod("lib/gui-location");
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
+  let {WindowUtils} = iMod("lib/utils/windows");
   let {rpService} = iMod("main/requestpolicy-service");
   let {C} = iMod("lib/utils/constants");
 
@@ -97,6 +98,16 @@ requestpolicy.menu = (function() {
     }
   };
 
+
+  /**
+   * „Should be permanent rules be displayed or hidden?“
+   */
+  function mayPermRulesBeDisplayed() {
+    return WindowUtils.isWindowPrivate(window) &&
+        !rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
+  }
+
+
   self.prepareMenu = function() {
     try {
       var disabled = Prefs.isBlockingDisabled();
@@ -144,9 +155,6 @@ requestpolicy.menu = (function() {
       self._allRequestsOnDocument = RequestProcessor
             .getAllRequestsInBrowser(gBrowser.selectedBrowser);
       self._allRequestsOnDocument.print("_allRequestsOnDocument");
-
-      self._privateBrowsingEnabled = rpService.isPrivateBrowsingEnabled()
-          && !rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
 
       self._setPrivateBrowsingStyles();
 
@@ -349,13 +357,13 @@ requestpolicy.menu = (function() {
       if (Prefs.isDefaultAllow()) {
         // It seems pretty rare that someone will want to add a rule to block all
         // requests from a given origin.
-        //if (!self._privateBrowsingEnabled) {
+        //if (mayPermRulesBeDisplayed() === true) {
         //  var item = self._addMenuItemDenyOrigin(
         //    self._addRulesList, ruleData);
         //}
         //var item = self._addMenuItemTempDenyOrigin(self._addRulesList, ruleData);
       } else {
-        if (!self._privateBrowsingEnabled) {
+        if (mayPermRulesBeDisplayed() === true) {
           var item = self._addMenuItemAllowOrigin(self._addRulesList, ruleData);
         }
         var item = self._addMenuItemTempAllowOrigin(self._addRulesList, ruleData);
@@ -380,7 +388,7 @@ requestpolicy.menu = (function() {
         //  -- this enables support for blacklisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-          if (!self._privateBrowsingEnabled) {
+          if (mayPermRulesBeDisplayed() === true) {
               var item = self._addMenuItemDenyOriginToDest(
                   self._addRulesList, ruleData);
           }
@@ -390,7 +398,7 @@ requestpolicy.menu = (function() {
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-          if (!self._privateBrowsingEnabled) {
+          if (mayPermRulesBeDisplayed() === true) {
             var item = self._addMenuItemDenyDest(
                 self._addRulesList, destOnlyRuleData);
           }
@@ -406,7 +414,7 @@ requestpolicy.menu = (function() {
         //  -- this enables support for whitelisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-          if (!self._privateBrowsingEnabled) {
+          if (mayPermRulesBeDisplayed() === true) {
             var item = self._addMenuItemAllowOriginToDest(
                 self._addRulesList, ruleData);
           }
@@ -416,7 +424,7 @@ requestpolicy.menu = (function() {
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-          if (!self._privateBrowsingEnabled) {
+          if (mayPermRulesBeDisplayed() === true) {
             var item = self._addMenuItemAllowDest(
                 self._addRulesList, destOnlyRuleData);
           }
@@ -466,7 +474,7 @@ requestpolicy.menu = (function() {
 
   self._setPrivateBrowsingStyles = function() {
     document.getElementById('rp-details').setAttribute(
-      'class', self._privateBrowsingEnabled ? 'privatebrowsing' : '');
+      'class', mayPermRulesBeDisplayed() === true ? '' : 'privatebrowsing');
   };
 
   self._resetSelectedOrigin = function() {
@@ -1181,7 +1189,7 @@ requestpolicy.menu = (function() {
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-        if (!self._privateBrowsingEnabled) {
+        if (mayPermRulesBeDisplayed() === true) {
           var item = self._addMenuItemAllowOriginToDest(list, ruleData);
         }
         var item = self._addMenuItemTempAllowOriginToDest(list, ruleData);
@@ -1194,7 +1202,7 @@ requestpolicy.menu = (function() {
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-        if (!self._privateBrowsingEnabled) {
+        if (mayPermRulesBeDisplayed() === true) {
           var item = self._addMenuItemAllowDest(list, destOnlyRuleData);
         }
         var item = self._addMenuItemTempAllowDest(list, destOnlyRuleData);

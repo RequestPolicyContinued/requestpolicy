@@ -116,17 +116,7 @@ let rpService = (function() {
     subscriptions.update(updateCompleted, serials, defaultPolicy);
   }
 
-  // TODO: fix this
-  function initializePrivateBrowsing() {
-    try {
-      var pbs = Cc["@mozilla.org/privatebrowsing;1"].
-          getService(Ci.nsIPrivateBrowsingService);
-      self._privateBrowsingEnabled = pbs.privateBrowsingEnabled;
-    } catch (e) {
-      // Ignore exceptions from browsers that do not support private browsing.
-    }
-  }
-
+  // TODO: move to window manager
   function showWelcomeWindow() {
     if (!rpPrefBranch.getBoolPref("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
@@ -165,10 +155,14 @@ let rpService = (function() {
   ProcessEnvironment.enqueueStartupFunction(function() {
     ProcessEnvironment.obMan.observe({
       "sessionstore-windows-restored": self.observe,
-      "private-browsing": self.observe,
       SUBSCRIPTION_UPDATED_TOPIC: self.observe,
       SUBSCRIPTION_ADDED_TOPIC: self.observe,
-      SUBSCRIPTION_REMOVED_TOPIC: self.observe
+      SUBSCRIPTION_REMOVED_TOPIC: self.observe,
+
+      // support for old browsers (Firefox <20)
+      // TODO: support per-window temporary rules
+      //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
+      "private-browsing": self.observe
     });
   });
 
@@ -186,13 +180,6 @@ let rpService = (function() {
 
 
   self = {
-    // TODO: private windows instead.
-    _privateBrowsingEnabled : false,
-
-
-    isPrivateBrowsingEnabled: function() {
-      return self._privateBrowsingEnabled;
-    },
     getSubscriptions: function() {
       return subscriptions;
     },
@@ -250,16 +237,16 @@ let rpService = (function() {
         case "sessionstore-windows-restored":
           showWelcomeWindow();
           break;
+
+        // support for old browsers (Firefox <20)
         case "private-browsing" :
-          if (data == "enter") {
-            self._privateBrowsingEnabled = true;
-          } else if (data == "exit") {
-            self._privateBrowsingEnabled = false;
+          if (data == "exit") {
             PolicyManager.revokeTemporaryRules();
           }
           break;
+
         default :
-          Logger.warning(Logger.TYPE_ERROR, "uknown topic observed: " + topic);
+          Logger.warning(Logger.TYPE_ERROR, "unknown topic observed: " + topic);
       }
     },
   };

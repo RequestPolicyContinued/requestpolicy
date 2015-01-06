@@ -19,7 +19,7 @@ var PAGE_STRINGS = [
 $(function () {
   common.localize(PAGE_STRINGS);
   // l10n for input placeholders.
-  $('#rulesearch').prop('placeholder', _('search'));
+  $id("rulesearch").placeholder = _('search');
   $('[name=originscheme]').prop('placeholder', _('scheme'));
   $('[name=destscheme]').prop('placeholder', _('scheme'));
   $('[name=originhost]').prop('placeholder', _('host'));

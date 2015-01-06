@@ -29,7 +29,7 @@ function showConfigure() {
 
 function handleDefaultPolicyChange() {
   rpPrefBranch.setBoolPref('defaultPolicy.allow',
-      $('#defaultallow').prop('checked'));
+      $id("defaultallow").checked);
   Services.prefs.savePrefFile(null);
   setAllowSameDomainBlockDisplay();
   handleSubscriptionsChange();
@@ -37,12 +37,12 @@ function handleDefaultPolicyChange() {
 
 function handleAllowSameDomainChange() {
   rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
-      $('#allowsamedomain').prop('checked'));
+      $id("allowsamedomain").checked);
   Services.prefs.savePrefFile(null);
 }
 
 function setAllowSameDomainBlockDisplay() {
-  if ($('#defaultallow').prop('checked')) {
+  if ($id("defaultallow").checked) {
     $('#allowsamedomainblock').css('display', 'none');
   } else {
     $('#allowsamedomainblock').css('display', 'block');
@@ -50,9 +50,9 @@ function setAllowSameDomainBlockDisplay() {
 }
 
 function handleSubscriptionsChange() {
-  var enableSubs = $('#enablesubs').prop('checked');
-  var enableAllowSubs = enableSubs && $('#defaultdeny').prop('checked');
-  var enableDenySubs = enableSubs && $('#defaultallow').prop('checked');
+  var enableSubs = $id("enablesubs").checked;
+  var enableAllowSubs = enableSubs && $id("defaultdeny").checked;
+  var enableDenySubs = enableSubs && $id("defaultallow").checked;
   var subs = {
     'allow_embedded':{},
     'allow_extensions':{},
@@ -111,9 +111,9 @@ function onload() {
     } else {
       var identLevel = 1;
     }
-    $('#defaultdeny').prop('checked', true);
+    $id("defaultdeny").checked = true;
     $('#allowsamedomainblock').css('display', 'block');
-    $('#allowsamedomain').prop('checked', identLevel == 1);
+    $id("allowsamedomain").checked = identLevel == 1;
 
     // If the user doesn't have any new-style rules, automatically do an import
     // of the old rules. We check for new-style rules just in case the user has
@@ -136,13 +136,13 @@ function onload() {
     showConfigure();
   } else {
     var defaultAllow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
-    $('#defaultallow').prop('checked', defaultAllow);
-    $('#defaultdeny').prop('checked', !defaultAllow);
+    $id("defaultallow").checked = !!defaultAllow;
+    $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
-    $('#allowsamedomain').prop('checked',
-        rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain'));
+    $id("allowsamedomain").checked =
+        rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
     // Subscriptions are only simple here if we assume the user won't open the
     // setup window again after changing their individual subscriptions through
     // the preferences. So, let's assume that as the worst case is that the setup

@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'importOldRules',
   'deleteOldRules',
   'showOldRuleReimportOptions',

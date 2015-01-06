@@ -26,7 +26,7 @@ WinEnv.shutdownOnWindowUnload(content);
 var $id = content.document.getElementById.bind(content.document);
 
 
-const COMMON_STRINGS = [
+var COMMON_STRINGS = [
   'preferences',
   'managePolicies',
   'about',

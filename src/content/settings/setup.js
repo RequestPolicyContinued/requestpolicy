@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'welcomeToRequestPolicy',
   'forMostUsersDefaultsAreIdeal',
   'youCanConfigureRequestPolicyToBeMoreStrict',

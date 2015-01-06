@@ -1021,7 +1021,7 @@ requestpolicy.overlay = (function() {
    */
   self.getTopLevelDocumentUri = function() {
     let uri = gBrowser.selectedBrowser.currentURI.spec;
-    return rpService.getTopLevelDocTranslation(uri) ||
+    return RequestProcessor.getTopLevelDocTranslation(uri) ||
         DomainUtil.stripFragment(uri);
   };
 
@@ -1212,7 +1212,7 @@ requestpolicy.overlay = (function() {
   };
 
   //  showExtensionConflictInfo : function() {
-  //    var ext = rpService.getConflictingExtensions();
+  //    var ext = RequestProcessor.getConflictingExtensions();
   //    var extJson = JSON.stringify(ext);
   //    self._openInNewTab(self._extensionConflictInfoUri
   //        + encodeURIComponent(extJson));

@@ -140,7 +140,7 @@ let RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    let compatibilityRules = rpService.getCompatibilityRules();
+    let compatibilityRules = self.getCompatibilityRules();
     for (var i = 0; i < compatibilityRules.length; i++) {
       var rule = compatibilityRules[i];
       var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;

@@ -92,7 +92,7 @@ requestpolicy.menu = (function() {
       self._addRulesList = document.getElementById("rp-rules-add");
       self._removeRulesList = document.getElementById("rp-rules-remove");
 
-      var conflictCount = rpService.getConflictingExtensions().length;
+      var conflictCount = RequestProcessor.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
     }
   };

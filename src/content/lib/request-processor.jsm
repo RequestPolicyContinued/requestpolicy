@@ -800,7 +800,7 @@ let RequestProcessor = (function(self) {
         return accept("Allowed by subscription policy", request);
       }
 
-      let compatibilityRules = rpService.getCompatibilityRules();
+      let compatibilityRules = self.getCompatibilityRules();
       for (var i = 0; i < compatibilityRules.length; i++) {
         var rule = compatibilityRules[i];
         var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
@@ -1076,3 +1076,5 @@ let RequestProcessor = (function(self) {
 
 Services.scriptloader.loadSubScript('chrome://requestpolicy/content/lib/' +
                                     'request-processor.redirects.js');
+Services.scriptloader.loadSubScript('chrome://requestpolicy/content/lib/' +
+                                    'request-processor.compat.js');

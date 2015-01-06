@@ -233,14 +233,17 @@ let ManagerForDOMContentLoaded = (function() {
   function wrapWindowFunctions(aWindow) {
     wrapWindowFunction(aWindow, "open",
         function(url, windowName, windowFeatures) {
-          rpService.registerLinkClicked(aWindow.document.documentURI, url);
+          sendSyncMessage(C.MMID + ":notifyLinkClicked",
+                          {origin: aWindow.document.documentURI,
+                           dest: url});
         });
 
     wrapWindowFunction(aWindow, "openDialog",
         function() {
           // openDialog(url, name, features, arg1, arg2, ...)
-          rpService.registerLinkClicked(aWindow.document.documentURI,
-              arguments[0]);
+          sendSyncMessage(C.MMID + ":notifyLinkClicked",
+                          {origin: aWindow.document.documentURI,
+                           dest: arguments[0]});
         });
   }
 

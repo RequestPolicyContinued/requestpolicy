@@ -34,7 +34,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/utils/domains",
-  "lib/constants"
+  "lib/utils/constants"
 ], this);
 
 

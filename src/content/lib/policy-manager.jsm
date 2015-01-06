@@ -37,7 +37,7 @@ ScriptLoader.importModules([
   "lib/request-result",
   "lib/ruleset",
   "lib/ruleset-storage",
-  "lib/constants"
+  "lib/utils/constants"
 ], this);
 
 

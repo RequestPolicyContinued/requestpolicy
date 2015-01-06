@@ -23,7 +23,7 @@
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 
-ScriptLoader.importModule("lib/constants", this);
+ScriptLoader.importModule("lib/utils/constants", this);
 
 
 

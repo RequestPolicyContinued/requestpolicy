@@ -39,7 +39,7 @@ let rpWindowManager = (function(self) {
   ScriptLoader.importModules([
     "lib/utils",
     "lib/utils/xul",
-    "lib/constants",
+    "lib/utils/constants",
     "lib/process-environment"
   ], globalScope);
 

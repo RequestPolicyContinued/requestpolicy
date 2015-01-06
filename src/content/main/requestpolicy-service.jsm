@@ -41,7 +41,7 @@ ScriptLoader.importModules([
   "lib/subscription",
   "lib/utils",
   "lib/content-policy",
-  "lib/constants",
+  "lib/utils/constants",
   "lib/process-environment"
 ], this);
 

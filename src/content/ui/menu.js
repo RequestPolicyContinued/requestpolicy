@@ -47,7 +47,7 @@ requestpolicy.menu = (function() {
        GUILocation, GUILocationProperties} = iMod("lib/gui-location");
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
-  let {rpService} = iMod("lib/requestpolicy-service");
+  let {rpService} = iMod("main/requestpolicy-service");
   let {RULE_ACTION_ALLOW, RULE_ACTION_DENY} = iMod("lib/constants");
 
 

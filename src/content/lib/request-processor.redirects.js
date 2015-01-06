@@ -39,7 +39,7 @@ ScriptLoader.importModules([
   "lib/process-environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
-  "lib/requestpolicy-service": ["rpService"]
+  "main/requestpolicy-service": ["rpService"]
 }, this);
 
 

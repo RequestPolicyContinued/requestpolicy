@@ -49,7 +49,7 @@ requestpolicy.overlay = (function() {
   let {DomainUtil} = iMod("lib/utils/domains");
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
-  let {rpService} = iMod("lib/requestpolicy-service");
+  let {rpService} = iMod("main/requestpolicy-service");
   let {MMID} = iMod("lib/constants");
 
   let $ = function(id) {

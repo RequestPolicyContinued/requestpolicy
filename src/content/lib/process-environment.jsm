@@ -121,8 +121,11 @@ if (ProcessEnvironment.isMainProcess) {
       // import the Logger as the first module so that its startup-function
       // will be called after this one
       ScriptLoader.importModule("lib/logger", globalScope);
-      ScriptLoader.importModules(["lib/requestpolicy-service", "lib/window-manager",
-                                  "lib/about-uri"], globalScope);
+      ScriptLoader.importModules([
+        "main/requestpolicy-service",
+        "main/window-manager",
+        "main/about-uri"
+      ], globalScope);
     }
   });
   // =======================================

@@ -44,7 +44,7 @@ let rpWindowManager = (function(self) {
   ], globalScope);
 
   // import the WindowListener
-  Services.scriptloader.loadSubScript("chrome://requestpolicy/content/lib/" +
+  Services.scriptloader.loadSubScript("chrome://requestpolicy/content/main/" +
                                       "window-manager.listener.js",
                                       globalScope);
 
@@ -216,5 +216,5 @@ let rpWindowManager = (function(self) {
 
 // extend rpWindowManager
 Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/lib/window-manager-toolbarbutton.js",
+    "chrome://requestpolicy/content/main/window-manager-toolbarbutton.js",
     globalScope);

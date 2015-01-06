@@ -18,7 +18,7 @@ var addHostWildcard = true;
 
 
 function clearRulesTable() {
-  var table = document.getElementById('rules');
+  var table = $id('rules');
   var children = table.getElementsByTagName('tr');
   while (children.length) {
     var child = children.item(0);
@@ -27,7 +27,7 @@ function clearRulesTable() {
 }
 
 function populateRuleTable() {
-  var table = document.getElementById('rules');
+  var table = $id('rules');
   // Setting the global rules var here.
   rules = common.getOldRulesAsNewRules(addHostWildcard);
 

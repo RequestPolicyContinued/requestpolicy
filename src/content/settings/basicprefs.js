@@ -20,16 +20,16 @@ var prefsChangedObserver = null;
 
 function updateDisplay() {
   var indicate = rpPrefBranch.getBoolPref('indicateBlockedObjects');
-  document.getElementById('pref-indicateBlockedObjects').checked = indicate;
-  document.getElementById('indicateBlockedImages-details').hidden = !indicate;
+  $id('pref-indicateBlockedObjects').checked = indicate;
+  $id('indicateBlockedImages-details').hidden = !indicate;
 
-  document.getElementById('pref-dontIndicateBlacklistedObjects').checked =
+  $id('pref-dontIndicateBlacklistedObjects').checked =
       !rpPrefBranch.getBoolPref('indicateBlacklistedObjects');
 
-  document.getElementById('pref-autoReload').checked =
+  $id('pref-autoReload').checked =
       rpPrefBranch.getBoolPref('autoReload');
 
-  document.getElementById('pref-privateBrowsingPermanentWhitelisting').checked =
+  $id('pref-privateBrowsingPermanentWhitelisting').checked =
       rpPrefBranch.getBoolPref('privateBrowsingPermanentWhitelisting');
 
 //  if (rpPrefBranch.getBoolPref('defaultPolicy.allow')) {
@@ -37,14 +37,14 @@ function updateDisplay() {
 //  } else {
 //    var word = 'block';
 //  }
-//  document.getElementById('defaultpolicyword').innerHTML = word;
+//  $id('defaultpolicyword').innerHTML = word;
 }
 
 
 function onload() {
   updateDisplay();
 
-  document.getElementById('pref-indicateBlockedObjects').addEventListener('change',
+  $id('pref-indicateBlockedObjects').addEventListener('change',
       function (event) {
         rpPrefBranch.setBoolPref('indicateBlockedObjects', event.target.checked);
         Services.prefs.savePrefFile(null);
@@ -52,7 +52,7 @@ function onload() {
       }
   );
 
-  document.getElementById('pref-dontIndicateBlacklistedObjects').addEventListener('change',
+  $id('pref-dontIndicateBlacklistedObjects').addEventListener('change',
       function (event) {
         Prefs.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
         Services.prefs.savePrefFile(null);
@@ -60,7 +60,7 @@ function onload() {
       }
   );
 
-  document.getElementById('pref-autoReload').addEventListener('change',
+  $id('pref-autoReload').addEventListener('change',
     function(event) {
       rpPrefBranch.setBoolPref('autoReload', event.target.checked);
       Services.prefs.savePrefFile(null);
@@ -68,7 +68,7 @@ function onload() {
     }
   );
 
-  document.getElementById('pref-privateBrowsingPermanentWhitelisting')
+  $id('pref-privateBrowsingPermanentWhitelisting')
       .addEventListener('change', function (event) {
         rpPrefBranch.setBoolPref('privateBrowsingPermanentWhitelisting',
                                  event.target.checked);

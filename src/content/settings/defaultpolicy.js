@@ -23,25 +23,25 @@ var prefsChangedObserver = null;
 function updateDisplay() {
   var defaultallow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
-    document.getElementById('defaultallow').checked = true;
-    document.getElementById('defaultdenysetting').hidden = true;
+    $id('defaultallow').checked = true;
+    $id('defaultdenysetting').hidden = true;
   } else {
-    document.getElementById('defaultdeny').checked = true;
-    document.getElementById('defaultdenysetting').hidden = false;
+    $id('defaultdeny').checked = true;
+    $id('defaultdenysetting').hidden = false;
   }
 
   var allowsamedomain = rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
-  document.getElementById('allowsamedomain').checked = allowsamedomain;
+  $id('allowsamedomain').checked = allowsamedomain;
 }
 
 function showManageSubscriptionsLink() {
-  document.getElementById('subscriptionschanged').style.display = 'block';
+  $id('subscriptionschanged').style.display = 'block';
 }
 
 function onload() {
   updateDisplay();
 
-  document.getElementById('defaultallow').addEventListener('change',
+  $id('defaultallow').addEventListener('change',
       function (event) {
         var allow = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allow', allow);
@@ -53,7 +53,7 @@ function onload() {
         showManageSubscriptionsLink();
       }
   );
-  document.getElementById('defaultdeny').addEventListener('change',
+  $id('defaultdeny').addEventListener('change',
       function (event) {
         var deny = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allow', !deny);
@@ -65,7 +65,7 @@ function onload() {
         showManageSubscriptionsLink();
       }
   );
-  document.getElementById('allowsamedomain').addEventListener('change',
+  $id('allowsamedomain').addEventListener('change',
       function (event) {
         var allowSameDomain = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',

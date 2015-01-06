@@ -51,9 +51,7 @@ requestpolicy.overlay = (function() {
   let {DOMUtils} = iMod("lib/utils/dom");
   let {C} = iMod("lib/utils/constants");
 
-  let $ = function(id) {
-    return document.getElementById(id);
-  }
+  let $id = document.getElementById.bind(document);
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
 
@@ -108,12 +106,11 @@ requestpolicy.overlay = (function() {
 
         requestpolicy.menu.init();
 
-        popupElement = document.getElementById("rp-popup");
+        popupElement = $id("rp-popup");
 
-        //statusbar = document.getElementById("status-bar");
-        //rpContextMenu = document
-        //    .getElementById("requestpolicyContextMenu");
-        toolbox = document.getElementById("navigator-toolbox");
+        //statusbar = $id("status-bar");
+        //rpContextMenu = $id("requestpolicyContextMenu");
+        toolbox = $id("navigator-toolbox");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
@@ -152,7 +149,7 @@ requestpolicy.overlay = (function() {
     self._removeHistoryObserver();
     self._removeLocationObserver();
 
-    if ($("requestpolicy-requestLog").hidden === false) {
+    if ($id("requestpolicy-requestLog").hidden === false) {
       self.toggleRequestLog();
     }
   };
@@ -168,7 +165,7 @@ requestpolicy.overlay = (function() {
     //try {
       // Info on detecting page load at:
       // http://developer.mozilla.org/En/Code_snippets/On_page_load
-      var appcontent = document.getElementById("appcontent"); // browser
+      var appcontent = $id("appcontent"); // browser
       const requestpolicyOverlay = this;
       if (appcontent) {
         if (isFennec) {
@@ -289,7 +286,7 @@ requestpolicy.overlay = (function() {
 
       // Add an event listener for when the contentAreaContextMenu (generally
       // the right-click menu within the document) is shown.
-      var contextMenu = document.getElementById("contentAreaContextMenu");
+      var contextMenu = $id("contentAreaContextMenu");
       if (contextMenu) {
         contextMenu.addEventListener("popupshowing",
             self._contextMenuOnPopupShowing, false);
@@ -485,7 +482,7 @@ requestpolicy.overlay = (function() {
 
 
     var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
-    var addRulePopup = document.getElementById(addRuleMenuName);
+    var addRulePopup = $id(addRuleMenuName);
     DOMUtils.removeChildren(addRulePopup);
 
     let m = requestpolicy.menu;
@@ -609,7 +606,7 @@ requestpolicy.overlay = (function() {
    * Sets the blocked content notifications visible to the user.
    */
   self._setContentBlockedState = function(isContentBlocked) {
-    var button = document.getElementById(toolbarButtonId);
+    var button = $id(toolbarButtonId);
     if (button) {
       button.setAttribute("requestpolicyBlocked", isContentBlocked);
     }
@@ -635,7 +632,7 @@ requestpolicy.overlay = (function() {
    * Sets the permissive status visible to the user for just this window.
    */
   self._setPermissiveNotification = function(isPermissive) {
-    var button = document.getElementById(toolbarButtonId);
+    var button = $id(toolbarButtonId);
     if (button) {
       button.setAttribute("requestpolicyPermissive", isPermissive);
     }
@@ -1035,8 +1032,8 @@ requestpolicy.overlay = (function() {
     Prefs.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
-    document.getElementById('rp-link-enable-blocking').hidden = !disabled;
-    document.getElementById('rp-link-disable-blocking').hidden = disabled;
+    $id('rp-link-enable-blocking').hidden = !disabled;
+    $id('rp-link-disable-blocking').hidden = disabled;
 
     self._setPermissiveNotificationForAllWindows(disabled);
   };
@@ -1157,7 +1154,7 @@ requestpolicy.overlay = (function() {
     // directly specify the width of the entire popup.
     //Logger.dump('popup width: ' + popup.clientWidth);
     var popupWidth = popupElement.clientWidth ? 730 : popupElement.clientWidth;
-    var anchor = document.getElementById('content');
+    var anchor = $id('content');
     var contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
     var xOffset = contentWidth - popupWidth - 2;
@@ -1202,14 +1199,13 @@ requestpolicy.overlay = (function() {
   };
 
   self.toggleRequestLog = function() {
-    var requestLog = document.getElementById("requestpolicy-requestLog");
-    var requestLogSplitter = document.getElementById("requestpolicy-requestLog-splitter");
-    var requestLogFrame = document.getElementById("requestpolicy-requestLog-frame");
-    //var openRequestLog = document.getElementById("requestpolicyOpenRequestLog");
+    var requestLog = $id("requestpolicy-requestLog");
+    var requestLogSplitter = $id("requestpolicy-requestLog-splitter");
+    var requestLogFrame = $id("requestpolicy-requestLog-frame");
+    //var openRequestLog = $id("requestpolicyOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.
-    //var closeRequestLog = document
-    //    .getElementById("requestpolicyCloseRequestLog");
+    //var closeRequestLog = $id("requestpolicyCloseRequestLog");
     var closeRequestLog = {};
 
     if (requestLog.hidden) {

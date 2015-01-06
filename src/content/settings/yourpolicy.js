@@ -35,7 +35,7 @@ var searchTimeoutId = null;
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
-  var table = document.getElementById('rules');
+  var table = $id('rules');
 
   clearRulesTable(table);
 
@@ -151,7 +151,7 @@ function addRule() {
     alert('Unable to add rule: ' + e.toString());
     return;
   }
-  var search = document.getElementById('rulesearch');
+  var search = $id('rulesearch');
 
   // the table is repopulated through the RulesChangedObserver
 }
@@ -215,7 +215,7 @@ function addRuleHelper() {
 
 
 function onload() {
-  var search = document.getElementById('rulesearch');
+  var search = $id('rulesearch');
   search.addEventListener('keyup', function (event) {
     if (searchTimeoutId != null) {
       clearTimeout(searchTimeoutId);
@@ -232,7 +232,7 @@ function onload() {
   // observe rule changes and update the table then
   WinEnv.obMan.observe({
     "requestpolicy-rules-changed": function(subject, topic, data) {
-      var search = document.getElementById('rulesearch');
+      var search = $id('rulesearch');
       populateRuleTable(search.value);
     }
   });

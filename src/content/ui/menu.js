@@ -51,6 +51,9 @@ requestpolicy.menu = (function() {
   let {C} = iMod("lib/utils/constants");
 
 
+  let $id = document.getElementById.bind(document);
+
+
   let initialized = false;
 
 
@@ -79,18 +82,15 @@ requestpolicy.menu = (function() {
       initialized = true;
 
       self._originItem = document.getElementById("rp-origin");
-      self._originDomainnameItem = document.getElementById('rp-origin-domainname');
-      self._originNumRequestsItem = document.getElementById('rp-origin-num-requests');
+      self._originDomainnameItem = $id('rp-origin-domainname');
+      self._originNumRequestsItem = $id('rp-origin-num-requests');
 
-      self._otherOriginsList = document.getElementById("rp-other-origins-list");
-      self._blockedDestinationsList = document
-            .getElementById("rp-blocked-destinations-list");
-      self._mixedDestinationsList = document
-            .getElementById("rp-mixed-destinations-list");
-      self._allowedDestinationsList = document
-            .getElementById("rp-allowed-destinations-list");
-      self._addRulesList = document.getElementById("rp-rules-add");
-      self._removeRulesList = document.getElementById("rp-rules-remove");
+      self._otherOriginsList = $id("rp-other-origins-list");
+      self._blockedDestinationsList = $id("rp-blocked-destinations-list");
+      self._mixedDestinationsList = $id("rp-mixed-destinations-list");
+      self._allowedDestinationsList = $id("rp-allowed-destinations-list");
+      self._addRulesList = $id("rp-rules-add");
+      self._removeRulesList = $id("rp-rules-remove");
 
       var conflictCount = RequestProcessor.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
@@ -110,10 +110,10 @@ requestpolicy.menu = (function() {
   self.prepareMenu = function() {
     try {
       var disabled = Prefs.isBlockingDisabled();
-      document.getElementById('rp-link-enable-blocking').hidden = !disabled;
-      document.getElementById('rp-link-disable-blocking').hidden = disabled;
+      $id('rp-link-enable-blocking').hidden = !disabled;
+      $id('rp-link-disable-blocking').hidden = disabled;
 
-      document.getElementById('rp-revoke-temporary-permissions').hidden =
+      $id('rp-revoke-temporary-permissions').hidden =
           !PolicyManager.temporaryRulesExist();
 
       self._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
@@ -170,7 +170,7 @@ requestpolicy.menu = (function() {
 
       self._populateOrigin();
       self._populateOtherOrigins();
-      self._activateOriginItem(self._originItem);
+      self._activateOriginItem($id("rp-origin"));
 
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
@@ -194,10 +194,10 @@ requestpolicy.menu = (function() {
         self._allowedDestinationsList,
         self._removeRulesList,
         self._addRulesList]);
-    document.getElementById('rp-other-origins').hidden = true;
-    document.getElementById('rp-blocked-destinations').hidden = true;
-    document.getElementById('rp-mixed-destinations').hidden = true;
-    document.getElementById('rp-allowed-destinations').hidden = true;
+    $id('rp-other-origins').hidden = true;
+    $id('rp-blocked-destinations').hidden = true;
+    $id('rp-mixed-destinations').hidden = true;
+    $id('rp-allowed-destinations').hidden = true;
     // TODO: show some message about why the menu is empty.
   };
 
@@ -273,7 +273,7 @@ requestpolicy.menu = (function() {
   self._populateOtherOrigins = function() {
     var guiOrigins = self._getOtherOriginsAsGUILocations();
     self._populateList(self._otherOriginsList, guiOrigins);
-    document.getElementById('rp-other-origins').hidden = guiOrigins.length == 0;
+    $id('rp-other-origins').hidden = guiOrigins.length == 0;
   };
 
   self._populateDestinations = function(originIdentifier) {
@@ -325,16 +325,15 @@ requestpolicy.menu = (function() {
 
     self._populateList(self._blockedDestinationsList,
         destsWithSolelyBlockedRequests);
-    document.getElementById('rp-blocked-destinations').hidden =
+    $id('rp-blocked-destinations').hidden =
         destsWithSolelyBlockedRequests.length == 0;
 
     self._populateList(self._mixedDestinationsList, destsMixed);
-    document.getElementById('rp-mixed-destinations').hidden =
-        destsMixed.length == 0;
+    $id('rp-mixed-destinations').hidden = destsMixed.length == 0;
 
     self._populateList(self._allowedDestinationsList,
         destsWithSolelyAllowedRequests);
-    document.getElementById('rp-allowed-destinations').hidden =
+    $id('rp-allowed-destinations').hidden =
         destsWithSolelyAllowedRequests.length == 0;
   };
 
@@ -472,8 +471,8 @@ requestpolicy.menu = (function() {
   };
 
   self._setPrivateBrowsingStyles = function() {
-    document.getElementById('rp-details').setAttribute(
-      'class', mayPermRulesBeDisplayed() === true ? '' : 'privatebrowsing');
+    let val = mayPermRulesBeDisplayed() === true ? '' : 'privatebrowsing';
+    $id('rp-details').setAttribute('class', val);
   };
 
   self._resetSelectedOrigin = function() {

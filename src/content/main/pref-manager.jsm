@@ -85,11 +85,13 @@ let PrefManager = (function() {
     // to handle their default preferences manually, see Mozilla Bug 564675:
     // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
     // The scope of that script doesn't need to be remembered.
-    Services.scriptloader.loadSubScript("chrome://requestpolicy/content/lib/"+
-                                        "default-prefs-initializer.js", {});
+    Services.scriptloader.loadSubScript("chrome://requestpolicy/content/main/" +
+                                        "default-pref-handler.js", {});
+
+
     // ================================
-
-
+    // Link/DNS prefetching
+    // --------------------
     // Disable link prefetch.
     if (rpPrefBranch.getBoolPref("prefetch.link.disableOnStartup")) {
       if (rootPrefBranch.getBoolPref("network.prefetch-next")) {
@@ -109,7 +111,10 @@ let PrefManager = (function() {
       }
     }
 
+
+    // ================================
     // Clean up old, unused prefs (removed in 0.2.0).
+    // ----------------------------------------------
     let deletePrefs = [
       "temporarilyAllowedOrigins",
       "temporarilyAllowedDestinations",
@@ -120,6 +125,7 @@ let PrefManager = (function() {
         rpPrefBranch.clearUserPref(deletePrefs[i]);
       }
     }
+
 
     Services.prefs.savePrefFile(null);
   };

@@ -48,7 +48,6 @@ requestpolicy.menu = (function() {
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
   let {WindowUtils} = iMod("lib/utils/windows");
-  let {rpService} = iMod("main/requestpolicy-service");
   let {C} = iMod("lib/utils/constants");
 
 

@@ -36,7 +36,6 @@ ScriptLoader.importModules([
   "lib/prefs",
   "lib/utils/domains",
   "lib/policy-manager",
-  "lib/request-processor",
   "lib/subscription",
   "lib/utils",
   "lib/utils/constants",
@@ -165,7 +164,6 @@ let rpService = (function() {
   // start observers / listeners
   ProcessEnvironment.enqueueStartupFunction(function() {
     ProcessEnvironment.obMan.observe({
-      "http-on-modify-request": self.observe,
       "sessionstore-windows-restored": self.observe,
       "private-browsing": self.observe,
       SUBSCRIPTION_UPDATED_TOPIC: self.observe,
@@ -208,11 +206,6 @@ let rpService = (function() {
 
     observe: function(subject, topic, data) {
       switch (topic) {
-        case "http-on-modify-request" :
-          // TODO: observe "http-on-modify-request" not here, but in
-          //       RequestProcessor
-          RequestProcessor._examineHttpRequest(subject);
-          break;
         case SUBSCRIPTION_UPDATED_TOPIC:
           Logger.debug(Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
           // TODO: check if the subscription is enabled. The user might have

@@ -47,7 +47,8 @@ ScriptLoader.importModules([
   "lib/utils",
   "lib/request",
   "lib/request-result",
-  "lib/request-set"
+  "lib/request-set",
+  "lib/process-environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "lib/content-policy": ["PolicyImplementation"],
@@ -868,7 +869,7 @@ let RequestProcessor = (function(self) {
    * Currently this just looks for prefetch requests that are getting through
    * which we currently can't stop.
    */
-  self._examineHttpRequest = function(aSubject) {
+  let examineHttpRequest = function(aSubject) {
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
@@ -882,6 +883,12 @@ let RequestProcessor = (function(self) {
       // No X-moz header.
     }
   };
+
+  ProcessEnvironment.obMan.observe({
+    "http-on-modify-request": examineHttpRequest
+  });
+
+
 
   self._printAllowedRequests = function() {
     self._allowedRequests.print();

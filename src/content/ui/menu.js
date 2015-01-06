@@ -163,7 +163,7 @@ requestpolicy.menu = (function() {
   //
   //      if (isChromeUri) {
   //        self._itemUnrestrictedOrigin.setAttribute("label",
-  //            StringUtils.$str("unrestrictedOrigin", ["chrome://"]), 1);
+  //            StringUtils.$str("unrestrictedOrigin", ["chrome://"]));
   //        self._itemUnrestrictedOrigin.hidden = false;
   //        return;
   //      }
@@ -918,7 +918,7 @@ requestpolicy.menu = (function() {
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
       ruleAction, cssClass) {
-    var label = StringUtils.$str(fmtStrName, fmtStrArgs, fmtStrArgs.length);
+    var label = StringUtils.$str(fmtStrName, fmtStrArgs);
     var item = self._addListItem(list, 'rp-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;

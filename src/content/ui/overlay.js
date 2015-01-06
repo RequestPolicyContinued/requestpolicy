@@ -474,10 +474,10 @@ requestpolicy.overlay = (function() {
     let notificationLabel;
     if (isOriginUndefined) {
       notificationLabel = StringUtils.$str("redirectNotification",
-          [cropUri(redirectTargetUri, 50)], 1);
+          [cropUri(redirectTargetUri, 50)]);
     } else {
       notificationLabel = StringUtils.$str("redirectNotificationWithOrigin",
-          [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)], 2);
+          [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
 

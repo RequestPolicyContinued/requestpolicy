@@ -72,7 +72,7 @@ requestpolicy.classicmenu = (function() {
 
 
   self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOriginTemporarily", [originHost], 1);
+    var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
     var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
     var item = self.addMenuItem(menu, label, command);
@@ -81,7 +81,7 @@ requestpolicy.classicmenu = (function() {
   };
 
   self.addMenuItemAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOrigin", [originHost], 1);
+    var label = StringUtils.$str("allowOrigin", [originHost]);
     var command = "requestpolicy.overlay.allowOrigin('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
     return self.addMenuItem(menu, label, command);
@@ -91,7 +91,7 @@ requestpolicy.classicmenu = (function() {
   self.addMenuItemTemporarilyAllowOriginToDest = function(menu, originHost,
                                                      destHost) {
     var label = StringUtils.$str("allowOriginToDestinationTemporarily",
-                                 [originHost, destHost], 2);
+                                 [originHost, destHost]);
     var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
@@ -102,7 +102,7 @@ requestpolicy.classicmenu = (function() {
 
   self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
     var label = StringUtils.$str("allowOriginToDestination",
-                                 [originHost, destHost], 2);
+                                 [originHost, destHost]);
     var command = "requestpolicy.overlay.allowOriginToDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
@@ -113,7 +113,7 @@ requestpolicy.classicmenu = (function() {
 
 
   self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestinationTemporarily", [destHost], 1);
+    var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
     var command = "requestpolicy.overlay.temporarilyAllowDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
@@ -122,7 +122,7 @@ requestpolicy.classicmenu = (function() {
   };
 
   self.addMenuItemAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestination", [destHost], 1);
+    var label = StringUtils.$str("allowDestination", [destHost]);
     var command = "requestpolicy.overlay.allowDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
     return self.addMenuItem(menu, label, command);

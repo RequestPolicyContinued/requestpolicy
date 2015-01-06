@@ -19,13 +19,13 @@ var PAGE_STRINGS = [
 $(function () {
   common.localize(PAGE_STRINGS);
   // l10n for input placeholders.
-  $id("rulesearch").placeholder = _('search');
-  $('[name=originscheme]').prop('placeholder', _('scheme'));
-  $('[name=destscheme]').prop('placeholder', _('scheme'));
-  $('[name=originhost]').prop('placeholder', _('host'));
-  $('[name=desthost]').prop('placeholder', _('host'));
-  $('[name=originport]').prop('placeholder', _('port'));
-  $('[name=destport]').prop('placeholder', _('port'));
+  $id("rulesearch").placeholder = $str('search');
+  $('[name=originscheme]').prop('placeholder', $str('scheme'));
+  $('[name=destscheme]').prop('placeholder', $str('scheme'));
+  $('[name=originhost]').prop('placeholder', $str('host'));
+  $('[name=desthost]').prop('placeholder', $str('host'));
+  $('[name=originport]').prop('placeholder', $str('port'));
+  $('[name=destport]').prop('placeholder', $str('port'));
 });
 
 const SEARCH_DELAY = 100;
@@ -107,7 +107,7 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
     ruleAction = 'block';
   }
   ruleAction = ruleAction == 'allow' ? 'allow' : 'block';
-  var ruleActionString = ruleAction == 'allow' ? _('allow') : _('block');
+  var ruleActionString = ruleAction == 'allow' ? $str('allow') : $str('block');
 
   var row = $('<tr>').addClass(ruleAction).appendTo(table);
 

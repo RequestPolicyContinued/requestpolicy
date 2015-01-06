@@ -41,7 +41,7 @@ function populateRuleTable() {
 
 function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
   var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
-  var action = ruleAction == 'allow' ? _('allow') : _('block');
+  var action = ruleAction == 'allow' ? $str('allow') : $str('block');
 
   var row = $('<tr>').addClass(actionClass).appendTo(table);
 

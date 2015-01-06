@@ -36,7 +36,7 @@ var COMMON_STRINGS = [
 ];
 
 
-var _ = StringUtils.$str;
+var $str = StringUtils.$str;
 
 var common = {};
 
@@ -214,7 +214,7 @@ common.addAllowRules = function (rules) {
 common.localize = function(stringNames) {
   stringNames.forEach(function(name) {
     $('[data-string="' + name + '"]').each(function () {
-      $(this).text(_(name));
+      $(this).text($str(name));
     });
   });
 };

@@ -461,7 +461,7 @@ requestpolicy.overlay = (function() {
     // Line: 260
 
     // redirectOriginUri is optional and is not necessary for <meta> redirects.
-    isOriginUndefined = redirectOriginUri === undefined;
+    let isOriginUndefined = redirectOriginUri === undefined;
     redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {

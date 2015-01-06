@@ -1131,52 +1131,6 @@ requestpolicy.overlay = (function() {
   };
 
   /**
-   * Forbids an origin from requesting from any destination. This revoke's
-   * temporary or permanent request permissions the origin had been given.
-   */
-  self.forbidOrigin = function(originHost) {
-    rpService.forbidOrigin(originHost);
-  };
-
-  /**
-   * Forbids the current document's origin from requesting from any destination.
-   * This revoke's temporary or permanent request permissions the origin had
-   * been given.
-   *
-   * @param {Event}
-   *          event
-   */
-  self.forbidCurrentOrigin = function(event) {
-    var host = self.getTopLevelDocumentUriIdentifier();
-    rpService.forbidOrigin(host);
-  };
-
-  /**
-   * Forbids a destination from being requested by any origin. This revoke's
-   * temporary or permanent request permissions the destination had been given.
-   *
-   * @param {String}
-   *          destHost
-   */
-  self.forbidDestination = function(destHost) {
-    rpService.forbidDestination(destHost);
-  };
-
-  /**
-   * Forbids a destination from being requested by a single origin. This
-   * revoke's temporary or permanent request permissions the destination had
-   * been given.
-   *
-   * @param {String}
-   *          originHost
-   * @param {String}
-   *          destHost
-   */
-  self.forbidOriginToDestination = function(originHost, destHost) {
-    rpService.forbidOriginToDestination(originHost, destHost);
-  };
-
-  /**
    * Revokes all temporary permissions granted during the current session.
    *
    * @param {Event}

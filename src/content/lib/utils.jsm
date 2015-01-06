@@ -105,54 +105,6 @@ let Utils = (function() {
   self.info.isAustralis = self.info.isFirefox &&
       Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
 
-  self.getChromeWindow = function(aContentWindow) {
-    return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
-                             .getInterface(Ci.nsIWebNavigation)
-                             .QueryInterface(Ci.nsIDocShellTreeItem)
-                             .rootTreeItem
-                             .QueryInterface(Ci.nsIInterfaceRequestor)
-                             .getInterface(Ci.nsIDOMWindow);
-  };
-
-  self.getBrowserForWindow = function(aContentWindow) {
-    let win = self.getChromeWindow(aContentWindow);
-    let tab = win.gBrowser._getTabForContentWindow(aContentWindow.top);
-    return tab.linkedBrowser;
-  }
-
-  self.getChromeWindowForDocShell = function(aDocShell) {
-    return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
-                    .rootTreeItem
-                    .QueryInterface(Ci.nsIInterfaceRequestor)
-                    .getInterface(Ci.nsIDOMWindow);
-  };
-
-
-  //
-  // DOM utilities
-  //
-
-  /**
-   * Wait for a window to be loaded and then add a list of Elements „by ID“ to
-   * a scope. The scope is optional, but in any case will be returned.
-   *
-   * @returns {Object} the scope of the elements
-   */
-  self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
-                                        aCallback) {
-    let scope = aScope || {};
-    let document = aWindow.document;
-    aWindow.addEventListener("load", function() {
-      for (let elementName in aElementIDs) {
-        scope[elementName] = document.getElementById(aElementIDs[elementName]);
-      }
-      if (aCallback) {
-        aCallback();
-      }
-    });
-    return scope;
-  };
-
 
 
   /**

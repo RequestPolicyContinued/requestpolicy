@@ -36,7 +36,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/utils/domains",
-  "lib/utils"
+  "lib/utils/windows"
 ], this);
 
 
@@ -152,7 +152,7 @@ function getBrowser() {
     } else {
       // we hope the associated window is available. in multiprocessor
       // firefox it's not available.
-      return Utils.getBrowserForWindow(loadContext.topWindow);
+      return WindowUtils.getBrowserForWindow(loadContext.topWindow);
     }
   } catch (e) {
     Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +

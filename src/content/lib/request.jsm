@@ -39,6 +39,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/utils/domains",
+  "lib/utils/windows",
   "lib/utils"
 ], this);
 
@@ -237,7 +238,7 @@ NormalRequest.prototype.getContentWindow = function() {
 NormalRequest.prototype.getChromeWindow = function() {
   let contentWindow = this.getContentWindow();
   if (!!contentWindow) {
-    return Utils.getChromeWindow(contentWindow);
+    return WindowUtils.getChromeWindow(contentWindow);
   } else {
     return null;
   }
@@ -251,7 +252,7 @@ NormalRequest.prototype.getBrowser = function() {
   if (context instanceof Ci.nsIDOMXULElement && context.tagName === "browser") {
     return context;
   } else {
-    return Utils.getBrowserForWindow(this.getContentWindow());
+    return WindowUtils.getBrowserForWindow(this.getContentWindow());
   }
 };
 

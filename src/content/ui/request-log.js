@@ -36,7 +36,7 @@ window.requestpolicy.requestLog = (function (self) {
     ScriptLoader = mod.ScriptLoader;
   }
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-  let {Utils} = ScriptLoader.importModule("lib/utils");
+  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
 
 
   self.isEmptyMessageDisplayed = true;
@@ -55,7 +55,7 @@ window.requestpolicy.requestLog = (function (self) {
     window.parent.requestpolicy.overlay.requestLog = self;
   }
 
-  Utils.getElementsByIdOnLoad(window, {
+  WindowUtils.getElementsByIdOnLoad(window, {
         tree: "requestpolicy-requestLog-tree"
       }, self, init);
 

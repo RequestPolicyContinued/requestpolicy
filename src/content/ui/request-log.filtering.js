@@ -36,11 +36,11 @@ window.requestpolicy.requestLog = (function (self) {
     ScriptLoader = mod.ScriptLoader;
     Services = mod.Services;
   }
-  let {Utils} = ScriptLoader.importModule("lib/utils");
+  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
 
   let filterText = null;
 
-  let elements = Utils.getElementsByIdOnLoad(window, {
+  let elements = WindowUtils.getElementsByIdOnLoad(window, {
         filterTextbox: "requestpolicy-requestLog-requestFilter",
         clearFilterButton: "requestpolicy-requestLog-clearFilter"
       });

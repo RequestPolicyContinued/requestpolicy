@@ -50,7 +50,7 @@ requestpolicy.overlay = (function() {
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
   let {rpService} = iMod("main/requestpolicy-service");
-  let {MMID} = iMod("lib/constants");
+  let {C} = iMod("lib/constants");
 
   let $ = function(id) {
     return document.getElementById(id);
@@ -182,7 +182,7 @@ requestpolicy.overlay = (function() {
 
 
       messageManager.addMessageListener(
-          MMID + ":notifyDocumentLoaded",
+          C.MMID + ":notifyDocumentLoaded",
           function(message) {
             dump("notifyDocumentLoaded\n\n");
             let {docID, documentURI} = message.data;
@@ -221,7 +221,7 @@ requestpolicy.overlay = (function() {
                 }
               }
               message.target.messageManager.sendAsyncMessage(
-                  MMID + ":indicateBlockedVisibleObjects",
+                  C.MMID + ":indicateBlockedVisibleObjects",
                   {blockedURIs: blockedURIs, docID: docID});
             }
 
@@ -239,7 +239,7 @@ requestpolicy.overlay = (function() {
           });
 
       messageManager.addMessageListener(
-          MMID + ":notifyTopLevelDocumentLoaded",
+          C.MMID + ":notifyTopLevelDocumentLoaded",
           function (message) {
             // Clear any notifications that may have been present.
             self._setContentBlockedState(false);
@@ -258,7 +258,7 @@ requestpolicy.overlay = (function() {
           });
 
       messageManager.addMessageListener(
-          MMID + ":notifyDOMFrameContentLoaded",
+          C.MMID + ":notifyDOMFrameContentLoaded",
           function (message) {
             // This has an advantage over just relying on the
             // observeBlockedRequest() call in that this will clear a blocked
@@ -270,17 +270,17 @@ requestpolicy.overlay = (function() {
             self._updateBlockedContentState(message.target);
           });
 
-      messageManager.addMessageListener(MMID + ":handleMetaRefreshes",
+      messageManager.addMessageListener(C.MMID + ":handleMetaRefreshes",
                                         self.handleMetaRefreshes);
 
       messageManager.addMessageListener(
-          MMID + ":notifyLinkClicked", function (message) {
+          C.MMID + ":notifyLinkClicked", function (message) {
               RequestProcessor.registerLinkClicked(message.data.origin,
                                                    message.data.dest);
           });
 
       messageManager.addMessageListener(
-          MMID + ":notifyFormSubmitted", function (message) {
+          C.MMID + ":notifyFormSubmitted", function (message) {
               RequestProcessor.registerFormSubmitted(message.data.origin,
                                                      message.data.dest);
           });
@@ -530,7 +530,7 @@ requestpolicy.overlay = (function() {
             RequestProcessor.registerAllowedRedirect(
                 browser.documentURI.specIgnoringRef, redirectTargetUri);
 
-            browser.messageManager.sendAsyncMessage(MMID + ":setLocation",
+            browser.messageManager.sendAsyncMessage(C.MMID + ":setLocation",
                 {uri: redirectTargetUri});
           }
         },
@@ -994,7 +994,7 @@ requestpolicy.overlay = (function() {
     if (rulesChanged || self._needsReloadOnMenuClose) {
       if (rpPrefBranch.getBoolPref("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
-        mm.sendAsyncMessage(MMID + ":reload");
+        mm.sendAsyncMessage(C.MMID + ":reload");
       }
     }
     self._needsReloadOnMenuClose = false;

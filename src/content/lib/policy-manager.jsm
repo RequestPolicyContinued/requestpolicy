@@ -188,7 +188,7 @@ let PolicyManager = (function(self) {
   };
 
   function assertRuleAction(ruleAction) {
-    if (ruleAction != RULE_ACTION_ALLOW && ruleAction != RULE_ACTION_DENY) {
+    if (ruleAction != C.RULE_ACTION_ALLOW && ruleAction != C.RULE_ACTION_DENY) {
       throw "Invalid rule type: " + ruleAction;
     }
   }

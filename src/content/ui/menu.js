@@ -48,7 +48,7 @@ requestpolicy.menu = (function() {
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
   let {rpService} = iMod("main/requestpolicy-service");
-  let {RULE_ACTION_ALLOW, RULE_ACTION_DENY} = iMod("lib/constants");
+  let {C} = iMod("lib/constants");
 
 
   let initialized = false;
@@ -373,13 +373,13 @@ requestpolicy.menu = (function() {
       };
       //if (Prefs.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
-           (!PolicyManager.ruleExists(RULE_ACTION_DENY, ruleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_DENY, destOnlyRuleData))) {
+           (!PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData))) {
         // show "Block requests" if the destination was allowed
         // OR if there's no blocking rule (i.e. the request was blocked "by default")
         //  -- this enables support for blacklisting.
-        if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_DENY, ruleData)) {
+        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (!self._privateBrowsingEnabled) {
               var item = self._addMenuItemDenyOriginToDest(
                   self._addRulesList, ruleData);
@@ -388,8 +388,8 @@ requestpolicy.menu = (function() {
             self._addRulesList, ruleData);
         }
 
-        if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (!self._privateBrowsingEnabled) {
             var item = self._addMenuItemDenyDest(
                 self._addRulesList, destOnlyRuleData);
@@ -399,13 +399,13 @@ requestpolicy.menu = (function() {
         }
       }
       if (self._isCurrentlySelectedDestBlocked ||
-           (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData))) {
+           (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData))) {
         // show "Allow requests" if the destination was blocked
         // OR if there's no allow-rule (i.e. the request was allowed "by default")
         //  -- this enables support for whitelisting.
-        if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_DENY, ruleData)) {
+        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (!self._privateBrowsingEnabled) {
             var item = self._addMenuItemAllowOriginToDest(
                 self._addRulesList, ruleData);
@@ -414,8 +414,8 @@ requestpolicy.menu = (function() {
               self._addRulesList, ruleData);
         }
 
-        if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !PolicyManager.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (!self._privateBrowsingEnabled) {
             var item = self._addMenuItemAllowDest(
                 self._addRulesList, destOnlyRuleData);
@@ -663,7 +663,7 @@ requestpolicy.menu = (function() {
     var result = [];
     for (var destBase in requests) {
       var properties = new GUILocationProperties();
-      properties.accumulate(requests[destBase], RULE_ACTION_DENY);
+      properties.accumulate(requests[destBase], C.RULE_ACTION_DENY);
       result.push(new GUIDestination(destBase, properties));
     }
     return result;
@@ -686,7 +686,7 @@ requestpolicy.menu = (function() {
       }
 
       var properties = new GUILocationProperties();
-      properties.accumulate(requests[destBase], RULE_ACTION_ALLOW);
+      properties.accumulate(requests[destBase], C.RULE_ACTION_ALLOW);
       result.push(new GUIDestination(destBase, properties));
     }
     return result;
@@ -1179,8 +1179,8 @@ requestpolicy.menu = (function() {
           'h': destHost
         }
       };
-      if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, ruleData) &&
-          !PolicyManager.ruleExists(RULE_ACTION_DENY, ruleData)) {
+      if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+          !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
         if (!self._privateBrowsingEnabled) {
           var item = self._addMenuItemAllowOriginToDest(list, ruleData);
         }
@@ -1192,8 +1192,8 @@ requestpolicy.menu = (function() {
           'h': destHost
         }
       };
-      if (!PolicyManager.ruleExists(RULE_ACTION_ALLOW, destOnlyRuleData) &&
-          !PolicyManager.ruleExists(RULE_ACTION_DENY, destOnlyRuleData)) {
+      if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+          !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         if (!self._privateBrowsingEnabled) {
           var item = self._addMenuItemAllowDest(list, destOnlyRuleData);
         }

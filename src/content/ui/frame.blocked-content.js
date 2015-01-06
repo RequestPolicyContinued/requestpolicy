@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var MMID = "requestpolicy@requestpolicy.com";
-
 let ManagerForBlockedContent = (function() {
   let self = {};
 
@@ -94,7 +92,7 @@ let ManagerForBlockedContent = (function() {
     }
   }
 
-  addMessageListener(MMID + ":indicateBlockedVisibleObjects",
+  addMessageListener(C.MMID + ":indicateBlockedVisibleObjects",
                      indicateBlockedVisibleObjects);
 
   return self;

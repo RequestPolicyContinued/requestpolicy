@@ -34,7 +34,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "lib/constants", // e.g. CP_OK
+  "lib/constants",
   "lib/logger",
   "lib/request",
   "lib/utils",
@@ -117,7 +117,7 @@ let PolicyImplementation = (function() {
     //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
   };
 
-  self.shouldProcess = (() => CP_OK);
+  self.shouldProcess = (() => C.CP_OK);
 
   //
   // nsIFactory interface implementation

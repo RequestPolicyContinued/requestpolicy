@@ -448,7 +448,7 @@ let rpService = (function() {
   });
 
   ProcessEnvironment.pushShutdownFunction(function(data, reason) {
-    if (reason == ADDON_DISABLE || reason == ADDON_UNINSTALL) {
+    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
       handleUninstallOrDisable();
     }
     unregister();

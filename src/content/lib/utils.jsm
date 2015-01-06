@@ -79,7 +79,7 @@ let Utils = (function() {
 
     self.info.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
-    AddonManager.getAddonByID(EXTENSION_ID, function(addon) {
+    AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
       rpPrefBranch.setCharPref("lastVersion", addon.version);
       self.info.curRPVersion = addon.version;
       if (self.info.lastRPVersion != self.info.curRPVersion) {
@@ -101,7 +101,7 @@ let Utils = (function() {
     }
   }
 
-  self.info.isFirefox = Services.appinfo.ID == FIREFOX_ID;
+  self.info.isFirefox = Services.appinfo.ID == C.FIREFOX_ID;
   self.info.isAustralis = self.info.isFirefox &&
       Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
 

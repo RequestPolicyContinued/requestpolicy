@@ -162,7 +162,7 @@ RawRuleset.prototype = {
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -171,7 +171,7 @@ RawRuleset.prototype = {
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
       //r.originRuleAction = ruleAction;
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
         r.denyOrigin = true;
@@ -180,7 +180,7 @@ RawRuleset.prototype = {
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -193,8 +193,8 @@ RawRuleset.prototype = {
   },
 
   ruleExists : function(ruleAction, ruleData) {
-    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -220,8 +220,8 @@ RawRuleset.prototype = {
   addRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
-    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -291,9 +291,9 @@ RawRuleset.prototype = {
       //   r.destinationRuleAction = null;
       // }
       //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == RULE_ACTION_DENY) {
+      } else if (ruleAction == C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -317,9 +317,9 @@ RawRuleset.prototype = {
       // if (r.originRuleAction == ruleAction) {
       //   r.originRuleAction = null;
       // }
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowOrigin = null;
-      } else if (ruleAction == RULE_ACTION_DENY) {
+      } else if (ruleAction == C.RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -343,9 +343,9 @@ RawRuleset.prototype = {
       // if (r.destinationRuleAction == ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      if (ruleAction == RULE_ACTION_ALLOW) {
+      if (ruleAction == C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == RULE_ACTION_DENY) {
+      } else if (ruleAction == C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -367,8 +367,8 @@ RawRuleset.prototype = {
   removeRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
-    var actionStr = ruleAction == RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -412,7 +412,7 @@ RawRuleset.prototype = {
         dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleAction = actionStr == "allow" ? RULE_ACTION_ALLOW : RULE_ACTION_DENY;
+      var ruleAction = actionStr == "allow" ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
       var entryArray = this._entries[actionStr];
       for (var i in entryArray) {
         //dprint("toRuleset: adding entry");
@@ -915,13 +915,13 @@ Ruleset.prototype = {
           matchedDenyRules.push(["origin", entry, rule]);
         }
         // switch(rule.originRuleAction) {
-        //   case RULE_ACTION_ALLOW:
+        //   case C.RULE_ACTION_ALLOW:
         //     if (ruleMatchedOrigin) {
         //       dprint("ALLOW origin by rule " + entry + " " + rule);
         //       matchedAllowRules.push(["origin", entry, rule]);
         //     }
         //     break;
-        //   case RULE_ACTION_DENY:
+        //   case C.RULE_ACTION_DENY:
         //     if (ruleMatchedOrigin) {
         //               dprint("DENY origin by rule " + entry + " " + rule);
         //               matchedDenyRules.push(["origin", entry, rule]);
@@ -948,13 +948,13 @@ Ruleset.prototype = {
               }
 
               // switch(destRule.destinationRuleAction) {
-              //   case RULE_ACTION_ALLOW:
+              //   case C.RULE_ACTION_ALLOW:
               //     if (destRule.isMatch(dest)) {
               //                     dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
               //                     matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
               //                   }
               //     break;
-              //   case RULE_ACTION_DENY:
+              //   case C.RULE_ACTION_DENY:
               //     if (destRule.isMatch(dest)) {
               //                     dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
               //                     matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
@@ -985,13 +985,13 @@ Ruleset.prototype = {
           matchedDenyRules.push(["dest", entry, rule]);
         }
         // switch(rule.destinationRuleAction) {
-        //   case RULE_ACTION_ALLOW:
+        //   case C.RULE_ACTION_ALLOW:
         //     if (rule.isMatch(dest)) {
         //               dprint("ALLOW dest by rule " + entry + " " + rule);
         //               matchedAllowRules.push(["dest", entry, rule]);
         //             }
         //     break;
-        //   case RULE_ACTION_DENY:
+        //   case C.RULE_ACTION_DENY:
         //     if (rule.isMatch(dest)) {
         //       dprint("DENY dest by rule " + entry + " " + rule);
         //       matchedDenyRules.push(["dest", entry, rule]);

@@ -25,45 +25,28 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-let EXPORTED_SYMBOLS = [
-  "EXTENSION_ID",
-  "FIREFOX_ID",
-  "MMID",
+let EXPORTED_SYMBOLS = ["C"];
 
-  "APP_STARTUP",
-  "APP_SHUTDOWN",
-  "ADDON_ENABLE",
-  "ADDON_DISABLE",
-  "ADDON_INSTALL",
-  "ADDON_UNINSTALL",
-  "ADDON_UPGRADE",
-  "ADDON_DOWNGRADE",
+let C = {};
 
-  "CP_OK",
-  "CP_REJECT",
-
-  "RULE_ACTION_ALLOW",
-  "RULE_ACTION_DENY"
-];
-
-const EXTENSION_ID = "requestpolicy@requestpolicy.com";
-const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
-const MMID = EXTENSION_ID; // message manager ID
+C.EXTENSION_ID = "requestpolicy@requestpolicy.com";
+C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
+C.MMID = C.EXTENSION_ID; // message manager ID
 
 // reason constants for startup(), shutdown(), install() and uninstall()
 // see https://developer.mozilla.org/en-US/Add-ons/Bootstrapped_extensions#Reason_constants
-const APP_STARTUP = 1; // The application is starting up.
-const APP_SHUTDOWN = 2; // The application is shutting down.
-const ADDON_ENABLE = 3; // The add-on is being enabled.
-const ADDON_DISABLE = 4; // The add-on is being disabled. (Also sent during uninstallation)
-const ADDON_INSTALL = 5; // The add-on is being installed.
-const ADDON_UNINSTALL = 6; // The add-on is being uninstalled.
-const ADDON_UPGRADE = 7; // The add-on is being upgraded.
-const ADDON_DOWNGRADE = 8; // The add-on is being downgraded.
+C.APP_STARTUP = 1; // The application is starting up.
+C.APP_SHUTDOWN = 2; // The application is shutting down.
+C.ADDON_ENABLE = 3; // The add-on is being enabled.
+C.ADDON_DISABLE = 4; // The add-on is being disabled. (Also sent during uninstallation)
+C.ADDON_INSTALL = 5; // The add-on is being installed.
+C.ADDON_UNINSTALL = 6; // The add-on is being uninstalled.
+C.ADDON_UPGRADE = 7; // The add-on is being upgraded.
+C.ADDON_DOWNGRADE = 8; // The add-on is being downgraded.
 
 // content policy
-const CP_OK = Ci.nsIContentPolicy.ACCEPT;
-const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
+C.CP_OK = Ci.nsIContentPolicy.ACCEPT;
+C.CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
-const RULE_ACTION_ALLOW = 1;
-const RULE_ACTION_DENY = 2;
+C.RULE_ACTION_ALLOW = 1;
+C.RULE_ACTION_DENY = 2;

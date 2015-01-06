@@ -215,11 +215,11 @@ GUILocationProperties.prototype.accumulate = function (requests, ruleAction) {
   }
 
   switch (ruleAction) {
-    case RULE_ACTION_ALLOW:
+    case C.RULE_ACTION_ALLOW:
       this.numAllowedRequests += ruleActionCounter;
       break;
 
-    case RULE_ACTION_DENY:
+    case C.RULE_ACTION_DENY:
       this.numBlockedRequests += ruleActionCounter;
       break;
 

@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var MMID = "requestpolicy@requestpolicy.com";
-
 
 let ManagerForDOMContentLoaded = (function() {
   let self = {};
@@ -44,7 +42,7 @@ let ManagerForDOMContentLoaded = (function() {
     // Notify the main thread that a link has been clicked.
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
-    sendSyncMessage(MMID + ":notifyLinkClicked",
+    sendSyncMessage(C.MMID + ":notifyLinkClicked",
                     {origin: event.currentTarget.ownerDocument.URL,
                      dest: event.currentTarget.href});
   }
@@ -79,12 +77,12 @@ let ManagerForDOMContentLoaded = (function() {
 
     onDocumentLoaded(doc);
     let docID = DocManager.generateDocID(doc);
-    sendAsyncMessage(MMID + ":notifyDocumentLoaded",
+    sendAsyncMessage(C.MMID + ":notifyDocumentLoaded",
                      {docID: docID, documentURI: doc.documentURI});
 
 
     if (isActiveTopLevelDocument(doc)) {
-      sendAsyncMessage(MMID + ":notifyTopLevelDocumentLoaded");
+      sendAsyncMessage(C.MMID + ":notifyTopLevelDocumentLoaded");
     }
   }
 
@@ -110,7 +108,7 @@ let ManagerForDOMContentLoaded = (function() {
     // other origins every time an iframe is loaded. Maybe, then, this should
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
-      sendAsyncMessage(MMID + ":notifyDOMFrameContentLoaded");
+      sendAsyncMessage(C.MMID + ":notifyDOMFrameContentLoaded");
       /*
       // This has an advantage over just relying on the
       // observeBlockedRequest() call in that this will clear a blocked
@@ -174,7 +172,7 @@ let ManagerForDOMContentLoaded = (function() {
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 
-      sendAsyncMessage(MMID + ":handleMetaRefreshes",
+      sendAsyncMessage(C.MMID + ":handleMetaRefreshes",
           {documentURI: documentURI, metaRefreshes: metaRefreshes});
     }
 

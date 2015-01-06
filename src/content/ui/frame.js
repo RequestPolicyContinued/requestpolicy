@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var MMID = "requestpolicy@requestpolicy.com";
-
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+
+ScriptLoader.importModule("lib/constants", this);
 
 
 
@@ -91,7 +91,7 @@ var WinEnv = (function getWindowEnvironment() {
     // I believe an empty href always gets filled in with the current URL so
     // it will never actually be empty. However, I don't know this for certain.
     if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
-      sendSyncMessage(MMID + ":notifyLinkClicked",
+      sendSyncMessage(C.MMID + ":notifyLinkClicked",
                       {origin: event.target.ownerDocument.URL,
                        dest: event.target.href});
       return;
@@ -102,7 +102,7 @@ var WinEnv = (function getWindowEnvironment() {
     if (event.target.nodeName.toLowerCase() == "input" &&
         event.target.type.toLowerCase() == "submit" &&
         event.target.form && event.target.form.action) {
-      sendSyncMessage(MMID + ":registerFormSubmitted",
+      sendSyncMessage(C.MMID + ":registerFormSubmitted",
                       {origin: event.target.ownerDocument.URL,
                        dest: event.target.form.action});
       return;
@@ -110,11 +110,11 @@ var WinEnv = (function getWindowEnvironment() {
   }, true);*/
 
 WinEnv.enqueueStartupFunction(function() {
-  addMessageListener(MMID + ":reload", function() {
+  addMessageListener(C.MMID + ":reload", function() {
     content.document.location.reload(false);
   });
 
-  addMessageListener(MMID + ":setLocation", function(message) {
+  addMessageListener(C.MMID + ":setLocation", function(message) {
     content.document.location.href = message.data.uri;
   });
 });

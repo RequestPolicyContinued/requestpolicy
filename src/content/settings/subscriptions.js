@@ -76,7 +76,7 @@ function updateDisplay() {
     element.input.checked = (element.id in subsInfo['official']);
   }
 
-  if (rpService._defaultAllow) {
+  if (Prefs.isDefaultAllow) {
     var currentPolicy = 'allow', otherPolicy = 'deny';
   } else {
     var currentPolicy = 'deny', otherPolicy = 'allow';

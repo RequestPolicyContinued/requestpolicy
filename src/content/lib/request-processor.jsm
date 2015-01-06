@@ -51,8 +51,7 @@ ScriptLoader.importModules([
   "lib/process-environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
-  "lib/content-policy": ["PolicyImplementation"],
-  "main/requestpolicy-service": ["rpService"]
+  "lib/content-policy": ["PolicyImplementation"]
 }, this);
 
 

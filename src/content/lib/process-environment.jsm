@@ -113,14 +113,27 @@ if (ProcessEnvironment.isMainProcess) {
     //                 ProcessEnvironment says "You can't load me, I didn't
     //                 finish yet!"
     {
-      // At first initialize the preferences. Its scope doesn't need to be
-      // remembered.
-      Services.scriptloader.loadSubScript("chrome://requestpolicy/content/lib/"+
-                                          "default-prefs-initializer.js", {});
+      // =======================================================================
+      // The following section is not optimal – read on…
+      // -----------------------------------------------
+
+      // load init PrefManager before anything else is loaded!
+      // the reason is that the Logger expects the prefs to be initialized
+      // and available already.
+      let {PrefManager} = ScriptLoader.importModule("main/pref-manager");
+      PrefManager.init();
+
+      // TODO: use the Browser Console for logging, see #563.
+      //       *Then* it's no longer necessary to load and init PrefManager
+      //       first. PrefManager will then be loaded and initialized when all
+      //       other back end modules are loaded / initialized.
 
       // import the Logger as the first module so that its startup-function
       // will be called after this one
       ScriptLoader.importModule("lib/logger", globalScope);
+      // =======================================================================
+
+      // import main modules:
       ScriptLoader.importModules([
         "main/requestpolicy-service",
         "lib/content-policy",

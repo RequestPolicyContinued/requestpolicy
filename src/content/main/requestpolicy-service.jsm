@@ -58,26 +58,6 @@ let rpService = (function() {
   // Utility
   // /////////////////////////////////////////////////////////////////////////
 
-  function handleUninstallOrDisable() {
-    Logger.debug(Logger.TYPE_INTERNAL, "Performing 'disable' operations.");
-    var resetLinkPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.link.restoreDefaultOnUninstall");
-    var resetDNSPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.dns.restoreDefaultOnUninstall");
-
-    if (resetLinkPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.prefetch-next")) {
-        rootPrefBranch.clearUserPref("network.prefetch-next");
-      }
-    }
-    if (resetDNSPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch")) {
-        rootPrefBranch.clearUserPref("network.dns.disablePrefetch");
-      }
-    }
-    Services.prefs.savePrefFile(null);
-  }
-
 
   function loadConfigAndRules() {
     subscriptions = new UserSubscriptions();
@@ -164,14 +144,6 @@ let rpService = (function() {
       //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
       "private-browsing": self.observe
     });
-  });
-
-  ProcessEnvironment.pushShutdownFunction(function(data, reason) {
-    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
-      // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
-      //       disabled when being uninstalled.
-      handleUninstallOrDisable();
-    }
   });
 
 

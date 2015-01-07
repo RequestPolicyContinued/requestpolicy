@@ -20,8 +20,6 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
-var prefsChangedObserver = null;
-
 /**
  * @param {String} policy
  *                 "allow" or "deny"

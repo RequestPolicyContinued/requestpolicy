@@ -24,8 +24,6 @@ $(function () {
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-var prefsChangedObserver = null;
-
 
 function updateDisplay() {
   // Link prefetch.

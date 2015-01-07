@@ -17,8 +17,6 @@ $(function () {
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-var prefsChangedObserver = null;
-
 
 function updateDisplay() {
   var defaultallow = rpPrefBranch.getBoolPref('defaultPolicy.allow');

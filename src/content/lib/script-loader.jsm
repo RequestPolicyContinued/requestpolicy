@@ -24,6 +24,7 @@
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
+const Cr = Components.results;
 
 let EXPORTED_SYMBOLS = ["ScriptLoader"];
 
@@ -105,8 +106,11 @@ let ScriptLoader = (function() {
         if (moduleID in modulesCurrentlyBeingImported) {
           delete modulesCurrentlyBeingImported[moduleID];
         }
+      } catch (e if e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
+        logSevereError("Failed to import module with ID \"" + moduleID + "\", the " +
+                       "file was not found! ", e.stack);
       } catch (e) {
-        logSevereError("Failed to import module \"" + moduleID + "\": " + e,
+        logSevereError("Failed to import module with ID \"" + moduleID + "\": " + e,
                        e.stack);
       }
       return scope;

@@ -54,20 +54,72 @@ let Prefs = (function() {
     Services.prefs.savePrefFile(null);
   };
 
-  self.isDefaultAllow = function() {
-    return defaultAllow;
+
+
+  /**
+   * Define a list of preferences that will be available through
+   * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
+   * Those functions will be created subsequently.
+   */
+  let cachedPrefList = {
+    "defaultPolicy.allow": {
+      getter: {name: "isDefaultAllow", fn: rpPrefBranch.getBoolPref}
+    },
+    "defaultPolicy.allowSameDomain": {
+      getter: {name: "isDefaultAllowSameDomain", fn: rpPrefBranch.getBoolPref}
+    },
+    "startWithAllowAllEnabled": {
+      getter: {name: "isBlockingDisabled", fn: rpPrefBranch.getBoolPref},
+      setter: {name: "setBlockingDisabled", fn: rootPrefBranch.setBoolPref}
+    }
   };
-  self.isDefaultAllowSameDomain = function() {
-    return defaultAllowSameDomain;
-  };
-  self.isBlockingDisabled = function() {
-    return blockingDisabled;
-  };
-  self.setBlockingDisabled = function(disabled) {
-    blockingDisabled = disabled;
-    rootPrefBranch.setBoolPref('startWithAllowAllEnabled', disabled);
-    self.save();
-  };
+  let cachedPrefs = {};
+
+
+  /**
+   * Dynamically create functions like `isDefaultAllow` or
+   * `setBlockingDisabled`. Also add `update()` functions to elements of
+   * `cachedPrefList` that have a `getter`.
+   */
+  {
+    for (let prefID in cachedPrefList) {
+      let pref = cachedPrefList[prefID];
+
+      if (pref.hasOwnProperty("getter")) {
+        let getterName = pref.getter.name;
+
+        // define the pref's getter function to `self`
+        self[getterName] = function() {
+          return cachedPrefs[getterName];
+        };
+
+        // define the pref's update() function to `cachedPrefList`
+        pref.update = function() {
+          cachedPrefs[prefID] = pref.getter.fn(prefID);
+        };
+
+        // initially call update()
+        pref.update();
+      }
+
+      if (pref.hasOwnProperty("setter")) {
+        let setterName = pref.setter.name;
+
+        // define the pref's getter function to `self`
+        self[setterName] = function(aValue) {
+          // set the pref and save it
+          pref.setter.fn(prefID, aValue);
+          self.save();
+
+          // update the cached value
+          if (typeof pref.update !== 'undefined') {
+            pref.update();
+          }
+        };
+      }
+    }
+  }
+
   self.isPrefetchEnabled = function() {
     // network.dns.disablePrefetch only exists starting in Firefox 3.1
     try {
@@ -77,26 +129,6 @@ let Prefs = (function() {
       return rootPrefBranch.getBoolPref("network.prefetch-next");
     }
   };
-
-
-  /**
-   * Take necessary actions when preferences are updated.
-   *
-   * @param {String} prefName name of the preference that was updated.
-   */
-  function updateCachedPref(prefName) {
-    switch (prefName) {
-      case "defaultPolicy.allow" :
-        defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
-        break;
-      case "defaultPolicy.allowSameDomain" :
-        defaultAllowSameDomain = rpPrefBranch.getBoolPref(
-            "defaultPolicy.allowSameDomain");
-        break;
-      default:
-        break;
-    }
-  }
 
   function isPrefEmpty(pref) {
     try {
@@ -113,10 +145,22 @@ let Prefs = (function() {
              isPrefEmpty('allowedOriginsToDestinations'));
   };
 
-  function init() {
-    defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
-    defaultAllowSameDomain = rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
-    blockingDisabled = rpPrefBranch.getBoolPref("startWithAllowAllEnabled");
+
+  /**
+   * This function updates all cached prefs.
+   */
+  function updateCachedPref(prefID) {
+    // first check if this pref is cached
+    if (!cachedPrefList.hasOwnProperty(prefID)) {
+      return;
+    }
+
+    let pref = cachedPrefList[prefID];
+
+    // check if this pref has an update() function
+    if (typeof pref.update === 'function') {
+      pref.update();
+    }
   }
 
   let observePref = function(subject, topic, data) {
@@ -130,13 +174,9 @@ let Prefs = (function() {
     }
   };
 
-  init();
-
   ProcessEnvironment.enqueueStartupFunction(function() {
     ProcessEnvironment.obMan.observeRPPref({
-      "": function() {
-        observePref.apply(null, arguments);
-      }
+      "": observePref
     });
     ProcessEnvironment.obMan.observeRootPref({
       "network.prefetch-next": observePref,

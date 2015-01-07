@@ -52,7 +52,8 @@ function onload() {
 
   $id('pref-dontIndicateBlacklistedObjects').addEventListener('change',
       function (event) {
-        Prefs.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
+        rpPrefBranch.setBoolPref('indicateBlacklistedObjects',
+                                 !event.target.checked);
         Services.prefs.savePrefFile(null);
         updateDisplay();
       }

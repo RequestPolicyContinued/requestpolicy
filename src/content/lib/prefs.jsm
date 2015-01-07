@@ -29,6 +29,9 @@ let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["lib/process-environment"], this);
+
 
 
 let rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
@@ -81,7 +84,7 @@ let Prefs = (function() {
    *
    * @param {String} prefName name of the preference that was updated.
    */
-  function prefChanged(prefName) {
+  function updateCachedPref(prefName) {
     switch (prefName) {
       case "defaultPolicy.allow" :
         defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
@@ -93,7 +96,6 @@ let Prefs = (function() {
       default:
         break;
     }
-    Services.obs.notifyObservers(null, "requestpolicy-prefs-changed", null);
   }
 
   function isPrefEmpty(pref) {
@@ -117,19 +119,30 @@ let Prefs = (function() {
     blockingDisabled = rpPrefBranch.getBoolPref("startWithAllowAllEnabled");
   }
 
-  let prefObserver = {
-    observe: function(subject, topic, data) {
-      if (topic == "nsPref:changed") {
-        prefChanged(data);
-      }
+  let observePref = function(subject, topic, data) {
+    if (topic == "nsPref:changed") {
+      updateCachedPref(data);
+
+      // Send an observer notification that a pref that affects RP has been
+      // changed.
+      // TODO: also send the pref's name and its branch
+      Services.obs.notifyObservers(null, "requestpolicy-prefs-changed", null);
     }
   };
 
-  rpPrefBranch.addObserver("", prefObserver, false);
-  rootPrefBranch.addObserver("network.prefetch-next", prefObserver, false);
-  rootPrefBranch.addObserver("network.dns.disablePrefetch", prefObserver, false);
-
   init();
+
+  ProcessEnvironment.enqueueStartupFunction(function() {
+    ProcessEnvironment.obMan.observeRPPref({
+      "": function() {
+        observePref.apply(null, arguments);
+      }
+    });
+    ProcessEnvironment.obMan.observeRootPref({
+      "network.prefetch-next": observePref,
+      "network.dns.disablePrefetch": observePref
+    });
+  });
 
   return self;
 }());

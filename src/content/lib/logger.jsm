@@ -94,14 +94,6 @@ let Logger = (function() {
     types = rpPrefBranch.getIntPref("log.types");
   }
 
-  let prefObserver = {
-    observe: function(subject, topic, data) {
-      if (topic == "nsPref:changed") {
-        updateLoggingSettings();
-      }
-    }
-  };
-
   /**
    * init() is called by doLog() until initialization was successful.
    * For the case that nothing is logged at all, init is registered as a
@@ -113,7 +105,14 @@ let Logger = (function() {
       return;
     }
 
-    rpPrefBranch.addObserver("log", prefObserver, false);
+    // rpPrefBranch is available now.
+    ProcessEnvironment.obMan.observeRPPref({
+      "log": function(subject, topic, data) {
+        if (topic == "nsPref:changed") {
+          updateLoggingSettings();
+        }
+      }
+    });
     updateLoggingSettings();
 
     // don't call init() anymore when doLog() is called

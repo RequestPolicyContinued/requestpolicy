@@ -27,10 +27,19 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["ObserverManager"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+let globalScope = this;
 
-let {ProcessEnvironment} = ScriptLoader.importModule("lib/process-environment");
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/utils/observers",
+  "lib/process-environment"
+], globalScope);
+
+ScriptLoader.defineLazyModuleGetters({
+  "lib/prefs": ["rpPrefBranch", "rootPrefBranch"]
+}, globalScope);
+
+
 
 // Load the Logger at startup-time, not at load-time!
 // ( On load-time Logger might be null. )
@@ -39,36 +48,6 @@ ProcessEnvironment.enqueueStartupFunction(function() {
   Logger = ScriptLoader.importModule("lib/logger").Logger;
 });
 
-
-
-/**
- * An instance of this class registers itself to `nsIObserverService` on behalf
- * of some other object.
- */
-function SingleTopicObserver(aTopic, aFunctionToCall) {
-  // save the parameters
-  this.topic = aTopic;
-  // As the `observe` function, take directly the parameter.
-  this.observe = aFunctionToCall;
-
-  // currently this obserer is not rgistered yet
-  this.isRegistered = false;
-
-  // register this observer
-  this.register();
-}
-SingleTopicObserver.prototype.register = function() {
-  if (!this.isRegistered) {
-    Services.obs.addObserver(this, this.topic, false);
-    this.isRegistered = true;
-  }
-};
-SingleTopicObserver.prototype.unregister = function() {
-  if (this.isRegistered) {
-    Services.obs.removeObserver(this, this.topic);
-    this.isRegistered = false;
-  }
-};
 
 
 
@@ -84,6 +63,7 @@ function ObserverManager(aEnv) {
 
   if (!!aEnv) {
     self.environment.pushShutdownFunction(function() {
+      // unregister when the environment shuts down
       self.unregisterAllObservers();
     });
   } else {
@@ -99,24 +79,104 @@ function ObserverManager(aEnv) {
   self.observers = [];
 }
 
-/**
- * This function can be called from anywhere; the caller hands over an object
- * with the keys being the *topic* and the values being the function that
- * should be called when the topic is observed.
- */
-ObserverManager.prototype.observe = function(aList) {
-  let self = this;
-  for (let topic in aList) {
-    if (aList.hasOwnProperty(topic)) {
-      self.observers.push(new SingleTopicObserver(topic, aList[topic]));
-    }
-  }
-};
 
-ObserverManager.prototype.observePrefChanges = function(aFunctionToCall) {
-  let self = this;
-  self.observe({"requestpolicy-prefs-changed": aFunctionToCall});
-};
+/**
+ * Define 'observe' functions. Those function can be called from anywhere;
+ * the caller hands over an object with the keys being the "IDs" and the values
+ * being the function that should be called when the "ID" is observed.
+ *
+ * The "ID" for each function might be something different.
+ */
+{
+  /**
+   * Call aCallback for each of the object's entries, (key, value) being the
+   * parameters.
+   */
+  let forEach = function(obj, aCallback) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        aCallback(key, obj[key]);
+      }
+    }
+  };
+
+
+  //
+  // functions using nsIObserverService
+  //
+
+  /**
+   * Observe one single topic by using nsIObserverService. Details:
+   * https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIObserverService#addObserver%28%29
+   *
+   * @param {string} aTopic - The topic to be observed.
+   * @param {Function} aCallback - The observer's callback function.
+   */
+  ObserverManager.prototype.observeSingleTopic = function(aTopic, aCallback) {
+    let self = this;
+    self.observers.push(new SingleTopicObserver(aTopic, aCallback));
+  };
+
+  // shorthand for binding
+  let observeSingleTopic = ObserverManager.prototype.observeSingleTopic;
+
+  /**
+   * Observe multiple topics.
+   *
+   * @param {Object} aList - A list whereas a key is a "topic" to be observed
+   *     and a value is the function to be called when the topic is observed.
+   */
+  ObserverManager.prototype.observe = function(aList) {
+    let self = this;
+    forEach(aList, observeSingleTopic.bind(self));
+  };
+
+  /**
+   * A shorthand for calling observe() with topic "requestpolicy-prefs-changed".
+   */
+  ObserverManager.prototype.observePrefChanges = function(aCallback) {
+    let self = this;
+    self.observeSingleTopic("requestpolicy-prefs-changed", aCallback);
+  };
+
+  //
+  // functions using nsIPrefBranch
+  //
+
+  /**
+   * Observe one single subdomain of a Pref Branch (using nsIPrefBranch).
+   * Details: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefBranch#addObserver%28%29
+   *
+   * @param {string} aTopic - The topic to be observed.
+   * @param {Function} aCallback - The observer's callback function.
+   */
+  ObserverManager.prototype.observeSinglePrefBranch = function(aPrefBranch,
+                                                               aDomain,
+                                                               aCallback) {
+    let self = this;
+    let obs = new SinglePrefBranchObserver(aPrefBranch, aDomain, aCallback);
+    self.observers.push(obs);
+  };
+
+  // shorthand for binding
+  let observeSinglePrefBranch = ObserverManager.prototype.observeSinglePrefBranch;
+
+  /**
+   * Observe a notification directly from nsIObserverService.
+   * ==> In this case, each "ID" is a "topic".
+   * https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIObserverService#addObserver%28%29
+   */
+  ObserverManager.prototype.observeRPPref = function(aList) {
+    let self = this;
+    forEach(aList, observeSinglePrefBranch.bind(self, rpPrefBranch));
+  };
+  ObserverManager.prototype.observeRootPref = function(aList) {
+    let self = this;
+    forEach(aList, observeSinglePrefBranch.bind(self, rootPrefBranch));
+  };
+}
+
+
 
 /**
  * The function will unregister all registered observers.

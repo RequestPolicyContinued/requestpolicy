@@ -4,12 +4,15 @@
 
 "use strict";
 
-var {assert, expect} = require("../../../../../../lib/assertions");
-var prefs = require("../../../../../lib/prefs");
-var tabs = require("../../../../../lib/tabs");
+var rpRootDir = "../../";
+var rpConst = require(rpRootDir + "lib/constants");
+var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 
-var rpUtils = require("../../lib/rp-utils");
-var rpConst = require("../../lib/constants");
+var {assert, expect} = require(rootDir + "lib/assertions");
+var prefs = require(rootDir + "lib/prefs");
+var tabs = require(rootDir + "firefox/lib/tabs");
+
+var rpUtils = require(rpRootDir + "lib/rp-utils");
 
 var testURLs = [
   "http://www.maindomain.test/redirect-js-document-location-link.html",
@@ -22,11 +25,11 @@ var setupModule = function(aModule) {
   aModule.tabBrowser = new tabs.tabBrowser(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 
-  prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
+  prefs.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
 }
 
 var teardownModule = function(aModule) {
-  prefs.preferences.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
+  prefs.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
   aModule.tabBrowser.closeAllTabs();
 }
 

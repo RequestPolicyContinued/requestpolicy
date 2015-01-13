@@ -9,7 +9,7 @@ var rpConst = require(rpRootDir + "lib/constants");
 var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 
 var {assert, expect} = require(rootDir + "lib/assertions");
-var prefs = require(rootDir + "firefox/lib/prefs");
+var prefs = require(rootDir + "lib/prefs");
 var tabs = require(rootDir + "firefox/lib/tabs");
 
 var {

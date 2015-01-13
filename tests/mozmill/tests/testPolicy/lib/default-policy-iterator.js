@@ -44,10 +44,9 @@ let DefaultPolicyManager = exports.DefaultPolicyManager = (function() {
     if (binaryValue < 0 || binaryValue > maxBinaryValue) {
       return false;
     } else {
-      prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW,
-          isDefaultAllow(binaryValue));
-      prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW_SAME_DOMAIN,
-          isInterSubdomainAllowed(binaryValue));
+      prefs.setPref(rpConst.PREF_DEFAULT_ALLOW, isDefaultAllow(binaryValue));
+      prefs.setPref(rpConst.PREF_DEFAULT_ALLOW_SAME_DOMAIN,
+                    isInterSubdomainAllowed(binaryValue));
       currentBinaryValue = binaryValue;
       return true;
     }

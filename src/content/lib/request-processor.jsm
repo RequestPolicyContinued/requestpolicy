@@ -253,10 +253,13 @@ let RequestProcessor = (function(self) {
   };
 
   /**
-   * Determines if a request is a duplicate of the last call to shouldLoad(). If
-   * it is, the cached result in lastShouldLoadCheck.result can be used. Not
-   * sure why, it seems that there are duplicates so using this simple cache of
-   * the last call to shouldLoad() keeps duplicates out of log data.
+   * Determines if a request is a duplicate of the last call to shouldLoad().
+   * If it is, the cached result in lastShouldLoadCheck.result can be used.
+   * Using this simple cache of the last call to shouldLoad() keeps duplicates
+   * out of log data.
+   *
+   * Duplicate shouldLoad() calls can be produced for example by creating a
+   * page containing many <img> with the same image (same `src`).
    *
    * @param {Request} request
    * @return {boolean} True if the request is a duplicate of the previous one.

@@ -70,7 +70,7 @@ let Prefs = (function() {
     },
     "startWithAllowAllEnabled": {
       getter: {name: "isBlockingDisabled", fn: rpPrefBranch.getBoolPref},
-      setter: {name: "setBlockingDisabled", fn: rootPrefBranch.setBoolPref}
+      setter: {name: "setBlockingDisabled", fn: rpPrefBranch.setBoolPref}
     }
   };
   let cachedPrefs = {};

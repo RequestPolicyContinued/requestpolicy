@@ -28,6 +28,7 @@ const Cu = Components.utils;
 let EXPORTED_SYMBOLS = ["Logger"];
 
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
@@ -121,7 +122,7 @@ let Logger = (function() {
     initialized = true;
   }
 
-  ProcessEnvironment.enqueueStartupFunction(init);
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL, init);
 
 
 
@@ -147,6 +148,7 @@ let Logger = (function() {
       if (aError) {
         // if an error was provided, report it to the browser console
         Cu.reportError(aError);
+        console.trace();
       }
 
       // TODO: remove the following after finishing e10s

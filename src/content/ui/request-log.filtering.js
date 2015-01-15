@@ -40,6 +40,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let filterText = null;
 
+  // TODO: use the Window Environment instead
   let elements = WindowUtils.getElementsByIdOnLoad(window, {
         filterTextbox: "requestpolicy-requestLog-requestFilter",
         clearFilterButton: "requestpolicy-requestLog-clearFilter"

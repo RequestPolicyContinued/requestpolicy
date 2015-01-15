@@ -103,14 +103,17 @@ let WindowUtils = (function() {
                                         aCallback) {
     let scope = aScope || {};
     let document = aWindow.document;
-    aWindow.addEventListener("load", function() {
+    let callback = function() {
+      aWindow.removeEventListener("load", callback);
+
       for (let elementName in aElementIDs) {
         scope[elementName] = document.getElementById(aElementIDs[elementName]);
       }
       if (aCallback) {
         aCallback();
       }
-    });
+    };
+    aWindow.addEventListener("load", callback);
     return scope;
   };
 

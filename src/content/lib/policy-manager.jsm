@@ -348,5 +348,6 @@ let PolicyManager = (function(self) {
 }(PolicyManager || {}));
 
 
-Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/lib/policy-manager.alias-functions.js");
+Services.scriptloader.loadSubScriptWithOptions(
+    "chrome://requestpolicy/content/lib/policy-manager.alias-functions.js",
+    {/*ignoreCache: true*/});

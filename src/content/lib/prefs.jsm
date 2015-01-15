@@ -90,7 +90,7 @@ let Prefs = (function() {
 
         // define the pref's getter function to `self`
         self[getterName] = function() {
-          return cachedPrefs[getterName];
+          return cachedPrefs[prefID];
         };
 
         // define the pref's update() function to `cachedPrefList`
@@ -174,7 +174,7 @@ let Prefs = (function() {
     }
   };
 
-  ProcessEnvironment.enqueueStartupFunction(function() {
+  function registerPrefObserver() {
     ProcessEnvironment.obMan.observeRPPref({
       "": observePref
     });
@@ -182,7 +182,9 @@ let Prefs = (function() {
       "network.prefetch-next": observePref,
       "network.dns.disablePrefetch": observePref
     });
-  });
+  }
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        registerPrefObserver);
 
   return self;
 }());

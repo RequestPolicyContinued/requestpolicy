@@ -44,14 +44,17 @@ let rpWindowManager = (function(self) {
   ], globalScope);
 
   // import the WindowListener
-  Services.scriptloader.loadSubScript("chrome://requestpolicy/content/main/" +
-                                      "window-manager.listener.js",
-                                      globalScope);
+  Services.scriptloader.loadSubScriptWithOptions(
+      "chrome://requestpolicy/content/main/window-manager.listener.js",
+      {target: globalScope/*, ignoreCache: true*/});
 
   let styleSheets = [
     "chrome://requestpolicy/skin/requestpolicy.css",
     "chrome://requestpolicy/skin/toolbarbutton.css"
   ];
+
+  let frameScriptURI = "chrome://requestpolicy/content/ui/frame.js?" +
+      Math.random();
 
 
 
@@ -77,15 +80,18 @@ let rpWindowManager = (function(self) {
     // # 3 : load the overlay's and menu's javascript
     // ----------------------------------------------
     try {
-      Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/overlay.js", window);
-      Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/menu.js", window);
-      Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/classicmenu.js", window);
+      Services.scriptloader.loadSubScriptWithOptions(
+          "chrome://requestpolicy/content/ui/overlay.js",
+          {target: window/*, ignoreCache: true*/});
+      Services.scriptloader.loadSubScriptWithOptions(
+          "chrome://requestpolicy/content/ui/menu.js",
+          {target: window/*, ignoreCache: true*/});
+      Services.scriptloader.loadSubScriptWithOptions(
+          "chrome://requestpolicy/content/ui/classicmenu.js",
+          {target: window/*, ignoreCache: true*/});
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
-                     "Error loading subscripts for window: "+e, e);
+                     "Error loading subscripts for window: " + e, e);
     }
 
 
@@ -116,8 +122,7 @@ let rpWindowManager = (function(self) {
     // ==================================
     // # 6 : load frame scripts
     try {
-      window.messageManager.loadFrameScript(
-          "chrome://requestpolicy/content/ui/frame.js", true);
+      window.messageManager.loadFrameScript(frameScriptURI, true);
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR, "Error loading the frame script: "+e,e);
     }
@@ -126,7 +131,10 @@ let rpWindowManager = (function(self) {
   function unloadFromWindow(window) {
     // # 6 : unload frame scripts
     // --------------------------
-    // not needed
+    let mm = window.messageManager;
+    mm.removeDelayedFrameScript(frameScriptURI);
+    Logger.dump("broadcasting `shutdown` message to framescripts!");
+    mm.broadcastAsyncMessage(C.MM_PREFIX + "shutdown", {uri: frameScriptURI});
 
 
     // # 5 : "shutdown" the overlay
@@ -156,21 +164,26 @@ let rpWindowManager = (function(self) {
 
 
 
-  ProcessEnvironment.enqueueStartupFunction(function(data, reason) {
-    forEachOpenWindow(loadIntoWindow);
-    WindowListener.setLoadFunction(loadIntoWindow);
-    WindowListener.setUnloadFunction(unloadFromWindow);
-    WindowListener.startListening();
+  ProcessEnvironment.addStartupFunction(
+      Environment.LEVELS.INTERFACE,
+      function(data, reason) {
+        forEachOpenWindow(loadIntoWindow);
+        WindowListener.setLoadFunction(loadIntoWindow);
+        WindowListener.setUnloadFunction(unloadFromWindow);
+        WindowListener.startListening();
+      });
 
-    loadStyleSheets();
-  });
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, loadStyleSheets);
 
-  ProcessEnvironment.pushShutdownFunction(function() {
-    forEachOpenWindow(unloadFromWindow);
-    WindowListener.stopListening();
+  ProcessEnvironment.addShutdownFunction(
+      Environment.LEVELS.INTERFACE,
+      function() {
+        forEachOpenWindow(unloadFromWindow);
+        WindowListener.stopListening();
+      });
 
-    unloadStyleSheets();
-  });
+  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI,
+                                         unloadStyleSheets);
 
 
 
@@ -215,6 +228,6 @@ let rpWindowManager = (function(self) {
 
 
 // extend rpWindowManager
-Services.scriptloader.loadSubScript(
+Services.scriptloader.loadSubScriptWithOptions(
     "chrome://requestpolicy/content/main/window-manager-toolbarbutton.js",
-    globalScope);
+    {target: globalScope/*, ignoreCache: true*/});

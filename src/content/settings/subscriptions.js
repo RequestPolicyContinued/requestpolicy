@@ -121,7 +121,7 @@ function onload() {
       Logger.dump('Skipping unexpected official subName: ' + subName);
       continue;
     }
-    el.addEventListener('change', handleSubscriptionCheckboxChange);
+    elManager.addListener(el, 'change', handleSubscriptionCheckboxChange);
   }
 
   var selector = '[data-defaultpolicy=' +

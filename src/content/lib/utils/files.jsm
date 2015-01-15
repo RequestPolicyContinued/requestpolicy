@@ -76,6 +76,10 @@ var FileUtil = {
    * @param {nsIFile} file
    */
   fileToString : function(file) {
+    if (file.exists() === false) {
+      // prevent NS_ERROR_FILE_NOT_FOUND
+      return "";
+    }
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, octal444, 0);

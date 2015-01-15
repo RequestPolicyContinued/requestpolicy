@@ -38,6 +38,15 @@ window.requestpolicy.requestLog = (function (self) {
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
   let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
 
+  // create a new Environment for this window
+  var WinEnv = new Environment("WinEnv");
+  // The Environment has to be shut down when the content window gets unloaded.
+  WinEnv.shutdownOnUnload(window);
+  // start up right now, as there won't be any startup functions
+  WinEnv.startup();
+
+  let $id = window.document.getElementById.bind(window.document);
+
 
   self.isEmptyMessageDisplayed = true;
   self.rows = [];
@@ -45,8 +54,9 @@ window.requestpolicy.requestLog = (function (self) {
 
 
 
-  let init = function() {
-    // callback function – gets called when the tree is available.
+  function init() {
+    self.tree = $id("requestpolicy-requestLog-tree")
+
     self.tree.view = self.treeView;
 
     showLogIsEmptyMessage();
@@ -54,20 +64,15 @@ window.requestpolicy.requestLog = (function (self) {
     // Give the requestpolicy overlay direct access to the the request log.
     window.parent.requestpolicy.overlay.requestLog = self;
   }
-
-  WindowUtils.getElementsByIdOnLoad(window, {
-        tree: "requestpolicy-requestLog-tree"
-      }, self, init);
-
-
-
-
   function showLogIsEmptyMessage() {
     var message = StringUtils.$str("requestLogIsEmpty");
     var directions = StringUtils.$str("requestLogDirections");
     self.visibleRows.push([message, directions, false, ""]);
     self.treebox.rowCountChanged(0, 1);
-  };
+  }
+
+  // call init() on the window's "load" event
+  WinEnv.elManager.addListener(window, "load", init, false);
 
 
 

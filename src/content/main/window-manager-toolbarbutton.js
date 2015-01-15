@@ -42,18 +42,19 @@ let rpWindowManager = (function(self) {
   let isAustralis = Utils.info.isAustralis;
 
   //
-  // Case 1: Australis (Gecko >= 29)
+  // Case 1: Australis (Firefox >= 29)
   //
 
   if (isAustralis) {
-    ProcessEnvironment.enqueueStartupFunction(function() {
-      addToolbarButtonToAustralis();
-    });
+    ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI,
+                                          addToolbarButtonToAustralis);
+    ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI,
+                                           removeToolbarButtonFromAustralis);
+  }
 
-    ProcessEnvironment.pushShutdownFunction(function() {
-      let tbb = XULUtils.xulTrees.toolbarbutton[0];
-      CustomizableUI.destroyWidget(tbb.id);
-    });
+  function removeToolbarButtonFromAustralis() {
+    let tbb = XULUtils.xulTrees.toolbarbutton[0];
+    CustomizableUI.destroyWidget(tbb.id);
   }
 
   function addToolbarButtonToAustralis() {

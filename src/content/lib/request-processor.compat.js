@@ -40,20 +40,6 @@ let RequestProcessor = (function(self) {
   let compatibilityRules = [];
   let topLevelDocTranslationRules = {};
 
-  ProcessEnvironment.enqueueStartupFunction(function() {
-    // Detect other installed extensions and the current application and do
-    // what is needed to allow their requests.
-    initializeExtensionCompatibility();
-    initializeApplicationCompatibility();
-
-    AddonManager.addAddonListener(addonListener);
-  });
-
-  // stop observers / listeners
-  ProcessEnvironment.pushShutdownFunction(function() {
-    AddonManager.removeAddonListener(addonListener);
-  });
-
   // TODO: update compatibility rules etc. when addons are enabled/disabled
   let addonListener = {
     onDisabling : function(addon, needsRestart) {},
@@ -61,7 +47,22 @@ let RequestProcessor = (function(self) {
     onOperationCancelled : function(addon, needsRestart) {}
   };
 
+  function init() {
+    // Detect other installed extensions and the current application and do
+    // what is needed to allow their requests.
+    initializeExtensionCompatibility();
+    initializeApplicationCompatibility();
 
+    AddonManager.addAddonListener(addonListener);
+  }
+
+  // stop observers / listeners
+  function cleanup() {
+    AddonManager.removeAddonListener(addonListener);
+  }
+
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
+  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND, cleanup);
 
 
   function initializeExtensionCompatibility() {

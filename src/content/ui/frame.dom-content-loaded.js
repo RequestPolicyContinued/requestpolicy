@@ -42,9 +42,9 @@ let ManagerForDOMContentLoaded = (function() {
     // Notify the main thread that a link has been clicked.
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
-    sendSyncMessage(C.MMID + ":notifyLinkClicked",
-                    {origin: event.currentTarget.ownerDocument.URL,
-                     dest: event.currentTarget.href});
+    mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+                       {origin: event.currentTarget.ownerDocument.URL,
+                        dest: event.currentTarget.href});
   }
 
 
@@ -77,12 +77,12 @@ let ManagerForDOMContentLoaded = (function() {
 
     onDocumentLoaded(doc);
     let docID = DocManager.generateDocID(doc);
-    sendAsyncMessage(C.MMID + ":notifyDocumentLoaded",
+    mm.sendAsyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
                      {docID: docID, documentURI: doc.documentURI});
 
 
     if (isActiveTopLevelDocument(doc)) {
-      sendAsyncMessage(C.MMID + ":notifyTopLevelDocumentLoaded");
+      mm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
     }
   }
 
@@ -108,7 +108,7 @@ let ManagerForDOMContentLoaded = (function() {
     // other origins every time an iframe is loaded. Maybe, then, this should
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
-      sendAsyncMessage(C.MMID + ":notifyDOMFrameContentLoaded");
+      mm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
       /*
       // This has an advantage over just relying on the
       // observeBlockedRequest() call in that this will clear a blocked
@@ -121,19 +121,30 @@ let ManagerForDOMContentLoaded = (function() {
   }
 
 
+
+
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
    *
    * @param {Event} event
    */
-  function onDocumentLoaded(document) {
-    let documentURI = document.documentURI;
+  function onDocumentLoaded(doc) {
+    // Create a new Environment for this Document and shut it down when
+    // the document is unloaded.
+    let DocEnv = new Environment("DocEnv");
+    DocEnv.shutdownOnUnload(doc.defaultView);
+    // start up the Environment immediately, as it won't have any startup
+    // functions.
+    DocEnv.startup();
+
+
+    let documentURI = doc.documentURI;
 
     let metaRefreshes = [];
 
     // Find all meta redirects.
-    var metaTags = document.getElementsByTagName("meta");
+    var metaTags = doc.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
       let metaTag = metaTags[i];
       if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() != "refresh") {
@@ -153,7 +164,7 @@ let ManagerForDOMContentLoaded = (function() {
       // If destURI isn't a valid uri, assume it's a relative uri.
       if (!DomainUtil.isValidUri(destURI)) {
         originalDestURI = destURI;
-        destURI = document.documentURIObject.resolve(destURI);
+        destURI = doc.documentURIObject.resolve(destURI);
       }
 
       metaRefreshes.push({delay: delay, destURI: destURI,
@@ -163,7 +174,11 @@ let ManagerForDOMContentLoaded = (function() {
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      var docShell = document.defaultView
+      Logger.info(Logger.TYPE_META_REFRESH,
+                  "Number of meta refreshes found: " + metaRefreshes.length);
+
+
+      var docShell = doc.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShell);
@@ -172,7 +187,7 @@ let ManagerForDOMContentLoaded = (function() {
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 
-      sendAsyncMessage(C.MMID + ":handleMetaRefreshes",
+      mm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
           {documentURI: documentURI, metaRefreshes: metaRefreshes});
     }
 
@@ -188,12 +203,22 @@ let ManagerForDOMContentLoaded = (function() {
     // but I just don't know what it is. For now, there remains the risk of
     // dynamically added links whose target of the click event isn't the anchor
     // tag.
-    var anchorTags = document.getElementsByTagName("a");
-    for (var i = 0; i < anchorTags.length; i++) {
-      anchorTags[i].addEventListener("click", htmlAnchorTagClicked, false);
+    // TODO: is it possible to implement this differently?
+    var anchorTags = doc.getElementsByTagName("a");
+    for (let anchorTag of anchorTags) {
+      anchorTag.addEventListener("click", htmlAnchorTagClicked, false);
     }
+    DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+      for (let anchorTag of anchorTags) {
+        anchorTag.removeEventListener("click", htmlAnchorTagClicked, false);
+      }
+    });
 
-    wrapWindowFunctions(document.defaultView);
+    // maybe not needed?
+    //wrapWindowFunctions(doc.defaultView);
+    //DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+    //  unwrapWindowFunctions(doc.defaultView);
+    //});
   }
 
   /**
@@ -206,14 +231,27 @@ let ManagerForDOMContentLoaded = (function() {
    * @param {Function} aNewFunction
    */
   function wrapWindowFunction(aWindow, aFunctionName, aNewFunction) {
-    let originals = aWindow.rpOriginalFunctions
-        = aWindow.rpOriginalFunctions || {};
+    aWindow.rpOriginalFunctions = aWindow.rpOriginalFunctions || {};
+    let originals = aWindow.rpOriginalFunctions;
+
     if (!(aFunctionName in originals)) {
       originals[aFunctionName] = aWindow[aFunctionName];
       aWindow[aFunctionName] = function() {
         aNewFunction.apply(aWindow, arguments);
         return originals[aFunctionName].apply(aWindow, arguments);
       }
+    }
+  }
+  function unwrapWindowFunction(aWindow, aFunctionName) {
+    if (typeof aWindow.rpOriginalFunctions !== 'object') {
+      return;
+    }
+    let originals = aWindow.rpOriginalFunctions;
+
+    if (aFunctionName in originals) {
+      aWindow[aFunctionName] =
+          originals[aFunctionName];
+      delete originals[aFunctionName];
     }
   }
 
@@ -233,7 +271,7 @@ let ManagerForDOMContentLoaded = (function() {
   function wrapWindowFunctions(aWindow) {
     wrapWindowFunction(aWindow, "open",
         function(url, windowName, windowFeatures) {
-          sendSyncMessage(C.MMID + ":notifyLinkClicked",
+          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                           {origin: aWindow.document.documentURI,
                            dest: url});
         });
@@ -241,18 +279,40 @@ let ManagerForDOMContentLoaded = (function() {
     wrapWindowFunction(aWindow, "openDialog",
         function() {
           // openDialog(url, name, features, arg1, arg2, ...)
-          sendSyncMessage(C.MMID + ":notifyLinkClicked",
+          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                           {origin: aWindow.document.documentURI,
                            dest: arguments[0]});
         });
   }
+  function unwrapWindowFunctions(aWindow) {
+    unwrapWindowFunction(aWindow, "open");
+    unwrapWindowFunction(aWindow, "openDialog");
+    delete aWindow.rpOriginalFunctions;
+  }
 
 
-  addEventListener("DOMContentLoaded", onDOMContentLoaded, true);
+  FrameScriptEnv.elManager.addListener(mm, "DOMContentLoaded",
+                                       onDOMContentLoaded, true);
 
   // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
   // enclosed frames.
-  addEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded, true);
+  FrameScriptEnv.elManager.addListener(mm, "DOMFrameContentLoaded",
+                                       onDOMFrameContentLoaded, true);
+
+  //mm.addEventListener("DOMContentLoaded", onDOMContentLoaded, true);
+  //
+  //// DOMFrameContentLoaded is same DOMContentLoaded but also fires for
+  //// enclosed frames.
+  //mm.addEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded, true);
+  //
+  //// clean up on shutdown
+  //FrameScriptEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+  //  Logger.dump('removing listeners for "DOMContentLoaded" and ' +
+  //              '"DOMFrameContentLoaded"');
+  //  mm.removeEventListener("DOMContentLoaded", onDOMContentLoaded, true);
+  //  mm.removeEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded,
+  //                         true);
+  //});
 
   return self;
 }());

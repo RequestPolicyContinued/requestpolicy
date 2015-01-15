@@ -24,29 +24,78 @@
  * This singleton module can be used for having a reference to documents
  * (whether top level or frame documents). This is necessary when chrome code
  * needs to call functions on specific documents.
+ *
  */
 let DocManager = (function() {
   let self = {};
 
   let nextDocID = 0;
-  let documents = [];
+  let documents = new Map();
+
+  // the DocManager is enabled until it is shut down.
+  let enabled = true;
+
+
+  function cleanUpDoc(docID) {
+    let {doc, unloadCallback} = documents.get(docID);
+    // clean up listeners
+
+    doc.removeEventListener("unload", unloadCallback);
+    // no longer remember the document
+    documents.delete(docID);
+  }
+
+  // TODO: Create a `getDocEnv` function. The Environment can then also be
+  //       used to call `cleanUpDoc`.
+  //self.getDocEnv = function(doc) {};
+
 
   self.generateDocID = function(doc) {
+    if (!enabled) {
+      return null;
+    }
+
     let docID = nextDocID++;
-    documents[docID] = doc;
+
+    function cleanUpThisDoc() {
+      cleanUpDoc(docID);
+    };
 
     // Destructor function:
     // As soon as the document is unloaded, delete the reference.
     // The unload event is called when the document's location changes.
-    content.addEventListener("unload", function() {
-      delete documents[docID];
+    doc.addEventListener("unload", cleanUpThisDoc);
+
+    documents.set(docID, {
+      doc: doc,
+      unloadCallback: cleanUpThisDoc
     });
 
     return docID;
   };
 
+  function cleanUpAllDocs() {
+    // call `cleanUpAllDoc` for all docs
+    for (let [docID] of documents) {
+      // Note to the loop's head:
+      //     Destructuring assignment (ECMAScript 6) is used, that is, only
+      //     the "key" of `documents` is used, the "value" is ignored.
+      cleanUpDoc(docID);
+    }
+  }
+
+  function shutdownDocManager() {
+    enabled = false;
+    cleanUpAllDocs();
+  }
+  FrameScriptEnv.addShutdownFunction(Environment.LEVELS.BACKEND,
+                                     shutdownDocManager);
+
   self.getDocument = function(docID) {
-    return documents[docID] || null;
+    if (documents.has(docID)) {
+      return documents.get(docID).doc;
+    }
+    return null;
   };
 
   return self;

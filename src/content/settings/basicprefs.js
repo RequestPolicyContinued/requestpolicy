@@ -42,39 +42,37 @@ function updateDisplay() {
 function onload() {
   updateDisplay();
 
-  $id('pref-indicateBlockedObjects').addEventListener('change',
+  elManager.addListener(
+      $id('pref-indicateBlockedObjects'), 'change',
       function (event) {
         rpPrefBranch.setBoolPref('indicateBlockedObjects', event.target.checked);
         Services.prefs.savePrefFile(null);
         updateDisplay();
-      }
-  );
+      });
 
-  $id('pref-dontIndicateBlacklistedObjects').addEventListener('change',
+  elManager.addListener(
+      $id('pref-dontIndicateBlacklistedObjects'), 'change',
       function (event) {
         rpPrefBranch.setBoolPref('indicateBlacklistedObjects',
                                  !event.target.checked);
         Services.prefs.savePrefFile(null);
         updateDisplay();
-      }
-  );
+      });
 
-  $id('pref-autoReload').addEventListener('change',
-    function(event) {
-      rpPrefBranch.setBoolPref('autoReload', event.target.checked);
-      Services.prefs.savePrefFile(null);
-      updateDisplay();
-    }
-  );
+  elManager.addListener($id('pref-autoReload'), 'change', function(event) {
+    rpPrefBranch.setBoolPref('autoReload', event.target.checked);
+    Services.prefs.savePrefFile(null);
+    updateDisplay();
+  });
 
-  $id('pref-privateBrowsingPermanentWhitelisting')
-      .addEventListener('change', function (event) {
+  elManager.addListener(
+      $id('pref-privateBrowsingPermanentWhitelisting'), 'change',
+      function (event) {
         rpPrefBranch.setBoolPref('privateBrowsingPermanentWhitelisting',
                                  event.target.checked);
         Services.prefs.savePrefFile(null);
         updateDisplay();
-      }
-  );
+      });
 
   // call updateDisplay() every time a preference gets changed
   WinEnv.obMan.observePrefChanges(updateDisplay);

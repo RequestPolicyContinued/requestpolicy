@@ -46,13 +46,13 @@ let ManagerForBlockedContent = (function() {
   let transparentImageDataUri = "data:image/gif;base64,R0lGODlhAQABAIAAA"
       + "AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
-  function indicateBlockedVisibleObjects(message) {
+  let indicateBlockedVisibleObjects = function(message) {
     let {blockedURIs, docID} = message.data;
-    let document = DocManager.getDocument(docID);
-    if (!document) {
+    let doc = DocManager.getDocument(docID);
+    if (!doc) {
       return;
     }
-    let images = document.getElementsByTagName("img");
+    let images = doc.getElementsByTagName("img");
 
     // Ideally, want the image to be a broken image so that the alt text
     // shows. By default, the blocked image will just not show up at all.
@@ -90,10 +90,10 @@ let ManagerForBlockedContent = (function() {
         img.src = transparentImageDataUri;
       }
     }
-  }
+  };
 
-  addMessageListener(C.MMID + ":indicateBlockedVisibleObjects",
-                     indicateBlockedVisibleObjects);
+  mlManager.addListener("indicateBlockedVisibleObjects",
+                        indicateBlockedVisibleObjects);
 
   return self;
 }());

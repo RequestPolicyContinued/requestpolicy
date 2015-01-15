@@ -19,8 +19,12 @@ ScriptLoader.importModules([
 ], this);
 
 // create a new Environment for this window
-var WinEnv = new Environment();
-WinEnv.shutdownOnWindowUnload(content);
+var WinEnv = new Environment("WinEnv");
+// The Environment has to be shut down when the content window gets unloaded.
+WinEnv.shutdownOnUnload(content);
+// start up right now, as there won't be any startup functions
+WinEnv.startup();
+var elManager = WinEnv.elManager;
 
 
 var $id = content.document.getElementById.bind(content.document);

@@ -44,7 +44,7 @@ ScriptLoader.defineLazyModuleGetters({
 // Load the Logger at startup-time, not at load-time!
 // ( On load-time Logger might be null. )
 let Logger;
-ProcessEnvironment.enqueueStartupFunction(function() {
+ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, function() {
   Logger = ScriptLoader.importModule("lib/logger").Logger;
 });
 
@@ -62,10 +62,12 @@ function ObserverManager(aEnv) {
   self.environment = aEnv;
 
   if (!!aEnv) {
-    self.environment.pushShutdownFunction(function() {
-      // unregister when the environment shuts down
-      self.unregisterAllObservers();
-    });
+    self.environment.addShutdownFunction(
+        Environment.LEVELS.INTERFACE,
+        function() {
+          // unregister when the environment shuts down
+          self.unregisterAllObservers();
+        });
   } else {
     // aEnv is not defined! Try to report an error.
     if (!!Logger) {
@@ -185,7 +187,6 @@ ObserverManager.prototype.unregisterAllObservers = function() {
   let self = this;
   while (self.observers.length > 0) {
     let observer = self.observers.pop();
-    Logger.dump("Unregistering observer for topic " + observer.topic);
     observer.unregister();
   }
 };

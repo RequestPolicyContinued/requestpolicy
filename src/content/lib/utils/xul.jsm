@@ -35,9 +35,10 @@ let EXPORTED_SYMBOLS = ["XULUtils"];
 let XULUtils = {};
 
 let xulTrees = XULUtils.xulTrees = {};
-// TODO: convert to JSON
-Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/ui/xul-trees.js', xulTrees);
+
+Services.scriptloader.loadSubScriptWithOptions(
+    'chrome://requestpolicy/content/ui/xul-trees.js',
+    {target: xulTrees/*, ignoreCache: true*/});
 
 
 function getParentElement(doc, element) {

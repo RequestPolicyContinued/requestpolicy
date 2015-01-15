@@ -56,13 +56,13 @@ let PolicyImplementation = (function() {
   /**
    * Registers the content policy on startup.
    */
-  ProcessEnvironment.enqueueStartupFunction(function() {
+  function register() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
                       .registerFactory(self.classID, self.classDescription,
                                        self.contractID, self);
 
     let catMan = Utils.categoryManager;
-    for each (let category in xpcom_categories) {
+    for (let category of xpcom_categories) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
     }
@@ -74,14 +74,22 @@ let PolicyImplementation = (function() {
           Cc['@mozilla.org/uriloader/external-helper-app-service;1']
           .getService(Ci.nsIMIMEService);
     }
-  });
+  }
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        register);
 
 
-  ProcessEnvironment.pushShutdownFunction(function() {
+  function unregister() {
+    Logger.dump("shutting down PolicyImplementation...");
+
+    // Ensure that RP stops blocking requests even in case of an error in the
+    // shutdown process of PolicyImplementation.
+    self.shouldLoad = (() => C.CP_OK);
+
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
 
-    for (let category in xpcom_categories) {
+    for (let category of xpcom_categories) {
       catMan.deleteCategoryEntry(category, self.contractID, false);
     }
 
@@ -89,7 +97,9 @@ let PolicyImplementation = (function() {
     Utils.runAsync(function() {
       registrar.unregisterFactory(self.classID, self);
     });
-  });
+  }
+  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+                                         unregister);
 
   //
   // nsISupports interface implementation

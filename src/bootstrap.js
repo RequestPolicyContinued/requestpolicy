@@ -25,34 +25,26 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const procEnvURI = "chrome://requestpolicy/content/lib/" +
-    "process-environment.jsm";
+const envManURI = "chrome://requestpolicy/content/main/" +
+    "environment-manager.jsm";
 
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.
  * The Logger can't be used, as it might not be available.
  */
-function logSevereError(msg, stack) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-       (stack ? ", stack was: " + stack : "") + "\n");
+function logSevereError(msg, e) {
+  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
+       (e.stack ? ", stack was: " + e.stack : "") + "\n");
+  Cu.reportError(e);
 }
 
 function startup(data, reason) {
-  // if the Browser Toolbox is open when enabling RP, stop here.
-  // uncomment to enable this functionality.
-  // see also https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger
-  //debugger;
-
   try {
-    // Import the ProcessEnvironment and call its startup() function.
-    // Note: It is IMPORTANT that ProcessEnvironment is the FIRST module to be
-    //       imported! The reason is that many modules call
-    //       `ProcessEnvironment.enqueueStartupFunction()` at *load-time*, so
-    //       ProcessEnvironment has to be available.
-    Cu.import(procEnvURI);
-    ProcessEnvironment.startup(data, reason);
+    // Import the EnvironmentManager and call its startup() function.
+    Cu.import(envManURI);
+    EnvironmentManager.startup(data, reason);
   } catch(e) {
-    logSevereError("startup() failed! " + e, e.stack);
+    logSevereError("startup() failed!", e);
   }
 }
 
@@ -63,11 +55,11 @@ function shutdown(data, reason) {
 
   try {
     // shutdown, unset and unload.
-    ProcessEnvironment.shutdown(data, reason);
-    ProcessEnvironment = null;
-    Cu.unload(procEnvURI);
+    EnvironmentManager.shutdown(data, reason);
+    EnvironmentManager = null;
+    Cu.unload(envManURI);
   } catch(e) {
-    logSevereError("shutdown() failed! " + e, e.stack);
+    logSevereError("shutdown() failed!", e);
   }
 }
 

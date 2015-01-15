@@ -45,6 +45,12 @@ let RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
 
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cr = Components.results;
+  const Cu = Components.utils;
+
+
   /**
    * These are redirects that the user allowed when presented with a redirect
    * notification.

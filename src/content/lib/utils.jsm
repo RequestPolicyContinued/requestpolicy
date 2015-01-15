@@ -30,6 +30,7 @@ let EXPORTED_SYMBOLS = ["Utils"];
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/AddonManager.jsm");
+//Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
@@ -54,6 +55,8 @@ let Utils = (function() {
    * @param {Object} thisPtr
    */
   self.runAsync = function(callback, thisPtr) {
+    //console.log("registering async execution. Caller is "+
+    //            Components.stack.caller.filename);
     let params = Array.prototype.slice.call(arguments, 2);
     let runnable = {
       run: function() {
@@ -126,10 +129,11 @@ let Utils = (function() {
    */
   self.moduleInternal = function(aModuleScope) {
     aModuleScope.internal = aModuleScope.internal || {};
-    let sealInternal = function() {
+    function sealInternal() {
       delete aModuleScope.internal;
     };
-    ProcessEnvironment.enqueueStartupFunction(sealInternal);
+    ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL,
+                                          sealInternal);
     return aModuleScope.internal;
   };
 

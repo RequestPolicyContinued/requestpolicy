@@ -39,7 +39,8 @@ function showManageSubscriptionsLink() {
 function onload() {
   updateDisplay();
 
-  $id('defaultallow').addEventListener('change',
+  elManager.addListener(
+      $id('defaultallow'), 'change',
       function (event) {
         var allow = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allow', allow);
@@ -49,9 +50,10 @@ function onload() {
         common.switchSubscriptionPolicies();
         updateDisplay();
         showManageSubscriptionsLink();
-      }
-  );
-  $id('defaultdeny').addEventListener('change',
+      });
+
+  elManager.addListener(
+      $id('defaultdeny'), 'change',
       function (event) {
         var deny = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allow', !deny);
@@ -61,16 +63,16 @@ function onload() {
         common.switchSubscriptionPolicies();
         updateDisplay();
         showManageSubscriptionsLink();
-      }
-  );
-  $id('allowsamedomain').addEventListener('change',
+      });
+
+  elManager.addListener(
+      $id('allowsamedomain'), 'change',
       function (event) {
         var allowSameDomain = event.target.checked;
         rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
         Services.prefs.savePrefFile(null);
-      }
-  );
+      });
 
   // call updateDisplay() every time a preference gets changed
   WinEnv.obMan.observePrefChanges(updateDisplay);

@@ -216,7 +216,7 @@ function addRuleHelper() {
 
 function onload() {
   var search = $id('rulesearch');
-  search.addEventListener('keyup', function (event) {
+  elManager.addListener(search, 'keyup', function (event) {
     if (searchTimeoutId != null) {
       clearTimeout(searchTimeoutId);
     }

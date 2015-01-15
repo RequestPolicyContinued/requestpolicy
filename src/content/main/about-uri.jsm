@@ -25,14 +25,17 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
+let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
+
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
+let globalScope = this;
 
-let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModule("lib/process-environment", this);
+ScriptLoader.importModule("lib/process-environment", globalScope);
+
 
 var filenames = {
   "basicprefs": "basicprefs.html",
@@ -46,10 +49,8 @@ var filenames = {
 function getURI(aURI) {
   let id;
   let index = aURI.path.indexOf("?");
-  dump("path: "+aURI.path+"\n");
   if (index >= 0 && aURI.path.length > index) {
     id = aURI.path.substr(index+1);
-    dump("id: "+id+"\n");
   }
   if (!id || !(id in filenames)) {
     id = "basicprefs";
@@ -90,21 +91,26 @@ let AboutRequestPolicy = (function() {
   };
 
 
-
-  ProcessEnvironment.enqueueStartupFunction(function() {
+  function registerFactory() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-        .registerFactory(self.classID, self.classDescription, self.contractID,
-            self);
-  });
+        .registerFactory(self.classID, self.classDescription,
+                         self.contractID, self);
+  }
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        registerFactory);
 
-  ProcessEnvironment.pushShutdownFunction(function() {
+  function unregisterFactory() {
     let registrar = Components.manager
         .QueryInterface(Ci.nsIComponentRegistrar);
-    // This needs to run asynchronously, see bug 753687
+    let {Utils} = ScriptLoader.importModule("lib/utils");
+
+    // This needs to run asynchronously, see Mozilla bug 753687
     Utils.runAsync(function() {
       registrar.unregisterFactory(self.classID, self);
     });
-  });
+  }
+  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+                                         unregisterFactory);
 
   return self;
 }());

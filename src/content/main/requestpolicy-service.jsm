@@ -127,12 +127,10 @@ let rpService = (function() {
   // /////////////////////////////////////////////////////////////////////////
 
   // prepare back-end
-  ProcessEnvironment.enqueueStartupFunction(function() {
-    loadConfigAndRules();
-  });
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
+                                        loadConfigAndRules);
 
-  // start observers / listeners
-  ProcessEnvironment.enqueueStartupFunction(function() {
+  function registerObservers() {
     ProcessEnvironment.obMan.observe({
       "sessionstore-windows-restored": self.observe,
       SUBSCRIPTION_UPDATED_TOPIC: self.observe,
@@ -144,7 +142,9 @@ let rpService = (function() {
       //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
       "private-browsing": self.observe
     });
-  });
+  }
+  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        registerObservers);
 
 
 

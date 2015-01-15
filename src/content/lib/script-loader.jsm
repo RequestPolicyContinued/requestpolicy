@@ -34,6 +34,7 @@ let EXPORTED_SYMBOLS = ["ScriptLoader"];
 //         when the module to be imported wants to import ScriptLoader.
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 
 const rpChromeContentURI = 'chrome://requestpolicy/content/';
@@ -45,9 +46,9 @@ function getModuleURI(id) {
 /**
  * If the ScriptLoader catches an Exception, it will be a severe error.
  */
-function logSevereError(msg, stack) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg +
-       (stack ? ", stack was: " + stack : "") + "\n");
+function logSevereError(msg, e) {
+  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
+       (e.stack ? ", stack was: " + e.stack : "") + "\n");
 }
 
 
@@ -55,6 +56,14 @@ function logSevereError(msg, stack) {
 let ScriptLoader = (function() {
 
   let importedModuleURIs = {};
+
+  // URIs in that variable will not be unloaded
+  let moduleUnloadExceptions = {};
+  // a module shouldn't unload itself
+  moduleUnloadExceptions[getModuleURI("lib/script-loader")] = true;
+  // EnvironmentManager has to be unloaded even later than ScriptLoader
+  moduleUnloadExceptions[getModuleURI("main/environment-manager")] = true;
+
 
   // contains the module IDs that are currently being imported initially and
   // have not finished importing yet.
@@ -65,16 +74,29 @@ let ScriptLoader = (function() {
     /**
      * Unload all modules that have been imported.
      * See https://developer.mozilla.org/en-US/docs/Components.utils.unload
-     * The Process Environment of the main process takes care of calling this
-     * function.
      */
     unloadAllModules: function() {
       for (let uri in importedModuleURIs) {
-        if (importedModuleURIs.hasOwnProperty(uri)) {
-          Cu.unload(uri);
+        if (importedModuleURIs.hasOwnProperty(uri) &&
+            moduleUnloadExceptions.hasOwnProperty(uri) === false) {
+          //console.debug("[RPC] Unloading module "+uri);
+          try {
+            Cu.unload(uri);
+          } catch(e) {
+            console.error("[RPC] Failed to unload module "+uri);
+            Components.utils.reportError(e);
+          }
           delete importedModuleURIs[uri];
         }
       }
+    },
+
+    /**
+     * Function called by EnvironmentManager before ScriptLoader is being
+     * unloaded.
+     */
+    doShutdownTasks: function() {
+      self.unloadAllModules();
     },
 
     /**
@@ -93,11 +115,14 @@ let ScriptLoader = (function() {
         return scope;
       }
 
+      //console.debug("[RPC] `importModule` called for "+moduleID);
+
       let uri = getModuleURI(moduleID);
       try {
         if (!(uri in importedModuleURIs)) {
           // the module hasn't been imported yet
           modulesCurrentlyBeingImported[moduleID] = true;
+          //console.debug("[RPC] importing " + moduleID);
         }
 
         Cu.import(uri, scope);
@@ -107,11 +132,11 @@ let ScriptLoader = (function() {
           delete modulesCurrentlyBeingImported[moduleID];
         }
       } catch (e if e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
-        logSevereError("Failed to import module with ID \"" + moduleID + "\", the " +
-                       "file was not found! ", e.stack);
+        logSevereError('Failed to import module with ID "' + moduleID +
+                       '", the file was not found!', e);
       } catch (e) {
-        logSevereError("Failed to import module with ID \"" + moduleID + "\": " + e,
-                       e.stack);
+        logSevereError('Failed to import module with ID "' + moduleID +
+                       '".', e);
       }
       return scope;
     },
@@ -147,6 +172,7 @@ let ScriptLoader = (function() {
     defineLazyModuleGetter: function(moduleID, names, scope) {
       scope = scope || {};
 
+      //console.debug("[RPC] defining lazy module getter(s) for " + moduleID);
       let uri = getModuleURI(moduleID);
       for (let i in names) {
         let name = names[i];

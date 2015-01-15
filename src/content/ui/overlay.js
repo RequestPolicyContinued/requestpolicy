@@ -42,6 +42,8 @@ requestpolicy.overlay = (function() {
   }
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
+  let {Environment} = iMod("lib/environment");
+  let {ManagerForMessageListeners} = iMod("lib/manager-for-message-listeners");
   let {Logger} = iMod("lib/logger");
   let {rpPrefBranch, Prefs} = iMod("lib/prefs");
   let {RequestProcessor} = iMod("lib/request-processor");
@@ -57,6 +59,13 @@ requestpolicy.overlay = (function() {
 
   //let _prefetchInfoUri = "http://www.requestpolicy.com/help/prefetch.html";
   //let _prefetchDisablingInstructionsUri = "http://www.requestpolicy.com/help/prefetch.html#disable";
+
+
+  // create an environment for this overlay.
+  let OverlayEnvironment = new Environment("OverlayEnv");
+  // manage this overlay's message listeners:
+  let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
+                                                 window.messageManager);
 
 
   let initialized = false;
@@ -162,160 +171,178 @@ requestpolicy.overlay = (function() {
    *          event
    */
   self.onWindowLoad = function() {
-    //try {
-      // Info on detecting page load at:
-      // http://developer.mozilla.org/En/Code_snippets/On_page_load
-      var appcontent = $id("appcontent"); // browser
-      const requestpolicyOverlay = this;
-      if (appcontent) {
-        if (isFennec) {
-          appcontent.addEventListener("TabSelect", function(event) {
-            requestpolicyOverlay.tabChanged();
-          }, false);
-        }
-      }
-
-
-
-      messageManager.addMessageListener(
-          C.MMID + ":notifyDocumentLoaded",
-          function(message) {
-            dump("notifyDocumentLoaded\n\n");
-            let {docID, documentURI} = message.data;
-
-            // the <browser> element of the corresponding tab.
-            let browser = message.target;
-
-            if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
-              var indicateBlacklisted = rpPrefBranch
-                  .getBoolPref("indicateBlacklistedObjects");
-
-              var rejectedRequests = RequestProcessor._rejectedRequests
-                  .getOriginUri(documentURI);
-              let blockedURIs = {};
-              for (var destBase in rejectedRequests) {
-                for (var destIdent in rejectedRequests[destBase]) {
-                  for (var destUri in rejectedRequests[destBase][destIdent]) {
-                    // case 1: indicateBlacklisted == true
-                    //         ==> indicate the object has been blocked
-                    //
-                    // case 2: indicateBlacklisted == false
-                    // case 2a: all requests have been blocked because of a blacklist
-                    //          ==> do *not* indicate
-                    //
-                    // case 2b: at least one of the blocked (identical) requests has been
-                    //          blocked by a rule *other than* the blacklist
-                    //          ==> *do* indicate
-                    let requests = rejectedRequests[destBase][destIdent][destUri];
-                    if (indicateBlacklisted ||
-                        requestpolicyOverlay._containsNonBlacklistedRequests(
-                            requests)) {
-                      blockedURIs[destUri] = blockedURIs[destUri] ||
-                          {identifier: DomainUtil.getIdentifier(destUri)};
-                    }
-                  }
-                }
-              }
-              message.target.messageManager.sendAsyncMessage(
-                  C.MMID + ":indicateBlockedVisibleObjects",
-                  {blockedURIs: blockedURIs, docID: docID});
-            }
-
-            if ("requestpolicy" in browser &&
-                documentURI in browser.requestpolicy.blockedRedirects) {
-              // bad smell: do not save blocked requests in the <browser> obj
-              var dest = browser.requestpolicy.blockedRedirects[documentURI];
-              Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                  "Showing notification for blocked redirect. To <" + dest +
-                  "> " + "from <" + documentURI + ">");
-              self._showRedirectNotification(browser, dest);
-
-              delete browser.requestpolicy.blockedRedirects[documentURI];
-            }
-          });
-
-      messageManager.addMessageListener(
-          C.MMID + ":notifyTopLevelDocumentLoaded",
-          function (message) {
-            // Clear any notifications that may have been present.
-            self._setContentBlockedState(false);
-            // We don't do this immediately anymore because slow systems might have
-            // this slow down the loading of the page, which is noticable
-            // especially with CSS loading delays (it's not unlikely that slow
-            // webservers have a hand in this, too).
-            // Note that the change to _updateBlockedContentStateAfterTimeout seems to have
-            // added a bug where opening a blank tab and then quickly switching back
-            // to the original tab can cause the original tab's blocked content
-            // notification to be cleared. A simple compensation was to decrease
-            // the timeout from 1000ms to 250ms, making it much less likely the tab
-            // switch can be done in time for a blank opened tab. This isn't a real
-            // solution, though.
-            self._updateBlockedContentStateAfterTimeout();
-          });
-
-      messageManager.addMessageListener(
-          C.MMID + ":notifyDOMFrameContentLoaded",
-          function (message) {
-            // This has an advantage over just relying on the
-            // observeBlockedRequest() call in that this will clear a blocked
-            // content notification if there no longer blocked content. Another way
-            // to solve this would be to observe allowed requests as well as blocked
-            // requests.
-            blockedContentCheckLastTime = (new Date()).getTime();
-            self._stopBlockedContentCheckTimeout();
-            self._updateBlockedContentState(message.target);
-          });
-
-      messageManager.addMessageListener(C.MMID + ":handleMetaRefreshes",
-                                        self.handleMetaRefreshes);
-
-      messageManager.addMessageListener(
-          C.MMID + ":notifyLinkClicked", function (message) {
-              RequestProcessor.registerLinkClicked(message.data.origin,
-                                                   message.data.dest);
-          });
-
-      messageManager.addMessageListener(
-          C.MMID + ":notifyFormSubmitted", function (message) {
-              RequestProcessor.registerFormSubmitted(message.data.origin,
-                                                     message.data.dest);
-          });
-
-
-
-
-      // Add an event listener for when the contentAreaContextMenu (generally
-      // the right-click menu within the document) is shown.
-      var contextMenu = $id("contentAreaContextMenu");
-      if (contextMenu) {
-        contextMenu.addEventListener("popupshowing",
-            self._contextMenuOnPopupShowing, false);
-      }
-
-      // We consider the default place for the popup to be attached to the
-      // context menu, so attach it there.
-      //self._attachPopupToContextMenu();
-
-      // Listen for the user changing tab so we can update any notification or
-      // indication of blocked requests.
-      if (!isFennec) {
-        var container = gBrowser.tabContainer;
-        container.addEventListener("TabSelect", function(event) {
-          requestpolicyOverlay.tabChanged();
-        }, false);
-        self._wrapAddTab();
-        self._addLocationObserver();
-        self._addHistoryObserver();
-      }
-
-    //} catch (e) {
-    //  Logger.severeError("Fatal Error, " + e, e);
-    //  Logger.severeError(
-    //      "Unable to complete requestpolicy.overlay.onWindowLoad actions.");
-    //}
+    OverlayEnvironment.startup();
   };
 
+  function addAppcontentTabSelectListener() {
+    // Info on detecting page load at:
+    // http://developer.mozilla.org/En/Code_snippets/On_page_load
+    var appcontent = $id("appcontent"); // browser
+    if (appcontent) {
+      if (isFennec) {
+        OverlayEnvironment.elManager.addListener(appcontent, "TabSelect",
+                                                 self.tabChanged, false);
+      }
+    }
+  }
+  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        addAppcontentTabSelectListener);
+
+  /**
+   * Add an event listener for when the contentAreaContextMenu (generally
+   * the right-click menu within the document) is shown.
+   */
+  function addContextMenuListener() {
+    var contextMenu = $id("contentAreaContextMenu");
+    if (contextMenu) {
+      OverlayEnvironment.elManager.addListener(contextMenu, "popupshowing",
+                                               self._contextMenuOnPopupShowing,
+                                               false);
+    }
+  }
+  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        addContextMenuListener);
+
+  function addTabContainerTabSelectListener() {
+    // We consider the default place for the popup to be attached to the
+    // context menu, so attach it there.
+    //self._attachPopupToContextMenu();
+
+    // Listen for the user changing tab so we can update any notification or
+    // indication of blocked requests.
+    if (!isFennec) {
+      var container = gBrowser.tabContainer;
+
+      let tabSelectCallback = function(event) {
+        self.tabChanged();
+      };
+
+      OverlayEnvironment.elManager.addListener(container, "TabSelect",
+                                               tabSelectCallback, false);
+
+      // maybe it's not necessary anymore to wrap the tab. if it's needed,
+      // the wrapping needs to be undone at shutdown!
+      //self._wrapAddTab();
+      self._addLocationObserver();
+      self._addHistoryObserver();
+    }
+  }
+  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        addTabContainerTabSelectListener);
+
+
+
+
+  mlManager.addListener("notifyDocumentLoaded", function(message) {
+    let {docID, documentURI} = message.data;
+
+    // the <browser> element of the corresponding tab.
+    let browser = message.target;
+
+    if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
+      var indicateBlacklisted = rpPrefBranch
+          .getBoolPref("indicateBlacklistedObjects");
+
+      var rejectedRequests = RequestProcessor._rejectedRequests
+          .getOriginUri(documentURI);
+      let blockedURIs = {};
+      for (var destBase in rejectedRequests) {
+        for (var destIdent in rejectedRequests[destBase]) {
+          for (var destUri in rejectedRequests[destBase][destIdent]) {
+            // case 1: indicateBlacklisted == true
+            //         ==> indicate the object has been blocked
+            //
+            // case 2: indicateBlacklisted == false
+            // case 2a: all requests have been blocked because of a blacklist
+            //          ==> do *not* indicate
+            //
+            // case 2b: at least one of the blocked (identical) requests has been
+            //          blocked by a rule *other than* the blacklist
+            //          ==> *do* indicate
+            let requests = rejectedRequests[destBase][destIdent][destUri];
+            if (indicateBlacklisted ||
+                self._containsNonBlacklistedRequests(requests)) {
+              blockedURIs[destUri] = blockedURIs[destUri] ||
+                  {identifier: DomainUtil.getIdentifier(destUri)};
+            }
+          }
+        }
+      }
+      message.target.messageManager.sendAsyncMessage(
+          C.MM_PREFIX + "indicateBlockedVisibleObjects",
+          {blockedURIs: blockedURIs, docID: docID});
+    }
+
+    if ("requestpolicy" in browser &&
+        documentURI in browser.requestpolicy.blockedRedirects) {
+      // bad smell: do not save blocked requests in the <browser> obj
+      var dest = browser.requestpolicy.blockedRedirects[documentURI];
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "Showing notification for blocked redirect. To <" + dest +
+          "> " + "from <" + documentURI + ">");
+      self._showRedirectNotification(browser, dest);
+
+      delete browser.requestpolicy.blockedRedirects[documentURI];
+    }
+  });
+
+
+
+  mlManager.addListener("notifyTopLevelDocumentLoaded", function (message) {
+    // Clear any notifications that may have been present.
+    self._setContentBlockedState(false);
+    // We don't do this immediately anymore because slow systems might have
+    // this slow down the loading of the page, which is noticable
+    // especially with CSS loading delays (it's not unlikely that slow
+    // webservers have a hand in this, too).
+    // Note that the change to _updateBlockedContentStateAfterTimeout seems to have
+    // added a bug where opening a blank tab and then quickly switching back
+    // to the original tab can cause the original tab's blocked content
+    // notification to be cleared. A simple compensation was to decrease
+    // the timeout from 1000ms to 250ms, making it much less likely the tab
+    // switch can be done in time for a blank opened tab. This isn't a real
+    // solution, though.
+    self._updateBlockedContentStateAfterTimeout();
+  });
+
+
+
+  mlManager.addListener("notifyDOMFrameContentLoaded", function (message) {
+    // This has an advantage over just relying on the
+    // observeBlockedRequest() call in that this will clear a blocked
+    // content notification if there no longer blocked content. Another way
+    // to solve this would be to observe allowed requests as well as blocked
+    // requests.
+    blockedContentCheckLastTime = (new Date()).getTime();
+    self._stopBlockedContentCheckTimeout();
+    self._updateBlockedContentState(message.target);
+  });
+
+
+
+  mlManager.addListener("handleMetaRefreshes", function(message) {
+    self.handleMetaRefreshes(message);
+  });
+
+
+
+  mlManager.addListener("notifyLinkClicked", function (message) {
+    RequestProcessor.registerLinkClicked(message.data.origin,
+                                         message.data.dest);
+  });
+
+
+
+  mlManager.addListener("notifyFormSubmitted", function (message) {
+    RequestProcessor.registerFormSubmitted(message.data.origin,
+                                           message.data.dest);
+  });
+
+
+
   self.handleMetaRefreshes = function(message) {
+    Logger.dump("Handling meta refreshes...");
+
     let {documentURI, metaRefreshes} = message.data;
     let browser = message.target;
 
@@ -526,7 +553,7 @@ requestpolicy.overlay = (function() {
             RequestProcessor.registerAllowedRedirect(
                 browser.documentURI.specIgnoringRef, redirectTargetUri);
 
-            browser.messageManager.sendAsyncMessage(C.MMID + ":setLocation",
+            browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
                 {uri: redirectTargetUri});
           }
         },
@@ -990,7 +1017,7 @@ requestpolicy.overlay = (function() {
     if (rulesChanged || self._needsReloadOnMenuClose) {
       if (rpPrefBranch.getBoolPref("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
-        mm.sendAsyncMessage(C.MMID + ":reload");
+        mm.sendAsyncMessage(C.MM_PREFIX + "reload");
       }
     }
     self._needsReloadOnMenuClose = false;

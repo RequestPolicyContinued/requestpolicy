@@ -57,7 +57,6 @@ let PrefManager = (function() {
 
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
-    console.info("Performing 'disable' operations.");
     var resetLinkPrefetch = rpPrefBranch.getBoolPref(
         "prefetch.link.restoreDefaultOnUninstall");
     var resetDNSPrefetch = rpPrefBranch.getBoolPref(
@@ -85,8 +84,9 @@ let PrefManager = (function() {
     // to handle their default preferences manually, see Mozilla Bug 564675:
     // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
     // The scope of that script doesn't need to be remembered.
-    Services.scriptloader.loadSubScript("chrome://requestpolicy/content/main/" +
-                                        "default-pref-handler.js", {});
+    Services.scriptloader.loadSubScriptWithOptions(
+        "chrome://requestpolicy/content/main/default-pref-handler.js",
+        {target: {}/*, ignoreCache: true*/});
 
 
     // ================================
@@ -131,13 +131,15 @@ let PrefManager = (function() {
   };
 
 
-  ProcessEnvironment.pushShutdownFunction(function(data, reason) {
+  function eventuallyHandleUninstallOrDisable(data, reason) {
     if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
       // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
       //       disabled when being uninstalled.
       handleUninstallOrDisable();
     }
-  });
+  }
+  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
+                                         eventuallyHandleUninstallOrDisable);
 
   return self;
 }());

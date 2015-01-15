@@ -102,8 +102,8 @@ requestpolicy.menu = (function() {
    * „Should be permanent rules be displayed or hidden?“
    */
   function mayPermRulesBeDisplayed() {
-    return WindowUtils.isWindowPrivate(window) &&
-        !rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
+    return WindowUtils.isWindowPrivate(window) === false ||
+        rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
   }
 
 

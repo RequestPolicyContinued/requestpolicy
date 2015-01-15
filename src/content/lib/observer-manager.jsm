@@ -163,11 +163,6 @@ function ObserverManager(aEnv) {
   // shorthand for binding
   let observeSinglePrefBranch = ObserverManager.prototype.observeSinglePrefBranch;
 
-  /**
-   * Observe a notification directly from nsIObserverService.
-   * ==> In this case, each "ID" is a "topic".
-   * https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIObserverService#addObserver%28%29
-   */
   ObserverManager.prototype.observeRPPref = function(aList) {
     let self = this;
     forEach(aList, observeSinglePrefBranch.bind(self, rpPrefBranch));

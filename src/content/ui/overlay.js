@@ -138,7 +138,6 @@ requestpolicy.overlay = (function() {
         RequestProcessor.addRequestObserver(self);
 
         //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
-        self._setPermissiveNotification(Prefs.isBlockingDisabled());
       }
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
@@ -640,30 +639,32 @@ requestpolicy.overlay = (function() {
   };
 
   /**
-   * Sets the permissive status visible to the user for all windows.
+   * Update RP's "permissive" status, which is to true or false.
    */
-  self._setPermissiveNotificationForAllWindows = function(isPermissive) {
-    // We do it for all windows, not just the current one.
-    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-        .getService(Components.interfaces.nsIWindowMediator);
-    var enumerator = wm.getEnumerator(null);
-    while (enumerator.hasMoreElements()) {
-      var window = enumerator.getNext();
-      if ("requestpolicy" in window && "overlay" in window.requestpolicy) {
-        window.requestpolicy.overlay._setPermissiveNotification(isPermissive);
-      }
-    }
-  };
-
-  /**
-   * Sets the permissive status visible to the user for just this window.
-   */
-  self._setPermissiveNotification = function(isPermissive) {
+  function updatePermissiveStatus() {
     var button = $id(toolbarButtonId);
     if (button) {
+      let isPermissive = Prefs.isBlockingDisabled();
       button.setAttribute("requestpolicyPermissive", isPermissive);
     }
-  };
+  }
+  /**
+   * register a pref observer
+   */
+  function updatePermissiveStatusOnPrefChanges() {
+    OverlayEnvironment.obMan.observeRPPref({
+      "startWithAllowAllEnabled": function(subject, topic, data) {
+        if (topic == "nsPref:changed") {
+          updatePermissiveStatus();
+        }
+      }
+    });
+  }
+  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+                                        updatePermissiveStatusOnPrefChanges);
+  // initially set the Permissive Status
+  OverlayEnvironment.addStartupFunction(Environment.LEVELS.UI,
+                                        updatePermissiveStatus);
 
   /**
    * This function is called when any allowed requests happen. This must be as
@@ -1061,8 +1062,6 @@ requestpolicy.overlay = (function() {
     // Change the link displayed in the menu.
     $id('rp-link-enable-blocking').hidden = !disabled;
     $id('rp-link-disable-blocking').hidden = disabled;
-
-    self._setPermissiveNotificationForAllWindows(disabled);
   };
 
   /**

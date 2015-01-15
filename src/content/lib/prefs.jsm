@@ -55,13 +55,20 @@ let Prefs = (function() {
   };
 
 
+  // not needed yet
+  //function getInvertedRPBoolPref(aPrefName) {
+  //  return !rpPrefBranch.getBoolPref(aPrefName);
+  //}
+  //function setInvertedRPBoolPref(aPrefName, aValue) {
+  //  rpPrefBranch.setBoolPref(aPrefName, !aValue);
+  //}
 
   /**
-   * Define a list of preferences that will be available through
+   * Define a list of pref aliases that will be available through
    * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
-   * Those functions will be created subsequently.
+   * Those functions will be added to `self` subsequently.
    */
-  let cachedPrefList = {
+  let prefAliases = {
     "defaultPolicy.allow": {
       getter: {name: "isDefaultAllow", fn: rpPrefBranch.getBoolPref}
     },
@@ -73,48 +80,34 @@ let Prefs = (function() {
       setter: {name: "setBlockingDisabled", fn: rpPrefBranch.setBoolPref}
     }
   };
-  let cachedPrefs = {};
-
 
   /**
    * Dynamically create functions like `isDefaultAllow` or
-   * `setBlockingDisabled`. Also add `update()` functions to elements of
-   * `cachedPrefList` that have a `getter`.
+   * `setBlockingDisabled`.
    */
   {
-    for (let prefID in cachedPrefList) {
-      let pref = cachedPrefList[prefID];
+    for (let prefID in prefAliases) {
+      let pref = prefAliases[prefID];
 
       if (pref.hasOwnProperty("getter")) {
         let getterName = pref.getter.name;
+        let getPref = pref.getter.fn;
 
         // define the pref's getter function to `self`
         self[getterName] = function() {
-          return cachedPrefs[prefID];
+          return getPref(prefID);
         };
-
-        // define the pref's update() function to `cachedPrefList`
-        pref.update = function() {
-          cachedPrefs[prefID] = pref.getter.fn(prefID);
-        };
-
-        // initially call update()
-        pref.update();
       }
 
       if (pref.hasOwnProperty("setter")) {
         let setterName = pref.setter.name;
+        let setPref = pref.setter.fn;
 
         // define the pref's getter function to `self`
         self[setterName] = function(aValue) {
           // set the pref and save it
-          pref.setter.fn(prefID, aValue);
+          setPref(prefID, aValue);
           self.save();
-
-          // update the cached value
-          if (typeof pref.update !== 'undefined') {
-            pref.update();
-          }
         };
       }
     }
@@ -146,27 +139,9 @@ let Prefs = (function() {
   };
 
 
-  /**
-   * This function updates all cached prefs.
-   */
-  function updateCachedPref(prefID) {
-    // first check if this pref is cached
-    if (!cachedPrefList.hasOwnProperty(prefID)) {
-      return;
-    }
 
-    let pref = cachedPrefList[prefID];
-
-    // check if this pref has an update() function
-    if (typeof pref.update === 'function') {
-      pref.update();
-    }
-  }
-
-  let observePref = function(subject, topic, data) {
+  function observePref(subject, topic, data) {
     if (topic == "nsPref:changed") {
-      updateCachedPref(data);
-
       // Send an observer notification that a pref that affects RP has been
       // changed.
       // TODO: also send the pref's name and its branch
@@ -175,9 +150,10 @@ let Prefs = (function() {
   };
 
   function registerPrefObserver() {
-    ProcessEnvironment.obMan.observeRPPref({
-      "": observePref
-    });
+    // observe everything on RP's pref branch
+    ProcessEnvironment.obMan.observeRPPref({"": observePref});
+
+    // observe what is needed else
     ProcessEnvironment.obMan.observeRootPref({
       "network.prefetch-next": observePref,
       "network.dns.disablePrefetch": observePref

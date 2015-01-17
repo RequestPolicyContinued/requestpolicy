@@ -55,6 +55,12 @@ let Prefs = (function() {
   };
 
 
+  function getRPBoolPref(aPrefName) {
+    return rpPrefBranch.getBoolPref(aPrefName);
+  }
+  function setRPBoolPref(aPrefName, aValue) {
+    rpPrefBranch.setBoolPref(aPrefName, aValue);
+  }
   // not needed yet
   //function getInvertedRPBoolPref(aPrefName) {
   //  return !rpPrefBranch.getBoolPref(aPrefName);
@@ -68,16 +74,14 @@ let Prefs = (function() {
    * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
    * Those functions will be added to `self` subsequently.
    */
-  let prefAliases = {
-    "defaultPolicy.allow": {
-      getter: {name: "isDefaultAllow", fn: rpPrefBranch.getBoolPref}
-    },
-    "defaultPolicy.allowSameDomain": {
-      getter: {name: "isDefaultAllowSameDomain", fn: rpPrefBranch.getBoolPref}
-    },
-    "startWithAllowAllEnabled": {
-      getter: {name: "isBlockingDisabled", fn: rpPrefBranch.getBoolPref},
-      setter: {name: "setBlockingDisabled", fn: rpPrefBranch.setBoolPref}
+  let rpPrefAliases = {
+    "bool": {
+      "defaultPolicy.allow": "DefaultAllow",
+      "defaultPolicy.allowSameDomain": "DefaultAllowSameDomain",
+
+      // As an example, this will become `isBlockingDisabled()` and
+      // `setBlockingDisabled()`:
+      "startWithAllowAllEnabled": "BlockingDisabled"
     }
   };
 
@@ -86,30 +90,14 @@ let Prefs = (function() {
    * `setBlockingDisabled`.
    */
   {
-    for (let prefID in prefAliases) {
-      let pref = prefAliases[prefID];
+    for (let prefID in rpPrefAliases.bool) {
+      let prefName = rpPrefAliases.bool[prefID];
 
-      if (pref.hasOwnProperty("getter")) {
-        let getterName = pref.getter.name;
-        let getPref = pref.getter.fn;
+      // define the pref's getter function to `self`
+      self["is"+prefName] = getRPBoolPref.bind(this, prefID);
 
-        // define the pref's getter function to `self`
-        self[getterName] = function() {
-          return getPref(prefID);
-        };
-      }
-
-      if (pref.hasOwnProperty("setter")) {
-        let setterName = pref.setter.name;
-        let setPref = pref.setter.fn;
-
-        // define the pref's getter function to `self`
-        self[setterName] = function(aValue) {
-          // set the pref and save it
-          setPref(prefID, aValue);
-          self.save();
-        };
-      }
+      // define the pref's getter function to `self`
+      self["set"+prefName] = setRPBoolPref.bind(this, prefID);
     }
   }
 

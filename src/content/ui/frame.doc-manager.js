@@ -57,9 +57,7 @@ let DocManager = (function() {
 
     let docID = nextDocID++;
 
-    function cleanUpThisDoc() {
-      cleanUpDoc(docID);
-    };
+    let cleanUpThisDoc = cleanUpDoc.bind(this, docID);
 
     // Destructor function:
     // As soon as the document is unloaded, delete the reference.

@@ -131,10 +131,14 @@ NormalRequest.prototype.detailsToString = function() {
   *         resources.
   */
 NormalRequest.prototype.isInternal = function() {
+  // TODO: investigate "moz-nullprincipal". The following comment has been
+  //       created by @jsamuel in 2008, commit 46a04bb. More information about
+  //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
+  //
   // Note: Don't OK the origin scheme "moz-nullprincipal" without further
-  // understanding. It appears to be the source when test8.html is used. That
-  // is, javascript redirect to a "javascript:" url that creates the entire
-  // page's content which includes a form that it submits. Maybe
+  // understanding. It appears to be the source when the `js_1.html` test is
+  // used. That is, javascript redirect to a "javascript:" url that creates the
+  // entire page's content which includes a form that it submits. Maybe
   // "moz-nullprincipal" always shows up when using "document.location"?
 
   // Not cross-site requests.

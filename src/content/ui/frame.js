@@ -133,9 +133,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
    * closed.
    */
   {
-    FrameScriptEnv.elManager.addListener(mm, "unload", function() {
-      FrameScriptEnv.shutdown();
-    }, false);
+    FrameScriptEnv.shutdownOnUnload(mm);
   }
 
   /**

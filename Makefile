@@ -181,13 +181,20 @@ run: $(xpi_file)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 mozmill_tests_path := .mozilla/mozmill-tests/
-mozmill_manifest := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/manifest.ini
+mozmill_requestpolicy_test_path := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/
+
+# It's possible to pass the manifest file `mm_manifest` to make
+ifndef mm_manifest
+## default value
+mm_manifest := manifest.ini
+endif
 
 .PHONY: check test mozmill
 check test: mozmill
 
 mozmill: $(xpi_file)
-	mozmill -a $(xpi_file) -b $(binary_firefox_nightly) -m $(mozmill_manifest)
+	mozmill -a $(xpi_file) -b $(binary_firefox_nightly) \
+		-m $(mozmill_requestpolicy_test_path)$(mm_manifest)
 
 
 # ________________

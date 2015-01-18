@@ -46,12 +46,12 @@ let ManagerForBlockedContent = (function() {
   let transparentImageDataUri = "data:image/gif;base64,R0lGODlhAQABAIAAA"
       + "AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
-  let indicateBlockedVisibleObjects = function(message) {
-    let {blockedURIs, docID} = message.data;
-    let doc = DocManager.getDocument(docID);
-    if (!doc) {
+  self.indicateBlockedVisibleObjects = function(doc, blockedURIs) {
+    if (Object.getOwnPropertyNames(blockedURIs).length == 0) {
+      // there are no blocked uris
       return;
     }
+
     let images = doc.getElementsByTagName("img");
 
     // Ideally, want the image to be a broken image so that the alt text
@@ -91,9 +91,6 @@ let ManagerForBlockedContent = (function() {
       }
     }
   };
-
-  mlManager.addListener("indicateBlockedVisibleObjects",
-                        indicateBlockedVisibleObjects);
 
   return self;
 }());

@@ -25,6 +25,7 @@ let ManagerForDOMContentLoaded = (function() {
   let self = {};
 
   let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
+  let {Utils} = ScriptLoader.importModule("lib/utils");
 
 
   function htmlAnchorTagClicked(event) {
@@ -58,16 +59,24 @@ let ManagerForDOMContentLoaded = (function() {
     // called once.
     //    <--- the above comment is very old – is it still true that
     //         onDOMContentLoaded is eventually called multiple times?
-    let doc = event.originalTarget;
+    var doc = event.originalTarget;
     if (doc.nodeName != "#document") {
       // only documents
       return;
     }
 
     onDocumentLoaded(doc);
-    let docID = DocManager.generateDocID(doc);
-    mm.sendAsyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
-                     {docID: docID, documentURI: doc.documentURI});
+
+    // take only one answer. If there are more answers, they are ignored
+    // ==> there must be only one listener for 'notifyDocumentLoaded'
+    let [answer] = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
+                                      {documentURI: doc.documentURI});
+    var blockedURIs = answer.blockedURIs;
+    // Indicating blocked visible objects isn't an urgent task, so this should
+    // be done async.
+    Utils.runAsync(function() {
+      ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
+    });
 
 
     if (isActiveTopLevelDocument(doc)) {

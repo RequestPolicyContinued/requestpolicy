@@ -233,10 +233,12 @@ requestpolicy.overlay = (function() {
 
 
   mlManager.addListener("notifyDocumentLoaded", function(message) {
-    let {docID, documentURI} = message.data;
+    let {documentURI} = message.data;
 
     // the <browser> element of the corresponding tab.
     let browser = message.target;
+
+    let blockedURIs = {};
 
     if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
       var indicateBlacklisted = rpPrefBranch
@@ -244,7 +246,6 @@ requestpolicy.overlay = (function() {
 
       var rejectedRequests = RequestProcessor._rejectedRequests
           .getOriginUri(documentURI);
-      let blockedURIs = {};
       for (var destBase in rejectedRequests) {
         for (var destIdent in rejectedRequests[destBase]) {
           for (var destUri in rejectedRequests[destBase][destIdent]) {
@@ -267,9 +268,6 @@ requestpolicy.overlay = (function() {
           }
         }
       }
-      message.target.messageManager.sendAsyncMessage(
-          C.MM_PREFIX + "indicateBlockedVisibleObjects",
-          {blockedURIs: blockedURIs, docID: docID});
     }
 
     if ("requestpolicy" in browser &&
@@ -283,6 +281,9 @@ requestpolicy.overlay = (function() {
 
       delete browser.requestpolicy.blockedRedirects[documentURI];
     }
+
+    // send the list of blocked URIs back to the frame script
+    return {blockedURIs: blockedURIs};
   });
 
 

@@ -187,9 +187,6 @@ Components.utils.import("resource://gre/modules/Services.jsm");
     Services.scriptloader.loadSubScriptWithOptions(
         'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js',
         {target: FrameScriptScope/*, ignoreCache: true*/});
-    Services.scriptloader.loadSubScriptWithOptions(
-        'chrome://requestpolicy/content/ui/frame.doc-manager.js',
-        {target: FrameScriptScope/*, ignoreCache: true*/});
   }
   FrameScriptEnv.addStartupFunction(Environment.LEVELS.BACKEND,
                                     loadSubScripts);

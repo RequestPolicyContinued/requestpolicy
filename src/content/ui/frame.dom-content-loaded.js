@@ -24,18 +24,7 @@
 let ManagerForDOMContentLoaded = (function() {
   let self = {};
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
-
-  let ScriptLoader;
-  {
-    let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-    ScriptLoader = mod.ScriptLoader;
-  }
   let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
-  let {Logger} = ScriptLoader.importModule("lib/logger");
 
 
   function htmlAnchorTagClicked(event) {

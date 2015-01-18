@@ -55,6 +55,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 
   ScriptLoader.importModules([
     "lib/utils/constants",
+    "lib/logger",
     "lib/environment",
     "main/environment-manager"
   ], FrameScriptScope);

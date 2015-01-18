@@ -36,6 +36,7 @@ window.requestpolicy.requestLog = (function (self) {
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
   let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
+  let {Environment} = ScriptLoader.importModule("lib/environment");
 
   // create a new Environment for this window
   var WinEnv = new Environment("WinEnv");

@@ -29,12 +29,11 @@ window.requestpolicy.requestLog = (function (self) {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  let ScriptLoader;
-  {
+  let {ScriptLoader} = (function() {
     let mod = {};
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-    ScriptLoader = mod.ScriptLoader;
-  }
+    return mod;
+  }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
   let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
 

@@ -32,14 +32,12 @@ requestpolicy.overlay = (function() {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  Cu.import("resource://gre/modules/Services.jsm");
-
-  let ScriptLoader;
-  {
+  let {ScriptLoader} = (function() {
     let mod = {};
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-    ScriptLoader = mod.ScriptLoader;
-  }
+    return mod;
+  }());
+
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
   let {Environment} = iMod("lib/environment");

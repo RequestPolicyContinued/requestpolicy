@@ -29,12 +29,11 @@ requestpolicy.menu = (function() {
   const Cu = Components.utils;
 
 
-  let ScriptLoader;
-  {
+  let {ScriptLoader} = (function() {
     let mod = {};
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
-    ScriptLoader = mod.ScriptLoader;
-  }
+    return mod;
+  }());
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
   let {Logger} = iMod("lib/logger");

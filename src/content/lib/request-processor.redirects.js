@@ -361,7 +361,7 @@ let RequestProcessor = (function(self) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
         internal.faviconRequests[rawDestString] = true;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + headerType
+        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + httpResponse.redirHeaderType
                 + "' header to <" + rawDestString + "> " + "from <" + originString
                 + "> appears to be a redirected favicon request. "
                 + "This will be treated as a content request.");

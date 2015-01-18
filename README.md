@@ -13,8 +13,7 @@ The RequestPolicy "Continued" project is a fork of [RequestPolicy](https://githu
 
 ## Getting the Source Code
 
-If you'd like to download the RequestPolicy source code from our version
-control system, you can do so with:
+If you'd like to download the RequestPolicy source code from our version control system, you can do so with:
 
 ```bash
 git clone https://github.com/RequestPolicyContinued/requestpolicy.git
@@ -22,8 +21,7 @@ git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 
 ## Building the XPI Firefox addon
 
-To create an [XPI](https://developer.mozilla.org/en-US/docs/XPI) file, run `make`
-from the repository's root directory.  It will be created at `dist/requestpolicy.xpi` and can be used for easy installation of RP into your web browser (Firefox).
+To create an [XPI](https://developer.mozilla.org/en-US/docs/XPI) file, run `make` from the repository's root directory.  It will be created at `dist/requestpolicy.xpi` and can be used for easy installation of RP into your web browser (Firefox).
 
 
 ## License
@@ -37,15 +35,14 @@ from the repository's root directory.  It will be created at `dist/requestpolicy
 Here are a few ways you can help make this project better!
 
 ### Discussion
-If you have any questions general thoughts about the project, please post them in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484)
+If you have any questions or general thoughts about the project, please post them in our [general discussion](https://github.com/RequestPolicyContinued/requestpolicy/issues/484)
 
 
 ### Testing, reporting bugs & requesting new features
 
 Always use the [latest release](https://github.com/RequestPolicyContinued/requestpolicy/releases/), or [build the XPI from the most recent source revision](https://github.com/RequestPolicyContinued/requestpolicy#getting-the-source-code)
 
-If you'd like a bug to be fixed or a feature added,  
-[find if it has already been reported](https://github.com/RequestPolicyContinued/requestpolicy/issues). Open a new issue if needed, and add information about the bug/request such as:
+If you'd like a bug to be fixed or a feature added, [find if it has already been reported](https://github.com/RequestPolicyContinued/requestpolicy/issues). Open a new issue if needed, and add information about the bug/request such as:
 
  * Steps to reproduce the bug (user actions)
  * What should happen.
@@ -53,7 +50,7 @@ If you'd like a bug to be fixed or a feature added,
 
 Response time from the maintainers should be around a few days.
 
-**Please respect these recommendations about addon compatibility problems**
+**Please bear in mind that each user might have a different browser setup. Sometimes it's necessary to further investigate the problem:**
 
 Some bugs are caused by other Firefox addons interfering with RequestPolicy. To make sure a bug is caused by RequestPolicy itself:
 
@@ -101,4 +98,4 @@ You can add [bounties at bountysource](https://www.bountysource.com/teams/reques
 ### Community  and support
 
 * You can help us answer questions our users have on the issue tracker
-* You can write posts about the project, take screenshots and make videos, share links RequestPolicy Continued on the Internet, show how it's used in daily life, and talk about it to your friends.
+* You can write posts about the project, take screenshots and make videos, share RequestPolicy Continued on the Internet, show how it's used in daily life, and talk about it to your friends.

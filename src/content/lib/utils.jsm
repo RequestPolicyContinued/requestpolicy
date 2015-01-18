@@ -29,7 +29,6 @@ let EXPORTED_SYMBOLS = ["Utils"];
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/AddonManager.jsm");
 //Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
@@ -38,6 +37,10 @@ ScriptLoader.importModules([
   "lib/utils/constants",
   "lib/process-environment"
 ], this);
+
+if (ProcessEnvironment.isMainProcess) {
+  Cu.import("resource://gre/modules/AddonManager.jsm");
+}
 
 
 
@@ -76,8 +79,9 @@ let Utils = (function() {
 
   self.info = {};
 
+  // bad smell...
   // get/set last/current RP version
-  {
+  if (ProcessEnvironment.isMainProcess) {
     self.info.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
 
     self.info.curRPVersion = "0.0";
@@ -91,8 +95,9 @@ let Utils = (function() {
     });
   }
 
+  // bad smell...
   // get/set last/current app (e.g. firefox) version
-  {
+  if (ProcessEnvironment.isMainProcess) {
     self.info.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
 
     let curAppVersion = Services.appinfo.version;

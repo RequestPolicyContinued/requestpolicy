@@ -32,9 +32,10 @@ requestpolicy.overlay = (function() {
   const Cc = Components.classes;
   const Cu = Components.utils;
 
-  let {ScriptLoader} = (function() {
+  let {ScriptLoader, XPCOMUtils} = (function() {
     let mod = {};
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
     return mod;
   }());
 
@@ -893,23 +894,12 @@ requestpolicy.overlay = (function() {
         requestpolicy.overlay
             ._updateBlockedContentState(gBrowser.selectedBrowser);
       },
-      // Though unnecessary for Gecko 2.0, I'm leaving in onSecurityChange for
-      // SeaMonkey because of https://bugzilla.mozilla.org/show_bug.cgi?id=685466
-      onSecurityChange : function() {
-      },
 
-      QueryInterface : function(aIID) {
-        if (aIID.equals(Components.interfaces.nsIWebProgressListener)
-            || aIID.equals(Components.interfaces.nsISupportsWeakReference)
-            || aIID.equals(Components.interfaces.nsISupports))
-          return this;
-        throw Components.results.NS_NOINTERFACE;
-      }
+      QueryInterface: XPCOMUtils.generateQI(["nsIWebProgressListener",
+                                             "nsISupportsWeakReference"])
     };
 
     // https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
-    // "Starting in Gecko 2.0, all events are optional. The tabbrowser only
-    // notifies you of the events for which you provide a callback."
     gBrowser.addProgressListener(self.locationListener);
   };
 

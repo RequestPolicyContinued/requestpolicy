@@ -102,13 +102,8 @@ let Prefs = (function() {
   }
 
   self.isPrefetchEnabled = function() {
-    // network.dns.disablePrefetch only exists starting in Firefox 3.1
-    try {
-      return rootPrefBranch.getBoolPref("network.prefetch-next")
-          || !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
-    } catch (e) {
-      return rootPrefBranch.getBoolPref("network.prefetch-next");
-    }
+    return rootPrefBranch.getBoolPref("network.prefetch-next")
+        || !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
   };
 
   function isPrefEmpty(pref) {

@@ -444,10 +444,14 @@ let RequestProcessor = (function(self) {
    * @param {NormalRequest} request
    */
   self.process = function(request) {
+    // uncomment for debugging:
+    //Logger.dump("request: " +
+    //            (request.aRequestOrigin ? request.aRequestOrigin.spec :
+    //             "<unknown>") +
+    //            " -->  "+request.aContentLocation.spec);
     //Logger.vardump(request.aRequestOrigin);
     //Logger.vardump(request.aContentLocation);
     try {
-
       if (request.isInternal()) {
         return CP_OK;
       }
@@ -456,47 +460,38 @@ let RequestProcessor = (function(self) {
       var destURI = request.destURI;
 
       if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
-        let browser = null;
-
-        // Fx 16 changed the following: 1) we should be able to count on the
-        // referrer (aRequestOrigin) being set to something besides
-        // moz-nullprincipal when there is a referrer, and 2) the new argument
-        // aRequestPrincipal is provided. This means our hackery to set the
-        // referrer based on aContext when aRequestOrigin is moz-nullprincipal
-        // is now causing requests that don't have a referrer (namely, URLs
-        // entered in the address bar) to be blocked and trigger a top-level
-        // document redirect notification.
+        // Before RP has been forked, there was a hack: in case of a request
+        // with the origin's scheme being 'moz-nullprincipal', RequestPolicy
+        // used the documentURI of the request's context as the "real" origin
+        // URI.
+        //   (Note: RP assuemed that the context is always a document, but this
+        //    is in fact not always true.)
+        // The reason for using the context's documentURI was, according to
+        // @jsamuel's comment, that the request's origin was not always the
+        // correct URI; according to @jsamuel this was fixed in Firefox 16.
+        // Originally he wrote:
+        //   >  "[Since Fx 16] we should be able to count on the referrer
+        //   >  (aRequestOrigin) being set to something besides
+        //   >  moz-nullprincipal when there is a referrer."
+        // TODO: check whether the requests that are allowed by this case are
+        //       *definitely* internal request. Is it possible to determine
+        //       where this request originally came from?
+        //
+        // ### Links:
+        // * nsIPrincipal:
+        //   -> https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrincipal
+        //
+        // * discussion about RequestPolicy with regard to detecting that
+        //   something has been entered in the url-bar -- it's the Mozilla Bug
+        //   about adding `aRequestPrincipal` to `shouldLoad()` and it's
+        //   milestone was Firefox 16.
+        //   -> https://bugzilla.mozilla.org/show_bug.cgi?id=767134#c15
         if (request.aRequestPrincipal) {
           Logger.warning(
               Logger.TYPE_CONTENT,
               "Allowing request that appears to be a URL entered in the " +
               "location bar or some other good explanation: " + destURI);
           return CP_OK;
-        }
-
-        // Note: Assuming the Fx 16 moz-nullprincipal+aRequestPrincipal check
-        // above is correct, this should be able to be removed when Fx < 16 is
-        // no longer supported.
-        if (request.aContext) {
-          try {
-            let domElement = request.aContext.QueryInterface(Ci.nsIDOMElement);
-            if (domElement && domElement.tagName == "") {
-              var newOriginURI = DomainUtil
-                    .stripFragment(request.aContext.contentDocument.documentURI);
-              Logger.info(Logger.TYPE_CONTENT,
-                  "Considering moz-nullprincipal origin <"
-                      + originURI + "> to be origin <" + newOriginURI + ">");
-              originURI = newOriginURI;
-              request.setOriginURI(originURI);
-            }
-          } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {
-            try {
-              let domWin = request.aContext.QueryInterface(Ci.nsIDOMWindow);
-          return CP_OK;
-              if (domWin && domWin.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
-              }
-            } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-          }
         }
       }
 

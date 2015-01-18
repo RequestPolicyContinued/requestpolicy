@@ -159,18 +159,10 @@ $(deleted_files): FORCE
 # run firefox
 #
 
-# $(mozrunner_prefs) is a workaround for Mozilla Bug 1100363
-# see https://bugzilla.mozilla.org/show_bug.cgi?id=1100363
-mozrunner_prefs += --pref=extensions.requestpolicy.defaultPolicy.allow:false \
-	--pref=general.warnOnAboutConfig:false \
-	--pref=browser.displayedE10SNotice:3 \
-	--pref=extensions.requestpolicy.welcomeWindowShown:true
-
 .PHONY: run
 run: $(xpi_file)
 	mozrunner -a $(xpi_file) -b $(binary_firefox_nightly) \
-		--preferences=$(mozrunner_prefs_ini):dev \
-		$(mozrunner_prefs)
+		--preferences=$(mozrunner_prefs_ini):dev
 
 
 # ____________

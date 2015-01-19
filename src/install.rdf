@@ -12,7 +12,7 @@
 
     <em:unpack>false</em:unpack>
     <em:bootstrap>true</em:bootstrap>
-    <em:multiprocessCompatible>false</em:multiprocessCompatible>
+    <em:multiprocessCompatible>true</em:multiprocessCompatible>
 
     <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
     <em:optionsURL>about:requestpolicy</em:optionsURL>

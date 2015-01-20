@@ -100,23 +100,21 @@ let EnvironmentManager = (function(self) {
     let fnArgsToApply = [data, reason];
 
     // prepare shutdown
-    for (let env of self.environments) {
+    self.environments.forEach(function(env) {
       env.envState = Environment.SHUTTING_DOWN;
-    }
+    });
     // shut down
-    Environment.processSequence(
-        Environment.shutdownSequence,
-        function (level) {
-          //console.debug("[RPC] reaching level "+level+" ...");
-          for (let env of self.environments) {
-            env.callShutdownFunctions(level, fnArgsToApply);
-          }
-        });
+    Environment.iterateShutdownLevels(function (level) {
+      //console.debug("[RPC] reaching level "+level+" ...");
+      self.environments.forEach(function(env) {
+        env.callShutdownFunctions(level, fnArgsToApply);
+      });
+    });
     // finishing tasks
-    for (let env of self.environments) {
+    self.environments.forEach(function(env) {
       env.envState = Environment.SHUT_DOWN;
       self.unregisterEnvironment(env);
-    }
+    });
 
     // final tasks
     //console.debug("[RPC] reaching level 0 ...");

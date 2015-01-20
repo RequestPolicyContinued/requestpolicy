@@ -135,18 +135,36 @@ function generateLevelObjects() {
   return obj;
 }
 
-Environment.startupSequence = [
-  LEVELS.ESSENTIAL,
-  LEVELS.BACKEND,
-  LEVELS.INTERFACE,
-  LEVELS.UI
-];
-Environment.shutdownSequence = [
-  LEVELS.UI,
-  LEVELS.INTERFACE,
-  LEVELS.BACKEND,
-  LEVELS.ESSENTIAL
-];
+(function addLevelIterators(Environment) {
+  let startupSequence = [
+    LEVELS.ESSENTIAL,
+    LEVELS.BACKEND,
+    LEVELS.INTERFACE,
+    LEVELS.UI
+  ];
+  let shutdownSequence = [
+    LEVELS.UI,
+    LEVELS.INTERFACE,
+    LEVELS.BACKEND,
+    LEVELS.ESSENTIAL
+  ];
+  function iterateLevels(aSequence, aFn) {
+    for (let i = 0, len = aSequence.length; i < len; ++i) {
+      // Note: It's necessary to use for(;;) instead of  for(..of..)
+      //       because the order/sequence must be exactly the same as in the
+      //       array.  for(..of..) doesn't guarantee that the elements are
+      //       called in order.
+
+      let level = aSequence[i];
+      aFn(level);
+    }
+  };
+
+  Environment.iterateStartupLevels = iterateLevels.bind(null, startupSequence);
+  Environment.iterateShutdownLevels = iterateLevels.bind(null, shutdownSequence);
+})(Environment);
+
+
 
 
 /**
@@ -228,19 +246,6 @@ Environment.prototype.callShutdownFunctions = function(aLevel, fnArgsToApply) {
 };
 
 
-Environment.processSequence = function(aSequence, aCallback) {
-  for (let i = 0, len = aSequence.length; i < len; ++i) {
-    // Note: It's necessary to use for(;;) instead of  for(..of..)
-    //       because the order/sequence must be exactly the same as in the
-    //       array.  for(..of..) doesn't guarantee that the elements are
-    //       called in order.
-
-    let level = aSequence[i];
-    aCallback(level);
-  }
-};
-
-
 
 
 Environment.prototype.startup = function() {
@@ -251,12 +256,10 @@ Environment.prototype.startup = function() {
     //console.log('[RPC] starting up Environment "'+self.name+'"...');
     self.envState = ENV_STATES.STARTING_UP;
 
-    Environment.processSequence(
-        Environment.startupSequence,
-        function (level) {
-          let levelObj = self.startupLevels[level];
-          processLevel(levelObj, fnArgsToApply);
-        });
+    Environment.iterateStartupLevels(function (level) {
+      let levelObj = self.startupLevels[level];
+      processLevel(levelObj, fnArgsToApply);
+    });
 
     self.envState = ENV_STATES.STARTUP_DONE;
   }
@@ -272,12 +275,10 @@ Environment.prototype.shutdown = function() {
 
     EnvironmentManager.unregisterEnvironment(self);
 
-    Environment.processSequence(
-        Environment.shutdownSequence,
-        function (level) {
-          let levelObj = self.shutdownLevels[level];
-          processLevel(levelObj, fnArgsToApply);
-        });
+    Environment.iterateShutdownLevels(function (level) {
+      let levelObj = self.shutdownLevels[level];
+      processLevel(levelObj, fnArgsToApply);
+    });
 
     self.envState = ENV_STATES.SHUT_DOWN;
   }

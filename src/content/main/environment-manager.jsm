@@ -82,7 +82,7 @@ let EnvironmentManager = (function(self) {
         .ProcessEnvironment.startup();
   };
 
-  self.shutdown = function(data, reason) {
+  self.shutdown = function(fnArgsToApply) {
     // remove the comments in this function for debugging.
     //console.debug("[RPC] EnvironmentManager ("+procString+") is going to " +
     //              "shut down all registered Environments...");
@@ -96,8 +96,6 @@ let EnvironmentManager = (function(self) {
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
     let {Environment} = ScriptLoader.importModule("lib/environment");
     let sequence = Environment.shutdownSequence;
-
-    let fnArgsToApply = [data, reason];
 
     // prepare shutdown
     self.environments.forEach(function(env) {

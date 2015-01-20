@@ -249,9 +249,8 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
 
 
 
-  Environment.prototype.startup = function() {
+  Environment.prototype.startup = function(fnArgsToApply) {
     let self = this;
-    let fnArgsToApply = arguments;
 
     if (self.envState == ENV_STATES.NOT_STARTED) {
       //console.log('[RPC] starting up Environment "'+self.name+'"...');
@@ -266,9 +265,8 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
     }
   };
 
-  Environment.prototype.shutdown = function() {
+  Environment.prototype.shutdown = function(fnArgsToApply) {
     let self = this;
-    let fnArgsToApply = arguments;
 
     if (self.envState === ENV_STATES.STARTUP_DONE) {
       //console.log('[RPC] shutting down Environment "'+self.name+'"...');

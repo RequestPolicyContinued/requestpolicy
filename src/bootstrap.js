@@ -38,24 +38,20 @@ function logSevereError(msg, e) {
   Cu.reportError(e);
 }
 
-function startup(data, reason) {
+function startup(...startupArgs) {
   try {
     // Import the EnvironmentManager and call its startup() function.
     Cu.import(envManURI);
-    EnvironmentManager.startup(data, reason);
+    EnvironmentManager.startup(startupArgs);
   } catch(e) {
     logSevereError("startup() failed!", e);
   }
 }
 
-function shutdown(data, reason) {
-  if (reason == APP_SHUTDOWN) {
-    return;
-  }
-
+function shutdown(...shutdownArgs) {
   try {
     // shutdown, unset and unload.
-    EnvironmentManager.shutdown(data, reason);
+    EnvironmentManager.shutdown(shutdownArgs);
     EnvironmentManager = null;
     Cu.unload(envManURI);
   } catch(e) {

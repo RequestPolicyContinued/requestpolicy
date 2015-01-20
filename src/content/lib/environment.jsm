@@ -30,9 +30,10 @@ let EXPORTED_SYMBOLS = ["Environment"];
 let globalScope = this;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+//Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-//Cu.import("resource://gre/modules/devtools/Console.jsm");
+
 ScriptLoader.defineLazyModuleGetters({
   "lib/manager-for-event-listeners": ["ManagerForEventListeners"],
   "main/environment-manager": ["EnvironmentManager"],
@@ -148,7 +149,15 @@ function generateLevelObjects() {
     LEVELS.BACKEND,
     LEVELS.ESSENTIAL
   ];
-  function iterateLevels(aSequence, aFn) {
+
+  function lastValue(aArray) {
+    return aArray[aArray.length - 1];
+  }
+
+  Environment.lastStartupLevel = lastValue(startupSequence);
+  Environment.lastShutdownLevel = lastValue(shutdownSequence);
+
+  function iterateLevels(aSequence, aFn, aUntilLevel=lastValue(aSequence)) {
     for (let i = 0, len = aSequence.length; i < len; ++i) {
       // Note: It's necessary to use for(;;) instead of  for(..of..)
       //       because the order/sequence must be exactly the same as in the
@@ -157,6 +166,11 @@ function generateLevelObjects() {
 
       let level = aSequence[i];
       aFn(level);
+
+      if (level === aUntilLevel) {
+        // Stop after aUntilLevel
+        break;
+      }
     }
   };
 
@@ -230,56 +244,66 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
   };
 
   function processLevel(aLevelObj, fnArgsToApply) {
-    aLevelObj.levelState = LEVEL_STATES.PROCESSING;
-    callFunctions(aLevelObj.functions, fnArgsToApply);
-    aLevelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
+    if (aLevelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
+      aLevelObj.levelState = LEVEL_STATES.PROCESSING;
+      callFunctions(aLevelObj.functions, fnArgsToApply);
+      aLevelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
+    }
   }
 
-  // not used for now
-  //Environment.prototype.callStartupFunctions = function(aLevel, fnArgsToApply) {
-  //  let self = this;
-  //  processLevel(self.startupLevels[aLevel], fnArgsToApply);
-  //};
 
-  Environment.prototype.callShutdownFunctions = function(aLevel, fnArgsToApply) {
-    let self = this;
-    processLevel(self.shutdownLevels[aLevel], fnArgsToApply);
-  };
+  let {lastStartupLevel, lastShutdownLevel} = Environment;
 
-
-
-
-  Environment.prototype.startup = function(fnArgsToApply) {
+  /**
+   * @param {Array} fnArgsToApply
+   * @param {integer=} untilLevel - The level after which the startup
+   *     processing is stopped.
+   */
+  Environment.prototype.startup = function(fnArgsToApply,
+                                           untilLevel=lastStartupLevel) {
     let self = this;
 
     if (self.envState == ENV_STATES.NOT_STARTED) {
       //console.log('[RPC] starting up Environment "'+self.name+'"...');
       self.envState = ENV_STATES.STARTING_UP;
+    }
 
+    if (self.envState === ENV_STATES.STARTING_UP) {
       Environment.iterateStartupLevels(function (level) {
         let levelObj = self.startupLevels[level];
         processLevel(levelObj, fnArgsToApply);
-      });
+      }, untilLevel);
 
-      self.envState = ENV_STATES.STARTUP_DONE;
+      if (untilLevel === lastStartupLevel) {
+        self.envState = ENV_STATES.STARTUP_DONE;
+      }
     }
   };
 
-  Environment.prototype.shutdown = function(fnArgsToApply) {
+  /**
+   * @param {Array} fnArgsToApply
+   * @param {integer=} untilLevel - The level after which the shutdown
+   *     processing is stopped.
+   */
+  Environment.prototype.shutdown = function(fnArgsToApply,
+                                            untilLevel=lastShutdownLevel) {
     let self = this;
 
     if (self.envState === ENV_STATES.STARTUP_DONE) {
       //console.log('[RPC] shutting down Environment "'+self.name+'"...');
       self.envState = ENV_STATES.SHUTTING_DOWN;
+    }
 
-      EnvironmentManager.unregisterEnvironment(self);
-
+    if (self.envState === ENV_STATES.SHUTTING_DOWN) {
       Environment.iterateShutdownLevels(function (level) {
         let levelObj = self.shutdownLevels[level];
         processLevel(levelObj, fnArgsToApply);
-      });
+      }, untilLevel);
 
-      self.envState = ENV_STATES.SHUT_DOWN;
+      if (untilLevel === lastShutdownLevel) {
+        EnvironmentManager.unregisterEnvironment(self);
+        self.envState = ENV_STATES.SHUT_DOWN;
+      }
     }
   };
 })(Environment);

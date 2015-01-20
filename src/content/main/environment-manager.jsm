@@ -53,6 +53,10 @@ let EnvironmentManager = (function(self) {
   //console.debug("[RPC] creating new EnvironmentManager (" + procString + ")");
 
 
+  // this function is set by a framescript
+  self.asyncUnloadEnvMan = function() {};
+
+
   self.environments = new Set();
 
   self.registerEnvironment = function(aEnv) {
@@ -60,6 +64,7 @@ let EnvironmentManager = (function(self) {
   };
   self.unregisterEnvironment = function(aEnv) {
     self.environments.delete(aEnv);
+    self.asyncUnloadEnvMan();
   };
 
 
@@ -95,23 +100,13 @@ let EnvironmentManager = (function(self) {
 
     Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
     let {Environment} = ScriptLoader.importModule("lib/environment");
-    let sequence = Environment.shutdownSequence;
 
-    // prepare shutdown
-    self.environments.forEach(function(env) {
-      env.envState = Environment.SHUTTING_DOWN;
-    });
     // shut down
     Environment.iterateShutdownLevels(function (level) {
       //console.debug("[RPC] reaching level "+level+" ...");
       self.environments.forEach(function(env) {
-        env.callShutdownFunctions(level, fnArgsToApply);
+        env.shutdown(fnArgsToApply, level);
       });
-    });
-    // finishing tasks
-    self.environments.forEach(function(env) {
-      env.envState = Environment.SHUT_DOWN;
-      self.unregisterEnvironment(env);
     });
 
     // final tasks

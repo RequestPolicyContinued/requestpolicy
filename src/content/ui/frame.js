@@ -163,8 +163,7 @@ Components.utils.import("resource://gre/modules/Services.jsm");
                   Components.interfaces.nsIEventTarget.DISPATCH_NORMAL);
   }
   if (EnvironmentManager.isMainProcess === false) {
-    FrameScriptEnv.addShutdownFunction(Environment.LEVELS.ESSENTIAL,
-                                       unloadEnvMan);
+    Environment.asyncUnloadEnvMan = unloadEnvMan;
   }
 
 

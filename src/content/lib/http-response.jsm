@@ -53,6 +53,8 @@ function HttpResponse(aHttpChannel) {
   XPCOMUtils.defineLazyGetter(this, "rawDestString", getRawDestString);
   XPCOMUtils.defineLazyGetter(this, "destURI", getDestURI);
   XPCOMUtils.defineLazyGetter(this, "originURI", getOriginURI);
+
+  XPCOMUtils.defineLazyGetter(this, "loadContext", getLoadContext);
   XPCOMUtils.defineLazyGetter(this, "browser", getBrowser);
 }
 
@@ -124,26 +126,42 @@ function getOriginURI() {
   return Services.io.newURI(this.httpChannel.name, null, null);
 }
 
-/**
- * Get the <browser> (nsIDOMXULElement) related to this request.
- */
-function getBrowser() {
+function getLoadContext() {
+  // more info on the load context:
+  // https://developer.mozilla.org/en-US/Firefox/Releases/3.5/Updating_extensions
+
   /* start - be careful when editing here */
-  let loadContext = null;
   try {
-    loadContext = this.httpChannel.notificationCallbacks
-                                  .QueryInterface(Ci.nsIInterfaceRequestor)
-                                  .getInterface(Ci.nsILoadContext);
+    return this.httpChannel.notificationCallbacks
+                           .QueryInterface(Ci.nsIInterfaceRequestor)
+                           .getInterface(Ci.nsILoadContext);
   } catch (ex) {
     try {
-      loadContext = this.httpChannel.loadGroup.notificationCallbacks
-          .getInterface(Ci.nsILoadContext);
+      return this.httpChannel.loadGroup
+                             .notificationCallbacks
+                             .getInterface(Ci.nsILoadContext);
     } catch (ex2) {
+      // fixme: the Load Context can't be found in case a favicon
+      //        request is redirected, that is, the server responds
+      //        with a 'Location' header when the server's
+      //        `favicon.ico` is requested.
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
+                     "Load Context couldn't be found! " + ex2);
       return null;
     }
   }
   /* end - be careful when editing here */
+}
 
+/**
+ * Get the <browser> (nsIDOMXULElement) related to this request.
+ */
+function getBrowser() {
+  let loadContext = this.loadContext;
+
+  if (loadContext === null) {
+    return null;
+  }
 
   try {
     if (loadContext.topFrameElement) {
@@ -155,8 +173,9 @@ function getBrowser() {
       return WindowUtils.getBrowserForWindow(loadContext.topWindow);
     }
   } catch (e) {
-    Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
-                   "Load Context couldn't be found! " + e);
+    Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The browser for " +
+                   "the redirection's Load Context couldn't be " +
+                   "found! " + e);
     return null;
   }
-};
+}

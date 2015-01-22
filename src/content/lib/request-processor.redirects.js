@@ -351,7 +351,7 @@ let RequestProcessor = (function(self) {
     let originString = httpResponse.originURI.specIgnoringRef;
 
     // Allow redirects of requests from privileged code.
-    if (!isContentRequest(httpChannel)) {
+    if (!isContentRequest(httpResponse)) {
       // However, favicon requests that are redirected appear as non-content
       // requests. So, check if the original request was for a favicon.
       var originPath = httpResponse.originURI.path;
@@ -385,24 +385,14 @@ let RequestProcessor = (function(self) {
    * Checks whether a request is initiated by a content window. If it's from a
    * content window, then it's from unprivileged code.
    */
-  function isContentRequest(channel) {
-    var callbacks = [];
-    if (channel.notificationCallbacks) {
-      callbacks.push(channel.notificationCallbacks);
-    }
-    if (channel.loadGroup && channel.loadGroup.notificationCallbacks) {
-      callbacks.push(channel.loadGroup.notificationCallbacks);
+  function isContentRequest(httpResponse) {
+    let loadContext = httpResponse.loadContext;
+
+    if (loadContext === null) {
+      return false;
     }
 
-    for (var i = 0; i < callbacks.length; i++) {
-      var callback = callbacks[i];
-      try {
-        return callback.getInterface(Ci.nsILoadContext).isContent;
-      } catch (e) {
-      }
-    }
-
-    return false;
+    return !!loadContext.isContent;
   }
 
 

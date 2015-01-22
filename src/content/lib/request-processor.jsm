@@ -453,6 +453,10 @@ let RequestProcessor = (function(self) {
     //Logger.vardump(request.aContentLocation);
     try {
       if (request.isInternal()) {
+        Logger.debug(Logger.TYPE_CONTENT,
+                     "Allowing a request that seems to be internal. " +
+                     "Origin: " + request.originURI + ", Dest: " +
+                     request.destURI);
         return CP_OK;
       }
 

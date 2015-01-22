@@ -151,10 +151,14 @@ NormalRequest.prototype.isInternal = function() {
       || this.aContentLocation.scheme == "blob"
       || this.aContentLocation.scheme == "wyciwyg"
       || this.aContentLocation.scheme == "javascript") {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request with an internal destination.");
     return true;
   }
 
   if (this.aRequestOrigin === undefined || this.aRequestOrigin === null) {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request without an origin.");
     return true;
   }
 

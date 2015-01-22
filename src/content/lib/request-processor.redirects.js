@@ -224,14 +224,19 @@ let RequestProcessor = (function(self) {
 
         let browser = request.browser;
 
-        // TODO: use WeakMap instead of putting data into the <browser> object
-        // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
+        if (browser !== null) {
+          // `browser` is null if it could not be found. One known
+          // example is a favicon request that is redirected.
 
-        // save all blocked redirects directly in the browser element. the
-        // blocked elements will be checked later when the DOM content
-        // finished loading.
-        browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
-        browser.requestpolicy.blockedRedirects[originURI] = destURI;
+          // TODO: do not put data into the <browser> object. Maybe use
+          //       Map instead?
+
+          // save all blocked redirects directly in the browser element. the
+          // blocked elements will be checked later when the DOM content
+          // finished loading.
+          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
+          browser.requestpolicy.blockedRedirects[originURI] = destURI;
+        }
 
         // Cancel the request. As of Fx 37, this causes the location bar to
         // show the URL of the previously displayed page.

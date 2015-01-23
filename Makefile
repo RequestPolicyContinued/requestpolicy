@@ -25,7 +25,12 @@ jar_file := $(build_path)chrome/$(extension_name).jar
 xpi_file := $(dist_path)$(extension_name).xpi
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
 
-binary_firefox_nightly := .mozilla/software/firefox/nightly/firefox
+# It's possible to pass the manifest file `mm_manifest` to make
+ifndef fx_branch
+## default value
+fx_branch := nightly
+endif
+binary_firefox := .mozilla/software/firefox/$(fx_branch)/firefox
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 
@@ -161,7 +166,7 @@ $(deleted_files): FORCE
 
 .PHONY: run
 run: $(xpi_file)
-	mozrunner -a $(xpi_file) -b $(binary_firefox_nightly) \
+	mozrunner -a $(xpi_file) -b $(binary_firefox) \
 		--preferences=$(mozrunner_prefs_ini):dev
 
 
@@ -185,7 +190,7 @@ endif
 check test: mozmill
 
 mozmill: $(xpi_file)
-	mozmill -a $(xpi_file) -b $(binary_firefox_nightly) \
+	mozmill -a $(xpi_file) -b $(binary_firefox) \
 		-m $(mozmill_requestpolicy_test_path)$(mm_manifest)
 
 

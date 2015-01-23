@@ -32,7 +32,7 @@ Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "lib/process-environment",
+  "lib/environment",
   "lib/prefs"
 ], this);
 

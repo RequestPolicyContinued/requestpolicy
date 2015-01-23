@@ -34,7 +34,7 @@ let globalScope = this;
 
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModule("lib/process-environment", globalScope);
+ScriptLoader.importModule("lib/environment", globalScope);
 
 
 var filenames = {

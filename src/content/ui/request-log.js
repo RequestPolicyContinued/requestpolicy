@@ -36,10 +36,11 @@ window.requestpolicy.requestLog = (function (self) {
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
   let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
-  let {Environment} = ScriptLoader.importModule("lib/environment");
+  let {Environment,
+       ProcessEnvironment} = ScriptLoader.importModule("lib/environment");
 
   // create a new Environment for this window
-  var WinEnv = new Environment("WinEnv");
+  var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
   // The Environment has to be shut down when the content window gets unloaded.
   WinEnv.shutdownOnUnload(window);
   // start up right now, as there won't be any startup functions

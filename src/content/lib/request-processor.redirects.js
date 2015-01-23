@@ -36,7 +36,7 @@ ScriptLoader.importModules([
   "lib/request",
   "lib/request-result",
   "lib/http-response",
-  "lib/process-environment"
+  "lib/environment"
 ], this);
 
 
@@ -305,7 +305,7 @@ let RequestProcessor = (function(self) {
       Logger.severe(
           Logger.TYPE_HEADER_REDIRECT, "Failed removing " +
           "'" + headerType + "' header to <" + destURI + ">" +
-          "  in response from <" + originURI + ">." + e);
+          "  in response from <" + originURI + ">. " + e, e);
     }
   }
 

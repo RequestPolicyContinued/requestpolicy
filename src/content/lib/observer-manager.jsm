@@ -32,7 +32,7 @@ let globalScope = this;
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/observers",
-  "lib/process-environment"
+  "lib/environment"
 ], globalScope);
 
 ScriptLoader.defineLazyModuleGetters({

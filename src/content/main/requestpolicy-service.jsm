@@ -39,7 +39,7 @@ ScriptLoader.importModules([
   "lib/subscription",
   "lib/utils",
   "lib/utils/constants",
-  "lib/process-environment"
+  "lib/environment"
 ], this);
 
 

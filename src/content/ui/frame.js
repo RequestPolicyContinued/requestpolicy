@@ -21,7 +21,7 @@
  */
 
 Components.utils.import("resource://gre/modules/Services.jsm");
-//Components.utils.import("resource://gre/modules/devtools/Console.jsm");
+Components.utils.import("resource://gre/modules/devtools/Console.jsm");
 
 /**
  * This anonymous function is needed because of Mozilla Bug 673569, fixed in
@@ -36,135 +36,61 @@ Components.utils.import("resource://gre/modules/Services.jsm");
   // the ContentFrameMessageManager of this framescript
   let mm = this;
 
-  // Create a new scope that can be removed easily when the framescript has to
-  // be unloaded.
-  var FrameScriptScope = {
-    mm: mm,
-    content: mm.content,
-    Components: mm.Components,
-
-    Ci: mm.Components.interfaces,
-    Cc: mm.Components.classes,
-    Cu: mm.Components.utils
-  };
-
   const Cu = Components.utils;
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm",
-            FrameScriptScope);
-  let ScriptLoader = FrameScriptScope.ScriptLoader;
 
+  // import some modules
+  let {ScriptLoader} = Cu.import(
+      "chrome://requestpolicy/content/lib/script-loader.jsm", {});
+  let mod = {};
   ScriptLoader.importModules([
     "lib/utils/constants",
     "lib/logger",
-    "lib/environment",
-    "main/environment-manager"
-  ], FrameScriptScope);
-  let C = FrameScriptScope.C;
-  let Environment = FrameScriptScope.Environment;
-  let EnvironmentManager = FrameScriptScope.EnvironmentManager;
+    "lib/environment"
+  ], mod);
+  let {C, Logger, Environment, FrameScriptEnvironment} = mod;
 
 
-  /**
-   * This function gets a Environment variable that has the same lifespan as
-   * the framescript. , i.e. the Environment's shutdown() function will be called
-   * when the Tab is  is unloaded.
-   *
-   * There are two cases:
-   *
-   * If this is the main process:
-   *     A new Environment is created.
-   *
-   * If this is *not* the main process:
-   *     `ProcessEnvironment` will be used. This ensures that this script will
-   *     have the same Environment as the modules that will be loaded.
-   */
-  FrameScriptScope.FrameScriptEnv = (function getFrameScriptEnv() {
-    // Check if this is the main process.
-    if (EnvironmentManager.isMainProcess === true) {
-      //console.debug('[RPC] the framescript is in the main process. ' +
-      //              'Creating a new environment...');
-      // This is the main process. The `ProcessEnvironment` can't be used as the
-      // content window's Environment, so a new Environment has to be created.
-      let {Environment} = ScriptLoader.importModules(["lib/environment"]);
-      return new Environment("FrameScriptEnv (main process)");
-    } else {
-      //console.debug('[RPC] the framescript is in a child process. ' +
-      //              "Going to use the child's ProcEnv...");
-      // This is a child process. The `ProcessEnvironment` can be used for this
-      // window's Environment.
-      return ScriptLoader.importModule("lib/process-environment")
-                         .ProcessEnvironment;
-    }
-  }());
+  let framescriptEnv = new FrameScriptEnvironment(mm);
+  let mlManager = framescriptEnv.mlManager;
 
-  let FrameScriptEnv = FrameScriptScope.FrameScriptEnv;
 
-  FrameScriptEnv.addShutdownFunction(Environment.LEVELS.ESSENTIAL, function() {
-    //console.debug("removing FrameScriptScope");
-    FrameScriptScope = null;
+  // Create a scope for the sub-scripts, which also can
+  // be removed easily when the framescript gets unloaded.
+  var framescriptScope = {
+    "mm": mm,
+    "content": mm.content,
+    "Components": mm.Components,
+
+    "Ci": mm.Components.interfaces,
+    "Cc": mm.Components.classes,
+    "Cu": mm.Components.utils,
+
+    "ScriptLoader": ScriptLoader,
+    "C": C,
+    "Logger": Logger,
+    "Environment": Environment,
+
+    "framescriptEnv": framescriptEnv,
+    "mlManager": mlManager
+  };
+
+  function loadSubScripts() {
+    Services.scriptloader.loadSubScriptWithOptions(
+        'chrome://requestpolicy/content/ui/frame.blocked-content.js',
+        {target: framescriptScope/*, ignoreCache: true*/});
+    Services.scriptloader.loadSubScriptWithOptions(
+        'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js',
+        {target: framescriptScope/*, ignoreCache: true*/});
+  }
+  framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,
+                                    loadSubScripts);
+
+  framescriptEnv.addShutdownFunction(Environment.LEVELS.ESSENTIAL, function() {
+    //console.debug("removing framescriptScope '" + framescriptEnv.uid + "'");
+    framescriptScope = null;
   });
 
 
-  let {ManagerForMessageListeners} = ScriptLoader.importModule(
-      "lib/manager-for-message-listeners");
-  FrameScriptScope.mlManager = new ManagerForMessageListeners(
-      FrameScriptEnv, mm);
-  let mlManager = FrameScriptScope.mlManager;
-
-
-
-  /**
-   * Ensure that the framescript is „shut down“ when the addon gets disabled.
-   *
-   * TODO: use the Child Message Manager instead!
-   *       https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/The_message_manager#Process_Message_Managers
-   */
-  {
-    // Hand over the ContentFrameMessageManager of this framescript to the
-    // EnvironmentManager. The EnvironmentManager then shuts down all environments
-    // in the child process when the "shutdown" message is received. If this
-    // framescript is in the *chrome* process (aka. main process / parent process)
-    // then EnvironmentManager will simply ignore this function call.
-    EnvironmentManager.registerFramescript(mm);
-  }
-
-  /**
-   * Ensure that the framescript is „shut down“ when the correspondung Tab gets
-   * closed.
-   */
-  {
-    FrameScriptEnv.shutdownOnUnload(mm);
-  }
-
-  /**
-   * Ensure that EnvironmentManager is unloaded in a child process. If it
-   * wouldn't be unloaded, the EnvironmentManager might be the same one the
-   * next time the addon gets enabled.
-   *
-   * The unload can't be done from EnvironmentManager itself, as due to Mozilla
-   * Bug 769253 a module cannot unload itself. This is also the reason why
-   * the unload is done async -- the shutdown functions are called by
-   * EnvironmentManager.
-   */
-  function unloadEnvMan() {
-    // The runnable (nsIRunnable) that will be executed asynchronously.
-    let runnableForUnloadingEnvMan = {
-      run: function() {
-        Components.utils.unload("chrome://requestpolicy/content/" +
-                                "main/environment-manager.jsm");
-      }
-    };
-
-    // tell the current thread to run the `unloadEnvMan` runnable async.
-    Components.classes["@mozilla.org/thread-manager;1"]
-        .getService(Components.interfaces.nsIThreadManager)
-        .currentThread
-        .dispatch(runnableForUnloadingEnvMan,
-                  Components.interfaces.nsIEventTarget.DISPATCH_NORMAL);
-  }
-  if (EnvironmentManager.isMainProcess === false) {
-    Environment.asyncUnloadEnvMan = unloadEnvMan;
-  }
 
 
   function reloadDocument() {
@@ -178,19 +104,6 @@ Components.utils.import("resource://gre/modules/Services.jsm");
   mlManager.addListener("setLocation", function (message) {
     setLocation(message.data.uri);
   });
-
-  function loadSubScripts() {
-    Services.scriptloader.loadSubScriptWithOptions(
-        'chrome://requestpolicy/content/ui/frame.blocked-content.js',
-        {target: FrameScriptScope/*, ignoreCache: true*/});
-    Services.scriptloader.loadSubScriptWithOptions(
-        'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js',
-        {target: FrameScriptScope/*, ignoreCache: true*/});
-  }
-  FrameScriptEnv.addStartupFunction(Environment.LEVELS.BACKEND,
-                                    loadSubScripts);
-
-  FrameScriptEnv.startup();
 
 
 
@@ -231,7 +144,12 @@ Components.utils.import("resource://gre/modules/Services.jsm");
       return;
     }
   };
-  FrameScriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
-    FrameScriptEnv.elManager.addListener(mm, "click", mouseClicked, true);
+
+  framescriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
+    framescriptEnv.elManager.addListener(mm, "click", mouseClicked, true);
   });
+
+
+  // start up the framescript's environment
+  framescriptEnv.startup();
 }());

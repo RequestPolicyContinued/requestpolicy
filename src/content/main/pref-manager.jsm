@@ -36,7 +36,7 @@ Cu.import("resource://gre/modules/devtools/Console.jsm");
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/constants",
-  "lib/process-environment"
+  "lib/environment"
 ], globalScope);
 
 XPCOMUtils.defineLazyGetter(globalScope, "rpPrefBranch", function() {

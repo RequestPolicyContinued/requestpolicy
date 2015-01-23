@@ -130,7 +130,7 @@ let ManagerForDOMContentLoaded = (function() {
   function onDocumentLoaded(doc) {
     // Create a new Environment for this Document and shut it down when
     // the document is unloaded.
-    let DocEnv = new Environment("DocEnv");
+    let DocEnv = new Environment(framescriptEnv, "DocEnv");
     DocEnv.shutdownOnUnload(doc.defaultView);
     // start up the Environment immediately, as it won't have any startup
     // functions.
@@ -289,12 +289,12 @@ let ManagerForDOMContentLoaded = (function() {
   }
 
 
-  FrameScriptEnv.elManager.addListener(mm, "DOMContentLoaded",
+  framescriptEnv.elManager.addListener(mm, "DOMContentLoaded",
                                        onDOMContentLoaded, true);
 
   // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
   // enclosed frames.
-  FrameScriptEnv.elManager.addListener(mm, "DOMFrameContentLoaded",
+  framescriptEnv.elManager.addListener(mm, "DOMFrameContentLoaded",
                                        onDOMFrameContentLoaded, true);
 
   //mm.addEventListener("DOMContentLoaded", onDOMContentLoaded, true);
@@ -304,7 +304,7 @@ let ManagerForDOMContentLoaded = (function() {
   //mm.addEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded, true);
   //
   //// clean up on shutdown
-  //FrameScriptEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+  //framescriptEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
   //  Logger.dump('removing listeners for "DOMContentLoaded" and ' +
   //              '"DOMFrameContentLoaded"');
   //  mm.removeEventListener("DOMContentLoaded", onDOMContentLoaded, true);

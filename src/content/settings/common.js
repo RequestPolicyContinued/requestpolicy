@@ -19,7 +19,7 @@ ScriptLoader.importModules([
 ], this);
 
 // create a new Environment for this window
-var WinEnv = new Environment("WinEnv");
+var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
 // The Environment has to be shut down when the content window gets unloaded.
 WinEnv.shutdownOnUnload(content);
 // start up right now, as there won't be any startup functions

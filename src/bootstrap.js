@@ -25,8 +25,8 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const envManURI = "chrome://requestpolicy/content/main/" +
-    "environment-manager.jsm";
+var mod = {};
+const envURI = "chrome://requestpolicy/content/lib/environment.jsm";
 
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.
@@ -38,22 +38,23 @@ function logSevereError(msg, e) {
   Cu.reportError(e);
 }
 
-function startup(...startupArgs) {
+function startup(data, reason) {
   try {
-    // Import the EnvironmentManager and call its startup() function.
-    Cu.import(envManURI);
-    EnvironmentManager.startup(startupArgs);
+    // Import the ProcessEnvironment and call its startup() function.
+    Cu.import(envURI, mod);
+    mod.ProcessEnvironment.startup(arguments);
   } catch(e) {
     logSevereError("startup() failed!", e);
   }
 }
 
-function shutdown(...shutdownArgs) {
+function shutdown(data, reason) {
+
   try {
     // shutdown, unset and unload.
-    EnvironmentManager.shutdown(shutdownArgs);
-    EnvironmentManager = null;
-    Cu.unload(envManURI);
+    mod.ProcessEnvironment.shutdown(arguments);
+    mod = {};
+    Cu.unload(envURI);
   } catch(e) {
     logSevereError("shutdown() failed!", e);
   }

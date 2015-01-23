@@ -27,7 +27,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/utils",
-  "lib/process-environment"
+  "lib/environment"
 ], this);
 
 

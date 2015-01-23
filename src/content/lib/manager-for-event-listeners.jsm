@@ -31,7 +31,6 @@ let globalScope = this;
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "main/environment-manager",
   "lib/environment",
   "lib/logger"
 ], globalScope);

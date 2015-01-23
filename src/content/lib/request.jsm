@@ -365,11 +365,9 @@ function RedirectRequest(httpResponse) {
                httpResponse.destURI.specIgnoringRef, REQUEST_TYPE_REDIRECT);
   this.httpResponse = httpResponse;
 
-  XPCOMUtils.defineLazyGetter(this, "browser", getBrowser);
+  XPCOMUtils.defineLazyGetter(this, "browser", function() {
+    return httpResponse.browser;
+  });
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;
-
-function getBrowser() {
-  return this.httpResponse.browser;
-}

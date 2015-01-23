@@ -40,7 +40,7 @@ let rpWindowManager = (function(self) {
     "lib/utils",
     "lib/utils/xul",
     "lib/utils/constants",
-    "lib/process-environment"
+    "lib/environment"
   ], globalScope);
 
   // import the WindowListener
@@ -129,12 +129,17 @@ let rpWindowManager = (function(self) {
   }
 
   function unloadFromWindow(window) {
-    // # 6 : unload frame scripts
+    // # 6 : stop loading framescripts into new tabs
     // --------------------------
+    // Note that it's not necessary to tell the framescripts'
+    // environments to shut down. Instead:
+    // - In case the window is closed, the will shut down on
+    //   the ContentFrameMessageManager's "unload" event.
+    // - In case the addon is being disabled or firefox gets quit,
+    //   the ParentProcessEnvironment will send a message to all
+    //   children.
     let mm = window.messageManager;
     mm.removeDelayedFrameScript(frameScriptURI);
-    Logger.dump("broadcasting `shutdown` message to framescripts!");
-    mm.broadcastAsyncMessage(C.MM_PREFIX + "shutdown", {uri: frameScriptURI});
 
 
     // # 5 : "shutdown" the overlay

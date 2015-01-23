@@ -41,7 +41,7 @@ requestpolicy.overlay = (function() {
 
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
-  let {Environment} = iMod("lib/environment");
+  let {Environment, ProcessEnvironment} = iMod("lib/environment");
   let {ManagerForMessageListeners} = iMod("lib/manager-for-message-listeners");
   let {Logger} = iMod("lib/logger");
   let {rpPrefBranch, Prefs} = iMod("lib/prefs");
@@ -61,7 +61,7 @@ requestpolicy.overlay = (function() {
 
 
   // create an environment for this overlay.
-  let OverlayEnvironment = new Environment("OverlayEnv");
+  let OverlayEnvironment = new Environment(ProcessEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);

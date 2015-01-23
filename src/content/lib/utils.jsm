@@ -35,7 +35,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/prefs",
   "lib/utils/constants",
-  "lib/process-environment"
+  "lib/environment"
 ], this);
 
 if (ProcessEnvironment.isMainProcess) {

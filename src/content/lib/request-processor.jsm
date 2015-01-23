@@ -48,7 +48,7 @@ ScriptLoader.importModules([
   "lib/request",
   "lib/request-result",
   "lib/request-set",
-  "lib/process-environment"
+  "lib/environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
   "lib/content-policy": ["PolicyImplementation"]

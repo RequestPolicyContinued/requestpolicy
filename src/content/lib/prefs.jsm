@@ -30,7 +30,7 @@ let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/process-environment"], this);
+ScriptLoader.importModules(["lib/environment"], this);
 
 
 

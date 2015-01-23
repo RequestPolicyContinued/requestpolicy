@@ -21,24 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
+let EXPORTED_SYMBOLS = [
+  "Environment",
+  "FrameScriptEnvironment",
+  "ProcessEnvironment"
+];
+
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-let EXPORTED_SYMBOLS = ["Environment"];
-
 let globalScope = this;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-//Cu.import("resource://gre/modules/devtools/Console.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 
 ScriptLoader.defineLazyModuleGetters({
   "lib/manager-for-event-listeners": ["ManagerForEventListeners"],
-  "main/environment-manager": ["EnvironmentManager"],
+  "lib/manager-for-message-listeners": ["ManagerForMessageListeners"],
+  "lib/utils/constants": ["C"],
   "lib/observer-manager": ["ObserverManager"]
 }, globalScope);
+
 
 
 
@@ -72,29 +79,94 @@ let LEVEL_STATES = {
 };
 
 
+let BOOTSTRAP = {
+  "startup": {
+    levelSequence: [
+      LEVELS.ESSENTIAL,
+      LEVELS.BACKEND,
+      LEVELS.INTERFACE,
+      LEVELS.UI
+    ],
+    lastLevel: LEVELS.UI,
+    envStates: {
+      "beforeProcessing": ENV_STATES.NOT_STARTED,
+      "duringProcessing": ENV_STATES.STARTING_UP,
+      "afterProcessing": ENV_STATES.STARTUP_DONE
+    },
+    functions: {
+      "beforeProcessing": function() {
+        // "this" will be an environment
+        let self = this;
+        //console.log("[RPC] starting up Environment " + getEnvInfo(self) + "." +
+        //            (self.outerEnv ?
+        //             " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
+        //             " No OuterEnv."));
+        self.register();
+      },
+      "afterProcessing": function() {}
+    }
+  },
+  "shutdown": {
+    levelSequence: [
+      LEVELS.UI,
+      LEVELS.INTERFACE,
+      LEVELS.BACKEND,
+      LEVELS.ESSENTIAL
+    ],
+    lastLevel: LEVELS.ESSENTIAL,
+    envStates: {
+      "beforeProcessing": ENV_STATES.STARTUP_DONE,
+      "duringProcessing": ENV_STATES.SHUTTING_DOWN,
+      "afterProcessing": ENV_STATES.SHUT_DOWN
+    },
+    functions: {
+      "beforeProcessing": function() {},
+      "afterProcessing": function() {
+        // "this" will be an environment
+        let self = this;
+        self.innerEnvs.length = 0;
+        self.unregister();
+      }
+    }
+  }
+};
+function getBootstrapMetadata(startupOrShutdown) {
+  return BOOTSTRAP[startupOrShutdown];
+}
+
+
 /**
- * The `Environment` class can take care of the "startup" (=initialization) and
- * "shutdown" of any environment.
+ * The `Environment` class can take care of the "startup" (=initialization)
+ * and "shutdown" of any environment.
  *
  * To each `Environment` instance, `startup` and `shutdown` functions can be
- * added. As soon as the Environment's startup() function is called, all of
- * those functions will be called; same for shutdown().
+ * added. As soon as the Environment starts up, e.g. via its startup()
+ * function, all those functions will be called. Equally the shutdown
+ * functions are called on the environment's shutdown.
  *
  * Both startup and shutdown functions will have Levels assigned. The levels
- * of the functions determine in which sequence they are called
+ * of the functions determine in which sequence they are called.
+ *
+ * @constructor
+ * @param {Environment=} aOuterEnv - the Environment to which this environment
+ *     will register itself. Inner environments shut down when its outer
+ *     environment shuts down.
+ * @param {string=} aName - the Environment's name; only needed for debugging.
  */
-function Environment(aName) {
+function Environment(aOuterEnv, aName="anonymous") {
   let self = this;
-
-  // the Environment's name is only needed for debugging
-  self.name = aName || "anonymous";
 
   self.envState = ENV_STATES.NOT_STARTED;
 
-  self.startupLevels = generateLevelObjects();
-  self.shutdownLevels = generateLevelObjects();
+  self.name = aName;
 
-  EnvironmentManager.registerEnvironment(self);
+  self.outerEnv = aOuterEnv instanceof Environment ? aOuterEnv : null;
+  self.innerEnvs = new Set();
+
+  self.levels = {
+    "startup": generateLevelObjects(),
+    "shutdown": generateLevelObjects()
+  };
 
   // Define a Lazy Getter to get an ObserverManager for this Environment.
   // Using that Getter is more convenient than doing it manually, as the
@@ -117,7 +189,6 @@ function Environment(aName) {
   //console.debug('[RPC] created new Environment "'+self.name+'"');
 }
 
-Environment.ENV_STATES = ENV_STATES;
 Environment.LEVELS = LEVELS;
 
 
@@ -136,53 +207,62 @@ function generateLevelObjects() {
   return obj;
 }
 
-(function addLevelIterators(Environment) {
-  let startupSequence = [
-    LEVELS.ESSENTIAL,
-    LEVELS.BACKEND,
-    LEVELS.INTERFACE,
-    LEVELS.UI
-  ];
-  let shutdownSequence = [
-    LEVELS.UI,
-    LEVELS.INTERFACE,
-    LEVELS.BACKEND,
-    LEVELS.ESSENTIAL
-  ];
 
-  function lastValue(aArray) {
-    return aArray[aArray.length - 1];
+/**
+ * Registers the environment to its outer environment.
+ */
+Environment.prototype.register = function() {
+  let self = this;
+  if (self.outerEnv) {
+    self.outerEnv.registerInnerEnvironment(self);
   }
+}
+/**
+ * Unregisters the environment from its outer environment.
+ */
+Environment.prototype.unregister = function() {
+  let self = this;
+  if (self.outerEnv) {
+    self.outerEnv.unregisterInnerEnvironment(self);
+  }
+}
+/**
+ * Function called by an inner environment when it starts up.
+ *
+ * @param {Environment} aEnv - the environment that wants to register itself.
+ */
+Environment.prototype.registerInnerEnvironment = function(aEnv) {
+  let self = this;
+  if (self.envState === ENV_STATES.NOT_STARTED) {
+    console.warn("[RPC] registerInnerEnvironment() has been called, " +
+                 "but the outer environment hasn't started up yet. " +
+                 "Starting up now.");
+    self.startup();
+  }
+  //console.debug("[RPC] registering inner environment.");
+  self.innerEnvs.add(aEnv);
+};
+/**
+ * Function that is called each time an inner environment shuts down.
+ *
+ * @param {Environment} aEnv - the environment that is unregistering
+ */
+Environment.prototype.unregisterInnerEnvironment = function(aEnv) {
+  let self = this;
 
-  Environment.lastStartupLevel = lastValue(startupSequence);
-  Environment.lastShutdownLevel = lastValue(shutdownSequence);
-
-  function iterateLevels(aSequence, aFn, aUntilLevel=lastValue(aSequence)) {
-    for (let i = 0, len = aSequence.length; i < len; ++i) {
-      // Note: It's necessary to use for(;;) instead of  for(..of..)
-      //       because the order/sequence must be exactly the same as in the
-      //       array.  for(..of..) doesn't guarantee that the elements are
-      //       called in order.
-
-      let level = aSequence[i];
-      aFn(level);
-
-      if (level === aUntilLevel) {
-        // Stop after aUntilLevel
-        break;
-      }
-    }
-  };
-
-  Environment.iterateStartupLevels = iterateLevels.bind(null, startupSequence);
-  Environment.iterateShutdownLevels = iterateLevels.bind(null, shutdownSequence);
-})(Environment);
+  if (self.innerEnvs.has(aEnv) === false) {
+    console.error("[RPC] it seems like an inner Environment " +
+                  "did not register.");
+  } else {
+    self.innerEnvs.delete(aEnv);
+  }
+};
 
 
 
 
 /**
- * This set of functions can be used for adding startup/shutdown functions.
+ * Add a startup function to the environment.
  */
 Environment.prototype.addStartupFunction = function(aLevel, f) {
   let self = this;
@@ -190,7 +270,7 @@ Environment.prototype.addStartupFunction = function(aLevel, f) {
     // the environment is shutting down or already shut down.
     return;
   }
-  if (self.startupLevels[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
+  if (self.levels["startup"][aLevel].levelState >= LEVEL_STATES.PROCESSING) {
     // Either the startup functions of the same level as `aLevel` have
     //        already been processed
     //    OR  they are currently being processed.
@@ -201,13 +281,16 @@ Environment.prototype.addStartupFunction = function(aLevel, f) {
     // the startup process did not reach the function's level yet.
     //
     // ==> remember the function.
-    self.startupLevels[aLevel].functions.push(f);
+    self.levels["startup"][aLevel].functions.push(f);
   }
 };
 
+/**
+ * Add a shutdown function to the environment.
+ */
 Environment.prototype.addShutdownFunction = function(aLevel, f) {
   let self = this;
-  if (self.shutdownLevels[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
+  if (self.levels["shutdown"][aLevel].levelState >= LEVEL_STATES.PROCESSING) {
     // Either the shutdown functions of the same level as `aLevel` have
     //        already been processed
     //    OR  they are currently being processed.
@@ -221,96 +304,189 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
     // level yet.
     //
     // ==> remember the function.
-    self.shutdownLevels[aLevel].functions.push(f);
+    self.levels["shutdown"][aLevel].functions.push(f);
   }
 };
 
 
-
-(function addStartupAndShutdown(Environment) {
+// have a scope/closure for private functions specific to
+// startup() and shutdown().
+(function createMethods_StartupAndShutdown(Environment) {
   /**
-   * This function calls all functions of a function queue.
+   * Iterates all levels of either the startup or the shutdown
+   * sequence and calls a function for each level.
+   *
+   * @param {string} aStartupOrShutdown
+   * @param {function()} aFn - the function to call
+   * @param {integer=} aUntilLevel - if specified, iteration stops
+   *     after that level.
    */
-  function callFunctions(fnArray, fnArgsToApply) {
-    // process the Array as long as it contains elements
-    while (fnArray.length > 0) {
-      // The following is either `fnArray.pop()` or `fnArray.shift()`
-      // depending on `sequence`.
-      let f = fnArray.pop();
+  function iterateLevels(aStartupOrShutdown, aFn, aUntilLevel=null) {
+    let sequence = BOOTSTRAP[aStartupOrShutdown].levelSequence;
 
-      // call the function
-      f.apply(null, fnArgsToApply);
-    }
-  };
+    for (let i = 0, len = sequence.length; i < len; ++i) {
+      // Note: It's necessary to use for(;;) instead of  for(..of..)
+      //       because the order/sequence must be exactly the same as in the
+      //       array.  for(..of..) doesn't guarantee that the elements are
+      //       called in order.
 
-  function processLevel(aLevelObj, fnArgsToApply) {
-    if (aLevelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
-      aLevelObj.levelState = LEVEL_STATES.PROCESSING;
-      callFunctions(aLevelObj.functions, fnArgsToApply);
-      aLevelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
+      let level = sequence[i];
+      aFn(level);
+
+      if (level === aUntilLevel) {
+        // Stop after aUntilLevel
+        break;
+      }
     }
   }
 
 
-  let {lastStartupLevel, lastShutdownLevel} = Environment;
+  /**
+   * This function calls all functions in an array.
+   *
+   * @param {Array.<function()>} aFunctions
+   * @param {Array} aBootstrapArgs - the arguments to apply
+   */
+  function callFunctions(aFunctions, aBootstrapArgs) {
+    // process the Array as long as it contains elements
+    while (aFunctions.length > 0) {
+      // The following is either `fnArray.pop()` or `fnArray.shift()`
+      // depending on `sequence`.
+      let f = aFunctions.pop();
+
+      // call the function
+      f.apply(null, aBootstrapArgs);
+      //console.debug("[RPC] function called! (" + fnArray.length +
+      //              " functions left)");
+    }
+  };
+
 
   /**
-   * @param {Array} fnArgsToApply
-   * @param {integer=} untilLevel - The level after which the startup
-   *     processing is stopped.
+   * Process a level independently of the environment's states and
+   * independently of the other levels' states.
+   *
+   * @this {Environment}
+   * @param {string} aStartupOrShutdown - either "startup" or "shutdown"
+   * @param {integer} aLevel
    */
-  Environment.prototype.startup = function(fnArgsToApply,
-                                           untilLevel=lastStartupLevel) {
+  function processLevel(aStartupOrShutdown, aLevel, aBootstrapArgs) {
     let self = this;
 
-    if (self.envState == ENV_STATES.NOT_STARTED) {
-      //console.log('[RPC] starting up Environment "'+self.name+'"...');
-      self.envState = ENV_STATES.STARTING_UP;
+    let levelObj = self.levels[aStartupOrShutdown][aLevel];
+
+    if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
+      levelObj.levelState = LEVEL_STATES.PROCESSING;
+
+      if (aStartupOrShutdown === "shutdown") {
+        // shut down all inner environments
+        self.innerEnvs.forEach(function(innerEnv) {
+          innerEnv.shutdown(aBootstrapArgs, aLevel);
+        });
+      }
+
+      callFunctions(levelObj.functions, aBootstrapArgs);
+
+      levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
+    }
+  }
+
+
+  /**
+   * Iterate levels and call processLevel() for each level.
+   *
+   * @this {Environment}
+   * @param {string} aStartupOrShutdown
+   * @param {Array} aBootstrapArgs
+   * @param {integer=} aUntilLevel
+   */
+  function processLevels(aStartupOrShutdown, aBootstrapArgs, aUntilLevel) {
+    let self = this;
+    iterateLevels(aStartupOrShutdown, function (level) {
+      processLevel.call(self, aStartupOrShutdown, level, aBootstrapArgs);
+    }, aUntilLevel);
+  }
+
+
+  /**
+   * Return some information about an environment.
+   *
+   * @param {Environment} env
+   * @return {string}
+   */
+  function getEnvInfo(env) {
+    return "'" + env.name + "' (" + env.uid + ")";
+  }
+
+  /**
+   * Log some debug information on startup or shutdown.
+   *
+   * @this {Environment}
+   * @param {string} aStartupOrShutdown
+   */
+  function logStartupOrShutdown(aStartupOrShutdown) {
+    let self = this;
+    console.log("[RPC] " + aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
+                (self.outerEnv ?
+                 " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
+                 " No OuterEnv."));
+  }
+
+  /**
+   * Actual body of the functions startup() and shutdown().
+   *
+   * @this {Environment}
+   * @param {string} aStartupOrShutdown - either "startup" or "shutdown"
+   * @param {Array} aBootstrapArgs
+   * @param {integer=} aUntilLevel - The level after which the startup
+   *     (or shutdown) processing is stopped.
+   */
+  function bootstrap(aStartupOrShutdown,
+                     aBootstrapArgs,
+                     aUntilLevel=BOOTSTRAP[aStartupOrShutdown].lastLevel) {
+    let self = this;
+
+    let {
+      lastLevel,
+      envStates,
+      functions
+    } = getBootstrapMetadata(aStartupOrShutdown);
+
+    if (self.envState === envStates["beforeProcessing"]) {
+      //logStartupOrShutdown.call(self, aStartupOrShutdown);
+      functions["beforeProcessing"].call(self);
+
+      self.envState = envStates["duringProcessing"];
     }
 
-    if (self.envState === ENV_STATES.STARTING_UP) {
-      Environment.iterateStartupLevels(function (level) {
-        let levelObj = self.startupLevels[level];
-        processLevel(levelObj, fnArgsToApply);
-      }, untilLevel);
+    if (self.envState === envStates["duringProcessing"]) {
+      processLevels.call(self, aStartupOrShutdown, aBootstrapArgs, aUntilLevel);
 
-      if (untilLevel === lastStartupLevel) {
-        self.envState = ENV_STATES.STARTUP_DONE;
+      if (aUntilLevel === lastLevel) {
+        self.envState = envStates["afterProcessing"];
+        functions["afterProcessing"].call(self);
       }
     }
   };
 
-  /**
-   * @param {Array} fnArgsToApply
-   * @param {integer=} untilLevel - The level after which the shutdown
-   *     processing is stopped.
-   */
-  Environment.prototype.shutdown = function(fnArgsToApply,
-                                            untilLevel=lastShutdownLevel) {
+  Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
     let self = this;
-
-    if (self.envState === ENV_STATES.STARTUP_DONE) {
-      //console.log('[RPC] shutting down Environment "'+self.name+'"...');
-      self.envState = ENV_STATES.SHUTTING_DOWN;
-    }
-
-    if (self.envState === ENV_STATES.SHUTTING_DOWN) {
-      Environment.iterateShutdownLevels(function (level) {
-        let levelObj = self.shutdownLevels[level];
-        processLevel(levelObj, fnArgsToApply);
-      }, untilLevel);
-
-      if (untilLevel === lastShutdownLevel) {
-        EnvironmentManager.unregisterEnvironment(self);
-        self.envState = ENV_STATES.SHUT_DOWN;
-      }
-    }
+    bootstrap.call(self, "startup", aBootstrapArgs, aUntilLevel);
   };
+
+  Environment.prototype.shutdown = function(aBootstrapArgs, aUntilLevel) {
+    let self = this;
+    bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
+  };
+
 })(Environment);
 
 /**
- * Helper function: shuts down the environment when an EventTarget's "unload"
- * event occurres.
+ * Tell the Environment to shut down when an EventTarget's
+ * "unload" event occurres.
+ *
+ * @param {EventTarget} aEventTarget - an object having the functions
+ *     addEventListener() and removeEventListener().
  */
 Environment.prototype.shutdownOnUnload = function(aEventTarget) {
   let self = this;
@@ -320,3 +496,39 @@ Environment.prototype.shutdownOnUnload = function(aEventTarget) {
     self.shutdown();
   });
 };
+
+
+/**
+ * @constructor
+ * @extends {Environment}
+ * @param {ContentFrameMessageManager} aMM
+ * @param {string=} aName - the environment's name, passed to the superclass.
+ */
+function FrameScriptEnvironment(aMM, aName="frame script environment") {
+  let self = this;
+
+  // The outer Environment will be either ChildProcessEnvironment
+  // or ParentProcessEnvironment.
+  let _outerEnv = ProcessEnvironment;
+
+  Environment.call(self, _outerEnv, aName);
+
+  self.addStartupFunction(LEVELS.INTERFACE, function() {
+    // shut down the framescript on the message manager's
+    // `unload`. That event will occur when the browsing context
+    // (e.g. the tab) has been closed.
+    self.shutdownOnUnload(aMM);
+  });
+
+  // a "MessageListener"-Manager for this environment
+  XPCOMUtils.defineLazyGetter(self, "mlManager", function() {
+    return new ManagerForMessageListeners(self, aMM);
+  });
+}
+FrameScriptEnvironment.prototype = Object.create(Environment.prototype);
+FrameScriptEnvironment.prototype.constructor = Environment;
+
+
+// Load the "ProcessEnvironment"
+Services.scriptloader.loadSubScript("chrome://requestpolicy/content/" +
+                                    "lib/environment.process.js");

@@ -62,7 +62,7 @@ let ScriptLoader = (function() {
   // a module shouldn't unload itself
   moduleUnloadExceptions[getModuleURI("lib/script-loader")] = true;
   // EnvironmentManager has to be unloaded even later than ScriptLoader
-  moduleUnloadExceptions[getModuleURI("main/environment-manager")] = true;
+  moduleUnloadExceptions[getModuleURI("lib/environment")] = true;
 
 
   // contains the module IDs that are currently being imported initially and

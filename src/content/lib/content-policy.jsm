@@ -39,7 +39,7 @@ ScriptLoader.importModules([
   "lib/request",
   "lib/utils",
   "lib/request-processor",
-  "lib/process-environment"
+  "lib/environment"
 ], globalScope);
 
 

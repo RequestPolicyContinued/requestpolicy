@@ -31,7 +31,6 @@ let globalScope = this;
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "main/environment-manager",
   "lib/environment",
   "lib/logger",
   "lib/utils/constants"
@@ -104,6 +103,14 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                    '"');
     return;
   }
+  if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
+    Logger.warning(Logger.TYPE_INTERNAL,
+                   "The message name that has been passed to " +
+                   "`addListener()` contains the MM Prefix. " +
+                   "Extracting the message name.");
+    aMessageName = aMessageName.substr(C.MM_PREFIX.length)
+  }
+
   let listener = {
     messageName: aMessageName,
     messageID: C.MM_PREFIX + aMessageName,

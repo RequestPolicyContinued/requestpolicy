@@ -153,6 +153,7 @@ requestpolicy.overlay = (function() {
 
   self.onWindowUnload = function() {
     RequestProcessor.removeRequestObserver(self);
+    self._unwrapAddTab();
     self._removeHistoryObserver();
     self._removeLocationObserver();
 
@@ -218,9 +219,7 @@ requestpolicy.overlay = (function() {
       OverlayEnvironment.elManager.addListener(container, "TabSelect",
                                                tabSelectCallback, false);
 
-      // maybe it's not necessary anymore to wrap the tab. if it's needed,
-      // the wrapping needs to be undone at shutdown!
-      //self._wrapAddTab();
+      self._wrapAddTab();
       self._addLocationObserver();
       self._addHistoryObserver();
     }
@@ -858,6 +857,27 @@ requestpolicy.overlay = (function() {
       // Finally, add our line to the beginning of the addTab function.
       eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine
           + addTabParts[1]);
+    }
+  };
+
+
+
+  self._unwrapAddTab = function() {
+    if (gBrowser.requestpolicyAddTabModified === true) {
+      // get the addTab() function as a string
+      let addTabString = gBrowser.addTab.toString();
+
+      // define the regular expression that should find the existing code
+      // line that RequestPolicy added.
+      let codeLineRE = /(\n    )?requestpolicy\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/
+
+      // use the regular expression
+      let newAddTabString = addTabString.replace(codeLineRE, "");
+
+      // apply the changes
+      eval("gBrowser.addTab = " + newAddTabString);
+
+      delete gBrowser.requestpolicyAddTabModified;
     }
   };
 

@@ -238,7 +238,11 @@ var knownSchemesWithoutHost = [
 
   // custom schemes
   "magnet",
-  "UT2004"
+  "UT2004",
+  "gopher",
+  "spotify",
+  "greasemonkey-script",
+  "floatnotes"
 ];
 
 function isKnownSchemeWithoutHost(scheme) {

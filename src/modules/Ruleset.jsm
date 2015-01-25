@@ -678,14 +678,16 @@ DomainEntry.prototype = {
   },
 
   addLowerLevel : function(name, entry) {
-    if (this._lower[name]) {
+    if (this._lower.hasOwnProperty(name)) {
       throw "ENTRY_ALREADY_EXISTS";
     }
     this._lower[name] = entry;
   },
 
   getLowerLevel : function(name) {
-    return this._lower[name];
+    if (this._lower.hasOwnProperty(name)) {
+      return this._lower[name];
+    }
   }
 };
 

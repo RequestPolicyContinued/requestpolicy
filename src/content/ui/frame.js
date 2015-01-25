@@ -68,6 +68,7 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
     "ScriptLoader": ScriptLoader,
     "C": C,
     "Logger": Logger,
+    "console": console,
     "Environment": Environment,
 
     "framescriptEnv": framescriptEnv,

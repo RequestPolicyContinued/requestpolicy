@@ -72,6 +72,10 @@ let ManagerForDOMContentLoaded = (function() {
     let [answer] = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
                                       {documentURI: doc.documentURI});
     var blockedURIs = answer.blockedURIs;
+    //console.debug("Received " +
+    //              Object.getOwnPropertyNames(blockedURIs).length +
+    //              " blocked URIs.");
+
     // Indicating blocked visible objects isn't an urgent task, so this should
     // be done async.
     Utils.runAsync(function() {

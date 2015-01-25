@@ -88,6 +88,7 @@ function addEvLis(listener) {
   listener.target.addEventListener(listener.eventType, listener.callback,
                                    listener.useCapture);
   listener.listening = true;
+  //Logger.dump("[RPC] event listener for '" + listener.eventType + "' added");
 };
 
 

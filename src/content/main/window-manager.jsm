@@ -118,30 +118,9 @@ let rpWindowManager = (function(self) {
       Logger.warning(Logger.TYPE_ERROR,
                      "An error occurred while initializing the overlay: "+e, e);
     }
-
-    // ==================================
-    // # 6 : load frame scripts
-    try {
-      window.messageManager.loadFrameScript(frameScriptURI, true);
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR, "Error loading the frame script: "+e,e);
-    }
   }
 
   function unloadFromWindow(window) {
-    // # 6 : stop loading framescripts into new tabs
-    // --------------------------
-    // Note that it's not necessary to tell the framescripts'
-    // environments to shut down. Instead:
-    // - In case the window is closed, the will shut down on
-    //   the ContentFrameMessageManager's "unload" event.
-    // - In case the addon is being disabled or firefox gets quit,
-    //   the ParentProcessEnvironment will send a message to all
-    //   children.
-    let mm = window.messageManager;
-    mm.removeDelayedFrameScript(frameScriptURI);
-
-
     // # 5 : "shutdown" the overlay
     // ----------------------------
     if (window.requestpolicy) {
@@ -176,6 +155,13 @@ let rpWindowManager = (function(self) {
         WindowListener.setLoadFunction(loadIntoWindow);
         WindowListener.setUnloadFunction(unloadFromWindow);
         WindowListener.startListening();
+
+        // Load the framescript into all existing tabs.
+        // Also tell the globalMM to load it into each new
+        // tab from now on.
+        var globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
+            .getService(Ci.nsIMessageListenerManager);
+        globalMM.loadFrameScript(frameScriptURI, true);
       });
 
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, loadStyleSheets);
@@ -183,6 +169,19 @@ let rpWindowManager = (function(self) {
   ProcessEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
       function() {
+        // Stop loading framescripts into new tabs.
+        // --------------------------
+        // Note that it's not necessary to tell the framescripts'
+        // environments to shut down. Instead:
+        // - In case the window is closed, the framescript will shut
+        //   down on the ContentFrameMessageManager's "unload" event.
+        // - In case the addon is being disabled or firefox gets quit,
+        //   the ParentProcessEnvironment will send a message to all
+        //   children.
+        var globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
+            .getService(Ci.nsIMessageListenerManager);
+        globalMM.removeDelayedFrameScript(frameScriptURI);
+
         forEachOpenWindow(unloadFromWindow);
         WindowListener.stopListening();
       });

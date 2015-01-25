@@ -50,6 +50,7 @@ requestpolicy.overlay = (function() {
   let {DomainUtil} = iMod("lib/utils/domains");
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
+  let {WindowUtils} = iMod("lib/utils/windows");
   let {C} = iMod("lib/utils/constants");
 
   let $id = document.getElementById.bind(document);
@@ -514,17 +515,26 @@ requestpolicy.overlay = (function() {
     var origin = m._addWildcard(DomainUtil.getBaseDomain(redirectOriginUri));
     var dest = m._addWildcard(DomainUtil.getBaseDomain(redirectTargetUri));
 
+
+    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
+
     let cm = requestpolicy.classicmenu;
     cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
-    cm.addMenuItemAllowDest(addRulePopup, dest);
+    if (mayPermRulesBeAdded) {
+      cm.addMenuItemAllowDest(addRulePopup, dest);
+    }
     cm.addMenuSeparator(addRulePopup);
 
     cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
-    cm.addMenuItemAllowOrigin(addRulePopup, origin);
+    if (mayPermRulesBeAdded) {
+      cm.addMenuItemAllowOrigin(addRulePopup, origin);
+    }
     cm.addMenuSeparator(addRulePopup);
 
     cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
-    cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+    if (mayPermRulesBeAdded) {
+      cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+    }
 
 
 

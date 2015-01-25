@@ -27,6 +27,8 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["WindowUtils"];
 
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["lib/prefs"], this);
 
 
 
@@ -88,6 +90,16 @@ let WindowUtils = (function() {
     }
   }());
 
+  /**
+   * Should it be possible to add permanent rules in that window?
+   *
+   * @return {boolean}
+   */
+  self.mayPermanentRulesBeAdded = function(aWindow) {
+    return self.isWindowPrivate(aWindow) === false ||
+        rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
+  };
+
 
   //
   // Window & DOM utilities
@@ -97,7 +109,7 @@ let WindowUtils = (function() {
    * Wait for a window to be loaded and then add a list of Elements „by ID“ to
    * a scope. The scope is optional, but in any case will be returned.
    *
-   * @returns {Object} the scope of the elements
+   * @return {Object} the scope of the elements
    */
   self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
                                         aCallback) {

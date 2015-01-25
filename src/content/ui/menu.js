@@ -97,15 +97,6 @@ requestpolicy.menu = (function() {
   };
 
 
-  /**
-   * „Should be permanent rules be displayed or hidden?“
-   */
-  function mayPermRulesBeDisplayed() {
-    return WindowUtils.isWindowPrivate(window) === false ||
-        rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
-  }
-
-
   self.prepareMenu = function() {
     try {
       var disabled = Prefs.isBlockingDisabled();
@@ -347,6 +338,8 @@ requestpolicy.menu = (function() {
       }
     };
 
+    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
+
     // Note: in PBR we'll need to still use the old string for the temporary
     // rule. We won't be able to use just "allow temporarily".
 
@@ -354,13 +347,13 @@ requestpolicy.menu = (function() {
       if (Prefs.isDefaultAllow()) {
         // It seems pretty rare that someone will want to add a rule to block all
         // requests from a given origin.
-        //if (mayPermRulesBeDisplayed() === true) {
+        //if (mayPermRulesBeAdded === true) {
         //  var item = self._addMenuItemDenyOrigin(
         //    self._addRulesList, ruleData);
         //}
         //var item = self._addMenuItemTempDenyOrigin(self._addRulesList, ruleData);
       } else {
-        if (mayPermRulesBeDisplayed() === true) {
+        if (mayPermRulesBeAdded === true) {
           var item = self._addMenuItemAllowOrigin(self._addRulesList, ruleData);
         }
         var item = self._addMenuItemTempAllowOrigin(self._addRulesList, ruleData);
@@ -385,7 +378,7 @@ requestpolicy.menu = (function() {
         //  -- this enables support for blacklisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-          if (mayPermRulesBeDisplayed() === true) {
+          if (mayPermRulesBeAdded === true) {
               var item = self._addMenuItemDenyOriginToDest(
                   self._addRulesList, ruleData);
           }
@@ -395,7 +388,7 @@ requestpolicy.menu = (function() {
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-          if (mayPermRulesBeDisplayed() === true) {
+          if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemDenyDest(
                 self._addRulesList, destOnlyRuleData);
           }
@@ -411,7 +404,7 @@ requestpolicy.menu = (function() {
         //  -- this enables support for whitelisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-          if (mayPermRulesBeDisplayed() === true) {
+          if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemAllowOriginToDest(
                 self._addRulesList, ruleData);
           }
@@ -421,7 +414,7 @@ requestpolicy.menu = (function() {
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-          if (mayPermRulesBeDisplayed() === true) {
+          if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemAllowDest(
                 self._addRulesList, destOnlyRuleData);
           }
@@ -470,7 +463,8 @@ requestpolicy.menu = (function() {
   };
 
   self._setPrivateBrowsingStyles = function() {
-    let val = mayPermRulesBeDisplayed() === true ? '' : 'privatebrowsing';
+    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
+    let val = mayPermRulesBeAdded === true ? '' : 'privatebrowsing';
     $id('rp-details').setAttribute('class', val);
   };
 
@@ -1175,6 +1169,8 @@ requestpolicy.menu = (function() {
       }
     }
 
+    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
+
     for (var destHost in destHosts) {
       var ruleData = {
         'o' : {
@@ -1186,7 +1182,7 @@ requestpolicy.menu = (function() {
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
-        if (mayPermRulesBeDisplayed() === true) {
+        if (mayPermRulesBeAdded === true) {
           var item = self._addMenuItemAllowOriginToDest(list, ruleData);
         }
         var item = self._addMenuItemTempAllowOriginToDest(list, ruleData);
@@ -1199,7 +1195,7 @@ requestpolicy.menu = (function() {
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
-        if (mayPermRulesBeDisplayed() === true) {
+        if (mayPermRulesBeAdded === true) {
           var item = self._addMenuItemAllowDest(list, destOnlyRuleData);
         }
         var item = self._addMenuItemTempAllowDest(list, destOnlyRuleData);

@@ -111,14 +111,6 @@ let ManagerForDOMContentLoaded = (function() {
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
       mm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
-      /*
-      // This has an advantage over just relying on the
-      // observeBlockedRequest() call in that this will clear a blocked
-      // content notification if there no longer blocked content. Another way
-      // to solve this would be to observe allowed requests as well as blocked
-      // requests.
-      self._updateBlockedContentState(iframe.ownerDocument);
-      */
     }
   }
 
@@ -300,21 +292,6 @@ let ManagerForDOMContentLoaded = (function() {
   // enclosed frames.
   framescriptEnv.elManager.addListener(mm, "DOMFrameContentLoaded",
                                        onDOMFrameContentLoaded, true);
-
-  //mm.addEventListener("DOMContentLoaded", onDOMContentLoaded, true);
-  //
-  //// DOMFrameContentLoaded is same DOMContentLoaded but also fires for
-  //// enclosed frames.
-  //mm.addEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded, true);
-  //
-  //// clean up on shutdown
-  //framescriptEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
-  //  Logger.dump('removing listeners for "DOMContentLoaded" and ' +
-  //              '"DOMFrameContentLoaded"');
-  //  mm.removeEventListener("DOMContentLoaded", onDOMContentLoaded, true);
-  //  mm.removeEventListener("DOMFrameContentLoaded", onDOMFrameContentLoaded,
-  //                         true);
-  //});
 
   return self;
 }());

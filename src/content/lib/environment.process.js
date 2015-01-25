@@ -175,7 +175,7 @@ let ProcessEnvironment = (function() {
       // Unloading `environment.jsm` has to be the last task.
       // After that task, any global object, such as
       // `Environment` or `Cu` is not available anymore.
-      console.debug("unloading environment.jsm");
+      //console.debug("unloading environment.jsm");
       Cu.unload("chrome://requestpolicy/content/lib/environment.jsm");
     };
 
@@ -202,7 +202,7 @@ let ProcessEnvironment = (function() {
     if (self.envState === ENV_STATES.NOT_STARTED) {
       // The child Process Environment needs to start up when
       // the first framescript in that child is loading.
-      console.debug("[RPC] Going to start up Child Process Environment.");
+      //console.debug("[RPC] Going to start up Child Process Environment.");
       self.startup();
     }
     ProcessEnvironmentBase.prototype.registerInnerEnvironment.apply(self,

@@ -51,7 +51,7 @@ ScriptLoader.importModules([
   "lib/environment"
 ], this);
 ScriptLoader.defineLazyModuleGetters({
-  "lib/content-policy": ["PolicyImplementation"]
+  "main/content-policy": ["PolicyImplementation"]
 }, this);
 
 

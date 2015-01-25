@@ -121,7 +121,7 @@ let ProcessEnvironment = (function() {
     // import main modules:
     ScriptLoader.importModules([
       "main/requestpolicy-service",
-      "lib/content-policy",
+      "main/content-policy",
       "main/window-manager",
       "main/about-uri"
     ], dummyScope);

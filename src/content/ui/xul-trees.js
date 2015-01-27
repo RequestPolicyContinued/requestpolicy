@@ -22,7 +22,7 @@
  */
 
 
-let toolbarbutton = [
+exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
     tag: "toolbarbutton", id: "requestpolicyToolbarButton",
@@ -31,7 +31,7 @@ let toolbarbutton = [
   }
 ];
 
-let mainTree = [
+exports.mainTree = [
   {parent: {id: "menu_ToolsPopup"},
       tag: "menu", id: "requestpolicyToolsMenuPopup", label: "RequestPolicy",
       accesskey: "r",

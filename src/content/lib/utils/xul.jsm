@@ -38,7 +38,7 @@ let xulTrees = XULUtils.xulTrees = {};
 
 Services.scriptloader.loadSubScriptWithOptions(
     'chrome://requestpolicy/content/ui/xul-trees.js',
-    {target: xulTrees/*, ignoreCache: true*/});
+    {target: {exports: xulTrees}/*, ignoreCache: true*/});
 
 
 function getParentElement(doc, element) {

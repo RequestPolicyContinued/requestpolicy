@@ -25,12 +25,16 @@ jar_file := $(build_path)chrome/$(extension_name).jar
 xpi_file := $(dist_path)$(extension_name).xpi
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
 
-# It's possible to pass the manifest file `mm_manifest` to make
-ifndef fx_branch
-## default value
-fx_branch := nightly
+# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
+app := firefox
+# default app branch
+ifeq ($(app),firefox)
+app_branch := nightly
+else
+app_branch := release
 endif
-binary_firefox := .mozilla/software/firefox/$(fx_branch)/firefox
+binary_filename := $(app)
+app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 
@@ -166,7 +170,7 @@ $(deleted_files): FORCE
 
 .PHONY: run
 run: $(xpi_file)
-	mozrunner -a $(xpi_file) -b $(binary_firefox) \
+	mozrunner -a $(xpi_file) -b $(app_binary) \
 		--preferences=$(mozrunner_prefs_ini):dev
 
 
@@ -187,7 +191,7 @@ mm_manifest := manifest.ini
 check test: mozmill
 
 mozmill: $(xpi_file)
-	mozmill -a $(xpi_file) -b $(binary_firefox) \
+	mozmill -a $(xpi_file) -b $(app_binary) \
 		-m $(mozmill_requestpolicy_test_path)$(mm_manifest)
 
 

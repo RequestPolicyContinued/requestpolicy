@@ -180,11 +180,8 @@ run: $(xpi_file)
 mozmill_tests_path := .mozilla/mozmill-tests/
 mozmill_requestpolicy_test_path := $(mozmill_tests_path)firefox/tests/addons/$(extension_uuid)/
 
-# It's possible to pass the manifest file `mm_manifest` to make
-ifndef mm_manifest
-## default value
+# Default mozmill manifest to use for testing
 mm_manifest := manifest.ini
-endif
 
 .PHONY: check test mozmill
 check test: mozmill

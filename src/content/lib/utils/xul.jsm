@@ -99,8 +99,8 @@ function setAttributes(node, element) {
 }
 
 
-function recursivelyAddXULElements(doc, elements, parentElement) {
-  let parentElementIsSet = parentElement ? true : false;
+function recursivelyAddXULElements(doc, elements, parentElement=null) {
+  let parentElementIsSet = !!parentElement;
 
   for (let i in elements) {
     let element = elements[i];
@@ -111,6 +111,11 @@ function recursivelyAddXULElements(doc, elements, parentElement) {
     parentElement = parentElementIsSet ? parentElement :
         getParentElement(doc, element);
     if (false === parentElement) {
+      continue;
+    }
+    if (parentElement === null) {
+      Logger.warning(Logger.TYPE_ERROR,
+                     "parentElement of '"+element.id+"' is null!");
       continue;
     }
 

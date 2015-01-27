@@ -66,7 +66,7 @@ let rpWindowManager = (function(self) {
       XULUtils.addTreeElementsToWindow(window, "mainTree");
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
-                     "Couldn't add tree elements to window.");
+                     "Couldn't add tree elements to window. " + e, e);
     }
 
 

@@ -28,7 +28,11 @@ const Cu = Components.utils;
 Cu.import("resource://gre/modules/Services.jsm");
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/logger", "lib/utils/strings"], this);
+ScriptLoader.importModules([
+  "lib/logger",
+  "lib/utils/strings",
+  "lib/utils/constants"
+], this);
 
 let EXPORTED_SYMBOLS = ["XULUtils"];
 
@@ -36,9 +40,15 @@ let XULUtils = {};
 
 let xulTrees = XULUtils.xulTrees = {};
 
+let xulTreesScope = {
+  "exports": xulTrees,
+  "C": C,
+  "appID": Services.appinfo.ID
+};
+
 Services.scriptloader.loadSubScriptWithOptions(
     'chrome://requestpolicy/content/ui/xul-trees.js',
-    {target: {exports: xulTrees}/*, ignoreCache: true*/});
+    {target: xulTreesScope/*, ignoreCache: true*/});
 
 
 function getParentElement(doc, element) {

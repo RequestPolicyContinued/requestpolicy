@@ -31,6 +31,7 @@ let C = {};
 
 C.EXTENSION_ID = "requestpolicy@requestpolicy.com";
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
+C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";
 C.MMID = C.EXTENSION_ID; // message manager ID
 C.MM_PREFIX = C.MMID + ":";
 

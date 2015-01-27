@@ -21,6 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// differences in seamonkey:
+// https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
+let isSeamonkey = appID === C.SEAMONKEY_ID;
+
 
 exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
@@ -32,7 +36,7 @@ exports.toolbarbutton = [
 ];
 
 exports.mainTree = [
-  {parent: {id: "menu_ToolsPopup"},
+  {parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
       tag: "menu", id: "requestpolicyToolsMenuPopup", label: "RequestPolicy",
       accesskey: "r",
   children: [

@@ -138,6 +138,11 @@ requestpolicy.overlay = (function() {
         RequestProcessor.addRequestObserver(self);
 
         //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
+
+
+        OverlayEnvironment.elManager.addListener(window, "load",
+                                                 self.onWindowLoad);
+        OverlayEnvironment.shutdownOnUnload(window);
       }
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,

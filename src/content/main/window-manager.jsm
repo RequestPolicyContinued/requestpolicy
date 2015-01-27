@@ -110,10 +110,9 @@ let rpWindowManager = (function(self) {
     // # 5 : init the overlay
     // ----------------------
     try {
-      // init and onWindowLoad must be called last, because they assume that
+      // init must be called last, because it assumes that
       // everything else is ready
       window.requestpolicy.overlay.init();
-      window.requestpolicy.overlay.onWindowLoad();
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "An error occurred while initializing the overlay: "+e, e);
@@ -121,11 +120,8 @@ let rpWindowManager = (function(self) {
   }
 
   function unloadFromWindow(window) {
-    // # 5 : "shutdown" the overlay
-    // ----------------------------
-    if (window.requestpolicy) {
-      window.requestpolicy.overlay.onWindowUnload();
-    }
+    // # 5 : the overlay cares itself about shutdown.
+    //       nothing to do here.
 
 
     // # 4 : remove the toolbarbutton

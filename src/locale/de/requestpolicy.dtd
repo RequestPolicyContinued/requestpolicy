@@ -13,8 +13,8 @@
 <!ENTITY rp.requestLog.destination "Ziel">
 <!ENTITY rp.requestLog.blocked "Blockiert">
 <!ENTITY rp.requestLog.time "Zeit">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">
-<!ENTITY rp.requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Adresse der Quelle in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Adresse des Ziels in die Zwischenablage kopieren">
 <!ENTITY rp.requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
 <!ENTITY rp.requestLog.clear "Löschen">

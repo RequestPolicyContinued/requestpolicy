@@ -1,20 +1,20 @@
 <!ENTITY rp.menu.revokeTemporaryPermissions "Temporäre Berechtigungen aufheben">
 <!ENTITY rp.menu.blockedDestinations "Blockierte Anfragen">
 <!ENTITY rp.menu.allowedDestinations "Erlaubte Anfragen">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
+<!ENTITY rp.menu.mixedDestinations "Gemischte Anfragen">
 <!ENTITY rp.menu.otherOrigins "Weitere Quellen">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
+<!ENTITY rp.menu.enableBlocking "Anfragen blockieren">
+<!ENTITY rp.menu.disableBlocking "Anfragen zulassen">
+<!ENTITY rp.menu.help "Hilfe">
 <!ENTITY rp.menu.preferences "Einstellungen">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
+<!ENTITY rp.menu.managePolicies "Regeln verwalten">
 <!ENTITY rp.requestLog.title "Anfragenchronik">
 <!ENTITY rp.requestLog.origin "Quelle">
 <!ENTITY rp.requestLog.destination "Ziel">
 <!ENTITY rp.requestLog.blocked "Blockiert">
 <!ENTITY rp.requestLog.time "Zeit">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Quelle in die Zwischenablage kopieren">
-<!ENTITY rp.requestLog.copyDestinationToClipboard "Ziel in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Adresse der Quelle in die Zwischenablage kopieren">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Adresse des Ziels in die Zwischenablage kopieren">
 <!ENTITY rp.requestLog.openOriginInNewTab "Quelle in neuem Tab öffnen">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Ziel in neuem Tab öffnen">
 <!ENTITY rp.requestLog.clear "Löschen">

@@ -273,16 +273,16 @@ let ManagerForDOMContentLoaded = (function() {
     wrapWindowFunction(aWindow, "open",
         function(url, windowName, windowFeatures) {
           mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                          {origin: aWindow.document.documentURI,
-                           dest: url});
+                             {origin: aWindow.document.documentURI,
+                              dest: url});
         });
 
     wrapWindowFunction(aWindow, "openDialog",
         function() {
           // openDialog(url, name, features, arg1, arg2, ...)
           mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                          {origin: aWindow.document.documentURI,
-                           dest: arguments[0]});
+                             {origin: aWindow.document.documentURI,
+                              dest: arguments[0]});
         });
   }
   function unwrapWindowFunctions(aWindow) {

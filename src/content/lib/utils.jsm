@@ -109,7 +109,9 @@ let Utils = (function() {
     }
   }
 
-  self.info.isFirefox = Services.appinfo.ID == C.FIREFOX_ID;
+  let appID = Services.appinfo.ID;
+  self.info.isFirefox = appID === C.FIREFOX_ID;
+  self.info.isSeamonkey = appID === C.SEAMONKEY_ID;
   self.info.isAustralis = self.info.isFirefox &&
       Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
 

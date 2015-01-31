@@ -49,9 +49,13 @@ let rpWindowManager = (function(self) {
       globalScope);
 
   let styleSheets = [
-    "chrome://requestpolicy/skin/requestpolicy.css",
-    "chrome://requestpolicy/skin/toolbarbutton.css"
+    "chrome://requestpolicy/skin/requestpolicy.css"
   ];
+  if (Utils.info.isSeamonkey) {
+    styleSheets.push("chrome://requestpolicy/skin/toolbarbutton-seamonkey.css");
+  } else {
+    styleSheets.push("chrome://requestpolicy/skin/toolbarbutton.css");
+  }
 
   let frameScriptURI = "chrome://requestpolicy/content/ui/frame.js?" +
       Math.random();

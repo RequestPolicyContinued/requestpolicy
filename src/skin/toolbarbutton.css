@@ -41,10 +41,10 @@
  *********************************************
  * ___________ detecting Icon Size ___________
  *
- * since Australis:
+ * Australis:
  *    the size/place of the buttons is detected
  *    via the "cui-areatype" attribute.
- * pre-Australis:
+ * non-Australis:
  *    the selector includes the
  * parent toolbar[iconsize="..."]
  *
@@ -55,7 +55,7 @@
  * toolbarpaletteitem[place="..."].
  * Places can be:
  *   palette (32px), panel (32px), toolbar
- * this is the same for Australs and pre-
+ * this is the same for Australs and non-
  * Australis firefox versions.
  *
  *********************************************
@@ -72,6 +72,7 @@ toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png) !important;
 }
+toolbar > toolbarpaletteitem #requestpolicyToolbarButton,
 toolbar[iconsize="large"] > toolbarpaletteitem #requestpolicyToolbarButton {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png) !important;
@@ -95,7 +96,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-32.png);
 }
-/*** pre-Australis only ***/
+/*** non-Australis only ***/
 /* default: */ toolbar[iconsize="large"] #requestpolicyToolbarButton,
 /* blocked: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
@@ -105,7 +106,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /** Australis: **/
 /* default: */ #requestpolicyToolbarButton[cui-areatype="toolbar"],
 /* blocked: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][requestpolicyBlocked="true"],
-/** pre-Australis: **/
+/** non-Australis: **/
 /* default: */ toolbar[iconsize="small"] #requestpolicyToolbarButton,
 /* blocked: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
@@ -124,7 +125,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-32-allowed.png);
 }
-/*** pre-Australis only ***/
+/*** non-Australis only ***/
 /* allowed: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
@@ -132,7 +133,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /*** "normal" toolbars (16px icons) ***/
 /** selectors for Australis **/
 /* allowed: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][requestpolicyBlocked="false"],
-/** selectors for pre-Australis **/
+/** selectors for non-Australis **/
 /* allowed: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
@@ -148,7 +149,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-32-disabled.png);
 }
-/*** pre-Australis only ***/
+/*** non-Australis only ***/
 toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
@@ -156,7 +157,7 @@ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyPermissive="t
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
 #requestpolicyToolbarButton[cui-areatype="toolbar"][requestpolicyPermissive="true"],
-/** pre-Australis: **/
+/** non-Australis: **/
 toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);

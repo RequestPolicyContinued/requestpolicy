@@ -168,10 +168,15 @@ $(deleted_files): FORCE
 # run firefox
 #
 
+# arguments for mozrunner
+mozrunner_args := -a $(xpi_file)
+mozrunner_args += -b $(app_binary)
+mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
+mozrunner_args += $(moz_args)
+
 .PHONY: run
 run: $(xpi_file)
-	mozrunner -a $(xpi_file) -b $(app_binary) \
-		--preferences=$(mozrunner_prefs_ini):dev
+	mozrunner $(mozrunner_args)
 
 
 # ____________

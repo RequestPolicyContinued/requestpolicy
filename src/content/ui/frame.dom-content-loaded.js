@@ -67,20 +67,27 @@ let ManagerForDOMContentLoaded = (function() {
 
     onDocumentLoaded(doc);
 
-    // take only one answer. If there are more answers, they are ignored
-    // ==> there must be only one listener for 'notifyDocumentLoaded'
-    let [answer] = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
-                                      {documentURI: doc.documentURI});
-    var blockedURIs = answer.blockedURIs;
-    //console.debug("Received " +
-    //              Object.getOwnPropertyNames(blockedURIs).length +
-    //              " blocked URIs.");
+    let answers = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
+                                     {documentURI: doc.documentURI});
+    if (answers.length === 0) {
+      Logger.warning(Logger.TYPE_ERROR, 'There seems to be no message ' +
+                     'listener for "notifyDocumentLoaded".');
+    } else {
+      // take only one answer. If there are more answers, they are ignored
+      // ==> there must be only one listener for 'notifyDocumentLoaded'
+      let answer = answers[0];
 
-    // Indicating blocked visible objects isn't an urgent task, so this should
-    // be done async.
-    Utils.runAsync(function() {
-      ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
-    });
+      var blockedURIs = answer.blockedURIs;
+      //console.debug("Received " +
+      //              Object.getOwnPropertyNames(blockedURIs).length +
+      //              " blocked URIs.");
+
+      // Indicating blocked visible objects isn't an urgent task, so this should
+      // be done async.
+      Utils.runAsync(function() {
+        ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
+      });
+    }
 
 
     if (isActiveTopLevelDocument(doc)) {

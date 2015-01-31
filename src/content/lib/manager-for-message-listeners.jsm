@@ -65,6 +65,9 @@ function ManagerForMessageListeners(aEnv, aMM) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
+          Logger.dump('From now on new message listeners will be ' +
+                      'added immediately. Environment: "' +
+                      self.environment.name + '"');
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -118,6 +121,9 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     listening: false
   };
   if (self.addNewListenersImmediately) {
+    Logger.dump('Immediately adding message listener for "' +
+                listener.messageName + '". Environment: "' +
+                self.environment.name + '"');
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
   }
@@ -133,6 +139,9 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
+      Logger.dump('Lazily adding message listener for "' +
+                  listener.messageName + '". Environment: "' +
+                  self.environment.name + '"');
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
     }

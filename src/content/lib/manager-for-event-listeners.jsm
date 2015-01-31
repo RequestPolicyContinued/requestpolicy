@@ -64,6 +64,9 @@ function ManagerForEventListeners(aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
+          Logger.dump('From now on new event listeners will be ' +
+                      'added immediately. Environment: "' +
+                      self.environment.name + '"');
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -88,7 +91,6 @@ function addEvLis(listener) {
   listener.target.addEventListener(listener.eventType, listener.callback,
                                    listener.useCapture);
   listener.listening = true;
-  //Logger.dump("[RPC] event listener for '" + listener.eventType + "' added");
 };
 
 
@@ -110,6 +112,9 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     listening: false
   };
   if (self.addNewListenersImmediately) {
+    Logger.dump('Immediately adding event listener for "' +
+                listener.eventType + '". Environment: "' +
+                self.environment.name + '"');
     addEvLis(listener);
   }
   self.listeners.push(listener);
@@ -124,6 +129,9 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
+      Logger.dump('Lazily adding event listener for "' +
+                  listener.eventType + '". Environment: "' +
+                  self.environment.name + '"');
       addEvLis(listener);
     }
   }
@@ -136,7 +144,8 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    Logger.dump('Removing event listener for "' + listener.eventType + '"');
+    Logger.dump('Removing event listener for "' + listener.eventType +
+                '". Environment: "' + self.environment.name + '"');
     listener.target.removeEventListener(listener.eventType, listener.callback,
                                         listener.useCapture);
   }

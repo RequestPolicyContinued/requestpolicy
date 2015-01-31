@@ -49,6 +49,8 @@ requestpolicy.menu = (function() {
   let {WindowUtils} = iMod("lib/utils/windows");
   let {C} = iMod("lib/utils/constants");
 
+  let gBrowser = WindowUtils.getTabBrowser(window);
+
 
   let $id = document.getElementById.bind(document);
 

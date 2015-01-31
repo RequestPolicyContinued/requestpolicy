@@ -53,6 +53,8 @@ requestpolicy.overlay = (function() {
   let {WindowUtils} = iMod("lib/utils/windows");
   let {C} = iMod("lib/utils/constants");
 
+  let gBrowser = WindowUtils.getTabBrowser(window);
+
   let $id = document.getElementById.bind(document);
 
   //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
@@ -139,10 +141,8 @@ requestpolicy.overlay = (function() {
 
         //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
 
-
-        OverlayEnvironment.elManager.addListener(window, "load",
-                                                 self.onWindowLoad);
         OverlayEnvironment.shutdownOnUnload(window);
+        OverlayEnvironment.startup();
       }
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
@@ -166,17 +166,6 @@ requestpolicy.overlay = (function() {
     if ($id("requestpolicy-requestLog").hidden === false) {
       self.toggleRequestLog();
     }
-  };
-
-  /**
-   * Perform the actions required once the window has loaded. This just sets a
-   * listener for when the content of the window has changed (a page is loaded).
-   *
-   * @param {Event}
-   *          event
-   */
-  self.onWindowLoad = function() {
-    OverlayEnvironment.startup();
   };
 
   function addAppcontentTabSelectListener() {

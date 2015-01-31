@@ -46,7 +46,8 @@ let WindowUtils = (function() {
 
   self.getBrowserForWindow = function(aContentWindow) {
     let win = self.getChromeWindow(aContentWindow);
-    let tab = win.gBrowser._getTabForContentWindow(aContentWindow.top);
+    let tab = self.getTabBrowser(win)
+                  ._getTabForContentWindow(aContentWindow.top);
     return tab.linkedBrowser;
   }
 
@@ -55,6 +56,11 @@ let WindowUtils = (function() {
                     .rootTreeItem
                     .QueryInterface(Ci.nsIInterfaceRequestor)
                     .getInterface(Ci.nsIDOMWindow);
+  };
+
+  self.getTabBrowser = function(window) {
+    // bug 1009938 - may be null in SeaMonkey
+    return window.gBrowser || window.getBrowser();
   };
 
   //

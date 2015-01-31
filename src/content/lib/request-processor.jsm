@@ -1083,9 +1083,7 @@ let RequestProcessor = (function(self) {
 }(RequestProcessor || {}));
 
 
-Services.scriptloader.loadSubScriptWithOptions(
-    'chrome://requestpolicy/content/lib/request-processor.redirects.js',
-    {/*ignoreCache: true*/});
-Services.scriptloader.loadSubScriptWithOptions(
-    'chrome://requestpolicy/content/lib/request-processor.compat.js',
-    {/*ignoreCache: true*/});
+Services.scriptloader.loadSubScript(
+    'chrome://requestpolicy/content/lib/request-processor.redirects.js');
+Services.scriptloader.loadSubScript(
+    'chrome://requestpolicy/content/lib/request-processor.compat.js');

@@ -46,9 +46,9 @@ let xulTreesScope = {
   "appID": Services.appinfo.ID
 };
 
-Services.scriptloader.loadSubScriptWithOptions(
+Services.scriptloader.loadSubScript(
     'chrome://requestpolicy/content/ui/xul-trees.js',
-    {target: xulTreesScope/*, ignoreCache: true*/});
+    xulTreesScope);
 
 
 function getParentElement(doc, element) {

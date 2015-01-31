@@ -76,12 +76,12 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
   };
 
   function loadSubScripts() {
-    Services.scriptloader.loadSubScriptWithOptions(
+    Services.scriptloader.loadSubScript(
         'chrome://requestpolicy/content/ui/frame.blocked-content.js',
-        {target: framescriptScope/*, ignoreCache: true*/});
-    Services.scriptloader.loadSubScriptWithOptions(
+        framescriptScope);
+    Services.scriptloader.loadSubScript(
         'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js',
-        {target: framescriptScope/*, ignoreCache: true*/});
+        framescriptScope);
   }
   framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,
                                     loadSubScripts);

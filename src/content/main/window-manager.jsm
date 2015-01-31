@@ -44,9 +44,9 @@ let rpWindowManager = (function(self) {
   ], globalScope);
 
   // import the WindowListener
-  Services.scriptloader.loadSubScriptWithOptions(
+  Services.scriptloader.loadSubScript(
       "chrome://requestpolicy/content/main/window-manager.listener.js",
-      {target: globalScope/*, ignoreCache: true*/});
+      globalScope);
 
   let styleSheets = [
     "chrome://requestpolicy/skin/requestpolicy.css",
@@ -80,15 +80,15 @@ let rpWindowManager = (function(self) {
     // # 3 : load the overlay's and menu's javascript
     // ----------------------------------------------
     try {
-      Services.scriptloader.loadSubScriptWithOptions(
+      Services.scriptloader.loadSubScript(
           "chrome://requestpolicy/content/ui/overlay.js",
-          {target: window/*, ignoreCache: true*/});
-      Services.scriptloader.loadSubScriptWithOptions(
+          window);
+      Services.scriptloader.loadSubScript(
           "chrome://requestpolicy/content/ui/menu.js",
-          {target: window/*, ignoreCache: true*/});
-      Services.scriptloader.loadSubScriptWithOptions(
+          window);
+      Services.scriptloader.loadSubScript(
           "chrome://requestpolicy/content/ui/classicmenu.js",
-          {target: window/*, ignoreCache: true*/});
+          window);
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "Error loading subscripts for window: " + e, e);
@@ -228,6 +228,6 @@ let rpWindowManager = (function(self) {
 
 
 // extend rpWindowManager
-Services.scriptloader.loadSubScriptWithOptions(
+Services.scriptloader.loadSubScript(
     "chrome://requestpolicy/content/main/window-manager-toolbarbutton.js",
-    {target: globalScope/*, ignoreCache: true*/});
+    globalScope);

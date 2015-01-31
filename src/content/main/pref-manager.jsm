@@ -84,9 +84,9 @@ let PrefManager = (function() {
     // to handle their default preferences manually, see Mozilla Bug 564675:
     // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
     // The scope of that script doesn't need to be remembered.
-    Services.scriptloader.loadSubScriptWithOptions(
+    Services.scriptloader.loadSubScript(
         "chrome://requestpolicy/content/main/default-pref-handler.js",
-        {target: {}/*, ignoreCache: true*/});
+        {});
 
 
     // ================================

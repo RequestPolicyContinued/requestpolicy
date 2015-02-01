@@ -985,7 +985,11 @@ RequestProcessor.prototype.checkRedirect = function(request) {
 
   var result = this._rpService._policyMgr.checkRequestAgainstUserRules(
       originURIObj, destURIObj);
-  // For now, we always give priority to deny rules.
+  // For user rules, use the default policy if both types of rule match.
+  if (result.denyRulesExist() && result.allowRulesExist()) {
+    result.isAllowed = this._rpService._defaultAllow;
+    return result;
+  }
   if (result.denyRulesExist()) {
     result.isAllowed = false;
     return result;

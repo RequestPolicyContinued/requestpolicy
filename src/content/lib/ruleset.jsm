@@ -871,7 +871,11 @@ Ruleset.prototype = {
     } else {
       var parts = host.split(".");
       var curLevel = this._domain;
-      var nextLevel;
+      // Start by checking for a wildcard at the highest level.
+      var nextLevel = curLevel.getLowerLevel("*");
+      if (nextLevel) {
+        yield nextLevel;
+      }
       for (var i = parts.length - 1; i >= 0; i--) {
         nextLevel = curLevel.getLowerLevel(parts[i]);
         if (!nextLevel) {
@@ -904,7 +908,7 @@ Ruleset.prototype = {
     }
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (var entry in this.getHostMatches(originHost)) {
+    for (var entry in this.getHostMatches(originHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -917,22 +921,6 @@ Ruleset.prototype = {
           //dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
-        // switch(rule.originRuleAction) {
-        //   case RULE_ACTION_ALLOW:
-        //     if (ruleMatchedOrigin) {
-        //       dprint("ALLOW origin by rule " + entry + " " + rule);
-        //       matchedAllowRules.push(["origin", entry, rule]);
-        //     }
-        //     break;
-        //   case RULE_ACTION_DENY:
-        //     if (ruleMatchedOrigin) {
-        //               dprint("DENY origin by rule " + entry + " " + rule);
-        //               matchedDenyRules.push(["origin", entry, rule]);
-        //               //break originouterloop;
-        //               break;
-        //             }
-        //             break;
-        // }
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
@@ -949,23 +937,6 @@ Ruleset.prototype = {
                 //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
               }
-
-              // switch(destRule.destinationRuleAction) {
-              //   case RULE_ACTION_ALLOW:
-              //     if (destRule.isMatch(dest)) {
-              //                     dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-              //                     matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-              //                   }
-              //     break;
-              //   case RULE_ACTION_DENY:
-              //     if (destRule.isMatch(dest)) {
-              //                     dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-              //                     matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-              //                     //break originouterloop;
-              //                     break;
-              //                   }
-              //                   break;
-              // }
             }
           }
           //dprint("Done checking origin-to-destination rules using this origin rule.");
@@ -975,7 +946,7 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (var entry in this.getHostMatches(destHost)) {
+    for (var entry in this.getHostMatches(destHost)) {
       //dprint(entry);
       for (var rule in entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -987,22 +958,6 @@ Ruleset.prototype = {
           //dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
-        // switch(rule.destinationRuleAction) {
-        //   case RULE_ACTION_ALLOW:
-        //     if (rule.isMatch(dest)) {
-        //               dprint("ALLOW dest by rule " + entry + " " + rule);
-        //               matchedAllowRules.push(["dest", entry, rule]);
-        //             }
-        //     break;
-        //   case RULE_ACTION_DENY:
-        //     if (rule.isMatch(dest)) {
-        //       dprint("DENY dest by rule " + entry + " " + rule);
-        //       matchedDenyRules.push(["dest", entry, rule]);
-        //       //break destouterloop;
-        //       break;
-        //     }
-        //     break;
-        // }
       }
     }
 

@@ -75,6 +75,49 @@ let Utils = (function() {
       "@mozilla.org/thread-manager;1", "nsIThreadManager");
 
 
+  /**
+   * Calls a function multiple times until it succeeds. The
+   * function must return TRUE on success.
+   *
+   * @param {function():boolean} aFunction
+   * @param {number} aTries - The number of tries.
+   */
+  self.tryMultipleTimes = function(aFunction, aTries=10) {
+    if (aTries <= 0) {
+      //console.log("no more tries!");
+      return;
+    }
+    self.runAsync(function() {
+      if (aFunction.call(null) !== true) {
+        self.tryMultipleTimes(aFunction, aTries - 1);
+      }
+    });
+  };
+
+  /**
+   * Return a nested property or `undefined` if it does not exist.
+   * Any element in the object chain may be undefined.
+   *
+   * Other implementations at http://stackoverflow.com/questions/2631001/javascript-test-for-existence-of-nested-object-key
+   *
+   * @param {Object} object
+   * @param {...string} properties
+   */
+  self.getObjectPath = function(object, ...properties) {
+    return properties.reduce(self.getObjectProperty, object);
+  };
+
+  /**
+   * @private
+   */
+  self.getObjectProperty = function(object, property) {
+    if (!!object && object.hasOwnProperty(property)) {
+      return object[property];
+    }
+    return undefined;
+  };
+
+
 
 
   self.info = {};

@@ -460,10 +460,10 @@ requestpolicy.overlay = (function() {
    * or with headers).
    *
    * @param {<browser> element} browser
-   * @param {String}
-   *          redirectTargetUri
-   * @param {int}
-   *          delay
+   * @param {string} redirectTargetUri
+   * @param {number} delay
+   * @param {string=} redirectOriginUri
+   * @return {boolean} whether showing the notification succeeded
    */
   // TODO, bad smell: Instead of the <browser> etc. hand over a `Request`
   //                  object that contains everything. This requires

@@ -315,10 +315,16 @@ let RequestProcessor = (function(self) {
       return false;
     }
 
-    let window = browser.ownerGlobal;
-    let overlay = window.requestpolicy.overlay;
-    return overlay._showRedirectNotification(browser, request.destURI, 0,
-                                             request.originURI);
+    var window = browser.ownerGlobal;
+
+    Utils.tryMultipleTimes(function() {
+      var showNotification = Utils.getObjectPath(window, 'requestpolicy',
+          'overlay', '_showRedirectNotification');
+      if (!showNotification) {
+        return false;
+      }
+      return showNotification(browser, request.destURI, 0, request.originURI);
+    });
     return true;
   }
 

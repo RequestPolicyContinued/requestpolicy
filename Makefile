@@ -25,6 +25,9 @@ jar_file := $(build_path)chrome/$(extension_name).jar
 xpi_file := $(dist_path)$(extension_name).xpi
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
 
+# the default XPI to use for mozrunner and mozmill
+moz_xpi := $(xpi_file)
+
 # select the default app. Can be overridden e.g. via `make run app='seamonkey'`
 app := firefox
 # default app branch
@@ -169,13 +172,13 @@ $(deleted_files): FORCE
 #
 
 # arguments for mozrunner
-mozrunner_args := -a $(xpi_file)
+mozrunner_args := -a $(moz_xpi)
 mozrunner_args += -b $(app_binary)
 mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
 mozrunner_args += $(moz_args)
 
 .PHONY: run
-run: $(xpi_file)
+run: $(moz_xpi)
 	mozrunner $(mozrunner_args)
 
 
@@ -195,8 +198,8 @@ mm_manifest := manifest.ini
 .PHONY: check test mozmill
 check test: mozmill
 
-mozmill: $(xpi_file)
-	mozmill -a $(xpi_file) -b $(app_binary) \
+mozmill: $(moz_xpi)
+	mozmill -a $(moz_xpi) -b $(app_binary) \
 		-m $(mozmill_requestpolicy_test_path)$(mm_manifest)
 
 

@@ -76,10 +76,21 @@ var FileUtil = {
    * @param {nsIFile} file
    */
   fileToString : function(file) {
-    if (file.exists() === false) {
-      // prevent NS_ERROR_FILE_NOT_FOUND
-      return "";
-    }
+    // FIXME: This function MUST NOT check for the file to exist,
+    //        otherwise the subscriptions are not fetched at all,
+    //        for whatever reason.
+    //
+    //        Another issue, maybe it's the same as above, is that
+    //        `loadSubscriptionRules()` catches exceptions and by
+    //        that knows if the file exists or not. See also
+    //        `loadRawRulesetFromFile()`.
+    //
+    //        The subscription system urgently needs to rewritten,
+    //        see issue #597.
+    //if (file.exists() === false) {
+    //  // prevent NS_ERROR_FILE_NOT_FOUND
+    //  return "";
+    //}
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, octal444, 0);

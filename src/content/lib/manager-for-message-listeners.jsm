@@ -97,8 +97,19 @@ function ManagerForMessageListeners(aEnv, aMM) {
 }
 
 
+/**
+ * Add a listener. The class will then take care about adding
+ * and removing that message listener.
+ *
+ * @param {string} aMessageName
+ * @param {function} aCallback
+ * @param {boolean} aAddImmediately - Whether the listener should be
+ *     added immediately, i.e. without waiting for the environment
+ *     to start up.
+ */
 ManagerForMessageListeners.prototype.addListener = function(aMessageName,
-                                                            aCallback) {
+                                                            aCallback,
+                                                            aAddImmediately) {
   let self = this;
   if (typeof aCallback !== 'function') {
     Logger.warning(Logger.TYPE_ERROR, "The callback for a message listener" +
@@ -120,7 +131,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     callback: aCallback,
     listening: false
   };
-  if (self.addNewListenersImmediately) {
+  if (aAddImmediately === true || self.addNewListenersImmediately) {
     Logger.dump('Immediately adding message listener for "' +
                 listener.messageName + '". Environment: "' +
                 self.environment.name + '"');

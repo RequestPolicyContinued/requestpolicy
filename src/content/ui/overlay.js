@@ -143,6 +143,14 @@ requestpolicy.overlay = (function() {
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
+
+        // Tell the framescripts that the overlay is ready. The
+        // listener must be added immediately.
+        mlManager.addListener("isOverlayReady", function() {
+          return true;
+        });
+        window.messageManager.broadcastAsyncMessage(C.MM_PREFIX +
+                                                    "overlayIsReady", true);
       }
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,

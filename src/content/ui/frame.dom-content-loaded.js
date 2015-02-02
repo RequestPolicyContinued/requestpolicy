@@ -32,9 +32,11 @@ let ManagerForDOMContentLoaded = (function() {
     // Notify the main thread that a link has been clicked.
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
-    mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                       {origin: event.currentTarget.ownerDocument.URL,
-                        dest: event.currentTarget.href});
+    overlayComm.run(function() {
+      mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+                         {origin: event.currentTarget.ownerDocument.URL,
+                          dest: event.currentTarget.href});
+    });
   }
 
 
@@ -67,32 +69,33 @@ let ManagerForDOMContentLoaded = (function() {
 
     onDocumentLoaded(doc);
 
-    let answers = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
-                                     {documentURI: doc.documentURI});
-    if (answers.length === 0) {
-      Logger.warning(Logger.TYPE_ERROR, 'There seems to be no message ' +
-                     'listener for "notifyDocumentLoaded".');
-    } else {
-      // take only one answer. If there are more answers, they are ignored
-      // ==> there must be only one listener for 'notifyDocumentLoaded'
-      let answer = answers[0];
+    overlayComm.run(function() {
+      let answers = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
+                                       {documentURI: doc.documentURI});
+      if (answers.length === 0) {
+        Logger.warning(Logger.TYPE_ERROR, 'There seems to be no message ' +
+                       'listener for "notifyDocumentLoaded".');
+      } else {
+        // take only one answer. If there are more answers, they are ignored
+        // ==> there must be only one listener for 'notifyDocumentLoaded'
+        let answer = answers[0];
 
-      var blockedURIs = answer.blockedURIs;
-      //console.debug("Received " +
-      //              Object.getOwnPropertyNames(blockedURIs).length +
-      //              " blocked URIs.");
+        var blockedURIs = answer.blockedURIs;
+        //console.debug("Received " +
+        //              Object.getOwnPropertyNames(blockedURIs).length +
+        //              " blocked URIs.");
 
-      // Indicating blocked visible objects isn't an urgent task, so this should
-      // be done async.
-      Utils.runAsync(function() {
-        ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
-      });
-    }
+        // Indicating blocked visible objects isn't an urgent task, so this should
+        // be done async.
+        Utils.runAsync(function() {
+          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
+        });
+      }
 
-
-    if (isActiveTopLevelDocument(doc)) {
-      mm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
-    }
+      if (isActiveTopLevelDocument(doc)) {
+        mm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
+      }
+    });
   }
 
   /**
@@ -117,7 +120,9 @@ let ManagerForDOMContentLoaded = (function() {
     // other origins every time an iframe is loaded. Maybe, then, this should
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
-      mm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
+      overlayComm.run(function() {
+        mm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
+      });
     }
   }
 
@@ -188,8 +193,10 @@ let ManagerForDOMContentLoaded = (function() {
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 
-      mm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
-          {documentURI: documentURI, metaRefreshes: metaRefreshes});
+      overlayComm.run(function() {
+        mm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
+            {documentURI: documentURI, metaRefreshes: metaRefreshes});
+      });
     }
 
     // Find all anchor tags and add click events (which also fire when enter
@@ -272,17 +279,21 @@ let ManagerForDOMContentLoaded = (function() {
   function wrapWindowFunctions(aWindow) {
     wrapWindowFunction(aWindow, "open",
         function(url, windowName, windowFeatures) {
-          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                             {origin: aWindow.document.documentURI,
-                              dest: url});
+          overlayComm.run(function() {
+            mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+                               {origin: aWindow.document.documentURI,
+                                dest: url});
+          });
         });
 
     wrapWindowFunction(aWindow, "openDialog",
         function() {
           // openDialog(url, name, features, arg1, arg2, ...)
-          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                             {origin: aWindow.document.documentURI,
-                              dest: arguments[0]});
+          overlayComm.run(function() {
+            mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+                               {origin: aWindow.document.documentURI,
+                                dest: arguments[0]});
+          });
         });
   }
   function unwrapWindowFunctions(aWindow) {

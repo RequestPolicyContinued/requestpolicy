@@ -513,16 +513,18 @@ function FrameScriptEnvironment(aMM, aName="frame script environment") {
 
   Environment.call(self, _outerEnv, aName);
 
+  self.mm = aMM;
+
   self.addStartupFunction(LEVELS.INTERFACE, function() {
     // shut down the framescript on the message manager's
     // `unload`. That event will occur when the browsing context
     // (e.g. the tab) has been closed.
-    self.shutdownOnUnload(aMM);
+    self.shutdownOnUnload(self.mm);
   });
 
   // a "MessageListener"-Manager for this environment
   XPCOMUtils.defineLazyGetter(self, "mlManager", function() {
-    return new ManagerForMessageListeners(self, aMM);
+    return new ManagerForMessageListeners(self, self.mm);
   });
 }
 FrameScriptEnvironment.prototype = Object.create(Environment.prototype);

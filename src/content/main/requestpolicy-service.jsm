@@ -145,6 +145,15 @@ let rpService = (function() {
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         registerObservers);
 
+  ProcessEnvironment.addStartupFunction(
+      Environment.LEVELS.UI,
+      function(data, reason) {
+        if (reason !== C.APP_STARTUP) {
+          // In case of the app's startup `showWelcomeWindow()` will be
+          // called when "sessionstore-windows-restored" is observed.
+          showWelcomeWindow();
+        }
+      });
 
 
 

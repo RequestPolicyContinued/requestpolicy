@@ -230,10 +230,8 @@ function onload() {
   }
 
   // observe rule changes and update the table then
-  WinEnv.obMan.observe({
-    "requestpolicy-rules-changed": function(subject, topic, data) {
-      var search = $id('rulesearch');
-      populateRuleTable(search.value);
-    }
+  WinEnv.obMan.observe(["requestpolicy-rules-changed"], function() {
+    var search = $id('rulesearch');
+    populateRuleTable(search.value);
   });
 }

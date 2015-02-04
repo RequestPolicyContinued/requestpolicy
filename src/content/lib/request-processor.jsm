@@ -885,9 +885,8 @@ let RequestProcessor = (function(self) {
     }
   };
 
-  ProcessEnvironment.obMan.observe({
-    "http-on-modify-request": examineHttpRequest
-  });
+  ProcessEnvironment.obMan.observe(["http-on-modify-request"],
+                                   examineHttpRequest);
 
 
 

@@ -90,19 +90,6 @@ function ObserverManager(aEnv) {
  * The "ID" for each function might be something different.
  */
 {
-  /**
-   * Call aCallback for each of the object's entries, (key, value) being the
-   * parameters.
-   */
-  let forEach = function(obj, aCallback) {
-    for (let key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        aCallback(key, obj[key]);
-      }
-    }
-  };
-
-
   //
   // functions using nsIObserverService
   //
@@ -119,18 +106,18 @@ function ObserverManager(aEnv) {
     self.observers.push(new SingleTopicObserver(aTopic, aCallback));
   };
 
-  // shorthand for binding
-  let observeSingleTopic = ObserverManager.prototype.observeSingleTopic;
-
   /**
    * Observe multiple topics.
    *
-   * @param {Object} aList - A list whereas a key is a "topic" to be observed
-   *     and a value is the function to be called when the topic is observed.
+   * @param {Array} aTopics - A list of topics to be observed.
+   * @param {function} aCallback - the function to be called when one of the
+   *     the topics is observed.
    */
-  ObserverManager.prototype.observe = function(aList) {
+  ObserverManager.prototype.observe = function(aTopics, aCallback) {
     let self = this;
-    forEach(aList, observeSingleTopic.bind(self));
+    aTopics.forEach(function(topic) {
+      self.observeSingleTopic(topic, aCallback);
+    });
   };
 
   /**
@@ -160,16 +147,17 @@ function ObserverManager(aEnv) {
     self.observers.push(obs);
   };
 
-  // shorthand for binding
-  let observeSinglePrefBranch = ObserverManager.prototype.observeSinglePrefBranch;
-
-  ObserverManager.prototype.observeRPPref = function(aList) {
+  ObserverManager.prototype.observeRPPref = function(aDomains, aCallback) {
     let self = this;
-    forEach(aList, observeSinglePrefBranch.bind(self, rpPrefBranch));
+    aDomains.forEach(function(domain) {
+      self.observeSinglePrefBranch(rpPrefBranch, domain, aCallback);
+    });
   };
-  ObserverManager.prototype.observeRootPref = function(aList) {
+  ObserverManager.prototype.observeRootPref = function(aDomains, aCallback) {
     let self = this;
-    forEach(aList, observeSinglePrefBranch.bind(self, rootPrefBranch));
+    aDomains.forEach(function(domain) {
+      self.observeSinglePrefBranch(rootPrefBranch, domain, aCallback);
+    });
   };
 }
 

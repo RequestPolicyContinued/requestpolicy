@@ -663,13 +663,13 @@ requestpolicy.overlay = (function() {
    * register a pref observer
    */
   function updatePermissiveStatusOnPrefChanges() {
-    OverlayEnvironment.obMan.observeRPPref({
-      "startWithAllowAllEnabled": function(subject, topic, data) {
-        if (topic == "nsPref:changed") {
-          updatePermissiveStatus();
-        }
-      }
-    });
+    OverlayEnvironment.obMan.observeRPPref(
+        ["startWithAllowAllEnabled"],
+        function(subject, topic, data) {
+          if (topic === "nsPref:changed") {
+            updatePermissiveStatus();
+          }
+        });
   }
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);

@@ -134,13 +134,13 @@ let Prefs = (function() {
 
   function registerPrefObserver() {
     // observe everything on RP's pref branch
-    ProcessEnvironment.obMan.observeRPPref({"": observePref});
+    ProcessEnvironment.obMan.observeRPPref([""], observePref);
 
     // observe what is needed else
-    ProcessEnvironment.obMan.observeRootPref({
-      "network.prefetch-next": observePref,
-      "network.dns.disablePrefetch": observePref
-    });
+    ProcessEnvironment.obMan.observeRootPref([
+      "network.prefetch-next",
+      "network.dns.disablePrefetch"
+    ], observePref);
   }
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         registerPrefObserver);

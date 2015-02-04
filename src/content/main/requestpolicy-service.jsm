@@ -131,17 +131,17 @@ let rpService = (function() {
                                         loadConfigAndRules);
 
   function registerObservers() {
-    ProcessEnvironment.obMan.observe({
-      "sessionstore-windows-restored": self.observe,
-      SUBSCRIPTION_UPDATED_TOPIC: self.observe,
-      SUBSCRIPTION_ADDED_TOPIC: self.observe,
-      SUBSCRIPTION_REMOVED_TOPIC: self.observe,
+    ProcessEnvironment.obMan.observe([
+      "sessionstore-windows-restored",
+      SUBSCRIPTION_UPDATED_TOPIC,
+      SUBSCRIPTION_ADDED_TOPIC,
+      SUBSCRIPTION_REMOVED_TOPIC,
 
       // support for old browsers (Firefox <20)
       // TODO: support per-window temporary rules
       //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
-      "private-browsing": self.observe
-    });
+      "private-browsing"
+    ], self.observe);
   }
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         registerObservers);

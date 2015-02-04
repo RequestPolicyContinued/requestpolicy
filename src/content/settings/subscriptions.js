@@ -133,8 +133,8 @@ function onload() {
   }
 
   // call updateDisplay() every time a subscription is added or removed
-  WinEnv.obMan.observe({
-    SUBSCRIPTION_ADDED_TOPIC: updateDisplay,
-    SUBSCRIPTION_REMOVED_TOPIC: updateDisplay
-  });
+  WinEnv.obMan.observe([
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC
+  ], updateDisplay);
 }

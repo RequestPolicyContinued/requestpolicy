@@ -107,13 +107,13 @@ let Logger = (function() {
     }
 
     // rpPrefBranch is available now.
-    ProcessEnvironment.obMan.observeRPPref({
-      "log": function(subject, topic, data) {
-        if (topic == "nsPref:changed") {
-          updateLoggingSettings();
-        }
-      }
-    });
+    ProcessEnvironment.obMan.observeRPPref(
+        ["log"],
+        function(subject, topic) {
+          if (topic === "nsPref:changed") {
+            updateLoggingSettings();
+          }
+        });
     updateLoggingSettings();
 
     // don't call init() anymore when doLog() is called

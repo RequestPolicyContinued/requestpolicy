@@ -61,14 +61,16 @@ let RequestProcessor = (function(self) {
 
 
 
-  ProcessEnvironment.obMan.observe({
-    "http-on-examine-response": function(subject) {
-      examineHttpResponse(subject);
-    },
-    HTTPS_EVERYWHERE_REWRITE_TOPIC: function(subject, topic, data) {
-      handleHttpsEverywhereUriRewrite(subject, data);
-    }
-  });
+  ProcessEnvironment.obMan.observe(
+      ["http-on-examine-response"],
+      function(subject) {
+        examineHttpResponse(subject);
+      });
+  ProcessEnvironment.obMan.observe(
+      [HTTPS_EVERYWHERE_REWRITE_TOPIC],
+      function(subject, topic, data) {
+        handleHttpsEverywhereUriRewrite(subject, data);
+      });
 
 
 
@@ -337,7 +339,7 @@ let RequestProcessor = (function(self) {
    * available on the channel. The response can be accessed and modified via
    * nsITraceableChannel.
    */
-  let examineHttpResponse = function(aSubject) {
+  function examineHttpResponse(aSubject) {
     // Currently, if a user clicks a link to download a file and that link
     // redirects and is subsequently blocked, the user will see the blocked
     // destination in the menu. However, after they have allowed it from

@@ -74,7 +74,7 @@ function updateDisplay() {
     element.input.checked = (element.id in subsInfo['official']);
   }
 
-  if (Prefs.isDefaultAllow) {
+  if (Prefs.isDefaultAllow()) {
     var currentPolicy = 'allow', otherPolicy = 'deny';
   } else {
     var currentPolicy = 'deny', otherPolicy = 'allow';

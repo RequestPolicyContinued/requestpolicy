@@ -21,6 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+/* exported EXPORTED_SYMBOLS, ObserverManager */
+
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
@@ -29,14 +32,19 @@ let EXPORTED_SYMBOLS = ["ObserverManager"];
 
 let globalScope = this;
 
+/* global ScriptLoader */
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "lib/utils/observers",
-  "lib/environment"
+  "lib/utils/observers", /* global SingleTopicObserver,
+                            SinglePrefBranchObserver */
+  "lib/environment" /* global Environment, ProcessEnvironment */
 ], globalScope);
 
 ScriptLoader.defineLazyModuleGetters({
-  "lib/prefs": ["rpPrefBranch", "rootPrefBranch"]
+  "lib/prefs": [
+    "rpPrefBranch", /* global rpPrefBranch */
+    "rootPrefBranch" /* global rootPrefBranch */
+  ]
 }, globalScope);
 
 

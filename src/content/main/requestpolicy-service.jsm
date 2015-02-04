@@ -63,8 +63,7 @@ let rpService = (function() {
     subscriptions = new UserSubscriptions();
     PolicyManager.loadUserRules();
 
-    Prefs.isDefaultAllow;
-    var defaultPolicy = rpPrefBranch.defaultAllow ? 'allow' : 'deny';
+    var defaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
 
     var failures = PolicyManager.loadSubscriptionRules(
           subscriptions.getSubscriptionInfo(defaultPolicy));

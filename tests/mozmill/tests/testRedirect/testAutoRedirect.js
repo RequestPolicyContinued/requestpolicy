@@ -50,7 +50,7 @@ var teardownModule = function(aModule) {
 var testAutoRedirect = function() {
   var tabIndex = tabBrowser.selectedIndex;
 
-  var panel = tabBrowser.getTabPanelElement(tabIndex,
+  var getPanel = () => tabBrowser.getTabPanelElement(tabIndex,
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
   for (let [shouldBeAllowed, testURL] of urlsWithRedirect) {
@@ -70,10 +70,11 @@ var testAutoRedirect = function() {
       controller.waitFor(function() {
           return controller.window.content.document.location.href !== testURL;
       }, "The URL in the urlbar has changed.");
-      expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
+      expect.ok(!getPanel().exists(),
+                "The redirect notification bar is hidden.");
     } else {
-      controller.waitFor((() => panel.exists()), "The redirect " +
-                           "notification bar has been displayed.");
+      controller.waitFor(() => getPanel().exists(), "The redirect " +
+                         "notification bar has been displayed.");
       let finalURI = controller.window.content.document.location.href;
       expect.ok(finalURI === testURL || finalURI === initialURI,
                 "The URL in the urlbar hasn't changed.");
@@ -84,8 +85,8 @@ var testAutoRedirect = function() {
     // It's necessary to wait for the notification panel to be closed. If we
     // don't wait for that to happen, the next URL in urlsWithRedirect might
     // already be displayed while the panel is still there.
-    controller.waitFor((() => !panel.exists()), "No panel is being displayed " +
-                       "because all tabs have been closed.");
+    controller.waitFor(() => !getPanel().exists(), "No panel is being " +
+                       "displayed because all tabs have been closed.");
 
     //
     // The `sleep` below has been a workaround against the following exception:

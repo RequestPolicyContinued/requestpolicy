@@ -111,7 +111,7 @@ requestpolicy.overlay = (function() {
    */
   self.init = function() {
     try {
-      if (initialized == false) {
+      if (initialized === false) {
         initialized = true;
         overlayId = (new Date()).getTime();
 
@@ -125,7 +125,7 @@ requestpolicy.overlay = (function() {
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
-        isFennec = (appInfo.ID == "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
+        isFennec = (appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
 
         if (isFennec) {
           Logger.dump("Detected Fennec.");
@@ -364,8 +364,8 @@ requestpolicy.overlay = (function() {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!Prefs.isBlockingDisabled()
-          && !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
+      if (!Prefs.isBlockingDisabled() &&
+          !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them, as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
           Logger.warning(Logger.TYPE_META_REFRESH,
@@ -389,7 +389,7 @@ requestpolicy.overlay = (function() {
    * @param {String} scheme
    */
   self.showSchemeNotification = function(browser, scheme) {
-    let notificationBox = gBrowser.getNotificationBox(browser)
+    let notificationBox = gBrowser.getNotificationBox(browser);
     let notificationValue = "requestpolicy-scheme-notification";
 
     let notification = notificationBox
@@ -580,7 +580,7 @@ requestpolicy.overlay = (function() {
           popup: addRuleMenuName,
           callback: null
         }
-        // TODO: add a „read more about URL redirection“ button, targetting to
+        // TODO: add a "read more about URL redirection" button, targetting to
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
@@ -850,8 +850,8 @@ requestpolicy.overlay = (function() {
       // the second parameter's purpose having been changed.
       var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(arguments[0], arguments[1]);";
       // Finally, add our line to the beginning of the addTab function.
-      eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine
-          + addTabParts[1]);
+      eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine +
+           addTabParts[1]);
     }
   };
 
@@ -864,7 +864,7 @@ requestpolicy.overlay = (function() {
 
       // define the regular expression that should find the existing code
       // line that RequestPolicy added.
-      let codeLineRE = /(\n    )?requestpolicy\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/
+      let codeLineRE = /(\n    )?requestpolicy\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
 
       // use the regular expression
       let newAddTabString = addTabString.replace(codeLineRE, "");
@@ -952,9 +952,9 @@ requestpolicy.overlay = (function() {
       },
 
       QueryInterface : function(aIID, aResult) {
-        if (aIID.equals(Components.interfaces.nsISHistoryListener)
-            || aIID.equals(Components.interfaces.nsISupportsWeakReference)
-            || aIID.equals(Components.interfaces.nsISupports)) {
+        if (aIID.equals(Components.interfaces.nsISHistoryListener) ||
+            aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+            aIID.equals(Components.interfaces.nsISupports)) {
           return this;
         }
         throw Components.results.NS_NOINTERFACE;
@@ -966,7 +966,7 @@ requestpolicy.overlay = (function() {
       }
     };
 
-    // there seems to be a bug in Firefox ESR 24 – the session history is
+    // there seems to be a bug in Firefox ESR 24 -- the session history is
     // null. After waiting a few miliseconds it's available. To be sure this
     let tries = 0, waitTime = 20, maxTries = 10;
     let tryAddingSHistoryListener = function() {
@@ -1064,8 +1064,8 @@ requestpolicy.overlay = (function() {
     Prefs.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
-    $id('rp-link-enable-blocking').hidden = !disabled;
-    $id('rp-link-disable-blocking').hidden = disabled;
+    $id("rp-link-enable-blocking").hidden = !disabled;
+    $id("rp-link-disable-blocking").hidden = disabled;
   };
 
   /**
@@ -1184,11 +1184,11 @@ requestpolicy.overlay = (function() {
     // directly specify the width of the entire popup.
     //Logger.dump('popup width: ' + popup.clientWidth);
     var popupWidth = popupElement.clientWidth ? 730 : popupElement.clientWidth;
-    var anchor = $id('content');
+    var anchor = $id("content");
     var contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
     var xOffset = contentWidth - popupWidth - 2;
-    popupElement.openPopup(anchor, 'overlap', xOffset);
+    popupElement.openPopup(anchor, "overlap", xOffset);
   };
 
   //  showExtensionConflictInfo : function() {
@@ -1209,7 +1209,7 @@ requestpolicy.overlay = (function() {
   self.openToolbarPopup = function(anchor) {
   //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay.popupElement,
   //        null);
-    popupElement.openPopup(anchor, 'after_start', 0, 0, true, true);
+    popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
   };
 
   function openLinkInNewTab(url, relatedToCurrent) {
@@ -1217,11 +1217,11 @@ requestpolicy.overlay = (function() {
     popupElement.hidePopup();
   }
 
-  self.openPrefs = openLinkInNewTab.bind(this, 'about:requestpolicy', true);
+  self.openPrefs = openLinkInNewTab.bind(this, "about:requestpolicy", true);
   self.openPolicyManager = openLinkInNewTab.bind(this,
-      'about:requestpolicy?yourpolicy', true);
+      "about:requestpolicy?yourpolicy", true);
   self.openHelp = openLinkInNewTab.bind(this,
-      'https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support');
+      "https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
 
 
   self.clearRequestLog = function() {

@@ -710,34 +710,18 @@ requestpolicy.overlay = (function() {
   };
 
   /**
-   * If the RP service noticed a blocked top-level document request, look for
-   * a tab where the current location is the same as the origin of the blocked
-   * request. If we find one, show a redirect notification. Note that if there
-   * is more than one tab in this window open to the same origin, then we only
-   * show the notification in the first one we find. However, if there are
-   * multiple windows open and two different windows have a tab open to this
-   * same origin, then the first tab at that location in each window will show
-   * the redirect notification. This is because the RP service informs each
-   * window separately to look for a document to show a notification in.
+   * This function gets called when a top-level document request has been
+   * blocked.
+   * This function is called during shouldLoad(). As shouldLoad shoudn't be
+   * blocked, it's better to set a timeout here.
    */
-  self.observeBlockedTopLevelDocRequest = function (originUri, destUri) {
-    const browser = self._getBrowserAtUri(originUri);
-    if (!browser) {
-      return;
-    }
-    // We're called indirectly from shouldLoad so we can't block.
+  self.observeBlockedTopLevelDocRequest = function (browser, originUri,
+                                                    destUri) {
+    // This function is called during shouldLoad() so set a timeout to
+    // avoid blocking shouldLoad.
     window.setTimeout(function() {
       requestpolicy.overlay._showRedirectNotification(browser, destUri, 0);
     }, 0);
-  };
-
-  self._getBrowserAtUri = function(uri) {
-    for (let i = 0, len = gBrowser.browsers.length; i < len; i++) {
-      if (gBrowser.getBrowserAtIndex(i).currentURI.spec == uri) {
-        return gBrowser.getBrowserAtIndex(i);
-      }
-    }
-    return null;
   };
 
   // TODO: observeBlockedFormSubmissionRedirect

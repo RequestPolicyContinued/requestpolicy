@@ -126,17 +126,6 @@ let RequestProcessor = (function(self) {
     }
   }
 
-  function notifyBlockedTopLevelDocRequest(originUri, destUri) {
-    // TODO: this probably could be done async.
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
-        continue;
-      }
-      internal.requestObservers[i].observeBlockedTopLevelDocRequest(originUri,
-          destUri);
-    }
-  }
-
 
 
 
@@ -159,11 +148,20 @@ let RequestProcessor = (function(self) {
     cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
     internal.recordRejectedRequest(request);
 
-    if (Ci.nsIContentPolicy.TYPE_DOCUMENT == request.aContentType) {
+    if (Ci.nsIContentPolicy.TYPE_DOCUMENT === request.aContentType) {
       // This was a blocked top-level document request. This may be due to
       // a blocked attempt by javascript to set the document location.
-      // TODO: pass requestResult?
-      notifyBlockedTopLevelDocRequest(request.originURI, request.destURI);
+
+      let browser = request.getBrowser();
+      let window = request.getChromeWindow();
+
+      if (!browser || !window) {
+        Logger.warning(Logger.TYPE_CONTENT, "The user could not be notified " +
+            "about the blocked top-level document request!");
+      } else {
+        window.requestpolicy.overlay.observeBlockedTopLevelDocRequest(
+            browser, request.originURI, request.destURI);
+      }
     }
 
     return CP_REJECT;

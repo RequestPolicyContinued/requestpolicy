@@ -584,8 +584,10 @@ let RequestProcessor = (function(self) {
       }
 
 
-      if (request.checkURISchemes().shouldLoad === true) {
-        return CP_OK;
+
+      let uriSchemeShouldLoadResult = request.checkURISchemes().shouldLoad;
+      if (uriSchemeShouldLoadResult !== null) {
+        return uriSchemeShouldLoadResult === true ? CP_OK : CP_REJECT;
       }
 
 

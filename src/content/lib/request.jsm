@@ -297,6 +297,7 @@ NormalRequest.prototype.checkURISchemes = function() {
   *
   * TODO: solve this problem and remove this workaround.
   */
+  let unknownSchemesDetected = false;
   let uris = [this.aContentLocation, this.aRequestOrigin];
   for (let i = 0; i < 2; ++i) {
     let uri = uris[i];
@@ -335,6 +336,7 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
 
     // if we get here, the scheme is unknown. try to show a notification.
+    unknownSchemesDetected = true;
     Logger.warning(Logger.TYPE_CONTENT,
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
@@ -354,7 +356,7 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
   }
 
-  return {shouldLoad: null};
+  return {shouldLoad: unknownSchemesDetected ? false : null};
 };
 
 

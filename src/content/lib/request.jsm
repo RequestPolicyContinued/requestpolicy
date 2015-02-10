@@ -346,13 +346,14 @@ NormalRequest.prototype.checkURISchemes = function() {
         throw "The chrome window could not be extracted from aContext.";
       }
       let overlay = chromeWin.requestpolicy.overlay;
+      let browser = this.getBrowser();
       Utils.runAsync(function() {
-        overlay.showSchemeNotification(win, scheme);
+        overlay.showSchemeNotification(browser, scheme);
       });
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "The user could not be informed about the " +
-                     "unknown scheme. Error was: " + e);
+                     "unknown scheme. Error was: " + e, e);
     }
   }
 

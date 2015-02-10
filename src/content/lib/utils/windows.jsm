@@ -46,10 +46,14 @@ let WindowUtils = (function() {
 
   self.getBrowserForWindow = function(aContentWindow) {
     let win = self.getChromeWindow(aContentWindow);
-    let tab = self.getTabBrowser(win)
-                  ._getTabForContentWindow(aContentWindow.top);
-    return tab.linkedBrowser;
-  }
+    let tabs = self.getTabsForWindow(win);
+    for (let tab of tabs) {
+      if (tab.linkedBrowser.contentWindow === aContentWindow.top) {
+        return tab.linkedBrowser;
+      }
+    }
+    return null;
+  };
 
   self.getChromeWindowForDocShell = function(aDocShell) {
     return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
@@ -61,6 +65,10 @@ let WindowUtils = (function() {
   self.getTabBrowser = function(window) {
     // bug 1009938 - may be null in SeaMonkey
     return window.gBrowser || window.getBrowser();
+  };
+
+  self.getTabsForWindow = function(window) {
+    return self.getTabBrowser(window).tabContainer.children;
   };
 
   //

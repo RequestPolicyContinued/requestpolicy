@@ -385,11 +385,10 @@ requestpolicy.overlay = (function() {
    *
    * issue: https://github.com/RequestPolicyContinued/requestpolicy/issues/447
    *
-   * @param {nsIDOMWindow} contentWindow
+   * @param {browser} browser
    * @param {String} scheme
    */
-  self.showSchemeNotification = function(contentWindow, scheme) {
-    let browser = gBrowser.getBrowserForContentWindow(contentWindow);
+  self.showSchemeNotification = function(browser, scheme) {
     let notificationBox = gBrowser.getNotificationBox(browser)
     let notificationValue = "requestpolicy-scheme-notification";
 

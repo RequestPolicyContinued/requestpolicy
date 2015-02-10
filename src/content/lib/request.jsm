@@ -217,7 +217,7 @@ NormalRequest.prototype.getContentWindow = function() {
     return null;
   }
 
-  if (context instanceof Ci.nsIDOMXULElement && context.tagName === "browser") {
+  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
     return context.contentWindow;
   }
 
@@ -257,7 +257,7 @@ NormalRequest.prototype.getChromeWindow = function() {
  */
 NormalRequest.prototype.getBrowser = function() {
   let context = this.aContext;
-  if (context instanceof Ci.nsIDOMXULElement && context.tagName === "browser") {
+  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
     return context;
   } else {
     return WindowUtils.getBrowserForWindow(this.getContentWindow());

@@ -24,6 +24,7 @@
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
+const Cr = Components.results;
 
 let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
@@ -34,7 +35,10 @@ let globalScope = this;
 
 
 Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
-ScriptLoader.importModule("lib/environment", globalScope);
+ScriptLoader.importModules([
+  "lib/environment",
+  "lib/utils"
+], globalScope);
 
 
 var filenames = {
@@ -96,8 +100,17 @@ let AboutRequestPolicy = (function() {
         .registerFactory(self.classID, self.classDescription,
                          self.contractID, self);
   }
-  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
-                                        registerFactory);
+
+  ProcessEnvironment.addStartupFunction(
+      Environment.LEVELS.INTERFACE,
+      function () {
+        try {
+          registerFactory();
+        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+          // When upgrading restartless the old factory might still exist.
+          Utils.runAsync(registerFactory);
+        }
+      });
 
   function unregisterFactory() {
     let registrar = Components.manager

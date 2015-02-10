@@ -24,6 +24,7 @@
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
+const Cr = Components.results;
 
 let EXPORTED_SYMBOLS = ["PolicyImplementation"];
 
@@ -75,8 +76,17 @@ let PolicyImplementation = (function() {
           .getService(Ci.nsIMIMEService);
     }
   }
-  ProcessEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
-                                        register);
+
+  ProcessEnvironment.addStartupFunction(
+      Environment.LEVELS.INTERFACE,
+      function () {
+        try {
+          register();
+        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+          // When upgrading restartless the old factory might still exist.
+          Utils.runAsync(register);
+        }
+      });
 
 
   function unregister() {

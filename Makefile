@@ -19,8 +19,6 @@ source_path := $(source_dirname)/
 build_path := $(build_dirname)/
 dist_path := $(dist_dirname)/
 
-jar_file := $(build_path)chrome/$(extension_name).jar
-
 # the path of the target XPI file
 xpi_file := $(dist_path)$(extension_name).xpi
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
@@ -152,7 +150,7 @@ $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 # This cleans all temporary files and directories created by 'make'.
 .PHONY: clean
 clean:
-	@rm -rf $(xpi_file) $(jar_file) $(build_path)*
+	@rm -rf $(xpi_file) $(build_path)*
 	@echo "Cleanup is done."
 
 # remove empty directories

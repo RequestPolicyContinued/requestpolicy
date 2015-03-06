@@ -16,7 +16,7 @@ build_dirname := build
 dist_dirname := dist
 
 source_path := $(source_dirname)/
-build_path := $(build_dirname)/
+build_path := $(build_dirname)/normal/
 dist_path := $(dist_dirname)/
 
 # the path of the target XPI file
@@ -150,7 +150,7 @@ $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 # This cleans all temporary files and directories created by 'make'.
 .PHONY: clean
 clean:
-	@rm -rf $(xpi_file) $(build_path)*
+	@rm -rf $(xpi_file) $(build_dirname)/*
 	@echo "Cleanup is done."
 
 # remove empty directories

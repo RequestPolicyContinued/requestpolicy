@@ -1,12 +1,21 @@
 # NOTE: in this file tab indentation is used.
 # Otherwise .RECIPEPREFIX would have to be set.
 
-#
+
+# ==============================================================================
 # create variables
+# ==============================================================================
+
+# _________________
+# general variables
 #
 
 extension_name := requestpolicy
 extension_uuid := requestpolicy@requestpolicy.com
+
+# ____________________________________
+# generating XPIs -- general variables
+#
 
 # The zip application to be used.
 ZIP := zip
@@ -16,27 +25,7 @@ build_dirname := build
 dist_dirname := dist
 
 source_path := $(source_dirname)/
-build_path := $(build_dirname)/normal/
 dist_path := $(dist_dirname)/
-
-# the path of the target XPI file
-xpi_file := $(dist_path)$(extension_name).xpi
-signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
-
-# the default XPI to use for mozrunner and mozmill
-moz_xpi := $(xpi_file)
-
-# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
-app := firefox
-# default app branch
-ifeq ($(app),firefox)
-app_branch := nightly
-else
-app_branch := release
-endif
-binary_filename := $(app)
-app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
-mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 
 # collect files that are part of the source code
@@ -53,11 +42,22 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(wildcard $(source_dirname)/skin/*.css) \
 		$(wildcard $(source_dirname)/skin/*.png) \
 		$(wildcard $(source_dirname)/skin/*.svg)
+
+
+# ____________________________________
+# vars for generating the "normal" XPI
+#
+
+build_path := $(build_dirname)/normal/
+
+xpi_file := $(dist_path)$(extension_name).xpi
+
 # take all files from above and create their paths in the "build" directory
 all_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
 
 javascript_files := $(filter %.js %.jsm,$(all_files))
 other_files := $(filter-out $(javascript_files),$(all_files))
+
 
 # detect deleted files and empty directories
 deleted_files :=
@@ -72,44 +72,72 @@ empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
 endif
 
 
-
-
-
+# ________________________________
+# vars for generating a signed XPI
 #
+
+signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
+
+
+# ______________________________
+# vars for mozrunner and mozmill
+#
+
+# the default XPI to use for mozrunner and mozmill
+moz_xpi := $(xpi_file)
+
+# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
+app := firefox
+# default app branch
+ifeq ($(app),firefox)
+app_branch := nightly
+else
+app_branch := release
+endif
+binary_filename := $(app)
+app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
+
+# __________________
+# vars for mozrunner
+#
+
+mozrunner_prefs_ini := tests/mozrunner-prefs.ini
+
+
+
+# ==============================================================================
 # define targets
-#
+# ==============================================================================
+
+.PHONY: all build dist sign
 
 # set "all" to be the default target
 .DEFAULT_GOAL := all
 
+# building means to prepare all files in the build directory
+build: $(build_path)
+
 # build and create XPI file
-.PHONY: all
 all: $(xpi_file)
 	@echo "Build finished successfully."
-
-# Building means processing all source files and eventually delete
-# empty directories and deleted files from the build directory.
-.PHONY: build
-build: $(build_path)
-$(build_path): $(all_files) $(deleted_files) $(empty_dirs)
-
-$(build_path)/META-INF/: $(build_path) $(all_files)
-	mkdir -p $(build_path)/META-INF
-	signtool -d .signing \
-		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
-		$(build_path)
-
+dist: $(xpi_file)
 
 # create the dist directory
 $(dist_path):
 	@mkdir -p $(dist_path)
 
-# "dist" means packaging to a XPI file
-.PHONY: dist
-dist: $(xpi_file)
-# Note: We add the build path as a prerequisite, not the phony "build" target.
-#       This way we avoid re-packaging in case nothing has changed.
-#       Also $(all_files) is needed as prerequisite, so that the xpi gets updated
+sign: $(signed_xpi_file)
+
+
+# _______________________
+# create the "normal" XPI
+#
+
+# Note: Here the build path is added as a prerequisite, *not* the
+#       phony "build" target. This avoids re-packaging in case
+#       nothing has changed.
+#       Also $(all_files) is needed as prerequisite, so that the
+#       xpi gets updated.
 $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	@rm -f $(xpi_file)
 	@echo "Creating XPI file."
@@ -117,8 +145,11 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
 	@echo "Creating XPI file: Done!"
 
-.PHONY: sign
-sign $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
+# _____________________
+# create the signed XPI
+#
+
+$(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
 	@cd $(build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \
@@ -127,9 +158,13 @@ sign $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
 		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
 		-x META-INF/zigbert.rsa
 
-# ___________________
-# processing of files
+# _____________________________________
+# create the files for the "normal" XPI
 #
+
+# Process all source files, but also eventually delete
+# empty directories and deleted files from the build directory.
+$(build_path): $(all_files) $(deleted_files) $(empty_dirs)
 
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
@@ -142,6 +177,17 @@ $(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
+
+# ___________________________________
+# create the files for the signed XPI
+#
+
+$(build_path)/META-INF/: $(build_path) $(all_files)
+	mkdir -p $(build_path)/META-INF
+	signtool -d .signing \
+		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
+		$(build_path)
+
 
 # __________________
 # "cleaning" targets

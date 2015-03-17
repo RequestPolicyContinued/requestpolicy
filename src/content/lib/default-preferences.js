@@ -28,6 +28,10 @@ pref("extensions.requestpolicy.menu.info.showNumRequests", true);
 pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
 
+// #ifdef UNIT_TESTING
+pref("extensions.requestpolicy.unitTesting.errorCount", 0);
+// #endif
+
 // Old prefs that are no longer used.
 //pref("extensions.requestpolicy.allowedOrigins", "");
 //pref("extensions.requestpolicy.allowedDestinations", "");

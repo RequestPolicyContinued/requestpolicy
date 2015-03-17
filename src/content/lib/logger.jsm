@@ -136,7 +136,21 @@ let Logger = (function() {
   };
 
   let log = function(aLevel, aType, aMessage, aError) {
-    if (enabled && aLevel >= level && types & aType) {
+    let shouldLog = (enabled && aLevel >= level && types & aType);
+
+    // #ifdef UNIT_TESTING
+    if (aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE) {
+      // increment the error count
+      let errorCount = rpPrefBranch.getIntPref("unitTesting.errorCount");
+      rpPrefBranch.setIntPref("unitTesting.errorCount", ++errorCount);
+      Services.prefs.savePrefFile(null);
+
+      // log even if logging is disabled
+      shouldLog = true;
+    }
+    // #endif
+
+    if (shouldLog) {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
       let typeName = self._TYPE_NAMES[aType.toString()];
 

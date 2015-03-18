@@ -92,9 +92,41 @@ let PolicyImplementation = (function() {
   function unregister() {
     Logger.dump("shutting down PolicyImplementation...");
 
-    // Ensure that RP stops blocking requests even in case of an error in the
-    // shutdown process of PolicyImplementation.
-    self.shouldLoad = (() => C.CP_OK);
+    // Below the shouldLoad function is replaced by a new one
+    // which always allows *all* requests.
+    //
+    // What's the reason?
+    // ------------------
+    // The function for unregistering, which is `unregisterFactory`,
+    // has to be called async; this means that the unregistering
+    // will be done at a later time. However, it's necessary to
+    // disable blocking *right now*.
+    //
+    // Why is that necessary?
+    // ----------------------
+    // It's possible (or always true) that async functions
+    // get called *after* the addon finished shutting down.
+    // After the shutdown RequestPolicy's modules and
+    // functions can't be used anymore, the modules have
+    // been unloaded already. There might be still some
+    // objects or closures, but it's unreliable to use
+    // them.
+    // However, the shouldLoad function needs many of
+    // RequestPolicy's other modules and functions. So any
+    // call to RP's `shouldLoad` might cause exceptions,
+    // given that the call happens between now and the
+    // time when the factory is actually unregistered.
+
+    // Before defining the new shouldLoad ...
+    // ... save the return value in the closure of this function.
+    //     Similarly like described above this is necessary
+    //     because the `C` variable is not available anymore
+    //     after RP has been shut down.
+    var finalReturnValue = C.CP_OK;
+
+    // Actually create the final function, as it is described
+    // above.
+    self.shouldLoad = () => finalReturnValue;
 
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
@@ -108,6 +140,7 @@ let PolicyImplementation = (function() {
       registrar.unregisterFactory(self.classID, self);
     });
   }
+
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
 

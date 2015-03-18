@@ -165,16 +165,27 @@ requestpolicy.overlay = (function() {
   //  rpContextMenu.setAttribute("hidden", !isEnabled);
   //},
 
-  self.onWindowUnload = function() {
-    RequestProcessor.removeRequestObserver(self);
-    self._unwrapAddTab();
-    self._removeHistoryObserver();
-    self._removeLocationObserver();
+  OverlayEnvironment.addShutdownFunction(
+      Environment.LEVELS.INTERFACE,
+      function() {
+        RequestProcessor.removeRequestObserver(self);
+        self._unwrapAddTab();
+        self._removeHistoryObserver();
+        self._removeLocationObserver();
+      });
 
-    if ($id("requestpolicy-requestLog").hidden === false) {
-      self.toggleRequestLog();
-    }
-  };
+  OverlayEnvironment.addShutdownFunction(
+    Environment.LEVELS.UI,
+    function() {
+      let requestLog = $id("requestpolicy-requestLog");
+
+      // If the request log is found and is opened.
+      // The XUL elements of the request log might have already
+      // been removed.
+      if (!!requestLog && requestLog.hidden === false) {
+        self.toggleRequestLog();
+      }
+    });
 
   function addAppcontentTabSelectListener() {
     // Info on detecting page load at:

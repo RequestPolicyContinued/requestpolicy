@@ -97,10 +97,6 @@ let BOOTSTRAP = {
       "beforeProcessing": function() {
         // "this" will be an environment
         let self = this;
-        //console.log("[RPC] starting up Environment " + getEnvInfo(self) + "." +
-        //            (self.outerEnv ?
-        //             " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
-        //             " No OuterEnv."));
         self.register();
       },
       "afterProcessing": function() {}
@@ -418,6 +414,7 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
     return "'" + env.name + "' (" + env.uid + ")";
   }
 
+  // #ifdef LOG_ENVIRONMENT
   /**
    * Log some debug information on startup or shutdown.
    *
@@ -431,6 +428,7 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
                  " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
                  " No OuterEnv."));
   }
+  // #endif
 
   /**
    * Actual body of the functions startup() and shutdown().
@@ -453,7 +451,9 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
     } = getBootstrapMetadata(aStartupOrShutdown);
 
     if (self.envState === envStates["beforeProcessing"]) {
-      //logStartupOrShutdown.call(self, aStartupOrShutdown);
+      // #ifdef LOG_ENVIRONMENT
+      logStartupOrShutdown.call(self, aStartupOrShutdown);
+      // #endif
       functions["beforeProcessing"].call(self);
 
       self.envState = envStates["duringProcessing"];
@@ -491,8 +491,10 @@ Environment.prototype.addShutdownFunction = function(aLevel, f) {
 Environment.prototype.shutdownOnUnload = function(aEventTarget) {
   let self = this;
   self.elManager.addListener(aEventTarget, "unload", function() {
-    //console.log("[RPC] an EventTarget's `unload` function has been called. " +
-    //            'Going to shut down Environment "'+self.name+'"');
+    // #ifdef LOG_ENVIRONMENT
+    console.log("[RPC] an EventTarget's `unload` function has been called. " +
+                'Going to shut down Environment "' + self.name + '"');
+    // #endif
     self.shutdown();
   });
 };

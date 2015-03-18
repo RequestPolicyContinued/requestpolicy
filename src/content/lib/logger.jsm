@@ -211,8 +211,7 @@ let Logger = (function() {
         self.dump("    => key: " + i + " / value: [unable to access value]");
       }
     }
-  }
-
+  };
 
   return self;
 }());

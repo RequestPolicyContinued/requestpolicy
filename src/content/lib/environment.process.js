@@ -191,7 +191,7 @@ let ProcessEnvironment = (function() {
   ChildProcessEnvironment.prototype.shutdown = function() {
     let self = this;
 
-    ProcessEnvironmentBasevironmentBase.prototype.shutdown.apply(self, arguments);
+    ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 
     ScriptLoader.doShutdownTasks();
     Cu.unload("chrome://requestpolicy/content/lib/script-loader.jsm");

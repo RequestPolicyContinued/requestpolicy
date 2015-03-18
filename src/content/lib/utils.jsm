@@ -87,9 +87,10 @@ let Utils = (function() {
       //console.log("no more tries!");
       return;
     }
+    let triesLeft = aTries - 1;
     self.runAsync(function() {
-      if (aFunction.call(null) !== true) {
-        self.tryMultipleTimes(aFunction, aTries - 1);
+      if (aFunction.call(null, triesLeft) !== true) {
+        self.tryMultipleTimes(aFunction, triesLeft);
       }
     });
   };

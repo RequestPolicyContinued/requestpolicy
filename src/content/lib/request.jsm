@@ -340,21 +340,45 @@ NormalRequest.prototype.checkURISchemes = function() {
     Logger.warning(Logger.TYPE_CONTENT,
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
+
+    let chromeWin, browser;
     try {
-      let chromeWin = this.getChromeWindow();
+      chromeWin = this.getChromeWindow();
       if (!chromeWin) {
         throw "The chrome window could not be extracted from aContext.";
       }
-      let overlay = chromeWin.requestpolicy.overlay;
-      let browser = this.getBrowser();
-      Utils.runAsync(function() {
-        overlay.showSchemeNotification(browser, scheme);
-      });
+      browser = this.getBrowser();
     } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
+      Logger.warning(Logger.TYPE_INTERNAL,
                      "The user could not be informed about the " +
                      "unknown scheme. Error was: " + e, e);
     }
+
+    // Try showing the notification multiple times. This is done
+    // async for two reasons:
+    // (a) The chrome window's overlay might not be initialized
+    //     yet.
+    // (b) This function is called by the request processor, so
+    //     it should terminate asap.
+    Utils.tryMultipleTimes(function (aTriesLeft) {
+      try {
+        let overlay = chromeWin.requestpolicy.overlay;
+        overlay.showSchemeNotification(browser, scheme);
+        return true;
+      } catch (e) {
+        if (aTriesLeft === 0) {
+          Logger.warning(Logger.TYPE_INTERNAL,
+                         "Failed to show the scheme notification. " +
+                         "Error was: " + e, e);
+        } else {
+          Logger.warning(Logger.TYPE_INTERNAL,
+                         "Failed to show the scheme notification. " +
+                         "Trying again...");
+        }
+        return false;
+      }
+    }, 3);
+
   }
 
   return {shouldLoad: unknownSchemesDetected ? false : null};

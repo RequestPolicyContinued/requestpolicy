@@ -138,11 +138,6 @@ let ProcessEnvironment = (function() {
 
     ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 
-    // HACK WARNING: The Addon Manager does not properly clear all addon
-    //               related caches on update; in order to fully update
-    //               images and locales, their caches need clearing here.
-    Services.obs.notifyObservers(null, "chrome-flush-caches", null);
-
     ScriptLoader.doShutdownTasks();
     Cu.unload("chrome://requestpolicy/content/lib/script-loader.jsm");
   };

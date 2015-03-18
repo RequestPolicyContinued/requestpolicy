@@ -62,6 +62,14 @@ function shutdown(data, reason) {
 
 function install(data, reason) {
   // note: the addon might be not activated when this function gets called
+
+  // HACK WARNING: The Addon Manager does not properly clear all addon
+  //               related caches on update; in order to fully update
+  //               images and locales, their caches are flushed.
+  // Note: Due to Bug 1144248 this has to be done in the
+  //       `install` function.
+  Components.utils.import("resource://gre/modules/Services.jsm");
+  Services.obs.notifyObservers(null, "chrome-flush-caches", null);
 }
 
 function uninstall(data, reason) {

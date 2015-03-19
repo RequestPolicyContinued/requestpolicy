@@ -31,8 +31,17 @@ Cu.import("resource://gre/modules/Services.jsm");
 var regEx = /(Error|Warning|Exception)/i;
 
 function isRPException(aMessage) {
-  return aMessage.indexOf("chrome://requestpolicy") !== -1 &&
-      regEx.test(aMessage);
+  if (aMessage.indexOf("chrome://requestpolicy") === -1 ||
+      regEx.test(aMessage) === false) {
+    return false;
+  }
+
+  if (aMessage.indexOf("jquery.min.js") !== -1) {
+    // ignore logs caused by jQuery
+    return false;
+  }
+
+  return true;
 }
 
 /**

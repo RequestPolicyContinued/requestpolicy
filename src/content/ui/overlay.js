@@ -767,17 +767,6 @@ requestpolicy.overlay = (function() {
   };
 
   /**
-   * Called as an event listener when popuphidden fires on the
-   * contentAreaContextMenu.
-   */
-  //_contextMenuOnPopupHidden : function(event) {
-  //  if (event.currentTarget != event.originalTarget) {
-  //    return;
-  //  }
-  //  /*requestpolicy.overlay._attachPopupToStatusbar();*/
-  //},
-
-  /**
    * Wraps (overrides) the following methods of gContextMenu
    * - openLink()
    * - openLinkInPrivateWindow()

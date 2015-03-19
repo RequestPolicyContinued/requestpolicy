@@ -890,16 +890,6 @@ let RequestProcessor = (function(self) {
 
 
 
-  self._printAllowedRequests = function() {
-    self._allowedRequests.print();
-  };
-
-  self._printRejectedRequests = function() {
-    self._rejectedRequests.print();
-  };
-
-
-
 
 
 

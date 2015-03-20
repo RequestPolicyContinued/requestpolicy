@@ -32,7 +32,6 @@ dist_path := $(dist_dirname)/
 source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/chrome.manifest \
 		$(source_dirname)/install.rdf \
-		$(source_dirname)/LICENSE \
 		$(source_dirname)/README \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
@@ -43,6 +42,9 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(wildcard $(source_dirname)/skin/*.png) \
 		$(wildcard $(source_dirname)/skin/*.svg)
 
+# files that are in the root of the repository
+root_files := LICENSE
+
 
 # ____________________________________
 # vars for generating the "normal" XPI
@@ -52,11 +54,15 @@ build_path := $(build_dirname)/normal/
 
 xpi_file := $(dist_path)$(extension_name).xpi
 
-# take all files from above and create their paths in the "build" directory
-all_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
+# take all source files from above and replace the source path by the build path
+normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
 
-javascript_files := $(filter %.js %.jsm,$(all_files))
-other_files := $(filter-out $(javascript_files),$(all_files))
+javascript_files := $(filter %.js %.jsm,$(normal_build__src_files))
+other_files := $(filter-out $(javascript_files),$(normal_build__src_files))
+
+normal_build__root_files := $(addprefix $(build_path),$(root_files))
+
+all_files := $(normal_build__src_files) $(normal_build__root_files)
 
 
 # detect deleted files and empty directories
@@ -88,10 +94,14 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
 # take all files from above and create their paths in the "build" directory
-unit_testing__all_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(source_files))
+unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(source_files))
 
-unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__all_files))
-unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__all_files))
+unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__src_files))
+unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__src_files))
+
+unit_testing__root_files := $(addprefix $(unit_testing__build_path),$(root_files))
+
+unit_testing__all_files := $(unit_testing__src_files) $(unit_testing__root_files)
 
 
 # detect deleted files and empty directories
@@ -247,6 +257,9 @@ $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
 
+$(normal_build__root_files): $$(patsubst $$(build_path)%,%,$$@)
+	cp $(patsubst $(build_path)%,%,$@) $@
+
 # ___________________________________
 # create the files for the signed XPI
 #
@@ -257,7 +270,7 @@ $(build_path)/META-INF/: $(build_path) $(all_files)
 		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
 		$(build_path)
 
-# _____________________________________
+# _________________________________________
 # create the files for the unit-testing XPI
 #
 
@@ -270,6 +283,9 @@ $(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(
 $(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
+
+$(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
+	cp $(patsubst $(unit_testing__build_path)%,%,$@) $@
 
 
 # __________________

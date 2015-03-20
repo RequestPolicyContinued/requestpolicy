@@ -4,9 +4,10 @@
 
 "use strict";
 
+Components.utils.import("chrome://rp-observer/content/restart-detection-helper.jsm");
+
 
 function setupModule(aModule) {
-  aModule.controller = mozmill.getBrowserController();
 }
 
 function teardownModule(aModule) {
@@ -14,6 +15,6 @@ function teardownModule(aModule) {
 
 
 function testAssertNoRestart() {
-  assert.ok(typeof controller.window.markForDetectingRestarts !== "undefined",
+  assert.ok(RestartDetectionHelper.mark === "MARK",
             "The MARK still exists, which means the browser did not restart.");
 }

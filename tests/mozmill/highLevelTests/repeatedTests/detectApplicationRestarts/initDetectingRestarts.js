@@ -4,9 +4,10 @@
 
 "use strict";
 
+Components.utils.import("chrome://rp-observer/content/restart-detection-helper.jsm");
+
 
 function setupModule(aModule) {
-  aModule.controller = mozmill.getBrowserController();
 }
 
 function teardownModule(aModule) {
@@ -14,5 +15,5 @@ function teardownModule(aModule) {
 
 
 function testInitAssertNoRestart() {
-  controller.window.markForDetectingRestarts = "MARK";
+  RestartDetectionHelper.mark = "MARK";
 }

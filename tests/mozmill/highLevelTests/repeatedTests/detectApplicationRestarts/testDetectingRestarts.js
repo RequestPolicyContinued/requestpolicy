@@ -4,6 +4,8 @@
 
 "use strict";
 
+Components.utils.import("chrome://rp-observer/content/restart-detection-helper.jsm");
+
 
 function setupModule(aModule) {
 }
@@ -16,7 +18,7 @@ function setupTest(aModule) {
 
 function teardownTest(aModule) {
   if (persisted.nextTest) {
-    controller.restartApplication(persisted.nextTest);
+    aModule.controller.restartApplication(persisted.nextTest);
   }
 }
 
@@ -30,10 +32,10 @@ function teardownModule(aModule) {
 function testAddMark() {
   persisted.nextTest = "testMarkHasBeenRemoved";
 
-  controller.window.markForDetectingRestarts = "MARK";
+  RestartDetectionHelper.mark = "MARK";
 }
 
 function testMarkHasBeenRemoved() {
-  assert.ok(typeof controller.window.markForDetectingRestarts === "undefined",
+  assert.ok(RestartDetectionHelper.mark !== "MARK",
             "The MARK has been removed after a restart.");
 }

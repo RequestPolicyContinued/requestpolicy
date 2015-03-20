@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "RequestResult",
   "REQUEST_REASON_USER_POLICY",
   "REQUEST_REASON_SUBSCRIPTION_POLICY",
@@ -38,7 +42,6 @@ var EXPORTED_SYMBOLS = [
   "REQUEST_REASON_IDENTICAL_IDENTIFIER",
   "REQUEST_REASON_RELATIVE_URL"
 ];
-
 
 const REQUEST_REASON_USER_POLICY           = 1;
 const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;

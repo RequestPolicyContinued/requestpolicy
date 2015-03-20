@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,21 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "GUILocation",
   "GUIOrigin",
   "GUIDestination",
   "GUILocationProperties"
 ];
 
-
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
-
-
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["lib/utils/constants"], this);
 
 
 function GUILocation(value, properties) {
@@ -141,10 +139,7 @@ GUIOrigin.prototype = new GUILocation;
 /**
  * @static
  */
-GUIOrigin.merge = function (origin1, origin2) {
-  return GUILocation.merge(GUIOrigin, origin1, origin2);
-};
-
+GUIOrigin.merge = GUILocation.merge.bind(GUIOrigin, GUIOrigin);
 GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
 
 
@@ -164,10 +159,7 @@ GUIDestination.prototype = new GUILocation;
 /**
  * @static
  */
-GUIDestination.merge = function (dest1, dest2) {
-  return GUILocation.merge(GUIDestination, dest1, dest2);
-};
-
+GUIDestination.merge = GUILocation.merge.bind(GUIDestination, GUIDestination);
 GUIDestination.indexOfDestInArray = GUILocation.indexOfLocationInArray;
 
 
@@ -197,8 +189,7 @@ GUILocationProperties.prototype.reset = function() {
   *        with the specified rule action without being checked.
   *        Otherwise the ruleAction will be checked for every single request.
   */
-GUILocationProperties.prototype.accumulate = function (requests,
-    ruleAction) {
+GUILocationProperties.prototype.accumulate = function (requests, ruleAction) {
   var extractRuleActions = (undefined === ruleAction);
   var ruleActionCounter = 0;
 
@@ -224,11 +215,11 @@ GUILocationProperties.prototype.accumulate = function (requests,
   }
 
   switch (ruleAction) {
-    case rp.mod.RULE_ACTION_ALLOW:
+    case C.RULE_ACTION_ALLOW:
       this.numAllowedRequests += ruleActionCounter;
       break;
 
-    case rp.mod.RULE_ACTION_DENY:
+    case C.RULE_ACTION_DENY:
       this.numBlockedRequests += ruleActionCounter;
       break;
 

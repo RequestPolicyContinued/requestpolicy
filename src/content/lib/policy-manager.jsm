@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,42 +21,40 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
-  "PolicyManager",
-  "RULES_CHANGED_TOPIC"
-];
-
 const Ci = Components.interfaces;
 const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
 
 const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 
-if (!rp) {
-  var rp = {mod : {}};
-}
+Cu.import("resource://gre/modules/Services.jsm");
 
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset-storage.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/request-result.jsm", rp.mod);
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/logger",
+  "lib/request-result",
+  "lib/ruleset",
+  "lib/ruleset-storage",
+  "lib/utils/constants"
+], this);
 
 
 function dprint(msg) {
   if (typeof print == "function") {
     print(msg);
   } else {
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_POLICY, msg);
+    Logger.info(Logger.TYPE_POLICY, msg);
   }
 }
 
 function warn(msg) {
-  rp.mod.Logger.warning(rp.mod.Logger.TYPE_POLICY, msg);
+  Logger.warning(Logger.TYPE_POLICY, msg);
 }
 
 function notifyRulesChanged() {
-  var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-  observerService.notifyObservers(null, RULES_CHANGED_TOPIC, null);
+  Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
 
@@ -81,44 +79,52 @@ function notifyRulesChanged() {
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-function PolicyManager() {
-  this._userRulesets = {};
-  this._subscriptionRulesets = {};
-}
-PolicyManager.prototype = {
+let PolicyManager = (function(self) {
 
-  //_rulesets : null,
 
-  getUserRuleCount : function() {
-    return this._userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
-        this._userRulesets["user"]["rawRuleset"].getDenyRuleCount();
-  },
+  let userRulesets = {};
+  let subscriptionRulesets = {};
 
-  loadUserRules : function() {
+  self.getUserRulesets = function() {
+    return userRulesets;
+  };
+  self.getSubscriptionRulesets = function() {
+    return subscriptionRulesets;
+  };
+
+  //self._rulesets = null;
+
+  self.getUserRuleCount = function() {
+    return userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
+        userRulesets["user"]["rawRuleset"].getDenyRuleCount();
+  };
+
+  self.loadUserRules = function() {
+    let rawRuleset;
     // Read the user rules from a file.
     try {
       dprint("PolicyManager::loadUserRules loading user rules");
-      rawRuleset = rp.mod.RulesetStorage.loadRawRulesetFromFile("user.json");
+      rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
     } catch (e) {
       // TODO: log a message about missing user.json ruleset file.
       // There's no user ruleset. This is either because RP has just been
       // installed, the file has been deleted, or something is wrong. For now,
       // we'll assume this is a new install.
-      rawRuleset = new rp.mod.RawRuleset();
+      rawRuleset = new RawRuleset();
     }
-    this._userRulesets["user"] = {
+    userRulesets["user"] = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("user")
     };
-    this._userRulesets["user"]["ruleset"].userRuleset = true;
-    this._userRulesets["user"].ruleset.print();
+    userRulesets["user"]["ruleset"].userRuleset = true;
+    //userRulesets["user"].ruleset.print();
     // Temporary rules. These are never stored.
-    this.revokeTemporaryRules();
+    self.revokeTemporaryRules();
 
     notifyRulesChanged();
-  },
+  };
 
-  loadSubscriptionRules : function(subscriptionInfo) {
+  self.loadSubscriptionRules = function(subscriptionInfo) {
     var failures = {};
 
     // Read each subscription from a file.
@@ -128,7 +134,7 @@ PolicyManager.prototype = {
         try {
           dprint("PolicyManager::loadSubscriptionRules: " +
                  listName + ' / ' + subName);
-          rawRuleset = rp.mod.RulesetStorage
+          rawRuleset = RulesetStorage
               .loadRawRulesetFromFile(subName + ".json", listName);
         } catch (e) {
           warn("Unable to load ruleset from file: " + e);
@@ -138,40 +144,40 @@ PolicyManager.prototype = {
           failures[listName][subName] = null;
           continue;
         }
-        if (!this._subscriptionRulesets[listName]) {
-          this._subscriptionRulesets[listName] = {};
+        if (!subscriptionRulesets[listName]) {
+          subscriptionRulesets[listName] = {};
         }
-        var list = this._subscriptionRulesets[listName];
+        var list = subscriptionRulesets[listName];
         list[subName] = {
           "rawRuleset" : rawRuleset,
           "ruleset" : rawRuleset.toRuleset(subName)
         };
         list[subName]["ruleset"].userRuleset = false;
-        list[subName].ruleset.print();
+        //list[subName].ruleset.print();
       }
     }
 
     notifyRulesChanged();
 
     return failures;
-  },
+  };
 
-  unloadSubscriptionRules : function(subscriptionInfo) {
+  self.unloadSubscriptionRules = function(subscriptionInfo) {
     var failures = {};
 
     for (var listName in subscriptionInfo) {
       for (var subName in subscriptionInfo[listName]) {
         dprint("PolicyManager::unloadSubscriptionRules: " +
                  listName + ' / ' + subName);
-        if (!this._subscriptionRulesets[listName] ||
-            !this._subscriptionRulesets[listName][subName]) {
+        if (!subscriptionRulesets[listName] ||
+            !subscriptionRulesets[listName][subName]) {
           if (!failures[listName]) {
             failures[listName] = {};
           }
           failures[listName][subName] = null;
           continue;
         }
-        var list = this._subscriptionRulesets[listName];
+        var list = subscriptionRulesets[listName];
         delete list[subName];
       }
     }
@@ -179,24 +185,23 @@ PolicyManager.prototype = {
     notifyRulesChanged();
 
     return failures;
-  },
+  };
 
-  _assertRuleAction : function(ruleAction) {
-    if (ruleAction != rp.mod.RULE_ACTION_ALLOW &&
-        ruleAction != rp.mod.RULE_ACTION_DENY) {
+  function assertRuleAction(ruleAction) {
+    if (ruleAction != C.RULE_ACTION_ALLOW && ruleAction != C.RULE_ACTION_DENY) {
       throw "Invalid rule type: " + ruleAction;
     }
-  },
+  }
 
-  ruleExists : function(ruleAction, ruleData) {
-    this._assertRuleAction(ruleAction);
-    for (var name in this._userRulesets) {
-      if (this._userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
+  self.ruleExists = function(ruleAction, ruleData) {
+    assertRuleAction(ruleAction);
+    for (var name in userRulesets) {
+      if (userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
       }
     }
-    for (var listName in this._subscriptionRulesets) {
-      var rulesets = this._subscriptionRulesets[listName];
+    for (var listName in subscriptionRulesets) {
+      var rulesets = subscriptionRulesets[listName];
       for (var name in rulesets) {
         if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
@@ -204,17 +209,17 @@ PolicyManager.prototype = {
       }
     }
     return false;
-  },
+  };
 
-  addRule : function(ruleAction, ruleData, noStore) {
+  self.addRule = function(ruleAction, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleAction + " "
-           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
-    //this._userRulesets["user"].ruleset.print();
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets["user"].ruleset.print();
 
-    this._assertRuleAction(ruleAction);
+    assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    this._userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
-          this._userRulesets["user"].ruleset);
+    userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets["user"].ruleset);
 
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawRuleset.addRule()| to indicate whether a rule
@@ -222,48 +227,48 @@ PolicyManager.prototype = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        rp.mod.RulesetStorage.saveRawRulesetToFile(
-            this._userRulesets["user"].rawRuleset, "user.json");
+        RulesetStorage.saveRawRulesetToFile(
+            userRulesets["user"].rawRuleset, "user.json");
     }
 
-    //this._userRulesets["user"].ruleset.print();
+    //userRulesets["user"].ruleset.print();
 
     notifyRulesChanged();
-  },
+  };
 
-  storeRules : function() {
-    rp.mod.RulesetStorage.saveRawRulesetToFile(
-        this._userRulesets["user"].rawRuleset, "user.json");
-  },
+  self.storeRules = function() {
+    RulesetStorage.saveRawRulesetToFile(
+        userRulesets["user"].rawRuleset, "user.json");
+  };
 
-  addTemporaryRule : function(ruleAction, ruleData) {
+  self.addTemporaryRule = function(ruleAction, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
-           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
-    //this._userRulesets["temp"].ruleset.print();
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets["temp"].ruleset.print();
 
-    this._assertRuleAction(ruleAction);
+    assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    this._userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
-          this._userRulesets["temp"].ruleset);
+    userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets["temp"].ruleset);
 
-    //this._userRulesets["temp"].ruleset.print();
+    //userRulesets["temp"].ruleset.print();
 
     notifyRulesChanged();
-  },
+  };
 
-  removeRule : function(ruleAction, ruleData, noStore) {
+  self.removeRule = function(ruleAction, ruleData, noStore) {
     dprint("PolicyManager::removeRule " + ruleAction + " "
-           + rp.mod.Ruleset.rawRuleToCanonicalString(ruleData));
-    //this._userRulesets["user"].ruleset.print();
-    //this._userRulesets["temp"].ruleset.print();
+           + Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets["user"].ruleset.print();
+    //userRulesets["temp"].ruleset.print();
 
-    this._assertRuleAction(ruleAction);
+    assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    this._userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
-          this._userRulesets["user"].ruleset);
-    this._userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
-          this._userRulesets["temp"].ruleset);
+    userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets["user"].ruleset);
+    userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets["temp"].ruleset);
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawRuleset.removeRule()| to indicate whether a rule
@@ -271,46 +276,46 @@ PolicyManager.prototype = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        rp.mod.RulesetStorage.saveRawRulesetToFile(
-              this._userRulesets["user"].rawRuleset, "user.json");
+        RulesetStorage.saveRawRulesetToFile(
+            userRulesets["user"].rawRuleset, "user.json");
     }
 
-    //this._userRulesets["user"].ruleset.print();
-    //this._userRulesets["temp"].ruleset.print();
+    //userRulesets["user"].ruleset.print();
+    //userRulesets["temp"].ruleset.print();
 
     notifyRulesChanged();
-  },
+  };
 
-  temporaryRulesExist : function() {
-    return this._userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
-           this._userRulesets["temp"].rawRuleset.getDenyRuleCount();
-  },
+  self.temporaryRulesExist = function() {
+    return userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
+           userRulesets["temp"].rawRuleset.getDenyRuleCount();
+  };
 
-  revokeTemporaryRules : function() {
-    var rawRuleset = new rp.mod.RawRuleset();
-    this._userRulesets["temp"] = {
+  self.revokeTemporaryRules = function() {
+    var rawRuleset = new RawRuleset();
+    userRulesets["temp"] = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("temp")
     };
-    this._userRulesets["temp"]["ruleset"].userRuleset = true;
+    userRulesets["temp"]["ruleset"].userRuleset = true;
 
     notifyRulesChanged();
-  },
+  };
 
-  checkRequestAgainstUserRules : function(origin, dest) {
-    return this._checkRequest(origin, dest, this._userRulesets);
-  },
+  self.checkRequestAgainstUserRules = function(origin, dest) {
+    return checkRequest(origin, dest, userRulesets);
+  };
 
-  checkRequestAgainstSubscriptionRules : function(origin, dest) {
-    var result = new rp.mod.RequestResult();
-    for (var listName in this._subscriptionRulesets) {
-      var ruleset = this._subscriptionRulesets[listName];
-      this._checkRequest(origin, dest, ruleset, result);
+  self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
+    var result = new RequestResult();
+    for (var listName in subscriptionRulesets) {
+      var ruleset = subscriptionRulesets[listName];
+      checkRequest(origin, dest, ruleset, result);
     }
     return result;
-  },
+  };
 
-  _checkRequest : function(origin, dest, aRuleset, result) {
+  function checkRequest(origin, dest, aRuleset, result) {
     if (!(origin instanceof Ci.nsIURI)) {
       throw "Origin must be an nsIURI.";
     }
@@ -318,7 +323,7 @@ PolicyManager.prototype = {
       throw "Destination must be an nsIURI.";
     }
     if (!result) {
-      result = new rp.mod.RequestResult();
+      result = new RequestResult();
     }
     for (var i in aRuleset) {
       var ruleset = aRuleset[i].ruleset;
@@ -337,6 +342,11 @@ PolicyManager.prototype = {
       }
     }
     return result;
-  }
+  };
 
-};
+  return self;
+}(PolicyManager || {}));
+
+
+Services.scriptloader.loadSubScript(
+    "chrome://requestpolicy/content/lib/policy-manager.alias-functions.js");

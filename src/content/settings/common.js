@@ -1,23 +1,36 @@
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/subscription.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/policy-manager.jsm");
 
-Components.utils.import("resource://gre/modules/Services.jsm");
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
 
-var rpService = Components.classes["@requestpolicy.com/requestpolicy-service;1"]
-    .getService().wrappedJSObject;
+Cu.import("resource://gre/modules/Services.jsm");
 
-var observerService = Components.classes["@mozilla.org/observer-service;1"]
-    .getService(Components.interfaces.nsIObserverService);
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/utils/constants",
+  "lib/utils/strings",
+  "lib/prefs",
+  "lib/utils/domains",
+  "lib/logger",
+  "lib/subscription",
+  "lib/policy-manager",
+  "main/requestpolicy-service",
+  "lib/environment"
+], this);
 
-var stringBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"]
-    .getService(Components.interfaces.nsIStringBundleService);
-strbundle = stringBundleService.createBundle(
-    "chrome://requestpolicy/locale/requestpolicy.properties");
+// create a new Environment for this window
+var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
+// The Environment has to be shut down when the content window gets unloaded.
+WinEnv.shutdownOnUnload(window);
+// start up right now, as there won't be any startup functions
+WinEnv.startup();
+var elManager = WinEnv.elManager;
 
-const COMMON_STRINGS = [
+
+var $id = window.document.getElementById.bind(window.document);
+
+
+var COMMON_STRINGS = [
   'preferences',
   'managePolicies',
   'about',
@@ -27,14 +40,7 @@ const COMMON_STRINGS = [
 ];
 
 
-function _(msg, args) {
-  if (args) {
-    args = Array.prototype.slice.call(arguments, 1);
-    return strbundle.formatStringFromName(msg, args, args.length);
-  } else {
-    return strbundle.GetStringFromName(msg);
-  }
-}
+var $str = StringUtils.$str;
 
 var common = {};
 
@@ -48,8 +54,8 @@ var common = {};
 common.switchSubscriptionPolicies = function () {
   var subscriptions = new UserSubscriptions();
 
-  var newDefaultPolicy = rpService._defaultAllow ? 'allow' : 'deny';
-  var oldDefaultPolicy = rpService._defaultAllow ? 'deny' : 'allow';
+  var newDefaultPolicy = Prefs.isDefaultAllow() ? 'allow' : 'deny';
+  var oldDefaultPolicy = Prefs.isDefaultAllow() ? 'deny' : 'allow';
 
   var oldSubInfo = subscriptions.getSubscriptionInfo(oldDefaultPolicy);
   for (var listName in oldSubInfo) {
@@ -60,7 +66,7 @@ common.switchSubscriptionPolicies = function () {
       var subInfo = {};
       subInfo[listName] = {};
       subInfo[listName][subName] = true;
-      observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo));
     }
   }
@@ -74,7 +80,7 @@ common.switchSubscriptionPolicies = function () {
       var subInfo = {};
       subInfo[listName] = {};
       subInfo[listName][subName] = true;
-      observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo));
     }
   }
@@ -172,8 +178,7 @@ common.getOldRulesAsNewRules = function (addHostWildcard) {
 
 common.getPrefObj = function (pref) {
   try {
-    var value = rpService.prefs
-        .getComplexValue(pref, Components.interfaces.nsISupportsString).data;
+    var value = prefs.getComplexValue(pref, Ci.nsISupportsString).data;
   } catch (e) {
     value = '';
   }
@@ -193,34 +198,31 @@ common.prefStringToObj = function (prefString) {
 
 common.clearPref = function (pref) {
   try {
-    if (rpService.prefs.prefHasUserValue(pref)) {
-      rpService.prefs.clearUserPref(pref);
+    if (rpPrefBranch.prefHasUserValue(pref)) {
+      rpPrefBranch.clearUserPref(pref);
     }
   } catch (e) {
     Logger.dump('Clearing pref failed: ' + e.toString());
   }
-  rpService._prefService.savePrefFile(null);
+  Services.prefs.savePrefFile(null);
 };
 
 common.addAllowRules = function (rules) {
   for (var i in rules) {
     var ruleData = rules[i];
-    rpService.addAllowRule(ruleData, true);
+    PolicyManager.addAllowRule(ruleData, true);
   }
-  rpService.storeRules();
+  PolicyManager.storeRules();
 };
 
 common.localize = function(stringNames) {
   stringNames.forEach(function(name) {
     $('[data-string="' + name + '"]').each(function () {
-      $(this).text(_(name));
+      $(this).text($str(name));
     });
   });
 };
 
-
-Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/settings/common.observer-manager.js", this);
 
 
 $(function() {

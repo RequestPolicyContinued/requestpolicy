@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,37 +21,44 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// if (!rp) {
-//   var rp = {mod : {}};
-// }
-//
-// Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-// Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-// Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
-// Components.utils.import("chrome://requestpolicy/content/lib/request-util.jsm", rp.mod);
-// Components.utils.import("chrome://requestpolicy/content/lib/policy-manager.jsm",
-//     rp.mod);
 
-requestpolicy.classicmenu = {
+
+
+requestpolicy.classicmenu = (function() {
+  let self = {};
+
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cu = Components.utils;
+
+
+  let {ScriptLoader} = (function() {
+    let mod = {};
+    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    return mod;
+  }());
+  let {rpPrefBranch} = ScriptLoader.importModule("lib/prefs");
+  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
+
 
   /**
   * Reloads the current document if the user's preferences indicate it should
   * be reloaded.
   */
-  _conditionallyReloadDocument : function() {
-    if (requestpolicy.overlay._rpService.prefs.getBoolPref("autoReload")) {
+  self._conditionallyReloadDocument = function() {
+    if (rpPrefBranch.getBoolPref("autoReload")) {
       content.document.location.reload(false);
     }
-  },
+  };
 
 
-  addMenuSeparator : function(menu) {
+  self.addMenuSeparator = function(menu) {
     var separator = document.createElement("menuseparator");
     menu.insertBefore(separator, menu.firstChild);
     return separator;
-  },
+  };
 
-  addMenuItem : function(menu, label, oncommand) {
+  self.addMenuItem = function(menu, label, oncommand) {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     oncommand = oncommand +
@@ -60,68 +67,65 @@ requestpolicy.classicmenu = {
     // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
     menu.insertBefore(menuItem, menu.firstChild);
     return menuItem;
-  },
+  };
 
 
-  addMenuItemTemporarilyAllowOrigin : function(menu, originHost) {
-    var label = requestpolicy.menu._strbundle.
-        getFormattedString("allowOriginTemporarily", [originHost]);
+  self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
+    var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
     var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
-    var item = this.addMenuItem(menu, label, command);
+    var item = self.addMenuItem(menu, label, command);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
-  },
+  };
 
-  addMenuItemAllowOrigin : function(menu, originHost) {
-    var label = requestpolicy.menu._strbundle.
-        getFormattedString("allowOrigin", [originHost]);
+  self.addMenuItemAllowOrigin = function(menu, originHost) {
+    var label = StringUtils.$str("allowOrigin", [originHost]);
     var command = "requestpolicy.overlay.allowOrigin('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
-    return this.addMenuItem(menu, label, command);
-  },
+    return self.addMenuItem(menu, label, command);
+  };
 
 
-  addMenuItemTemporarilyAllowOriginToDest : function(menu, originHost,
+  self.addMenuItemTemporarilyAllowOriginToDest = function(menu, originHost,
                                                      destHost) {
-    var label = requestpolicy.menu._strbundle.getFormattedString(
-        "allowOriginToDestinationTemporarily", [originHost, destHost]);
+    var label = StringUtils.$str("allowOriginToDestinationTemporarily",
+                                 [originHost, destHost]);
     var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-    var item = this.addMenuItem(menu, label, command);
+    var item = self.addMenuItem(menu, label, command);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
-  },
+  };
 
-  addMenuItemAllowOriginToDest : function(menu, originHost, destHost) {
-    var label = requestpolicy.menu._strbundle.getFormattedString(
-        "allowOriginToDestination", [originHost, destHost]);
+  self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
+    var label = StringUtils.$str("allowOriginToDestination",
+                                 [originHost, destHost]);
     var command = "requestpolicy.overlay.allowOriginToDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-    var item = this.addMenuItem(menu, label, command);
+    var item = self.addMenuItem(menu, label, command);
     item.setAttribute("class", "requestpolicyAllowOriginToDest");
     return item;
-  },
+  };
 
 
-  addMenuItemTemporarilyAllowDest : function(menu, destHost) {
-    var label = requestpolicy.menu._strbundle.
-        getFormattedString("allowDestinationTemporarily", [destHost]);
+  self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
+    var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
     var command = "requestpolicy.overlay.temporarilyAllowDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-    var item = this.addMenuItem(menu, label, command);
+    var item = self.addMenuItem(menu, label, command);
     item.setAttribute("class", "requestpolicyTemporary");
     return item;
-  },
+  };
 
-  addMenuItemAllowDest : function(menu, destHost) {
-    var label = requestpolicy.menu._strbundle.
-        getFormattedString("allowDestination", [destHost]);
+  self.addMenuItemAllowDest = function(menu, destHost) {
+    var label = StringUtils.$str("allowDestination", [destHost]);
     var command = "requestpolicy.overlay.allowDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
-    return this.addMenuItem(menu, label, command);
-  }
+    return self.addMenuItem(menu, label, command);
+  };
 
-}
+  return self;
+}());

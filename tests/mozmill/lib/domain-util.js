@@ -51,5 +51,23 @@ var DomainUtil = exports.DomainUtil = (function() {
     return !self.isSameDomain(dom1, dom2);
   };
 
+  self.stripFilenameFromURL = function(aURL) {
+    return /^(.*\/)[^/]*$/.exec(aURL)[1];
+  };
+
+  self.isAbsoluteURL = function(aURL) {
+    return /^[a-zA-Z][a-zA-Z0-9+-.]*:\/\//.test(aURL);
+  };
+
+  self.getAbsoluteURL = function(aURL, aReferenceURL) {
+    if (self.isAbsoluteURL(aURL)) {
+      return aURL;
+    }
+
+    // this function does not consider all types of relative URIs !
+    // see http://tools.ietf.org/html/std66#appendix-A
+    return self.stripFilenameFromURL(aReferenceURL) + aURL;
+  };
+
   return self;
 }());

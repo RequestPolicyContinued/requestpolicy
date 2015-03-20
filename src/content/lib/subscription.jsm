@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "UserSubscriptions",
   "SubscriptionList",
   "Subscription",
@@ -30,11 +34,15 @@ var EXPORTED_SYMBOLS = [
   "SUBSCRIPTION_REMOVED_TOPIC"
 ];
 
-Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm");
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset-storage.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
 
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/logger",
+  "lib/ruleset",
+  "lib/utils/files",
+  "lib/ruleset-storage"
+], this);
 
 const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';
 const SUBSCRIPTION_ADDED_TOPIC = 'requestpolicy-subscription-policy-added';
@@ -47,16 +55,11 @@ const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
 const SUBSCRIPTION_UPDATE_FAILURE = 'FAILURE';
 
 
-var observerService = Components.classes["@mozilla.org/observer-service;1"].
-      getService(Components.interfaces.nsIObserverService);
-
 
 function setTimeout(func, delay) {
-  var timer = Components.classes["@mozilla.org/timer;1"]
-        .createInstance(Components.interfaces.nsITimer);
+  var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   var event = {notify: function() { func() }};
-  timer.initWithCallback(event, delay,
-        Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+  timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
   return timer;
 }
 
@@ -81,11 +84,9 @@ function dwarn(msg) {
 function UserSubscriptions() {
   var userSubsFile = FileUtil.getRPUserDir();
   userSubsFile.appendRelativePath('subscriptions.json');
-  try {
-    var jsonData = FileUtil.fileToString(userSubsFile);
-  } catch (e) {
-    // TODO: make sure this is NS_ERROR_FILE_NOT_FOUND
-    jsonData = '{}';
+  let jsonData = '{}';
+  if (userSubsFile.exists()) {
+    jsonData = FileUtil.fileToString(userSubsFile);
   }
   this._data = JSON.parse(jsonData);
   if (!this._data['lists']) {
@@ -228,7 +229,7 @@ UserSubscriptions.prototype = {
       }
       updateResults[listName] = {};
 
-      function metadataSuccess(list) {
+      let metadataSuccess = function(list) {
         function subSuccess(sub, status) {
           dprint('Successfully updated subscription ' + sub.toString());
           recordDone(list._name, sub._name, status);
@@ -242,9 +243,9 @@ UserSubscriptions.prototype = {
 
         dprint('Successfully updated list ' + list.toString());
         list.updateSubscriptions(updateSubs, subSuccess, subError);
-      }
+      };
 
-      function metadataError(list, error) {
+      let metadataError = function(list, error) {
         dprint('Failed to update list: ' + list.toString() + ': ' + error);
         updateResults[listName] = false;
         recordDone(list._name);
@@ -424,8 +425,8 @@ Subscription.prototype = {
         var subInfo = {};
         subInfo[self._list] = {};
         subInfo[self._list][self._name] = true;
-        observerService.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
-              JSON.stringify(subInfo));
+        Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
+            JSON.stringify(subInfo));
         setTimeout(function () {
               successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);

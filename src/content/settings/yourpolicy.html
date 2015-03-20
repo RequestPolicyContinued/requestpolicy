@@ -2,10 +2,11 @@
 <html>
 <head>
   <title>RequestPolicy - Your Policy</title>
-  <script src="jquery.min.js"></script>
-  <script src="common.js"></script>
-  <script src="yourpolicy.js"></script>
-  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <script src="chrome://requestpolicy/content/settings/jquery.min.js"></script>
+  <script src="chrome://requestpolicy/content/settings/common.js"></script>
+  <script src="chrome://requestpolicy/content/settings/yourpolicy.js"></script>
+  <link href="chrome://requestpolicy/content/settings/settings.css"
+        rel="stylesheet" type="text/css"/>
 </head>
 <body onload="onload()">
 <table>
@@ -16,17 +17,24 @@
         <div id="requestpolicy">RequestPolicy</div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="basicprefs.html" data-string="preferences"></a></li>
-            <li><a href="yourpolicy.html" selected="true" data-string="managePolicies"></a></li>
-            <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers" data-string="help" target="_blank"></a></li>
-            <li><a href="https://requestpolicycontinued.github.io/#about" data-string="about" target="_blank"></a></li>
+            <li><a href="about:requestpolicy?basicprefs"
+                   data-string="preferences"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy" selected="true"
+                   data-string="managePolicies"></a></li>
+            <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers"
+                   data-string="help" target="_blank"></a></li>
+            <li><a href="https://requestpolicycontinued.github.io/#about"
+                   data-string="about" target="_blank"></a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="yourpolicy.html" selected="true" data-string="yourPolicy"></a></li>
-            <li><a href="defaultpolicy.html" data-string="defaultPolicy"></a></li>
-            <li><a href="subscriptions.html" data-string="subscriptions"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy" selected="true"
+                   data-string="yourPolicy"></a></li>
+            <li><a href="about:requestpolicy?defaultpolicy"
+                   data-string="defaultPolicy"></a></li>
+            <li><a href="about:requestpolicy?subscriptions"
+                   data-string="subscriptions"></a></li>
           </ul>
         </div>
       </div>
@@ -39,7 +47,8 @@
         <h2>Create Rule</h2>
           <div id="addrule">
             <p>
-              <a href="https://www.requestpolicy.com/help-rules.html" target="_blank" data-string="learnMoreAboutRules"></a>
+              <a href="https://www.requestpolicy.com/help-rules.html"
+                 target="_blank" data-string="learnMoreAboutRules"></a>
             </p>
             <form id="addruleform" onsubmit="return false;">
               <ul>
@@ -49,11 +58,13 @@
                 <li class="rule-action">
                   <label class="allow">
                     <span data-string="allow"></span>
-                    <input type="radio" name="allowdeny" id="allowrule" value="allow" checked="checked"/>
+                    <input type="radio" name="allowdeny" id="allowrule"
+                           value="allow" checked="checked"/>
                   </label>
                   <label class="block">
                     <span data-string="block"></span>
-                    <input type="radio" name="allowdeny" id="denyrule" value="deny"/>
+                    <input type="radio" name="allowdeny" id="denyrule"
+                           value="deny"/>
                   </label>
                 </li>
                 <li class="input-label">

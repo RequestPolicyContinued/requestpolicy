@@ -1,0 +1,3 @@
+<IfModule mod_alias.c>
+Redirect 301 /favicon.ico http://www.otherdomain.test/subdirectory/flag-gray.png
+</IfModule>

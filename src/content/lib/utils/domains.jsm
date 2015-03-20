@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["DomainUtil"];
+
+Cu.import("resource://gre/modules/Services.jsm");
+
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules(["lib/logger"], this);
+
 /*
  * It's worth noting that many of the functions in this module will convert ACE
  * formatted IDNs to UTF8 formatted values. This is done automatically when
@@ -28,24 +39,9 @@
  * which Mozilla supports UTF8 IDNs.
  */
 
-var EXPORTED_SYMBOLS = ["DomainUtil"]
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
 
 var DomainUtil = {};
-
-DomainUtil._ios = Cc["@mozilla.org/network/io-service;1"]
-    .getService(Ci.nsIIOService);
-
-DomainUtil._eTLDService = Cc["@mozilla.org/network/effective-tld-service;1"]
-    .getService(Ci.nsIEffectiveTLDService);
 
 DomainUtil._idnService = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);
@@ -102,15 +98,10 @@ DomainUtil.getIdentifier = function(uri, level) {
       var identifier = uri.split(",")[0];
       return identifier.split(";")[0];
     }
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL,
-        "Unable to getIdentifier from uri " + uri + " using identifier level "
-            + level + ".");
+    Logger.info(Logger.TYPE_INTERNAL, "Unable to getIdentifier from uri " +
+        uri + " using identifier level " + level + ".");
     return uri;
   }
-};
-
-DomainUtil.identifierIsInUri = function(identifier, uri, level) {
-  return identifier == this.getIdentifier(uri, level);
 };
 
 /**
@@ -136,13 +127,16 @@ DomainUtil.getHost = function(uri) {
  *         exception if it is an invalid uri.
  */
 DomainUtil.getUriObject = function(uri) {
+  // fixme: if `uri` is relative, `newURI()` throws NS_ERROR_MALFORMED_URI.
+  // possible solution: use nsIURI.resolve() instead for relative uris
+
   // Throws an exception if uri is invalid.
   try {
-    return this._ios.newURI(uri, null, null);
+    return Services.io.newURI(uri, null, null);
   } catch (e) {
     var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> "
       + ". Exception was: " + e;
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_INTERNAL, msg);
+    Logger.info(Logger.TYPE_INTERNAL, msg);
     throw e;
   }
 };
@@ -170,11 +164,11 @@ DomainUtil.isValidUri = function(uri) {
  *          uri The uri.
  * @return {String} The domain of the uri.
  */
-DomainUtil.getDomain = function(uri) {
+DomainUtil.getBaseDomain = function(uri) {
   var host = this.getHost(uri);
   try {
     // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
-    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
     // Note: we use convertToDisplayIDN rather than convertACEtoUTF8() because
     // we want to only convert IDNs that that are in Mozilla's IDN whitelist.
     // The second argument will have the property named "value" set to true if
@@ -200,7 +194,7 @@ DomainUtil.getDomain = function(uri) {
  */
 DomainUtil.isIPAddress = function(host) {
   try {
-    var baseDomain = this._eTLDService.getBaseDomainFromHost(host, 0);
+    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
   } catch (e) {
     if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return true;
@@ -233,63 +227,8 @@ DomainUtil.getPrePath = function(uri) {
   return this.getUriObject(uri).prePath;
 };
 
-/**
- * Strips any "www." from the beginning of a hostname.
- *
- * @param {String}
- *          hostname The hostname to strip.
- * @return {String} The hostname with any leading "www." removed.
- */
-DomainUtil.stripWww = function(hostname) {
-  return hostname.indexOf('www.') == 0 ? hostname.substring(4) : hostname;
-};
-
-/**
- * Determine if two hostnames are the same if any "www." prefix is ignored.
- *
- * @param {String}
- *          destinationHost The destination hostname.
- * @param {String}
- *          originHost The origin hostname.
- * @return {Boolean} True if the hostnames are the same regardless of "www.",
- *         false otherwise.
- */
-DomainUtil.sameHostIgnoreWww = function(destinationHost, originHost) {
-  return destinationHost
-      && this.stripWww(destinationHost) == this.stripWww(originHost);
-
-};
-
 DomainUtil.stripFragment = function(uri) {
   return uri.split("#")[0];
-};
-
-/**
- * Determine if the destination hostname is a subdomain of the origin hostname,
- * ignoring any "www." that may exist in the origin hostname. That is,
- * "images.example.com" is subdomain of both "www.example.com" and
- * "example.com", but "www.example.com " and "example.com" are not subdomains of
- * "images.example.com".
- *
- * @param {String}
- *          destinationHost The destination hostname.
- * @param {String}
- *          originHost The origin hostname.
- * @return {Boolean} True if the destination hostname is a subdomain of the
- *         origin hostname.
- */
-DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
-    originHost) {
-  var destHostNoWww = this.stripWww(destinationHost);
-  var originHostNoWww = this.stripWww(originHost);
-
-  var lengthDifference = destHostNoWww.length - originHostNoWww.length;
-  if (lengthDifference > 1) {
-    if (destHostNoWww.substring(lengthDifference - 1) == '.' + originHostNoWww) {
-      return true;
-    }
-  }
-  return false;
 };
 
 // TODO: Maybe this should have a different home.
@@ -298,9 +237,9 @@ DomainUtil.destinationIsSubdomainOfOrigin = function(destinationHost,
  *
  * @param {String}
  *          refreshString The original content of a refresh header or meta tag.
- * @return {Array} First element is the delay in seconds, second element is the
- *         url to refresh to. The url may be an empty string if the current url
- *         should be refreshed.
+ * @return {Object} The delay in seconds and the url to refresh to.
+ *                  The url may be an empty string if the current url should be
+ *                  refreshed.
  * @throws Generic
  *           exception if the refreshString has an invalid format, including if
  *           the seconds can't be parsed as a float.
@@ -323,7 +262,7 @@ DomainUtil.parseRefresh = function(refreshString) {
       url = url.substring(1, url.length - 1);
     }
   }
-  return [delay, url];
+  return {delay: delay, destURI: url};
 }
 
 /**

@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,17 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["RulesetStorage"];
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = ["RulesetStorage"];
+
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/ruleset",
+  "lib/utils/files"
+], this);
 
 
-if (!rp) {
-  var rp = {mod : {}};
-}
-
-Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm", rp.mod);
-
-var RulesetStorage = {
+let RulesetStorage = {
 
   /**
    * @return {RawRuleset}
@@ -40,7 +43,7 @@ var RulesetStorage = {
         /**string*/ subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
-    var policyFile = rp.mod.FileUtil.getRPUserDir("policies");
+    var policyFile = FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {
@@ -48,9 +51,17 @@ var RulesetStorage = {
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
-    var str = rp.mod.FileUtil.fileToString(policyFile);
-    var rawRuleset = new rp.mod.RawRuleset(str);
-    return rawRuleset;
+    // Important note: Do not catch the error thrown by the fileToString!
+    // There is no check for the existence of the file, because
+    // loadSubscriptionRules catches errors and then knows if a file
+    // existed or not. This is a bad implementation.
+    // TODO: solve this mess
+    let str = FileUtil.fileToString(policyFile);
+    //let str;
+    //if (policyFile.exists()) {
+    //  str = FileUtil.fileToString(policyFile);
+    //}
+    return new RawRuleset(str);
   },
 
   saveRawRulesetToFile : function(/**RawRuleset*/ policy, /**string*/ filename,
@@ -58,13 +69,13 @@ var RulesetStorage = {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
     if (subscriptionListName) {
-      var policyFile = rp.mod.FileUtil.getRPUserDir("policies",
+      var policyFile = FileUtil.getRPUserDir("policies",
             'subscriptions', subscriptionListName);
     } else {
-      var policyFile = rp.mod.FileUtil.getRPUserDir("policies");
+      var policyFile = FileUtil.getRPUserDir("policies");
     }
     policyFile.appendRelativePath(filename);
-    rp.mod.FileUtil.stringToFile(JSON.stringify(policy), policyFile);
+    FileUtil.stringToFile(JSON.stringify(policy), policyFile);
   }
 
 };

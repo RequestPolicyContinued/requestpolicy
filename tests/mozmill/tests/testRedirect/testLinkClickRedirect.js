@@ -4,12 +4,15 @@
 
 "use strict";
 
-var {assert, expect} = require("../../../../../../lib/assertions");
-var prefs = require("../../../../../lib/prefs");
-var tabs = require("../../../../../lib/tabs");
+var rpRootDir = "../../";
+var rpConst = require(rpRootDir + "lib/constants");
+var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 
-var rpUtils = require("../../lib/rp-utils");
-var rpConst = require("../../lib/constants");
+var {assert, expect} = require(rootDir + "lib/assertions");
+var prefs = require(rootDir + "lib/prefs");
+var tabs = require(rootDir + "firefox/lib/tabs");
+
+var rpUtils = require(rpRootDir + "lib/rp-utils");
 
 var testURLs = [
   "http://www.maindomain.test/redirect-js-document-location-link.html",
@@ -22,11 +25,11 @@ var setupModule = function(aModule) {
   aModule.tabBrowser = new tabs.tabBrowser(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 
-  prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
+  prefs.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
 }
 
 var teardownModule = function(aModule) {
-  prefs.preferences.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
+  prefs.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
   aModule.tabBrowser.closeAllTabs();
 }
 
@@ -61,15 +64,25 @@ var testLinkClickRedirect = function() {
           '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
       if (redirectShouldBeAllowed) {
+        // fixme: find a better waitFor-function that ensures that the part of
+        //        RP which is responsible for showing the panel *really* has
+        //        finished.
         controller.waitFor(function() {
             return controller.window.content.document.location.href !== url;
         }, "The URL in the urlbar has changed.");
-        assert.ok(!panel.exists(), "The redirect has been allowed.");
+        expect.ok(!panel.exists(), "The redirect notification bar is hidden.");
       } else {
-        assert.ok(panel.exists(), "The redirect has been blocked.");
+        controller.waitFor((() => panel.exists()), "The redirect " +
+                           "notification bar has been displayed.");
       }
 
       tabBrowser.closeAllTabs();
+
+      // It's necessary to wait for the notification panel to be closed. If we
+      // don't wait for that to happen, the next URL in urlsWithRedirect might
+      // already be displayed while the panel is still there.
+      controller.waitFor((() => !panel.exists()), "No panel is being " +
+                         "displayed because all tabs have been closed.");
     }
   }
 }

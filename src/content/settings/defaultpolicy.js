@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'yourPolicy',
   'defaultPolicy',
   'subscriptions',
@@ -15,63 +15,65 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
-var prefsChangedObserver = null;
+Cu.import("resource://gre/modules/Services.jsm");
 
 
 function updateDisplay() {
-  var defaultallow = rpService.prefs.getBoolPref('defaultPolicy.allow');
+  var defaultallow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
   if (defaultallow) {
-    document.getElementById('defaultallow').checked = true;
-    document.getElementById('defaultdenysetting').hidden = true;
+    $id('defaultallow').checked = true;
+    $id('defaultdenysetting').hidden = true;
   } else {
-    document.getElementById('defaultdeny').checked = true;
-    document.getElementById('defaultdenysetting').hidden = false;
+    $id('defaultdeny').checked = true;
+    $id('defaultdenysetting').hidden = false;
   }
 
-  var allowsamedomain = rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain');
-  document.getElementById('allowsamedomain').checked = allowsamedomain;
+  var allowsamedomain = rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
+  $id('allowsamedomain').checked = allowsamedomain;
 }
 
 function showManageSubscriptionsLink() {
-  document.getElementById('subscriptionschanged').style.display = 'block';
+  $id('subscriptionschanged').style.display = 'block';
 }
 
 function onload() {
   updateDisplay();
 
-  document.getElementById('defaultallow').addEventListener('change',
+  elManager.addListener(
+      $id('defaultallow'), 'change',
       function (event) {
         var allow = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allow', allow);
-        rpService._prefService.savePrefFile(null);
+        rpPrefBranch.setBoolPref('defaultPolicy.allow', allow);
+        Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
         common.switchSubscriptionPolicies();
         updateDisplay();
         showManageSubscriptionsLink();
-      }
-  );
-  document.getElementById('defaultdeny').addEventListener('change',
+      });
+
+  elManager.addListener(
+      $id('defaultdeny'), 'change',
       function (event) {
         var deny = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allow', !deny);
-        rpService._prefService.savePrefFile(null);
+        rpPrefBranch.setBoolPref('defaultPolicy.allow', !deny);
+        Services.prefs.savePrefFile(null);
         // Reload all subscriptions because it's likely that different
         // subscriptions will now be active.
         common.switchSubscriptionPolicies();
         updateDisplay();
         showManageSubscriptionsLink();
-      }
-  );
-  document.getElementById('allowsamedomain').addEventListener('change',
+      });
+
+  elManager.addListener(
+      $id('allowsamedomain'), 'change',
       function (event) {
         var allowSameDomain = event.target.checked;
-        rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
+        rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
             allowSameDomain);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+        Services.prefs.savePrefFile(null);
+      });
 
   // call updateDisplay() every time a preference gets changed
-  ObserverManager.observePrefChanges(updateDisplay);
+  WinEnv.obMan.observePrefChanges(updateDisplay);
 }

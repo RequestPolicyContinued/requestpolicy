@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,33 +21,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = [
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cu = Components.utils;
+
+let EXPORTED_SYMBOLS = [
   "Request",
   "NormalRequest",
   "RedirectRequest",
-
   "REQUEST_TYPE_NORMAL",
   "REQUEST_TYPE_REDIRECT"
 ];
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+
+Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+ScriptLoader.importModules([
+  "lib/logger",
+  "lib/utils/domains",
+  "lib/utils/windows",
+  "lib/utils"
+], this);
+
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
 
 
-if (!rp) {
-  var rp = {mod : {}};
-}
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm", rp.mod);
-
-
-
 
 function Request(originURI, destURI, requestType) {
+  // TODO: save a nsIURI objects here instead of strings
   this.originURI = originURI;
   this.destURI = destURI;
   this.requestType = requestType;
@@ -100,14 +103,12 @@ NormalRequest.prototype.constructor = Request;
 
 NormalRequest.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
-  this.aRequestOrigin = rp.mod.DomainUtil.
-          getUriObject(originURI);
+  this.aRequestOrigin = DomainUtil.getUriObject(originURI);
 };
 
 NormalRequest.prototype.setDestURI = function(destURI) {
   this.destURI = destURI;
-  this.aContentLocation = rp.mod.DomainUtil.
-      getUriObject(destURI);
+  this.aContentLocation = DomainUtil.getUriObject(destURI);
 };
 
 NormalRequest.prototype.detailsToString = function() {
@@ -130,10 +131,14 @@ NormalRequest.prototype.detailsToString = function() {
   *         resources.
   */
 NormalRequest.prototype.isInternal = function() {
+  // TODO: investigate "moz-nullprincipal". The following comment has been
+  //       created by @jsamuel in 2008, commit 46a04bb. More information about
+  //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
+  //
   // Note: Don't OK the origin scheme "moz-nullprincipal" without further
-  // understanding. It appears to be the source when test8.html is used. That
-  // is, javascript redirect to a "javascript:" url that creates the entire
-  // page's content which includes a form that it submits. Maybe
+  // understanding. It appears to be the source when the `js_1.html` test is
+  // used. That is, javascript redirect to a "javascript:" url that creates the
+  // entire page's content which includes a form that it submits. Maybe
   // "moz-nullprincipal" always shows up when using "document.location"?
 
   // Not cross-site requests.
@@ -146,10 +151,14 @@ NormalRequest.prototype.isInternal = function() {
       || this.aContentLocation.scheme == "blob"
       || this.aContentLocation.scheme == "wyciwyg"
       || this.aContentLocation.scheme == "javascript") {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request with an internal destination.");
     return true;
   }
 
   if (this.aRequestOrigin === undefined || this.aRequestOrigin === null) {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request without an origin.");
     return true;
   }
 
@@ -157,7 +166,7 @@ NormalRequest.prototype.isInternal = function() {
     // The spec can be empty if odd things are going on, like the Refcontrol
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
+    Logger.info(Logger.TYPE_CONTENT,
         "Allowing request with empty aRequestOrigin spec!");
     return true;
   }
@@ -167,7 +176,7 @@ NormalRequest.prototype.isInternal = function() {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
-    rp.mod.Logger.info(rp.mod.Logger.TYPE_CONTENT,
+    Logger.info(Logger.TYPE_CONTENT,
         "Allowing request with no asciiHost on either aRequestOrigin <" +
         this.aRequestOrigin.spec + "> or aContentLocation <" +
         this.aContentLocation.spec + ">");
@@ -200,12 +209,16 @@ NormalRequest.prototype.isInternal = function() {
 };
 
 /**
- * Get the nsIDOMWindow related to this request.
+ * Get the content window (nsIDOMWindow) related to this request.
  */
-NormalRequest.prototype.getWindow = function() {
+NormalRequest.prototype.getContentWindow = function() {
   let context = this.aContext;
   if (!context) {
     return null;
+  }
+
+  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
+    return context.contentWindow;
   }
 
   let win;
@@ -225,6 +238,30 @@ NormalRequest.prototype.getWindow = function() {
     win = doc.defaultView;
   }
   return win;
+};
+
+/**
+ * Get the chrome window (nsIDOMWindow) related to this request.
+ */
+NormalRequest.prototype.getChromeWindow = function() {
+  let contentWindow = this.getContentWindow();
+  if (!!contentWindow) {
+    return WindowUtils.getChromeWindow(contentWindow);
+  } else {
+    return null;
+  }
+};
+
+/**
+ * Get the <browser> (nsIDOMXULElement) related to this request.
+ */
+NormalRequest.prototype.getBrowser = function() {
+  let context = this.aContext;
+  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
+    return context;
+  } else {
+    return WindowUtils.getBrowserForWindow(this.getContentWindow());
+  }
 };
 
 
@@ -264,6 +301,7 @@ NormalRequest.prototype.checkURISchemes = function() {
   *
   * TODO: solve this problem and remove this workaround.
   */
+  let unknownSchemesDetected = false;
   let uris = [this.aContentLocation, this.aRequestOrigin];
   for (let i = 0; i < 2; ++i) {
     let uri = uris[i];
@@ -282,7 +320,7 @@ NormalRequest.prototype.checkURISchemes = function() {
         throw "no scheme!";
       }
     } catch(e) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+      Logger.warning(Logger.TYPE_CONTENT,
           "URI <" + uri.spec + "> has no scheme!");
       continue;
     }
@@ -293,7 +331,7 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
 
     if (isKnownSchemeWithoutHost(scheme)) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+      Logger.warning(Logger.TYPE_CONTENT,
           "RequestPolicy currently cannot handle '" + scheme + "' schemes. " +
           "Therefore the request from <" + this.originURI + "> to <" +
           this.destURI + "> is allowed (but not recorded).");
@@ -302,33 +340,65 @@ NormalRequest.prototype.checkURISchemes = function() {
     }
 
     // if we get here, the scheme is unknown. try to show a notification.
-    rp.mod.Logger.warning(rp.mod.Logger.TYPE_CONTENT,
+    unknownSchemesDetected = true;
+    Logger.warning(Logger.TYPE_CONTENT,
         "uncatched scheme '" + scheme + "'. The request is from <" +
         this.originURI + "> to <" + this.destURI + "> ");
+
+    let chromeWin, browser;
     try {
-      let win = this.getWindow();
-      if (!win) {
-        throw "The window could not be extracted from aContext.";
+      chromeWin = this.getChromeWindow();
+      if (!chromeWin) {
+        throw "The chrome window could not be extracted from aContext.";
       }
-      rp.mod.Utils.getChromeWindow(win).requestpolicy.overlay
-          .showSchemeNotification(win, scheme);
+      browser = this.getBrowser();
     } catch (e) {
-      rp.mod.Logger.warning(rp.mod.Logger.TYPE_ERROR,
-                            "The user could not be informed about the " +
-                            "unknown scheme. Error was: " + e);
+      Logger.warning(Logger.TYPE_INTERNAL,
+                     "The user could not be informed about the " +
+                     "unknown scheme. Error was: " + e, e);
     }
+
+    // Try showing the notification multiple times. This is done
+    // async for two reasons:
+    // (a) The chrome window's overlay might not be initialized
+    //     yet.
+    // (b) This function is called by the request processor, so
+    //     it should terminate asap.
+    Utils.tryMultipleTimes(function (aTriesLeft) {
+      try {
+        let overlay = chromeWin.requestpolicy.overlay;
+        overlay.showSchemeNotification(browser, scheme);
+        return true;
+      } catch (e) {
+        if (aTriesLeft === 0) {
+          Logger.warning(Logger.TYPE_INTERNAL,
+                         "Failed to show the scheme notification. " +
+                         "Error was: " + e, e);
+        } else {
+          Logger.warning(Logger.TYPE_INTERNAL,
+                         "Failed to show the scheme notification. " +
+                         "Trying again...");
+        }
+        return false;
+      }
+    }, 3);
+
   }
 
-  return {shouldLoad: null};
+  return {shouldLoad: unknownSchemesDetected ? false : null};
 };
 
 
 
 
-function RedirectRequest(originURI, destURI, httpHeader) {
-  Request.call(this, originURI, destURI, REQUEST_TYPE_REDIRECT);
+function RedirectRequest(httpResponse) {
+  Request.call(this, httpResponse.originURI.specIgnoringRef,
+               httpResponse.destURI.specIgnoringRef, REQUEST_TYPE_REDIRECT);
+  this.httpResponse = httpResponse;
 
-  this.httpHeader = httpHeader;
+  XPCOMUtils.defineLazyGetter(this, "browser", function() {
+    return httpResponse.browser;
+  });
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;

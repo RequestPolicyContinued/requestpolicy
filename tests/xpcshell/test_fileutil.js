@@ -22,5 +22,3 @@ function run_test() {
 
   // TODO: check perms on the created directories.
 }
-
-

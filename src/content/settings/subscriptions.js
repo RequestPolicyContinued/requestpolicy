@@ -20,14 +20,12 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
-var prefsChangedObserver = null;
-
 /**
  * @param {String} policy
  *                 "allow" or "deny"
  */
 function getDefaultPolicyElements(policy) {
-  var selector = '[data-default-policy=' + policy + ']';
+  var selector = '[data-defaultpolicy=' + policy + ']';
   var matches = document.body.querySelectorAll(selector);
   var elements = Array.prototype.slice.call(matches);
   return elements;
@@ -68,7 +66,7 @@ function getAllSubscriptionElements() {
 }
 
 function updateDisplay() {
-  var userSubs = rpService._subscriptions;
+  var userSubs = rpService.getSubscriptions();
   var subsInfo = userSubs.getSubscriptionInfo();
   var allSubElements = getAllSubscriptionElements();
   for (var i = 0, len = allSubElements.length; i < len; ++i) {
@@ -76,7 +74,7 @@ function updateDisplay() {
     element.input.checked = (element.id in subsInfo['official']);
   }
 
-  if (rpService._defaultAllow) {
+  if (Prefs.isDefaultAllow()) {
     var currentPolicy = 'allow', otherPolicy = 'deny';
   } else {
     var currentPolicy = 'deny', otherPolicy = 'allow';
@@ -88,7 +86,7 @@ function updateDisplay() {
 
 
 function handleSubscriptionCheckboxChange(event) {
-  var userSubs = rpService._subscriptions;
+  var userSubs = rpService.getSubscriptions();
 
   var subName = event.target.name;
   var enabled = event.target.checked;
@@ -97,11 +95,11 @@ function handleSubscriptionCheckboxChange(event) {
   subInfo['official'][subName] = true;
   if (enabled) {
     userSubs.addSubscription('official', subName);
-    observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+    Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo));
   } else {
     userSubs.removeSubscription('official', subName);
-    observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+    Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo));
   }
 }
@@ -123,10 +121,20 @@ function onload() {
       Logger.dump('Skipping unexpected official subName: ' + subName);
       continue;
     }
-    el.addEventListener('change', handleSubscriptionCheckboxChange);
+    elManager.addListener(el, 'change', handleSubscriptionCheckboxChange);
+  }
+
+  var selector = '[data-defaultpolicy=' +
+    (Prefs.isDefaultAllow() ? 'deny' : 'allow') + ']';
+  var matches = document.body.querySelectorAll(selector);
+  var hideElements = Array.prototype.slice.call(matches);
+  for (var i = 0; i < hideElements.length; i++) {
+    hideElements[i].style.display = 'none';
   }
 
   // call updateDisplay() every time a subscription is added or removed
-  ObserverManager.observe(SUBSCRIPTION_ADDED_TOPIC, updateDisplay);
-  ObserverManager.observe(SUBSCRIPTION_REMOVED_TOPIC, updateDisplay);
+  WinEnv.obMan.observe([
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC
+  ], updateDisplay);
 }

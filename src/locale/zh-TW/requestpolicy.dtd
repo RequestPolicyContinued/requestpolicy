@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "撤銷所有暫時性的允許">
-<!ENTITY rp.menu.blockedDestinations "已阻擋的目標">
-<!ENTITY rp.menu.allowedDestinations "已允許的目標">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "偏好設定">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "請求記錄">
 <!ENTITY rp.requestLog.origin "來源">
 <!ENTITY rp.requestLog.destination "目標">
 <!ENTITY rp.requestLog.blocked "已阻擋">
@@ -17,4 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
 <!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY rp.requestLog.clear "Clear">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

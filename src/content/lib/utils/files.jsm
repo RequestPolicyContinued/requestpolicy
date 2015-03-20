@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var EXPORTED_SYMBOLS = ["FileUtil"];
-
 const Ci = Components.interfaces;
 const Cc = Components.classes;
+const Cu = Components.utils;
 
-Components.utils.import("resource://gre/modules/Services.jsm");
+let EXPORTED_SYMBOLS = ["FileUtil"];
+
+Cu.import("resource://gre/modules/Services.jsm");
 
 /**
  * creates an integer from the arguments
@@ -75,6 +76,21 @@ var FileUtil = {
    * @param {nsIFile} file
    */
   fileToString : function(file) {
+    // FIXME: This function MUST NOT check for the file to exist,
+    //        otherwise the subscriptions are not fetched at all,
+    //        for whatever reason.
+    //
+    //        Another issue, maybe it's the same as above, is that
+    //        `loadSubscriptionRules()` catches exceptions and by
+    //        that knows if the file exists or not. See also
+    //        `loadRawRulesetFromFile()`.
+    //
+    //        The subscription system urgently needs to rewritten,
+    //        see issue #597.
+    //if (file.exists() === false) {
+    //  // prevent NS_ERROR_FILE_NOT_FOUND
+    //  return "";
+    //}
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, octal444, 0);

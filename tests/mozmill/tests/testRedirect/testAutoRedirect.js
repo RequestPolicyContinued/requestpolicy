@@ -4,11 +4,15 @@
 
 "use strict";
 
-var {assert, expect} = require("../../../../../../lib/assertions");
-var prefs = require("../../../../../lib/prefs");
-var tabs = require("../../../../../lib/tabs");
+var rpRootDir = "../../";
+var rpConst = require(rpRootDir + "lib/constants");
+var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 
-var rpConst = require("../../lib/constants");
+var {assert, expect} = require(rootDir + "lib/assertions");
+var prefs = require(rootDir + "lib/prefs");
+var tabs = require(rootDir + "firefox/lib/tabs");
+
+var rpUtils = require(rpRootDir + "lib/rp-utils");
 
 var testURLPrePath = "http://www.maindomain.test/";
 var urlsWithRedirect = [
@@ -34,11 +38,11 @@ var setupModule = function(aModule) {
   aModule.tabBrowser = new tabs.tabBrowser(aModule.controller);
   aModule.tabBrowser.closeAllTabs();
 
-  prefs.preferences.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
+  prefs.setPref(rpConst.PREF_DEFAULT_ALLOW, false);
 }
 
 var teardownModule = function(aModule) {
-  prefs.preferences.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
+  prefs.clearUserPref(rpConst.PREF_DEFAULT_ALLOW);
   aModule.tabBrowser.closeAllTabs();
 }
 
@@ -46,31 +50,51 @@ var teardownModule = function(aModule) {
 var testAutoRedirect = function() {
   var tabIndex = tabBrowser.selectedIndex;
 
-  var panel = tabBrowser.getTabPanelElement(tabIndex,
+  var getPanel = () => tabBrowser.getTabPanelElement(tabIndex,
       '/{"value":"' + rpConst.REDIRECT_NOTIFICATION_VALUE + '"}');
 
   for (let [shouldBeAllowed, testURL] of urlsWithRedirect) {
+    let initialURI = controller.window.content.document.location.href;
     testURL = testURLPrePath + testURL;
     dump("Testing " + testURL + ". The redirect should be " +
          (shouldBeAllowed ? "allowed" : "blocked") + ".\n");
 
     controller.open(testURL);
-    controller.waitForPageLoad();
+
+    // Wait for the tab to be loaded. The function `waitForPageLoad()` will not
+    // work here, because if a redirect is blocked by cancelling the channel's
+    // associated request, the `waitForPageLoad` would wait infinitely.
+    rpUtils.waitForTabLoad(controller, tabBrowser.getTab(tabIndex));
 
     if (shouldBeAllowed) {
       controller.waitFor(function() {
           return controller.window.content.document.location.href !== testURL;
       }, "The URL in the urlbar has changed.");
-      assert.ok(!panel.exists(), "The redirect has been allowed.");
+      expect.ok(!getPanel().exists(),
+                "The redirect notification bar is hidden.");
     } else {
-      assert.ok(panel.exists(), "The redirect has been blocked.");
-      assert.ok(controller.window.content.document.location.href === testURL,
+      controller.waitFor(() => getPanel().exists(), "The redirect " +
+                         "notification bar has been displayed.");
+      let finalURI = controller.window.content.document.location.href;
+      expect.ok(finalURI === testURL || finalURI === initialURI,
                 "The URL in the urlbar hasn't changed.");
     }
 
     tabBrowser.closeAllTabs();
 
-    // the following sleep is a workaround against the error:
+    // It's necessary to wait for the notification panel to be closed. If we
+    // don't wait for that to happen, the next URL in urlsWithRedirect might
+    // already be displayed while the panel is still there.
+    controller.waitFor(() => !getPanel().exists(), "No panel is being " +
+                       "displayed because all tabs have been closed.");
+
+    //
+    // The `sleep` below has been a workaround against the following exception:
+    //
+    // --> Note: This workaround is probably not needed anymore -- if the
+    //           problem occurres again, uncomment the `sleep`. Otherwise,
+    //           remove this comment after some time.
+    //           (comment by @myrdd, 27.12.2014)
     // *************************
     // A coding exception was thrown in a Promise resolution callback.
     // See https://developer.mozilla.org/Mozilla/JavaScript_code_modules/Promise.jsm/Promise
@@ -80,6 +104,6 @@ var testAutoRedirect = function() {
     // BackgroundPageThumbs._processCaptureQueue@resource://gre/modules/BackgroundPageThumbs.jsm:222:5
     // BackgroundPageThumbs.capture@resource://gre/modules/BackgroundPageThumbs.jsm:73:5
     // (...)
-    controller.sleep(100);
+    //controller.sleep(100);
   }
 }

@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Alle tijdelijke permissies intrekken">
-<!ENTITY rp.menu.blockedDestinations "Geblokkeerde bestemmingen">
-<!ENTITY rp.menu.allowedDestinations "Toegestane bestemmingen">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Andere oorsprongen">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Voorkeuren">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Logbestand verzoeken">
 <!ENTITY rp.requestLog.origin "Oorsprong">
 <!ENTITY rp.requestLog.destination "Bestemming">
 <!ENTITY rp.requestLog.blocked "Geblokkeerd">
@@ -17,4 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Doel naar Klembord kopiëren">
 <!ENTITY rp.requestLog.openOriginInNewTab "Oorsprong in nieuw tabblad openen">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Doel in nieuw tabblad openen">
-<!ENTITY rp.requestLog.clear "Wissen">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

@@ -1,4 +1,4 @@
 <?php
-  header('Location: http://www.otherdomain.test/subdirectory/1px.png');
+  header('Location: http://www.otherdomain.test/subdirectory/flag-gray.png');
   header('Content-Type: image/png');
 ?>

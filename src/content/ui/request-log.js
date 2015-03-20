@@ -3,7 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2014-2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,78 +21,61 @@
  * ***** END LICENSE BLOCK *****
  */
 
-if (!rp) {
-  var rp = {mod : {}};
-}
+window.requestpolicy = window.requestpolicy || {};
 
-Components.utils.import("chrome://requestpolicy/content/lib/domain-util.jsm", rp.mod);
-Components.utils.import("chrome://requestpolicy/content/lib/utils.jsm", rp.mod);
+window.requestpolicy.requestLog = (function (self) {
 
-requestpolicy.requestLog = {
+  const Ci = Components.interfaces;
+  const Cc = Components.classes;
+  const Cu = Components.utils;
 
-  _initialized : false,
+  let {ScriptLoader} = (function() {
+    let mod = {};
+    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    return mod;
+  }());
+  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
+  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
+  let {Environment,
+       ProcessEnvironment} = ScriptLoader.importModule("lib/environment");
 
-  _tree : null,
+  // create a new Environment for this window
+  var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
+  // The Environment has to be shut down when the content window gets unloaded.
+  WinEnv.shutdownOnUnload(window);
+  // start up right now, as there won't be any startup functions
+  WinEnv.startup();
 
-  _strbundle : null,
+  let $id = window.document.getElementById.bind(window.document);
 
-  init : function() {
-    if (this._initialized) {
-      return;
-    }
-    this._initialized = true;
 
-    this._strbundle = document.getElementById("requestpolicyStrings");
+  self.isEmptyMessageDisplayed = true;
+  self.rows = [];
+  self.visibleRows = [];
 
-    this._tree = document.getElementById("requestpolicy-requestLog-tree");
-    this._tree.view = window.requestpolicy.requestLogTreeView;
 
-    // Give the requestpolicyOverlay direct access to the tree view.
-    window.parent.requestpolicy.overlay.requestLogTreeView = window.requestpolicy.requestLogTreeView;
-  },
 
-  /**
-   * Copy the content of a cell to the clipboard. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  copyToClipboard : function(columnName) {
-    var content = this._tree.view.getCellText(this._tree.currentIndex,
-        this._tree.columns.getNamedColumn(columnName));
+  function init() {
+    self.tree = $id("requestpolicy-requestLog-tree")
 
-    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-        .getService(Components.interfaces.nsIClipboardHelper);
-    clipboardHelper.copyString(content);
-  },
+    self.tree.view = self.treeView;
 
-  /**
-   * Open the content of a cell in a new tab. The row used will be the one
-   * selected when the context menu was opened.
-   */
-  openInNewTab : function(columnName) {
-    var content = this._tree.view.getCellText(this._tree.currentIndex,
-        this._tree.columns.getNamedColumn(columnName));
+    showLogIsEmptyMessage();
 
-    var forbidden = true;
-    try {
-      var uri = rp.mod.DomainUtil.getUriObject(content);
-      if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
-        forbidden = false;
-      }
-    } catch (e) {
-    }
-
-    if (forbidden) {
-      var alertTitle = this._strbundle.getString("actionForbidden");
-      var alertText = this._strbundle
-          .getString("urlCanOnlyBeCopiedToClipboard");
-      Services.prompt.alert(null, alertTitle, alertText);
-      return;
-    }
-
-    rp.mod.Utils.getChromeWindow(window).gBrowser.addTab(content);
+    // Give the requestpolicy overlay direct access to the the request log.
+    window.parent.requestpolicy.overlay.requestLog = self;
   }
-};
+  function showLogIsEmptyMessage() {
+    var message = StringUtils.$str("requestLogIsEmpty");
+    var directions = StringUtils.$str("requestLogDirections");
+    self.visibleRows.push([message, directions, false, ""]);
+    self.treebox.rowCountChanged(0, 1);
+  }
 
-addEventListener("load", function(event) {
-      requestpolicy.requestLog.init(event);
-    }, false);
+  // call init() on the window's "load" event
+  WinEnv.elManager.addListener(window, "load", init, false);
+
+
+
+  return self;
+}(window.requestpolicy.requestLog || {}));

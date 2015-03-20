@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'importOldRules',
   'deleteOldRules',
   'showOldRuleReimportOptions',
@@ -18,7 +18,7 @@ var addHostWildcard = true;
 
 
 function clearRulesTable() {
-  var table = document.getElementById('rules');
+  var table = $id('rules');
   var children = table.getElementsByTagName('tr');
   while (children.length) {
     var child = children.item(0);
@@ -27,7 +27,7 @@ function clearRulesTable() {
 }
 
 function populateRuleTable() {
-  var table = document.getElementById('rules');
+  var table = $id('rules');
   // Setting the global rules var here.
   rules = common.getOldRulesAsNewRules(addHostWildcard);
 
@@ -41,7 +41,7 @@ function populateRuleTable() {
 
 function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
   var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
-  var action = ruleAction == 'allow' ? _('allow') : _('block');
+  var action = ruleAction == 'allow' ? $str('allow') : $str('block');
 
   var row = $('<tr>').addClass(actionClass).appendTo(table);
 
@@ -58,7 +58,7 @@ function ruleDataPartToDisplayString(ruleDataPart) {
   if (ruleDataPart["s"]) {
     str += ruleDataPart["s"] + "://";
   }
-  str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+  str += ruleDataPart["h"] || "*";
   if (ruleDataPart["port"]) {
     str += ":" + ruleDataPart["port"];
   }
@@ -69,16 +69,16 @@ function deleteOldRules() {
   common.clearPref('allowedOrigins');
   common.clearPref('allowedDestinations');
   common.clearPref('allowedOriginsToDestinations');
-  $('#doimport').hide();
-  $('#deletedone').show();
-  $('#showReimportOptions').hide();
-  $('#reimportOldRules').hide();
-  $('#deleteOldRules').hide();
+  $id("doimport").hidden = true;
+  $id("deletedone").hidden = false;
+  $id("showReimportOptions").hidden = true;
+  $id("reimportOldRules").hidden = true;
+  $id("deleteOldRules").hidden = true;
 }
 
 function showReimportOptions() {
-  $('#showReimportOptions').hide();
-  $('#reimportOldRules').show();
+  $id("showReimportOptions").hidden = true;
+  $id("reimportOldRules").hidden = false;
 }
 
 function importOldRules() {
@@ -86,10 +86,10 @@ function importOldRules() {
     throw 'rules is undefined or empty';
   }
   common.addAllowRules(rules);
-  $('#doimport').hide();
-  $('#policy').hide();
-  $('#importoptions').hide();
-  $('#importdone').show();
+  $id("doimport").hidden = true;
+  $id("policy").hidden = true;
+  $id("importoptions").hidden = true;
+  $id("importdone").hidden = false;
 }
 
 function handleAddHostWildcardsChange(event) {
@@ -99,10 +99,10 @@ function handleAddHostWildcardsChange(event) {
 }
 
 function onload() {
-  var oldRulesExist = rpService.oldRulesExist();
+  var oldRulesExist = Prefs.oldRulesExist();
   if (!oldRulesExist) {
-    $('#hasrules').hide();
-    $('#norules').show();
+    $id("hasrules").hidden = true;
+    $id("norules").hidden = false;
     return;
   }
   populateRuleTable();

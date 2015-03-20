@@ -3,6 +3,18 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta8.2 (bugfix)
+* fix a bug that caused the subscription `deny_trackers.json` to be
+  ignored (#582)
+* add some schemes to the temporary whitelist, see #447
+  - `gopher`
+  - `spotify`
+  - `greasemonkey-script`
+  - `floatnotes`
+
+#### Version 1.0.beta8.1 (bugfix)
+* it was not possible to delete rules (#514)
+
 #### Version 1.0.beta8
 * new features
   * Changes to the `Manage Policies` page, thanks to @chrisbura (#459)

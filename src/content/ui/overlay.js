@@ -524,28 +524,46 @@ requestpolicy.overlay = (function() {
     DOMUtils.removeChildren(addRulePopup);
 
     let m = requestpolicy.menu;
-    var origin = m._addWildcard(DomainUtil.getBaseDomain(redirectOriginUri));
-    var dest = m._addWildcard(DomainUtil.getBaseDomain(redirectTargetUri));
+    var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
+    var destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
 
+    var origin = null, dest = null;
+    if (originBaseDomain !== null) {
+      origin = m._addWildcard(originBaseDomain);
+    }
+    if (destBaseDomain !== null) {
+      dest = m._addWildcard(destBaseDomain);
+    }
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
     let cm = requestpolicy.classicmenu;
-    cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
-    if (mayPermRulesBeAdded) {
-      cm.addMenuItemAllowDest(addRulePopup, dest);
-    }
-    cm.addMenuSeparator(addRulePopup);
 
-    cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
-    if (mayPermRulesBeAdded) {
-      cm.addMenuItemAllowOrigin(addRulePopup, origin);
+    if (destBaseDomain !== null) {
+      cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
+      if (mayPermRulesBeAdded) {
+        cm.addMenuItemAllowDest(addRulePopup, dest);
+      }
     }
-    cm.addMenuSeparator(addRulePopup);
 
-    cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
-    if (mayPermRulesBeAdded) {
-      cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+    if (originBaseDomain !== null && destBaseDomain !== null) {
+      cm.addMenuSeparator(addRulePopup);
+    }
+
+    if (originBaseDomain !== null) {
+      cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
+      if (mayPermRulesBeAdded) {
+        cm.addMenuItemAllowOrigin(addRulePopup, origin);
+      }
+    }
+
+    if (originBaseDomain !== null && destBaseDomain !== null) {
+      cm.addMenuSeparator(addRulePopup);
+
+      cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
+      if (mayPermRulesBeAdded) {
+        cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+      }
     }
 
 

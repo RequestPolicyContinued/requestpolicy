@@ -113,7 +113,13 @@ DomainUtil.getIdentifier = function(uri, level) {
  *         invalid uri.
  */
 DomainUtil.getHost = function(uri) {
-  return this.getUriObject(uri).host;
+  let uriObj = this.getUriObject(uri);
+  try {
+    return uriObj.host;
+  } catch(e) {
+    // it's an URI without host
+    return null;
+  }
 };
 
 /**
@@ -166,6 +172,9 @@ DomainUtil.isValidUri = function(uri) {
  */
 DomainUtil.getBaseDomain = function(uri) {
   var host = this.getHost(uri);
+  if (host === null) {
+    return null;
+  }
   try {
     // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
     var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);

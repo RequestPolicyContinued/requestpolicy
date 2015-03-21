@@ -232,21 +232,24 @@ let RequestProcessor = (function(self) {
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
+
     if (Prefs.isDefaultAllowSameDomain()) {
-      var originDomain = DomainUtil.getBaseDomain(
-          originUri);
+      var originDomain = DomainUtil.getBaseDomain(originUri);
       var destDomain = DomainUtil.getBaseDomain(destUri);
-      return new RequestResult(originDomain == destDomain,
-          REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+
+      if (originDomain !== null && destDomain !== null) {
+        // apply this rule only if both origin and dest URIs
+        // do have a host.
+        return new RequestResult(originDomain === destDomain,
+            REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+      }
     }
     // We probably want to allow requests from http:80 to https:443 of the same
     // domain. However, maybe this is so uncommon it's not worth any extra
     // complexity.
-    var originIdent = DomainUtil.getIdentifier(
-        originUri, DomainUtil.LEVEL_SOP);
-    var destIdent = DomainUtil.getIdentifier(destUri,
-        DomainUtil.LEVEL_SOP);
-    return new RequestResult(originIdent == destIdent,
+    var originIdent = DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP);
+    var destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
+    return new RequestResult(originIdent === destIdent,
         REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   };
 
@@ -293,7 +296,7 @@ let RequestProcessor = (function(self) {
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
     for (var originUri in requests) {
-      if (DomainUtil.getBaseDomain(originUri) != currentlySelectedOrigin) {
+      if (DomainUtil.getBaseDomain(originUri) !== currentlySelectedOrigin) {
         // only return requests from the given base domain
         continue;
       }
@@ -585,7 +588,13 @@ let RequestProcessor = (function(self) {
 
       let uriSchemeShouldLoadResult = request.checkURISchemes().shouldLoad;
       if (uriSchemeShouldLoadResult !== null) {
-        return uriSchemeShouldLoadResult === true ? CP_OK : CP_REJECT;
+        request.requestResult = new RequestResult(uriSchemeShouldLoadResult,
+            REQUEST_REASON_COMPATIBILITY);
+        if (uriSchemeShouldLoadResult === true) {
+          return accept("Allowing request due to scheme-workaround", request);
+        } else {
+          return reject("Blocking request due to scheme-workaround", request);
+        }
       }
 
 
@@ -710,7 +719,8 @@ let RequestProcessor = (function(self) {
       // solution but I'm not sure what that solution is.
       var originIdent = DomainUtil.getIdentifier(originURI);
       var destIdent = DomainUtil.getIdentifier(destURI);
-      if (originIdent == destIdent) {
+      if (originIdent === destIdent &&
+          originIdent !== null && destIdent !== null) {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_IDENTICAL_IDENTIFIER);
         return accept(

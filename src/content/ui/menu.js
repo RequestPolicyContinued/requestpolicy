@@ -112,6 +112,12 @@ requestpolicy.menu = (function() {
 
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
+        if (self._currentBaseDomain === null) {
+          Logger.info(Logger.TYPE_INTERNAL, "Unable to prepare menu because " +
+              "the current uri has no host: " + self._currentUri);
+          self._populateMenuForUncontrollableOrigin();
+          return;
+        }
       } catch (e) {
         Logger.info(Logger.TYPE_INTERNAL, "Unable to prepare menu because " +
             "base domain can't be determined: " + self._currentUri);
@@ -710,7 +716,7 @@ requestpolicy.menu = (function() {
 
     for (var originUri in allRequests) {
       var originBase = DomainUtil.getBaseDomain(originUri);
-      if (originBase != self._currentBaseDomain) {
+      if (originBase !== self._currentBaseDomain) {
         continue;
       }
 
@@ -730,7 +736,7 @@ requestpolicy.menu = (function() {
     var guiOrigins = [];
     for (var originUri in allRequests) {
       var originBase = DomainUtil.getBaseDomain(originUri);
-      if (originBase == self._currentBaseDomain) {
+      if (originBase === self._currentBaseDomain) {
         continue;
       }
 

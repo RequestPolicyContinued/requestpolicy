@@ -30,7 +30,7 @@ exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
     tag: "toolbarbutton", id: "requestpolicyToolbarButton",
-    label: "RequestPolicy", tooltiptext: "RequestPolicy",//"<b>RequestPolicy</b><br />test",
+    label: "RequestPolicy", tooltiptext: "RequestPolicy",
     popup: "rp-popup"
   }
 ];
@@ -168,7 +168,8 @@ exports.mainTree = [
         {tag: "label", id: "requestpolicy-requestLog-title",
             control: "requestpolicy-requestLog-frame",
             value: "&rp.requestLog.title;", crop: "end"},
-        {tag: "button", label: "&rp.requestLog.clear;",
+        {tag: "button", id: "requestpolicy-requestLog-clear",
+            label: "&rp.requestLog.clear;",
             oncommand: "requestpolicy.overlay.clearRequestLog();"},
         {tag: "vbox", flex: "1"},
         {tag: "toolbarbutton", id: "requestpolicy-requestLog-close",

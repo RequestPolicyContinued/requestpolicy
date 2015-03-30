@@ -24,11 +24,15 @@ RequestLog.prototype.open = function () {
   // open the menu
   tbb.click();
   // wait for the menu
-  findElement.ID(this.windowDoc, "rp-popup").waitForElement();
+  let popup = findElement.ID(this.windowDoc, "rp-popup");
+  popup.waitForElement();
   // open the request log
   findElement.ID(this.windowDoc, "rp-link-request-log").click();
   // close the menu
-  tbb.click();
+  popup.getNode().hidePopup();
+  this.controller.waitFor(function () {
+    return popup.getNode().state === "closed";
+  }, "The menu has been closed.");
 
   let iframe = this.windowDoc.getElementById("requestpolicy-requestLog-frame");
   this.requestLogDoc = iframe.contentDocument;

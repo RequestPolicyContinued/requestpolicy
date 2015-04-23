@@ -8,10 +8,10 @@ var rpRootDir = "../";
 var rpConst = require(rpRootDir + "lib/constants");
 var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 
+var menuUtils = require(rpRootDir + "lib/menu-utils");
+
 var prefs = require(rootDir + "lib/prefs");
 var tabs = require(rootDir + "firefox/lib/tabs");
-
-const TBB_ID = "requestpolicyToolbarButton";
 
 
 function RequestLog(aController) {
@@ -20,19 +20,16 @@ function RequestLog(aController) {
 }
 
 RequestLog.prototype.open = function () {
-  let tbb = findElement.ID(this.windowDoc, TBB_ID);
-  // open the menu
-  tbb.click();
-  // wait for the menu
-  let popup = findElement.ID(this.windowDoc, "rp-popup");
-  popup.waitForElement();
-  // open the request log
-  findElement.ID(this.windowDoc, "rp-link-request-log").click();
-  // close the menu
-  popup.getNode().hidePopup();
-  this.controller.waitFor(function () {
-    return popup.getNode().state === "closed";
-  }, "The menu has been closed.");
+  {
+    let menu = new menuUtils.Menu(this.controller);
+    menu.open();
+
+    // open the request log
+    findElement.ID(this.windowDoc, "rp-link-request-log").click();
+
+    // close the menu
+    menu.close();
+  }
 
   let iframe = this.windowDoc.getElementById("requestpolicy-requestLog-frame");
   this.requestLogDoc = iframe.contentDocument;

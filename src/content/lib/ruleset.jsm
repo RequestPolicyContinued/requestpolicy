@@ -735,9 +735,27 @@ function Ruleset(name) {
 //}
 
 Ruleset.prototype = {
+  /**
+   * @type {?string}
+   */
   _name : null,
+
+  /**
+   * Represents the root domain entry, that is, the domain ".".
+   * Its "lower levels" are domain entries like "com", "info", "org".
+   * @type {DomainEntry}
+   */
   _domain : null,
+
+  /**
+   * @type {Object<string, IPAddressEntry>}
+   */
   _ipAddr : null,
+
+  /**
+   * Contains rules that don't specify a host.
+   * @type {Rules}
+   */
   rules : null,
 
   toString : function() {
@@ -756,6 +774,10 @@ Ruleset.prototype = {
     this.rules.print(depth + 1);
   },
 
+  // fixme: this static function should be `Ruleset.isIPAddress()`
+  /**
+   * @static
+   */
   _isIPAddress : function(host) {
     // Check if it's an IPv6 address.
     if (host.indexOf(":") != -1) {
@@ -851,11 +873,13 @@ Ruleset.prototype = {
    */
   getHostMatches : function(host) {
     if (!this.rules.isEmpty()) {
-      // There are non-host-specific rules for this policy. If it's the start
-      // of an origin-to-destination rule, the origin is non-host-specific but
-      // the destination doesn't have to be. Note that we never check for
-      // a domain entry of "*" because that is represented by these any
-      // non-host-specific rules that are defined.
+      // If `this.rules` is not empty, it contains any rules which do
+      // not specify a host (host = undefined).
+      //
+      // If it's the start of an origin-to-destination rule, the
+      // origin is non-host-specific but the destination doesn't
+      // have to be.
+
       yield this;
     }
 
@@ -902,6 +926,7 @@ Ruleset.prototype = {
     } catch (e) {
       var destHost = '';
     }
+
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
     originouterloop: for (var entry in this.getHostMatches(originHost)) {
@@ -909,6 +934,7 @@ Ruleset.prototype = {
       for (var rule in entry.rules) {
         //dprint("Checking rule: " + rule);
         var ruleMatchedOrigin = rule.isMatch(origin);
+
         if (rule.allowOrigin && ruleMatchedOrigin) {
           //dprint("ALLOW origin by rule " + entry + " " + rule);
           matchedAllowRules.push(["origin", entry, rule]);

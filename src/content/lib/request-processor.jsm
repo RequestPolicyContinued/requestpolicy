@@ -586,19 +586,6 @@ let RequestProcessor = (function(self) {
 
 
 
-      let uriSchemeShouldLoadResult = request.checkURISchemes().shouldLoad;
-      if (uriSchemeShouldLoadResult !== null) {
-        request.requestResult = new RequestResult(uriSchemeShouldLoadResult,
-            REQUEST_REASON_COMPATIBILITY);
-        if (uriSchemeShouldLoadResult === true) {
-          return accept("Allowing request due to scheme-workaround", request);
-        } else {
-          return reject("Blocking request due to scheme-workaround", request);
-        }
-      }
-
-
-
       // Note: If changing the logic here, also make necessary changes to
       // isAllowedRedirect).
 

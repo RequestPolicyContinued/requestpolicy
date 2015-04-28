@@ -601,31 +601,37 @@ Rule.prototype = {
 
   isMatch : function(uriObj) {
     if (this.scheme && this.scheme != uriObj.scheme) {
-      dprint("isMatch: wrong scheme");
+      //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
+      //       this.scheme + "')");
       return false;
     }
-    if (this.port) {
-      // If the rule's port is "*" it means any port. We use this convention
-      // because we assume an empty port in a rule means default ports rather
-      // than any port.
-      if (this.port != uriObj.port && this.port != "*") {
-        dprint("isMatch: wrong port (not the port specified by the rule)");
-        return false;
-      }
-    } else {
-      if (!DomainUtil.hasStandardPort(uriObj)) {
-        dprint("isMatch: wrong port (not the default port and the rule assumes default)");
-        return false;
+
+    // Check the port only in case the URI has a host at all.
+    if (DomainUtil.uriObjHasHost(uriObj)) {
+      if (this.port) {
+        // If the rule's port is "*" it means any port. We use this convention
+        // because we assume an empty port in a rule means default ports rather
+        // than any port.
+        if (this.port !== uriObj.port && this.port !== "*") {
+          //dprint("isMatch: wrong port (not the port specified by the rule)");
+          return false;
+        }
+      } else {
+        if (!DomainUtil.hasStandardPort(uriObj)) {
+          //dprint("isMatch: wrong port (not the default port and the rule assumes default)");
+          return false;
+        }
       }
     }
+
     if (this.path) {
       if (typeof this.path == "string") {
         if (uriObj.path.indexOf(this.path) != 0) {
-          dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
+          //dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
           return false;
         }
       } else if (!this.path.test(uriObj.path)) {
-        dprint("isMatch: wrong path (regex)");
+        //dprint("isMatch: wrong path (regex)");
         return false;
       }
     }

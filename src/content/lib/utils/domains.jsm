@@ -107,18 +107,32 @@ DomainUtil.getIdentifier = function(uri, level) {
 /**
  * Returns the hostname from a uri string.
  *
- * @param {String}
- *          uri The uri.
- * @return {String} The hostname of the uri or throws an exception if it is an
- *         invalid uri.
+ * @param {string} uri
+ * @return {?string} The hostname of the uri.
  */
 DomainUtil.getHost = function(uri) {
   let uriObj = this.getUriObject(uri);
-  try {
+
+  if (DomainUtil.uriObjHasHost(uriObj)) {
     return uriObj.host;
-  } catch(e) {
+  }
+
+  // it's an URI without host
+  return null;
+};
+
+/**
+ * @param {nsIURI} aUriObj
+ * @return {boolean} whether the uri object has a host
+ */
+DomainUtil.uriObjHasHost = function(aUriObj) {
+  try {
+    // simply access the host.
+    aUriObj.host;
+    return true;
+  } catch (e) {
     // it's an URI without host
-    return null;
+    return false;
   }
 };
 

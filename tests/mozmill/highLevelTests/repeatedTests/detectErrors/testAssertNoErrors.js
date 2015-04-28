@@ -11,7 +11,7 @@ var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 var {assert, expect} = require(rootDir + "lib/assertions");
 var prefs = require(rootDir + "lib/prefs");
 
-Components.utils.import("chrome://rp-observer/content/console-observer.jsm");
+Components.utils.import("chrome://rpc-dev-helper/content/console-observer.jsm");
 
 
 

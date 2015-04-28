@@ -118,18 +118,18 @@ unit_testing__empty_dirs := $(shell find $(unit_testing__build_path) -mindepth 1
 endif
 
 
-# ____________________________________
-# vars for generating the Observer XPI
+# ______________________________________
+# vars for generating the Dev Helper XPI
 #
 
-rp_observer__source_dirname := tests/mozmill/extension
-rp_observer__source_path := $(rp_observer__source_dirname)/
+dev_helper__source_dirname := tests/mozmill/extension
+dev_helper__source_path := $(dev_helper__source_dirname)/
 
-rp_observer__source_files := $(shell find $(rp_observer__source_dirname) -type f -regex ".*\.jsm?") \
-		$(rp_observer__source_dirname)/chrome.manifest \
-		$(rp_observer__source_dirname)/install.rdf
+dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
+		$(dev_helper__source_dirname)/chrome.manifest \
+		$(dev_helper__source_dirname)/install.rdf
 
-rp_observer__xpi_file := $(dist_path)$(extension_name)-observer.xpi
+dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
 
 
 # ______________________________
@@ -224,19 +224,19 @@ $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files
 	@echo "Creating unit-testing XPI: Done!"
 
 
-# _______________________
-# create the Observer XPI
+# _________________________
+# create the Dev Helper XPI
 #
 
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-$(rp_observer__xpi_file): $(rp_observer__source_files) FORCE | $(dist_path)
-	@rm -f $(rp_observer__xpi_file)
-	@echo "Creating Observer XPI."
-	@cd $(rp_observer__source_dirname) && \
-	$(ZIP) $(abspath $(rp_observer__xpi_file)) $(patsubst $(rp_observer__source_path)%,%,$(rp_observer__source_files))
-	@echo "Creating Observer XPI: Done!"
+$(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
+	@rm -f $(dev_helper__xpi_file)
+	@echo "Creating 'RPC Dev Helper' XPI."
+	@cd $(dev_helper__source_dirname) && \
+	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
+	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
 # _____________________________________
 # create the files for the "normal" XPI
@@ -315,13 +315,13 @@ $(deleted_files): FORCE
 #
 
 # arguments for mozrunner
-mozrunner_args := -a $(moz_xpi) -a $(rp_observer__xpi_file)
+mozrunner_args := -a $(moz_xpi) -a $(dev_helper__xpi_file)
 mozrunner_args += -b $(app_binary)
 mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
 mozrunner_args += $(moz_args)
 
 .PHONY: run
-run: $(moz_xpi) $(rp_observer__xpi_file)
+run: $(moz_xpi) $(dev_helper__xpi_file)
 	mozrunner $(mozrunner_args)
 
 
@@ -341,8 +341,8 @@ mm_manifest := manifest.ini
 .PHONY: check test mozmill
 check test: mozmill
 
-mozmill: $(moz_xpi) $(rp_observer__xpi_file) mozmill-dirs
-	mozmill -a $(moz_xpi) -a $(rp_observer__xpi_file) -b $(app_binary) \
+mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
 		-m $(mozmill_requestpolicy_test_dir)/$(mm_manifest) $(moz_args)
 
 

@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  *
- * RequestPolicy Observer - A helper add-on for RequestPolicy development.
+ * RPC Dev Helper - A helper add-on for RequestPolicy development.
  * Copyright (c) 2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under

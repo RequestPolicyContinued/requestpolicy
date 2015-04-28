@@ -4,7 +4,7 @@
 
 "use strict";
 
-Components.utils.import("chrome://rp-observer/content/restart-detection-helper.jsm");
+Components.utils.import("chrome://rpc-dev-helper/content/restart-detection-helper.jsm");
 
 
 function setupModule(aModule) {

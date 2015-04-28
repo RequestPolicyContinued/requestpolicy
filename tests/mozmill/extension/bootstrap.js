@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  *
- * RequestPolicy Observer - A helper add-on for RequestPolicy development.
+ * RPC Dev Helper - A helper add-on for RequestPolicy development.
  * Copyright (c) 2015 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
@@ -26,13 +26,13 @@ const Cu = Components.utils;
 
 
 function startup(data, reason) {
-  Cu.import("chrome://rp-observer/content/console-observer.jsm");
+  Cu.import("chrome://rpc-dev-helper/content/console-observer.jsm");
   ConsoleObserver.startup();
 }
 
 function shutdown(data, reason) {
   ConsoleObserver.shutdown();
-  Cu.unload("chrome://rp-observer/content/console-observer.jsm");
+  Cu.unload("chrome://rpc-dev-helper/content/console-observer.jsm");
 }
 
 function install(data, reason) {

@@ -4,11 +4,11 @@
   xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:name>RequestPolicy Observer</em:name>
+    <em:name>RPC Dev Helper</em:name>
     <em:version>dev</em:version>
     <em:type>2</em:type>
     <em:description>Helper Add-On for testing and developing RequestPolicy.</em:description>
-    <em:id>observer@requestpolicy.com</em:id>
+    <em:id>rpc-dev-helper@requestpolicy.org</em:id>
 
     <em:unpack>false</em:unpack>
     <em:bootstrap>true</em:bootstrap>

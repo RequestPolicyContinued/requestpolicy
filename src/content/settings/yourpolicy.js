@@ -134,7 +134,13 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
 function ruleDataPartToDisplayString(ruleDataPart) {
   var str = "";
   if (ruleDataPart["s"]) {
-    str += ruleDataPart["s"] + "://";
+    str += ruleDataPart["s"] + ":";
+
+    if (ruleDataPart["h"]) {
+      // In case no host has been specified, do not show the
+      // two slashes, as it might be an URI without a host.
+      str += "//";
+    }
   }
   str += ruleDataPart["h"] || "*";
   if (ruleDataPart["port"]) {

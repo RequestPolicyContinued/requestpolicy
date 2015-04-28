@@ -37,8 +37,15 @@ RequestLog.prototype.open = function () {
 
   var tree = this.requestLogDoc.getElementById("requestpolicy-requestLog-tree");
   this.treeView = tree.view;
+
+  this.originCol = tree.columns
+      .getNamedColumn("requestpolicy-requestLog-origin");
   this.destCol = tree.columns
       .getNamedColumn("requestpolicy-requestLog-destination");
+  this.blockedCol = tree.columns
+      .getNamedColumn("requestpolicy-requestLog-blocked");
+  this.timeCol = tree.columns
+      .getNamedColumn("requestpolicy-requestLog-time");
 };
 
 RequestLog.prototype.close = function () {
@@ -47,8 +54,12 @@ RequestLog.prototype.close = function () {
 
 RequestLog.prototype.clear = function () {
   findElement.ID(this.windowDoc, "requestpolicy-requestLog-clear").click();
-}
+};
 
+
+RequestLog.prototype.getOrigin = function (aRow) {
+  return this.treeView.getCellText(aRow, this.originCol);
+};
 
 RequestLog.prototype.getDestination = function (aRow) {
   return this.treeView.getCellText(aRow, this.destCol);
@@ -60,6 +71,29 @@ RequestLog.prototype.getDestinations = function () {
     destinations.push(this.getDestination(i));
   }
   return destinations;
+};
+
+RequestLog.prototype.hasBeenAllowed = function (aRow) {
+  let imageSrc = this.treeView.getImageSrc(aRow, this.blockedCol);
+  return imageSrc !== "chrome://requestpolicy/skin/dot.png";
+};
+
+RequestLog.prototype.getRow = function(aRow) {
+  return {
+    origin: this.getOrigin(aRow),
+    destination: this.getDestination(aRow),
+    hasBeenAllowed: this.hasBeenAllowed(aRow)
+  };
+};
+
+RequestLog.prototype.getRowsByDestination = function (aDestination) {
+  let rows = [];
+  for (let i = 0, len = this.treeView.rowCount; i < len; ++i) {
+    if (this.getDestination(i) === aDestination) {
+      rows.push(this.getRow(i));
+    }
+  }
+  return rows;
 };
 
 exports.RequestLog = RequestLog;

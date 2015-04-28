@@ -42,6 +42,6 @@ var testUnknownScheme = function() {
   var getPanel = () => tabBrowser.getTabPanelElement(0,
       '/{"value":"requestpolicy-scheme-notification"}');
 
-  controller.waitFor(() => getPanel().exists(),
-                     "The scheme notification has been displayed.");
+  assert.ok(getPanel().exists() === false,
+            "The scheme notification is NOT displayed.");
 }

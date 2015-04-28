@@ -28,9 +28,13 @@ const Cu = Components.utils;
 function startup(data, reason) {
   Cu.import("chrome://rpc-dev-helper/content/console-observer.jsm");
   ConsoleObserver.startup();
+  Cu.import("chrome://rpc-dev-helper/content/rpc-uri.jsm");
+  CustomUri.startup();
 }
 
 function shutdown(data, reason) {
+  CustomUri.shutdown();
+  Cu.unload("chrome://rpc-dev-helper/content/rpc-uri.jsm");
   ConsoleObserver.shutdown();
   Cu.unload("chrome://rpc-dev-helper/content/console-observer.jsm");
 }

@@ -1,6 +1,16 @@
-### Source Code ChangeLog of RequestPolicy Continued
+### Source Code ChangeLog of RequestPolicyContinued
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
+
+#### Version 1.0.beta9
+* build process
+  * change from `ant` to `make`
+  * usage of npm package `preprocessor`
+* restartlessness: The addon is now restartless! This brought
+  many more changes, they aren't documented though.
+* All files have been renamed to be lowercase.
+* The nsIRequestPolicy interface and its functions have been removed.
+
 
 #### Version 1.0.beta8
 * The functionality of `shouldLoad()` has been moved to `RequestProcessor`.

@@ -1,7 +1,28 @@
-### RequestPolicy Continued ChangeLog
+### RequestPolicyContinued ChangeLog
 
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
+
+#### Version 1.0.beta9
+* new features
+  * RPC is now a bootstrapped addon. (#489)
+    This means that the addon can be installed, upgraded etc. without
+    restarting firefox.
+  * the RequestLog now has a RegEx filter (#537)
+  * releases are now signed (#465)
+  * On preferences pages, if a preference's value gets changed somewhere
+    else, the preferences page is automatically updated.
+    See for example commit 576d09d.
+* updated translation (ja, de)
+* bugfixes
+  * bugs regarding requests with an origin and/or destination
+    without a host:
+    - The request log did not show such requests; now it does.
+    - Such requests have always been rejected until the workaround
+      introduced in beta8. This bug has now been fixed, so the
+      workaround has been removed. (#447)
+      In fact a user can now define rules which specify only a "scheme",
+      no "host". Such rules will match also on requests without host.
 
 #### Version 1.0.beta8.2 (bugfix)
 * fix a bug that caused the subscription `deny_trackers.json` to be

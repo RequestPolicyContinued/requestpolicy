@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'welcomeToRequestPolicy',
   'forMostUsersDefaultsAreIdeal',
   'youCanConfigureRequestPolicyToBeMoreStrict',
@@ -20,27 +20,29 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+Cu.import("resource://gre/modules/Services.jsm");
+
 function showConfigure() {
   $('#welcome').css('display', 'none');
   $('#configure').css('display', 'block');
 }
 
 function handleDefaultPolicyChange() {
-  rpService.prefs.setBoolPref('defaultPolicy.allow',
-      $('#defaultallow').prop('checked'));
-  rpService._prefService.savePrefFile(null);
+  rpPrefBranch.setBoolPref('defaultPolicy.allow',
+      $id("defaultallow").checked);
+  Services.prefs.savePrefFile(null);
   setAllowSameDomainBlockDisplay();
   handleSubscriptionsChange();
 }
 
 function handleAllowSameDomainChange() {
-  rpService.prefs.setBoolPref('defaultPolicy.allowSameDomain',
-      $('#allowsamedomain').prop('checked'));
-  rpService._prefService.savePrefFile(null);
+  rpPrefBranch.setBoolPref('defaultPolicy.allowSameDomain',
+      $id("allowsamedomain").checked);
+  Services.prefs.savePrefFile(null);
 }
 
 function setAllowSameDomainBlockDisplay() {
-  if ($('#defaultallow').prop('checked')) {
+  if ($id("defaultallow").checked) {
     $('#allowsamedomainblock').css('display', 'none');
   } else {
     $('#allowsamedomainblock').css('display', 'block');
@@ -48,9 +50,9 @@ function setAllowSameDomainBlockDisplay() {
 }
 
 function handleSubscriptionsChange() {
-  var enableSubs = $('#enablesubs').prop('checked');
-  var enableAllowSubs = enableSubs && $('#defaultdeny').prop('checked');
-  var enableDenySubs = enableSubs && $('#defaultallow').prop('checked');
+  var enableSubs = $id("enablesubs").checked;
+  var enableAllowSubs = enableSubs && $id("defaultdeny").checked;
+  var enableDenySubs = enableSubs && $id("defaultallow").checked;
   var subs = {
     'allow_embedded':{},
     'allow_extensions':{},
@@ -59,7 +61,7 @@ function handleSubscriptionsChange() {
     'allow_sameorg':{},
     'deny_trackers':{}
   };
-  var userSubs = rpService._subscriptions;
+  var userSubs = rpService.getSubscriptions();
   for (var subName in subs) {
     var subInfo = {};
     subInfo['official'] = {};
@@ -67,38 +69,57 @@ function handleSubscriptionsChange() {
     if (enableAllowSubs && subName.indexOf('allow_') == 0 ||
         enableDenySubs && subName.indexOf('deny_') == 0) {
       userSubs.addSubscription('official', subName);
-      observerService.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo));
     } else {
       userSubs.removeSubscription('official', subName);
-      observerService.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
+      Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo));
     }
   }
 }
 
+/*
+function getArguments(args) {
+  let urlQuery = document.location.search || "";
+  if (urlQuery.length > 1) {
+    urlQuery = decodeURIComponent(urlQuery.substr(1));
+  }
+  let queryArgs = split("&");
+  for (let i in queryArgs) {
+    let tmp = queryArgs.split("=");
+    if (args.hasOwnProperty(tmp)) {
+      args[tmp[0]] = tmp[1];
+    }
+  }
+  return args;
+}*/
+
 function onload() {
+  var lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
+
   // Populate the form values based on the user's current settings.
   // If the use has just upgrade from an 0.x version, populate based on the old
   // preferences and also do a rule import based on the old strictness settings.
   // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
   // before this setup window was added.
-  if (Util.compareVersions(Util.lastVersion, '0.0') > 0 &&
-      Util.compareVersions(Util.lastVersion, '1.0.0a8') <= 0) {
-    if (rpService.prefs.prefHasUserValue('uriIdentificationLevel')) {
-      var identLevel = rpService.prefs.getIntPref('uriIdentificationLevel');
+  if (lastRPVersion &&
+      Services.vc.compare(lastRPVersion, '0.0') > 0 &&
+      Services.vc.compare(lastRPVersion, '1.0.0a8') <= 0) {
+    if (rpPrefBranch.prefHasUserValue('uriIdentificationLevel')) {
+      var identLevel = rpPrefBranch.getIntPref('uriIdentificationLevel');
     } else {
       var identLevel = 1;
     }
-    $('#defaultdeny').prop('checked', true);
+    $id("defaultdeny").checked = true;
     $('#allowsamedomainblock').css('display', 'block');
-    $('#allowsamedomain').prop('checked', identLevel == 1);
+    $id("allowsamedomain").checked = identLevel == 1;
 
     // If the user doesn't have any new-style rules, automatically do an import
     // of the old rules. We check for new-style rules just in case the user has
     // opened the setup window again after initial upgrade.
     try {
-      var ruleCount = rpService._policyMgr.getUserRuleCount();
+      var ruleCount = PolicyManager.getUserRuleCount();
     } catch (e) {
       Logger.warning(Logger.TYPE_INTERNAL, 'Unable to get new rule count: ' + e);
       ruleCount = -1;
@@ -114,14 +135,14 @@ function onload() {
     // Skip the welcome screen.
     showConfigure();
   } else {
-    var defaultAllow = rpService.prefs.getBoolPref('defaultPolicy.allow');
-    $('#defaultallow').prop('checked', defaultAllow);
-    $('#defaultdeny').prop('checked', !defaultAllow);
+    var defaultAllow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
+    $id("defaultallow").checked = !!defaultAllow;
+    $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
-    $('#allowsamedomain').prop('checked',
-        rpService.prefs.getBoolPref('defaultPolicy.allowSameDomain'));
+    $id("allowsamedomain").checked =
+        rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
     // Subscriptions are only simple here if we assume the user won't open the
     // setup window again after changing their individual subscriptions through
     // the preferences. So, let's assume that as the worst case is that the setup

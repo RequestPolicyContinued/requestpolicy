@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+  ***** BEGIN LICENSE BLOCK *****
+
+  RequestPolicy - A Firefox extension for control over cross-site requests.
+  Copyright (c) 2008-2012 Justin Samuel
+  Copyright (c) 2014-2015 Martin Kimmerle
+
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later
+  version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  details.
+
+  You should have received a copy of the GNU General Public License along with
+  this program. If not, see <http://www.gnu.org/licenses/>.
+
+  ***** END LICENSE BLOCK *****
+-->
+<!DOCTYPE page SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://requestpolicy/skin/request-log.css" type="text/css"?>
+
+<page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/x-javascript" src="request-log.js" />
+  <script type="application/x-javascript" src="request-log.interface.js" />
+  <script type="application/x-javascript" src="request-log.tree-view.js" />
+  <script type="application/x-javascript" src="request-log.filtering.js" />
+
+  <popupset>
+    <menupopup id="requestpolicyRequestLogContext">
+      <menuitem
+        id="requestpolicyRequestLogCopyOrigin"
+        label="&rp.requestLog.copyOriginToClipboard;"
+        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-origin');" />
+      <menuitem
+        id="requestpolicyRequestLogOpenOriginNewTab"
+        label="&rp.requestLog.openOriginInNewTab;"
+        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-origin');" />
+      <menuitem
+        id="requestpolicyRequestLogCopyDestination"
+        label="&rp.requestLog.copyDestinationToClipboard;"
+        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-destination');" />
+      <menuitem
+        id="requestpolicyRequestLogDestinationOriginNewTab"
+        label="&rp.requestLog.openDestinationInNewTab;"
+        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-destination');" />
+    </menupopup>
+  </popupset>
+
+  <tree id="requestpolicy-requestLog-tree" flex="1" flags="dont-build-content"
+        seltype="single" context="requestpolicyRequestLogContext">
+    <treecols>
+      <treecol id="requestpolicy-requestLog-origin"
+               label="&rp.requestLog.origin;" flex="1" crop="center"
+               persist="width ordinal hidden"/>
+      <splitter class="tree-splitter"/>
+      <treecol id="requestpolicy-requestLog-destination"
+               label="&rp.requestLog.destination;" flex="1" crop="center"
+               persist="width ordinal hidden"/>
+      <splitter class="tree-splitter"/>
+      <treecol id="requestpolicy-requestLog-blocked"
+               label="&rp.requestLog.blocked;" width="80"
+               persist="width ordinal hidden"/>
+      <splitter class="tree-splitter"/>
+      <treecol id="requestpolicy-requestLog-time" label="&rp.requestLog.time;"
+               width="120" persist="width ordinal hidden"/>
+    </treecols>
+
+    <treechildren/>
+  </tree>
+
+  <hbox align="center" id="search-box">
+    <label accesskey="&rp.requestLog.filterRequests.accesskey;"
+           control="requestpolicy-requestLog-requestFilter"
+           value="&rp.requestLog.filterRequests;"/>
+    <textbox id="requestpolicy-requestLog-requestFilter"
+             oninput="requestpolicy.requestLog.filterChanged(event)" flex="1"/>
+    <button id="requestpolicy-requestLog-clearFilter"
+            oncommand="requestpolicy.requestLog.clearFilter()"
+            label="&rp.requestLog.clearFilter;"
+            accesskey="&rp.requestLog.clearFilter.accesskey;" disabled="true"/>
+  </hbox>
+</page>

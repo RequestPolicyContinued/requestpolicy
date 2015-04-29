@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'basic',
   'advanced',
   'advancedPreferences',
@@ -22,50 +22,50 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
-var prefsChangedObserver = null;
+Cu.import("resource://gre/modules/Services.jsm");
 
 
 function updateDisplay() {
   // Link prefetch.
-  document.getElementById('pref-linkPrefetch').checked =
-      rpService._rootPrefs.getBoolPref('network.prefetch-next');
+  $id('pref-linkPrefetch').checked =
+      rootPrefBranch.getBoolPref('network.prefetch-next');
 
-  document.getElementById('pref-prefetch.link.disableOnStartup').checked =
-      rpService.prefs.getBoolPref('prefetch.link.disableOnStartup');
+  $id('pref-prefetch.link.disableOnStartup').checked =
+      rpPrefBranch.getBoolPref('prefetch.link.disableOnStartup');
 
-  document.getElementById('pref-prefetch.link.restoreDefaultOnUninstall').checked =
-      rpService.prefs.getBoolPref('prefetch.link.restoreDefaultOnUninstall');
+  $id('pref-prefetch.link.restoreDefaultOnUninstall').checked =
+      rpPrefBranch.getBoolPref('prefetch.link.restoreDefaultOnUninstall');
 
   // DNS prefetch.
-  document.getElementById('pref-dnsPrefetch').checked =
-      !rpService._rootPrefs.getBoolPref('network.dns.disablePrefetch');
+  $id('pref-dnsPrefetch').checked =
+      !rootPrefBranch.getBoolPref('network.dns.disablePrefetch');
 
-  document.getElementById('pref-prefetch.dns.disableOnStartup').checked =
-      rpService.prefs.getBoolPref('prefetch.dns.disableOnStartup');
+  $id('pref-prefetch.dns.disableOnStartup').checked =
+      rpPrefBranch.getBoolPref('prefetch.dns.disableOnStartup');
 
-  document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').checked =
-      rpService.prefs.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
+  $id('pref-prefetch.dns.restoreDefaultOnUninstall').checked =
+      rpPrefBranch.getBoolPref('prefetch.dns.restoreDefaultOnUninstall');
 
   // TODO: Create a class which acts as an API for preferences and which ensures
   // that the returned value is always a valid value for "string" preferences.
-  var sorting = rpService.prefs.getCharPref('menu.sorting');
+  var sorting = rpPrefBranch.getCharPref('menu.sorting');
 
-  if (sorting == document.getElementById('sortByNumRequests').value) {
-    document.getElementById('sortByNumRequests').checked = true;
-    document.getElementById('sortByDestName').checked = false;
-    document.getElementById('noSorting').checked = false;
-  } else if (sorting == document.getElementById('noSorting').value) {
-    document.getElementById('sortByNumRequests').checked = false;
-    document.getElementById('sortByDestName').checked = false;
-    document.getElementById('noSorting').checked = true;
+  if (sorting == $id('sortByNumRequests').value) {
+    $id('sortByNumRequests').checked = true;
+    $id('sortByDestName').checked = false;
+    $id('noSorting').checked = false;
+  } else if (sorting == $id('noSorting').value) {
+    $id('sortByNumRequests').checked = false;
+    $id('sortByDestName').checked = false;
+    $id('noSorting').checked = true;
   } else {
-    document.getElementById('sortByNumRequests').checked = false;
-    document.getElementById('sortByDestName').checked = true;
-    document.getElementById('noSorting').checked = false;
+    $id('sortByNumRequests').checked = false;
+    $id('sortByDestName').checked = true;
+    $id('noSorting').checked = false;
   }
 
-  document.getElementById('menu.info.showNumRequests').checked =
-      rpService.prefs.getBoolPref('menu.info.showNumRequests');
+  $id('menu.info.showNumRequests').checked =
+      rpPrefBranch.getBoolPref('menu.info.showNumRequests');
 }
 
 
@@ -73,69 +73,61 @@ function onload() {
   updateDisplay();
 
   // Link prefetch.
-  document.getElementById('pref-linkPrefetch').addEventListener('change',
-      function (event) {
-        rpService._rootPrefs.setBoolPref('network.prefetch-next', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+  elManager.addListener($id('pref-linkPrefetch'), 'change', function (event) {
+    rootPrefBranch.setBoolPref('network.prefetch-next', event.target.checked);
+    Services.prefs.savePrefFile(null);
+  });
 
-  document.getElementById('pref-prefetch.link.disableOnStartup').addEventListener('change',
+  elManager.addListener(
+      $id('pref-prefetch.link.disableOnStartup'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('prefetch.link.disableOnStartup', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+        rpPrefBranch.setBoolPref('prefetch.link.disableOnStartup',
+                                 event.target.checked);
+        Services.prefs.savePrefFile(null);
+      });
 
-  document.getElementById('pref-prefetch.link.restoreDefaultOnUninstall').addEventListener('change',
+  elManager.addListener(
+      $id('pref-prefetch.link.restoreDefaultOnUninstall'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('prefetch.link.restoreDefaultOnUninstall', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+        rpPrefBranch.setBoolPref('prefetch.link.restoreDefaultOnUninstall', event.target.checked);
+        Services.prefs.savePrefFile(null);
+      });
 
   // DNS prefetch.
-  document.getElementById('pref-dnsPrefetch').addEventListener('change',
-      function (event) {
-        rpService._rootPrefs.setBoolPref('network.dns.disablePrefetch', !event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+  elManager.addListener($id('pref-dnsPrefetch'), 'change', function (event) {
+    rootPrefBranch.setBoolPref('network.dns.disablePrefetch', !event.target.checked);
+    Services.prefs.savePrefFile(null);
+  });
 
-  document.getElementById('pref-prefetch.dns.disableOnStartup').addEventListener('change',
+  elManager.addListener(
+      $id('pref-prefetch.dns.disableOnStartup'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('prefetch.dns.disableOnStartup', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+        rpPrefBranch.setBoolPref('prefetch.dns.disableOnStartup', event.target.checked);
+        Services.prefs.savePrefFile(null);
+      });
 
-  document.getElementById('pref-prefetch.dns.restoreDefaultOnUninstall').addEventListener('change',
+  elManager.addListener(
+      $id('pref-prefetch.dns.restoreDefaultOnUninstall'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('prefetch.dns.restoreDefaultOnUninstall', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
+        rpPrefBranch.setBoolPref('prefetch.dns.restoreDefaultOnUninstall', event.target.checked);
+        Services.prefs.savePrefFile(null);
+      });
 
   var sortingListener = function (event) {
-    rpService.prefs.setCharPref('menu.sorting', event.target.value);
-    rpService._prefService.savePrefFile(null);
+    rpPrefBranch.setCharPref('menu.sorting', event.target.value);
+    Services.prefs.savePrefFile(null);
   };
-  document.getElementById('sortByNumRequests').addEventListener('change', sortingListener);
-  document.getElementById('sortByDestName').addEventListener('change', sortingListener);
-  document.getElementById('noSorting').addEventListener('change', sortingListener);
+  elManager.addListener($id('sortByNumRequests'), 'change', sortingListener);
+  elManager.addListener($id('sortByDestName'), 'change', sortingListener);
+  elManager.addListener($id('noSorting'), 'change', sortingListener);
 
-  document.getElementById('menu.info.showNumRequests').addEventListener('change',
+  elManager.addListener(
+      $id('menu.info.showNumRequests'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('menu.info.showNumRequests', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-      }
-  );
-
-  prefsChangedObserver = new common.PrefsChangedObserver(
-      function(subject, topic, data) {
-        updateDisplay();
+        rpPrefBranch.setBoolPref('menu.info.showNumRequests', event.target.checked);
+        Services.prefs.savePrefFile(null);
       });
-  window.addEventListener("beforeunload", function(event) {
-    prefsChangedObserver.unregister();
-  });
+
+  // call updateDisplay() every time a preference gets changed
+  WinEnv.obMan.observePrefChanges(updateDisplay);
 }

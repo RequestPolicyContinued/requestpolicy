@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'yourPolicy',
   'defaultPolicy',
   'subscriptions',
@@ -19,42 +19,38 @@ PAGE_STRINGS = [
 $(function () {
   common.localize(PAGE_STRINGS);
   // l10n for input placeholders.
-  $('#rulesearch').prop('placeholder', _('search'));
-  $('[name=originscheme]').prop('placeholder', _('scheme'));
-  $('[name=destscheme]').prop('placeholder', _('scheme'));
-  $('[name=originhost]').prop('placeholder', _('host'));
-  $('[name=desthost]').prop('placeholder', _('host'));
-  $('[name=originport]').prop('placeholder', _('port'));
-  $('[name=destport]').prop('placeholder', _('port'));
+  $id("rulesearch").placeholder = $str('search');
+  $('[name=originscheme]').prop('placeholder', $str('scheme'));
+  $('[name=destscheme]').prop('placeholder', $str('scheme'));
+  $('[name=originhost]').prop('placeholder', $str('host'));
+  $('[name=desthost]').prop('placeholder', $str('host'));
+  $('[name=originport]').prop('placeholder', $str('port'));
+  $('[name=destport]').prop('placeholder', $str('port'));
 });
 
 const SEARCH_DELAY = 100;
 
 var searchTimeoutId = null;
 
-var rulesChangedObserver = null;
-
 function populateRuleTable(filter) {
   searchTimeoutId = null;
 
-  var policyMgr = rpService._policyMgr;
-
-  var table = document.getElementById('rules');
+  var table = $id('rules');
 
   clearRulesTable(table);
 
   // Get and display user rules
-  var user = policyMgr._userRulesets['user'];
+  var user = PolicyManager.getUserRulesets()['user'];
   var entries = user.rawRuleset.toJSON()['entries'];
   addRules(entries, 'User', filter, false);
 
   // Get and display temorary rules
-  var temp = policyMgr._userRulesets['temp'];
+  var temp = PolicyManager.getUserRulesets()['temp'];
   var entries = temp.rawRuleset.toJSON()['entries'];
   addRules(entries, 'Temporary', filter, false);
 
   // Get and display subscription rules
-  var subscriptionLists = policyMgr._subscriptionRulesets;
+  var subscriptionLists = PolicyManager.getSubscriptionRulesets();
   for (subscriptionList in subscriptionLists) {
     for (subscription in subscriptionLists[subscriptionList]) {
       entries = subscriptionLists[subscriptionList][subscription].rawRuleset.toJSON()['entries'];
@@ -89,9 +85,9 @@ function deleteRule(event) {
   var ruleAction = anchor.data('requestpolicyRuleAction');
   var ruleData = anchor.data('requestpolicyRuleData');
   if (ruleAction == 'allow') {
-    rpService.removeAllowRule(ruleData);
+    PolicyManager.removeAllowRule(ruleData);
   } else {
-    rpService.removeDenyRule(ruleData);
+    PolicyManager.removeDenyRule(ruleData);
   }
   anchor.closest('tr').remove();
 }
@@ -111,7 +107,7 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
     ruleAction = 'block';
   }
   ruleAction = ruleAction == 'allow' ? 'allow' : 'block';
-  var ruleActionString = ruleAction == 'allow' ? _('allow') : _('block');
+  var ruleActionString = ruleAction == 'allow' ? $str('allow') : $str('block');
 
   var row = $('<tr>').addClass(ruleAction).appendTo(table);
 
@@ -138,9 +134,15 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
 function ruleDataPartToDisplayString(ruleDataPart) {
   var str = "";
   if (ruleDataPart["s"]) {
-    str += ruleDataPart["s"] + "://";
+    str += ruleDataPart["s"] + ":";
+
+    if (ruleDataPart["h"]) {
+      // In case no host has been specified, do not show the
+      // two slashes, as it might be an URI without a host.
+      str += "//";
+    }
   }
-  str += ruleDataPart["h"] ? ruleDataPart["h"] : "*";
+  str += ruleDataPart["h"] || "*";
   if (ruleDataPart["port"]) {
     str += ":" + ruleDataPart["port"];
   }
@@ -155,7 +157,7 @@ function addRule() {
     alert('Unable to add rule: ' + e.toString());
     return;
   }
-  var search = document.getElementById('rulesearch');
+  var search = $id('rulesearch');
 
   // the table is repopulated through the RulesChangedObserver
 }
@@ -203,32 +205,24 @@ function addRuleHelper() {
   }
   if (allow) {
     if (temporary) {
-      rpService.addTemporaryAllowRule(ruleData);
+      PolicyManager.addTemporaryAllowRule(ruleData);
     } else {
-      rpService.addAllowRule(ruleData);
+      PolicyManager.addAllowRule(ruleData);
     }
   } else {
     if (temporary) {
-      rpService.addTemporaryDenyRule(ruleData);
+      PolicyManager.addTemporaryDenyRule(ruleData);
     } else {
-      rpService.addDenyRule(ruleData);
+      PolicyManager.addDenyRule(ruleData);
     }
   }
 }
 
-function RulesChangedObserver()
-{
-  common.Observer.call(this, function(subject, topic, data) {
-    var search = document.getElementById('rulesearch');
-    populateRuleTable(search.value);
-  }, "requestpolicy-rules-changed");
-}
-RulesChangedObserver.prototype = Object.create(common.Observer.prototype);
-RulesChangedObserver.prototype.constructor = RulesChangedObserver;
+
 
 function onload() {
-  var search = document.getElementById('rulesearch');
-  search.addEventListener('keyup', function (event) {
+  var search = $id('rulesearch');
+  elManager.addListener(search, 'keyup', function (event) {
     if (searchTimeoutId != null) {
       clearTimeout(searchTimeoutId);
     }
@@ -237,12 +231,13 @@ function onload() {
     }, SEARCH_DELAY);
   }, false);
   populateRuleTable(search.value);
-  if (rpService.oldRulesExist()) {
-    $('#oldrulesexist').show();
+  if (Prefs.oldRulesExist()) {
+    $id("oldrulesexist").hidden = false;
   }
 
-  rulesChangedObserver = new RulesChangedObserver();
-  window.addEventListener("beforeunload", function(event) {
-    rulesChangedObserver.unregister();
+  // observe rule changes and update the table then
+  WinEnv.obMan.observe(["requestpolicy-rules-changed"], function() {
+    var search = $id('rulesearch');
+    populateRuleTable(search.value);
   });
 }

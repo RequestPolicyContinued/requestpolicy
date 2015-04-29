@@ -1,6 +1,6 @@
 
-Components.utils.import("resource://requestpolicy/Ruleset.jsm");
-Components.utils.import("resource://requestpolicy/RulesetStorage.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/ruleset-storage.jsm");
 
 // We expect JSON data to represent the following data structure.
 var exampleJsonObj = {

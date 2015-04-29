@@ -1,20 +1,12 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "すべての一時的な許可を取り消す">
-<!ENTITY rp.menu.blockedDestinations "禁止されている送信先">
-<!ENTITY rp.menu.allowedDestinations "許可されている送信先">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "設定">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "リクエストログ">
 <!ENTITY rp.requestLog.origin "オリジン">
 <!ENTITY rp.requestLog.destination "送信先">
 <!ENTITY rp.requestLog.blocked "禁止">
 <!ENTITY rp.requestLog.time "時間">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
-<!ENTITY rp.requestLog.clear "Clear">
+<!ENTITY rp.requestLog.copyOriginToClipboard "オリジンをクリップボードにコピー">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "送信先をクリップボードにコピー">
+<!ENTITY rp.requestLog.openOriginInNewTab "オリジンを新しいタブで開く">
+<!ENTITY rp.requestLog.openDestinationInNewTab "送信先を新しいタブで開く">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

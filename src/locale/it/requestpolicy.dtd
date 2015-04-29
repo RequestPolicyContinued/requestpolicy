@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Revoca tutti i permessi temporanei">
-<!ENTITY rp.menu.blockedDestinations "Destinazioni bloccate">
-<!ENTITY rp.menu.allowedDestinations "Destinazioni permesse">
-<!ENTITY rp.menu.mixedDestinations "Destinazioni miste">
-<!ENTITY rp.menu.otherOrigins "Altre origini">
-<!ENTITY rp.menu.enableBlocking "Abilita blocco">
-<!ENTITY rp.menu.disableBlocking "Disabilita blocco">
-<!ENTITY rp.menu.help "Aiuto">
-<!ENTITY rp.menu.preferences "Preferenze">
-<!ENTITY rp.menu.managePolicies "Gestisci Regole">
-<!ENTITY rp.requestLog.title "Log Richieste">
 <!ENTITY rp.requestLog.origin "Origine">
 <!ENTITY rp.requestLog.destination "Destinazione">
 <!ENTITY rp.requestLog.blocked "Bloccato">
@@ -17,4 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Copia Destinazione negli Appunti">
 <!ENTITY rp.requestLog.openOriginInNewTab "Apri Origine in una Nuova Scheda">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Apri Destinazione in una Nuova Scheda">
-<!ENTITY rp.requestLog.clear "Svuota">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

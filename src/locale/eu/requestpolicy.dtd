@@ -1,14 +1,3 @@
-<!ENTITY rp.menu.revokeTemporaryPermissions "Aldi baterako baimen guztiak baliogabetu">
-<!ENTITY rp.menu.blockedDestinations "Blokeatutako helmugak">
-<!ENTITY rp.menu.allowedDestinations "Baimendutako helmugak">
-<!ENTITY rp.menu.mixedDestinations "Mixed destinations">
-<!ENTITY rp.menu.otherOrigins "Other origins">
-<!ENTITY rp.menu.enableBlocking "Enable blocking">
-<!ENTITY rp.menu.disableBlocking "Disable blocking">
-<!ENTITY rp.menu.help "Help">
-<!ENTITY rp.menu.preferences "Hobespenak">
-<!ENTITY rp.menu.managePolicies "Manage Policies">
-<!ENTITY rp.requestLog.title "Eskaera Erregistroa">
 <!ENTITY rp.requestLog.origin "Jatorria">
 <!ENTITY rp.requestLog.destination "Helmuga">
 <!ENTITY rp.requestLog.blocked "Blokeatuta">
@@ -17,4 +6,7 @@
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiatu Helmuga Arbelera">
 <!ENTITY rp.requestLog.openOriginInNewTab "Ireki Jatorria Fitxa berri batean">
 <!ENTITY rp.requestLog.openDestinationInNewTab "ireki Helmuga Fitxa berri batean">
-<!ENTITY rp.requestLog.clear "Garbitu">
+<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter.accesskey "C">

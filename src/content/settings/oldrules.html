@@ -2,10 +2,11 @@
 <html>
 <head>
   <title>RequestPolicy - Old Rules</title>
-  <script src="jquery.min.js"></script>
-  <script src="common.js"></script>
-  <script src="oldrules.js"></script>
-  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <script src="chrome://requestpolicy/content/settings/jquery.min.js"></script>
+  <script src="chrome://requestpolicy/content/settings/common.js"></script>
+  <script src="chrome://requestpolicy/content/settings/oldrules.js"></script>
+  <link href="chrome://requestpolicy/content/settings/settings.css"
+        rel="stylesheet" type="text/css"/>
 </head>
 <body onload="onload()">
 <table>
@@ -67,14 +68,18 @@
             <p>If you believe all of your old rules have been correctly
               imported, you can delete your old rules.</p>
 
-            <p id="deleteOldRules"><button type="submit" onclick="deleteOldRules()"
-                data-string="deleteOldRules"></button></p>
+            <p id="deleteOldRules">
+              <button type="submit" onclick="deleteOldRules()"
+                      data-string="deleteOldRules"></button>
+            </p>
 
-            <p id="showReimportOptions"><a
-                href="javascript:showReimportOptions()"
-                data-string="showOldRuleReimportOptions"></a></p>
+            <p id="showReimportOptions">
+              <a href="javascript:showReimportOptions()"
+                 data-string="showOldRuleReimportOptions"></a>
+            </p>
 
-            <div id="deletedone" data-string="yourOldRulesHaveBeenDeleted"></div>
+            <div id="deletedone" data-string="yourOldRulesHaveBeenDeleted">
+            </div>
           </div>
 
           <div id="reimportOldRules">
@@ -112,7 +117,7 @@
             </div>
             <div id="importdone">
               Done! Your old rules have been imported into
-              <a href="yourpolicy.html">your policy</a>.
+              <a href="about:requestpolicy?yourpolicy">your policy</a>.
             </div>
 
           </div>

@@ -5,12 +5,17 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy</em:name>
-    <em:version>1.0.beta8.2</em:version>
+    <em:version>1.0.beta9</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:id>requestpolicy@requestpolicy.com</em:id>
+
+    <em:unpack>false</em:unpack>
+    <em:bootstrap>true</em:bootstrap>
+    <em:multiprocessCompatible>false</em:multiprocessCompatible>
+
     <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
-    <em:optionsURL>chrome://requestpolicy/content/settings/basicprefs.html</em:optionsURL>
+    <em:optionsURL>about:requestpolicy</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
 
@@ -62,8 +67,8 @@
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>4.0</em:minVersion>
-        <em:maxVersion>36.0a1</em:maxVersion>
+        <em:minVersion>16.0</em:minVersion>
+        <em:maxVersion>38.0</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -71,8 +76,8 @@
     <em:targetApplication>
       <Description>
         <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-        <em:minVersion>2.1</em:minVersion>
-        <em:maxVersion>2.15a1</em:maxVersion>
+        <em:minVersion>2.13</em:minVersion>
+        <em:maxVersion>2.32</em:maxVersion>
       </Description>
     </em:targetApplication>
 

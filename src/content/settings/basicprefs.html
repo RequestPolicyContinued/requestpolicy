@@ -2,10 +2,11 @@
 <html>
 <head>
   <title>RequestPolicy - Preferences</title>
-  <script src="jquery.min.js"></script>
-  <script src="common.js"></script>
-  <script src="basicprefs.js"></script>
-  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <script src="chrome://requestpolicy/content/settings/jquery.min.js"></script>
+  <script src="chrome://requestpolicy/content/settings/common.js"></script>
+  <script src="chrome://requestpolicy/content/settings/basicprefs.js"></script>
+  <link href="chrome://requestpolicy/content/settings/settings.css"
+        rel="stylesheet" type="text/css"/>
 </head>
 <body onload="onload()">
 <table>
@@ -16,16 +17,22 @@
         <div id="requestpolicy">RequestPolicy</div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="basicprefs.html" selected="true" data-string="preferences"></a></li>
-            <li><a href="yourpolicy.html" data-string="managePolicies"></a></li>
-            <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support" data-string="help" target="_blank"></a></li>
-            <li><a href="https://requestpolicycontinued.github.io/requestpolicy/#about" data-string="about" target="_blank"></a></li>
+            <li><a href="about:requestpolicy?basicprefs" selected="true"
+                   data-string="preferences"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy"
+                   data-string="managePolicies"></a></li>
+            <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers"
+                   data-string="help" target="_blank"></a></li>
+            <li><a href="https://requestpolicycontinued.github.io/#about"
+                   data-string="about" target="_blank"></a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="basicprefs.html" selected="true" data-string="basic"></a></li>
-            <li><a href="advancedprefs.html" data-string="advanced"></a></li>
+            <li><a href="about:requestpolicy?basicprefs" selected="true"
+                   data-string="basic"></a></li>
+            <li><a href="about:requestpolicy?advancedprefs"
+                   data-string="advanced"></a></li>
           </ul>
         </div>
       </div>

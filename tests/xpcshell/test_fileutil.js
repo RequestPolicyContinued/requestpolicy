@@ -1,5 +1,5 @@
 
-Components.utils.import("resource://requestpolicy/FileUtil.jsm");
+Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm");
 
 function run_test() {
   // Make sure the RP user dir doesn't already exist.
@@ -22,5 +22,3 @@ function run_test() {
 
   // TODO: check perms on the created directories.
 }
-
-

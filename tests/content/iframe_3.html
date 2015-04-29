@@ -1,7 +1,9 @@
+<!doctype html>
 <html>
 <head>
-  <script src="inc/jquery.min.js"></script>
-  <script src="inc/global.js"></script>
+  <meta charset="utf-8" />
+  <script src="inc/jquery.min.js" class="rp-request"></script>
+  <script src="inc/global.js" class="rp-request"></script>
 </head>
 <body>
 
@@ -34,7 +36,7 @@
 
       var html = '<b>' + domain + ':</b><br />' +
           '<iframe id="' + id + '" src="' + src + '" ' +
-          ' width="'+width+'" height="'+height+'"></iframe><br />';
+          ' width="'+width+'" height="'+height+'" class="rp-request"></iframe><br />';
       $('body').append(html);
     }
 

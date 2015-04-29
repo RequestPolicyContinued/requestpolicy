@@ -1,4 +1,4 @@
-PAGE_STRINGS = [
+var PAGE_STRINGS = [
   'basic',
   'advanced',
   'webPages',
@@ -13,72 +13,67 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
-var prefsChangedObserver = null;
+Cu.import("resource://gre/modules/Services.jsm");
 
 
 function updateDisplay() {
-  var indicate = rpService.prefs.getBoolPref('indicateBlockedObjects');
-  document.getElementById('pref-indicateBlockedObjects').checked = indicate;
-  document.getElementById('indicateBlockedImages-details').hidden = !indicate;
+  var indicate = rpPrefBranch.getBoolPref('indicateBlockedObjects');
+  $id('pref-indicateBlockedObjects').checked = indicate;
+  $id('indicateBlockedImages-details').hidden = !indicate;
 
-  document.getElementById('pref-dontIndicateBlacklistedObjects').checked =
-      !rpService.prefs.getBoolPref('indicateBlacklistedObjects');
+  $id('pref-dontIndicateBlacklistedObjects').checked =
+      !rpPrefBranch.getBoolPref('indicateBlacklistedObjects');
 
-  document.getElementById('pref-autoReload').checked =
-      rpService.prefs.getBoolPref('autoReload');
+  $id('pref-autoReload').checked =
+      rpPrefBranch.getBoolPref('autoReload');
 
-  document.getElementById('pref-privateBrowsingPermanentWhitelisting').checked =
-      rpService.prefs.getBoolPref('privateBrowsingPermanentWhitelisting');
+  $id('pref-privateBrowsingPermanentWhitelisting').checked =
+      rpPrefBranch.getBoolPref('privateBrowsingPermanentWhitelisting');
 
-//  if (rpService.prefs.getBoolPref('defaultPolicy.allow')) {
+//  if (rpPrefBranch.getBoolPref('defaultPolicy.allow')) {
 //    var word = 'allow';
 //  } else {
 //    var word = 'block';
 //  }
-//  document.getElementById('defaultpolicyword').innerHTML = word;
+//  $id('defaultpolicyword').innerHTML = word;
 }
 
 
 function onload() {
   updateDisplay();
 
-  document.getElementById('pref-indicateBlockedObjects').addEventListener('change',
+  elManager.addListener(
+      $id('pref-indicateBlockedObjects'), 'change',
       function (event) {
-        rpService.prefs.setBoolPref('indicateBlockedObjects', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-        updateDisplay();
-      }
-  );
-
-  document.getElementById('pref-dontIndicateBlacklistedObjects').addEventListener('change',
-      function (event) {
-        rpService.prefs.setBoolPref('indicateBlacklistedObjects', !event.target.checked);
-        rpService._prefService.savePrefFile(null);
-        updateDisplay();
-      }
-  );
-
-  document.getElementById('pref-autoReload').addEventListener('change',
-    function(event) {
-      rpService.prefs.setBoolPref('autoReload', event.target.checked);
-      rpService._prefService.savePrefFile(null);
-      updateDisplay();
-    }
-  );
-
-  document.getElementById('pref-privateBrowsingPermanentWhitelisting').addEventListener('change',
-      function (event) {
-        rpService.prefs.setBoolPref('privateBrowsingPermanentWhitelisting', event.target.checked);
-        rpService._prefService.savePrefFile(null);
-        updateDisplay();
-      }
-  );
-
-  prefsChangedObserver = new common.PrefsChangedObserver(
-      function(subject, topic, data) {
+        rpPrefBranch.setBoolPref('indicateBlockedObjects', event.target.checked);
+        Services.prefs.savePrefFile(null);
         updateDisplay();
       });
-  window.addEventListener("beforeunload", function(event) {
-    prefsChangedObserver.unregister();
+
+  elManager.addListener(
+      $id('pref-dontIndicateBlacklistedObjects'), 'change',
+      function (event) {
+        rpPrefBranch.setBoolPref('indicateBlacklistedObjects',
+                                 !event.target.checked);
+        Services.prefs.savePrefFile(null);
+        updateDisplay();
+      });
+
+  elManager.addListener($id('pref-autoReload'), 'change', function(event) {
+    rpPrefBranch.setBoolPref('autoReload', event.target.checked);
+    Services.prefs.savePrefFile(null);
+    updateDisplay();
   });
+
+  elManager.addListener(
+      $id('pref-privateBrowsingPermanentWhitelisting'), 'change',
+      function (event) {
+        rpPrefBranch.setBoolPref('privateBrowsingPermanentWhitelisting',
+                                 event.target.checked);
+        Services.prefs.savePrefFile(null);
+        updateDisplay();
+      });
+
+  // call updateDisplay() every time a preference gets changed
+  WinEnv.obMan.observePrefChanges(updateDisplay);
 }

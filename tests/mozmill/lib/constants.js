@@ -6,6 +6,8 @@
 
 exports.mozmillTestsRootDir = "../../../../";
 
+exports.ADDON_ID = "requestpolicy@requestpolicy.com";
+
 exports.PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow";
 exports.PREF_DEFAULT_ALLOW_SAME_DOMAIN =
     "extensions.requestpolicy.defaultPolicy.allowSameDomain";

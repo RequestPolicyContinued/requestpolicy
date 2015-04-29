@@ -2,10 +2,10 @@
 <!ENTITY rp.requestLog.destination "送信先">
 <!ENTITY rp.requestLog.blocked "禁止">
 <!ENTITY rp.requestLog.time "時間">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Copy Origin to Clipboard">
-<!ENTITY rp.requestLog.copyDestinationToClipboard "Copy Destination to Clipboard">
-<!ENTITY rp.requestLog.openOriginInNewTab "Open Origin in New Tab">
-<!ENTITY rp.requestLog.openDestinationInNewTab "Open Destination in New Tab">
+<!ENTITY rp.requestLog.copyOriginToClipboard "オリジンをクリップボードにコピー">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "送信先をクリップボードにコピー">
+<!ENTITY rp.requestLog.openOriginInNewTab "オリジンを新しいタブで開く">
+<!ENTITY rp.requestLog.openDestinationInNewTab "送信先を新しいタブで開く">
 <!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
 <!ENTITY rp.requestLog.filterRequests.accesskey "F">
 <!ENTITY rp.requestLog.clearFilter "Clear Filter">

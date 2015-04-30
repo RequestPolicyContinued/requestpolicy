@@ -546,7 +546,12 @@ function Rule(scheme, port) {
 Rule.prototype = {
 
   scheme : null,
+
+  /**
+   * @type {?string}
+   */
   port : null,
+
   path : null,
 
   // Either null, RULE_ACTION_ALLOW, or RULE_ACTION_DENY.
@@ -612,7 +617,7 @@ Rule.prototype = {
         // If the rule's port is "*" it means any port. We use this convention
         // because we assume an empty port in a rule means default ports rather
         // than any port.
-        if (this.port !== uriObj.port && this.port !== "*") {
+        if (parseInt(this.port, 10) !== uriObj.port && this.port !== "*") {
           //dprint("isMatch: wrong port (not the port specified by the rule)");
           return false;
         }
@@ -780,24 +785,6 @@ Ruleset.prototype = {
     this.rules.print(depth + 1);
   },
 
-  // fixme: this static function should be `Ruleset.isIPAddress()`
-  /**
-   * @static
-   */
-  _isIPAddress : function(host) {
-    // Check if it's an IPv6 address.
-    if (host.indexOf(":") != -1) {
-      return true;
-    }
-    var parts = host.split(".");
-    for (var i = 0; i < parts.length; i++) {
-      if (!parseInt(parts[i])) {
-        return false;
-      }
-    }
-    return true;
-  },
-
   _getIPAddress : function(address) {
     // TODO: Canonicalize IPv6 addresses.
     return this._ipAddr[address];
@@ -851,7 +838,7 @@ Ruleset.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       return this._getIPAddress(host);
     } else {
       return this._getDomain(host);
@@ -862,7 +849,7 @@ Ruleset.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       return this._addIPAddress(host);
     } else {
       return this._addDomain(host);
@@ -893,7 +880,7 @@ Ruleset.prototype = {
       return;
     }
 
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       var addrEntry = this._ipAddr[host];
       if (addrEntry) {
         yield addrEntry;

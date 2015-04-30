@@ -3,6 +3,10 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta9.1 (bugfix)
+* rules with a port specified in the origin or destination haven't
+  been working (#627)
+
 #### Version 1.0.beta9
 * new features
   * RPC is now a bootstrapped addon. (#489)

@@ -780,24 +780,6 @@ Ruleset.prototype = {
     this.rules.print(depth + 1);
   },
 
-  // fixme: this static function should be `Ruleset.isIPAddress()`
-  /**
-   * @static
-   */
-  _isIPAddress : function(host) {
-    // Check if it's an IPv6 address.
-    if (host.indexOf(":") != -1) {
-      return true;
-    }
-    var parts = host.split(".");
-    for (var i = 0; i < parts.length; i++) {
-      if (!parseInt(parts[i])) {
-        return false;
-      }
-    }
-    return true;
-  },
-
   _getIPAddress : function(address) {
     // TODO: Canonicalize IPv6 addresses.
     return this._ipAddr[address];
@@ -851,7 +833,7 @@ Ruleset.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       return this._getIPAddress(host);
     } else {
       return this._getDomain(host);
@@ -862,7 +844,7 @@ Ruleset.prototype = {
     if (!host) {
       throw "INVALID_HOST";
     }
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       return this._addIPAddress(host);
     } else {
       return this._addDomain(host);
@@ -893,7 +875,7 @@ Ruleset.prototype = {
       return;
     }
 
-    if (this._isIPAddress(host)) {
+    if (DomainUtil.isIPAddress(host)) {
       var addrEntry = this._ipAddr[host];
       if (addrEntry) {
         yield addrEntry;

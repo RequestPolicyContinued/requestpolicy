@@ -546,7 +546,12 @@ function Rule(scheme, port) {
 Rule.prototype = {
 
   scheme : null,
+
+  /**
+   * @type {?string}
+   */
   port : null,
+
   path : null,
 
   // Either null, RULE_ACTION_ALLOW, or RULE_ACTION_DENY.
@@ -612,7 +617,7 @@ Rule.prototype = {
         // If the rule's port is "*" it means any port. We use this convention
         // because we assume an empty port in a rule means default ports rather
         // than any port.
-        if (this.port !== uriObj.port && this.port !== "*") {
+        if (parseInt(this.port, 10) !== uriObj.port && this.port !== "*") {
           //dprint("isMatch: wrong port (not the port specified by the rule)");
           return false;
         }

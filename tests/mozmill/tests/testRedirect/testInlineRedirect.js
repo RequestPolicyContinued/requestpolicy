@@ -17,6 +17,7 @@ var rpUtils = require(rpRootDir + "lib/rp-utils");
 var testURLPrePath = "http://www.maindomain.test/";
 var urlsWithInlineRedirect = [
   "redirect-inline-image.html",
+  "redirect-iframe.html",
 ];
 
 

@@ -3,6 +3,9 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta9.2 (bugfix)
+* the redirection notification bar has been shown too often (#561, #630)
+
 #### Version 1.0.beta9.1 (bugfix)
 * rules with a port specified in the origin or destination haven't
   been working (#627)

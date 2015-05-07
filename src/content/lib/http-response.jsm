@@ -56,6 +56,7 @@ function HttpResponse(aHttpChannel) {
 
   XPCOMUtils.defineLazyGetter(this, "loadContext", getLoadContext);
   XPCOMUtils.defineLazyGetter(this, "browser", getBrowser);
+  XPCOMUtils.defineLazyGetter(this, "docShell", getDocShell);
 }
 
 HttpResponse.headerTypes = ["Location", "Refresh"];
@@ -154,7 +155,8 @@ function getLoadContext() {
 }
 
 /**
- * Get the <browser> (nsIDOMXULElement) related to this request.
+ * Get the <browser> related to this request.
+ * @return {?nsIDOMXULElement}
  */
 function getBrowser() {
   let loadContext = this.loadContext;
@@ -175,6 +177,23 @@ function getBrowser() {
   } catch (e) {
     Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The browser for " +
                    "the redirection's Load Context couldn't be " +
+                   "found! " + e);
+    return null;
+  }
+}
+
+/**
+ * Get the DocShell related to this request.
+ * @return {?nsIDocShell}
+ */
+function getDocShell() {
+  try {
+    return this.httpChannel.notificationCallbacks
+                           .QueryInterface(Ci.nsIInterfaceRequestor)
+                           .getInterface(Ci.nsIDocShell);
+  } catch (e) {
+    Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+                   "The redirection's DocShell couldn't be " +
                    "found! " + e);
     return null;
   }

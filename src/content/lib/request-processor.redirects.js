@@ -244,21 +244,7 @@ let RequestProcessor = (function(self) {
         // show the URL of the previously displayed page.
         httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
-        // TODO: show the redirect notification *only* when
-        //           a) a link has been clicked
-        //           b) an url has been entered.
-        //       In any other case the redirect should *not* cause a notific.
-        //       bar to be displayed, because the redirect hasn't been caused by
-        //       *explicit* user interaction.
-        //       Examples for such other cases are inline elements whose
-        //       destination causes a redirect (via a HTTP Header), e.g. <img>.
-        //    Note: As soon as this is fixed, enable this mozmill test:
-        //          tests/mozmill/tests/testRedirect/testInlineRedirect.js
-        showRedirectNotification(request) || Logger.warning(
-            Logger.TYPE_HEADER_REDIRECT,
-            "A redirect has been observed, but it was not possible to notify " +
-            "the user! The redirect was from page <" + request.originURI + "> " +
-            "to <" + request.destURI + ">.");
+        eventuallyShowRedirectNotification(request);
 
         // We try to trace the blocked redirect back to a link click or form
         // submission if we can. It may indicate, for example, a link that
@@ -328,6 +314,55 @@ let RequestProcessor = (function(self) {
       return showNotification(browser, request.destURI, 0, request.originURI);
     });
     return true;
+  }
+
+  /**
+   * @param {RedirectRequest} aRequest
+   */
+  function eventuallyShowRedirectNotification(aRequest) {
+    var httpResponse = aRequest.httpResponse;
+
+    // Check whether the request is associated with a `document` element.
+    {
+      let docShell = httpResponse.docShell;
+
+      if (docShell === null) {
+        return;
+      }
+
+      let busyFlags = docShell.busyFlags;
+      const expectedFlags = Ci.nsIDocShell.BUSY_FLAGS_BUSY
+          | Ci.nsIDocShell.BUSY_FLAGS_BEFORE_PAGE_LOAD;
+
+      // The document is loading AND nothing has been received yet.
+      let isDocumentRequest = (busyFlags & expectedFlags) === expectedFlags;
+
+      if (isDocumentRequest === false) {
+        // This is probably a redirect of an "inline" element, e.g. <img>.
+        return;
+      }
+    }
+
+    // Check whether it's the top-level document that is being loaded.
+    {
+      let loadContext = httpResponse.loadContext;
+
+      if (loadContext === null) {
+        return;
+      }
+
+      if (loadContext.associatedWindow !== loadContext.topWindow) {
+        // this request belongs to a sub-document, e.g. an iframe.
+        return;
+      }
+    }
+
+    showRedirectNotification(aRequest) || Logger.warning(
+        Logger.TYPE_HEADER_REDIRECT,
+        "A redirection of a top-level document has been observed, " +
+        "but it was not possible to notify the user! The redirection " +
+        "was from page <" + request.originURI + "> " +
+        "to <" + request.destURI + ">.");
   }
 
 

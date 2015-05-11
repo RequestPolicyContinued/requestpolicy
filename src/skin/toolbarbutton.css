@@ -8,7 +8,7 @@
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 
-#requestpolicyContextMenu[requestpolicyBlocked="true"] {
+#requestpolicyContextMenu[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
   color: #a00;
@@ -92,23 +92,23 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 
 /*** Australis only: (the new menu) ***/
 /* default: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"],
-/* blocked: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][requestpolicyBlocked="true"] {
+/* blocked: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
 }
 /*** non-Australis only ***/
 /* default: */ toolbar[iconsize="large"] #requestpolicyToolbarButton,
-/* blocked: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
+/* blocked: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
 /* default: */ #requestpolicyToolbarButton[cui-areatype="toolbar"],
-/* blocked: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][requestpolicyBlocked="true"],
+/* blocked: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="true"],
 /** non-Australis: **/
 /* default: */ toolbar[iconsize="small"] #requestpolicyToolbarButton,
-/* blocked: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
+/* blocked: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
@@ -121,20 +121,20 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 
 
 /*** Australis only: (the new menu) ***/
-/* allowed: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][requestpolicyBlocked="false"] {
+/* allowed: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="false"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
 }
 /*** non-Australis only ***/
-/* allowed: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
+/* allowed: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-24-allowed.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** selectors for Australis **/
-/* allowed: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][requestpolicyBlocked="false"],
+/* allowed: */ #requestpolicyToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="false"],
 /** selectors for non-Australis **/
-/* allowed: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
+/* allowed: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }

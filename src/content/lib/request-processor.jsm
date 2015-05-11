@@ -142,7 +142,9 @@ let RequestProcessor = (function(self) {
     }
 
     if (request.aContext) {
-      request.aContext.requestpolicyBlocked = true;
+      // fixme: `rpcontinuedBlocked` is probably not needed anymore.
+      //        There's now `rpcontinuedIdentified`.
+      request.aContext.rpcontinuedBlocked = true;
     }
 
     cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);

@@ -624,7 +624,7 @@ requestpolicy.overlay = (function() {
   self._setContentBlockedState = function(isContentBlocked) {
     var button = $id(toolbarButtonId);
     if (button) {
-      button.setAttribute("requestpolicyBlocked", isContentBlocked);
+      button.setAttribute("rpcontinuedBlocked", isContentBlocked);
     }
   };
 

@@ -72,7 +72,7 @@ requestpolicy.overlay = (function() {
 
   let initialized = false;
 
-  let toolbarButtonId = "requestpolicyToolbarButton";
+  let toolbarButtonId = "rpcontinuedToolbarButton";
 
   let overlayId = 0;
 

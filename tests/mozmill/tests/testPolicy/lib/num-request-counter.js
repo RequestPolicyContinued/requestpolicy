@@ -19,7 +19,7 @@ function NumRequestsCounter(controller) {
   let self = this;
 
   let rpMenuButton = findElement.ID(controller.window.document,
-                                    'requestpolicyToolbarButton');
+                                    'rpcontinuedToolbarButton');
   let rpMenuPopup = findElement.ID(controller.window.document, 'rp-popup');
 
 

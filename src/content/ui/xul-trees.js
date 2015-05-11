@@ -29,7 +29,7 @@ let isSeamonkey = appID === C.SEAMONKEY_ID;
 exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
-    tag: "toolbarbutton", id: "requestpolicyToolbarButton",
+    tag: "toolbarbutton", id: "rpcontinuedToolbarButton",
     label: "RequestPolicy", tooltiptext: "RequestPolicy",
     popup: "rp-popup"
   }

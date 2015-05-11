@@ -25,7 +25,7 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const toolbarButtonId = "requestpolicyToolbarButton";
+const toolbarButtonId = "rpcontinuedToolbarButton";
 
 
 Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");

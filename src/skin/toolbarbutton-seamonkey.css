@@ -5,12 +5,12 @@
  * (the !important keyword is necessary.)
  */
 /* 32px is the default icon size in SeaMonkey */
-toolbar > toolbarpaletteitem #requestpolicyToolbarButton,
-#palette-box #requestpolicyToolbarButton {
+toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
+#palette-box #rpcontinuedToolbarButton {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png) !important;
 }
-toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
+toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
 }
@@ -22,13 +22,13 @@ toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
  * ==> red flag.
  */
 
-/* default: */ toolbar #requestpolicyToolbarButton,
-/* blocked: */ toolbar #requestpolicyToolbarButton[rpcontinuedBlocked="true"] {
+/* default: */ toolbar #rpcontinuedToolbarButton,
+/* blocked: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png);
 }
-/* default: */ toolbar[iconsize="small"] #requestpolicyToolbarButton,
-/* blocked: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[rpcontinuedBlocked="true"] {
+/* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
+/* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
@@ -39,11 +39,11 @@ toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
  * ==> grey flag.
  */
 
-/* allowed: */ toolbar #requestpolicyToolbarButton[rpcontinuedBlocked="false"] {
+/* allowed: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
 }
-/* allowed: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[rpcontinuedBlocked="false"] {
+/* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
@@ -54,11 +54,11 @@ toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
  * ==> yellow flag.
  */
 
-toolbar #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
+toolbar #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
 }
-toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
+toolbar[iconsize="small"] #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
 }

@@ -72,8 +72,8 @@ let ManagerForBlockedContent = (function() {
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
       // Note: we're no longer checking img.requestpolicyBlocked here.
-      if (!img.requestpolicyIdentified && img.src in blockedURIs) {
-        img.requestpolicyIdentified = true;
+      if (!img.rpcontinuedIdentified && img.src in blockedURIs) {
+        img.rpcontinuedIdentified = true;
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";
         img.style.backgroundPosition = "center center";

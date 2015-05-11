@@ -129,11 +129,11 @@ function ObserverManager(aEnv) {
   };
 
   /**
-   * A shorthand for calling observe() with topic "requestpolicy-prefs-changed".
+   * A shorthand for calling observe() with topic "rpcontinued-prefs-changed".
    */
   ObserverManager.prototype.observePrefChanges = function(aCallback) {
     let self = this;
-    self.observeSingleTopic("requestpolicy-prefs-changed", aCallback);
+    self.observeSingleTopic("rpcontinued-prefs-changed", aCallback);
   };
 
   //

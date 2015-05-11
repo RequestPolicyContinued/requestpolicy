@@ -128,7 +128,7 @@ let Prefs = (function() {
       // Send an observer notification that a pref that affects RP has been
       // changed.
       // TODO: also send the pref's name and its branch
-      Services.obs.notifyObservers(null, "requestpolicy-prefs-changed", null);
+      Services.obs.notifyObservers(null, "rpcontinued-prefs-changed", null);
     }
   };
 

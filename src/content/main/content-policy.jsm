@@ -50,8 +50,8 @@ let PolicyImplementation = (function() {
 
   let self = {
     classDescription: "RequestPolicy JavaScript XPCOM Component",
-    classID:          Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
-    contractID:       "@requestpolicy.com/requestpolicy-service;1"
+    classID:          Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}"),
+    contractID:       "@requestpolicy.org/rpcontinued-service;1"
   };
 
   /**

@@ -49,7 +49,7 @@ let PolicyImplementation = (function() {
   let xpcom_categories = ["content-policy"];
 
   let self = {
-    classDescription: "RequestPolicy JavaScript XPCOM Component",
+    classDescription: "RequestPolicy ContentPolicy Implementation",
     classID:          Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}"),
     contractID:       "@requestpolicy.org/rpcontinued-service;1"
   };

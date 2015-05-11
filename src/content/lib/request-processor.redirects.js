@@ -252,7 +252,7 @@ let RequestProcessor = (function(self) {
         // Example:
         //   "link click" -> "first redirect" -> "second redirect"
         {
-          let initialOrigin = getOriginOfInitialRedirect();
+          let initialOrigin = getOriginOfInitialRedirect(request);
 
           if (internal.clickedLinksReverse.hasOwnProperty(initialOrigin)) {
             let linkClickDest = initialOrigin;

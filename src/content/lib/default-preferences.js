@@ -1,4 +1,4 @@
-pref("extensions.requestpolicy@requestpolicy.com.description",
+pref("extensions.rpcontinued@requestpolicy.org.description",
     "chrome://requestpolicy/locale/requestpolicy.properties");
 
 pref("extensions.requestpolicy.log", false);

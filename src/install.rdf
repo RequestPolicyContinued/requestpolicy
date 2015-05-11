@@ -4,11 +4,11 @@
   xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:name>RequestPolicy</em:name>
+    <em:name>RequestPolicy Continued</em:name>
     <em:version>1.0.dev</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
-    <em:id>requestpolicy@requestpolicy.com</em:id>
+    <em:id>rpcontinued@requestpolicy.org</em:id>
 
     <em:unpack>false</em:unpack>
     <em:bootstrap>true</em:bootstrap>

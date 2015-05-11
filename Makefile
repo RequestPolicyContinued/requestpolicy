@@ -11,7 +11,7 @@
 #
 
 extension_name := requestpolicy
-extension_uuid := requestpolicy@requestpolicy.com
+extension_uuid := rpcontinued@requestpolicy.org
 
 # ____________________________________
 # generating XPIs -- general variables

@@ -14,7 +14,7 @@
   color: #a00;
 }
 
-#requestpolicyContextMenu[requestpolicyPermissive="true"] {
+#requestpolicyContextMenu[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
   color: #d07100;
@@ -145,20 +145,20 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
  */
 
 /*** Australis only: (the new menu) ***/
-#rpcontinuedToolbarButton[cui-areatype="menu-panel"][requestpolicyPermissive="true"] {
+#rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
 }
 /*** non-Australis only ***/
-toolbar[iconsize="large"] #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
+toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-24-disabled.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
-#rpcontinuedToolbarButton[cui-areatype="toolbar"][requestpolicyPermissive="true"],
+#rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedPermissive="true"],
 /** non-Australis: **/
-toolbar[iconsize="small"] #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
+toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
 }

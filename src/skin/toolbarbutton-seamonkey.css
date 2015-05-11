@@ -54,11 +54,11 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> yellow flag.
  */
 
-toolbar #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
+toolbar #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
 }
-toolbar[iconsize="small"] #rpcontinuedToolbarButton[requestpolicyPermissive="true"] {
+toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
 }

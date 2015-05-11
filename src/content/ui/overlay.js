@@ -635,7 +635,7 @@ requestpolicy.overlay = (function() {
     var button = $id(toolbarButtonId);
     if (button) {
       let isPermissive = Prefs.isBlockingDisabled();
-      button.setAttribute("requestpolicyPermissive", isPermissive);
+      button.setAttribute("rpcontinuedPermissive", isPermissive);
     }
   }
   /**

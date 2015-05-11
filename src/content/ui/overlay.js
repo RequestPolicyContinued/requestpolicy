@@ -120,7 +120,7 @@ requestpolicy.overlay = (function() {
         popupElement = $id("rp-popup");
 
         //statusbar = $id("status-bar");
-        //rpContextMenu = $id("requestpolicyContextMenu");
+        //rpContextMenu = $id("rpcontinuedContextMenu");
         toolbox = $id("navigator-toolbox");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]

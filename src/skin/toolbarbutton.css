@@ -3,18 +3,18 @@
  * Context menu
  *********************************************/
 /*
-#requestpolicyContextMenu {
+#rpcontinuedContextMenu {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 
-#requestpolicyContextMenu[rpcontinuedBlocked="true"] {
+#rpcontinuedContextMenu[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
   color: #a00;
 }
 
-#requestpolicyContextMenu[rpcontinuedPermissive="true"] {
+#rpcontinuedContextMenu[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
   color: #d07100;

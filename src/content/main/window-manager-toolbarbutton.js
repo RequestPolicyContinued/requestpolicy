@@ -28,7 +28,7 @@ const Cu = Components.utils;
 const toolbarButtonId = "requestpolicyToolbarButton";
 
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules(["lib/utils/xul", "lib/utils", "lib/logger"], this);
 
 if (Utils.info.isAustralis) {

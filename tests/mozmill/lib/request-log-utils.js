@@ -75,7 +75,7 @@ RequestLog.prototype.getDestinations = function () {
 
 RequestLog.prototype.hasBeenAllowed = function (aRow) {
   let imageSrc = this.treeView.getImageSrc(aRow, this.blockedCol);
-  return imageSrc !== "chrome://requestpolicy/skin/dot.png";
+  return imageSrc !== "chrome://rpcontinued/skin/dot.png";
 };
 
 RequestLog.prototype.getRow = function(aRow) {

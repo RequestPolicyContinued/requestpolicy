@@ -32,7 +32,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
@@ -135,7 +135,7 @@ window.requestpolicy.requestLog = (function (self) {
     getImageSrc: function(aIndex, aColumn) {
       if (self.columnNameToIndexMap[aColumn.id] == 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
-          return "chrome://requestpolicy/skin/dot.png";
+          return "chrome://rpcontinued/skin/dot.png";
         }
       }
     },

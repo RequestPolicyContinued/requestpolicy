@@ -34,7 +34,7 @@ requestpolicy.overlay = (function() {
 
   let {ScriptLoader, XPCOMUtils} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
     return mod;
   }());
@@ -1209,7 +1209,7 @@ requestpolicy.overlay = (function() {
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
-          "chrome://requestpolicy/content/ui/request-log.xul");
+          "chrome://rpcontinued/content/ui/request-log.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {

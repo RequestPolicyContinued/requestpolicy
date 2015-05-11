@@ -33,7 +33,7 @@ let EXPORTED_SYMBOLS = ["ObserverManager"];
 let globalScope = this;
 
 /* global ScriptLoader */
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/observers", /* global SingleTopicObserver,
                             SinglePrefBranchObserver */

@@ -21,10 +21,10 @@
 
   ***** END LICENSE BLOCK *****
 -->
-<!DOCTYPE page SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
+<!DOCTYPE page SYSTEM "chrome://rpcontinued/locale/requestpolicy.dtd">
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://requestpolicy/skin/request-log.css" type="text/css"?>
+<?xml-stylesheet href="chrome://rpcontinued/skin/request-log.css" type="text/css"?>
 
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 

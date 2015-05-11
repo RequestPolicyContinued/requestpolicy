@@ -30,7 +30,7 @@ let EXPORTED_SYMBOLS = [
   "RawRuleset"
 ];
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/utils/domains",

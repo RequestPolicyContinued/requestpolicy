@@ -5,18 +5,18 @@
 /*
 #requestpolicyContextMenu {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 
 #requestpolicyContextMenu[requestpolicyBlocked="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
   color: #a00;
 }
 
 #requestpolicyContextMenu[requestpolicyPermissive="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
   color: #d07100;
 }
 */
@@ -70,17 +70,17 @@
 toolbarpaletteitem #requestpolicyToolbarButton,
 toolbar[iconsize="small"] > toolbarpaletteitem #requestpolicyToolbarButton {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png) !important;
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
 }
 toolbar > toolbarpaletteitem #requestpolicyToolbarButton,
 toolbar[iconsize="large"] > toolbarpaletteitem #requestpolicyToolbarButton {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png) !important;
+    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png) !important;
 }
 toolbarpaletteitem[place="palette"] #requestpolicyToolbarButton,
 toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-32.png) !important;
+    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png) !important;
 }
 
 
@@ -94,13 +94,13 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /* default: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"],
 /* blocked: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][requestpolicyBlocked="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-32.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
 }
 /*** non-Australis only ***/
 /* default: */ toolbar[iconsize="large"] #requestpolicyToolbarButton,
 /* blocked: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
@@ -110,7 +110,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /* default: */ toolbar[iconsize="small"] #requestpolicyToolbarButton,
 /* blocked: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
 
 
@@ -123,12 +123,12 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /*** Australis only: (the new menu) ***/
 /* allowed: */ #requestpolicyToolbarButton[cui-areatype="menu-panel"][requestpolicyBlocked="false"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-32-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
 }
 /*** non-Australis only ***/
 /* allowed: */ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-24-allowed.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** selectors for Australis **/
@@ -136,7 +136,7 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /** selectors for non-Australis **/
 /* allowed: */ toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyBlocked="false"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 
 /*
@@ -147,12 +147,12 @@ toolbarpaletteitem[place="panel"] #requestpolicyToolbarButton {
 /*** Australis only: (the new menu) ***/
 #requestpolicyToolbarButton[cui-areatype="menu-panel"][requestpolicyPermissive="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-32-disabled.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
 }
 /*** non-Australis only ***/
 toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-24-disabled.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-24-disabled.png);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
@@ -160,5 +160,5 @@ toolbar[iconsize="large"] #requestpolicyToolbarButton[requestpolicyPermissive="t
 /** non-Australis: **/
 toolbar[iconsize="small"] #requestpolicyToolbarButton[requestpolicyPermissive="true"] {
   list-style-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-disabled.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
 }

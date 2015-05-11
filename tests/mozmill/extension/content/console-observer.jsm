@@ -31,7 +31,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 var regEx = /(Error|Warning|Exception)/i;
 
 function isRPException(aMessage) {
-  if (aMessage.indexOf("chrome://requestpolicy") === -1 ||
+  if (aMessage.indexOf("chrome://rpcontinued") === -1 ||
       regEx.test(aMessage) === false) {
     return false;
   }

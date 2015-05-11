@@ -1,8 +1,8 @@
-Components.utils.import("chrome://requestpolicy/content/lib/file-util.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/file-util.jsm");
 //// TODO: Maybe the script loader needs to be used instead?
 //var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
 //    .getService(Components.interfaces.mozIJSSubScriptLoader);
-//loader.loadSubScript("chrome://requestpolicy/content/modules/FileUtil.jsm");
+//loader.loadSubScript("chrome://rpcontinued/content/modules/FileUtil.jsm");
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {

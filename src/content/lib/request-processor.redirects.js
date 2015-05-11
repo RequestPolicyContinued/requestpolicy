@@ -26,7 +26,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/prefs",

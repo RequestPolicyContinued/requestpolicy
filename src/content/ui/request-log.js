@@ -31,7 +31,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");

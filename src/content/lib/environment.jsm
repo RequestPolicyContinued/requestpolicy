@@ -37,7 +37,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/devtools/Console.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 
 ScriptLoader.defineLazyModuleGetters({
   "lib/manager-for-event-listeners": ["ManagerForEventListeners"],
@@ -534,5 +534,5 @@ FrameScriptEnvironment.prototype.constructor = Environment;
 
 
 // Load the "ProcessEnvironment"
-Services.scriptloader.loadSubScript("chrome://requestpolicy/content/" +
+Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
                                     "lib/environment.process.js");

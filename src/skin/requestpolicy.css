@@ -49,13 +49,13 @@
 
 #rp-blocked-destinations [default-policy="true"],
 #rp-allowed-destinations [default-policy="true"] {
-  background-image: url(chrome://requestpolicy/skin/menu-default.svg);
+  background-image: url(chrome://rpcontinued/skin/menu-default.svg);
 }
 #rp-blocked-destinations [default-policy="false"] {
-  background-image: url(chrome://requestpolicy/skin/menu-blocked.svg);
+  background-image: url(chrome://rpcontinued/skin/menu-blocked.svg);
 }
 #rp-allowed-destinations [default-policy="false"] {
-  background-image: url(chrome://requestpolicy/skin/menu-allowed.svg);
+  background-image: url(chrome://rpcontinued/skin/menu-allowed.svg);
 }
 #rp-blocked-destinations [default-policy],
 #rp-allowed-destinations [default-policy] {
@@ -145,11 +145,11 @@
 }
 #rp-origin[requests-blocked="true"] {
   background-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
 #rp-origin[requests-blocked="false"] {
   background-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 #rp-origin[requests-blocked] {
   background-position: left center;
@@ -169,11 +169,11 @@
 }
 #rp-other-origins [requests-blocked="true"] {
   background-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-blocked.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
 #rp-other-origins [requests-blocked="false"] {
   background-image:
-    url(chrome://requestpolicy/skin/requestpolicy-icon-allowed.png);
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
 #rp-other-origins [requests-blocked] {
   background-position: left center;
@@ -276,7 +276,7 @@
   margin-right: 4px;
   border: none !important;
   background: transparent !important;
-  list-style-image: url(chrome://requestpolicy/skin/close.png);
+  list-style-image: url(chrome://rpcontinued/skin/close.png);
   -moz-image-region: rect(0px, 16px, 16px, 0px);
   -moz-box-align: end;
 }

@@ -34,7 +34,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 let globalScope = this;
 
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/environment",
   "lib/utils"
@@ -59,7 +59,7 @@ function getURI(aURI) {
   if (!id || !(id in filenames)) {
     id = "basicprefs";
   }
-  return "chrome://requestpolicy/content/settings/" + filenames[id];
+  return "chrome://rpcontinued/content/settings/" + filenames[id];
 }
 
 

@@ -36,7 +36,7 @@ let EXPORTED_SYMBOLS = [
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/ruleset",

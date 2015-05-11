@@ -31,7 +31,7 @@ const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/request-result",
@@ -349,4 +349,4 @@ let PolicyManager = (function(self) {
 
 
 Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/lib/policy-manager.alias-functions.js");
+    "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js");

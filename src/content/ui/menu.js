@@ -31,7 +31,7 @@ requestpolicy.menu = (function() {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   // iMod: Alias for ScriptLoader.importModule

@@ -17,7 +17,7 @@
     <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
     <em:optionsURL>about:requestpolicy</em:optionsURL>
     <em:optionsType>3</em:optionsType>
-    <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
+    <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>
 
     <em:updateURL>https://requestpolicycontinued.github.io/xpi/update-1.x-beta.rdf</em:updateURL>
 

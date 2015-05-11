@@ -30,7 +30,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader, Services} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     Cu.import("resource://gre/modules/Services.jsm", mod);
     return mod;
   }());

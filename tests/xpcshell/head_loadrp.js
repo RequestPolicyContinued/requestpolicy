@@ -78,9 +78,9 @@ if (!requestpolicy) {
 //// maybe this needs to be changed to:
 //var loader = Cc["@mozilla.org/moz/jssubscript-loader;1"]
 //    .getService(Ci.mozIJSSubScriptLoader);
-//loader.loadSubScript("chrome://requestpolicy/content/lib/logger.jsm");
+//loader.loadSubScript("chrome://rpcontinued/content/lib/logger.jsm");
 //// ? -- see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_bindings/XPConnect/xpcshell/HOWTO
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/logger.jsm");
 Logger.printFunc = function (msg) {
   print(msg.trimRight());
 }

@@ -178,7 +178,7 @@ exports.mainTree = [
       ]}
     ]},
     // The src of this iframe is set to
-    // chrome://requestpolicy/content/ui/request-log.xul in overlay.js
+    // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
     {tag: "iframe", id: "requestpolicy-requestLog-frame", type: "chrome",
         flex: "1"}
   ]}

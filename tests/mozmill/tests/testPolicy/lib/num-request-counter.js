@@ -18,9 +18,9 @@ function NumRequestsCounter(controller) {
 
   let self = this;
 
-  let rpMenuButton = findElement.ID(controller.window.document,
+  let rpcMenuButton = findElement.ID(controller.window.document,
                                     'rpcontinuedToolbarButton');
-  let rpMenuPopup = findElement.ID(controller.window.document, 'rp-popup');
+  let rpcMenuPopup = findElement.ID(controller.window.document, 'rpc-popup');
 
 
   function initOriginAndDest(originHostname, destHostname) {
@@ -63,8 +63,8 @@ function NumRequestsCounter(controller) {
 
   self.checkIfIsCorrect = function() {
     // open the menu
-    rpMenuButton.click();
-    rpMenuPopup.waitForElement();
+    rpcMenuButton.click();
+    rpcMenuPopup.waitForElement();
 
     {
       let rpOriginNumReq = rpUtils.getElementById(controller.window.document,
@@ -108,7 +108,7 @@ function NumRequestsCounter(controller) {
      */
 
     // close the menu
-    rpMenuPopup.keypress('VK_ESCAPE');
+    rpcMenuPopup.keypress('VK_ESCAPE');
   };
 
   return self;

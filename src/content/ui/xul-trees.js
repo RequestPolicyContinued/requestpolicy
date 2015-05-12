@@ -31,7 +31,7 @@ exports.toolbarbutton = [
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
     tag: "toolbarbutton", id: "rpcontinuedToolbarButton",
     label: "RequestPolicy", tooltiptext: "RequestPolicy Continued",
-    popup: "rp-popup"
+    popup: "rpc-popup"
   }
 ];
 
@@ -64,7 +64,7 @@ exports.mainTree = [
       tag: "popupset", id: "requestpolicyPopupset",
   children: [
     {tag: "menupopup", id: "requestpolicyRedirectAddRuleMenu"},
-    {tag: "menupopup", id: "rp-popup", noautohide: "true",
+    {tag: "menupopup", id: "rpc-popup", noautohide: "true",
         position: "after_start",
         onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",
         onpopuphidden: "requestpolicy.overlay.onPopupHidden(event);",

@@ -117,7 +117,7 @@ requestpolicy.overlay = (function() {
 
         requestpolicy.menu.init();
 
-        popupElement = $id("rp-popup");
+        popupElement = $id("rpc-popup");
 
         //statusbar = $id("status-bar");
         //rpContextMenu = $id("rpcontinuedContextMenu");

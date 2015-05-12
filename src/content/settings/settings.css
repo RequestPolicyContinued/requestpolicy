@@ -38,10 +38,11 @@ text in the side. */
   margin-right: 20px;
 }
 
-#side #requestpolicy {
+#side #rpcontinued {
   margin: 0 0 30px 6px;
   font-size: 1.6em;
   letter-spacing: 0.03em;
+  line-height: 1em;
 }
 
 #side .nav {

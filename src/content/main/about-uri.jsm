@@ -47,6 +47,7 @@ var filenames = {
   "yourpolicy": "yourpolicy.html",
   "defaultpolicy": "defaultpolicy.html",
   "subscriptions": "subscriptions.html",
+  "oldrules": "oldrules.html",
   "setup": "setup.html"
 };
 

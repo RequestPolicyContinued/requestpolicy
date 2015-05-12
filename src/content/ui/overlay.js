@@ -1033,8 +1033,8 @@ requestpolicy.overlay = (function() {
     Prefs.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
-    $id("rp-link-enable-blocking").hidden = !disabled;
-    $id("rp-link-disable-blocking").hidden = disabled;
+    $id("rpc-link-enable-blocking").hidden = !disabled;
+    $id("rpc-link-disable-blocking").hidden = disabled;
   };
 
   /**

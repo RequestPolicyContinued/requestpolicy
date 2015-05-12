@@ -7,21 +7,21 @@
   margin: 0;
   font-family: Helvetica, sans-serif;
 }
-#rp-contents {
+#rpc-contents {
   background-color: #ffffff;
 }
-#rp-main {
+#rpc-main {
   padding: 10px 10px 10px 10px;
   font-size: 13px;
 }
 
-#rp-origins-destinations {
+#rpc-origins-destinations {
   width : 200px;
   margin-right: 10px;
 }
 
 /*
-#rp-origins-destinations .rp-od-item {
+#rpc-origins-destinations .rpc-od-item {
   border: 1px solid #ffffff;
   border-right: 0;
   padding: 2px 0 2px 8px;
@@ -30,229 +30,229 @@
   border-bottom-left-radius: 3px;
 }
 */
-.rp-od-item {
+.rpc-od-item {
   border: 1px solid #ffffff;
   padding: 0 12px 0 12px;
   margin: 0px 4px 0px 4px;
   border-radius: 3px;
 }
 
-#rp-origins-destinations [selected-origin="true"] {
+#rpc-origins-destinations [selected-origin="true"] {
   border-color: #ddd !important;
   background-color: #eaeaea;
 }
-#rp-origins-destinations [selected-origin="false"]:hover {
+#rpc-origins-destinations [selected-origin="false"]:hover {
   border-color: #eee !important;
   background-color: #f1f1f1;
 }
 
 
-#rp-blocked-destinations [default-policy="true"],
-#rp-allowed-destinations [default-policy="true"] {
+#rpc-blocked-destinations [default-policy="true"],
+#rpc-allowed-destinations [default-policy="true"] {
   background-image: url(chrome://rpcontinued/skin/menu-default.svg);
 }
-#rp-blocked-destinations [default-policy="false"] {
+#rpc-blocked-destinations [default-policy="false"] {
   background-image: url(chrome://rpcontinued/skin/menu-blocked.svg);
 }
-#rp-allowed-destinations [default-policy="false"] {
+#rpc-allowed-destinations [default-policy="false"] {
   background-image: url(chrome://rpcontinued/skin/menu-allowed.svg);
 }
-#rp-blocked-destinations [default-policy],
-#rp-allowed-destinations [default-policy] {
+#rpc-blocked-destinations [default-policy],
+#rpc-allowed-destinations [default-policy] {
   background-position: left center;
   background-repeat: no-repeat;
   background-size: 14px 14px;
   padding-left: 20px;
 }
 
-#rp-blocked-destinations [selected-dest="true"] {
+#rpc-blocked-destinations [selected-dest="true"] {
   border-color: #edd !important;
   background-color: #ffe1e1;
 }
-#rp-blocked-destinations [selected-dest="false"]:hover {
+#rpc-blocked-destinations [selected-dest="false"]:hover {
   border-color: #fee !important;
   background-color: #fff1f1;
 }
 
-#rp-mixed-destinations [selected-dest="true"] {
+#rpc-mixed-destinations [selected-dest="true"] {
   border-color: #F2E2C7 !important;
   background-color: #FFF3DE;
 }
-#rp-mixed-destinations [selected-dest="false"]:hover {
+#rpc-mixed-destinations [selected-dest="false"]:hover {
   border-color: #FFF3DE !important;
   background-color: #FFFAF2;
 }
 
-#rp-allowed-destinations [selected-dest="true"] {
+#rpc-allowed-destinations [selected-dest="true"] {
   border-color: #ded !important;
   background-color: #e1ffe1;
 }
-#rp-allowed-destinations [selected-dest="false"]:hover {
+#rpc-allowed-destinations [selected-dest="false"]:hover {
   border-color: #efe !important;
   background-color: #f1fff1;
 }
 
-#rp-details .rp-od-item:hover {
+#rpc-details .rpc-od-item:hover {
   border-color: #eee !important;
   background-color: #f1f1f1;
 }
-#rp-details .rp-allow {
+#rpc-details .rp-allow {
   /* This should probably stay the same color as the allowed destinations. */
   color: #484;
 }
-#rp-details .rp-deny {
+#rpc-details .rp-deny {
   /* This should probably stay the same color as the blocked destinations. */
   color: #844;
 }
-#rp-details .rp-temporary {
+#rpc-details .rp-temporary {
   font-style: italic;
   font-size: 0.9em;
   color: #999;
 }
 /* When in private browsing mode, the user only has the option of adding
    temporary rules. So, don't show them only small, grey text. */
-#rp-details.privatebrowsing .rp-allow {
+#rpc-details.privatebrowsing .rp-allow {
   font-size: 1em;
   color: #484;
 }
-#rp-details.privatebrowsing .rp-deny {
+#rpc-details.privatebrowsing .rp-deny {
   font-size: 1em;
   color: #844;
 }
 
 
 
-#rp-details .rp-stop-rule[selected-rule="true"] {
+#rpc-details .rp-stop-rule[selected-rule="true"] {
   text-decoration: underline;
 }
 
-#rp-details .rp-start-rule[selected-rule="true"] {
+#rpc-details .rp-start-rule[selected-rule="true"] {
   text-decoration: underline;
 }
 
-#rp-rules-remove label:last-child {
+#rpc-rules-remove label:last-child {
   margin-bottom: 14px;
 }
 
-#rp-origin #rp-origin-domainname {
+#rpc-origin #rpc-origin-domainname {
   font-size: 1.2em;
   color : #555;
   padding-right: 10px;
 }
-#rp-origin #rp-origin-num-requests {
+#rpc-origin #rpc-origin-num-requests {
   font-size: 1.2em;
   color: #777;
 }
-#rp-origin[requests-blocked="true"] {
+#rpc-origin[requests-blocked="true"] {
   background-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
-#rp-origin[requests-blocked="false"] {
+#rpc-origin[requests-blocked="false"] {
   background-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
-#rp-origin[requests-blocked] {
+#rpc-origin[requests-blocked] {
   background-position: left center;
   background-repeat: no-repeat;
   background-size: 14px 14px;
   padding-left: 20px;
 }
 
-.rp-label-list {
+.rpc-label-list {
   /*margin-left : 10px;*/
 }
-#rp-other-origins {
+#rpc-other-origins {
   color: #444;
   margin-top: 1em;
   padding-bottom: 1em;
   border-bottom: 1px solid #eee;
 }
-#rp-other-origins [requests-blocked="true"] {
+#rpc-other-origins [requests-blocked="true"] {
   background-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
 }
-#rp-other-origins [requests-blocked="false"] {
+#rpc-other-origins [requests-blocked="false"] {
   background-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
 }
-#rp-other-origins [requests-blocked] {
+#rpc-other-origins [requests-blocked] {
   background-position: left center;
   background-repeat: no-repeat;
   background-size: 14px 14px;
   padding-left: 20px;
 }
 
-#rp-other-origins-title {
+#rpc-other-origins-title {
   color: #aaa;
 }
 
-#rp-blocked-destinations {
+#rpc-blocked-destinations {
   color: #844;
   margin-top: 1em;
 }
-#rp-blocked-destinations-title {
+#rpc-blocked-destinations-title {
   color: #caa;
 }
 
-#rp-mixed-destinations {
+#rpc-mixed-destinations {
   color: #AA7215;
   margin-top: 1em;
 }
-#rp-mixed-destinations-title {
+#rpc-mixed-destinations-title {
   color: #CCAF7D;
 }
 
-#rp-allowed-destinations {
+#rpc-allowed-destinations {
   color: #484;
   margin-top: 1em;
 }
-#rp-allowed-destinations-title {
+#rpc-allowed-destinations-title {
   color: #aca;
 }
 
-#rp-details {
+#rpc-details {
   padding: 0 1em 0 1em;
   border-left: 1px solid #eee;
   width: 500px !important;
 }
 
-#rp-revoke-temporary-permissions {
+#rpc-revoke-temporary-permissions {
   border-top: 1px solid #ddd;
   padding: 7px 5px 9px 5px;
   -moz-box-pack: center;
 }
-#rp-revoke-temporary-permissions label {
+#rpc-revoke-temporary-permissions label {
   color: #2550ba;
   font-size: 14px;
   margin: 0 10px 0 10px;
 }
-#rp-revoke-temporary-permissions label:hover {
+#rpc-revoke-temporary-permissions label:hover {
   text-decoration: underline;
   cursor: pointer;
 }
 
-#rp-footer {
+#rpc-footer {
   border-top: 1px solid #ddd;
   padding: 0 5px 2px 5px;
   -moz-box-pack: end;
 }
-#rp-footer-links {
+#rpc-footer-links {
   margin-top: 4px;
 }
-.rp-footer-link {
+.rpc-footer-link {
   color: #888;
   font-size: 11px;
   margin: 0 10px 0 10px;
 }
-.rp-footer-link:hover {
+.rpc-footer-link:hover {
   color: #555;
   text-decoration: underline;
   cursor: pointer;
 }
-#rp-link-disable-blocking {
+#rpc-link-disable-blocking {
   color: #000;
 }
-#rp-link-enable-blocking {
+#rpc-link-enable-blocking {
   color: #966803;
 }
 

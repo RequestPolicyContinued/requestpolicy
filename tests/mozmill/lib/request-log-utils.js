@@ -25,7 +25,7 @@ RequestLog.prototype.open = function () {
     menu.open();
 
     // open the request log
-    findElement.ID(this.windowDoc, "rp-link-request-log").click();
+    findElement.ID(this.windowDoc, "rpc-link-request-log").click();
 
     // close the menu
     menu.close();

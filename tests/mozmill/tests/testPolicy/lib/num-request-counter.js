@@ -68,14 +68,14 @@ function NumRequestsCounter(controller) {
 
     {
       let rpOriginNumReq = rpUtils.getElementById(controller.window.document,
-                                                  "rp-origin-num-requests");
+                                                  "rpc-origin-num-requests");
       let total = counter.$total.$total;
       let totalAllow = counter.$total.allowed;
       let totalDeny = counter.$total.denied;
 
       let re = /^\s*([0-9]+)\s*(?:\(\s*([0-9]+)\s*\+\s*([0-9]+)\s*\))?\s*$/;
       let reResult = re.exec(rpOriginNumReq.value);
-      assert.ok(reResult !== null, "The numRequests field of #rp-origin " +
+      assert.ok(reResult !== null, "The numRequests field of #rpc-origin " +
                 "has the correct format, either 'num' or 'num (num + num)'.");
       assert.ok(reResult[1] > total, "The total number of requests" +
                 " is correct.");

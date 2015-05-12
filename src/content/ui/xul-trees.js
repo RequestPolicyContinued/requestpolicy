@@ -68,82 +68,82 @@ exports.mainTree = [
         onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",
         onpopuphidden: "requestpolicy.overlay.onPopupHidden(event);",
     children: [
-      {tag: "vbox", id: "rp-contents",
+      {tag: "vbox", id: "rpc-contents",
       children: [
-        {tag: "hbox", id: "rp-main",
+        {tag: "hbox", id: "rpc-main",
         children: [
-          {tag: "vbox", id: "rp-origins-destinations",
+          {tag: "vbox", id: "rpc-origins-destinations",
           children: [
-            {tag: "hbox", id: "rp-origin", "class": "rp-od-item",
+            {tag: "hbox", id: "rpc-origin", "class": "rpc-od-item",
                 onclick: "requestpolicy.menu.itemSelected(event);",
             children: [
-              {tag: "label", id: "rp-origin-domainname", "class": "domainname",
+              {tag: "label", id: "rpc-origin-domainname", "class": "domainname",
                   flex: "2"},
-              {tag: "label", id: "rp-origin-num-requests",
+              {tag: "label", id: "rpc-origin-num-requests",
                   "class": "numRequests"}
             ]},
-            {tag: "vbox", id: "rp-other-origins",
+            {tag: "vbox", id: "rpc-other-origins",
             children: [
-              {tag: "label", id: "rp-other-origins-title",
+              {tag: "label", id: "rpc-other-origins-title",
                   value: "&rp.menu.otherOrigins;"},
-              {tag: "vbox", id: "rp-other-origins-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-other-origins-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-blocked-destinations",
+            {tag: "vbox", id: "rpc-blocked-destinations",
             children: [
-              {tag: "label", id: "rp-blocked-destinations-title",
+              {tag: "label", id: "rpc-blocked-destinations-title",
                   value: "&rp.menu.blockedDestinations;"},
-              {tag: "vbox", id: "rp-blocked-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-blocked-destinations-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-mixed-destinations",
+            {tag: "vbox", id: "rpc-mixed-destinations",
             children: [
-              {tag: "label", id: "rp-mixed-destinations-title",
+              {tag: "label", id: "rpc-mixed-destinations-title",
                   value: "&rp.menu.mixedDestinations;"},
-              {tag: "vbox", id: "rp-mixed-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-mixed-destinations-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-allowed-destinations",
+            {tag: "vbox", id: "rpc-allowed-destinations",
             children: [
-              {tag: "label", id: "rp-allowed-destinations-title",
+              {tag: "label", id: "rpc-allowed-destinations-title",
                   value: "&rp.menu.allowedDestinations;"},
-              {tag: "vbox", id: "rp-allowed-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-allowed-destinations-list",
+                  "class": "rpc-label-list"}
             ]}
           ]},
-          {tag: "vbox", id: "rp-details",
+          {tag: "vbox", id: "rpc-details",
           children: [
-            {tag: "vbox", id: "rp-rules-remove"},
-            {tag: "vbox", id: "rp-rules-add"},
-            {tag: "vbox", id: "rp-rules-info"}
+            {tag: "vbox", id: "rpc-rules-remove"},
+            {tag: "vbox", id: "rpc-rules-add"},
+            {tag: "vbox", id: "rpc-rules-info"}
           ]}
         ]},
-        {tag: "hbox", id: "rp-revoke-temporary-permissions", hidden: "true",
+        {tag: "hbox", id: "rpc-revoke-temporary-permissions", hidden: "true",
         children: [
           {tag: "label", value: "&rp.menu.revokeTemporaryPermissions;",
               onclick: "requestpolicy.overlay.revokeTemporaryPermissions();"}
         ]},
-        {tag: "hbox", id: "rp-footer",
+        {tag: "hbox", id: "rpc-footer",
         children: [
-          {tag: "hbox", id: "rp-footer-links",
+          {tag: "hbox", id: "rpc-footer-links",
           children: [
-            {tag: "label", id: "rp-link-enable-blocking",
-                "class": "rp-footer-link", value: "&rp.menu.enableBlocking;",
+            {tag: "label", id: "rpc-link-enable-blocking",
+                "class": "rpc-footer-link", value: "&rp.menu.enableBlocking;",
                 onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rp-link-disable-blocking",
-                "class": "rp-footer-link", value: "&rp.menu.disableBlocking;",
+            {tag: "label", id: "rpc-link-disable-blocking",
+                "class": "rpc-footer-link", value: "&rp.menu.disableBlocking;",
                 onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rp-link-help", "class": "rp-footer-link",
+            {tag: "label", id: "rpc-link-help", "class": "rpc-footer-link",
                 value: "&rp.menu.help;",
                 onclick: "requestpolicy.overlay.openHelp();"},
-            {tag: "label", id: "rp-link-prefs", "class": "rp-footer-link",
+            {tag: "label", id: "rpc-link-prefs", "class": "rpc-footer-link",
                 value: "&rp.menu.preferences;",
                 onclick: "requestpolicy.overlay.openPrefs(event);"},
-            {tag: "label", id: "rp-link-policies", "class": "rp-footer-link",
+            {tag: "label", id: "rpc-link-policies", "class": "rpc-footer-link",
                 value: "&rp.menu.managePolicies;",
                 onclick: "requestpolicy.overlay.openPolicyManager();"},
-            {tag: "label", id: "rp-link-request-log", "class": "rp-footer-link",
-                value: "&rp.requestLog.title;",
+            {tag: "label", id: "rpc-link-request-log",
+                "class": "rpc-footer-link", value: "&rp.requestLog.title;",
                 onclick: "requestpolicy.overlay.toggleRequestLog(event);"}
           ]}
         ]}

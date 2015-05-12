@@ -27,7 +27,7 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
 
-const RULES_CHANGED_TOPIC = "requestpolicy-rules-changed";
+const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
 Cu.import("resource://gre/modules/Services.jsm");
 

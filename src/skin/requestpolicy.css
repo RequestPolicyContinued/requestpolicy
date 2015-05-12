@@ -96,37 +96,37 @@
   border-color: #eee !important;
   background-color: #f1f1f1;
 }
-#rpc-details .rp-allow {
+#rpc-details .rpc-allow {
   /* This should probably stay the same color as the allowed destinations. */
   color: #484;
 }
-#rpc-details .rp-deny {
+#rpc-details .rpc-deny {
   /* This should probably stay the same color as the blocked destinations. */
   color: #844;
 }
-#rpc-details .rp-temporary {
+#rpc-details .rpc-temporary {
   font-style: italic;
   font-size: 0.9em;
   color: #999;
 }
 /* When in private browsing mode, the user only has the option of adding
    temporary rules. So, don't show them only small, grey text. */
-#rpc-details.privatebrowsing .rp-allow {
+#rpc-details.privatebrowsing .rpc-allow {
   font-size: 1em;
   color: #484;
 }
-#rpc-details.privatebrowsing .rp-deny {
+#rpc-details.privatebrowsing .rpc-deny {
   font-size: 1em;
   color: #844;
 }
 
 
 
-#rpc-details .rp-stop-rule[selected-rule="true"] {
+#rpc-details .rpc-stop-rule[selected-rule="true"] {
   text-decoration: underline;
 }
 
-#rpc-details .rp-start-rule[selected-rule="true"] {
+#rpc-details .rpc-start-rule[selected-rule="true"] {
   text-decoration: underline;
 }
 
@@ -259,11 +259,11 @@
 /*********************************************
 * ClassicMenu contents
 *********************************************/
-.requestpolicyTemporary {
+.rpcontinuedTemporary {
   font-style: italic;
 }
 
-.requestpolicyAllowOriginToDest {
+.rpcontinuedAllowOriginToDest {
   font-weight: bold;
 }
 

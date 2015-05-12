@@ -75,7 +75,7 @@ requestpolicy.classicmenu = (function() {
     var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 
@@ -95,7 +95,7 @@ requestpolicy.classicmenu = (function() {
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 
@@ -106,7 +106,7 @@ requestpolicy.classicmenu = (function() {
         + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyAllowOriginToDest");
+    item.setAttribute("class", "rpcontinuedAllowOriginToDest");
     return item;
   };
 
@@ -116,7 +116,7 @@ requestpolicy.classicmenu = (function() {
     var command = "requestpolicy.overlay.temporarilyAllowDestination('"
         + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 

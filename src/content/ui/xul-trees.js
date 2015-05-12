@@ -52,7 +52,7 @@ exports.mainTree = [
 
 
   {parent: {special: {type: "__window__"}},
-      tag: "keyset", id: "requestpolicyKeyset",
+      tag: "keyset", id: "rpcontinuedKeyset",
   children: [
     {tag: "key", key: "r", modifiers: "accel alt",
         oncommand: "requestpolicy.overlay.openMenuByHotkey()"}
@@ -60,7 +60,7 @@ exports.mainTree = [
 
 
   {parent: {special: {type: "__window__"}},
-      tag: "popupset", id: "requestpolicyPopupset",
+      tag: "popupset", id: "rpcontinuedPopupset",
   children: [
     {tag: "menupopup", id: "requestpolicyRedirectAddRuleMenu"},
     {tag: "menupopup", id: "rpc-popup", noautohide: "true",

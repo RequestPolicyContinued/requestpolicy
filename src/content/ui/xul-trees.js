@@ -62,7 +62,7 @@ exports.mainTree = [
   {parent: {special: {type: "__window__"}},
       tag: "popupset", id: "rpcontinuedPopupset",
   children: [
-    {tag: "menupopup", id: "requestpolicyRedirectAddRuleMenu"},
+    {tag: "menupopup", id: "rpcontinuedRedirectAddRuleMenu"},
     {tag: "menupopup", id: "rpc-popup", noautohide: "true",
         position: "after_start",
         onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",

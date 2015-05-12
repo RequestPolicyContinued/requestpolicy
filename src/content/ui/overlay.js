@@ -470,7 +470,7 @@ requestpolicy.overlay = (function() {
     }
 
 
-    var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
+    var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
     DOMUtils.removeChildren(addRulePopup);
 

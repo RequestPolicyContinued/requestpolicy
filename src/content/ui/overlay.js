@@ -177,7 +177,7 @@ requestpolicy.overlay = (function() {
   OverlayEnvironment.addShutdownFunction(
     Environment.LEVELS.UI,
     function() {
-      let requestLog = $id("requestpolicy-requestLog");
+      let requestLog = $id("rpcontinued-requestLog");
 
       // If the request log is found and is opened.
       // The XUL elements of the request log might have already
@@ -1198,9 +1198,9 @@ requestpolicy.overlay = (function() {
   };
 
   self.toggleRequestLog = function() {
-    var requestLog = $id("requestpolicy-requestLog");
-    var requestLogSplitter = $id("requestpolicy-requestLog-splitter");
-    var requestLogFrame = $id("requestpolicy-requestLog-frame");
+    var requestLog = $id("rpcontinued-requestLog");
+    var requestLogSplitter = $id("rpcontinued-requestLog-splitter");
+    var requestLogFrame = $id("rpcontinued-requestLog-frame");
     //var openRequestLog = $id("requestpolicyOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.

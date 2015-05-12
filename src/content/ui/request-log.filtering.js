@@ -40,8 +40,8 @@ window.requestpolicy.requestLog = (function (self) {
 
   // TODO: use the Window Environment instead
   let elements = WindowUtils.getElementsByIdOnLoad(window, {
-        filterTextbox: "requestpolicy-requestLog-requestFilter",
-        clearFilterButton: "requestpolicy-requestLog-clearFilter"
+        filterTextbox: "rpcontinued-requestLog-requestFilter",
+        clearFilterButton: "rpcontinued-requestLog-clearFilter"
       });
 
   self.filterChanged = function() {

@@ -153,32 +153,32 @@ exports.mainTree = [
 
 
   {parent: {id: "appcontent"},
-      tag: "splitter", id: "requestpolicy-requestLog-splitter", hidden: "true"},
+      tag: "splitter", id: "rpcontinued-requestLog-splitter", hidden: "true"},
 
   {parent: {id: "appcontent"},
-      tag: "vbox", id: "requestpolicy-requestLog", height: "300",
+      tag: "vbox", id: "rpcontinued-requestLog", height: "300",
       hidden: "true", persist: "height",
   children: [
-    {tag: "toolbox", id: "requestpolicy-requestLog-header",
+    {tag: "toolbox", id: "rpcontinued-requestLog-header",
     children: [
-      {tag: "toolbar", id: "requestpolicy-requestLog-toolbar",
+      {tag: "toolbar", id: "rpcontinued-requestLog-toolbar",
           align: "center",
       children: [
-        {tag: "label", id: "requestpolicy-requestLog-title",
-            control: "requestpolicy-requestLog-frame",
+        {tag: "label", id: "rpcontinued-requestLog-title",
+            control: "rpcontinued-requestLog-frame",
             value: "&rp.requestLog.title;", crop: "end"},
-        {tag: "button", id: "requestpolicy-requestLog-clear",
+        {tag: "button", id: "rpcontinued-requestLog-clear",
             label: "&rp.requestLog.clear;",
             oncommand: "requestpolicy.overlay.clearRequestLog();"},
         {tag: "vbox", flex: "1"},
-        {tag: "toolbarbutton", id: "requestpolicy-requestLog-close",
+        {tag: "toolbarbutton", id: "rpcontinued-requestLog-close",
             align: "right",
             oncommand: "requestpolicy.overlay.toggleRequestLog()"}
       ]}
     ]},
     // The src of this iframe is set to
     // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
-    {tag: "iframe", id: "requestpolicy-requestLog-frame", type: "chrome",
+    {tag: "iframe", id: "rpcontinued-requestLog-frame", type: "chrome",
         flex: "1"}
   ]}
 ];

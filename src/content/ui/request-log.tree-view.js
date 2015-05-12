@@ -43,10 +43,10 @@ window.requestpolicy.requestLog = (function (self) {
   self.treebox = null;
 
   self.columnNameToIndexMap = {
-    "requestpolicy-requestLog-origin" : 0,
-    "requestpolicy-requestLog-destination" : 1,
-    "requestpolicy-requestLog-blocked" : 2,
-    "requestpolicy-requestLog-time" : 3
+    "rpcontinued-requestLog-origin" : 0,
+    "rpcontinued-requestLog-destination" : 1,
+    "rpcontinued-requestLog-blocked" : 2,
+    "rpcontinued-requestLog-time" : 3
   };
 
   let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);

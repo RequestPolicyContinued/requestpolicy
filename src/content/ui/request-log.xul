@@ -38,38 +38,38 @@
       <menuitem
         id="requestpolicyRequestLogCopyOrigin"
         label="&rp.requestLog.copyOriginToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-origin');" />
+        oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-origin');" />
       <menuitem
         id="requestpolicyRequestLogOpenOriginNewTab"
         label="&rp.requestLog.openOriginInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-origin');" />
+        oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-origin');" />
       <menuitem
         id="requestpolicyRequestLogCopyDestination"
         label="&rp.requestLog.copyDestinationToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-destination');" />
+        oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-destination');" />
       <menuitem
         id="requestpolicyRequestLogDestinationOriginNewTab"
         label="&rp.requestLog.openDestinationInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-destination');" />
+        oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-destination');" />
     </menupopup>
   </popupset>
 
-  <tree id="requestpolicy-requestLog-tree" flex="1" flags="dont-build-content"
+  <tree id="rpcontinued-requestLog-tree" flex="1" flags="dont-build-content"
         seltype="single" context="requestpolicyRequestLogContext">
     <treecols>
-      <treecol id="requestpolicy-requestLog-origin"
+      <treecol id="rpcontinued-requestLog-origin"
                label="&rp.requestLog.origin;" flex="1" crop="center"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-destination"
+      <treecol id="rpcontinued-requestLog-destination"
                label="&rp.requestLog.destination;" flex="1" crop="center"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-blocked"
+      <treecol id="rpcontinued-requestLog-blocked"
                label="&rp.requestLog.blocked;" width="80"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-time" label="&rp.requestLog.time;"
+      <treecol id="rpcontinued-requestLog-time" label="&rp.requestLog.time;"
                width="120" persist="width ordinal hidden"/>
     </treecols>
 
@@ -78,11 +78,11 @@
 
   <hbox align="center" id="search-box">
     <label accesskey="&rp.requestLog.filterRequests.accesskey;"
-           control="requestpolicy-requestLog-requestFilter"
+           control="rpcontinued-requestLog-requestFilter"
            value="&rp.requestLog.filterRequests;"/>
-    <textbox id="requestpolicy-requestLog-requestFilter"
+    <textbox id="rpcontinued-requestLog-requestFilter"
              oninput="requestpolicy.requestLog.filterChanged(event)" flex="1"/>
-    <button id="requestpolicy-requestLog-clearFilter"
+    <button id="rpcontinued-requestLog-clearFilter"
             oncommand="requestpolicy.requestLog.clearFilter()"
             label="&rp.requestLog.clearFilter;"
             accesskey="&rp.requestLog.clearFilter.accesskey;" disabled="true"/>

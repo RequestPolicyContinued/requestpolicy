@@ -270,7 +270,7 @@
 /*********************************************
  * Request Log
  *********************************************/
-#requestpolicy-requestLog-close {
+#rpcontinued-requestLog-close {
   -moz-appearance: none;
   padding: 0 !important;
   margin-right: 4px;
@@ -281,6 +281,6 @@
   -moz-box-align: end;
 }
 
-#requestpolicy-requestLog-close :hover {
+#rpcontinued-requestLog-close :hover {
   -moz-image-region: rect(0px, 32px, 16px, 16px);
 }

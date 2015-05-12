@@ -30,7 +30,7 @@ exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
     tag: "toolbarbutton", id: "rpcontinuedToolbarButton",
-    label: "RequestPolicy", tooltiptext: "RequestPolicy",
+    label: "RequestPolicy", tooltiptext: "RequestPolicy Continued",
     popup: "rp-popup"
   }
 ];

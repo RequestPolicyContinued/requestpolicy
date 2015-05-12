@@ -553,8 +553,7 @@ requestpolicy.menu = (function() {
                item.parentNode.id == 'rpc-mixed-destinations-list' ||
                item.parentNode.id == 'rpc-allowed-destinations-list') {
       self._activateDestinationItem(item);
-    } else if (item.parentNode.id == 'rp-rule-options' ||
-               item.parentNode.id == 'rpc-rules-remove' ||
+    } else if (item.parentNode.id == 'rpc-rules-remove' ||
                item.parentNode.id == 'rpc-rules-add') {
       self._processRuleSelection(item);
     } else {

@@ -333,7 +333,7 @@ run: $(moz_xpi) $(dev_helper__xpi_file)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 mozmill_tests_dir := .mozilla/mozmill-tests
-mozmill_requestpolicy_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/$(extension_uuid)
+mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/$(extension_uuid)
 
 # Default mozmill manifest to use for testing
 mm_manifest := manifest.ini
@@ -343,25 +343,25 @@ check test: mozmill
 
 mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
-		-m $(mozmill_requestpolicy_test_dir)/$(mm_manifest) $(moz_args)
+		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args)
 
 
 
 .PHONY: mozmill-dirs
 mozmill-dirs: $(mozmill_tests_dir) \
-	$(mozmill_requestpolicy_test_dir) \
-	$(mozmill_requestpolicy_test_dir)/mozmill-tests \
-	$(mozmill_requestpolicy_test_dir)/data
+	$(mozmill_rpc_test_dir) \
+	$(mozmill_rpc_test_dir)/mozmill-tests \
+	$(mozmill_rpc_test_dir)/data
 
-$(mozmill_requestpolicy_test_dir): $(mozmill_tests_dir)
+$(mozmill_rpc_test_dir): $(mozmill_tests_dir)
 	@test -L $@ \
 	|| ln -ns ../../../../../tests/mozmill $@
 
-$(mozmill_requestpolicy_test_dir)/mozmill-tests: $(mozmill_requestpolicy_test_dir)
+$(mozmill_rpc_test_dir)/mozmill-tests: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/mozmill-tests \
 	|| ln -ns ../../$(mozmill_tests_dir) tests/mozmill/mozmill-tests
 
-$(mozmill_requestpolicy_test_dir)/data: $(mozmill_requestpolicy_test_dir)
+$(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/data \
 	|| ln -ns ../../ tests/mozmill/data
 

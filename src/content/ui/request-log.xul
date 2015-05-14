@@ -34,28 +34,28 @@
   <script type="application/x-javascript" src="request-log.filtering.js" />
 
   <popupset>
-    <menupopup id="requestpolicyRequestLogContext">
+    <menupopup id="rpcontinuedRequestLogContext">
       <menuitem
-        id="requestpolicyRequestLogCopyOrigin"
+        id="rpcontinuedRequestLogCopyOrigin"
         label="&rp.requestLog.copyOriginToClipboard;"
         oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-origin');" />
       <menuitem
-        id="requestpolicyRequestLogOpenOriginNewTab"
+        id="rpcontinuedRequestLogOpenOriginNewTab"
         label="&rp.requestLog.openOriginInNewTab;"
         oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-origin');" />
       <menuitem
-        id="requestpolicyRequestLogCopyDestination"
+        id="rpcontinuedRequestLogCopyDestination"
         label="&rp.requestLog.copyDestinationToClipboard;"
         oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-destination');" />
       <menuitem
-        id="requestpolicyRequestLogDestinationOriginNewTab"
+        id="rpcontinuedRequestLogDestinationOriginNewTab"
         label="&rp.requestLog.openDestinationInNewTab;"
         oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-destination');" />
     </menupopup>
   </popupset>
 
   <tree id="rpcontinued-requestLog-tree" flex="1" flags="dont-build-content"
-        seltype="single" context="requestpolicyRequestLogContext">
+        seltype="single" context="rpcontinuedRequestLogContext">
     <treecols>
       <treecol id="rpcontinued-requestLog-origin"
                label="&rp.requestLog.origin;" flex="1" crop="center"

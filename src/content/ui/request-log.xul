@@ -38,19 +38,19 @@
       <menuitem
         id="rpcontinuedRequestLogCopyOrigin"
         label="&rp.requestLog.copyOriginToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-origin');" />
+        oncommand="rpcontinued.requestLog.copyToClipboard('rpcontinued-requestLog-origin');" />
       <menuitem
         id="rpcontinuedRequestLogOpenOriginNewTab"
         label="&rp.requestLog.openOriginInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-origin');" />
+        oncommand="rpcontinued.requestLog.openInNewTab('rpcontinued-requestLog-origin');" />
       <menuitem
         id="rpcontinuedRequestLogCopyDestination"
         label="&rp.requestLog.copyDestinationToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('rpcontinued-requestLog-destination');" />
+        oncommand="rpcontinued.requestLog.copyToClipboard('rpcontinued-requestLog-destination');" />
       <menuitem
         id="rpcontinuedRequestLogDestinationOriginNewTab"
         label="&rp.requestLog.openDestinationInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('rpcontinued-requestLog-destination');" />
+        oncommand="rpcontinued.requestLog.openInNewTab('rpcontinued-requestLog-destination');" />
     </menupopup>
   </popupset>
 
@@ -81,9 +81,9 @@
            control="rpcontinued-requestLog-requestFilter"
            value="&rp.requestLog.filterRequests;"/>
     <textbox id="rpcontinued-requestLog-requestFilter"
-             oninput="requestpolicy.requestLog.filterChanged(event)" flex="1"/>
+             oninput="rpcontinued.requestLog.filterChanged(event)" flex="1"/>
     <button id="rpcontinued-requestLog-clearFilter"
-            oncommand="requestpolicy.requestLog.clearFilter()"
+            oncommand="rpcontinued.requestLog.clearFilter()"
             label="&rp.requestLog.clearFilter;"
             accesskey="&rp.requestLog.clearFilter.accesskey;" disabled="true"/>
   </hbox>

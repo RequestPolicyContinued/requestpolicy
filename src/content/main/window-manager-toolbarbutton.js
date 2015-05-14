@@ -67,7 +67,7 @@ let rpWindowManager = (function(self) {
       onCommand : function(aEvent) {
         // Bad smell
         let win = aEvent.target.ownerDocument.defaultView;
-        win.requestpolicy.overlay.openToolbarPopup(aEvent.target);
+        win.rpcontinued.overlay.openToolbarPopup(aEvent.target);
       }
     });
   }

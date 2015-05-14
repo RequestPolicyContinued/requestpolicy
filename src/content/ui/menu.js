@@ -22,7 +22,7 @@
  */
 
 
-requestpolicy.menu = (function() {
+rpcontinued.menu = (function() {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -108,7 +108,7 @@ requestpolicy.menu = (function() {
       $id('rpc-revoke-temporary-permissions').hidden =
           !PolicyManager.temporaryRulesExist();
 
-      self._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
+      self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
 
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
@@ -125,7 +125,7 @@ requestpolicy.menu = (function() {
         return;
       }
 
-      self._currentIdentifier = requestpolicy.overlay
+      self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
       //Logger.info(Logger.TYPE_POLICY,
@@ -446,7 +446,7 @@ requestpolicy.menu = (function() {
   self._addListItem = function(list, cssClass, value, numRequests) {
     var hbox = document.createElement("hbox");
     hbox.setAttribute("class", cssClass);
-    hbox.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
+    hbox.setAttribute("onclick", 'rpcontinued.menu.itemSelected(event);');
     list.insertBefore(hbox, null);
 
     var destLabel = document.createElement("label");

@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-window.requestpolicy = window.requestpolicy || {};
+window.rpcontinued = window.rpcontinued || {};
 
-window.requestpolicy.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -182,4 +182,4 @@ window.requestpolicy.requestLog = (function (self) {
   };
 
   return self;
-}(window.requestpolicy.requestLog || {}));
+}(window.rpcontinued.requestLog || {}));

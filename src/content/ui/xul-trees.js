@@ -42,11 +42,11 @@ exports.mainTree = [
     {tag: "menupopup",
     children: [
       {tag: "menuitem", label: "&rp.menu.managePolicies;", accesskey: "m",
-          oncommand: "requestpolicy.overlay.openPolicyManager();"},
+          oncommand: "rpcontinued.overlay.openPolicyManager();"},
       {tag: "menuitem", label: "&rp.requestLog.title;", accesskey: "l",
-          oncommand: "requestpolicy.overlay.toggleRequestLog(event);"},
+          oncommand: "rpcontinued.overlay.toggleRequestLog(event);"},
       {tag: "menuitem", label: "&rp.menu.preferences;", accesskey: "p",
-          oncommand: "requestpolicy.overlay.openPrefs(event);"}
+          oncommand: "rpcontinued.overlay.openPrefs(event);"}
     ]}
   ]},
 
@@ -55,7 +55,7 @@ exports.mainTree = [
       tag: "keyset", id: "rpcontinuedKeyset",
   children: [
     {tag: "key", key: "r", modifiers: "accel alt",
-        oncommand: "requestpolicy.overlay.openMenuByHotkey()"}
+        oncommand: "rpcontinued.overlay.openMenuByHotkey()"}
   ]},
 
 
@@ -65,8 +65,8 @@ exports.mainTree = [
     {tag: "menupopup", id: "rpcontinuedRedirectAddRuleMenu"},
     {tag: "menupopup", id: "rpc-popup", noautohide: "true",
         position: "after_start",
-        onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",
-        onpopuphidden: "requestpolicy.overlay.onPopupHidden(event);",
+        onpopupshowing: "rpcontinued.overlay.onPopupShowing(event);",
+        onpopuphidden: "rpcontinued.overlay.onPopupHidden(event);",
     children: [
       {tag: "vbox", id: "rpc-contents",
       children: [
@@ -75,7 +75,7 @@ exports.mainTree = [
           {tag: "vbox", id: "rpc-origins-destinations",
           children: [
             {tag: "hbox", id: "rpc-origin", "class": "rpc-od-item",
-                onclick: "requestpolicy.menu.itemSelected(event);",
+                onclick: "rpcontinued.menu.itemSelected(event);",
             children: [
               {tag: "label", id: "rpc-origin-domainname", "class": "domainname",
                   flex: "2"},
@@ -121,7 +121,7 @@ exports.mainTree = [
         {tag: "hbox", id: "rpc-revoke-temporary-permissions", hidden: "true",
         children: [
           {tag: "label", value: "&rp.menu.revokeTemporaryPermissions;",
-              onclick: "requestpolicy.overlay.revokeTemporaryPermissions();"}
+              onclick: "rpcontinued.overlay.revokeTemporaryPermissions();"}
         ]},
         {tag: "hbox", id: "rpc-footer",
         children: [
@@ -129,22 +129,22 @@ exports.mainTree = [
           children: [
             {tag: "label", id: "rpc-link-enable-blocking",
                 "class": "rpc-footer-link", value: "&rp.menu.enableBlocking;",
-                onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
+                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
             {tag: "label", id: "rpc-link-disable-blocking",
                 "class": "rpc-footer-link", value: "&rp.menu.disableBlocking;",
-                onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
+                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
             {tag: "label", id: "rpc-link-help", "class": "rpc-footer-link",
                 value: "&rp.menu.help;",
-                onclick: "requestpolicy.overlay.openHelp();"},
+                onclick: "rpcontinued.overlay.openHelp();"},
             {tag: "label", id: "rpc-link-prefs", "class": "rpc-footer-link",
                 value: "&rp.menu.preferences;",
-                onclick: "requestpolicy.overlay.openPrefs(event);"},
+                onclick: "rpcontinued.overlay.openPrefs(event);"},
             {tag: "label", id: "rpc-link-policies", "class": "rpc-footer-link",
                 value: "&rp.menu.managePolicies;",
-                onclick: "requestpolicy.overlay.openPolicyManager();"},
+                onclick: "rpcontinued.overlay.openPolicyManager();"},
             {tag: "label", id: "rpc-link-request-log",
                 "class": "rpc-footer-link", value: "&rp.requestLog.title;",
-                onclick: "requestpolicy.overlay.toggleRequestLog(event);"}
+                onclick: "rpcontinued.overlay.toggleRequestLog(event);"}
           ]}
         ]}
       ]}
@@ -169,11 +169,11 @@ exports.mainTree = [
             value: "&rp.requestLog.title;", crop: "end"},
         {tag: "button", id: "rpcontinued-requestLog-clear",
             label: "&rp.requestLog.clear;",
-            oncommand: "requestpolicy.overlay.clearRequestLog();"},
+            oncommand: "rpcontinued.overlay.clearRequestLog();"},
         {tag: "vbox", flex: "1"},
         {tag: "toolbarbutton", id: "rpcontinued-requestLog-close",
             align: "right",
-            oncommand: "requestpolicy.overlay.toggleRequestLog()"}
+            oncommand: "rpcontinued.overlay.toggleRequestLog()"}
       ]}
     ]},
     // The src of this iframe is set to

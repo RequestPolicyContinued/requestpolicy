@@ -26,7 +26,7 @@
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-requestpolicy.overlay = (function() {
+rpcontinued.overlay = (function() {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -103,7 +103,7 @@ requestpolicy.overlay = (function() {
 
 
   self.toString = function() {
-    return "[requestpolicy.overlay " + overlayId + "]";
+    return "[rpcontinued.overlay " + overlayId + "]";
   };
 
   /**
@@ -115,7 +115,7 @@ requestpolicy.overlay = (function() {
         initialized = true;
         overlayId = (new Date()).getTime();
 
-        requestpolicy.menu.init();
+        rpcontinued.menu.init();
 
         popupElement = $id("rpc-popup");
 
@@ -156,7 +156,7 @@ requestpolicy.overlay = (function() {
       Logger.severe(Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
       Logger.severe(Logger.TYPE_ERROR,
-          "Unable to initialize requestpolicy.overlay.");
+          "Unable to initialize rpcontinued.overlay.");
       throw e;
     }
   };
@@ -282,16 +282,16 @@ requestpolicy.overlay = (function() {
       }
     }
 
-    if ("requestpolicy" in browser &&
-        documentURI in browser.requestpolicy.blockedRedirects) {
+    if ("rpcontinued" in browser &&
+        documentURI in browser.rpcontinued.blockedRedirects) {
       // bad smell: do not save blocked requests in the <browser> obj
-      var dest = browser.requestpolicy.blockedRedirects[documentURI];
+      var dest = browser.rpcontinued.blockedRedirects[documentURI];
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest +
           "> " + "from <" + documentURI + ">");
       self._showRedirectNotification(browser, dest);
 
-      delete browser.requestpolicy.blockedRedirects[documentURI];
+      delete browser.rpcontinued.blockedRedirects[documentURI];
     }
 
     // send the list of blocked URIs back to the frame script
@@ -474,7 +474,7 @@ requestpolicy.overlay = (function() {
     var addRulePopup = $id(addRuleMenuName);
     DOMUtils.removeChildren(addRulePopup);
 
-    let m = requestpolicy.menu;
+    let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
     var destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
 
@@ -488,7 +488,7 @@ requestpolicy.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
-    let cm = requestpolicy.classicmenu;
+    let cm = rpcontinued.classicmenu;
 
     if (destBaseDomain !== null) {
       cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
@@ -700,7 +700,7 @@ requestpolicy.overlay = (function() {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     window.setTimeout(function() {
-      requestpolicy.overlay._showRedirectNotification(browser, destUri, 0);
+      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0);
     }, 0);
   };
 
@@ -715,7 +715,7 @@ requestpolicy.overlay = (function() {
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
     blockedContentCheckTimeoutId = window.setTimeout(function() {
-      requestpolicy.overlay._updateBlockedContentState(browser);
+      rpcontinued.overlay._updateBlockedContentState(browser);
     }, blockedContentStateUpdateDelay);
   };
 
@@ -731,8 +731,8 @@ requestpolicy.overlay = (function() {
    * contentAreaContextMenu.
    */
   self._contextMenuOnPopupShowing = function() {
-    requestpolicy.overlay._wrapOpenLink();
-    /*requestpolicy.overlay._attachPopupToContextMenu();*/
+    rpcontinued.overlay._wrapOpenLink();
+    /*rpcontinued.overlay._attachPopupToContextMenu();*/
   };
 
   /**
@@ -817,7 +817,7 @@ requestpolicy.overlay = (function() {
       // We use 'arguments' so that we aren't dependent on the names of two
       // parameters, as it seems not unlikely that these could change due to
       // the second parameter's purpose having been changed.
-      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(arguments[0], arguments[1]);";
+      var newFirstCodeLine = "\n    rpcontinued.overlay.tabAdded(arguments[0], arguments[1]);";
       // Finally, add our line to the beginning of the addTab function.
       eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine +
            addTabParts[1]);
@@ -833,7 +833,7 @@ requestpolicy.overlay = (function() {
 
       // define the regular expression that should find the existing code
       // line that RequestPolicy added.
-      let codeLineRE = /(\n    )?requestpolicy\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
+      let codeLineRE = /(\n    )?rpcontinued\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
 
       // use the regular expression
       let newAddTabString = addTabString.replace(codeLineRE, "");
@@ -874,8 +874,8 @@ requestpolicy.overlay = (function() {
         // This gets called both for tab changes and for history navigation.
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
-        requestpolicy.overlay._stopBlockedContentCheckTimeout();
-        requestpolicy.overlay
+        rpcontinued.overlay._stopBlockedContentCheckTimeout();
+        rpcontinued.overlay
             ._updateBlockedContentState(gBrowser.selectedBrowser);
       },
 
@@ -977,7 +977,7 @@ requestpolicy.overlay = (function() {
   //    if (event.currentTarget != event.originalTarget) {
   //      return;
   //    }
-    requestpolicy.menu.prepareMenu();
+    rpcontinued.menu.prepareMenu();
   };
 
   /**
@@ -987,7 +987,7 @@ requestpolicy.overlay = (function() {
    *          event
    */
   self.onPopupHidden = function(event) {
-    var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
+    var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
       if (rpPrefBranch.getBoolPref("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
@@ -1176,7 +1176,7 @@ requestpolicy.overlay = (function() {
   //  },
 
   self.openToolbarPopup = function(anchor) {
-  //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay.popupElement,
+  //    rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
   //        null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
   };

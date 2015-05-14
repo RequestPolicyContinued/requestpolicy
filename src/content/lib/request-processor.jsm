@@ -161,7 +161,7 @@ let RequestProcessor = (function(self) {
         Logger.warning(Logger.TYPE_CONTENT, "The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
-        window.requestpolicy.overlay.observeBlockedTopLevelDocRequest(
+        window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
             browser, request.originURI, request.destURI);
       }
     }

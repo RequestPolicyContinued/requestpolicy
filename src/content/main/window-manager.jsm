@@ -77,7 +77,7 @@ let rpWindowManager = (function(self) {
     // ==================================
     // # 2 : create a scope variable for RP for this window
     // ----------------------------------------------------
-    window.requestpolicy = {};
+    window.rpcontinued = {};
 
 
     // ==================================
@@ -116,7 +116,7 @@ let rpWindowManager = (function(self) {
     try {
       // init must be called last, because it assumes that
       // everything else is ready
-      window.requestpolicy.overlay.init();
+      window.rpcontinued.overlay.init();
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "An error occurred while initializing the overlay: "+e, e);
@@ -133,11 +133,11 @@ let rpWindowManager = (function(self) {
     self.removeToolbarButtonFromWindow(window);
 
 
-    // # 3 and 2 : remove the `requestpolicy` variable from the window
+    // # 3 and 2 : remove the `rpcontinued` variable from the window
     // ---------------------------------------------------------
     // This wouldn't be needed when the window is closed, but this has to be
     // done when RP is being disabled.
-    delete window.requestpolicy;
+    delete window.rpcontinued;
 
 
     // # 1 : remove all XUL elements

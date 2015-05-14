@@ -755,8 +755,8 @@ requestpolicy.overlay = (function() {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    if (!gContextMenu.requestpolicyMethodsOverridden) {
-      gContextMenu.requestpolicyMethodsOverridden = true;
+    if (!gContextMenu.rpcontinuedMethodsOverridden) {
+      gContextMenu.rpcontinuedMethodsOverridden = true;
 
       gContextMenu.openLink = function() {
         RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
@@ -792,8 +792,8 @@ requestpolicy.overlay = (function() {
    * wrapping it will break tabs if TabMixPlus is installed.
    */
   self._wrapAddTab = function() {
-    if (!gBrowser.requestpolicyAddTabModified) {
-      gBrowser.requestpolicyAddTabModified = true;
+    if (!gBrowser.rpcontinuedAddTabModified) {
+      gBrowser.rpcontinuedAddTabModified = true;
 
       // For reference, the addTab() function signature looks like this:
       // function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner,
@@ -827,7 +827,7 @@ requestpolicy.overlay = (function() {
 
 
   self._unwrapAddTab = function() {
-    if (gBrowser.requestpolicyAddTabModified === true) {
+    if (gBrowser.rpcontinuedAddTabModified === true) {
       // get the addTab() function as a string
       let addTabString = gBrowser.addTab.toString();
 
@@ -841,7 +841,7 @@ requestpolicy.overlay = (function() {
       // apply the changes
       eval("gBrowser.addTab = " + newAddTabString);
 
-      delete gBrowser.requestpolicyAddTabModified;
+      delete gBrowser.rpcontinuedAddTabModified;
     }
   };
 
@@ -1201,7 +1201,7 @@ requestpolicy.overlay = (function() {
     var requestLog = $id("rpcontinued-requestLog");
     var requestLogSplitter = $id("rpcontinued-requestLog-splitter");
     var requestLogFrame = $id("rpcontinued-requestLog-frame");
-    //var openRequestLog = $id("requestpolicyOpenRequestLog");
+    //var openRequestLog = $id("rpcontinuedOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.
     //var closeRequestLog = $id("requestpolicyCloseRequestLog");

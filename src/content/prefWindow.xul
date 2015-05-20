@@ -128,7 +128,7 @@
               <textbox id="addOrigin-originField" emptytext="&rp.origin;"
                 oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
                 flex="1"
-                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+                onkeydown="if(event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
               <button id="addOrigin" label="&rp.allow;"
                 oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
                 disabled="true" />
@@ -160,7 +160,7 @@
               <textbox id="addDestination-destinationField" emptytext="&rp.destination;"
                 oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
                 flex="1"
-                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+                onkeydown="if(event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
               <button id="addDestination" label="&rp.allow;"
                 oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
                 disabled="true" />
@@ -188,19 +188,19 @@
               <button id="removeOriginsToDestinations" label="&preferences.removeSelectedSites;"
                 oncommand="requestpolicy.prefWindow.removeSelectedFromList(this.listbox)"
                 disabled="true" />
-            </hbox>
+            </hbox> 
             <separator class="thin" />
             <hbox>
               <textbox id="addOriginToDestination-originField"
                 emptytext="&rp.origin;"
                 oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
                 flex="1"
-                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+                onkeydown="if(event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
               <textbox id="addOriginToDestination-destinationField"
                 emptytext="&rp.destination;"
                 oninput="requestpolicy.prefWindow.addToWhitelistInputChanged(this)"
                 flex="1"
-                onkeydown="if(event.keyCode==event.DOM_VK_ENTER || event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
+                onkeydown="if(event.keyCode==event.DOM_VK_RETURN) { requestpolicy.prefWindow.addToWhitelist(this.button); return false; }" />
               <button id="addOriginToDestination" label="&rp.allow;"
                 oncommand="requestpolicy.prefWindow.addToWhitelist(this)"
                 disabled="true" />

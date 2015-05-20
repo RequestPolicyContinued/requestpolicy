@@ -4,3 +4,10 @@
 *.xpi
 *.bak*
 *.orig
+
+# build and dist directories in the root folder
+/build/
+/dist/
+
+/tests/mozmill/data
+/tests/mozmill/mozmill-tests

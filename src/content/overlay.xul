@@ -38,7 +38,7 @@
     <toolbarbutton id="requestpolicyToolbarButton"
       class="toolbarbutton-1 chromeclass-toolbar-additional"
       label="RequestPolicy"
-      tooltiptext="RequestPolicy"
+      tooltiptext="RequestPolicy Continued"
       type="menu-button"
       oncontextmenu="event.preventDefault();"
       onclick="requestpolicy.overlay.openToolbarPopup(this)" />
@@ -55,7 +55,7 @@
     <statusbarpanel
       class="statusbarpanel-menu-iconic"
       id="requestpolicyStatusbar"
-      tooltiptext="RequestPolicy"
+      tooltiptext="RequestPolicy Continued"
       oncontextmenu="event.preventDefault();"
       onclick="requestpolicy.overlay.openStatusbarPopup(this);"
       >

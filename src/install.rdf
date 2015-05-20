@@ -9,7 +9,7 @@
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:creator>Justin Samuel</em:creator>
-    <em:id>requestpolicy@requestpolicy.com</em:id>
+    <em:id>rpcontinued@requestpolicy.org</em:id>
     <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>

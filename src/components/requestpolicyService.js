@@ -188,6 +188,11 @@ RequestPolicyService.prototype = {
         return;
       }
 
+      if (addon.isActive === false) {
+        // RP is disabled
+        return;
+      }
+
       const url = "chrome://rpcontinued/content/rp-and-rpc.html";
 
       var wm = CC["@mozilla.org/appshell/window-mediator;1"]

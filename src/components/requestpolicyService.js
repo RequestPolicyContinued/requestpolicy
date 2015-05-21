@@ -179,6 +179,35 @@ RequestPolicyService.prototype = {
     // default preferences.
   },
 
+
+  _checkForLegacyRP : function () {
+
+    function addonCallback(addon) {
+      if (addon === null) {
+        // RP is not installed
+        return;
+      }
+
+      const url = "chrome://rpcontinued/content/rp-and-rpc.html";
+
+      var wm = CC["@mozilla.org/appshell/window-mediator;1"]
+          .getService(CI.nsIWindowMediator);
+      var mostRecentWindow = wm.getMostRecentWindow("navigator:browser");
+
+      // the gBrowser object of the firefox window
+      var _gBrowser = mostRecentWindow.getBrowser();
+
+      if (typeof(_gBrowser.addTab) !== "function") {
+        return;
+      }
+
+      _gBrowser.selectedTab = _gBrowser.addTab(url);
+    }
+
+    AddonManager.getAddonByID("requestpolicy@requestpolicy.com",
+                              addonCallback);
+  },
+
   _initializeExtensionCompatibility : function() {
     if (this._compatibilityRules.length != 0) {
       return;
@@ -516,6 +545,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "http-on-modify-request", false);
     os.addObserver(this, "xpcom-shutdown", false);
     os.addObserver(this, "profile-after-change", false);
+    os.addObserver(this, "sessionstore-windows-restored", false);
     os.addObserver(this, "quit-application", false);
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
@@ -537,6 +567,7 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "http-on-modify-request");
       os.removeObserver(this, "xpcom-shutdown");
       os.removeObserver(this, "profile-after-change");
+      os.removeObserver(this, "sessionstore-windows-restored");
       os.removeObserver(this, "quit-application");
       if (!AddonManager) {
         os.removeObserver(this, "em-action-requested");
@@ -1669,6 +1700,9 @@ RequestPolicyService.prototype = {
         this._initializeExtensionCompatibility();
         this._initializeApplicationCompatibility();
 
+        break;
+      case "sessionstore-windows-restored":
+        this._checkForLegacyRP();
         break;
       case "private-browsing" :
         if (data == "enter") {

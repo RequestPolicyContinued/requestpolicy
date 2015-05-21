@@ -2,6 +2,9 @@ content    requestpolicy    content/
 resource   requestpolicy    modules/
 skin       requestpolicy    classic/1.0    skin/
 
+content    rpcontinued      content/
+skin       rpcontinued      classic/1.0    skin/
+
 locale     requestpolicy    en-US          locale/en-US/
 locale     requestpolicy    de             locale/de/
 locale     requestpolicy    eo             locale/eo/

@@ -9,6 +9,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/constants",
   "lib/utils/strings",
+  "lib/utils",
   "lib/prefs",
   "lib/utils/domains",
   "lib/logger",
@@ -178,7 +179,7 @@ common.getOldRulesAsNewRules = function (addHostWildcard) {
 
 common.getPrefObj = function (pref) {
   try {
-    var value = prefs.getComplexValue(pref, Ci.nsISupportsString).data;
+    var value = rpPrefBranch.getComplexValue(pref, Ci.nsISupportsString).data;
   } catch (e) {
     value = '';
   }

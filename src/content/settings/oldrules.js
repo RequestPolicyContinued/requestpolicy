@@ -69,16 +69,16 @@ function deleteOldRules() {
   common.clearPref('allowedOrigins');
   common.clearPref('allowedDestinations');
   common.clearPref('allowedOriginsToDestinations');
-  $id("doimport").hidden = true;
-  $id("deletedone").hidden = false;
-  $id("showReimportOptions").hidden = true;
-  $id("reimportOldRules").hidden = true;
-  $id("deleteOldRules").hidden = true;
+  $("#doimport").hide();
+  $("#deletedone").show();
+  $("#showReimportOptions").hide();
+  $("#reimportOldRules").hide();
+  $("#deleteOldRules").hide();
 }
 
 function showReimportOptions() {
-  $id("showReimportOptions").hidden = true;
-  $id("reimportOldRules").hidden = false;
+  $("#showReimportOptions").hide();
+  $("#reimportOldRules").show();
 }
 
 function importOldRules() {
@@ -86,10 +86,10 @@ function importOldRules() {
     throw 'rules is undefined or empty';
   }
   common.addAllowRules(rules);
-  $id("doimport").hidden = true;
-  $id("policy").hidden = true;
-  $id("importoptions").hidden = true;
-  $id("importdone").hidden = false;
+  $("#doimport").hide();
+  $("#policy").hide();
+  $("#importoptions").hide();
+  $("#importdone").show();
 }
 
 function handleAddHostWildcardsChange(event) {
@@ -101,8 +101,8 @@ function handleAddHostWildcardsChange(event) {
 function onload() {
   var oldRulesExist = Prefs.oldRulesExist();
   if (!oldRulesExist) {
-    $id("hasrules").hidden = true;
-    $id("norules").hidden = false;
+    $("#hasrules").hide();
+    $("#norules").show();
     return;
   }
   populateRuleTable();

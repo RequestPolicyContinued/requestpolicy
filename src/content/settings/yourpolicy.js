@@ -232,7 +232,7 @@ function onload() {
   }, false);
   populateRuleTable(search.value);
   if (Prefs.oldRulesExist()) {
-    $id("oldrulesexist").hidden = false;
+    $("#oldrulesexist").show();
   }
 
   // observe rule changes and update the table then

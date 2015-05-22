@@ -96,7 +96,10 @@ function getArguments(args) {
 }*/
 
 function onload() {
-  var lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
+  // To retrieve the last RP version, `Utils` needs to be used,
+  // because the pref "extensions.requestpolicy.lastVersion" has
+  // already been updated.
+  var lastRPVersion = Utils.info.lastRPVersion;
 
   // Populate the form values based on the user's current settings.
   // If the use has just upgrade from an 0.x version, populate based on the old
@@ -111,9 +114,12 @@ function onload() {
     } else {
       var identLevel = 1;
     }
+
     $id("defaultdeny").checked = true;
-    $('#allowsamedomainblock').css('display', 'block');
+    handleDefaultPolicyChange();
+
     $id("allowsamedomain").checked = identLevel == 1;
+    handleAllowSameDomainChange();
 
     // If the user doesn't have any new-style rules, automatically do an import
     // of the old rules. We check for new-style rules just in case the user has
@@ -134,6 +140,7 @@ function onload() {
 
     // Skip the welcome screen.
     showConfigure();
+
   } else {
     var defaultAllow = rpPrefBranch.getBoolPref('defaultPolicy.allow');
     $id("defaultallow").checked = !!defaultAllow;
@@ -141,6 +148,7 @@ function onload() {
     if (!defaultAllow) {
       $('#allowsamedomainblock').css('display', 'block');
     }
+
     $id("allowsamedomain").checked =
         rpPrefBranch.getBoolPref('defaultPolicy.allowSameDomain');
     // Subscriptions are only simple here if we assume the user won't open the

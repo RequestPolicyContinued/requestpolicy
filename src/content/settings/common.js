@@ -9,6 +9,7 @@ Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/constants",
   "lib/utils/strings",
+  "lib/utils",
   "lib/prefs",
   "lib/utils/domains",
   "lib/logger",

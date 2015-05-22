@@ -178,7 +178,7 @@ common.getOldRulesAsNewRules = function (addHostWildcard) {
 
 common.getPrefObj = function (pref) {
   try {
-    var value = prefs.getComplexValue(pref, Ci.nsISupportsString).data;
+    var value = rpPrefBranch.getComplexValue(pref, Ci.nsISupportsString).data;
   } catch (e) {
     value = '';
   }

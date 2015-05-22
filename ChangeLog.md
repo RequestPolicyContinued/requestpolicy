@@ -3,6 +3,12 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta9.3 (bugfix)
+* it was not possible to import rules from RequestPolicy 0.5.x
+  Old rules can now be imported on `about:requestpolicy?oldrules`.
+* when a user was upgrading from 0.5.x, the default policy afterwards
+  was "allow", but it has to be "deny".
+
 #### Version 1.0.beta9.2 (bugfix)
 * the redirection notification bar has been shown too often (#561, #630)
 

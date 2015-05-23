@@ -33,8 +33,8 @@ function populateRuleTable() {
 
   for (var i = 0; i < rules.length; i++) {
     var entry = rules[i];
-    var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
-    var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
+    var origin = entry['o'] ? common.ruleDataPartToDisplayString(entry['o']) : '';
+    var dest = entry['d'] ? common.ruleDataPartToDisplayString(entry['d']) : '';
     addRulesTableRow(table, 'allow', origin, dest, entry);
   }
 }
@@ -50,19 +50,6 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
     $('<td>').text(origin),
     $('<td>').text(dest)
   );
-}
-
-// TODO: remove code duplication with menu.js
-function ruleDataPartToDisplayString(ruleDataPart) {
-  var str = "";
-  if (ruleDataPart["s"]) {
-    str += ruleDataPart["s"] + "://";
-  }
-  str += ruleDataPart["h"] || "*";
-  if (ruleDataPart["port"]) {
-    str += ":" + ruleDataPart["port"];
-  }
-  return str;
 }
 
 function deleteOldRules() {

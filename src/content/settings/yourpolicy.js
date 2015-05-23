@@ -65,8 +65,8 @@ function addRules(entries, source, filter, readOnly) {
   for (var entryType in entries) {
     for (var i = 0; i < entries[entryType].length; i++) {
       var entry = entries[entryType][i];
-      var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
-      var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
+      var origin = entry['o'] ? common.ruleDataPartToDisplayString(entry['o']) : '';
+      var dest = entry['d'] ? common.ruleDataPartToDisplayString(entry['d']) : '';
       if (filter) {
         if (origin.indexOf(filter) == -1 && dest.indexOf(filter) == -1) {
           continue;
@@ -128,47 +128,6 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source, rea
   } else {
     row.append($('<td>'));
   }
-}
-
-/**
- * Get a string representation of an endpoint (origin or dest) specification.
- *
- * The following list shows a mapping of the possible endpoint specs
- * to the corresponding string representation. Each endpoint spec contains at
- * least one of the parts "scheme", "host" and "port". The list shows the
- * strings by example: scheme "http"; host "www.example.com"; port "80".
- *
- * - s__: `scheme "http"`
- * - _h_: `www.example.com`
- * - __p: `*://*:80`
- * - sh_: `http://www.example.com`
- * - s_p: `http://*:80`
- * - _hp: `*://www.example.com:80`
- * - shp: `http://www.example.com:80`
- *
- * TODO: remove code duplication with menu.js
- */
-function ruleDataPartToDisplayString(ruleDataPart) {
-  if (ruleDataPart["s"] && !ruleDataPart["h"] && !ruleDataPart["port"]) {
-    // Special case: Only a scheme is specified.
-    //               The result string will be `scheme "..."`.
-    // Background info: The string could be `http:*`, but this could however
-    //                  be confused with `*://http:*`. The string `http://*`
-    //                  wouldn't be correct for all cases, since there are
-    //                  URIs _without_ a host.
-    return "scheme \"" + ruleDataPart["s"] + "\"";
-  }
-  var str = "";
-  if (ruleDataPart["s"] || ruleDataPart["port"]) {
-    str += ruleDataPart["s"] || "*";
-    str += "://";
-  }
-  str += ruleDataPart["h"] || "*";
-  if (ruleDataPart["port"]) {
-    str += ":" + ruleDataPart["port"];
-  }
-  // TODO: path
-  return str;
 }
 
 function addRule() {

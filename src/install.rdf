@@ -4,15 +4,20 @@
   xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:name>RequestPolicy</em:name>
-    <em:version>0.5.28</em:version>
+    <em:name>RequestPolicy Continued</em:name>
+    <em:version>0.5.29</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
-    <em:creator>Justin Samuel</em:creator>
-    <em:id>requestpolicy@requestpolicy.com</em:id>
-    <em:homepageURL>http://www.requestpolicy.com/</em:homepageURL>
+    <em:id>rpcontinued@requestpolicy.org</em:id>
+    <em:unpack>true</em:unpack>
+    <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
     <em:optionsURL>chrome://requestpolicy/content/prefWindow.xul</em:optionsURL>
     <em:iconURL>chrome://requestpolicy/skin/requestpolicy-icon-32.png</em:iconURL>
+
+    <em:creator>RequestPolicy Continued Team</em:creator>
+
+    <em:developer>Justin Samuel (original author)</em:developer>
+    <em:developer>Martin Kimmerle (main developer)</em:developer>
 
     <em:contributor>myahoo (French translation)</em:contributor>
     <em:contributor>Team erweiterungen.de (German translation)</em:contributor>
@@ -40,7 +45,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>4.0</em:minVersion>
-        <em:maxVersion>26.0</em:maxVersion>
+        <em:maxVersion>40.0a2</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -49,7 +54,7 @@
       <Description>
         <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
         <em:minVersion>2.1</em:minVersion>
-        <em:maxVersion>2.23</em:maxVersion>
+        <em:maxVersion>2.33.*</em:maxVersion>
       </Description>
     </em:targetApplication>
 

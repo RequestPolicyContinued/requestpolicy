@@ -4,7 +4,7 @@
 	<property name="src.dir" value="." />
 	<property name="dist.dir" value="dist" />
 	<property name="app.name" value="requestpolicy" />
-	<property name="app.id" value="requestpolicy@requestpolicy.com" />
+	<property name="app.id" value="rpcontinued@requestpolicy.org" />
 	<!-- extension id like: xxx@xxx.com -->
 	<property name="ff.dir" value="" />
 

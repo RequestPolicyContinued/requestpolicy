@@ -1,17 +1,17 @@
-RequestPolicy
+RequestPolicy Continued
 =================================================
 
 A Firefox extension for allowing user control over cross-site requests.
 
-Author: Justin Samuel <justin (at) justinsamuel (dot) com>
+original author: Justin Samuel
+maintainer/main developer: Martin Kimmerle
 License: GPL 3 or later
-Copyright 2008
-Website: http://www.requestpolicy.com/
 
-Documentation
--------------
 
-On the website: http://www.requestpolicy.com/
+Website and Documentation
+-------------------------
+https://requestpolicycontinued.github.io/
+
 
 Installation
 ------------
@@ -19,3 +19,7 @@ Installation
 Any way you like to install your Firefox extensions. For example, you can open
 the .xpi file through Firefox's File > Open dialog.
 
+
+The extension is developed on github
+------------------------------------
+https://github.com/RequestPolicyContinued/requestpolicy

@@ -173,13 +173,13 @@ build: $(build_path)
 # build and create XPI file
 all: $(xpi_file)
 	@echo "Build finished successfully."
-dist: $(xpi_file)
+dist xpi: $(xpi_file)
 
 # create the dist directory
 $(dist_path):
 	@mkdir -p $(dist_path)
 
-sign: $(signed_xpi_file)
+signed-xpi: $(signed_xpi_file)
 
 
 # _______________________
@@ -216,7 +216,7 @@ $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
 # create the unit-testing XPI
 #
 
-$(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files) | $(dist_path)
+unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files) | $(dist_path)
 	@rm -f $(unit_testing__xpi_file)
 	@echo "Creating unit-testing XPI."
 	@cd $(unit_testing__build_path) && \
@@ -231,7 +231,7 @@ $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-$(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
+dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
 	@rm -f $(dev_helper__xpi_file)
 	@echo "Creating 'RPC Dev Helper' XPI."
 	@cd $(dev_helper__source_dirname) && \

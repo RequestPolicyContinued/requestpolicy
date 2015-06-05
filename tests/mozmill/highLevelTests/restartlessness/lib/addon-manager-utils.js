@@ -132,13 +132,6 @@ AMHelper.prototype.getAddon = function() {
   return addonList.length === 0 ? null : addonList[0];
 }
 
-AMHelper.prototype.setCategory = function(id) {
-  var self = this;
-  self.addonsManager.setCategory({
-    category: self.addonsManager.getCategoryById({id: id})
-  });
-}
-
 AMHelper.prototype.getSetupTabIndex = function() {
   var self = this;
   return self.findTabIndex(function(tab) {

@@ -10,6 +10,8 @@
 # general variables
 #
 
+SHELL := /bin/bash
+
 extension_name := requestpolicy
 
 # ____________________________________

@@ -11,7 +11,6 @@
 #
 
 extension_name := requestpolicy
-extension_uuid := rpcontinued@requestpolicy.org
 
 # ____________________________________
 # generating XPIs -- general variables
@@ -333,7 +332,7 @@ run: $(moz_xpi) $(dev_helper__xpi_file)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 mozmill_tests_dir := .mozilla/mozmill-tests
-mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/$(extension_uuid)
+mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/rpcontinued@requestpolicy.org
 
 # Default mozmill manifest to use for testing
 mm_manifest := manifest.ini

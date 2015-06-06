@@ -7,7 +7,7 @@
     <em:name>RequestPolicy Continued</em:name>
     <em:version>1.0.dev</em:version>
     <em:type>2</em:type>
-    <em:id>rpcontinued@requestpolicy.org</em:id>
+    <em:id>rpcontinued@non-amo.requestpolicy.org</em:id>
 
     <em:unpack>false</em:unpack>
     <em:bootstrap>true</em:bootstrap>
@@ -38,7 +38,6 @@
     <em:localized>
       <Description>
         <em:locale>eo</em:locale>
-        <em:name>RequestPolicy Continued</em:name>
         <em:name>RequestPolicy Continued</em:name>
         <em:description>Administru la rajtojn de retejoj fari inter-retejajn petojn. Plibonigu la privatecon de via retumado. Sekurigu vin kontraŭ Falsado de inter-retejaj petoj (Cross-Site Request Forgery, CSRF) kaj aliaj atakoj.</em:description>
       </Description>

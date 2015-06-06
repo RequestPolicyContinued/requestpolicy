@@ -14,6 +14,10 @@ SHELL := /bin/bash
 
 extension_name := requestpolicy
 
+amo__extension_id     := rpcontinued@requestpolicy.org
+off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
+
+
 # ____________________________________
 # generating XPIs -- general variables
 #
@@ -47,8 +51,8 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 root_files := LICENSE
 
 
-# ____________________________________
-# vars for generating the "normal" XPI
+# _____________________________________
+# vars for generating the "off-AMO" XPI
 #
 
 build_path := $(build_dirname)/normal/
@@ -79,11 +83,44 @@ empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
 endif
 
 
-# ________________________________
-# vars for generating a signed XPI
+# __________________________________________
+# vars for generating a signed "off-AMO" XPI
 #
 
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
+
+
+# _________________________________
+# vars for generating the "AMO" XPI
+#
+
+amo__build_path := $(build_dirname)/amo/
+
+amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
+
+# take all files from above and create their paths in the "build" directory
+amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(source_files))
+
+amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
+amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
+
+amo__root_files := $(addprefix $(amo__build_path),$(root_files))
+
+amo__all_files := $(amo__src_files) $(amo__root_files)
+
+
+# detect deleted files and empty directories
+amo__deleted_files :=
+amo__empty_dirs :=
+ifneq "$(wildcard $(amo__build_path))" ""
+# files that have been deleted but still exist in the build directory.
+amo__deleted_files := \
+		$(shell find $(amo__build_path) -type f | \
+		grep -v "META-INF" | \
+		grep -F -v $(addprefix -e ,$(amo__all_files)))
+# empty directories. -mindepth 1 to exclude the build directory itself.
+amo__empty_dirs := $(shell find $(amo__build_path) -mindepth 1 -type d -empty)
+endif
 
 
 # ________________________________________
@@ -183,8 +220,8 @@ $(dist_path):
 signed-xpi: $(signed_xpi_file)
 
 
-# _______________________
-# create the "normal" XPI
+# ________________________
+# create the "off-AMO" XPI
 #
 
 # Note: Here the build path is added as a prerequisite, *not* the
@@ -199,8 +236,8 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
 	@echo "Creating XPI file: Done!"
 
-# _____________________
-# create the signed XPI
+# _______________________________
+# create the signed "off-AMO" XPI
 #
 
 $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
@@ -212,6 +249,16 @@ $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
 		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
 		-x META-INF/zigbert.rsa
 
+# ____________________
+# create the "AMO" XPI
+#
+
+amo-xpi $(amo__xpi_file): $(amo__build_path) $(amo__all_files) | $(dist_path)
+	@rm -f $(amo__xpi_file)
+	@echo "Creating AMO XPI."
+	@cd $(amo__build_path) && \
+	$(ZIP) $(abspath $(amo__xpi_file)) $(patsubst $(amo__build_path)%,%,$(amo__all_files))
+	@echo "Creating AMO XPI: Done!"
 
 # ___________________________
 # create the unit-testing XPI
@@ -239,8 +286,8 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
-# _____________________________________
-# create the files for the "normal" XPI
+# ______________________________________
+# create the files for the "off-AMO" XPI
 #
 
 # Process all source files, but also eventually delete
@@ -261,8 +308,8 @@ $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 $(normal_build__root_files): $$(patsubst $$(build_path)%,%,$$@)
 	cp $(patsubst $(build_path)%,%,$@) $@
 
-# ___________________________________
-# create the files for the signed XPI
+# _____________________________________________
+# create the files for the signed "off-AMO" XPI
 #
 
 $(build_path)/META-INF/: $(build_path) $(all_files)
@@ -270,6 +317,28 @@ $(build_path)/META-INF/: $(build_path) $(all_files)
 	signtool -d .signing \
 		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
 		$(build_path)
+
+# __________________________________
+# create the files for the "AMO" XPI
+#
+
+$(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
+
+$(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(dir $@)
+	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
+
+$(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(dir $@)
+	cp $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
+
+	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
+	  echo 'using `sed` on install.rdf !' ; \
+	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+	fi
+
+$(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)
+	cp $(patsubst $(amo__build_path)%,%,$@) $@
 
 # _________________________________________
 # create the files for the unit-testing XPI

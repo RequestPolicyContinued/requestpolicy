@@ -18,6 +18,7 @@ var rpUtils = require(rpRootDir + "lib/rp-utils");
 
 
 const PREF_INSTALL_DIALOG = "security.dialog_enable_delay";
+const PREF_NEW_CONFIRMATION_UI = "xpinstall.customConfirmationUI";
 
 const INSTALL_DIALOG_DELAY = 1000;
 const TIMEOUT_DOWNLOAD = 25000;
@@ -35,6 +36,7 @@ AMHelper.prototype.onSetupModule = function(aModule) {
   var self = this;
   prefs.setPref(PREF_INSTALL_DIALOG, INSTALL_DIALOG_DELAY);
   addons.setDiscoveryPaneURL("about:home");
+  prefs.setPref(PREF_NEW_CONFIRMATION_UI, false);
 };
 
 AMHelper.prototype.onSetupTest = function(aModule) {
@@ -49,6 +51,7 @@ AMHelper.prototype.onTeardownModule = function(aModule) {
   var self = this;
   prefs.clearUserPref(PREF_INSTALL_DIALOG);
   addons.resetDiscoveryPaneURL();
+  prefs.clearUserPref(PREF_NEW_CONFIRMATION_UI);
 }
 
 

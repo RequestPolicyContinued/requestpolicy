@@ -286,6 +286,36 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
+# _________________________________________
+# create the XPI from any tag or any commit
+#
+
+# Default tree-ish.
+specific_xpi__treeish := v1.0.beta9.3
+
+specific_xpi__file := $(dist_path)$(extension_name)-$(specific_xpi__treeish).xpi
+specific_xpi__build_path := $(build_dirname)/specific-xpi
+
+# create the XPI only if it doesn't exist yet
+.PHONY: specific-xpi
+specific-xpi: $(specific_xpi__file)
+
+$(specific_xpi__file):
+	@# remove the build directory (if it exists) and recreate it
+	rm -rf $(specific_xpi__build_path)
+	mkdir -p $(specific_xpi__build_path)
+
+	@# copy the content of the tree-ish to the build dir
+	@# see https://stackoverflow.com/questions/160608/do-a-git-export-like-svn-export/9416271#9416271
+	git archive $(specific_xpi__treeish) | (cd $(specific_xpi__build_path); tar x)
+
+	@# run `make` in the build directory
+	(cd $(specific_xpi__build_path); make)
+
+	@# move the created XPI from the build directory to the actual
+	@# dist directory
+	mv $(specific_xpi__build_path)/dist/*.xpi $(specific_xpi__file)
+
 # ______________________________________
 # create the files for the "off-AMO" XPI
 #

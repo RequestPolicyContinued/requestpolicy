@@ -365,7 +365,7 @@ $(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
 # This cleans all temporary files and directories created by 'make'.
 .PHONY: clean
 clean:
-	@rm -rf $(xpi_file) $(unit_testing__xpi_file) $(build_dirname)/*
+	@rm -rf $(dist_dirname)/*.xpi $(build_dirname)/*
 	@echo "Cleanup is done."
 
 # remove empty directories

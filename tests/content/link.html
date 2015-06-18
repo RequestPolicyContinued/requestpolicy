@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Link page</title>
+  <script src="inc/jquery.min.js"></script>
+</head>
+<body>
+
+<script>
+  $( document ).ready(function(){
+    if (location.search) {
+      var path = decodeURIComponent(location.search.substr(1));
+      var url = location.protocol + location.hostname + path;
+      $("p").append("<a href='" + path + "'>Link</a>");
+    }
+  });
+</script>
+
+<p style="margin: 2em">
+  <noscript>
+    Please enable JavaScript for this test.
+  </noscript>
+</p>
+
+</body>
+</html>

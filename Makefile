@@ -170,6 +170,19 @@ dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -
 dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
 
 
+# _________________________________
+# vars for generating the Dummy XPI
+#
+
+dummy_ext__source_dirname := tests/helper-addons/dummy-ext
+dummy_ext__source_path := $(dummy_ext__source_dirname)/
+
+dummy_ext__source_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
+		$(dummy_ext__source_dirname)/install.rdf
+
+dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
+
+
 # ______________________________
 # vars for mozrunner and mozmill
 #
@@ -285,6 +298,22 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 	@cd $(dev_helper__source_dirname) && \
 	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
+
+
+# ____________________
+# create the Dummy XPI
+#
+
+# For now use FORCE, i.e. create the XPI every time. If the
+# 'FORCE' should be removed, deleted files have to be detected,
+# just like for the other XPIs.
+dev-helper-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+	@rm -f $(dummy_ext__xpi_file)
+	@echo "Creating 'Dummy' XPI."
+	@cd $(dummy_ext__source_dirname) && \
+	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__source_files))
+	@echo "Creating 'Dummy' XPI: Done!"
+
 
 # _________________________________________
 # create the XPI from any tag or any commit

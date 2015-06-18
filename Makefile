@@ -410,6 +410,25 @@ $(deleted_files): FORCE
 	@# delete parent dirs if empty:
 	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
 
+# ____________________________
+# virtual python environments
+# for running and unit-testing
+#
+
+.PHONY: venv
+
+venv: .venv/bin/activate
+.venv/bin/activate: requirements.txt
+	test -d .venv || virtualenv --prompt='(RP)' .venv
+
+	@# With the `touch` command, this target is only executed
+	@# when "requirements.txt" changes
+	( \
+	source .venv/bin/activate ; \
+	pip install -r requirements.txt ; \
+	touch --no-create .venv/bin/activate ; \
+	)
+
 # ___________
 # run firefox
 #
@@ -421,8 +440,11 @@ mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
 mozrunner_args += $(moz_args)
 
 .PHONY: run
-run: $(moz_xpi) $(dev_helper__xpi_file)
-	mozrunner $(mozrunner_args)
+run: venv $(moz_xpi) $(dev_helper__xpi_file)
+	( \
+	source .venv-mozmill/bin/activate ; \
+	mozrunner $(mozrunner_args) ; \
+	)
 
 
 # ____________
@@ -438,8 +460,8 @@ mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/rpcontinued@re
 # Default mozmill manifest to use for testing
 mm_manifest := manifest.ini
 
-.PHONY: check test mozmill
-check test: mozmill
+.PHONY: check test mozmill marionette mozmill-dirs
+check test: mozmill marionette
 
 mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
@@ -447,7 +469,6 @@ mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
 
 
 
-.PHONY: mozmill-dirs
 mozmill-dirs: $(mozmill_tests_dir) \
 	$(mozmill_rpc_test_dir) \
 	$(mozmill_rpc_test_dir)/mozmill-tests \
@@ -465,6 +486,23 @@ $(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/data \
 	|| ln -ns ../../ tests/mozmill/data
 
+
+
+marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
+marionette_tests += tests/marionette/tests/manifest.ini
+
+
+.PHONY: marionette
+marionette: venv $(unit_testing__xpi_file) $(dev_helper__xpi_file) $(dummy_ext__xpi_file)
+	@# Due to Mozilla Bug 1173502, the profile needs to be created and
+	@# removed directly.
+	( \
+	source .venv/bin/activate ; \
+	export PYTHONPATH=tests/marionette/ ; \
+	profile_dir=`mozprofile -a $(unit_testing__xpi_file) -a $(dev_helper__xpi_file) --preferences=$(mozrunner_prefs_ini):marionette` ; \
+	firefox-ui-tests --binary=$(app_binary) --profile=$$profile_dir $(marionette_tests) ; \
+	rm -rf $$profile_dir ; \
+	)
 
 # ________________
 # "helper" targets

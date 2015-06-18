@@ -415,7 +415,7 @@ $(deleted_files): FORCE
 # for running and unit-testing
 #
 
-.PHONY: venv
+.PHONY: venv venv-mozmill
 
 venv: .venv/bin/activate
 .venv/bin/activate: requirements.txt
@@ -427,6 +427,17 @@ venv: .venv/bin/activate
 	source .venv/bin/activate ; \
 	pip install -r requirements.txt ; \
 	touch --no-create .venv/bin/activate ; \
+	)
+
+# mozmill needs a separate venv
+#   ( because it uses '==' package dependencies instead of '>='
+#     see https://github.com/mozilla/mozmill/blob/2.0.10/mozmill/setup.py#L11 )
+venv-mozmill: .venv-mozmill/bin/activate
+.venv-mozmill/bin/activate:
+	test -d .venv-mozmill || virtualenv --prompt='(RP/mozmill)' .venv-mozmill
+	( \
+	source .venv-mozmill/bin/activate ; \
+	pip install mozmill ; \
 	)
 
 # ___________
@@ -463,9 +474,12 @@ mm_manifest := manifest.ini
 .PHONY: check test mozmill marionette mozmill-dirs
 check test: mozmill marionette
 
-mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+mozmill: venv-mozmill $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+	( \
+	source .venv/bin/activate ; \
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
-		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args)
+		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args) ; \
+	)
 
 
 

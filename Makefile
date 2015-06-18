@@ -160,7 +160,7 @@ endif
 # vars for generating the Dev Helper XPI
 #
 
-dev_helper__source_dirname := tests/mozmill/extension
+dev_helper__source_dirname := tests/helper-addons/dev-helper
 dev_helper__source_path := $(dev_helper__source_dirname)/
 
 dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \

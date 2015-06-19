@@ -53,6 +53,45 @@ class _InstallNotifications(object):
             self.wait_until_hidden(notification_id)
 
 
+class RequestPolicy(BaseLib):
+    """With this class, RequestPolicy can be installed, enabled, disabled
+    or removed.
+    """
+
+    def __init__(self, marionette_getter):
+        BaseLib.__init__(self, marionette_getter)
+
+        self.pref_welcome_win = "extensions.requestpolicy.welcomeWindowShown"
+        self.addon_id = "rpcontinued@non-amo.requestpolicy.org"
+        self.install_url = ("http://localhost/link.html?"
+                            ".dist/requestpolicy-unit-testing.xpi")
+
+        self.addons = Addons(marionette_getter)
+
+    @contextmanager
+    def install_in_two_steps(self):
+        with self.addons.install_addon_in_two_steps(self.install_url):
+            yield
+
+    def install(self):
+        self.addons.install_addon(self.install_url)
+
+    def remove(self):
+        self.addons.remove_addon_by_id(self.addon_id)
+
+    def enable(self):
+        self.addons.enable_addon_by_id(self.addon_id)
+
+    def disable(self):
+        self.addons.disable_addon_by_id(self.addon_id)
+
+    def is_installed(self):
+        return self.addons.is_addon_installed(self.addon_id)
+
+    def is_enabled(self):
+        return self.addons.is_addon_enabled(self.addon_id)
+
+
 class Addons(BaseLib):
     """With this class, an addon can be installed, enabled, disabled
     or removed. All actions required, such as opening `about:addons`,

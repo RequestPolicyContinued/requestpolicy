@@ -145,6 +145,18 @@ class Addons(BaseLib):
             addon = about_addons.get_addon_by_id(addon_id)
             about_addons.disable_addon(addon)
 
+    def is_addon_installed(self, addon_id):
+        with self.using_addon_list() as about_addons:
+            addon = about_addons.get_addon_by_id(addon_id)
+            return addon != None
+
+    def is_addon_enabled(self, addon_id):
+        with self.using_addon_list() as about_addons:
+            addon = about_addons.get_addon_by_id(addon_id)
+            if addon == None:
+                return False
+            return addon.is_enabled()
+
 
 class AboutAddonsTab(BaseLib):
     """This class helps handling an `about:addons` tab.

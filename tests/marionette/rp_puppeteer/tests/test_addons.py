@@ -74,15 +74,11 @@ class TestAddons(AddonsTestCase):
         self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
 
     def test_uninstall_install(self):
-        def is_installed():
-            with self.addons.using_addon_list() as about_addons:
-                return about_addons.is_addon_installed(ADDON_ID)
-
-        self.assertTrue(is_installed())
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
         self.addons.remove_addon_by_id(ADDON_ID)
-        self.assertFalse(is_installed())
+        self.assertFalse(self.addons.is_addon_installed(ADDON_ID))
         self.addons.install_addon(INSTALL_URL)
-        self.assertTrue(is_installed())
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
 
     def test_multiple_uninstall_install(self):
         self.addons.remove_addon_by_id(ADDON_ID)
@@ -91,22 +87,37 @@ class TestAddons(AddonsTestCase):
         self.addons.install_addon(INSTALL_URL)
 
     def test_disable_enable(self):
-        def is_enabled():
-            with self.addons.using_addon_list() as about_addons:
-                addon = about_addons.get_addon_by_id(ADDON_ID)
-                return addon.is_enabled()
-
-        self.assertTrue(is_enabled())
+        self.assertTrue(self.addons.is_addon_enabled(ADDON_ID))
         self.addons.disable_addon_by_id(ADDON_ID)
-        self.assertFalse(is_enabled())
+        self.assertFalse(self.addons.is_addon_enabled(ADDON_ID))
         self.addons.enable_addon_by_id(ADDON_ID)
-        self.assertTrue(is_enabled())
+        self.assertTrue(self.addons.is_addon_enabled(ADDON_ID))
 
     def test_multiple_disable_enable(self):
         self.addons.disable_addon_by_id(ADDON_ID)
         self.addons.disable_addon_by_id(ADDON_ID)
         self.addons.enable_addon_by_id(ADDON_ID)
         self.addons.enable_addon_by_id(ADDON_ID)
+
+    def test_is_installed(self):
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
+        self.addons.disable_addon_by_id(ADDON_ID)
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
+        self.addons.remove_addon_by_id(ADDON_ID)
+        self.assertFalse(self.addons.is_addon_installed(ADDON_ID))
+        self.addons.install_addon(INSTALL_URL)
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
+        self.addons.enable_addon_by_id(ADDON_ID)
+
+    def test_is_enabled(self):
+        self.assertTrue(self.addons.is_addon_enabled(ADDON_ID))
+        self.addons.disable_addon_by_id(ADDON_ID)
+        self.assertFalse(self.addons.is_addon_enabled(ADDON_ID))
+        self.addons.remove_addon_by_id(ADDON_ID)
+        self.assertFalse(self.addons.is_addon_enabled(ADDON_ID))
+        self.addons.install_addon(INSTALL_URL)
+        self.addons.enable_addon_by_id(ADDON_ID)
+        self.assertTrue(self.addons.is_addon_enabled(ADDON_ID))
 
 
 class TestAboutAddons(AddonsTestCase):

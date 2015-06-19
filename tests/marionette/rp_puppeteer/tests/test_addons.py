@@ -59,6 +59,20 @@ class TestAddons(AddonsTestCase):
         self.assertEqual(self.count_tabs(), num_tabs,
                          msg="The number of tabs is like in the beginning.")
 
+    def test_install_in_two_steps(self):
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
+        self.addons.remove_addon_by_id(ADDON_ID)
+        self.assertFalse(self.addons.is_addon_installed(ADDON_ID))
+
+        tab = None
+        with self.addons.install_addon_in_two_steps(INSTALL_URL):
+            # when a tab is opened and selected, there shouldn't be an exception
+            tab = self.browser.tabbar.open_tab()
+            tab.select()
+        tab.close()
+
+        self.assertTrue(self.addons.is_addon_installed(ADDON_ID))
+
     def test_uninstall_install(self):
         def is_installed():
             with self.addons.using_addon_list() as about_addons:

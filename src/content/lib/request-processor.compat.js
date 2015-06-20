@@ -308,6 +308,28 @@ RequestProcessor = (function(self) {
       ]);
     }
 
+    // Firefox 34 added hello (talk) service
+    compatibilityRules.push([
+      "about:loopconversation",
+      "wss://loop.services.mozilla.com/websocket",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://hlg.tokbox.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://anvil.opentok.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "wss://",
+      appInfo.vendor
+    ]);
+
     // Flock
     if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,

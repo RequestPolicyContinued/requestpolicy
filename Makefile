@@ -307,7 +307,7 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-dev-helper-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
 	@rm -f $(dummy_ext__xpi_file)
 	@echo "Creating 'Dummy' XPI."
 	@cd $(dummy_ext__source_dirname) && \

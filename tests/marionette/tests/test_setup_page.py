@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from firefox_ui_harness import FirefoxTestCase
+from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.wait import Wait
 from rp_puppeteer.ui.addons import RequestPolicy
 
@@ -10,7 +10,7 @@ from rp_puppeteer.ui.addons import RequestPolicy
 PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
 
 
-class TestSetupPageShowingUp(FirefoxTestCase):
+class TestSetupPageShowingUp(RequestPolicyTestCase):
     def _get_setup_tab(self):
         # TODO: Search in all windows for setup tabs.
         #       Assert there isn't more than one setup tab.

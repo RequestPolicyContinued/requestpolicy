@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from firefox_ui_harness import FirefoxTestCase
+from rp_ui_harness import RequestPolicyTestCase
 
 from rp_puppeteer.ui.addons import Addons, AboutAddonsTab
 
@@ -11,7 +11,7 @@ ADDON_ID = "dummy-ext@requestpolicy.org"
 INSTALL_URL = "http://localhost/link.html?.dist/dummy-ext.xpi"
 
 
-class AddonsTestCase(FirefoxTestCase):
+class AddonsTestCase(RequestPolicyTestCase):
     def selected_tab_is_about_addons(self):
         location = self.browser.tabbar.selected_tab.location
         return location == "about:addons"
@@ -122,7 +122,7 @@ class TestAddons(AddonsTestCase):
 
 class TestAboutAddons(AddonsTestCase):
     def setUp(self):
-        FirefoxTestCase.setUp(self)
+        RequestPolicyTestCase.setUp(self)
 
         Addons(lambda: self.marionette).install_addon(INSTALL_URL)
 
@@ -136,7 +136,7 @@ class TestAboutAddons(AddonsTestCase):
                 self.about_addons.remove_addon(self.addon)
             self.about_addons.close_tab()
         finally:
-            FirefoxTestCase.tearDown(self)
+            RequestPolicyTestCase.tearDown(self)
 
     @property
     def addon(self):

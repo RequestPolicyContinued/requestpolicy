@@ -6,6 +6,8 @@ from marionette_driver.errors import NoSuchElementException
 from marionette_driver.wait import Wait
 from firefox_puppeteer.base import BaseLib
 from firefox_puppeteer.ui.windows import Windows
+from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
+                                              ConsoleErrorDetection)
 from contextlib import contextmanager
 
 
@@ -68,22 +70,50 @@ class RequestPolicy(BaseLib):
 
         self.addons = Addons(marionette_getter)
 
+        self.logging_error_detect = LoggingErrorDetection(marionette_getter)
+        self.console_error_detect = ConsoleErrorDetection(marionette_getter)
+
+    @contextmanager
+    def _ensure_no_errors(self):
+        logging_errors_before = self.logging_error_detect.get_error_count()
+        console_errors_before = self.console_error_detect.get_error_count()
+        yield
+        logging_error_count = (self.logging_error_detect.get_error_count() -
+                               logging_errors_before)
+        console_error_count = (self.console_error_detect.get_error_count() -
+                               console_errors_before)
+        if logging_error_count > 0 and console_error_count > 0:
+            raise Exception("There have been {} Logging errors and "
+                            "{} Console errors!".format(logging_error_count,
+                                                        console_error_count))
+        elif logging_error_count > 0:
+            raise Exception("There have been {} Logging "
+                            "errors!".format(logging_error_count))
+        elif console_error_count > 0:
+            raise Exception("There have been {} Console "
+                            "errors!".format(console_error_count))
+
     @contextmanager
     def install_in_two_steps(self):
-        with self.addons.install_addon_in_two_steps(self.install_url):
-            yield
+        with self._ensure_no_errors():
+            with self.addons.install_addon_in_two_steps(self.install_url):
+                yield
 
     def install(self):
-        self.addons.install_addon(self.install_url)
+        with self._ensure_no_errors():
+            self.addons.install_addon(self.install_url)
 
     def remove(self):
-        self.addons.remove_addon_by_id(self.addon_id)
+        with self._ensure_no_errors():
+            self.addons.remove_addon_by_id(self.addon_id)
 
     def enable(self):
-        self.addons.enable_addon_by_id(self.addon_id)
+        with self._ensure_no_errors():
+            self.addons.enable_addon_by_id(self.addon_id)
 
     def disable(self):
-        self.addons.disable_addon_by_id(self.addon_id)
+        with self._ensure_no_errors():
+            self.addons.disable_addon_by_id(self.addon_id)
 
     def is_installed(self):
         return self.addons.is_addon_installed(self.addon_id)

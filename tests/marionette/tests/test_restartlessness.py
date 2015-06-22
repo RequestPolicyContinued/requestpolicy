@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from firefox_ui_harness import FirefoxTestCase
+from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.ui.addons import RequestPolicy
 
 PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
@@ -10,13 +10,13 @@ RP_ID = "rpcontinued@non-amo.requestpolicy.org"
 INSTALL_URL = "http://localhost/link.html?.dist/requestpolicy-unit-testing.xpi"
 
 
-class TestRequestPolicyRestartlessness(FirefoxTestCase):
+class TestRequestPolicyRestartlessness(RequestPolicyTestCase):
     """These tests ensure that RequestPolicy can be uninstalled/installed and
     disabled/enabled restartless.
     """
 
     def setUp(self):
-        FirefoxTestCase.setUp(self)
+        RequestPolicyTestCase.setUp(self)
         self.rp = RequestPolicy(lambda: self.marionette)
 
     def test_disable_enable(self):

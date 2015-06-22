@@ -2,15 +2,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from firefox_ui_harness import FirefoxTestCase
+from rp_ui_harness import RequestPolicyTestCase
 
 from rp_puppeteer.api.prefs import using_pref
 
 
-class TestPrefs(FirefoxTestCase):
+class TestPrefs(RequestPolicyTestCase):
 
     def setUp(self):
-        FirefoxTestCase.setUp(self)
+        RequestPolicyTestCase.setUp(self)
 
         self.new_pref = 'marionette.unittest.using_pref'
 

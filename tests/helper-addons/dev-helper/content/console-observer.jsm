@@ -56,8 +56,12 @@ var ConsoleObserver = (function (self) {
     return numErrors;
   };
 
-  self.startup = function () {
+  self.reset = function () {
     numErrors = 0;
+  };
+
+  self.startup = function () {
+    self.reset();
     Services.console.registerListener(self);
   };
 

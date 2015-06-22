@@ -6,8 +6,6 @@ from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.ui.addons import RequestPolicy
 
 PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
-RP_ID = "rpcontinued@non-amo.requestpolicy.org"
-INSTALL_URL = "http://localhost/link.html?.dist/requestpolicy-unit-testing.xpi"
 
 
 class TestRequestPolicyRestartlessness(RequestPolicyTestCase):

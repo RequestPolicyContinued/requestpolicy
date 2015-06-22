@@ -160,7 +160,7 @@ endif
 # vars for generating the Dev Helper XPI
 #
 
-dev_helper__source_dirname := tests/mozmill/extension
+dev_helper__source_dirname := tests/helper-addons/dev-helper
 dev_helper__source_path := $(dev_helper__source_dirname)/
 
 dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
@@ -168,6 +168,19 @@ dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -
 		$(dev_helper__source_dirname)/install.rdf
 
 dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
+
+
+# _________________________________
+# vars for generating the Dummy XPI
+#
+
+dummy_ext__source_dirname := tests/helper-addons/dummy-ext
+dummy_ext__source_path := $(dummy_ext__source_dirname)/
+
+dummy_ext__source_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
+		$(dummy_ext__source_dirname)/install.rdf
+
+dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
 
 
 # ______________________________
@@ -285,6 +298,22 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 	@cd $(dev_helper__source_dirname) && \
 	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
+
+
+# ____________________
+# create the Dummy XPI
+#
+
+# For now use FORCE, i.e. create the XPI every time. If the
+# 'FORCE' should be removed, deleted files have to be detected,
+# just like for the other XPIs.
+dev-helper-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+	@rm -f $(dummy_ext__xpi_file)
+	@echo "Creating 'Dummy' XPI."
+	@cd $(dummy_ext__source_dirname) && \
+	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__source_files))
+	@echo "Creating 'Dummy' XPI: Done!"
+
 
 # _________________________________________
 # create the XPI from any tag or any commit
@@ -410,6 +439,36 @@ $(deleted_files): FORCE
 	@# delete parent dirs if empty:
 	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
 
+# ____________________________
+# virtual python environments
+# for running and unit-testing
+#
+
+.PHONY: venv venv-mozmill
+
+venv: .venv/bin/activate
+.venv/bin/activate: requirements.txt
+	test -d .venv || virtualenv --prompt='(RP)' .venv
+
+	@# With the `touch` command, this target is only executed
+	@# when "requirements.txt" changes
+	( \
+	source .venv/bin/activate ; \
+	pip install -r requirements.txt ; \
+	touch --no-create .venv/bin/activate ; \
+	)
+
+# mozmill needs a separate venv
+#   ( because it uses '==' package dependencies instead of '>='
+#     see https://github.com/mozilla/mozmill/blob/2.0.10/mozmill/setup.py#L11 )
+venv-mozmill: .venv-mozmill/bin/activate
+.venv-mozmill/bin/activate:
+	test -d .venv-mozmill || virtualenv --prompt='(RP/mozmill)' .venv-mozmill
+	( \
+	source .venv-mozmill/bin/activate ; \
+	pip install mozmill ; \
+	)
+
 # ___________
 # run firefox
 #
@@ -421,8 +480,11 @@ mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
 mozrunner_args += $(moz_args)
 
 .PHONY: run
-run: $(moz_xpi) $(dev_helper__xpi_file)
-	mozrunner $(mozrunner_args)
+run: venv $(moz_xpi) $(dev_helper__xpi_file)
+	( \
+	source .venv-mozmill/bin/activate ; \
+	mozrunner $(mozrunner_args) ; \
+	)
 
 
 # ____________
@@ -438,16 +500,18 @@ mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/rpcontinued@re
 # Default mozmill manifest to use for testing
 mm_manifest := manifest.ini
 
-.PHONY: check test mozmill
-check test: mozmill
+.PHONY: check test mozmill marionette mozmill-dirs
+check test: mozmill marionette
 
-mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+mozmill: venv-mozmill $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+	( \
+	source .venv/bin/activate ; \
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
-		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args)
+		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args) ; \
+	)
 
 
 
-.PHONY: mozmill-dirs
 mozmill-dirs: $(mozmill_tests_dir) \
 	$(mozmill_rpc_test_dir) \
 	$(mozmill_rpc_test_dir)/mozmill-tests \
@@ -465,6 +529,23 @@ $(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/data \
 	|| ln -ns ../../ tests/mozmill/data
 
+
+
+marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
+marionette_tests += tests/marionette/tests/manifest.ini
+
+
+.PHONY: marionette
+marionette: venv $(unit_testing__xpi_file) $(dev_helper__xpi_file) $(dummy_ext__xpi_file)
+	@# Due to Mozilla Bug 1173502, the profile needs to be created and
+	@# removed directly.
+	( \
+	source .venv/bin/activate ; \
+	export PYTHONPATH=tests/marionette/ ; \
+	profile_dir=`mozprofile -a $(unit_testing__xpi_file) -a $(dev_helper__xpi_file) --preferences=$(mozrunner_prefs_ini):marionette` ; \
+	firefox-ui-tests --binary=$(app_binary) --profile=$$profile_dir $(marionette_tests) ; \
+	rm -rf $$profile_dir ; \
+	)
 
 # ________________
 # "helper" targets

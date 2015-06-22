@@ -199,3 +199,83 @@ let Logger = (function() {
 
   return self;
 }());
+
+// #ifdef UNIT_TESTING
+
+/**
+ * Triggers errors for a RequestPolicy unit test.
+ * It's used to test Error Detection from the unit tests.
+ */
+var UnitTestObserver = (function (self) {
+
+  var loggingErrorTopic = "requestpolicy-trigger-logging-error";
+  var consoleErrorTopic = "requestpolicy-trigger-console-error";
+
+  self.startup = function () {
+    Services.obs.addObserver(self, loggingErrorTopic, false);
+    Services.obs.addObserver(self, consoleErrorTopic, false);
+  };
+
+  self.shutdown = function () {
+    Services.obs.removeObserver(self, loggingErrorTopic);
+    Services.obs.removeObserver(self, consoleErrorTopic);
+  };
+
+  /**
+   * Split a string like
+   *   "foo:bar:baz"
+   * to two strings:
+   *   ["foo", "bar:baz"]
+   * Only the first colon counts.
+   */
+  function splitColon(aString) {
+    var index = aString.indexOf(":");
+    if (index === -1) {
+      return [aString, ""]
+    }
+    var part1 = aString.substr(0, index);
+    var part2 = aString.substr(index + 1);
+    return [part1, part2];
+  }
+
+  self.observe = function (aSubject, aTopic, aData) {
+    switch (aTopic) {
+      case loggingErrorTopic:
+        let [logLevel, logMessage] = splitColon(aData);
+
+        if (logLevel === "warning") {
+          Logger.warning(Logger.TYPE_ERROR, logMessage);
+        } else if (logLevel === "severe") {
+          Logger.severe(Logger.TYPE_INTERNAL, logMessage);
+        }
+        break;
+
+      case consoleErrorTopic:
+        if (aData === "ReferenceError") {
+          runAsync(produceReferenceError);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  function produceReferenceError() {
+    var localVar = nonexistantVariable;
+  }
+
+  function runAsync(aFunction) {
+    var runnable = {run: aFunction};
+    Services.tm.currentThread.dispatch(runnable,
+        Ci.nsIEventTarget.DISPATCH_NORMAL);
+  }
+
+  return self;
+})({});
+
+ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
+                                      UnitTestObserver.startup);
+ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
+                                       UnitTestObserver.shutdown);
+// #endif

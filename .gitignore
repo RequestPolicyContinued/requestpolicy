@@ -5,6 +5,9 @@
 *.xpi
 *.bak*
 *.orig
+*.pyc
+
+gecko.log
 
 # build and dist directories in the root folder
 /build/

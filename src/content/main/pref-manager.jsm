@@ -33,7 +33,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/devtools/Console.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/constants",
   "lib/environment"
@@ -85,7 +85,7 @@ let PrefManager = (function() {
     // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
     // The scope of that script doesn't need to be remembered.
     Services.scriptloader.loadSubScript(
-        "chrome://requestpolicy/content/main/default-pref-handler.js",
+        "chrome://rpcontinued/content/main/default-pref-handler.js",
         {});
 
 

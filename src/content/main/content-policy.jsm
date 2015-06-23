@@ -33,7 +33,7 @@ let globalScope = this;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/constants",
   "lib/logger",
@@ -49,9 +49,9 @@ let PolicyImplementation = (function() {
   let xpcom_categories = ["content-policy"];
 
   let self = {
-    classDescription: "RequestPolicy JavaScript XPCOM Component",
-    classID:          Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
-    contractID:       "@requestpolicy.com/requestpolicy-service;1"
+    classDescription: "RequestPolicy ContentPolicy Implementation",
+    classID:          Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}"),
+    contractID:       "@requestpolicy.org/rpcontinued-service;1"
   };
 
   /**

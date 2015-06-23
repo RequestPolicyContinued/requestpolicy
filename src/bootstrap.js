@@ -26,7 +26,7 @@ const Cc = Components.classes;
 const Cu = Components.utils;
 
 var mod = {};
-const envURI = "chrome://requestpolicy/content/lib/environment.jsm";
+const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
 
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.

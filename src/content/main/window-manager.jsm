@@ -35,7 +35,7 @@ let rpWindowManager = (function(self) {
   Cu.import("resource://gre/modules/Services.jsm", globalScope);
   Cu.import("resource://gre/modules/XPCOMUtils.jsm", globalScope);
 
-  Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", globalScope);
+  Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
     "lib/utils",
     "lib/utils/xul",
@@ -45,19 +45,19 @@ let rpWindowManager = (function(self) {
 
   // import the WindowListener
   Services.scriptloader.loadSubScript(
-      "chrome://requestpolicy/content/main/window-manager.listener.js",
+      "chrome://rpcontinued/content/main/window-manager.listener.js",
       globalScope);
 
   let styleSheets = [
-    "chrome://requestpolicy/skin/requestpolicy.css"
+    "chrome://rpcontinued/skin/requestpolicy.css"
   ];
   if (Utils.info.isSeamonkey) {
-    styleSheets.push("chrome://requestpolicy/skin/toolbarbutton-seamonkey.css");
+    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton-seamonkey.css");
   } else {
-    styleSheets.push("chrome://requestpolicy/skin/toolbarbutton.css");
+    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton.css");
   }
 
-  let frameScriptURI = "chrome://requestpolicy/content/ui/frame.js?" +
+  let frameScriptURI = "chrome://rpcontinued/content/ui/frame.js?" +
       Math.random();
 
 
@@ -77,7 +77,7 @@ let rpWindowManager = (function(self) {
     // ==================================
     // # 2 : create a scope variable for RP for this window
     // ----------------------------------------------------
-    window.requestpolicy = {};
+    window.rpcontinued = {};
 
 
     // ==================================
@@ -85,13 +85,13 @@ let rpWindowManager = (function(self) {
     // ----------------------------------------------
     try {
       Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/overlay.js",
+          "chrome://rpcontinued/content/ui/overlay.js",
           window);
       Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/menu.js",
+          "chrome://rpcontinued/content/ui/menu.js",
           window);
       Services.scriptloader.loadSubScript(
-          "chrome://requestpolicy/content/ui/classicmenu.js",
+          "chrome://rpcontinued/content/ui/classicmenu.js",
           window);
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
@@ -116,7 +116,7 @@ let rpWindowManager = (function(self) {
     try {
       // init must be called last, because it assumes that
       // everything else is ready
-      window.requestpolicy.overlay.init();
+      window.rpcontinued.overlay.init();
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "An error occurred while initializing the overlay: "+e, e);
@@ -133,11 +133,11 @@ let rpWindowManager = (function(self) {
     self.removeToolbarButtonFromWindow(window);
 
 
-    // # 3 and 2 : remove the `requestpolicy` variable from the window
+    // # 3 and 2 : remove the `rpcontinued` variable from the window
     // ---------------------------------------------------------
     // This wouldn't be needed when the window is closed, but this has to be
     // done when RP is being disabled.
-    delete window.requestpolicy;
+    delete window.rpcontinued;
 
 
     // # 1 : remove all XUL elements
@@ -233,5 +233,5 @@ let rpWindowManager = (function(self) {
 
 // extend rpWindowManager
 Services.scriptloader.loadSubScript(
-    "chrome://requestpolicy/content/main/window-manager-toolbarbutton.js",
+    "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
     globalScope);

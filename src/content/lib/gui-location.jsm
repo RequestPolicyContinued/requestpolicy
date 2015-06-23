@@ -32,7 +32,7 @@ let EXPORTED_SYMBOLS = [
   "GUILocationProperties"
 ];
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules(["lib/utils/constants"], this);
 
 

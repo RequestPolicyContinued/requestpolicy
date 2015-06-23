@@ -36,7 +36,7 @@ let EXPORTED_SYMBOLS = [
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/ruleset",
@@ -44,9 +44,9 @@ ScriptLoader.importModules([
   "lib/ruleset-storage"
 ], this);
 
-const SUBSCRIPTION_UPDATED_TOPIC = 'requestpolicy-subscription-policy-updated';
-const SUBSCRIPTION_ADDED_TOPIC = 'requestpolicy-subscription-policy-added';
-const SUBSCRIPTION_REMOVED_TOPIC = 'requestpolicy-subscription-policy-removed';
+const SUBSCRIPTION_UPDATED_TOPIC = 'rpcontinued-subscription-policy-updated';
+const SUBSCRIPTION_ADDED_TOPIC = 'rpcontinued-subscription-policy-added';
+const SUBSCRIPTION_REMOVED_TOPIC = 'rpcontinued-subscription-policy-removed';
 
 const DEFAULT_SUBSCRIPTION_LIST_URL_BASE = 'https://raw.githubusercontent.com/RequestPolicyContinued/subscriptions/master/';
 

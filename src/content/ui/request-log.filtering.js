@@ -22,7 +22,7 @@
  */
 
 
-window.requestpolicy.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -30,7 +30,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader, Services} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     Cu.import("resource://gre/modules/Services.jsm", mod);
     return mod;
   }());
@@ -40,8 +40,8 @@ window.requestpolicy.requestLog = (function (self) {
 
   // TODO: use the Window Environment instead
   let elements = WindowUtils.getElementsByIdOnLoad(window, {
-        filterTextbox: "requestpolicy-requestLog-requestFilter",
-        clearFilterButton: "requestpolicy-requestLog-clearFilter"
+        filterTextbox: "rpcontinued-requestLog-requestFilter",
+        clearFilterButton: "rpcontinued-requestLog-clearFilter"
       });
 
   self.filterChanged = function() {
@@ -107,4 +107,4 @@ window.requestpolicy.requestLog = (function (self) {
 
 
   return self;
-}(window.requestpolicy.requestLog || {}));
+}(window.rpcontinued.requestLog || {}));

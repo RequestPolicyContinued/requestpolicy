@@ -22,7 +22,7 @@
  */
 
 
-requestpolicy.menu = (function() {
+rpcontinued.menu = (function() {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -31,7 +31,7 @@ requestpolicy.menu = (function() {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   // iMod: Alias for ScriptLoader.importModule
@@ -82,16 +82,16 @@ requestpolicy.menu = (function() {
     if (initialized === false) {
       initialized = true;
 
-      self._originItem = document.getElementById("rp-origin");
-      self._originDomainnameItem = $id('rp-origin-domainname');
-      self._originNumRequestsItem = $id('rp-origin-num-requests');
+      self._originItem = document.getElementById("rpc-origin");
+      self._originDomainnameItem = $id('rpc-origin-domainname');
+      self._originNumRequestsItem = $id('rpc-origin-num-requests');
 
-      self._otherOriginsList = $id("rp-other-origins-list");
-      self._blockedDestinationsList = $id("rp-blocked-destinations-list");
-      self._mixedDestinationsList = $id("rp-mixed-destinations-list");
-      self._allowedDestinationsList = $id("rp-allowed-destinations-list");
-      self._addRulesList = $id("rp-rules-add");
-      self._removeRulesList = $id("rp-rules-remove");
+      self._otherOriginsList = $id("rpc-other-origins-list");
+      self._blockedDestinationsList = $id("rpc-blocked-destinations-list");
+      self._mixedDestinationsList = $id("rpc-mixed-destinations-list");
+      self._allowedDestinationsList = $id("rpc-allowed-destinations-list");
+      self._addRulesList = $id("rpc-rules-add");
+      self._removeRulesList = $id("rpc-rules-remove");
 
       var conflictCount = RequestProcessor.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
@@ -102,13 +102,13 @@ requestpolicy.menu = (function() {
   self.prepareMenu = function() {
     try {
       var disabled = Prefs.isBlockingDisabled();
-      $id('rp-link-enable-blocking').hidden = !disabled;
-      $id('rp-link-disable-blocking').hidden = disabled;
+      $id('rpc-link-enable-blocking').hidden = !disabled;
+      $id('rpc-link-disable-blocking').hidden = disabled;
 
-      $id('rp-revoke-temporary-permissions').hidden =
+      $id('rpc-revoke-temporary-permissions').hidden =
           !PolicyManager.temporaryRulesExist();
 
-      self._currentUri = requestpolicy.overlay.getTopLevelDocumentUri();
+      self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
 
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
@@ -125,7 +125,7 @@ requestpolicy.menu = (function() {
         return;
       }
 
-      self._currentIdentifier = requestpolicy.overlay
+      self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
       //Logger.info(Logger.TYPE_POLICY,
@@ -168,7 +168,7 @@ requestpolicy.menu = (function() {
 
       self._populateOrigin();
       self._populateOtherOrigins();
-      self._activateOriginItem($id("rp-origin"));
+      self._activateOriginItem($id("rpc-origin"));
 
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
@@ -192,10 +192,10 @@ requestpolicy.menu = (function() {
         self._allowedDestinationsList,
         self._removeRulesList,
         self._addRulesList]);
-    $id('rp-other-origins').hidden = true;
-    $id('rp-blocked-destinations').hidden = true;
-    $id('rp-mixed-destinations').hidden = true;
-    $id('rp-allowed-destinations').hidden = true;
+    $id('rpc-other-origins').hidden = true;
+    $id('rpc-blocked-destinations').hidden = true;
+    $id('rpc-mixed-destinations').hidden = true;
+    $id('rpc-allowed-destinations').hidden = true;
     // TODO: show some message about why the menu is empty.
   };
 
@@ -228,7 +228,7 @@ requestpolicy.menu = (function() {
                 "+" + props.numAllowedRequests + ")";
           }
         }
-        var newitem = self._addListItem(list, 'rp-od-item', guiLocation, num);
+        var newitem = self._addListItem(list, 'rpc-od-item', guiLocation, num);
 
         newitem.setAttribute("default-policy",
             (props.numDefaultPolicyRequests > 0 ? "true" : "false"));
@@ -238,7 +238,7 @@ requestpolicy.menu = (function() {
     } else {
       values.sort();
       for (var i in values) {
-        self._addListItem(list, 'rp-od-item', values[i]);
+        self._addListItem(list, 'rpc-od-item', values[i]);
       }
     }
   };
@@ -271,7 +271,7 @@ requestpolicy.menu = (function() {
   self._populateOtherOrigins = function() {
     var guiOrigins = self._getOtherOriginsAsGUILocations();
     self._populateList(self._otherOriginsList, guiOrigins);
-    $id('rp-other-origins').hidden = guiOrigins.length == 0;
+    $id('rpc-other-origins').hidden = guiOrigins.length == 0;
   };
 
   self._populateDestinations = function(originIdentifier) {
@@ -323,15 +323,15 @@ requestpolicy.menu = (function() {
 
     self._populateList(self._blockedDestinationsList,
         destsWithSolelyBlockedRequests);
-    $id('rp-blocked-destinations').hidden =
+    $id('rpc-blocked-destinations').hidden =
         destsWithSolelyBlockedRequests.length == 0;
 
     self._populateList(self._mixedDestinationsList, destsMixed);
-    $id('rp-mixed-destinations').hidden = destsMixed.length == 0;
+    $id('rpc-mixed-destinations').hidden = destsMixed.length == 0;
 
     self._populateList(self._allowedDestinationsList,
         destsWithSolelyAllowedRequests);
-    $id('rp-allowed-destinations').hidden =
+    $id('rpc-allowed-destinations').hidden =
         destsWithSolelyAllowedRequests.length == 0;
   };
 
@@ -446,7 +446,7 @@ requestpolicy.menu = (function() {
   self._addListItem = function(list, cssClass, value, numRequests) {
     var hbox = document.createElement("hbox");
     hbox.setAttribute("class", cssClass);
-    hbox.setAttribute("onclick", 'requestpolicy.menu.itemSelected(event);');
+    hbox.setAttribute("onclick", 'rpcontinued.menu.itemSelected(event);');
     list.insertBefore(hbox, null);
 
     var destLabel = document.createElement("label");
@@ -473,7 +473,7 @@ requestpolicy.menu = (function() {
   self._setPrivateBrowsingStyles = function() {
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
     let val = mayPermRulesBeAdded === true ? '' : 'privatebrowsing';
-    $id('rp-details').setAttribute('class', val);
+    $id('rpc-details').setAttribute('class', val);
   };
 
   self._resetSelectedOrigin = function() {
@@ -500,10 +500,10 @@ requestpolicy.menu = (function() {
   };
 
   self._activateOriginItem = function(item) {
-    if (item.id == 'rp-origin') {
+    if (item.id == 'rpc-origin') {
       // it's _the_ origin
       self._currentlySelectedOrigin = self._originDomainnameItem.value;
-    } else if (item.parentNode.id == 'rp-other-origins-list') {
+    } else if (item.parentNode.id == 'rpc-other-origins-list') {
       // it's an otherOrigin
       self._currentlySelectedOrigin = item.getElementsByClassName("domainname")[0].value;
     }
@@ -520,10 +520,10 @@ requestpolicy.menu = (function() {
   self._activateDestinationItem = function(item) {
     self._currentlySelectedDest = item.getElementsByClassName("domainname")[0].value;
 
-    if (item.parentNode.id == 'rp-blocked-destinations-list') {
+    if (item.parentNode.id == 'rpc-blocked-destinations-list') {
       self._isCurrentlySelectedDestBlocked = true;
       self._isCurrentlySelectedDestAllowed = false;
-    } else if (item.parentNode.id == 'rp-allowed-destinations-list') {
+    } else if (item.parentNode.id == 'rpc-allowed-destinations-list') {
       self._isCurrentlySelectedDestBlocked = false;
       self._isCurrentlySelectedDestAllowed = true;
     } else {
@@ -546,16 +546,15 @@ requestpolicy.menu = (function() {
       // item should be the <hbox>
       item = item.parentNode;
     }
-    if (item.id == 'rp-origin' ||
-        item.parentNode.id == 'rp-other-origins-list') {
+    if (item.id == 'rpc-origin' ||
+        item.parentNode.id == 'rpc-other-origins-list') {
       self._activateOriginItem(item);
-    } else if (item.parentNode.id == 'rp-blocked-destinations-list' ||
-               item.parentNode.id == 'rp-mixed-destinations-list' ||
-               item.parentNode.id == 'rp-allowed-destinations-list') {
+    } else if (item.parentNode.id == 'rpc-blocked-destinations-list' ||
+               item.parentNode.id == 'rpc-mixed-destinations-list' ||
+               item.parentNode.id == 'rpc-allowed-destinations-list') {
       self._activateDestinationItem(item);
-    } else if (item.parentNode.id == 'rp-rule-options' ||
-               item.parentNode.id == 'rp-rules-remove' ||
-               item.parentNode.id == 'rp-rules-add') {
+    } else if (item.parentNode.id == 'rpc-rules-remove' ||
+               item.parentNode.id == 'rpc-rules-add') {
       self._processRuleSelection(item);
     } else {
       Logger.severe(Logger.TYPE_ERROR,
@@ -806,56 +805,56 @@ requestpolicy.menu = (function() {
   self._addMenuItemStopAllowingOrigin = function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return self._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], ruleAction, 'rp-stop-rule rp-stop-allow');
+    return self._addMenuItemHelper(list, ruleData, 'stopAllowingOrigin', [originHost], ruleAction, 'rpc-stop-rule rpc-stop-allow');
   };
 
   self._addMenuItemStopAllowingDest = function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return self._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], ruleAction, 'rp-stop-rule rp-stop-allow');
+    return self._addMenuItemHelper(list, ruleData, 'stopAllowingDestination', [destHost], ruleAction, 'rpc-stop-rule rpc-stop-allow');
   };
 
   self._addMenuItemStopAllowingOriginToDest = function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'deny' : 'stop-allow';
-    return self._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-rule rp-stop-allow');
+    return self._addMenuItemHelper(list, ruleData, 'stopAllowingOriginToDestination', [originHost, destHost], ruleAction, 'rpc-stop-rule rpc-stop-allow');
   };
 
   // Allow
 
   self._addMenuItemAllowOrigin = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowOrigin', [originHost], 'allow', 'rp-start-rule rp-allow');
+    return self._addMenuItemHelper(list, ruleData, 'allowOrigin', [originHost], 'allow', 'rpc-start-rule rpc-allow');
   };
 
   self._addMenuItemAllowDest = function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowDestination', [destHost], 'allow', 'rp-start-rule rp-allow');
+    return self._addMenuItemHelper(list, ruleData, 'allowDestination', [destHost], 'allow', 'rpc-start-rule rpc-allow');
   };
 
   self._addMenuItemAllowOriginToDest = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowOriginToDestination', [originHost, destHost], 'allow', 'rp-start-rule rp-allow');
+    return self._addMenuItemHelper(list, ruleData, 'allowOriginToDestination', [originHost, destHost], 'allow', 'rpc-start-rule rpc-allow');
   };
 
   // Allow temp
 
   self._addMenuItemTempAllowOrigin = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowOriginTemporarily', [originHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
+    return self._addMenuItemHelper(list, ruleData, 'allowOriginTemporarily', [originHost], 'allow-temp', 'rpc-start-rule rpc-allow rpc-temporary');
   };
 
   self._addMenuItemTempAllowDest = function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowDestinationTemporarily', [destHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
+    return self._addMenuItemHelper(list, ruleData, 'allowDestinationTemporarily', [destHost], 'allow-temp', 'rpc-start-rule rpc-allow rpc-temporary');
   };
 
   self._addMenuItemTempAllowOriginToDest = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'allowOriginToDestinationTemporarily', [originHost, destHost], 'allow-temp', 'rp-start-rule rp-allow rp-temporary');
+    return self._addMenuItemHelper(list, ruleData, 'allowOriginToDestinationTemporarily', [originHost, destHost], 'allow-temp', 'rpc-start-rule rpc-allow rpc-temporary');
   };
 
   // Stop denying
@@ -863,50 +862,50 @@ requestpolicy.menu = (function() {
   self._addMenuItemStopDenyingOrigin = function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return self._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], ruleAction, 'rp-stop-rule rp-stop-deny');
+    return self._addMenuItemHelper(list, ruleData, 'stopDenyingOrigin', [originHost], ruleAction, 'rpc-stop-rule rpc-stop-deny');
   };
 
   self._addMenuItemStopDenyingDest = function(list, ruleData, subscriptionOverride) {
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return self._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], ruleAction, 'rp-stop-rule rp-stop-deny');
+    return self._addMenuItemHelper(list, ruleData, 'stopDenyingDestination', [destHost], ruleAction, 'rpc-stop-rule rpc-stop-deny');
   };
 
   self._addMenuItemStopDenyingOriginToDest = function(list, ruleData, subscriptionOverride) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
     var ruleAction = subscriptionOverride ? 'allow' : 'stop-deny';
-    return self._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], ruleAction, 'rp-stop-rule rp-stop-deny');
+    return self._addMenuItemHelper(list, ruleData, 'stopDenyingOriginToDestination', [originHost, destHost], ruleAction, 'rpc-stop-rule rpc-stop-deny');
   };
 
   // Deny
 
   self._addMenuItemDenyOrigin = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'denyOrigin', [originHost], 'deny', 'rp-start-rule rp-deny');
+    return self._addMenuItemHelper(list, ruleData, 'denyOrigin', [originHost], 'deny', 'rpc-start-rule rpc-deny');
   };
 
   self._addMenuItemDenyDest = function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'denyDestination', [destHost], 'deny', 'rp-start-rule rp-deny');
+    return self._addMenuItemHelper(list, ruleData, 'denyDestination', [destHost], 'deny', 'rpc-start-rule rpc-deny');
   };
 
   self._addMenuItemDenyOriginToDest = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'denyOriginToDestination', [originHost, destHost], 'deny', 'rp-start-rule rp-deny');
+    return self._addMenuItemHelper(list, ruleData, 'denyOriginToDestination', [originHost, destHost], 'deny', 'rpc-start-rule rpc-deny');
   };
 
   // Deny temp
 
   self._addMenuItemTempDenyOrigin = function(list, ruleData) {
     var originHost = ruleData["o"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'denyOriginTemporarily', [originHost], 'deny-temp', 'rp-start-rule rp-deny rp-temporary');
+    return self._addMenuItemHelper(list, ruleData, 'denyOriginTemporarily', [originHost], 'deny-temp', 'rpc-start-rule rpc-deny rpc-temporary');
   };
 
   self._addMenuItemTempDenyDest = function(list, ruleData) {
     var destHost = ruleData["d"]["h"];
-    return self._addMenuItemHelper(list, ruleData, 'denyDestinationTemporarily', [destHost], 'deny-temp', 'rp-start-rule rp-deny rp-temporary');
+    return self._addMenuItemHelper(list, ruleData, 'denyDestinationTemporarily', [destHost], 'deny-temp', 'rpc-start-rule rpc-deny rpc-temporary');
   };
 
   self._addMenuItemTempDenyOriginToDest = function(list, ruleData) {
@@ -914,17 +913,17 @@ requestpolicy.menu = (function() {
     var destHost = ruleData["d"]["h"];
     return self._addMenuItemHelper(list, ruleData,
         'denyOriginToDestinationTemporarily', [originHost, destHost],
-        'deny-temp', 'rp-start-rule rp-deny rp-temporary');
+        'deny-temp', 'rpc-start-rule rpc-deny rpc-temporary');
   };
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
       ruleAction, cssClass) {
     var label = StringUtils.$str(fmtStrName, fmtStrArgs);
-    var item = self._addListItem(list, 'rp-od-item', label);
+    var item = self._addListItem(list, 'rpc-od-item', label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;
     //var statustext = ''; // TODO
-    item.setAttribute('class', 'rp-od-item ' + cssClass);
+    item.setAttribute('class', 'rpc-od-item ' + cssClass);
     var canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
     if (self._ruleChangeQueues[ruleAction]) {
       if (self._ruleChangeQueues[ruleAction][canonicalRule]) {

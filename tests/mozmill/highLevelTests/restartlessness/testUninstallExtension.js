@@ -36,7 +36,7 @@ function teardownModule(aModule) {
 
 function testUninstallExtension() {
   amHelper.openOnlyAddonManager();
-  amHelper.setCategory("extension");
+  addonsManager.setCategoryById({id: "extension"});
 
   var addon = amHelper.getAddon();
   assert.notEqual(addon, null,
@@ -47,8 +47,8 @@ function testUninstallExtension() {
 
   // Switch categories to dispose of the undo link,
   // i.e. switch to 'Appearance' and back to 'Extensions'.
-  amHelper.setCategory("theme");
-  amHelper.setCategory("extension");
+  addonsManager.setCategoryById({id: "theme"});
+  addonsManager.setCategoryById({id: "extension"});
 
   assert.equal(amHelper.getAddon(), null,
                "Extension '" + rpConst.ADDON_ID + "' has been uninstalled");

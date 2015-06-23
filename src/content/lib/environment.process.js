@@ -139,7 +139,7 @@ let ProcessEnvironment = (function() {
     ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 
     ScriptLoader.doShutdownTasks();
-    Cu.unload("chrome://requestpolicy/content/lib/script-loader.jsm");
+    Cu.unload("chrome://rpcontinued/content/lib/script-loader.jsm");
   };
 
 
@@ -171,7 +171,7 @@ let ProcessEnvironment = (function() {
       // After that task, any global object, such as
       // `Environment` or `Cu` is not available anymore.
       //console.debug("unloading environment.jsm");
-      Cu.unload("chrome://requestpolicy/content/lib/environment.jsm");
+      Cu.unload("chrome://rpcontinued/content/lib/environment.jsm");
     };
 
     childMM.addMessageListener(shutdownMessage, receiveShutdownMessage);
@@ -189,7 +189,7 @@ let ProcessEnvironment = (function() {
     ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 
     ScriptLoader.doShutdownTasks();
-    Cu.unload("chrome://requestpolicy/content/lib/script-loader.jsm");
+    Cu.unload("chrome://rpcontinued/content/lib/script-loader.jsm");
   };
 
   ChildProcessEnvironment.prototype.registerInnerEnvironment = function(aEnv) {

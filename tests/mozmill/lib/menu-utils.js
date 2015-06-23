@@ -22,7 +22,7 @@ function Menu(aController) {
  * @return {MozMillElement}
  */
 Menu.prototype.getPopup = function () {
-  return findElement.ID(this.window.document, "rp-popup");
+  return findElement.ID(this.window.document, "rpc-popup");
 };
 
 /**

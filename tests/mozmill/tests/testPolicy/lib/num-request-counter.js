@@ -18,9 +18,9 @@ function NumRequestsCounter(controller) {
 
   let self = this;
 
-  let rpMenuButton = findElement.ID(controller.window.document,
-                                    'requestpolicyToolbarButton');
-  let rpMenuPopup = findElement.ID(controller.window.document, 'rp-popup');
+  let rpcMenuButton = findElement.ID(controller.window.document,
+                                    'rpcontinuedToolbarButton');
+  let rpcMenuPopup = findElement.ID(controller.window.document, 'rpc-popup');
 
 
   function initOriginAndDest(originHostname, destHostname) {
@@ -63,19 +63,19 @@ function NumRequestsCounter(controller) {
 
   self.checkIfIsCorrect = function() {
     // open the menu
-    rpMenuButton.click();
-    rpMenuPopup.waitForElement();
+    rpcMenuButton.click();
+    rpcMenuPopup.waitForElement();
 
     {
       let rpOriginNumReq = rpUtils.getElementById(controller.window.document,
-                                                  "rp-origin-num-requests");
+                                                  "rpc-origin-num-requests");
       let total = counter.$total.$total;
       let totalAllow = counter.$total.allowed;
       let totalDeny = counter.$total.denied;
 
       let re = /^\s*([0-9]+)\s*(?:\(\s*([0-9]+)\s*\+\s*([0-9]+)\s*\))?\s*$/;
       let reResult = re.exec(rpOriginNumReq.value);
-      assert.ok(reResult !== null, "The numRequests field of #rp-origin " +
+      assert.ok(reResult !== null, "The numRequests field of #rpc-origin " +
                 "has the correct format, either 'num' or 'num (num + num)'.");
       assert.ok(reResult[1] > total, "The total number of requests" +
                 " is correct.");
@@ -108,7 +108,7 @@ function NumRequestsCounter(controller) {
      */
 
     // close the menu
-    rpMenuPopup.keypress('VK_ESCAPE');
+    rpcMenuPopup.keypress('VK_ESCAPE');
   };
 
   return self;

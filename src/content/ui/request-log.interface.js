@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-window.requestpolicy = window.requestpolicy || {};
+window.rpcontinued = window.rpcontinued || {};
 
-window.requestpolicy.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -31,7 +31,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader, Services} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     Cu.import("resource://gre/modules/Services.jsm", mod);
     return mod;
   }());
@@ -131,4 +131,4 @@ window.requestpolicy.requestLog = (function (self) {
 
 
   return self;
-}(window.requestpolicy.requestLog || {}));
+}(window.rpcontinued.requestLog || {}));

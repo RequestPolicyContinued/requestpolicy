@@ -29,7 +29,7 @@ let EXPORTED_SYMBOLS = ["DomainUtil"];
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules(["lib/logger"], this);
 
 /*

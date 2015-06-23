@@ -34,7 +34,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 let globalScope = this;
 
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/environment",
   "lib/utils"
@@ -60,7 +60,7 @@ function getURI(aURI) {
   if (!id || !(id in filenames)) {
     id = "basicprefs";
   }
-  return "chrome://requestpolicy/content/settings/" + filenames[id];
+  return "chrome://rpcontinued/content/settings/" + filenames[id];
 }
 
 
@@ -69,7 +69,7 @@ let AboutRequestPolicy = (function() {
   let self = {
     classDescription: "about:requestpolicy",
     contractID: "@mozilla.org/network/protocol/about;1?what=requestpolicy",
-    classID: Components.ID("{ad30f46c-42a6-45cd-ad0b-08b37f87435a}"),
+    classID: Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}"),
     QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
 
     getURIFlags: function(aURI) {

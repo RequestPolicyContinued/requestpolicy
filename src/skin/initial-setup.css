@@ -6,7 +6,7 @@ dialog {
 dialogheader {
   padding-left: 40px;
   background-image:
-    url("chrome://requestpolicy/skin/requestpolicy-icon-24-blocked.png");
+    url("chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png");
   background-repeat: no-repeat;
   background-position: 6px center;
 }

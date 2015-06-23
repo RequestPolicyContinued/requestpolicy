@@ -26,7 +26,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/prefs",
@@ -236,8 +236,8 @@ let RequestProcessor = (function(self) {
           // save all blocked redirects directly in the browser element. the
           // blocked elements will be checked later when the DOM content
           // finished loading.
-          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
-          browser.requestpolicy.blockedRedirects[originURI] = destURI;
+          browser.rpcontinued = browser.rpcontinued || {blockedRedirects: {}};
+          browser.rpcontinued.blockedRedirects[originURI] = destURI;
         }
 
         // Cancel the request. As of Fx 37, this causes the location bar to
@@ -305,7 +305,7 @@ let RequestProcessor = (function(self) {
     var window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(function() {
-      var showNotification = Utils.getObjectPath(window, 'requestpolicy',
+      var showNotification = Utils.getObjectPath(window, 'rpcontinued',
           'overlay', '_showRedirectNotification');
       if (!showNotification) {
         return false;

@@ -1,4 +1,4 @@
-# RequestPolicy (continued)
+# RequestPolicy Continued
 
 ## About RequestPolicy
 

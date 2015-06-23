@@ -40,6 +40,7 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/README \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
+		$(wildcard $(source_dirname)/content/*.html) \
 		$(wildcard $(source_dirname)/content/ui/*.xul) \
 		$(wildcard $(source_dirname)/locale/*/*.dtd) \
 		$(wildcard $(source_dirname)/locale/*/*.properties) \
@@ -536,7 +537,12 @@ marionette_tests += tests/marionette/tests/manifest.ini
 
 
 .PHONY: marionette
-marionette: venv $(unit_testing__xpi_file) $(dev_helper__xpi_file) $(dummy_ext__xpi_file)
+marionette: venv \
+		unit-testing-xpi \
+		dev-helper-xpi \
+		dummy-xpi \
+		specific-xpi \
+		amo-xpi
 	@# Due to Mozilla Bug 1173502, the profile needs to be created and
 	@# removed directly.
 	( \

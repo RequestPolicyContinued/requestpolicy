@@ -29,6 +29,7 @@ let EXPORTED_SYMBOLS = ["rpService"];
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/AddonManager.jsm");
 
 Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
@@ -118,6 +119,115 @@ let rpService = (function() {
   }
 
 
+  /**
+   * Module for detecting installations of other RequestPolicy versions,
+   * which have a different extension ID.
+   */
+  var DetectorForOtherInstallations = (function () {
+    const NOTICE_URL = "chrome://rpcontinued/content/" +
+        "multiple-installations.html";
+
+    // The other extension IDs of RequestPolicy.
+    var addonIDs = Object.freeze([
+      "requestpolicy@requestpolicy.com",
+      // #ifdef AMO
+      // In the AMO version the non-AMO version needs to be detected.
+      "rpcontinued@non-amo.requestpolicy.org",
+      // #else
+      // In the non-AMO version the AMO version needs to be detected.
+      "rpcontinued@requestpolicy.org",
+      // #endif
+    ]);
+
+    var addonListener = {
+      onEnabled: checkAddon,
+      onInstalled: checkAddon
+    };
+
+    function checkAddon(addon) {
+      for (let id of addonIDs) {
+        if (addon.id === id) {
+          openTab();
+          return;
+        }
+      }
+    }
+
+    ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, function () {
+      AddonManager.addAddonListener(addonListener);
+    });
+
+    ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI, function () {
+      AddonManager.removeAddonListener(addonListener);
+    });
+
+    /**
+     * Open the tab with the 'multiple installations' notice.
+     *
+     * @return {Boolean} whether opening the tab was successful
+     */
+    function openTab() {
+      var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
+          .getService(Ci.nsIWindowMediator);
+      var mostRecentWindow = wm.getMostRecentWindow("navigator:browser");
+
+      // the gBrowser object of the firefox window
+      var _gBrowser = mostRecentWindow.getBrowser();
+
+      if (typeof(_gBrowser.addTab) !== "function") {
+        return false;
+      }
+
+      _gBrowser.selectedTab = _gBrowser.addTab(NOTICE_URL);
+
+      return true;
+    }
+
+    function isAddonActive(addon) {
+      if (addon === null) {
+        return false;
+      }
+
+      return addon.isActive;
+    }
+
+    // On startup, the tab should be opened only once.
+    var initialCheckDone = false;
+
+    function addonListCallback(addons) {
+      var activeAddons = addons.filter(isAddonActive);
+      if (activeAddons.length === 0) {
+        // no other RequestPolicy version is active
+        return;
+      }
+
+      if (initialCheckDone === true) {
+        return;
+      }
+
+      var rv = openTab();
+
+      if (rv === true) {
+        initialCheckDone = true;
+      }
+    }
+
+    /**
+     * Check if other RequestPolicy versions (with other extension IDs)
+     * are installed. If so, a tab with a notice will be opened.
+     */
+    function checkForOtherInstallations() {
+      if (initialCheckDone === true) {
+        return;
+      }
+
+      AddonManager.getAddonsByIDs(addonIDs, addonListCallback);
+    }
+
+    return {checkForOtherInstallations: checkForOtherInstallations};
+  })();
+
+
 
 
 
@@ -149,9 +259,10 @@ let rpService = (function() {
       Environment.LEVELS.UI,
       function(data, reason) {
         if (reason !== C.APP_STARTUP) {
-          // In case of the app's startup `showWelcomeWindow()` will be
+          // In case of the app's startup, the following functions will be
           // called when "sessionstore-windows-restored" is observed.
           showWelcomeWindow();
+          DetectorForOtherInstallations.checkForOtherInstallations();
         }
       });
 
@@ -215,6 +326,7 @@ let rpService = (function() {
 
       case "sessionstore-windows-restored":
         showWelcomeWindow();
+        DetectorForOtherInstallations.checkForOtherInstallations();
         break;
 
       // support for old browsers (Firefox <20)

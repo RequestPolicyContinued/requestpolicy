@@ -254,7 +254,7 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 # create the signed "off-AMO" XPI
 #
 
-$(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
+$(signed_xpi_file): $(build_path) $(all_files) $(build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
 	@cd $(build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \

@@ -10,8 +10,16 @@
 # general variables
 #
 
+SHELL := /bin/bash
+
 extension_name := requestpolicy
-extension_uuid := requestpolicy@requestpolicy.com
+
+amo__extension_id     := rpcontinued@requestpolicy.org
+off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
+
+amo__extension_name     := RequestPolicy Continued
+off_amo__extension_name := RequestPolicy Continued Beta
+
 
 # ____________________________________
 # generating XPIs -- general variables
@@ -35,6 +43,7 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/README \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
+		$(wildcard $(source_dirname)/content/*.html) \
 		$(wildcard $(source_dirname)/content/ui/*.xul) \
 		$(wildcard $(source_dirname)/locale/*/*.dtd) \
 		$(wildcard $(source_dirname)/locale/*/*.properties) \
@@ -46,8 +55,8 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 root_files := LICENSE
 
 
-# ____________________________________
-# vars for generating the "normal" XPI
+# _____________________________________
+# vars for generating the "off-AMO" XPI
 #
 
 build_path := $(build_dirname)/normal/
@@ -78,11 +87,44 @@ empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
 endif
 
 
-# ________________________________
-# vars for generating a signed XPI
+# __________________________________________
+# vars for generating a signed "off-AMO" XPI
 #
 
 signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
+
+
+# _________________________________
+# vars for generating the "AMO" XPI
+#
+
+amo__build_path := $(build_dirname)/amo/
+
+amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
+
+# take all files from above and create their paths in the "build" directory
+amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(source_files))
+
+amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
+amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
+
+amo__root_files := $(addprefix $(amo__build_path),$(root_files))
+
+amo__all_files := $(amo__src_files) $(amo__root_files)
+
+
+# detect deleted files and empty directories
+amo__deleted_files :=
+amo__empty_dirs :=
+ifneq "$(wildcard $(amo__build_path))" ""
+# files that have been deleted but still exist in the build directory.
+amo__deleted_files := \
+		$(shell find $(amo__build_path) -type f | \
+		grep -v "META-INF" | \
+		grep -F -v $(addprefix -e ,$(amo__all_files)))
+# empty directories. -mindepth 1 to exclude the build directory itself.
+amo__empty_dirs := $(shell find $(amo__build_path) -mindepth 1 -type d -empty)
+endif
 
 
 # ________________________________________
@@ -122,7 +164,7 @@ endif
 # vars for generating the Dev Helper XPI
 #
 
-dev_helper__source_dirname := tests/mozmill/extension
+dev_helper__source_dirname := tests/helper-addons/dev-helper
 dev_helper__source_path := $(dev_helper__source_dirname)/
 
 dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
@@ -130,6 +172,19 @@ dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -
 		$(dev_helper__source_dirname)/install.rdf
 
 dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
+
+
+# _________________________________
+# vars for generating the Dummy XPI
+#
+
+dummy_ext__source_dirname := tests/helper-addons/dummy-ext
+dummy_ext__source_path := $(dummy_ext__source_dirname)/
+
+dummy_ext__source_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
+		$(dummy_ext__source_dirname)/install.rdf
+
+dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
 
 
 # ______________________________
@@ -173,17 +228,17 @@ build: $(build_path)
 # build and create XPI file
 all: $(xpi_file)
 	@echo "Build finished successfully."
-dist: $(xpi_file)
+dist xpi: $(xpi_file)
 
 # create the dist directory
 $(dist_path):
 	@mkdir -p $(dist_path)
 
-sign: $(signed_xpi_file)
+signed-xpi: $(signed_xpi_file)
 
 
-# _______________________
-# create the "normal" XPI
+# ________________________
+# create the "off-AMO" XPI
 #
 
 # Note: Here the build path is added as a prerequisite, *not* the
@@ -198,11 +253,11 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
 	@echo "Creating XPI file: Done!"
 
-# _____________________
-# create the signed XPI
+# _______________________________
+# create the signed "off-AMO" XPI
 #
 
-$(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
+$(signed_xpi_file): $(build_path) $(all_files) $(build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
 	@cd $(build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \
@@ -211,12 +266,22 @@ $(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
 		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
 		-x META-INF/zigbert.rsa
 
+# ____________________
+# create the "AMO" XPI
+#
+
+amo-xpi $(amo__xpi_file): $(amo__build_path) $(amo__all_files) | $(dist_path)
+	@rm -f $(amo__xpi_file)
+	@echo "Creating AMO XPI."
+	@cd $(amo__build_path) && \
+	$(ZIP) $(abspath $(amo__xpi_file)) $(patsubst $(amo__build_path)%,%,$(amo__all_files))
+	@echo "Creating AMO XPI: Done!"
 
 # ___________________________
 # create the unit-testing XPI
 #
 
-$(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files) | $(dist_path)
+unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files) | $(dist_path)
 	@rm -f $(unit_testing__xpi_file)
 	@echo "Creating unit-testing XPI."
 	@cd $(unit_testing__build_path) && \
@@ -231,15 +296,61 @@ $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_testing__all_files
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-$(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
+dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
 	@rm -f $(dev_helper__xpi_file)
 	@echo "Creating 'RPC Dev Helper' XPI."
 	@cd $(dev_helper__source_dirname) && \
 	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
-# _____________________________________
-# create the files for the "normal" XPI
+
+# ____________________
+# create the Dummy XPI
+#
+
+# For now use FORCE, i.e. create the XPI every time. If the
+# 'FORCE' should be removed, deleted files have to be detected,
+# just like for the other XPIs.
+dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+	@rm -f $(dummy_ext__xpi_file)
+	@echo "Creating 'Dummy' XPI."
+	@cd $(dummy_ext__source_dirname) && \
+	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__source_files))
+	@echo "Creating 'Dummy' XPI: Done!"
+
+
+# _________________________________________
+# create the XPI from any tag or any commit
+#
+
+# Default tree-ish.
+specific_xpi__treeish := v1.0.beta9.3
+
+specific_xpi__file := $(dist_path)$(extension_name)-$(specific_xpi__treeish).xpi
+specific_xpi__build_path := $(build_dirname)/specific-xpi
+
+# create the XPI only if it doesn't exist yet
+.PHONY: specific-xpi
+specific-xpi: $(specific_xpi__file)
+
+$(specific_xpi__file):
+	@# remove the build directory (if it exists) and recreate it
+	rm -rf $(specific_xpi__build_path)
+	mkdir -p $(specific_xpi__build_path)
+
+	@# copy the content of the tree-ish to the build dir
+	@# see https://stackoverflow.com/questions/160608/do-a-git-export-like-svn-export/9416271#9416271
+	git archive $(specific_xpi__treeish) | (cd $(specific_xpi__build_path); tar x)
+
+	@# run `make` in the build directory
+	(cd $(specific_xpi__build_path); make)
+
+	@# move the created XPI from the build directory to the actual
+	@# dist directory
+	mv $(specific_xpi__build_path)/dist/*.xpi $(specific_xpi__file)
+
+# ______________________________________
+# create the files for the "off-AMO" XPI
 #
 
 # Process all source files, but also eventually delete
@@ -260,8 +371,8 @@ $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 $(normal_build__root_files): $$(patsubst $$(build_path)%,%,$$@)
 	cp $(patsubst $(build_path)%,%,$@) $@
 
-# ___________________________________
-# create the files for the signed XPI
+# _____________________________________________
+# create the files for the signed "off-AMO" XPI
 #
 
 $(build_path)/META-INF/: $(build_path) $(all_files)
@@ -269,6 +380,29 @@ $(build_path)/META-INF/: $(build_path) $(all_files)
 	signtool -d .signing \
 		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
 		$(build_path)
+
+# __________________________________
+# create the files for the "AMO" XPI
+#
+
+$(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
+
+$(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(dir $@)
+	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
+
+$(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(dir $@)
+	cp $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
+
+	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
+	  echo 'using `sed` on install.rdf !' ; \
+	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+	  sed -i 's/$(off_amo__extension_name)/$(amo__extension_name)/' $@ ; \
+	fi
+
+$(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)
+	cp $(patsubst $(amo__build_path)%,%,$@) $@
 
 # _________________________________________
 # create the files for the unit-testing XPI
@@ -295,7 +429,7 @@ $(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
 # This cleans all temporary files and directories created by 'make'.
 .PHONY: clean
 clean:
-	@rm -rf $(xpi_file) $(unit_testing__xpi_file) $(build_dirname)/*
+	@rm -rf $(dist_dirname)/*.xpi $(build_dirname)/*
 	@echo "Cleanup is done."
 
 # remove empty directories
@@ -310,6 +444,36 @@ $(deleted_files): FORCE
 	@# delete parent dirs if empty:
 	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
 
+# ____________________________
+# virtual python environments
+# for running and unit-testing
+#
+
+.PHONY: venv venv-mozmill
+
+venv: .venv/bin/activate
+.venv/bin/activate: requirements.txt
+	test -d .venv || virtualenv --prompt='(RP)' .venv
+
+	@# With the `touch` command, this target is only executed
+	@# when "requirements.txt" changes
+	( \
+	source .venv/bin/activate ; \
+	pip install -r requirements.txt ; \
+	touch --no-create .venv/bin/activate ; \
+	)
+
+# mozmill needs a separate venv
+#   ( because it uses '==' package dependencies instead of '>='
+#     see https://github.com/mozilla/mozmill/blob/2.0.10/mozmill/setup.py#L11 )
+venv-mozmill: .venv-mozmill/bin/activate
+.venv-mozmill/bin/activate:
+	test -d .venv-mozmill || virtualenv --prompt='(RP/mozmill)' .venv-mozmill
+	( \
+	source .venv-mozmill/bin/activate ; \
+	pip install mozmill ; \
+	)
+
 # ___________
 # run firefox
 #
@@ -321,8 +485,11 @@ mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
 mozrunner_args += $(moz_args)
 
 .PHONY: run
-run: $(moz_xpi) $(dev_helper__xpi_file)
-	mozrunner $(mozrunner_args)
+run: venv $(moz_xpi) $(dev_helper__xpi_file)
+	( \
+	source .venv-mozmill/bin/activate ; \
+	mozrunner $(mozrunner_args) ; \
+	)
 
 
 # ____________
@@ -333,38 +500,62 @@ run: $(moz_xpi) $(dev_helper__xpi_file)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 mozmill_tests_dir := .mozilla/mozmill-tests
-mozmill_requestpolicy_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/$(extension_uuid)
+mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/rpcontinued@requestpolicy.org
 
 # Default mozmill manifest to use for testing
 mm_manifest := manifest.ini
 
-.PHONY: check test mozmill
-check test: mozmill
+.PHONY: check test mozmill marionette mozmill-dirs
+check test: mozmill marionette
 
-mozmill: $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+mozmill: venv-mozmill $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
+	( \
+	source .venv/bin/activate ; \
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
-		-m $(mozmill_requestpolicy_test_dir)/$(mm_manifest) $(moz_args)
+		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args) ; \
+	)
 
 
 
-.PHONY: mozmill-dirs
 mozmill-dirs: $(mozmill_tests_dir) \
-	$(mozmill_requestpolicy_test_dir) \
-	$(mozmill_requestpolicy_test_dir)/mozmill-tests \
-	$(mozmill_requestpolicy_test_dir)/data
+	$(mozmill_rpc_test_dir) \
+	$(mozmill_rpc_test_dir)/mozmill-tests \
+	$(mozmill_rpc_test_dir)/data
 
-$(mozmill_requestpolicy_test_dir): $(mozmill_tests_dir)
+$(mozmill_rpc_test_dir): $(mozmill_tests_dir)
 	@test -L $@ \
 	|| ln -ns ../../../../../tests/mozmill $@
 
-$(mozmill_requestpolicy_test_dir)/mozmill-tests: $(mozmill_requestpolicy_test_dir)
+$(mozmill_rpc_test_dir)/mozmill-tests: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/mozmill-tests \
 	|| ln -ns ../../$(mozmill_tests_dir) tests/mozmill/mozmill-tests
 
-$(mozmill_requestpolicy_test_dir)/data: $(mozmill_requestpolicy_test_dir)
+$(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
 	@test -L tests/mozmill/data \
 	|| ln -ns ../../ tests/mozmill/data
 
+
+
+marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
+marionette_tests += tests/marionette/tests/manifest.ini
+
+
+.PHONY: marionette
+marionette: venv \
+		unit-testing-xpi \
+		dev-helper-xpi \
+		dummy-xpi \
+		specific-xpi \
+		amo-xpi
+	@# Due to Mozilla Bug 1173502, the profile needs to be created and
+	@# removed directly.
+	( \
+	source .venv/bin/activate ; \
+	export PYTHONPATH=tests/marionette/ ; \
+	profile_dir=`mozprofile -a $(unit_testing__xpi_file) -a $(dev_helper__xpi_file) --preferences=$(mozrunner_prefs_ini):marionette` ; \
+	firefox-ui-tests --binary=$(app_binary) --profile=$$profile_dir $(marionette_tests) ; \
+	rm -rf $$profile_dir ; \
+	)
 
 # ________________
 # "helper" targets

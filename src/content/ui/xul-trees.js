@@ -29,123 +29,122 @@ let isSeamonkey = appID === C.SEAMONKEY_ID;
 exports.toolbarbutton = [
   {parent: {special: {type: "subobject", id: "navigator-toolbox",
       tree: ["palette"]}}, // ("#navigator-toolbox".palette)
-    tag: "toolbarbutton", id: "requestpolicyToolbarButton",
-    label: "RequestPolicy", tooltiptext: "RequestPolicy",
-    popup: "rp-popup"
+    tag: "toolbarbutton", id: "rpcontinuedToolbarButton",
+    label: "RequestPolicy", tooltiptext: "RequestPolicy Continued",
+    popup: "rpc-popup"
   }
 ];
 
 exports.mainTree = [
   {parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
-      tag: "menu", id: "requestpolicyToolsMenuPopup", label: "RequestPolicy",
-      accesskey: "r",
+      tag: "menu", label: "RequestPolicy Continued", accesskey: "r",
   children: [
     {tag: "menupopup",
     children: [
       {tag: "menuitem", label: "&rp.menu.managePolicies;", accesskey: "m",
-          oncommand: "requestpolicy.overlay.openPolicyManager();"},
+          oncommand: "rpcontinued.overlay.openPolicyManager();"},
       {tag: "menuitem", label: "&rp.requestLog.title;", accesskey: "l",
-          oncommand: "requestpolicy.overlay.toggleRequestLog(event);"},
+          oncommand: "rpcontinued.overlay.toggleRequestLog(event);"},
       {tag: "menuitem", label: "&rp.menu.preferences;", accesskey: "p",
-          oncommand: "requestpolicy.overlay.openPrefs(event);"}
+          oncommand: "rpcontinued.overlay.openPrefs(event);"}
     ]}
   ]},
 
 
   {parent: {special: {type: "__window__"}},
-      tag: "keyset", id: "requestpolicyKeyset",
+      tag: "keyset", id: "rpcontinuedKeyset",
   children: [
     {tag: "key", key: "r", modifiers: "accel alt",
-        oncommand: "requestpolicy.overlay.openMenuByHotkey()"}
+        oncommand: "rpcontinued.overlay.openMenuByHotkey()"}
   ]},
 
 
   {parent: {special: {type: "__window__"}},
-      tag: "popupset", id: "requestpolicyPopupset",
+      tag: "popupset", id: "rpcontinuedPopupset",
   children: [
-    {tag: "menupopup", id: "requestpolicyRedirectAddRuleMenu"},
-    {tag: "menupopup", id: "rp-popup", noautohide: "true",
+    {tag: "menupopup", id: "rpcontinuedRedirectAddRuleMenu"},
+    {tag: "menupopup", id: "rpc-popup", noautohide: "true",
         position: "after_start",
-        onpopupshowing: "requestpolicy.overlay.onPopupShowing(event);",
-        onpopuphidden: "requestpolicy.overlay.onPopupHidden(event);",
+        onpopupshowing: "rpcontinued.overlay.onPopupShowing(event);",
+        onpopuphidden: "rpcontinued.overlay.onPopupHidden(event);",
     children: [
-      {tag: "vbox", id: "rp-contents",
+      {tag: "vbox", id: "rpc-contents",
       children: [
-        {tag: "hbox", id: "rp-main",
+        {tag: "hbox", id: "rpc-main",
         children: [
-          {tag: "vbox", id: "rp-origins-destinations",
+          {tag: "vbox", id: "rpc-origins-destinations",
           children: [
-            {tag: "hbox", id: "rp-origin", "class": "rp-od-item",
-                onclick: "requestpolicy.menu.itemSelected(event);",
+            {tag: "hbox", id: "rpc-origin", "class": "rpc-od-item",
+                onclick: "rpcontinued.menu.itemSelected(event);",
             children: [
-              {tag: "label", id: "rp-origin-domainname", "class": "domainname",
+              {tag: "label", id: "rpc-origin-domainname", "class": "domainname",
                   flex: "2"},
-              {tag: "label", id: "rp-origin-num-requests",
+              {tag: "label", id: "rpc-origin-num-requests",
                   "class": "numRequests"}
             ]},
-            {tag: "vbox", id: "rp-other-origins",
+            {tag: "vbox", id: "rpc-other-origins",
             children: [
-              {tag: "label", id: "rp-other-origins-title",
+              {tag: "label", id: "rpc-other-origins-title",
                   value: "&rp.menu.otherOrigins;"},
-              {tag: "vbox", id: "rp-other-origins-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-other-origins-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-blocked-destinations",
+            {tag: "vbox", id: "rpc-blocked-destinations",
             children: [
-              {tag: "label", id: "rp-blocked-destinations-title",
+              {tag: "label", id: "rpc-blocked-destinations-title",
                   value: "&rp.menu.blockedDestinations;"},
-              {tag: "vbox", id: "rp-blocked-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-blocked-destinations-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-mixed-destinations",
+            {tag: "vbox", id: "rpc-mixed-destinations",
             children: [
-              {tag: "label", id: "rp-mixed-destinations-title",
+              {tag: "label", id: "rpc-mixed-destinations-title",
                   value: "&rp.menu.mixedDestinations;"},
-              {tag: "vbox", id: "rp-mixed-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-mixed-destinations-list",
+                  "class": "rpc-label-list"}
             ]},
-            {tag: "vbox", id: "rp-allowed-destinations",
+            {tag: "vbox", id: "rpc-allowed-destinations",
             children: [
-              {tag: "label", id: "rp-allowed-destinations-title",
+              {tag: "label", id: "rpc-allowed-destinations-title",
                   value: "&rp.menu.allowedDestinations;"},
-              {tag: "vbox", id: "rp-allowed-destinations-list",
-                  "class": "rp-label-list"}
+              {tag: "vbox", id: "rpc-allowed-destinations-list",
+                  "class": "rpc-label-list"}
             ]}
           ]},
-          {tag: "vbox", id: "rp-details",
+          {tag: "vbox", id: "rpc-details",
           children: [
-            {tag: "vbox", id: "rp-rules-remove"},
-            {tag: "vbox", id: "rp-rules-add"},
-            {tag: "vbox", id: "rp-rules-info"}
+            {tag: "vbox", id: "rpc-rules-remove"},
+            {tag: "vbox", id: "rpc-rules-add"},
+            {tag: "vbox", id: "rpc-rules-info"}
           ]}
         ]},
-        {tag: "hbox", id: "rp-revoke-temporary-permissions", hidden: "true",
+        {tag: "hbox", id: "rpc-revoke-temporary-permissions", hidden: "true",
         children: [
           {tag: "label", value: "&rp.menu.revokeTemporaryPermissions;",
-              onclick: "requestpolicy.overlay.revokeTemporaryPermissions();"}
+              onclick: "rpcontinued.overlay.revokeTemporaryPermissions();"}
         ]},
-        {tag: "hbox", id: "rp-footer",
+        {tag: "hbox", id: "rpc-footer",
         children: [
-          {tag: "hbox", id: "rp-footer-links",
+          {tag: "hbox", id: "rpc-footer-links",
           children: [
-            {tag: "label", id: "rp-link-enable-blocking",
-                "class": "rp-footer-link", value: "&rp.menu.enableBlocking;",
-                onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rp-link-disable-blocking",
-                "class": "rp-footer-link", value: "&rp.menu.disableBlocking;",
-                onclick: "requestpolicy.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rp-link-help", "class": "rp-footer-link",
+            {tag: "label", id: "rpc-link-enable-blocking",
+                "class": "rpc-footer-link", value: "&rp.menu.enableBlocking;",
+                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
+            {tag: "label", id: "rpc-link-disable-blocking",
+                "class": "rpc-footer-link", value: "&rp.menu.disableBlocking;",
+                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
+            {tag: "label", id: "rpc-link-help", "class": "rpc-footer-link",
                 value: "&rp.menu.help;",
-                onclick: "requestpolicy.overlay.openHelp();"},
-            {tag: "label", id: "rp-link-prefs", "class": "rp-footer-link",
+                onclick: "rpcontinued.overlay.openHelp();"},
+            {tag: "label", id: "rpc-link-prefs", "class": "rpc-footer-link",
                 value: "&rp.menu.preferences;",
-                onclick: "requestpolicy.overlay.openPrefs(event);"},
-            {tag: "label", id: "rp-link-policies", "class": "rp-footer-link",
+                onclick: "rpcontinued.overlay.openPrefs(event);"},
+            {tag: "label", id: "rpc-link-policies", "class": "rpc-footer-link",
                 value: "&rp.menu.managePolicies;",
-                onclick: "requestpolicy.overlay.openPolicyManager();"},
-            {tag: "label", id: "rp-link-request-log", "class": "rp-footer-link",
-                value: "&rp.requestLog.title;",
-                onclick: "requestpolicy.overlay.toggleRequestLog(event);"}
+                onclick: "rpcontinued.overlay.openPolicyManager();"},
+            {tag: "label", id: "rpc-link-request-log",
+                "class": "rpc-footer-link", value: "&rp.requestLog.title;",
+                onclick: "rpcontinued.overlay.toggleRequestLog(event);"}
           ]}
         ]}
       ]}
@@ -154,32 +153,32 @@ exports.mainTree = [
 
 
   {parent: {id: "appcontent"},
-      tag: "splitter", id: "requestpolicy-requestLog-splitter", hidden: "true"},
+      tag: "splitter", id: "rpcontinued-requestLog-splitter", hidden: "true"},
 
   {parent: {id: "appcontent"},
-      tag: "vbox", id: "requestpolicy-requestLog", height: "300",
+      tag: "vbox", id: "rpcontinued-requestLog", height: "300",
       hidden: "true", persist: "height",
   children: [
-    {tag: "toolbox", id: "requestpolicy-requestLog-header",
+    {tag: "toolbox", id: "rpcontinued-requestLog-header",
     children: [
-      {tag: "toolbar", id: "requestpolicy-requestLog-toolbar",
+      {tag: "toolbar", id: "rpcontinued-requestLog-toolbar",
           align: "center",
       children: [
-        {tag: "label", id: "requestpolicy-requestLog-title",
-            control: "requestpolicy-requestLog-frame",
+        {tag: "label", id: "rpcontinued-requestLog-title",
+            control: "rpcontinued-requestLog-frame",
             value: "&rp.requestLog.title;", crop: "end"},
-        {tag: "button", id: "requestpolicy-requestLog-clear",
+        {tag: "button", id: "rpcontinued-requestLog-clear",
             label: "&rp.requestLog.clear;",
-            oncommand: "requestpolicy.overlay.clearRequestLog();"},
+            oncommand: "rpcontinued.overlay.clearRequestLog();"},
         {tag: "vbox", flex: "1"},
-        {tag: "toolbarbutton", id: "requestpolicy-requestLog-close",
+        {tag: "toolbarbutton", id: "rpcontinued-requestLog-close",
             align: "right",
-            oncommand: "requestpolicy.overlay.toggleRequestLog()"}
+            oncommand: "rpcontinued.overlay.toggleRequestLog()"}
       ]}
     ]},
     // The src of this iframe is set to
-    // chrome://requestpolicy/content/ui/request-log.xul in overlay.js
-    {tag: "iframe", id: "requestpolicy-requestLog-frame", type: "chrome",
+    // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
+    {tag: "iframe", id: "rpcontinued-requestLog-frame", type: "chrome",
         flex: "1"}
   ]}
 ];

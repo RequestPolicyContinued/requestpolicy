@@ -29,7 +29,7 @@ let EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
 
 let globalScope = this;
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/environment",
   "lib/logger",

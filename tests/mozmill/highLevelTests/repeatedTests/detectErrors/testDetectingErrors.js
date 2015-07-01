@@ -11,7 +11,7 @@ var rootDir = rpRootDir + rpConst.mozmillTestsRootDir;
 var {assert, expect} = require(rootDir + "lib/assertions");
 var prefs = require(rootDir + "lib/prefs");
 
-Components.utils.import("chrome://requestpolicy/content/lib/logger.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/logger.jsm");
 
 
 function setupModule(aModule) {

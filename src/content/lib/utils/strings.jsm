@@ -41,7 +41,7 @@ let StringUtils = (function() {
 
   XPCOMUtils.defineLazyGetter(self, "strbundle", function() {
     return loadPropertiesFile(
-        "chrome://requestpolicy/locale/requestpolicy.properties");
+        "chrome://rpcontinued/locale/requestpolicy.properties");
   });
   // from https://developer.mozilla.org/en-US/Add-ons/
   // How_to_convert_an_overlay_extension_to_restartless

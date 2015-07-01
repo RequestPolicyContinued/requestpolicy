@@ -21,10 +21,10 @@
 
   ***** END LICENSE BLOCK *****
 -->
-<!DOCTYPE page SYSTEM "chrome://requestpolicy/locale/requestpolicy.dtd">
+<!DOCTYPE page SYSTEM "chrome://rpcontinued/locale/requestpolicy.dtd">
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://requestpolicy/skin/request-log.css" type="text/css"?>
+<?xml-stylesheet href="chrome://rpcontinued/skin/request-log.css" type="text/css"?>
 
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -34,42 +34,42 @@
   <script type="application/x-javascript" src="request-log.filtering.js" />
 
   <popupset>
-    <menupopup id="requestpolicyRequestLogContext">
+    <menupopup id="rpcontinuedRequestLogContext">
       <menuitem
-        id="requestpolicyRequestLogCopyOrigin"
+        id="rpcontinuedRequestLogCopyOrigin"
         label="&rp.requestLog.copyOriginToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-origin');" />
+        oncommand="rpcontinued.requestLog.copyToClipboard('rpcontinued-requestLog-origin');" />
       <menuitem
-        id="requestpolicyRequestLogOpenOriginNewTab"
+        id="rpcontinuedRequestLogOpenOriginNewTab"
         label="&rp.requestLog.openOriginInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-origin');" />
+        oncommand="rpcontinued.requestLog.openInNewTab('rpcontinued-requestLog-origin');" />
       <menuitem
-        id="requestpolicyRequestLogCopyDestination"
+        id="rpcontinuedRequestLogCopyDestination"
         label="&rp.requestLog.copyDestinationToClipboard;"
-        oncommand="requestpolicy.requestLog.copyToClipboard('requestpolicy-requestLog-destination');" />
+        oncommand="rpcontinued.requestLog.copyToClipboard('rpcontinued-requestLog-destination');" />
       <menuitem
-        id="requestpolicyRequestLogDestinationOriginNewTab"
+        id="rpcontinuedRequestLogDestinationOriginNewTab"
         label="&rp.requestLog.openDestinationInNewTab;"
-        oncommand="requestpolicy.requestLog.openInNewTab('requestpolicy-requestLog-destination');" />
+        oncommand="rpcontinued.requestLog.openInNewTab('rpcontinued-requestLog-destination');" />
     </menupopup>
   </popupset>
 
-  <tree id="requestpolicy-requestLog-tree" flex="1" flags="dont-build-content"
-        seltype="single" context="requestpolicyRequestLogContext">
+  <tree id="rpcontinued-requestLog-tree" flex="1" flags="dont-build-content"
+        seltype="single" context="rpcontinuedRequestLogContext">
     <treecols>
-      <treecol id="requestpolicy-requestLog-origin"
+      <treecol id="rpcontinued-requestLog-origin"
                label="&rp.requestLog.origin;" flex="1" crop="center"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-destination"
+      <treecol id="rpcontinued-requestLog-destination"
                label="&rp.requestLog.destination;" flex="1" crop="center"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-blocked"
+      <treecol id="rpcontinued-requestLog-blocked"
                label="&rp.requestLog.blocked;" width="80"
                persist="width ordinal hidden"/>
       <splitter class="tree-splitter"/>
-      <treecol id="requestpolicy-requestLog-time" label="&rp.requestLog.time;"
+      <treecol id="rpcontinued-requestLog-time" label="&rp.requestLog.time;"
                width="120" persist="width ordinal hidden"/>
     </treecols>
 
@@ -78,12 +78,12 @@
 
   <hbox align="center" id="search-box">
     <label accesskey="&rp.requestLog.filterRequests.accesskey;"
-           control="requestpolicy-requestLog-requestFilter"
+           control="rpcontinued-requestLog-requestFilter"
            value="&rp.requestLog.filterRequests;"/>
-    <textbox id="requestpolicy-requestLog-requestFilter"
-             oninput="requestpolicy.requestLog.filterChanged(event)" flex="1"/>
-    <button id="requestpolicy-requestLog-clearFilter"
-            oncommand="requestpolicy.requestLog.clearFilter()"
+    <textbox id="rpcontinued-requestLog-requestFilter"
+             oninput="rpcontinued.requestLog.filterChanged(event)" flex="1"/>
+    <button id="rpcontinued-requestLog-clearFilter"
+            oncommand="rpcontinued.requestLog.clearFilter()"
             label="&rp.requestLog.clearFilter;"
             accesskey="&rp.requestLog.clearFilter.accesskey;" disabled="true"/>
   </hbox>

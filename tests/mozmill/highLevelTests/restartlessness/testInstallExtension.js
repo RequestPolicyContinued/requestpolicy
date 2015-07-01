@@ -55,7 +55,7 @@ function testInstallExtension() {
   }, "The setup tab has been opened.");
 
   amHelper.openOnlyAddonManager();
-  amHelper.setCategory("extension");
+  addonsManager.setCategoryById({id: "extension"});
 
   var addon = amHelper.getAddon();
   assert.ok(addonsManager.isAddonEnabled({addon: addon}),

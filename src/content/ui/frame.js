@@ -40,7 +40,7 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
 
   // import some modules
   let {ScriptLoader} = Cu.import(
-      "chrome://requestpolicy/content/lib/script-loader.jsm", {});
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   let mod = {};
   ScriptLoader.importModules([
     "lib/utils/constants",
@@ -81,10 +81,10 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
 
   function loadSubScripts() {
     Services.scriptloader.loadSubScript(
-        'chrome://requestpolicy/content/ui/frame.blocked-content.js',
+        'chrome://rpcontinued/content/ui/frame.blocked-content.js',
         framescriptScope);
     Services.scriptloader.loadSubScript(
-        'chrome://requestpolicy/content/ui/frame.dom-content-loaded.js',
+        'chrome://rpcontinued/content/ui/frame.dom-content-loaded.js',
         framescriptScope);
   }
   framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,

@@ -25,35 +25,35 @@ RequestLog.prototype.open = function () {
     menu.open();
 
     // open the request log
-    findElement.ID(this.windowDoc, "rp-link-request-log").click();
+    findElement.ID(this.windowDoc, "rpc-link-request-log").click();
 
     // close the menu
     menu.close();
   }
 
-  let iframe = this.windowDoc.getElementById("requestpolicy-requestLog-frame");
+  let iframe = this.windowDoc.getElementById("rpcontinued-requestLog-frame");
   this.requestLogDoc = iframe.contentDocument;
   this.controller.waitForPageLoad(this.requestLogDoc);
 
-  var tree = this.requestLogDoc.getElementById("requestpolicy-requestLog-tree");
+  var tree = this.requestLogDoc.getElementById("rpcontinued-requestLog-tree");
   this.treeView = tree.view;
 
   this.originCol = tree.columns
-      .getNamedColumn("requestpolicy-requestLog-origin");
+      .getNamedColumn("rpcontinued-requestLog-origin");
   this.destCol = tree.columns
-      .getNamedColumn("requestpolicy-requestLog-destination");
+      .getNamedColumn("rpcontinued-requestLog-destination");
   this.blockedCol = tree.columns
-      .getNamedColumn("requestpolicy-requestLog-blocked");
+      .getNamedColumn("rpcontinued-requestLog-blocked");
   this.timeCol = tree.columns
-      .getNamedColumn("requestpolicy-requestLog-time");
+      .getNamedColumn("rpcontinued-requestLog-time");
 };
 
 RequestLog.prototype.close = function () {
-  findElement.ID(this.windowDoc, "requestpolicy-requestLog-close").click();
+  findElement.ID(this.windowDoc, "rpcontinued-requestLog-close").click();
 };
 
 RequestLog.prototype.clear = function () {
-  findElement.ID(this.windowDoc, "requestpolicy-requestLog-clear").click();
+  findElement.ID(this.windowDoc, "rpcontinued-requestLog-clear").click();
 };
 
 
@@ -75,7 +75,7 @@ RequestLog.prototype.getDestinations = function () {
 
 RequestLog.prototype.hasBeenAllowed = function (aRow) {
   let imageSrc = this.treeView.getImageSrc(aRow, this.blockedCol);
-  return imageSrc !== "chrome://requestpolicy/skin/dot.png";
+  return imageSrc !== "chrome://rpcontinued/skin/dot.png";
 };
 
 RequestLog.prototype.getRow = function(aRow) {

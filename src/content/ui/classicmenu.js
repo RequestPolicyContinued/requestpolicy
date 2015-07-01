@@ -24,7 +24,7 @@
 
 
 
-requestpolicy.classicmenu = (function() {
+rpcontinued.classicmenu = (function() {
   let self = {};
 
   const Ci = Components.interfaces;
@@ -34,7 +34,7 @@ requestpolicy.classicmenu = (function() {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   let {rpPrefBranch} = ScriptLoader.importModule("lib/prefs");
@@ -62,7 +62,7 @@ requestpolicy.classicmenu = (function() {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     oncommand = oncommand +
-        " requestpolicy.classicmenu._conditionallyReloadDocument();";
+        " rpcontinued.classicmenu._conditionallyReloadDocument();";
     menuItem.setAttribute("oncommand", oncommand);
     // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
     menu.insertBefore(menuItem, menu.firstChild);
@@ -72,17 +72,17 @@ requestpolicy.classicmenu = (function() {
 
   self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
     var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
-    var command = "requestpolicy.overlay.temporarilyAllowOrigin('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
+    var command = "rpcontinued.overlay.temporarilyAllowOrigin('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(originHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 
   self.addMenuItemAllowOrigin = function(menu, originHost) {
     var label = StringUtils.$str("allowOrigin", [originHost]);
-    var command = "requestpolicy.overlay.allowOrigin('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "');";
+    var command = "rpcontinued.overlay.allowOrigin('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(originHost) + "');";
     return self.addMenuItem(menu, label, command);
   };
 
@@ -91,39 +91,39 @@ requestpolicy.classicmenu = (function() {
                                                      destHost) {
     var label = StringUtils.$str("allowOriginToDestinationTemporarily",
                                  [originHost, destHost]);
-    var command = "requestpolicy.overlay.temporarilyAllowOriginToDestination('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
-        + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
+    var command = "rpcontinued.overlay.temporarilyAllowOriginToDestination('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(originHost) + "', '"
+        + rpcontinued.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 
   self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
     var label = StringUtils.$str("allowOriginToDestination",
                                  [originHost, destHost]);
-    var command = "requestpolicy.overlay.allowOriginToDestination('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(originHost) + "', '"
-        + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
+    var command = "rpcontinued.overlay.allowOriginToDestination('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(originHost) + "', '"
+        + rpcontinued.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyAllowOriginToDest");
+    item.setAttribute("class", "rpcontinuedAllowOriginToDest");
     return item;
   };
 
 
   self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
     var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
-    var command = "requestpolicy.overlay.temporarilyAllowDestination('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
+    var command = "rpcontinued.overlay.temporarilyAllowDestination('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(destHost) + "');";
     var item = self.addMenuItem(menu, label, command);
-    item.setAttribute("class", "requestpolicyTemporary");
+    item.setAttribute("class", "rpcontinuedTemporary");
     return item;
   };
 
   self.addMenuItemAllowDest = function(menu, destHost) {
     var label = StringUtils.$str("allowDestination", [destHost]);
-    var command = "requestpolicy.overlay.allowDestination('"
-        + requestpolicy.menu._sanitizeJsFunctionArg(destHost) + "');";
+    var command = "rpcontinued.overlay.allowDestination('"
+        + rpcontinued.menu._sanitizeJsFunctionArg(destHost) + "');";
     return self.addMenuItem(menu, label, command);
   };
 

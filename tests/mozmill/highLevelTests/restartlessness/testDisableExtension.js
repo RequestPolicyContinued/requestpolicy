@@ -36,13 +36,11 @@ function teardownModule(aModule) {
 
 function testDisableExtension() {
   amHelper.openOnlyAddonManager();
-  amHelper.setCategory("extension");
+  addonsManager.setCategoryById({id: "extension"});
 
   var addon = amHelper.getAddon();
   assert.ok(addonsManager.isAddonEnabled({addon: addon}),
             "The addon is enabled");
-
-  //controller.sleep(3600000);
 
   // Disable the addon
   addonsManager.disableAddon({addon: addon});

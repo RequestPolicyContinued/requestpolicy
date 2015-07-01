@@ -3,6 +3,13 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta10
+* The extension ID has changed (#609). It has to be taken care that
+  different versions of RequestPolicy aren't installed at the same time.
+  When upgrading from an older version there shouldn't be any problems though.
+* updated translation (eu, zh-CN)
+
+
 #### Version 1.0.beta9.3 (bugfix)
 * it was not possible to import rules from RequestPolicy 0.5.x
   Old rules can now be imported on `about:requestpolicy?oldrules`.

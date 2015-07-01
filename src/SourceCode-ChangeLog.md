@@ -2,6 +2,21 @@
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
 
+#### Version 1.0.beta10
+* The extension ID (GUID) has changed. At the same time, several other
+  relevant "names" have been changed. (#609)
+  * The ID:
+    * old ID: `requestpolicy@requestpolicy.com`
+    * new IDs:
+       * AMO-release:     `rpcontinued@requestpolicy.org`
+       * off-AMO release: `rpcontinued@non-amo.requestpolicy.org`
+  * The "chrome://" URI
+    * Old: `chrome://requestpolicy/`
+    * New: `chrome://rpcontinued/`
+* The localization (l10n) of the add-on description is now
+  in `install.rdf`. (600825b)
+
+
 #### Version 1.0.beta9
 * build process
   * change from `ant` to `make`

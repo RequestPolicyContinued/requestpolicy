@@ -26,7 +26,7 @@
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-requestpolicy.overlay = (function() {
+rpcontinued.overlay = (function() {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -34,7 +34,7 @@ requestpolicy.overlay = (function() {
 
   let {ScriptLoader, XPCOMUtils} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
     return mod;
   }());
@@ -72,7 +72,7 @@ requestpolicy.overlay = (function() {
 
   let initialized = false;
 
-  let toolbarButtonId = "requestpolicyToolbarButton";
+  let toolbarButtonId = "rpcontinuedToolbarButton";
 
   let overlayId = 0;
 
@@ -103,7 +103,7 @@ requestpolicy.overlay = (function() {
 
 
   self.toString = function() {
-    return "[requestpolicy.overlay " + overlayId + "]";
+    return "[rpcontinued.overlay " + overlayId + "]";
   };
 
   /**
@@ -115,12 +115,12 @@ requestpolicy.overlay = (function() {
         initialized = true;
         overlayId = (new Date()).getTime();
 
-        requestpolicy.menu.init();
+        rpcontinued.menu.init();
 
-        popupElement = $id("rp-popup");
+        popupElement = $id("rpc-popup");
 
         //statusbar = $id("status-bar");
-        //rpContextMenu = $id("requestpolicyContextMenu");
+        //rpContextMenu = $id("rpcontinuedContextMenu");
         toolbox = $id("navigator-toolbox");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -156,7 +156,7 @@ requestpolicy.overlay = (function() {
       Logger.severe(Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
       Logger.severe(Logger.TYPE_ERROR,
-          "Unable to initialize requestpolicy.overlay.");
+          "Unable to initialize rpcontinued.overlay.");
       throw e;
     }
   };
@@ -177,7 +177,7 @@ requestpolicy.overlay = (function() {
   OverlayEnvironment.addShutdownFunction(
     Environment.LEVELS.UI,
     function() {
-      let requestLog = $id("requestpolicy-requestLog");
+      let requestLog = $id("rpcontinued-requestLog");
 
       // If the request log is found and is opened.
       // The XUL elements of the request log might have already
@@ -282,16 +282,16 @@ requestpolicy.overlay = (function() {
       }
     }
 
-    if ("requestpolicy" in browser &&
-        documentURI in browser.requestpolicy.blockedRedirects) {
+    if ("rpcontinued" in browser &&
+        documentURI in browser.rpcontinued.blockedRedirects) {
       // bad smell: do not save blocked requests in the <browser> obj
-      var dest = browser.requestpolicy.blockedRedirects[documentURI];
+      var dest = browser.rpcontinued.blockedRedirects[documentURI];
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
           "Showing notification for blocked redirect. To <" + dest +
           "> " + "from <" + documentURI + ">");
       self._showRedirectNotification(browser, dest);
 
-      delete browser.requestpolicy.blockedRedirects[documentURI];
+      delete browser.rpcontinued.blockedRedirects[documentURI];
     }
 
     // send the list of blocked URIs back to the frame script
@@ -470,11 +470,11 @@ requestpolicy.overlay = (function() {
     }
 
 
-    var addRuleMenuName = "requestpolicyRedirectAddRuleMenu";
+    var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
     DOMUtils.removeChildren(addRulePopup);
 
-    let m = requestpolicy.menu;
+    let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
     var destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
 
@@ -488,7 +488,7 @@ requestpolicy.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
-    let cm = requestpolicy.classicmenu;
+    let cm = rpcontinued.classicmenu;
 
     if (destBaseDomain !== null) {
       cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
@@ -624,7 +624,7 @@ requestpolicy.overlay = (function() {
   self._setContentBlockedState = function(isContentBlocked) {
     var button = $id(toolbarButtonId);
     if (button) {
-      button.setAttribute("requestpolicyBlocked", isContentBlocked);
+      button.setAttribute("rpcontinuedBlocked", isContentBlocked);
     }
   };
 
@@ -635,7 +635,7 @@ requestpolicy.overlay = (function() {
     var button = $id(toolbarButtonId);
     if (button) {
       let isPermissive = Prefs.isBlockingDisabled();
-      button.setAttribute("requestpolicyPermissive", isPermissive);
+      button.setAttribute("rpcontinuedPermissive", isPermissive);
     }
   }
   /**
@@ -700,7 +700,7 @@ requestpolicy.overlay = (function() {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     window.setTimeout(function() {
-      requestpolicy.overlay._showRedirectNotification(browser, destUri, 0);
+      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0);
     }, 0);
   };
 
@@ -715,7 +715,7 @@ requestpolicy.overlay = (function() {
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
     blockedContentCheckTimeoutId = window.setTimeout(function() {
-      requestpolicy.overlay._updateBlockedContentState(browser);
+      rpcontinued.overlay._updateBlockedContentState(browser);
     }, blockedContentStateUpdateDelay);
   };
 
@@ -731,8 +731,8 @@ requestpolicy.overlay = (function() {
    * contentAreaContextMenu.
    */
   self._contextMenuOnPopupShowing = function() {
-    requestpolicy.overlay._wrapOpenLink();
-    /*requestpolicy.overlay._attachPopupToContextMenu();*/
+    rpcontinued.overlay._wrapOpenLink();
+    /*rpcontinued.overlay._attachPopupToContextMenu();*/
   };
 
   /**
@@ -755,8 +755,8 @@ requestpolicy.overlay = (function() {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    if (!gContextMenu.requestpolicyMethodsOverridden) {
-      gContextMenu.requestpolicyMethodsOverridden = true;
+    if (!gContextMenu.rpcontinuedMethodsOverridden) {
+      gContextMenu.rpcontinuedMethodsOverridden = true;
 
       gContextMenu.openLink = function() {
         RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
@@ -792,8 +792,8 @@ requestpolicy.overlay = (function() {
    * wrapping it will break tabs if TabMixPlus is installed.
    */
   self._wrapAddTab = function() {
-    if (!gBrowser.requestpolicyAddTabModified) {
-      gBrowser.requestpolicyAddTabModified = true;
+    if (!gBrowser.rpcontinuedAddTabModified) {
+      gBrowser.rpcontinuedAddTabModified = true;
 
       // For reference, the addTab() function signature looks like this:
       // function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner,
@@ -817,7 +817,7 @@ requestpolicy.overlay = (function() {
       // We use 'arguments' so that we aren't dependent on the names of two
       // parameters, as it seems not unlikely that these could change due to
       // the second parameter's purpose having been changed.
-      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(arguments[0], arguments[1]);";
+      var newFirstCodeLine = "\n    rpcontinued.overlay.tabAdded(arguments[0], arguments[1]);";
       // Finally, add our line to the beginning of the addTab function.
       eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine +
            addTabParts[1]);
@@ -827,13 +827,13 @@ requestpolicy.overlay = (function() {
 
 
   self._unwrapAddTab = function() {
-    if (gBrowser.requestpolicyAddTabModified === true) {
+    if (gBrowser.rpcontinuedAddTabModified === true) {
       // get the addTab() function as a string
       let addTabString = gBrowser.addTab.toString();
 
       // define the regular expression that should find the existing code
       // line that RequestPolicy added.
-      let codeLineRE = /(\n    )?requestpolicy\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
+      let codeLineRE = /(\n    )?rpcontinued\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
 
       // use the regular expression
       let newAddTabString = addTabString.replace(codeLineRE, "");
@@ -841,7 +841,7 @@ requestpolicy.overlay = (function() {
       // apply the changes
       eval("gBrowser.addTab = " + newAddTabString);
 
-      delete gBrowser.requestpolicyAddTabModified;
+      delete gBrowser.rpcontinuedAddTabModified;
     }
   };
 
@@ -874,8 +874,8 @@ requestpolicy.overlay = (function() {
         // This gets called both for tab changes and for history navigation.
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
-        requestpolicy.overlay._stopBlockedContentCheckTimeout();
-        requestpolicy.overlay
+        rpcontinued.overlay._stopBlockedContentCheckTimeout();
+        rpcontinued.overlay
             ._updateBlockedContentState(gBrowser.selectedBrowser);
       },
 
@@ -977,7 +977,7 @@ requestpolicy.overlay = (function() {
   //    if (event.currentTarget != event.originalTarget) {
   //      return;
   //    }
-    requestpolicy.menu.prepareMenu();
+    rpcontinued.menu.prepareMenu();
   };
 
   /**
@@ -987,7 +987,7 @@ requestpolicy.overlay = (function() {
    *          event
    */
   self.onPopupHidden = function(event) {
-    var rulesChanged = requestpolicy.menu.processQueuedRuleChanges();
+    var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
       if (rpPrefBranch.getBoolPref("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
@@ -1033,8 +1033,8 @@ requestpolicy.overlay = (function() {
     Prefs.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
-    $id("rp-link-enable-blocking").hidden = !disabled;
-    $id("rp-link-disable-blocking").hidden = disabled;
+    $id("rpc-link-enable-blocking").hidden = !disabled;
+    $id("rpc-link-disable-blocking").hidden = disabled;
   };
 
   /**
@@ -1176,7 +1176,7 @@ requestpolicy.overlay = (function() {
   //  },
 
   self.openToolbarPopup = function(anchor) {
-  //    requestpolicy.overlay._toolbox.insertBefore(requestpolicy.overlay.popupElement,
+  //    rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
   //        null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
   };
@@ -1198,10 +1198,10 @@ requestpolicy.overlay = (function() {
   };
 
   self.toggleRequestLog = function() {
-    var requestLog = $id("requestpolicy-requestLog");
-    var requestLogSplitter = $id("requestpolicy-requestLog-splitter");
-    var requestLogFrame = $id("requestpolicy-requestLog-frame");
-    //var openRequestLog = $id("requestpolicyOpenRequestLog");
+    var requestLog = $id("rpcontinued-requestLog");
+    var requestLogSplitter = $id("rpcontinued-requestLog-splitter");
+    var requestLogFrame = $id("rpcontinued-requestLog-frame");
+    //var openRequestLog = $id("rpcontinuedOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.
     //var closeRequestLog = $id("requestpolicyCloseRequestLog");
@@ -1209,7 +1209,7 @@ requestpolicy.overlay = (function() {
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
-          "chrome://requestpolicy/content/ui/request-log.xul");
+          "chrome://rpcontinued/content/ui/request-log.xul");
       requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {

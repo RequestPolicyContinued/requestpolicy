@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-window.requestpolicy = window.requestpolicy || {};
+window.rpcontinued = window.rpcontinued || {};
 
-window.requestpolicy.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -32,7 +32,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
@@ -43,10 +43,10 @@ window.requestpolicy.requestLog = (function (self) {
   self.treebox = null;
 
   self.columnNameToIndexMap = {
-    "requestpolicy-requestLog-origin" : 0,
-    "requestpolicy-requestLog-destination" : 1,
-    "requestpolicy-requestLog-blocked" : 2,
-    "requestpolicy-requestLog-time" : 3
+    "rpcontinued-requestLog-origin" : 0,
+    "rpcontinued-requestLog-destination" : 1,
+    "rpcontinued-requestLog-blocked" : 2,
+    "rpcontinued-requestLog-time" : 3
   };
 
   let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
@@ -135,7 +135,7 @@ window.requestpolicy.requestLog = (function (self) {
     getImageSrc: function(aIndex, aColumn) {
       if (self.columnNameToIndexMap[aColumn.id] == 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
-          return "chrome://requestpolicy/skin/dot.png";
+          return "chrome://rpcontinued/skin/dot.png";
         }
       }
     },
@@ -182,4 +182,4 @@ window.requestpolicy.requestLog = (function (self) {
   };
 
   return self;
-}(window.requestpolicy.requestLog || {}));
+}(window.rpcontinued.requestLog || {}));

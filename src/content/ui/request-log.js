@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-window.requestpolicy = window.requestpolicy || {};
+window.rpcontinued = window.rpcontinued || {};
 
-window.requestpolicy.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function (self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;
@@ -31,7 +31,7 @@ window.requestpolicy.requestLog = (function (self) {
 
   let {ScriptLoader} = (function() {
     let mod = {};
-    Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm", mod);
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
     return mod;
   }());
   let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
@@ -56,14 +56,14 @@ window.requestpolicy.requestLog = (function (self) {
 
 
   function init() {
-    self.tree = $id("requestpolicy-requestLog-tree")
+    self.tree = $id("rpcontinued-requestLog-tree")
 
     self.tree.view = self.treeView;
 
     showLogIsEmptyMessage();
 
     // Give the requestpolicy overlay direct access to the the request log.
-    window.parent.requestpolicy.overlay.requestLog = self;
+    window.parent.rpcontinued.overlay.requestLog = self;
   }
   function showLogIsEmptyMessage() {
     var message = StringUtils.$str("requestLogIsEmpty");
@@ -78,4 +78,4 @@ window.requestpolicy.requestLog = (function (self) {
 
 
   return self;
-}(window.requestpolicy.requestLog || {}));
+}(window.rpcontinued.requestLog || {}));

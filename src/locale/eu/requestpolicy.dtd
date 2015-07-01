@@ -2,11 +2,11 @@
 <!ENTITY rp.requestLog.destination "Helmuga">
 <!ENTITY rp.requestLog.blocked "Blokeatuta">
 <!ENTITY rp.requestLog.time "Ordua">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Kopiatu Jatorria Arbelera">
-<!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiatu Helmuga Arbelera">
-<!ENTITY rp.requestLog.openOriginInNewTab "Ireki Jatorria Fitxa berri batean">
-<!ENTITY rp.requestLog.openDestinationInNewTab "ireki Helmuga Fitxa berri batean">
-<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Kopiatu jatorria arbelera">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiatu helmuga arbelera">
+<!ENTITY rp.requestLog.openOriginInNewTab "Ireki jatorria fitxa berri batean">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Ireki helmuga fitxa berri batean">
+<!ENTITY rp.requestLog.filterRequests "Eskaerak iragazi (RegEx)">
 <!ENTITY rp.requestLog.filterRequests.accesskey "F">
-<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter "Iragazkia garbitu">
 <!ENTITY rp.requestLog.clearFilter.accesskey "C">

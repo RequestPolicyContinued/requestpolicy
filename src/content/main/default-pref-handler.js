@@ -109,6 +109,6 @@ try {
   //   How_to_convert_an_overlay_extension_to_restartless
   //   #Step_4.3A_Manually_handle_default_preferences )
   Services.scriptloader.loadSubScript(
-      "chrome://requestpolicy/content/lib/default-preferences.js",
+      "chrome://rpcontinued/content/lib/default-preferences.js",
       defaultPrefScriptScope);
 } catch (e) {}

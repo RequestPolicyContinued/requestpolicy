@@ -36,7 +36,7 @@ function teardownModule(aModule) {
 
 function testEnableExtension() {
   amHelper.openOnlyAddonManager();
-  amHelper.setCategory("extension");
+  addonsManager.setCategoryById({id: "extension"});
 
   var addon = amHelper.getAddon();
 

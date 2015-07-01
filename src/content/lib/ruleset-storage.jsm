@@ -27,7 +27,7 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["RulesetStorage"];
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/ruleset",
   "lib/utils/files"

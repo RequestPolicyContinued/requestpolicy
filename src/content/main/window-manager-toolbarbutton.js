@@ -25,10 +25,10 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cu = Components.utils;
 
-const toolbarButtonId = "requestpolicyToolbarButton";
+const toolbarButtonId = "rpcontinuedToolbarButton";
 
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules(["lib/utils/xul", "lib/utils", "lib/logger"], this);
 
 if (Utils.info.isAustralis) {
@@ -67,7 +67,7 @@ let rpWindowManager = (function(self) {
       onCommand : function(aEvent) {
         // Bad smell
         let win = aEvent.target.ownerDocument.defaultView;
-        win.requestpolicy.overlay.openToolbarPopup(aEvent.target);
+        win.rpcontinued.overlay.openToolbarPopup(aEvent.target);
       }
     });
   }

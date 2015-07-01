@@ -27,7 +27,7 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["WindowUtils"];
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules(["lib/prefs"], this);
 
 

@@ -26,7 +26,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/prefs",
@@ -236,8 +236,8 @@ let RequestProcessor = (function(self) {
           // save all blocked redirects directly in the browser element. the
           // blocked elements will be checked later when the DOM content
           // finished loading.
-          browser.requestpolicy = browser.requestpolicy || {blockedRedirects: {}};
-          browser.requestpolicy.blockedRedirects[originURI] = destURI;
+          browser.rpcontinued = browser.rpcontinued || {blockedRedirects: {}};
+          browser.rpcontinued.blockedRedirects[originURI] = destURI;
         }
 
         // Cancel the request. As of Fx 37, this causes the location bar to
@@ -249,40 +249,39 @@ let RequestProcessor = (function(self) {
         // We try to trace the blocked redirect back to a link click or form
         // submission if we can. It may indicate, for example, a link that
         // was to download a file but a redirect got blocked at some point.
-        var initialOrigin = originURI;
-        var initialDest = destURI;
-        // To prevent infinite loops, bound the number of iterations.
-        // Note that an apparent redirect loop doesn't mean a problem with a
-        // website as the site may be using other information, such as cookies
-        // that get set in the redirection process, to stop the redirection.
-        var iterations = 0;
-        const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
-        while (initialOrigin in internal.allowedRedirectsReverse &&
-               iterations++ < ASSUME_REDIRECT_LOOP) {
-          initialDest = initialOrigin;
-          initialOrigin = internal.allowedRedirectsReverse[initialOrigin];
-        }
+        // Example:
+        //   "link click" -> "first redirect" -> "second redirect"
+        {
+          let initialOrigin = getOriginOfInitialRedirect(request);
 
-        if (initialOrigin in internal.clickedLinksReverse) {
-          for (var i in internal.clickedLinksReverse[initialOrigin]) {
-            // We hope there's only one possibility of a source page (that is,
-            // ideally there will be one iteration of this loop).
-            var sourcePage = i;
+          if (internal.clickedLinksReverse.hasOwnProperty(initialOrigin)) {
+            let linkClickDest = initialOrigin;
+            let linkClickOrigin;
+
+            // fixme: bad smell! the same link (linkClickDest) could have
+            //        been clicked from different origins!
+            for (let i in internal.clickedLinksReverse[linkClickDest]) {
+              // We hope there's only one possibility of a source page (that is,
+              // ideally there will be one iteration of this loop).
+              linkClickOrigin = i;
+            }
+
+            // TODO: #633 - Review the following line (recordAllowedRequest).
+
+            // Maybe we just record the clicked link and each step in between as
+            // an allowed request, and the final blocked one as a blocked request.
+            // That is, make it show up in the requestpolicy menu like anything
+            // else.
+            // We set the "isInsert" parameter so we don't clobber the existing
+            // info about allowed and deleted requests.
+            internal.recordAllowedRequest(linkClickOrigin, linkClickDest, true,
+                                          request.requestResult);
           }
 
-          // Maybe we just record the clicked link and each step in between as
-          // an allowed request, and the final blocked one as a blocked request.
-          // That is, make it show up in the requestpolicy menu like anything
-          // else.
-          // We set the "isInsert" parameter so we don't clobber the existing
-          // info about allowed and deleted requests.
-          internal.recordAllowedRequest(sourcePage, initialOrigin, true,
-                                        request.requestResult);
+          // TODO: implement for form submissions whose redirects are blocked
+          //if (internal.submittedFormsReverse[initialOrigin]) {
+          //}
         }
-
-        // if (internal.submittedFormsReverse[initialOrigin]) {
-        // // TODO: implement for form submissions whose redirects are blocked
-        // }
 
         internal.recordRejectedRequest(request);
       }
@@ -306,7 +305,7 @@ let RequestProcessor = (function(self) {
     var window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(function() {
-      var showNotification = Utils.getObjectPath(window, 'requestpolicy',
+      var showNotification = Utils.getObjectPath(window, 'rpcontinued',
           'overlay', '_showRedirectNotification');
       if (!showNotification) {
         return false;
@@ -365,6 +364,32 @@ let RequestProcessor = (function(self) {
         "to <" + request.destURI + ">.");
   }
 
+  /**
+   * @param {RedirectRequest} aRequest
+   */
+  function getOriginOfInitialRedirect(aRequest) {
+    var initialOrigin = aRequest.originURI;
+    var initialDest = aRequest.destURI;
+
+    // Prevent infinite loops, that is, bound the number of iterations.
+    // Note: An apparent redirect loop doesn't mean a problem with a
+    //       website as the site may be using other information,
+    //       such as cookies that get set in the redirection process,
+    //       to stop the redirection.
+    const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
+
+    for (let i = 0; i < ASSUME_REDIRECT_LOOP; ++i) {
+      if (false === (initialOrigin in internal.allowedRedirectsReverse)) {
+        // break the loop
+        break;
+      }
+
+      initialDest = initialOrigin;
+      initialOrigin = internal.allowedRedirectsReverse[initialOrigin];
+    }
+
+    return initialOrigin;
+  }
 
 
 

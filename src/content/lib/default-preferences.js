@@ -1,5 +1,3 @@
-pref("extensions.requestpolicy@requestpolicy.com.description",
-    "chrome://requestpolicy/locale/requestpolicy.properties");
 
 pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);

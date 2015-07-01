@@ -33,7 +33,7 @@ let EXPORTED_SYMBOLS = ["ObserverManager"];
 let globalScope = this;
 
 /* global ScriptLoader */
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/utils/observers", /* global SingleTopicObserver,
                             SinglePrefBranchObserver */
@@ -129,11 +129,11 @@ function ObserverManager(aEnv) {
   };
 
   /**
-   * A shorthand for calling observe() with topic "requestpolicy-prefs-changed".
+   * A shorthand for calling observe() with topic "rpcontinued-prefs-changed".
    */
   ObserverManager.prototype.observePrefChanges = function(aCallback) {
     let self = this;
-    self.observeSingleTopic("requestpolicy-prefs-changed", aCallback);
+    self.observeSingleTopic("rpcontinued-prefs-changed", aCallback);
   };
 
   //

@@ -38,7 +38,7 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 
-Cu.import("chrome://requestpolicy/content/lib/script-loader.jsm");
+Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
   "lib/logger",
   "lib/prefs",
@@ -142,7 +142,9 @@ let RequestProcessor = (function(self) {
     }
 
     if (request.aContext) {
-      request.aContext.requestpolicyBlocked = true;
+      // fixme: `rpcontinuedBlocked` is probably not needed anymore.
+      //        There's now `rpcontinuedIdentified`.
+      request.aContext.rpcontinuedBlocked = true;
     }
 
     cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
@@ -159,7 +161,7 @@ let RequestProcessor = (function(self) {
         Logger.warning(Logger.TYPE_CONTENT, "The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
-        window.requestpolicy.overlay.observeBlockedTopLevelDocRequest(
+        window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
             browser, request.originURI, request.destURI);
       }
     }
@@ -1070,6 +1072,6 @@ let RequestProcessor = (function(self) {
 
 
 Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/lib/request-processor.redirects.js');
+    'chrome://rpcontinued/content/lib/request-processor.redirects.js');
 Services.scriptloader.loadSubScript(
-    'chrome://requestpolicy/content/lib/request-processor.compat.js');
+    'chrome://rpcontinued/content/lib/request-processor.compat.js');

@@ -17,6 +17,9 @@ extension_name := requestpolicy
 amo__extension_id     := rpcontinued@requestpolicy.org
 off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
+amo__extension_name     := RequestPolicy Continued
+off_amo__extension_name := RequestPolicy Continued Beta
+
 
 # ____________________________________
 # generating XPIs -- general variables
@@ -254,7 +257,7 @@ $(xpi_file): $(build_path) $(all_files) | $(dist_path)
 # create the signed "off-AMO" XPI
 #
 
-$(signed_xpi_file): $(build_path)/META-INF/ | $(dist_path)
+$(signed_xpi_file): $(build_path) $(all_files) $(build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
 	@cd $(build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \
@@ -395,6 +398,7 @@ $(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
 	  echo 'using `sed` on install.rdf !' ; \
 	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+	  sed -i 's/$(off_amo__extension_name)/$(amo__extension_name)/' $@ ; \
 	fi
 
 $(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)

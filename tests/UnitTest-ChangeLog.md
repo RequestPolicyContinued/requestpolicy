@@ -2,6 +2,11 @@
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
 
+#### Version 1.0.beta10
+* A Marionette testing environment and some first tests have been created.
+  See #641 and 9950ad2.
+
+
 #### Version 1.0.beta9
 * A simple addon has been added to the development environment, called
   "RPC Dev Helper".

@@ -19,6 +19,7 @@ extension_uuid := requestpolicy@requestpolicy.com
 
 # The zip application to be used.
 ZIP := zip
+PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
 
 source_dirname := src
 build_dirname := build
@@ -181,6 +182,12 @@ $(dist_path):
 
 sign: $(signed_xpi_file)
 
+.PHONY: preprocessor
+preprocessor: $(build_dirname)/preprocess-content-types.txt
+$(build_dirname)/preprocess-content-types.txt:
+	@mkdir $(build_dirname)
+	echo 'JavaScript .jsm' > $@
+
 
 # _______________________
 # create the "normal" XPI
@@ -249,9 +256,9 @@ $(build_path): $(all_files) $(deleted_files) $(empty_dirs)
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
 
-$(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
+$(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@) preprocessor
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(build_path)%,$(source_path)%,$@) > $@
+	$(PREPROCESS) $(patsubst $(build_path)%,$(source_path)%,$@) > $@
 
 $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
@@ -276,9 +283,9 @@ $(build_path)/META-INF/: $(build_path) $(all_files)
 
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
-$(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+$(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@) preprocessor
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) -UNIT_TESTING=true > $@
+	$(PREPROCESS) --keep-lines -D UNIT_TESTING $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) > $@
 
 $(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)

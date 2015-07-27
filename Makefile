@@ -487,7 +487,7 @@ mozrunner_args += $(moz_args)
 .PHONY: run
 run: venv $(moz_xpi) $(dev_helper__xpi_file)
 	( \
-	source .venv-mozmill/bin/activate ; \
+	source .venv/bin/activate ; \
 	mozrunner $(mozrunner_args) ; \
 	)
 

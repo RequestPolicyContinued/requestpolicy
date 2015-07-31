@@ -1,5 +1,7 @@
 #!/bin/bash
 
+(cd `dirname $0`/.. ; make unit-testing-files)
+
 TEST_DIR=`dirname $0`/xpcshell
 
 MOZ_SRC_DIR=/moz/mozilla-central

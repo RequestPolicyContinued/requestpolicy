@@ -1,4 +1,4 @@
-Components.utils.import("chrome://rpcontinued/content/lib/domain-util.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/domains.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/policy-manager.jsm");
 

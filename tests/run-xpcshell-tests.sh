@@ -1,23 +1,17 @@
 #!/bin/bash
 
-(cd `dirname $0`/.. ; make unit-testing-files)
-
 TEST_DIR=`dirname $0`/xpcshell
 
 MOZ_SRC_DIR=/moz/mozilla-central
 MOZ_OBJ_DIR=($MOZ_SRC_DIR/obj-*)
 MOZ_BIN_DIR=$MOZ_OBJ_DIR/dist/bin
 
-ARGUMENTS=""
-
-if [ -z "$1" ]; then
-  ARGUMENTS=""
-elif [ "$1" = "--help" ]; then
-  echo "Usage:"
-  echo "  $0 [test_filename.js]     (run all tests or just one.)"
-  exit
+if [ "$1" = "--help" ]; then
+  echo 'Hints:'
+  echo '  Use --test-path="test_file.js" to run a single test.'
+  echo
 else
-  ARGUMENTS=" --test-path=$1 "
+  (cd `dirname $0`/.. ; make unit-testing-files)
 fi
 
 export PYTHONPATH=\
@@ -32,6 +26,6 @@ $MOZ_SRC_DIR/testing/mozbase/mozlog
 python2.7 $MOZ_SRC_DIR/testing/xpcshell/runxpcshelltests.py \
   --build-info-json $MOZ_OBJ_DIR/mozinfo.json \
   --no-logfiles \
-  $ARGUMENTS \
-  $MOZ_BIN_DIR/xpcshell \
-  $TEST_DIR
+  --manifest=$TEST_DIR/xpcshell.ini \
+  $@ \
+  $MOZ_BIN_DIR/xpcshell

@@ -1,4 +1,4 @@
-Components.utils.import("chrome://rpcontinued/content/lib/file-util.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm");
 //// TODO: Maybe the script loader needs to be used instead?
 //var loader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
 //    .getService(Components.interfaces.mozIJSSubScriptLoader);

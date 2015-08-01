@@ -421,6 +421,9 @@ $(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(sourc
 $(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
 	cp $(patsubst $(unit_testing__build_path)%,%,$@) $@
 
+.PHONY: unit-testing-files
+unit-testing-files: $(unit_testing__all_files)
+
 
 # __________________
 # "cleaning" targets

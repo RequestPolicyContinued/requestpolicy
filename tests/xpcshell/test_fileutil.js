@@ -1,5 +1,5 @@
 
-Components.utils.import("chrome://rpcontinued/content/lib/file-util.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm");
 
 function run_test() {
   // Make sure the RP user dir doesn't already exist.

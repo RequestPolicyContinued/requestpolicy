@@ -1,6 +1,7 @@
 
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset-storage.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
 
 // We expect JSON data to represent the following data structure.
 var exampleJsonObj = {
@@ -79,8 +80,8 @@ function test_2() {
   // Add all of the rules as allow rules.
   for (var name in Iterator(rules, true)) {
     // Do it twice to trigger bugs/check for duplicates.
-    rawRuleset.addRule(RULE_ACTION_ALLOW, rules[name]);
-    rawRuleset.addRule(RULE_ACTION_ALLOW, rules[name]);
+    rawRuleset.addRule(C.RULE_ACTION_ALLOW, rules[name]);
+    rawRuleset.addRule(C.RULE_ACTION_ALLOW, rules[name]);
   }
 
   // Write it to a file and read it back.
@@ -93,8 +94,8 @@ function test_2() {
   // Add all of the rules as deny rules.
   for (var name in Iterator(rules, true)) {
     // Do it twice to trigger bugs/check for duplicates.
-    rawRuleset.addRule(RULE_ACTION_DENY, rules[name]);
-    rawRuleset.addRule(RULE_ACTION_DENY, rules[name]);
+    rawRuleset.addRule(C.RULE_ACTION_DENY, rules[name]);
+    rawRuleset.addRule(C.RULE_ACTION_DENY, rules[name]);
   }
 
   // Write it to a file and read it back.
@@ -105,7 +106,7 @@ function test_2() {
   do_check_eq(rawRuleset._entries["deny"].length, 3);
 
   // Remove one of the deny rules.
-  rawRuleset.removeRule(RULE_ACTION_DENY, rules["origin"]);
+  rawRuleset.removeRule(C.RULE_ACTION_DENY, rules["origin"]);
 
   // Write it to a file and read it back.
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
@@ -117,8 +118,8 @@ function test_2() {
   // Remove all of the deny rules.
   for (var name in Iterator(rules, true)) {
     // Do it twice to trigger bugs/check for duplicates.
-    rawRuleset.removeRule(RULE_ACTION_DENY, rules[name]);
-    rawRuleset.removeRule(RULE_ACTION_DENY, rules[name]);
+    rawRuleset.removeRule(C.RULE_ACTION_DENY, rules[name]);
+    rawRuleset.removeRule(C.RULE_ACTION_DENY, rules[name]);
   }
 
   // Write it to a file and read it back.
@@ -129,7 +130,7 @@ function test_2() {
   do_check_eq(rawRuleset._entries["deny"].length, 0);
 
   // Remove one of the allow rules.
-  rawRuleset.removeRule(RULE_ACTION_ALLOW, rules["dest"]);
+  rawRuleset.removeRule(C.RULE_ACTION_ALLOW, rules["dest"]);
 
   // Write it to a file and read it back.
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
@@ -141,8 +142,8 @@ function test_2() {
   // Remove all of the allow rules.
   for (var name in Iterator(rules, true)) {
     // Do it twice to trigger bugs/check for duplicates.
-    rawRuleset.removeRule(RULE_ACTION_ALLOW, rules[name]);
-    rawRuleset.removeRule(RULE_ACTION_ALLOW, rules[name]);
+    rawRuleset.removeRule(C.RULE_ACTION_ALLOW, rules[name]);
+    rawRuleset.removeRule(C.RULE_ACTION_ALLOW, rules[name]);
   }
 
   // Write it to a file and read it back.

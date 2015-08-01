@@ -5,82 +5,40 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cr = Components.results;
+const Cu = Components.utils;
 
-// Simulate ProfD in xpcshell tests.
-// Modified from http://ehsanakhgari.org/blog/2008-10-17/testing-cache-service
-function setup_profile_dir() {
-  var dirSvc = Cc["@mozilla.org/file/directory_service;1"]
-        .getService(Ci.nsIProperties);
-  var provider = {
-    getFile: function(prop, persistent) {
-      persistent.value = true;
-      if (prop == "ProfLD" ||
-          prop == "ProfD" ||
-          prop == "cachePDir")
-        return do_get_profile();
-      throw Cr.NS_ERROR_FAILURE;
-    },
-    QueryInterface: function(iid) {
-      if (iid.equals(Ci.nsIDirectoryProvider) ||
-          iid.equals(Ci.nsISupports)) {
-        return this;
-      }
-      throw Cr.NS_ERROR_NO_INTERFACE;
-    }
-  };
-  dirSvc.QueryInterface(Ci.nsIDirectoryService).registerProvider(provider);
+Cu.import("resource://gre/modules/Services.jsm");
+
+// Initialize profile.
+// This will create a Directory Service Provider for the
+// profile directory. See `head.js` in mozilla-central.
+{
+  let gProfD = do_get_profile();
 }
 
-setup_profile_dir();
+// Register RequestPolicy's Chrome Manifest.
+{
+  let cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
-// Register components in the "components" subdirectory. The current directory
-// is the tests/xpcshell/ directory.
-let cwd = Cc["@mozilla.org/file/directory_service;1"]
-      .getService(Ci.nsIProperties)
-      .get("CurWorkD", Ci.nsILocalFile);
-let compDir = cwd.parent.parent.clone();
-compDir.append("src");
-//compDir.append("components");
-Components.manager instanceof Ci.nsIComponentRegistrar;
-Components.manager.autoRegister(compDir);
+  let manifestFile = cwd.parent.parent.clone();
+  manifestFile.appendRelativePath("build/unit-testing/chrome.manifest");
 
-// TODO: Since resource://requestpolicy/ is not used anymore, we might have to
-//       change code here.
-// Setup resource://requestpolicy/
-let ioService = Cc["@mozilla.org/network/io-service;1"]
-    .getService(Ci.nsIIOService);
-let resProt = ioService.getProtocolHandler("resource")
-    .QueryInterface(Ci.nsIResProtocolHandler);
-let aliasFile = Cc["@mozilla.org/file/local;1"]
-    .createInstance(Ci.nsILocalFile);
-let modulesDir = cwd.parent.parent.clone();
-modulesDir.append("src");
-modulesDir.append("content");
-modulesDir.append("modules");
-aliasFile.initWithPath(modulesDir.path);
-let aliasURI = ioService.newFileURI(aliasFile);
-resProt.setSubstitution("requestpolicy", aliasURI);
-
-// register chrome://* URIs
-let cr = Components.classes["@mozilla.org/chrome/chrome-registry;1"]
-    .getService(Components.interfaces.nsIChromeRegistry);
-cr.checkForNewChrome();
-
-
-// Setup the Logger module to use |print| instead of |dump| because that's
-// what's available for xpcshell tests.
-if (!requestpolicy) {
-  var requestpolicy = {
-    mod : {}
-  };
+  Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
+                    .autoRegister(manifestFile);
 }
 
-//// maybe this needs to be changed to:
-//var loader = Cc["@mozilla.org/moz/jssubscript-loader;1"]
-//    .getService(Ci.mozIJSSubScriptLoader);
-//loader.loadSubScript("chrome://rpcontinued/content/lib/logger.jsm");
-//// ? -- see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_bindings/XPConnect/xpcshell/HOWTO
-Components.utils.import("chrome://rpcontinued/content/lib/logger.jsm");
-Logger.printFunc = function (msg) {
-  print(msg.trimRight());
+// Load default preferences
+Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
+                                    "main/default-pref-handler.js", {});
+
+// Setup the Logger module
+{
+  let tmpScope = {};
+  Cu.import("chrome://rpcontinued/content/lib/logger.jsm", tmpScope);
+
+  // Use |do_print| instead of |dump| because that's what's
+  // available for xpcshell tests.
+  tmpScope.Logger.printFunc = function (msg) {
+    do_print(msg.trimRight());
+  };
 }

@@ -30,7 +30,7 @@ function test_0() {
   copyRulesetFileToProfile("foo.json");
 
   var manager = new PolicyManager();
-  manager.loadPolicies(config);
+  manager.loadUserRules(config);
 
   for (var i in manager._rulesets) {
     print("print ruleset: " + i);
@@ -86,7 +86,7 @@ function test_0() {
 function test_1() {
   var noStore = true;
   var manager = new PolicyManager();
-  manager.loadPolicies();
+  manager.loadUserRules();
 
   var origin = DomainUtil.getUriObject("http://www.foo.com/");
   var dest = DomainUtil.getUriObject("https://www.example.com/");
@@ -99,7 +99,7 @@ function test_1() {
   for (var i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
-    // manager.loadPolicies();
+    // manager.loadUserRules();
 
     print("Starting: " + i);
     var rawRule = rules[i];
@@ -201,7 +201,7 @@ function test_1() {
 function test_2() {
   var noStore = true;
   var manager = new PolicyManager();
-  manager.loadPolicies();
+  manager.loadUserRules();
 
   var origin = DomainUtil.getUriObject("http://www.foo.com/");
   var dest = DomainUtil.getUriObject("https://www.example.com/");
@@ -214,7 +214,7 @@ function test_2() {
   for (var i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
-    // manager.loadPolicies();
+    // manager.loadUserRules();
 
     print("Starting: " + i);
     var rawRule = rules[i];
@@ -318,7 +318,7 @@ function test_2() {
 function test_2() {
   var noStore = true;
   var manager = new PolicyManager();
-  manager.loadPolicies();
+  manager.loadUserRules();
 
   var origin = DomainUtil.getUriObject("http://www.foo.com/");
   var dest = DomainUtil.getUriObject("https://www.example.com/");
@@ -331,7 +331,7 @@ function test_2() {
   for (var i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
-    // manager.loadPolicies();
+    // manager.loadUserRules();
 
     print("Starting: " + i);
     var rawRule = rules[i];

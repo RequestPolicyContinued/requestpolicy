@@ -513,7 +513,7 @@ check test: mozmill marionette
 
 mozmill: venv-mozmill $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
 	( \
-	source .venv/bin/activate ; \
+	source .venv-mozmill/bin/activate ; \
 	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
 		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args) ; \
 	)

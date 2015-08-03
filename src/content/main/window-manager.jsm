@@ -37,7 +37,7 @@ let rpWindowManager = (function(self) {
 
   Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
-    "lib/utils",
+    "lib/utils/info",
     "lib/utils/xul",
     "lib/utils/constants",
     "lib/environment"
@@ -51,7 +51,7 @@ let rpWindowManager = (function(self) {
   let styleSheets = [
     "chrome://rpcontinued/skin/requestpolicy.css"
   ];
-  if (Utils.info.isSeamonkey) {
+  if (Info.isSeamonkey) {
     styleSheets.push("chrome://rpcontinued/skin/toolbarbutton-seamonkey.css");
   } else {
     styleSheets.push("chrome://rpcontinued/skin/toolbarbutton.css");

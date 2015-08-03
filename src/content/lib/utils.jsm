@@ -119,48 +119,6 @@ let Utils = (function() {
   };
 
 
-
-
-  self.info = {};
-
-  // bad smell...
-  // get/set last/current RP version
-  if (ProcessEnvironment.isMainProcess) {
-    self.info.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
-
-    self.info.curRPVersion = "0.0";
-    // curRPVersion needs to be set asynchronously
-    AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
-      rpPrefBranch.setCharPref("lastVersion", addon.version);
-      self.info.curRPVersion = addon.version;
-      if (self.info.lastRPVersion != self.info.curRPVersion) {
-        Services.prefs.savePrefFile(null);
-      }
-    });
-  }
-
-  // bad smell...
-  // get/set last/current app (e.g. firefox) version
-  if (ProcessEnvironment.isMainProcess) {
-    self.info.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
-
-    let curAppVersion = Services.appinfo.version;
-    self.info.curAppVersion = curAppVersion;
-    rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
-
-    if (self.info.lastAppVersion != self.info.curAppVersion) {
-      Services.prefs.savePrefFile(null);
-    }
-  }
-
-  let appID = Services.appinfo.ID;
-  self.info.isFirefox = appID === C.FIREFOX_ID;
-  self.info.isSeamonkey = appID === C.SEAMONKEY_ID;
-  self.info.isAustralis = self.info.isFirefox &&
-      Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
-
-
-
   /**
    * This function returns and eventually creates a module's `internal`
    * variable. The `internal` can be accessed from all submodules of that

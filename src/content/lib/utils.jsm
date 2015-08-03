@@ -27,21 +27,14 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["Utils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 //Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "lib/prefs",
-  "lib/utils/constants",
   "lib/environment",
   "lib/logger"
 ], this);
-
-if (ProcessEnvironment.isMainProcess) {
-  Cu.import("resource://gre/modules/AddonManager.jsm");
-}
 
 
 

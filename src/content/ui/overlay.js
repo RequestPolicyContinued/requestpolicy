@@ -51,6 +51,7 @@ rpcontinued.overlay = (function() {
   let {StringUtils} = iMod("lib/utils/strings");
   let {DOMUtils} = iMod("lib/utils/dom");
   let {WindowUtils} = iMod("lib/utils/windows");
+  let {Utils} = iMod("lib/utils");
   let {C} = iMod("lib/utils/constants");
 
   let gBrowser = WindowUtils.getTabBrowser(window);
@@ -169,7 +170,7 @@ rpcontinued.overlay = (function() {
       Environment.LEVELS.INTERFACE,
       function() {
         RequestProcessor.removeRequestObserver(self);
-        self._unwrapAddTab();
+        unwrapAddTab();
         self._removeHistoryObserver();
         self._removeLocationObserver();
       });
@@ -233,7 +234,7 @@ rpcontinued.overlay = (function() {
       OverlayEnvironment.elManager.addListener(container, "TabSelect",
                                                tabSelectCallback, false);
 
-      self._wrapAddTab();
+      wrapAddTab();
       self._addLocationObserver();
       self._addHistoryObserver();
     }
@@ -783,90 +784,49 @@ rpcontinued.overlay = (function() {
   };
 
   /**
-   * Modifies the addTab() function so that RequestPolicy can be aware of the
+   * Wraps the addTab() function so that RequestPolicy can be aware of the
    * tab being opened. Assume that if the tab is being opened, it was an action
    * the user wanted (e.g. the equivalent of a link click). Using a TabOpen
-   * event handler, I was unable to determine the referrer, so that approach
-   * doesn't seem to be an option. This doesn't actually wrap addTab because the
-   * extension TabMixPlus modifies the function rather than wraps it, so
-   * wrapping it will break tabs if TabMixPlus is installed.
+   * event handler, I (Justin) was unable to determine the referrer,
+   * so that approach doesn't seem to be an option.
+   *
+   * TODO: Give examples when the wrap is necessary.
+   *
+   * Details on addTab():
+   * - https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/tabbrowser#m-addTab
+   * - See mozilla-central: "base/content/tabbrowser.xml"
    */
-  self._wrapAddTab = function() {
-    if (!gBrowser.rpcontinuedAddTabModified) {
-      gBrowser.rpcontinuedAddTabModified = true;
+  function wrapAddTab() {
+    Utils.wrapFunction(gBrowser, "addTab", tabAdded);
+  }
 
-      // For reference, the addTab() function signature looks like this:
-      // function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner,
-      // aAllowThirdPartyFixup) {";
-      // where it's possible that only two arguments are used and aReferrerURI
-      // is a hash of the other arguments as well as new ones.
-      // See https://github.com/RequestPolicyContinued/requestpolicy/issues/38
-
-      // In order to keep our code from breaking if the signature of addTab
-      // changes (even just a change in variable names, for example), we'll
-      // simply insert our own line right after the first curly brace in the
-      // string representation of the addTab function.
-      var addTabString = gBrowser.addTab.toString();
-      var firstCurlyBrace = addTabString.indexOf("{");
-      var addTabParts = [];
-      // Includes the '{'
-      addTabParts[0] = addTabString.substring(0, firstCurlyBrace + 1);
-      // Starts after the '{'
-      addTabParts[1] = addTabString.substring(firstCurlyBrace + 1);
-
-      // We use 'arguments' so that we aren't dependent on the names of two
-      // parameters, as it seems not unlikely that these could change due to
-      // the second parameter's purpose having been changed.
-      var newFirstCodeLine = "\n    rpcontinued.overlay.tabAdded(arguments[0], arguments[1]);";
-      // Finally, add our line to the beginning of the addTab function.
-      eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine +
-           addTabParts[1]);
-    }
-  };
-
-
-
-  self._unwrapAddTab = function() {
-    if (gBrowser.rpcontinuedAddTabModified === true) {
-      // get the addTab() function as a string
-      let addTabString = gBrowser.addTab.toString();
-
-      // define the regular expression that should find the existing code
-      // line that RequestPolicy added.
-      let codeLineRE = /(\n    )?rpcontinued\.overlay\.tabAdded\(arguments\[0\], arguments\[1\]\);/;
-
-      // use the regular expression
-      let newAddTabString = addTabString.replace(codeLineRE, "");
-
-      // apply the changes
-      eval("gBrowser.addTab = " + newAddTabString);
-
-      delete gBrowser.rpcontinuedAddTabModified;
-    }
-  };
+  /**
+   * Unwrap the addTab() function.
+   */
+  function unwrapAddTab() {
+    Utils.unwrapFunction(gBrowser, "addTab");
+  }
 
   /**
    * This is called by the modified addTab().
    *
-   * @param {String}
-   *          url
-   * @param {nsIURI/hash}
-   *          referrerURI
+   * @param {string} aURI
+   * @param {(nsIURI|{referrerURI: nsIURI})} aReferrerURI The referrer or an
+   *     object containing the referrer.
    */
-  self.tabAdded = function(url, referrerURI) {
-    // The second argument to addTab was changed to a hash.
-    // See https://github.com/RequestPolicyContinued/requestpolicy/issues/38
-    if (referrerURI && !(referrerURI instanceof Components.interfaces.nsIURI)) {
-      if ("referrerURI" in referrerURI) {
-        referrerURI = referrerURI.referrerURI;
-      } else {
-        referrerURI = null;
-      }
+  function tabAdded(aURI, aReferrerURI) {
+    var referrerURI = aReferrerURI;
+
+    // The second argument can be an object of parameters.
+    if (typeof aReferrerURI === "object" &&
+        !(referrerURI instanceof Components.interfaces.nsIURI)) {
+      referrerURI = aReferrerURI.referrerURI;
     }
+
     if (referrerURI) {
-      RequestProcessor.registerLinkClicked(referrerURI.spec, url);
+      RequestProcessor.registerLinkClicked(referrerURI.spec, aURI);
     }
-  };
+  }
 
   self._addLocationObserver = function() {
     self.locationListener = {

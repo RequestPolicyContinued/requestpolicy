@@ -29,9 +29,9 @@ const toolbarButtonId = "rpcontinuedToolbarButton";
 
 
 Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/utils/xul", "lib/utils", "lib/logger"], this);
+ScriptLoader.importModules(["lib/utils/xul", "lib/utils/info", "lib/logger"], this);
 
-if (Utils.info.isAustralis) {
+if (Info.isAustralis) {
   Components.utils.import("resource:///modules/CustomizableUI.jsm");
 }
 
@@ -39,7 +39,7 @@ if (Utils.info.isAustralis) {
 
 let rpWindowManager = (function(self) {
 
-  let isAustralis = Utils.info.isAustralis;
+  let isAustralis = Info.isAustralis;
 
   //
   // Case 1: Australis (Firefox >= 29)
@@ -98,7 +98,7 @@ let rpWindowManager = (function(self) {
     // justify a bunch of special cases to support the statusbar when such a
     // tiny number of users have seamonkey and I can't even be sure that many of
     // those users want a statusbar icon.
-    //if (!Utils.info.isFirefox) {
+    //if (!Info.isFirefox) {
     //  Logger.info(Logger.TYPE_INTERNAL,
     //    "Not performing toolbar button check: not Firefox.");
     //  return;
@@ -106,7 +106,7 @@ let rpWindowManager = (function(self) {
     let doc = win.document;
 
     let isFirstRun = false;
-    if (Services.vc.compare(Utils.info.lastAppVersion, "0.0") <= 0) {
+    if (Services.vc.compare(Info.lastAppVersion, "0.0") <= 0) {
       Logger.info(Logger.TYPE_INTERNAL, "This is the first run.");
       isFirstRun = true;
     }

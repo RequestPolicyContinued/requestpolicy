@@ -12,24 +12,35 @@ Cu.import("resource://gre/modules/Services.jsm");
 // Initialize profile.
 // This will create a Directory Service Provider for the
 // profile directory. See `head.js` in mozilla-central.
-{
-  let gProfD = do_get_profile();
+// The return value is the profile directory, and can be
+// simply ignored.
+do_get_profile();
+
+
+
+function getRPChromeManifest() {
+  var cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
+
+  var manifestFile = cwd.parent.parent.clone();
+  manifestFile.appendRelativePath("build/unit-testing/chrome.manifest");
+  return manifestFile;
+}
+
+function registerRPChromeManifest() {
+  Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
+                    .autoRegister(getRPChromeManifest());
 }
 
 // Register RequestPolicy's Chrome Manifest.
-{
-  let cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
+registerRPChromeManifest();
 
-  let manifestFile = cwd.parent.parent.clone();
-  manifestFile.appendRelativePath("build/unit-testing/chrome.manifest");
 
-  Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-                    .autoRegister(manifestFile);
-}
 
 // Load default preferences
 Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
                                     "main/default-pref-handler.js", {});
+
+
 
 // Setup the Logger module
 {

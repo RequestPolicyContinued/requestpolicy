@@ -36,6 +36,7 @@ rpcontinued.menu = (function() {
   }());
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
+  let {Environment} = iMod("lib/environment");
   let {Logger} = iMod("lib/logger");
   let {rpPrefBranch, Prefs} = iMod("lib/prefs");
   let {RequestProcessor} = iMod("lib/request-processor");
@@ -95,8 +96,49 @@ rpcontinued.menu = (function() {
 
       var conflictCount = RequestProcessor.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
+
+
+      rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
+        Environment.LEVELS.INTERFACE,
+        function() {
+          emptyLists([
+            self._otherOriginsList,
+            self._blockedDestinationsList,
+            self._mixedDestinationsList,
+            self._allowedDestinationsList,
+            self._addRulesList,
+            self._removeRulesList
+          ]);
+        });
     }
   };
+
+
+  /**
+   * Removes all children from a list and eventually removes
+   * all event listeners.
+   *
+   * @param {Array<Element>} aLists The lists that should be emptied.
+   */
+  function emptyLists(aLists) {
+    for (let list of aLists) {
+      if (!list) {
+        // skip `null` lists
+        continue;
+      }
+
+      // remove all event listeners
+      {
+        let elements = list.getElementsByClassName("listen-click");
+        for (let el of elements) {
+          el.removeEventListener("click", self.itemSelected, false);
+        }
+      }
+
+      // remove the children
+      DOMUtils.removeChildren(list);
+    }
+  }
 
 
   self.prepareMenu = function() {
@@ -185,13 +227,14 @@ rpcontinued.menu = (function() {
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
 
-    DOMUtils.removeChildren([
-        self._otherOriginsList,
-        self._blockedDestinationsList,
-        self._mixedDestinationsList,
-        self._allowedDestinationsList,
-        self._removeRulesList,
-        self._addRulesList]);
+    emptyLists([
+      self._otherOriginsList,
+      self._blockedDestinationsList,
+      self._mixedDestinationsList,
+      self._allowedDestinationsList,
+      self._removeRulesList,
+      self._addRulesList
+    ]);
     $id('rpc-other-origins').hidden = true;
     $id('rpc-blocked-destinations').hidden = true;
     $id('rpc-mixed-destinations').hidden = true;
@@ -200,7 +243,7 @@ rpcontinued.menu = (function() {
   };
 
   self._populateList = function(list, values) {
-    DOMUtils.removeChildren(list);
+    emptyLists([list]);
 
     // check whether there are objects of GUILocation or just strings
     var guiLocations = values[0] && (values[0] instanceof GUILocation);
@@ -338,7 +381,7 @@ rpcontinued.menu = (function() {
   self._populateDetails = function() {
     var origin = self._currentlySelectedOrigin;
     var dest = self._currentlySelectedDest;
-    DOMUtils.removeChildren([self._removeRulesList, self._addRulesList]);
+    emptyLists([self._removeRulesList, self._addRulesList]);
 
     var ruleData = {
       'o' : {
@@ -445,8 +488,8 @@ rpcontinued.menu = (function() {
 
   self._addListItem = function(list, cssClass, value, numRequests) {
     var hbox = document.createElement("hbox");
-    hbox.setAttribute("class", cssClass);
-    hbox.setAttribute("onclick", 'rpcontinued.menu.itemSelected(event);');
+    hbox.setAttribute("class", cssClass + " listen-click");
+    hbox.addEventListener("click", self.itemSelected, false);
     list.insertBefore(hbox, null);
 
     var destLabel = document.createElement("label");

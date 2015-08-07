@@ -99,7 +99,8 @@ rpcontinued.overlay = (function() {
   let self = {
     // This is set by request-log.js when it is initialized. We don't need to worry
     // about setting it here.
-    requestLog: null
+    requestLog: null,
+    OverlayEnvironment: OverlayEnvironment
   };
 
 

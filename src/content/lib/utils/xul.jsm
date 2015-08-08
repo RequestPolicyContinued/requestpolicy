@@ -80,32 +80,38 @@ function getParentElement(aDocument, aElementSpec) {
   }
 }
 
-function isAttribute(aElementSpec, aAttributeName) {
-  return aAttributeName !== "children" && aAttributeName !== "parent" &&
-      aAttributeName !== "tag" && aElementSpec.hasOwnProperty(aAttributeName);
-}
+/**
+ * Get the localized value of an attribute.
+ */
+function getLocalizedValue(aRawValue) {
+  if (typeof aRawValue !== "string") {
+    return aRawValue;
+  }
 
-function getAttrValue(aElementSpec, aAttrName) {
-  if (!isAttribute(aElementSpec, aAttrName)) {
-    return false;
+  if (aRawValue.charAt(0) !== "&" ||
+      aRawValue.slice(-1) !== ";") {
+    return aRawValue;
   }
-  let value = aElementSpec[aAttrName];
-  if (value.charAt(0) == "&" && value.charAt(value.length-1) == ";") {
-    try {
-      value = StringUtils.$str(value.substr(1, value.length-2));
-    } catch (e) {
-      Logger.severe(Logger.TYPE_ERROR, e, e);
-      return false;
-    }
+
+  try {
+    let name = aRawValue.slice(1, -1);
+    return StringUtils.$str(name);
+  } catch (e) {
+    Logger.severe(Logger.TYPE_INTERNAL, "It was not possible to get the " +
+                  "localized value for '" + aRawValue + "'. " +
+                  "The error was: " + e, e);
+    return aRawValue;
   }
-  return value;
 }
 
 function setAttributes(aElement, aElementSpec) {
-  for (let attr in aElementSpec) {
-    let value = getAttrValue(aElementSpec, attr);
+  if (!aElementSpec.hasOwnProperty("attributes")) {
+    return;
+  }
+  for (let attributeName in aElementSpec.attributes) {
+    let value = getLocalizedValue(aElementSpec.attributes[attributeName]);
     if (value) {
-      aElement.setAttribute(attr, value);
+      aElement.setAttribute(attributeName, value);
     }
   }
 }
@@ -152,7 +158,7 @@ function getElementIDsToRemove(aTreeName) {
   let ids = elementIDsToRemove[aTreeName] = [];
   let tree = xulTrees[aTreeName];
   for (let i in tree) {
-    ids.push(tree[i].id);
+    ids.push(tree[i].attributes.id);
   }
   return ids;
 }

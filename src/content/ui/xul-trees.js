@@ -27,158 +27,331 @@ let isSeamonkey = appID === C.SEAMONKEY_ID;
 
 
 exports.toolbarbutton = [
-  {parent: {special: {type: "subobject", id: "navigator-toolbox",
-      tree: ["palette"]}}, // ("#navigator-toolbox".palette)
-    tag: "toolbarbutton", id: "rpcontinuedToolbarButton",
-    label: "RequestPolicy", tooltiptext: "RequestPolicy Continued",
-    popup: "rpc-popup"
+  {
+    parent: {
+      // $("#navigator-toolbox").palette
+      special: {
+        type: "subobject",
+        id: "navigator-toolbox",
+        tree: ["palette"]
+      }
+    },
+
+    tag: "toolbarbutton",
+    attributes: {
+      id: "rpcontinuedToolbarButton",
+      label: "RequestPolicy",
+      tooltiptext: "RequestPolicy Continued",
+      popup: "rpc-popup"
+    }
   }
 ];
 
 exports.mainTree = [
-  {parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
-      tag: "menu", label: "RequestPolicy Continued", accesskey: "r",
-  children: [
-    {tag: "menupopup",
+  {
+    parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
+
+    tag: "menu",
+    attributes: {label: "RequestPolicy Continued",
+                 accesskey: "r"},
     children: [
-      {tag: "menuitem", label: "&rp.menu.managePolicies;", accesskey: "m",
-          oncommand: "rpcontinued.overlay.openPolicyManager();"},
-      {tag: "menuitem", label: "&rp.requestLog.title;", accesskey: "l",
-          oncommand: "rpcontinued.overlay.toggleRequestLog(event);"},
-      {tag: "menuitem", label: "&rp.menu.preferences;", accesskey: "p",
-          oncommand: "rpcontinued.overlay.openPrefs(event);"}
-    ]}
-  ]},
+      {
+        tag: "menupopup",
+        children: [
+          {
+            tag: "menuitem",
+            attributes: {label: "&rp.menu.managePolicies;",
+                         accesskey: "m",
+                         oncommand: "rpcontinued.overlay.openPolicyManager();"}
+          },
+          {
+            tag: "menuitem",
+            attributes: {label: "&rp.requestLog.title;",
+                         accesskey: "l",
+                         oncommand: "rpcontinued.overlay.toggleRequestLog(event);"}
+          },
+          {
+            tag: "menuitem",
+            attributes: {label: "&rp.menu.preferences;",
+                         accesskey: "p",
+                         oncommand: "rpcontinued.overlay.openPrefs(event);"}
+          }
+        ]
+      }
+    ]
+  },
 
 
-  {parent: {special: {type: "__window__"}},
-      tag: "keyset", id: "rpcontinuedKeyset",
-  children: [
-    {tag: "key", key: "r", modifiers: "accel alt",
-        oncommand: "rpcontinued.overlay.openMenuByHotkey()"}
-  ]},
+  {
+    parent: {special: {type: "__window__"}},
 
-
-  {parent: {special: {type: "__window__"}},
-      tag: "popupset", id: "rpcontinuedPopupset",
-  children: [
-    {tag: "menupopup", id: "rpcontinuedRedirectAddRuleMenu"},
-    {tag: "menupopup", id: "rpc-popup", noautohide: "true",
-        position: "after_start",
-        onpopupshowing: "rpcontinued.overlay.onPopupShowing(event);",
-        onpopuphidden: "rpcontinued.overlay.onPopupHidden(event);",
+    tag: "keyset",
+    attributes: {id: "rpcontinuedKeyset"},
     children: [
-      {tag: "vbox", id: "rpc-contents",
-      children: [
-        {tag: "hbox", id: "rpc-main",
-        children: [
-          {tag: "vbox", id: "rpc-origins-destinations",
-          children: [
-            {tag: "hbox", id: "rpc-origin", "class": "rpc-od-item",
-                onclick: "rpcontinued.menu.itemSelected(event);",
-            children: [
-              {tag: "label", id: "rpc-origin-domainname", "class": "domainname",
-                  flex: "2"},
-              {tag: "label", id: "rpc-origin-num-requests",
-                  "class": "numRequests"}
-            ]},
-            {tag: "vbox", id: "rpc-other-origins",
-            children: [
-              {tag: "label", id: "rpc-other-origins-title",
-                  value: "&rp.menu.otherOrigins;"},
-              {tag: "vbox", id: "rpc-other-origins-list",
-                  "class": "rpc-label-list"}
-            ]},
-            {tag: "vbox", id: "rpc-blocked-destinations",
-            children: [
-              {tag: "label", id: "rpc-blocked-destinations-title",
-                  value: "&rp.menu.blockedDestinations;"},
-              {tag: "vbox", id: "rpc-blocked-destinations-list",
-                  "class": "rpc-label-list"}
-            ]},
-            {tag: "vbox", id: "rpc-mixed-destinations",
-            children: [
-              {tag: "label", id: "rpc-mixed-destinations-title",
-                  value: "&rp.menu.mixedDestinations;"},
-              {tag: "vbox", id: "rpc-mixed-destinations-list",
-                  "class": "rpc-label-list"}
-            ]},
-            {tag: "vbox", id: "rpc-allowed-destinations",
-            children: [
-              {tag: "label", id: "rpc-allowed-destinations-title",
-                  value: "&rp.menu.allowedDestinations;"},
-              {tag: "vbox", id: "rpc-allowed-destinations-list",
-                  "class": "rpc-label-list"}
-            ]}
-          ]},
-          {tag: "vbox", id: "rpc-details",
-          children: [
-            {tag: "vbox", id: "rpc-rules-remove"},
-            {tag: "vbox", id: "rpc-rules-add"},
-            {tag: "vbox", id: "rpc-rules-info"}
-          ]}
-        ]},
-        {tag: "hbox", id: "rpc-revoke-temporary-permissions", hidden: "true",
-        children: [
-          {tag: "label", value: "&rp.menu.revokeTemporaryPermissions;",
-              onclick: "rpcontinued.overlay.revokeTemporaryPermissions();"}
-        ]},
-        {tag: "hbox", id: "rpc-footer",
-        children: [
-          {tag: "hbox", id: "rpc-footer-links",
-          children: [
-            {tag: "label", id: "rpc-link-enable-blocking",
-                "class": "rpc-footer-link", value: "&rp.menu.enableBlocking;",
-                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rpc-link-disable-blocking",
-                "class": "rpc-footer-link", value: "&rp.menu.disableBlocking;",
-                onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"},
-            {tag: "label", id: "rpc-link-help", "class": "rpc-footer-link",
-                value: "&rp.menu.help;",
-                onclick: "rpcontinued.overlay.openHelp();"},
-            {tag: "label", id: "rpc-link-prefs", "class": "rpc-footer-link",
-                value: "&rp.menu.preferences;",
-                onclick: "rpcontinued.overlay.openPrefs(event);"},
-            {tag: "label", id: "rpc-link-policies", "class": "rpc-footer-link",
-                value: "&rp.menu.managePolicies;",
-                onclick: "rpcontinued.overlay.openPolicyManager();"},
-            {tag: "label", id: "rpc-link-request-log",
-                "class": "rpc-footer-link", value: "&rp.requestLog.title;",
-                onclick: "rpcontinued.overlay.toggleRequestLog(event);"}
-          ]}
-        ]}
-      ]}
-    ]}
-  ]},
+      {
+        tag: "key",
+        attributes: {key: "r",
+                     modifiers: "accel alt",
+                     oncommand: "rpcontinued.overlay.openMenuByHotkey()"}
+      }
+    ]
+  },
 
 
-  {parent: {id: "appcontent"},
-      tag: "splitter", id: "rpcontinued-requestLog-splitter", hidden: "true"},
+  {
+    parent: {special: {type: "__window__"}},
 
-  {parent: {id: "appcontent"},
-      tag: "vbox", id: "rpcontinued-requestLog", height: "300",
-      hidden: "true", persist: "height",
-  children: [
-    {tag: "toolbox", id: "rpcontinued-requestLog-header",
+    tag: "popupset",
+    attributes: {id: "rpcontinuedPopupset"},
     children: [
-      {tag: "toolbar", id: "rpcontinued-requestLog-toolbar",
-          align: "center",
-      children: [
-        {tag: "label", id: "rpcontinued-requestLog-title",
-            control: "rpcontinued-requestLog-frame",
-            value: "&rp.requestLog.title;", crop: "end"},
-        {tag: "button", id: "rpcontinued-requestLog-clear",
-            label: "&rp.requestLog.clear;",
-            oncommand: "rpcontinued.overlay.clearRequestLog();"},
-        {tag: "vbox", flex: "1"},
-        {tag: "toolbarbutton", id: "rpcontinued-requestLog-close",
-            align: "right",
-            oncommand: "rpcontinued.overlay.toggleRequestLog()"}
-      ]}
-    ]},
-    // The src of this iframe is set to
-    // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
-    {tag: "iframe", id: "rpcontinued-requestLog-frame", type: "chrome",
-        flex: "1"}
-  ]}
+      {
+        tag: "menupopup",
+        attributes: {id: "rpcontinuedRedirectAddRuleMenu"}
+      }, {
+        tag: "menupopup",
+        attributes: {id: "rpc-popup",
+                     noautohide: "true",
+                     position: "after_start",
+                     onpopupshowing: "rpcontinued.overlay.onPopupShowing(event);",
+                     onpopuphidden: "rpcontinued.overlay.onPopupHidden(event);"},
+        children: [
+          {
+            tag: "vbox",
+            attributes: {id: "rpc-contents"},
+            children: [
+              {
+                tag: "hbox",
+                attributes: {id: "rpc-main"},
+                children: [
+                  // [BEGIN] LEFT MENU COLUMN
+                  {
+                    tag: "vbox",
+                    attributes: {id: "rpc-origins-destinations"},
+                    children: [
+                      {
+                        tag: "hbox",
+                        attributes: {id: "rpc-origin",
+                                     "class": "rpc-od-item",
+                                     onclick: "rpcontinued.menu.itemSelected(event);"},
+                        children: [
+                          {
+                            tag: "label",
+                            attributes: {id: "rpc-origin-domainname",
+                                         "class": "domainname",
+                                         flex: "2"}
+                          }, {
+                            tag: "label",
+                            attributes: {id: "rpc-origin-num-requests",
+                                         "class": "numRequests"}
+                          }
+                        ]
+                      },
+                      {
+                        tag: "vbox",
+                        attributes: {id: "rpc-other-origins"},
+                        children: [
+                          {
+                            tag: "label",
+                            attributes: {id: "rpc-other-origins-title",
+                                         value: "&rp.menu.otherOrigins;"}
+                          }, {
+                            tag: "vbox",
+                            attributes: {id: "rpc-other-origins-list",
+                                         "class": "rpc-label-list"}
+                          }
+                        ]
+                      },
+                      {
+                        tag: "vbox",
+                        attributes: {id: "rpc-blocked-destinations"},
+                        children: [
+                          {
+                            tag: "label",
+                            attributes: {id: "rpc-blocked-destinations-title",
+                                         value: "&rp.menu.blockedDestinations;"}
+                          }, {
+                            tag: "vbox",
+                            attributes: {id: "rpc-blocked-destinations-list",
+                                         "class": "rpc-label-list"}
+                          }
+                        ]
+                      }, {
+                        tag: "vbox",
+                        attributes: {id: "rpc-mixed-destinations"},
+                        children: [
+                          {
+                            tag: "label",
+                            attributes: {id: "rpc-mixed-destinations-title",
+                                         value: "&rp.menu.mixedDestinations;"}
+                          }, {
+                            tag: "vbox",
+                            attributes: {id: "rpc-mixed-destinations-list",
+                                         "class": "rpc-label-list"}
+                          }
+                        ]
+                      }, {
+                        tag: "vbox",
+                        attributes: {id: "rpc-allowed-destinations"},
+                        children: [
+                          {
+                            tag: "label",
+                            attributes: {id: "rpc-allowed-destinations-title",
+                                         value: "&rp.menu.allowedDestinations;"}
+                          }, {
+                            tag: "vbox",
+                            attributes: {id: "rpc-allowed-destinations-list",
+                                         "class": "rpc-label-list"}
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  // [END] LEFT MENU COLUMN
+                  // [BEGIN] RIGHT MENU COLUMN
+                  {
+                    tag: "vbox",
+                    attributes: {id: "rpc-details"},
+                    children: [
+                      {
+                        tag: "vbox",
+                        attributes: {id: "rpc-rules-remove"}
+                      }, {
+                        tag: "vbox",
+                        attributes: {id: "rpc-rules-add"}
+                      }, {
+                        tag: "vbox",
+                        attributes: {id: "rpc-rules-info"}
+                      }
+                    ]
+                  }
+                  // [END] RIGHT MENU COLUMN
+                ]
+              }, {
+                tag: "hbox",
+                attributes: {id: "rpc-revoke-temporary-permissions",
+                             hidden: "true"},
+                children: [
+                  {
+                    tag: "label",
+                    attributes: {value: "&rp.menu.revokeTemporaryPermissions;",
+                                 onclick: "rpcontinued.overlay.revokeTemporaryPermissions();"}
+                  }
+                ]
+              },
+              // [BEGIN] MENU FOOTER
+              {
+                tag: "hbox",
+                attributes: {id: "rpc-footer"},
+                children: [
+                  {
+                    tag: "hbox",
+                    attributes: {id: "rpc-footer-links"},
+                    children: [
+                      {
+                        tag: "label",
+                        attributes: {id: "rpc-link-enable-blocking",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.menu.enableBlocking;",
+                                     onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"}
+                      }, {
+                        tag: "label",
+                        attributes: {id: "rpc-link-disable-blocking",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.menu.disableBlocking;",
+                                     onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"}
+                      }, {
+                        tag: "label",
+                        attributes: {id: "rpc-link-help",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.menu.help;",
+                                     onclick: "rpcontinued.overlay.openHelp();"}
+                      }, {
+                        tag: "label",
+                        attributes: {id: "rpc-link-prefs",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.menu.preferences;",
+                                     onclick: "rpcontinued.overlay.openPrefs(event);"}
+                      }, {
+                        tag: "label",
+                        attributes: {id: "rpc-link-policies",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.menu.managePolicies;",
+                                     onclick: "rpcontinued.overlay.openPolicyManager();"}
+                      }, {
+                        tag: "label",
+                        attributes: {id: "rpc-link-request-log",
+                                     "class": "rpc-footer-link",
+                                     value: "&rp.requestLog.title;",
+                                     onclick: "rpcontinued.overlay.toggleRequestLog(event);"}
+                      }
+                    ]
+                  }
+                ]
+              }
+              // [END] MENU FOOTER
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+
+  {
+    parent: {id: "appcontent"},
+    tag: "splitter",
+    attributes: {id: "rpcontinued-requestLog-splitter",
+                 hidden: "true"}
+  },
+  {
+    parent: {id: "appcontent"},
+    tag: "vbox",
+    attributes: {id: "rpcontinued-requestLog",
+                 height: "300",
+                 hidden: "true",
+                 persist: "height"},
+    children: [
+      {
+        tag: "toolbox",
+        attributes: {id: "rpcontinued-requestLog-header"},
+        children: [
+          {
+            tag: "toolbar",
+            attributes: {id: "rpcontinued-requestLog-toolbar",
+                         align: "center"},
+            children: [
+              {
+                tag: "label",
+                attributes: {id: "rpcontinued-requestLog-title",
+                             control: "rpcontinued-requestLog-frame",
+                             value: "&rp.requestLog.title;",
+                             crop: "end"}
+              }, {
+                tag: "button",
+                attributes: {id: "rpcontinued-requestLog-clear",
+                             label: "&rp.requestLog.clear;",
+                             oncommand: "rpcontinued.overlay.clearRequestLog();"}
+              }, {
+                tag: "vbox",
+                attributes: {flex: "1"}
+              }, {
+                tag: "toolbarbutton",
+                attributes: {id: "rpcontinued-requestLog-close",
+                             align: "right",
+                             oncommand: "rpcontinued.overlay.toggleRequestLog()"}
+              }
+            ]
+          }
+        ]
+      },
+      // The src of this iframe is set to
+      // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
+      {
+        tag: "iframe",
+        attributes: {id: "rpcontinued-requestLog-frame",
+                     type: "chrome",
+                     flex: "1"}
+      }
+    ]
+  }
 ];

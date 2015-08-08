@@ -53,17 +53,22 @@ let rpWindowManager = (function(self) {
   }
 
   function removeToolbarButtonFromAustralis() {
-    let tbb = XULUtils.xulTrees.toolbarbutton[0];
-    CustomizableUI.destroyWidget(tbb.id);
+    const {
+      attributes: {id}
+    } = XULUtils.xulTrees.toolbarbutton[0];
+    CustomizableUI.destroyWidget(id);
   }
 
   function addToolbarButtonToAustralis() {
-    let tbb = XULUtils.xulTrees.toolbarbutton[0];
+    const {
+      attributes: {id, label, tooltiptext}
+    } = XULUtils.xulTrees.toolbarbutton[0];
+
     CustomizableUI.createWidget({
-      id: tbb.id,
+      id: id,
       defaultArea: CustomizableUI.AREA_NAVBAR,
-      label: tbb.label,
-      tooltiptext: tbb.tooltiptext,
+      label: label,
+      tooltiptext: tooltiptext,
       onCommand : function(aEvent) {
         // Bad smell
         let win = aEvent.target.ownerDocument.defaultView;

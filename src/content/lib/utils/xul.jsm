@@ -34,13 +34,13 @@ ScriptLoader.importModules([
   "lib/utils/constants"
 ], this);
 
-let EXPORTED_SYMBOLS = ["XULUtils"];
+var EXPORTED_SYMBOLS = ["XULUtils"];
 
-let XULUtils = {};
+var XULUtils = {};
 
-let xulTrees = XULUtils.xulTrees = {};
+var xulTrees = XULUtils.xulTrees = {};
 
-let xulTreesScope = {
+var xulTreesScope = {
   "exports": xulTrees,
   "C": C,
   "appID": Services.appinfo.ID
@@ -51,24 +51,26 @@ Services.scriptloader.loadSubScript(
     xulTreesScope);
 
 
-function getParentElement(doc, element) {
-  if (!element.parent) {
+function getParentElement(aDocument, aElementSpec) {
+  if (!aElementSpec.parent) {
     return false;
   } else {
-    if (element.parent.id) {
-      return doc.getElementById(element.parent.id);
-    } else if (element.parent.special) {
-      switch (element.parent.special.type) {
+    if (aElementSpec.parent.id) {
+      return aDocument.getElementById(aElementSpec.parent.id);
+    } else if (aElementSpec.parent.special) {
+      switch (aElementSpec.parent.special.type) {
         case "__window__":
-          return doc.querySelector("window");
+          return aDocument.querySelector("window");
 
         case "subobject":
-          let subobjectTree = element.parent.special.tree;
-          let parentElement = doc.getElementById(element.parent.special.id);
+          let subobjectTree = aElementSpec.parent.special.tree;
+          let parentElement = aDocument.getElementById(aElementSpec.parent
+                                                                   .special.id);
           for (let i = 0, len = subobjectTree.length; i < len; ++i) {
             parentElement = parentElement[subobjectTree[i]];
           }
           return parentElement;
+
         default:
           return false;
       }
@@ -78,16 +80,16 @@ function getParentElement(doc, element) {
   }
 }
 
-function isAttribute(element, attr) {
-  return attr != "children" && attr != "parent" && attr != "tag" &&
-          element.hasOwnProperty(attr);
+function isAttribute(aElementSpec, aAttributeName) {
+  return aAttributeName !== "children" && aAttributeName !== "parent" &&
+      aAttributeName !== "tag" && aElementSpec.hasOwnProperty(aAttributeName);
 }
 
-function getAttrValue(element, attr) {
-  if (!isAttribute(element, attr)) {
+function getAttrValue(aElementSpec, aAttrName) {
+  if (!isAttribute(aElementSpec, aAttrName)) {
     return false;
   }
-  let value = element[attr];
+  let value = aElementSpec[aAttrName];
   if (value.charAt(0) == "&" && value.charAt(value.length-1) == ";") {
     try {
       value = StringUtils.$str(value.substr(1, value.length-2));
@@ -99,75 +101,72 @@ function getAttrValue(element, attr) {
   return value;
 }
 
-function setAttributes(node, element) {
-  for (let attr in element) {
-    let value = getAttrValue(element, attr);
+function setAttributes(aElement, aElementSpec) {
+  for (let attr in aElementSpec) {
+    let value = getAttrValue(aElementSpec, attr);
     if (value) {
-      node.setAttribute(attr, value);
+      aElement.setAttribute(attr, value);
     }
   }
 }
 
 
-function recursivelyAddXULElements(doc, elements, parentElement=null) {
-  let parentElementIsSet = !!parentElement;
-
-  for (let i in elements) {
-    let element = elements[i];
-
-    if (!element || !element.tag) {
+function recursivelyAddXULElements(aDocument, aElementSpecList,
+                                   aParentElement = null) {
+  for (let elementSpec of aElementSpecList) {
+    if (!elementSpec || !elementSpec.tag) {
       continue;
     }
-    parentElement = parentElementIsSet ? parentElement :
-        getParentElement(doc, element);
+    let parentElement = !!aParentElement ? aParentElement :
+        getParentElement(aDocument, elementSpec);
     if (false === parentElement) {
       continue;
     }
     if (parentElement === null) {
       Logger.warning(Logger.TYPE_ERROR,
-                     "parentElement of '"+element.id+"' is null!");
+                     "parentElement of '" + elementSpec.id + "' is null!");
       continue;
     }
 
-    let newElem = doc.createElement(element.tag);
-    setAttributes(newElem, element);
-    if (element.children) {
-      recursivelyAddXULElements(doc, element.children, newElem);
+    let newElement = aDocument.createElement(elementSpec.tag);
+    setAttributes(newElement, elementSpec);
+    if (elementSpec.children) {
+      recursivelyAddXULElements(aDocument, elementSpec.children, newElement);
     }
-    parentElement.appendChild(newElem);
+    parentElement.appendChild(newElement);
   }
 };
 
-XULUtils.addTreeElementsToWindow = function(win, treeName) {
-  if (xulTrees.hasOwnProperty(treeName)) {
-    recursivelyAddXULElements(win.document, xulTrees[treeName]);
+XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
+  if (xulTrees.hasOwnProperty(aTreeName)) {
+    recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
 }
 
-let elementIDsToRemove = {};
+var elementIDsToRemove = {};
 
-function getElementIDsToRemove(treeName) {
-  if (elementIDsToRemove.hasOwnProperty(treeName)) {
-    return elementIDsToRemove[treeName];
+function getElementIDsToRemove(aTreeName) {
+  if (elementIDsToRemove.hasOwnProperty(aTreeName)) {
+    return elementIDsToRemove[aTreeName];
   }
-  let ids = elementIDsToRemove[treeName] = [];
-  let tree = xulTrees[treeName];
+  let ids = elementIDsToRemove[aTreeName] = [];
+  let tree = xulTrees[aTreeName];
   for (let i in tree) {
     ids.push(tree[i].id);
   }
   return ids;
 }
 
-XULUtils.removeTreeElementsFromWindow = function(win, treeName) {
-  if (!xulTrees.hasOwnProperty(treeName)) {
+XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
+  if (!xulTrees.hasOwnProperty(aTreeName)) {
     return;
   }
-  let tree = xulTrees[treeName];
-  let elementIDs = getElementIDsToRemove(treeName);
+  let tree = xulTrees[aTreeName];
+  let elementIDs = getElementIDsToRemove(aTreeName);
 
   for (let i in elementIDs) {
     let id = elementIDs[i];
-    let node = win.document.getElementById(id);
+    let node = aWin.document.getElementById(id);
     if (node && node.parentNode) {
       node.parentNode.removeChild(node);
     }

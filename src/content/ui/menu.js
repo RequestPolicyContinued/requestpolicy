@@ -36,6 +36,7 @@ rpcontinued.menu = (function() {
   }());
   // iMod: Alias for ScriptLoader.importModule
   let iMod = ScriptLoader.importModule;
+  let {Environment} = iMod("lib/environment");
   let {Logger} = iMod("lib/logger");
   let {rpPrefBranch, Prefs} = iMod("lib/prefs");
   let {RequestProcessor} = iMod("lib/request-processor");
@@ -58,19 +59,24 @@ rpcontinued.menu = (function() {
   let initialized = false;
 
 
+  // TODO: Create a "List" class which also contains functions like
+  //       _populateList() and emptyList().
+  var lists = {
+    otherOrigins: null,
+    blockedDestinations: null,
+    mixedDestinations: null,
+    allowedDestinations: null,
+    removeRules: null,
+    addRules: null
+  };
+
+
   let self = {
     addedMenuItems : [],
 
     _originItem : null,
     _originDomainnameItem : null,
     _originNumRequestsItem : null,
-
-    _otherOriginsList : null,
-    _blockedDestinationsList : null,
-    _mixedDestinationsList : null,
-    _allowedDestinationsList : null,
-    _removeRulesList : null,
-    _addRulesList : null,
 
     _isCurrentlySelectedDestBlocked : null,
     _isCurrentlySelectedDestAllowed : null,
@@ -86,17 +92,51 @@ rpcontinued.menu = (function() {
       self._originDomainnameItem = $id('rpc-origin-domainname');
       self._originNumRequestsItem = $id('rpc-origin-num-requests');
 
-      self._otherOriginsList = $id("rpc-other-origins-list");
-      self._blockedDestinationsList = $id("rpc-blocked-destinations-list");
-      self._mixedDestinationsList = $id("rpc-mixed-destinations-list");
-      self._allowedDestinationsList = $id("rpc-allowed-destinations-list");
-      self._addRulesList = $id("rpc-rules-add");
-      self._removeRulesList = $id("rpc-rules-remove");
+      lists.otherOrigins = $id("rpc-other-origins-list");
+      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
+      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
+      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
+      lists.addRules = $id("rpc-rules-add");
+      lists.removeRules = $id("rpc-rules-remove");
 
       var conflictCount = RequestProcessor.getConflictingExtensions().length;
       var hideConflictInfo = (conflictCount == 0);
+
+
+      rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
+        Environment.LEVELS.INTERFACE,
+        function() {
+          // empty _all_ lists
+          for (let listName in lists) {
+            emptyList(lists[listName]);
+          }
+        });
     }
   };
+
+
+  /**
+   * Removes all children from a list and eventually removes
+   * all event listeners.
+   *
+   * @param {Element} aList The list that should be emptied.
+   */
+  function emptyList(aList) {
+    if (!aList) {
+      return;
+    }
+
+    // remove all event listeners
+    {
+      let elements = aList.getElementsByClassName("listen-click");
+      for (let el of elements) {
+        el.removeEventListener("click", self.itemSelected, false);
+      }
+    }
+
+    // remove the children
+    DOMUtils.removeChildren(aList);
+  }
 
 
   self.prepareMenu = function() {
@@ -185,13 +225,15 @@ rpcontinued.menu = (function() {
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
 
-    DOMUtils.removeChildren([
-        self._otherOriginsList,
-        self._blockedDestinationsList,
-        self._mixedDestinationsList,
-        self._allowedDestinationsList,
-        self._removeRulesList,
-        self._addRulesList]);
+    [
+      lists.otherOrigins,
+      lists.blockedDestinations,
+      lists.mixedDestinations,
+      lists.allowedDestinations,
+      lists.removeRules,
+      lists.addRules
+    ].forEach(emptyList);
+
     $id('rpc-other-origins').hidden = true;
     $id('rpc-blocked-destinations').hidden = true;
     $id('rpc-mixed-destinations').hidden = true;
@@ -200,7 +242,7 @@ rpcontinued.menu = (function() {
   };
 
   self._populateList = function(list, values) {
-    DOMUtils.removeChildren(list);
+    emptyList(list);
 
     // check whether there are objects of GUILocation or just strings
     var guiLocations = values[0] && (values[0] instanceof GUILocation);
@@ -270,7 +312,7 @@ rpcontinued.menu = (function() {
 
   self._populateOtherOrigins = function() {
     var guiOrigins = self._getOtherOriginsAsGUILocations();
-    self._populateList(self._otherOriginsList, guiOrigins);
+    self._populateList(lists.otherOrigins, guiOrigins);
     $id('rpc-other-origins').hidden = guiOrigins.length == 0;
   };
 
@@ -321,15 +363,15 @@ rpcontinued.menu = (function() {
       }
     }
 
-    self._populateList(self._blockedDestinationsList,
+    self._populateList(lists.blockedDestinations,
         destsWithSolelyBlockedRequests);
     $id('rpc-blocked-destinations').hidden =
         destsWithSolelyBlockedRequests.length == 0;
 
-    self._populateList(self._mixedDestinationsList, destsMixed);
+    self._populateList(lists.mixedDestinations, destsMixed);
     $id('rpc-mixed-destinations').hidden = destsMixed.length == 0;
 
-    self._populateList(self._allowedDestinationsList,
+    self._populateList(lists.allowedDestinations,
         destsWithSolelyAllowedRequests);
     $id('rpc-allowed-destinations').hidden =
         destsWithSolelyAllowedRequests.length == 0;
@@ -338,7 +380,9 @@ rpcontinued.menu = (function() {
   self._populateDetails = function() {
     var origin = self._currentlySelectedOrigin;
     var dest = self._currentlySelectedDest;
-    DOMUtils.removeChildren([self._removeRulesList, self._addRulesList]);
+
+    emptyList(lists.removeRules);
+    emptyList(lists.addRules);
 
     var ruleData = {
       'o' : {
@@ -357,14 +401,14 @@ rpcontinued.menu = (function() {
         // requests from a given origin.
         //if (mayPermRulesBeAdded === true) {
         //  var item = self._addMenuItemDenyOrigin(
-        //    self._addRulesList, ruleData);
+        //    lists.addRules, ruleData);
         //}
-        //var item = self._addMenuItemTempDenyOrigin(self._addRulesList, ruleData);
+        //var item = self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
       } else {
         if (mayPermRulesBeAdded === true) {
-          var item = self._addMenuItemAllowOrigin(self._addRulesList, ruleData);
+          var item = self._addMenuItemAllowOrigin(lists.addRules, ruleData);
         }
-        var item = self._addMenuItemTempAllowOrigin(self._addRulesList, ruleData);
+        var item = self._addMenuItemTempAllowOrigin(lists.addRules, ruleData);
       }
     }
 
@@ -388,20 +432,20 @@ rpcontinued.menu = (function() {
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
               var item = self._addMenuItemDenyOriginToDest(
-                  self._addRulesList, ruleData);
+                  lists.addRules, ruleData);
           }
           var item = self._addMenuItemTempDenyOriginToDest(
-            self._addRulesList, ruleData);
+            lists.addRules, ruleData);
         }
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemDenyDest(
-                self._addRulesList, destOnlyRuleData);
+                lists.addRules, destOnlyRuleData);
           }
           var item = self._addMenuItemTempDenyDest(
-              self._addRulesList, destOnlyRuleData);
+              lists.addRules, destOnlyRuleData);
         }
       }
       if (self._isCurrentlySelectedDestBlocked ||
@@ -414,20 +458,20 @@ rpcontinued.menu = (function() {
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemAllowOriginToDest(
-                self._addRulesList, ruleData);
+                lists.addRules, ruleData);
           }
           var item = self._addMenuItemTempAllowOriginToDest(
-              self._addRulesList, ruleData);
+              lists.addRules, ruleData);
         }
 
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
             var item = self._addMenuItemAllowDest(
-                self._addRulesList, destOnlyRuleData);
+                lists.addRules, destOnlyRuleData);
           }
           var item = self._addMenuItemTempAllowDest(
-              self._addRulesList, destOnlyRuleData);
+              lists.addRules, destOnlyRuleData);
         }
       }
     }
@@ -435,18 +479,18 @@ rpcontinued.menu = (function() {
     if (self._currentlySelectedDest) {
       if (!Prefs.isDefaultAllow() &&
           !Prefs.isDefaultAllowSameDomain()) {
-        self._populateDetailsAddSubdomainAllowRules(self._addRulesList);
+        self._populateDetailsAddSubdomainAllowRules(lists.addRules);
       }
     }
 
-    self._populateDetailsRemoveAllowRules(self._removeRulesList);
-    self._populateDetailsRemoveDenyRules(self._removeRulesList);
+    self._populateDetailsRemoveAllowRules(lists.removeRules);
+    self._populateDetailsRemoveDenyRules(lists.removeRules);
   };
 
   self._addListItem = function(list, cssClass, value, numRequests) {
     var hbox = document.createElement("hbox");
-    hbox.setAttribute("class", cssClass);
-    hbox.setAttribute("onclick", 'rpcontinued.menu.itemSelected(event);');
+    hbox.setAttribute("class", cssClass + " listen-click");
+    hbox.addEventListener("click", self.itemSelected, false);
     list.insertBefore(hbox, null);
 
     var destLabel = document.createElement("label");
@@ -478,23 +522,23 @@ rpcontinued.menu = (function() {
 
   self._resetSelectedOrigin = function() {
     self._originItem.setAttribute('selected-origin', 'false');
-    for (var i = 0; i < self._otherOriginsList.childNodes.length; i++) {
-      var child = self._otherOriginsList.childNodes[i];
+    for (var i = 0; i < lists.otherOrigins.childNodes.length; i++) {
+      var child = lists.otherOrigins.childNodes[i];
       child.setAttribute('selected-origin', 'false');
     }
   };
 
   self._resetSelectedDest = function() {
-    for (var i = 0; i < self._blockedDestinationsList.childNodes.length; i++) {
-      var child = self._blockedDestinationsList.childNodes[i];
+    for (var i = 0; i < lists.blockedDestinations.childNodes.length; i++) {
+      var child = lists.blockedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
-    for (var i = 0; i < self._mixedDestinationsList.childNodes.length; i++) {
-      var child = self._mixedDestinationsList.childNodes[i];
+    for (var i = 0; i < lists.mixedDestinations.childNodes.length; i++) {
+      var child = lists.mixedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
-    for (var i = 0; i < self._allowedDestinationsList.childNodes.length; i++) {
-      var child = self._allowedDestinationsList.childNodes[i];
+    for (var i = 0; i < lists.allowedDestinations.childNodes.length; i++) {
+      var child = lists.allowedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
   };
@@ -778,11 +822,6 @@ rpcontinued.menu = (function() {
       }
     }
     return guiOrigins;
-  };
-
-  self._sanitizeJsFunctionArg = function(str) {
-    // strip single quotes and backslashes
-    return str.replace(/['\\]/g, "");
   };
 
   self._isIPAddressOrSingleName = function(hostname) {

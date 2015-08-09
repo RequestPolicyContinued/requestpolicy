@@ -49,7 +49,6 @@ rpcontinued.overlay = (function() {
   let {PolicyManager} = iMod("lib/policy-manager");
   let {DomainUtil} = iMod("lib/utils/domains");
   let {StringUtils} = iMod("lib/utils/strings");
-  let {DOMUtils} = iMod("lib/utils/dom");
   let {WindowUtils} = iMod("lib/utils/windows");
   let {Utils} = iMod("lib/utils");
   let {C} = iMod("lib/utils/constants");
@@ -99,7 +98,8 @@ rpcontinued.overlay = (function() {
   let self = {
     // This is set by request-log.js when it is initialized. We don't need to worry
     // about setting it here.
-    requestLog: null
+    requestLog: null,
+    OverlayEnvironment: OverlayEnvironment
   };
 
 
@@ -473,7 +473,8 @@ rpcontinued.overlay = (function() {
 
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
-    DOMUtils.removeChildren(addRulePopup);
+    var cm = rpcontinued.classicmenu;
+    cm.emptyMenu(addRulePopup);
 
     let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
@@ -488,8 +489,6 @@ rpcontinued.overlay = (function() {
     }
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
-
-    let cm = rpcontinued.classicmenu;
 
     if (destBaseDomain !== null) {
       cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);

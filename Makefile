@@ -17,9 +17,6 @@ extension_name := requestpolicy
 amo__extension_id     := rpcontinued@requestpolicy.org
 off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
-amo__extension_name     := RequestPolicy Continued
-off_amo__extension_name := RequestPolicy Continued Beta
-
 
 # ____________________________________
 # generating XPIs -- general variables
@@ -398,7 +395,6 @@ $(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
 	  echo 'using `sed` on install.rdf !' ; \
 	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
-	  sed -i 's/$(off_amo__extension_name)/$(amo__extension_name)/' $@ ; \
 	fi
 
 $(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)

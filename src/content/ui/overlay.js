@@ -910,7 +910,10 @@ rpcontinued.overlay = (function() {
           return;
         }
         // call this function again in a few miliseconds.
-        setTimeout(tryAddingSHistoryListener, waitTime);
+        setTimeout(function () {
+          // Prevent the `setTimeout` warning of the AMO Validator.
+          tryAddingSHistoryListener();
+        }, waitTime);
       }
     };
     tryAddingSHistoryListener();

@@ -824,11 +824,6 @@ rpcontinued.menu = (function() {
     return guiOrigins;
   };
 
-  self._sanitizeJsFunctionArg = function(str) {
-    // strip single quotes and backslashes
-    return str.replace(/['\\]/g, "");
-  };
-
   self._isIPAddressOrSingleName = function(hostname) {
     return DomainUtil.isIPAddress(hostname) ||
         hostname.indexOf(".") == -1;

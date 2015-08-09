@@ -149,17 +149,16 @@ XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
   }
 }
 
-var elementIDsToRemove = {};
-
-function getElementIDsToRemove(aTreeName) {
-  if (elementIDsToRemove.hasOwnProperty(aTreeName)) {
-    return elementIDsToRemove[aTreeName];
-  }
-  let ids = elementIDsToRemove[aTreeName] = [];
-  let tree = xulTrees[aTreeName];
-  for (let i in tree) {
-    ids.push(tree[i].attributes.id);
-  }
+/**
+ * Return a list of the IDs of the specified tree's root elements.
+ *
+ * @param {string} aTreeName
+ * @return {Array<string>} The list of IDs.
+ */
+function getRootElementIDs(aTreeName) {
+  var ids = xulTrees[aTreeName].map(function (aElementSpec) {
+    return aElementSpec.attributes.id;
+  });
   return ids;
 }
 
@@ -167,11 +166,9 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
   if (!xulTrees.hasOwnProperty(aTreeName)) {
     return;
   }
-  let tree = xulTrees[aTreeName];
-  let elementIDs = getElementIDsToRemove(aTreeName);
+  var elementIDs = getRootElementIDs(aTreeName);
 
-  for (let i in elementIDs) {
-    let id = elementIDs[i];
+  for (let id of elementIDs) {
     let node = aWin.document.getElementById(id);
     if (node && node.parentNode) {
       node.parentNode.removeChild(node);

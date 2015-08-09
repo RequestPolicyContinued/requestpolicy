@@ -61,20 +61,20 @@ exports.mainTree = [
           {
             tag: "menuitem",
             attributes: {label: "&rp.menu.managePolicies;",
-                         accesskey: "m",
-                         oncommand: "rpcontinued.overlay.openPolicyManager();"}
+                         accesskey: "m"},
+            events: {command: ["overlay", "openPolicyManager"]}
           },
           {
             tag: "menuitem",
             attributes: {label: "&rp.requestLog.title;",
-                         accesskey: "l",
-                         oncommand: "rpcontinued.overlay.toggleRequestLog(event);"}
+                         accesskey: "l"},
+            events: {command: ["overlay", "toggleRequestLog"]}
           },
           {
             tag: "menuitem",
             attributes: {label: "&rp.menu.preferences;",
-                         accesskey: "p",
-                         oncommand: "rpcontinued.overlay.openPrefs(event);"}
+                         accesskey: "p"},
+            events: {command: ["overlay", "openPrefs"]}
           }
         ]
       }
@@ -91,8 +91,8 @@ exports.mainTree = [
       {
         tag: "key",
         attributes: {key: "r",
-                     modifiers: "accel alt",
-                     oncommand: "rpcontinued.overlay.openMenuByHotkey()"}
+                     modifiers: "accel alt"},
+        events: {command: ["overlay", "openMenuByHotkey"]}
       }
     ]
   },
@@ -111,9 +111,9 @@ exports.mainTree = [
         tag: "menupopup",
         attributes: {id: "rpc-popup",
                      noautohide: "true",
-                     position: "after_start",
-                     onpopupshowing: "rpcontinued.overlay.onPopupShowing(event);",
-                     onpopuphidden: "rpcontinued.overlay.onPopupHidden(event);"},
+                     position: "after_start"},
+        events: {popupshowing: ["overlay", "onPopupShowing"],
+                 popuphidden: ["overlay", "onPopupHidden"]},
         children: [
           {
             tag: "vbox",
@@ -131,8 +131,8 @@ exports.mainTree = [
                       {
                         tag: "hbox",
                         attributes: {id: "rpc-origin",
-                                     "class": "rpc-od-item",
-                                     onclick: "rpcontinued.menu.itemSelected(event);"},
+                                     "class": "rpc-od-item"},
+                        events: {click: ["menu", "itemSelected"]},
                         children: [
                           {
                             tag: "label",
@@ -233,8 +233,8 @@ exports.mainTree = [
                 children: [
                   {
                     tag: "label",
-                    attributes: {value: "&rp.menu.revokeTemporaryPermissions;",
-                                 onclick: "rpcontinued.overlay.revokeTemporaryPermissions();"}
+                    attributes: {value: "&rp.menu.revokeTemporaryPermissions;"},
+                    events: {click: ["overlay", "revokeTemporaryPermissions"]}
                   }
                 ]
               },
@@ -251,38 +251,40 @@ exports.mainTree = [
                         tag: "label",
                         attributes: {id: "rpc-link-enable-blocking",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.menu.enableBlocking;",
-                                     onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"}
+                                     value: "&rp.menu.enableBlocking;"},
+                        events: {click: ["overlay",
+                                         "toggleTemporarilyAllowAll"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-disable-blocking",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.menu.disableBlocking;",
-                                     onclick: "rpcontinued.overlay.toggleTemporarilyAllowAll();"}
+                                     value: "&rp.menu.disableBlocking;"},
+                        events: {click: ["overlay",
+                                         "toggleTemporarilyAllowAll"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-help",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.menu.help;",
-                                     onclick: "rpcontinued.overlay.openHelp();"}
+                                     value: "&rp.menu.help;"},
+                        events: {click: ["overlay", "openHelp"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-prefs",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.menu.preferences;",
-                                     onclick: "rpcontinued.overlay.openPrefs(event);"}
+                                     value: "&rp.menu.preferences;"},
+                        events: {click: ["overlay", "openPrefs"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-policies",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.menu.managePolicies;",
-                                     onclick: "rpcontinued.overlay.openPolicyManager();"}
+                                     value: "&rp.menu.managePolicies;"},
+                        events: {click: ["overlay", "openPolicyManager"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-request-log",
                                      "class": "rpc-footer-link",
-                                     value: "&rp.requestLog.title;",
-                                     onclick: "rpcontinued.overlay.toggleRequestLog(event);"}
+                                     value: "&rp.requestLog.title;"},
+                        events: {click: ["overlay", "toggleRequestLog"]}
                       }
                     ]
                   }
@@ -329,16 +331,16 @@ exports.mainTree = [
               }, {
                 tag: "button",
                 attributes: {id: "rpcontinued-requestLog-clear",
-                             label: "&rp.requestLog.clear;",
-                             oncommand: "rpcontinued.overlay.clearRequestLog();"}
+                             label: "&rp.requestLog.clear;"},
+                events: {command: ["overlay", "clearRequestLog"]}
               }, {
                 tag: "vbox",
                 attributes: {flex: "1"}
               }, {
                 tag: "toolbarbutton",
                 attributes: {id: "rpcontinued-requestLog-close",
-                             align: "right",
-                             oncommand: "rpcontinued.overlay.toggleRequestLog()"}
+                             align: "right"},
+                events: {command: ["overlay", "toggleRequestLog"]}
               }
             ]
           }

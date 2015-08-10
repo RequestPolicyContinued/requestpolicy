@@ -64,6 +64,11 @@ src__jspp_files := \
 src__all_files := $(src__copy_files) $(src__jspp_files)
 
 
+# Create generic variables without path prefixs.
+rp_all_files  := $(patsubst $(source_path)%,%,$(src__all_files))
+rp_jspp_files := $(patsubst $(source_path)%,%,$(src__jspp_files))
+rp_copy_files := $(patsubst $(source_path)%,%,$(src__copy_files))
+
 
 # _____________________________________
 # vars for generating the "off-AMO" XPI
@@ -73,10 +78,9 @@ off_amo__build_path := $(build_dirname)/normal/
 
 off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 
-# take all source files from above and replace the source path by the build path
-off_amo__all_files  := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
-off_amo__jspp_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__jspp_files))
-off_amo__copy_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__copy_files))
+off_amo__all_files  := $(addprefix $(off_amo__build_path),$(rp_all_files))
+off_amo__jspp_files := $(addprefix $(off_amo__build_path),$(rp_jspp_files))
+off_amo__copy_files := $(addprefix $(off_amo__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
@@ -107,10 +111,9 @@ amo__build_path := $(build_dirname)/amo/
 
 amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 
-# take all files from above and create their paths in the "build" directory
-amo__all_files  := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
-amo__jspp_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__jspp_files))
-amo__copy_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__copy_files))
+amo__all_files  := $(addprefix $(amo__build_path),$(rp_all_files))
+amo__jspp_files := $(addprefix $(amo__build_path),$(rp_jspp_files))
+amo__copy_files := $(addprefix $(amo__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
@@ -135,10 +138,9 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
-# take all files from above and create their paths in the "build" directory
-unit_testing__all_files  := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
-unit_testing__jspp_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__jspp_files))
-unit_testing__copy_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__copy_files))
+unit_testing__all_files  := $(addprefix $(unit_testing__build_path),$(rp_all_files))
+unit_testing__jspp_files := $(addprefix $(unit_testing__build_path),$(rp_jspp_files))
+unit_testing__copy_files := $(addprefix $(unit_testing__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
@@ -245,7 +247,7 @@ $(off_amo__xpi_file): $(off_amo__build_path) $(off_amo__all_files) | $(dist_path
 	@rm -f $(off_amo__xpi_file)
 	@echo "Creating XPI file."
 	@cd $(off_amo__build_path) && \
-	$(ZIP) $(abspath $(off_amo__xpi_file)) $(patsubst $(off_amo__build_path)%,%,$(off_amo__all_files))
+	$(ZIP) $(abspath $(off_amo__xpi_file)) $(rp_all_files)
 	@echo "Creating XPI file: Done!"
 
 # _______________________________
@@ -258,7 +260,7 @@ $(signed_xpi_file): $(off_amo__build_path) $(off_amo__all_files) $(off_amo__buil
 	$(ZIP) $(abspath $(signed_xpi_file)) \
 		META-INF/zigbert.rsa && \
 	$(ZIP) -r -D $(abspath $(signed_xpi_file)) \
-		$(patsubst $(off_amo__build_path)%,%,$(off_amo__all_files)) META-INF \
+		$(rp_all_files) META-INF \
 		-x META-INF/zigbert.rsa
 
 # ____________________
@@ -269,7 +271,7 @@ amo-xpi $(amo__xpi_file): $(amo__build_path) $(amo__all_files) | $(dist_path)
 	@rm -f $(amo__xpi_file)
 	@echo "Creating AMO XPI."
 	@cd $(amo__build_path) && \
-	$(ZIP) $(abspath $(amo__xpi_file)) $(patsubst $(amo__build_path)%,%,$(amo__all_files))
+	$(ZIP) $(abspath $(amo__xpi_file)) $(rp_all_files)
 	@echo "Creating AMO XPI: Done!"
 
 # ___________________________
@@ -280,7 +282,7 @@ unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_t
 	@rm -f $(unit_testing__xpi_file)
 	@echo "Creating unit-testing XPI."
 	@cd $(unit_testing__build_path) && \
-	$(ZIP) $(abspath $(unit_testing__xpi_file)) $(patsubst $(unit_testing__build_path)%,%,$(unit_testing__all_files))
+	$(ZIP) $(abspath $(unit_testing__xpi_file)) $(rp_all_files)
 	@echo "Creating unit-testing XPI: Done!"
 
 

@@ -61,8 +61,8 @@ off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 # take all source files from above and replace the source path by the build path
 off_amo__all_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
 
-off_amo__javascript_files := $(filter %.js %.jsm,$(off_amo__all_files))
-off_amo__copy_files := $(filter-out $(off_amo__javascript_files),$(off_amo__all_files))
+off_amo__jspp_files := $(filter %.js %.jsm,$(off_amo__all_files))
+off_amo__copy_files := $(filter-out $(off_amo__jspp_files),$(off_amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -96,8 +96,8 @@ amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 # take all files from above and create their paths in the "build" directory
 amo__all_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
 
-amo__javascript_files := $(filter %.js %.jsm,$(amo__all_files))
-amo__copy_files := $(filter-out $(amo__javascript_files),$(amo__all_files))
+amo__jspp_files := $(filter %.js %.jsm,$(amo__all_files))
+amo__copy_files := $(filter-out $(amo__jspp_files),$(amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -125,8 +125,8 @@ unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 # take all files from above and create their paths in the "build" directory
 unit_testing__all_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
 
-unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__all_files))
-unit_testing__copy_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__all_files))
+unit_testing__jspp_files := $(filter %.js %.jsm,$(unit_testing__all_files))
+unit_testing__copy_files := $(filter-out $(unit_testing__jspp_files),$(unit_testing__all_files))
 
 
 # detect deleted files and empty directories
@@ -343,7 +343,7 @@ $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_am
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
 
-$(off_amo__javascript_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+$(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) > $@
 
@@ -368,7 +368,7 @@ $(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
 
 $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
-$(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+$(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
 
@@ -387,7 +387,7 @@ $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
-$(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+$(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) -UNIT_TESTING=true > $@
 

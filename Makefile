@@ -62,7 +62,7 @@ off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 off_amo__all_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
 
 off_amo__javascript_files := $(filter %.js %.jsm,$(off_amo__all_files))
-off_amo__other_files := $(filter-out $(off_amo__javascript_files),$(off_amo__all_files))
+off_amo__copy_files := $(filter-out $(off_amo__javascript_files),$(off_amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -97,7 +97,7 @@ amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 amo__all_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
 
 amo__javascript_files := $(filter %.js %.jsm,$(amo__all_files))
-amo__other_files := $(filter-out $(amo__javascript_files),$(amo__all_files))
+amo__copy_files := $(filter-out $(amo__javascript_files),$(amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -126,7 +126,7 @@ unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 unit_testing__all_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
 
 unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__all_files))
-unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__all_files))
+unit_testing__copy_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__all_files))
 
 
 # detect deleted files and empty directories
@@ -347,7 +347,7 @@ $(off_amo__javascript_files): $$(patsubst $$(off_amo__build_path)%,$$(source_pat
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) > $@
 
-$(off_amo__other_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+$(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) $@
@@ -372,7 +372,7 @@ $(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
 
-$(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+$(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp --dereference $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
 
@@ -391,7 +391,7 @@ $(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(
 	@mkdir -p $(dir $@)
 	preprocess $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) -UNIT_TESTING=true > $@
 
-$(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+$(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	cp --dereference $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
 

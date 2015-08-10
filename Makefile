@@ -359,12 +359,12 @@ $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_am
 
 $(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) > $@
+	preprocess $< > $@
 
 $(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	@# Use `--dereference` to copy the files instead of the symlinks.
-	cp --dereference $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) $@
+	cp --dereference $< $@
 
 # _____________________________________________
 # create the files for the signed "off-AMO" XPI
@@ -384,11 +384,11 @@ $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
 $(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
+	preprocess $< -AMO=true > $@
 
 $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	cp --dereference $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
+	cp --dereference $< $@
 
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
 	  echo 'using `sed` on install.rdf !' ; \
@@ -403,11 +403,11 @@ $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_
 
 $(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) -UNIT_TESTING=true > $@
+	preprocess $< -UNIT_TESTING=true > $@
 
 $(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	cp --dereference $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
+	cp --dereference $< $@
 
 .PHONY: unit-testing-files
 unit-testing-files: $(unit_testing__all_files)

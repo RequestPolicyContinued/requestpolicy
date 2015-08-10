@@ -51,7 +51,8 @@ src__copy_files := \
 		$(wildcard $(source_dirname)/locale/*/*.properties) \
 		$(wildcard $(source_dirname)/skin/*.css) \
 		$(wildcard $(source_dirname)/skin/*.png) \
-		$(wildcard $(source_dirname)/skin/*.svg)
+		$(wildcard $(source_dirname)/skin/*.svg) \
+		$(shell find $(source_dirname) -type f -iname "jquery*.js")
 
 # JavaScript files which will be (pre)processed.
 # The `copy_files` will be filtered out.

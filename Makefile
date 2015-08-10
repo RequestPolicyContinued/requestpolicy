@@ -33,11 +33,16 @@ source_path := $(source_dirname)/
 dist_path := $(dist_dirname)/
 
 
-# collect files that are part of the source code
-source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
+# _____________________________________________
+# RequestPolicy XPI -- collect the files' paths
+#
+
+# files which are simply copied
+src__copy_files := \
 		$(source_dirname)/chrome.manifest \
 		$(source_dirname)/install.rdf \
 		$(source_dirname)/README \
+		$(source_dirname)/LICENSE \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
 		$(wildcard $(source_dirname)/content/*.html) \
@@ -48,40 +53,51 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(wildcard $(source_dirname)/skin/*.png) \
 		$(wildcard $(source_dirname)/skin/*.svg)
 
-# files that are in the root of the repository
-root_files := LICENSE
+# JavaScript files which will be (pre)processed.
+# The `copy_files` will be filtered out.
+src__jspp_files := \
+		$(filter-out $(src__copy_files), \
+				$(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
+		)
 
+# all source files
+src__all_files := $(src__copy_files) $(src__jspp_files)
+
+
+# Create generic variables without path prefixs.
+rp_all_files  := $(patsubst $(source_path)%,%,$(src__all_files))
+rp_jspp_files := $(patsubst $(source_path)%,%,$(src__jspp_files))
+rp_copy_files := $(patsubst $(source_path)%,%,$(src__copy_files))
+
+rp_deleted_files :=
+rp_empty_dirs :=
 
 # _____________________________________
 # vars for generating the "off-AMO" XPI
 #
 
-build_path := $(build_dirname)/normal/
+off_amo__build_path := $(build_dirname)/off-amo/
 
-xpi_file := $(dist_path)$(extension_name).xpi
+off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 
-# take all source files from above and replace the source path by the build path
-normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
-
-javascript_files := $(filter %.js %.jsm,$(normal_build__src_files))
-other_files := $(filter-out $(javascript_files),$(normal_build__src_files))
-
-normal_build__root_files := $(addprefix $(build_path),$(root_files))
-
-all_files := $(normal_build__src_files) $(normal_build__root_files)
+off_amo__all_files  := $(addprefix $(off_amo__build_path),$(rp_all_files))
+off_amo__jspp_files := $(addprefix $(off_amo__build_path),$(rp_jspp_files))
+off_amo__copy_files := $(addprefix $(off_amo__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
-deleted_files :=
-empty_dirs :=
-ifneq "$(wildcard $(build_path))" ""
+off_amo__deleted_files :=
+off_amo__empty_dirs :=
+ifneq "$(wildcard $(off_amo__build_path))" ""
 # files that have been deleted but still exist in the build directory.
-deleted_files := $(shell find $(build_path) -type f | \
+off_amo__deleted_files := $(shell find $(off_amo__build_path) -type f | \
 		grep -v "META-INF" | \
-		grep -F -v $(addprefix -e ,$(all_files)))
+		grep -F -v $(addprefix -e ,$(off_amo__all_files)))
 # empty directories. -mindepth 1 to exclude the build directory itself.
-empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
+off_amo__empty_dirs := $(shell find $(off_amo__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(off_amo__deleted_files)
+rp_empty_dirs += $(off_amo__empty_dirs)
 
 
 # __________________________________________
@@ -99,15 +115,9 @@ amo__build_path := $(build_dirname)/amo/
 
 amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 
-# take all files from above and create their paths in the "build" directory
-amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(source_files))
-
-amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
-amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
-
-amo__root_files := $(addprefix $(amo__build_path),$(root_files))
-
-amo__all_files := $(amo__src_files) $(amo__root_files)
+amo__all_files  := $(addprefix $(amo__build_path),$(rp_all_files))
+amo__jspp_files := $(addprefix $(amo__build_path),$(rp_jspp_files))
+amo__copy_files := $(addprefix $(amo__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
@@ -122,6 +132,8 @@ amo__deleted_files := \
 # empty directories. -mindepth 1 to exclude the build directory itself.
 amo__empty_dirs := $(shell find $(amo__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(amo__deleted_files)
+rp_empty_dirs += $(amo__empty_dirs)
 
 
 # ________________________________________
@@ -132,15 +144,9 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
-# take all files from above and create their paths in the "build" directory
-unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(source_files))
-
-unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__src_files))
-unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__src_files))
-
-unit_testing__root_files := $(addprefix $(unit_testing__build_path),$(root_files))
-
-unit_testing__all_files := $(unit_testing__src_files) $(unit_testing__root_files)
+unit_testing__all_files  := $(addprefix $(unit_testing__build_path),$(rp_all_files))
+unit_testing__jspp_files := $(addprefix $(unit_testing__build_path),$(rp_jspp_files))
+unit_testing__copy_files := $(addprefix $(unit_testing__build_path),$(rp_copy_files))
 
 
 # detect deleted files and empty directories
@@ -155,6 +161,8 @@ unit_testing__deleted_files := \
 # empty directories. -mindepth 1 to exclude the build directory itself.
 unit_testing__empty_dirs := $(shell find $(unit_testing__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(unit_testing__deleted_files)
+rp_empty_dirs += $(unit_testing__empty_dirs)
 
 
 # ______________________________________
@@ -164,7 +172,7 @@ endif
 dev_helper__source_dirname := tests/helper-addons/dev-helper
 dev_helper__source_path := $(dev_helper__source_dirname)/
 
-dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
+dev_helper__src__all_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
 		$(dev_helper__source_dirname)/chrome.manifest \
 		$(dev_helper__source_dirname)/install.rdf
 
@@ -178,7 +186,7 @@ dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
 dummy_ext__source_dirname := tests/helper-addons/dummy-ext
 dummy_ext__source_path := $(dummy_ext__source_dirname)/
 
-dummy_ext__source_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
+dummy_ext__src__all_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
 		$(dummy_ext__source_dirname)/install.rdf
 
 dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
@@ -220,12 +228,12 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 .DEFAULT_GOAL := all
 
 # building means to prepare all files in the build directory
-build: $(build_path)
+build: $(off_amo__build_path)
 
 # build and create XPI file
-all: $(xpi_file)
+all: $(off_amo__xpi_file)
 	@echo "Build finished successfully."
-dist xpi: $(xpi_file)
+dist xpi: $(off_amo__xpi_file)
 
 # create the dist directory
 $(dist_path):
@@ -241,26 +249,26 @@ signed-xpi: $(signed_xpi_file)
 # Note: Here the build path is added as a prerequisite, *not* the
 #       phony "build" target. This avoids re-packaging in case
 #       nothing has changed.
-#       Also $(all_files) is needed as prerequisite, so that the
+#       Also $(off_amo__all_files) is needed as prerequisite, so that the
 #       xpi gets updated.
-$(xpi_file): $(build_path) $(all_files) | $(dist_path)
-	@rm -f $(xpi_file)
+$(off_amo__xpi_file): $(off_amo__build_path) $(off_amo__all_files) | $(dist_path)
+	@rm -f $(off_amo__xpi_file)
 	@echo "Creating XPI file."
-	@cd $(build_path) && \
-	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
+	@cd $(off_amo__build_path) && \
+	$(ZIP) $(abspath $(off_amo__xpi_file)) $(rp_all_files)
 	@echo "Creating XPI file: Done!"
 
 # _______________________________
 # create the signed "off-AMO" XPI
 #
 
-$(signed_xpi_file): $(build_path) $(all_files) $(build_path)/META-INF/ | $(dist_path)
+$(signed_xpi_file): $(off_amo__build_path) $(off_amo__all_files) $(off_amo__build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
-	@cd $(build_path) && \
+	@cd $(off_amo__build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \
 		META-INF/zigbert.rsa && \
 	$(ZIP) -r -D $(abspath $(signed_xpi_file)) \
-		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
+		$(rp_all_files) META-INF \
 		-x META-INF/zigbert.rsa
 
 # ____________________
@@ -271,7 +279,7 @@ amo-xpi $(amo__xpi_file): $(amo__build_path) $(amo__all_files) | $(dist_path)
 	@rm -f $(amo__xpi_file)
 	@echo "Creating AMO XPI."
 	@cd $(amo__build_path) && \
-	$(ZIP) $(abspath $(amo__xpi_file)) $(patsubst $(amo__build_path)%,%,$(amo__all_files))
+	$(ZIP) $(abspath $(amo__xpi_file)) $(rp_all_files)
 	@echo "Creating AMO XPI: Done!"
 
 # ___________________________
@@ -282,7 +290,7 @@ unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_t
 	@rm -f $(unit_testing__xpi_file)
 	@echo "Creating unit-testing XPI."
 	@cd $(unit_testing__build_path) && \
-	$(ZIP) $(abspath $(unit_testing__xpi_file)) $(patsubst $(unit_testing__build_path)%,%,$(unit_testing__all_files))
+	$(ZIP) $(abspath $(unit_testing__xpi_file)) $(rp_all_files)
 	@echo "Creating unit-testing XPI: Done!"
 
 
@@ -293,11 +301,11 @@ unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_t
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
+dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__src__all_files) FORCE | $(dist_path)
 	@rm -f $(dev_helper__xpi_file)
 	@echo "Creating 'RPC Dev Helper' XPI."
 	@cd $(dev_helper__source_dirname) && \
-	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
+	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__src__all_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
 
@@ -308,11 +316,11 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__src__all_files) FORCE | $(dist_path)
 	@rm -f $(dummy_ext__xpi_file)
 	@echo "Creating 'Dummy' XPI."
 	@cd $(dummy_ext__source_dirname) && \
-	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__source_files))
+	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__src__all_files))
 	@echo "Creating 'Dummy' XPI: Done!"
 
 
@@ -352,31 +360,29 @@ $(specific_xpi__file):
 
 # Process all source files, but also eventually delete
 # empty directories and deleted files from the build directory.
-$(build_path): $(all_files) $(deleted_files) $(empty_dirs)
+$(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_amo__empty_dirs)
 
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
 
-$(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(build_path)%,$(source_path)%,$@) > $@
+$(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	preprocess $< > $@
 
-$(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
-
-$(normal_build__root_files): $$(patsubst $$(build_path)%,%,$$@)
-	cp $(patsubst $(build_path)%,%,$@) $@
+$(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	@# Use `--dereference` to copy the files instead of the symlinks.
+	cp --dereference $< $@
 
 # _____________________________________________
 # create the files for the signed "off-AMO" XPI
 #
 
-$(build_path)/META-INF/: $(build_path) $(all_files)
-	mkdir -p $(build_path)/META-INF
+$(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
+	mkdir -p $(off_amo__build_path)/META-INF
 	signtool -d .signing \
 		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
-		$(build_path)
+		$(off_amo__build_path)
 
 # __________________________________
 # create the files for the "AMO" XPI
@@ -384,21 +390,18 @@ $(build_path)/META-INF/: $(build_path) $(all_files)
 
 $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
-$(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(amo__build_path)%,$(source_path)%,$@) -AMO=true > $@
+$(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	preprocess $< -AMO=true > $@
 
-$(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	cp $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
+$(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	cp --dereference $< $@
 
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
 	  echo 'using `sed` on install.rdf !' ; \
 	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
 	fi
-
-$(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)
-	cp $(patsubst $(amo__build_path)%,%,$@) $@
 
 # _________________________________________
 # create the files for the unit-testing XPI
@@ -406,16 +409,13 @@ $(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)
 
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
-$(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) -UNIT_TESTING=true > $@
+$(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	preprocess $< -UNIT_TESTING=true > $@
 
-$(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
-	cp $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
-
-$(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
-	cp $(patsubst $(unit_testing__build_path)%,%,$@) $@
+$(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+	@mkdir -p $(@D)
+	cp --dereference $< $@
 
 .PHONY: unit-testing-files
 unit-testing-files: $(unit_testing__all_files)
@@ -432,16 +432,16 @@ clean:
 	@echo "Cleanup is done."
 
 # remove empty directories
-$(empty_dirs): FORCE
+$(rp_empty_dirs): FORCE
 	rmdir $@
 
 # delete deleted files that still exist in the build directory.
 # this target should be forced
-$(deleted_files): FORCE
+$(rp_deleted_files): FORCE
 	@# delete:
 	rm $@
 	@# delete parent dirs if empty:
-	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
+	@rmdir --parents --ignore-fail-on-non-empty $(@D)
 
 # ____________________________
 # virtual python environments

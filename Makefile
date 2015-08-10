@@ -76,7 +76,7 @@ rp_empty_dirs :=
 # vars for generating the "off-AMO" XPI
 #
 
-off_amo__build_path := $(build_dirname)/normal/
+off_amo__build_path := $(build_dirname)/off-amo/
 
 off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 

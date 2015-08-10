@@ -34,7 +34,7 @@ dist_path := $(dist_dirname)/
 
 
 # collect files that are part of the source code
-source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
+src__all_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/chrome.manifest \
 		$(source_dirname)/install.rdf \
 		$(source_dirname)/README \
@@ -59,7 +59,7 @@ build_path := $(build_dirname)/normal/
 xpi_file := $(dist_path)$(extension_name).xpi
 
 # take all source files from above and replace the source path by the build path
-normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(source_files))
+normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(src__all_files))
 
 javascript_files := $(filter %.js %.jsm,$(normal_build__src_files))
 other_files := $(filter-out $(javascript_files),$(normal_build__src_files))
@@ -96,7 +96,7 @@ amo__build_path := $(build_dirname)/amo/
 amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 
 # take all files from above and create their paths in the "build" directory
-amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(source_files))
+amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
 
 amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
 amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
@@ -127,7 +127,7 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
 # take all files from above and create their paths in the "build" directory
-unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(source_files))
+unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
 
 unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__src_files))
 unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__src_files))
@@ -156,7 +156,7 @@ endif
 dev_helper__source_dirname := tests/helper-addons/dev-helper
 dev_helper__source_path := $(dev_helper__source_dirname)/
 
-dev_helper__source_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
+dev_helper__src__all_files := $(shell find $(dev_helper__source_dirname) -type f -regex ".*\.jsm?") \
 		$(dev_helper__source_dirname)/chrome.manifest \
 		$(dev_helper__source_dirname)/install.rdf
 
@@ -170,7 +170,7 @@ dev_helper__xpi_file := $(dist_path)rpc-dev-helper.xpi
 dummy_ext__source_dirname := tests/helper-addons/dummy-ext
 dummy_ext__source_path := $(dummy_ext__source_dirname)/
 
-dummy_ext__source_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
+dummy_ext__src__all_files := $(shell find $(dummy_ext__source_dirname) -type f -regex ".*\.jsm?") \
 		$(dummy_ext__source_dirname)/install.rdf
 
 dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
@@ -285,11 +285,11 @@ unit-testing-xpi $(unit_testing__xpi_file): $(unit_testing__build_path) $(unit_t
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(dist_path)
+dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__src__all_files) FORCE | $(dist_path)
 	@rm -f $(dev_helper__xpi_file)
 	@echo "Creating 'RPC Dev Helper' XPI."
 	@cd $(dev_helper__source_dirname) && \
-	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__source_files))
+	$(ZIP) $(abspath $(dev_helper__xpi_file)) $(patsubst $(dev_helper__source_path)%,%,$(dev_helper__src__all_files))
 	@echo "Creating 'RPC Dev Helper' XPI: Done!"
 
 
@@ -300,11 +300,11 @@ dev-helper-xpi $(dev_helper__xpi_file): $(dev_helper__source_files) FORCE | $(di
 # For now use FORCE, i.e. create the XPI every time. If the
 # 'FORCE' should be removed, deleted files have to be detected,
 # just like for the other XPIs.
-dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__source_files) FORCE | $(dist_path)
+dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__src__all_files) FORCE | $(dist_path)
 	@rm -f $(dummy_ext__xpi_file)
 	@echo "Creating 'Dummy' XPI."
 	@cd $(dummy_ext__source_dirname) && \
-	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__source_files))
+	$(ZIP) $(abspath $(dummy_ext__xpi_file)) $(patsubst $(dummy_ext__source_path)%,%,$(dummy_ext__src__all_files))
 	@echo "Creating 'Dummy' XPI: Done!"
 
 

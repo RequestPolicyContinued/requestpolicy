@@ -358,11 +358,11 @@ $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_am
 .SECONDEXPANSION:
 
 $(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	preprocess $< > $@
 
 $(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $< $@
 
@@ -383,11 +383,11 @@ $(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
 $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
 $(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	preprocess $< -AMO=true > $@
 
 $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	cp --dereference $< $@
 
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
@@ -402,11 +402,11 @@ $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
 $(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	preprocess $< -UNIT_TESTING=true > $@
 
 $(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
-	@mkdir -p $(dir $@)
+	@mkdir -p $(@D)
 	cp --dereference $< $@
 
 .PHONY: unit-testing-files
@@ -433,7 +433,7 @@ $(off_amo__deleted_files): FORCE
 	@# delete:
 	rm $@
 	@# delete parent dirs if empty:
-	@rmdir --parents --ignore-fail-on-non-empty $(dir $@)
+	@rmdir --parents --ignore-fail-on-non-empty $(@D)
 
 # ____________________________
 # virtual python environments

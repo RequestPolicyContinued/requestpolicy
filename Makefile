@@ -59,12 +59,10 @@ off_amo__build_path := $(build_dirname)/normal/
 off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 
 # take all source files from above and replace the source path by the build path
-off_amo__src_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
+off_amo__all_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
 
-off_amo__javascript_files := $(filter %.js %.jsm,$(off_amo__src_files))
-off_amo__other_files := $(filter-out $(off_amo__javascript_files),$(off_amo__src_files))
-
-off_amo__all_files := $(off_amo__src_files)
+off_amo__javascript_files := $(filter %.js %.jsm,$(off_amo__all_files))
+off_amo__other_files := $(filter-out $(off_amo__javascript_files),$(off_amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -96,12 +94,10 @@ amo__build_path := $(build_dirname)/amo/
 amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 
 # take all files from above and create their paths in the "build" directory
-amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
+amo__all_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
 
-amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
-amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
-
-amo__all_files := $(amo__src_files)
+amo__javascript_files := $(filter %.js %.jsm,$(amo__all_files))
+amo__other_files := $(filter-out $(amo__javascript_files),$(amo__all_files))
 
 
 # detect deleted files and empty directories
@@ -127,12 +123,10 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
 # take all files from above and create their paths in the "build" directory
-unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
+unit_testing__all_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
 
-unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__src_files))
-unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__src_files))
-
-unit_testing__all_files := $(unit_testing__src_files)
+unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__all_files))
+unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__all_files))
 
 
 # detect deleted files and empty directories

@@ -38,6 +38,7 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(source_dirname)/chrome.manifest \
 		$(source_dirname)/install.rdf \
 		$(source_dirname)/README \
+		$(source_dirname)/LICENSE \
 		$(wildcard $(source_dirname)/content/settings/*.css) \
 		$(wildcard $(source_dirname)/content/settings/*.html) \
 		$(wildcard $(source_dirname)/content/*.html) \
@@ -47,9 +48,6 @@ source_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(wildcard $(source_dirname)/skin/*.css) \
 		$(wildcard $(source_dirname)/skin/*.png) \
 		$(wildcard $(source_dirname)/skin/*.svg)
-
-# files that are in the root of the repository
-root_files := LICENSE
 
 
 # _____________________________________
@@ -66,9 +64,7 @@ normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(source_fi
 javascript_files := $(filter %.js %.jsm,$(normal_build__src_files))
 other_files := $(filter-out $(javascript_files),$(normal_build__src_files))
 
-normal_build__root_files := $(addprefix $(build_path),$(root_files))
-
-all_files := $(normal_build__src_files) $(normal_build__root_files)
+all_files := $(normal_build__src_files)
 
 
 # detect deleted files and empty directories
@@ -105,9 +101,7 @@ amo__src_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(source_files)
 amo__javascript_files := $(filter %.js %.jsm,$(amo__src_files))
 amo__other_files := $(filter-out $(amo__javascript_files),$(amo__src_files))
 
-amo__root_files := $(addprefix $(amo__build_path),$(root_files))
-
-amo__all_files := $(amo__src_files) $(amo__root_files)
+amo__all_files := $(amo__src_files)
 
 
 # detect deleted files and empty directories
@@ -138,9 +132,7 @@ unit_testing__src_files := $(patsubst $(source_path)%,$(unit_testing__build_path
 unit_testing__javascript_files := $(filter %.js %.jsm,$(unit_testing__src_files))
 unit_testing__other_files := $(filter-out $(unit_testing__javascript_files),$(unit_testing__src_files))
 
-unit_testing__root_files := $(addprefix $(unit_testing__build_path),$(root_files))
-
-unit_testing__all_files := $(unit_testing__src_files) $(unit_testing__root_files)
+unit_testing__all_files := $(unit_testing__src_files)
 
 
 # detect deleted files and empty directories
@@ -363,10 +355,8 @@ $(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 
 $(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	cp $(patsubst $(build_path)%,$(source_path)%,$@) $@
-
-$(normal_build__root_files): $$(patsubst $$(build_path)%,%,$$@)
-	cp $(patsubst $(build_path)%,%,$@) $@
+	@# Use `--dereference` to copy the files instead of the symlinks.
+	cp --dereference $(patsubst $(build_path)%,$(source_path)%,$@) $@
 
 # _____________________________________________
 # create the files for the signed "off-AMO" XPI
@@ -390,15 +380,12 @@ $(amo__javascript_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 
 $(amo__other_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	cp $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
+	cp --dereference $(patsubst $(amo__build_path)%,$(source_path)%,$@) $@
 
 	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
 	  echo 'using `sed` on install.rdf !' ; \
 	  sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
 	fi
-
-$(amo__root_files): $$(patsubst $$(amo__build_path)%,%,$$@)
-	cp $(patsubst $(amo__build_path)%,%,$@) $@
 
 # _________________________________________
 # create the files for the unit-testing XPI
@@ -412,10 +399,7 @@ $(unit_testing__javascript_files): $$(patsubst $$(unit_testing__build_path)%,$$(
 
 $(unit_testing__other_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	cp $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
-
-$(unit_testing__root_files): $$(patsubst $$(unit_testing__build_path)%,%,$$@)
-	cp $(patsubst $(unit_testing__build_path)%,%,$@) $@
+	cp --dereference $(patsubst $(unit_testing__build_path)%,$(source_path)%,$@) $@
 
 .PHONY: unit-testing-files
 unit-testing-files: $(unit_testing__all_files)

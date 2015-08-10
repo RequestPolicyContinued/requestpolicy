@@ -54,29 +54,29 @@ src__all_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 # vars for generating the "off-AMO" XPI
 #
 
-build_path := $(build_dirname)/normal/
+off_amo__build_path := $(build_dirname)/normal/
 
-xpi_file := $(dist_path)$(extension_name).xpi
+off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 
 # take all source files from above and replace the source path by the build path
-normal_build__src_files := $(patsubst $(source_path)%,$(build_path)%,$(src__all_files))
+off_amo__src_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
 
-javascript_files := $(filter %.js %.jsm,$(normal_build__src_files))
-other_files := $(filter-out $(javascript_files),$(normal_build__src_files))
+off_amo__javascript_files := $(filter %.js %.jsm,$(off_amo__src_files))
+off_amo__other_files := $(filter-out $(off_amo__javascript_files),$(off_amo__src_files))
 
-all_files := $(normal_build__src_files)
+off_amo__all_files := $(off_amo__src_files)
 
 
 # detect deleted files and empty directories
-deleted_files :=
-empty_dirs :=
-ifneq "$(wildcard $(build_path))" ""
+off_amo__deleted_files :=
+off_amo__empty_dirs :=
+ifneq "$(wildcard $(off_amo__build_path))" ""
 # files that have been deleted but still exist in the build directory.
-deleted_files := $(shell find $(build_path) -type f | \
+off_amo__deleted_files := $(shell find $(off_amo__build_path) -type f | \
 		grep -v "META-INF" | \
-		grep -F -v $(addprefix -e ,$(all_files)))
+		grep -F -v $(addprefix -e ,$(off_amo__all_files)))
 # empty directories. -mindepth 1 to exclude the build directory itself.
-empty_dirs := $(shell find $(build_path) -mindepth 1 -type d -empty)
+off_amo__empty_dirs := $(shell find $(off_amo__build_path) -mindepth 1 -type d -empty)
 endif
 
 
@@ -212,12 +212,12 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 .DEFAULT_GOAL := all
 
 # building means to prepare all files in the build directory
-build: $(build_path)
+build: $(off_amo__build_path)
 
 # build and create XPI file
-all: $(xpi_file)
+all: $(off_amo__xpi_file)
 	@echo "Build finished successfully."
-dist xpi: $(xpi_file)
+dist xpi: $(off_amo__xpi_file)
 
 # create the dist directory
 $(dist_path):
@@ -233,26 +233,26 @@ signed-xpi: $(signed_xpi_file)
 # Note: Here the build path is added as a prerequisite, *not* the
 #       phony "build" target. This avoids re-packaging in case
 #       nothing has changed.
-#       Also $(all_files) is needed as prerequisite, so that the
+#       Also $(off_amo__all_files) is needed as prerequisite, so that the
 #       xpi gets updated.
-$(xpi_file): $(build_path) $(all_files) | $(dist_path)
-	@rm -f $(xpi_file)
+$(off_amo__xpi_file): $(off_amo__build_path) $(off_amo__all_files) | $(dist_path)
+	@rm -f $(off_amo__xpi_file)
 	@echo "Creating XPI file."
-	@cd $(build_path) && \
-	$(ZIP) $(abspath $(xpi_file)) $(patsubst $(build_path)%,%,$(all_files))
+	@cd $(off_amo__build_path) && \
+	$(ZIP) $(abspath $(off_amo__xpi_file)) $(patsubst $(off_amo__build_path)%,%,$(off_amo__all_files))
 	@echo "Creating XPI file: Done!"
 
 # _______________________________
 # create the signed "off-AMO" XPI
 #
 
-$(signed_xpi_file): $(build_path) $(all_files) $(build_path)/META-INF/ | $(dist_path)
+$(signed_xpi_file): $(off_amo__build_path) $(off_amo__all_files) $(off_amo__build_path)/META-INF/ | $(dist_path)
 	@rm -f $(signed_xpi_file)
-	@cd $(build_path) && \
+	@cd $(off_amo__build_path) && \
 	$(ZIP) $(abspath $(signed_xpi_file)) \
 		META-INF/zigbert.rsa && \
 	$(ZIP) -r -D $(abspath $(signed_xpi_file)) \
-		$(patsubst $(build_path)%,%,$(all_files)) META-INF \
+		$(patsubst $(off_amo__build_path)%,%,$(off_amo__all_files)) META-INF \
 		-x META-INF/zigbert.rsa
 
 # ____________________
@@ -344,29 +344,29 @@ $(specific_xpi__file):
 
 # Process all source files, but also eventually delete
 # empty directories and deleted files from the build directory.
-$(build_path): $(all_files) $(deleted_files) $(empty_dirs)
+$(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_amo__empty_dirs)
 
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
 
-$(javascript_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
+$(off_amo__javascript_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
-	preprocess $(patsubst $(build_path)%,$(source_path)%,$@) > $@
+	preprocess $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) > $@
 
-$(other_files): $$(patsubst $$(build_path)%,$$(source_path)%,$$@)
+$(off_amo__other_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(dir $@)
 	@# Use `--dereference` to copy the files instead of the symlinks.
-	cp --dereference $(patsubst $(build_path)%,$(source_path)%,$@) $@
+	cp --dereference $(patsubst $(off_amo__build_path)%,$(source_path)%,$@) $@
 
 # _____________________________________________
 # create the files for the signed "off-AMO" XPI
 #
 
-$(build_path)/META-INF/: $(build_path) $(all_files)
-	mkdir -p $(build_path)/META-INF
+$(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
+	mkdir -p $(off_amo__build_path)/META-INF
 	signtool -d .signing \
 		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
-		$(build_path)
+		$(off_amo__build_path)
 
 # __________________________________
 # create the files for the "AMO" XPI
@@ -416,12 +416,12 @@ clean:
 	@echo "Cleanup is done."
 
 # remove empty directories
-$(empty_dirs): FORCE
+$(off_amo__empty_dirs): FORCE
 	rmdir $@
 
 # delete deleted files that still exist in the build directory.
 # this target should be forced
-$(deleted_files): FORCE
+$(off_amo__deleted_files): FORCE
 	@# delete:
 	rm $@
 	@# delete parent dirs if empty:

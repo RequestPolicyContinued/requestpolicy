@@ -69,6 +69,8 @@ rp_all_files  := $(patsubst $(source_path)%,%,$(src__all_files))
 rp_jspp_files := $(patsubst $(source_path)%,%,$(src__jspp_files))
 rp_copy_files := $(patsubst $(source_path)%,%,$(src__copy_files))
 
+rp_deleted_files :=
+rp_empty_dirs :=
 
 # _____________________________________
 # vars for generating the "off-AMO" XPI
@@ -94,6 +96,8 @@ off_amo__deleted_files := $(shell find $(off_amo__build_path) -type f | \
 # empty directories. -mindepth 1 to exclude the build directory itself.
 off_amo__empty_dirs := $(shell find $(off_amo__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(off_amo__deleted_files)
+rp_empty_dirs += $(off_amo__empty_dirs)
 
 
 # __________________________________________
@@ -128,6 +132,8 @@ amo__deleted_files := \
 # empty directories. -mindepth 1 to exclude the build directory itself.
 amo__empty_dirs := $(shell find $(amo__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(amo__deleted_files)
+rp_empty_dirs += $(amo__empty_dirs)
 
 
 # ________________________________________
@@ -155,6 +161,8 @@ unit_testing__deleted_files := \
 # empty directories. -mindepth 1 to exclude the build directory itself.
 unit_testing__empty_dirs := $(shell find $(unit_testing__build_path) -mindepth 1 -type d -empty)
 endif
+rp_deleted_files += $(unit_testing__deleted_files)
+rp_empty_dirs += $(unit_testing__empty_dirs)
 
 
 # ______________________________________
@@ -424,12 +432,12 @@ clean:
 	@echo "Cleanup is done."
 
 # remove empty directories
-$(off_amo__empty_dirs): FORCE
+$(rp_empty_dirs): FORCE
 	rmdir $@
 
 # delete deleted files that still exist in the build directory.
 # this target should be forced
-$(off_amo__deleted_files): FORCE
+$(rp_deleted_files): FORCE
 	@# delete:
 	rm $@
 	@# delete parent dirs if empty:

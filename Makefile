@@ -33,8 +33,12 @@ source_path := $(source_dirname)/
 dist_path := $(dist_dirname)/
 
 
-# collect files that are part of the source code
-src__all_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
+# _____________________________________________
+# RequestPolicy XPI -- collect the files' paths
+#
+
+# files which are simply copied
+src__copy_files := \
 		$(source_dirname)/chrome.manifest \
 		$(source_dirname)/install.rdf \
 		$(source_dirname)/README \
@@ -49,6 +53,17 @@ src__all_files := $(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
 		$(wildcard $(source_dirname)/skin/*.png) \
 		$(wildcard $(source_dirname)/skin/*.svg)
 
+# JavaScript files which will be (pre)processed.
+# The `copy_files` will be filtered out.
+src__jspp_files := \
+		$(filter-out $(src__copy_files), \
+				$(shell find $(source_dirname) -type f -regex ".*\.jsm?") \
+		)
+
+# all source files
+src__all_files := $(src__copy_files) $(src__jspp_files)
+
+
 
 # _____________________________________
 # vars for generating the "off-AMO" XPI
@@ -59,10 +74,9 @@ off_amo__build_path := $(build_dirname)/normal/
 off_amo__xpi_file := $(dist_path)$(extension_name).xpi
 
 # take all source files from above and replace the source path by the build path
-off_amo__all_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
-
-off_amo__jspp_files := $(filter %.js %.jsm,$(off_amo__all_files))
-off_amo__copy_files := $(filter-out $(off_amo__jspp_files),$(off_amo__all_files))
+off_amo__all_files  := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__all_files))
+off_amo__jspp_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__jspp_files))
+off_amo__copy_files := $(patsubst $(source_path)%,$(off_amo__build_path)%,$(src__copy_files))
 
 
 # detect deleted files and empty directories
@@ -94,10 +108,9 @@ amo__build_path := $(build_dirname)/amo/
 amo__xpi_file := $(dist_path)$(extension_name)-amo.xpi
 
 # take all files from above and create their paths in the "build" directory
-amo__all_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
-
-amo__jspp_files := $(filter %.js %.jsm,$(amo__all_files))
-amo__copy_files := $(filter-out $(amo__jspp_files),$(amo__all_files))
+amo__all_files  := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__all_files))
+amo__jspp_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__jspp_files))
+amo__copy_files := $(patsubst $(source_path)%,$(amo__build_path)%,$(src__copy_files))
 
 
 # detect deleted files and empty directories
@@ -123,10 +136,9 @@ unit_testing__build_path := $(build_dirname)/unit-testing/
 unit_testing__xpi_file := $(dist_path)$(extension_name)-unit-testing.xpi
 
 # take all files from above and create their paths in the "build" directory
-unit_testing__all_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
-
-unit_testing__jspp_files := $(filter %.js %.jsm,$(unit_testing__all_files))
-unit_testing__copy_files := $(filter-out $(unit_testing__jspp_files),$(unit_testing__all_files))
+unit_testing__all_files  := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__all_files))
+unit_testing__jspp_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__jspp_files))
+unit_testing__copy_files := $(patsubst $(source_path)%,$(unit_testing__build_path)%,$(src__copy_files))
 
 
 # detect deleted files and empty directories

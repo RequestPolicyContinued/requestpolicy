@@ -222,85 +222,90 @@ let ManagerForDOMContentLoaded = (function() {
       }
     });
 
-    // maybe not needed?
+    // TODO: Is it necessary to wrap the window's open() and
+    //       openDialog() methods?
+
     //wrapWindowFunctions(doc.defaultView);
     //DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
     //  unwrapWindowFunctions(doc.defaultView);
     //});
   }
 
-  /**
-   * This function wraps an existing method of a window object.
-   * If that method is being called after being wrapped, first the custom
-   * function will be called and then the original function.
-   *
-   * @param {Window} aWindow
-   * @param {String} aFunctionName The name of the window's method.
-   * @param {Function} aNewFunction
-   */
-  function wrapWindowFunction(aWindow, aFunctionName, aNewFunction) {
-    aWindow.rpOriginalFunctions = aWindow.rpOriginalFunctions || {};
-    let originals = aWindow.rpOriginalFunctions;
-
-    if (!(aFunctionName in originals)) {
-      originals[aFunctionName] = aWindow[aFunctionName];
-      aWindow[aFunctionName] = function() {
-        aNewFunction.apply(aWindow, arguments);
-        return originals[aFunctionName].apply(aWindow, arguments);
-      }
-    }
-  }
-  function unwrapWindowFunction(aWindow, aFunctionName) {
-    if (typeof aWindow.rpOriginalFunctions !== 'object') {
-      return;
-    }
-    let originals = aWindow.rpOriginalFunctions;
-
-    if (aFunctionName in originals) {
-      aWindow[aFunctionName] =
-          originals[aFunctionName];
-      delete originals[aFunctionName];
-    }
-  }
-
-  /**
-   * Wraps the window's open() and openDialog() methods so that RequestPolicy
-   * can know the origin and destination URLs of the window being opened. Assume
-   * that if window.open() calls have made it this far, it's a window the user
-   * wanted open (e.g. they have allowed the popup). Unfortunately, this method
-   * (or our timing of doing self) doesn't seem to work for popups that are
-   * allowed popups (the user has allowed popups from the domain). So, the
-   * workaround was to also add the 'if(aContext.nodeName == "xul:browser" &&
-   * aContext.currentURI && aContext.currentURI.spec == "about:blank")' to
-   * shouldLoad().
-   *
-   * @param {Window} aWindow
-   */
-  function wrapWindowFunctions(aWindow) {
-    wrapWindowFunction(aWindow, "open",
-        function(url, windowName, windowFeatures) {
-          overlayComm.run(function() {
-            mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                               {origin: aWindow.document.documentURI,
-                                dest: url});
-          });
-        });
-
-    wrapWindowFunction(aWindow, "openDialog",
-        function() {
-          // openDialog(url, name, features, arg1, arg2, ...)
-          overlayComm.run(function() {
-            mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                               {origin: aWindow.document.documentURI,
-                                dest: arguments[0]});
-          });
-        });
-  }
-  function unwrapWindowFunctions(aWindow) {
-    unwrapWindowFunction(aWindow, "open");
-    unwrapWindowFunction(aWindow, "openDialog");
-    delete aWindow.rpOriginalFunctions;
-  }
+  // If the following code will be used again, the Utils.wrapFunction()
+  // and Utils.unwrapFunction() functions can be used instead.
+  //
+  ///**
+  // * This function wraps an existing method of a window object.
+  // * If that method is being called after being wrapped, first the custom
+  // * function will be called and then the original function.
+  // *
+  // * @param {Window} aWindow
+  // * @param {String} aFunctionName The name of the window's method.
+  // * @param {Function} aNewFunction
+  // */
+  //function wrapWindowFunction(aWindow, aFunctionName, aNewFunction) {
+  //  aWindow.rpOriginalFunctions = aWindow.rpOriginalFunctions || {};
+  //  let originals = aWindow.rpOriginalFunctions;
+  //
+  //  if (!(aFunctionName in originals)) {
+  //    originals[aFunctionName] = aWindow[aFunctionName];
+  //    aWindow[aFunctionName] = function() {
+  //      aNewFunction.apply(aWindow, arguments);
+  //      return originals[aFunctionName].apply(aWindow, arguments);
+  //    }
+  //  }
+  //}
+  //function unwrapWindowFunction(aWindow, aFunctionName) {
+  //  if (typeof aWindow.rpOriginalFunctions !== 'object') {
+  //    return;
+  //  }
+  //  let originals = aWindow.rpOriginalFunctions;
+  //
+  //  if (aFunctionName in originals) {
+  //    aWindow[aFunctionName] =
+  //        originals[aFunctionName];
+  //    delete originals[aFunctionName];
+  //  }
+  //}
+  //
+  ///**
+  // * Wraps the window's open() and openDialog() methods so that RequestPolicy
+  // * can know the origin and destination URLs of the window being opened. Assume
+  // * that if window.open() calls have made it this far, it's a window the user
+  // * wanted open (e.g. they have allowed the popup). Unfortunately, this method
+  // * (or our timing of doing self) doesn't seem to work for popups that are
+  // * allowed popups (the user has allowed popups from the domain). So, the
+  // * workaround was to also add the 'if(aContext.nodeName == "xul:browser" &&
+  // * aContext.currentURI && aContext.currentURI.spec == "about:blank")' to
+  // * shouldLoad().
+  // *
+  // * @param {Window} aWindow
+  // */
+  //function wrapWindowFunctions(aWindow) {
+  //  wrapWindowFunction(aWindow, "open",
+  //      function(url, windowName, windowFeatures) {
+  //        overlayComm.run(function() {
+  //          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+  //                             {origin: aWindow.document.documentURI,
+  //                              dest: url});
+  //        });
+  //      });
+  //
+  //  wrapWindowFunction(aWindow, "openDialog",
+  //      function() {
+  //        // openDialog(url, name, features, arg1, arg2, ...)
+  //        overlayComm.run(function() {
+  //          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+  //                             {origin: aWindow.document.documentURI,
+  //                              dest: arguments[0]});
+  //        });
+  //      });
+  //}
+  //function unwrapWindowFunctions(aWindow) {
+  //  unwrapWindowFunction(aWindow, "open");
+  //  unwrapWindowFunction(aWindow, "openDialog");
+  //  delete aWindow.rpOriginalFunctions;
+  //}
 
 
   framescriptEnv.elManager.addListener(mm, "DOMContentLoaded",

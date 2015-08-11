@@ -96,10 +96,10 @@ function getArguments(args) {
 }*/
 
 function onload() {
-  // To retrieve the last RP version, `Utils` needs to be used,
+  // To retrieve the last RP version, `Info` needs to be used,
   // because the pref "extensions.requestpolicy.lastVersion" has
   // already been updated.
-  var lastRPVersion = Utils.info.lastRPVersion;
+  var lastRPVersion = Info.lastRPVersion;
 
   // Populate the form values based on the user's current settings.
   // If the use has just upgrade from an 0.x version, populate based on the old

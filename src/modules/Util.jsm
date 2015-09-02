@@ -25,6 +25,8 @@ var EXPORTED_SYMBOLS = ["Util"];
 const CI = Components.interfaces;
 const CC = Components.classes;
 
+Components.utils.import("resource://requestpolicy/Logger.jsm");
+
 const FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 
 var Util = {
@@ -52,5 +54,100 @@ var Util = {
 
   isFirefox : function() {
     return this.appInfo.ID == FIREFOX_ID;
+  },
+
+  /**
+   * Wrap a function. Allow 'before' and 'after' functions.
+   * If the function was wrapped already earlier in time, the old
+   * wrapper function will be re-used.
+   *
+   * @param {Object} aOwnerObject The object which contains (a reference to)
+   *     the function which should be wrapped.
+   * @param {string} aFunctionName The function's name in the object.
+   * @param {Function=} aBeforeFunction The function to be called before the
+   *     original function.
+   * @param {Function=} aAfterFunction The function to be called after the
+   *     original function.
+   */
+  wrapFunction : function(aOwnerObject, aFunctionName, aBeforeFunction = null,
+                          aAfterFunction = null) {
+    initWrapperFunction(aOwnerObject, aFunctionName);
+
+    var fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
+    fnMetadata.before = aBeforeFunction;
+    fnMetadata.after = aAfterFunction;
+  },
+
+  /**
+   * Unwrap a function which has been wrapped before. The function won't
+   * be removed though, because another addon could have wrapped the same
+   * function as well. Instead, the 'before' and 'after' functions are
+   * set to `null`.
+   *
+   * @param {Object} aOwnerObject The object which contains (a reference to)
+   *     the function which should be wrapped.
+   * @param {string} aFunctionName The function's name in the object.
+   */
+  unwrapFunction : function(aOwnerObject, aFunctionName) {
+    this.wrapFunction(aOwnerObject, aFunctionName, null, null);
   }
+}
+
+/**
+ * @param {Object} aOwnerObject The object which contains (a reference to)
+ *     the function which should be wrapped.
+ * @param {string} aFunctionName The function's name in the object.
+ */
+function initWrapperFunction(aOwnerObject, aFunctionName) {
+  // create metadata object
+  if (!aOwnerObject.hasOwnProperty("rpcontinuedWrappedFunctions")) {
+    aOwnerObject.rpcontinuedWrappedFunctions = {};
+  }
+
+  var metadata = aOwnerObject.rpcontinuedWrappedFunctions;
+
+  if (metadata.hasOwnProperty(aFunctionName)) {
+    // the function is already wrapped by RequestPolicy
+    return;
+  }
+
+  // create metadata
+  metadata[aFunctionName] = {
+    main: aOwnerObject[aFunctionName], // the original function
+    before: null,
+    after: null
+  };
+
+  // actually wrap the object
+  aOwnerObject[aFunctionName] = function() {
+    var {main, before, after} = metadata[aFunctionName];
+
+    // Execute some action before the original function call.
+    try {
+      if (before) {
+        before.apply(aOwnerObject, arguments);
+      }
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR, "The 'before' function of the " +
+                     "`" + aFunctionName + "()` wrapper has thrown an " +
+                     "error.", e);
+    }
+
+    // Execute original function.
+    var rv = main.apply(aOwnerObject, arguments);
+
+    // Execute some action afterwards.
+    try {
+      if (after) {
+        after.apply(aOwnerObject, arguments);
+      }
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR, "The 'after' function of the " +
+                     "`" + aFunctionName + "()` wrapper has thrown an " +
+                     "error.", e);
+    }
+
+    // return the original result
+    return rv;
+  };
 }

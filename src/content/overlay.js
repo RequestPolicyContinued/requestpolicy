@@ -1076,45 +1076,18 @@ requestpolicy.overlay = {
   },
 
   /**
-   * Modifies the addTab() function so that RequestPolicy can be aware of the
+   * Wraps the addTab() function so that RequestPolicy can be aware of the
    * tab being opened. Assume that if the tab is being opened, it was an action
    * the user wanted (e.g. the equivalent of a link click). Using a TabOpen
-   * event handler, I was unable to determine the referrer, so that approach
-   * doesn't seem to be an option. This doesn't actually wrap addTab because the
-   * extension TabMixPlus modifies the function rather than wraps it, so
-   * wrapping it will break tabs if TabMixPlus is installed.
+   * event handler, I (Justin) was unable to determine the referrer,
+   * so that approach doesn't seem to be an option.
+   *
+   * Details on addTab():
+   * - https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/tabbrowser#m-addTab
+   * - See mozilla-central: "base/content/tabbrowser.xml"
    */
   _wrapAddTab : function() {
-    if (!gBrowser.requestpolicyAddTabModified) {
-      gBrowser.requestpolicyAddTabModified = true;
-
-      // For reference, the addTab() function signature looks like this:
-      // function addTab(aURI, aReferrerURI, aCharset, aPostData, aOwner,
-      // aAllowThirdPartyFixup) {";
-      // where it's possible that only two arguments are used and aReferrerURI
-      // is a hash of the other arguments as well as new ones.
-      // See https://www.requestpolicy.com/dev/ticket/38
-
-      // In order to keep our code from breaking if the signature of addTab
-      // changes (even just a change in variable names, for example), we'll
-      // simply insert our own line right after the first curly brace in the
-      // string representation of the addTab function.
-      var addTabString = gBrowser.addTab.toString();
-      var firstCurlyBrace = addTabString.indexOf("{");
-      var addTabParts = [];
-      // Includes the '{'
-      addTabParts[0] = addTabString.substring(0, firstCurlyBrace + 1);
-      // Starts after the '{'
-      addTabParts[1] = addTabString.substring(firstCurlyBrace + 1);
-
-      // We use 'arguments' so that we aren't dependent on the names of two
-      // parameters, as it seems not unlikely that these could change due to
-      // the second parameter's purpose having been changed.
-      var newFirstCodeLine = "\n    requestpolicy.overlay.tabAdded(arguments[0], arguments[1]);";
-      // Finally, add our line to the beginning of the addTab function.
-      eval("gBrowser.addTab = " + addTabParts[0] + newFirstCodeLine
-          + addTabParts[1]);
-    }
+    Util.wrapFunction(gBrowser, "addTab", this.tabAdded);
   },
 
   /**

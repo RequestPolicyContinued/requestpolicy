@@ -138,6 +138,7 @@ let RequestProcessor = (function(self) {
       return result;
     }
 
+    // fixme: "//example.com/path" is also a valid relative URL
     if (destURI[0] && destURI[0] == '/'
         || destURI.indexOf(":") == -1) {
       // Redirect is to a relative url.
@@ -424,6 +425,8 @@ let RequestProcessor = (function(self) {
     let originString = httpResponse.originURI.specIgnoringRef;
 
     // Allow redirects of requests from privileged code.
+    // Fixme: should the check instead be ' === false' in case the
+    //        return value is `null`? See also #18.
     if (!isContentRequest(httpResponse)) {
       // However, favicon requests that are redirected appear as non-content
       // requests. So, check if the original request was for a favicon.

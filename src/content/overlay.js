@@ -1187,6 +1187,7 @@ requestpolicy.overlay = {
       },
       // Though unnecessary for Gecko 2.0, I'm leaving in onSecurityChange for
       // SeaMonkey because of https://bugzilla.mozilla.org/show_bug.cgi?id=685466
+      // The bug is fixed in SeaMonkey 2.4, that is, Gecko 7.
       onSecurityChange : function() {
       },
 

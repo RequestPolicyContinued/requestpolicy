@@ -54,11 +54,7 @@ RequestPolicyService.prototype = {
   classDescription : "RequestPolicy JavaScript XPCOM Component",
   classID : Components.ID("{14027e96-1afb-4066-8846-e6c89b5faf3b}"),
   contractID : "@requestpolicy.com/requestpolicy-service;1",
-  // For info about the change from app-startup to profile-after-change, see:
-  // https://developer.mozilla.org/en/XPCOM/XPCOM_changes_in_Gecko_1.9.3
   _xpcom_categories : [{
-        category : "app-startup"
-      }, {
         category : "profile-after-change"
       }, {
         category : "content-policy"
@@ -235,27 +231,14 @@ RequestPolicyService.prototype = {
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
-    try {
-      // For Firefox <= 3.6.
-      var em = Components.classes["@mozilla.org/extensions/manager;1"]
-          .getService(Components.interfaces.nsIExtensionManager);
-      var ext;
-      for (var i = 0; i < idArray.length; i++) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            "Extension old-style check: " + idArray[i]);
-        this._initializeExtCompatCallback(em.getItemForID(idArray[i]));
-      }
-    } catch (e) {
-      // As of Firefox 3.7, the extension manager has been replaced.
-      const rpService = this;
-      var callback = function(ext) {
-        rpService._initializeExtCompatCallback(ext)
-      };
-      for (var i = 0; i < idArray.length; i++) {
-        requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
-            "Extension new-style check: " + idArray[i]);
-        AddonManager.getAddonByID(idArray[i], callback);
-      }
+    const rpService = this;
+    var callback = function(ext) {
+      rpService._initializeExtCompatCallback(ext)
+    };
+    for (var i = 0; i < idArray.length; i++) {
+      requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
+          "Extension new-style check: " + idArray[i]);
+      AddonManager.getAddonByID(idArray[i], callback);
     }
   },
 
@@ -264,8 +247,6 @@ RequestPolicyService.prototype = {
       return;
     }
 
-    // As of Firefox 3.7, we can easily whether addons are disabled.
-    // The isActive property won't exist before 3.7, so it will be null.
     if (ext.isActive == false) {
       requestpolicy.mod.Logger.info(requestpolicy.mod.Logger.TYPE_INTERNAL,
           "Extension is not active: " + ext.name);
@@ -555,13 +536,7 @@ RequestPolicyService.prototype = {
     os.addObserver(this, "private-browsing", false);
     os.addObserver(this, HTTPS_EVERYWHERE_REWRITE_TOPIC, false);
 
-    // Listening for uninstall/disable events is done with the AddonManager
-    // since Firefox 4.
-    if (AddonManager) {
-      this._registerAddonListener();
-    } else {
-      os.addObserver(this, "em-action-requested", false);
-    }
+    this._registerAddonListener();
   },
 
   _unregister : function() {
@@ -574,9 +549,6 @@ RequestPolicyService.prototype = {
       os.removeObserver(this, "profile-after-change");
       os.removeObserver(this, "sessionstore-windows-restored");
       os.removeObserver(this, "quit-application");
-      if (!AddonManager) {
-        os.removeObserver(this, "em-action-requested");
-      }
     } catch (e) {
       requestpolicy.mod.Logger.dump(e + " while unregistering.");
     }
@@ -612,27 +584,15 @@ RequestPolicyService.prototype = {
       this.prefs.setCharPref("lastAppVersion", util.curAppVersion);
 
       var versionChanged = false;
-      if (AddonManager) {
-        const usePrefs = this.prefs;
-        const prefService = this._prefService;
-        AddonManager.getAddonByID(EXTENSION_ID,
-          function(addon) {
-            usePrefs.setCharPref("lastVersion", addon.version);
-            util.curVersion = addon.version;
-            if (util.lastVersion != util.curVersion) {
-              prefService.savePrefFile(null);
-            }
-          });
-      } else {
-        var em = Components.classes["@mozilla.org/extensions/manager;1"]
-                 .getService(Components.interfaces.nsIExtensionManager);
-        var addon = em.getItemForID(EXTENSION_ID);
-        this.prefs.setCharPref("lastVersion", addon.version);
+      const usePrefs = this.prefs;
+      const prefService = this._prefService;
+      AddonManager.getAddonByID(EXTENSION_ID, function(addon) {
+        usePrefs.setCharPref("lastVersion", addon.version);
         util.curVersion = addon.version;
         if (util.lastVersion != util.curVersion) {
-          versionChanged = true;
+          prefService.savePrefFile(null);
         }
-      }
+      });
 
       if (versionChanged || util.lastAppVersion != util.curAppVersion) {
         this._prefService.savePrefFile(null);
@@ -673,12 +633,7 @@ RequestPolicyService.prototype = {
         requestpolicy.mod);
     Components.utils.import("resource://requestpolicy/Stats.jsm",
         requestpolicy.mod);
-    try {
-      Components.utils.import("resource://gre/modules/AddonManager.jsm");
-    } catch (e) {
-      // We'll be using the old (pre-Firefox 4) addon manager.
-      AddonManager = null;
-    }
+    Components.utils.import("resource://gre/modules/AddonManager.jsm");
   },
 
   _initializePrivateBrowsing : function() {
@@ -707,15 +662,7 @@ RequestPolicyService.prototype = {
     for (var i = 0; i < callbacks.length; i++) {
       var callback = callbacks[i];
       try {
-        // For Gecko 1.9.1
         return callback.getInterface(CI.nsILoadContext).isContent;
-      } catch (e) {
-      }
-      try {
-        // For Gecko 1.9.0
-        var itemType = callback.getInterface(CI.nsIWebNavigation)
-            .QueryInterface(CI.nsIDocShellTreeItem).itemType;
-        return itemType == CI.nsIDocShellTreeItem.typeContent;
       } catch (e) {
       }
     }
@@ -1692,8 +1639,6 @@ RequestPolicyService.prototype = {
         }
         this._profileAfterChangeCompleted = true;
 
-        // We call _init() here because gecko 1.9.3 states that extensions will
-        // no longer be able to receive app-startup.
         this._init();
         // "profile-after-change" means that user preferences are now
         // accessible. If we tried to load preferences before this, we would get
@@ -1717,31 +1662,8 @@ RequestPolicyService.prototype = {
           this.revokeTemporaryPermissions();
         }
         break;
-      case "app-startup" :
-        this._init();
-        break;
       case "xpcom-shutdown" :
         this._shutdown();
-        break;
-      case "em-action-requested" :
-        if ((subject instanceof CI.nsIUpdateItem)
-            && subject.id == EXTENSION_ID) {
-          if (data == "item-uninstalled" || data == "item-disabled") {
-            this._uninstall = true;
-            requestpolicy.mod.Logger.debug(
-                requestpolicy.mod.Logger.TYPE_INTERNAL, "Disabled");
-          } else if (data == "item-cancel-action") {
-            // This turns out to be correct. Unlike with the AddonManager
-            // in Firefox 4, here if the user does a "disable" followed by
-            // "uninstall" followed by a single "undo", rather than the
-            // "undo" triggering a"n "item-cancel-action", the first "undo"
-            // appears to send an "item-disabled" and only if the user click
-            // "undo" a second time does the "item-cancel-action" event occur.
-            this._uninstall = false;
-            requestpolicy.mod.Logger.debug(
-                requestpolicy.mod.Logger.TYPE_INTERNAL, "Enabled");
-          }
-        }
         break;
       case "quit-application" :
         if (this._uninstall) {
@@ -2351,11 +2273,4 @@ RequestPolicyService.prototype = {
   // /////////////////////////////////////////////////////////////////////////
 };
 
-/**
- * XPCOMUtils.generateNSGetFactory was introduced in Mozilla 2 (Firefox 4).
- * XPCOMUtils.generateNSGetModule is for Mozilla 1.9.2 (Firefox 3.6).
- */
-if (XPCOMUtils.generateNSGetFactory)
-  var NSGetFactory = XPCOMUtils.generateNSGetFactory([RequestPolicyService]);
-else
-  var NSGetModule = XPCOMUtils.generateNSGetModule([RequestPolicyService]);
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([RequestPolicyService]);

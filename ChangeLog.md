@@ -3,6 +3,10 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta10.1-signed
+* The add-on is now signed by Mozilla. (#701) There's no change in
+  functionality, and no bugs have been fixed.
+
 #### Version 1.0.beta10
 * The extension ID has changed (#609). It has to be taken care that
   different versions of RequestPolicy aren't installed at the same time.

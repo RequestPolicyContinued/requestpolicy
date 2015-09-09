@@ -37,7 +37,7 @@ let rpWindowManager = (function(self) {
 
   Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", globalScope);
   ScriptLoader.importModules([
-    "lib/utils",
+    "lib/utils/info",
     "lib/utils/xul",
     "lib/utils/constants",
     "lib/environment"
@@ -51,7 +51,7 @@ let rpWindowManager = (function(self) {
   let styleSheets = [
     "chrome://rpcontinued/skin/requestpolicy.css"
   ];
-  if (Utils.info.isSeamonkey) {
+  if (Info.isSeamonkey) {
     styleSheets.push("chrome://rpcontinued/skin/toolbarbutton-seamonkey.css");
   } else {
     styleSheets.push("chrome://rpcontinued/skin/toolbarbutton.css");
@@ -64,24 +64,13 @@ let rpWindowManager = (function(self) {
 
   function loadIntoWindow(window) {
     // ==================================
-    // # 1 : add all XUL elements
-    // --------------------------
-    try {
-      XULUtils.addTreeElementsToWindow(window, "mainTree");
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "Couldn't add tree elements to window. " + e, e);
-    }
-
-
-    // ==================================
-    // # 2 : create a scope variable for RP for this window
+    // # 1 : create a scope variable for RP for this window
     // ----------------------------------------------------
     window.rpcontinued = {};
 
 
     // ==================================
-    // # 3 : load the overlay's and menu's javascript
+    // # 2 : load the overlay's and menu's javascript
     // ----------------------------------------------
     try {
       Services.scriptloader.loadSubScript(
@@ -96,6 +85,17 @@ let rpWindowManager = (function(self) {
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
                      "Error loading subscripts for window: " + e, e);
+    }
+
+
+    // ==================================
+    // # 3 : add all XUL elements
+    // --------------------------
+    try {
+      XULUtils.addTreeElementsToWindow(window, "mainTree");
+    } catch (e) {
+      Logger.warning(Logger.TYPE_ERROR,
+                     "Couldn't add tree elements to window. " + e, e);
     }
 
 
@@ -133,15 +133,15 @@ let rpWindowManager = (function(self) {
     self.removeToolbarButtonFromWindow(window);
 
 
-    // # 3 and 2 : remove the `rpcontinued` variable from the window
+    // # 3 : remove all XUL elements
+    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
+
+
+    // # 2 and 1 : remove the `rpcontinued` variable from the window
     // ---------------------------------------------------------
     // This wouldn't be needed when the window is closed, but this has to be
     // done when RP is being disabled.
     delete window.rpcontinued;
-
-
-    // # 1 : remove all XUL elements
-    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
   }
 
 

@@ -27,20 +27,14 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["Utils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 //Cu.import("resource://gre/modules/devtools/Console.jsm");
 
 Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
 ScriptLoader.importModules([
-  "lib/prefs",
-  "lib/utils/constants",
-  "lib/environment"
+  "lib/environment",
+  "lib/logger"
 ], this);
-
-if (ProcessEnvironment.isMainProcess) {
-  Cu.import("resource://gre/modules/AddonManager.jsm");
-}
 
 
 
@@ -119,48 +113,6 @@ let Utils = (function() {
   };
 
 
-
-
-  self.info = {};
-
-  // bad smell...
-  // get/set last/current RP version
-  if (ProcessEnvironment.isMainProcess) {
-    self.info.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
-
-    self.info.curRPVersion = "0.0";
-    // curRPVersion needs to be set asynchronously
-    AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
-      rpPrefBranch.setCharPref("lastVersion", addon.version);
-      self.info.curRPVersion = addon.version;
-      if (self.info.lastRPVersion != self.info.curRPVersion) {
-        Services.prefs.savePrefFile(null);
-      }
-    });
-  }
-
-  // bad smell...
-  // get/set last/current app (e.g. firefox) version
-  if (ProcessEnvironment.isMainProcess) {
-    self.info.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
-
-    let curAppVersion = Services.appinfo.version;
-    self.info.curAppVersion = curAppVersion;
-    rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
-
-    if (self.info.lastAppVersion != self.info.curAppVersion) {
-      Services.prefs.savePrefFile(null);
-    }
-  }
-
-  let appID = Services.appinfo.ID;
-  self.info.isFirefox = appID === C.FIREFOX_ID;
-  self.info.isSeamonkey = appID === C.SEAMONKEY_ID;
-  self.info.isAustralis = self.info.isFirefox &&
-      Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
-
-
-
   /**
    * This function returns and eventually creates a module's `internal`
    * variable. The `internal` can be accessed from all submodules of that
@@ -187,6 +139,102 @@ let Utils = (function() {
                                           sealInternal);
     return aModuleScope.internal;
   };
+
+
+  /**
+   * Wrap a function. Allow 'before' and 'after' functions.
+   * If the function was wrapped already earlier in time, the old
+   * wrapper function will be re-used.
+   *
+   * @param {Object} aOwnerObject The object which contains (a reference to)
+   *     the function which should be wrapped.
+   * @param {string} aFunctionName The function's name in the object.
+   * @param {Function=} aBeforeFunction The function to be called before the
+   *     original function.
+   * @param {Function=} aAfterFunction The function to be called after the
+   *     original function.
+   */
+  self.wrapFunction = function(aOwnerObject, aFunctionName,
+                               aBeforeFunction = null, aAfterFunction = null) {
+    initWrapperFunction(aOwnerObject, aFunctionName);
+
+    var fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
+    fnMetadata.before = aBeforeFunction;
+    fnMetadata.after = aAfterFunction;
+  };
+
+  /**
+   * Unwrap a function which has been wrapped before. The function won't
+   * be removed though, because another addon could have wrapped the same
+   * function as well. Instead, the 'before' and 'after' functions are
+   * set to `null`.
+   *
+   * @param {Object} aOwnerObject The object which contains (a reference to)
+   *     the function which should be wrapped.
+   * @param {string} aFunctionName The function's name in the object.
+   */
+  self.unwrapFunction = function(aOwnerObject, aFunctionName) {
+    self.wrapFunction(aOwnerObject, aFunctionName, null, null);
+  };
+
+  /**
+   * @param {Object} aOwnerObject The object which contains (a reference to)
+   *     the function which should be wrapped.
+   * @param {string} aFunctionName The function's name in the object.
+   */
+  function initWrapperFunction(aOwnerObject, aFunctionName) {
+    // create metadata object
+    if (!aOwnerObject.hasOwnProperty("rpcontinuedWrappedFunctions")) {
+      aOwnerObject.rpcontinuedWrappedFunctions = {};
+    }
+
+    var metadata = aOwnerObject.rpcontinuedWrappedFunctions;
+
+    if (metadata.hasOwnProperty(aFunctionName)) {
+      // the function is already wrapped by RequestPolicy
+      return;
+    }
+
+    // create metadata
+    metadata[aFunctionName] = {
+      main: aOwnerObject[aFunctionName], // the original function
+      before: null,
+      after: null
+    };
+
+    // actually wrap the object
+    aOwnerObject[aFunctionName] = function() {
+      var {main, before, after} = metadata[aFunctionName];
+
+      // Execute some action before the original function call.
+      try {
+        if (before) {
+          before.apply(aOwnerObject, arguments);
+        }
+      } catch (e) {
+        Logger.warning(Logger.TYPE_ERROR, "The 'before' function of the " +
+                       "`" + aFunctionName + "()` wrapper has thrown an " +
+                       "error.", e);
+      }
+
+      // Execute original function.
+      var rv = main.apply(aOwnerObject, arguments);
+
+      // Execute some action afterwards.
+      try {
+        if (after) {
+          after.apply(aOwnerObject, arguments);
+        }
+      } catch (e) {
+        Logger.warning(Logger.TYPE_ERROR, "The 'after' function of the " +
+                       "`" + aFunctionName + "()` wrapper has thrown an " +
+                       "error.", e);
+      }
+
+      // return the original result
+      return rv;
+    };
+  }
 
   return self;
 }());

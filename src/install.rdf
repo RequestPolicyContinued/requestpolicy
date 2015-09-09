@@ -4,8 +4,8 @@
   xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:name>RequestPolicy Continued Beta</em:name>
-    <em:version>1.0.beta10</em:version>
+    <em:name>RequestPolicy Continued</em:name>
+    <em:version>1.0.beta10.1-signed</em:version>
     <em:type>2</em:type>
     <em:id>rpcontinued@non-amo.requestpolicy.org</em:id>
 

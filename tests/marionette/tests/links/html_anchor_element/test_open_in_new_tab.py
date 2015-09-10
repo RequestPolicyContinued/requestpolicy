@@ -6,6 +6,7 @@ from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.marionette import Actions
 from rp_puppeteer.ui.redirect_notification import RedirectNotification
 from rp_puppeteer.ui.context_menu import ContextMenu
+from rp_puppeteer.ui.tabs import Tabs
 
 
 TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -16,7 +17,10 @@ class TestOpenInNewTab(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+
         self.redir = RedirectNotification(lambda: self.marionette)
+        self.tabs = Tabs(lambda: self.marionette)
+        self.ctx_menu = ContextMenu(lambda: self.marionette)
 
 
     def test_open_in_new_tab(self):
@@ -34,21 +38,24 @@ class TestOpenInNewTab(RequestPolicyTestCase):
                 self.assertEqual(len(self.browser.tabbar.tabs), 2,
                                  "A new tab has been opened.")
 
+                [origin_tab, dest_tab] = self.browser.tabbar.tabs
+                self.tabs.wait_until_loaded(dest_tab)
+
                 # checks in the origin's tab
+                origin_tab.switch_to()
                 self.assertFalse(self.redir.panel_exists(),
                                  ("Following the link didn't cause a "
                                   "redirect in the origin tab."))
 
-                # the destination's tab
-                tab = self.browser.tabbar.tabs[-1]
-                tab.switch_to()
                 # checks in the destination's tab
-                self.assertEqual(tab.location, link_url,
+                dest_tab.switch_to()
+                self.assertEqual(dest_tab.location, link_url,
                                  "The location in the new tab is correct.")
                 self.assertFalse(self.redir.panel_exists(),
                                  ("Following the link didn't cause a "
                                   "redirect in the destination tab."))
-                tab.close()
+
+                dest_tab.close()
 
 
     def open_link_multi(self, link):
@@ -60,10 +67,7 @@ class TestOpenInNewTab(RequestPolicyTestCase):
         yield
 
         # METHOD #2: context menu
-        (
-            ContextMenu(lambda: self.marionette)
-            .select_entry("context-openlinkintab", link)
-        )
+        self.ctx_menu.select_entry("context-openlinkintab", link)
         # TODO: Use the "tabs" library as soon as it has been ported
         #       to Marionette, see Mozilla Bug 1121725.
         #       The mozmill code to open the link in a new tab was:

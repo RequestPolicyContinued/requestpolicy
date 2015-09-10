@@ -45,7 +45,11 @@ class ContextMenu(BaseLib):
     def _close(self, menu):
         """Close the context menu."""
 
-        menu.send_keys(Keys.ESCAPE)
+        # Only close if the menu is open. The menu for example closes itself
+        # in case the URL in the current tab changes. Sending ESC to a menu
+        # which is _not_ open anymore will cause the page load to stop.
+        if menu.get_attribute("state") is "open":
+            menu.send_keys(Keys.ESCAPE)
         self._wait_for_state(menu, "closed")
 
 

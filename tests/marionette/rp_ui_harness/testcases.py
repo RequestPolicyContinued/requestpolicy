@@ -3,13 +3,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_ui_harness import FirefoxTestCase
+from rp_puppeteer import RequestPolicyPuppeteer
 
 from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
                                               ConsoleErrorDetection)
 
 
-class RequestPolicyTestCase(FirefoxTestCase):
+class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
     """Base testcase class for RequestPolicy Marionette tests.
+
+    Note: RequestPolicyPuppeteer must be the first base class
+    in order to allow overriding the attributes of the `Puppeteer`
+    class.
     """
 
     def __init__(self, *args, **kwargs):

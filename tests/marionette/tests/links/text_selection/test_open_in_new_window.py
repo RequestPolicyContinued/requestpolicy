@@ -3,10 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.ui.redirect_notification import RedirectNotification
-from rp_puppeteer.ui.context_menu import ContextMenu
-from rp_puppeteer.ui.tabs import Tabs
-from rp_puppeteer.ui.web_utils import WebUtils
 
 
 TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -18,11 +14,6 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
-
-        self.redir = RedirectNotification(lambda: self.marionette)
-        self.web_utils = WebUtils(lambda: self.marionette)
-        self.tabs = Tabs(lambda: self.marionette)
-        self.ctx_menu = ContextMenu(lambda: self.marionette)
 
         self.origin_window = self.windows.current
 
@@ -79,8 +70,8 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
         """Open a selected URL in new window using different methods."""
 
         context_menu_ids = [
-            "context-openlink",       # Open Link in New Window
-            "context-openlinkprivate" # Open Link in New Private Window
+            "context-openlink",  # Open Link in New Window
+            "context-openlinkprivate"  # Open Link in New Private Window
         ]
 
         for id in context_menu_ids:

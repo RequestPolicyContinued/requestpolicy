@@ -3,9 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.ui.redirect_notification import RedirectNotification
-from rp_puppeteer.ui.context_menu import ContextMenu
-from rp_puppeteer.ui.tabs import Tabs
 
 
 TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -16,7 +13,6 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
-        self.redir = RedirectNotification(lambda: self.marionette)
         self.main_window = self.windows.current
 
 
@@ -53,7 +49,7 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
 
                 # checks in the destination's window
                 tab = new_window.tabbar.selected_tab
-                Tabs(lambda: self.marionette).wait_until_loaded(tab)
+                self.tabs.wait_until_loaded(tab)
                 self.assertEqual(tab.location, link_url,
                                  "The location in the new window is correct.")
                 self.assertFalse(self.redir.panel_exists(),
@@ -75,10 +71,10 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
         """Open a link in new window using different methods."""
 
         context_menu_ids = [
-            "context-openlink",       # Open Link in New Window
-            "context-openlinkprivate" # Open Link in New Private Window
+            "context-openlink",  # Open Link in New Window
+            "context-openlinkprivate"  # Open Link in New Private Window
         ]
 
         for id in context_menu_ids:
-            ContextMenu(lambda: self.marionette).select_entry(id, link)
+            self.ctx_menu.select_entry(id, link)
             yield

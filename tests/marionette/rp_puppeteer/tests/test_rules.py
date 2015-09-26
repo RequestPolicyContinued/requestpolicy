@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.api.rules import Rules
 from marionette import SkipTest
 
 
@@ -12,8 +11,6 @@ class RulesTestCase(RequestPolicyTestCase):
 
     def setUp(self):
         super(RulesTestCase, self).setUp()
-
-        self.rules = Rules(lambda: self.marionette)
 
         cr = self.rules.create_rule
 

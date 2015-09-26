@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.ui.redirect_notification import RedirectNotification
 
 
 TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -14,7 +13,6 @@ class TestLinkClick(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
-        self.redir = RedirectNotification(lambda: self.marionette)
 
 
     def test_link_click(self):

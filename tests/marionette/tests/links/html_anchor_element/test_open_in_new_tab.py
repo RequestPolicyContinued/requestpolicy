@@ -4,9 +4,6 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.marionette import Actions
-from rp_puppeteer.ui.redirect_notification import RedirectNotification
-from rp_puppeteer.ui.context_menu import ContextMenu
-from rp_puppeteer.ui.tabs import Tabs
 
 
 TEST_URL = "http://www.maindomain.test/link_1.html";
@@ -17,10 +14,6 @@ class TestOpenInNewTab(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
-
-        self.redir = RedirectNotification(lambda: self.marionette)
-        self.tabs = Tabs(lambda: self.marionette)
-        self.ctx_menu = ContextMenu(lambda: self.marionette)
 
 
     def test_open_in_new_tab(self):

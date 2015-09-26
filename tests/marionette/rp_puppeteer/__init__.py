@@ -16,6 +16,10 @@ class RequestPolicyPuppeteer(object):
     def prefs(self):
         pass
 
+    @use_class_as_property('api.requests.Requests')
+    def requests(self):
+        pass
+
     @use_class_as_property('api.rules.Rules')
     def rules(self):
         pass

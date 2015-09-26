@@ -12,6 +12,10 @@ class RequestPolicyPuppeteer(object):
     RequestPolicyTestCase instance.
     """
 
+    @use_class_as_property('api.prefs.Preferences')
+    def prefs(self):
+        pass
+
     @use_class_as_property('api.rules.Rules')
     def rules(self):
         pass

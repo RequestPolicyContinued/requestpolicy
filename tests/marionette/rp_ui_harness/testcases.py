@@ -49,6 +49,8 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
 
     def tearDown(self, *args, **kwargs):
         try:
+            self.rules.remove_all()
+
             self._check_and_reset_error_counts()
         finally:
             FirefoxTestCase.tearDown(self, *args, **kwargs)

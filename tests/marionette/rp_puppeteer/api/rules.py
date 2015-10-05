@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_puppeteer.base import BaseLib
+import copy
 
 
 class Rules(BaseLib):
@@ -118,7 +119,7 @@ class Rule(BaseLib):
 
     def __init__(self, marionette_getter, rule_data, allow, temp):
         super(Rule, self).__init__(marionette_getter)
-        self.rule_data = rule_data
+        self._set_rule_data(rule_data)
         self.allow = allow
         self.temp = temp
 
@@ -221,3 +222,12 @@ class Rule(BaseLib):
         if first in self.rule_data and second in self.rule_data[first]:
             return self.rule_data[first][second]
         return None
+
+    def _set_rule_data(self, new_rule_data):
+        rule_data = copy.deepcopy(new_rule_data)
+        # Convert port numbers to integer
+        if "o" in rule_data and "port" in rule_data["o"]:
+            rule_data["o"]["port"] = int(rule_data["o"]["port"])
+        if "d" in rule_data and "port" in rule_data["d"]:
+            rule_data["d"]["port"] = int(rule_data["d"]["port"])
+        self.rule_data = rule_data

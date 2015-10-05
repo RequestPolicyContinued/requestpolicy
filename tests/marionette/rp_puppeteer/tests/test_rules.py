@@ -172,6 +172,12 @@ class TestRules(RulesTestCase):
 
 class TestRule(RulesTestCase):
 
+    def test_string_port(self):
+        # The port needs to be converted to integer.
+        string_port_rule = Rule(lambda: self.marionette, {"o": {"port": "80"}},
+                                allow=False, temp=False)
+        self.assertEqual(string_port_rule.origin_port, 80)
+
     def test_eq_and_ne_rich_comparisons(self):
         # Test that `Rule` has both the __eq__ and the __ne__ method
         self.assertIn("__eq__", dir(Rule))

@@ -58,6 +58,21 @@ class RulesTestCase(RequestPolicyTestCase):
             different_temp=cr({"o": {"h": "a"}}, allow=False, temp=True)
         )
 
+        # Rules specifying scheme, host and port, but only
+        # for origin or dest, respectively.
+        self.origin_shp_rule = cr(
+            {"o": {"s": "fooscheme", "h": "barhost", "port": 18224}},
+            allow=False, temp=True)
+        self.dest_shp_rule = cr(
+            {"d": {"s": "bazscheme", "h": "xyzhost", "port": 34755}},
+            allow=False, temp=True)
+
+        # A rule specifying scheme, host and port for both origin and dest.
+        self.shp_shp_rule = cr(
+            {"o": {"s": "fooscheme", "h": "barhost", "port": 18224},
+             "d": {"s": "bazscheme", "h": "xyzhost", "port": 34755}},
+            allow=False, temp=True)
+
     def tearDown(self):
         try:
             self.rules.remove_all()
@@ -232,3 +247,26 @@ class TestRule(RulesTestCase):
             self.assertFalse(rule.exists())
             rule.add()
             self.assertTrue(rule.exists())
+
+    def test_rule_data_properties(self):
+        # Test that all fields return `None` if not present.
+        self.assertIsNone(self.dest_shp_rule.origin_scheme)
+        self.assertIsNone(self.dest_shp_rule.origin_host)
+        self.assertIsNone(self.dest_shp_rule.origin_port)
+        self.assertIsNone(self.origin_shp_rule.dest_scheme)
+        self.assertIsNone(self.origin_shp_rule.dest_host)
+        self.assertIsNone(self.origin_shp_rule.dest_port)
+
+        # Test that each field returns the correct value if present.
+        self.assertEqual(self.shp_shp_rule.origin_scheme,
+                         self.shp_shp_rule.rule_data["o"]["s"])
+        self.assertEqual(self.shp_shp_rule.origin_host,
+                         self.shp_shp_rule.rule_data["o"]["h"])
+        self.assertEqual(self.shp_shp_rule.origin_port,
+                         self.shp_shp_rule.rule_data["o"]["port"])
+        self.assertEqual(self.shp_shp_rule.dest_scheme,
+                         self.shp_shp_rule.rule_data["d"]["s"])
+        self.assertEqual(self.shp_shp_rule.dest_host,
+                         self.shp_shp_rule.rule_data["d"]["h"])
+        self.assertEqual(self.shp_shp_rule.dest_port,
+                         self.shp_shp_rule.rule_data["d"]["port"])

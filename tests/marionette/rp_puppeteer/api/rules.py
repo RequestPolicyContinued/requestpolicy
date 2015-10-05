@@ -198,6 +198,13 @@ class Rule(BaseLib):
         """, script_args=[self._ruleset_name, self._rule_action,
                           self.rule_data])
 
+    origin_scheme = property(lambda self: self._get_rule_data_entry("o", "s"))
+    origin_host = property(lambda self: self._get_rule_data_entry("o", "h"))
+    origin_port = property(lambda self: self._get_rule_data_entry("o", "port"))
+    dest_scheme = property(lambda self: self._get_rule_data_entry("d", "s"))
+    dest_host = property(lambda self: self._get_rule_data_entry("d", "h"))
+    dest_port = property(lambda self: self._get_rule_data_entry("d", "port"))
+
     ##################################
     # Private Properties and Methods #
     ##################################
@@ -209,3 +216,8 @@ class Rule(BaseLib):
     @property
     def _rule_action(self):
         return 1 if self.allow else 2
+
+    def _get_rule_data_entry(self, first, second):
+        if first in self.rule_data and second in self.rule_data[first]:
+            return self.rule_data[first][second]
+        return None

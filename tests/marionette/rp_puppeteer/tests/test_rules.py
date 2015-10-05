@@ -177,6 +177,12 @@ class TestRule(RulesTestCase):
                                 msg=("Variant '{}' and the Baserule are "
                                      "unequal.".format(variant_name)))
 
+        # Compare with non-`Rule` instances.
+        self.assertNotEqual(self.baserule, None)
+        self.assertNotEqual(self.baserule, {})
+        self.assertNotEqual(self.baserule, [])
+        self.assertNotEqual(self.baserule, 10)
+
     def test_adding_and_removing_rule(self):
         rule = self.baserule
         self.assertEqual(self.rules.count_rules(), 0)

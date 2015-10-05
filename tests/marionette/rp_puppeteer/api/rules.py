@@ -123,6 +123,8 @@ class Rule(BaseLib):
         self.temp = temp
 
     def __eq__(self, other):
+        if not isinstance(other, Rule):
+            return False
         return (self.allow == other.allow and self.temp == other.temp and
                 self.rule_data == other.rule_data)
 

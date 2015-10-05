@@ -126,6 +126,9 @@ class Rule(BaseLib):
         return (self.allow == other.allow and self.temp == other.temp and
                 self.rule_data == other.rule_data)
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __cmp__(self, other):
         # Temporary rules first.
         if self.temp != other.temp:

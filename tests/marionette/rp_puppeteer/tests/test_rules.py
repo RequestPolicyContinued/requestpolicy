@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from rp_puppeteer.api.rules import Rule
 from marionette import SkipTest
 
 
@@ -156,7 +157,11 @@ class TestRules(RulesTestCase):
 
 class TestRule(RulesTestCase):
 
-    def test__eq__operator(self):
+    def test_eq_and_ne_rich_comparisons(self):
+        # Test that `Rule` has both the __eq__ and the __ne__ method
+        self.assertIn("__eq__", dir(Rule))
+        self.assertIn("__ne__", dir(Rule))
+
         # Create a copy of the "baserule".
         baserule_copy = self.rules.create_rule(
             rule_data=self.baserule.rule_data,

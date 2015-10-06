@@ -83,13 +83,14 @@ class TestRuleWithSchemeOnly(RequestPolicyTestCase):
         # Assertions
         #=======================================================================
         self.assertTrue(iframe_uri.startswith(SCHEME + ":"),
-                        "The iframe's URI starts with scheme '%s'." % SCHEME)
+                        ("The iframe's URI starts with scheme '{}'."
+                         .format(SCHEME)))
 
         matching_requests = filter(lambda r: r["dest"] == iframe_uri,
                                    self.requests.all)
         self.assertEqual(len(matching_requests), 1,
-                         ("There has been exactly one request to '%s'."
-                          % iframe_uri))
+                         ("There has been exactly one request to '{}'."
+                          .format(iframe_uri)))
 
         # Check the decision (allow or deny) on the request
         self.assertEqual(matching_requests[0]["isAllowed"],

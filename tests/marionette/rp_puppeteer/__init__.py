@@ -43,3 +43,7 @@ class RequestPolicyPuppeteer(object):
     @use_class_as_property('ui.web_utils.WebUtils')
     def web_utils(self):
         pass
+
+    @use_class_as_property('ui.settings.your_policy.YourPolicy')
+    def your_policy(self):
+        pass

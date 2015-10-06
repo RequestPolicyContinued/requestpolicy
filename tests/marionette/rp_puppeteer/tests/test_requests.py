@@ -4,7 +4,6 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.api.requests import Requests
-from marionette_driver.errors import JavascriptException
 
 
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"

@@ -154,7 +154,6 @@ class Addons(BaseLib):
 
         with self.marionette.using_context("chrome"):
             notif = _InstallNotifications(self.marionette)
-            wait = Wait(self.marionette)
 
             with notif.wrap_lifetime("addon-install-blocked-notification"):
                 # Allow the XPI to be downloaded.  ("allow" button)

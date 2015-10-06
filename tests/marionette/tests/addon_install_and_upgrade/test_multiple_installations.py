@@ -5,9 +5,6 @@
 from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.ui.addons import RequestPolicy, Addons
 
-from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
-                                              ConsoleErrorDetection)
-
 
 OLD_VERSION__ADDON_ID = "requestpolicy@requestpolicy.com"
 AMO_VERSION__ADDON_ID = "rpcontinued@requestpolicy.org"
@@ -141,27 +138,27 @@ class TestOldAndCurrentVersionActiveAfterRestart(OldVersionTestCase):
         self._assert_notice_tab(selected_required=False)
 
 
-class TestAMOVersionActive_ThenInstallCurrentVersion( \
+class TestAMOVersionActive_ThenInstallCurrentVersion(\
         TestOldVersionActive_ThenInstallCurrentVersion):
     INSTALL_URL = AMO_VERSION__INSTALL_URL
     ADDON_ID = AMO_VERSION__ADDON_ID
 
-class TestAMOVersionActive_ThenEnableCurrentVersion( \
+class TestAMOVersionActive_ThenEnableCurrentVersion(\
         TestOldVersionActive_ThenEnableCurrentVersion):
     INSTALL_URL = AMO_VERSION__INSTALL_URL
     ADDON_ID = AMO_VERSION__ADDON_ID
 
-class TestAMOVersionNotActive_ThenInstall( \
+class TestAMOVersionNotActive_ThenInstall(\
         TestOldVersionNotActive_ThenInstall):
     INSTALL_URL = AMO_VERSION__INSTALL_URL
     ADDON_ID = AMO_VERSION__ADDON_ID
 
-class TestAMOVersionNotActive_ThenEnable( \
+class TestAMOVersionNotActive_ThenEnable(\
         TestOldVersionNotActive_ThenEnable):
     INSTALL_URL = AMO_VERSION__INSTALL_URL
     ADDON_ID = AMO_VERSION__ADDON_ID
 
-class TestAMOAndNonAMOVersionActiveAfterRestart( \
+class TestAMOAndNonAMOVersionActiveAfterRestart(\
         TestOldAndCurrentVersionActiveAfterRestart):
     INSTALL_URL = AMO_VERSION__INSTALL_URL
     ADDON_ID = AMO_VERSION__ADDON_ID

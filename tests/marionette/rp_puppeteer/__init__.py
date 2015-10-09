@@ -36,6 +36,10 @@ class RequestPolicyPuppeteer(object):
     def redir(self):
         pass
 
+    @use_class_as_property('ui.request_log.RequestLog')
+    def request_log(self):
+        pass
+
     @use_class_as_property('ui.tabs.Tabs')
     def tabs(self):
         pass

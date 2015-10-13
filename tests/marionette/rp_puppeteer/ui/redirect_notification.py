@@ -4,6 +4,7 @@
 
 from firefox_puppeteer.base import BaseLib
 from marionette_driver.errors import NoSuchElementException
+from marionette_driver.wait import Wait
 
 
 class RedirectNotification(BaseLib):
@@ -22,6 +23,12 @@ class RedirectNotification(BaseLib):
         except NoSuchElementException:
             return False
 
+    def close(self):
+        """Close the notification bar."""
+
+        self._close_button.click()
+        Wait(self.marionette).until(lambda _: not self.is_shown())
+
     ##################################
     # Private Properties and Methods #
     ##################################
@@ -35,4 +42,12 @@ class RedirectNotification(BaseLib):
             .find_element("id", "content")
             .find_element("anon attribute",
                           {"value": "request-policy-meta-redirect"})
+        )
+
+    @property
+    def _close_button(self):
+        return (
+            self._panel
+            .find_element("anon attribute",
+                          {"class": "messageCloseButton close-icon tabbable"})
         )

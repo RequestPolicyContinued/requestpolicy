@@ -35,7 +35,7 @@ class TestOpenInCurrentTab(RequestPolicyTestCase):
             tab = self.browser.tabbar.selected_tab
             self.tabs.wait_until_loaded(tab)
 
-            self.assertFalse(self.redir.panel_exists(),
+            self.assertFalse(self.redir.is_shown(),
                              "Following the URL didn't cause a redirect.")
             self.assertEqual(tab.location, url,
                              "The location is correct.")

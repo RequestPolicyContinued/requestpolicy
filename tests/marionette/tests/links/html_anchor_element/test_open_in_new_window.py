@@ -52,7 +52,7 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
                 self.tabs.wait_until_loaded(tab)
                 self.assertEqual(tab.location, link_url,
                                  "The location in the new window is correct.")
-                self.assertFalse(self.redir.panel_exists(),
+                self.assertFalse(self.redir.is_shown(),
                                  ("Following the link didn't cause a "
                                   "redirect in the destination window."))
 
@@ -62,7 +62,7 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
                 self.main_window.switch_to()
 
                 # checks in the origin's window
-                self.assertFalse(self.redir.panel_exists(),
+                self.assertFalse(self.redir.is_shown(),
                                  ("Following the link didn't cause a "
                                   "redirect in the origin tab."))
 

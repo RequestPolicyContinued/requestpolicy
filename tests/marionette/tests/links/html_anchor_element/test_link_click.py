@@ -24,7 +24,7 @@ class TestLinkClick(RequestPolicyTestCase):
             link_url = link.get_attribute("href")
             link.click()
 
-        self.assertFalse(self.redir.panel_exists(),
+        self.assertFalse(self.redir.is_shown(),
                          "Following the link didn't cause a redirect.")
         self.assertEqual(self.browser.tabbar.selected_tab.location,
                          link_url, "The location is correct.")

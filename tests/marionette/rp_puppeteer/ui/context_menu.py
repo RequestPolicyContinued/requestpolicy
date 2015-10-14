@@ -9,51 +9,61 @@ from marionette_driver.wait import Wait
 
 
 class ContextMenu(BaseLib):
+
+    #################################
+    # Public Properties and Methods #
+    #################################
+
+    @property
+    def element(self):
+        return self.marionette.find_element("id", "contentAreaContextMenu")
+
+    @property
+    def state(self):
+        return self.element.get_attribute("state")
+
     def select_entry(self, entry_id, context_element):
-        """Select a specific entry in the context menu of an HTMLElement.
-        """
+        """Select a specific entry in the context menu of an HTMLElement."""
 
-        menu = self.marionette.find_element("id", "contentAreaContextMenu")
+        self._open(context_element)
+        self._click(entry_id)
+        self._close()
 
-        self._open(menu, context_element)
-        self._click(menu, entry_id)
-        self._close(menu)
+    ##################################
+    # Private Properties and Methods #
+    ##################################
 
-
-    def _open(self, menu, context_element):
+    def _open(self, context_element):
         """Open the context menu."""
 
         with self.marionette.using_context("content"):
             # right click on the HTML element
             Actions(self.marionette).click(context_element, 2).perform()
 
-        self._wait_for_state(menu, "open")
+        self._wait_for_state("open")
 
         # FIXME: Sub-menus aren't currently supported. To support those,
         #        implement the Mozmill Controller's `_buildMenu()` function.
         #        It populates all submenus of the context menu recursively.
         #        Right now only top-level menu entries can be selected.
 
-
-    def _click(self, menu, entry_id):
+    def _click(self, entry_id):
         """Click on an entry in the menu."""
 
-        entry = menu.find_element("id", entry_id)
-        Actions(self.marionette).click(entry).perform()
+        entry = self.element.find_element("id", entry_id)
+        entry.click()
 
-
-    def _close(self, menu):
+    def _close(self):
         """Close the context menu."""
 
         # Only close if the menu is open. The menu for example closes itself
         # in case the URL in the current tab changes. Sending ESC to a menu
         # which is _not_ open anymore will cause the page load to stop.
-        if menu.get_attribute("state") is "open":
-            menu.send_keys(Keys.ESCAPE)
-        self._wait_for_state(menu, "closed")
+        if self.state is "open":
+            self.element.send_keys(Keys.ESCAPE)
+        self._wait_for_state("closed")
 
-
-    def _wait_for_state(self, menu, state):
+    def _wait_for_state(self, state):
         Wait(self.marionette).until(
-            lambda m: menu.get_attribute("state") == state,
-            message="The menu's state is now '" + state + "'.")
+            lambda _: self.state == state,
+            message="The menu's state is now '{}'.".format(state))

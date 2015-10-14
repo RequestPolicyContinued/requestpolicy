@@ -5,5 +5,8 @@
 from marionette_driver.errors import MarionetteException
 
 
+class ElementNotDisplayedException(MarionetteException):
+    pass
+
 class RadioButtonException(MarionetteException):
     pass

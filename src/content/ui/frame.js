@@ -39,17 +39,24 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
   const Cu = Components.utils;
 
   // import some modules
-  let {ScriptLoader} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let mod = {};
-  ScriptLoader.importModules([
-    "lib/utils/constants",
-    "lib/logger",
-    "lib/environment",
-    "lib/framescript-to-overlay-communication"
-  ], mod);
-  let {C, Logger, Environment, FrameScriptEnvironment,
-       FramescriptToOverlayCommunication} = mod;
+  let {
+    ScriptLoader,
+    C,
+    Logger,
+    Environment,
+    FrameScriptEnvironment,
+    FramescriptToOverlayCommunication
+  } = (function () {
+    let mod = {};
+    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
+    mod.ScriptLoader.importModules([
+      "lib/utils/constants",
+      "lib/logger",
+      "lib/environment",
+      "lib/framescript-to-overlay-communication"
+    ], mod);
+    return mod;
+  })();
 
 
   let framescriptEnv = new FrameScriptEnvironment(mm);

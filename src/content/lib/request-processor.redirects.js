@@ -41,7 +41,7 @@ ScriptLoader.importModules([
 
 
 
-let RequestProcessor = (function(self) {
+RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
 

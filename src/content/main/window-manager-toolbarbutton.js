@@ -37,7 +37,7 @@ if (Info.isAustralis) {
 
 
 
-let rpWindowManager = (function(self) {
+rpWindowManager = (function(self) {
 
   let isAustralis = Info.isAustralis;
 

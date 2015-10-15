@@ -21,11 +21,12 @@ $MOZ_SRC_DIR/testing/mozbase/mozdebug:\
 $MOZ_SRC_DIR/testing/mozbase/mozinfo:\
 $MOZ_SRC_DIR/testing/mozbase/mozcrash:\
 $MOZ_SRC_DIR/testing/mozbase/mozfile:\
-$MOZ_SRC_DIR/testing/mozbase/mozlog
+$MOZ_SRC_DIR/testing/mozbase/mozlog:\
+$MOZ_SRC_DIR/testing/mozbase/mozscreenshot
 
 python2.7 $MOZ_SRC_DIR/testing/xpcshell/runxpcshelltests.py \
   --build-info-json $MOZ_OBJ_DIR/mozinfo.json \
   --no-logfiles \
-  --manifest=$TEST_DIR/xpcshell.ini \
-  $@ \
-  $MOZ_BIN_DIR/xpcshell
+  --manifest $TEST_DIR/xpcshell.ini \
+  --xpcshell $MOZ_BIN_DIR/xpcshell \
+  $@

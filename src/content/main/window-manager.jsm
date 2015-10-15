@@ -26,7 +26,7 @@ let EXPORTED_SYMBOLS = ["rpWindowManager"];
 let globalScope = this;
 
 
-let rpWindowManager = (function(self) {
+var rpWindowManager = (function(self) {
 
   const Ci = Components.interfaces;
   const Cc = Components.classes;

@@ -56,7 +56,7 @@ ScriptLoader.defineLazyModuleGetters({
 
 
 
-let RequestProcessor = (function(self) {
+var RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
 

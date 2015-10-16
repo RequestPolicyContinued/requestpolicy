@@ -37,6 +37,15 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
         finally:
             self._reset_error_counts()
 
+    def _check_rules_and_remove_all(self):
+        try:
+            n_rules = self.rules.count_rules()
+            self.assertEqual(n_rules, 0,
+                             "A test must not leak rules. Rule count is {}, "
+                             "but should be zero.".format(n_rules))
+        finally:
+            self.rules.remove_all()
+
 
     def setUp(self, *args, **kwargs):
         FirefoxTestCase.setUp(self, *args, **kwargs)
@@ -49,8 +58,7 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
 
     def tearDown(self, *args, **kwargs):
         try:
-            self.rules.remove_all()
-
+            self._check_rules_and_remove_all()
             self._check_and_reset_error_counts()
         finally:
             FirefoxTestCase.tearDown(self, *args, **kwargs)

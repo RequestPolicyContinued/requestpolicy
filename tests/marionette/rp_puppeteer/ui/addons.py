@@ -75,12 +75,12 @@ class RequestPolicy(BaseLib):
 
     @contextmanager
     def _ensure_no_errors(self):
-        logging_errors_before = self.logging_error_detect.get_error_count()
-        console_errors_before = self.console_error_detect.get_error_count()
+        logging_errors_before = self.logging_error_detect.n_errors
+        console_errors_before = self.console_error_detect.n_errors
         yield
-        logging_error_count = (self.logging_error_detect.get_error_count() -
+        logging_error_count = (self.logging_error_detect.n_errors -
                                logging_errors_before)
-        console_error_count = (self.console_error_detect.get_error_count() -
+        console_error_count = (self.console_error_detect.n_errors -
                                console_errors_before)
         if logging_error_count > 0 and console_error_count > 0:
             raise Exception("There have been {} Logging errors and "

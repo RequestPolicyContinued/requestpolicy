@@ -55,10 +55,10 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
 
     def _check_and_reset_error_counts(self):
         try:
-            self.assertEqual(self.logging_error_detect.get_error_count(), 0,
-                             "The Logging error count is zero.")
-            self.assertEqual(self.console_error_detect.get_error_count(), 0,
-                             "The Console error count is zero.")
+            self.assertEqual(self.logging_error_detect.n_errors, 0,
+                             "There should be no logging errers.")
+            self.assertEqual(self.console_error_detect.n_errors, 0,
+                             "There should be no console errors.")
         finally:
-            self.logging_error_detect.reset_error_count()
-            self.console_error_detect.reset_error_count()
+            self.logging_error_detect.reset()
+            self.console_error_detect.reset()

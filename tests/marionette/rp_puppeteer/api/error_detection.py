@@ -17,10 +17,11 @@ class ErrorDetection(BaseLib):
                 Services.obs.notifyObservers(null, "{}", "{}");
                 """.format(topic, data))
 
-    def get_error_count(self):
+    @property
+    def n_errors(self):
         raise NotImplementedError
 
-    def reset_error_count(self):
+    def reset(self):
         raise NotImplementedError
 
     def trigger_error(self):
@@ -28,15 +29,17 @@ class ErrorDetection(BaseLib):
 
 
 class LoggingErrorDetection(ErrorDetection):
+
     def __init__(self, marionette_getter):
         BaseLib.__init__(self, marionette_getter)
 
         self.prefs = Preferences(marionette_getter)
 
-    def get_error_count(self):
+    @property
+    def n_errors(self):
         return self.prefs.get_pref(ERROR_COUNT_PREF)
 
-    def reset_error_count(self):
+    def reset(self):
         self.prefs.set_pref(ERROR_COUNT_PREF, 0)
 
     def trigger_error(self, error_type, msg="[Marionette unit test]"):
@@ -45,7 +48,9 @@ class LoggingErrorDetection(ErrorDetection):
 
 
 class ConsoleErrorDetection(ErrorDetection):
-    def get_error_count(self):
+
+    @property
+    def n_errors(self):
         with self.marionette.using_context("chrome"):
             return self.marionette.execute_script(
                 """
@@ -55,7 +60,7 @@ class ConsoleErrorDetection(ErrorDetection):
                 return scope.ConsoleObserver.getNumErrors();
                 """)
 
-    def reset_error_count(self):
+    def reset(self):
         with self.marionette.using_context("chrome"):
             return self.marionette.execute_script(
                 """

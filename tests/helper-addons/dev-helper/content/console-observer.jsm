@@ -51,13 +51,19 @@ function isRPException(aMessage) {
  */
 var ConsoleObserver = (function (self) {
   let numErrors = 0;
+  let messages = [];
 
   self.getNumErrors = function () {
     return numErrors;
   };
+  
+  self.getMessages = function () {
+    return messages;
+  };
 
   self.reset = function () {
     numErrors = 0;
+    messages = [];
   };
 
   self.startup = function () {
@@ -74,6 +80,7 @@ var ConsoleObserver = (function (self) {
 
     if (isRPException(msg)) {
       ++numErrors;
+      messages.push(msg);
       dump("[RequestPolicy] [Browser Console] " + msg + "\n");
     }
   };

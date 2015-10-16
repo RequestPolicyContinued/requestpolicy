@@ -4,8 +4,6 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 
-from rp_puppeteer.api.prefs import using_pref
-
 
 class TestPrefs(RequestPolicyTestCase):
 
@@ -18,7 +16,7 @@ class TestPrefs(RequestPolicyTestCase):
         self.assertEqual(self.prefs.get_pref(self.new_pref), None,
                          msg="The pref initially doesn't exist.")
 
-        with using_pref(self.prefs, self.new_pref, 'unittest'):
+        with self.prefs.using_pref(self.new_pref, 'unittest'):
             self.assertEqual(self.prefs.get_pref(self.new_pref), 'unittest',
                              msg="The pref has been set.")
 

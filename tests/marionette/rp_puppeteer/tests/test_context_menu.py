@@ -7,10 +7,10 @@ from rp_puppeteer.errors import ElementNotDisplayedException
 from marionette_driver.errors import NoSuchElementException
 
 
-class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
+class TestContextMenu(RequestPolicyTestCase):
 
     def setUp(self):
-        super(TestLinkClickRedirectInNewTab, self).setUp()
+        super(TestContextMenu, self).setUp()
 
         # A page with a link to the domain's root.
         self.test_url = "http://www.maindomain.test/link.html?/"
@@ -23,7 +23,7 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
         try:
             self.browser.tabbar.close_all_tabs(exceptions=[self.origin_tab])
         finally:
-            super(TestLinkClickRedirectInNewTab, self).tearDown()
+            super(TestContextMenu, self).tearDown()
 
     def test_select_entry__normal(self):
         # Open Link in New Tab.

@@ -28,8 +28,8 @@ class TestRedirectNotification(RequestPolicyTestCase):
         with self.marionette.using_context("content"):
             self.marionette.navigate(PAGE_WITH_REDIRECT)
 
-        self.assertTrue(self.redir.panel_exists())
+        self.assertTrue(self.redir.is_shown())
         self.redir.close()
         # The panel should be closed when `close()` has been called,
         # that is, the close action should be synchronized.
-        self.assertFalse(self.redir.panel_exists())
+        self.assertFalse(self.redir.is_shown())

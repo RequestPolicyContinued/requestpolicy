@@ -21,6 +21,10 @@ class ErrorDetection(BaseLib):
     def n_errors(self):
         raise NotImplementedError
 
+    @property
+    def messages(self):
+        raise NotImplementedError
+
     def reset(self):
         raise NotImplementedError
 
@@ -59,6 +63,15 @@ class ConsoleErrorDetection(ErrorDetection):
                     "content/console-observer.jsm", scope);
                 return scope.ConsoleObserver.getNumErrors();
                 """)
+
+    @property
+    def messages(self):
+        return self.marionette.execute_script("""
+          let scope = {};
+          Components.utils.import("chrome://rpc-dev-helper/" +
+              "content/console-observer.jsm", scope);
+          return scope.ConsoleObserver.getMessages();
+        """)
 
     def reset(self):
         with self.marionette.using_context("chrome"):

@@ -58,7 +58,9 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
             self.assertEqual(self.logging_error_detect.n_errors, 0,
                              "There should be no logging errers.")
             self.assertEqual(self.console_error_detect.n_errors, 0,
-                             "There should be no console errors.")
+                             "There should be no console errors. "
+                             "Messages were: {}"
+                             .format(self.console_error_detect.messages))
         finally:
             self.logging_error_detect.reset()
             self.console_error_detect.reset()

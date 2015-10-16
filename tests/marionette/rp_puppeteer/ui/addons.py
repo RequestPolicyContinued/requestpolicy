@@ -82,16 +82,21 @@ class RequestPolicy(BaseLib):
                                logging_errors_before)
         console_error_count = (self.console_error_detect.n_errors -
                                console_errors_before)
+        console_error_messages = self.console_error_detect.messages
+
         if logging_error_count > 0 and console_error_count > 0:
             raise Exception("There have been {} Logging errors and "
-                            "{} Console errors!".format(logging_error_count,
-                                                        console_error_count))
+                            "{} Console errors! "
+                            "Console error messages were: {}"
+                            .format(logging_error_count, console_error_count,
+                                    console_error_messages))
         elif logging_error_count > 0:
             raise Exception("There have been {} Logging "
                             "errors!".format(logging_error_count))
         elif console_error_count > 0:
-            raise Exception("There have been {} Console "
-                            "errors!".format(console_error_count))
+            raise Exception("There have been {} Console  errors! "
+                            "Messages were: {}".format(console_error_count,
+                                                       console_error_messages))
 
     @contextmanager
     def install_in_two_steps(self):

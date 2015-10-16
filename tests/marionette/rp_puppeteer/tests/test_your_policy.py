@@ -76,6 +76,7 @@ class YourPolicyTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
+            self.rules.remove_all()
             self.marionette.set_context("chrome")
         finally:
             super(YourPolicyTestCase, self).tearDown()

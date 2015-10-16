@@ -20,32 +20,9 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
     def __init__(self, *args, **kwargs):
         FirefoxTestCase.__init__(self, *args, **kwargs)
 
-
-    def _check_error_counts(self):
-        self.assertEqual(self.logging_error_detect.get_error_count(), 0,
-                         msg="The Logging error count is zero.")
-        self.assertEqual(self.console_error_detect.get_error_count(), 0,
-                         msg="The Console error count is zero.")
-
-    def _reset_error_counts(self):
-        self.logging_error_detect.reset_error_count()
-        self.console_error_detect.reset_error_count()
-
-    def _check_and_reset_error_counts(self):
-        try:
-            self._check_error_counts()
-        finally:
-            self._reset_error_counts()
-
-    def _check_rules_and_remove_all(self):
-        try:
-            n_rules = self.rules.count_rules()
-            self.assertEqual(n_rules, 0,
-                             "A test must not leak rules. Rule count is {}, "
-                             "but should be zero.".format(n_rules))
-        finally:
-            self.rules.remove_all()
-
+    #################################
+    # Public Properties and Methods #
+    #################################
 
     def setUp(self, *args, **kwargs):
         FirefoxTestCase.setUp(self, *args, **kwargs)
@@ -62,3 +39,26 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
             self._check_and_reset_error_counts()
         finally:
             FirefoxTestCase.tearDown(self, *args, **kwargs)
+
+    ##################################
+    # Private Properties and Methods #
+    ##################################
+
+    def _check_rules_and_remove_all(self):
+        try:
+            n_rules = self.rules.count_rules()
+            self.assertEqual(n_rules, 0,
+                             "A test must not leak rules. Rule count is {}, "
+                             "but should be zero.".format(n_rules))
+        finally:
+            self.rules.remove_all()
+
+    def _check_and_reset_error_counts(self):
+        try:
+            self.assertEqual(self.logging_error_detect.get_error_count(), 0,
+                             "The Logging error count is zero.")
+            self.assertEqual(self.console_error_detect.get_error_count(), 0,
+                             "The Console error count is zero.")
+        finally:
+            self.logging_error_detect.reset_error_count()
+            self.console_error_detect.reset_error_count()

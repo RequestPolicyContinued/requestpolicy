@@ -7,6 +7,7 @@ from marionette_driver.wait import Wait
 
 
 class Tabs(BaseLib):
+
     def is_loaded(self, tab):
         return tab.tab_element.get_attribute("busy") == None
 

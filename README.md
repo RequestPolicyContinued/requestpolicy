@@ -35,4 +35,7 @@ After preparation, run `make` from the repository's root directory.  The [XPI](h
 
 [GPL v3](LICENSE)
 
-----------------------------------------
+
+## Contributing
+
+See [here](https://requestpolicycontinued.github.io/Contributing.html).

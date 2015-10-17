@@ -3,6 +3,10 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta10.2 (bugfix)
+* The add-on did not start on the latest Firefox Nightly,
+  version 44.0a1 (#719).
+
 #### Version 1.0.beta10.1-signed
 * The add-on is now signed by Mozilla. (#701) There's no change in
   functionality, and no bugs have been fixed.

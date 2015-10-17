@@ -2,6 +2,11 @@
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
 
+#### Version 1.0.beta11
+* All Mozmill tests have been migrated to the new Marionette testing
+  environment. See issue #641 and commit c86b806.
+
+
 #### Version 1.0.beta10
 * A Marionette testing environment and some first tests have been created.
   See #641 and 9950ad2.

@@ -22,7 +22,7 @@
  */
 
 
-let PolicyManager = (function(self) {
+PolicyManager = (function(self) {
 
   self.addAllowRule = self.addRule.bind(this, C.RULE_ACTION_ALLOW);
   self.addTemporaryAllowRule = self.addTemporaryRule.bind(this,

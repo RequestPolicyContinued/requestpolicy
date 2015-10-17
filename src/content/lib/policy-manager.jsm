@@ -79,7 +79,7 @@ function notifyRulesChanged() {
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-let PolicyManager = (function(self) {
+var PolicyManager = (function(self) {
 
 
   let userRulesets = {};

@@ -75,23 +75,28 @@ class RequestPolicy(BaseLib):
 
     @contextmanager
     def _ensure_no_errors(self):
-        logging_errors_before = self.logging_error_detect.get_error_count()
-        console_errors_before = self.console_error_detect.get_error_count()
+        logging_errors_before = self.logging_error_detect.n_errors
+        console_errors_before = self.console_error_detect.n_errors
         yield
-        logging_error_count = (self.logging_error_detect.get_error_count() -
+        logging_error_count = (self.logging_error_detect.n_errors -
                                logging_errors_before)
-        console_error_count = (self.console_error_detect.get_error_count() -
+        console_error_count = (self.console_error_detect.n_errors -
                                console_errors_before)
+        console_error_messages = self.console_error_detect.messages
+
         if logging_error_count > 0 and console_error_count > 0:
             raise Exception("There have been {} Logging errors and "
-                            "{} Console errors!".format(logging_error_count,
-                                                        console_error_count))
+                            "{} Console errors! "
+                            "Console error messages were: {}"
+                            .format(logging_error_count, console_error_count,
+                                    console_error_messages))
         elif logging_error_count > 0:
             raise Exception("There have been {} Logging "
                             "errors!".format(logging_error_count))
         elif console_error_count > 0:
-            raise Exception("There have been {} Console "
-                            "errors!".format(console_error_count))
+            raise Exception("There have been {} Console  errors! "
+                            "Messages were: {}".format(console_error_count,
+                                                       console_error_messages))
 
     @contextmanager
     def install_in_two_steps(self):
@@ -154,7 +159,6 @@ class Addons(BaseLib):
 
         with self.marionette.using_context("chrome"):
             notif = _InstallNotifications(self.marionette)
-            wait = Wait(self.marionette)
 
             with notif.wrap_lifetime("addon-install-blocked-notification"):
                 # Allow the XPI to be downloaded.  ("allow" button)

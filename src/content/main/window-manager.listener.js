@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let WindowListener = (function() {
+WindowListener = (function() {
   let self = {};
 
   let nextWinID = 0;

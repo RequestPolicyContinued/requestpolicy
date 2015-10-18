@@ -1,2 +1,2 @@
--e git+https://github.com/mozilla/firefox-ui-tests.git#egg=firefox-ui-tests
+-e git+https://github.com/mozilla/firefox-ui-tests.git@mozilla-central#egg=firefox-ui-tests
 mozrunner >= 6.9

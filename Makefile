@@ -24,6 +24,7 @@ off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
 # The zip application to be used.
 ZIP := zip
+PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
 
 source_dirname := src
 build_dirname := build
@@ -242,6 +243,11 @@ $(dist_path):
 
 signed-xpi: $(signed_xpi_file)
 
+.PHONY: preprocessor
+preprocessor: $(build_dirname)/preprocess-content-types.txt
+$(build_dirname)/preprocess-content-types.txt:
+	echo 'JavaScript .jsm' > $@
+
 
 # ________________________
 # create the "off-AMO" XPI
@@ -330,7 +336,7 @@ dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__src__all_files) FORCE | $(dist_pa
 #
 
 # Default tree-ish.
-specific_xpi__treeish := v1.0.beta9.3
+specific_xpi__treeish := v1.0.beta9.3__preprocess.py
 
 specific_xpi__file := $(dist_path)$(extension_name)-$(specific_xpi__treeish).xpi
 specific_xpi__build_path := $(build_dirname)/specific-xpi
@@ -366,9 +372,9 @@ $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_am
 # enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
 .SECONDEXPANSION:
 
-$(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+$(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@) preprocessor
 	@mkdir -p $(@D)
-	preprocess $< > $@
+	$(PREPROCESS) $< > $@
 
 $(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(@D)
@@ -391,9 +397,9 @@ $(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
 
 $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
-$(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+$(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@) preprocessor
 	@mkdir -p $(@D)
-	preprocess $< -AMO=true > $@
+	$(PREPROCESS) -D AMO $< > $@
 
 $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(@D)
@@ -410,9 +416,9 @@ $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
-$(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+$(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@) preprocessor
 	@mkdir -p $(@D)
-	preprocess $< -UNIT_TESTING=true > $@
+	$(PREPROCESS) --keep-lines -D UNIT_TESTING $< > $@
 
 $(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
 	@mkdir -p $(@D)

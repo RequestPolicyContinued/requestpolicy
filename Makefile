@@ -336,7 +336,7 @@ dummy-xpi $(dummy_ext__xpi_file): $(dummy_ext__src__all_files) FORCE | $(dist_pa
 #
 
 # Default tree-ish.
-specific_xpi__treeish := v1.0.beta9.3
+specific_xpi__treeish := v1.0.beta9.3__preprocess.py
 
 specific_xpi__file := $(dist_path)$(extension_name)-$(specific_xpi__treeish).xpi
 specific_xpi__build_path := $(build_dirname)/specific-xpi

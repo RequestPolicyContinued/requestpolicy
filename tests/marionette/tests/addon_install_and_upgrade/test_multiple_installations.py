@@ -12,7 +12,8 @@ AMO_VERSION__ADDON_ID = "rpcontinued@requestpolicy.org"
 def _install_url(filename):
     return "http://localhost/link.html?.dist/" + filename
 
-OLD_VERSION__INSTALL_URL = _install_url("requestpolicy-v1.0.beta9.3.xpi")
+OLD_VERSION__INSTALL_URL = _install_url("requestpolicy-v1.0.beta9.3"
+                                        "__preprocess.py.xpi")
 AMO_VERSION__INSTALL_URL = _install_url("requestpolicy-amo.xpi")
 
 

@@ -148,36 +148,21 @@ window.rpcontinued.requestLog = (function (self) {
     performAction: function(action) {},
     performActionOnCell: function(action, aIndex, aColumn) {},
 
-    getRowProperties: function(aIndex, aProps) {
-      var returnValue = (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
-
-      if (aProps) {
-        // Gecko version < 22
-        aProps.AppendElement(aserv.getAtom(returnValue));
-      } else {
-        // Gecko version >= 22
-        return returnValue;
-      }
+    getRowProperties: function(aIndex) {
+      return (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
     },
 
-    getCellProperties: function(aIndex, aColumn, aProps) {
+    getCellProperties: function(aIndex, aColumn) {
       if (self.columnNameToIndexMap[aColumn.id] == 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
-          if (aProps) {
-            // Gecko version < 22
-            aProps.AppendElement(aserv.getAtom("blocked"));
-          } else {
-            // Gecko version >= 22
-            return "blocked";
-          }
+          return "blocked";
         }
       }
+      return "";
     },
 
-    getColumnProperties: function(aColumn, aProps) {
-      if (!aProps) {
-        return "";
-      }
+    getColumnProperties: function(aColumn) {
+      return "";
     }
   };
 

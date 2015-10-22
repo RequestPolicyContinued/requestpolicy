@@ -545,6 +545,7 @@ $(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini
 
+marionette_prefs :=
 
 .PHONY: marionette
 marionette: venv \
@@ -559,7 +560,7 @@ marionette: venv \
 	source .venv/bin/activate ; \
 	export PYTHONPATH=tests/marionette/ ; \
 	profile_dir=`mozprofile -a $(unit_testing__xpi_file) -a $(dev_helper__xpi_file) --preferences=$(mozrunner_prefs_ini):marionette` ; \
-	firefox-ui-tests --binary=$(app_binary) --profile=$$profile_dir $(marionette_tests) ; \
+	firefox-ui-tests --binary=$(app_binary) --profile=$$profile_dir $(marionette_prefs) $(marionette_tests) ; \
 	rm -rf $$profile_dir ; \
 	)
 

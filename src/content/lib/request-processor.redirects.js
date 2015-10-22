@@ -320,39 +320,12 @@ RequestProcessor = (function(self) {
    * @param {RedirectRequest} aRequest
    */
   function eventuallyShowRedirectNotification(aRequest) {
-    var httpResponse = aRequest.httpResponse;
-
-    // Check whether the request is associated with a `document` element.
+    // Check if the request corresponds to a top-level document load.
     {
-      let docShell = httpResponse.docShell;
+      let loadFlags = aRequest.httpResponse.httpChannel.loadFlags;
+      let topLevelDocFlag = Ci.nsIChannel.LOAD_INITIAL_DOCUMENT_URI;
 
-      if (docShell === null) {
-        return;
-      }
-
-      let busyFlags = docShell.busyFlags;
-      const expectedFlags = Ci.nsIDocShell.BUSY_FLAGS_BUSY
-          | Ci.nsIDocShell.BUSY_FLAGS_BEFORE_PAGE_LOAD;
-
-      // The document is loading AND nothing has been received yet.
-      let isDocumentRequest = (busyFlags & expectedFlags) === expectedFlags;
-
-      if (isDocumentRequest === false) {
-        // This is probably a redirect of an "inline" element, e.g. <img>.
-        return;
-      }
-    }
-
-    // Check whether it's the top-level document that is being loaded.
-    {
-      let loadContext = httpResponse.loadContext;
-
-      if (loadContext === null) {
-        return;
-      }
-
-      if (loadContext.associatedWindow !== loadContext.topWindow) {
-        // this request belongs to a sub-document, e.g. an iframe.
+      if ((loadFlags & topLevelDocFlag) !== topLevelDocFlag) {
         return;
       }
     }

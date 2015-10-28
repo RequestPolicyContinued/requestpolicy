@@ -12,6 +12,10 @@ class RequestPolicyPuppeteer(object):
     RequestPolicyTestCase instance.
     """
 
+    @use_class_as_property('api.browser_info.BrowserInfo')
+    def browser_info(self):
+        pass
+
     @use_class_as_property('api.l10n.L10n')
     def l10n(self):
         pass

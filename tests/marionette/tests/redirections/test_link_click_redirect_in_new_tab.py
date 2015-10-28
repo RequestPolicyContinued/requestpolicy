@@ -100,13 +100,19 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                 yield
 
         def test_variant(*args):
-            with assert_raises_if(ElementNotDisplayedException,
-                                  args[0] == "contextMenu"):
-                # The "Open Link in New Tab" context menu entry is not
-                # available for <a> elements with such hrefs containing
-                # JavaScript code.
-                test_appear(expand_url("redirect-js-document-location-link.html",
-                                       option="no link creation"), *args)
+            # FIXME: Issue #725;  This test fails with E10s enabled.
+            #        When FxPuppeteer's `TabBar.get_handle_for_tab()` is
+            #        executed for the new tab with the test URL, the
+            #        `contentWindowAsCPOW` either is `null` or does not
+            #        have a `QueryInterface()` function.
+            if not self.browser_info.e10s_enabled:
+                with assert_raises_if(ElementNotDisplayedException,
+                                      args[0] == "contextMenu"):
+                    # The "Open Link in New Tab" context menu entry is not
+                    # available for <a> elements with such hrefs containing
+                    # JavaScript code.
+                    test_appear(expand_url("redirect-js-document-location-link.html",
+                                           option="no link creation"), *args)
 
             test_appear(expand_url("redirect-http-location-header.php"), *args)
             test_appear(expand_url("redirect-http-refresh-header.php"), *args)

@@ -47,12 +47,20 @@ class TestAutoRedirect(RequestPolicyTestCase):
             # Load the page, expecting a TimeoutException, because when
             # RequestPolicy blocks a redirection, the page never loads.
             with self.marionette.using_context("content"):
-                # Set the timeout to a low value in order to speed up the
-                # test.
-                self.marionette.timeouts("page load", 100)
-                self.assertRaises(TimeoutException, self.marionette.navigate,
-                                  test_url)
-                self.marionette.timeouts("page load", 20000)
+                if self.browser_info.e10s_enabled:
+                    # Looks like with E10s enabled the TimeoutException
+                    # is not thrown.
+                    self.marionette.navigate(test_url)
+                else:
+                    # Set the timeout to a low value in order to speed up the
+                    # test.
+                    self.marionette.timeouts("page load", 100)
+
+                    self.assertRaises(TimeoutException,
+                                      self.marionette.navigate,
+                                      test_url)
+
+                    self.marionette.timeouts("page load", 20000)
 
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed.")
@@ -61,8 +69,17 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             self.redir.close()
 
-        test_appear("redirect-http-location-header.php")
-        test_appear("redirect-http-refresh-header.php")
+        if not self.browser_info.e10s_enabled:
+            # FIXME: Issue #722;  There should be a notification bar for
+            #        HTTP <location|refresh> header redirections.
+            # FIXME: If these two tests were activated on E10s, they would
+            #        be paused for several minutes until they fail as follows:
+            #            IOError: process died with returncode None
+            #        This might be related to Mozilla Bug 1209373:
+            #            `marionette.navigate()` throws `IOError` instead
+            #            of `TimeoutException`.
+            test_appear("redirect-http-location-header.php")
+            test_appear("redirect-http-refresh-header.php")
         test_appear("redirect-js-document-location-auto.html")
         test_appear("redirect-meta-tag-01-immediate.html")
         test_appear("redirect-meta-tag-02-delayed.html")

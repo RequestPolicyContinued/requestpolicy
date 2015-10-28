@@ -33,11 +33,6 @@ class TestInlineRedirect(RequestPolicyTestCase):
             with self.marionette.using_context("content"):
                 self.marionette.navigate(test_url)
 
-            # Wait some time to be sure the test is not faster than the
-            # redirect notification.
-            # FIXME: Find a better solution than `sleep()`
-            time.sleep(0.1)
-
             self.assertFalse(self.redir.is_shown(),
                              "There's no redirect notification.")
 

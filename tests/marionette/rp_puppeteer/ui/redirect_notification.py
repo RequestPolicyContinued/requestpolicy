@@ -5,6 +5,7 @@
 from firefox_puppeteer.base import BaseLib
 from marionette_driver.errors import NoSuchElementException
 from marionette_driver.wait import Wait
+import time
 
 
 class RedirectNotification(BaseLib):
@@ -16,6 +17,12 @@ class RedirectNotification(BaseLib):
 
     def is_shown(self):
         """Check if the redirection notification bar is present."""
+
+        # Wait some time to make sure the check happens not too early.
+        # In that case `is_shown()` would return `False`, but it should
+        # return `True`.
+        # FIXME: Find a better solution than `sleep()`.
+        time.sleep(0.1)
 
         try:
             self._panel

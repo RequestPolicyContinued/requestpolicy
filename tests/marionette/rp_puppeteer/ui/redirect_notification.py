@@ -44,12 +44,10 @@ class RedirectNotification(BaseLib):
     def _panel(self):
         """The redirection notification bar in the tab currently focused."""
 
-        return (
-            self.marionette
-            .find_element("id", "content")
-            .find_element("anon attribute",
-                          {"value": "request-policy-meta-redirect"})
-        )
+        return (self.marionette.find_element("id", "content")
+                .find_element("anon attribute", {"anonid": "tabbox"})
+                .find_element("css selector",
+                              "[value='request-policy-meta-redirect']"))
 
     @property
     def _close_button(self):

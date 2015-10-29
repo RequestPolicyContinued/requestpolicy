@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from firefox_ui_harness import FirefoxTestCase
+from firefox_puppeteer.testcases import FirefoxTestCase
 from rp_puppeteer import RequestPolicyPuppeteer
 
 from rp_puppeteer.api.error_detection import (LoggingErrorDetection,

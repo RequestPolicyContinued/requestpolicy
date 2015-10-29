@@ -223,7 +223,9 @@ RequestProcessor = (function(self) {
     // The header isn't allowed, so remove it.
     try {
       if (!Prefs.isBlockingDisabled()) {
-        httpResponse.removeResponseHeader();
+        // Cancel the request. As of Fx 37, this causes the location bar to
+        // show the URL of the previously displayed page.
+        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
         let browser = request.browser;
 
@@ -240,10 +242,6 @@ RequestProcessor = (function(self) {
           browser.rpcontinued = browser.rpcontinued || {blockedRedirects: {}};
           browser.rpcontinued.blockedRedirects[originURI] = destURI;
         }
-
-        // Cancel the request. As of Fx 37, this causes the location bar to
-        // show the URL of the previously displayed page.
-        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
         eventuallyShowRedirectNotification(request);
 

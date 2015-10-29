@@ -539,8 +539,8 @@ rpcontinued.overlay = (function() {
             //       this is not necessary at all.
             // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
 
-            RequestProcessor.registerAllowedRedirect(
-                browser.documentURI.specIgnoringRef, redirectTargetUri);
+            RequestProcessor.registerAllowedRedirect(redirectOriginUri,
+                                                     redirectTargetUri);
 
             browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
                 {uri: redirectTargetUri});

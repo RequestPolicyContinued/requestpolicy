@@ -4,6 +4,7 @@
 
 from rp_ui_harness.testcases import RequestPolicyTestCase
 from marionette_driver.errors import TimeoutException
+from marionette import SkipTest
 
 
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
@@ -34,6 +35,8 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
         def test_no_appear(path):
             test_url = "http://www.maindomain.test/" + path
+            # FIXME: Remove the following line when #726 is fixed.
+            test_url += "?test_redirect_notification_appears_or_not"
 
             with self.marionette.using_context("content"):
                 self.marionette.navigate(test_url)
@@ -45,6 +48,8 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
         def test_appear(path):
             test_url = "http://www.maindomain.test/" + path
+            # FIXME: Remove the following line when #726 is fixed.
+            test_url += "?test_redirect_notification_appears_or_not"
 
             initial_uri = self.marionette.get_url()
 
@@ -74,6 +79,58 @@ class TestAutoRedirect(RequestPolicyTestCase):
         test_no_appear("redirect-meta-tag-06-different-formatting.html")
         test_no_appear("redirect-meta-tag-07-different-formatting-delayed.html")
         test_no_appear("redirect-meta-tag-09-relative.html")
+
+    def test_allow(self):
+
+        def test(path, dest_uri):
+            test_url = "http://www.maindomain.test/" + path
+            # FIXME: Remove the following line when #726 is fixed.
+            test_url += "?test_allow"
+
+            self._navigate_expecting_r21n(test_url)
+            self.assertTrue(self.redir.is_shown())
+            self.redir.allow()
+            self.assertFalse(self.redir.is_shown())
+            with self.marionette.using_context("content"):
+                self.assertEqual(self.marionette.get_url(), dest_uri)
+
+        # FIXME: Issue #727
+        if not self.browser_info.e10s_enabled:
+            # Header redirection
+            test("redirect-http-location-header.php",
+                 "http://www.otherdomain.test/")
+
+        # JavaScript redirection
+        test("redirect-js-document-location-auto.html",
+             "http://www.otherdomain.test/")
+        # <meta> redirection
+        test("redirect-meta-tag-01-immediate.html",
+             ("http://www.otherdomain.test/destination.html?"
+              "redirect-meta-tag-01%20redirected%20here."))
+
+    def test_r21n_appears_again_after_allow(self):
+        raise SkipTest("Skipping due to issue #726.")
+
+        def test(path):
+            test_url = "http://www.maindomain.test/" + path
+
+            self._navigate_expecting_r21n(test_url)
+            self.assertTrue(self.redir.is_shown())
+            self.redir.allow()
+
+            self._navigate_expecting_r21n(test_url)
+            self.assertTrue(self.redir.is_shown())
+            self.redir.close()
+
+        # FIXME: Issue #727
+        if not self.browser_info.e10s_enabled:
+            # Header redirection
+            test("redirect-http-location-header.php")
+
+        # JavaScript redirection
+        test("redirect-js-document-location-auto.html")
+        # <meta> redirection
+        test("redirect-meta-tag-01-immediate.html")
 
     ##########################
     # Private Helper Methods #

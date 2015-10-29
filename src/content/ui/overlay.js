@@ -564,8 +564,25 @@ rpcontinued.overlay = (function() {
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-      notificationBox.appendNotification(notificationLabel, notificationValue,
+      
+      let notificationElem = notificationBox.appendNotification(
+          notificationLabel, notificationValue,
           "chrome://browser/skin/Info.png", priority, buttons);
+      
+      // Let the notification persist at least 300ms. This is needed in the
+      // following scenario:
+      //     If an URL is entered on an empty tab (e.g. "about:blank"),
+      //     and that URL redirects to another URL with a different
+      //     host, and that redirect is blocked by RequestPolicy,
+      //     then immediately after blocking the redirect Firefox will make
+      //     a location change, maybe back from the blocked URL to
+      //     "about:blank". In any case, when the location changes, the
+      //     function `notificationbox.removeTransientNotifications()`
+      //     is called. It checks for the `persistence` and `timeout`
+      //     properties. See MDN documentation:
+      //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
+      // See also issue #722.
+      notificationElem.timeout = Date.now() + 300;
     }
     return true;
   };

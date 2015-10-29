@@ -69,17 +69,12 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             self.redir.close()
 
+        # FIXME: Issue #727;   On E10s, Marionette Tests for HTTP
+        #        <location|refresh> header redirections raise IOError.
         if not self.browser_info.e10s_enabled:
-            # FIXME: Issue #722;  There should be a notification bar for
-            #        HTTP <location|refresh> header redirections.
-            # FIXME: If these two tests were activated on E10s, they would
-            #        be paused for several minutes until they fail as follows:
-            #            IOError: process died with returncode None
-            #        This might be related to Mozilla Bug 1209373:
-            #            `marionette.navigate()` throws `IOError` instead
-            #            of `TimeoutException`.
             test_appear("redirect-http-location-header.php")
             test_appear("redirect-http-refresh-header.php")
+
         test_appear("redirect-js-document-location-auto.html")
         test_appear("redirect-meta-tag-01-immediate.html")
         test_appear("redirect-meta-tag-02-delayed.html")

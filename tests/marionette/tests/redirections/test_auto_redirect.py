@@ -22,6 +22,10 @@ class TestAutoRedirect(RequestPolicyTestCase):
         finally:
             super(TestAutoRedirect, self).tearDown()
 
+    ################
+    # Test Methods #
+    ################
+
     def test_redirect_notification_appears_or_not(self):
         """Using some pages which cause redirections, this test ensures
         that the redirect notification appears when it's expected and stays
@@ -44,23 +48,7 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             initial_uri = self.marionette.get_url()
 
-            # Load the page, expecting a TimeoutException, because when
-            # RequestPolicy blocks a redirection, the page never loads.
-            with self.marionette.using_context("content"):
-                if self.browser_info.e10s_enabled:
-                    # Looks like with E10s enabled the TimeoutException
-                    # is not thrown.
-                    self.marionette.navigate(test_url)
-                else:
-                    # Set the timeout to a low value in order to speed up the
-                    # test.
-                    self.marionette.timeouts("page load", 100)
-
-                    self.assertRaises(TimeoutException,
-                                      self.marionette.navigate,
-                                      test_url)
-
-                    self.marionette.timeouts("page load", 20000)
+            self._navigate_expecting_r21n(test_url)
 
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed.")
@@ -86,3 +74,27 @@ class TestAutoRedirect(RequestPolicyTestCase):
         test_no_appear("redirect-meta-tag-06-different-formatting.html")
         test_no_appear("redirect-meta-tag-07-different-formatting-delayed.html")
         test_no_appear("redirect-meta-tag-09-relative.html")
+
+    ##########################
+    # Private Helper Methods #
+    ##########################
+
+    def _navigate_expecting_r21n(self, url):
+        """Navigate to a URL, catching all expected exceptions."""
+
+        with self.marionette.using_context("content"):
+            if self.browser_info.e10s_enabled:
+                # On E10s there's no TimeoutException raised.
+                self.marionette.navigate(url)
+            else:
+                # On non-E10s, expect a TimeoutException, because when
+                # RequestPolicy blocks a redirection, the page never loads.
+
+                # Set the timeout to a low value in order to speed up the
+                # test.
+                self.marionette.timeouts("page load", 100)
+
+                self.assertRaises(TimeoutException, self.marionette.navigate,
+                                  url)
+
+                self.marionette.timeouts("page load", 20000)

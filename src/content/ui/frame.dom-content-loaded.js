@@ -59,8 +59,8 @@ let ManagerForDOMContentLoaded = (function() {
   function onDOMContentLoaded(event) {
     // TODO: This is getting called multiple times for a page, should only be
     // called once.
-    //    <--- the above comment is very old – is it still true that
-    //         onDOMContentLoaded is eventually called multiple times?
+    //    <--- the above comment is very old – is it (still) true that
+    //         onDOMContentLoaded is called multiple times?
     var doc = event.originalTarget;
     if (doc.nodeName != "#document") {
       // only documents

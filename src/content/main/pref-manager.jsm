@@ -131,7 +131,7 @@ let PrefManager = (function() {
   };
 
 
-  function eventuallyHandleUninstallOrDisable(data, reason) {
+  function maybeHandleUninstallOrDisable(data, reason) {
     if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
       // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
       //       disabled when being uninstalled.
@@ -139,7 +139,7 @@ let PrefManager = (function() {
     }
   }
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-                                         eventuallyHandleUninstallOrDisable);
+                                         maybeHandleUninstallOrDisable);
 
   return self;
 }());

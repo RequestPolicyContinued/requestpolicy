@@ -403,7 +403,7 @@ rpcontinued.overlay = (function() {
    * @param {String} aUri
    * @param {Int} aMaxLength
    *
-   * @returns {String} the URI, eventually cropped
+   * @returns {String} the URI, possibly cropped
    *
    */
   function cropUri(aUri, aMaxLength) {

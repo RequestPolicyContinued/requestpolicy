@@ -116,8 +116,7 @@ rpcontinued.menu = (function() {
 
 
   /**
-   * Removes all children from a list and eventually removes
-   * all event listeners.
+   * Remove all children from a list, and remove all event listeners.
    *
    * @param {Element} aList The list that should be emptied.
    */

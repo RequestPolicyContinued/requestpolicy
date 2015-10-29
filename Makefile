@@ -365,7 +365,7 @@ $(specific_xpi__file):
 # create the files for the "off-AMO" XPI
 #
 
-# Process all source files, but also eventually delete
+# Process all source files and, if necessary, delete all
 # empty directories and deleted files from the build directory.
 $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_amo__empty_dirs)
 

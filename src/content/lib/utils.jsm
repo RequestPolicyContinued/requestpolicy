@@ -114,9 +114,8 @@ let Utils = (function() {
 
 
   /**
-   * This function returns and eventually creates a module's `internal`
-   * variable. The `internal` can be accessed from all submodules of that
-   * module (which might be in different files).
+   * Return a module's `internal` object, which is a singleton.
+   * The `internal` can be accessed from all submodules of that module.
    *
    * The `internal` is added to `self`, and as soon as all modules have been
    * loaded, i.e. when the startup functions are called, the `internal` is

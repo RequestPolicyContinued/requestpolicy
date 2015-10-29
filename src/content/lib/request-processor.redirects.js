@@ -243,7 +243,7 @@ RequestProcessor = (function(self) {
           browser.rpcontinued.blockedRedirects[originURI] = destURI;
         }
 
-        eventuallyShowRedirectNotification(request);
+        maybeShowRedirectNotification(request);
 
         // We try to trace the blocked redirect back to a link click or form
         // submission if we can. It may indicate, for example, a link that
@@ -317,7 +317,7 @@ RequestProcessor = (function(self) {
   /**
    * @param {RedirectRequest} aRequest
    */
-  function eventuallyShowRedirectNotification(aRequest) {
+  function maybeShowRedirectNotification(aRequest) {
     // Check if the request corresponds to a top-level document load.
     {
       let loadFlags = aRequest.httpResponse.httpChannel.loadFlags;

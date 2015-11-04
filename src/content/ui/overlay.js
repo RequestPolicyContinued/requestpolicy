@@ -917,6 +917,8 @@ rpcontinued.overlay = (function() {
     let tryAddingSHistoryListener = function() {
       ++tries;
       try {
+        // FIXME: [e10s] The DocShell (and webNavigation) lives in the
+        //               content process.
         let sHistory = gBrowser.webNavigation.sessionHistory;
         sHistory.addSHistoryListener(self.historyListener);
         return;

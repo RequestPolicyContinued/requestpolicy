@@ -28,6 +28,10 @@ class RequestPolicyPuppeteer(object):
     def requests(self):
         pass
 
+    @use_class_as_property('api.addon.RequestPolicy')
+    def rp_addon(self):
+        pass
+
     @use_class_as_property('api.rules.Rules')
     def rules(self):
         pass

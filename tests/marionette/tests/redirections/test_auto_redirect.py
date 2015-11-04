@@ -46,14 +46,14 @@ class TestAutoRedirect(RequestPolicyTestCase):
             self.assertFalse(self.redir.is_shown(),
                              "There's no redirect notification.")
 
-        def test_appear(path):
+        def test_appear(path, navigate_args={}):
             test_url = "http://www.maindomain.test/" + path
             # FIXME: Remove the following line when #726 is fixed.
             test_url += "?test_redirect_notification_appears_or_not"
 
             initial_uri = self.marionette.get_url()
 
-            self._navigate_expecting_r21n(test_url)
+            self._navigate_expecting_r21n(test_url, **navigate_args)
 
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed.")
@@ -62,11 +62,10 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             self.redir.close()
 
-        # FIXME: Issue #727;   On E10s, Marionette Tests for HTTP
-        #        <location|refresh> header redirections raise IOError.
-        if not self.browser_info.e10s_enabled:
-            test_appear("redirect-http-location-header.php")
-            test_appear("redirect-http-refresh-header.php")
+        test_appear("redirect-http-location-header.php",
+                    navigate_args={"on_e10s_use_locationbar": True})
+        test_appear("redirect-http-refresh-header.php",
+                    navigate_args={"on_e10s_use_locationbar": True})
 
         test_appear("redirect-js-document-location-auto.html")
         test_appear("redirect-meta-tag-01-immediate.html")
@@ -82,24 +81,22 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
     def test_allow(self):
 
-        def test(path, dest_uri):
+        def test(path, dest_uri, navigate_args={}):
             test_url = "http://www.maindomain.test/" + path
             # FIXME: Remove the following line when #726 is fixed.
             test_url += "?test_allow"
 
-            self._navigate_expecting_r21n(test_url)
+            self._navigate_expecting_r21n(test_url, **navigate_args)
             self.assertTrue(self.redir.is_shown())
             self.redir.allow()
             self.assertFalse(self.redir.is_shown())
             with self.marionette.using_context("content"):
                 self.assertEqual(self.marionette.get_url(), dest_uri)
 
-        # FIXME: Issue #727
-        if not self.browser_info.e10s_enabled:
-            # Header redirection
-            test("redirect-http-location-header.php",
-                 "http://www.otherdomain.test/")
-
+        # Header redirection
+        test("redirect-http-location-header.php",
+             "http://www.otherdomain.test/",
+             navigate_args={"on_e10s_use_locationbar": True})
         # JavaScript redirection
         test("redirect-js-document-location-auto.html",
              "http://www.otherdomain.test/")
@@ -111,22 +108,20 @@ class TestAutoRedirect(RequestPolicyTestCase):
     def test_r21n_appears_again_after_allow(self):
         raise SkipTest("Skipping due to issue #726.")
 
-        def test(path):
+        def test(path, navigate_args={}):
             test_url = "http://www.maindomain.test/" + path
 
-            self._navigate_expecting_r21n(test_url)
+            self._navigate_expecting_r21n(test_url, **navigate_args)
             self.assertTrue(self.redir.is_shown())
             self.redir.allow()
 
-            self._navigate_expecting_r21n(test_url)
+            self._navigate_expecting_r21n(test_url, **navigate_args)
             self.assertTrue(self.redir.is_shown())
             self.redir.close()
 
-        # FIXME: Issue #727
-        if not self.browser_info.e10s_enabled:
-            # Header redirection
-            test("redirect-http-location-header.php")
-
+        # Header redirection
+        test("redirect-http-location-header.php",
+             navigate_args={"on_e10s_use_locationbar": True})
         # JavaScript redirection
         test("redirect-js-document-location-auto.html")
         # <meta> redirection
@@ -136,14 +131,23 @@ class TestAutoRedirect(RequestPolicyTestCase):
     # Private Helper Methods #
     ##########################
 
-    def _navigate_expecting_r21n(self, url):
+    def _navigate_expecting_r21n(self, url, on_e10s_use_locationbar=False):
         """Navigate to a URL, catching all expected exceptions."""
 
-        with self.marionette.using_context("content"):
-            if self.browser_info.e10s_enabled:
-                # On E10s there's no TimeoutException raised.
-                self.marionette.navigate(url)
+        if self.browser_info.e10s_enabled:
+            # On E10s there's no TimeoutException raised.
+
+            if on_e10s_use_locationbar:
+                # In some cases `navigate()` raises an IOError. The workaround
+                # is to use the location-bar.
+                # For details see Mozilla Bug 1219969 / Issue #727.
+                self.browser.navbar.locationbar.load_url(url)
+                self.tabs.wait_until_loaded(self.browser.tabbar.tabs[0])
             else:
+                with self.marionette.using_context("content"):
+                    self.marionette.navigate(url)
+        else:
+            with self.marionette.using_context("content"):
                 # On non-E10s, expect a TimeoutException, because when
                 # RequestPolicy blocks a redirection, the page never loads.
 

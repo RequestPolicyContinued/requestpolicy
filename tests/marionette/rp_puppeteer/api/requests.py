@@ -56,7 +56,8 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          Cu.import("chrome://rpcontinued/content/lib/request-processor.jsm");
+          Components.utils.import("chrome://rpcontinued/content/lib/" +
+                                  "request-processor.jsm");
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];

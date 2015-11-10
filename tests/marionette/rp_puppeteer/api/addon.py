@@ -7,6 +7,7 @@ from firefox_puppeteer.base import BaseLib
 from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
                                               ConsoleErrorDetection)
 from contextlib import contextmanager
+import time
 
 
 class Addon(BaseLib):
@@ -63,6 +64,14 @@ class Addon(BaseLib):
     def disable(self):
         self._set_user_disabled(True)
         Wait(self.marionette).until(lambda _: not self.is_active)
+
+    @contextmanager
+    def tmp_disabled(self):
+        self.disable()
+        try:
+            yield
+        finally:
+            self.enable()
 
     @property
     def is_installed(self):
@@ -220,6 +229,9 @@ class RequestPolicy(Addon):
             super(RequestPolicy, self).enable()
 
     def disable(self, ignore_errors=False):
+        # FIXME: issue #728
+        time.sleep(0.2)
+
         with self._ensure_no_errors():
             super(RequestPolicy, self).disable()
 

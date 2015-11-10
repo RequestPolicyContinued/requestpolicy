@@ -36,6 +36,10 @@ class RequestPolicyPuppeteer(object):
     def rules(self):
         pass
 
+    @use_class_as_property('api.rules.RulesFile')
+    def rules_file(self):
+        pass
+
     @use_class_as_property('ui.context_menu.ContextMenu')
     def ctx_menu(self):
         pass

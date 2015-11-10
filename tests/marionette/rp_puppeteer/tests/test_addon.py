@@ -6,10 +6,10 @@ from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.api.addon import Addon
 
 
-class TestAddons(RequestPolicyTestCase):
+class TestAddon(RequestPolicyTestCase):
 
     def setUp(self):
-        super(TestAddons, self).setUp()
+        super(TestAddon, self).setUp()
         self.addon = Addon(lambda: self.marionette,
                            addon_id="dummy-ext@requestpolicy.org",
                            install_url="http://localhost/.dist/dummy-ext.xpi")
@@ -19,7 +19,7 @@ class TestAddons(RequestPolicyTestCase):
         try:
             self.addon.uninstall()
         finally:
-            super(TestAddons, self).tearDown()
+            super(TestAddon, self).tearDown()
 
     def test_uninstall_install(self):
         self.assertTrue(self.addon.is_installed)
@@ -46,6 +46,12 @@ class TestAddons(RequestPolicyTestCase):
         self.addon.disable()
         self.addon.enable()
         self.addon.enable()
+
+    def test_tmp_disabled(self):
+        self.assertTrue(self.addon.is_active)
+        with self.addon.tmp_disabled():
+            self.assertFalse(self.addon.is_active)
+        self.assertTrue(self.addon.is_active)
 
     def test_is_installed(self):
         self.assertTrue(self.addon.is_installed)

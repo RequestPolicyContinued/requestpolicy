@@ -4,6 +4,8 @@
 
 from firefox_puppeteer.base import BaseLib
 import copy
+import os.path
+import json
 
 
 class Rules(BaseLib):
@@ -68,6 +70,16 @@ class Rules(BaseLib):
         for rule in self.all:
             rule.remove()
 
+    def save(self):
+        """Save the rules to the json file."""
+
+        return self.marionette.execute_script("""
+          var mod = {};
+          Components.utils.import("chrome://rpcontinued/content/lib/" +
+                                  "policy-manager.jsm", mod);
+          mod.PolicyManager.storeRules();
+        """)
+
     ##################################
     # Private Properties and Methods #
     ##################################
@@ -114,6 +126,49 @@ class Rules(BaseLib):
                 for rule_data in rule_data_list]
 
 
+class RulesFile(BaseLib):
+
+    def __init__(self, marionette_getter, file_path="user.json"):
+        super(RulesFile, self).__init__(marionette_getter)
+
+        if os.path.isabs(file_path):
+            self.file_path = file_path
+        else:
+            profile_path = self.marionette.instance.profile.profile
+            self.file_path = ("{}/requestpolicy/policies/{}"
+                              .format(profile_path, file_path))
+
+    #################################
+    # Public Properties and Methods #
+    #################################
+
+    def get_rules(self):
+        if not os.path.isfile(self.file_path):
+            return None
+
+        with open(self.file_path, 'r') as f:
+            json_data = json.loads(f.read())
+
+        assert json_data["metadata"]["version"] is 1
+
+        entries = json_data["entries"]
+        rules = []
+
+        for (keyword, is_allow) in [("allow", True), ("deny", False)]:
+            if keyword not in entries:
+                continue
+
+            for rule_data in entries[keyword]:
+                rules.append(Rule(lambda: self.marionette, rule_data,
+                                  allow=is_allow, temp=False))
+
+        return rules
+
+    def remove(self):
+        if os.path.isfile(self.file_path):
+            os.remove(self.file_path)
+
+
 class Rule(BaseLib):
     """Class to represent a specific rule."""
 
@@ -146,6 +201,10 @@ class Rule(BaseLib):
             return 0
         else:
             return 1
+
+    def __repr__(self):
+        return ("Rule(rule_data={}, allow={}, temp={})"
+                .format(self.rule_data, self.allow, self.temp))
 
     #################################
     # Public Properties and Methods #

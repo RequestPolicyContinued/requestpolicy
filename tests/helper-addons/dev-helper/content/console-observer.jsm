@@ -44,6 +44,20 @@ function isRPException(aMessage) {
   return true;
 }
 
+const knownBugs = [
+  // issue #597
+  `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`
+];
+  
+function isKnownBug(aMessage) {
+  for (bugMsg of knownBugs) {
+    if (aMessage.startsWith(bugMsg)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * ConsoleObserver observes all messages sent to the
  * Browser Console and detects errors caused by
@@ -78,7 +92,7 @@ var ConsoleObserver = (function (self) {
   self.observe = function (aSubject) {
     var msg = aSubject.message;
 
-    if (isRPException(msg)) {
+    if (isRPException(msg) && !isKnownBug(msg)) {
       ++numErrors;
       messages.push(msg);
       dump("[RequestPolicy] [Browser Console] " + msg + "\n");

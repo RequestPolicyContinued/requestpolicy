@@ -1087,7 +1087,7 @@ requestpolicy.overlay = {
    * - See mozilla-central: "base/content/tabbrowser.xml"
    */
   _wrapAddTab : function() {
-    Util.wrapFunction(gBrowser, "addTab", this.tabAdded);
+    requestpolicy.mod.Util.wrapFunction(gBrowser, "addTab", this.tabAdded);
   },
 
   /**
@@ -1109,7 +1109,7 @@ requestpolicy.overlay = {
       }
     }
     if (referrerURI) {
-      this._rpService.registerLinkClicked(referrerURI.spec, url);
+      requestpolicy.overlay._rpService.registerLinkClicked(referrerURI.spec, url);
     }
   },
 

@@ -13,7 +13,7 @@ PREF_WELCOME_WIN_SHOWN = PREF_PREFIX + "welcomeWindowShown"
 PREF_LAST_RP_VERSION = PREF_PREFIX + "lastVersion"
 
 
-class TestAutomaticRulesImportOnUpgrade(RequestPolicyTestCase):
+class RulesImportTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
@@ -23,66 +23,10 @@ class TestAutomaticRulesImportOnUpgrade(RequestPolicyTestCase):
                 self.prefs.reset_pref(PREF_PREFIX + pref)
             self.rules.remove_all()
         finally:
-            super(TestAutomaticRulesImportOnUpgrade, self).tearDown()
-
-    ################
-    # Test Methods #
-    ################
-
-    def test_autoimport__usual_first_upgrade(self):
-        self._test_autoimport_or_not(is_upgrade=True,
-                                     with_existing_rules_file=False,
-                                     with_welcomewin=True,
-                                     should_autoimport=True)
-
-    def test_autoimport__upgrade_without_welcomewin(self):
-        raise SkipTest("FIXME: issue #731")
-        self._test_autoimport_or_not(is_upgrade=True,
-                                     with_existing_rules_file=False,
-                                     with_welcomewin=False,
-                                     should_autoimport=True)
-
-    def test_no_autoimport__rules_file_removed(self):
-        self._test_autoimport_or_not(is_upgrade=False,
-                                     with_existing_rules_file=False,
-                                     with_welcomewin=True,
-                                     should_autoimport=False)
-
-    def test_no_autoimport__upgrade_with_existing_rules_file(self):
-        raise SkipTest("FIXME: issue #731")
-        self._test_autoimport_or_not(is_upgrade=True,
-                                     with_existing_rules_file=True,
-                                     with_welcomewin=True,
-                                     should_autoimport=False)
-
-    def _test_autoimport_or_not(self, is_upgrade, with_existing_rules_file,
-                                with_welcomewin, should_autoimport):
-        rules = self.typical_rules
-
-        if with_existing_rules_file:
-            # Ensure that a user.json file exists.
-            self.rules.save()
-
-        last_rp_version = "0.5.28" if is_upgrade else "1.0.beta9"
-
-        with self.rp_addon.tmp_disabled():
-            if not with_existing_rules_file:
-                self.rules_file.remove()
-            self.prefs.set_pref(PREF_LAST_RP_VERSION, last_rp_version)
-            self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, not with_welcomewin)
-
-            self._add_legacy_rules(rules["v0"])
-
-        expected_rules = rules["expected"] if should_autoimport else []
-        self.assertListEqual(sorted(self.rules.get_rules()),
-                             sorted(expected_rules))
-
-        if with_welcomewin:
-            # Close the setup tab.
-            self.browser.tabbar.tabs[-1].close()
+            super(RulesImportTestCase, self).tearDown()
 
     @lazyprop
-    def typical_rules(self):
+    def _typical_rules(self):
         return {
             "v0": {
                 "allowedOriginsToDestinations": (
@@ -120,10 +64,6 @@ class TestAutomaticRulesImportOnUpgrade(RequestPolicyTestCase):
             ]
         }
 
-    ##########################
-    # Private Helper Methods #
-    ##########################
-
     def _add_legacy_rules(self, rules):
         """Add the rules for v0.*.*."""
 
@@ -132,3 +72,58 @@ class TestAutomaticRulesImportOnUpgrade(RequestPolicyTestCase):
 
     def _rule(self, rule_data):
         return self.rules.create_rule(rule_data, allow=True, temp=False)
+
+
+class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
+
+    def test_autoimport__usual_first_upgrade(self):
+        self._test_autoimport_or_not(is_upgrade=True,
+                                     with_existing_rules_file=False,
+                                     with_welcomewin=True,
+                                     should_autoimport=True)
+
+    def test_autoimport__upgrade_without_welcomewin(self):
+        raise SkipTest("FIXME: issue #731")
+        self._test_autoimport_or_not(is_upgrade=True,
+                                     with_existing_rules_file=False,
+                                     with_welcomewin=False,
+                                     should_autoimport=True)
+
+    def test_no_autoimport__rules_file_removed(self):
+        self._test_autoimport_or_not(is_upgrade=False,
+                                     with_existing_rules_file=False,
+                                     with_welcomewin=True,
+                                     should_autoimport=False)
+
+    def test_no_autoimport__upgrade_with_existing_rules_file(self):
+        raise SkipTest("FIXME: issue #731")
+        self._test_autoimport_or_not(is_upgrade=True,
+                                     with_existing_rules_file=True,
+                                     with_welcomewin=True,
+                                     should_autoimport=False)
+
+    def _test_autoimport_or_not(self, is_upgrade, with_existing_rules_file,
+                                with_welcomewin, should_autoimport):
+        rules = self._typical_rules
+
+        if with_existing_rules_file:
+            # Ensure that a user.json file exists.
+            self.rules.save()
+
+        last_rp_version = "0.5.28" if is_upgrade else "1.0.beta9"
+
+        with self.rp_addon.tmp_disabled():
+            if not with_existing_rules_file:
+                self.rules_file.remove()
+            self.prefs.set_pref(PREF_LAST_RP_VERSION, last_rp_version)
+            self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, not with_welcomewin)
+
+            self._add_legacy_rules(rules["v0"])
+
+        expected_rules = rules["expected"] if should_autoimport else []
+        self.assertListEqual(sorted(self.rules.get_rules()),
+                             sorted(expected_rules))
+
+        if with_welcomewin:
+            # Close the setup tab.
+            self.browser.tabbar.tabs[-1].close()

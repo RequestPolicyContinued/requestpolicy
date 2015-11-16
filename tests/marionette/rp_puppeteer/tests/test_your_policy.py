@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from rp_ui_harness.test_data.rules import ExemplaryRules
 from rp_puppeteer.api.rules import Rule
 from marionette import SkipTest
 from functools import partial
@@ -19,60 +20,7 @@ class YourPolicyTestCase(RequestPolicyTestCase):
         self.rules_table = self.your_policy.rules_table
         self.add_rule_form = self.your_policy.add_rule_form
 
-        #=======================================================================
-        # Create some rules for the tests
-        #=======================================================================
-
-        # Alias for `create_rule()`
-        cr = self.rules.create_rule
-
-        # some rules that should not collide with each other
-        self.allow_rule = cr({"o": {"h": "w"}}, allow=True, temp=False)
-        self.temp_allow_rule = cr({"o": {"h": "x"}}, allow=True, temp=True)
-        self.deny_rule = cr({"o": {"h": "y"}}, allow=False, temp=False)
-        self.temp_deny_rule = cr({"o": {"h": "z"}}, allow=False, temp=True)
-        self.some_rules = [self.allow_rule, self.temp_allow_rule,
-                           self.deny_rule, self.temp_deny_rule]
-
-        self.rule_without_origin = cr({"d": {"h": "foo"}}, allow=True)
-        self.rule_without_dest = cr({"o": {"h": "bar"}}, allow=True)
-
-        # A list of all possible pre-paths, including the expected string.
-        self.pre_path_specs = {
-            "s": {"spec": {"s": "s1"},
-                  # The string "s1:*" could be confused with "*://s1:*"
-                  "expected_string": 'scheme "s1"'},
-            "h": {"spec": {"h": "h2"},
-                  "expected_string": "h2"},
-            "p": {"spec": {"port": 3},
-                  "expected_string": "*://*:3"},
-            "sh": {"spec": {"s": "s4", "h": "h4"},
-                   "expected_string": "s4://h4"},
-            "sp": {"spec": {"s": "s5", "port": 5},
-                   "expected_string": "s5://*:5"},
-            "hp": {"spec": {"h": "h6", "port": 6},
-                   "expected_string": "*://h6:6"},
-            "shp": {"spec": {"s": "s7", "h": "h7", "port": 7},
-                    "expected_string": "s7://h7:7"}
-        }
-
-        self.allow_rule_shp_shp = cr({"o": {"s": "os", "h": "oh", "port": 1},
-                                      "d": {"s": "ds", "h": "dh", "port": 2}},
-                                     allow=True, temp=False)
-        self.temp_deny_rule_shp_shp = cr(
-                {"o": {"s": "os", "h": "oh", "port": 3},
-                 "d": {"s": "ds", "h": "dh", "port": 4}},
-                allow=False, temp=True)
-
-        self.allow_rule_sh_p = cr({"o": {"s": "os", "h": "oh"}, "d": {"port": 5}},
-                                  allow=True, temp=False)
-        self.temp_deny_rule_s_hp = cr({"o": {"s": "os"},
-                                       "d": {"h": "dh", "port": 4}},
-                                      allow=False, temp=True)
-        self.arbitrary_rule_shp_shp = cr(
-            {"o": {"s": "fooscheme", "h": "barhost", "port": 18224},
-             "d": {"s": "bazscheme", "h": "xyzhost", "port": 34755}},
-            allow=False, temp=True)
+        self.data = ExemplaryRules(lambda: self.marionette)
 
     def tearDown(self):
         try:
@@ -108,25 +56,26 @@ class TestRulesTable(YourPolicyTestCase):
                          "There are no user rules yet.")
 
         # Add some rules
-        for rule in self.some_rules:
+        some_rules = self.data.some_rules
+        for rule in some_rules:
             rule.add()
 
         # Get the user rule rows.
         user_rule_rows = self._user_rule_rows
         # Compare the amount of rules.
-        self.assertEqual(len(user_rule_rows), len(self.some_rules),
+        self.assertEqual(len(user_rule_rows), len(some_rules),
                          "The correct amount of rules have been added.")
 
         # Convert rule-rows to `Rule` instances.
         returned_rules = [row.create_rule() for row in user_rule_rows]
 
         # Compare the two `Rule` lists.
-        self.assertEqual(returned_rules.sort(), self.some_rules.sort(),
+        self.assertEqual(returned_rules.sort(), some_rules.sort(),
                          "All rules have been added and returned correctly.")
 
     def test_get_rule_rows_by_ruleset_string(self):
-        permanent_rule = self.allow_rule
-        temporary_rule = self.temp_deny_rule
+        permanent_rule = self.data.allow_rule
+        temporary_rule = self.data.temp_deny_rule
 
         permanent_rule.add()
         temporary_rule.add()
@@ -157,12 +106,14 @@ class TestRulesTable(YourPolicyTestCase):
         # subscription rules.
         num_rules_initial = count()
 
+        rule = self.data.some_rules[0]
+
         # Add a rule
-        self.some_rules[0].add()
+        rule.add()
         self.assertEqual(count(), num_rules_initial + 1)
 
         # Remove the rule
-        self.some_rules[0].remove()
+        rule.remove()
         self.assertEqual(count(), num_rules_initial)
 
 
@@ -184,16 +135,17 @@ class TestRuleRow(YourPolicyTestCase):
             rule.remove()
 
         # Test using a rule with "allow" policy.
-        test_rule(self.allow_rule, "allow")
+        test_rule(self.data.allow_rule, "allow")
 
         # Test using a rule with "deny" policy.
-        test_rule(self.deny_rule, "block")
+        test_rule(self.data.deny_rule, "block")
 
     def _test_endpoint(self, endpoint):
         assert endpoint in ["origin", "dest"]
 
         def test(spec_id):
-            self._test_pre_path_spec(endpoint, self.pre_path_specs[spec_id])
+            self._test_pre_path_spec(endpoint,
+                                     self.data.pre_path_specs[spec_id])
 
         test("s")
         test("h")
@@ -229,12 +181,12 @@ class TestRuleRow(YourPolicyTestCase):
         self._test_endpoint("dest")
 
     def test_origin_empty(self):
-        self.rule_without_origin.add()
+        self.data.rule_without_origin.add()
         origin_string = self._user_rule_rows[0].origin
         self.assertEqual(origin_string, "")
 
     def test_dest_empty(self):
-        self.rule_without_dest.add()
+        self.data.rule_without_dest.add()
         dest_string = self._user_rule_rows[0].dest
         self.assertEqual(dest_string, "")
 
@@ -245,8 +197,8 @@ class TestRuleRow(YourPolicyTestCase):
                              expected_ruleset_string)
             rule.remove()
 
-        test(self.allow_rule, "User")
-        test(self.temp_allow_rule, "Temporary")
+        test(self.data.allow_rule, "User")
+        test(self.data.temp_allow_rule, "Temporary")
 
     def test_create_rule(self):
         def test(rule):
@@ -262,11 +214,11 @@ class TestRuleRow(YourPolicyTestCase):
             rule.remove()
 
         # Test rules with all origin/dest fields specified.
-        test(self.allow_rule_shp_shp)
-        test(self.temp_deny_rule_shp_shp)
+        test(self.data.allow_rule_shp_shp)
+        test(self.data.temp_deny_rule_shp_shp)
 
     def test_remove_rule(self):
-        for rule in self.some_rules:
+        for rule in self.data.some_rules:
             rule.add()
             self.assertTrue(rule.exists())
             self._user_rule_rows[0].remove()
@@ -280,8 +232,8 @@ class TestRuleRow(YourPolicyTestCase):
             rule.remove()
 
         # Test some user rules, that is, both temporary and permanent rules.
-        test_rule(self.allow_rule, True)
-        test_rule(self.temp_allow_rule, True)
+        test_rule(self.data.allow_rule, True)
+        test_rule(self.data.temp_allow_rule, True)
 
         # TODO: Test some non-user rules (subscription rules).
         #       In those cases `is_user_rule()` should return `False`.
@@ -293,8 +245,8 @@ class TestRuleRow(YourPolicyTestCase):
             rule.remove()
 
         # Test both temporary and permanent rules.
-        test_rule(self.allow_rule, False)
-        test_rule(self.temp_allow_rule, True)
+        test_rule(self.data.allow_rule, False)
+        test_rule(self.data.temp_allow_rule, True)
 
 
 class TestAddRuleForm(YourPolicyTestCase):
@@ -392,18 +344,19 @@ class TestAddRuleForm(YourPolicyTestCase):
                                               expected_field_value)))
 
         # Test some rules which make use of all fields.
-        test_rule(self.allow_rule_shp_shp)
-        test_rule(self.temp_deny_rule_shp_shp)
+        test_rule(self.data.allow_rule_shp_shp)
+        test_rule(self.data.temp_deny_rule_shp_shp)
 
         # Test some rules which make use of _some_ fields.
-        test_rule(self.allow_rule_sh_p)
-        test_rule(self.temp_deny_rule_s_hp)
-        test_rule(self.rule_without_dest)
-        test_rule(self.rule_without_origin)
+        test_rule(self.data.allow_rule_sh_p)
+        test_rule(self.data.temp_deny_rule_s_hp)
+        test_rule(self.data.rule_without_dest)
+        test_rule(self.data.rule_without_origin)
 
     def test_reset(self):
         # Set all fields.
-        self.add_rule_form.set_all_values_by_rule(self.temp_deny_rule_shp_shp)
+        self.add_rule_form.set_all_values_by_rule(
+            self.data.temp_deny_rule_shp_shp)
 
         # reset
         self.add_rule_form.reset()
@@ -436,14 +389,14 @@ class TestAddRuleForm(YourPolicyTestCase):
             rule.remove()
 
         # Test some rules which make use of all fields.
-        test_rule(self.allow_rule_shp_shp)
-        test_rule(self.temp_deny_rule_shp_shp)
+        test_rule(self.data.allow_rule_shp_shp)
+        test_rule(self.data.temp_deny_rule_shp_shp)
 
         # Test some rules which make use of _some_ fields.
-        test_rule(self.allow_rule_sh_p)
-        test_rule(self.temp_deny_rule_s_hp)
-        test_rule(self.rule_without_dest)
-        test_rule(self.rule_without_origin)
+        test_rule(self.data.allow_rule_sh_p)
+        test_rule(self.data.temp_deny_rule_s_hp)
+        test_rule(self.data.rule_without_dest)
+        test_rule(self.data.rule_without_origin)
 
         # If all form fields are empty, no rule should be added.
         self.add_rule_form.reset()
@@ -472,5 +425,5 @@ class TestAddRuleForm(YourPolicyTestCase):
     def _fill_all_fields(self):
         """Fill all form fields with some data."""
 
-        rule = self.arbitrary_rule_shp_shp
+        rule = self.data.arbitrary_rule_shp_shp
         self.add_rule_form.set_all_values_by_rule(rule)

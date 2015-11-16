@@ -14,9 +14,9 @@ class RulesTableTestCase(RequestPolicyTestCase):
         super(RulesTableTestCase, self).setUp()
 
         self.marionette.set_context("content")
-        self.your_policy.open()
+        self.settings.your_policy.open()
 
-        self.table = self.your_policy.rules_table
+        self.table = self.settings.your_policy.rules_table
 
         self.data = ExemplaryRules(lambda: self.marionette)
 

@@ -13,10 +13,10 @@ class YourPolicyTestCase(RequestPolicyTestCase):
         super(YourPolicyTestCase, self).setUp()
 
         self.marionette.set_context("content")
-        self.your_policy.open()
+        self.settings.your_policy.open()
 
-        self.rules_table = self.your_policy.rules_table
-        self.add_rule_form = self.your_policy.add_rule_form
+        self.rules_table = self.settings.your_policy.rules_table
+        self.add_rule_form = self.settings.your_policy.add_rule_form
 
         self.data = ExemplaryRules(lambda: self.marionette)
 
@@ -38,7 +38,7 @@ class TestYourPolicy(YourPolicyTestCase):
         self.marionette.navigate("about:blank")
         self.assertNotEqual(self.marionette.get_url(),
                             "about:requestpolicy?yourpolicy")
-        self.your_policy.open()
+        self.settings.your_policy.open()
         self.assertEqual(self.marionette.get_url(),
                          "about:requestpolicy?yourpolicy")
 

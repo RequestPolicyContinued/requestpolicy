@@ -52,14 +52,14 @@ class RequestPolicyPuppeteer(object):
     def request_log(self):
         pass
 
+    @use_class_as_property('ui.settings.Settings')
+    def settings(self):
+        pass
+
     @use_class_as_property('ui.tabs.Tabs')
     def tabs(self):
         pass
 
     @use_class_as_property('ui.web_utils.WebUtils')
     def web_utils(self):
-        pass
-
-    @use_class_as_property('ui.settings.your_policy.YourPolicy')
-    def your_policy(self):
         pass

@@ -17,10 +17,7 @@ class RulesImportTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
-            for pref in ("allowedOriginsToDestinations",
-                         "allowedOrigins",
-                         "allowedDestinations"):
-                self.prefs.reset_pref(PREF_PREFIX + pref)
+            self.prefs.old_rules.remove_all_prefs()
             self.rules.remove_all()
         finally:
             super(RulesImportTestCase, self).tearDown()
@@ -63,12 +60,6 @@ class RulesImportTestCase(RequestPolicyTestCase):
                 self._rule({"d": {"h": "*.mozilla.net"}})
             ]
         }
-
-    def _add_legacy_rules(self, rules):
-        """Add the rules for v0.*.*."""
-
-        for (pref, value) in rules.items():
-            self.prefs.set_pref(PREF_PREFIX + pref, value)
 
     def _rule(self, rule_data):
         return self.rules.create_rule(rule_data, allow=True, temp=False)
@@ -118,7 +109,7 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
             self.prefs.set_pref(PREF_LAST_RP_VERSION, last_rp_version)
             self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, not with_welcomewin)
 
-            self._add_legacy_rules(rules["v0"])
+            self.prefs.old_rules.set_rules(rules["v0"])
 
         expected_rules = rules["expected"] if should_autoimport else []
         self.assertListEqual(sorted(self.rules.get_rules()),

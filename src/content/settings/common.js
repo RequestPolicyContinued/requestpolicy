@@ -240,14 +240,6 @@ common.prefStringToObj = function (prefString) {
   return prefObj;
 };
 
-common.addAllowRules = function (rules) {
-  for (var i in rules) {
-    var ruleData = rules[i];
-    PolicyManager.addAllowRule(ruleData, true);
-  }
-  PolicyManager.storeRules();
-};
-
 common.localize = function(stringNames) {
   stringNames.forEach(function(name) {
     $('[data-string="' + name + '"]').each(function () {

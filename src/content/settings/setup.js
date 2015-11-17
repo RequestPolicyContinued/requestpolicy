@@ -135,7 +135,7 @@ function onload() {
       Logger.dump('Performing rule import.');
       var addHostWildcard = identLevel == 1;
       var rules = common.getOldRulesAsNewRules(addHostWildcard);
-      common.addAllowRules(rules);
+      PolicyManager.addAllowRules(rules);
     }
 
     // Skip the welcome screen.

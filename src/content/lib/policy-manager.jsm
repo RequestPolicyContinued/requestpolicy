@@ -236,6 +236,15 @@ var PolicyManager = (function(self) {
     notifyRulesChanged();
   };
 
+  self.addRules = function (aRuleAction, aRuleDataList, aNoStore=false) {
+    for (let ruleData of aRuleDataList) {
+      PolicyManager.addRule(aRuleAction, ruleData, true);
+    }
+    if (false === aNoStore) {
+      PolicyManager.storeRules();
+    }
+  };
+
   self.storeRules = function() {
     RulesetStorage.saveRawRulesetToFile(
         userRulesets["user"].rawRuleset, "user.json");

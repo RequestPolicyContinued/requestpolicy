@@ -33,6 +33,9 @@ PolicyManager = (function(self) {
                                                          C.RULE_ACTION_DENY);
   self.removeDenyRule = self.removeRule.bind(this, C.RULE_ACTION_DENY);
 
+  self.addAllowRules = self.addRules.bind(this, C.RULE_ACTION_ALLOW);
+  self.addDenyRules = self.addRules.bind(this, C.RULE_ACTION_DENY);
+
 
   function getRuleData(aOrigin, aDest) {
     let ruleData = {};

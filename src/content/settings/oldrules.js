@@ -72,7 +72,7 @@ function importOldRules() {
   if (!rules || rules.length == 0) {
     throw 'rules is undefined or empty';
   }
-  common.addAllowRules(rules);
+  PolicyManager.addAllowRules(rules);
   $("#doimport").hide();
   $("#policy").hide();
   $("#importoptions").hide();

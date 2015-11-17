@@ -82,3 +82,25 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
         if with_welcomewin:
             # Close the setup tab.
             self.browser.tabbar.tabs[-1].close()
+
+
+class TestImportPage(RulesImportTestCase):
+
+    def test_import(self):
+        # Add some "old rules".
+        self.prefs.old_rules.set_rules(self.oldrules_prefs)
+
+        with self.marionette.using_context("content"):
+            self.settings.old_rules.open()
+            self.settings.old_rules.show_rules()
+
+            # Check the rule rows.
+            rule_rows = self.settings.old_rules.rules_table.all_rule_rows
+            displayed_rules = [row.create_rule() for row in rule_rows]
+            self.assertListEqual(sorted(displayed_rules),
+                                 sorted(self.oldrules_rules))
+
+            # Import and compare.
+            self.settings.old_rules.import_rules()
+            self.assertListEqual(sorted(self.rules.get_rules()),
+                                 sorted(self.oldrules_rules))

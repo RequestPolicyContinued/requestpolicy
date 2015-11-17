@@ -3,8 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness.testcases import RequestPolicyTestCase
-from rp_ui_harness.decorators import lazyprop
 from marionette.marionette_test import SkipTest
+from rp_ui_harness.test_data.rules import ExemplaryOldRules
 
 
 PREF_PREFIX = "extensions.requestpolicy."
@@ -15,54 +15,20 @@ PREF_LAST_RP_VERSION = PREF_PREFIX + "lastVersion"
 
 class RulesImportTestCase(RequestPolicyTestCase):
 
+    def setUp(self):
+        super(RulesImportTestCase, self).setUp()
+
+        typical_rules = (ExemplaryOldRules(lambda: self.marionette)
+                         .typical_rules)
+        self.oldrules_prefs = typical_rules["v0"]
+        self.oldrules_rules = typical_rules["expected"]
+
     def tearDown(self):
         try:
             self.prefs.old_rules.remove_all_prefs()
             self.rules.remove_all()
         finally:
             super(RulesImportTestCase, self).tearDown()
-
-    @lazyprop
-    def _typical_rules(self):
-        return {
-            "v0": {
-                "allowedOriginsToDestinations": (
-                    "https://www.mozilla.org|https://mozorg.cdn.mozilla.net "
-                    "www.mozilla.org|mozorg.cdn.mozilla.net "
-                    "mozilla.org|mozilla.net"
-                ),
-                "allowedOrigins": (
-                    "https://www.mozilla.org "
-                    "www.mozilla.org "
-                    "mozilla.org"
-                ),
-                "allowedDestinations": (
-                    "https://mozorg.cdn.mozilla.net "
-                    "mozorg.cdn.mozilla.net "
-                    "mozilla.net"
-                )
-            },
-            "expected": [
-                # origin-to-destination rules
-                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"},
-                            "d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"o": {"h": "*.www.mozilla.org"},
-                            "d": {"h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"o": {"h": "*.mozilla.org"},
-                            "d": {"h": "*.mozilla.net"}}),
-                # origin rules
-                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"}}),
-                self._rule({"o": {"h": "*.www.mozilla.org"}}),
-                self._rule({"o": {"h": "*.mozilla.org"}}),
-                # destination rules
-                self._rule({"d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"d": {"h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"d": {"h": "*.mozilla.net"}})
-            ]
-        }
-
-    def _rule(self, rule_data):
-        return self.rules.create_rule(rule_data, allow=True, temp=False)
 
 
 class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
@@ -95,8 +61,6 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
 
     def _test_autoimport_or_not(self, is_upgrade, with_existing_rules_file,
                                 with_welcomewin, should_autoimport):
-        rules = self._typical_rules
-
         if with_existing_rules_file:
             # Ensure that a user.json file exists.
             self.rules.save()
@@ -109,9 +73,9 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
             self.prefs.set_pref(PREF_LAST_RP_VERSION, last_rp_version)
             self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, not with_welcomewin)
 
-            self.prefs.old_rules.set_rules(rules["v0"])
+            self.prefs.old_rules.set_rules(self.oldrules_prefs)
 
-        expected_rules = rules["expected"] if should_autoimport else []
+        expected_rules = self.oldrules_rules if should_autoimport else []
         self.assertListEqual(sorted(self.rules.get_rules()),
                              sorted(expected_rules))
 

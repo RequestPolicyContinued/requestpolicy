@@ -7,13 +7,16 @@ from rp_puppeteer.api.rules import Rules
 from ..decorators import lazyprop
 
 
-class ExemplaryRules(BaseLib):
+class ExemplaryRules_Meta(BaseLib):
     """Some rules for unit tests."""
 
     def __init__(self, marionette_getter):
-        super(ExemplaryRules, self).__init__(marionette_getter)
+        super(ExemplaryRules_Meta, self).__init__(marionette_getter)
 
         self.rules = Rules(marionette_getter)
+
+
+class ExemplaryRules(ExemplaryRules_Meta):
 
     #################################
     # Public Properties and Methods #
@@ -120,3 +123,56 @@ class ExemplaryRules(BaseLib):
 
     def _rule(self, *args, **kwargs):
         return self.rules.create_rule(*args, **kwargs)
+
+
+class ExemplaryOldRules(ExemplaryRules_Meta):
+
+    #################################
+    # Public Properties and Methods #
+    #################################
+
+    @lazyprop
+    def typical_rules(self):
+        return {
+            "v0": {
+                "allowedOriginsToDestinations": (
+                    "https://www.mozilla.org|https://mozorg.cdn.mozilla.net "
+                    "www.mozilla.org|mozorg.cdn.mozilla.net "
+                    "mozilla.org|mozilla.net"
+                ),
+                "allowedOrigins": (
+                    "https://www.mozilla.org "
+                    "www.mozilla.org "
+                    "mozilla.org"
+                ),
+                "allowedDestinations": (
+                    "https://mozorg.cdn.mozilla.net "
+                    "mozorg.cdn.mozilla.net "
+                    "mozilla.net"
+                )
+            },
+            "expected": [
+                # origin-to-destination rules
+                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"},
+                            "d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"o": {"h": "*.www.mozilla.org"},
+                            "d": {"h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"o": {"h": "*.mozilla.org"},
+                            "d": {"h": "*.mozilla.net"}}),
+                # origin rules
+                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"}}),
+                self._rule({"o": {"h": "*.www.mozilla.org"}}),
+                self._rule({"o": {"h": "*.mozilla.org"}}),
+                # destination rules
+                self._rule({"d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"d": {"h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"d": {"h": "*.mozilla.net"}})
+            ]
+        }
+
+    ##################################
+    # Private Properties and Methods #
+    ##################################
+
+    def _rule(self, rule_data):
+        return self.rules.create_rule(rule_data, allow=True, temp=False)

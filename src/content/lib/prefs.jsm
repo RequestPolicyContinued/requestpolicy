@@ -121,6 +121,17 @@ let Prefs = (function() {
              isPrefEmpty('allowedOriginsToDestinations'));
   };
 
+  self.clearPref = function (aPrefName) {
+    try {
+      if (rpPrefBranch.prefHasUserValue(aPrefName)) {
+        rpPrefBranch.clearUserPref(aPrefName);
+      }
+    } catch (e) {
+      Logger.dump('Clearing pref failed: ' + e.toString());
+    }
+    Services.prefs.savePrefFile(null);
+  };
+
 
 
   function observePref(subject, topic, data) {

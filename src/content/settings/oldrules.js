@@ -53,9 +53,9 @@ function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
 }
 
 function deleteOldRules() {
-  common.clearPref('allowedOrigins');
-  common.clearPref('allowedDestinations');
-  common.clearPref('allowedOriginsToDestinations');
+  Prefs.clearPref('allowedOrigins');
+  Prefs.clearPref('allowedDestinations');
+  Prefs.clearPref('allowedOriginsToDestinations');
   $("#doimport").hide();
   $("#deletedone").show();
   $("#showReimportOptions").hide();

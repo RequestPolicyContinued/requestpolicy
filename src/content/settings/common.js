@@ -240,17 +240,6 @@ common.prefStringToObj = function (prefString) {
   return prefObj;
 };
 
-common.clearPref = function (pref) {
-  try {
-    if (rpPrefBranch.prefHasUserValue(pref)) {
-      rpPrefBranch.clearUserPref(pref);
-    }
-  } catch (e) {
-    Logger.dump('Clearing pref failed: ' + e.toString());
-  }
-  Services.prefs.savePrefFile(null);
-};
-
 common.addAllowRules = function (rules) {
   for (var i in rules) {
     var ruleData = rules[i];

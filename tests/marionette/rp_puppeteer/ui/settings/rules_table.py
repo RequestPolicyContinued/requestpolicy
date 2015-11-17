@@ -4,6 +4,8 @@
 
 from rp_puppeteer.base import BaseLib, ElementBaseLib
 from rp_puppeteer.api.rules import Rule
+from rp_puppeteer.api.l10n import L10n
+import re
 
 
 class RuleRow(ElementBaseLib):
@@ -17,6 +19,18 @@ class RuleRow(ElementBaseLib):
     origin = property(lambda self: self._get_cell_text_content(1))
     dest = property(lambda self: self._get_cell_text_content(2))
 
+    def create_rule(self):
+        """Create a `Rule` instance for this rule row."""
+
+        allow_string = L10n(lambda: self.marionette).get_rp_property("allow")
+        allow = self.policy == allow_string
+        temp = (self.is_temporary()
+                if hasattr(self, "is_temporary")
+                else False)
+        rule_data = RuleRow._get_rule_data_from_strings(self.origin, self.dest)
+
+        return Rule(lambda: self.marionette, rule_data, allow, temp)
+
     ##################################
     # Private Properties and Methods #
     ##################################
@@ -28,6 +42,71 @@ class RuleRow(ElementBaseLib):
     def _get_cell_text_content(self, column_index):
         return self._cells[column_index].get_attribute("textContent")
 
+    @staticmethod
+    def _get_rule_data_from_strings(origin_string, dest_string):
+        origin = RuleRow._get_endpoint_spec_from_string(origin_string)
+        dest = RuleRow._get_endpoint_spec_from_string(dest_string)
+        rule_data = {}
+        assert origin or dest
+        if origin:
+            rule_data["o"] = origin
+        if dest:
+            rule_data["d"] = dest
+        return rule_data
+
+    @staticmethod
+    def _get_endpoint_spec_from_string(string):
+        # Case: Endpoint not specified.
+        if string == "":
+            return None
+
+        # Case: Only a scheme is specified.
+        match = re.match('^scheme "([^"]+)"$', string)
+        if match:
+            return {"s": match.group(1)}
+
+        # Case: URI without host, but with path
+        match = re.match(r"""^
+                             ([^:]+):  # scheme
+                             ([^/]+)   # path
+                             $""", string, flags=re.X)
+        if match:
+            scheme = match.group(1)
+            path = match.group(2)
+            spec = {}
+            if scheme != "*":
+                spec["s"] = scheme
+            if path != "*":
+                # Path support is not implemented yet.
+                raise NotImplementedError
+            if spec == {}:
+                raise SyntaxError
+            return spec
+
+        # Case: An URI with host, optionally with scheme and port.
+        match = re.match(r"""^
+                             (?:   ([^:]+)  :// )?  # scheme (optional)
+                                   ([^:/]+)         # host
+                             (?: : ([^/]+)      )?  # port (optional)
+                             $""", string, flags=re.X)
+        if match:
+            spec = {}
+            scheme = match.group(1)
+            host = match.group(2)
+            port = match.group(3)
+            if scheme and scheme != "*":
+                spec["s"] = scheme
+            if host != "*":
+                spec["h"] = host
+            if port and port != "*":
+                spec["port"] = port
+            if spec == {}:
+                raise SyntaxError
+            return spec
+
+        # Nothing matched.
+        raise SyntaxError
+
 
 class YourPolicyRuleRow(RuleRow):
 
@@ -37,29 +116,6 @@ class YourPolicyRuleRow(RuleRow):
 
     # Properties to get the strings of the corresponding table cells.
     rule_set = property(lambda self: self._get_cell_text_content(3))
-
-    def create_rule(self):
-        """Create a `Rule` instance for this rule row."""
-
-        if not self.is_user_rule():
-            # Getting non-user (e.g. subscription) rules is not implemented yet.
-            raise NotImplementedError
-
-        # The rule details are retained by RequestPolicy via `jQuery.data()`
-        # on the "<a>x</a>" HTML anchor element, the element being clicked to
-        # remove the rule.
-        [rule_action, rule_data] = self.marionette.execute_script("""
-          var anchor = $(arguments[0]);
-          return [
-            anchor.data('requestpolicyRuleAction'),
-            anchor.data('requestpolicyRuleData')
-          ];
-        """, script_args=[self._remove_anchor])
-
-        allow = True if rule_action == "allow" else False
-        temp = self.is_temporary()
-
-        return Rule(lambda: self.marionette, rule_data, allow, temp)
 
     def remove(self):
         self._remove_anchor.click()

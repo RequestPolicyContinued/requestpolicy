@@ -171,6 +171,38 @@ class TestRuleRow(RulesTableTestCase):
         dest_string = self.table.user_rule_rows[0].dest
         self.assertEqual(dest_string, "")
 
+    def test_create_rule(self):
+        def test_pre_path_spec(spec_id, allow=True, temp=True):
+            def create_rule():
+                spec = self.data.pre_path_specs[spec_id]
+                rule_data = {"o": spec["spec"], "d": spec["spec"]}
+                return self.rules.create_rule(rule_data, allow=allow, temp=temp)
+
+            # Create and add the rule.
+            rule = create_rule()
+            rule.add()
+
+            rule_row = self.table.user_rule_rows[0]
+            returned_rule = rule_row.create_rule()
+            self.assertIsInstance(returned_rule, Rule)
+            # The returned rule should be identical to what has been added.
+            self.assertEqual(returned_rule, rule)
+
+            rule.remove()
+
+        # Test all possible pre-path specs.
+        test_pre_path_spec("s")
+        test_pre_path_spec("h")
+        test_pre_path_spec("p")
+        test_pre_path_spec("sh")
+        test_pre_path_spec("sp")
+        test_pre_path_spec("hp")
+        test_pre_path_spec("shp")
+
+        # Test rules with all origin/dest fields specified.
+        test_pre_path_spec("shp", True, False)
+        test_pre_path_spec("shp", False, True)
+
 
 class TestYourPolicyRuleRow(RulesTableTestCase):
 
@@ -183,23 +215,6 @@ class TestYourPolicyRuleRow(RulesTableTestCase):
 
         test(self.data.allow_rule, "User")
         test(self.data.temp_allow_rule, "Temporary")
-
-    def test_create_rule(self):
-        def test(rule):
-            rule.add()
-            rule_row = self.table.user_rule_rows[0]
-            returned_rule = rule_row.create_rule()
-            self.assertIsInstance(returned_rule, Rule,
-                                  "`create_rule()` has returned a `Rule` "
-                                  "instance.")
-            self.assertEqual(returned_rule, rule,
-                             msg=("The returned rule is identical to what "
-                                  "has been added."))
-            rule.remove()
-
-        # Test rules with all origin/dest fields specified.
-        test(self.data.allow_rule_shp_shp)
-        test(self.data.temp_deny_rule_shp_shp)
 
     def test_remove_rule(self):
         for rule in self.data.some_rules:

@@ -124,45 +124,42 @@ class TestRuleRow(RulesTableTestCase):
         # Test using a rule with "deny" policy.
         test_rule(self.data.deny_rule, "block")
 
-    def _test_endpoint(self, endpoint):
-        assert endpoint in ["origin", "dest"]
+    def test_origin_and_dest_properties(self):
+        def test_pre_path_spec(endpoint, spec):
+            def create_rule():
+                """Create the rule from the spec info."""
+                endpoint_short = "o" if endpoint == "origin" else "d"
+                rule_data = {endpoint_short: spec["spec"]}
+                return self.rules.create_rule(rule_data, allow=True)
 
-        def test(spec_id):
-            self._test_pre_path_spec(endpoint,
-                                     self.data.pre_path_specs[spec_id])
+            # Create and add the rule.
+            rule = create_rule()
+            rule.add()
 
-        test("s")
-        test("h")
-        test("p")
-        test("sh")
-        test("sp")
-        test("hp")
-        test("shp")
+            # Check if the cell text matches the expected string.
+            rule_row = self.table.user_rule_rows[0]
+            returned_string = getattr(rule_row, endpoint)
+            self.assertEqual(returned_string, spec["expected_string"])
 
-    def _test_pre_path_spec(self, endpoint, spec):
-        def create_rule():
-            """Create the rule from the spec info."""
-            endpoint_short = "o" if endpoint == "origin" else "d"
-            rule_data = {endpoint_short: spec["spec"]}
-            return self.rules.create_rule(rule_data, allow=True)
+            # Remove the rule again.
+            rule.remove()
 
-        # Create and add the rule.
-        rule = create_rule()
-        rule.add()
+        def test_endpoint(endpoint):
+            assert endpoint in ["origin", "dest"]
 
-        # Check if the cell text matches the expected string.
-        rule_row = self.table.user_rule_rows[0]
-        returned_string = getattr(rule_row, endpoint)
-        self.assertEqual(returned_string, spec["expected_string"])
+            def test(spec_id):
+                test_pre_path_spec(endpoint, self.data.pre_path_specs[spec_id])
 
-        # Remove the rule again.
-        rule.remove()
+            test("s")
+            test("h")
+            test("p")
+            test("sh")
+            test("sp")
+            test("hp")
+            test("shp")
 
-    def test_origin_property(self):
-        self._test_endpoint("origin")
-
-    def test_dest_property(self):
-        self._test_endpoint("dest")
+        test_endpoint("origin")
+        test_endpoint("dest")
 
     def test_origin_empty(self):
         self.data.rule_without_origin.add()

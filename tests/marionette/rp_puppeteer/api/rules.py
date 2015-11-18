@@ -66,9 +66,11 @@ class Rules(BaseLib):
                 counter += self._count_rules(allow_value, temp_value)
         return counter
 
-    def remove_all(self):
+    def remove_all(self, store=False):
         for rule in self.all:
-            rule.remove()
+            rule.remove(store=False)
+        if store:
+            self.save()
 
     def save(self):
         """Save the rules to the json file."""

@@ -26,7 +26,7 @@ class RulesImportTestCase(RequestPolicyTestCase):
     def tearDown(self):
         try:
             self.prefs.old_rules.remove_all_prefs()
-            self.rules.remove_all()
+            self.rules.remove_all(store=True)
         finally:
             super(RulesImportTestCase, self).tearDown()
 

@@ -35,7 +35,8 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
 
     def tearDown(self, *args, **kwargs):
         try:
-            self._check_rules_and_remove_all()
+            self._check_and_fix_leaked_rules()
+            self._check_and_fix_leaked_rules_in_rules_file()
             self._check_and_reset_error_counts()
         finally:
             FirefoxTestCase.tearDown(self, *args, **kwargs)
@@ -44,7 +45,7 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
     # Private Properties and Methods #
     ##################################
 
-    def _check_rules_and_remove_all(self):
+    def _check_and_fix_leaked_rules(self):
         try:
             n_rules = self.rules.count_rules()
             self.assertEqual(n_rules, 0,
@@ -52,6 +53,14 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
                              "but should be zero.".format(n_rules))
         finally:
             self.rules.remove_all()
+
+    def _check_and_fix_leaked_rules_in_rules_file(self):
+        rules = self.rules_file.get_rules()
+        n_rules = 0 if rules is None else len(rules)
+        if n_rules != 0:
+            self.rules.save()
+            self.fail("A test must not leak rules in the rules file. "
+                      "Rule count is {} but should be zero.".format(n_rules))
 
     def _check_and_reset_error_counts(self):
         try:

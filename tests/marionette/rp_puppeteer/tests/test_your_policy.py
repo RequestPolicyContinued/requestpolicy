@@ -179,8 +179,9 @@ class TestAddRuleForm(YourPolicyTestCase):
             self.add_rule_form.set_all_values_by_rule(rule)
             # Submit and compare.
             submit_and_compare(rule)
-            # Remove the rule again.
-            rule.remove()
+            # Remove the rule again. The rules file must be updated
+            # because submitting the form has saved the rule.
+            rule.remove(store=True)
 
         # Test some rules which make use of all fields.
         test_rule(self.data.allow_rule_shp_shp)

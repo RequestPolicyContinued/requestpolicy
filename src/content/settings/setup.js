@@ -22,6 +22,10 @@ $(function () {
 
 Cu.import("resource://gre/modules/Services.jsm");
 
+ScriptLoader.importModules([
+  "lib/old-rules"
+], this);
+
 function showConfigure() {
   $('#welcome').css('display', 'none');
   $('#configure').css('display', 'block');
@@ -133,8 +137,9 @@ function onload() {
     Logger.dump('Rule count: ' + ruleCount);
     if (ruleCount <= 0) {
       Logger.dump('Performing rule import.');
-      var addHostWildcard = identLevel == 1;
-      var rules = common.getOldRulesAsNewRules(addHostWildcard);
+      let addHostWildcard = identLevel == 1;
+      let oldRules = new OldRules();
+      let rules = oldRules.getAsNewRules(addHostWildcard);
       PolicyManager.addAllowRules(rules);
     }
 

@@ -12,6 +12,9 @@ $(function () {
   common.localize(PAGE_STRINGS);
 });
 
+ScriptLoader.importModules([
+  "lib/old-rules"
+], this);
 
 var rules = null;
 var addHostWildcard = true;
@@ -28,8 +31,10 @@ function clearRulesTable() {
 
 function populateRuleTable() {
   var table = $id('rules');
+
+  let oldRules = new OldRules();
   // Setting the global rules var here.
-  rules = common.getOldRulesAsNewRules(addHostWildcard);
+  rules = oldRules.getAsNewRules(addHostWildcard);
 
   for (var i = 0; i < rules.length; i++) {
     var entry = rules[i];

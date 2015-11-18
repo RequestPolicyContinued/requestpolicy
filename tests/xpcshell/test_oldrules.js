@@ -1,0 +1,147 @@
+/* exported run_test */
+/* global Cc, Ci, Cu, equal, deepEqual */
+
+/* global OldRules */
+Cu.import("chrome://rpcontinued/content/lib/old-rules.jsm");
+/* global rpPrefBranch */
+Cu.import("chrome://rpcontinued/content/lib/prefs.jsm");
+
+
+function run_test() {
+  "use strict";
+
+  test_0();
+}
+
+
+function test_0() {
+  "use strict";
+
+  testGetOldRulesAsNewRules(
+      [
+        "mozilla.org",
+        "mozilla.net",
+        "mozilla.org|mozilla.net"
+      ],
+      [
+        {o: {h: "*.mozilla.org"}},
+        {d: {h: "*.mozilla.net"}},
+        {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}}
+      ]);
+
+  testGetOldRulesAsNewRules(
+      [
+        "https://www.mozilla.org " +
+        "www.mozilla.org " +
+        "mozilla.org",
+
+        "https://mozorg.cdn.mozilla.net " +
+        "mozorg.cdn.mozilla.net " +
+        "mozilla.net",
+
+        "https://www.mozilla.org|https://mozorg.cdn.mozilla.net " +
+        "www.mozilla.org|mozorg.cdn.mozilla.net " +
+        "mozilla.org|mozilla.net"
+      ],
+      [
+        {o: {s: "https", h: "*.www.mozilla.org"}},
+        {o: {h: "*.www.mozilla.org"}},
+        {o: {h: "*.mozilla.org"}},
+
+        {d: {s: "https", h: "*.mozorg.cdn.mozilla.net"}},
+        {d: {h: "*.mozorg.cdn.mozilla.net"}},
+        {d: {h: "*.mozilla.net"}},
+
+        {
+          o: {s: "https", h: "*.www.mozilla.org"},
+          d: {s: "https", h: "*.mozorg.cdn.mozilla.net"}
+        }, {
+          o: {h: "*.www.mozilla.org"},
+          d: {h: "*.mozorg.cdn.mozilla.net"}
+        }, {
+          o: {h: "*.mozilla.org"},
+          d: {h: "*.mozilla.net"}
+        }
+      ]);
+
+  // Get the old rules from the prefs.
+  // The prefs don't exist.
+  testGetOldRulesAsNewRules([undefined, undefined, undefined], []);
+
+  // Get the old rules from the prefs.
+  // Some rules are defined in the prefs.
+  usingOldRulePrefs({
+    "allowedOrigins": "mozilla.org",
+    "allowedDestinations": "mozilla.net",
+    "allowedOriginsToDestinations": "mozilla.org|mozilla.net"
+  }, function () {
+    testGetOldRulesAsNewRules([undefined, undefined, undefined], [
+      {o: {h: "*.mozilla.org"}},
+      {d: {h: "*.mozilla.net"}},
+      {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}}
+    ]);
+  });
+}
+
+
+function usingOldRulePrefs(aPrefs, aFunction) {
+  "use strict";
+
+  function forEachPrefName(fn) {
+    Object.getOwnPropertyNames(aPrefs).forEach(fn);
+  }
+
+  // Set the prefs.
+  forEachPrefName(function (prefName) {
+    let prefValue = aPrefs[prefName];
+    setOldRulePref(prefName, prefValue);
+  });
+
+  aFunction.call(null);
+
+  // Clear the prefs.
+  forEachPrefName(function (prefName) {
+    rpPrefBranch.clearUserPref(prefName);
+  });
+}
+
+function setOldRulePref(aPrefName, aValue) {
+  "use strict";
+  // Code taken from RequestPolicy 0.5.28 (requestpolicyService.js).
+
+  // Not using just setCharPref because these values may contain Unicode
+  // strings (e.g. for IDNs).
+  var str = Cc["@mozilla.org/supports-string;1"]
+      .createInstance(Ci.nsISupportsString);
+  str.data = aValue;
+  rpPrefBranch.setComplexValue(aPrefName, Ci.nsISupportsString, str);
+}
+
+function testGetOldRulesAsNewRules(
+    [origins, destinations, originsToDestinations], expectedRuleSpecs) {
+  "use strict";
+
+  var oldRules = new OldRules(origins, destinations, originsToDestinations);
+  var actualRuleSpecs = oldRules.getAsNewRules(true);
+  assertRuleSpecsEqual(actualRuleSpecs, expectedRuleSpecs);
+}
+
+function assertRuleSpecsEqual(actual, expected) {
+  "use strict";
+
+  if (false === Array.isArray(actual)) {
+    actual = [actual];
+  }
+  if (false === Array.isArray(expected)) {
+    expected = [expected];
+  }
+
+  equal(actual.length, expected.length);
+
+  actual.sort();
+  expected.sort();
+
+  for (let i = 0, len = expected.length; i < len; ++i) {
+    deepEqual(actual[i], expected[i]);
+  }
+}

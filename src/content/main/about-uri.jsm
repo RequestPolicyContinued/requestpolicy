@@ -66,33 +66,34 @@ function getURI(aURI) {
 
 
 var AboutRequestPolicy = (function() {
-  let self = {
-    classDescription: "about:requestpolicy",
-    contractID: "@mozilla.org/network/protocol/about;1?what=requestpolicy",
-    classID: Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}"),
-    QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
+  let self = {};
 
-    getURIFlags: function(aURI) {
-      return Ci.nsIAboutModule.ALLOW_SCRIPT;
-    },
 
-    newChannel: function(aURI) {
-      let uri = getURI(aURI)
-      let channel = Services.io.newChannel(uri, null, null);
-      channel.originalURI = aURI;
-      return channel;
-    },
+  self.classDescription = "about:requestpolicy";
+  self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
+  self.classID = Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
+  self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
 
-    //
-    // nsIFactory interface implementation
-    //
+  self.getURIFlags = function (aURI) {
+    return Ci.nsIAboutModule.ALLOW_SCRIPT;
+  };
 
-    createInstance: function(outer, iid) {
-      if (outer) {
-        throw Cr.NS_ERROR_NO_AGGREGATION;
-      }
-      return self.QueryInterface(iid);
+  self.newChannel = function (aURI) {
+    let uri = getURI(aURI);
+    let channel = Services.io.newChannel(uri, null, null);
+    channel.originalURI = aURI;
+    return channel;
+  };
+
+  //----------------------------------------------------------------------------
+  // nsIFactory interface implementation
+  //----------------------------------------------------------------------------
+
+  self.createInstance = function (outer, iid) {
+    if (outer) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    return self.QueryInterface(iid);
   };
 
 

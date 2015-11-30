@@ -21,12 +21,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-// ProcessEnvironment is either a ParentProcessEnvironment or
-// a ChildProcessEnvironment.
+/* exported ProcessEnvironment */
+/* global Environment */
+
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm");
+let {C} = ScriptLoader.importModule("lib/utils/constants");
+
+//==============================================================================
+// ProcessEnvironment
+//==============================================================================
+
+/**
+ * ProcessEnvironment is either a ParentProcessEnvironment or
+ * a ChildProcessEnvironment.
+ */
 var ProcessEnvironment = (function() {
-
-
   // determine if this is the main process
   let isMainProcess = (function isMainProcess() {
     let xulRuntime = Cc["@mozilla.org/xre/app-info;1"]
@@ -194,7 +207,7 @@ var ProcessEnvironment = (function() {
 
   ChildProcessEnvironment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
-    if (self.envState === ENV_STATES.NOT_STARTED) {
+    if (self.envState === Environment.ENV_STATES.NOT_STARTED) {
       // The child Process Environment needs to start up when
       // the first framescript in that child is loading.
       //console.debug("[RPC] Going to start up Child Process Environment.");
@@ -213,4 +226,4 @@ var ProcessEnvironment = (function() {
     return new ChildProcessEnvironment();
   }
 
-})();
+}());

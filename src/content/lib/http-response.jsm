@@ -21,26 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
-  "HttpResponse"
-];
+/* exported HttpResponse */
+this.EXPORTED_SYMBOLS = ["HttpResponse"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/windows"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {WindowUtils} = importModule("lib/utils/windows");
+let {Prefs} = importModule("lib/prefs");
 
-
+//==============================================================================
+// HttpResponse
+//==============================================================================
 
 function HttpResponse(aHttpChannel) {
   this.httpChannel = aHttpChannel;

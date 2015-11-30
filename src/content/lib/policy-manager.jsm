@@ -21,25 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
+/* exported PolicyManager, RULES_CHANGED_TOPIC */
+this.EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Logger} = importModule("lib/logger");
+let {RequestResult} = importModule("lib/request-result");
+let {Ruleset, RawRuleset} = importModule("lib/ruleset");
+let {RulesetStorage} = importModule("lib/ruleset-storage");
+
+//==============================================================================
+// constants
+//==============================================================================
 
 const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
-Cu.import("resource://gre/modules/Services.jsm");
-
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/request-result",
-  "lib/ruleset",
-  "lib/ruleset-storage",
-  "lib/utils/constants"
-], this);
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function dprint(msg) {
   if (typeof print == "function") {
@@ -57,13 +63,16 @@ function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
+//==============================================================================
+// PolicyManager
+//==============================================================================
 
 /**
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-var PolicyManager = (function(self) {
-
+var PolicyManager = (function () {
+  let self = {};
 
   let userRulesets = {};
   let subscriptionRulesets = {};
@@ -337,8 +346,13 @@ var PolicyManager = (function(self) {
   };
 
   return self;
-}(PolicyManager || {}));
+}());
 
 
-Services.scriptloader.loadSubScript(
-    "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js");
+PolicyManager = (function () {
+  let scope = {PolicyManager};
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js",
+      scope);
+  return scope.PolicyManager;
+}());

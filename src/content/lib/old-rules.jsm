@@ -21,23 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* exported EXPORTED_SYMBOLS, OldRules */
-var EXPORTED_SYMBOLS = ["OldRules"];
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-var globalScope = this;
+/* exported OldRules */
+this.EXPORTED_SYMBOLS = ["OldRules"];
 
-var {OldRules} = (function () {
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {DomainUtil} = importModule("lib/utils/domains");
+let {rpPrefBranch} = importModule("lib/prefs");
+
+//==============================================================================
+// OldRules
+//==============================================================================
+
+var OldRules = (function () {
   "use strict";
-
-  /* global Components */
-  const {interfaces: Ci, results: Cr, utils: Cu} = Components;
-
-  /* global ScriptLoader */
-  Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-  ScriptLoader.importModules([
-    "lib/utils/domains", /* global DomainUtil */
-    "lib/prefs" /* global rpPrefBranch */
-  ], globalScope);
 
   function OldRules(aOrigins = "", aDestinations = "",
                     aOriginsToDestinations = "") {
@@ -173,5 +173,5 @@ var {OldRules} = (function () {
     }
   };
 
-  return {OldRules};
-})();
+  return OldRules;
+}());

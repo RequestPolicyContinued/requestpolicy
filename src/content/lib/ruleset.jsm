@@ -21,22 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported Ruleset, RawRuleset */
+this.EXPORTED_SYMBOLS = [
   "Ruleset",
   "RawRuleset"
 ];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/constants"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {C} = importModule("lib/utils/constants");
 
+//==============================================================================
+// utilities
+//==============================================================================
 
 function dprint(msg) {
   if (typeof print == "function") {
@@ -102,6 +104,10 @@ function dump(arr,level) {
   }
   return dumped_text;
 }
+
+//==============================================================================
+// RawRuleset
+//==============================================================================
 
 function RawRuleset(jsonData) {
   this._metadata = {"version" : 1};
@@ -478,6 +484,9 @@ RuleIterator.prototype.next = function() {
   return this._rulesIterator.next()[1];
 }
 
+//==============================================================================
+// Rules
+//==============================================================================
 
 function Rules() {
   this._rules = [];
@@ -527,6 +536,9 @@ Rules.prototype = {
   }
 };
 
+//==============================================================================
+// Rule
+//==============================================================================
 
 /*
  * Semantics of rules:
@@ -645,6 +657,9 @@ Rule.prototype = {
   }
 };
 
+//==============================================================================
+// DomainEntry
+//==============================================================================
 
 function DomainEntry(name, fullName, higher) {
   if (typeof name != "string" && name !== null) {
@@ -702,6 +717,9 @@ DomainEntry.prototype = {
   }
 };
 
+//==============================================================================
+// IPAddressEntry
+//==============================================================================
 
 function IPAddressEntry(address) {
   this.address = address;
@@ -730,6 +748,9 @@ IPAddressEntry.prototype = {
   }
 };
 
+//==============================================================================
+// Ruleset
+//==============================================================================
 
 function Ruleset(name) {
   this._name = name || null;

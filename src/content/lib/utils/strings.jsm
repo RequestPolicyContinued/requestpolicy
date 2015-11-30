@@ -21,20 +21,21 @@
  */
 
 /**
- * Note: The string utils are used also in the content process (see
- * e10s/multiprocessor firefox), so this file shouldn't contain code which is
- * limited to the chrome process.
+ * [E10s]: This file runs both in PARENT and CHILD process.
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["StringUtils"];
+/* exported StringUtils */
+this.EXPORTED_SYMBOLS = ["StringUtils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+var {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
+//==============================================================================
+// StringUtils
+//==============================================================================
 
 var StringUtils = (function() {
   let self = {};

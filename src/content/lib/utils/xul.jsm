@@ -21,20 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+/* exported XULUtils */
+this.EXPORTED_SYMBOLS = ["XULUtils"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/strings",
-  "lib/utils/constants"
-], this);
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-var EXPORTED_SYMBOLS = ["XULUtils"];
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {StringUtils} = importModule("lib/utils/strings");
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// XULUtils
+//==============================================================================
 
 var XULUtils = {};
 
@@ -77,7 +80,7 @@ var xulTrees = XULUtils.xulTrees = {};
       //            "' for element <" + aElementSpec.tag + ">");
     }
   }
-})();
+}());
 
 
 /**
@@ -239,7 +242,7 @@ var {addEventListeners, removeEventListeners} = (function () {
     addEventListeners: addEventListeners,
     removeEventListeners: removeEventListeners
   };
-})();
+}());
 
 
 function recursivelyAddXULElements(aDocument, aElementSpecList,

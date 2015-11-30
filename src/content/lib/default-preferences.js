@@ -1,3 +1,4 @@
+/* global pref */
 
 pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);

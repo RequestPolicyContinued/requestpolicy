@@ -21,7 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-WindowListener = (function() {
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
+
+/* exported WindowListener */
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// WindowListener
+//==============================================================================
+
+var WindowListener = (function() {
   let self = {};
 
   let nextWinID = 0;

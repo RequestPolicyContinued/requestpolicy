@@ -21,37 +21,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-rpcontinued.overlay = (function() {
+window.rpcontinued.overlay = (function () {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  let {ScriptLoader, XPCOMUtils} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
-    return mod;
-  }());
+  let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-  // iMod: Alias for ScriptLoader.importModule
-  let iMod = ScriptLoader.importModule;
-  let {Environment, ProcessEnvironment} = iMod("lib/environment");
-  let {ManagerForMessageListeners} = iMod("lib/manager-for-message-listeners");
-  let {Logger} = iMod("lib/logger");
-  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
-  let {RequestProcessor} = iMod("lib/request-processor");
-  let {PolicyManager} = iMod("lib/policy-manager");
-  let {DomainUtil} = iMod("lib/utils/domains");
-  let {StringUtils} = iMod("lib/utils/strings");
-  let {WindowUtils} = iMod("lib/utils/windows");
-  let {Utils} = iMod("lib/utils");
-  let {C} = iMod("lib/utils/constants");
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Environment, ProcessEnvironment} = importModule("lib/environment");
+  let {ManagerForMessageListeners} = importModule(
+      "lib/manager-for-message-listeners");
+  let {Logger} = importModule("lib/logger");
+  let {rpPrefBranch, Prefs} = importModule("lib/prefs");
+  let {RequestProcessor} = importModule("lib/request-processor");
+  let {PolicyManager} = importModule("lib/policy-manager");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {WindowUtils} = importModule("lib/utils/windows");
+  let {Utils} = importModule("lib/utils");
+  let {C} = importModule("lib/utils/constants");
+
+  let rpcontinued = window.rpcontinued;
+
+  //============================================================================
+
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
@@ -929,7 +930,7 @@ rpcontinued.overlay = (function() {
           return;
         }
         // call this function again in a few miliseconds.
-        setTimeout(function () {
+        window.setTimeout(function () {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);

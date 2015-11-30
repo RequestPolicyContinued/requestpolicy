@@ -21,34 +21,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
+
+/* global RequestProcessor: true */
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {Prefs} = importModule("lib/prefs");
+let {PolicyManager} = importModule("lib/policy-manager");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {Utils} = importModule("lib/utils");
+let {Request, RedirectRequest} = importModule("lib/request");
+let {RequestResult, REQUEST_REASON_COMPATIBILITY,
+     REQUEST_REASON_RELATIVE_URL} = importModule("lib/request-result");
+let {HttpResponse} = importModule("lib/http-response");
+let {ProcessEnvironment} = importModule("lib/environment");
+
+//==============================================================================
+// constants
+//==============================================================================
+
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/prefs",
-  "lib/policy-manager",
-  "lib/utils/domains",
-  "lib/utils",
-  "lib/request",
-  "lib/request-result",
-  "lib/http-response",
-  "lib/environment"
-], this);
-
-
+//==============================================================================
+// RequestProcessor (extension)
+//==============================================================================
 
 RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
-
-
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cr = Components.results;
-  const Cu = Components.utils;
 
 
   /**

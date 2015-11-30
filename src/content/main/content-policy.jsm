@@ -21,28 +21,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PolicyImplementation"];
+/* exported PolicyImplementation */
+this.EXPORTED_SYMBOLS = ["PolicyImplementation"];
 
-let globalScope = this;
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Logger} = importModule("lib/logger");
+let {NormalRequest} = importModule("lib/request");
+let {Utils} = importModule("lib/utils");
+let {RequestProcessor} = importModule("lib/request-processor");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/constants",
-  "lib/logger",
-  "lib/request",
-  "lib/utils",
-  "lib/request-processor",
-  "lib/environment"
-], globalScope);
-
+//==============================================================================
+// PolicyImplementation
+//==============================================================================
 
 // TODO: implement nsIChannelEventSink to catch redirects as Adblock Plus does.
 var PolicyImplementation = (function() {
@@ -144,18 +142,18 @@ var PolicyImplementation = (function() {
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
 
-  //
+  //----------------------------------------------------------------------------
   // nsISupports interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
                                                Ci.nsIObserver,
                                                Ci.nsIFactory,
                                                Ci.nsISupportsWeakReference]);
 
-  //
+  //----------------------------------------------------------------------------
   // nsIContentPolicy interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   // https://developer.mozilla.org/en/nsIContentPolicy
 
@@ -172,9 +170,9 @@ var PolicyImplementation = (function() {
 
   self.shouldProcess = (() => C.CP_OK);
 
-  //
+  //----------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {

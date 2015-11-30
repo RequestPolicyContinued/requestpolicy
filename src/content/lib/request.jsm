@@ -21,11 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported Request, NormalRequest, RedirectRequest,
+       REQUEST_TYPE_NORMAL, REQUEST_TYPE_REDIRECT */
+this.EXPORTED_SYMBOLS = [
   "Request",
   "NormalRequest",
   "RedirectRequest",
@@ -33,21 +34,24 @@ let EXPORTED_SYMBOLS = [
   "REQUEST_TYPE_REDIRECT"
 ];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/windows",
-  "lib/utils"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {WindowUtils} = importModule("lib/utils/windows");
 
+//==============================================================================
+// constants
+//==============================================================================
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
 
-
+//==============================================================================
+// Request
+//==============================================================================
 
 function Request(originURI, destURI, requestType) {
   // TODO: save a nsIURI objects here instead of strings
@@ -73,8 +77,9 @@ Request.prototype.detailsToString = function() {
   return "destination: " + this.destURI + ", origin: " + this.originURI;
 };
 
-
-
+//==============================================================================
+// NormalRequest
+//==============================================================================
 
 function NormalRequest(aContentType, aContentLocation, aRequestOrigin, aContext,
     aMimeTypeGuess, aExtra, aRequestPrincipal) {
@@ -264,8 +269,9 @@ NormalRequest.prototype.getBrowser = function() {
   }
 };
 
-
-
+//==============================================================================
+// RedirectRequest
+//==============================================================================
 
 function RedirectRequest(httpResponse) {
   Request.call(this, httpResponse.originURI.specIgnoringRef,

@@ -21,23 +21,35 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-const toolbarButtonId = "rpcontinuedToolbarButton";
+/* global rpWindowManager: true */
 
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/utils/xul", "lib/utils/info", "lib/logger"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {XULUtils} = importModule("lib/utils/xul");
+let {Info} = importModule("lib/utils/info");
+let {Logger} = importModule("lib/logger");
 
+let CustomizableUI = null;
 if (Info.isAustralis) {
-  Components.utils.import("resource:///modules/CustomizableUI.jsm");
+  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
+  /* jshint -W126 */
+  ({CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm",
+                                {}));
+  /* jshint +W126 */
 }
 
-
+//==============================================================================
+// rpWindowManager (extension)
+//==============================================================================
 
 rpWindowManager = (function(self) {
+  const toolbarButtonId = "rpcontinuedToolbarButton";
 
   let isAustralis = Info.isAustralis;
 

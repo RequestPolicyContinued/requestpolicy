@@ -20,9 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* exported ManagerForBlockedContent */
+
 var ManagerForBlockedContent = (function() {
   let self = {};
 
+  //============================================================================
 
   let missingImageDataUri = "data:image/png;base64,"
       + "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c"

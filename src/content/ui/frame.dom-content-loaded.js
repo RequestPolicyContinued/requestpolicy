@@ -20,13 +20,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* exported ManagerForDOMContentLoaded */
+/* global mm, overlayComm, framescriptEnv, ManagerForBlockedContent */
 
 var ManagerForDOMContentLoaded = (function() {
   let self = {};
 
-  let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
-  let {Utils} = ScriptLoader.importModule("lib/utils");
+  /* global Components */
+  const {interfaces: Ci, utils: Cu} = Components;
 
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Logger} = importModule("lib/logger");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {Utils} = importModule("lib/utils");
+  let {Environment} = importModule("lib/environment");
+  let {C} = importModule("lib/utils/constants");
+
+  let {content} = mm;
+
+  //============================================================================
 
   function htmlAnchorTagClicked(event) {
     // Notify the main thread that a link has been clicked.

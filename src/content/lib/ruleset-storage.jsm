@@ -21,18 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RulesetStorage"];
+/* exported RulesetStorage */
+this.EXPORTED_SYMBOLS = ["RulesetStorage"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/ruleset",
-  "lib/utils/files"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RawRuleset} = importModule("lib/ruleset");
+let {FileUtil} = importModule("lib/utils/files");
 
+//==============================================================================
+// RulesetStorage
+//==============================================================================
 
 var RulesetStorage = {
 

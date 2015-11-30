@@ -21,24 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Utils"];
+/* exported Utils */
+this.EXPORTED_SYMBOLS = ["Utils"];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-//Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+//let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
-
-
-
+//==============================================================================
+// Utils
+//==============================================================================
 
 var Utils = (function() {
   let self = {};

@@ -21,16 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Cu.import("resource://gre/modules/AddonManager.jsm");
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils",
-  "lib/environment"
-], this);
+/* global RequestProcessor: true */
 
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+
+//==============================================================================
+// RequestProcessor (extension)
+//==============================================================================
 
 RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);

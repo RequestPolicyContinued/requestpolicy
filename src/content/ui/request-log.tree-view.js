@@ -21,24 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
+
 window.rpcontinued = window.rpcontinued || {};
 
 window.rpcontinued.requestLog = (function (self) {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
-
-
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-
-
-
+  //============================================================================
 
   self.treebox = null;
 
@@ -48,8 +37,6 @@ window.rpcontinued.requestLog = (function (self) {
     "rpcontinued-requestLog-blocked" : 2,
     "rpcontinued-requestLog-time" : 3
   };
-
-  let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
 
 
   function getVisibleRowAtIndex(index) {

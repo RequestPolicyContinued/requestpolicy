@@ -21,21 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Logger"];
+/* exported Logger */
+this.EXPORTED_SYMBOLS = ["Logger"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+/* global dump */
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/prefs"
-], this);
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {rpPrefBranch} = importModule("lib/prefs");
+
+//==============================================================================
+// Logger
+//==============================================================================
 
 /**
  * Provides logging methods
@@ -202,11 +205,16 @@ var Logger = (function() {
 
 // #ifdef UNIT_TESTING
 
+//==============================================================================
+// unit testing part
+//==============================================================================
+
 /**
  * Triggers errors for a RequestPolicy unit test.
  * It's used to test Error Detection from the unit tests.
  */
-var UnitTestObserver = (function (self) {
+var UnitTestObserver = (function () {
+  let self = {};
 
   var loggingErrorTopic = "requestpolicy-trigger-logging-error";
   var consoleErrorTopic = "requestpolicy-trigger-console-error";
@@ -272,7 +280,7 @@ var UnitTestObserver = (function (self) {
   }
 
   return self;
-})({});
+}());
 
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
                                       UnitTestObserver.startup);

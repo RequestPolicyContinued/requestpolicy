@@ -21,28 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = [
+/* global Components */
+const {utils: Cu} = Components;
+
+/* exported Environment, FrameScriptEnvironment, ProcessEnvironment */
+this.EXPORTED_SYMBOLS = [
   "Environment",
   "FrameScriptEnvironment",
   "ProcessEnvironment"
 ];
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-
 let globalScope = this;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 
 ScriptLoader.defineLazyModuleGetters({
+  /* global ManagerForEventListeners */
   "lib/manager-for-event-listeners": ["ManagerForEventListeners"],
+  /* global ManagerForMessageListeners */
   "lib/manager-for-message-listeners": ["ManagerForMessageListeners"],
-  "lib/utils/constants": ["C"],
+  /* global ObserverManager */
   "lib/observer-manager": ["ObserverManager"]
 }, globalScope);
 

@@ -21,11 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported UserSubscriptions, SubscriptionList,
+       Subscription, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
+       SUBSCRIPTION_REMOVED_TOPIC */
+this.EXPORTED_SYMBOLS = [
   "UserSubscriptions",
   "SubscriptionList",
   "Subscription",
@@ -34,15 +36,18 @@ let EXPORTED_SYMBOLS = [
   "SUBSCRIPTION_REMOVED_TOPIC"
 ];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/ruleset",
-  "lib/utils/files",
-  "lib/ruleset-storage"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {RawRuleset} = importModule("lib/ruleset");
+let {FileUtil} = importModule("lib/utils/files");
+let {RulesetStorage} = importModule("lib/ruleset-storage");
+
+//==============================================================================
+// Constants
+//==============================================================================
 
 const SUBSCRIPTION_UPDATED_TOPIC = 'rpcontinued-subscription-policy-updated';
 const SUBSCRIPTION_ADDED_TOPIC = 'rpcontinued-subscription-policy-added';
@@ -54,7 +59,9 @@ const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
 const SUBSCRIPTION_UPDATE_FAILURE = 'FAILURE';
 
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function setTimeout(func, delay) {
   var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
@@ -75,6 +82,10 @@ function dprint(msg) {
 function dwarn(msg) {
   Logger.warning(Logger.TYPE_INTERNAL, msg);
 }
+
+//==============================================================================
+// UserSubscriptions
+//==============================================================================
 
 /**
  * Represents all of the subscriptions a user has enabled. This is where user

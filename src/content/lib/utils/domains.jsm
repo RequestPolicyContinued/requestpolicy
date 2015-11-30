@@ -21,27 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["DomainUtil"];
+/* exported DomainUtil */
+this.EXPORTED_SYMBOLS = ["DomainUtil"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/logger"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
 
-/*
- * It's worth noting that many of the functions in this module will convert ACE
- * formatted IDNs to UTF8 formatted values. This is done automatically when
- * constructing nsIURI instances from ACE formatted URIs when the TLD is one in
- * which Mozilla supports UTF8 IDNs.
- */
-
-
+//==============================================================================
+// DomainUtil
+//==============================================================================
 
 var DomainUtil = {};
+
+/*
+ * It's worth noting that many of the functions in this module will
+ * convert ACE formatted IDNs to UTF8 formatted values. This is done
+ * automatically when constructing nsIURI instances from ACE
+ * formatted URIs when the TLD is one in which Mozilla supports
+ * UTF8 IDNs.
+ */
 
 DomainUtil._idnService = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);

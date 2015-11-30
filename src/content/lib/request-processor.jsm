@@ -21,12 +21,45 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RequestProcessor"];
+/* exported RequestProcessor */
+this.EXPORTED_SYMBOLS = ["RequestProcessor"];
+
+let globalScope = this;
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let importModule = ScriptLoader.importModule;
+
+let {Logger} = importModule("lib/logger");
+let {Prefs} = importModule("lib/prefs");
+let {PolicyManager} = importModule("lib/policy-manager");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {RequestResult, REQUEST_REASON_USER_POLICY,
+     REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,
+     REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
+     REQUEST_REASON_DEFAULT_SAME_DOMAIN, REQUEST_REASON_COMPATIBILITY,
+     REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
+     REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
+     REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
+     REQUEST_REASON_IDENTICAL_IDENTIFIER} =
+        importModule("lib/request-result");
+let {RequestSet} = importModule("lib/request-set");
+let {ProcessEnvironment} = importModule("lib/environment");
+let {Utils} = importModule("lib/utils");
+
+/* global PolicyImplementation */
+ScriptLoader.defineLazyModuleGetters({
+  "main/content-policy": ["PolicyImplementation"]
+}, globalScope);
+
+//==============================================================================
+// constants
+//==============================================================================
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
@@ -35,28 +68,13 @@ const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 // other callers. Was chosen randomly.
 const CP_MAPPEDDESTINATION = 0x178c40bf;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+//==============================================================================
+// RequestProcessor
+//==============================================================================
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/prefs",
-  "lib/policy-manager",
-  "lib/utils/domains",
-  "lib/utils",
-  "lib/request",
-  "lib/request-result",
-  "lib/request-set",
-  "lib/environment"
-], this);
-ScriptLoader.defineLazyModuleGetters({
-  "main/content-policy": ["PolicyImplementation"]
-}, this);
+var RequestProcessor = (function () {
+  let self = {};
 
-
-
-var RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
 
@@ -1068,10 +1086,18 @@ var RequestProcessor = (function(self) {
   };
 
   return self;
-}(RequestProcessor || {}));
+}());
 
+RequestProcessor = (function () {
+  let scope = {RequestProcessor};
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/request-processor.redirects.js", scope);
+  return scope.RequestProcessor;
+}());
 
-Services.scriptloader.loadSubScript(
-    'chrome://rpcontinued/content/lib/request-processor.redirects.js');
-Services.scriptloader.loadSubScript(
-    'chrome://rpcontinued/content/lib/request-processor.compat.js');
+RequestProcessor = (function () {
+  let scope = {RequestProcessor};
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);
+  return scope.RequestProcessor;
+}());

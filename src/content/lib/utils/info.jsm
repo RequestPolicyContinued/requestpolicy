@@ -21,31 +21,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Info"];
+/* exported Info */
+this.EXPORTED_SYMBOLS = ["Info"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/prefs",
-  "lib/utils/constants",
-  "lib/environment"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {rpPrefBranch} = importModule("lib/prefs");
+let {C} = importModule("lib/utils/constants");
+let {ProcessEnvironment} = importModule("lib/environment");
 
+let AddonManager = null;
 if (ProcessEnvironment.isMainProcess) {
-  Cu.import("resource://gre/modules/AddonManager.jsm");
+  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
+  /* jshint -W126 */
+  ({AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {}));
+  /* jshint +W126 */
 }
 
-
+//==============================================================================
+// Info
+//==============================================================================
 
 var Info = (function() {
   let self = {};
-
-  self = {};
 
   // bad smell...
   // get/set last/current RP version

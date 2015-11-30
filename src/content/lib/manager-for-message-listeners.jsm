@@ -21,21 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
+/* exported ManagerForMessageListeners */
+this.EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+let {C} = importModule("lib/utils/constants");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger",
-  "lib/utils/constants"
-], globalScope);
-
+//==============================================================================
+// ManagerForMessageListeners
+//==============================================================================
 
 /**
  * This class provides an interface to a "Message Manager" which takes

@@ -21,43 +21,42 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["rpService"];
+/* exported rpService */
+this.EXPORTED_SYMBOLS = ["rpService"];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/AddonManager.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/prefs",
-  "lib/utils/domains",
-  "lib/policy-manager",
-  "lib/subscription",
-  "lib/utils",
-  "lib/utils/constants",
-  "lib/environment"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {Prefs, rpPrefBranch} = importModule("lib/prefs");
+let {PolicyManager} = importModule("lib/policy-manager");
+let {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
+     SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
+let {C} = importModule("lib/utils/constants");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-
+//==============================================================================
+// rpService
+//==============================================================================
 
 var rpService = (function() {
   let self = {};
 
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
   // Internal Data
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
 
   let subscriptions = null;
 
 
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
   // Utility
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
 
 
   function loadConfigAndRules() {
@@ -225,15 +224,15 @@ var rpService = (function() {
     }
 
     return {checkForOtherInstallations: checkForOtherInstallations};
-  })();
+  }());
 
 
 
 
 
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
   // startup and shutdown functions
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
 
   // prepare back-end
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
@@ -277,9 +276,9 @@ var rpService = (function() {
 
 
 
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
   // nsIObserver interface
-  // /////////////////////////////////////////////////////////////////////////
+  //----------------------------------------------------------------------------
 
   self.observe = function(subject, topic, data) {
     switch (topic) {

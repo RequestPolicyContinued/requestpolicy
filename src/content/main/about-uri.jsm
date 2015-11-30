@@ -21,25 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
+/* exported AboutRequestPolicy */
+this.EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Utils} = importModule("lib/utils");
 
-
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/utils"
-], globalScope);
-
+//==============================================================================
+// utilities, constants
+//==============================================================================
 
 var filenames = {
   "basicprefs": "basicprefs.html",
@@ -63,7 +61,9 @@ function getURI(aURI) {
   return "chrome://rpcontinued/content/settings/" + filenames[id];
 }
 
-
+//==============================================================================
+// AboutRequestPolicy
+//==============================================================================
 
 var AboutRequestPolicy = (function() {
   let self = {};
@@ -117,7 +117,7 @@ var AboutRequestPolicy = (function() {
   function unregisterFactory() {
     let registrar = Components.manager
         .QueryInterface(Ci.nsIComponentRegistrar);
-    let {Utils} = ScriptLoader.importModule("lib/utils");
+    let {Utils} = importModule("lib/utils");
 
     // This needs to run asynchronously, see Mozilla bug 753687
     Utils.runAsync(function() {

@@ -21,34 +21,33 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
-rpcontinued.menu = (function() {
+window.rpcontinued.menu = (function () {
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 
+  let {Environment} = importModule("lib/environment");
+  let {Logger} = importModule("lib/logger");
+  let {rpPrefBranch, Prefs} = importModule("lib/prefs");
+  let {RequestProcessor} = importModule("lib/request-processor");
+  let {PolicyManager} = importModule("lib/policy-manager");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {Ruleset} = importModule("lib/ruleset");
+  let {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties} =
+      importModule("lib/gui-location");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {DOMUtils} = importModule("lib/utils/dom");
+  let {WindowUtils} = importModule("lib/utils/windows");
+  let {C} = importModule("lib/utils/constants");
 
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  // iMod: Alias for ScriptLoader.importModule
-  let iMod = ScriptLoader.importModule;
-  let {Environment} = iMod("lib/environment");
-  let {Logger} = iMod("lib/logger");
-  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
-  let {RequestProcessor} = iMod("lib/request-processor");
-  let {PolicyManager} = iMod("lib/policy-manager");
-  let {DomainUtil} = iMod("lib/utils/domains");
-  let {Ruleset} = iMod("lib/ruleset");
-  let {GUIOrigin, GUIDestination,
-       GUILocation, GUILocationProperties} = iMod("lib/gui-location");
-  let {StringUtils} = iMod("lib/utils/strings");
-  let {DOMUtils} = iMod("lib/utils/dom");
-  let {WindowUtils} = iMod("lib/utils/windows");
-  let {C} = iMod("lib/utils/constants");
+  let rpcontinued = window.rpcontinued;
+
+  //============================================================================
+
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 

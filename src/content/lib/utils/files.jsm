@@ -21,13 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["FileUtil"];
+/* exported FileUtil */
+this.EXPORTED_SYMBOLS = ["FileUtil"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// utilities and constants
+//==============================================================================
 
 /**
  * creates an integer from the arguments
@@ -47,6 +51,10 @@ const octal444 = getOctalInt(4,4,4); // octal: 0444
 const octal700 = getOctalInt(7,0,0); // octal: 0700
 
 const REQUESTPOLICY_DIR = "requestpolicy";
+
+//==============================================================================
+// FileUtil
+//==============================================================================
 
 var FileUtil = {
 

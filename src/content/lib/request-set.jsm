@@ -21,20 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RequestSet"];
+/* exported RequestSet */
+this.EXPORTED_SYMBOLS = ["RequestSet"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/request-result"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {RequestResult} = importModule("lib/request-result");
 
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function getUriIdentifier(uri) {
   try {
@@ -46,6 +47,9 @@ function getUriIdentifier(uri) {
   }
 }
 
+//==============================================================================
+// RequestSet
+//==============================================================================
 
 function RequestSet() {
   this._origins = {};

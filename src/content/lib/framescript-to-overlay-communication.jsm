@@ -21,21 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
+/* exported FramescriptToOverlayCommunication */
+this.EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+let {C} = importModule("lib/utils/constants");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger",
-  "lib/utils/constants"
-], globalScope);
-
+//==============================================================================
+// constants
+//==============================================================================
 
 /**
  * The states of the communication channel to with the overlay.
@@ -47,6 +47,9 @@ let States = Object.freeze({
   "STOPPED": 2
 });
 
+//==============================================================================
+// FramescriptToOverlayCommunication
+//==============================================================================
 
 /**
  * Sometimes the framescript loads and starts up faster than the

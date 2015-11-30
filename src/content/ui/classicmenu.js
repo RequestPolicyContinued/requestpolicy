@@ -21,26 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
+window.rpcontinued.classicmenu = (function () {
+  var self = {};
 
+  /* global Components */
+  const {utils: Cu} = Components;
 
-rpcontinued.classicmenu = (function() {
-  let self = {};
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Logger} = importModule("lib/logger");
+  let {rpPrefBranch} = importModule("lib/prefs");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {DOMUtils} = importModule("lib/utils/dom");
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let rpcontinued = window.rpcontinued;
 
-
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {rpPrefBranch} = ScriptLoader.importModule("lib/prefs");
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-  let {DOMUtils} = ScriptLoader.importModule("lib/utils/dom");
-
+  //============================================================================
 
   /**
   * Reloads the current document if the user's preferences indicate it should
@@ -48,7 +46,7 @@ rpcontinued.classicmenu = (function() {
   */
   function conditionallyReloadDocument() {
     if (rpPrefBranch.getBoolPref("autoReload")) {
-      content.document.location.reload(false);
+      window.content.document.location.reload(false);
     }
   }
 

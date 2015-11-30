@@ -21,35 +21,41 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PrefManager"];
+/* exported PrefManager */
+this.EXPORTED_SYMBOLS = ["PrefManager"];
 
 let globalScope = this;
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/constants",
-  "lib/environment"
-], globalScope);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
+//==============================================================================
+// pref branches
+//==============================================================================
+
+/* global rpPrefBranch */
 XPCOMUtils.defineLazyGetter(globalScope, "rpPrefBranch", function() {
   return Services.prefs.getBranch("extensions.requestpolicy.")
       .QueryInterface(Ci.nsIPrefBranch2);
 });
+
+/* global rootPrefBranch */
 XPCOMUtils.defineLazyGetter(globalScope, "rootPrefBranch", function() {
   return Services.prefs.getBranch("").QueryInterface(Ci.nsIPrefBranch2);
 });
 
-
-
-
+//==============================================================================
+// PrefManager
+//==============================================================================
 
 var PrefManager = (function() {
   let self = {};

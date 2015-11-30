@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global exports: true, C, appID */
+
 // differences in seamonkey:
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 let isSeamonkey = appID === C.SEAMONKEY_ID;

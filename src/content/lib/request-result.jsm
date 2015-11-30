@@ -21,11 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-
-let EXPORTED_SYMBOLS = [
+/* exported RequestResult, REQUEST_REASON_USER_POLICY,
+       REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,
+       REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
+       REQUEST_REASON_DEFAULT_SAME_DOMAIN, REQUEST_REASON_COMPATIBILITY,
+       REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
+       REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
+       REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
+       REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL */
+this.EXPORTED_SYMBOLS = [
   "RequestResult",
   "REQUEST_REASON_USER_POLICY",
   "REQUEST_REASON_SUBSCRIPTION_POLICY",
@@ -42,6 +46,10 @@ let EXPORTED_SYMBOLS = [
   "REQUEST_REASON_IDENTICAL_IDENTIFIER",
   "REQUEST_REASON_RELATIVE_URL"
 ];
+
+//==============================================================================
+// constants
+//==============================================================================
 
 const REQUEST_REASON_USER_POLICY           = 1;
 const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
@@ -60,6 +68,9 @@ const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
 const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
 
+//==============================================================================
+// RequestResult
+//==============================================================================
 
 // TODO: merge this Class with the "Request" class and/or some kind of
 // "RememberedRequest" or "RequestInfo" class.

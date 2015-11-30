@@ -20,22 +20,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// This file has to be called only once. It handles the default preferences [1],
-// so it has to be called quite early at the extension startup.
-//
-// Note that this script may *only* be loaded from the main process!
-// Also note that if possible this script shouldn't import any other of RP's
-// modules, e.g. to prevent import() loops.
-//
-// [1] https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
+/**
+ * This file has to be called only once. It handles the default
+ * preferences [1], so it has to be called quite early at the
+ * extension startup.
+ *
+ * Note that this script may _only_ be loaded from the main process!
+ * Also note that if possible this script shouldn't import any other
+ * of RP's modules, e.g. to prevent import() loops.
+ *
+ * [1] https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
+ */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-
+//==============================================================================
 
 let prefInitFunctions = {
   getGenericPref: function(branch, prefName) {

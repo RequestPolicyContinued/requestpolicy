@@ -21,6 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {utils: Cu} = Components;
+
+/* global PolicyManager: true */
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// PolicyManager (extension)
+//==============================================================================
 
 PolicyManager = (function(self) {
 

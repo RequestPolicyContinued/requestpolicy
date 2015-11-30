@@ -21,26 +21,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
+
 window.rpcontinued = window.rpcontinued || {};
 
 window.rpcontinued.requestLog = (function (self) {
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-  let {ScriptLoader, Services} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/Services.jsm", mod);
-    return mod;
-  }());
-  let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-  let {Utils} = ScriptLoader.importModule("lib/utils");
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {StringUtils} = importModule("lib/utils/strings");
 
-
-
+  //============================================================================
 
   self.clear = function() {
     var count = self.treeView.rowCount;

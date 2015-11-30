@@ -21,16 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["WindowUtils"];
+/* exported WindowUtils */
+this.EXPORTED_SYMBOLS = ["WindowUtils"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/prefs"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {rpPrefBranch} = importModule("lib/prefs");
 
-
+//==============================================================================
+// WindowUtils
+//==============================================================================
 
 var WindowUtils = (function() {
   let self = {};
@@ -79,7 +82,8 @@ var WindowUtils = (function() {
   self.isWindowPrivate = (function() {
     try {
       // Firefox 20+
-      Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+      let {PrivateBrowsingUtils} = Cu.import("resource://gre/modules/" +
+                                             "PrivateBrowsingUtils.jsm", {});
 
       return (function(aWindow) {
         return PrivateBrowsingUtils.isWindowPrivate(aWindow)

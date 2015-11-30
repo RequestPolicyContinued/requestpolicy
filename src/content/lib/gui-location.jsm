@@ -21,20 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported GUILocation, GUIOrigin, GUIDestination, GUILocationProperties */
+this.EXPORTED_SYMBOLS = [
   "GUILocation",
   "GUIOrigin",
   "GUIDestination",
   "GUILocationProperties"
 ];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/utils/constants"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
 
+//==============================================================================
+// GUILocation
+//==============================================================================
 
 function GUILocation(value, properties) {
   this.value = value || null;
@@ -122,9 +126,9 @@ GUILocation.compareFunction = function (a, b, sortType) {
   return 0;
 };
 
-
-
-
+//==============================================================================
+// GUIOrigin
+//==============================================================================
 
 /**
  * GUIOrigin objects are used to hand over not only "origin" strings, like
@@ -142,9 +146,9 @@ GUIOrigin.prototype = new GUILocation;
 GUIOrigin.merge = GUILocation.merge.bind(GUIOrigin, GUIOrigin);
 GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
 
-
-
-
+//==============================================================================
+// GUIDestination
+//==============================================================================
 
 /**
  * GUIDestination objects are used to hand over not only "destination" strings,
@@ -162,10 +166,9 @@ GUIDestination.prototype = new GUILocation;
 GUIDestination.merge = GUILocation.merge.bind(GUIDestination, GUIDestination);
 GUIDestination.indexOfDestInArray = GUILocation.indexOfLocationInArray;
 
-
-
-
-
+//==============================================================================
+// GUILocationProperties
+//==============================================================================
 
 function GUILocationProperties(value, properties) {
   this.reset();

@@ -21,13 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* exported DOMUtils */
+this.EXPORTED_SYMBOLS = ["DOMUtils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-
-let EXPORTED_SYMBOLS = ["DOMUtils"];
+//==============================================================================
+// DOMUtils
+//==============================================================================
 
 var DOMUtils = (function () {
   let self = {};

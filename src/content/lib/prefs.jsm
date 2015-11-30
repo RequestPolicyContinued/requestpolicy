@@ -21,25 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
+/* exported rpPrefBranch, rootPrefBranch, Prefs */
+this.EXPORTED_SYMBOLS = ["rpPrefBranch", "rootPrefBranch", "Prefs"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/environment"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
-
+//==============================================================================
+// pref branches
+//==============================================================================
 
 var rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
     .QueryInterface(Ci.nsIPrefBranch2);
 var rootPrefBranch = Services.prefs.getBranch("")
     .QueryInterface(Ci.nsIPrefBranch2);
 
-
+//==============================================================================
+// Prefs
+//==============================================================================
 
 var Prefs = (function() {
   let self = {};

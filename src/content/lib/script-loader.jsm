@@ -21,21 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ScriptLoader"];
+/* exported ScriptLoader */
+this.EXPORTED_SYMBOLS = ["ScriptLoader"];
+
+/* global dump */
 
 // import some modules
 // NOTICE: This file should NOT import any of RP's modules when it is loaded!
 //         Doing so would be a bad practice, and might produce import() loops
 //         when the module to be imported wants to import ScriptLoader.
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
+//==============================================================================
+// utilities
+//==============================================================================
 
 const rpChromeContentURI = 'chrome://rpcontinued/content/';
 
@@ -51,7 +54,9 @@ function logSevereError(msg, e) {
        (e.stack ? ", stack was: " + e.stack : "") + "\n");
 }
 
-
+//==============================================================================
+// ScriptLoader
+//==============================================================================
 
 var ScriptLoader = (function() {
 

@@ -21,20 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
+/* exported ManagerForEventListeners */
+this.EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger"
-], globalScope);
-
+//==============================================================================
+// ManagerForEventListeners
+//==============================================================================
 
 /**
  * This class provides an interface to multiple "Event Targets" which takes

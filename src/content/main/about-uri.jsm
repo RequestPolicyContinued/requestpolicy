@@ -65,7 +65,7 @@ function getURI(aURI) {
 
 
 
-let AboutRequestPolicy = (function() {
+var AboutRequestPolicy = (function() {
   let self = {
     classDescription: "about:requestpolicy",
     contractID: "@mozilla.org/network/protocol/about;1?what=requestpolicy",

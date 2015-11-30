@@ -40,7 +40,7 @@ ScriptLoader.importModules([
 /**
  * Provides logging methods
  */
-let Logger = (function() {
+var Logger = (function() {
 
   let self = {
     TYPE_CONTENT: 1, // content whose origin isn't known more specifically

@@ -21,7 +21,7 @@
  */
 
 
-let ManagerForDOMContentLoaded = (function() {
+var ManagerForDOMContentLoaded = (function() {
   let self = {};
 
   let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");

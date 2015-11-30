@@ -34,14 +34,14 @@ ScriptLoader.importModules(["lib/environment"], this);
 
 
 
-let rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
+var rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
     .QueryInterface(Ci.nsIPrefBranch2);
-let rootPrefBranch = Services.prefs.getBranch("")
+var rootPrefBranch = Services.prefs.getBranch("")
     .QueryInterface(Ci.nsIPrefBranch2);
 
 
 
-let Prefs = (function() {
+var Prefs = (function() {
   let self = {};
 
   let defaultAllow = true;

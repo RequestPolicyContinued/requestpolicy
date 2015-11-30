@@ -53,7 +53,7 @@ function logSevereError(msg, e) {
 
 
 
-let ScriptLoader = (function() {
+var ScriptLoader = (function() {
 
   let importedModuleURIs = {};
 

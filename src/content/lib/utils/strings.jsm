@@ -36,7 +36,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 
 
-let StringUtils = (function() {
+var StringUtils = (function() {
   let self = {};
 
   XPCOMUtils.defineLazyGetter(self, "strbundle", function() {

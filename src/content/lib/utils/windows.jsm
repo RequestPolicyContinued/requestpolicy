@@ -32,7 +32,7 @@ ScriptLoader.importModules(["lib/prefs"], this);
 
 
 
-let WindowUtils = (function() {
+var WindowUtils = (function() {
   let self = {};
 
   self.getChromeWindow = function(aContentWindow) {

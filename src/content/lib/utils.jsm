@@ -40,7 +40,7 @@ ScriptLoader.importModules([
 
 
 
-let Utils = (function() {
+var Utils = (function() {
   let self = {};
 
   /**

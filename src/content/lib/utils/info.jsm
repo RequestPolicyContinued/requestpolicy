@@ -42,7 +42,7 @@ if (ProcessEnvironment.isMainProcess) {
 
 
 
-let Info = (function() {
+var Info = (function() {
   let self = {};
 
   self = {};

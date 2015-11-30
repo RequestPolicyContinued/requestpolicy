@@ -27,7 +27,7 @@ const Cu = Components.utils;
 
 let EXPORTED_SYMBOLS = ["C"];
 
-let C = {};
+var C = {};
 
 // #ifdef AMO
 C.EXTENSION_ID = "rpcontinued@requestpolicy.org";

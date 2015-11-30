@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let ManagerForBlockedContent = (function() {
+var ManagerForBlockedContent = (function() {
   let self = {};
 
 

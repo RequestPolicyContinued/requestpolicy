@@ -45,7 +45,7 @@ ScriptLoader.importModules([
 
 
 // TODO: implement nsIChannelEventSink to catch redirects as Adblock Plus does.
-let PolicyImplementation = (function() {
+var PolicyImplementation = (function() {
   let xpcom_categories = ["content-policy"];
 
   let self = {

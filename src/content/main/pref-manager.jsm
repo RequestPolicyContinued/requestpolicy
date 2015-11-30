@@ -51,7 +51,7 @@ XPCOMUtils.defineLazyGetter(globalScope, "rootPrefBranch", function() {
 
 
 
-let PrefManager = (function() {
+var PrefManager = (function() {
   let self = {};
 
 

@@ -34,7 +34,7 @@ ScriptLoader.importModules([
 ], this);
 
 
-let RulesetStorage = {
+var RulesetStorage = {
 
   /**
    * @return {RawRuleset}

@@ -24,7 +24,7 @@
 
 // ProcessEnvironment is either a ParentProcessEnvironment or
 // a ChildProcessEnvironment.
-let ProcessEnvironment = (function() {
+var ProcessEnvironment = (function() {
 
 
   // determine if this is the main process

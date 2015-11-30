@@ -45,7 +45,7 @@ ScriptLoader.importModules([
 
 
 
-let rpService = (function() {
+var rpService = (function() {
   let self = {};
 
   // /////////////////////////////////////////////////////////////////////////

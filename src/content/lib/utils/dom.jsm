@@ -29,7 +29,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 let EXPORTED_SYMBOLS = ["DOMUtils"];
 
-let DOMUtils = {};
+var DOMUtils = {};
 
 /**
  * Function that takes a DOM Element or an Array of DOM elements and removes

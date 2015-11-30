@@ -389,7 +389,7 @@ RequestProcessor = (function(self) {
     // the "raw" dest string might be a relative or absolute URI
     let rawDestString = httpResponse.rawDestString;
 
-    if (httpResponse.containsRedirection === false || rawDestString === null) {
+    if (httpResponse.hasRedirectionHeader === false || rawDestString === null) {
       return;
     }
 

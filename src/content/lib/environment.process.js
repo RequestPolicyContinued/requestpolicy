@@ -210,7 +210,10 @@ var ProcessEnvironment = (function() {
     if (self.envState === Environment.ENV_STATES.NOT_STARTED) {
       // The child Process Environment needs to start up when
       // the first framescript in that child is loading.
-      //console.debug("[RPC] Going to start up Child Process Environment.");
+      // #ifdef LOG_ENVIRONMENT
+      console.debug("[RPC] [Environment] Going to start up Child " +
+          "Process Environment.");
+      // #endif
       self.startup();
     }
     ProcessEnvironmentBase.prototype.registerInnerEnvironment.apply(self,

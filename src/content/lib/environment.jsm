@@ -50,6 +50,22 @@ ScriptLoader.defineLazyModuleGetters({
 }, globalScope);
 
 //==============================================================================
+// utilities
+//==============================================================================
+
+const LOG_PREFIX = "[RPC] [Environment] ";
+
+function consoleLog(method, message) {
+  console[method](LOG_PREFIX + message);
+}
+
+let log = {
+  debug: consoleLog.bind(null, "debug"),
+  warning: consoleLog.bind(null, "warn"),
+  error: consoleLog.bind(null, "error")
+};
+
+//==============================================================================
 // Environment
 //==============================================================================
 
@@ -197,7 +213,9 @@ var Environment = (function () {
       return Math.random().toString(36).substr(2, 5);
     });
 
-    //console.debug('[RPC] created new Environment "'+self.name+'"');
+    // #ifdef LOG_ENVIRONMENT
+    log.debug(`created new Environment "${self.name}`);
+    // #endif
   }
 
   Environment.LEVELS = LEVELS;
@@ -246,12 +264,14 @@ var Environment = (function () {
   Environment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
     if (self.envState === ENV_STATES.NOT_STARTED) {
-      console.warn("[RPC] registerInnerEnvironment() has been called, " +
-                   "but the outer environment hasn't started up yet. " +
-                   "Starting up now.");
+      log.warning("registerInnerEnvironment() has been called but " +
+          "the outer environment hasn't started up yet. " +
+          "Starting up now.");
       self.startup();
     }
-    //console.debug("[RPC] registering inner environment.");
+    // #ifdef LOG_ENVIRONMENT
+    log.debug("registering inner environment");
+    // #endif
     self.innerEnvs.add(aEnv);
   };
   /**
@@ -263,8 +283,7 @@ var Environment = (function () {
     let self = this;
 
     if (self.innerEnvs.has(aEnv) === false) {
-      console.error("[RPC] it seems like an inner Environment " +
-                    "did not register.");
+      log.error("it seems like an inner Environment did not register.");
     } else {
       self.innerEnvs.delete(aEnv);
     }
@@ -309,8 +328,11 @@ var Environment = (function () {
       //
       // ==> call the function immediately.
       f();
-      //console.debug('[RPC] calling shutdown function immediately: "' +
-      //              (f.name || "anonymous") + '" (' + self.name + ')');
+      // #ifdef LOG_ENVIRONMENT
+      let fName = f.name || "anonymous";
+      log.debug("calling shutdown function immediately: " +
+          `"${fName}" (${self.name})`);
+      // #endif
     } else {
       // The opposite, i.e. the startup process did not reach the function's
       // level yet.
@@ -368,8 +390,9 @@ var Environment = (function () {
 
         // call the function
         f.apply(null, aBootstrapArgs);
-        //console.debug("[RPC] function called! (" + fnArray.length +
-        //              " functions left)");
+        // #ifdef LOG_ENVIRONMENT
+        log.debug(`function called! (${aFunctions.length} functions left)`);
+        // #endif
       }
     }
 
@@ -389,6 +412,9 @@ var Environment = (function () {
 
       if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
         levelObj.levelState = LEVEL_STATES.PROCESSING;
+        // #ifdef LOG_ENVIRONMENT
+        log.debug(`processing level ${aLevel} of startup (${self.uid})`);
+        // #endif
 
         if (aStartupOrShutdown === "shutdown") {
           // shut down all inner environments
@@ -400,6 +426,10 @@ var Environment = (function () {
         callFunctions(levelObj.functions, aBootstrapArgs);
 
         levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
+        // #ifdef LOG_ENVIRONMENT
+        log.debug(`processing level ${aLevel} of startup ` +
+            `(${self.uid}) finished`);
+        // #endif
       }
     }
 
@@ -439,10 +469,10 @@ var Environment = (function () {
      */
     function logStartupOrShutdown(aStartupOrShutdown) {
       let self = this;
-      console.log("[RPC] " + aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
-                  (self.outerEnv ?
-                   " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
-                   " No OuterEnv."));
+      log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
+                (self.outerEnv ?
+                 " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
+                 " No OuterEnv."));
     }
     // #endif
 
@@ -488,11 +518,17 @@ var Environment = (function () {
 
     Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
+      // #ifdef LOG_ENVIRONMENT
+      log.debug("starting up: " + self.name);
+      // #endif
       bootstrap.call(self, "startup", aBootstrapArgs, aUntilLevel);
     };
 
     Environment.prototype.shutdown = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
+      // #ifdef LOG_ENVIRONMENT
+      log.debug("shutting down: " + self.name);
+      // #endif
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
 
@@ -509,8 +545,9 @@ var Environment = (function () {
     let self = this;
     self.elManager.addListener(aEventTarget, "unload", function() {
       // #ifdef LOG_ENVIRONMENT
-      console.log("[RPC] an EventTarget's `unload` function has been called. " +
-                  'Going to shut down Environment "' + self.name + '"');
+      log.debug("an EventTarget's `unload` function " +
+          "has been called. Going to shut down Environment \"" +
+          self.name + "\"");
       // #endif
       self.shutdown();
     });

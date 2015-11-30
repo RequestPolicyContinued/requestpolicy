@@ -29,22 +29,26 @@ Cu.import("resource://gre/modules/Services.jsm");
 
 let EXPORTED_SYMBOLS = ["DOMUtils"];
 
-var DOMUtils = {};
+var DOMUtils = (function () {
+  let self = {};
 
-/**
- * Function that takes a DOM Element or an Array of DOM elements and removes
- * all their children.
- */
-DOMUtils.removeChildren = function(aElements) {
-  // If aElements is not an Array, put the element in an Array.
-  let elements = Array.isArray(aElements) ? aElements : [aElements];
-  // Note on `isArray` (above):
-  //     using `instanceof` did not work. For details see
-  //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+  /**
+   * Function that takes a DOM Element or an Array of DOM elements and removes
+   * all their children.
+   */
+  self.removeChildren = function (aElements) {
+    // If aElements is not an Array, put the element in an Array.
+    let elements = Array.isArray(aElements) ? aElements : [aElements];
+    // Note on `isArray` (above):
+    //     using `instanceof` did not work. For details see
+    //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 
-  for (let el of elements) {
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
+    for (let el of elements) {
+      while (el.firstChild) {
+        el.removeChild(el.firstChild);
+      }
     }
-  }
-};
+  };
+
+  return self;
+}());

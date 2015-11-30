@@ -58,23 +58,6 @@ function notifyRulesChanged() {
 }
 
 
-// XXX: Subscriptions need an option to be "blacklist-only" so that users
-// can subscribe to one as blacklist-only and know that a malicious or
-// insecure-http-retrieved update can't result in any whitelisting the
-// user didn't want.
-
-// XXX: Maybe how we deal with users wanting to override (ignore) a specific
-// rule of a specific list is to add a section to their user config which has
-// the ignored rules. Then whenever a rule matches, we check the ignored rules
-// list to see if it was an ignored rule before using the rule. That is, this
-// would probably be more startup time efficient than going through the lists
-// at load time and having to remove them, then having to remove them again
-// after an update.
-
-
-
-
-
 /**
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.

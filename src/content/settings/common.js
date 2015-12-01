@@ -110,7 +110,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
       //                  be confused with `*://http:*`. The string `http://*`
       //                  wouldn't be correct for all cases, since there are
       //                  URIs _without_ a host.
-      return "scheme \"" + ruleDataPart.s + "\"";
+      return `scheme "${ruleDataPart.s}"`;
     }
     var str = "";
     if (ruleDataPart.s || ruleDataPart.port) {
@@ -127,7 +127,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
 
   common.localize = function(stringNames) {
     stringNames.forEach(function(name) {
-      $("[data-string=\"" + name + "\"]").each(function() {
+      $(`[data-string="${name}"]`).each(function() {
         $(this).text($str(name));
       });
     });

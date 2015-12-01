@@ -224,14 +224,17 @@ RequestSet.prototype = {
   },
 
   containsBlockedRequests: function() {
-    var origins = this._origins;
-    for (var originURI in origins) {
-      for (var destBase in origins[originURI]) {
-        for (var destIdent in origins[originURI][destBase]) {
-          for (var destURI in origins[originURI][destBase][destIdent]) {
-            for (var i in origins[originURI][destBase][destIdent][destURI]) {
-              if (true !==
-                  origins[originURI][destBase][destIdent][destURI][i].isAllowed) {
+    let origins = this._origins;
+    for (let originURI in origins) {
+      let originUriRequests = origins[originURI];
+      for (let destBase in originUriRequests) {
+        let destBaseRequests = originUriRequests[destBase];
+        for (let destIdent in destBaseRequests) {
+          let destIdentRequests = destBaseRequests[destIdent];
+          for (let destURI in destIdentRequests) {
+            let destUriRequests = destIdentRequests[destURI];
+            for (let request of destUriRequests) {
+              if (true !== request.isAllowed) {
                 return true;
               }
             }

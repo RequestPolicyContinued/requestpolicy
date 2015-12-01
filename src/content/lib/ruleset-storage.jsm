@@ -36,13 +36,15 @@ let {FileUtil} = importModule("lib/utils/files");
 // RulesetStorage
 //==============================================================================
 
-var RulesetStorage = {
+var RulesetStorage = (function() {
+  let self = {};
 
   /**
+   * @param {String} filename
+   * @param {String} subscriptionListName
    * @return {RawRuleset}
    */
-  loadRawRulesetFromFile : function(/**string*/ filename,
-        /**string*/ subscriptionListName) {
+  self.loadRawRulesetFromFile = function (filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
     var policyFile = FileUtil.getRPUserDir("policies");
@@ -64,10 +66,15 @@ var RulesetStorage = {
     //  str = FileUtil.fileToString(policyFile);
     //}
     return new RawRuleset(str);
-  },
+  };
 
-  saveRawRulesetToFile : function(/**RawRuleset*/ policy, /**string*/ filename,
-        /**string*/ subscriptionListName) {
+  /**
+   * @param {RawRuleset} policy
+   * @param {String} filename
+   * @param {String} subscriptionListName
+   */
+  self.saveRawRulesetToFile = function (policy, filename,
+                                        subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
     if (subscriptionListName) {
@@ -78,6 +85,7 @@ var RulesetStorage = {
     }
     policyFile.appendRelativePath(filename);
     FileUtil.stringToFile(JSON.stringify(policy), policyFile);
-  }
+  };
 
-};
+  return self;
+}());

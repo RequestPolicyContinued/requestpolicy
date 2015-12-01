@@ -33,18 +33,17 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
-            self._close_notice_tabs()
-
             self.other_rp.uninstall()
             self.rp_addon.install()
-
-            self.rp_addon.ignore_errors = False
 
             # Restart the browser. (It's a method of FirefoxTestCase.)
             # It's necessary to restart because multiple installed versions
             # might have broken RequestPolicy's functionality.
             self.restart()
         finally:
+            self._close_notice_tabs()
+            self.rp_addon.ignore_errors = False
+
             # It's highly probable that errors occur. However, the tests
             # in this file don't intend to avoid these errors.
             self.logging_error_detect.reset()

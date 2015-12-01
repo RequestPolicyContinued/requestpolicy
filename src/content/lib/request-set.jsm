@@ -128,7 +128,7 @@ RequestSet.prototype = {
    * @param {Array} rules The rules that were triggered by this request.
    */
   addRequest : function(originUri, destUri, requestResult) {
-    if (requestResult == undefined) {
+    if (requestResult === undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +

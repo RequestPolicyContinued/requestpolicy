@@ -116,7 +116,7 @@ var FileUtil = {
       // Read as much as we can and put it in |data.value|.
       read = cstream.readString(0xffffffff, data);
       str += data.value;
-    } while (read != 0);
+    } while (read !== 0);
     cstream.close(); // This closes |fstream|.
 
     return str;

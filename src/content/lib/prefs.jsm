@@ -111,7 +111,7 @@ var Prefs = (function() {
   function isPrefEmpty(pref) {
     try {
       let value = rpPrefBranch.getComplexValue(pref, Ci.nsISupportsString).data;
-      return value == '';
+      return value === "";
     } catch (e) {
       return true;
     }
@@ -137,7 +137,7 @@ var Prefs = (function() {
 
 
   function observePref(subject, topic, data) {
-    if (topic == "nsPref:changed") {
+    if (topic === "nsPref:changed") {
       // Send an observer notification that a pref that affects RP has been
       // changed.
       // TODO: also send the pref's name and its branch

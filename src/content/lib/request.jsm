@@ -192,21 +192,21 @@ NormalRequest.prototype.isInternal = function() {
 
   // "global" dest are [some sort of interal requests]
   // "browser" dest are [???]
-  if (destHost == "global" || destHost == "browser") {
+  if (destHost === "global" || destHost === "browser") {
     return true;
   }
 
   // see issue #180
-  if (this.aRequestOrigin.scheme == 'about' &&
-      this.aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
+  if (this.aRequestOrigin.scheme === "about" &&
+      this.aRequestOrigin.spec.indexOf("about:neterror?") === 0) {
     return true;
   }
 
   // If there are entities in the document, they may trigger a local file
   // request. We'll only allow requests to .dtd files, though, so we don't
   // open up all file:// destinations.
-  if (this.aContentLocation.scheme == "file" &&
-      this.aContentType == Ci.nsIContentPolicy.TYPE_DTD) {
+  if (this.aContentLocation.scheme === "file" &&
+      this.aContentType === Ci.nsIContentPolicy.TYPE_DTD) {
     return true;
   }
 

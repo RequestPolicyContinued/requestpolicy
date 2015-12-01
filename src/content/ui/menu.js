@@ -308,7 +308,7 @@ window.rpcontinued.menu = (function () {
   self._populateOtherOrigins = function() {
     let guiOrigins = self._getOtherOriginsAsGUILocations();
     self._populateList(lists.otherOrigins, guiOrigins);
-    $id('rpc-other-origins').hidden = guiOrigins.length == 0;
+    $id('rpc-other-origins').hidden = guiOrigins.length === 0;
   };
 
   self._populateDestinations = function(originIdentifier) {
@@ -338,10 +338,10 @@ window.rpcontinued.menu = (function () {
       let destsMixedIndex = GUIDestination.
           indexOfDestInArray(allowedGUIDest, destsMixed);
 
-      if (indexRawBlocked == -1) {
+      if (indexRawBlocked === -1) {
         destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
-        if (destsMixedIndex != -1) {
+        if (destsMixedIndex !== -1) {
           Logger.info(Logger.TYPE_INTERNAL,
               "Merging dest: <" + allowedGUIDest + ">");
           destsMixed[destsMixedIndex] = GUIDestination.merge(
@@ -361,15 +361,15 @@ window.rpcontinued.menu = (function () {
     self._populateList(lists.blockedDestinations,
         destsWithSolelyBlockedRequests);
     $id('rpc-blocked-destinations').hidden =
-        destsWithSolelyBlockedRequests.length == 0;
+        destsWithSolelyBlockedRequests.length === 0;
 
     self._populateList(lists.mixedDestinations, destsMixed);
-    $id('rpc-mixed-destinations').hidden = destsMixed.length == 0;
+    $id('rpc-mixed-destinations').hidden = destsMixed.length === 0;
 
     self._populateList(lists.allowedDestinations,
         destsWithSolelyAllowedRequests);
     $id('rpc-allowed-destinations').hidden =
-        destsWithSolelyAllowedRequests.length == 0;
+        destsWithSolelyAllowedRequests.length === 0;
   };
 
   self._populateDetails = function() {
@@ -718,7 +718,7 @@ window.rpcontinued.menu = (function () {
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
       if (Prefs.isDefaultAllow() || Prefs.isDefaultAllowSameDomain()) {
-        if (destBase == self._currentlySelectedOrigin) {
+        if (destBase === self._currentlySelectedOrigin) {
           continue;
         }
       }
@@ -779,7 +779,7 @@ window.rpcontinued.menu = (function () {
       var guiOriginsIndex = GUIOrigin.indexOfOriginInArray(originBase,
           guiOrigins);
       var properties;
-      if (guiOriginsIndex == -1) {
+      if (guiOriginsIndex === -1) {
         properties = new GUILocationProperties();
       } else {
         properties = guiOrigins[guiOriginsIndex].properties;
@@ -795,14 +795,14 @@ window.rpcontinued.menu = (function () {
         // guiOrigins to the same domain:
         // Only list other origins where there is a destination from that origin
         // that is at a different domain, not just a different subdomain.
-        if (allowSameDomain && destBase == originBase) {
+        if (allowSameDomain && destBase === originBase) {
           continue;
         }
         addThisOriginBase = true;
         properties.accumulate(allRequests[originUri][destBase]);
       }
 
-      if (addThisOriginBase && guiOriginsIndex == -1) {
+      if (addThisOriginBase && guiOriginsIndex === -1) {
         guiOrigins.push(new GUIOrigin(originBase, properties));
       }
     }
@@ -811,7 +811,7 @@ window.rpcontinued.menu = (function () {
 
   self._isIPAddressOrSingleName = function(hostname) {
     return DomainUtil.isIPAddress(hostname) ||
-        hostname.indexOf(".") == -1;
+        hostname.indexOf(".") === -1;
   };
 
   self._addWildcard = function(hostname) {
@@ -1035,7 +1035,7 @@ window.rpcontinued.menu = (function () {
     for (let destBase in requests) {
 
       if (self._currentlySelectedDest &&
-          self._currentlySelectedDest != destBase) {
+          self._currentlySelectedDest !== destBase) {
         continue;
       }
 
@@ -1118,7 +1118,7 @@ window.rpcontinued.menu = (function () {
     for (let destBase in requests) {
 
       if (self._currentlySelectedDest &&
-        self._currentlySelectedDest != destBase) {
+        self._currentlySelectedDest !== destBase) {
         continue;
       }
 
@@ -1191,7 +1191,7 @@ window.rpcontinued.menu = (function () {
 
     for (let destBase in requests) {
       if (self._currentlySelectedDest &&
-          self._currentlySelectedDest != destBase) {
+          self._currentlySelectedDest !== destBase) {
         continue;
       }
       for (let destIdent in requests[destBase]) {

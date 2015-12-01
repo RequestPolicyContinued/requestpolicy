@@ -332,7 +332,7 @@ var rpService = (function() {
 
       // support for old browsers (Firefox <20)
       case "private-browsing" :
-        if (data == "exit") {
+        if (data === "exit") {
           PolicyManager.revokeTemporaryRules();
         }
         break;

@@ -204,18 +204,18 @@ UserSubscriptions.prototype = {
           dprint('Skipping update of unsubscribed subscription: ' + listName + ' ' + subName);
           continue;
         }
-        if (defaultPolicy == 'allow' && subName.indexOf('allow_') == 0) {
+        if (defaultPolicy === 'allow' && subName.indexOf('allow_') === 0) {
           dprint('Skipping update of subscription that is only used with a default deny policy: ' + subName);
           continue;
         }
-        if (defaultPolicy == 'deny' && subName.indexOf('deny_') == 0) {
+        if (defaultPolicy === 'deny' && subName.indexOf('deny_') === 0) {
           dprint('Skipping update of subscription that is only used with a default allow policy: ' + subName);
           continue;
         }
         updateSubs[subName] = {'serial' : serials[listName][subName]};
         subCount++;
       }
-      if (subCount == 0) {
+      if (subCount === 0) {
         dprint('Skipping list with no subscriptions: ' + listName);
         continue;
       }
@@ -262,7 +262,7 @@ UserSubscriptions.prototype = {
       list.updateMetadata(metadataSuccess, metadataError);
     }
 
-    if (listCount == 0) {
+    if (listCount === 0) {
       dprint('No lists to update.');
       setTimeout(function () { callback(updateResults); }, 0);
     }
@@ -428,7 +428,7 @@ Subscription.prototype = {
           }, 0);
           return;
         }
-        if (typeof serial != 'number' || serial % 1 != 0) {
+        if (typeof serial !== 'number' || serial % 1 !== 0) {
           let error = 'Ruleset has invalid serial number: ' + serial;
           setTimeout(function () {
             errorCallback(self, error);

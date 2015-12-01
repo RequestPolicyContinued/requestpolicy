@@ -95,9 +95,9 @@ DomainUtil.getIdentifier = function(uri, level) {
   if (identifier) {
     return identifier;
   } else {
-    if (uri.indexOf("file://") == 0) {
+    if (uri.indexOf("file://") === 0) {
       return "file://";
-    } else if (uri.indexOf("data:") == 0) {
+    } else if (uri.indexOf("data:") === 0) {
       // Format: data:[<MIME-type>][;charset=<encoding>][;base64],<data>
       identifier = uri.split(",")[0];
       return identifier.split(";")[0];
@@ -199,9 +199,9 @@ DomainUtil.getBaseDomain = function(uri) {
     // the result is ASCII/ACE encoded, false otherwise.
     return DomainUtil._idnService.convertToDisplayIDN(baseDomain, {});
   } catch (e) {
-    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
+    if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return host;
-    } else if (e.name == "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
+    } else if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
       return host;
     } else {
       throw e;
@@ -220,7 +220,7 @@ DomainUtil.isIPAddress = function(host) {
   try {
     Services.eTLD.getBaseDomainFromHost(host, 0);
   } catch (e) {
-    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
+    if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return true;
     }
   }
@@ -272,14 +272,14 @@ DomainUtil.parseRefresh = function(refreshString) {
     throw "Invalid delay value in refresh string: " + parts[1];
   }
   var url = parts[3];
-  if (url == undefined) {
+  if (url === undefined) {
     url = '';
   }
   // Strip off enclosing quotes around the url.
   if (url) {
     var first = url[0];
     var last = url[url.length - 1];
-    if (first == last && (first == "'" || first == '"')) {
+    if (first === last && (first === "'" || first === '"')) {
       url = url.substring(1, url.length - 1);
     }
   }
@@ -349,8 +349,8 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
  */
 DomainUtil.hasStandardPort = function(uri) {
   // A port value of -1 in the uriObj means the default for the protocol.
-  return uri.port == -1 ||
-         uri.scheme != "http" && uri.scheme != "https" ||
-         uri.port == 80 && uri.scheme == "http" ||
-         uri.port == 443 && uri.scheme == "https";
-}
+  return uri.port === -1 ||
+         uri.scheme !== "http" && uri.scheme !== "https" ||
+         uri.port === 80 && uri.scheme === "http" ||
+         uri.port === 443 && uri.scheme === "https";
+};

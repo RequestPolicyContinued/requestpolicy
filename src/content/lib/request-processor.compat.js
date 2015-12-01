@@ -68,7 +68,7 @@ RequestProcessor = (function(self) {
 
 
   function initializeExtensionCompatibility() {
-    if (compatibilityRules.length != 0) {
+    if (compatibilityRules.length !== 0) {
       return;
     }
 

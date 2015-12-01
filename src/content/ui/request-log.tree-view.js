@@ -76,7 +76,7 @@ window.rpcontinued.requestLog = (function (self) {
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
       var columnIndex = self.columnNameToIndexMap[aColumn.id];
-      if (columnIndex != 2) {
+      if (columnIndex !== 2) {
         return getVisibleRowAtIndex(aIndex)[self.columnNameToIndexMap[aColumn.id]];
       }
     },
@@ -120,7 +120,7 @@ window.rpcontinued.requestLog = (function (self) {
     toggleOpenState: function(aIndex) {},
 
     getImageSrc: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://rpcontinued/skin/dot.png";
         }
@@ -140,7 +140,7 @@ window.rpcontinued.requestLog = (function (self) {
     },
 
     getCellProperties: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "blocked";
         }

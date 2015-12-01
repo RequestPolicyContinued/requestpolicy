@@ -182,7 +182,7 @@ var Logger = (function() {
   self.dump = doLog.bind(self, self.LEVEL_DEBUG, self.TYPE_INTERNAL);
 
   self.vardump = function(obj, name, ignoreFunctions) {
-    if (name != undefined) {
+    if (name !== undefined) {
       self.dump(name + " : " + obj);
     } else {
       self.dump(obj);

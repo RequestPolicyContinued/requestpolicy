@@ -169,7 +169,7 @@ RawRuleset.prototype = {
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -178,7 +178,7 @@ RawRuleset.prototype = {
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
       //r.originRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
         r.denyOrigin = true;
@@ -187,7 +187,7 @@ RawRuleset.prototype = {
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -200,8 +200,8 @@ RawRuleset.prototype = {
   },
 
   ruleExists : function(ruleAction, ruleData) {
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -210,7 +210,7 @@ RawRuleset.prototype = {
     var entries = this._entries[actionStr];
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
-      if (ruleStr == curRuleStr) {
+      if (ruleStr === curRuleStr) {
         return true;
       }
     }
@@ -227,8 +227,8 @@ RawRuleset.prototype = {
   addRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -294,13 +294,13 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.destinationRuleAction == ruleAction) {
+      // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
       //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -321,12 +321,12 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.originRuleAction == ruleAction) {
+      // if (r.originRuleAction === ruleAction) {
       //   r.originRuleAction = null;
       // }
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -347,12 +347,12 @@ RawRuleset.prototype = {
         return;
       }
 
-      // if (r.destinationRuleAction == ruleAction) {
+      // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -374,8 +374,8 @@ RawRuleset.prototype = {
   removeRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -384,7 +384,7 @@ RawRuleset.prototype = {
     var removeIndex = false;
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
-      if (ruleStr == curRuleStr) {
+      if (ruleStr === curRuleStr) {
         // |i| is a string which will cause bugs when we use it in arithmetic
         // expressions below. Why does this form of iterator give us string
         // indexes? I have no idea but it's something to watch out for.
@@ -395,7 +395,7 @@ RawRuleset.prototype = {
     if (removeIndex !== false) {
       var begin = entries.slice(0, removeIndex);
       var end = entries.slice(Number(removeIndex) + 1);
-      if (begin.length + end.length + 1 != entries.length) {
+      if (begin.length + end.length + 1 !== entries.length) {
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
       this._entries[actionStr] = begin.concat(end);
@@ -415,11 +415,12 @@ RawRuleset.prototype = {
 
     for (var actionStr in this._entries) {
       //dprint("actionStr: " + actionStr);
-      if (actionStr != "allow" && actionStr != "deny") {
+      if (actionStr !== "allow" && actionStr !== "deny") {
         dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleAction = actionStr == "allow" ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
+      var ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
+          C.RULE_ACTION_DENY;
       var entryArray = this._entries[actionStr];
       for (var i in entryArray) {
         //dprint("toRuleset: adding entry");
@@ -437,7 +438,7 @@ RawRuleset.prototype = {
     if (!("version" in dataObj.metadata)) {
       throw "Invalid policy data: no 'version' key";
     }
-    if (dataObj.metadata.version != 1) {
+    if (dataObj.metadata.version !== 1) {
       throw "Wrong metadata version. Expected 1, was " +
           dataObj.metadata.version;
     }
@@ -499,7 +500,7 @@ Rules.prototype = {
   },
 
   isEmpty : function() {
-    return this._rules.length == 0;
+    return this._rules.length === 0;
   },
 
   [Symbol.iterator] : function*() {
@@ -596,9 +597,9 @@ Rule.prototype = {
   },
 
   isEqual : function(otherRule) {
-    return this.scheme == otherRule.scheme &&
-           this.port == otherRule.port &&
-           this.path == otherRule.path;
+    return this.scheme === otherRule.scheme &&
+        this.port === otherRule.port &&
+        this.path === otherRule.path;
   },
 
   initDestinations : function() {
@@ -609,7 +610,7 @@ Rule.prototype = {
   },
 
   isMatch : function(uriObj) {
-    if (this.scheme && this.scheme != uriObj.scheme) {
+    if (this.scheme && this.scheme !== uriObj.scheme) {
       //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
       //       this.scheme + "')");
       return false;
@@ -634,8 +635,8 @@ Rule.prototype = {
     }
 
     if (this.path) {
-      if (typeof this.path == "string") {
-        if (uriObj.path.indexOf(this.path) != 0) {
+      if (typeof this.path === "string") {
+        if (uriObj.path.indexOf(this.path) !== 0) {
           //dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
           return false;
         }
@@ -1080,13 +1081,13 @@ Ruleset.matchToRawRule = function(match) {
   var entry, rule, destEntry, destRule;
   var actionStr = match[0];
 
-  if (actionStr == "origin") {
+  if (actionStr === "origin") {
     [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
-  } else if (actionStr == "dest") {
+  } else if (actionStr === "dest") {
     [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
-  } else if (actionStr == "origin-to-dest") {
+  } else if (actionStr === "origin-to-dest") {
     [actionStr, entry, rule, destEntry, destRule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
@@ -1149,5 +1150,5 @@ Ruleset.rawRuleToCanonicalString = function(rawRule) {
 // Ruleset.rawRulesAreEqual = function(first, second) {
 //   var firstStr = Ruleset.rawRuleToCanonicalString(first);
 //   var secondStr = Ruleset.rawRuleToCanonicalString(second);
-//   return firstStr == secondStr;
+//   return firstStr === secondStr;
 // }

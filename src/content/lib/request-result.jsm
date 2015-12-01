@@ -105,9 +105,9 @@ RequestResult.prototype.denyRulesExist = function() {
 
 RequestResult.prototype.isDefaultPolicyUsed = function() {
   // returns whether the default policy has been or will be used for this request.
-  return (this.resultReason == REQUEST_REASON_DEFAULT_POLICY ||
-          this.resultReason == REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
-          this.resultReason == REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+  return this.resultReason === REQUEST_REASON_DEFAULT_POLICY ||
+      this.resultReason === REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
+      this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;
 };
 
 RequestResult.prototype.isOnBlacklist = function() {

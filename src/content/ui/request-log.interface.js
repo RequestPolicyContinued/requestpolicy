@@ -40,7 +40,7 @@ window.rpcontinued.requestLog = (function (self) {
 
   self.clear = function() {
     var count = self.treeView.rowCount;
-    if (count == 0) {
+    if (count === 0) {
       return;
     }
     self.rows = [];

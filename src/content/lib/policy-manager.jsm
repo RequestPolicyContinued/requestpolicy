@@ -176,7 +176,8 @@ var PolicyManager = (function () {
   };
 
   function assertRuleAction(ruleAction) {
-    if (ruleAction != C.RULE_ACTION_ALLOW && ruleAction != C.RULE_ACTION_DENY) {
+    if (ruleAction !== C.RULE_ACTION_ALLOW &&
+        ruleAction !== C.RULE_ACTION_DENY) {
       throw "Invalid rule type: " + ruleAction;
     }
   }

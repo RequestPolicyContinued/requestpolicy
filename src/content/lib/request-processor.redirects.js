@@ -414,7 +414,8 @@ RequestProcessor = (function(self) {
       var originPath = httpResponse.originURI.path;
       // We always have to check "/favicon.ico" because Firefox will use this
       // as a default path and that request won't pass through shouldLoad().
-      if (originPath == "/favicon.ico" || internal.faviconRequests[originString]) {
+      if (originPath === "/favicon.ico" ||
+          internal.faviconRequests[originString]) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
         internal.faviconRequests[rawDestString] = true;

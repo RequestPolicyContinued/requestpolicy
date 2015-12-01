@@ -286,8 +286,8 @@ var RequestProcessor = (function () {
    * @return {boolean} True if the request is a duplicate of the previous one.
    */
   function isDuplicateRequest(request) {
-    if (lastShouldLoadCheck.origin == request.originURI &&
-        lastShouldLoadCheck.destination == request.destURI) {
+    if (lastShouldLoadCheck.origin === request.originURI &&
+        lastShouldLoadCheck.destination === request.destURI) {
       var date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
@@ -487,7 +487,7 @@ var RequestProcessor = (function () {
       var originURI = request.originURI;
       var destURI = request.destURI;
 
-      if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
+      if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
         // Before RP has been forked, there was a hack: in case of a request
         // with the origin's scheme being 'moz-nullprincipal', RequestPolicy
         // used the documentURI of the request's context as the "real" origin
@@ -532,9 +532,9 @@ var RequestProcessor = (function () {
         request.setOriginURI(originURI);
       }
 
-      if (request.aContentLocation.scheme == "view-source") {
+      if (request.aContentLocation.scheme === "view-source") {
         var newDestURI = destURI.split(":").slice(1).join(":");
-        if (newDestURI.indexOf("data:text/html") == 0) {
+        if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
           Logger.info(Logger.TYPE_CONTENT,
               "Allowing \"data:text/html\" view-source destination" +
@@ -549,19 +549,19 @@ var RequestProcessor = (function () {
         }
       }
 
-      if (originURI == "about:blank" && request.aContext) {
+      if (originURI === "about:blank" && request.aContext) {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-        if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
+        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
+        if (domNode && domNode.nodeType === Ci.nsIDOMNode.DOCUMENT_NODE) {
           let newOriginURI;
           if (request.aContext.documentURI &&
-              request.aContext.documentURI != "about:blank") {
+              request.aContext.documentURI !== "about:blank") {
             newOriginURI = request.aContext.documentURI;
           } else if (request.aContext.ownerDocument &&
               request.aContext.ownerDocument.documentURI &&
-              request.aContext.ownerDocument.documentURI != "about:blank") {
+              request.aContext.ownerDocument.documentURI !== "about:blank") {
             newOriginURI = request.aContext.ownerDocument.documentURI;
           }
           if (newOriginURI) {
@@ -586,7 +586,7 @@ var RequestProcessor = (function () {
       // all of that data was cleared due to the new request.
       // Example to test with: Click on "expand all" at
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
-      if (originURI == destURI) {
+      if (originURI === destURI) {
         Logger.warning(Logger.TYPE_CONTENT,
             "Allowing (but not recording) request " +
             "where origin is the same as the destination: " + originURI);
@@ -599,10 +599,10 @@ var RequestProcessor = (function () {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
 
-        if (domNode && domNode.nodeName == "LINK" &&
-            (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
+        if (domNode && domNode.nodeName === "LINK" &&
+            (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
           internal.faviconRequests[destURI] = true;
         }
       }
@@ -670,8 +670,8 @@ var RequestProcessor = (function () {
         return accept("User-allowed redirect", request, true);
       }
 
-      if (request.aRequestOrigin.scheme == "chrome") {
-        if (request.aRequestOrigin.asciiHost == "browser") {
+      if (request.aRequestOrigin.scheme === "chrome") {
+        if (request.aRequestOrigin.asciiHost === "browser") {
           // "browser" origin shows up for favicon.ico and an address entered
           // in address bar.
           request.requestResult = new RequestResult(true,
@@ -707,10 +707,10 @@ var RequestProcessor = (function () {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
 
-        if (domNode && domNode.nodeName == "xul:browser" &&
-            domNode.currentURI && domNode.currentURI.spec == "about:blank") {
+        if (domNode && domNode.nodeName === "xul:browser" &&
+            domNode.currentURI && domNode.currentURI.spec === "about:blank") {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_NEW_WINDOW);
           return accept("New window (should probably only be an allowed " +
@@ -720,8 +720,8 @@ var RequestProcessor = (function () {
 
       // XMLHttpRequests made within chrome's context have these origins.
       // Greasemonkey uses such a method to provide their cross-site xhr.
-      if (originURI == "resource://gre/res/hiddenWindow.html" ||
-          originURI == "resource://gre-resources/hiddenWindow.html") {
+      if (originURI === "resource://gre/res/hiddenWindow.html" ||
+          originURI === "resource://gre-resources/hiddenWindow.html") {
       }
 
       // Now that we have blacklists, a user could prevent themselves from
@@ -839,7 +839,7 @@ var RequestProcessor = (function () {
       // destination but was changed into the current one), accept this
       // request if the original destination would have been accepted.
       // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
-      if (request.aExtra != CP_MAPPEDDESTINATION &&
+      if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
           var mappedDestUriObj = internal.mappedDestinations[destURI][mappedDest];
@@ -848,7 +848,7 @@ var RequestProcessor = (function () {
           let mappedResult = PolicyImplementation.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
-          if (mappedResult == CP_OK) {
+          if (mappedResult === CP_OK) {
             return CP_OK;
           }
         }
@@ -860,7 +860,8 @@ var RequestProcessor = (function () {
       } else {
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
-        return request.aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
+        return request.aExtra === CP_MAPPEDDESTINATION ?
+            CP_REJECT :
             reject("Denied by default policy", request);
       }
 
@@ -893,7 +894,7 @@ var RequestProcessor = (function () {
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
-      if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
+      if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
         // Seems to be too late to block it at this point. Calling the
         // cancel(status) method didn't stop it.
         Logger.warning(Logger.TYPE_CONTENT,
@@ -933,19 +934,20 @@ var RequestProcessor = (function () {
     // we'll need to be dropping the query string there.
     destinationUrl = destinationUrl.split("?")[0];
 
-    if (internal.submittedForms[originUrl] == undefined) {
+    if (internal.submittedForms[originUrl] === undefined) {
       internal.submittedForms[originUrl] = {};
     }
-    if (internal.submittedForms[originUrl][destinationUrl] == undefined) {
+    if (internal.submittedForms[originUrl][destinationUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
       internal.submittedForms[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.submittedFormsReverse[destinationUrl] == undefined) {
+    if (internal.submittedFormsReverse[destinationUrl] === undefined) {
       internal.submittedFormsReverse[destinationUrl] = {};
     }
-    if (internal.submittedFormsReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.
+        submittedFormsReverse[destinationUrl][originUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
       internal.submittedFormsReverse[destinationUrl][originUrl] = true;
     }
@@ -960,10 +962,10 @@ var RequestProcessor = (function () {
     Logger.info(Logger.TYPE_INTERNAL,
         "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.clickedLinks[originUrl] == undefined) {
+    if (internal.clickedLinks[originUrl] === undefined) {
       internal.clickedLinks[originUrl] = {};
     }
-    if (internal.clickedLinks[originUrl][destinationUrl] == undefined) {
+    if (internal.clickedLinks[originUrl][destinationUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp that can be used elsewhere
       // to determine if this is a recent click. This is probably necessary as
       // multiple calls to shouldLoad get made and we need a way to allow
@@ -977,10 +979,10 @@ var RequestProcessor = (function () {
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.clickedLinksReverse[destinationUrl] == undefined) {
+    if (internal.clickedLinksReverse[destinationUrl] === undefined) {
       internal.clickedLinksReverse[destinationUrl] = {};
     }
-    if (internal.clickedLinksReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.clickedLinksReverse[destinationUrl][originUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp, as described above.
       internal.clickedLinksReverse[destinationUrl][originUrl] = true;
     }
@@ -994,10 +996,11 @@ var RequestProcessor = (function () {
     Logger.info(Logger.TYPE_INTERNAL, "User-allowed redirect from <" +
         originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.userAllowedRedirects[originUrl] == undefined) {
+    if (internal.userAllowedRedirects[originUrl] === undefined) {
       internal.userAllowedRedirects[originUrl] = {};
     }
-    if (internal.userAllowedRedirects[originUrl][destinationUrl] == undefined) {
+    if (internal.
+        userAllowedRedirects[originUrl][destinationUrl] === undefined) {
       internal.userAllowedRedirects[originUrl][destinationUrl] = true;
     }
   };
@@ -1025,7 +1028,7 @@ var RequestProcessor = (function () {
    */
   self.removeRequestObserver = function(observer) {
     for (let i = 0; i < internal.requestObservers.length; i++) {
-      if (internal.requestObservers[i] == observer) {
+      if (internal.requestObservers[i] === observer) {
         Logger.debug(Logger.TYPE_INTERNAL,
             "Removing request observer: " + observer.toString());
         delete internal.requestObservers[i];

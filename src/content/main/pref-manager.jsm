@@ -137,7 +137,7 @@ var PrefManager = (function() {
 
 
   function maybeHandleUninstallOrDisable(data, reason) {
-    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
+    if (reason === C.ADDON_DISABLE || reason === C.ADDON_UNINSTALL) {
       // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
       //       disabled when being uninstalled.
       handleUninstallOrDisable();

@@ -62,7 +62,7 @@ GUILocation.merge = function (guiLocation, location1, location2) {
  * @static
  */
 GUILocation.existsInArray = function (locationString, locations) {
-  return (GUILocation.indexOfLocationInArray(locationString, locations) != -1);
+  return GUILocation.indexOfLocationInArray(locationString, locations) !== -1;
 };
 
 /**
@@ -79,7 +79,7 @@ GUILocation.indexOfLocationInArray = function (locationString, locations) {
     locationString = locationString.value;
   }
   for (var i in locations) {
-    if (locations[i].value == locationString) {
+    if (locations[i].value === locationString) {
       return i;
     }
   }

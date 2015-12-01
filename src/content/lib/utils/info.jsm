@@ -60,7 +60,7 @@ var Info = (function() {
     AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
       rpPrefBranch.setCharPref("lastVersion", addon.version);
       self.curRPVersion = addon.version;
-      if (self.lastRPVersion != self.curRPVersion) {
+      if (self.lastRPVersion !== self.curRPVersion) {
         Services.prefs.savePrefFile(null);
       }
     });
@@ -75,7 +75,7 @@ var Info = (function() {
     self.curAppVersion = curAppVersion;
     rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
 
-    if (self.lastAppVersion != self.curAppVersion) {
+    if (self.lastAppVersion !== self.curAppVersion) {
       Services.prefs.savePrefFile(null);
     }
   }

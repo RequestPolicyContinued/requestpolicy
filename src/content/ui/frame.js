@@ -100,7 +100,7 @@
     // * left-clicks
     // * enter key while focused
     // * space bar while focused (no event sent for links in this case)
-    if (event.button != 0) {
+    if (event.button !== 0) {
       return;
     }
     // Link clicked.

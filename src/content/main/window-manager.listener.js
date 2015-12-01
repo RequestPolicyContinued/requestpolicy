@@ -53,7 +53,7 @@ var WindowListener = (function() {
         listeners[winID][eventName] !== null) {
       listeners[winID].window.removeEventListener(eventName,
                                                   listeners[winID][eventName]);
-      if (eventName == 'unload') {
+      if (eventName === "unload") {
         // when removing the 'unload' listener, also remove the 'load'
         // listener and then delete listener[winID].
         removeEvLis("load", winID);
@@ -85,8 +85,8 @@ var WindowListener = (function() {
     // ----------------------------------------------
     let onLoad = function(event) {
       removeEvLis("load", winID);
-      
-      if (window.document.documentElement.getAttribute("windowtype") ==
+
+      if (window.document.documentElement.getAttribute("windowtype") ===
           "navigator:browser") {
         if (!!externalLoadFunction) {
           externalLoadFunction(window);
@@ -98,7 +98,7 @@ var WindowListener = (function() {
     let onUnload = function(event) {
       removeEvLis("unload", onUnload);
 
-      if (window.document.documentElement.getAttribute("windowtype") ==
+      if (window.document.documentElement.getAttribute("windowtype") ===
           "navigator:browser") {
         if (!!externalUnloadFunction) {
           externalUnloadFunction(window);

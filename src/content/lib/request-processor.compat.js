@@ -89,9 +89,9 @@ RequestProcessor = (function(self) {
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
-    for (let i in idArray) {
-      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + idArray[i]);
-      AddonManager.getAddonByID(idArray[i], initializeExtCompatCallback);
+    for (let id of idArray) {
+      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
+      AddonManager.getAddonByID(id, initializeExtCompatCallback);
     }
   }
 

@@ -116,28 +116,32 @@ RequestProcessor = (function(self) {
     var originURIObj = DomainUtil.getUriObject(originURI);
     var destURIObj = DomainUtil.getUriObject(destURI);
 
-    var result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
-        destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
+    {
+      let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
+          destURIObj);
+      // For now, we always give priority to deny rules.
+      if (result.denyRulesExist()) {
+        result.isAllowed = false;
+        return result;
+      }
+      if (result.allowRulesExist()) {
+        result.isAllowed = true;
+        return result;
+      }
     }
 
-    var result = PolicyManager.checkRequestAgainstSubscriptionRules(
-        originURIObj, destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
+    {
+      let result = PolicyManager.checkRequestAgainstSubscriptionRules(
+          originURIObj, destURIObj);
+      // For now, we always give priority to deny rules.
+      if (result.denyRulesExist()) {
+        result.isAllowed = false;
+        return result;
+      }
+      if (result.allowRulesExist()) {
+        result.isAllowed = true;
+        return result;
+      }
     }
 
     // fixme: "//example.com/path" is also a valid relative URL
@@ -148,16 +152,15 @@ RequestProcessor = (function(self) {
     }
 
     let compatibilityRules = self.getCompatibilityRules();
-    for (var i = 0; i < compatibilityRules.length; i++) {
-      var rule = compatibilityRules[i];
-      var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-      var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
+    for (let rule of compatibilityRules) {
+      let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
+      let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
       if (allowOrigin && allowDest) {
         return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
       }
     }
 
-    var result = internal.checkByDefaultPolicy(originURI, destURI);
+    let result = internal.checkByDefaultPolicy(originURI, destURI);
     return result;
   }
 

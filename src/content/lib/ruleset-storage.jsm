@@ -77,11 +77,12 @@ var RulesetStorage = (function() {
                                         subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
+    let policyFile;
     if (subscriptionListName) {
-      var policyFile = FileUtil.getRPUserDir("policies",
+      policyFile = FileUtil.getRPUserDir("policies",
             'subscriptions', subscriptionListName);
     } else {
-      var policyFile = FileUtil.getRPUserDir("policies");
+      policyFile = FileUtil.getRPUserDir("policies");
     }
     policyFile.appendRelativePath(filename);
     FileUtil.stringToFile(JSON.stringify(policy), policyFile);

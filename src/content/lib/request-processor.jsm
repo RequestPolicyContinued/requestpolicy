@@ -315,20 +315,23 @@ var RequestProcessor = (function () {
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
-    for (var originUri in requests) {
+    for (let originUri in requests) {
       if (DomainUtil.getBaseDomain(originUri) !== currentlySelectedOrigin) {
         // only return requests from the given base domain
         continue;
       }
-      Logger.dump("test destBase: " + destBase);
-      for (var destBase in requests[originUri]) {
+      Logger.dump("test originUri: " + originUri);
+      let originUriRequests = requests[originUri];
+      for (let destBase in originUriRequests) {
         Logger.dump("test destBase: " + destBase);
-        for (var destIdent in requests[originUri][destBase]) {
+        let destBaseRequests = originUriRequests[destBase];
+        for (let destIdent in destBaseRequests) {
           Logger.dump("test destIdent: " + destIdent);
-          for (var destUri in requests[originUri][destBase][destIdent]) {
+          let destIdentRequests = destBaseRequests[destIdent];
+          for (let destUri in destIdentRequests) {
             Logger.dump("test destUri: " + destUri);
-            var dest = requests[originUri][destBase][destIdent][destUri];
-            for (var i in dest) {
+            let dest = destIdentRequests[destUri];
+            for (let i in dest) {
               // TODO: This variable could have been created easily already in
               //       getAllRequestsInBrowser(). ==> rewrite RequestSet to
               //       contain a blocked list, an allowed list (and maybe a list
@@ -520,8 +523,8 @@ var RequestProcessor = (function () {
         }
       }
 
-      if (request.aRequestOrigin.scheme == "view-source") {
-        var newOriginURI = originURI.split(":").slice(1).join(":");
+      if (request.aRequestOrigin.scheme === "view-source") {
+        let newOriginURI = originURI.split(":").slice(1).join(":");
         Logger.info(Logger.TYPE_CONTENT,
             "Considering view-source origin <" + originURI + "> " +
             "to be origin <" + newOriginURI + ">");
@@ -552,7 +555,7 @@ var RequestProcessor = (function () {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
         if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
-          var newOriginURI;
+          let newOriginURI;
           if (request.aContext.documentURI &&
               request.aContext.documentURI != "about:blank") {
             newOriginURI = request.aContext.documentURI;
@@ -739,13 +742,13 @@ var RequestProcessor = (function () {
 
       request.requestResult = PolicyManager.checkRequestAgainstUserRules(
           request.aRequestOrigin, request.aContentLocation);
-      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
+      for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
         Logger.dump('Matched deny rules');
-        Logger.vardump(request.requestResult.matchedDenyRules[i]);
+        Logger.vardump(matchedDenyRule);
       }
-      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
+      for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
         Logger.dump('Matched allow rules');
-        Logger.vardump(request.requestResult.matchedAllowRules[i]);
+        Logger.vardump(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
       // policy. I believe this is effectively the same as giving precedence
@@ -783,15 +786,13 @@ var RequestProcessor = (function () {
       request.requestResult = PolicyManager
           .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
               request.aContentLocation);
-      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
+      for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
         Logger.dump('Matched deny rules');
-        Logger.vardump(
-            request.requestResult.matchedDenyRules[i]);
+        Logger.vardump(matchedDenyRule);
       }
-      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
+      for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
         Logger.dump('Matched allow rules');
-        Logger.vardump(
-            request.requestResult.matchedAllowRules[i]);
+        Logger.vardump(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
@@ -822,10 +823,9 @@ var RequestProcessor = (function () {
       }
 
       let compatibilityRules = self.getCompatibilityRules();
-      for (var i = 0; i < compatibilityRules.length; i++) {
-        var rule = compatibilityRules[i];
-        var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-        var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
+      for (let rule of compatibilityRules) {
+        let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
+        let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
         if (allowOrigin && allowDest) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
@@ -841,11 +841,11 @@ var RequestProcessor = (function () {
       // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
       if (request.aExtra != CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
-        for (var mappedDest in internal.mappedDestinations[destURI]) {
+        for (let mappedDest in internal.mappedDestinations[destURI]) {
           var mappedDestUriObj = internal.mappedDestinations[destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
-          var mappedResult = PolicyImplementation.shouldLoad(
+          let mappedResult = PolicyImplementation.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
           if (mappedResult == CP_OK) {
@@ -1024,7 +1024,7 @@ var RequestProcessor = (function () {
    * @param {Object} observer
    */
   self.removeRequestObserver = function(observer) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
+    for (let i = 0; i < internal.requestObservers.length; i++) {
       if (internal.requestObservers[i] == observer) {
         Logger.debug(Logger.TYPE_INTERNAL,
             "Removing request observer: " + observer.toString());

@@ -240,12 +240,12 @@ window.rpcontinued.menu = (function () {
     emptyList(list);
 
     // check whether there are objects of GUILocation or just strings
-    var guiLocations = values[0] && (values[0] instanceof GUILocation);
+    let guiLocations = values[0] && values[0] instanceof GUILocation;
 
     if (true === guiLocations) {
       // get prefs
-      var sorting = rpPrefBranch.getCharPref('menu.sorting');
-      var showNumRequests = rpPrefBranch.getBoolPref('menu.info.showNumRequests');
+      let sorting = rpPrefBranch.getCharPref('menu.sorting');
+      let showNumRequests = rpPrefBranch.getBoolPref('menu.info.showNumRequests');
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -253,9 +253,9 @@ window.rpcontinued.menu = (function () {
         values.sort(GUILocation.compareFunction);
       }
 
-      for (var i in values) {
-        var guiLocation = values[i];
-        var props = guiLocation.properties;
+      for (let i in values) {
+        let guiLocation = values[i];
+        let props = guiLocation.properties;
 
         let num;
         if (true === showNumRequests) {
@@ -265,7 +265,7 @@ window.rpcontinued.menu = (function () {
                 "+" + props.numAllowedRequests + ")";
           }
         }
-        var newitem = self._addListItem(list, 'rpc-od-item', guiLocation, num);
+        let newitem = self._addListItem(list, 'rpc-od-item', guiLocation, num);
 
         newitem.setAttribute("default-policy",
             props.numDefaultPolicyRequests > 0 ? "true" : "false");
@@ -274,7 +274,7 @@ window.rpcontinued.menu = (function () {
       }
     } else {
       values.sort();
-      for (var i in values) {
+      for (let i in values) {
         self._addListItem(list, 'rpc-od-item', values[i]);
       }
     }
@@ -283,12 +283,12 @@ window.rpcontinued.menu = (function () {
   self._populateOrigin = function() {
     self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
 
-    var showNumRequests = rpPrefBranch
+    let showNumRequests = rpPrefBranch
         .getBoolPref('menu.info.showNumRequests');
 
-    var props = self._getOriginGUILocationProperties();
+    let props = self._getOriginGUILocationProperties();
 
-    var numRequests = '';
+    let numRequests = '';
     if (true === showNumRequests) {
       if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
         numRequests = props.numRequests + " (" +
@@ -306,21 +306,21 @@ window.rpcontinued.menu = (function () {
   };
 
   self._populateOtherOrigins = function() {
-    var guiOrigins = self._getOtherOriginsAsGUILocations();
+    let guiOrigins = self._getOtherOriginsAsGUILocations();
     self._populateList(lists.otherOrigins, guiOrigins);
     $id('rpc-other-origins').hidden = guiOrigins.length == 0;
   };
 
   self._populateDestinations = function(originIdentifier) {
-    var destsWithBlockedRequests = self._getBlockedDestinationsAsGUILocations();
-    var destsWithAllowedRequests = self._getAllowedDestinationsAsGUILocations();
+    let destsWithBlockedRequests = self._getBlockedDestinationsAsGUILocations();
+    let destsWithAllowedRequests = self._getAllowedDestinationsAsGUILocations();
 
-    var destsWithSolelyBlockedRequests = [];
-    var destsMixed = [];
-    var destsWithSolelyAllowedRequests = [];
+    let destsWithSolelyBlockedRequests = [];
+    let destsMixed = [];
+    let destsWithSolelyAllowedRequests = [];
 
     // Set operations would be nice. These are small arrays, so keep it simple.
-    for (var i = 0; i < destsWithBlockedRequests.length; i++) {
+    for (let i = 0; i < destsWithBlockedRequests.length; i++) {
       let blockedGUIDest = destsWithBlockedRequests[i];
 
       if (false === GUILocation.existsInArray(blockedGUIDest,
@@ -330,12 +330,12 @@ window.rpcontinued.menu = (function () {
         destsMixed.push(blockedGUIDest);
       }
     }
-    for (var i = 0; i < destsWithAllowedRequests.length; i++) {
+    for (let i = 0; i < destsWithAllowedRequests.length; i++) {
       let allowedGUIDest = destsWithAllowedRequests[i];
 
-      var indexRawBlocked = GUIDestination.
+      let indexRawBlocked = GUIDestination.
           indexOfDestInArray(allowedGUIDest, destsWithBlockedRequests);
-      var destsMixedIndex = GUIDestination.
+      let destsMixedIndex = GUIDestination.
           indexOfDestInArray(allowedGUIDest, destsMixed);
 
       if (indexRawBlocked == -1) {
@@ -373,13 +373,13 @@ window.rpcontinued.menu = (function () {
   };
 
   self._populateDetails = function() {
-    var origin = self._currentlySelectedOrigin;
-    var dest = self._currentlySelectedDest;
+    let origin = self._currentlySelectedOrigin;
+    let dest = self._currentlySelectedDest;
 
     emptyList(lists.removeRules);
     emptyList(lists.addRules);
 
-    var ruleData = {
+    let ruleData = {
       'o' : {
         'h' : self._addWildcard(origin)
       }
@@ -517,16 +517,16 @@ window.rpcontinued.menu = (function () {
   };
 
   self._resetSelectedDest = function() {
-    for (var i = 0; i < lists.blockedDestinations.childNodes.length; i++) {
-      var child = lists.blockedDestinations.childNodes[i];
+    for (let i = 0; i < lists.blockedDestinations.childNodes.length; i++) {
+      let child = lists.blockedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
-    for (var i = 0; i < lists.mixedDestinations.childNodes.length; i++) {
-      var child = lists.mixedDestinations.childNodes[i];
+    for (let i = 0; i < lists.mixedDestinations.childNodes.length; i++) {
+      let child = lists.mixedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
-    for (var i = 0; i < lists.allowedDestinations.childNodes.length; i++) {
-      var child = lists.allowedDestinations.childNodes[i];
+    for (let i = 0; i < lists.allowedDestinations.childNodes.length; i++) {
+      let child = lists.allowedDestinations.childNodes[i];
       child.setAttribute('selected-dest', 'false');
     }
   };
@@ -646,10 +646,10 @@ window.rpcontinued.menu = (function () {
   };
 
   self.processQueuedRuleChanges = function() {
-    var rulesChanged = false;
-    for (var ruleAction in self._ruleChangeQueues) {
-      for (var canonicalRule in self._ruleChangeQueues[ruleAction]) {
-        var ruleData = self._ruleChangeQueues[ruleAction][canonicalRule];
+    let rulesChanged = false;
+    for (let ruleAction in self._ruleChangeQueues) {
+      for (let canonicalRule in self._ruleChangeQueues[ruleAction]) {
+        let ruleData = self._ruleChangeQueues[ruleAction][canonicalRule];
         self._processRuleChange(ruleAction, ruleData);
         rulesChanged = true;
       }
@@ -1017,14 +1017,14 @@ window.rpcontinued.menu = (function () {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = RequestProcessor.getAllowedRequests(
+    let reqSet = RequestProcessor.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
-    var requests = reqSet.getAllMergedOrigins();
+    let requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
 
-    var userRules = {};
-    var subscriptionRules = {};
+    let userRules = {};
+    let subscriptionRules = {};
 
     //reqSet.print('allowedRequests');
 
@@ -1032,17 +1032,17 @@ window.rpcontinued.menu = (function () {
     //var destBase = DomainUtil.getBaseDomain(
     //      self._currentlySelectedDest);
 
-    for (var destBase in requests) {
+    for (let destBase in requests) {
 
       if (self._currentlySelectedDest &&
           self._currentlySelectedDest != destBase) {
         continue;
       }
 
-      for (var destIdent in requests[destBase]) {
+      for (let destIdent in requests[destBase]) {
 
         var destinations = requests[destBase][destIdent];
-        for (var destUri in destinations) {
+        for (let destUri in destinations) {
 
           // This will be null when the request was denied because of a default
           // allow rule. However about any other time?
@@ -1059,11 +1059,10 @@ window.rpcontinued.menu = (function () {
           // at the first RequestResult object, but at all. (there might be
           // several requests with identical origin and destination URI.)
 
-          for (var i in results.matchedAllowRules) {
+          for (let i in results.matchedAllowRules) {
 
-            var ruleset, match;
-            [ruleset, match] = results.matchedAllowRules[i];
-            var rawRule = Ruleset.matchToRawRule(match);
+            let [ruleset, match] = results.matchedAllowRules[i];
+            let rawRule = Ruleset.matchToRawRule(match);
 
             if (!self._currentlySelectedDest) {
               if (rawRule.d && rawRule.d.h) {
@@ -1071,7 +1070,7 @@ window.rpcontinued.menu = (function () {
               }
             }
 
-            var rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
+            let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
             //Logger.info(Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
@@ -1086,13 +1085,13 @@ window.rpcontinued.menu = (function () {
       }
     }
 
-    for (var i in userRules) {
+    for (let i in userRules) {
       self._addMenuItemRemoveAllowRule(list, userRules[i], false);
     }
     // TODO: for subscription rules, we need the effect of the menu item to be
     // adding a deny rule instead of removing an allow rule. However, the text
     // used for the item needs to be the same as removing an allow rule.
-    for (var i in subscriptionRules) {
+    for (let i in subscriptionRules) {
       self._addMenuItemRemoveAllowRule(list, subscriptionRules[i], true);
     }
   };
@@ -1101,14 +1100,14 @@ window.rpcontinued.menu = (function () {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = RequestProcessor.getDeniedRequests(
+    let reqSet = RequestProcessor.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
-    var requests = reqSet.getAllMergedOrigins();
+    let requests = reqSet.getAllMergedOrigins();
 
     //var rules = {};
 
-    var userRules = {};
-    var subscriptionRules = {};
+    let userRules = {};
+    let subscriptionRules = {};
 
     reqSet.print('deniedRequests');
 
@@ -1116,17 +1115,17 @@ window.rpcontinued.menu = (function () {
     //var destBase = DomainUtil.getBaseDomain(
     //      self._currentlySelectedDest);
 
-    for (var destBase in requests) {
+    for (let destBase in requests) {
 
       if (self._currentlySelectedDest &&
         self._currentlySelectedDest != destBase) {
         continue;
       }
 
-      for (var destIdent in requests[destBase]) {
+      for (let destIdent in requests[destBase]) {
 
-        var destinations = requests[destBase][destIdent];
-        for (var destUri in destinations) {
+        let destinations = requests[destBase][destIdent];
+        for (let destUri in destinations) {
 
           // This will be null when the request was denied because of a default
           // deny rule. However about any other time?
@@ -1137,15 +1136,14 @@ window.rpcontinued.menu = (function () {
             continue;
           }
 
-          var results = destinations[destUri][0]; // TODO: Do not look only
+          let results = destinations[destUri][0]; // TODO: Do not look only
           // at the first RequestResult object, but at all. (there may be
           // several requests with identical origin and destination URI.)
 
-          for (var i in results.matchedDenyRules) {
+          for (let i in results.matchedDenyRules) {
 
-            var ruleset, match;
-            [ruleset, match] = results.matchedDenyRules[i];
-            var rawRule = Ruleset.matchToRawRule(match);
+            let [ruleset, match] = results.matchedDenyRules[i];
+            let rawRule = Ruleset.matchToRawRule(match);
 
             if (!self._currentlySelectedDest) {
               if (rawRule.d && rawRule.d.h) {
@@ -1153,7 +1151,7 @@ window.rpcontinued.menu = (function () {
               }
             }
 
-            var rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
+            let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
             //Logger.info(Logger.TYPE_POLICY,
             //       "matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
@@ -1168,37 +1166,37 @@ window.rpcontinued.menu = (function () {
       }
     }
 
-    for (var i in userRules) {
+    for (let i in userRules) {
       self._addMenuItemRemoveDenyRule(list, userRules[i], false);
     }
     // TODO: for subscription rules, we need the effect of the menu item to be
     // adding an allow rule instead of removing a deny rule. However, the text
     // used for the item needs to be the same as removing a deny rule.
-    for (var i in subscriptionRules) {
+    for (let i in subscriptionRules) {
       self._addMenuItemRemoveDenyRule(list, subscriptionRules[i], true);
     }
   };
 
   self._populateDetailsAddSubdomainAllowRules = function(list) {
-    var origin = self._currentlySelectedOrigin;
+    let origin = self._currentlySelectedOrigin;
 
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    var reqSet = RequestProcessor.getDeniedRequests(
+    let reqSet = RequestProcessor.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
-    var requests = reqSet.getAllMergedOrigins();
+    let requests = reqSet.getAllMergedOrigins();
 
-    var destHosts = {};
+    let destHosts = {};
 
-    for (var destBase in requests) {
+    for (let destBase in requests) {
       if (self._currentlySelectedDest &&
           self._currentlySelectedDest != destBase) {
         continue;
       }
-      for (var destIdent in requests[destBase]) {
-        var destinations = requests[destBase][destIdent];
-        for (var destUri in destinations) {
+      for (let destIdent in requests[destBase]) {
+        let destinations = requests[destBase][destIdent];
+        for (let destUri in destinations) {
           destHosts[DomainUtil.getHost(destUri)] = null;
         }
       }
@@ -1206,8 +1204,8 @@ window.rpcontinued.menu = (function () {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
-    for (var destHost in destHosts) {
-      var ruleData = {
+    for (let destHost in destHosts) {
+      let ruleData = {
         'o' : {
           'h' : self._addWildcard(origin)
         },
@@ -1223,7 +1221,7 @@ window.rpcontinued.menu = (function () {
         self._addMenuItemTempAllowOriginToDest(list, ruleData);
       }
 
-      var destOnlyRuleData = {
+      let destOnlyRuleData = {
         'd' : {
           'h': destHost
         }

@@ -941,11 +941,11 @@ Ruleset.prototype = {
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (var entry in this.getHostMatches(originHost)) {
+    originouterloop: for (let entry in this.getHostMatches(originHost)) {
       //dprint(entry);
-      for (var rule of entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
-        var ruleMatchedOrigin = rule.isMatch(origin);
+        let ruleMatchedOrigin = rule.isMatch(origin);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
           //dprint("ALLOW origin by rule " + entry + " " + rule);
@@ -975,9 +975,9 @@ Ruleset.prototype = {
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
-          for (var destEntry in rule.destinations.getHostMatches(destHost)) {
+          for (let destEntry in rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
-            for (var destRule of destEntry.rules) {
+            for (let destRule of destEntry.rules) {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
@@ -1013,9 +1013,9 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (var entry in this.getHostMatches(destHost)) {
+    destouterloop: for (let entry in this.getHostMatches(destHost)) {
       //dprint(entry);
-      for (var rule of entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);

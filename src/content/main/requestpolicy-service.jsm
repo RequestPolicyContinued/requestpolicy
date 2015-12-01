@@ -63,29 +63,29 @@ var rpService = (function() {
     subscriptions = new UserSubscriptions();
     PolicyManager.loadUserRules();
 
-    var defaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
+    let defaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
 
-    var failures = PolicyManager.loadSubscriptionRules(
-          subscriptions.getSubscriptionInfo(defaultPolicy));
+    let failures = PolicyManager.loadSubscriptionRules(
+        subscriptions.getSubscriptionInfo(defaultPolicy));
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
     // TODO: Maybe we should probably ship snapshot versions of the official
     // rulesets so that they can be available immediately after installation.
-    var serials = {};
-    for (var listName in failures) {
+    let serials = {};
+    for (let listName in failures) {
       serials[listName] = {};
-      for (var subName in failures[listName]) {
+      for (let subName in failures[listName]) {
         serials[listName][subName] = -1;
       }
     }
     var loadedSubs = PolicyManager.getSubscriptionRulesets();
-    for (var listName in loadedSubs) {
-      for (var subName in loadedSubs[listName]) {
+    for (let listName in loadedSubs) {
+      for (let subName in loadedSubs[listName]) {
         if (!serials[listName]) {
           serials[listName] = {};
         }
-        var rawRuleset = loadedSubs[listName][subName].rawRuleset;
-        serials[listName][subName] = rawRuleset._metadata['serial'];
+        let rawRuleset = loadedSubs[listName][subName].rawRuleset;
+        serials[listName][subName] = rawRuleset._metadata.serial;
       }
     }
     function updateCompleted(result) {
@@ -284,30 +284,28 @@ var rpService = (function() {
 
   self.observe = function(subject, topic, data) {
     switch (topic) {
-      case SUBSCRIPTION_UPDATED_TOPIC:
+      case SUBSCRIPTION_UPDATED_TOPIC: {
         Logger.debug(Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
-        var subInfo = JSON.parse(data);
-        var failures = PolicyManager.loadSubscriptionRules(subInfo);
+        let subInfo = JSON.parse(data);
+        PolicyManager.loadSubscriptionRules(subInfo);
         break;
+      }
 
-      case SUBSCRIPTION_ADDED_TOPIC:
+      case SUBSCRIPTION_ADDED_TOPIC: {
         Logger.debug(Logger.TYPE_INTERNAL, 'XXX added: ' + data);
-        var subInfo = JSON.parse(data);
-        var failures = PolicyManager.loadSubscriptionRules(subInfo);
-        var failed = false;
-        for (var listName in failures) {
-          failed = true;
-        }
+        let subInfo = JSON.parse(data);
+        let failures = PolicyManager.loadSubscriptionRules(subInfo);
+        let failed = Object.getOwnPropertyNames(failures).length > 0;
         if (failed) {
-          var serials = {};
-          for (var listName in subInfo) {
+          let serials = {};
+          for (let listName in subInfo) {
             if (!serials[listName]) {
               serials[listName] = {};
             }
-            for (var subName in subInfo[listName]) {
+            for (let subName in subInfo[listName]) {
               serials[listName][subName] = -1;
             }
           }
@@ -318,12 +316,14 @@ var rpService = (function() {
           subscriptions.update(updateCompleted, serials);
         }
         break;
+      }
 
-      case SUBSCRIPTION_REMOVED_TOPIC:
+      case SUBSCRIPTION_REMOVED_TOPIC: {
         Logger.debug(Logger.TYPE_INTERNAL, 'YYY: ' + data);
-        var subInfo = JSON.parse(data);
-        var failures = PolicyManager.unloadSubscriptionRules(subInfo);
+        let subInfo = JSON.parse(data);
+        PolicyManager.unloadSubscriptionRules(subInfo);
         break;
+      }
 
       case "sessionstore-windows-restored":
         showWelcomeWindow();

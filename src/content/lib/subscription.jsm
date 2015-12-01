@@ -323,7 +323,7 @@ SubscriptionList.prototype = {
   },
 
   updateSubscriptions : function (userSubs, successCallback, errorCallback) {
-    for (var subName in userSubs) {
+    for (let subName in userSubs) {
       let sub;
       try {
         var serial = this.getSubscriptionSerial(subName);
@@ -408,8 +408,10 @@ Subscription.prototype = {
       try {
         self._rawData = req.responseText;
         if (!self._rawData) {
-          var error = 'Empty response when requesting subscription file';
-          setTimeout(function () { errorCallback(self, error); }, 0);
+          let error = 'Empty response when requesting subscription file';
+          setTimeout(function () {
+            errorCallback(self, error);
+          }, 0);
           return;
         }
         self._data = JSON.parse(req.responseText);

@@ -113,12 +113,12 @@ var PolicyManager = (function () {
   };
 
   self.loadSubscriptionRules = function(subscriptionInfo) {
-    var failures = {};
+    let failures = {};
 
     // Read each subscription from a file.
-    var rawRuleset;
-    for (var listName in subscriptionInfo) {
-      for (var subName in subscriptionInfo[listName]) {
+    let rawRuleset;
+    for (let listName in subscriptionInfo) {
+      for (let subName in subscriptionInfo[listName]) {
         try {
           dprint("PolicyManager::loadSubscriptionRules: " +
                  listName + ' / ' + subName);
@@ -135,7 +135,7 @@ var PolicyManager = (function () {
         if (!subscriptionRulesets[listName]) {
           subscriptionRulesets[listName] = {};
         }
-        var list = subscriptionRulesets[listName];
+        let list = subscriptionRulesets[listName];
         list[subName] = {
           "rawRuleset" : rawRuleset,
           "ruleset" : rawRuleset.toRuleset(subName)
@@ -153,8 +153,8 @@ var PolicyManager = (function () {
   self.unloadSubscriptionRules = function(subscriptionInfo) {
     var failures = {};
 
-    for (var listName in subscriptionInfo) {
-      for (var subName in subscriptionInfo[listName]) {
+    for (let listName in subscriptionInfo) {
+      for (let subName in subscriptionInfo[listName]) {
         dprint("PolicyManager::unloadSubscriptionRules: " +
                  listName + ' / ' + subName);
         if (!subscriptionRulesets[listName] ||
@@ -165,7 +165,7 @@ var PolicyManager = (function () {
           failures[listName][subName] = null;
           continue;
         }
-        var list = subscriptionRulesets[listName];
+        let list = subscriptionRulesets[listName];
         delete list[subName];
       }
     }
@@ -183,14 +183,14 @@ var PolicyManager = (function () {
 
   self.ruleExists = function(ruleAction, ruleData) {
     assertRuleAction(ruleAction);
-    for (var name in userRulesets) {
+    for (let name in userRulesets) {
       if (userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
       }
     }
-    for (var listName in subscriptionRulesets) {
-      var rulesets = subscriptionRulesets[listName];
-      for (var name in rulesets) {
+    for (let listName in subscriptionRulesets) {
+      let rulesets = subscriptionRulesets[listName];
+      for (let name in rulesets) {
         if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
         }
@@ -305,8 +305,8 @@ var PolicyManager = (function () {
 
   self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
     var result = new RequestResult();
-    for (var listName in subscriptionRulesets) {
-      var ruleset = subscriptionRulesets[listName];
+    for (let listName in subscriptionRulesets) {
+      let ruleset = subscriptionRulesets[listName];
       checkRequest(origin, dest, ruleset, result);
     }
     return result;
@@ -322,20 +322,20 @@ var PolicyManager = (function () {
     if (!result) {
       result = new RequestResult();
     }
-    for (var i in aRuleset) {
-      var ruleset = aRuleset[i].ruleset;
+    for (let name in aRuleset) {
+      let {ruleset} = aRuleset[name];
       //ruleset.setPrintFunction(print);
       //ruleset.print();
-      var tempAllow, tempDeny;
+
       // TODO wrap this in a try/catch.
-      [tempAllow, tempDeny] = ruleset.check(origin, dest);
+      let [tempAllows, tempDenies] = ruleset.check(origin, dest);
       // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
       // but it works for now.
-      for (var i in tempAllow) {
-        result.matchedAllowRules.push([ruleset, tempAllow[i]]);
+      for (let tempAllow of tempAllows) {
+        result.matchedAllowRules.push([ruleset, tempAllow]);
       }
-      for (var i in tempDeny) {
-        result.matchedDenyRules.push([ruleset, tempDeny[i]]);
+      for (let tempDeny of tempDenies) {
+        result.matchedDenyRules.push([ruleset, tempDeny]);
       }
     }
     return result;

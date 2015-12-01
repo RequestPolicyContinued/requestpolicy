@@ -20,13 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = ["ConsoleObserver"];
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+this.EXPORTED_SYMBOLS = ["ConsoleObserver"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// utilities
+//==============================================================================
 
 var regEx = /(Error|Warning|Exception)/i;
 
@@ -48,7 +50,7 @@ const knownBugs = [
   // issue #597
   `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`
 ];
-  
+
 function isKnownBug(aMessage) {
   for (bugMsg of knownBugs) {
     if (aMessage.startsWith(bugMsg)) {
@@ -58,19 +60,25 @@ function isKnownBug(aMessage) {
   return false;
 }
 
+//==============================================================================
+// ConsoleObserver
+//==============================================================================
+
 /**
  * ConsoleObserver observes all messages sent to the
  * Browser Console and detects errors caused by
  * RequestPolicy.
  */
-var ConsoleObserver = (function (self) {
+var ConsoleObserver = (function () {
+  let self = {};
+
   let numErrors = 0;
   let messages = [];
 
   self.getNumErrors = function () {
     return numErrors;
   };
-  
+
   self.getMessages = function () {
     return messages;
   };
@@ -100,4 +108,4 @@ var ConsoleObserver = (function (self) {
   };
 
   return self;
-}({}));
+}());

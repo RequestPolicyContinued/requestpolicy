@@ -4,18 +4,18 @@
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Info} = importModule("lib/utils/info");
-  let {rpPrefBranch} = importModule("lib/prefs");
-  let {Logger} = importModule("lib/logger");
-  let {PolicyManager} = importModule("lib/policy-manager");
-  let {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
+  var {Info} = importModule("lib/utils/info");
+  var {rpPrefBranch} = importModule("lib/prefs");
+  var {Logger} = importModule("lib/logger");
+  var {PolicyManager} = importModule("lib/policy-manager");
+  var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");
-  let {rpService} = importModule("main/requestpolicy-service");
-  let {OldRules} = importModule("lib/old-rules");
+  var {rpService} = importModule("main/requestpolicy-service");
+  var {OldRules} = importModule("lib/old-rules");
 
   //============================================================================
 
@@ -154,9 +154,9 @@
       Logger.dump('Rule count: ' + ruleCount);
       if (ruleCount <= 0) {
         Logger.dump('Performing rule import.');
-        let addHostWildcard = identLevel === 1;
-        let oldRules = new OldRules();
-        let rules = oldRules.getAsNewRules(addHostWildcard);
+        var addHostWildcard = identLevel === 1;
+        var oldRules = new OldRules();
+        var rules = oldRules.getAsNewRules(addHostWildcard);
         PolicyManager.addAllowRules(rules);
       }
 

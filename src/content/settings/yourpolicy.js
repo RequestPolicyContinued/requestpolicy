@@ -4,10 +4,10 @@
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Prefs} = importModule("lib/prefs");
-  let {PolicyManager} = importModule("lib/policy-manager");
+  var {Prefs} = importModule("lib/prefs");
+  var {PolicyManager} = importModule("lib/policy-manager");
 
   //============================================================================
 

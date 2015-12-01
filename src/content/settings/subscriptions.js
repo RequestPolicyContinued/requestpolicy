@@ -4,15 +4,15 @@
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Prefs} = importModule("lib/prefs");
-  let {Logger} = importModule("lib/logger");
-  let {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
+  var {Prefs} = importModule("lib/prefs");
+  var {Logger} = importModule("lib/logger");
+  var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");
-  let {rpService} = importModule("main/requestpolicy-service");
+  var {rpService} = importModule("main/requestpolicy-service");
 
   //============================================================================
 

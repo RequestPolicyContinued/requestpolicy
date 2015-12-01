@@ -4,11 +4,11 @@
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Prefs} = importModule("lib/prefs");
-  let {PolicyManager} = importModule("lib/policy-manager");
-  let {OldRules} = importModule("lib/old-rules");
+  var {Prefs} = importModule("lib/prefs");
+  var {PolicyManager} = importModule("lib/policy-manager");
+  var {OldRules} = importModule("lib/old-rules");
 
   //============================================================================
 
@@ -42,7 +42,7 @@
   function populateRuleTable() {
     var table = $id('rules');
 
-    let oldRules = new OldRules();
+    var oldRules = new OldRules();
     // Setting the global rules var here.
     rules = oldRules.getAsNewRules(addHostWildcard);
 

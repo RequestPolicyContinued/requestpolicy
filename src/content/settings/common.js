@@ -5,15 +5,15 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {StringUtils} = importModule("lib/utils/strings");
-  let {Prefs} = importModule("lib/prefs");
-  let {UserSubscriptions, SUBSCRIPTION_ADDED_TOPIC,
+  var {StringUtils} = importModule("lib/utils/strings");
+  var {Prefs} = importModule("lib/prefs");
+  var {UserSubscriptions, SUBSCRIPTION_ADDED_TOPIC,
        SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
-  let {Environment, ProcessEnvironment} = importModule("lib/environment");
+  var {Environment, ProcessEnvironment} = importModule("lib/environment");
 
   //============================================================================
 

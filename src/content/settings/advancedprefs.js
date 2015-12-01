@@ -4,11 +4,11 @@
   /* global Components */
   const {utils: Cu} = Components;
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-  let {ScriptLoader: {importModule}} = Cu.import(
+  var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {rpPrefBranch, rootPrefBranch} = importModule("lib/prefs");
+  var {rpPrefBranch, rootPrefBranch} = importModule("lib/prefs");
 
   //============================================================================
 

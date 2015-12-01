@@ -772,31 +772,20 @@ window.rpcontinued.overlay = (function () {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    if (!gContextMenu.rpcontinuedMethodsOverridden) {
-      gContextMenu.rpcontinuedMethodsOverridden = true;
+    Utils.wrapFunction(window.gContextMenu, "openLink", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
 
-      gContextMenu.openLink = function() {
-        RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-        return this.__proto__.openLink.call(this); // call the overridden method
-      };
+    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
 
-      // Below, we check whether the functions exist before overriding it, because
-      // those functions have been introduced in later versions of Firefox than openLink().
-
-      if (gContextMenu.openLinkInPrivateWindow) {
-        gContextMenu.openLinkInPrivateWindow = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInPrivateWindow.call(this);
-        };
-      }
-
-      if (gContextMenu.openLinkInCurrent) {
-        gContextMenu.openLinkInCurrent = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInCurrent.call(this);
-        };
-      }
-    }
+    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
   };
 
   /**

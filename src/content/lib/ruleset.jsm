@@ -474,17 +474,6 @@ RawRuleset.prototype = {
   }
 };
 
-
-
-
-function RuleIterator(rules) {
-  this._rulesIterator = new Iterator(rules);
-}
-RuleIterator.prototype.next = function() {
-  // The default Iterator over arrays returns a tuple of [index, item].
-  return this._rulesIterator.next()[1];
-}
-
 //==============================================================================
 // Rules
 //==============================================================================
@@ -513,29 +502,29 @@ Rules.prototype = {
     return this._rules.length == 0;
   },
 
-  __iterator__ : function() {
-    return new RuleIterator(this._rules);
+  [Symbol.iterator] : function*() {
+    yield* this._rules;
   },
 
   get : function(scheme, port) {
-    var rule = new Rule(scheme, port);
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      if (item.isEqual(rule)) {
-        return item;
+    let rule = new Rule(scheme, port);
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(rule)) {
+        return existingRule;
       }
     }
     return null;
   },
 
   add : function(scheme, port) {
-    var rule = new Rule(scheme, port);
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      if (item.isEqual(rule)) {
-        return item;
+    let newRule = new Rule(scheme, port);
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(newRule)) {
+        return existingRule;
       }
     }
-    this._rules.push(rule);
-    return rule;
+    this._rules.push(newRule);
+    return newRule;
   }
 };
 
@@ -954,7 +943,7 @@ Ruleset.prototype = {
     // First, check for rules for each part of the origin host.
     originouterloop: for (var entry in this.getHostMatches(originHost)) {
       //dprint(entry);
-      for (var rule in entry.rules) {
+      for (var rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         var ruleMatchedOrigin = rule.isMatch(origin);
 
@@ -988,7 +977,7 @@ Ruleset.prototype = {
           //dprint("There are origin-to-destination rules using this origin rule.");
           for (var destEntry in rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
-            for (var destRule in destEntry.rules) {
+            for (var destRule of destEntry.rules) {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
@@ -1026,7 +1015,7 @@ Ruleset.prototype = {
     // Last, check for rules for each part of the destination host.
     destouterloop: for (var entry in this.getHostMatches(destHost)) {
       //dprint(entry);
-      for (var rule in entry.rules) {
+      for (var rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);

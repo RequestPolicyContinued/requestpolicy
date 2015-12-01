@@ -53,7 +53,9 @@ const SUBSCRIPTION_UPDATED_TOPIC = "rpcontinued-subscription-policy-updated";
 const SUBSCRIPTION_ADDED_TOPIC = "rpcontinued-subscription-policy-added";
 const SUBSCRIPTION_REMOVED_TOPIC = "rpcontinued-subscription-policy-removed";
 
-const DEFAULT_SUBSCRIPTION_LIST_URL_BASE = "https://raw.githubusercontent.com/RequestPolicyContinued/subscriptions/master/";
+const DEFAULT_SUBSCRIPTION_LIST_URL_BASE =
+    "https://raw.githubusercontent.com/" +
+    "RequestPolicyContinued/subscriptions/master/";
 
 const SUBSCRIPTION_UPDATE_SUCCESS = "SUCCESS";
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = "NOT_NEEDED";

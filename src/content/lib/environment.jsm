@@ -339,7 +339,7 @@ var Environment = (function() {
 
   // have a scope/closure for private functions specific to
   // startup() and shutdown().
-  (function createMethods_StartupAndShutdown(Environment) {
+  (function createMethodsStartupAndShutdown(Environment) {
     /**
      * Iterates all levels of either the startup or the shutdown
      * sequence and calls a function for each level.

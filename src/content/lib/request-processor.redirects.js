@@ -87,8 +87,8 @@ RequestProcessor = (function(self) {
    * Handles observer notifications sent by the HTTPS Everywhere extension
    * that inform us of URIs that extension has rewritten.
    *
-   * @param nsIURI oldURI
-   * @param string newSpec
+   * @param {nsIURI} oldURI
+   * @param {string} newSpec
    */
   function handleHttpsEverywhereUriRewrite(oldURI, newSpec) {
     oldURI = oldURI.QueryInterface(Ci.nsIURI);

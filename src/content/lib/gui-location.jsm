@@ -52,8 +52,8 @@ GUILocation.prototype.toString = function() {
 /**
  * @static
  */
-GUILocation.merge = function(guiLocation, location1, location2) {
-  return new guiLocation(
+GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
+  return new SubclassOfGUILocation(
     location1.value,  // we assume: location1.value == location2.value
     GUILocationProperties.merge(location1.properties, location2.properties));
 };
@@ -67,12 +67,10 @@ GUILocation.existsInArray = function(locationString, locations) {
 
 /**
  * @static
- * @param {String}
- *          locationString The location saved in GUILocation.value
- * @param {String}
- *          locations Array of GUILocation objects
+ * @param {String} locationString The location saved in GUILocation.value
+ * @param {String} locations Array of GUILocation objects
  * @return {int} The index of the first GUILocation object which contains the
- *          specified locationString. If it doesn't exist, it returns -1.
+ *     specified locationString. If it doesn't exist, it returns -1.
  */
 GUILocation.indexOfLocationInArray = function(locationString, locations) {
   if (locationString instanceof GUILocation) {
@@ -95,11 +93,11 @@ GUILocation.sortByNumRequestsCompareFunction = function(a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
 GUILocation.compareFunction = function(a, b, sortType) {
-  var a_default = 0 < a.properties.numDefaultPolicyRequests;
-  var b_default = 0 < b.properties.numDefaultPolicyRequests;
+  var aDefault = 0 < a.properties.numDefaultPolicyRequests;
+  var bDefault = 0 < b.properties.numDefaultPolicyRequests;
 
-  if (a_default !== b_default) {
-    if (a_default === true) {
+  if (aDefault !== bDefault) {
+    if (aDefault === true) {
       // default-policy destinations first.
       return -1;
     } else {
@@ -244,9 +242,9 @@ GUILocationProperties.requestCountProperties = [
 ];
 
 /**
- * @static
- *
  * Merge the given GUILocationProperties object to a new object
+ *
+ * @static
  */
 GUILocationProperties.merge = function(prop1, prop2) {
   var requestCountProperties = GUILocationProperties.requestCountProperties;

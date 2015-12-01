@@ -99,7 +99,8 @@ var ProcessEnvironment = (function() {
     self.addShutdownFunction(Environment.LEVELS.BACKEND,
                              sendShutdownMessageToChildren);
   }
-  ParentProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ParentProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
   /**
@@ -189,7 +190,8 @@ var ProcessEnvironment = (function() {
 
     childMM.addMessageListener(shutdownMessage, receiveShutdownMessage);
   }
-  ChildProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ChildProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ChildProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
   /**

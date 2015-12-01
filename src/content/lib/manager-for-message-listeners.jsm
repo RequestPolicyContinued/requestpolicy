@@ -81,8 +81,8 @@ function ManagerForMessageListeners(aEnv, aMM) {
     // aEnv is not defined! Try to report an error.
     if (!!Logger) {
       Logger.warning(Logger.TYPE_INTERNAL, "No Environment was specified for " +
-                     "a new ManagerForMessageListeners! This means that the listeners " +
-                     "won't be unregistered!");
+        "a new ManagerForMessageListeners! This means that the listeners " +
+        "won't be unregistered!");
     }
   }
 
@@ -112,8 +112,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
   let self = this;
   if (typeof aCallback !== "function") {
     Logger.warning(Logger.TYPE_ERROR, "The callback for a message listener" +
-                   "must be a function! The message name was \"" + aMessageName +
-                   "\"");
+        "must be a function! The message name was \"" + aMessageName + "\"");
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {

@@ -125,7 +125,9 @@ RequestSet.prototype = {
   },
 
   /**
-   * @param {Array} rules The rules that were triggered by this request.
+   * @param {string} originUri
+   * @param {string} destUri
+   * @param {RequestResult} requestResult
    */
   addRequest: function(originUri, destUri, requestResult) {
     if (requestResult === undefined) {

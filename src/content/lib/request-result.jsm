@@ -86,30 +86,32 @@ function RequestResult(isAllowed, resultReason) {
   this.isAllowed = isAllowed;
   this.resultReason = resultReason;
 }
+
 RequestResult.prototype = {
   matchedAllowRules : null,
   matchedDenyRules : null,
 
   isAllowed : undefined,  // whether the request will be or has been allowed
-  resultReason : undefined,
+  resultReason : undefined
+};
 
-  allowRulesExist : function() {
-    return this.matchedAllowRules.length > 0;
-  },
-  denyRulesExist : function () {
-    return this.matchedDenyRules.length > 0;
-  },
+RequestResult.prototype.allowRulesExist = function() {
+  return this.matchedAllowRules.length > 0;
+};
 
-  isDefaultPolicyUsed : function () {
-    // returns whether the default policy has been or will be used for this request.
-    return (this.resultReason == REQUEST_REASON_DEFAULT_POLICY ||
-            this.resultReason == REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
-            this.resultReason == REQUEST_REASON_DEFAULT_SAME_DOMAIN);
-  },
+RequestResult.prototype.denyRulesExist = function() {
+  return this.matchedDenyRules.length > 0;
+};
 
-  isOnBlacklist: function() {
-    // TODO: implement a real blacklist. currently, if a request is blocked
-    // *not* by the default policy it's by a blacklist
-    return this.isAllowed ? false : !this.isDefaultPolicyUsed();
-  }
+RequestResult.prototype.isDefaultPolicyUsed = function() {
+  // returns whether the default policy has been or will be used for this request.
+  return (this.resultReason == REQUEST_REASON_DEFAULT_POLICY ||
+          this.resultReason == REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
+          this.resultReason == REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+};
+
+RequestResult.prototype.isOnBlacklist = function() {
+  // TODO: implement a real blacklist. currently, if a request is blocked
+  // *not* by the default policy it's by a blacklist
+  return this.isAllowed ? false : !this.isDefaultPolicyUsed();
 };

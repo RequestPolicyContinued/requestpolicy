@@ -40,10 +40,10 @@ let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 // utilities
 //==============================================================================
 
-const rpChromeContentURI = 'chrome://rpcontinued/content/';
+const RP_CHROME_CONTENT_URI = "chrome://rpcontinued/content/";
 
 function getModuleURI(id) {
-  return rpChromeContentURI + id + ".jsm";
+  return RP_CHROME_CONTENT_URI + id + ".jsm";
 }
 
 /**
@@ -59,7 +59,6 @@ function logSevereError(msg, e) {
 //==============================================================================
 
 var ScriptLoader = (function() {
-
   let importedModuleURIs = {};
 
   // URIs in that variable will not be unloaded

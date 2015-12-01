@@ -103,12 +103,14 @@ var rpService = (function() {
       var wm = Cc['@mozilla.org/appshell/window-mediator;1'].
           getService(Ci.nsIWindowMediator);
       var windowtype = 'navigator:browser';
-      var mostRecentWindow  = wm.getMostRecentWindow(windowtype);
+      var mostRecentWindow = wm.getMostRecentWindow(windowtype);
 
       // the gBrowser object of the firefox window
       var _gBrowser = mostRecentWindow.getBrowser();
 
-      if (typeof(_gBrowser.addTab) != "function") return;
+      if (typeof _gBrowser.addTab !== "function") {
+        return;
+      }
 
       _gBrowser.selectedTab = _gBrowser.addTab(url);
 
@@ -173,7 +175,7 @@ var rpService = (function() {
       // the gBrowser object of the firefox window
       var _gBrowser = mostRecentWindow.getBrowser();
 
-      if (typeof(_gBrowser.addTab) !== "function") {
+      if (typeof _gBrowser.addTab !== "function") {
         return false;
       }
 
@@ -312,7 +314,7 @@ var rpService = (function() {
           let updateCompleted = function(result) {
             Logger.info(Logger.TYPE_INTERNAL,
                 'Subscription update completed: ' + result);
-          }
+          };
           subscriptions.update(updateCompleted, serials);
         }
         break;

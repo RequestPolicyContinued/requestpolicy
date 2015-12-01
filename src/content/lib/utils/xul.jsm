@@ -75,7 +75,7 @@ var xulTrees = XULUtils.xulTrees = {};
 
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
-      aElementSpec.attributes.id = "rpc-autoid-" + (nextID++);
+      aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
       //Logger.dump("Automatically created ID '" + aElementSpec.attributes.id +
       //            "' for element <" + aElementSpec.tag + ">");
     }
@@ -103,7 +103,8 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
     // Add all children recursively.
     if (elementSpec.hasOwnProperty("children")) {
-      let allChildrenSpecs = recursivelyGetAllElementSpecs(elementSpec.children)
+      let allChildrenSpecs = recursivelyGetAllElementSpecs(
+          elementSpec.children);
       allElementSpecs = allElementSpecs.concat(allChildrenSpecs);
     }
   }
@@ -282,13 +283,13 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
     }
     parentElement.appendChild(newElement);
   }
-};
+}
 
 XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
   if (xulTrees.hasOwnProperty(aTreeName)) {
     recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
-}
+};
 
 /**
  * Return a list of the IDs of the specified tree's root elements.
@@ -325,4 +326,4 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
       node.parentNode.removeChild(node);
     }
   }
-}
+};

@@ -79,7 +79,6 @@ window.rpcontinued.overlay = (function () {
 
   let blockedContentStateUpdateDelay = 250; // milliseconds
   let blockedContentCheckTimeoutId = null;
-  let blockedContentCheckMinWaitOnObservedBlockedRequest = 500;
   let blockedContentCheckLastTime = 0;
 
   let popupElement = null;
@@ -127,7 +126,7 @@ window.rpcontinued.overlay = (function () {
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
-        isFennec = (appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
+        isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
 
         if (isFennec) {
           Logger.dump("Detected Fennec.");
@@ -565,11 +564,11 @@ window.rpcontinued.overlay = (function () {
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-      
+
       let notificationElem = notificationBox.appendNotification(
           notificationLabel, notificationValue,
           "chrome://browser/skin/Info.png", priority, buttons);
-      
+
       // Let the notification persist at least 300ms. This is needed in the
       // following scenario:
       //     If an URL is entered on an empty tab (e.g. "about:blank"),

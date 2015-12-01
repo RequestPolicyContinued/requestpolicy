@@ -38,9 +38,6 @@ let {Logger} = importModule("lib/logger");
 //==============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = Utils.moduleInternal(self);
-
-
   let conflictingExtensions = [];
   let compatibilityRules = [];
   let topLevelDocTranslationRules = {};
@@ -278,7 +275,7 @@ RequestProcessor = (function(self) {
     compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
     // Flock
-    if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
+    if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,
           "Application detected: " + appInfo.vendor);
       compatibilityRules.push(
@@ -297,7 +294,7 @@ RequestProcessor = (function(self) {
     }
 
     // Seamonkey
-    if (appInfo.ID == "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
+    if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
       Logger.info(Logger.TYPE_INTERNAL, "Application detected: Seamonkey");
       compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
       compatibilityRules.push([null, "mailbox:", "Seamonkey"]);

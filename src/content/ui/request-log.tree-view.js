@@ -41,7 +41,7 @@ window.rpcontinued.requestLog = (function (self) {
 
   function getVisibleRowAtIndex(index) {
     return self.visibleRows[self.visibleRows.length - index - 1];
-  };
+  }
 
 
 
@@ -136,7 +136,7 @@ window.rpcontinued.requestLog = (function (self) {
     performActionOnCell: function(action, aIndex, aColumn) {},
 
     getRowProperties: function(aIndex) {
-      return (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
+      return getVisibleRowAtIndex(aIndex)[2] ? "blocked" : "allowed";
     },
 
     getCellProperties: function(aIndex, aColumn) {

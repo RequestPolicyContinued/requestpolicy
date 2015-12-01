@@ -41,11 +41,7 @@ let {C} = importModule("lib/utils/constants");
 //==============================================================================
 
 function dprint(msg) {
-  if (typeof print == "function") {
-    print(msg);
-  } else {
-    Logger.info(Logger.TYPE_POLICY, msg);
-  }
+  Logger.info(Logger.TYPE_POLICY, msg);
 }
 
 function dwarn(msg) {
@@ -80,30 +76,34 @@ exampleRawDataObj = {
 };
 */
 
-function dump(arr,level) {
+/*
+// currently unused.
+function dump(arr, level=0) {
   var dumped_text = "";
-  if(!level) level = 0;
 
   //The padding given at the beginning of the line.
   var level_padding = "";
-  for(var j=0;j<level+1;j++) level_padding += "    ";
+  for (let j = 0; j < level + 1; j++) {
+    level_padding += "    ";
+  }
 
-  if(typeof(arr) == 'object') { //Array/Hashes/Objects
-    for(var item in arr) {
-      var value = arr[item];
+  if (typeof arr === "object") { //Array/Hashes/Objects
+    for (let item in arr) {
+      let value = arr[item];
 
-      if(typeof(value) == 'object') { //If it is an array,
+      if (typeof value === "object") { //If it is an array,
         dumped_text += level_padding + "'" + item + "' ...\n";
-        dumped_text += dump(value,level+1);
+        dumped_text += dump(value, level + 1);
       } else {
         dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
       }
     }
   } else { //Stings/Chars/Numbers etc.
-    dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+    dumped_text = "===>" + arr + "<===(" + typeof arr + ")";
   }
   return dumped_text;
 }
+*/
 
 //==============================================================================
 // RawRuleset
@@ -115,11 +115,11 @@ function RawRuleset(jsonData) {
   if (jsonData) {
     this._fromJSON(jsonData);
   }
-  if (!this._entries["allow"]) {
-    this._entries["allow"] = [];
+  if (!this._entries.allow) {
+    this._entries.allow = [];
   }
-  if (!this._entries["deny"]) {
-    this._entries["deny"] = [];
+  if (!this._entries.deny) {
+    this._entries.deny = [];
   }
 }
 
@@ -132,24 +132,25 @@ RawRuleset.prototype = {
   },
 
   getAllowRuleCount : function() {
-    return this._entries["allow"].length;
+    return this._entries.allow.length;
   },
 
   getDenyRuleCount : function() {
-    return this._entries["deny"].length;
+    return this._entries.deny.length;
   },
 
   _addEntryHelper : function(entryPart, policy) {
-    if (entryPart["h"]) {
-      var rules = policy.addHost(entryPart["h"]).rules;
+    let rules;
+    if (entryPart.h) {
+      rules = policy.addHost(entryPart.h).rules;
     } else {
       rules = policy.rules;
     }
-    var r = rules.add(entryPart["s"], entryPart["port"]);
-    if (entryPart["pathPre"]) {
-      r.pathPre = entryPart["pathPre"];
-    } else if (entryPart["pathRegex"]) {
-      r.pathRegex = new RegExP(entryPart["pathRegex"]);
+    let r = rules.add(entryPart.s, entryPart.port);
+    if (entryPart.pathPre) {
+      r.pathPre = entryPart.pathPre;
+    } else if (entryPart.pathRegex) {
+      r.pathRegex = new RegExp(entryPart.pathRegex);
     }
     return [rules, r];
   },
@@ -157,8 +158,8 @@ RawRuleset.prototype = {
   _addEntryToRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry["o"];
-    var d = entry["d"];
+    var o = entry.o;
+    var d = entry.d;
     var rules, r;
 
     //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
@@ -243,8 +244,8 @@ RawRuleset.prototype = {
   },
 
   // _removeEntryHelper : function(entryPart, policy) {
-  //     if (entryPart["h"]) {
-  //       var originEntry = policy.getHost(entryPart["h"]);
+  //     if (entryPart.h) {
+  //       var originEntry = policy.getHost(entryPart.h);
   //       if (!originEntry) {
   //         return null;
   //       }
@@ -252,43 +253,43 @@ RawRuleset.prototype = {
   //     } else {
   //       rules = policy.rules;
   //     }
-  //     return rules.get(entryPart["s"], entryPart["port"]);
+  //     return rules.get(entryPart.s, entryPart.port);
   // },
 
   _removeEntryFromRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry["o"];
-    var d = entry["d"];
+    var o = entry.o;
+    var d = entry.d;
     var rules, r;
 
     // TODO: refactor like done with _addEntryToRuleset
 
     if (o && d) {
-      if (o["h"]) {
-        var originEntry = policy.getHost(o["h"]);
+      if (o.h) {
+        let originEntry = policy.getHost(o.h);
         if (!originEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = originEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(o["s"], o["port"]);
+      r = rules.get(o.s, o.port);
       if (!r || !r.destinations) {
         return;
       }
 
-      if (d["h"]) {
-        var destEntry = r.destinations.getHost(d["h"]);
+      if (d.h) {
+        let destEntry = r.destinations.getHost(d.h);
         if (!destEntry) {
           return;
         }
-        var rules = destEntry.rules;
+        rules = destEntry.rules;
       } else {
         rules = r.destinations.rules;
       }
-      r = rules.get(d["s"], d["port"]);
+      r = rules.get(d.s, d.port);
       if (!r) {
         return;
       }
@@ -306,16 +307,16 @@ RawRuleset.prototype = {
       }
 
     } else if (o && !d) {
-      if (o["h"]) {
-        var originEntry = policy.getHost(o["h"]);
+      if (o.h) {
+        let originEntry = policy.getHost(o.h);
         if (!originEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = originEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(o["s"], o["port"]);
+      r = rules.get(o.s, o.port);
       if (!r) {
         return;
       }
@@ -332,16 +333,16 @@ RawRuleset.prototype = {
       }
 
     } else if (!o && d) {
-      if (d["h"]) {
-        var originEntry = policy.getHost(d["h"]);
-        if (!originEntry) {
+      if (d.h) {
+        let destEntry = policy.getHost(d.h);
+        if (!destEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = destEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(d["s"], d["port"]);
+      r = rules.get(d.s, d.port);
       if (!r) {
         return;
       }
@@ -437,8 +438,8 @@ RawRuleset.prototype = {
       throw "Invalid policy data: no 'version' key";
     }
     if (dataObj.metadata.version != 1) {
-      throw "Wrong metadata version. Expected 1, was "
-          + dataObj.metadata.version;
+      throw "Wrong metadata version. Expected 1, was " +
+          dataObj.metadata.version;
     }
     if (!("entries" in dataObj)) {
       throw "Invalid policy data: no 'entries' key";
@@ -489,16 +490,18 @@ RuleIterator.prototype.next = function() {
 //==============================================================================
 
 function Rules() {
+  /**
+   * @type {Array<Rule>}
+   */
   this._rules = [];
 }
 
 Rules.prototype = {
   _rules : null,
 
-  print : function(depth) {
-    depth = depth || 0;
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      item.print(depth);
+  print : function(depth = 0) {
+    for (let rule of this._rules) {
+      rule.print(depth);
     }
   },
 
@@ -579,15 +582,15 @@ Rule.prototype = {
   destinations : null,
 
   toString : function() {
-    return "[Rule " + this.scheme + " " + this.port + " " + this.path + " "
-    // TODO
+    return "[Rule " + this.scheme + " " + this.port + " " + this.path + " " +
+           // TODO
            // + "originRuleAction:" + this.originRuleAction + " "
            // + "destinationRuleAction:" + this.destinationRuleAction + " "
-           + "allowOrigin:" + this.allowOrigin + " "
-           + "denyOrigin:" + this.denyOrigin + " "
-           + "allowDestination:" + this.allowDestination + " "
-           + "denyDestination:" + this.denyDestination + " "
-           + "]";
+           "allowOrigin:" + this.allowOrigin + " " +
+           "denyOrigin:" + this.denyOrigin + " " +
+           "allowDestination:" + this.allowDestination + " " +
+           "denyDestination:" + this.denyDestination + " " +
+           "]";
   },
 
   print : function(depth) {
@@ -662,7 +665,7 @@ Rule.prototype = {
 //==============================================================================
 
 function DomainEntry(name, fullName, higher) {
-  if (typeof name != "string" && name !== null) {
+  if (typeof name !== "string" && name !== null) {
     throw "Invalid type: DomainEntry name must be a string or null.";
   }
   this._name = name;
@@ -927,18 +930,24 @@ Ruleset.prototype = {
     }
   },
 
+  /**
+   * @param {nsIURI} origin
+   * @param {nsIURI} dest
+   * @return {Array<{length: 2, 0: Array<>, 1: Array<>}>}
+   */
   check : function(origin, dest) {
     var matchedAllowRules = [];
     var matchedDenyRules = [];
+    var originHost, destHost;
     try {
-     var originHost = origin["host"];
+      originHost = origin.host;
     } catch (e) {
-      var originHost = '';
+      originHost = "";
     }
     try {
-      var destHost = dest["host"];
+      destHost = dest.host;
     } catch (e) {
-      var destHost = '';
+      destHost = "";
     }
 
     //dprint("Checking origin rules and origin-to-destination rules.");
@@ -1048,7 +1057,7 @@ Ruleset.prototype = {
 
     return [matchedAllowRules, matchedDenyRules];
   }
-}
+};
 
 /**
  * @static
@@ -1056,18 +1065,18 @@ Ruleset.prototype = {
 Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
   if (entry instanceof DomainEntry && entry.fullName) {
-    rawRule[originOrDest]["h"] = entry.fullName;
+    rawRule[originOrDest].h = entry.fullName;
   } else if (entry instanceof IPAddressEntry) {
-    rawRule[originOrDest]["h"] = entry.address;
+    rawRule[originOrDest].h = entry.address;
   }
   if (rule.scheme) {
-    rawRule[originOrDest]["s"] = rule.scheme;
+    rawRule[originOrDest].s = rule.scheme;
   }
   if (rule.port) {
-    rawRule[originOrDest]["port"] = rule.port;
+    rawRule[originOrDest].port = rule.port;
   }
   // TODO: path
-}
+};
 
 /**
  * @static
@@ -1093,12 +1102,12 @@ Ruleset.matchToRawRule = function(match) {
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
-    throw "[matchToRawRule] Invalid match type: " + actionStr
-          + " from match: " + match;
+    throw "[matchToRawRule] Invalid match type: " + actionStr +
+        " from match: " + match;
   }
 
   return rawRule;
-}
+};
 
 /**
  * @static
@@ -1107,43 +1116,43 @@ Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts)
   if (rawRule[originOrDest]) {
     parts.push('"' + originOrDest + '":{');
     var needComma = false;
-    if (rawRule[originOrDest]["h"]) {
-      parts.push('"h":"' + rawRule[originOrDest]["h"] + '"');
+    if (rawRule[originOrDest].h) {
+      parts.push('"h":"' + rawRule[originOrDest].h + '"');
       needComma = true;
     }
-    if (rawRule[originOrDest]["port"]) {
+    if (rawRule[originOrDest].port) {
       if (needComma) {
         parts.push(',');
       }
-      parts.push('"port":"' + rawRule[originOrDest]["port"] + '"');
+      parts.push('"port":"' + rawRule[originOrDest].port + '"');
     }
-    if (rawRule[originOrDest]["s"]) {
+    if (rawRule[originOrDest].s) {
       if (needComma) {
         parts.push(',');
       }
-      parts.push('"s":"' + rawRule[originOrDest]["s"] + '"');
+      parts.push('"s":"' + rawRule[originOrDest].s + '"');
     }
     parts.push('}');
   }
   // TODO: pathPre and pathRegex (will need to escape strings)
   parts.push('}');
   return parts.join("");
-}
+};
 
 Ruleset.rawRuleToCanonicalString = function(rawRule) {
   var parts = ['{'];
-  if (rawRule["d"]) {
+  if (rawRule.d) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }
-  if (rawRule["d"] && rawRule["o"]) {
+  if (rawRule.d && rawRule.o) {
     parts.push(',');
   }
-  if (rawRule["o"]) {
+  if (rawRule.o) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
   }
   parts.push('}');
   return parts.join("");
-}
+};
 
 /**
  * @static

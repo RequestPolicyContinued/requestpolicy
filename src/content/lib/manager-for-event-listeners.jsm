@@ -91,7 +91,7 @@ function addEvLis(listener) {
   listener.target.addEventListener(listener.eventType, listener.callback,
                                    listener.useCapture);
   listener.listening = true;
-};
+}
 
 
 ManagerForEventListeners.prototype.addListener = function(aEventTarget,

@@ -39,7 +39,7 @@ let {Utils} = importModule("lib/utils");
 // utilities, constants
 //==============================================================================
 
-var filenames = {
+const FILENAMES = {
   "basicprefs": "basicprefs.html",
   "advancedprefs": "advancedprefs.html",
   "yourpolicy": "yourpolicy.html",
@@ -55,10 +55,10 @@ function getURI(aURI) {
   if (index >= 0 && aURI.path.length > index) {
     id = aURI.path.substr(index+1);
   }
-  if (!id || !(id in filenames)) {
+  if (!id || !(id in FILENAMES)) {
     id = "basicprefs";
   }
-  return "chrome://rpcontinued/content/settings/" + filenames[id];
+  return "chrome://rpcontinued/content/settings/" + FILENAMES[id];
 }
 
 //==============================================================================

@@ -50,10 +50,6 @@ var rootPrefBranch = Services.prefs.getBranch("")
 var Prefs = (function() {
   let self = {};
 
-  let defaultAllow = true;
-  let defaultAllowSameDomain = true;
-  let blockingDisabled = false;
-
 
 
   self.save = function() {
@@ -80,7 +76,7 @@ var Prefs = (function() {
    * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
    * Those functions will be added to `self` subsequently.
    */
-  let rpPrefAliases = {
+  const RP_PREF_ALIASES = {
     "bool": {
       "defaultPolicy.allow": "DefaultAllow",
       "defaultPolicy.allowSameDomain": "DefaultAllowSameDomain",
@@ -96,8 +92,8 @@ var Prefs = (function() {
    * `setBlockingDisabled`.
    */
   {
-    for (let prefID in rpPrefAliases.bool) {
-      let prefName = rpPrefAliases.bool[prefID];
+    for (let prefID in RP_PREF_ALIASES.bool) {
+      let prefName = RP_PREF_ALIASES.bool[prefID];
 
       // define the pref's getter function to `self`
       self["is"+prefName] = getRPBoolPref.bind(this, prefID);
@@ -108,8 +104,8 @@ var Prefs = (function() {
   }
 
   self.isPrefetchEnabled = function() {
-    return rootPrefBranch.getBoolPref("network.prefetch-next")
-        || !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
+    return rootPrefBranch.getBoolPref("network.prefetch-next") ||
+        !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
   };
 
   function isPrefEmpty(pref) {
@@ -147,7 +143,7 @@ var Prefs = (function() {
       // TODO: also send the pref's name and its branch
       Services.obs.notifyObservers(null, "rpcontinued-prefs-changed", null);
     }
-  };
+  }
 
   function registerPrefObserver() {
     // observe everything on RP's pref branch

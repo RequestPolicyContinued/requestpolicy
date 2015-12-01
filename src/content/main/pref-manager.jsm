@@ -60,7 +60,6 @@ XPCOMUtils.defineLazyGetter(globalScope, "rootPrefBranch", function() {
 var PrefManager = (function() {
   let self = {};
 
-
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
     var resetLinkPrefetch = rpPrefBranch.getBoolPref(

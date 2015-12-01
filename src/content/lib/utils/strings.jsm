@@ -44,11 +44,11 @@ var StringUtils = (function() {
     return loadPropertiesFile(
         "chrome://rpcontinued/locale/requestpolicy.properties");
   });
+
   // from https://developer.mozilla.org/en-US/Add-ons/
   // How_to_convert_an_overlay_extension_to_restartless
   // #Step_10.3A_Bypass_cache_when_loading_properties_files
-  function loadPropertiesFile(path)
-  {
+  function loadPropertiesFile(path) {
     /* HACK: The string bundle cache is cleared on addon shutdown, however it
      * doesn't appear to do so reliably. Errors can erratically happen on next
      * load of the same file in certain instances. (at minimum, when strings are

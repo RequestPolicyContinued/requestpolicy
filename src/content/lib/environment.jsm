@@ -59,7 +59,7 @@ var Environment = (function () {
   // constants, metadata
   //----------------------------------------------------------------------------
 
-  let ENV_STATES = {
+  const ENV_STATES = {
     "NOT_STARTED": 0,
     "STARTING_UP": 1,
     "STARTUP_DONE": 2,
@@ -67,7 +67,7 @@ var Environment = (function () {
     "SHUT_DOWN": 4
   };
 
-  let LEVELS = {
+  const LEVELS = {
     // Essential functions do tasks that must be run first on startup and last
     // on shutdown, that is they do tasks that are requirements for the Backend.
     "ESSENTIAL": 1,
@@ -83,7 +83,7 @@ var Environment = (function () {
   };
 
   // a level can be entered, being processed, or finished being processed.
-  let LEVEL_STATES = {
+  const LEVEL_STATES = {
     "NOT_ENTERED": 0,
     "PROCESSING": 1,
     "FINISHED_PROCESSING": 2
@@ -104,10 +104,11 @@ var Environment = (function () {
         "afterProcessing": ENV_STATES.STARTUP_DONE
       },
       functions: {
+        /**
+         * @this {Environment}
+         */
         "beforeProcessing": function() {
-          // "this" will be an environment
-          let self = this;
-          self.register();
+          this.register();
         },
         "afterProcessing": function() {}
       }
@@ -127,11 +128,12 @@ var Environment = (function () {
       },
       functions: {
         "beforeProcessing": function() {},
+        /**
+         * @this {Environment}
+         */
         "afterProcessing": function() {
-          // "this" will be an environment
-          let self = this;
-          self.innerEnvs.length = 0;
-          self.unregister();
+          this.innerEnvs.length = 0;
+          this.unregister();
         }
       }
     }
@@ -226,7 +228,7 @@ var Environment = (function () {
     if (self.outerEnv) {
       self.outerEnv.registerInnerEnvironment(self);
     }
-  }
+  };
   /**
    * Unregisters the environment from its outer environment.
    */
@@ -235,7 +237,7 @@ var Environment = (function () {
     if (self.outerEnv) {
       self.outerEnv.unregisterInnerEnvironment(self);
     }
-  }
+  };
   /**
    * Function called by an inner environment when it starts up.
    *
@@ -280,7 +282,7 @@ var Environment = (function () {
       // the environment is shutting down or already shut down.
       return;
     }
-    if (self.levels["startup"][aLevel].levelState >= LEVEL_STATES.PROCESSING) {
+    if (self.levels.startup[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
       // Either the startup functions of the same level as `aLevel` have
       //        already been processed
       //    OR  they are currently being processed.
@@ -291,7 +293,7 @@ var Environment = (function () {
       // the startup process did not reach the function's level yet.
       //
       // ==> remember the function.
-      self.levels["startup"][aLevel].functions.push(f);
+      self.levels.startup[aLevel].functions.push(f);
     }
   };
 
@@ -300,7 +302,7 @@ var Environment = (function () {
    */
   Environment.prototype.addShutdownFunction = function(aLevel, f) {
     let self = this;
-    if (self.levels["shutdown"][aLevel].levelState >= LEVEL_STATES.PROCESSING) {
+    if (self.levels.shutdown[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
       // Either the shutdown functions of the same level as `aLevel` have
       //        already been processed
       //    OR  they are currently being processed.
@@ -314,7 +316,7 @@ var Environment = (function () {
       // level yet.
       //
       // ==> remember the function.
-      self.levels["shutdown"][aLevel].functions.push(f);
+      self.levels.shutdown[aLevel].functions.push(f);
     }
   };
 
@@ -369,7 +371,7 @@ var Environment = (function () {
         //console.debug("[RPC] function called! (" + fnArray.length +
         //              " functions left)");
       }
-    };
+    }
 
 
     /**
@@ -464,25 +466,25 @@ var Environment = (function () {
         functions
       } = getBootstrapMetadata(aStartupOrShutdown);
 
-      if (self.envState === envStates["beforeProcessing"]) {
+      if (self.envState === envStates.beforeProcessing) {
         // #ifdef LOG_ENVIRONMENT
         logStartupOrShutdown.call(self, aStartupOrShutdown);
         // #endif
-        functions["beforeProcessing"].call(self);
+        functions.beforeProcessing.call(self);
 
-        self.envState = envStates["duringProcessing"];
+        self.envState = envStates.duringProcessing;
       }
 
-      if (self.envState === envStates["duringProcessing"]) {
+      if (self.envState === envStates.duringProcessing) {
         processLevels.call(self, aStartupOrShutdown, aBootstrapArgs,
             aUntilLevel);
 
         if (aUntilLevel === lastLevel) {
-          self.envState = envStates["afterProcessing"];
-          functions["afterProcessing"].call(self);
+          self.envState = envStates.afterProcessing;
+          functions.afterProcessing.call(self);
         }
       }
-    };
+    }
 
     Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
       let self = this;

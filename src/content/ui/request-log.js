@@ -53,7 +53,7 @@ window.rpcontinued.requestLog = (function (self) {
 
 
   function init() {
-    self.tree = $id("rpcontinued-requestLog-tree")
+    self.tree = $id("rpcontinued-requestLog-tree");
 
     self.tree.view = self.treeView;
 

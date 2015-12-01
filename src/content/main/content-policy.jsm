@@ -124,7 +124,10 @@ var PolicyImplementation = (function() {
 
     // Actually create the final function, as it is described
     // above.
+    // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
+    /* jshint -W119 */
     self.shouldLoad = () => finalReturnValue;
+    /* jshint +W119 */
 
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
@@ -168,7 +171,10 @@ var PolicyImplementation = (function() {
     //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
   };
 
-  self.shouldProcess = (() => C.CP_OK);
+  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
+  /* jshint -W119 */
+  self.shouldProcess = () => C.CP_OK;
+  /* jshint +W119 */
 
   //----------------------------------------------------------------------------
   // nsIFactory interface implementation

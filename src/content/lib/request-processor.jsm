@@ -192,7 +192,7 @@ var RequestProcessor = (function () {
         request.requestResult);
     self._allowedRequests.removeRequest(request.originURI, request.destURI);
     notifyRequestObserversOfBlockedRequest(request);
-  }
+  };
 
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
@@ -392,8 +392,8 @@ var RequestProcessor = (function () {
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
-    Logger.dump("Looking for other origins within allowed requests from "
-            + originURI);
+    Logger.dump("Looking for other origins within allowed requests from " +
+        originURI);
     if (!checkedOrigins[originURI]) {
       // this "if" is needed for the first call of this function.
       checkedOrigins[originURI] = true;
@@ -405,8 +405,8 @@ var RequestProcessor = (function () {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
           for (var destURI in allowedRequests[destBase][destIdent]) {
-            Logger.dump("Found allowed request to <"
-                + destURI + "> from <" + originURI + ">");
+            Logger.dump("Found allowed request to <" + destURI + "> " +
+                "from <" + originURI + ">");
             reqSet.addRequest(originURI, destURI,
                               allowedRequests[destBase][destIdent][destURI]);
 
@@ -523,8 +523,8 @@ var RequestProcessor = (function () {
       if (request.aRequestOrigin.scheme == "view-source") {
         var newOriginURI = originURI.split(":").slice(1).join(":");
         Logger.info(Logger.TYPE_CONTENT,
-          "Considering view-source origin <"
-            + originURI + "> to be origin <" + newOriginURI + ">");
+            "Considering view-source origin <" + originURI + "> " +
+            "to be origin <" + newOriginURI + ">");
         originURI = newOriginURI;
         request.setOriginURI(originURI);
       }
@@ -534,13 +534,13 @@ var RequestProcessor = (function () {
         if (newDestURI.indexOf("data:text/html") == 0) {
           // "View Selection Source" has been clicked
           Logger.info(Logger.TYPE_CONTENT,
-              "Allowing \"data:text/html\" view-source destination"
-                  + " (Selection Source)");
+              "Allowing \"data:text/html\" view-source destination" +
+              " (Selection Source)");
           return CP_OK;
         } else {
           Logger.info(Logger.TYPE_CONTENT,
-              "Considering view-source destination <"
-                  + destURI + "> to be destination <" + newDestURI + ">");
+              "Considering view-source destination <" + destURI + "> " +
+              "to be destination <" + newDestURI + ">");
           destURI = newDestURI;
           request.setDestURI(destURI);
         }
@@ -585,8 +585,8 @@ var RequestProcessor = (function () {
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
       if (originURI == destURI) {
         Logger.warning(Logger.TYPE_CONTENT,
-            "Allowing (but not recording) request "
-                + "where origin is the same as the destination: " + originURI);
+            "Allowing (but not recording) request " +
+            "where origin is the same as the destination: " + originURI);
         return CP_OK;
       }
 
@@ -658,8 +658,8 @@ var RequestProcessor = (function () {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_HISTORY_REQUEST);
         return accept("History request", request, true);
-      } else if (internal.userAllowedRedirects[originURI]
-          && internal.userAllowedRedirects[originURI][destURI]) {
+      } else if (internal.userAllowedRedirects[originURI] &&
+          internal.userAllowedRedirects[originURI][destURI]) {
         // shouldLoad is called by location.href in overlay.js as of Fx
         // 3.7a5pre and SeaMonkey 2.1a.
         request.requestResult = new RequestResult(true,
@@ -674,8 +674,9 @@ var RequestProcessor = (function () {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_USER_ACTION);
           return accept(
-              "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new window/tab opened)", request);
+              "User action (e.g. address entered in address bar) " +
+              "or other good explanation (e.g. new window/tab opened)",
+              request);
         } else {
           // TODO: It seems sketchy to allow all requests from chrome. If I
           // had to put my money on a possible bug (in terms of not blocking
@@ -687,8 +688,9 @@ var RequestProcessor = (function () {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_USER_ACTION);
           return accept(
-              "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new window/tab opened)", request);
+              "User action (e.g. address entered in address bar) " +
+              "or other good explanation (e.g. new window/tab opened)",
+              request);
         }
       }
 
@@ -950,7 +952,8 @@ var RequestProcessor = (function () {
   };
 
   self.registerLinkClicked = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
@@ -1007,8 +1010,8 @@ var RequestProcessor = (function () {
    */
   self.addRequestObserver = function(observer) {
     if (!("observeBlockedRequest" in observer)) {
-      throw "Observer passed to addRequestObserver does "
-          + "not have an observeBlockedRequest() method.";
+      throw "Observer passed to addRequestObserver does " +
+          "not have an observeBlockedRequest() method.";
     }
     Logger.debug(Logger.TYPE_INTERNAL,
         "Adding request observer: " + observer.toString());

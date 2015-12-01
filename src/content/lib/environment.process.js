@@ -88,7 +88,7 @@ var ProcessEnvironment = (function() {
       let parentMM = Cc["@mozilla.org/parentprocessmessagemanager;1"]
           .getService(Ci.nsIMessageBroadcaster);
       parentMM.broadcastAsyncMessage(shutdownMessage);
-    };
+    }
 
     // Very important: The shutdown message must be sent *after*
     //     calling `removeDelayedFrameScript`, which is done in
@@ -185,7 +185,7 @@ var ProcessEnvironment = (function() {
       // `Environment` or `Cu` is not available anymore.
       //console.debug("unloading environment.jsm");
       Cu.unload("chrome://rpcontinued/content/lib/environment.jsm");
-    };
+    }
 
     childMM.addMessageListener(shutdownMessage, receiveShutdownMessage);
   }

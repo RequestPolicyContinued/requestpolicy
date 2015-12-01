@@ -75,7 +75,8 @@ window.rpcontinued.requestLog = (function (self) {
     var forbidden = true;
     try {
       var uri = DomainUtil.getUriObject(content);
-      if (uri.scheme == 'http' || uri.scheme == 'https' || uri.scheme == 'ftp') {
+      if (uri.scheme === 'http' || uri.scheme === 'https' ||
+          uri.scheme === 'ftp') {
         forbidden = false;
       }
     } catch (e) {

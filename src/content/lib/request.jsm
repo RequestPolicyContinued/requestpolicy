@@ -119,12 +119,12 @@ NormalRequest.prototype.setDestURI = function(destURI) {
 NormalRequest.prototype.detailsToString = function() {
   // Note: try not to cause side effects of toString() during load, so "<HTML
   // Element>" is hard-coded.
+  let context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
+      "<HTML Element>" : this.aContext;
   return "type: " + this.aContentType +
       ", destination: " + this.destURI +
       ", origin: " + this.originURI +
-      ", context: " + ((this.aContext) instanceof (Ci.nsIDOMHTMLElement)
-          ? "<HTML Element>"
-          : this.aContext) +
+      ", context: " + context +
       ", mime: " + this.aMimeTypeGuess +
       ", " + this.aExtra;
 };
@@ -147,15 +147,15 @@ NormalRequest.prototype.isInternal = function() {
   // "moz-nullprincipal" always shows up when using "document.location"?
 
   // Not cross-site requests.
-  if (this.aContentLocation.scheme == "resource"
-      || this.aContentLocation.scheme == "about"
-      || this.aContentLocation.scheme == "data"
-      || this.aContentLocation.scheme == "chrome"
-      || this.aContentLocation.scheme == "moz-icon"
-      || this.aContentLocation.scheme == "moz-filedata"
-      || this.aContentLocation.scheme == "blob"
-      || this.aContentLocation.scheme == "wyciwyg"
-      || this.aContentLocation.scheme == "javascript") {
+  if (this.aContentLocation.scheme === "resource" ||
+      this.aContentLocation.scheme === "about" ||
+      this.aContentLocation.scheme === "data" ||
+      this.aContentLocation.scheme === "chrome" ||
+      this.aContentLocation.scheme === "moz-icon" ||
+      this.aContentLocation.scheme === "moz-filedata" ||
+      this.aContentLocation.scheme === "blob" ||
+      this.aContentLocation.scheme === "wyciwyg" ||
+      this.aContentLocation.scheme === "javascript") {
     Logger.info(Logger.TYPE_CONTENT,
                 "Allowing request with an internal destination.");
     return true;

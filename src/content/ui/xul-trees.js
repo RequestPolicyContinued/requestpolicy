@@ -51,7 +51,7 @@ exports.toolbarbutton = [
 
 exports.mainTree = [
   {
-    parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
+    parent: {id: isSeamonkey ? "taskPopup" : "menu_ToolsPopup"},
 
     tag: "menu",
     attributes: {label: "RequestPolicy Continued",

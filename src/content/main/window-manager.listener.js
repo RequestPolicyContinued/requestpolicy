@@ -40,7 +40,7 @@ var WindowListener = (function() {
 
 
   let addEvLis = function(eventName, winID) {
-    if ((typeof listeners[winID]) !== 'undefined' &&
+    if (typeof listeners[winID] !== "undefined" &&
         listeners[winID][eventName] !== null) {
       listeners[winID].window.addEventListener(eventName,
                                                listeners[winID][eventName],
@@ -61,6 +61,18 @@ var WindowListener = (function() {
         delete listeners[winID];
       }
     }
+  };
+
+
+
+  // external functions to be called on "load" or "unload" events
+  let externalLoadFunction = null;
+  let externalUnloadFunction = null;
+  self.setLoadFunction = function(f) {
+    externalLoadFunction = f;
+  };
+  self.setUnloadFunction = function(f) {
+    externalUnloadFunction = f;
   };
 
 
@@ -117,18 +129,6 @@ var WindowListener = (function() {
     listeners = {};
     nextWinID = 0;
   }
-
-
-
-  // external functions to be called on "load" or "unload" events
-  let externalLoadFunction = null;
-  let externalUnloadFunction = null;
-  self.setLoadFunction = function(f) {
-    externalLoadFunction = f;
-  };
-  self.setUnloadFunction = function(f) {
-    externalUnloadFunction = f;
-  };
 
 
   let listening = false;

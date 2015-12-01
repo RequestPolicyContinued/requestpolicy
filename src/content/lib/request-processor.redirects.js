@@ -141,8 +141,7 @@ RequestProcessor = (function(self) {
     }
 
     // fixme: "//example.com/path" is also a valid relative URL
-    if (destURI[0] && destURI[0] == '/'
-        || destURI.indexOf(":") == -1) {
+    if (destURI[0] && destURI[0] === "/" || destURI.indexOf(":") === -1) {
       // Redirect is to a relative url.
       // ==> allow.
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
@@ -165,7 +164,7 @@ RequestProcessor = (function(self) {
 
   self.isAllowedRedirect = function(originURI, destURI) {
     var request = new Request(originURI, destURI);
-    return (true === checkRedirect(request).isAllowed);
+    return true === checkRedirect(request).isAllowed;
   };
 
 
@@ -186,9 +185,10 @@ RequestProcessor = (function(self) {
 
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-          + headerType + "' header to <" + destURI + "> " + "from <" + originURI
-          + ">. Same hosts or allowed origin/destination.");
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "** ALLOWED ** '" + headerType + "' header to <" + destURI + "> " +
+          "from <" + originURI + ">. " +
+          "Same hosts or allowed origin/destination.");
       internal.recordAllowedRequest(originURI, destURI, false,
                                     request.requestResult);
       internal.allowedRedirectsReverse[destURI] = originURI;
@@ -209,8 +209,8 @@ RequestProcessor = (function(self) {
               "from <" + realOrigin + ">");
           self.registerLinkClicked(realOrigin, destURI);
 
-        } else if (internal.submittedForms[realOrigin]
-            && internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
+        } else if (internal.submittedForms[realOrigin] &&
+            internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
           Logger.warning(Logger.TYPE_HEADER_REDIRECT,
               "This redirect was from a form submission." +
               " Registering an additional form submission to <" + destURI +
@@ -262,9 +262,12 @@ RequestProcessor = (function(self) {
             // fixme: bad smell! the same link (linkClickDest) could have
             //        been clicked from different origins!
             for (let i in internal.clickedLinksReverse[linkClickDest]) {
-              // We hope there's only one possibility of a source page (that is,
-              // ideally there will be one iteration of this loop).
-              linkClickOrigin = i;
+              if (internal.clickedLinksReverse[linkClickDest].
+                      hasOwnProperty(i)) {
+                // We hope there's only one possibility of a source page
+                // (that is,ideally there will be one iteration of this loop).
+                linkClickOrigin = i;
+              }
             }
 
             // TODO: #633 - Review the following line (recordAllowedRequest).
@@ -330,12 +333,14 @@ RequestProcessor = (function(self) {
       }
     }
 
-    showRedirectNotification(aRequest) || Logger.warning(
-        Logger.TYPE_HEADER_REDIRECT,
-        "A redirection of a top-level document has been observed, " +
-        "but it was not possible to notify the user! The redirection " +
-        "was from page <" + request.originURI + "> " +
-        "to <" + request.destURI + ">.");
+    let rv = showRedirectNotification(aRequest);
+    if (true !== rv) {
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "A redirection of a top-level document has been observed, " +
+          "but it was not possible to notify the user! The redirection " +
+          "was from page <" + aRequest.originURI + "> " +
+          "to <" + aRequest.destURI + ">.");
+    }
   }
 
   /**
@@ -353,7 +358,7 @@ RequestProcessor = (function(self) {
     const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
 
     for (let i = 0; i < ASSUME_REDIRECT_LOOP; ++i) {
-      if (false === (initialOrigin in internal.allowedRedirectsReverse)) {
+      if (!internal.allowedRedirectsReverse.hasOwnProperty(initialOrigin)) {
         // break the loop
         break;
       }
@@ -410,10 +415,11 @@ RequestProcessor = (function(self) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
         internal.faviconRequests[rawDestString] = true;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + httpResponse.redirHeaderType
-                + "' header to <" + rawDestString + "> " + "from <" + originString
-                + "> appears to be a redirected favicon request. "
-                + "This will be treated as a content request.");
+        Logger.info(Logger.TYPE_HEADER_REDIRECT,
+            "'" + httpResponse.redirHeaderType + "' header " +
+            "to <" + rawDestString + "> " + "from <" + originString + "> " +
+            "appears to be a redirected favicon request. " +
+            "This will be treated as a content request.");
       } else {
         Logger.warning(Logger.TYPE_HEADER_REDIRECT,
             "** ALLOWED ** '" + httpResponse.redirHeaderType +
@@ -426,7 +432,7 @@ RequestProcessor = (function(self) {
 
     var request = new RedirectRequest(httpResponse);
     processUrlRedirection(request);
-  };
+  }
 
 
 

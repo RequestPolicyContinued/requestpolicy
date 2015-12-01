@@ -56,7 +56,7 @@ window.rpcontinued.requestLog = (function (self) {
     elements.filterTextbox.value = "";
     elements.filterTextbox.focus();
     self.filterChanged();
-  }
+  };
 
 
 

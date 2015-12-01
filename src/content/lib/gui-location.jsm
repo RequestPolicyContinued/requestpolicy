@@ -47,7 +47,7 @@ function GUILocation(value, properties) {
 
 GUILocation.prototype.toString = function() {
   return this.value;
-}
+};
 
 /**
  * @static
@@ -95,19 +95,19 @@ GUILocation.sortByNumRequestsCompareFunction = function (a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
 GUILocation.compareFunction = function (a, b, sortType) {
-  var a_default = (a.properties.numDefaultPolicyRequests > 0);
-  var b_default = (b.properties.numDefaultPolicyRequests > 0);
+  var a_default = 0 < a.properties.numDefaultPolicyRequests;
+  var b_default = 0 < b.properties.numDefaultPolicyRequests;
 
   if (a_default !== b_default) {
     if (a_default === true) {
       // default-policy destinations first.
       return -1;
     } else {
-      return 1
+      return 1;
     }
   }
 
-  if (sortType == "sortByNumRequests") {
+  if (sortType === "sortByNumRequests") {
     if (a.properties.numRequests > b.properties.numRequests) {
       return -1;
     }
@@ -115,7 +115,6 @@ GUILocation.compareFunction = function (a, b, sortType) {
       return 1;
     }
   }
-
 
   if (a.value > b.value) {
     return 1;
@@ -138,7 +137,7 @@ GUILocation.compareFunction = function (a, b, sortType) {
 function GUIOrigin(origin, properties) {
   GUILocation.call(this, origin, properties);
 }
-GUIOrigin.prototype = new GUILocation;
+GUIOrigin.prototype = new GUILocation();
 
 /**
  * @static
@@ -158,7 +157,7 @@ GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
 function GUIDestination(dest, properties) {
   GUILocation.call(this, dest, properties);
 }
-GUIDestination.prototype = new GUILocation;
+GUIDestination.prototype = new GUILocation();
 
 /**
  * @static
@@ -193,24 +192,27 @@ GUILocationProperties.prototype.reset = function() {
   *        Otherwise the ruleAction will be checked for every single request.
   */
 GUILocationProperties.prototype.accumulate = function (requests, ruleAction) {
-  var extractRuleActions = (undefined === ruleAction);
+  var extractRuleActions = undefined === ruleAction;
   var ruleActionCounter = 0;
 
-  for (var destIdent in requests) {
-    for (var destUri in requests[destIdent]) {
-      for (var i in requests[destIdent][destUri]) {
+  for (let destIdent in requests) {
+    let destIdentRequests = requests[destIdent];
+    for (let destUri in destIdentRequests) {
+      let destUriRequests = destIdentRequests[destUri];
+      for (let i in destUriRequests) {
+        let request = destUriRequests[i];
         ++this.numRequests;
 
         // depending on ruleAction:
         if (!extractRuleActions) {
           ++ruleActionCounter;
-        } else if (requests[destIdent][destUri][i].isAllowed) {
+        } else if (request.isAllowed) {
           ++this.numAllowedRequests;
         } else {
           ++this.numBlockedRequests;
         }
 
-        if ( requests[destIdent][destUri][i].isDefaultPolicyUsed() ) {
+        if (request.isDefaultPolicyUsed()) {
           ++this.numDefaultPolicyRequests;
         }
       }
@@ -250,8 +252,7 @@ GUILocationProperties.merge = function (prop1, prop2) {
   var requestCountProperties = GUILocationProperties.requestCountProperties;
   var newObj = new GUILocationProperties();
 
-  for (var i in requestCountProperties) {
-    var propertyName = requestCountProperties[i];
+  for (let propertyName of requestCountProperties) {
     newObj[propertyName] += prop1[propertyName] + prop2[propertyName];
   }
 

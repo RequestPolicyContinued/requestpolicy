@@ -122,7 +122,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                    "The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
-    aMessageName = aMessageName.substr(C.MM_PREFIX.length)
+    aMessageName = aMessageName.substr(C.MM_PREFIX.length);
   }
 
   let listener = {

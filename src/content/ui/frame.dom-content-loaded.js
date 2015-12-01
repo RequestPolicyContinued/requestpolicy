@@ -75,7 +75,7 @@ var ManagerForDOMContentLoaded = (function() {
     //    <--- the above comment is very old – is it (still) true that
     //         onDOMContentLoaded is called multiple times?
     var doc = event.originalTarget;
-    if (doc.nodeName != "#document") {
+    if (doc.nodeName !== "#document") {
       // only documents
       return;
     }
@@ -101,7 +101,8 @@ var ManagerForDOMContentLoaded = (function() {
         // Indicating blocked visible objects isn't an urgent task, so this should
         // be done async.
         Utils.runAsync(function() {
-          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
+          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc,
+              blockedURIs);
         });
       }
 
@@ -166,7 +167,7 @@ var ManagerForDOMContentLoaded = (function() {
     var metaTags = doc.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
       let metaTag = metaTags[i];
-      if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() != "refresh") {
+      if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() !== "refresh") {
         continue;
       }
 

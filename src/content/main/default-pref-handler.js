@@ -55,8 +55,9 @@ let prefInitFunctions = {
         return branch.getBoolPref(prefName);
 
       case 0:
-      default:
         // PREF_INVALID
+        /* falls through */
+      default:
         return undefined;
     }
   },

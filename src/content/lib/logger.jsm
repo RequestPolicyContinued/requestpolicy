@@ -84,6 +84,20 @@ var Logger = (function() {
 
   let initialized = false;
 
+  /**
+   * This function will be called in case Logger isn't fully initialized yet.
+   */
+  function initialLog() {
+    init();
+    log.apply(this, arguments);
+  }
+
+  /**
+  * Initially call initialLog() on doLog().
+  * After initialization it will be log().
+  */
+  let doLog = initialLog;
+
   // initially, enable logging. later the logging preferences of the user will
   // will be loaded.
   let enabled = true;
@@ -92,7 +106,7 @@ var Logger = (function() {
   let level = self.LEVEL_INFO;
   let types = self.TYPE_ALL;
 
-  function updateLoggingSettings(rp) {
+  function updateLoggingSettings() {
     enabled = rpPrefBranch.getBoolPref("log");
     level = rpPrefBranch.getIntPref("log.level");
     types = rpPrefBranch.getIntPref("log.types");
@@ -130,16 +144,10 @@ var Logger = (function() {
 
 
 
-  /**
-   * This function will be called in case Logger isn't fully initialized yet.
-   */
-  let initialLog = function() {
-    init();
-    log.apply(this, arguments);
-  };
 
-  let log = function(aLevel, aType, aMessage, aError) {
-    let shouldLog = (enabled && aLevel >= level && types & aType);
+
+  function log(aLevel, aType, aMessage, aError) {
+    let shouldLog = enabled && aLevel >= level && types & aType;
 
     // #ifdef UNIT_TESTING
     if (aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE) {
@@ -157,18 +165,12 @@ var Logger = (function() {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
       let typeName = self._TYPE_NAMES[aType.toString()];
 
-      let stack = (aError && aError.stack) ?
+      let stack = aError && aError.stack ?
                   ", stack was:\n" + aError.stack : "";
-      self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
-          + aMessage + stack + "\n");
+      self.printFunc("[RequestPolicy] [" + levelName + "] " +
+          "[" + typeName + "] " + aMessage + stack + "\n");
     }
-  };
-
-  /**
-   * Initially call initialLog() on doLog().
-   * After initialization it will be log().
-   */
-  let doLog = initialLog;
+  }
 
 
 
@@ -185,19 +187,23 @@ var Logger = (function() {
     } else {
       self.dump(obj);
     }
-    for (var i in obj) {
+    // Iterate through all keys in the whole prototype chain.
+    /* jshint -W089 */ // don't require checking hasOwnProperty()
+    for (let key in obj) {
+      let value = obj[key];
       try {
-        if (typeof obj[i] == 'function') {
+        if (typeof value === "function") {
           if (!ignoreFunctions) {
-            self.dump("    => key: " + i + " / value: instanceof Function");
+            self.dump("    => key: " + key + " / value: instanceof Function");
           }
         } else {
-          self.dump("    => key: " + i + " / value: " + obj[i]);
+          self.dump("    => key: " + key + " / value: " + value);
         }
       } catch (e) {
-        self.dump("    => key: " + i + " / value: [unable to access value]");
+        self.dump("    => key: " + key + " / value: [unable to access value]");
       }
     }
+    /* jshint +W089 */
   };
 
   return self;
@@ -239,7 +245,7 @@ var UnitTestObserver = (function () {
   function splitColon(aString) {
     var index = aString.indexOf(":");
     if (index === -1) {
-      return [aString, ""]
+      return [aString, ""];
     }
     var part1 = aString.substr(0, index);
     var part2 = aString.substr(index + 1);
@@ -270,7 +276,7 @@ var UnitTestObserver = (function () {
   };
 
   function produceReferenceError() {
-    var localVar = nonexistantVariable;
+    var localVar = nonexistantVariable; // jshint ignore:line
   }
 
   function runAsync(aFunction) {

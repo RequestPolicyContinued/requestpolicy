@@ -106,11 +106,12 @@ RequestSet.prototype = {
           }
           for (var destUri in dests[destBase][destIdent]) {
             if (!result[destBase][destIdent][destUri]) {
-              result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];
+              result[destBase][destIdent][destUri] =
+                  dests[destBase][destIdent][destUri];
             } else {
               result[destBase][destIdent][destUri] =
-                    result[destBase][destIdent][destUri]
-                    .concat(dests[destBase][destIdent][destUri]);
+                  result[destBase][destIdent][destUri].
+                      concat(dests[destBase][destIdent][destUri]);
             }
           }
         }
@@ -129,11 +130,9 @@ RequestSet.prototype = {
   addRequest : function(originUri, destUri, requestResult) {
     if (requestResult == undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
-          "addRequest() was called without a requestResult object!"
-          +" Creating a new one.\n"
-          +"\torigin: <"+originUri+">\n"
-          +"\tdestination: <"+destUri+">"
-      );
+          "addRequest() was called without a requestResult object!" +
+          " Creating a new one. -- " +
+          "origin: <" + originUri + ">, destination: <" + destUri + ">");
       requestResult = new RequestResult();
     }
 
@@ -225,7 +224,7 @@ RequestSet.prototype = {
   },
 
   containsBlockedRequests : function() {
-    var origins = this._origins
+    var origins = this._origins;
     for (var originURI in origins) {
       for (var destBase in origins[originURI]) {
         for (var destIdent in origins[originURI][destBase]) {

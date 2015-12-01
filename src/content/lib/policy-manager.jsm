@@ -48,11 +48,7 @@ const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 //==============================================================================
 
 function dprint(msg) {
-  if (typeof print == "function") {
-    print(msg);
-  } else {
-    Logger.info(Logger.TYPE_POLICY, msg);
-  }
+  Logger.info(Logger.TYPE_POLICY, msg);
 }
 
 function warn(msg) {
@@ -87,8 +83,8 @@ var PolicyManager = (function () {
   //self._rulesets = null;
 
   self.getUserRuleCount = function() {
-    return userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
-        userRulesets["user"]["rawRuleset"].getDenyRuleCount();
+    let rawRuleset = userRulesets.user.rawRuleset;
+    return rawRuleset.getAllowRuleCount() + rawRuleset.getDenyRuleCount();
   };
 
   self.loadUserRules = function() {
@@ -104,12 +100,12 @@ var PolicyManager = (function () {
       // we'll assume this is a new install.
       rawRuleset = new RawRuleset();
     }
-    userRulesets["user"] = {
+    userRulesets.user = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("user")
     };
-    userRulesets["user"]["ruleset"].userRuleset = true;
-    //userRulesets["user"].ruleset.print();
+    userRulesets.user.ruleset.userRuleset = true;
+    //userRulesets.user.ruleset.print();
     // Temporary rules. These are never stored.
     self.revokeTemporaryRules();
 
@@ -144,7 +140,7 @@ var PolicyManager = (function () {
           "rawRuleset" : rawRuleset,
           "ruleset" : rawRuleset.toRuleset(subName)
         };
-        list[subName]["ruleset"].userRuleset = false;
+        list[subName].ruleset.userRuleset = false;
         //list[subName].ruleset.print();
       }
     }
@@ -204,14 +200,14 @@ var PolicyManager = (function () {
   };
 
   self.addRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::addRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["user"].ruleset.print();
+    dprint("PolicyManager::addRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.user.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets["user"].ruleset);
+    userRulesets.user.rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets.user.ruleset);
 
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawRuleset.addRule()| to indicate whether a rule
@@ -220,10 +216,10 @@ var PolicyManager = (function () {
     // become annoying when there is a large file to write.
     if (!noStore) {
         RulesetStorage.saveRawRulesetToFile(
-            userRulesets["user"].rawRuleset, "user.json");
+            userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets["user"].ruleset.print();
+    //userRulesets.user.ruleset.print();
 
     notifyRulesChanged();
   };
@@ -239,37 +235,37 @@ var PolicyManager = (function () {
 
   self.storeRules = function() {
     RulesetStorage.saveRawRulesetToFile(
-        userRulesets["user"].rawRuleset, "user.json");
+        userRulesets.user.rawRuleset, "user.json");
   };
 
   self.addTemporaryRule = function(ruleAction, ruleData) {
-    dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["temp"].ruleset.print();
+    dprint("PolicyManager::addTemporaryRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets["temp"].ruleset);
+    userRulesets.temp.rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets.temp.ruleset);
 
-    //userRulesets["temp"].ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
 
   self.removeRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::removeRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["user"].ruleset.print();
-    //userRulesets["temp"].ruleset.print();
+    dprint("PolicyManager::removeRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.user.ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets["user"].ruleset);
-    userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets["temp"].ruleset);
+    userRulesets.user.rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets.user.ruleset);
+    userRulesets.temp.rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets.temp.ruleset);
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawRuleset.removeRule()| to indicate whether a rule
@@ -278,27 +274,27 @@ var PolicyManager = (function () {
     // become annoying when there is a large file to write.
     if (!noStore) {
         RulesetStorage.saveRawRulesetToFile(
-            userRulesets["user"].rawRuleset, "user.json");
+            userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets["user"].ruleset.print();
-    //userRulesets["temp"].ruleset.print();
+    //userRulesets.user.ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
 
   self.temporaryRulesExist = function() {
-    return userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
-           userRulesets["temp"].rawRuleset.getDenyRuleCount();
+    return userRulesets.temp.rawRuleset.getAllowRuleCount() ||
+           userRulesets.temp.rawRuleset.getDenyRuleCount();
   };
 
   self.revokeTemporaryRules = function() {
     var rawRuleset = new RawRuleset();
-    userRulesets["temp"] = {
+    userRulesets.temp = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("temp")
     };
-    userRulesets["temp"]["ruleset"].userRuleset = true;
+    userRulesets.temp.ruleset.userRuleset = true;
 
     notifyRulesChanged();
   };
@@ -343,7 +339,7 @@ var PolicyManager = (function () {
       }
     }
     return result;
-  };
+  }
 
   return self;
 }());

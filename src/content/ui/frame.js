@@ -106,7 +106,7 @@
     // Link clicked.
     // I believe an empty href always gets filled in with the current URL so
     // it will never actually be empty. However, I don't know this for certain.
-    if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
+    if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                         {origin: event.target.ownerDocument.URL,
@@ -117,8 +117,8 @@
     // Form submit button clicked. This can either be directly (e.g. mouseclick,
     // enter/space while the the submit button has focus) or indirectly (e.g.
     // pressing enter when a text input has focus).
-    if (event.target.nodeName.toLowerCase() == "input" &&
-        event.target.type.toLowerCase() == "submit" &&
+    if (event.target.nodeName.toLowerCase() === "input" &&
+        event.target.type.toLowerCase() === "submit" &&
         event.target.form && event.target.form.action) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
@@ -127,7 +127,7 @@
       });
       return;
     }
-  };
+  }
 
   framescriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
     framescriptEnv.elManager.addListener(mm, "click", mouseClicked, true);

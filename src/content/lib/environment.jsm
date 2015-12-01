@@ -389,7 +389,11 @@ var Environment = (function () {
         let f = aFunctions.pop();
 
         // call the function
-        f.apply(null, aBootstrapArgs);
+        try {
+          f.apply(null, aBootstrapArgs);
+        } catch (e) {
+          Cu.reportError(e);
+        }
         // #ifdef LOG_ENVIRONMENT
         log.debug(`function called! (${aFunctions.length} functions left)`);
         // #endif

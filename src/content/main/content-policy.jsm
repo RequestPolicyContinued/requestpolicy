@@ -80,9 +80,13 @@ var PolicyImplementation = (function() {
       function () {
         try {
           register();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(register);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(register);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
 

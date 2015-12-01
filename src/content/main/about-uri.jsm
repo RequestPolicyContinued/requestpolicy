@@ -108,9 +108,13 @@ var AboutRequestPolicy = (function() {
       function () {
         try {
           registerFactory();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(registerFactory);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(registerFactory);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
 

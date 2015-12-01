@@ -553,7 +553,11 @@ var RequestProcessor = (function () {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
         if (domNode && domNode.nodeType === Ci.nsIDOMNode.DOCUMENT_NODE) {
           let newOriginURI;
           if (request.aContext.documentURI &&
@@ -599,7 +603,11 @@ var RequestProcessor = (function () {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
 
         if (domNode && domNode.nodeName === "LINK" &&
             (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
@@ -707,7 +715,11 @@ var RequestProcessor = (function () {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result === Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
 
         if (domNode && domNode.nodeName === "xul:browser" &&
             domNode.currentURI && domNode.currentURI.spec === "about:blank") {

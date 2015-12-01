@@ -61,7 +61,10 @@ HttpResponse.prototype.removeResponseHeader = function() {
 HttpResponse.prototype._getResponseHeader = function (aHeaderName) {
   try {
     return this.httpChannel.getResponseHeader(aHeaderName);
-  } catch (e if e.result === Cr.NS_ERROR_NOT_AVAILABLE) {
+  } catch (e) {
+    if (e.result !== Cr.NS_ERROR_NOT_AVAILABLE) {
+      Cu.reportError(e);
+    }
     // The header is not set in the response.
     return undefined;
   }

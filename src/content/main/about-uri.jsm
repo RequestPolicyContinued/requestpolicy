@@ -117,7 +117,6 @@ var AboutRequestPolicy = (function() {
   function unregisterFactory() {
     let registrar = Components.manager
         .QueryInterface(Ci.nsIComponentRegistrar);
-    let {Utils} = importModule("lib/utils");
 
     // This needs to run asynchronously, see Mozilla bug 753687
     Utils.runAsync(function() {

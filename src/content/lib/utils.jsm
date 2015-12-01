@@ -67,7 +67,6 @@ var Utils = (function() {
   XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
       "@mozilla.org/thread-manager;1", "nsIThreadManager");
 
-
   /**
    * Calls a function multiple times until it succeeds. The
    * function must return TRUE on success.
@@ -115,7 +114,6 @@ var Utils = (function() {
     return undefined;
   };
 
-
   /**
    * Return a module's `internal` object, which is a singleton.
    * The `internal` can be accessed from all submodules of that module.
@@ -141,7 +139,6 @@ var Utils = (function() {
                                           sealInternal);
     return aModuleScope.internal;
   };
-
 
   /**
    * Wrap a function. Allow 'before' and 'after' functions.

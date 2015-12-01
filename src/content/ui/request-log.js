@@ -25,7 +25,7 @@
 
 window.rpcontinued = window.rpcontinued || {};
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
   /* global Components */
   const {utils: Cu} = Components;
 
@@ -45,12 +45,9 @@ window.rpcontinued.requestLog = (function (self) {
 
   let $id = window.document.getElementById.bind(window.document);
 
-
   self.isEmptyMessageDisplayed = true;
   self.rows = [];
   self.visibleRows = [];
-
-
 
   function init() {
     self.tree = $id("rpcontinued-requestLog-tree");
@@ -71,8 +68,6 @@ window.rpcontinued.requestLog = (function (self) {
 
   // call init() on the window's "load" event
   WinEnv.elManager.addListener(window, "load", init, false);
-
-
 
   return self;
 }(window.rpcontinued.requestLog || {}));

@@ -52,7 +52,7 @@ GUILocation.prototype.toString = function() {
 /**
  * @static
  */
-GUILocation.merge = function (guiLocation, location1, location2) {
+GUILocation.merge = function(guiLocation, location1, location2) {
   return new guiLocation(
     location1.value,  // we assume: location1.value == location2.value
     GUILocationProperties.merge(location1.properties, location2.properties));
@@ -61,7 +61,7 @@ GUILocation.merge = function (guiLocation, location1, location2) {
 /**
  * @static
  */
-GUILocation.existsInArray = function (locationString, locations) {
+GUILocation.existsInArray = function(locationString, locations) {
   return GUILocation.indexOfLocationInArray(locationString, locations) !== -1;
 };
 
@@ -74,7 +74,7 @@ GUILocation.existsInArray = function (locationString, locations) {
  * @return {int} The index of the first GUILocation object which contains the
  *          specified locationString. If it doesn't exist, it returns -1.
  */
-GUILocation.indexOfLocationInArray = function (locationString, locations) {
+GUILocation.indexOfLocationInArray = function(locationString, locations) {
   if (locationString instanceof GUILocation) {
     locationString = locationString.value;
   }
@@ -91,10 +91,10 @@ GUILocation.indexOfLocationInArray = function (locationString, locations) {
  *
  * @static
  */
-GUILocation.sortByNumRequestsCompareFunction = function (a, b) {
+GUILocation.sortByNumRequestsCompareFunction = function(a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
-GUILocation.compareFunction = function (a, b, sortType) {
+GUILocation.compareFunction = function(a, b, sortType) {
   var a_default = 0 < a.properties.numDefaultPolicyRequests;
   var b_default = 0 < b.properties.numDefaultPolicyRequests;
 
@@ -191,7 +191,7 @@ GUILocationProperties.prototype.reset = function() {
   *        with the specified rule action without being checked.
   *        Otherwise the ruleAction will be checked for every single request.
   */
-GUILocationProperties.prototype.accumulate = function (requests, ruleAction) {
+GUILocationProperties.prototype.accumulate = function(requests, ruleAction) {
   var extractRuleActions = undefined === ruleAction;
   var ruleActionCounter = 0;
 
@@ -248,7 +248,7 @@ GUILocationProperties.requestCountProperties = [
  *
  * Merge the given GUILocationProperties object to a new object
  */
-GUILocationProperties.merge = function (prop1, prop2) {
+GUILocationProperties.merge = function(prop1, prop2) {
   var requestCountProperties = GUILocationProperties.requestCountProperties;
   var newObj = new GUILocationProperties();
 

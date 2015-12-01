@@ -1,6 +1,6 @@
 /* global window, document, $, common, WinEnv, elManager */
 
-(function () {
+(function() {
   /* global Components */
   const {utils: Cu} = Components;
 
@@ -17,24 +17,24 @@
   //============================================================================
 
   var PAGE_STRINGS = [
-    'yourPolicy',
-    'defaultPolicy',
-    'subscriptions',
-    'subscriptionPolicies',
-    'subscriptionPoliciesDefinition',
-    'learnMoreAboutSubscriptions',
-    'usability',
-    'privacy',
-    'browser',
-    'subscriptionDenyTrackersDescription',
-    'subscriptionAllowSameOrgDescription',
-    'subscriptionAllowFunctionalityDescription',
-    'subscriptionAllowEmbeddedDescription',
-    'subscriptionAllowMozillaDescription',
-    'subscriptionAllowExtensionsDescription'
+    "yourPolicy",
+    "defaultPolicy",
+    "subscriptions",
+    "subscriptionPolicies",
+    "subscriptionPoliciesDefinition",
+    "learnMoreAboutSubscriptions",
+    "usability",
+    "privacy",
+    "browser",
+    "subscriptionDenyTrackersDescription",
+    "subscriptionAllowSameOrgDescription",
+    "subscriptionAllowFunctionalityDescription",
+    "subscriptionAllowEmbeddedDescription",
+    "subscriptionAllowMozillaDescription",
+    "subscriptionAllowExtensionsDescription"
   ];
 
-  $(function () {
+  $(function() {
     common.localize(PAGE_STRINGS);
   });
 
@@ -43,7 +43,7 @@
    *                 "allow" or "deny"
    */
   function getDefaultPolicyElements(policy) {
-    var selector = '[data-defaultpolicy=' + policy + ']';
+    var selector = "[data-defaultpolicy=" + policy + "]";
     var matches = document.body.querySelectorAll(selector);
     var elements = Array.prototype.slice.call(matches);
     return elements;
@@ -57,13 +57,13 @@
       if (display) {
         elements[i].removeAttribute("style");
       } else {
-        elements[i].style.display = 'none';
+        elements[i].style.display = "none";
       }
     }
   }
 
   function getInputElement(subName) {
-    var elements = document.body.querySelectorAll('input[name=' + subName + ']');
+    var elements = document.body.querySelectorAll("input[name=" + subName + "]");
     if (elements.length <= 0) {
       return null;
     }
@@ -94,17 +94,15 @@
 
     var currentPolicy, otherPolicy;
     if (Prefs.isDefaultAllow()) {
-      currentPolicy = 'allow';
-      otherPolicy = 'deny';
+      currentPolicy = "allow";
+      otherPolicy = "deny";
     } else {
-      currentPolicy = 'deny';
-      otherPolicy = 'allow';
+      currentPolicy = "deny";
+      otherPolicy = "allow";
     }
     displayDefaultPolicyElements(currentPolicy, true);
     displayDefaultPolicyElements(otherPolicy, false);
   }
-
-
 
   function handleSubscriptionCheckboxChange(event) {
     var userSubs = rpService.getSubscriptions();
@@ -115,42 +113,42 @@
     subInfo.official = {};
     subInfo.official[subName] = true;
     if (enabled) {
-      userSubs.addSubscription('official', subName);
+      userSubs.addSubscription("official", subName);
       Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
             JSON.stringify(subInfo));
     } else {
-      userSubs.removeSubscription('official', subName);
+      userSubs.removeSubscription("official", subName);
       Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
             JSON.stringify(subInfo));
     }
   }
 
-  window.onload = function () {
+  window.onload = function() {
     updateDisplay();
 
     var available = {
-      'allow_embedded' : {},
-      'allow_extensions' : {},
-      'allow_functionality' : {},
-      'allow_mozilla' : {},
-      'allow_sameorg' : {},
-      'deny_trackers' : {}
+      "allow_embedded": {},
+      "allow_extensions": {},
+      "allow_functionality": {},
+      "allow_mozilla": {},
+      "allow_sameorg": {},
+      "deny_trackers": {}
     };
     for (var subName in available) {
       var el = getInputElement(subName);
       if (!el) {
-        Logger.dump('Skipping unexpected official subName: ' + subName);
+        Logger.dump("Skipping unexpected official subName: " + subName);
         continue;
       }
-      elManager.addListener(el, 'change', handleSubscriptionCheckboxChange);
+      elManager.addListener(el, "change", handleSubscriptionCheckboxChange);
     }
 
-    var selector = '[data-defaultpolicy=' +
-      (Prefs.isDefaultAllow() ? 'deny' : 'allow') + ']';
+    var selector = "[data-defaultpolicy=" +
+      (Prefs.isDefaultAllow() ? "deny" : "allow") + "]";
     var matches = document.body.querySelectorAll(selector);
     var hideElements = Array.prototype.slice.call(matches);
     for (var i = 0; i < hideElements.length; i++) {
-      hideElements[i].style.display = 'none';
+      hideElements[i].style.display = "none";
     }
 
     // call updateDisplay() every time a subscription is added or removed

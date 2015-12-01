@@ -25,25 +25,22 @@
 
 window.rpcontinued = window.rpcontinued || {};
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
 
   //============================================================================
 
   self.treebox = null;
 
   self.columnNameToIndexMap = {
-    "rpcontinued-requestLog-origin" : 0,
-    "rpcontinued-requestLog-destination" : 1,
-    "rpcontinued-requestLog-blocked" : 2,
-    "rpcontinued-requestLog-time" : 3
+    "rpcontinued-requestLog-origin": 0,
+    "rpcontinued-requestLog-destination": 1,
+    "rpcontinued-requestLog-blocked": 2,
+    "rpcontinued-requestLog-time": 3
   };
-
 
   function getVisibleRowAtIndex(index) {
     return self.visibleRows[self.visibleRows.length - index - 1];
   }
-
-
 
   //
   // the interface.

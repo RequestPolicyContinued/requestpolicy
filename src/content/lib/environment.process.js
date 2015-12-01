@@ -50,8 +50,11 @@ var ProcessEnvironment = (function() {
     return xulRuntime.processType === xulRuntime.PROCESS_TYPE_DEFAULT;
   }());
 
-
   const shutdownMessage = C.MM_PREFIX + "shutdown";
+
+  //----------------------------------------------------------------------------
+  // ProcessEnvironmentBase
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -71,8 +74,9 @@ var ProcessEnvironment = (function() {
   ProcessEnvironmentBase.prototype = Object.create(Environment.prototype);
   ProcessEnvironmentBase.prototype.constructor = Environment;
 
-
-
+  //----------------------------------------------------------------------------
+  // ParentProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -82,7 +86,6 @@ var ProcessEnvironment = (function() {
   function ParentProcessEnvironment(aName="Parent Process Environment") {
     let self = this;
     ProcessEnvironmentBase.call(self, aName);
-
 
     function sendShutdownMessageToChildren() {
       let parentMM = Cc["@mozilla.org/parentprocessmessagemanager;1"]
@@ -99,8 +102,6 @@ var ProcessEnvironment = (function() {
   ParentProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
-
-
   /**
    * @override
    */
@@ -113,7 +114,6 @@ var ProcessEnvironment = (function() {
     // However, the main modules register their startup and
     // shutdown functions anyway.
     let dummyScope = {};
-
 
     /**
      * The following section is not optimal – read on…
@@ -142,7 +142,6 @@ var ProcessEnvironment = (function() {
     ProcessEnvironmentBase.prototype.startup.apply(self, arguments);
   };
 
-
   /**
    * @override
    */
@@ -155,8 +154,9 @@ var ProcessEnvironment = (function() {
     Cu.unload("chrome://rpcontinued/content/lib/script-loader.jsm");
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ChildProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -192,7 +192,6 @@ var ProcessEnvironment = (function() {
   ChildProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
   ChildProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
-
   /**
    * @override
    */
@@ -220,8 +219,9 @@ var ProcessEnvironment = (function() {
                                                                     arguments);
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ProcessEnvironment
+  //----------------------------------------------------------------------------
 
   if (isMainProcess === true) {
     return new ParentProcessEnvironment();

@@ -67,7 +67,7 @@ function notifyRulesChanged() {
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-var PolicyManager = (function () {
+var PolicyManager = (function() {
   let self = {};
 
   let userRulesets = {};
@@ -101,8 +101,8 @@ var PolicyManager = (function () {
       rawRuleset = new RawRuleset();
     }
     userRulesets.user = {
-      "rawRuleset" : rawRuleset,
-      "ruleset" : rawRuleset.toRuleset("user")
+      "rawRuleset": rawRuleset,
+      "ruleset": rawRuleset.toRuleset("user")
     };
     userRulesets.user.ruleset.userRuleset = true;
     //userRulesets.user.ruleset.print();
@@ -121,7 +121,7 @@ var PolicyManager = (function () {
       for (let subName in subscriptionInfo[listName]) {
         try {
           dprint("PolicyManager::loadSubscriptionRules: " +
-                 listName + ' / ' + subName);
+                 listName + " / " + subName);
           rawRuleset = RulesetStorage
               .loadRawRulesetFromFile(subName + ".json", listName);
         } catch (e) {
@@ -137,8 +137,8 @@ var PolicyManager = (function () {
         }
         let list = subscriptionRulesets[listName];
         list[subName] = {
-          "rawRuleset" : rawRuleset,
-          "ruleset" : rawRuleset.toRuleset(subName)
+          "rawRuleset": rawRuleset,
+          "ruleset": rawRuleset.toRuleset(subName)
         };
         list[subName].ruleset.userRuleset = false;
         //list[subName].ruleset.print();
@@ -156,7 +156,7 @@ var PolicyManager = (function () {
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
         dprint("PolicyManager::unloadSubscriptionRules: " +
-                 listName + ' / ' + subName);
+                 listName + " / " + subName);
         if (!subscriptionRulesets[listName] ||
             !subscriptionRulesets[listName][subName]) {
           if (!failures[listName]) {
@@ -216,8 +216,8 @@ var PolicyManager = (function () {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        RulesetStorage.saveRawRulesetToFile(
-            userRulesets.user.rawRuleset, "user.json");
+      RulesetStorage.saveRawRulesetToFile(
+          userRulesets.user.rawRuleset, "user.json");
     }
 
     //userRulesets.user.ruleset.print();
@@ -225,7 +225,7 @@ var PolicyManager = (function () {
     notifyRulesChanged();
   };
 
-  self.addRules = function (aRuleAction, aRuleDataList, aNoStore=false) {
+  self.addRules = function(aRuleAction, aRuleDataList, aNoStore=false) {
     for (let ruleData of aRuleDataList) {
       PolicyManager.addRule(aRuleAction, ruleData, true);
     }
@@ -274,8 +274,8 @@ var PolicyManager = (function () {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-        RulesetStorage.saveRawRulesetToFile(
-            userRulesets.user.rawRuleset, "user.json");
+      RulesetStorage.saveRawRulesetToFile(
+          userRulesets.user.rawRuleset, "user.json");
     }
 
     //userRulesets.user.ruleset.print();
@@ -292,8 +292,8 @@ var PolicyManager = (function () {
   self.revokeTemporaryRules = function() {
     var rawRuleset = new RawRuleset();
     userRulesets.temp = {
-      "rawRuleset" : rawRuleset,
-      "ruleset" : rawRuleset.toRuleset("temp")
+      "rawRuleset": rawRuleset,
+      "ruleset": rawRuleset.toRuleset("temp")
     };
     userRulesets.temp.ruleset.userRuleset = true;
 
@@ -345,8 +345,7 @@ var PolicyManager = (function () {
   return self;
 }());
 
-
-PolicyManager = (function () {
+PolicyManager = (function() {
   let scope = {PolicyManager};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js",

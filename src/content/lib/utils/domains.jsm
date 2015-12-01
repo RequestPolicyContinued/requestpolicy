@@ -209,7 +209,6 @@ DomainUtil.getBaseDomain = function(uri) {
   }
 };
 
-
 /**
  * Determine whether a hostname is an IP address.
  *
@@ -273,13 +272,13 @@ DomainUtil.parseRefresh = function(refreshString) {
   }
   var url = parts[3];
   if (url === undefined) {
-    url = '';
+    url = "";
   }
   // Strip off enclosing quotes around the url.
   if (url) {
     var first = url[0];
     var last = url[url.length - 1];
-    if (first === last && (first === "'" || first === '"')) {
+    if (first === last && (first === "'" || first === "\"")) {
       url = url.substring(1, url.length - 1);
     }
   }

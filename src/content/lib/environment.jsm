@@ -69,7 +69,7 @@ let log = {
 // Environment
 //==============================================================================
 
-var Environment = (function () {
+var Environment = (function() {
 
   //----------------------------------------------------------------------------
   // constants, metadata
@@ -221,7 +221,6 @@ var Environment = (function () {
   Environment.LEVELS = LEVELS;
   Environment.ENV_STATES = ENV_STATES;
 
-
   /**
    * This function creates one "Level Object" for each level. Those objects
    * mainly will hold the startup- or shutdown-functions of the corresponding
@@ -236,7 +235,6 @@ var Environment = (function () {
     }
     return obj;
   }
-
 
   /**
    * Registers the environment to its outer environment.
@@ -289,9 +287,6 @@ var Environment = (function () {
     }
   };
 
-
-
-
   /**
    * Add a startup function to the environment.
    */
@@ -342,7 +337,6 @@ var Environment = (function () {
     }
   };
 
-
   // have a scope/closure for private functions specific to
   // startup() and shutdown().
   (function createMethods_StartupAndShutdown(Environment) {
@@ -374,7 +368,6 @@ var Environment = (function () {
       }
     }
 
-
     /**
      * This function calls all functions in an array.
      *
@@ -399,7 +392,6 @@ var Environment = (function () {
         // #endif
       }
     }
-
 
     /**
      * Process a level independently of the environment's states and
@@ -437,7 +429,6 @@ var Environment = (function () {
       }
     }
 
-
     /**
      * Iterate levels and call processLevel() for each level.
      *
@@ -448,11 +439,10 @@ var Environment = (function () {
      */
     function processLevels(aStartupOrShutdown, aBootstrapArgs, aUntilLevel) {
       let self = this;
-      iterateLevels(aStartupOrShutdown, function (level) {
+      iterateLevels(aStartupOrShutdown, function(level) {
         processLevel.call(self, aStartupOrShutdown, level, aBootstrapArgs);
       }, aUntilLevel);
     }
-
 
     /**
      * Return some information about an environment.
@@ -564,7 +554,7 @@ var Environment = (function () {
 // ProcessEnvironment
 //==============================================================================
 
-var ProcessEnvironment = (function () {
+var ProcessEnvironment = (function() {
   let scope = {Environment};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/environment.process.js", scope);
@@ -575,7 +565,7 @@ var ProcessEnvironment = (function () {
 // FrameScriptEnvironment
 //==============================================================================
 
-var FrameScriptEnvironment = (function () {
+var FrameScriptEnvironment = (function() {
   /**
    * @constructor
    * @extends {Environment}

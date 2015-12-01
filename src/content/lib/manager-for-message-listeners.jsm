@@ -65,9 +65,9 @@ function ManagerForMessageListeners(aEnv, aMM) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          Logger.dump('From now on new message listeners will be ' +
-                      'added immediately. Environment: "' +
-                      self.environment.name + '"');
+          Logger.dump("From now on new message listeners will be " +
+                      "added immediately. Environment: \"" +
+                      self.environment.name + "\"");
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -96,7 +96,6 @@ function ManagerForMessageListeners(aEnv, aMM) {
   }
 }
 
-
 /**
  * Add a listener. The class will then take care about adding
  * and removing that message listener.
@@ -111,10 +110,10 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                                                             aCallback,
                                                             aAddImmediately) {
   let self = this;
-  if (typeof aCallback !== 'function') {
+  if (typeof aCallback !== "function") {
     Logger.warning(Logger.TYPE_ERROR, "The callback for a message listener" +
-                   'must be a function! The message name was "' + aMessageName +
-                   '"');
+                   "must be a function! The message name was \"" + aMessageName +
+                   "\"");
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
@@ -132,16 +131,14 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     listening: false
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
-    Logger.dump('Immediately adding message listener for "' +
-                listener.messageName + '". Environment: "' +
-                self.environment.name + '"');
+    Logger.dump("Immediately adding message listener for \"" +
+                listener.messageName + "\". Environment: \"" +
+                self.environment.name + "\"");
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
   }
   self.listeners.push(listener);
 };
-
-
 
 /**
  * The function will add all listeners already in the list.
@@ -150,9 +147,9 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      Logger.dump('Lazily adding message listener for "' +
-                  listener.messageName + '". Environment: "' +
-                  self.environment.name + '"');
+      Logger.dump("Lazily adding message listener for \"" +
+                  listener.messageName + "\". Environment: \"" +
+                  self.environment.name + "\"");
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
     }
@@ -172,8 +169,8 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //                 'is undefined!');
     //  continue;
     //}
-    Logger.dump('Removing message listener for "' + listener.messageName +
-                '".');
+    Logger.dump("Removing message listener for \"" + listener.messageName +
+                "\".");
     //try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
     //} catch (e) {

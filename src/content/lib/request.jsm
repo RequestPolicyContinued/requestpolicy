@@ -236,7 +236,7 @@ NormalRequest.prototype.getContentWindow = function() {
     } catch (e) {
       try {
         doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
-      } catch(e) {
+      } catch (e) {
         return null;
       }
     }

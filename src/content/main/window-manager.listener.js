@@ -38,7 +38,6 @@ var WindowListener = (function() {
   let nextWinID = 0;
   let listeners = {};
 
-
   let addEvLis = function(eventName, winID) {
     if (typeof listeners[winID] !== "undefined" &&
         listeners[winID][eventName] !== null) {
@@ -49,7 +48,7 @@ var WindowListener = (function() {
   };
 
   let removeEvLis = function(eventName, winID) {
-    if (typeof listeners[winID] !== 'undefined' &&
+    if (typeof listeners[winID] !== "undefined" &&
         listeners[winID][eventName] !== null) {
       listeners[winID].window.removeEventListener(eventName,
                                                   listeners[winID][eventName]);
@@ -63,8 +62,6 @@ var WindowListener = (function() {
     }
   };
 
-
-
   // external functions to be called on "load" or "unload" events
   let externalLoadFunction = null;
   let externalUnloadFunction = null;
@@ -74,8 +71,6 @@ var WindowListener = (function() {
   self.setUnloadFunction = function(f) {
     externalUnloadFunction = f;
   };
-
-
 
   let addEventListenersToWindow = function(window) {
     let winID = nextWinID++;
@@ -120,7 +115,6 @@ var WindowListener = (function() {
     return winID;
   };
 
-
   function removeAllEventListeners() {
     for (let winID in listeners) {
       removeEvLis("load", winID);
@@ -129,7 +123,6 @@ var WindowListener = (function() {
     listeners = {};
     nextWinID = 0;
   }
-
 
   let listening = false;
   self.startListening = function() {
@@ -146,8 +139,6 @@ var WindowListener = (function() {
     // remove all "load" and "unload" event listeners.
     removeAllEventListeners();
   };
-
-
 
   self.onOpenWindow = function(xulWindow) {
     let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)

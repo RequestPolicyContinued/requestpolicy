@@ -95,7 +95,7 @@ function FramescriptToOverlayCommunication(aEnv) {
                                stopCommunication.bind(null, self));
 }
 
-FramescriptToOverlayCommunication.prototype._dump = function (msg) {
+FramescriptToOverlayCommunication.prototype._dump = function(msg) {
   let self = this;
   Logger.dump(self.env.uid + ": " + msg);
 };

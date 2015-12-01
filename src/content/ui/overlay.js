@@ -27,7 +27,7 @@
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-window.rpcontinued.overlay = (function () {
+window.rpcontinued.overlay = (function() {
 
   /* global Components */
   const {utils: Cu} = Components;
@@ -53,7 +53,6 @@ window.rpcontinued.overlay = (function () {
 
   //============================================================================
 
-
   let gBrowser = WindowUtils.getTabBrowser(window);
 
   let $id = document.getElementById.bind(document);
@@ -63,13 +62,11 @@ window.rpcontinued.overlay = (function () {
   //let _prefetchInfoUri = "http://www.requestpolicy.com/help/prefetch.html";
   //let _prefetchDisablingInstructionsUri = "http://www.requestpolicy.com/help/prefetch.html#disable";
 
-
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(ProcessEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);
-
 
   let initialized = false;
 
@@ -93,15 +90,12 @@ window.rpcontinued.overlay = (function () {
 
   let isFennec = false;
 
-
-
   let self = {
     // This is set by request-log.js when it is initialized. We don't need to worry
     // about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment
   };
-
 
   self.toString = function() {
     return "[rpcontinued.overlay " + overlayId + "]";
@@ -242,9 +236,6 @@ window.rpcontinued.overlay = (function () {
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         addTabContainerTabSelectListener);
 
-
-
-
   mlManager.addListener("notifyDocumentLoaded", function(message) {
     let {documentURI} = message.data;
 
@@ -299,9 +290,7 @@ window.rpcontinued.overlay = (function () {
     return {blockedURIs: blockedURIs};
   });
 
-
-
-  mlManager.addListener("notifyTopLevelDocumentLoaded", function (message) {
+  mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
     // Clear any notifications that may have been present.
     self._setContentBlockedState(false);
     // We don't do this immediately anymore because slow systems might have
@@ -318,9 +307,7 @@ window.rpcontinued.overlay = (function () {
     self._updateBlockedContentStateAfterTimeout();
   });
 
-
-
-  mlManager.addListener("notifyDOMFrameContentLoaded", function (message) {
+  mlManager.addListener("notifyDOMFrameContentLoaded", function(message) {
     // This has an advantage over just relying on the
     // observeBlockedRequest() call in that this will clear a blocked
     // content notification if there no longer blocked content. Another way
@@ -331,27 +318,19 @@ window.rpcontinued.overlay = (function () {
     self._updateBlockedContentState(message.target);
   });
 
-
-
   mlManager.addListener("handleMetaRefreshes", function(message) {
     self.handleMetaRefreshes(message);
   });
 
-
-
-  mlManager.addListener("notifyLinkClicked", function (message) {
+  mlManager.addListener("notifyLinkClicked", function(message) {
     RequestProcessor.registerLinkClicked(message.data.origin,
                                          message.data.dest);
   });
 
-
-
-  mlManager.addListener("notifyFormSubmitted", function (message) {
+  mlManager.addListener("notifyFormSubmitted", function(message) {
     RequestProcessor.registerFormSubmitted(message.data.origin,
                                            message.data.dest);
   });
-
-
 
   self.handleMetaRefreshes = function(message) {
     Logger.dump("Handling meta refreshes...");
@@ -390,7 +369,6 @@ window.rpcontinued.overlay = (function () {
     }
   };
 
-
   /**
    * Takes an URI, crops it if necessary, and returns it.
    * It's ensured that the returned URI isn't longer than a specified length,
@@ -415,7 +393,6 @@ window.rpcontinued.overlay = (function () {
       return aUri.substring(0, len) + "...";
     }
   }
-
 
   /**
    * Shows a notification that a redirect was requested by a page (meta refresh
@@ -470,7 +447,6 @@ window.rpcontinued.overlay = (function () {
           [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
-
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
     var cm = rpcontinued.classicmenu;
@@ -516,9 +492,6 @@ window.rpcontinued.overlay = (function () {
         cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
       }
     }
-
-
-
 
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
@@ -586,7 +559,6 @@ window.rpcontinued.overlay = (function () {
     }
     return true;
   };
-
 
   /**
    * Performs actions required to be performed after a tab change.
@@ -712,7 +684,7 @@ window.rpcontinued.overlay = (function () {
    * This function is called during shouldLoad(). As shouldLoad shoudn't be
    * blocked, it's better to set a timeout here.
    */
-  self.observeBlockedTopLevelDocRequest = function (browser, originUri,
+  self.observeBlockedTopLevelDocRequest = function(browser, originUri,
                                                     destUri) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
@@ -772,17 +744,17 @@ window.rpcontinued.overlay = (function () {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    Utils.wrapFunction(window.gContextMenu, "openLink", function () {
+    Utils.wrapFunction(window.gContextMenu, "openLink", function() {
       RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
                                            this.linkURL);
     });
 
-    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow", function () {
+    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow", function() {
       RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
                                            this.linkURL);
     });
 
-    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent", function () {
+    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent", function() {
       RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
                                            this.linkURL);
     });
@@ -835,7 +807,7 @@ window.rpcontinued.overlay = (function () {
 
   self._addLocationObserver = function() {
     self.locationListener = {
-      onLocationChange : function(aProgress, aRequest, aURI) {
+      onLocationChange: function(aProgress, aRequest, aURI) {
         // This gets called both for tab changes and for history navigation.
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
@@ -859,33 +831,33 @@ window.rpcontinued.overlay = (function () {
   self._addHistoryObserver = function() {
     // Implements nsISHistoryListener (and nsISupportsWeakReference)
     self.historyListener = {
-      OnHistoryGoBack : function(backURI) {
+      OnHistoryGoBack: function(backURI) {
         RequestProcessor.registerHistoryRequest(backURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGoForward : function(forwardURI) {
+      OnHistoryGoForward: function(forwardURI) {
         RequestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGotoIndex : function(index, gotoURI) {
+      OnHistoryGotoIndex: function(index, gotoURI) {
         RequestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
         return true;
       },
 
-      OnHistoryNewEntry : function(newURI) {
+      OnHistoryNewEntry: function(newURI) {
       },
 
-      OnHistoryPurge : function(numEntries) {
+      OnHistoryPurge: function(numEntries) {
         return true;
       },
 
-      OnHistoryReload : function(reloadURI, reloadFlags) {
+      OnHistoryReload: function(reloadURI, reloadFlags) {
         return true;
       },
 
-      QueryInterface : function(aIID, aResult) {
+      QueryInterface: function(aIID, aResult) {
         if (aIID.equals(Components.interfaces.nsISHistoryListener) ||
             aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
             aIID.equals(Components.interfaces.nsISupports)) {
@@ -894,7 +866,7 @@ window.rpcontinued.overlay = (function () {
         throw Components.results.NS_NOINTERFACE;
       },
 
-      GetWeakReference : function() {
+      GetWeakReference: function() {
         return Components.classes["@mozilla.org/appshell/appShellService;1"]
             .createInstance(Components.interfaces.nsIWeakReference);
       }
@@ -914,11 +886,11 @@ window.rpcontinued.overlay = (function () {
       } catch (e) {
         if (tries >= maxTries) {
           Logger.severeError("Can't add session history listener, even " +
-              "after " + tries + " tries. "+e, e);
+              "after " + tries + " tries. " + e, e);
           return;
         }
         // call this function again in a few miliseconds.
-        window.setTimeout(function () {
+        window.setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);
@@ -944,9 +916,9 @@ window.rpcontinued.overlay = (function () {
    *          event
    */
   self.onPopupShowing = function(event) {
-  //    if (event.currentTarget != event.originalTarget) {
-  //      return;
-  //    }
+    // if (event.currentTarget != event.originalTarget) {
+    //   return;
+    // }
     rpcontinued.menu.prepareMenu();
   };
 
@@ -965,9 +937,9 @@ window.rpcontinued.overlay = (function () {
       }
     }
     self._needsReloadOnMenuClose = false;
-  //    if (event.currentTarget != event.originalTarget) {
-  //      return;
-  //    }
+    // if (event.currentTarget != event.originalTarget) {
+    //   return;
+    // }
     // Leave the popup attached to the context menu, as we consider that the
     // default location for it.
     //self._attachPopupToContextMenu();
@@ -1146,8 +1118,8 @@ window.rpcontinued.overlay = (function () {
   //  },
 
   self.openToolbarPopup = function(anchor) {
-  //    rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
-  //        null);
+    // rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
+    //     null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
   };
 
@@ -1161,7 +1133,6 @@ window.rpcontinued.overlay = (function () {
       "about:requestpolicy?yourpolicy", true);
   self.openHelp = openLinkInNewTab.bind(this,
       "https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
-
 
   self.clearRequestLog = function() {
     self.requestLog.clear();

@@ -81,7 +81,7 @@ rpWindowManager = (function(self) {
       defaultArea: CustomizableUI.AREA_NAVBAR,
       label: label,
       tooltiptext: tooltiptext,
-      onCommand : function(aEvent) {
+      onCommand: function(aEvent) {
         // Bad smell
         let win = aEvent.target.ownerDocument.defaultView;
         win.rpcontinued.overlay.openToolbarPopup(aEvent.target);
@@ -89,11 +89,9 @@ rpWindowManager = (function(self) {
     });
   }
 
-
   //
   // Case 2: Gecko < 29
   //
-
 
   // this function can be deleted if Gecko < 29 isn't supported anymore
   self.addToolbarButtonToWindow = function(win) {
@@ -108,7 +106,6 @@ rpWindowManager = (function(self) {
       XULUtils.removeTreeElementsFromWindow(win, "toolbarbutton");
     }
   };
-
 
   function addToolbarButtonToNavBar(win) {
     // SeaMonkey users have to use a toolbar button now. At the moment I can't
@@ -163,7 +160,6 @@ rpWindowManager = (function(self) {
       }
     }
   }
-
 
   return self;
 }(rpWindowManager || {}));

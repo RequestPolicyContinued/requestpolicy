@@ -44,9 +44,9 @@ RequestProcessor = (function(self) {
 
   // TODO: update compatibility rules etc. when addons are enabled/disabled
   let addonListener = {
-    onDisabling : function(addon, needsRestart) {},
-    onUninstalling : function(addon, needsRestart) {},
-    onOperationCancelled : function(addon, needsRestart) {}
+    onDisabling: function(addon, needsRestart) {},
+    onUninstalling: function(addon, needsRestart) {},
+    onOperationCancelled: function(addon, needsRestart) {}
   };
 
   function init() {
@@ -65,7 +65,6 @@ RequestProcessor = (function(self) {
 
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND, cleanup);
-
 
   function initializeExtensionCompatibility() {
     if (compatibilityRules.length !== 0) {
@@ -95,9 +94,6 @@ RequestProcessor = (function(self) {
     }
   }
 
-
-
-
   function initializeExtCompatCallback(ext) {
     if (!ext) {
       return;
@@ -124,9 +120,9 @@ RequestProcessor = (function(self) {
         compatibilityRules.push(
             ["resource://brief-content/", null, ext.name]);
         conflictingExtensions.push({
-          "id" : ext.id,
-          "name" : ext.name,
-          "version" : ext.version
+          "id": ext.id,
+          "name": ext.name,
+          "version": ext.version
         });
         break;
       case "foxmarks@kei.com" : // Xmarks Sync
@@ -189,9 +185,6 @@ RequestProcessor = (function(self) {
         break;
     }
   }
-
-
-
 
   function initializeApplicationCompatibility() {
     var appInfo = Cc["@mozilla.org/xre/app-info;1"].
@@ -300,9 +293,6 @@ RequestProcessor = (function(self) {
       compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
     }
   }
-
-
-
 
   self.getCompatibilityRules = function() {
     return compatibilityRules;

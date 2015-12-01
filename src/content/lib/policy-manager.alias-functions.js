@@ -48,7 +48,6 @@ PolicyManager = (function(self) {
   self.addAllowRules = self.addRules.bind(this, C.RULE_ACTION_ALLOW);
   self.addDenyRules = self.addRules.bind(this, C.RULE_ACTION_DENY);
 
-
   function getRuleData(aOrigin, aDest) {
     let ruleData = {};
     if (aOrigin !== undefined) {
@@ -60,7 +59,6 @@ PolicyManager = (function(self) {
     return ruleData;
   }
 
-
   function allowOrigin(aOrigin, noStore) {
     self.addAllowRule(getRuleData(aOrigin), noStore);
   }
@@ -71,14 +69,12 @@ PolicyManager = (function(self) {
     allowOrigin(aOrigin, true);
   };
 
-
   self.temporarilyAllowOrigin = function(aOrigin) {
     PolicyManager.addTemporaryAllowRule(getRuleData(aOrigin));
   };
   self.temporarilyAllowDestination = function(aDest) {
     self.addTemporaryAllowRule(getRuleData(undefined, aDest));
   };
-
 
   function allowDestination(aDest, noStore) {
     self.addAllowRule(getRuleData(undefined, aDest), noStore);
@@ -90,7 +86,6 @@ PolicyManager = (function(self) {
     allowDestination(aDest, true);
   };
 
-
   function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
     self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
   }
@@ -101,7 +96,6 @@ PolicyManager = (function(self) {
                                                      destIdentifier) {
     allowOriginToDestination(originIdentifier, destIdentifier, true);
   };
-
 
   self.temporarilyAllowOriginToDestination = function(originIdentifier,
                                                       destIdentifier) {

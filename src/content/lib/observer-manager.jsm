@@ -88,7 +88,6 @@ function ObserverManager(aEnv) {
   self.observers = [];
 }
 
-
 /**
  * Define 'observe' functions. Those function can be called from anywhere;
  * the caller hands over an object with the keys being the "IDs" and the values
@@ -167,8 +166,6 @@ function ObserverManager(aEnv) {
     });
   };
 }
-
-
 
 /**
  * The function will unregister all registered observers.

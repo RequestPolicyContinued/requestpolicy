@@ -79,9 +79,6 @@ var Logger = (function() {
   // function to use to print out the log
   self.printFunc = dump;
 
-
-
-
   let initialized = false;
 
   /**
@@ -141,11 +138,6 @@ var Logger = (function() {
 
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL, init);
 
-
-
-
-
-
   function log(aLevel, aType, aMessage, aError) {
     let shouldLog = enabled && aLevel >= level && types & aType;
 
@@ -171,8 +163,6 @@ var Logger = (function() {
           "[" + typeName + "] " + aMessage + stack + "\n");
     }
   }
-
-
 
   self.severe = doLog.bind(self, self.LEVEL_SEVERE);
   self.severeError = doLog.bind(self, self.LEVEL_SEVERE, self.TYPE_ERROR);
@@ -219,18 +209,18 @@ var Logger = (function() {
  * Triggers errors for a RequestPolicy unit test.
  * It's used to test Error Detection from the unit tests.
  */
-var UnitTestObserver = (function () {
+var UnitTestObserver = (function() {
   let self = {};
 
   var loggingErrorTopic = "requestpolicy-trigger-logging-error";
   var consoleErrorTopic = "requestpolicy-trigger-console-error";
 
-  self.startup = function () {
+  self.startup = function() {
     Services.obs.addObserver(self, loggingErrorTopic, false);
     Services.obs.addObserver(self, consoleErrorTopic, false);
   };
 
-  self.shutdown = function () {
+  self.shutdown = function() {
     Services.obs.removeObserver(self, loggingErrorTopic);
     Services.obs.removeObserver(self, consoleErrorTopic);
   };
@@ -252,7 +242,7 @@ var UnitTestObserver = (function () {
     return [part1, part2];
   }
 
-  self.observe = function (aSubject, aTopic, aData) {
+  self.observe = function(aSubject, aTopic, aData) {
     switch (aTopic) {
       case loggingErrorTopic:
         let [logLevel, logMessage] = splitColon(aData);

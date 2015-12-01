@@ -101,7 +101,6 @@ let defaultPrefScriptScope = {
   setUCharPref: prefInitFunctions.setUCharPref
 };
 
-
 //
 // Load default preferences (if necessary)
 //

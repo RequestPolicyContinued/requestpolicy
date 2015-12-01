@@ -40,7 +40,7 @@ let {Environment, ProcessEnvironment} = importModule("lib/environment");
 // WindowListener
 //==============================================================================
 
-let WindowListener = (function () {
+let WindowListener = (function() {
   let scope = {};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/main/window-manager.listener.js", scope);
@@ -51,7 +51,7 @@ let WindowListener = (function () {
 // rpWindowManager
 //==============================================================================
 
-var rpWindowManager = (function () {
+var rpWindowManager = (function() {
   let self = {};
 
   let styleSheets = [
@@ -66,14 +66,11 @@ var rpWindowManager = (function () {
   let frameScriptURI = "chrome://rpcontinued/content/ui/frame.js?" +
       Math.random();
 
-
-
   function loadIntoWindow(window) {
     // ==================================
     // # 1 : create a scope variable for RP for this window
     // ----------------------------------------------------
     window.rpcontinued = {};
-
 
     // ==================================
     // # 2 : load the overlay's and menu's javascript
@@ -93,7 +90,6 @@ var rpWindowManager = (function () {
                      "Error loading subscripts for window: " + e, e);
     }
 
-
     // ==================================
     // # 3 : add all XUL elements
     // --------------------------
@@ -104,7 +100,6 @@ var rpWindowManager = (function () {
                      "Couldn't add tree elements to window. " + e, e);
     }
 
-
     // ==================================
     // # 4 : toolbar button
     // --------------------
@@ -112,9 +107,8 @@ var rpWindowManager = (function () {
       self.addToolbarButtonToWindow(window);
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR, "Error while adding the toolbar " +
-                     "button to the window: "+e, e);
+                     "button to the window: " + e, e);
     }
-
 
     // ==================================
     // # 5 : init the overlay
@@ -125,7 +119,7 @@ var rpWindowManager = (function () {
       window.rpcontinued.overlay.init();
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
-                     "An error occurred while initializing the overlay: "+e, e);
+                     "An error occurred while initializing the overlay: " + e, e);
     }
   }
 
@@ -133,15 +127,12 @@ var rpWindowManager = (function () {
     // # 5 : the overlay cares itself about shutdown.
     //       nothing to do here.
 
-
     // # 4 : remove the toolbarbutton
     // ------------------------------
     self.removeToolbarButtonFromWindow(window);
 
-
     // # 3 : remove all XUL elements
     XULUtils.removeTreeElementsFromWindow(window, "mainTree");
-
 
     // # 2 and 1 : remove the `rpcontinued` variable from the window
     // ---------------------------------------------------------
@@ -149,10 +140,6 @@ var rpWindowManager = (function () {
     // done when RP is being disabled.
     delete window.rpcontinued;
   }
-
-
-
-
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
@@ -195,10 +182,6 @@ var rpWindowManager = (function () {
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI,
                                          unloadStyleSheets);
 
-
-
-
-
   function loadStyleSheets() {
     let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
         .getService(Ci.nsIStyleSheetService);
@@ -232,11 +215,10 @@ var rpWindowManager = (function () {
     }
   }
 
-
   return self;
 }());
 
-rpWindowManager = (function () {
+rpWindowManager = (function() {
   let scope = {rpWindowManager};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",

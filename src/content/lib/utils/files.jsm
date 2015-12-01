@@ -65,7 +65,7 @@ var FileUtil = {
    * @param {nsIFile}
    *          file
    */
-  fileToArray : function(file) {
+  fileToArray: function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
@@ -84,7 +84,7 @@ var FileUtil = {
    *
    * @param {nsIFile} file
    */
-  fileToString : function(file) {
+  fileToString: function(file) {
     // FIXME: This function MUST NOT check for the file to exist,
     //        otherwise the subscriptions are not fetched at all,
     //        for whatever reason.
@@ -131,7 +131,7 @@ var FileUtil = {
    * @param {nsIFile}
    *          file
    */
-  arrayToFile : function(lines, file) {
+  arrayToFile: function(lines, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
@@ -157,7 +157,7 @@ var FileUtil = {
    * @param {nsIFile}
    *          file
    */
-  stringToFile : function(str, file) {
+  stringToFile: function(str, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
@@ -179,29 +179,29 @@ var FileUtil = {
    *
    * @return {nsIFile}
    */
-  getRPUserDir : function(subdir1, subdir2, subdir3) {
+  getRPUserDir: function(subdir1, subdir2, subdir3) {
     var profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
     var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
-    if(!file.exists()) {
+    if (!file.exists()) {
       file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
     }
 
     if (subdir1) {
       file.appendRelativePath(subdir1);
-      if(!file.exists()) {
+      if (!file.exists()) {
         file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
       }
 
       if (subdir2) {
         file.appendRelativePath(subdir2);
-        if(!file.exists()) {
+        if (!file.exists()) {
           file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
         }
 
         if (subdir3) {
           file.appendRelativePath(subdir3);
-          if(!file.exists()) {
+          if (!file.exists()) {
             file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
           }
         }

@@ -49,15 +49,15 @@ let {RulesetStorage} = importModule("lib/ruleset-storage");
 // Constants
 //==============================================================================
 
-const SUBSCRIPTION_UPDATED_TOPIC = 'rpcontinued-subscription-policy-updated';
-const SUBSCRIPTION_ADDED_TOPIC = 'rpcontinued-subscription-policy-added';
-const SUBSCRIPTION_REMOVED_TOPIC = 'rpcontinued-subscription-policy-removed';
+const SUBSCRIPTION_UPDATED_TOPIC = "rpcontinued-subscription-policy-updated";
+const SUBSCRIPTION_ADDED_TOPIC = "rpcontinued-subscription-policy-added";
+const SUBSCRIPTION_REMOVED_TOPIC = "rpcontinued-subscription-policy-removed";
 
-const DEFAULT_SUBSCRIPTION_LIST_URL_BASE = 'https://raw.githubusercontent.com/RequestPolicyContinued/subscriptions/master/';
+const DEFAULT_SUBSCRIPTION_LIST_URL_BASE = "https://raw.githubusercontent.com/RequestPolicyContinued/subscriptions/master/";
 
-const SUBSCRIPTION_UPDATE_SUCCESS = 'SUCCESS';
-const SUBSCRIPTION_UPDATE_NOT_NEEDED = 'NOT_NEEDED';
-const SUBSCRIPTION_UPDATE_FAILURE = 'FAILURE';
+const SUBSCRIPTION_UPDATE_SUCCESS = "SUCCESS";
+const SUBSCRIPTION_UPDATE_NOT_NEEDED = "NOT_NEEDED";
+const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
 
 //==============================================================================
 // utilities
@@ -89,22 +89,22 @@ function dprint(msg) {
  */
 function UserSubscriptions() {
   var userSubsFile = FileUtil.getRPUserDir();
-  userSubsFile.appendRelativePath('subscriptions.json');
-  let jsonData = '{}';
+  userSubsFile.appendRelativePath("subscriptions.json");
+  let jsonData = "{}";
   if (userSubsFile.exists()) {
     jsonData = FileUtil.fileToString(userSubsFile);
   }
   this._data = JSON.parse(jsonData);
   if (!this._data.lists) {
     this._data.lists = {
-      'official' : {
-        'subscriptions' : {
-          'allow_embedded' : {},
-          'allow_extensions' : {},
-          'allow_functionality' : {},
-          'allow_mozilla' : {},
-          'allow_sameorg' : {},
-          'deny_trackers' : {}
+      "official": {
+        "subscriptions": {
+          "allow_embedded": {},
+          "allow_extensions": {},
+          "allow_functionality": {},
+          "allow_mozilla": {},
+          "allow_sameorg": {},
+          "deny_trackers": {}
         }
       }
     };
@@ -113,17 +113,17 @@ function UserSubscriptions() {
 }
 
 UserSubscriptions.prototype = {
-  toString : function () {
+  toString: function() {
     return "[UserSubscriptions]";
   },
 
-  save : function() {
+  save: function() {
     var userSubsFile = FileUtil.getRPUserDir();
-    userSubsFile.appendRelativePath('subscriptions.json');
+    userSubsFile.appendRelativePath("subscriptions.json");
     FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
-  getSubscriptionInfo : function(defaultPolicy) {
+  getSubscriptionInfo: function(defaultPolicy) {
     var lists = this._data.lists;
     var result = {};
     for (var listName in lists) {
@@ -144,7 +144,7 @@ UserSubscriptions.prototype = {
     return result;
   },
 
-  addSubscription : function(listName, subName) {
+  addSubscription: function(listName, subName) {
     var lists = this._data.lists;
     if (!lists[listName]) {
       lists[listName] = {};
@@ -156,7 +156,7 @@ UserSubscriptions.prototype = {
     this.save();
   },
 
-  removeSubscription : function(listName, subName) {
+  removeSubscription: function(listName, subName) {
     var lists = this._data.lists;
     if (lists[listName] && lists[listName].subscriptions &&
         lists[listName].subscriptions[subName]) {
@@ -170,12 +170,12 @@ UserSubscriptions.prototype = {
   // make a big fat mess of the code, or more likely I'm just not good at
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
-  update : function (callback, serials, defaultPolicy) {
+  update: function(callback, serials, defaultPolicy) {
     var updatingLists = {};
     var updateResults = {};
 
     function recordDone(listName, subName, result) {
-      dprint('Recording done: ' + listName + ' ' + subName);
+      dprint("Recording done: " + listName + " " + subName);
       if (subName) {
         updateResults[listName][subName] = result;
         let list = updatingLists[listName];
@@ -188,7 +188,7 @@ UserSubscriptions.prototype = {
       for (let i in updatingLists) {
         return; // What's that??
       }
-      setTimeout(function () { callback(updateResults); }, 0);
+      setTimeout(function() { callback(updateResults); }, 0);
     }
 
     var listCount = 0;
@@ -201,70 +201,70 @@ UserSubscriptions.prototype = {
       var subCount = 0;
       for (let subName in serials[listName]) {
         if (!this._lists[listName].subscriptions[subName]) {
-          dprint('Skipping update of unsubscribed subscription: ' + listName + ' ' + subName);
+          dprint("Skipping update of unsubscribed subscription: " + listName + " " + subName);
           continue;
         }
-        if (defaultPolicy === 'allow' && subName.indexOf('allow_') === 0) {
-          dprint('Skipping update of subscription that is only used with a default deny policy: ' + subName);
+        if (defaultPolicy === "allow" && subName.indexOf("allow_") === 0) {
+          dprint("Skipping update of subscription that is only used with a default deny policy: " + subName);
           continue;
         }
-        if (defaultPolicy === 'deny' && subName.indexOf('deny_') === 0) {
-          dprint('Skipping update of subscription that is only used with a default allow policy: ' + subName);
+        if (defaultPolicy === "deny" && subName.indexOf("deny_") === 0) {
+          dprint("Skipping update of subscription that is only used with a default allow policy: " + subName);
           continue;
         }
-        updateSubs[subName] = {'serial' : serials[listName][subName]};
+        updateSubs[subName] = {"serial": serials[listName][subName]};
         subCount++;
       }
       if (subCount === 0) {
-        dprint('Skipping list with no subscriptions: ' + listName);
+        dprint("Skipping list with no subscriptions: " + listName);
         continue;
       }
       var url = this._lists[listName].url;
       if (!url) {
-        url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + '.json';
+        url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + ".json";
       }
       if (!url) {
-        dprint('Skipping list without url: ' + listName);
+        dprint("Skipping list without url: " + listName);
         continue;
       }
       var list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
       for (let subName in updateSubs) {
-        dprint('Will update subscription: ' + listName + ' ' + subName);
+        dprint("Will update subscription: " + listName + " " + subName);
         updatingLists[listName][subName] = true;
       }
       updateResults[listName] = {};
 
       let metadataSuccess = function(list) {
         function subSuccess(sub, status) {
-          dprint('Successfully updated subscription ' + sub.toString());
+          dprint("Successfully updated subscription " + sub.toString());
           recordDone(list._name, sub._name, status);
         }
 
         function subError(sub, error) {
-          dprint('Failed to update subscription ' + sub.toString() + ': ' +
+          dprint("Failed to update subscription " + sub.toString() + ": " +
                 error);
           recordDone(list._name, sub._name, SUBSCRIPTION_UPDATE_FAILURE);
         }
 
-        dprint('Successfully updated list ' + list.toString());
+        dprint("Successfully updated list " + list.toString());
         list.updateSubscriptions(updateSubs, subSuccess, subError);
       };
 
       let metadataError = function(list, error) {
-        dprint('Failed to update list: ' + list.toString() + ': ' + error);
+        dprint("Failed to update list: " + list.toString() + ": " + error);
         updateResults[listName] = false;
         recordDone(list._name);
       };
 
       listCount++;
-      dprint('Will update list: ' + listName);
+      dprint("Will update list: " + listName);
       list.updateMetadata(metadataSuccess, metadataError);
     }
 
     if (listCount === 0) {
-      dprint('No lists to update.');
-      setTimeout(function () { callback(updateResults); }, 0);
+      dprint("No lists to update.");
+      setTimeout(function() { callback(updateResults); }, 0);
     }
   }
 };
@@ -292,78 +292,78 @@ function SubscriptionList(name, url) {
 }
 
 SubscriptionList.prototype = {
-  _name : null,
-  _url : null,
-  _data : null,
+  _name: null,
+  _url: null,
+  _data: null,
 
-  toString : function () {
+  toString: function() {
     return "[SubscriptionList " + this._name + " " + this._url + "]";
   },
 
-  updateMetadata : function (successCallback, errorCallback) {
-    dprint('Updating ' + this.toString());
+  updateMetadata: function(successCallback, errorCallback) {
+    dprint("Updating " + this.toString());
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Components.interfaces.nsIXMLHttpRequest);
     var self = this;
-    req.onload = function (event) {
+    req.onload = function(event) {
       try {
         self._data = JSON.parse(req.responseText);
         // Maybe we don't need to write this to a file since we never read it
         // back again (we always grab new metadata when updating).
-        setTimeout(function () { successCallback(self); }, 0);
+        setTimeout(function() { successCallback(self); }, 0);
       } catch (e) {
-        setTimeout(function () { errorCallback(self, e.toString()); }, 0);
+        setTimeout(function() { errorCallback(self, e.toString()); }, 0);
       }
     };
-    req.onerror = function (event) {
-      setTimeout(function () { errorCallback(self, req.statusText); }, 0);
+    req.onerror = function(event) {
+      setTimeout(function() { errorCallback(self, req.statusText); }, 0);
     };
-    req.open('GET', this._url);
+    req.open("GET", this._url);
     req.send(null);
   },
 
-  updateSubscriptions : function (userSubs, successCallback, errorCallback) {
+  updateSubscriptions: function(userSubs, successCallback, errorCallback) {
     for (let subName in userSubs) {
       let sub;
       try {
         var serial = this.getSubscriptionSerial(subName);
-        dprint('Current serial for ' + this._name + ' ' + subName + ': ' +
+        dprint("Current serial for " + this._name + " " + subName + ": " +
                userSubs[subName].serial);
-        dprint('Available serial for ' + this._name + ' ' + subName + ': ' +
+        dprint("Available serial for " + this._name + " " + subName + ": " +
                serial);
         var subUrl = this.getSubscriptionUrl(subName);
         sub = new Subscription(this._name, subName, subUrl);
         if (serial > userSubs[subName].serial) {
           sub.update(successCallback, errorCallback);
         } else {
-          dprint('No update needed for ' + this._name + ' ' + subName);
+          dprint("No update needed for " + this._name + " " + subName);
           let curSub = sub;
-          setTimeout(function () {
+          setTimeout(function() {
             successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
           }, 0);
         }
       } catch (e) {
         let curSub = sub;
-        setTimeout(function () {
+        setTimeout(function() {
           errorCallback(curSub, e.toString());
         }, 0);
       }
     }
   },
 
-//  getSubscriptionNames : function () {
-//    var names = [];
-//    for (var subName in this._data.subscriptions) {
-//      names.push(subName);
-//    }
-//    return names;
-//  },
+  // getSubscriptionNames : function () {
+  //   var names = [];
+  //   for (var subName in this._data.subscriptions) {
+  //     names.push(subName);
+  //   }
+  //   return names;
+  // },
 
-  getSubscriptionSerial : function (subName) {
+  getSubscriptionSerial: function(subName) {
     return this._data.subscriptions[subName].serial;
   },
 
-  getSubscriptionUrl : function (subName) {
+  getSubscriptionUrl: function(subName) {
     return this._data.subscriptions[subName].url;
   }
 };
@@ -389,27 +389,27 @@ function Subscription(listName, subName, subUrl) {
 }
 
 Subscription.prototype = {
-  _list : null,
-  _name : null,
-  _url : null,
-  _data : null,
+  _list: null,
+  _name: null,
+  _url: null,
+  _data: null,
 
-  toString : function () {
+  toString: function() {
     return "[Subscription " + this._list + " " + this._name + " " + this._url + "]";
   },
 
-  update : function (successCallback, errorCallback) {
-    dprint('Updating ' + this.toString());
+  update: function(successCallback, errorCallback) {
+    dprint("Updating " + this.toString());
 
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Components.interfaces.nsIXMLHttpRequest);
     var self = this;
-    req.onload = function (event) {
+    req.onload = function(event) {
       try {
         self._rawData = req.responseText;
         if (!self._rawData) {
-          let error = 'Empty response when requesting subscription file';
-          setTimeout(function () {
+          let error = "Empty response when requesting subscription file";
+          setTimeout(function() {
             errorCallback(self, error);
           }, 0);
           return;
@@ -422,15 +422,15 @@ Subscription.prototype = {
         try {
           serial = self._data.metadata.serial;
         } catch (e) {
-          let error = 'Ruleset has no serial number';
-          setTimeout(function () {
+          let error = "Ruleset has no serial number";
+          setTimeout(function() {
             errorCallback(self, error);
           }, 0);
           return;
         }
-        if (typeof serial !== 'number' || serial % 1 !== 0) {
-          let error = 'Ruleset has invalid serial number: ' + serial;
-          setTimeout(function () {
+        if (typeof serial !== "number" || serial % 1 !== 0) {
+          let error = "Ruleset has invalid serial number: " + serial;
+          setTimeout(function() {
             errorCallback(self, error);
           }, 0);
           return;
@@ -438,10 +438,10 @@ Subscription.prototype = {
         // The rest of the sanity checking is done by RawRuleset().
         try {
           var rawRuleset = new RawRuleset(self._rawData);
-          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + '.json',
+          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + ".json",
                 self._list);
         } catch (e) {
-          setTimeout(function () { errorCallback(self, e.toString()); }, 0);
+          setTimeout(function() { errorCallback(self, e.toString()); }, 0);
           return;
         }
         var subInfo = {};
@@ -449,19 +449,19 @@ Subscription.prototype = {
         subInfo[self._list][self._name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
             JSON.stringify(subInfo));
-        setTimeout(function () {
+        setTimeout(function() {
           successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);
       } catch (e) {
-        setTimeout(function () { errorCallback(self, e.toString()); }, 0);
+        setTimeout(function() { errorCallback(self, e.toString()); }, 0);
       }
     };
-    req.onerror = function (event) {
-      setTimeout(function () {
+    req.onerror = function(event) {
+      setTimeout(function() {
         errorCallback(self, req.statusText);
       }, 0);
     };
-    req.open('GET', this._url);
+    req.open("GET", this._url);
     req.send(null);
   }
 

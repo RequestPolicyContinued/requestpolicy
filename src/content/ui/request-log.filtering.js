@@ -23,7 +23,7 @@
 
 /* global window */
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
   /* global Components */
   const {utils: Cu} = Components;
 
@@ -45,7 +45,7 @@ window.rpcontinued.requestLog = (function (self) {
     let filterValue = elements.filterTextbox.value;
 
     // create a new regular expression
-    filterText = filterValue.length === 0 ? null : new RegExp(filterValue, 'i');
+    filterText = filterValue.length === 0 ? null : new RegExp(filterValue, "i");
     // enable/disable the "Clear Filter" button
     elements.clearFilterButton.disabled = filterValue.length === 0;
 
@@ -57,9 +57,6 @@ window.rpcontinued.requestLog = (function (self) {
     elements.filterTextbox.focus();
     self.filterChanged();
   };
-
-
-
 
   /**
    * Check if the row should be displayed or filtered out.
@@ -99,9 +96,8 @@ window.rpcontinued.requestLog = (function (self) {
 
     // notify that the table rows has changed
     let newRowCount = self.treeView.rowCount;
-    self.treebox.rowCountChanged(0, newRowCount-oldRowCount);
+    self.treebox.rowCountChanged(0, newRowCount - oldRowCount);
   }
-
 
   return self;
 }(window.rpcontinued.requestLog || {}));

@@ -85,10 +85,10 @@ var WindowUtils = (function() {
       let {PrivateBrowsingUtils} = Cu.import("resource://gre/modules/" +
                                              "PrivateBrowsingUtils.jsm", {});
 
-      return function (aWindow) {
+      return function(aWindow) {
         return PrivateBrowsingUtils.isWindowPrivate(aWindow);
       };
-    } catch(e) {
+    } catch (e) {
       // pre Firefox 20
       try {
         let pbs = Cc["@mozilla.org/privatebrowsing;1"]
@@ -97,7 +97,7 @@ var WindowUtils = (function() {
         return function(aWindow) {
           return pbs.privateBrowsingEnabled;
         };
-      } catch(e) {
+      } catch (e) {
         Components.utils.reportError(e);
         // It's uncertain if private browsing is possible at all, so assume
         // that Private Browsing is not possible.
@@ -117,7 +117,6 @@ var WindowUtils = (function() {
     return self.isWindowPrivate(aWindow) === false ||
         rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
   };
-
 
   //
   // Window & DOM utilities

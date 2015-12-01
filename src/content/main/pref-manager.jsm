@@ -80,7 +80,6 @@ var PrefManager = (function() {
     Services.prefs.savePrefFile(null);
   }
 
-
   self.init = function() {
     // ================================
     // manually handle RP's default preferences
@@ -92,7 +91,6 @@ var PrefManager = (function() {
     Services.scriptloader.loadSubScript(
         "chrome://rpcontinued/content/main/default-pref-handler.js",
         {});
-
 
     // ================================
     // Link/DNS prefetching
@@ -116,7 +114,6 @@ var PrefManager = (function() {
       }
     }
 
-
     // ================================
     // Clean up old, unused prefs (removed in 0.2.0).
     // ----------------------------------------------
@@ -131,10 +128,8 @@ var PrefManager = (function() {
       }
     }
 
-
     Services.prefs.savePrefFile(null);
   };
-
 
   function maybeHandleUninstallOrDisable(data, reason) {
     if (reason === C.ADDON_DISABLE || reason === C.ADDON_UNINSTALL) {

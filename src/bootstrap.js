@@ -21,11 +21,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-var mod = {};
+/* exported startup, shutdown, install, uninstall */
+/* global dump */
+
+//==============================================================================
+// utilities
+//==============================================================================
+
 const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
 
 /**
@@ -38,22 +43,27 @@ function logSevereError(msg, e) {
   Cu.reportError(e);
 }
 
+//==============================================================================
+// bootstrap functions
+//==============================================================================
+
 function startup(data, reason) {
   try {
-    // Import the ProcessEnvironment and call its startup() function.
-    Cu.import(envURI, mod);
-    mod.ProcessEnvironment.startup(arguments);
+    let {ProcessEnvironment} = Cu.import(envURI, {});
+    // Remark: startup() takes the arguments as an array!
+    ProcessEnvironment.startup([data, reason]);
   } catch(e) {
     logSevereError("startup() failed!", e);
   }
 }
 
 function shutdown(data, reason) {
-
   try {
-    // shutdown, unset and unload.
-    mod.ProcessEnvironment.shutdown(arguments);
-    mod = {};
+    {
+      let {ProcessEnvironment} = Cu.import(envURI, {});
+      // Remark: shutdown() takes the arguments as an array!
+      ProcessEnvironment.shutdown([data, reason]);
+    }
     Cu.unload(envURI);
   } catch(e) {
     logSevereError("shutdown() failed!", e);
@@ -68,7 +78,7 @@ function install(data, reason) {
   //               images and locales, their caches are flushed.
   // Note: Due to Bug 1144248 this has to be done in the
   //       `install` function.
-  Components.utils.import("resource://gre/modules/Services.jsm");
+  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
   Services.obs.notifyObservers(null, "chrome-flush-caches", null);
 }
 

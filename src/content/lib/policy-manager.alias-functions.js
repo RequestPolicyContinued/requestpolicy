@@ -21,6 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {utils: Cu} = Components;
+
+/* global PolicyManager: true */
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// PolicyManager (extension)
+//==============================================================================
 
 PolicyManager = (function(self) {
 
@@ -40,10 +52,10 @@ PolicyManager = (function(self) {
   function getRuleData(aOrigin, aDest) {
     let ruleData = {};
     if (aOrigin !== undefined) {
-      ruleData["o"] = {"h": aOrigin};
+      ruleData.o = {"h": aOrigin};
     }
     if (aDest !== undefined) {
-      ruleData["d"] = {"h": aDest};
+      ruleData.d = {"h": aDest};
     }
     return ruleData;
   }
@@ -81,7 +93,7 @@ PolicyManager = (function(self) {
 
   function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
     self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
-  };
+  }
   self.allowOriginToDestination = function(originIdentifier, destIdentifier) {
     allowOriginToDestination(originIdentifier, destIdentifier, false);
   };

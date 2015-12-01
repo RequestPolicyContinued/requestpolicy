@@ -21,13 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["FileUtil"];
+/* exported FileUtil */
+this.EXPORTED_SYMBOLS = ["FileUtil"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// utilities and constants
+//==============================================================================
 
 /**
  * creates an integer from the arguments
@@ -43,10 +47,15 @@ function getOctalInt() {
   }
   return result;
 }
-const octal444 = getOctalInt(4,4,4); // octal: 0444
-const octal700 = getOctalInt(7,0,0); // octal: 0700
+
+const OCTAL_444 = getOctalInt(4, 4, 4); // octal: 0444
+const OCTAL_700 = getOctalInt(7, 0, 0); // octal: 0700
 
 const REQUESTPOLICY_DIR = "requestpolicy";
+
+//==============================================================================
+// FileUtil
+//==============================================================================
 
 var FileUtil = {
 
@@ -59,7 +68,7 @@ var FileUtil = {
   fileToArray : function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
-    stream.init(file, 0x01, octal444, 0);
+    stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
     var line = {}, lines = [], hasmore;
     do {
@@ -93,7 +102,7 @@ var FileUtil = {
     //}
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
-    stream.init(file, 0x01, octal444, 0);
+    stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
 
     var cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
@@ -107,7 +116,7 @@ var FileUtil = {
       // Read as much as we can and put it in |data.value|.
       read = cstream.readString(0xffffffff, data);
       str += data.value;
-    } while (read != 0);
+    } while (read !== 0);
     cstream.close(); // This closes |fstream|.
 
     return str;
@@ -175,25 +184,25 @@ var FileUtil = {
     var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if(!file.exists()) {
-      file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
+      file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
     }
 
     if (subdir1) {
       file.appendRelativePath(subdir1);
       if(!file.exists()) {
-        file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
+        file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
       }
 
       if (subdir2) {
         file.appendRelativePath(subdir2);
         if(!file.exists()) {
-          file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
+          file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
         }
 
         if (subdir3) {
           file.appendRelativePath(subdir3);
           if(!file.exists()) {
-            file.create(Ci.nsIFile.DIRECTORY_TYPE, octal700);
+            file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
           }
         }
       }

@@ -21,20 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+/* exported XULUtils */
+this.EXPORTED_SYMBOLS = ["XULUtils"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/strings",
-  "lib/utils/constants"
-], this);
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-var EXPORTED_SYMBOLS = ["XULUtils"];
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {StringUtils} = importModule("lib/utils/strings");
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// XULUtils
+//==============================================================================
 
 var XULUtils = {};
 
@@ -72,12 +75,12 @@ var xulTrees = XULUtils.xulTrees = {};
 
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
-      aElementSpec.attributes.id = "rpc-autoid-" + (nextID++);
+      aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
       //Logger.dump("Automatically created ID '" + aElementSpec.attributes.id +
       //            "' for element <" + aElementSpec.tag + ">");
     }
   }
-})();
+}());
 
 
 /**
@@ -100,7 +103,8 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
     // Add all children recursively.
     if (elementSpec.hasOwnProperty("children")) {
-      let allChildrenSpecs = recursivelyGetAllElementSpecs(elementSpec.children)
+      let allChildrenSpecs = recursivelyGetAllElementSpecs(
+          elementSpec.children);
       allElementSpecs = allElementSpecs.concat(allChildrenSpecs);
     }
   }
@@ -239,7 +243,7 @@ var {addEventListeners, removeEventListeners} = (function () {
     addEventListeners: addEventListeners,
     removeEventListeners: removeEventListeners
   };
-})();
+}());
 
 
 function recursivelyAddXULElements(aDocument, aElementSpecList,
@@ -279,13 +283,13 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
     }
     parentElement.appendChild(newElement);
   }
-};
+}
 
 XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
   if (xulTrees.hasOwnProperty(aTreeName)) {
     recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
-}
+};
 
 /**
  * Return a list of the IDs of the specified tree's root elements.
@@ -322,4 +326,4 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
       node.parentNode.removeChild(node);
     }
   }
-}
+};

@@ -21,26 +21,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Utils"];
+/* exported Utils */
+this.EXPORTED_SYMBOLS = ["Utils"];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-//Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+//let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
+//==============================================================================
+// Utils
+//==============================================================================
 
-
-
-
-let Utils = (function() {
+var Utils = (function() {
   let self = {};
 
   /**
@@ -98,9 +97,13 @@ let Utils = (function() {
    * @param {Object} object
    * @param {...string} properties
    */
+  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
+  //        https://github.com/jshint/jshint/issues/2785
+  /* jshint -W119 */
   self.getObjectPath = function(object, ...properties) {
     return properties.reduce(self.getObjectProperty, object);
   };
+  /* jshint +W119 */
 
   /**
    * @private
@@ -133,7 +136,7 @@ let Utils = (function() {
     aModuleScope.internal = aModuleScope.internal || {};
     function sealInternal() {
       delete aModuleScope.internal;
-    };
+    }
     ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL,
                                           sealInternal);
     return aModuleScope.internal;

@@ -21,21 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
+/* exported ManagerForMessageListeners */
+this.EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+let {C} = importModule("lib/utils/constants");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger",
-  "lib/utils/constants"
-], globalScope);
-
+//==============================================================================
+// ManagerForMessageListeners
+//==============================================================================
 
 /**
  * This class provides an interface to a "Message Manager" which takes
@@ -122,7 +122,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                    "The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
-    aMessageName = aMessageName.substr(C.MM_PREFIX.length)
+    aMessageName = aMessageName.substr(C.MM_PREFIX.length);
   }
 
   let listener = {

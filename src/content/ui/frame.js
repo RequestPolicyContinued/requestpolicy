@@ -20,43 +20,29 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/devtools/Console.jsm");
-
-/**
- * This anonymous function is needed because of Mozilla Bug 673569, fixed in
- * Firefox 29 / Gecko 29.
- * The bug means that all frame scripts run in the same shared scope. The
- * anonymous function ensures that the framescripts do not overwrite
- * one another.
- */
 (function () {
-  //console.debug('[RPC] new framescript loading...');
+  /* global Components */
+  const {utils: Cu} = Components;
+
+  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  //let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {C} = importModule("lib/utils/constants");
+  let {Environment, FrameScriptEnvironment} = importModule("lib/environment");
+  let {FramescriptToOverlayCommunication} = importModule(
+      "lib/framescript-to-overlay-communication");
 
   // the ContentFrameMessageManager of this framescript
   let mm = this;
+  let {content, sendSyncMessage} = mm;
 
-  const Cu = Components.utils;
+  //============================================================================
 
-  // import some modules
-  let {
-    ScriptLoader,
-    C,
-    Logger,
-    Environment,
-    FrameScriptEnvironment,
-    FramescriptToOverlayCommunication
-  } = (function () {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    mod.ScriptLoader.importModules([
-      "lib/utils/constants",
-      "lib/logger",
-      "lib/environment",
-      "lib/framescript-to-overlay-communication"
-    ], mod);
-    return mod;
-  })();
+  //console.debug('[RPC] new framescript loading...');
+
+
 
 
   let framescriptEnv = new FrameScriptEnvironment(mm);
@@ -66,25 +52,7 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
 
   // Create a scope for the sub-scripts, which also can
   // be removed easily when the framescript gets unloaded.
-  var framescriptScope = {
-    "mm": mm,
-    "content": mm.content,
-    "Components": mm.Components,
-
-    "Ci": mm.Components.interfaces,
-    "Cc": mm.Components.classes,
-    "Cu": mm.Components.utils,
-
-    "ScriptLoader": ScriptLoader,
-    "C": C,
-    "Logger": Logger,
-    "console": console,
-    "Environment": Environment,
-
-    "framescriptEnv": framescriptEnv,
-    "mlManager": mlManager,
-    "overlayComm": overlayComm
-  };
+  var framescriptScope = {mm, framescriptEnv, mlManager, overlayComm};
 
   function loadSubScripts() {
     Services.scriptloader.loadSubScript(
@@ -132,13 +100,13 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
     // * left-clicks
     // * enter key while focused
     // * space bar while focused (no event sent for links in this case)
-    if (event.button != 0) {
+    if (event.button !== 0) {
       return;
     }
     // Link clicked.
     // I believe an empty href always gets filled in with the current URL so
     // it will never actually be empty. However, I don't know this for certain.
-    if (event.target.nodeName.toLowerCase() == "a" && event.target.href) {
+    if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                         {origin: event.target.ownerDocument.URL,
@@ -149,8 +117,8 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
     // Form submit button clicked. This can either be directly (e.g. mouseclick,
     // enter/space while the the submit button has focus) or indirectly (e.g.
     // pressing enter when a text input has focus).
-    if (event.target.nodeName.toLowerCase() == "input" &&
-        event.target.type.toLowerCase() == "submit" &&
+    if (event.target.nodeName.toLowerCase() === "input" &&
+        event.target.type.toLowerCase() === "submit" &&
         event.target.form && event.target.form.action) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
@@ -159,7 +127,7 @@ Components.utils.import("resource://gre/modules/devtools/Console.jsm");
       });
       return;
     }
-  };
+  }
 
   framescriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
     framescriptEnv.elManager.addListener(mm, "click", mouseClicked, true);

@@ -20,13 +20,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* exported ManagerForDOMContentLoaded */
+/* global mm, overlayComm, framescriptEnv, ManagerForBlockedContent */
 
-let ManagerForDOMContentLoaded = (function() {
+var ManagerForDOMContentLoaded = (function() {
   let self = {};
 
-  let {DomainUtil} = ScriptLoader.importModule("lib/utils/domains");
-  let {Utils} = ScriptLoader.importModule("lib/utils");
+  /* global Components */
+  const {interfaces: Ci, utils: Cu} = Components;
 
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Logger} = importModule("lib/logger");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {Utils} = importModule("lib/utils");
+  let {Environment} = importModule("lib/environment");
+  let {C} = importModule("lib/utils/constants");
+
+  let {content} = mm;
+
+  //============================================================================
 
   function htmlAnchorTagClicked(event) {
     // Notify the main thread that a link has been clicked.
@@ -62,7 +75,7 @@ let ManagerForDOMContentLoaded = (function() {
     //    <--- the above comment is very old – is it (still) true that
     //         onDOMContentLoaded is called multiple times?
     var doc = event.originalTarget;
-    if (doc.nodeName != "#document") {
+    if (doc.nodeName !== "#document") {
       // only documents
       return;
     }
@@ -88,7 +101,8 @@ let ManagerForDOMContentLoaded = (function() {
         // Indicating blocked visible objects isn't an urgent task, so this should
         // be done async.
         Utils.runAsync(function() {
-          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc, blockedURIs);
+          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc,
+              blockedURIs);
         });
       }
 
@@ -153,7 +167,7 @@ let ManagerForDOMContentLoaded = (function() {
     var metaTags = doc.getElementsByTagName("meta");
     for (var i = 0; i < metaTags.length; i++) {
       let metaTag = metaTags[i];
-      if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() != "refresh") {
+      if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() !== "refresh") {
         continue;
       }
 

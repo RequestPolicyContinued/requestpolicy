@@ -21,32 +21,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
+/* exported PolicyManager, RULES_CHANGED_TOPIC */
+this.EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Logger} = importModule("lib/logger");
+let {RequestResult} = importModule("lib/request-result");
+let {Ruleset, RawRuleset} = importModule("lib/ruleset");
+let {RulesetStorage} = importModule("lib/ruleset-storage");
+
+//==============================================================================
+// constants
+//==============================================================================
 
 const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
-Cu.import("resource://gre/modules/Services.jsm");
-
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/request-result",
-  "lib/ruleset",
-  "lib/ruleset-storage",
-  "lib/utils/constants"
-], this);
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function dprint(msg) {
-  if (typeof print == "function") {
-    print(msg);
-  } else {
-    Logger.info(Logger.TYPE_POLICY, msg);
-  }
+  Logger.info(Logger.TYPE_POLICY, msg);
 }
 
 function warn(msg) {
@@ -57,30 +59,16 @@ function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
-
-// XXX: Subscriptions need an option to be "blacklist-only" so that users
-// can subscribe to one as blacklist-only and know that a malicious or
-// insecure-http-retrieved update can't result in any whitelisting the
-// user didn't want.
-
-// XXX: Maybe how we deal with users wanting to override (ignore) a specific
-// rule of a specific list is to add a section to their user config which has
-// the ignored rules. Then whenever a rule matches, we check the ignored rules
-// list to see if it was an ignored rule before using the rule. That is, this
-// would probably be more startup time efficient than going through the lists
-// at load time and having to remove them, then having to remove them again
-// after an update.
-
-
-
-
+//==============================================================================
+// PolicyManager
+//==============================================================================
 
 /**
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-var PolicyManager = (function(self) {
-
+var PolicyManager = (function () {
+  let self = {};
 
   let userRulesets = {};
   let subscriptionRulesets = {};
@@ -95,8 +83,8 @@ var PolicyManager = (function(self) {
   //self._rulesets = null;
 
   self.getUserRuleCount = function() {
-    return userRulesets["user"]["rawRuleset"].getAllowRuleCount() +
-        userRulesets["user"]["rawRuleset"].getDenyRuleCount();
+    let rawRuleset = userRulesets.user.rawRuleset;
+    return rawRuleset.getAllowRuleCount() + rawRuleset.getDenyRuleCount();
   };
 
   self.loadUserRules = function() {
@@ -112,12 +100,12 @@ var PolicyManager = (function(self) {
       // we'll assume this is a new install.
       rawRuleset = new RawRuleset();
     }
-    userRulesets["user"] = {
+    userRulesets.user = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("user")
     };
-    userRulesets["user"]["ruleset"].userRuleset = true;
-    //userRulesets["user"].ruleset.print();
+    userRulesets.user.ruleset.userRuleset = true;
+    //userRulesets.user.ruleset.print();
     // Temporary rules. These are never stored.
     self.revokeTemporaryRules();
 
@@ -125,12 +113,12 @@ var PolicyManager = (function(self) {
   };
 
   self.loadSubscriptionRules = function(subscriptionInfo) {
-    var failures = {};
+    let failures = {};
 
     // Read each subscription from a file.
-    var rawRuleset;
-    for (var listName in subscriptionInfo) {
-      for (var subName in subscriptionInfo[listName]) {
+    let rawRuleset;
+    for (let listName in subscriptionInfo) {
+      for (let subName in subscriptionInfo[listName]) {
         try {
           dprint("PolicyManager::loadSubscriptionRules: " +
                  listName + ' / ' + subName);
@@ -147,12 +135,12 @@ var PolicyManager = (function(self) {
         if (!subscriptionRulesets[listName]) {
           subscriptionRulesets[listName] = {};
         }
-        var list = subscriptionRulesets[listName];
+        let list = subscriptionRulesets[listName];
         list[subName] = {
           "rawRuleset" : rawRuleset,
           "ruleset" : rawRuleset.toRuleset(subName)
         };
-        list[subName]["ruleset"].userRuleset = false;
+        list[subName].ruleset.userRuleset = false;
         //list[subName].ruleset.print();
       }
     }
@@ -165,8 +153,8 @@ var PolicyManager = (function(self) {
   self.unloadSubscriptionRules = function(subscriptionInfo) {
     var failures = {};
 
-    for (var listName in subscriptionInfo) {
-      for (var subName in subscriptionInfo[listName]) {
+    for (let listName in subscriptionInfo) {
+      for (let subName in subscriptionInfo[listName]) {
         dprint("PolicyManager::unloadSubscriptionRules: " +
                  listName + ' / ' + subName);
         if (!subscriptionRulesets[listName] ||
@@ -177,7 +165,7 @@ var PolicyManager = (function(self) {
           failures[listName][subName] = null;
           continue;
         }
-        var list = subscriptionRulesets[listName];
+        let list = subscriptionRulesets[listName];
         delete list[subName];
       }
     }
@@ -188,21 +176,22 @@ var PolicyManager = (function(self) {
   };
 
   function assertRuleAction(ruleAction) {
-    if (ruleAction != C.RULE_ACTION_ALLOW && ruleAction != C.RULE_ACTION_DENY) {
+    if (ruleAction !== C.RULE_ACTION_ALLOW &&
+        ruleAction !== C.RULE_ACTION_DENY) {
       throw "Invalid rule type: " + ruleAction;
     }
   }
 
   self.ruleExists = function(ruleAction, ruleData) {
     assertRuleAction(ruleAction);
-    for (var name in userRulesets) {
+    for (let name in userRulesets) {
       if (userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
       }
     }
-    for (var listName in subscriptionRulesets) {
-      var rulesets = subscriptionRulesets[listName];
-      for (var name in rulesets) {
+    for (let listName in subscriptionRulesets) {
+      let rulesets = subscriptionRulesets[listName];
+      for (let name in rulesets) {
         if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
         }
@@ -212,14 +201,14 @@ var PolicyManager = (function(self) {
   };
 
   self.addRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::addRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["user"].ruleset.print();
+    dprint("PolicyManager::addRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.user.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets["user"].rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets["user"].ruleset);
+    userRulesets.user.rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets.user.ruleset);
 
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawRuleset.addRule()| to indicate whether a rule
@@ -228,10 +217,10 @@ var PolicyManager = (function(self) {
     // become annoying when there is a large file to write.
     if (!noStore) {
         RulesetStorage.saveRawRulesetToFile(
-            userRulesets["user"].rawRuleset, "user.json");
+            userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets["user"].ruleset.print();
+    //userRulesets.user.ruleset.print();
 
     notifyRulesChanged();
   };
@@ -247,37 +236,37 @@ var PolicyManager = (function(self) {
 
   self.storeRules = function() {
     RulesetStorage.saveRawRulesetToFile(
-        userRulesets["user"].rawRuleset, "user.json");
+        userRulesets.user.rawRuleset, "user.json");
   };
 
   self.addTemporaryRule = function(ruleAction, ruleData) {
-    dprint("PolicyManager::addTemporaryRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["temp"].ruleset.print();
+    dprint("PolicyManager::addTemporaryRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets["temp"].rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets["temp"].ruleset);
+    userRulesets.temp.rawRuleset.addRule(ruleAction, ruleData,
+          userRulesets.temp.ruleset);
 
-    //userRulesets["temp"].ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
 
   self.removeRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::removeRule " + ruleAction + " "
-           + Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets["user"].ruleset.print();
-    //userRulesets["temp"].ruleset.print();
+    dprint("PolicyManager::removeRule " + ruleAction + " " +
+        Ruleset.rawRuleToCanonicalString(ruleData));
+    //userRulesets.user.ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    userRulesets["user"].rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets["user"].ruleset);
-    userRulesets["temp"].rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets["temp"].ruleset);
+    userRulesets.user.rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets.user.ruleset);
+    userRulesets.temp.rawRuleset.removeRule(ruleAction, ruleData,
+          userRulesets.temp.ruleset);
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawRuleset.removeRule()| to indicate whether a rule
@@ -286,27 +275,27 @@ var PolicyManager = (function(self) {
     // become annoying when there is a large file to write.
     if (!noStore) {
         RulesetStorage.saveRawRulesetToFile(
-            userRulesets["user"].rawRuleset, "user.json");
+            userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets["user"].ruleset.print();
-    //userRulesets["temp"].ruleset.print();
+    //userRulesets.user.ruleset.print();
+    //userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
 
   self.temporaryRulesExist = function() {
-    return userRulesets["temp"].rawRuleset.getAllowRuleCount() ||
-           userRulesets["temp"].rawRuleset.getDenyRuleCount();
+    return userRulesets.temp.rawRuleset.getAllowRuleCount() ||
+           userRulesets.temp.rawRuleset.getDenyRuleCount();
   };
 
   self.revokeTemporaryRules = function() {
     var rawRuleset = new RawRuleset();
-    userRulesets["temp"] = {
+    userRulesets.temp = {
       "rawRuleset" : rawRuleset,
       "ruleset" : rawRuleset.toRuleset("temp")
     };
-    userRulesets["temp"]["ruleset"].userRuleset = true;
+    userRulesets.temp.ruleset.userRuleset = true;
 
     notifyRulesChanged();
   };
@@ -317,8 +306,8 @@ var PolicyManager = (function(self) {
 
   self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
     var result = new RequestResult();
-    for (var listName in subscriptionRulesets) {
-      var ruleset = subscriptionRulesets[listName];
+    for (let listName in subscriptionRulesets) {
+      let ruleset = subscriptionRulesets[listName];
       checkRequest(origin, dest, ruleset, result);
     }
     return result;
@@ -334,28 +323,33 @@ var PolicyManager = (function(self) {
     if (!result) {
       result = new RequestResult();
     }
-    for (var i in aRuleset) {
-      var ruleset = aRuleset[i].ruleset;
+    for (let name in aRuleset) {
+      let {ruleset} = aRuleset[name];
       //ruleset.setPrintFunction(print);
       //ruleset.print();
-      var tempAllow, tempDeny;
+
       // TODO wrap this in a try/catch.
-      [tempAllow, tempDeny] = ruleset.check(origin, dest);
+      let [tempAllows, tempDenies] = ruleset.check(origin, dest);
       // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
       // but it works for now.
-      for (var i in tempAllow) {
-        result.matchedAllowRules.push([ruleset, tempAllow[i]]);
+      for (let tempAllow of tempAllows) {
+        result.matchedAllowRules.push([ruleset, tempAllow]);
       }
-      for (var i in tempDeny) {
-        result.matchedDenyRules.push([ruleset, tempDeny[i]]);
+      for (let tempDeny of tempDenies) {
+        result.matchedDenyRules.push([ruleset, tempDeny]);
       }
     }
     return result;
-  };
+  }
 
   return self;
-}(PolicyManager || {}));
+}());
 
 
-Services.scriptloader.loadSubScript(
-    "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js");
+PolicyManager = (function () {
+  let scope = {PolicyManager};
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js",
+      scope);
+  return scope.PolicyManager;
+}());

@@ -21,21 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Cu.import("resource://gre/modules/AddonManager.jsm");
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils",
-  "lib/environment"
-], this);
+/* global RequestProcessor: true */
 
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+
+//==============================================================================
+// RequestProcessor (extension)
+//==============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = Utils.moduleInternal(self);
-
-
   let conflictingExtensions = [];
   let compatibilityRules = [];
   let topLevelDocTranslationRules = {};
@@ -66,7 +68,7 @@ RequestProcessor = (function(self) {
 
 
   function initializeExtensionCompatibility() {
-    if (compatibilityRules.length != 0) {
+    if (compatibilityRules.length !== 0) {
       return;
     }
 
@@ -87,9 +89,9 @@ RequestProcessor = (function(self) {
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
 
-    for (let i in idArray) {
-      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + idArray[i]);
-      AddonManager.getAddonByID(idArray[i], initializeExtCompatCallback);
+    for (let id of idArray) {
+      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
+      AddonManager.getAddonByID(id, initializeExtCompatCallback);
     }
   }
 
@@ -273,7 +275,7 @@ RequestProcessor = (function(self) {
     compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
     // Flock
-    if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
+    if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,
           "Application detected: " + appInfo.vendor);
       compatibilityRules.push(
@@ -292,7 +294,7 @@ RequestProcessor = (function(self) {
     }
 
     // Seamonkey
-    if (appInfo.ID == "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
+    if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
       Logger.info(Logger.TYPE_INTERNAL, "Application detected: Seamonkey");
       compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
       compatibilityRules.push([null, "mailbox:", "Seamonkey"]);

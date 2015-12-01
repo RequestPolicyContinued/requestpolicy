@@ -564,6 +564,15 @@ marionette: venv \
 	rm -rf $$profile_dir ; \
 	)
 
+# ____________________
+# static code analysis
+#
+
+.PHONY: static-analysis jshint
+static-analysis: jshint
+jshint:
+	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
+
 # ________________
 # "helper" targets
 #

@@ -22,23 +22,19 @@
  */
 
 /* global Components */
-/* exported EXPORTED_SYMBOLS, ObserverManager */
+const {utils: Cu} = Components;
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-
-let EXPORTED_SYMBOLS = ["ObserverManager"];
+/* exported ObserverManager */
+this.EXPORTED_SYMBOLS = ["ObserverManager"];
 
 let globalScope = this;
 
-/* global ScriptLoader */
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/observers", /* global SingleTopicObserver,
-                            SinglePrefBranchObserver */
-  "lib/environment" /* global Environment, ProcessEnvironment */
-], globalScope);
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let importModule = ScriptLoader.importModule;
+let {SingleTopicObserver, SinglePrefBranchObserver} = importModule(
+    "lib/utils/observers");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
 ScriptLoader.defineLazyModuleGetters({
   "lib/prefs": [
@@ -47,17 +43,20 @@ ScriptLoader.defineLazyModuleGetters({
   ]
 }, globalScope);
 
-
-
 // Load the Logger at startup-time, not at load-time!
 // ( On load-time Logger might be null. )
 let Logger;
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, function() {
-  Logger = ScriptLoader.importModule("lib/logger").Logger;
+  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
+  //        https://github.com/jshint/jshint/issues/2775
+  /* jshint -W126 */
+  ({Logger} = importModule("lib/logger"));
+  /* jshint +W126 */
 });
 
-
-
+//==============================================================================
+// ObserverManager
+//==============================================================================
 
 /**
  * An ObserverManager provides an interface to `nsIObserverService` which takes

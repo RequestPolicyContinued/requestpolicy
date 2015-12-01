@@ -21,32 +21,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = ["rpWindowManager"];
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let globalScope = this;
+/* exported rpWindowManager */
+this.EXPORTED_SYMBOLS = ["rpWindowManager"];
 
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-var rpWindowManager = (function(self) {
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {Info} = importModule("lib/utils/info");
+let {XULUtils} = importModule("lib/utils/xul");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+//==============================================================================
+// WindowListener
+//==============================================================================
 
-  Cu.import("resource://gre/modules/Services.jsm", globalScope);
-  Cu.import("resource://gre/modules/XPCOMUtils.jsm", globalScope);
-
-  Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", globalScope);
-  ScriptLoader.importModules([
-    "lib/utils/info",
-    "lib/utils/xul",
-    "lib/utils/constants",
-    "lib/environment"
-  ], globalScope);
-
-  // import the WindowListener
+let WindowListener = (function () {
+  let scope = {};
   Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/main/window-manager.listener.js",
-      globalScope);
+      "chrome://rpcontinued/content/main/window-manager.listener.js", scope);
+  return scope.WindowListener;
+}());
+
+//==============================================================================
+// rpWindowManager
+//==============================================================================
+
+var rpWindowManager = (function () {
+  let self = {};
 
   let styleSheets = [
     "chrome://rpcontinued/skin/requestpolicy.css"
@@ -228,10 +234,12 @@ var rpWindowManager = (function(self) {
 
 
   return self;
-}(rpWindowManager || {}));
+}());
 
-
-// extend rpWindowManager
-Services.scriptloader.loadSubScript(
-    "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
-    globalScope);
+rpWindowManager = (function () {
+  let scope = {rpWindowManager};
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
+      scope);
+  return scope.rpWindowManager;
+}());

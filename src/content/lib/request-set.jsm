@@ -21,20 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RequestSet"];
+/* exported RequestSet */
+this.EXPORTED_SYMBOLS = ["RequestSet"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/request-result"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {RequestResult} = importModule("lib/request-result");
 
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function getUriIdentifier(uri) {
   try {
@@ -46,6 +47,9 @@ function getUriIdentifier(uri) {
   }
 }
 
+//==============================================================================
+// RequestSet
+//==============================================================================
 
 function RequestSet() {
   this._origins = {};
@@ -102,11 +106,12 @@ RequestSet.prototype = {
           }
           for (var destUri in dests[destBase][destIdent]) {
             if (!result[destBase][destIdent][destUri]) {
-              result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];
+              result[destBase][destIdent][destUri] =
+                  dests[destBase][destIdent][destUri];
             } else {
               result[destBase][destIdent][destUri] =
-                    result[destBase][destIdent][destUri]
-                    .concat(dests[destBase][destIdent][destUri]);
+                  result[destBase][destIdent][destUri].
+                      concat(dests[destBase][destIdent][destUri]);
             }
           }
         }
@@ -123,13 +128,11 @@ RequestSet.prototype = {
    * @param {Array} rules The rules that were triggered by this request.
    */
   addRequest : function(originUri, destUri, requestResult) {
-    if (requestResult == undefined) {
+    if (requestResult === undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
-          "addRequest() was called without a requestResult object!"
-          +" Creating a new one.\n"
-          +"\torigin: <"+originUri+">\n"
-          +"\tdestination: <"+destUri+">"
-      );
+          "addRequest() was called without a requestResult object!" +
+          " Creating a new one. -- " +
+          "origin: <" + originUri + ">, destination: <" + destUri + ">");
       requestResult = new RequestResult();
     }
 
@@ -221,7 +224,7 @@ RequestSet.prototype = {
   },
 
   containsBlockedRequests : function() {
-    var origins = this._origins
+    var origins = this._origins;
     for (var originURI in origins) {
       for (var destBase in origins[originURI]) {
         for (var destIdent in origins[originURI][destBase]) {

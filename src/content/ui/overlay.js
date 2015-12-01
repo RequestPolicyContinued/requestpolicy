@@ -21,37 +21,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-rpcontinued.overlay = (function() {
+window.rpcontinued.overlay = (function () {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  let {ScriptLoader, XPCOMUtils} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
-    return mod;
-  }());
+  let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-  // iMod: Alias for ScriptLoader.importModule
-  let iMod = ScriptLoader.importModule;
-  let {Environment, ProcessEnvironment} = iMod("lib/environment");
-  let {ManagerForMessageListeners} = iMod("lib/manager-for-message-listeners");
-  let {Logger} = iMod("lib/logger");
-  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
-  let {RequestProcessor} = iMod("lib/request-processor");
-  let {PolicyManager} = iMod("lib/policy-manager");
-  let {DomainUtil} = iMod("lib/utils/domains");
-  let {StringUtils} = iMod("lib/utils/strings");
-  let {WindowUtils} = iMod("lib/utils/windows");
-  let {Utils} = iMod("lib/utils");
-  let {C} = iMod("lib/utils/constants");
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Environment, ProcessEnvironment} = importModule("lib/environment");
+  let {ManagerForMessageListeners} = importModule(
+      "lib/manager-for-message-listeners");
+  let {Logger} = importModule("lib/logger");
+  let {rpPrefBranch, Prefs} = importModule("lib/prefs");
+  let {RequestProcessor} = importModule("lib/request-processor");
+  let {PolicyManager} = importModule("lib/policy-manager");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {WindowUtils} = importModule("lib/utils/windows");
+  let {Utils} = importModule("lib/utils");
+  let {C} = importModule("lib/utils/constants");
+
+  let rpcontinued = window.rpcontinued;
+
+  //============================================================================
+
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
@@ -78,7 +79,6 @@ rpcontinued.overlay = (function() {
 
   let blockedContentStateUpdateDelay = 250; // milliseconds
   let blockedContentCheckTimeoutId = null;
-  let blockedContentCheckMinWaitOnObservedBlockedRequest = 500;
   let blockedContentCheckLastTime = 0;
 
   let popupElement = null;
@@ -126,7 +126,7 @@ rpcontinued.overlay = (function() {
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
-        isFennec = (appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
+        isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
 
         if (isFennec) {
           Logger.dump("Detected Fennec.");
@@ -564,11 +564,11 @@ rpcontinued.overlay = (function() {
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-      
+
       let notificationElem = notificationBox.appendNotification(
           notificationLabel, notificationValue,
           "chrome://browser/skin/Info.png", priority, buttons);
-      
+
       // Let the notification persist at least 300ms. This is needed in the
       // following scenario:
       //     If an URL is entered on an empty tab (e.g. "about:blank"),
@@ -772,31 +772,20 @@ rpcontinued.overlay = (function() {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    if (!gContextMenu.rpcontinuedMethodsOverridden) {
-      gContextMenu.rpcontinuedMethodsOverridden = true;
+    Utils.wrapFunction(window.gContextMenu, "openLink", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
 
-      gContextMenu.openLink = function() {
-        RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-        return this.__proto__.openLink.call(this); // call the overridden method
-      };
+    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
 
-      // Below, we check whether the functions exist before overriding it, because
-      // those functions have been introduced in later versions of Firefox than openLink().
-
-      if (gContextMenu.openLinkInPrivateWindow) {
-        gContextMenu.openLinkInPrivateWindow = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInPrivateWindow.call(this);
-        };
-      }
-
-      if (gContextMenu.openLinkInCurrent) {
-        gContextMenu.openLinkInCurrent = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInCurrent.call(this);
-        };
-      }
-    }
+    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent", function () {
+      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
+                                           this.linkURL);
+    });
   };
 
   /**
@@ -929,7 +918,7 @@ rpcontinued.overlay = (function() {
           return;
         }
         // call this function again in a few miliseconds.
-        setTimeout(function () {
+        window.setTimeout(function () {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);

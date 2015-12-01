@@ -21,20 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
 
 window.rpcontinued.requestLog = (function (self) {
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {WindowUtils} = importModule("lib/utils/windows");
 
-  let {ScriptLoader, Services} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/Services.jsm", mod);
-    return mod;
-  }());
-  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
+  //============================================================================
 
   let filterText = null;
 
@@ -59,7 +56,7 @@ window.rpcontinued.requestLog = (function (self) {
     elements.filterTextbox.value = "";
     elements.filterTextbox.focus();
     self.filterChanged();
-  }
+  };
 
 
 

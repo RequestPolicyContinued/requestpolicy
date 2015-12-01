@@ -21,24 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
+
 window.rpcontinued = window.rpcontinued || {};
 
 window.rpcontinued.requestLog = (function (self) {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
-
-
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-
-
-
+  //============================================================================
 
   self.treebox = null;
 
@@ -49,12 +38,10 @@ window.rpcontinued.requestLog = (function (self) {
     "rpcontinued-requestLog-time" : 3
   };
 
-  let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-
 
   function getVisibleRowAtIndex(index) {
     return self.visibleRows[self.visibleRows.length - index - 1];
-  };
+  }
 
 
 
@@ -89,7 +76,7 @@ window.rpcontinued.requestLog = (function (self) {
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
       var columnIndex = self.columnNameToIndexMap[aColumn.id];
-      if (columnIndex != 2) {
+      if (columnIndex !== 2) {
         return getVisibleRowAtIndex(aIndex)[self.columnNameToIndexMap[aColumn.id]];
       }
     },
@@ -133,7 +120,7 @@ window.rpcontinued.requestLog = (function (self) {
     toggleOpenState: function(aIndex) {},
 
     getImageSrc: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://rpcontinued/skin/dot.png";
         }
@@ -149,11 +136,11 @@ window.rpcontinued.requestLog = (function (self) {
     performActionOnCell: function(action, aIndex, aColumn) {},
 
     getRowProperties: function(aIndex) {
-      return (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
+      return getVisibleRowAtIndex(aIndex)[2] ? "blocked" : "allowed";
     },
 
     getCellProperties: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "blocked";
         }

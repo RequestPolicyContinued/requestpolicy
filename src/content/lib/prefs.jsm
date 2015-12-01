@@ -21,32 +21,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ['rpPrefBranch', 'rootPrefBranch', 'Prefs'];
+/* exported rpPrefBranch, rootPrefBranch, Prefs */
+this.EXPORTED_SYMBOLS = ["rpPrefBranch", "rootPrefBranch", "Prefs"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/environment"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
+//==============================================================================
+// pref branches
+//==============================================================================
 
-
-let rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
+var rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.")
     .QueryInterface(Ci.nsIPrefBranch2);
-let rootPrefBranch = Services.prefs.getBranch("")
+var rootPrefBranch = Services.prefs.getBranch("")
     .QueryInterface(Ci.nsIPrefBranch2);
 
+//==============================================================================
+// Prefs
+//==============================================================================
 
-
-let Prefs = (function() {
+var Prefs = (function() {
   let self = {};
-
-  let defaultAllow = true;
-  let defaultAllowSameDomain = true;
-  let blockingDisabled = false;
 
 
 
@@ -74,7 +76,7 @@ let Prefs = (function() {
    * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
    * Those functions will be added to `self` subsequently.
    */
-  let rpPrefAliases = {
+  const RP_PREF_ALIASES = {
     "bool": {
       "defaultPolicy.allow": "DefaultAllow",
       "defaultPolicy.allowSameDomain": "DefaultAllowSameDomain",
@@ -90,8 +92,8 @@ let Prefs = (function() {
    * `setBlockingDisabled`.
    */
   {
-    for (let prefID in rpPrefAliases.bool) {
-      let prefName = rpPrefAliases.bool[prefID];
+    for (let prefID in RP_PREF_ALIASES.bool) {
+      let prefName = RP_PREF_ALIASES.bool[prefID];
 
       // define the pref's getter function to `self`
       self["is"+prefName] = getRPBoolPref.bind(this, prefID);
@@ -102,14 +104,14 @@ let Prefs = (function() {
   }
 
   self.isPrefetchEnabled = function() {
-    return rootPrefBranch.getBoolPref("network.prefetch-next")
-        || !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
+    return rootPrefBranch.getBoolPref("network.prefetch-next") ||
+        !rootPrefBranch.getBoolPref("network.dns.disablePrefetch");
   };
 
   function isPrefEmpty(pref) {
     try {
       let value = rpPrefBranch.getComplexValue(pref, Ci.nsISupportsString).data;
-      return value == '';
+      return value === "";
     } catch (e) {
       return true;
     }
@@ -135,13 +137,13 @@ let Prefs = (function() {
 
 
   function observePref(subject, topic, data) {
-    if (topic == "nsPref:changed") {
+    if (topic === "nsPref:changed") {
       // Send an observer notification that a pref that affects RP has been
       // changed.
       // TODO: also send the pref's name and its branch
       Services.obs.notifyObservers(null, "rpcontinued-prefs-changed", null);
     }
-  };
+  }
 
   function registerPrefObserver() {
     // observe everything on RP's pref branch

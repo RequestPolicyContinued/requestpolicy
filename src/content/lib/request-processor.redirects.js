@@ -21,34 +21,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
+
+/* global RequestProcessor: true */
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {Prefs} = importModule("lib/prefs");
+let {PolicyManager} = importModule("lib/policy-manager");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {Utils} = importModule("lib/utils");
+let {Request, RedirectRequest} = importModule("lib/request");
+let {RequestResult, REQUEST_REASON_COMPATIBILITY,
+     REQUEST_REASON_RELATIVE_URL} = importModule("lib/request-result");
+let {HttpResponse} = importModule("lib/http-response");
+let {ProcessEnvironment} = importModule("lib/environment");
+
+//==============================================================================
+// constants
+//==============================================================================
+
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/prefs",
-  "lib/policy-manager",
-  "lib/utils/domains",
-  "lib/utils",
-  "lib/request",
-  "lib/request-result",
-  "lib/http-response",
-  "lib/environment"
-], this);
-
-
+//==============================================================================
+// RequestProcessor (extension)
+//==============================================================================
 
 RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
-
-
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cr = Components.results;
-  const Cu = Components.utils;
 
 
   /**
@@ -114,56 +116,58 @@ RequestProcessor = (function(self) {
     var originURIObj = DomainUtil.getUriObject(originURI);
     var destURIObj = DomainUtil.getUriObject(destURI);
 
-    var result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
-        destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
+    {
+      let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
+          destURIObj);
+      // For now, we always give priority to deny rules.
+      if (result.denyRulesExist()) {
+        result.isAllowed = false;
+        return result;
+      }
+      if (result.allowRulesExist()) {
+        result.isAllowed = true;
+        return result;
+      }
     }
 
-    var result = PolicyManager.checkRequestAgainstSubscriptionRules(
-        originURIObj, destURIObj);
-    // For now, we always give priority to deny rules.
-    if (result.denyRulesExist()) {
-      result.isAllowed = false;
-      return result;
-    }
-    if (result.allowRulesExist()) {
-      result.isAllowed = true;
-      return result;
+    {
+      let result = PolicyManager.checkRequestAgainstSubscriptionRules(
+          originURIObj, destURIObj);
+      // For now, we always give priority to deny rules.
+      if (result.denyRulesExist()) {
+        result.isAllowed = false;
+        return result;
+      }
+      if (result.allowRulesExist()) {
+        result.isAllowed = true;
+        return result;
+      }
     }
 
     // fixme: "//example.com/path" is also a valid relative URL
-    if (destURI[0] && destURI[0] == '/'
-        || destURI.indexOf(":") == -1) {
+    if (destURI[0] && destURI[0] === "/" || destURI.indexOf(":") === -1) {
       // Redirect is to a relative url.
       // ==> allow.
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
     let compatibilityRules = self.getCompatibilityRules();
-    for (var i = 0; i < compatibilityRules.length; i++) {
-      var rule = compatibilityRules[i];
-      var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-      var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
+    for (let rule of compatibilityRules) {
+      let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
+      let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
       if (allowOrigin && allowDest) {
         return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
       }
     }
 
-    var result = internal.checkByDefaultPolicy(originURI, destURI);
+    let result = internal.checkByDefaultPolicy(originURI, destURI);
     return result;
   }
 
 
   self.isAllowedRedirect = function(originURI, destURI) {
     var request = new Request(originURI, destURI);
-    return (true === checkRedirect(request).isAllowed);
+    return true === checkRedirect(request).isAllowed;
   };
 
 
@@ -184,9 +188,10 @@ RequestProcessor = (function(self) {
 
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "** ALLOWED ** '"
-          + headerType + "' header to <" + destURI + "> " + "from <" + originURI
-          + ">. Same hosts or allowed origin/destination.");
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "** ALLOWED ** '" + headerType + "' header to <" + destURI + "> " +
+          "from <" + originURI + ">. " +
+          "Same hosts or allowed origin/destination.");
       internal.recordAllowedRequest(originURI, destURI, false,
                                     request.requestResult);
       internal.allowedRedirectsReverse[destURI] = originURI;
@@ -207,8 +212,8 @@ RequestProcessor = (function(self) {
               "from <" + realOrigin + ">");
           self.registerLinkClicked(realOrigin, destURI);
 
-        } else if (internal.submittedForms[realOrigin]
-            && internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
+        } else if (internal.submittedForms[realOrigin] &&
+            internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
           Logger.warning(Logger.TYPE_HEADER_REDIRECT,
               "This redirect was from a form submission." +
               " Registering an additional form submission to <" + destURI +
@@ -260,9 +265,12 @@ RequestProcessor = (function(self) {
             // fixme: bad smell! the same link (linkClickDest) could have
             //        been clicked from different origins!
             for (let i in internal.clickedLinksReverse[linkClickDest]) {
-              // We hope there's only one possibility of a source page (that is,
-              // ideally there will be one iteration of this loop).
-              linkClickOrigin = i;
+              if (internal.clickedLinksReverse[linkClickDest].
+                      hasOwnProperty(i)) {
+                // We hope there's only one possibility of a source page
+                // (that is,ideally there will be one iteration of this loop).
+                linkClickOrigin = i;
+              }
             }
 
             // TODO: #633 - Review the following line (recordAllowedRequest).
@@ -328,12 +336,14 @@ RequestProcessor = (function(self) {
       }
     }
 
-    showRedirectNotification(aRequest) || Logger.warning(
-        Logger.TYPE_HEADER_REDIRECT,
-        "A redirection of a top-level document has been observed, " +
-        "but it was not possible to notify the user! The redirection " +
-        "was from page <" + request.originURI + "> " +
-        "to <" + request.destURI + ">.");
+    let rv = showRedirectNotification(aRequest);
+    if (true !== rv) {
+      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+          "A redirection of a top-level document has been observed, " +
+          "but it was not possible to notify the user! The redirection " +
+          "was from page <" + aRequest.originURI + "> " +
+          "to <" + aRequest.destURI + ">.");
+    }
   }
 
   /**
@@ -351,7 +361,7 @@ RequestProcessor = (function(self) {
     const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
 
     for (let i = 0; i < ASSUME_REDIRECT_LOOP; ++i) {
-      if (false === (initialOrigin in internal.allowedRedirectsReverse)) {
+      if (!internal.allowedRedirectsReverse.hasOwnProperty(initialOrigin)) {
         // break the loop
         break;
       }
@@ -389,7 +399,7 @@ RequestProcessor = (function(self) {
     // the "raw" dest string might be a relative or absolute URI
     let rawDestString = httpResponse.rawDestString;
 
-    if (httpResponse.containsRedirection === false || rawDestString === null) {
+    if (httpResponse.hasRedirectionHeader === false || rawDestString === null) {
       return;
     }
 
@@ -404,14 +414,16 @@ RequestProcessor = (function(self) {
       var originPath = httpResponse.originURI.path;
       // We always have to check "/favicon.ico" because Firefox will use this
       // as a default path and that request won't pass through shouldLoad().
-      if (originPath == "/favicon.ico" || internal.faviconRequests[originString]) {
+      if (originPath === "/favicon.ico" ||
+          internal.faviconRequests[originString]) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
         internal.faviconRequests[rawDestString] = true;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT, "'" + httpResponse.redirHeaderType
-                + "' header to <" + rawDestString + "> " + "from <" + originString
-                + "> appears to be a redirected favicon request. "
-                + "This will be treated as a content request.");
+        Logger.info(Logger.TYPE_HEADER_REDIRECT,
+            "'" + httpResponse.redirHeaderType + "' header " +
+            "to <" + rawDestString + "> " + "from <" + originString + "> " +
+            "appears to be a redirected favicon request. " +
+            "This will be treated as a content request.");
       } else {
         Logger.warning(Logger.TYPE_HEADER_REDIRECT,
             "** ALLOWED ** '" + httpResponse.redirHeaderType +
@@ -424,7 +436,7 @@ RequestProcessor = (function(self) {
 
     var request = new RedirectRequest(httpResponse);
     processUrlRedirection(request);
-  };
+  }
 
 
 

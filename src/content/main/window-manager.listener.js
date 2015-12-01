@@ -21,7 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-WindowListener = (function() {
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
+
+/* exported WindowListener */
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// WindowListener
+//==============================================================================
+
+var WindowListener = (function() {
   let self = {};
 
   let nextWinID = 0;
@@ -29,7 +40,7 @@ WindowListener = (function() {
 
 
   let addEvLis = function(eventName, winID) {
-    if ((typeof listeners[winID]) !== 'undefined' &&
+    if (typeof listeners[winID] !== "undefined" &&
         listeners[winID][eventName] !== null) {
       listeners[winID].window.addEventListener(eventName,
                                                listeners[winID][eventName],
@@ -42,7 +53,7 @@ WindowListener = (function() {
         listeners[winID][eventName] !== null) {
       listeners[winID].window.removeEventListener(eventName,
                                                   listeners[winID][eventName]);
-      if (eventName == 'unload') {
+      if (eventName === "unload") {
         // when removing the 'unload' listener, also remove the 'load'
         // listener and then delete listener[winID].
         removeEvLis("load", winID);
@@ -50,6 +61,18 @@ WindowListener = (function() {
         delete listeners[winID];
       }
     }
+  };
+
+
+
+  // external functions to be called on "load" or "unload" events
+  let externalLoadFunction = null;
+  let externalUnloadFunction = null;
+  self.setLoadFunction = function(f) {
+    externalLoadFunction = f;
+  };
+  self.setUnloadFunction = function(f) {
+    externalUnloadFunction = f;
   };
 
 
@@ -62,8 +85,8 @@ WindowListener = (function() {
     // ----------------------------------------------
     let onLoad = function(event) {
       removeEvLis("load", winID);
-      
-      if (window.document.documentElement.getAttribute("windowtype") ==
+
+      if (window.document.documentElement.getAttribute("windowtype") ===
           "navigator:browser") {
         if (!!externalLoadFunction) {
           externalLoadFunction(window);
@@ -75,7 +98,7 @@ WindowListener = (function() {
     let onUnload = function(event) {
       removeEvLis("unload", onUnload);
 
-      if (window.document.documentElement.getAttribute("windowtype") ==
+      if (window.document.documentElement.getAttribute("windowtype") ===
           "navigator:browser") {
         if (!!externalUnloadFunction) {
           externalUnloadFunction(window);
@@ -106,18 +129,6 @@ WindowListener = (function() {
     listeners = {};
     nextWinID = 0;
   }
-
-
-
-  // external functions to be called on "load" or "unload" events
-  let externalLoadFunction = null;
-  let externalUnloadFunction = null;
-  self.setLoadFunction = function(f) {
-    externalLoadFunction = f;
-  };
-  self.setUnloadFunction = function(f) {
-    externalUnloadFunction = f;
-  };
 
 
   let listening = false;

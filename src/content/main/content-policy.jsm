@@ -21,38 +21,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PolicyImplementation"];
+/* exported PolicyImplementation */
+this.EXPORTED_SYMBOLS = ["PolicyImplementation"];
 
-let globalScope = this;
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Logger} = importModule("lib/logger");
+let {NormalRequest} = importModule("lib/request");
+let {Utils} = importModule("lib/utils");
+let {RequestProcessor} = importModule("lib/request-processor");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/constants",
-  "lib/logger",
-  "lib/request",
-  "lib/utils",
-  "lib/request-processor",
-  "lib/environment"
-], globalScope);
-
+//==============================================================================
+// PolicyImplementation
+//==============================================================================
 
 // TODO: implement nsIChannelEventSink to catch redirects as Adblock Plus does.
-let PolicyImplementation = (function() {
+var PolicyImplementation = (function() {
+  let self = {};
+
   let xpcom_categories = ["content-policy"];
 
-  let self = {
-    classDescription: "RequestPolicy ContentPolicy Implementation",
-    classID:          Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}"),
-    contractID:       "@requestpolicy.org/rpcontinued-service;1"
-  };
+  self.classDescription = "RequestPolicy ContentPolicy Implementation";
+  self.classID = Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}");
+  self.contractID = "@requestpolicy.org/rpcontinued-service;1";
 
   /**
    * Registers the content policy on startup.
@@ -126,7 +124,10 @@ let PolicyImplementation = (function() {
 
     // Actually create the final function, as it is described
     // above.
+    // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
+    /* jshint -W119 */
     self.shouldLoad = () => finalReturnValue;
+    /* jshint +W119 */
 
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
@@ -144,18 +145,18 @@ let PolicyImplementation = (function() {
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
 
-  //
+  //----------------------------------------------------------------------------
   // nsISupports interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
                                                Ci.nsIObserver,
                                                Ci.nsIFactory,
                                                Ci.nsISupportsWeakReference]);
 
-  //
+  //----------------------------------------------------------------------------
   // nsIContentPolicy interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   // https://developer.mozilla.org/en/nsIContentPolicy
 
@@ -170,11 +171,14 @@ let PolicyImplementation = (function() {
     //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
   };
 
-  self.shouldProcess = (() => C.CP_OK);
+  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
+  /* jshint -W119 */
+  self.shouldProcess = () => C.CP_OK;
+  /* jshint +W119 */
 
-  //
+  //----------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {

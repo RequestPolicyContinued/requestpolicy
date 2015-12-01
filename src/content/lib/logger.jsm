@@ -21,26 +21,29 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Logger"];
+/* exported Logger */
+this.EXPORTED_SYMBOLS = ["Logger"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+/* global dump */
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/prefs"
-], this);
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {rpPrefBranch} = importModule("lib/prefs");
+
+//==============================================================================
+// Logger
+//==============================================================================
 
 /**
  * Provides logging methods
  */
-let Logger = (function() {
+var Logger = (function() {
 
   let self = {
     TYPE_CONTENT: 1, // content whose origin isn't known more specifically
@@ -81,6 +84,20 @@ let Logger = (function() {
 
   let initialized = false;
 
+  /**
+   * This function will be called in case Logger isn't fully initialized yet.
+   */
+  function initialLog() {
+    init();
+    log.apply(this, arguments);
+  }
+
+  /**
+  * Initially call initialLog() on doLog().
+  * After initialization it will be log().
+  */
+  let doLog = initialLog;
+
   // initially, enable logging. later the logging preferences of the user will
   // will be loaded.
   let enabled = true;
@@ -89,7 +106,7 @@ let Logger = (function() {
   let level = self.LEVEL_INFO;
   let types = self.TYPE_ALL;
 
-  function updateLoggingSettings(rp) {
+  function updateLoggingSettings() {
     enabled = rpPrefBranch.getBoolPref("log");
     level = rpPrefBranch.getIntPref("log.level");
     types = rpPrefBranch.getIntPref("log.types");
@@ -127,16 +144,10 @@ let Logger = (function() {
 
 
 
-  /**
-   * This function will be called in case Logger isn't fully initialized yet.
-   */
-  let initialLog = function() {
-    init();
-    log.apply(this, arguments);
-  };
 
-  let log = function(aLevel, aType, aMessage, aError) {
-    let shouldLog = (enabled && aLevel >= level && types & aType);
+
+  function log(aLevel, aType, aMessage, aError) {
+    let shouldLog = enabled && aLevel >= level && types & aType;
 
     // #ifdef UNIT_TESTING
     if (aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE) {
@@ -154,18 +165,12 @@ let Logger = (function() {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
       let typeName = self._TYPE_NAMES[aType.toString()];
 
-      let stack = (aError && aError.stack) ?
+      let stack = aError && aError.stack ?
                   ", stack was:\n" + aError.stack : "";
-      self.printFunc("[RequestPolicy] [" + levelName + "] [" + typeName + "] "
-          + aMessage + stack + "\n");
+      self.printFunc("[RequestPolicy] [" + levelName + "] " +
+          "[" + typeName + "] " + aMessage + stack + "\n");
     }
-  };
-
-  /**
-   * Initially call initialLog() on doLog().
-   * After initialization it will be log().
-   */
-  let doLog = initialLog;
+  }
 
 
 
@@ -177,24 +182,28 @@ let Logger = (function() {
   self.dump = doLog.bind(self, self.LEVEL_DEBUG, self.TYPE_INTERNAL);
 
   self.vardump = function(obj, name, ignoreFunctions) {
-    if (name != undefined) {
+    if (name !== undefined) {
       self.dump(name + " : " + obj);
     } else {
       self.dump(obj);
     }
-    for (var i in obj) {
+    // Iterate through all keys in the whole prototype chain.
+    /* jshint -W089 */ // don't require checking hasOwnProperty()
+    for (let key in obj) {
+      let value = obj[key];
       try {
-        if (typeof obj[i] == 'function') {
+        if (typeof value === "function") {
           if (!ignoreFunctions) {
-            self.dump("    => key: " + i + " / value: instanceof Function");
+            self.dump("    => key: " + key + " / value: instanceof Function");
           }
         } else {
-          self.dump("    => key: " + i + " / value: " + obj[i]);
+          self.dump("    => key: " + key + " / value: " + value);
         }
       } catch (e) {
-        self.dump("    => key: " + i + " / value: [unable to access value]");
+        self.dump("    => key: " + key + " / value: [unable to access value]");
       }
     }
+    /* jshint +W089 */
   };
 
   return self;
@@ -202,11 +211,16 @@ let Logger = (function() {
 
 // #ifdef UNIT_TESTING
 
+//==============================================================================
+// unit testing part
+//==============================================================================
+
 /**
  * Triggers errors for a RequestPolicy unit test.
  * It's used to test Error Detection from the unit tests.
  */
-var UnitTestObserver = (function (self) {
+var UnitTestObserver = (function () {
+  let self = {};
 
   var loggingErrorTopic = "requestpolicy-trigger-logging-error";
   var consoleErrorTopic = "requestpolicy-trigger-console-error";
@@ -231,7 +245,7 @@ var UnitTestObserver = (function (self) {
   function splitColon(aString) {
     var index = aString.indexOf(":");
     if (index === -1) {
-      return [aString, ""]
+      return [aString, ""];
     }
     var part1 = aString.substr(0, index);
     var part2 = aString.substr(index + 1);
@@ -262,7 +276,7 @@ var UnitTestObserver = (function (self) {
   };
 
   function produceReferenceError() {
-    var localVar = nonexistantVariable;
+    var localVar = nonexistantVariable; // jshint ignore:line
   }
 
   function runAsync(aFunction) {
@@ -272,7 +286,7 @@ var UnitTestObserver = (function (self) {
   }
 
   return self;
-})({});
+}());
 
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
                                       UnitTestObserver.startup);

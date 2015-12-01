@@ -21,180 +21,217 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
-  "HttpResponse"
-];
+/* exported HttpResponse */
+this.EXPORTED_SYMBOLS = ["HttpResponse"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/windows"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {WindowUtils} = importModule("lib/utils/windows");
+let {Prefs} = importModule("lib/prefs");
 
-
+//==============================================================================
+// HttpResponse
+//==============================================================================
 
 function HttpResponse(aHttpChannel) {
   this.httpChannel = aHttpChannel;
 
-  this.containsRedirection = undefined;
-  this.redirHeaderType = undefined;
-  this.redirHeaderValue = undefined;
-
-  // initialize
-  determineHttpHeader.call(this);
-  XPCOMUtils.defineLazyGetter(this, "rawDestString", getRawDestString);
-  XPCOMUtils.defineLazyGetter(this, "destURI", getDestURI);
-  XPCOMUtils.defineLazyGetter(this, "originURI", getOriginURI);
-
-  XPCOMUtils.defineLazyGetter(this, "loadContext", getLoadContext);
-  XPCOMUtils.defineLazyGetter(this, "browser", getBrowser);
-  XPCOMUtils.defineLazyGetter(this, "docShell", getDocShell);
+  this._determineRedirectionHeader();
 }
 
-HttpResponse.headerTypes = ["Location", "Refresh"];
+HttpResponse.HEADER_TYPES = Object.freeze(["Location", "Refresh"]);
 
 HttpResponse.prototype.removeResponseHeader = function() {
   this.httpChannel.setResponseHeader(this.redirHeaderType, "", false);
 };
 
-
-
-
+/**
+ * Get the value of a particular response header.
+ *
+ * @return {String|undefined} The header's value, or `undefined`
+ *     if the header does not exist.
+ */
+HttpResponse.prototype._getResponseHeader = function (aHeaderName) {
+  try {
+    return this.httpChannel.getResponseHeader(aHeaderName);
+  } catch (e if e.result === Cr.NS_ERROR_NOT_AVAILABLE) {
+    // The header is not set in the response.
+    return undefined;
+  }
+};
 
 /**
- * This function calls getResponseHeader(headerType). If there is no such
- * header, that function will throw NS_ERROR_NOT_AVAILABLE.
+ * Determine `headerType` and `headerValue`.
  */
-function determineHttpHeader() {
-  this.containsRedirection = true;
+HttpResponse.prototype._determineRedirectionHeader = function () {
+  if (this.hasOwnProperty("hasRedirectionHeader")) {
+    // Determine only once.
+    return;
+  }
 
-  for (let i in HttpResponse.headerTypes) {
-    try {
-      this.redirHeaderType = HttpResponse.headerTypes[i];
-      this.redirHeaderValue = this.httpChannel.getResponseHeader(this.redirHeaderType);
-      // In case getResponseHeader() didn't throw NS_ERROR_NOT_AVAILABLE,
-      // the header-type exists, so we return:
+  for (let headerType of HttpResponse.HEADER_TYPES) {
+    let headerValue = this._getResponseHeader(headerType);
+    if (headerValue !== undefined) {
+      // The redirection header exists.
+      this.hasRedirectionHeader = true;
+      this.redirHeaderType = headerType;
+      this.redirHeaderValue = headerValue;
       return;
-    } catch (e) {
     }
   }
 
-  // The following will be executed when there is no redirection:
-  this.containsRedirection = false;
+  // No redirection header in the response.
+  this.hasRedirectionHeader = false;
   this.redirHeaderType = null;
   this.redirHeaderValue = null;
-}
+};
 
-function getRawDestString() {
-  switch (this.redirHeaderType) {
-    case "Location":
-      return this.redirHeaderValue;
+Object.defineProperty(HttpResponse.prototype, "rawDestString", {
+  get: function () {
+    if (!this.hasOwnProperty("_rawDestString")) {
+      switch (this.redirHeaderType) {
+        case "Location":
+          this._rawDestString = this.redirHeaderValue;
+          break;
 
-    case "Refresh":
-      try {
-        // We can ignore the delay because we aren't manually doing
-        // the refreshes. Allowed refreshes we still leave to the browser.
-        // The rawDestString may be empty if the origin is what should be refreshed.
-        // This will be handled by DomainUtil.determineRedirectUri().
-        return DomainUtil.parseRefresh(this.redirHeaderValue).destURI;
-      } catch (e) {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "Invalid refresh header: <" + this.redirHeaderValue + ">");
-        if (!Prefs.isBlockingDisabled()) {
-          this.removeResponseHeader();
-        }
-        return null;
+        case "Refresh":
+          try {
+            // We can ignore the delay because we aren't manually doing
+            // the refreshes. Allowed refreshes we still leave to the browser.
+            // The rawDestString may be empty if the origin is what should
+            // be refreshed.
+            // This will be handled by DomainUtil.determineRedirectUri().
+            this._rawDestString = DomainUtil.
+                                  parseRefresh(this.redirHeaderValue).destURI;
+          } catch (e) {
+            Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+                "Invalid refresh header: <" + this.redirHeaderValue + ">");
+            if (!Prefs.isBlockingDisabled()) {
+              this.removeResponseHeader();
+            }
+            this._rawDestString = null;
+          }
+          break;
+
+        default:
+          this._rawDestString = null;
+          break;
       }
-
-    default:
-      return null;
-  }
-}
-
-function getDestURI() {
-  return Services.io.newURI(this.rawDestString, null, this.originURI);
-}
-
-function getOriginURI() {
-  return Services.io.newURI(this.httpChannel.name, null, null);
-}
-
-function getLoadContext() {
-  // more info on the load context:
-  // https://developer.mozilla.org/en-US/Firefox/Releases/3.5/Updating_extensions
-
-  /* start - be careful when editing here */
-  try {
-    return this.httpChannel.notificationCallbacks
-                           .QueryInterface(Ci.nsIInterfaceRequestor)
-                           .getInterface(Ci.nsILoadContext);
-  } catch (ex) {
-    try {
-      return this.httpChannel.loadGroup
-                             .notificationCallbacks
-                             .getInterface(Ci.nsILoadContext);
-    } catch (ex2) {
-      // fixme: the Load Context can't be found in case a favicon
-      //        request is redirected, that is, the server responds
-      //        with a 'Location' header when the server's
-      //        `favicon.ico` is requested.
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
-                     "Load Context couldn't be found! " + ex2);
-      return null;
     }
+    return this._rawDestString;
   }
-  /* end - be careful when editing here */
-}
+});
+
+Object.defineProperty(HttpResponse.prototype, "destURI", {
+  get: function () {
+    if (!this.hasOwnProperty("_destURI")) {
+      this._destURI = Services.io.newURI(this.rawDestString, null,
+                                         this.originURI);
+    }
+    return this._destURI;
+  }
+});
+
+Object.defineProperty(HttpResponse.prototype, "originURI", {
+  get: function () {
+    if (!this.hasOwnProperty("_originURI")) {
+      this._originURI = Services.io.newURI(this.httpChannel.name, null, null);
+    }
+    return this._originURI;
+  }
+});
+
+Object.defineProperty(HttpResponse.prototype, "loadContext", {
+  get: function () {
+    if (!this.hasOwnProperty("_loadContext")) {
+      // more info on the load context:
+      // https://developer.mozilla.org/en-US/Firefox/Releases/3.5/Updating_extensions
+
+      /* start - be careful when editing here */
+      try {
+        this._loadContext = this.httpChannel.notificationCallbacks
+                               .QueryInterface(Ci.nsIInterfaceRequestor)
+                               .getInterface(Ci.nsILoadContext);
+      } catch (ex) {
+        try {
+          this._loadContext = this.httpChannel.loadGroup
+                                 .notificationCallbacks
+                                 .getInterface(Ci.nsILoadContext);
+        } catch (ex2) {
+          // fixme: the Load Context can't be found in case a favicon
+          //        request is redirected, that is, the server responds
+          //        with a 'Location' header when the server's
+          //        `favicon.ico` is requested.
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The redirection's " +
+                         "Load Context couldn't be found! " + ex2);
+          this._loadContext = null;
+        }
+      }
+      /* end - be careful when editing here */
+    }
+    return this._loadContext;
+  }
+});
 
 /**
  * Get the <browser> related to this request.
  * @return {?nsIDOMXULElement}
  */
-function getBrowser() {
-  let loadContext = this.loadContext;
+Object.defineProperty(HttpResponse.prototype, "browser", {
+  get: function () {
+    if (!this.hasOwnProperty("_browser")) {
+      let loadContext = this.loadContext;
 
-  if (loadContext === null) {
-    return null;
-  }
-
-  try {
-    if (loadContext.topFrameElement) {
-      // the top frame element should be already the browser element
-      return loadContext.topFrameElement;
-    } else {
-      // we hope the associated window is available. in multiprocessor
-      // firefox it's not available.
-      return WindowUtils.getBrowserForWindow(loadContext.topWindow);
+      if (loadContext === null) {
+        this._browser = null;
+      } else {
+        try {
+          if (loadContext.topFrameElement) {
+            // the top frame element should be already the browser element
+            this._browser = loadContext.topFrameElement;
+          } else {
+            // we hope the associated window is available. in multiprocessor
+            // firefox it's not available.
+            this._browser = WindowUtils.
+                            getBrowserForWindow(loadContext.topWindow);
+          }
+        } catch (e) {
+          Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The browser for " +
+                         "the redirection's Load Context couldn't be " +
+                         "found! " + e);
+          this._browser = null;
+        }
+      }
     }
-  } catch (e) {
-    Logger.warning(Logger.TYPE_HEADER_REDIRECT, "The browser for " +
-                   "the redirection's Load Context couldn't be " +
-                   "found! " + e);
-    return null;
+    return this._browser;
   }
-}
+});
 
 /**
  * Get the DocShell related to this request.
  * @return {?nsIDocShell}
  */
-function getDocShell() {
-  try {
-    return this.httpChannel.notificationCallbacks
-                           .QueryInterface(Ci.nsIInterfaceRequestor)
-                           .getInterface(Ci.nsIDocShell);
-  } catch (e) {
-    Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-                   "The redirection's DocShell couldn't be " +
-                   "found! " + e);
-    return null;
+Object.defineProperty(HttpResponse.prototype, "docShell", {
+  get: function () {
+    if (!this.hasOwnProperty("_docShell")) {
+      try {
+        this._docShell = this.httpChannel.notificationCallbacks.
+                         QueryInterface(Ci.nsIInterfaceRequestor).
+                         getInterface(Ci.nsIDocShell);
+      } catch (e) {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+                       "The redirection's DocShell couldn't be " +
+                       "found! " + e);
+        this._docShell = null;
+      }
+    }
+    return this._docShell;
   }
-}
+});

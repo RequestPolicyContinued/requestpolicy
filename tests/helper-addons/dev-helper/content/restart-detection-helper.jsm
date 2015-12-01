@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = ["RestartDetectionHelper"];
+this.EXPORTED_SYMBOLS = ["RestartDetectionHelper"];
 
 RestartDetectionHelper = {
   mark: null

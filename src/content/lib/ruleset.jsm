@@ -21,29 +21,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported Ruleset, RawRuleset */
+this.EXPORTED_SYMBOLS = [
   "Ruleset",
   "RawRuleset"
 ];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/constants"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {C} = importModule("lib/utils/constants");
 
+//==============================================================================
+// utilities
+//==============================================================================
 
 function dprint(msg) {
-  if (typeof print == "function") {
-    print(msg);
-  } else {
-    Logger.info(Logger.TYPE_POLICY, msg);
-  }
+  Logger.info(Logger.TYPE_POLICY, msg);
 }
 
 function dwarn(msg) {
@@ -78,30 +76,38 @@ exampleRawDataObj = {
 };
 */
 
-function dump(arr,level) {
+/*
+// currently unused.
+function dump(arr, level=0) {
   var dumped_text = "";
-  if(!level) level = 0;
 
   //The padding given at the beginning of the line.
   var level_padding = "";
-  for(var j=0;j<level+1;j++) level_padding += "    ";
+  for (let j = 0; j < level + 1; j++) {
+    level_padding += "    ";
+  }
 
-  if(typeof(arr) == 'object') { //Array/Hashes/Objects
-    for(var item in arr) {
-      var value = arr[item];
+  if (typeof arr === "object") { //Array/Hashes/Objects
+    for (let item in arr) {
+      let value = arr[item];
 
-      if(typeof(value) == 'object') { //If it is an array,
+      if (typeof value === "object") { //If it is an array,
         dumped_text += level_padding + "'" + item + "' ...\n";
-        dumped_text += dump(value,level+1);
+        dumped_text += dump(value, level + 1);
       } else {
         dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
       }
     }
   } else { //Stings/Chars/Numbers etc.
-    dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+    dumped_text = "===>" + arr + "<===(" + typeof arr + ")";
   }
   return dumped_text;
 }
+*/
+
+//==============================================================================
+// RawRuleset
+//==============================================================================
 
 function RawRuleset(jsonData) {
   this._metadata = {"version" : 1};
@@ -109,11 +115,11 @@ function RawRuleset(jsonData) {
   if (jsonData) {
     this._fromJSON(jsonData);
   }
-  if (!this._entries["allow"]) {
-    this._entries["allow"] = [];
+  if (!this._entries.allow) {
+    this._entries.allow = [];
   }
-  if (!this._entries["deny"]) {
-    this._entries["deny"] = [];
+  if (!this._entries.deny) {
+    this._entries.deny = [];
   }
 }
 
@@ -126,24 +132,25 @@ RawRuleset.prototype = {
   },
 
   getAllowRuleCount : function() {
-    return this._entries["allow"].length;
+    return this._entries.allow.length;
   },
 
   getDenyRuleCount : function() {
-    return this._entries["deny"].length;
+    return this._entries.deny.length;
   },
 
   _addEntryHelper : function(entryPart, policy) {
-    if (entryPart["h"]) {
-      var rules = policy.addHost(entryPart["h"]).rules;
+    let rules;
+    if (entryPart.h) {
+      rules = policy.addHost(entryPart.h).rules;
     } else {
       rules = policy.rules;
     }
-    var r = rules.add(entryPart["s"], entryPart["port"]);
-    if (entryPart["pathPre"]) {
-      r.pathPre = entryPart["pathPre"];
-    } else if (entryPart["pathRegex"]) {
-      r.pathRegex = new RegExP(entryPart["pathRegex"]);
+    let r = rules.add(entryPart.s, entryPart.port);
+    if (entryPart.pathPre) {
+      r.pathPre = entryPart.pathPre;
+    } else if (entryPart.pathRegex) {
+      r.pathRegex = new RegExp(entryPart.pathRegex);
     }
     return [rules, r];
   },
@@ -151,8 +158,8 @@ RawRuleset.prototype = {
   _addEntryToRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry["o"];
-    var d = entry["d"];
+    var o = entry.o;
+    var d = entry.d;
     var rules, r;
 
     //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
@@ -162,7 +169,7 @@ RawRuleset.prototype = {
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -171,7 +178,7 @@ RawRuleset.prototype = {
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
       //r.originRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
         r.denyOrigin = true;
@@ -180,7 +187,7 @@ RawRuleset.prototype = {
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
       //r.destinationRuleAction = ruleAction;
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
@@ -193,8 +200,8 @@ RawRuleset.prototype = {
   },
 
   ruleExists : function(ruleAction, ruleData) {
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -203,7 +210,7 @@ RawRuleset.prototype = {
     var entries = this._entries[actionStr];
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
-      if (ruleStr == curRuleStr) {
+      if (ruleStr === curRuleStr) {
         return true;
       }
     }
@@ -220,8 +227,8 @@ RawRuleset.prototype = {
   addRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -237,8 +244,8 @@ RawRuleset.prototype = {
   },
 
   // _removeEntryHelper : function(entryPart, policy) {
-  //     if (entryPart["h"]) {
-  //       var originEntry = policy.getHost(entryPart["h"]);
+  //     if (entryPart.h) {
+  //       var originEntry = policy.getHost(entryPart.h);
   //       if (!originEntry) {
   //         return null;
   //       }
@@ -246,106 +253,106 @@ RawRuleset.prototype = {
   //     } else {
   //       rules = policy.rules;
   //     }
-  //     return rules.get(entryPart["s"], entryPart["port"]);
+  //     return rules.get(entryPart.s, entryPart.port);
   // },
 
   _removeEntryFromRuleset : function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry["o"];
-    var d = entry["d"];
+    var o = entry.o;
+    var d = entry.d;
     var rules, r;
 
     // TODO: refactor like done with _addEntryToRuleset
 
     if (o && d) {
-      if (o["h"]) {
-        var originEntry = policy.getHost(o["h"]);
+      if (o.h) {
+        let originEntry = policy.getHost(o.h);
         if (!originEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = originEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(o["s"], o["port"]);
+      r = rules.get(o.s, o.port);
       if (!r || !r.destinations) {
         return;
       }
 
-      if (d["h"]) {
-        var destEntry = r.destinations.getHost(d["h"]);
+      if (d.h) {
+        let destEntry = r.destinations.getHost(d.h);
         if (!destEntry) {
           return;
         }
-        var rules = destEntry.rules;
+        rules = destEntry.rules;
       } else {
         rules = r.destinations.rules;
       }
-      r = rules.get(d["s"], d["port"]);
+      r = rules.get(d.s, d.port);
       if (!r) {
         return;
       }
 
-      // if (r.destinationRuleAction == ruleAction) {
+      // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
       //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
       }
 
     } else if (o && !d) {
-      if (o["h"]) {
-        var originEntry = policy.getHost(o["h"]);
+      if (o.h) {
+        let originEntry = policy.getHost(o.h);
         if (!originEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = originEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(o["s"], o["port"]);
+      r = rules.get(o.s, o.port);
       if (!r) {
         return;
       }
 
-      // if (r.originRuleAction == ruleAction) {
+      // if (r.originRuleAction === ruleAction) {
       //   r.originRuleAction = null;
       // }
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
       }
 
     } else if (!o && d) {
-      if (d["h"]) {
-        var originEntry = policy.getHost(d["h"]);
-        if (!originEntry) {
+      if (d.h) {
+        let destEntry = policy.getHost(d.h);
+        if (!destEntry) {
           return;
         }
-        var rules = originEntry.rules;
+        rules = destEntry.rules;
       } else {
         rules = policy.rules;
       }
-      var r = rules.get(d["s"], d["port"]);
+      r = rules.get(d.s, d.port);
       if (!r) {
         return;
       }
 
-      // if (r.destinationRuleAction == ruleAction) {
+      // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      if (ruleAction == C.RULE_ACTION_ALLOW) {
+      if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
-      } else if (ruleAction == C.RULE_ACTION_DENY) {
+      } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
         throw "Invalid rule type: " + ruleAction;
@@ -367,8 +374,8 @@ RawRuleset.prototype = {
   removeRule : function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
-    var actionStr = ruleAction == C.RULE_ACTION_ALLOW ? "allow" :
-        ruleAction == C.RULE_ACTION_DENY ? "deny" : "";
+    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+        ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
@@ -377,7 +384,7 @@ RawRuleset.prototype = {
     var removeIndex = false;
     for (var i in entries) {
       var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
-      if (ruleStr == curRuleStr) {
+      if (ruleStr === curRuleStr) {
         // |i| is a string which will cause bugs when we use it in arithmetic
         // expressions below. Why does this form of iterator give us string
         // indexes? I have no idea but it's something to watch out for.
@@ -388,7 +395,7 @@ RawRuleset.prototype = {
     if (removeIndex !== false) {
       var begin = entries.slice(0, removeIndex);
       var end = entries.slice(Number(removeIndex) + 1);
-      if (begin.length + end.length + 1 != entries.length) {
+      if (begin.length + end.length + 1 !== entries.length) {
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
       this._entries[actionStr] = begin.concat(end);
@@ -408,11 +415,12 @@ RawRuleset.prototype = {
 
     for (var actionStr in this._entries) {
       //dprint("actionStr: " + actionStr);
-      if (actionStr != "allow" && actionStr != "deny") {
+      if (actionStr !== "allow" && actionStr !== "deny") {
         dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleAction = actionStr == "allow" ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
+      var ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
+          C.RULE_ACTION_DENY;
       var entryArray = this._entries[actionStr];
       for (var i in entryArray) {
         //dprint("toRuleset: adding entry");
@@ -430,9 +438,9 @@ RawRuleset.prototype = {
     if (!("version" in dataObj.metadata)) {
       throw "Invalid policy data: no 'version' key";
     }
-    if (dataObj.metadata.version != 1) {
-      throw "Wrong metadata version. Expected 1, was "
-          + dataObj.metadata.version;
+    if (dataObj.metadata.version !== 1) {
+      throw "Wrong metadata version. Expected 1, was " +
+          dataObj.metadata.version;
     }
     if (!("entries" in dataObj)) {
       throw "Invalid policy data: no 'entries' key";
@@ -467,29 +475,23 @@ RawRuleset.prototype = {
   }
 };
 
-
-
-
-function RuleIterator(rules) {
-  this._rulesIterator = new Iterator(rules);
-}
-RuleIterator.prototype.next = function() {
-  // The default Iterator over arrays returns a tuple of [index, item].
-  return this._rulesIterator.next()[1];
-}
-
+//==============================================================================
+// Rules
+//==============================================================================
 
 function Rules() {
+  /**
+   * @type {Array<Rule>}
+   */
   this._rules = [];
 }
 
 Rules.prototype = {
   _rules : null,
 
-  print : function(depth) {
-    depth = depth || 0;
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      item.print(depth);
+  print : function(depth = 0) {
+    for (let rule of this._rules) {
+      rule.print(depth);
     }
   },
 
@@ -498,35 +500,38 @@ Rules.prototype = {
   },
 
   isEmpty : function() {
-    return this._rules.length == 0;
+    return this._rules.length === 0;
   },
 
-  __iterator__ : function() {
-    return new RuleIterator(this._rules);
+  [Symbol.iterator] : function*() {
+    yield* this._rules;
   },
 
   get : function(scheme, port) {
-    var rule = new Rule(scheme, port);
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      if (item.isEqual(rule)) {
-        return item;
+    let rule = new Rule(scheme, port);
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(rule)) {
+        return existingRule;
       }
     }
     return null;
   },
 
   add : function(scheme, port) {
-    var rule = new Rule(scheme, port);
-    for (var i = 0, item; item = this._rules[i]; i++) {
-      if (item.isEqual(rule)) {
-        return item;
+    let newRule = new Rule(scheme, port);
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(newRule)) {
+        return existingRule;
       }
     }
-    this._rules.push(rule);
-    return rule;
+    this._rules.push(newRule);
+    return newRule;
   }
 };
 
+//==============================================================================
+// Rule
+//==============================================================================
 
 /*
  * Semantics of rules:
@@ -567,15 +572,15 @@ Rule.prototype = {
   destinations : null,
 
   toString : function() {
-    return "[Rule " + this.scheme + " " + this.port + " " + this.path + " "
-    // TODO
+    return "[Rule " + this.scheme + " " + this.port + " " + this.path + " " +
+           // TODO
            // + "originRuleAction:" + this.originRuleAction + " "
            // + "destinationRuleAction:" + this.destinationRuleAction + " "
-           + "allowOrigin:" + this.allowOrigin + " "
-           + "denyOrigin:" + this.denyOrigin + " "
-           + "allowDestination:" + this.allowDestination + " "
-           + "denyDestination:" + this.denyDestination + " "
-           + "]";
+           "allowOrigin:" + this.allowOrigin + " " +
+           "denyOrigin:" + this.denyOrigin + " " +
+           "allowDestination:" + this.allowDestination + " " +
+           "denyDestination:" + this.denyDestination + " " +
+           "]";
   },
 
   print : function(depth) {
@@ -592,9 +597,9 @@ Rule.prototype = {
   },
 
   isEqual : function(otherRule) {
-    return this.scheme == otherRule.scheme &&
-           this.port == otherRule.port &&
-           this.path == otherRule.path;
+    return this.scheme === otherRule.scheme &&
+        this.port === otherRule.port &&
+        this.path === otherRule.path;
   },
 
   initDestinations : function() {
@@ -605,7 +610,7 @@ Rule.prototype = {
   },
 
   isMatch : function(uriObj) {
-    if (this.scheme && this.scheme != uriObj.scheme) {
+    if (this.scheme && this.scheme !== uriObj.scheme) {
       //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
       //       this.scheme + "')");
       return false;
@@ -630,8 +635,8 @@ Rule.prototype = {
     }
 
     if (this.path) {
-      if (typeof this.path == "string") {
-        if (uriObj.path.indexOf(this.path) != 0) {
+      if (typeof this.path === "string") {
+        if (uriObj.path.indexOf(this.path) !== 0) {
           //dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
           return false;
         }
@@ -645,9 +650,12 @@ Rule.prototype = {
   }
 };
 
+//==============================================================================
+// DomainEntry
+//==============================================================================
 
 function DomainEntry(name, fullName, higher) {
-  if (typeof name != "string" && name !== null) {
+  if (typeof name !== "string" && name !== null) {
     throw "Invalid type: DomainEntry name must be a string or null.";
   }
   this._name = name;
@@ -702,6 +710,9 @@ DomainEntry.prototype = {
   }
 };
 
+//==============================================================================
+// IPAddressEntry
+//==============================================================================
 
 function IPAddressEntry(address) {
   this.address = address;
@@ -730,6 +741,9 @@ IPAddressEntry.prototype = {
   }
 };
 
+//==============================================================================
+// Ruleset
+//==============================================================================
 
 function Ruleset(name) {
   this._name = name || null;
@@ -906,27 +920,33 @@ Ruleset.prototype = {
     }
   },
 
+  /**
+   * @param {nsIURI} origin
+   * @param {nsIURI} dest
+   * @return {Array<{length: 2, 0: Array<>, 1: Array<>}>}
+   */
   check : function(origin, dest) {
     var matchedAllowRules = [];
     var matchedDenyRules = [];
+    var originHost, destHost;
     try {
-     var originHost = origin["host"];
+      originHost = origin.host;
     } catch (e) {
-      var originHost = '';
+      originHost = "";
     }
     try {
-      var destHost = dest["host"];
+      destHost = dest.host;
     } catch (e) {
-      var destHost = '';
+      destHost = "";
     }
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (var entry in this.getHostMatches(originHost)) {
+    originouterloop: for (let entry in this.getHostMatches(originHost)) {
       //dprint(entry);
-      for (var rule in entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
-        var ruleMatchedOrigin = rule.isMatch(origin);
+        let ruleMatchedOrigin = rule.isMatch(origin);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
           //dprint("ALLOW origin by rule " + entry + " " + rule);
@@ -956,9 +976,9 @@ Ruleset.prototype = {
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
-          for (var destEntry in rule.destinations.getHostMatches(destHost)) {
+          for (let destEntry in rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
-            for (var destRule in destEntry.rules) {
+            for (let destRule of destEntry.rules) {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
@@ -994,9 +1014,9 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (var entry in this.getHostMatches(destHost)) {
+    destouterloop: for (let entry in this.getHostMatches(destHost)) {
       //dprint(entry);
-      for (var rule in entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);
@@ -1027,7 +1047,7 @@ Ruleset.prototype = {
 
     return [matchedAllowRules, matchedDenyRules];
   }
-}
+};
 
 /**
  * @static
@@ -1035,18 +1055,18 @@ Ruleset.prototype = {
 Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
   if (entry instanceof DomainEntry && entry.fullName) {
-    rawRule[originOrDest]["h"] = entry.fullName;
+    rawRule[originOrDest].h = entry.fullName;
   } else if (entry instanceof IPAddressEntry) {
-    rawRule[originOrDest]["h"] = entry.address;
+    rawRule[originOrDest].h = entry.address;
   }
   if (rule.scheme) {
-    rawRule[originOrDest]["s"] = rule.scheme;
+    rawRule[originOrDest].s = rule.scheme;
   }
   if (rule.port) {
-    rawRule[originOrDest]["port"] = rule.port;
+    rawRule[originOrDest].port = rule.port;
   }
   // TODO: path
-}
+};
 
 /**
  * @static
@@ -1061,23 +1081,23 @@ Ruleset.matchToRawRule = function(match) {
   var entry, rule, destEntry, destRule;
   var actionStr = match[0];
 
-  if (actionStr == "origin") {
+  if (actionStr === "origin") {
     [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
-  } else if (actionStr == "dest") {
+  } else if (actionStr === "dest") {
     [actionStr, entry, rule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
-  } else if (actionStr == "origin-to-dest") {
+  } else if (actionStr === "origin-to-dest") {
     [actionStr, entry, rule, destEntry, destRule] = match;
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
-    throw "[matchToRawRule] Invalid match type: " + actionStr
-          + " from match: " + match;
+    throw "[matchToRawRule] Invalid match type: " + actionStr +
+        " from match: " + match;
   }
 
   return rawRule;
-}
+};
 
 /**
  * @static
@@ -1086,43 +1106,43 @@ Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts)
   if (rawRule[originOrDest]) {
     parts.push('"' + originOrDest + '":{');
     var needComma = false;
-    if (rawRule[originOrDest]["h"]) {
-      parts.push('"h":"' + rawRule[originOrDest]["h"] + '"');
+    if (rawRule[originOrDest].h) {
+      parts.push('"h":"' + rawRule[originOrDest].h + '"');
       needComma = true;
     }
-    if (rawRule[originOrDest]["port"]) {
+    if (rawRule[originOrDest].port) {
       if (needComma) {
         parts.push(',');
       }
-      parts.push('"port":"' + rawRule[originOrDest]["port"] + '"');
+      parts.push('"port":"' + rawRule[originOrDest].port + '"');
     }
-    if (rawRule[originOrDest]["s"]) {
+    if (rawRule[originOrDest].s) {
       if (needComma) {
         parts.push(',');
       }
-      parts.push('"s":"' + rawRule[originOrDest]["s"] + '"');
+      parts.push('"s":"' + rawRule[originOrDest].s + '"');
     }
     parts.push('}');
   }
   // TODO: pathPre and pathRegex (will need to escape strings)
   parts.push('}');
   return parts.join("");
-}
+};
 
 Ruleset.rawRuleToCanonicalString = function(rawRule) {
   var parts = ['{'];
-  if (rawRule["d"]) {
+  if (rawRule.d) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }
-  if (rawRule["d"] && rawRule["o"]) {
+  if (rawRule.d && rawRule.o) {
     parts.push(',');
   }
-  if (rawRule["o"]) {
+  if (rawRule.o) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
   }
   parts.push('}');
   return parts.join("");
-}
+};
 
 /**
  * @static
@@ -1130,5 +1150,5 @@ Ruleset.rawRuleToCanonicalString = function(rawRule) {
 // Ruleset.rawRulesAreEqual = function(first, second) {
 //   var firstStr = Ruleset.rawRuleToCanonicalString(first);
 //   var secondStr = Ruleset.rawRuleToCanonicalString(second);
-//   return firstStr == secondStr;
+//   return firstStr === secondStr;
 // }

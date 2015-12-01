@@ -21,27 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["DomainUtil"];
+/* exported DomainUtil */
+this.EXPORTED_SYMBOLS = ["DomainUtil"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/logger"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
 
-/*
- * It's worth noting that many of the functions in this module will convert ACE
- * formatted IDNs to UTF8 formatted values. This is done automatically when
- * constructing nsIURI instances from ACE formatted URIs when the TLD is one in
- * which Mozilla supports UTF8 IDNs.
- */
-
-
+//==============================================================================
+// DomainUtil
+//==============================================================================
 
 var DomainUtil = {};
+
+/*
+ * It's worth noting that many of the functions in this module will
+ * convert ACE formatted IDNs to UTF8 formatted values. This is done
+ * automatically when constructing nsIURI instances from ACE
+ * formatted URIs when the TLD is one in which Mozilla supports
+ * UTF8 IDNs.
+ */
 
 DomainUtil._idnService = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);
@@ -59,7 +63,8 @@ DomainUtil.getIdentifier = function(uri, level) {
   var identifier;
   var identifierGettingFunctionName;
 
-  // We only have one identifier that we're using now: the pre-path / LEVEL_SOP.
+  // We only have one identifier that we're using now:
+  //     the pre-path / LEVEL_SOP.
   // TODO: figure out how we want to rename this function and clean up the
   // unused parts.
   level = this.LEVEL_SOP;
@@ -75,9 +80,8 @@ DomainUtil.getIdentifier = function(uri, level) {
       identifierGettingFunctionName = "getPrePath";
       break;
     default :
-      throw "Invalid identifier level specified in DomainUtil.getIdentifier(): "
-            + level;
-      break;
+      throw "Invalid identifier level specified " +
+          "in DomainUtil.getIdentifier(): " + level;
   }
 
   try {
@@ -91,11 +95,11 @@ DomainUtil.getIdentifier = function(uri, level) {
   if (identifier) {
     return identifier;
   } else {
-    if (uri.indexOf("file://") == 0) {
+    if (uri.indexOf("file://") === 0) {
       return "file://";
-    } else if (uri.indexOf("data:") == 0) {
+    } else if (uri.indexOf("data:") === 0) {
       // Format: data:[<MIME-type>][;charset=<encoding>][;base64],<data>
-      var identifier = uri.split(",")[0];
+      identifier = uri.split(",")[0];
       return identifier.split(";")[0];
     }
     Logger.info(Logger.TYPE_INTERNAL, "Unable to getIdentifier from uri " +
@@ -128,7 +132,7 @@ DomainUtil.getHost = function(uri) {
 DomainUtil.uriObjHasHost = function(aUriObj) {
   try {
     // simply access the host.
-    aUriObj.host;
+    aUriObj.host; // jshint ignore:line
     return true;
   } catch (e) {
     // it's an URI without host
@@ -141,10 +145,9 @@ DomainUtil.uriObjHasHost = function(aUriObj) {
  * automatically convert ACE formatting to UTF8 for IDNs in the various
  * attributes of the object that are available.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {nsIURI} The nsIURI object created from the uri, or throws an
- *         exception if it is an invalid uri.
+ *     exception if it is an invalid uri.
  */
 DomainUtil.getUriObject = function(uri) {
   // fixme: if `uri` is relative, `newURI()` throws NS_ERROR_MALFORMED_URI.
@@ -154,8 +157,8 @@ DomainUtil.getUriObject = function(uri) {
   try {
     return Services.io.newURI(uri, null, null);
   } catch (e) {
-    var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> "
-      + ". Exception was: " + e;
+    var msg = "DomainUtil.getUriObject exception on uri <" + uri + "> " +
+        ". Exception was: " + e;
     Logger.info(Logger.TYPE_INTERNAL, msg);
     throw e;
   }
@@ -164,8 +167,7 @@ DomainUtil.getUriObject = function(uri) {
 /**
  * Determines whether a uri string represents a valid uri.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {boolean} True if the uri is valid, false otherwise.
  */
 DomainUtil.isValidUri = function(uri) {
@@ -180,8 +182,7 @@ DomainUtil.isValidUri = function(uri) {
 /**
  * Returns the domain from a uri string.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {String} The domain of the uri.
  */
 DomainUtil.getBaseDomain = function(uri) {
@@ -198,9 +199,9 @@ DomainUtil.getBaseDomain = function(uri) {
     // the result is ASCII/ACE encoded, false otherwise.
     return DomainUtil._idnService.convertToDisplayIDN(baseDomain, {});
   } catch (e) {
-    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
+    if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return host;
-    } else if (e.name == "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
+    } else if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
       return host;
     } else {
       throw e;
@@ -217,20 +218,19 @@ DomainUtil.getBaseDomain = function(uri) {
  */
 DomainUtil.isIPAddress = function(host) {
   try {
-    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
+    Services.eTLD.getBaseDomainFromHost(host, 0);
   } catch (e) {
-    if (e.name == "NS_ERROR_HOST_IS_IP_ADDRESS") {
+    if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
       return true;
     }
   }
   return false;
-}
+};
 
 /**
  * Returns the path from a uri string.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {String} The path of the uri.
  */
 DomainUtil.getPath = function(uri) {
@@ -238,12 +238,11 @@ DomainUtil.getPath = function(uri) {
 };
 
 /**
- * Returns the prePath from a uri string. Note that this will return a prePath in
- * UTF8 format for all IDNs, even if the uri passed to the function is ACE
- * formatted.
+ * Returns the prePath from a uri string. Note that this will return
+ * a prePath in UTF8 format for all IDNs, even if the uri passed to
+ * the function is ACE formatted.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {String} The prePath of the uri.
  */
 DomainUtil.getPrePath = function(uri) {
@@ -258,14 +257,13 @@ DomainUtil.stripFragment = function(uri) {
 /**
  * Gets the relevant pieces out of a meta refresh or header refresh string.
  *
- * @param {String}
- *          refreshString The original content of a refresh header or meta tag.
+ * @param {String} refreshString The original content of a refresh
+ *     header or meta tag.
  * @return {Object} The delay in seconds and the url to refresh to.
- *                  The url may be an empty string if the current url should be
- *                  refreshed.
- * @throws Generic
- *           exception if the refreshString has an invalid format, including if
- *           the seconds can't be parsed as a float.
+ *     The url may be an empty string if the current url should be
+ *     refreshed.
+ * @throws Generic exception if the refreshString has an invalid format,
+ *     including if the seconds can't be parsed as a float.
  */
 DomainUtil.parseRefresh = function(refreshString) {
   var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
@@ -274,27 +272,26 @@ DomainUtil.parseRefresh = function(refreshString) {
     throw "Invalid delay value in refresh string: " + parts[1];
   }
   var url = parts[3];
-  if (url == undefined) {
+  if (url === undefined) {
     url = '';
   }
   // Strip off enclosing quotes around the url.
   if (url) {
     var first = url[0];
     var last = url[url.length - 1];
-    if (first == last && (first == "'" || first == '"')) {
+    if (first === last && (first === "'" || first === '"')) {
       url = url.substring(1, url.length - 1);
     }
   }
   return {delay: delay, destURI: url};
-}
+};
 
 /**
  * Adds a path of "/" to the uri if it doesn't have one. That is,
- * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return the origin
- * uri if the provided one is not valid.
+ * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return
+ * the origin uri if the provided one is not valid.
  *
- * @param {String}
- *          uri
+ * @param {String} uri
  * @return {String}
  */
 DomainUtil.ensureUriHasPath = function(uri) {
@@ -303,18 +300,18 @@ DomainUtil.ensureUriHasPath = function(uri) {
   } catch (e) {
     return uri;
   }
-}
+};
 
 /**
- * Returns the same uri but makes sure that it's UTF8 formatted instead of ACE
- * formatted if it's an IDN that Mozilla supports displaying in UTF8 format. See
- * http://www.mozilla.org/projects/security/tld-idn-policy-list.html for more
- * info.
+ * Returns the same uri but makes sure that it's UTF8 formatted
+ * instead of ACE formatted if it's an IDN that Mozilla supports
+ * displaying in UTF8 format. See
+ * http://www.mozilla.org/projects/security/tld-idn-policy-list.html
+ * for more info.
  *
- * @param {String}
- *          uri The uri.
+ * @param {String} uri The uri.
  * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
- *         was ACE formatted.
+ *     was ACE formatted.
  */
 DomainUtil.formatIDNUri = function(uri) {
   // Throws an exception if uri is invalid. This is almost the same as the
@@ -331,10 +328,8 @@ DomainUtil.formatIDNUri = function(uri) {
  * (starts with a slash), a protocol relative path (starts with two slashes),
  * or is relative to the originUri path.
  *
- * @param {String}
- *          originUri
- * @param {String}
- *          destPath
+ * @param {String} originUri
+ * @param {String} destPath
  * @return {String}
  */
 DomainUtil.determineRedirectUri = function(originUri, destPath) {
@@ -344,19 +339,18 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
   newUri.init(urlType, 0, destPath, null, baseUri);
   var resolvedUri = newUri.QueryInterface(Ci.nsIURI);
   return resolvedUri.spec;
-}
+};
 
 /**
  * Determines whether a URI uses the standard port for its scheme.
  *
- * @param {nsIURI}
- *          uri
+ * @param {nsIURI} uri
  * @return {Boolean}
  */
 DomainUtil.hasStandardPort = function(uri) {
   // A port value of -1 in the uriObj means the default for the protocol.
-  return uri.port == -1 ||
-         uri.scheme != "http" && uri.scheme != "https" ||
-         uri.port == 80 && uri.scheme == "http" ||
-         uri.port == 443 && uri.scheme == "https";
-}
+  return uri.port === -1 ||
+         uri.scheme !== "http" && uri.scheme !== "https" ||
+         uri.port === 80 && uri.scheme === "http" ||
+         uri.port === 443 && uri.scheme === "https";
+};

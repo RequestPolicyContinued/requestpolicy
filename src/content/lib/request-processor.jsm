@@ -72,11 +72,14 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 // RequestProcessor
 //==============================================================================
 
-var RequestProcessor = (function () {
+var RequestProcessor = (function() {
   let self = {};
 
   let internal = Utils.moduleInternal(self);
 
+  //----------------------------------------------------------------------------
+  // private properties
+  //----------------------------------------------------------------------------
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -94,10 +97,10 @@ var RequestProcessor = (function () {
    * @type {Object}
    */
   let lastShouldLoadCheck = {
-    "origin" : null,
-    "destination" : null,
-    "time" : 0,
-    "result" : null
+    "origin": null,
+    "destination": null,
+    "time": 0,
+    "result": null
   };
 
   let historyRequests = {};
@@ -114,14 +117,9 @@ var RequestProcessor = (function () {
 
   internal.requestObservers = [];
 
-
-
-
-
-
-
-
-
+  //----------------------------------------------------------------------------
+  // private functions
+  //----------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
     for (var i = 0; i < internal.requestObservers.length; i++) {
@@ -143,12 +141,6 @@ var RequestProcessor = (function () {
           requestResult);
     }
   }
-
-
-
-
-
-
 
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
@@ -306,8 +298,6 @@ var RequestProcessor = (function () {
     return false;
   }
 
-
-
   function _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
       isAllowed) {
     var result = new RequestSet();
@@ -348,50 +338,50 @@ var RequestProcessor = (function () {
     return result;
   }
 
-//  function _getOtherOriginsHelperFromDOM(document, reqSet) {
-//    var documentUri = DomainUtil
-//        .stripFragment(document.documentURI);
-//    Logger.dump("Looking for other origins within DOM of "
-//        + documentUri);
-//    // TODO: Check other elements besides iframes and frames?
-//    var frameTagTypes = {
-//      "iframe" : null,
-//      "frame" : null
-//    };
-//    for (var tagType in frameTagTypes) {
-//      var iframes = document.getElementsByTagName(tagType);
-//      for (var i = 0; i < iframes.length; i++) {
-//        var child = iframes[i];
-//        var childDocument = child.contentDocument;
-//        // Flock's special home page is about:myworld. It has (i)frames in it
-//        // that have no contentDocument. It's probably related to the fact that
-//        // that is an xul page, but I have no reason to fully understand the
-//        // problem in order to fix it.
-//        if (!childDocument) {
-//          continue;
-//        }
-//        var childUri = DomainUtil
-//            .stripFragment(childDocument.documentURI);
-//        if (childUri == "about:blank") {
-//          // iframe empty or not loaded yet, or maybe blocked.
-//          // childUri = child.src;
-//          // If it's not loaded or blocked, it's not the origin for anything
-//          // yet.
-//          continue;
-//        }
-//        Logger.dump("Found DOM child " + tagType
-//            + " with src <" + childUri + "> in document <" + documentUri + ">");
-//        //var childUriIdent = DomainUtil.getIdentifier(childUri,
-//        //    DomainUtil.LEVEL_SOP);
-//        // if (!origins[childUriIdent]) {
-//        //   origins[childUriIdent] = {};
-//        // }
-//        // origins[childUriIdent][childUri] = true;
-//        reqSet.addRequest(documentUri, childUri);
-//        _getOtherOriginsHelperFromDOM(childDocument, reqSet);
-//      }
-//    }
-//  },
+  // function _getOtherOriginsHelperFromDOM(document, reqSet) {
+  //   var documentUri = DomainUtil
+  //       .stripFragment(document.documentURI);
+  //   Logger.dump("Looking for other origins within DOM of "
+  //       + documentUri);
+  //   // TODO: Check other elements besides iframes and frames?
+  //   var frameTagTypes = {
+  //     "iframe" : null,
+  //     "frame" : null
+  //   };
+  //   for (var tagType in frameTagTypes) {
+  //     var iframes = document.getElementsByTagName(tagType);
+  //     for (var i = 0; i < iframes.length; i++) {
+  //       var child = iframes[i];
+  //       var childDocument = child.contentDocument;
+  //       // Flock's special home page is about:myworld. It has (i)frames in it
+  //       // that have no contentDocument. It's probably related to the fact that
+  //       // that is an xul page, but I have no reason to fully understand the
+  //       // problem in order to fix it.
+  //       if (!childDocument) {
+  //         continue;
+  //       }
+  //       var childUri = DomainUtil
+  //           .stripFragment(childDocument.documentURI);
+  //       if (childUri == "about:blank") {
+  //         // iframe empty or not loaded yet, or maybe blocked.
+  //         // childUri = child.src;
+  //         // If it's not loaded or blocked, it's not the origin for anything
+  //         // yet.
+  //         continue;
+  //       }
+  //       Logger.dump("Found DOM child " + tagType
+  //           + " with src <" + childUri + "> in document <" + documentUri + ">");
+  //       //var childUriIdent = DomainUtil.getIdentifier(childUri,
+  //       //    DomainUtil.LEVEL_SOP);
+  //       // if (!origins[childUriIdent]) {
+  //       //   origins[childUriIdent] = {};
+  //       // }
+  //       // origins[childUriIdent][childUri] = true;
+  //       reqSet.addRequest(documentUri, childUri);
+  //       _getOtherOriginsHelperFromDOM(childDocument, reqSet);
+  //     }
+  //   }
+  // },
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
@@ -444,23 +434,17 @@ var RequestProcessor = (function () {
     }
   }
 
+  //----------------------------------------------------------------------------
+  // public properties
+  //----------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-    // TODO: make them private
+  // TODO: make them private
   self._rejectedRequests = new RequestSet();
   self._allowedRequests = new RequestSet();
 
-
+  //----------------------------------------------------------------------------
+  // public functions
+  //----------------------------------------------------------------------------
 
   /**
    * Process a NormalRequest.
@@ -578,7 +562,6 @@ var RequestProcessor = (function () {
         }
       }
 
-
       if (isDuplicateRequest(request)) {
         return lastShouldLoadCheck.result;
       }
@@ -597,8 +580,6 @@ var RequestProcessor = (function () {
         return CP_OK;
       }
 
-
-
       if (request.aContext) {
         let domNode;
         try {
@@ -614,8 +595,6 @@ var RequestProcessor = (function () {
           internal.faviconRequests[destURI] = true;
         }
       }
-
-
 
       // Note: If changing the logic here, also make necessary changes to
       // isAllowedRedirect).
@@ -755,11 +734,11 @@ var RequestProcessor = (function () {
       request.requestResult = PolicyManager.checkRequestAgainstUserRules(
           request.aRequestOrigin, request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.dump('Matched deny rules');
+        Logger.dump("Matched deny rules");
         Logger.vardump(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.dump('Matched allow rules');
+        Logger.dump("Matched allow rules");
         Logger.vardump(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
@@ -799,11 +778,11 @@ var RequestProcessor = (function () {
           .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
               request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.dump('Matched deny rules');
+        Logger.dump("Matched deny rules");
         Logger.vardump(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.dump('Matched allow rules');
+        Logger.dump("Matched allow rules");
         Logger.vardump(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
@@ -877,7 +856,6 @@ var RequestProcessor = (function () {
             reject("Denied by default policy", request);
       }
 
-
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
           "Fatal Error, " + e + ", stack was: " + e.stack);
@@ -890,10 +868,6 @@ var RequestProcessor = (function () {
   // RequestProcessor.finishProcessing = function(request, result) {
   //   request.shouldLoadResult = result;
   // };
-
-
-
-
 
   /**
    * Called as a http request is made. The channel is available to allow you to
@@ -919,11 +893,6 @@ var RequestProcessor = (function () {
 
   ProcessEnvironment.obMan.observe(["http-on-modify-request"],
                                    examineHttpRequest);
-
-
-
-
-
 
   self.registerHistoryRequest = function(destinationUrl) {
     destinationUrl = DomainUtil.ensureUriHasPath(
@@ -1051,8 +1020,6 @@ var RequestProcessor = (function () {
         "Could not find observer to remove " + "in removeRequestObserver()");
   };
 
-
-
   self.getDeniedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
     Logger.dump("## getDeniedRequests");
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
@@ -1106,14 +1073,14 @@ var RequestProcessor = (function () {
   return self;
 }());
 
-RequestProcessor = (function () {
+RequestProcessor = (function() {
   let scope = {RequestProcessor};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/request-processor.redirects.js", scope);
   return scope.RequestProcessor;
 }());
 
-RequestProcessor = (function () {
+RequestProcessor = (function() {
   let scope = {RequestProcessor};
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);

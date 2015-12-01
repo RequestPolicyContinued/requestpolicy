@@ -70,14 +70,14 @@ var PolicyImplementation = (function() {
       // self.rejectCode = typeof(/ /) == "object" ? -4 : -3;
       self.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
       self.mimeService =
-          Cc['@mozilla.org/uriloader/external-helper-app-service;1']
+          Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
           .getService(Ci.nsIMIMEService);
     }
   }
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
-      function () {
+      function() {
         try {
           register();
         } catch (e) {
@@ -89,7 +89,6 @@ var PolicyImplementation = (function() {
           }
         }
       });
-
 
   function unregister() {
     Logger.dump("shutting down PolicyImplementation...");

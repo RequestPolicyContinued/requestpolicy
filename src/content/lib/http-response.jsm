@@ -58,7 +58,7 @@ HttpResponse.prototype.removeResponseHeader = function() {
  * @return {String|undefined} The header's value, or `undefined`
  *     if the header does not exist.
  */
-HttpResponse.prototype._getResponseHeader = function (aHeaderName) {
+HttpResponse.prototype._getResponseHeader = function(aHeaderName) {
   try {
     return this.httpChannel.getResponseHeader(aHeaderName);
   } catch (e) {
@@ -73,7 +73,7 @@ HttpResponse.prototype._getResponseHeader = function (aHeaderName) {
 /**
  * Determine `headerType` and `headerValue`.
  */
-HttpResponse.prototype._determineRedirectionHeader = function () {
+HttpResponse.prototype._determineRedirectionHeader = function() {
   if (this.hasOwnProperty("hasRedirectionHeader")) {
     // Determine only once.
     return;
@@ -97,7 +97,7 @@ HttpResponse.prototype._determineRedirectionHeader = function () {
 };
 
 Object.defineProperty(HttpResponse.prototype, "rawDestString", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_rawDestString")) {
       switch (this.redirHeaderType) {
         case "Location":
@@ -133,7 +133,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
 });
 
 Object.defineProperty(HttpResponse.prototype, "destURI", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_destURI")) {
       this._destURI = Services.io.newURI(this.rawDestString, null,
                                          this.originURI);
@@ -143,7 +143,7 @@ Object.defineProperty(HttpResponse.prototype, "destURI", {
 });
 
 Object.defineProperty(HttpResponse.prototype, "originURI", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_originURI")) {
       this._originURI = Services.io.newURI(this.httpChannel.name, null, null);
     }
@@ -152,7 +152,7 @@ Object.defineProperty(HttpResponse.prototype, "originURI", {
 });
 
 Object.defineProperty(HttpResponse.prototype, "loadContext", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_loadContext")) {
       // more info on the load context:
       // https://developer.mozilla.org/en-US/Firefox/Releases/3.5/Updating_extensions
@@ -188,7 +188,7 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
  * @return {?nsIDOMXULElement}
  */
 Object.defineProperty(HttpResponse.prototype, "browser", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_browser")) {
       let loadContext = this.loadContext;
 
@@ -222,7 +222,7 @@ Object.defineProperty(HttpResponse.prototype, "browser", {
  * @return {?nsIDocShell}
  */
 Object.defineProperty(HttpResponse.prototype, "docShell", {
-  get: function () {
+  get: function() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
         this._docShell = this.httpChannel.notificationCallbacks.

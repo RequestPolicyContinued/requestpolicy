@@ -569,9 +569,11 @@ marionette: venv \
 #
 
 .PHONY: static-analysis jshint
-static-analysis: jshint
+static-analysis: jshint jscs
 jshint:
 	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
+jscs:
+	jscs src/
 
 # ________________
 # "helper" targets

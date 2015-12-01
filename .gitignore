@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.jshintrc
+!.jscsrc
 !tests/content/.htaccess
 *.jar
 *.xpi

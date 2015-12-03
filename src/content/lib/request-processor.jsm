@@ -904,7 +904,8 @@ var RequestProcessor = (function() {
   };
 
   self.registerFormSubmitted = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
@@ -1022,13 +1023,15 @@ var RequestProcessor = (function() {
         "Could not find observer to remove " + "in removeRequestObserver()");
   };
 
-  self.getDeniedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+  self.getDeniedRequests = function(currentlySelectedOrigin,
+      allRequestsOnDocument) {
     Logger.dump("## getDeniedRequests");
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
   };
 
-  self.getAllowedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+  self.getAllowedRequests = function(currentlySelectedOrigin,
+      allRequestsOnDocument) {
     Logger.dump("## getAllowedRequests");
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);

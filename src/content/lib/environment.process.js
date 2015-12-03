@@ -27,6 +27,8 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported ProcessEnvironment */
 /* global Environment */
 
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+
 let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm");
 let {C} = ScriptLoader.importModule("lib/utils/constants");
@@ -184,7 +186,9 @@ var ProcessEnvironment = (function() {
       // Unloading `environment.jsm` has to be the last task.
       // After that task, any global object, such as
       // `Environment` or `Cu` is not available anymore.
-      //console.debug("unloading environment.jsm");
+      // #ifdef LOG_ENVIRONMENT
+      console.debug("unloading environment.jsm");
+      // #endif
       Cu.unload("chrome://rpcontinued/content/lib/environment.jsm");
     }
 

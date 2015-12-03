@@ -237,7 +237,8 @@ window.rpcontinued.menu = (function() {
     if (true === guiLocations) {
       // get prefs
       let sorting = rpPrefBranch.getCharPref("menu.sorting");
-      let showNumRequests = rpPrefBranch.getBoolPref("menu.info.showNumRequests");
+      let showNumRequests = rpPrefBranch.getBoolPref(
+          "menu.info.showNumRequests");
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -529,7 +530,8 @@ window.rpcontinued.menu = (function() {
       self._currentlySelectedOrigin = self._originDomainnameItem.value;
     } else if (item.parentNode.id === "rpc-other-origins-list") {
       // it's an otherOrigin
-      self._currentlySelectedOrigin = item.getElementsByClassName("domainname")[0].value;
+      self._currentlySelectedOrigin = item.getElementsByClassName("domainname")
+                                      [0].value;
     }
     self._currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
@@ -542,7 +544,8 @@ window.rpcontinued.menu = (function() {
   };
 
   self._activateDestinationItem = function(item) {
-    self._currentlySelectedDest = item.getElementsByClassName("domainname")[0].value;
+    self._currentlySelectedDest = item.getElementsByClassName("domainname")
+                                  [0].value;
 
     if (item.parentNode.id === "rpc-blocked-destinations-list") {
       self._isCurrentlySelectedDestBlocked = true;
@@ -617,7 +620,8 @@ window.rpcontinued.menu = (function() {
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
     // argument straight into the ruleset?
-    var origin, dest;
+    var origin;
+    var dest;
     if (ruleData.o && ruleData.o.h) {
       origin = ruleData.o.h;
     }
@@ -815,110 +819,137 @@ window.rpcontinued.menu = (function() {
 
   // Stop allowing
 
-  self._addMenuItemStopAllowingOrigin = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopAllowingOrigin = function(list, ruleData,
+      subscriptionOverride) {
     var originHost = ruleData.o.h;
     var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData, "stopAllowingOrigin", [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
+    return self._addMenuItemHelper(list, ruleData, "stopAllowingOrigin",
+        [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
   };
 
-  self._addMenuItemStopAllowingDest = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopAllowingDest = function(list, ruleData,
+      subscriptionOverride) {
     var destHost = ruleData.d.h;
     var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData, "stopAllowingDestination", [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
+    return self._addMenuItemHelper(list, ruleData, "stopAllowingDestination",
+        [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
   };
 
-  self._addMenuItemStopAllowingOriginToDest = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopAllowingOriginToDest = function(list, ruleData,
+      subscriptionOverride) {
     var originHost = ruleData.o.h;
     var destHost = ruleData.d.h;
     var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData, "stopAllowingOriginToDestination", [originHost, destHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
+    return self._addMenuItemHelper(list, ruleData,
+        "stopAllowingOriginToDestination", [originHost, destHost], ruleAction,
+        "rpc-stop-rule rpc-stop-allow");
   };
 
   // Allow
 
   self._addMenuItemAllowOrigin = function(list, ruleData) {
     var originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOrigin", [originHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(list, ruleData, "allowOrigin",
+        [originHost], "allow", "rpc-start-rule rpc-allow");
   };
 
   self._addMenuItemAllowDest = function(list, ruleData) {
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowDestination", [destHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(list, ruleData, "allowDestination",
+        [destHost], "allow", "rpc-start-rule rpc-allow");
   };
 
   self._addMenuItemAllowOriginToDest = function(list, ruleData) {
     var originHost = ruleData.o.h;
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOriginToDestination", [originHost, destHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(list, ruleData, "allowOriginToDestination",
+        [originHost, destHost], "allow", "rpc-start-rule rpc-allow");
   };
 
   // Allow temp
 
   self._addMenuItemTempAllowOrigin = function(list, ruleData) {
     var originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOriginTemporarily", [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
+    return self._addMenuItemHelper(list, ruleData, "allowOriginTemporarily",
+        [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
   };
 
   self._addMenuItemTempAllowDest = function(list, ruleData) {
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowDestinationTemporarily", [destHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
+    return self._addMenuItemHelper(list, ruleData,
+        "allowDestinationTemporarily", [destHost], "allow-temp",
+        "rpc-start-rule rpc-allow rpc-temporary");
   };
 
   self._addMenuItemTempAllowOriginToDest = function(list, ruleData) {
     var originHost = ruleData.o.h;
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOriginToDestinationTemporarily", [originHost, destHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
+    return self._addMenuItemHelper(list, ruleData,
+        "allowOriginToDestinationTemporarily", [originHost, destHost],
+        "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
   };
 
   // Stop denying
 
-  self._addMenuItemStopDenyingOrigin = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopDenyingOrigin = function(list, ruleData,
+      subscriptionOverride) {
     var originHost = ruleData.o.h;
     var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData, "stopDenyingOrigin", [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
+    return self._addMenuItemHelper(list, ruleData, "stopDenyingOrigin",
+        [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
   };
 
-  self._addMenuItemStopDenyingDest = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopDenyingDest = function(list, ruleData,
+      subscriptionOverride) {
     var destHost = ruleData.d.h;
     var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData, "stopDenyingDestination", [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
+    return self._addMenuItemHelper(list, ruleData, "stopDenyingDestination",
+        [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
   };
 
-  self._addMenuItemStopDenyingOriginToDest = function(list, ruleData, subscriptionOverride) {
+  self._addMenuItemStopDenyingOriginToDest = function(list, ruleData,
+      subscriptionOverride) {
     var originHost = ruleData.o.h;
     var destHost = ruleData.d.h;
     var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData, "stopDenyingOriginToDestination", [originHost, destHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
+    return self._addMenuItemHelper(list, ruleData,
+        "stopDenyingOriginToDestination", [originHost, destHost], ruleAction,
+        "rpc-stop-rule rpc-stop-deny");
   };
 
   // Deny
 
   self._addMenuItemDenyOrigin = function(list, ruleData) {
     var originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOrigin", [originHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(list, ruleData, "denyOrigin",
+        [originHost], "deny", "rpc-start-rule rpc-deny");
   };
 
   self._addMenuItemDenyDest = function(list, ruleData) {
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyDestination", [destHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(list, ruleData, "denyDestination",
+        [destHost], "deny", "rpc-start-rule rpc-deny");
   };
 
   self._addMenuItemDenyOriginToDest = function(list, ruleData) {
     var originHost = ruleData.o.h;
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOriginToDestination", [originHost, destHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(list, ruleData, "denyOriginToDestination",
+        [originHost, destHost], "deny", "rpc-start-rule rpc-deny");
   };
 
   // Deny temp
 
   self._addMenuItemTempDenyOrigin = function(list, ruleData) {
     var originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOriginTemporarily", [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
+    return self._addMenuItemHelper(list, ruleData, "denyOriginTemporarily",
+        [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
   };
 
   self._addMenuItemTempDenyDest = function(list, ruleData) {
     var destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyDestinationTemporarily", [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
+    return self._addMenuItemHelper(list, ruleData, "denyDestinationTemporarily",
+        [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
   };
 
   self._addMenuItemTempDenyOriginToDest = function(list, ruleData) {
@@ -1120,7 +1151,8 @@ window.rpcontinued.menu = (function() {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            Logger.dump("destinations[destUri] is null or undefined for destUri: " + destUri);
+            Logger.dump("destinations[destUri] is null or undefined " +
+                "for destUri: " + destUri);
             continue;
           }
 

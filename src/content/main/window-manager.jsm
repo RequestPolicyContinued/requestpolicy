@@ -119,7 +119,7 @@ var rpWindowManager = (function() {
       window.rpcontinued.overlay.init();
     } catch (e) {
       Logger.warning(Logger.TYPE_ERROR,
-                     "An error occurred while initializing the overlay: " + e, e);
+          "An error occurred while initializing the overlay: " + e, e);
     }
   }
 

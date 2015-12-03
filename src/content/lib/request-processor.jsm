@@ -833,7 +833,8 @@ var RequestProcessor = (function() {
       if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
-          var mappedDestUriObj = internal.mappedDestinations[destURI][mappedDest];
+          var mappedDestUriObj = internal.mappedDestinations
+                                 [destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
           let mappedResult = PolicyImplementation.shouldLoad(
@@ -970,7 +971,8 @@ var RequestProcessor = (function() {
   };
 
   self.registerAllowedRedirect = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
@@ -1050,10 +1052,7 @@ var RequestProcessor = (function() {
    * the most recent iframe that loaded that source uri. It may also help in
    * cases where the user has multiple tabs/windows open to the same page.
    *
-   * @param {}
-   *          browser
-   * @return {}
-   *          RequestSet
+   * @param {Browser} browser
    */
   self.getAllRequestsInBrowser = function(browser) {
     //var origins = {};

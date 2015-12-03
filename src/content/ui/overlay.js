@@ -398,7 +398,7 @@ window.rpcontinued.overlay = (function() {
    * Shows a notification that a redirect was requested by a page (meta refresh
    * or with headers).
    *
-   * @param {<browser> element} browser
+   * @param {Browser} browser
    * @param {string} redirectTargetUri
    * @param {number} delay
    * @param {string=} redirectOriginUri
@@ -456,7 +456,8 @@ window.rpcontinued.overlay = (function() {
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
     var destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
 
-    var origin = null, dest = null;
+    var origin = null;
+    var dest = null;
     if (originBaseDomain !== null) {
       origin = m._addWildcard(originBaseDomain);
     }
@@ -650,10 +651,8 @@ window.rpcontinued.overlay = (function() {
    * fast as possible because request processing blocks until this function
    * returns.
    *
-   * @param {}
-   *          originUri
-   * @param {}
-   *          destUri
+   * @param {string} originUri
+   * @param {string} destUri
    */
   self.observeAllowedRequest = function(originUri, destUri) {
     if (self.requestLog) {
@@ -666,10 +665,8 @@ window.rpcontinued.overlay = (function() {
    * fast as possible because request processing blocks until this function
    * returns.
    *
-   * @param {}
-   *          originUri
-   * @param {}
-   *          destUri
+   * @param {string} originUri
+   * @param {string} destUri
    */
   self.observeBlockedRequest = function(originUri, destUri) {
     self._updateNotificationDueToBlockedContent();
@@ -749,7 +746,8 @@ window.rpcontinued.overlay = (function() {
                                            this.linkURL);
     });
 
-    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow", function() {
+    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow",
+        function() {
       RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
                                            this.linkURL);
     });
@@ -874,7 +872,9 @@ window.rpcontinued.overlay = (function() {
 
     // there seems to be a bug in Firefox ESR 24 -- the session history is
     // null. After waiting a few miliseconds it's available. To be sure this
-    let tries = 0, waitTime = 20, maxTries = 10;
+    let tries = 0;
+    let waitTime = 20;
+    let maxTries = 10;
     let tryAddingSHistoryListener = function() {
       ++tries;
       try {
@@ -912,8 +912,7 @@ window.rpcontinued.overlay = (function() {
   /**
    * Called before the popup menu is shown.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.onPopupShowing = function(event) {
     // if (event.currentTarget != event.originalTarget) {
@@ -925,8 +924,7 @@ window.rpcontinued.overlay = (function() {
   /**
    * Called after the popup menu has been hidden.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.onPopupHidden = function(event) {
     var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
@@ -967,8 +965,7 @@ window.rpcontinued.overlay = (function() {
   /**
    * Toggles disabling of all blocking for the current session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
     var disabled = !Prefs.isBlockingDisabled();
@@ -991,8 +988,7 @@ window.rpcontinued.overlay = (function() {
    * Allows the current document's origin to request from any destination for
    * the duration of the browser session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.temporarilyAllowCurrentOrigin = function(event) {
     // Note: the available variable "content" is different than the avaialable
@@ -1005,8 +1001,7 @@ window.rpcontinued.overlay = (function() {
    * Allows a destination to be requested from any origin for the duration of
    * the browser session.
    *
-   * @param {String}
-   *          destHost
+   * @param {string} destHost
    */
   self.temporarilyAllowDestination = function(destHost) {
     PolicyManager.temporarilyAllowDestination(destHost);
@@ -1016,10 +1011,8 @@ window.rpcontinued.overlay = (function() {
    * Allows a destination to be requested from a single origin for the duration
    * of the browser session.
    *
-   * @param {String}
-   *          originHost
-   * @param {String}
-   *          destHost
+   * @param {string} originHost
+   * @param {string} destHost
    */
   self.temporarilyAllowOriginToDestination = function(originHost, destHost) {
     PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
@@ -1036,8 +1029,7 @@ window.rpcontinued.overlay = (function() {
    * Allows the current document's origin to request from any destination,
    * including in future browser sessions.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.allowCurrentOrigin = function(event) {
     var host = self.getTopLevelDocumentUriIdentifier();
@@ -1047,8 +1039,7 @@ window.rpcontinued.overlay = (function() {
   /**
    * Allows requests to a destination, including in future browser sessions.
    *
-   * @param {String}
-   *          destHost
+   * @param {String} destHost
    */
   self.allowDestination = function(destHost) {
     PolicyManager.allowDestination(destHost);
@@ -1058,10 +1049,8 @@ window.rpcontinued.overlay = (function() {
    * Allows requests to a destination from a single origin, including in future
    * browser sessions.
    *
-   * @param {String}
-   *          originHost
-   * @param {String}
-   *          destHost
+   * @param {String} originHost
+   * @param {String} destHost
    */
   self.allowOriginToDestination = function(originHost, destHost) {
     PolicyManager.allowOriginToDestination(originHost, destHost);
@@ -1070,8 +1059,7 @@ window.rpcontinued.overlay = (function() {
   /**
    * Revokes all temporary permissions granted during the current session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.revokeTemporaryPermissions = function(event) {
     PolicyManager.revokeTemporaryRules();
@@ -1131,8 +1119,8 @@ window.rpcontinued.overlay = (function() {
   self.openPrefs = openLinkInNewTab.bind(this, "about:requestpolicy", true);
   self.openPolicyManager = openLinkInNewTab.bind(this,
       "about:requestpolicy?yourpolicy", true);
-  self.openHelp = openLinkInNewTab.bind(this,
-      "https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
+  self.openHelp = openLinkInNewTab.bind(this, "https://github.com/" +
+      "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
 
   self.clearRequestLog = function() {
     self.requestLog.clear();
@@ -1151,11 +1139,15 @@ window.rpcontinued.overlay = (function() {
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
           "chrome://rpcontinued/content/ui/request-log.xul");
-      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
+      requestLog.hidden = false;
+      requestLogSplitter.hidden = false;
+      closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {
       requestLogFrame.setAttribute("src", "about:blank");
-      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
+      requestLog.hidden = true;
+      requestLogSplitter.hidden = true;
+      closeRequestLog.hidden = true;
       //openRequestLog.hidden = false;
       self.requestLog = null;
     }

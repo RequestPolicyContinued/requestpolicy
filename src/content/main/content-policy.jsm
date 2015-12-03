@@ -46,7 +46,7 @@ let {Environment, ProcessEnvironment} = importModule("lib/environment");
 var PolicyImplementation = (function() {
   let self = {};
 
-  let xpcom_categories = ["content-policy"];
+  const XPCOM_CATEGORIES = ["content-policy"];
 
   self.classDescription = "RequestPolicy ContentPolicy Implementation";
   self.classID = Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}");
@@ -61,7 +61,7 @@ var PolicyImplementation = (function() {
                                        self.contractID, self);
 
     let catMan = Utils.categoryManager;
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
     }
@@ -135,7 +135,7 @@ var PolicyImplementation = (function() {
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
 
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.deleteCategoryEntry(category, self.contractID, false);
     }
 

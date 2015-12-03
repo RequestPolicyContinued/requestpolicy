@@ -39,7 +39,8 @@
       $id("defaultdenysetting").hidden = false;
     }
 
-    var allowsamedomain = rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
+    var allowsamedomain = rpPrefBranch.getBoolPref(
+        "defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
   }
 

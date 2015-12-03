@@ -148,7 +148,8 @@
       try {
         ruleCount = PolicyManager.getUserRuleCount();
       } catch (e) {
-        Logger.warning(Logger.TYPE_INTERNAL, "Unable to get new rule count: " + e);
+        Logger.warning(Logger.TYPE_INTERNAL,
+            "Unable to get new rule count: " + e);
         ruleCount = -1;
       }
       Logger.dump("Rule count: " + ruleCount);

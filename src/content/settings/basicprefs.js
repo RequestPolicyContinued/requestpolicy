@@ -55,7 +55,8 @@
     elManager.addListener(
         $id("pref-indicateBlockedObjects"), "change",
         function(event) {
-          rpPrefBranch.setBoolPref("indicateBlockedObjects", event.target.checked);
+          rpPrefBranch.setBoolPref("indicateBlockedObjects",
+              event.target.checked);
           Services.prefs.savePrefFile(null);
           updateDisplay();
         });

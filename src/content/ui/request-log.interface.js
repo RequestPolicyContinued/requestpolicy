@@ -27,7 +27,7 @@ window.rpcontinued = window.rpcontinued || {};
 
 window.rpcontinued.requestLog = (function(self) {
   /* global Components */
-  const {utils: Cu} = Components;
+  const {classes: Cc, utils: Cu} = Components;
 
   let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -59,7 +59,7 @@ window.rpcontinued.requestLog = (function(self) {
     var content = self.treeView.getCellText(self.tree.currentIndex,
         self.tree.columns.getNamedColumn(columnName));
 
-    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+    const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
         .getService(Components.interfaces.nsIClipboardHelper);
     clipboardHelper.copyString(content);
   };

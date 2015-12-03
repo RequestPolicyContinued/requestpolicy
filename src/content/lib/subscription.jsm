@@ -203,15 +203,18 @@ UserSubscriptions.prototype = {
       var subCount = 0;
       for (let subName in serials[listName]) {
         if (!this._lists[listName].subscriptions[subName]) {
-          dprint("Skipping update of unsubscribed subscription: " + listName + " " + subName);
+          dprint("Skipping update of unsubscribed subscription: " + listName +
+              " " + subName);
           continue;
         }
         if (defaultPolicy === "allow" && subName.indexOf("allow_") === 0) {
-          dprint("Skipping update of subscription that is only used with a default deny policy: " + subName);
+          dprint("Skipping update of subscription that is only used " +
+              "with a default deny policy: " + subName);
           continue;
         }
         if (defaultPolicy === "deny" && subName.indexOf("deny_") === 0) {
-          dprint("Skipping update of subscription that is only used with a default allow policy: " + subName);
+          dprint("Skipping update of subscription that is only used " +
+              "with a default allow policy: " + subName);
           continue;
         }
         updateSubs[subName] = {"serial": serials[listName][subName]};
@@ -284,8 +287,8 @@ UserSubscriptions.prototype = {
  * number. If the the user's current copy of a subscription policy has a serial
  * number that is not lower than the one listed, an update isn't necessary.
  *
- * @param name
- * @param url
+ * @param {string} name
+ * @param {string} url
  */
 function SubscriptionList(name, url) {
   // TODO: allow only ascii lower letters, digits, and hyphens in name.
@@ -378,9 +381,9 @@ SubscriptionList.prototype = {
  * Represents a particular subscription policy available through a given
  * subscription list.
  *
- * @param listName
- * @param subName
- * @param subUrl
+ * @param {string} listName
+ * @param {string} subName
+ * @param {string} subUrl
  */
 function Subscription(listName, subName, subUrl) {
   // TODO: allow only ascii lower letters, digits, and hyphens in listName.
@@ -397,7 +400,8 @@ Subscription.prototype = {
   _data: null,
 
   toString: function() {
-    return "[Subscription " + this._list + " " + this._name + " " + this._url + "]";
+    return "[Subscription " + this._list + " " + this._name + " " +
+        this._url + "]";
   },
 
   update: function(successCallback, errorCallback) {

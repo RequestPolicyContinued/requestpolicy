@@ -99,27 +99,31 @@
     elManager.addListener(
         $id("pref-prefetch.link.restoreDefaultOnUninstall"), "change",
         function(event) {
-          rpPrefBranch.setBoolPref("prefetch.link.restoreDefaultOnUninstall", event.target.checked);
+          rpPrefBranch.setBoolPref("prefetch.link.restoreDefaultOnUninstall",
+              event.target.checked);
           Services.prefs.savePrefFile(null);
         });
 
     // DNS prefetch.
     elManager.addListener($id("pref-dnsPrefetch"), "change", function(event) {
-      rootPrefBranch.setBoolPref("network.dns.disablePrefetch", !event.target.checked);
+      rootPrefBranch.setBoolPref("network.dns.disablePrefetch",
+          !event.target.checked);
       Services.prefs.savePrefFile(null);
     });
 
     elManager.addListener(
         $id("pref-prefetch.dns.disableOnStartup"), "change",
         function(event) {
-          rpPrefBranch.setBoolPref("prefetch.dns.disableOnStartup", event.target.checked);
+          rpPrefBranch.setBoolPref("prefetch.dns.disableOnStartup",
+              event.target.checked);
           Services.prefs.savePrefFile(null);
         });
 
     elManager.addListener(
         $id("pref-prefetch.dns.restoreDefaultOnUninstall"), "change",
         function(event) {
-          rpPrefBranch.setBoolPref("prefetch.dns.restoreDefaultOnUninstall", event.target.checked);
+          rpPrefBranch.setBoolPref("prefetch.dns.restoreDefaultOnUninstall",
+              event.target.checked);
           Services.prefs.savePrefFile(null);
         });
 
@@ -134,7 +138,8 @@
     elManager.addListener(
         $id("menu.info.showNumRequests"), "change",
         function(event) {
-          rpPrefBranch.setBoolPref("menu.info.showNumRequests", event.target.checked);
+          rpPrefBranch.setBoolPref("menu.info.showNumRequests",
+              event.target.checked);
           Services.prefs.savePrefFile(null);
         });
 

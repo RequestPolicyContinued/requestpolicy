@@ -143,7 +143,7 @@ var ManagerForDOMContentLoaded = (function() {
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
    *
-   * @param {Event} event
+   * @param {Document} doc
    */
   function onDocumentLoaded(doc) {
     // Create a new Environment for this Document and shut it down when

@@ -63,7 +63,7 @@
   }
 
   function getInputElement(subName) {
-    var elements = document.body.querySelectorAll("input[name=" + subName + "]");
+    var elements = document.body.querySelectorAll(`input[name=${subName}]`);
     if (elements.length <= 0) {
       return null;
     }
@@ -92,7 +92,8 @@
       element.input.checked = element.id in subsInfo.official;
     }
 
-    var currentPolicy, otherPolicy;
+    var currentPolicy;
+    var otherPolicy;
     if (Prefs.isDefaultAllow()) {
       currentPolicy = "allow";
       otherPolicy = "deny";

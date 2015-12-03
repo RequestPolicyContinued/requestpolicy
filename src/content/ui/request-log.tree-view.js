@@ -74,7 +74,8 @@ window.rpcontinued.requestLog = (function(self) {
       // with this javascript array implementation, though I'm assuming it does.
       var columnIndex = self.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
-        return getVisibleRowAtIndex(aIndex)[self.columnNameToIndexMap[aColumn.id]];
+        return getVisibleRowAtIndex(aIndex)
+            [self.columnNameToIndexMap[aColumn.id]];
       }
     },
 

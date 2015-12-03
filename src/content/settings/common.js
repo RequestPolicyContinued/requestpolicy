@@ -53,7 +53,9 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     var newDefaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
     var oldDefaultPolicy = Prefs.isDefaultAllow() ? "deny" : "allow";
 
-    var listName, subName, subInfo;
+    var listName;
+    var subName;
+    var subInfo;
 
     var oldSubInfo = subscriptions.getSubscriptionInfo(oldDefaultPolicy);
     for (listName in oldSubInfo) {

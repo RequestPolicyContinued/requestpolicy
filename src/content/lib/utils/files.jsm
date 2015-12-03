@@ -62,15 +62,16 @@ var FileUtil = {
   /**
    * Returns the lines of the file in an array.
    *
-   * @param {nsIFile}
-   *          file
+   * @param {nsIFile} file
    */
   fileToArray: function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
-    var line = {}, lines = [], hasmore;
+    var line = {};
+    var lines = [];
+    var hasmore;
     do {
       hasmore = stream.readLine(line);
       lines.push(line.value);
@@ -126,10 +127,8 @@ var FileUtil = {
    * Writes each element of an array to a line of a file (truncates the file if
    * it exists, creates it if it doesn't).
    *
-   * @param {Array}
-   *          lines
-   * @param {nsIFile}
-   *          file
+   * @param {Array} lines
+   * @param {nsIFile} file
    */
   arrayToFile: function(lines, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]
@@ -152,10 +151,8 @@ var FileUtil = {
    * Writes a string to a file (truncates the file if it exists, creates it if
    * it doesn't).
    *
-   * @param {String}
-   *          str
-   * @param {nsIFile}
-   *          file
+   * @param {string} str
+   * @param {nsIFile} file
    */
   stringToFile: function(str, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]

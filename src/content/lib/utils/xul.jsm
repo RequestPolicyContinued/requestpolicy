@@ -184,7 +184,7 @@ var {addEventListeners, removeEventListeners} = (function() {
    * @param {!Object} aRootObject
    * @param {Array<string>} aListenerSpec
    *
-   * @return {Function} The listener function.
+   * @return {?Function} The listener function.
    */
   function getEventListener(aRootObject, aListenerSpec) {
     var object = aRootObject;

@@ -182,8 +182,8 @@ DomainUtil.isValidUri = function(uri) {
 /**
  * Returns the domain from a uri string.
  *
- * @param {String} uri The uri.
- * @return {String} The domain of the uri.
+ * @param {string} uri The uri.
+ * @return {?string} The domain of the uri.
  */
 DomainUtil.getBaseDomain = function(uri) {
   var host = this.getHost(uri);

@@ -874,11 +874,10 @@ Ruleset.prototype = {
    * Yields all matching hosts. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
-   * @param string
-   *          host The host to get matching entries for.
-   * @return DomainEntry|IPAddressEntry
+   * @param {string} host The host to get matching entries for.
+   * @return {Generator<DomainEntry|IPAddressEntry>}
    */
-  getHostMatches : function(host) {
+  getHostMatches : function*(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -942,7 +941,7 @@ Ruleset.prototype = {
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (let entry in this.getHostMatches(originHost)) {
+    originouterloop: for (let entry of this.getHostMatches(originHost)) {
       //dprint(entry);
       for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -976,7 +975,7 @@ Ruleset.prototype = {
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
-          for (let destEntry in rule.destinations.getHostMatches(destHost)) {
+          for (let destEntry of rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
             for (let destRule of destEntry.rules) {
               //dprint("Checking rule: " + rule);
@@ -1014,7 +1013,7 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (let entry in this.getHostMatches(destHost)) {
+    destouterloop: for (let entry of this.getHostMatches(destHost)) {
       //dprint(entry);
       for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);

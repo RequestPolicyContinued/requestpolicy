@@ -2,6 +2,11 @@
 
 Note: The ChangeLog relevant for users you can find in the parent directory.
 
+#### Version 1.0.beta11
+* Switch from "preprocessor.js" to "preprocess.py". (#693, a51d59b)
+* JSHint and JSCS are now used for static code analysis. (c8f1da1, 45f969c)
+
+
 #### Version 1.0.beta10
 * The extension ID (GUID) has changed. At the same time, several other
   relevant "names" have been changed. (#609)

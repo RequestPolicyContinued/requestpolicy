@@ -3,6 +3,14 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta11
+* bugfixes
+  * With E10s enabled, the "Allow" button on the redirection notification
+    bar did not always work. (#620, a168f70)
+  * With E10s enabled, the redirection notification bar did not appear in
+    some cases. (#722, 41366d3)
+
+
 #### Version 1.0.beta10.2 (bugfix)
 * The add-on did not start on the latest Firefox Nightly,
   version 44.0a1 (#719).

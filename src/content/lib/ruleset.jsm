@@ -110,7 +110,7 @@ function dump(arr, level=0) {
 //==============================================================================
 
 function RawRuleset(jsonData) {
-  this._metadata = {"version" : 1};
+  this._metadata = {"version": 1};
   this._entries = {};
   if (jsonData) {
     this._fromJSON(jsonData);
@@ -124,22 +124,22 @@ function RawRuleset(jsonData) {
 }
 
 RawRuleset.prototype = {
-  _metadata : null,
-  _entries : null,
+  _metadata: null,
+  _entries: null,
 
-  toString : function() {
+  toString: function() {
     return "[RawRuleset " + this._metadata + " " + this._entries + "]";
   },
 
-  getAllowRuleCount : function() {
+  getAllowRuleCount: function() {
     return this._entries.allow.length;
   },
 
-  getDenyRuleCount : function() {
+  getDenyRuleCount: function() {
     return this._entries.deny.length;
   },
 
-  _addEntryHelper : function(entryPart, policy) {
+  _addEntryHelper: function(entryPart, policy) {
     let rules;
     if (entryPart.h) {
       rules = policy.addHost(entryPart.h).rules;
@@ -155,7 +155,7 @@ RawRuleset.prototype = {
     return [rules, r];
   },
 
-  _addEntryToRuleset : function(entry, ruleAction, policy) {
+  _addEntryToRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry.o;
@@ -199,7 +199,7 @@ RawRuleset.prototype = {
     }
   },
 
-  ruleExists : function(ruleAction, ruleData) {
+  ruleExists: function(ruleAction, ruleData) {
     var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
@@ -224,7 +224,7 @@ RawRuleset.prototype = {
    * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
    * @param ruleData
    */
-  addRule : function(ruleAction, ruleData, policy) {
+  addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("addRule: adding entry");
     var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
@@ -256,7 +256,7 @@ RawRuleset.prototype = {
   //     return rules.get(entryPart.s, entryPart.port);
   // },
 
-  _removeEntryFromRuleset : function(entry, ruleAction, policy) {
+  _removeEntryFromRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry.o;
@@ -371,7 +371,7 @@ RawRuleset.prototype = {
    * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
    * @param ruleData
    */
-  removeRule : function(ruleAction, ruleData, policy) {
+  removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     //dprint("removeRule: removing entry");
     var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
@@ -410,7 +410,7 @@ RawRuleset.prototype = {
    * Returns a |Ruleset| object initialized to reflect the contents of this
    * |RawRuleset|.
    */
-  toRuleset : function(name) {
+  toRuleset: function(name) {
     var policy = new Ruleset(name);
 
     for (var actionStr in this._entries) {
@@ -431,7 +431,7 @@ RawRuleset.prototype = {
     return policy;
   },
 
-  _checkDataObj : function(dataObj) {
+  _checkDataObj: function(dataObj) {
     if (!("metadata" in dataObj)) {
       throw "Invalid policy data: no 'metadata' key";
     }
@@ -450,7 +450,7 @@ RawRuleset.prototype = {
   /**
    * Initializes this |RawRuleset| from JSON data.
    */
-  _fromJSON : function(data) {
+  _fromJSON: function(data) {
     // TODO: sanity check imported data, decide whether to ignore unrecognized
     // keys.
     // TODO: wrap in try/catch block
@@ -468,9 +468,9 @@ RawRuleset.prototype = {
    * is automatically invoked when |JSON.stringify(rawRulesetObj)| is called and
    * the result is passed through stringify before being returned.
    */
-  toJSON : function() {
+  toJSON: function() {
     // Note: unrecognized keys in the metadata and entries are preserved.
-    var tempObj = {"metadata" : this._metadata, "entries" : this._entries};
+    var tempObj = {"metadata": this._metadata, "entries": this._entries};
     return tempObj;
   }
 };
@@ -487,27 +487,27 @@ function Rules() {
 }
 
 Rules.prototype = {
-  _rules : null,
+  _rules: null,
 
-  print : function(depth = 0) {
+  print: function(depth = 0) {
     for (let rule of this._rules) {
       rule.print(depth);
     }
   },
 
-  getRules : function() {
+  getRules: function() {
     return this._rules;
   },
 
-  isEmpty : function() {
+  isEmpty: function() {
     return this._rules.length === 0;
   },
 
-  [Symbol.iterator] : function*() {
+  [Symbol.iterator]: function*() {
     yield* this._rules;
   },
 
-  get : function(scheme, port) {
+  get: function(scheme, port) {
     let rule = new Rule(scheme, port);
     for (let existingRule of this._rules) {
       if (existingRule.isEqual(rule)) {
@@ -517,7 +517,7 @@ Rules.prototype = {
     return null;
   },
 
-  add : function(scheme, port) {
+  add: function(scheme, port) {
     let newRule = new Rule(scheme, port);
     for (let existingRule of this._rules) {
       if (existingRule.isEqual(newRule)) {
@@ -550,28 +550,28 @@ function Rule(scheme, port) {
 
 Rule.prototype = {
 
-  scheme : null,
+  scheme: null,
 
   /**
    * @type {?string}
    */
-  port : null,
+  port: null,
 
-  path : null,
+  path: null,
 
   // Either null, RULE_ACTION_ALLOW, or RULE_ACTION_DENY.
   // originRuleAction : null,
   // destinationRuleAction : null,
 
-  allowOrigin : null,
-  denyOrigin : null,
-  allowDestination : null,
-  denyDestination : null,
+  allowOrigin: null,
+  denyOrigin: null,
+  allowDestination: null,
+  denyDestination: null,
 
   // For origin-to-destination rules, these are the destinations.
-  destinations : null,
+  destinations: null,
 
-  toString : function() {
+  toString: function() {
     return "[Rule " + this.scheme + " " + this.port + " " + this.path + " " +
            // TODO
            // + "originRuleAction:" + this.originRuleAction + " "
@@ -583,7 +583,7 @@ Rule.prototype = {
            "]";
   },
 
-  print : function(depth) {
+  print: function(depth) {
     depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
@@ -596,20 +596,20 @@ Rule.prototype = {
     }
   },
 
-  isEqual : function(otherRule) {
+  isEqual: function(otherRule) {
     return this.scheme === otherRule.scheme &&
         this.port === otherRule.port &&
         this.path === otherRule.path;
   },
 
-  initDestinations : function() {
+  initDestinations: function() {
     if (this.destinations) {
       return;
     }
     this.destinations = new Ruleset();
   },
 
-  isMatch : function(uriObj) {
+  isMatch: function(uriObj) {
     if (this.scheme && this.scheme !== uriObj.scheme) {
       //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
       //       this.scheme + "')");
@@ -666,21 +666,21 @@ function DomainEntry(name, fullName, higher) {
 }
 
 DomainEntry.prototype = {
-  _name : null,
-  fullName : null,
+  _name: null,
+  fullName: null,
   /**
    * A dictionary whose keys are strings of domain part names and values are
    * further DomainEntry objects.
    */
-  _lower : null,
-  _higher : null,
-  rules : null,
+  _lower: null,
+  _higher: null,
+  rules: null,
 
-  toString : function() {
+  toString: function() {
     return "[DomainEntry '" + this._name + " (" + this.fullName + ")']";
   },
 
-  print : function(depth) {
+  print: function(depth) {
     depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
@@ -695,14 +695,14 @@ DomainEntry.prototype = {
     }
   },
 
-  addLowerLevel : function(name, entry) {
+  addLowerLevel: function(name, entry) {
     if (this._lower.hasOwnProperty(name)) {
       throw "ENTRY_ALREADY_EXISTS";
     }
     this._lower[name] = entry;
   },
 
-  getLowerLevel : function(name) {
+  getLowerLevel: function(name) {
     if (this._lower.hasOwnProperty(name)) {
       return this._lower[name];
     }
@@ -720,11 +720,11 @@ function IPAddressEntry(address) {
 }
 
 IPAddressEntry.prototype = {
-  toString : function() {
+  toString: function() {
     return "[IPAddressEntry '" + this.address + "']";
   },
 
-  print : function(depth) {
+  print: function(depth) {
     depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
@@ -736,7 +736,7 @@ IPAddressEntry.prototype = {
     }
   },
 
-  deleteAllRules : function() {
+  deleteAllRules: function() {
 
   }
 };
@@ -763,31 +763,31 @@ Ruleset.prototype = {
   /**
    * @type {?string}
    */
-  _name : null,
+  _name: null,
 
   /**
    * Represents the root domain entry, that is, the domain ".".
    * Its "lower levels" are domain entries like "com", "info", "org".
    * @type {DomainEntry}
    */
-  _domain : null,
+  _domain: null,
 
   /**
    * @type {Object<string, IPAddressEntry>}
    */
-  _ipAddr : null,
+  _ipAddr: null,
 
   /**
    * Contains rules that don't specify a host.
    * @type {Rules}
    */
-  rules : null,
+  rules: null,
 
-  toString : function() {
+  toString: function() {
     return "[Ruleset " + this._name + "]";
   },
 
-  print : function(depth) {
+  print: function(depth) {
     depth = depth || 0;
     var indent = "";
     for (var i = 0; i < depth; i++) {
@@ -799,12 +799,12 @@ Ruleset.prototype = {
     this.rules.print(depth + 1);
   },
 
-  _getIPAddress : function(address) {
+  _getIPAddress: function(address) {
     // TODO: Canonicalize IPv6 addresses.
     return this._ipAddr[address];
   },
 
-  _addIPAddress : function(address) {
+  _addIPAddress: function(address) {
     // TODO: Canonicalize IPv6 addresses.
     if (!this._ipAddr[address]) {
       this._ipAddr[address] = new IPAddressEntry(address);
@@ -812,7 +812,7 @@ Ruleset.prototype = {
     return this._ipAddr[address];
   },
 
-  _getDomain : function(domain) {
+  _getDomain: function(domain) {
     var parts = domain.split(".");
     var curLevel = this._domain;
     var nextLevel;
@@ -829,7 +829,7 @@ Ruleset.prototype = {
     return curLevel;
   },
 
-  _addDomain : function(domain) {
+  _addDomain: function(domain) {
     var parts = domain.split(".");
     var curLevel = this._domain;
     var nextLevel;
@@ -848,7 +848,7 @@ Ruleset.prototype = {
     return curLevel;
   },
 
-  getHost : function(host) {
+  getHost: function(host) {
     if (!host) {
       throw "INVALID_HOST";
     }
@@ -859,7 +859,7 @@ Ruleset.prototype = {
     }
   },
 
-  addHost : function(host) {
+  addHost: function(host) {
     if (!host) {
       throw "INVALID_HOST";
     }
@@ -877,7 +877,7 @@ Ruleset.prototype = {
    * @param {string} host The host to get matching entries for.
    * @return {Generator<DomainEntry|IPAddressEntry>}
    */
-  getHostMatches : function*(host) {
+  getHostMatches: function*(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -924,7 +924,7 @@ Ruleset.prototype = {
    * @param {nsIURI} dest
    * @return {Array<{length: 2, 0: Array<>, 1: Array<>}>}
    */
-  check : function(origin, dest) {
+  check: function(origin, dest) {
     var matchedAllowRules = [];
     var matchedDenyRules = [];
     var originHost, destHost;
@@ -1103,43 +1103,43 @@ Ruleset.matchToRawRule = function(match) {
  */
 Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts) {
   if (rawRule[originOrDest]) {
-    parts.push('"' + originOrDest + '":{');
+    parts.push("\"" + originOrDest + "\":{");
     var needComma = false;
     if (rawRule[originOrDest].h) {
-      parts.push('"h":"' + rawRule[originOrDest].h + '"');
+      parts.push("\"h\":\"" + rawRule[originOrDest].h + "\"");
       needComma = true;
     }
     if (rawRule[originOrDest].port) {
       if (needComma) {
-        parts.push(',');
+        parts.push(",");
       }
-      parts.push('"port":"' + rawRule[originOrDest].port + '"');
+      parts.push("\"port\":\"" + rawRule[originOrDest].port + "\"");
     }
     if (rawRule[originOrDest].s) {
       if (needComma) {
-        parts.push(',');
+        parts.push(",");
       }
-      parts.push('"s":"' + rawRule[originOrDest].s + '"');
+      parts.push("\"s\":\"" + rawRule[originOrDest].s + "\"");
     }
-    parts.push('}');
+    parts.push("}");
   }
   // TODO: pathPre and pathRegex (will need to escape strings)
-  parts.push('}');
+  parts.push("}");
   return parts.join("");
 };
 
 Ruleset.rawRuleToCanonicalString = function(rawRule) {
-  var parts = ['{'];
+  var parts = ["{"];
   if (rawRule.d) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }
   if (rawRule.d && rawRule.o) {
-    parts.push(',');
+    parts.push(",");
   }
   if (rawRule.o) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
   }
-  parts.push('}');
+  parts.push("}");
   return parts.join("");
 };
 

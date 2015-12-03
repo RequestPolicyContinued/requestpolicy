@@ -160,7 +160,8 @@ RawRuleset.prototype = {
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry.o;
     var d = entry.d;
-    var rules, r;
+    var rules;
+    var r;
 
     //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
@@ -221,8 +222,7 @@ RawRuleset.prototype = {
    * Adds the rule to the entries of this |RawRuleset| instance as well as the
    * |Ruleset| optionally provided as the policy argument.
    *
-   * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
-   * @param ruleData
+   * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
    */
   addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
@@ -261,7 +261,8 @@ RawRuleset.prototype = {
     //    notes: 'pathPre' => path prefix (must start with "/")
     var o = entry.o;
     var d = entry.d;
-    var rules, r;
+    var rules;
+    var r;
 
     // TODO: refactor like done with _addEntryToRuleset
 
@@ -368,8 +369,7 @@ RawRuleset.prototype = {
    * Removes the rule from the entries of this |RawRuleset| instance as well as the
    * |Ruleset| optionally provided as the policy argument.
    *
-   * @param ruleAction RULE_ACTION_ALLOW|RULE_ACTION_DENY
-   * @param ruleData
+   * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
    */
   removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
@@ -871,11 +871,11 @@ Ruleset.prototype = {
   },
 
   /**
-   * Yields all matching hosts. For domains, this is in top-down order. For
+   * Yields all matching hosts, that is, DomainEntry or IPAddressEntry
+   * objects. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
    * @param {string} host The host to get matching entries for.
-   * @return {Generator<DomainEntry|IPAddressEntry>}
    */
   getHostMatches: function*(host) {
     if (!this.rules.isEmpty()) {
@@ -922,12 +922,14 @@ Ruleset.prototype = {
   /**
    * @param {nsIURI} origin
    * @param {nsIURI} dest
-   * @return {Array<{length: 2, 0: Array<>, 1: Array<>}>}
+   * @return {Array} Array of length 2, containing matched "allow"
+   *     and "deny" rules, respectively.
    */
   check: function(origin, dest) {
     var matchedAllowRules = [];
     var matchedDenyRules = [];
-    var originHost, destHost;
+    var originHost;
+    var destHost;
     try {
       originHost = origin.host;
     } catch (e) {
@@ -981,11 +983,23 @@ Ruleset.prototype = {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-                matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
+                matchedAllowRules.push([
+                  "origin-to-dest",
+                  entry,
+                  rule,
+                  destEntry,
+                  destRule
+                ]);
               }
               if (destRule.denyDestination && destRule.isMatch(dest)) {
                 //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-                matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
+                matchedDenyRules.push([
+                  "origin-to-dest",
+                  entry,
+                  rule,
+                  destEntry,
+                  destRule
+                ]);
               }
 
               // switch(destRule.destinationRuleAction) {
@@ -1077,7 +1091,10 @@ Ruleset.matchToRawRule = function(match) {
   //     [actionStr, originEntry, originRule, destEntry, destRule]
   // as returned by calls to |Ruleset.check()|.
   var rawRule = {};
-  var entry, rule, destEntry, destRule;
+  var entry;
+  var rule;
+  var destEntry;
+  var destRule;
   var actionStr = match[0];
 
   if (actionStr === "origin") {
@@ -1101,7 +1118,8 @@ Ruleset.matchToRawRule = function(match) {
 /**
  * @static
  */
-Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest, parts) {
+Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
+    parts) {
   if (rawRule[originOrDest]) {
     parts.push("\"" + originOrDest + "\":{");
     var needComma = false;

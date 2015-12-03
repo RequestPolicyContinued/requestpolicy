@@ -84,7 +84,7 @@ var Info = (function() {
   self.isFirefox = appID === C.FIREFOX_ID;
   self.isSeamonkey = appID === C.SEAMONKEY_ID;
   self.isAustralis = self.isFirefox &&
-      Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
+      Services.vc.compare(Services.appinfo.platformVersion, "29") >= 0;
 
   return self;
 }());

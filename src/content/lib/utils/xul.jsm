@@ -43,7 +43,6 @@ var XULUtils = {};
 
 var xulTrees = XULUtils.xulTrees = {};
 
-
 /**
  * IIFE: Import the XUL trees and ensure their integrity.
  */
@@ -55,7 +54,7 @@ var xulTrees = XULUtils.xulTrees = {};
   };
 
   Services.scriptloader.loadSubScript(
-      'chrome://rpcontinued/content/ui/xul-trees.js',
+      "chrome://rpcontinued/content/ui/xul-trees.js",
       xulTreesScope);
 
   // For ensuring that each Element Spec has an ID.
@@ -81,7 +80,6 @@ var xulTrees = XULUtils.xulTrees = {};
     }
   }
 }());
-
 
 /**
  * @param {Array<Object>} aElementSpecList
@@ -111,7 +109,6 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
   return allElementSpecs;
 }
-
 
 function getParentElement(aDocument, aElementSpec) {
   if (!aElementSpec.parent) {
@@ -182,12 +179,12 @@ function setAttributes(aElement, aElementSpec) {
   }
 }
 
-var {addEventListeners, removeEventListeners} = (function () {
+var {addEventListeners, removeEventListeners} = (function() {
   /**
    * @param {!Object} aRootObject
    * @param {Array<string>} aListenerSpec
    *
-   * @return {Function} The listener function.
+   * @return {?Function} The listener function.
    */
   function getEventListener(aRootObject, aListenerSpec) {
     var object = aRootObject;
@@ -212,7 +209,7 @@ var {addEventListeners, removeEventListeners} = (function () {
     }
     var rootObject = aEventTarget.ownerDocument.defaultView.rpcontinued;
 
-    return Object.keys(aEventList).map(function (eventName) {
+    return Object.keys(aEventList).map(function(eventName) {
       return [
         eventName,
         getEventListener(rootObject, aEventList[eventName])
@@ -227,14 +224,14 @@ var {addEventListeners, removeEventListeners} = (function () {
    */
   function addEventListeners(aEventTarget, {events}) {
     var listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function ([eventName, listener]) {
+    listeners.forEach(function([eventName, listener]) {
       aEventTarget.addEventListener(eventName, listener, false);
     });
   }
 
   function removeEventListeners(aEventTarget, {events}) {
     var listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function ([eventName, listener]) {
+    listeners.forEach(function([eventName, listener]) {
       aEventTarget.removeEventListener(eventName, listener, false);
     });
   }
@@ -244,7 +241,6 @@ var {addEventListeners, removeEventListeners} = (function () {
     removeEventListeners: removeEventListeners
   };
 }());
-
 
 function recursivelyAddXULElements(aDocument, aElementSpecList,
                                    aParentElement = null) {
@@ -298,7 +294,7 @@ XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
  * @return {Array<string>} The list of IDs.
  */
 function getRootElementIDs(aTreeName) {
-  var ids = xulTrees[aTreeName].map(function (aElementSpec) {
+  var ids = xulTrees[aTreeName].map(function(aElementSpec) {
     return aElementSpec.attributes.id;
   });
   return ids;

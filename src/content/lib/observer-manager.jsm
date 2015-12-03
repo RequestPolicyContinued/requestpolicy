@@ -88,7 +88,6 @@ function ObserverManager(aEnv) {
   self.observers = [];
 }
 
-
 /**
  * Define 'observe' functions. Those function can be called from anywhere;
  * the caller hands over an object with the keys being the "IDs" and the values
@@ -143,8 +142,9 @@ function ObserverManager(aEnv) {
    * Observe one single subdomain of a Pref Branch (using nsIPrefBranch).
    * Details: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefBranch#addObserver%28%29
    *
-   * @param {string} aTopic - The topic to be observed.
-   * @param {Function} aCallback - The observer's callback function.
+   * @param {nsIPrefBranch} aPrefBranch
+   * @param {String} aDomain
+   * @param {Function} aCallback
    */
   ObserverManager.prototype.observeSinglePrefBranch = function(aPrefBranch,
                                                                aDomain,
@@ -167,8 +167,6 @@ function ObserverManager(aEnv) {
     });
   };
 }
-
-
 
 /**
  * The function will unregister all registered observers.

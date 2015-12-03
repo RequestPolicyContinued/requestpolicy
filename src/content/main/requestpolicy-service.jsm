@@ -53,11 +53,9 @@ var rpService = (function() {
 
   let subscriptions = null;
 
-
   //----------------------------------------------------------------------------
   // Utility
   //----------------------------------------------------------------------------
-
 
   function loadConfigAndRules() {
     subscriptions = new UserSubscriptions();
@@ -90,7 +88,7 @@ var rpService = (function() {
     }
     function updateCompleted(result) {
       Logger.info(Logger.TYPE_INTERNAL,
-          'Subscription updates completed: ' + result);
+          "Subscription updates completed: " + result);
     }
     subscriptions.update(updateCompleted, serials, defaultPolicy);
   }
@@ -100,9 +98,9 @@ var rpService = (function() {
     if (!rpPrefBranch.getBoolPref("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
-      var wm = Cc['@mozilla.org/appshell/window-mediator;1'].
+      var wm = Cc["@mozilla.org/appshell/window-mediator;1"].
           getService(Ci.nsIWindowMediator);
-      var windowtype = 'navigator:browser';
+      var windowtype = "navigator:browser";
       var mostRecentWindow = wm.getMostRecentWindow(windowtype);
 
       // the gBrowser object of the firefox window
@@ -119,12 +117,11 @@ var rpService = (function() {
     }
   }
 
-
   /**
    * Module for detecting installations of other RequestPolicy versions,
    * which have a different extension ID.
    */
-  var DetectorForOtherInstallations = (function () {
+  var DetectorForOtherInstallations = (function() {
     const NOTICE_URL = "chrome://rpcontinued/content/" +
         "multiple-installations.html";
 
@@ -154,11 +151,11 @@ var rpService = (function() {
       }
     }
 
-    ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, function () {
+    ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, function() {
       AddonManager.addAddonListener(addonListener);
     });
 
-    ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI, function () {
+    ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI, function() {
       AddonManager.removeAddonListener(addonListener);
     });
 
@@ -228,10 +225,6 @@ var rpService = (function() {
     return {checkForOtherInstallations: checkForOtherInstallations};
   }());
 
-
-
-
-
   //----------------------------------------------------------------------------
   // startup and shutdown functions
   //----------------------------------------------------------------------------
@@ -267,16 +260,9 @@ var rpService = (function() {
         }
       });
 
-
-
-
-
   self.getSubscriptions = function() {
     return subscriptions;
   };
-
-
-
 
   //----------------------------------------------------------------------------
   // nsIObserver interface
@@ -285,7 +271,7 @@ var rpService = (function() {
   self.observe = function(subject, topic, data) {
     switch (topic) {
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        Logger.debug(Logger.TYPE_INTERNAL, 'XXX updated: ' + data);
+        Logger.debug(Logger.TYPE_INTERNAL, "XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -295,7 +281,7 @@ var rpService = (function() {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        Logger.debug(Logger.TYPE_INTERNAL, 'XXX added: ' + data);
+        Logger.debug(Logger.TYPE_INTERNAL, "XXX added: " + data);
         let subInfo = JSON.parse(data);
         let failures = PolicyManager.loadSubscriptionRules(subInfo);
         let failed = Object.getOwnPropertyNames(failures).length > 0;
@@ -311,7 +297,7 @@ var rpService = (function() {
           }
           let updateCompleted = function(result) {
             Logger.info(Logger.TYPE_INTERNAL,
-                'Subscription update completed: ' + result);
+                "Subscription update completed: " + result);
           };
           subscriptions.update(updateCompleted, serials);
         }
@@ -319,7 +305,7 @@ var rpService = (function() {
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        Logger.debug(Logger.TYPE_INTERNAL, 'YYY: ' + data);
+        Logger.debug(Logger.TYPE_INTERNAL, "YYY: " + data);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;

@@ -36,7 +36,7 @@ let {rpPrefBranch} = importModule("lib/prefs");
 // OldRules
 //==============================================================================
 
-var OldRules = (function () {
+var OldRules = (function() {
   "use strict";
 
   function OldRules(aOrigins = "", aDestinations = "",
@@ -55,7 +55,7 @@ var OldRules = (function () {
    * The three strings containing the old rules.
    */
   Object.defineProperty(OldRules.prototype, "prefStrings", {
-    get: function () {
+    get: function() {
       if (!this._prefStrings) {
         this._prefStrings = this._customPrefStrings || {
           origins: OldRules._getPrefString("allowedOrigins"),
@@ -72,7 +72,7 @@ var OldRules = (function () {
    * Three `Set`s containing the rules as strings.
    */
   Object.defineProperty(OldRules.prototype, "prefStringSets", {
-    get: function () {
+    get: function() {
       function splitString(aRulesString) {
         var rules = new Set(aRulesString.split(" "));
 
@@ -97,7 +97,7 @@ var OldRules = (function () {
   /**
    * Convert the pref strings to rule objects.
    */
-  OldRules.prototype.getAsNewRules = function (addHostWildcard) {
+  OldRules.prototype.getAsNewRules = function(addHostWildcard) {
     var rules = [];
     var {origins, dests, originsToDests} = this.prefStringSets;
 
@@ -131,7 +131,7 @@ var OldRules = (function () {
    * @param {boolean} aAddHostWildcard
    * @return {Object} The endpoints' specifications.
    */
-  OldRules.getEndpointSpecFromString = function (aEndpointString,
+  OldRules.getEndpointSpecFromString = function(aEndpointString,
                                                  aAddHostWildcard) {
     var spec = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
@@ -152,7 +152,7 @@ var OldRules = (function () {
   };
 
   // FIXME: This should be a function of DomainUtil.
-  OldRules._isHostname = function (host) {
+  OldRules._isHostname = function(host) {
     return !DomainUtil.isValidUri(host) && !DomainUtil.isIPAddress(host);
   };
 
@@ -161,7 +161,7 @@ var OldRules = (function () {
    * @return {string} The value of the pref, or an empty string if
    *     the pref does not exist.
    */
-  OldRules._getPrefString = function (aPrefName) {
+  OldRules._getPrefString = function(aPrefName) {
     try {
       return rpPrefBranch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
     } catch (e) {

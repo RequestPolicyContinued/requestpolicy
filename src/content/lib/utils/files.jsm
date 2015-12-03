@@ -62,15 +62,16 @@ var FileUtil = {
   /**
    * Returns the lines of the file in an array.
    *
-   * @param {nsIFile}
-   *          file
+   * @param {nsIFile} file
    */
-  fileToArray : function(file) {
+  fileToArray: function(file) {
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
-    var line = {}, lines = [], hasmore;
+    var line = {};
+    var lines = [];
+    var hasmore;
     do {
       hasmore = stream.readLine(line);
       lines.push(line.value);
@@ -84,7 +85,7 @@ var FileUtil = {
    *
    * @param {nsIFile} file
    */
-  fileToString : function(file) {
+  fileToString: function(file) {
     // FIXME: This function MUST NOT check for the file to exist,
     //        otherwise the subscriptions are not fetched at all,
     //        for whatever reason.
@@ -126,12 +127,10 @@ var FileUtil = {
    * Writes each element of an array to a line of a file (truncates the file if
    * it exists, creates it if it doesn't).
    *
-   * @param {Array}
-   *          lines
-   * @param {nsIFile}
-   *          file
+   * @param {Array} lines
+   * @param {nsIFile} file
    */
-  arrayToFile : function(lines, file) {
+  arrayToFile: function(lines, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
@@ -152,12 +151,10 @@ var FileUtil = {
    * Writes a string to a file (truncates the file if it exists, creates it if
    * it doesn't).
    *
-   * @param {String}
-   *          str
-   * @param {nsIFile}
-   *          file
+   * @param {string} str
+   * @param {nsIFile} file
    */
-  stringToFile : function(str, file) {
+  stringToFile: function(str, file) {
     var stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
@@ -179,29 +176,29 @@ var FileUtil = {
    *
    * @return {nsIFile}
    */
-  getRPUserDir : function(subdir1, subdir2, subdir3) {
+  getRPUserDir: function(subdir1, subdir2, subdir3) {
     var profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
     var file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
-    if(!file.exists()) {
+    if (!file.exists()) {
       file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
     }
 
     if (subdir1) {
       file.appendRelativePath(subdir1);
-      if(!file.exists()) {
+      if (!file.exists()) {
         file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
       }
 
       if (subdir2) {
         file.appendRelativePath(subdir2);
-        if(!file.exists()) {
+        if (!file.exists()) {
           file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
         }
 
         if (subdir3) {
           file.appendRelativePath(subdir3);
-          if(!file.exists()) {
+          if (!file.exists()) {
             file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
           }
         }

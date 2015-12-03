@@ -28,14 +28,14 @@ this.EXPORTED_SYMBOLS = ["DOMUtils"];
 // DOMUtils
 //==============================================================================
 
-var DOMUtils = (function () {
+var DOMUtils = (function() {
   let self = {};
 
   /**
    * Function that takes a DOM Element or an Array of DOM elements and removes
    * all their children.
    */
-  self.removeChildren = function (aElements) {
+  self.removeChildren = function(aElements) {
     // If aElements is not an Array, put the element in an Array.
     let elements = Array.isArray(aElements) ? aElements : [aElements];
     // Note on `isArray` (above):

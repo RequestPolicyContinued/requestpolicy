@@ -27,7 +27,6 @@
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 let isSeamonkey = appID === C.SEAMONKEY_ID;
 
-
 exports.toolbarbutton = [
   {
     parent: {
@@ -83,7 +82,6 @@ exports.mainTree = [
     ]
   },
 
-
   {
     parent: {special: {type: "__window__"}},
 
@@ -98,7 +96,6 @@ exports.mainTree = [
       }
     ]
   },
-
 
   {
     parent: {special: {type: "__window__"}},
@@ -299,7 +296,6 @@ exports.mainTree = [
       }
     ]
   },
-
 
   {
     parent: {id: "appcontent"},

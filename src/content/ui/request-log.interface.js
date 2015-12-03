@@ -25,9 +25,9 @@
 
 window.rpcontinued = window.rpcontinued || {};
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
   /* global Components */
-  const {utils: Cu} = Components;
+  const {classes: Cc, utils: Cu} = Components;
 
   let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -59,7 +59,7 @@ window.rpcontinued.requestLog = (function (self) {
     var content = self.treeView.getCellText(self.tree.currentIndex,
         self.tree.columns.getNamedColumn(columnName));
 
-    const clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+    const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
         .getService(Components.interfaces.nsIClipboardHelper);
     clipboardHelper.copyString(content);
   };
@@ -75,8 +75,8 @@ window.rpcontinued.requestLog = (function (self) {
     var forbidden = true;
     try {
       var uri = DomainUtil.getUriObject(content);
-      if (uri.scheme === 'http' || uri.scheme === 'https' ||
-          uri.scheme === 'ftp') {
+      if (uri.scheme === "http" || uri.scheme === "https" ||
+          uri.scheme === "ftp") {
         forbidden = false;
       }
     } catch (e) {
@@ -91,9 +91,6 @@ window.rpcontinued.requestLog = (function (self) {
 
     window.top.openUILinkIn(content, "tab", {relatedToCurrent: true});
   };
-
-
-
 
   function addRow(aRow) {
     self.rows.push(aRow);
@@ -124,8 +121,6 @@ window.rpcontinued.requestLog = (function (self) {
   self.addBlockedRequest = function(originURI, destURI) {
     addRow([originURI, destURI, true, (new Date()).toLocaleTimeString()]);
   };
-
-
 
   return self;
 }(window.rpcontinued.requestLog || {}));

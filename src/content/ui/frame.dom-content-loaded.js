@@ -52,7 +52,6 @@ var ManagerForDOMContentLoaded = (function() {
     });
   }
 
-
   /**
    * Determines if documentToCheck is the main document loaded in the currently
    * active tab.
@@ -86,8 +85,8 @@ var ManagerForDOMContentLoaded = (function() {
       let answers = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
                                        {documentURI: doc.documentURI});
       if (answers.length === 0) {
-        Logger.warning(Logger.TYPE_ERROR, 'There seems to be no message ' +
-                       'listener for "notifyDocumentLoaded".');
+        Logger.warning(Logger.TYPE_ERROR, "There seems to be no message " +
+                       "listener for \"notifyDocumentLoaded\".");
       } else {
         // take only one answer. If there are more answers, they are ignored
         // ==> there must be only one listener for 'notifyDocumentLoaded'
@@ -140,14 +139,11 @@ var ManagerForDOMContentLoaded = (function() {
     }
   }
 
-
-
-
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
    *
-   * @param {Event} event
+   * @param {Document} doc
    */
   function onDocumentLoaded(doc) {
     // Create a new Environment for this Document and shut it down when
@@ -157,7 +153,6 @@ var ManagerForDOMContentLoaded = (function() {
     // start up the Environment immediately, as it won't have any startup
     // functions.
     DocEnv.startup();
-
 
     let documentURI = doc.documentURI;
 
@@ -196,7 +191,6 @@ var ManagerForDOMContentLoaded = (function() {
 
       Logger.info(Logger.TYPE_META_REFRESH,
                   "Number of meta refreshes found: " + metaRefreshes.length);
-
 
       var docShell = doc.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)
@@ -320,7 +314,6 @@ var ManagerForDOMContentLoaded = (function() {
   //  unwrapWindowFunction(aWindow, "openDialog");
   //  delete aWindow.rpOriginalFunctions;
   //}
-
 
   framescriptEnv.elManager.addListener(mm, "DOMContentLoaded",
                                        onDOMContentLoaded, true);

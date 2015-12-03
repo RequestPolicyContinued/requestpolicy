@@ -27,6 +27,8 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported ProcessEnvironment */
 /* global Environment */
 
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+
 let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm");
 let {C} = ScriptLoader.importModule("lib/utils/constants");
@@ -50,8 +52,11 @@ var ProcessEnvironment = (function() {
     return xulRuntime.processType === xulRuntime.PROCESS_TYPE_DEFAULT;
   }());
 
-
   const shutdownMessage = C.MM_PREFIX + "shutdown";
+
+  //----------------------------------------------------------------------------
+  // ProcessEnvironmentBase
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -71,8 +76,9 @@ var ProcessEnvironment = (function() {
   ProcessEnvironmentBase.prototype = Object.create(Environment.prototype);
   ProcessEnvironmentBase.prototype.constructor = Environment;
 
-
-
+  //----------------------------------------------------------------------------
+  // ParentProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -82,7 +88,6 @@ var ProcessEnvironment = (function() {
   function ParentProcessEnvironment(aName="Parent Process Environment") {
     let self = this;
     ProcessEnvironmentBase.call(self, aName);
-
 
     function sendShutdownMessageToChildren() {
       let parentMM = Cc["@mozilla.org/parentprocessmessagemanager;1"]
@@ -96,10 +101,9 @@ var ProcessEnvironment = (function() {
     self.addShutdownFunction(Environment.LEVELS.BACKEND,
                              sendShutdownMessageToChildren);
   }
-  ParentProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ParentProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
-
-
 
   /**
    * @override
@@ -113,7 +117,6 @@ var ProcessEnvironment = (function() {
     // However, the main modules register their startup and
     // shutdown functions anyway.
     let dummyScope = {};
-
 
     /**
      * The following section is not optimal – read on…
@@ -142,7 +145,6 @@ var ProcessEnvironment = (function() {
     ProcessEnvironmentBase.prototype.startup.apply(self, arguments);
   };
 
-
   /**
    * @override
    */
@@ -155,8 +157,9 @@ var ProcessEnvironment = (function() {
     Cu.unload("chrome://rpcontinued/content/lib/script-loader.jsm");
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ChildProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -183,15 +186,17 @@ var ProcessEnvironment = (function() {
       // Unloading `environment.jsm` has to be the last task.
       // After that task, any global object, such as
       // `Environment` or `Cu` is not available anymore.
-      //console.debug("unloading environment.jsm");
+      // #ifdef LOG_ENVIRONMENT
+      console.debug("unloading environment.jsm");
+      // #endif
       Cu.unload("chrome://rpcontinued/content/lib/environment.jsm");
     }
 
     childMM.addMessageListener(shutdownMessage, receiveShutdownMessage);
   }
-  ChildProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ChildProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ChildProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
-
 
   /**
    * @override
@@ -220,8 +225,9 @@ var ProcessEnvironment = (function() {
                                                                     arguments);
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ProcessEnvironment
+  //----------------------------------------------------------------------------
 
   if (isMainProcess === true) {
     return new ParentProcessEnvironment();

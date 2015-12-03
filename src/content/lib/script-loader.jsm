@@ -68,11 +68,9 @@ var ScriptLoader = (function() {
   // EnvironmentManager has to be unloaded even later than ScriptLoader
   moduleUnloadExceptions[getModuleURI("lib/environment")] = true;
 
-
   // contains the module IDs that are currently being imported initially and
   // have not finished importing yet.
   let modulesCurrentlyBeingImported = {};
-
 
   let self = {
     /**
@@ -88,7 +86,7 @@ var ScriptLoader = (function() {
           // #endif
           try {
             Cu.unload(uri);
-          } catch(e) {
+          } catch (e) {
             console.error(`[RPC] [ScriptLoader] failed to unload "${uri}"`);
             Cu.reportError(e);
           }
@@ -141,12 +139,13 @@ var ScriptLoader = (function() {
         if (moduleID in modulesCurrentlyBeingImported) {
           delete modulesCurrentlyBeingImported[moduleID];
         }
-      } catch (e if e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '", the file was not found!', e);
       } catch (e) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '".', e);
+        if (e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
+          logSevereError(`Failed to import module with ID "${moduleID}", ` +
+                         "the file was not found!", e);
+        } else {
+          logSevereError(`Failed to import module with ID "${moduleID}".`, e);
+        }
       }
       return scope;
     },

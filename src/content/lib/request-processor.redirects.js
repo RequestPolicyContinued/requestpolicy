@@ -52,7 +52,6 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
-
   /**
    * These are redirects that the user allowed when presented with a redirect
    * notification.
@@ -60,8 +59,6 @@ RequestProcessor = (function(self) {
   internal.userAllowedRedirects = {};
 
   internal.allowedRedirectsReverse = {};
-
-
 
   ProcessEnvironment.obMan.observe(
       ["http-on-examine-response"],
@@ -73,8 +70,6 @@ RequestProcessor = (function(self) {
       function(subject, topic, data) {
         handleHttpsEverywhereUriRewrite(subject, data);
       });
-
-
 
   function mapDestinations(origDestUri, newDestUri) {
     origDestUri = DomainUtil.stripFragment(origDestUri);
@@ -92,8 +87,8 @@ RequestProcessor = (function(self) {
    * Handles observer notifications sent by the HTTPS Everywhere extension
    * that inform us of URIs that extension has rewritten.
    *
-   * @param nsIURI oldURI
-   * @param string newSpec
+   * @param {nsIURI} oldURI
+   * @param {string} newSpec
    */
   function handleHttpsEverywhereUriRewrite(oldURI, newSpec) {
     oldURI = oldURI.QueryInterface(Ci.nsIURI);
@@ -164,13 +159,10 @@ RequestProcessor = (function(self) {
     return result;
   }
 
-
   self.isAllowedRedirect = function(originURI, destURI) {
     var request = new Request(originURI, destURI);
     return true === checkRedirect(request).isAllowed;
   };
-
-
 
   function processUrlRedirection(request) {
     let httpResponse = request.httpResponse;
@@ -312,8 +304,8 @@ RequestProcessor = (function(self) {
     var window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(function() {
-      var showNotification = Utils.getObjectPath(window, 'rpcontinued',
-          'overlay', '_showRedirectNotification');
+      var showNotification = Utils.getObjectPath(window, "rpcontinued",
+          "overlay", "_showRedirectNotification");
       if (!showNotification) {
         return false;
       }
@@ -372,9 +364,6 @@ RequestProcessor = (function(self) {
 
     return initialOrigin;
   }
-
-
-
 
   /**
    * Called after a response has been received from the web server. Headers are
@@ -438,8 +427,6 @@ RequestProcessor = (function(self) {
     processUrlRedirection(request);
   }
 
-
-
   /**
    * Checks whether a request is initiated by a content window. If it's from a
    * content window, then it's from unprivileged code.
@@ -453,7 +440,6 @@ RequestProcessor = (function(self) {
 
     return !!loadContext.isContent;
   }
-
 
   return self;
 }(RequestProcessor || {}));

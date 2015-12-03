@@ -52,7 +52,7 @@ function startup(data, reason) {
     let {ProcessEnvironment} = Cu.import(envURI, {});
     // Remark: startup() takes the arguments as an array!
     ProcessEnvironment.startup([data, reason]);
-  } catch(e) {
+  } catch (e) {
     logSevereError("startup() failed!", e);
   }
 }
@@ -65,7 +65,7 @@ function shutdown(data, reason) {
       ProcessEnvironment.shutdown([data, reason]);
     }
     Cu.unload(envURI);
-  } catch(e) {
+  } catch (e) {
     logSevereError("shutdown() failed!", e);
   }
 }

@@ -67,7 +67,6 @@ var Utils = (function() {
   XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
       "@mozilla.org/thread-manager;1", "nsIThreadManager");
 
-
   /**
    * Calls a function multiple times until it succeeds. The
    * function must return TRUE on success.
@@ -97,13 +96,9 @@ var Utils = (function() {
    * @param {Object} object
    * @param {...string} properties
    */
-  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
-  //        https://github.com/jshint/jshint/issues/2785
-  /* jshint -W119 */
   self.getObjectPath = function(object, ...properties) {
     return properties.reduce(self.getObjectProperty, object);
   };
-  /* jshint +W119 */
 
   /**
    * @private
@@ -114,7 +109,6 @@ var Utils = (function() {
     }
     return undefined;
   };
-
 
   /**
    * Return a module's `internal` object, which is a singleton.
@@ -141,7 +135,6 @@ var Utils = (function() {
                                           sealInternal);
     return aModuleScope.internal;
   };
-
 
   /**
    * Wrap a function. Allow 'before' and 'after' functions.

@@ -1,7 +1,7 @@
 /* global $, window */
 /* exported common, WinEnv, elManager, $id, $str */
 
-var {common, WinEnv, elManager, $id, $str} = (function () {
+var {common, WinEnv, elManager, $id, $str} = (function() {
   /* global Components */
   const {utils: Cu} = Components;
 
@@ -25,19 +25,16 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
   WinEnv.startup();
   var elManager = WinEnv.elManager;
 
-
   var $id = window.document.getElementById.bind(window.document);
 
-
   var COMMON_STRINGS = [
-    'preferences',
-    'managePolicies',
-    'about',
-    'help',
-    'basic',
-    'advanced'
+    "preferences",
+    "managePolicies",
+    "about",
+    "help",
+    "basic",
+    "advanced"
   ];
-
 
   var $str = StringUtils.$str;
 
@@ -50,13 +47,15 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
    then calling this function will disable/enable the correct subscriptions.
    */
   // TODO: rename this function.
-  common.switchSubscriptionPolicies = function () {
+  common.switchSubscriptionPolicies = function() {
     var subscriptions = new UserSubscriptions();
 
-    var newDefaultPolicy = Prefs.isDefaultAllow() ? 'allow' : 'deny';
-    var oldDefaultPolicy = Prefs.isDefaultAllow() ? 'deny' : 'allow';
+    var newDefaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
+    var oldDefaultPolicy = Prefs.isDefaultAllow() ? "deny" : "allow";
 
-    var listName, subName, subInfo;
+    var listName;
+    var subName;
+    var subInfo;
 
     var oldSubInfo = subscriptions.getSubscriptionInfo(oldDefaultPolicy);
     for (listName in oldSubInfo) {
@@ -105,7 +104,7 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
    *
    * TODO: remove code duplication with menu.js
    */
-  common.ruleDataPartToDisplayString = function (ruleDataPart) {
+  common.ruleDataPartToDisplayString = function(ruleDataPart) {
     if (ruleDataPart.s && !ruleDataPart.h && !ruleDataPart.port) {
       // Special case: Only a scheme is specified.
       //               The result string will be `scheme "..."`.
@@ -113,7 +112,7 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
       //                  be confused with `*://http:*`. The string `http://*`
       //                  wouldn't be correct for all cases, since there are
       //                  URIs _without_ a host.
-      return "scheme \"" + ruleDataPart.s + "\"";
+      return `scheme "${ruleDataPart.s}"`;
     }
     var str = "";
     if (ruleDataPart.s || ruleDataPart.port) {
@@ -128,20 +127,13 @@ var {common, WinEnv, elManager, $id, $str} = (function () {
     return str;
   };
 
-
-
-
-
-
   common.localize = function(stringNames) {
     stringNames.forEach(function(name) {
-      $('[data-string="' + name + '"]').each(function () {
+      $(`[data-string="${name}"]`).each(function() {
         $(this).text($str(name));
       });
     });
   };
-
-
 
   $(function() {
     common.localize(COMMON_STRINGS);

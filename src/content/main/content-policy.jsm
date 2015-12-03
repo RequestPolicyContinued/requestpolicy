@@ -46,7 +46,7 @@ let {Environment, ProcessEnvironment} = importModule("lib/environment");
 var PolicyImplementation = (function() {
   let self = {};
 
-  let xpcom_categories = ["content-policy"];
+  const XPCOM_CATEGORIES = ["content-policy"];
 
   self.classDescription = "RequestPolicy ContentPolicy Implementation";
   self.classID = Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}");
@@ -61,7 +61,7 @@ var PolicyImplementation = (function() {
                                        self.contractID, self);
 
     let catMan = Utils.categoryManager;
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
     }
@@ -70,22 +70,25 @@ var PolicyImplementation = (function() {
       // self.rejectCode = typeof(/ /) == "object" ? -4 : -3;
       self.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
       self.mimeService =
-          Cc['@mozilla.org/uriloader/external-helper-app-service;1']
+          Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
           .getService(Ci.nsIMIMEService);
     }
   }
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
-      function () {
+      function() {
         try {
           register();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(register);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(register);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
-
 
   function unregister() {
     Logger.dump("shutting down PolicyImplementation...");
@@ -124,15 +127,12 @@ var PolicyImplementation = (function() {
 
     // Actually create the final function, as it is described
     // above.
-    // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
-    /* jshint -W119 */
     self.shouldLoad = () => finalReturnValue;
-    /* jshint +W119 */
 
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
 
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.deleteCategoryEntry(category, self.contractID, false);
     }
 
@@ -171,10 +171,7 @@ var PolicyImplementation = (function() {
     //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
   };
 
-  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
-  /* jshint -W119 */
   self.shouldProcess = () => C.CP_OK;
-  /* jshint +W119 */
 
   //----------------------------------------------------------------------------
   // nsIFactory interface implementation

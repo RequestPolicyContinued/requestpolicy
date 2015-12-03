@@ -1,0 +1,10 @@
+{
+  "preset": "google",
+  "fileExtensions": [".js", ".jsm"],
+  "validateQuoteMarks": "\"",
+  "esnext": true,
+  "requireParenthesesAroundIIFE": true,
+  "excludeFiles": [
+    "**/jquery.min.js"
+  ]
+}

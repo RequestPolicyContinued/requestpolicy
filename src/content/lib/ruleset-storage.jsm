@@ -44,14 +44,14 @@ var RulesetStorage = (function() {
    * @param {String} subscriptionListName
    * @return {RawRuleset}
    */
-  self.loadRawRulesetFromFile = function (filename, subscriptionListName) {
+  self.loadRawRulesetFromFile = function(filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
     var policyFile = FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {
-      policyFile.appendRelativePath('subscriptions');
+      policyFile.appendRelativePath("subscriptions");
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
@@ -73,14 +73,14 @@ var RulesetStorage = (function() {
    * @param {String} filename
    * @param {String} subscriptionListName
    */
-  self.saveRawRulesetToFile = function (policy, filename,
+  self.saveRawRulesetToFile = function(policy, filename,
                                         subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
     let policyFile;
     if (subscriptionListName) {
       policyFile = FileUtil.getRPUserDir("policies",
-            'subscriptions', subscriptionListName);
+            "subscriptions", subscriptionListName);
     } else {
       policyFile = FileUtil.getRPUserDir("policies");
     }

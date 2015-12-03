@@ -50,12 +50,9 @@ var rootPrefBranch = Services.prefs.getBranch("")
 var Prefs = (function() {
   let self = {};
 
-
-
   self.save = function() {
     Services.prefs.savePrefFile(null);
   };
-
 
   function getRPBoolPref(aPrefName) {
     return rpPrefBranch.getBoolPref(aPrefName);
@@ -96,10 +93,10 @@ var Prefs = (function() {
       let prefName = RP_PREF_ALIASES.bool[prefID];
 
       // define the pref's getter function to `self`
-      self["is"+prefName] = getRPBoolPref.bind(this, prefID);
+      self["is" + prefName] = getRPBoolPref.bind(this, prefID);
 
       // define the pref's getter function to `self`
-      self["set"+prefName] = setRPBoolPref.bind(this, prefID);
+      self["set" + prefName] = setRPBoolPref.bind(this, prefID);
     }
   }
 
@@ -118,23 +115,21 @@ var Prefs = (function() {
   }
 
   self.oldRulesExist = function() {
-    return !(isPrefEmpty('allowedOrigins') &&
-             isPrefEmpty('allowedDestinations') &&
-             isPrefEmpty('allowedOriginsToDestinations'));
+    return !(isPrefEmpty("allowedOrigins") &&
+             isPrefEmpty("allowedDestinations") &&
+             isPrefEmpty("allowedOriginsToDestinations"));
   };
 
-  self.clearPref = function (aPrefName) {
+  self.clearPref = function(aPrefName) {
     try {
       if (rpPrefBranch.prefHasUserValue(aPrefName)) {
         rpPrefBranch.clearUserPref(aPrefName);
       }
     } catch (e) {
-      Logger.dump('Clearing pref failed: ' + e.toString());
+      Logger.dump("Clearing pref failed: " + e.toString());
     }
     Services.prefs.savePrefFile(null);
   };
-
-
 
   function observePref(subject, topic, data) {
     if (topic === "nsPref:changed") {

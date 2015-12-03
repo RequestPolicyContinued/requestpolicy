@@ -53,7 +53,7 @@ function getURI(aURI) {
   let id;
   let index = aURI.path.indexOf("?");
   if (index >= 0 && aURI.path.length > index) {
-    id = aURI.path.substr(index+1);
+    id = aURI.path.substr(index + 1);
   }
   if (!id || !(id in FILENAMES)) {
     id = "basicprefs";
@@ -68,17 +68,16 @@ function getURI(aURI) {
 var AboutRequestPolicy = (function() {
   let self = {};
 
-
   self.classDescription = "about:requestpolicy";
   self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
   self.classID = Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
 
-  self.getURIFlags = function (aURI) {
+  self.getURIFlags = function(aURI) {
     return Ci.nsIAboutModule.ALLOW_SCRIPT;
   };
 
-  self.newChannel = function (aURI) {
+  self.newChannel = function(aURI) {
     let uri = getURI(aURI);
     let channel = Services.io.newChannel(uri, null, null);
     channel.originalURI = aURI;
@@ -89,13 +88,12 @@ var AboutRequestPolicy = (function() {
   // nsIFactory interface implementation
   //----------------------------------------------------------------------------
 
-  self.createInstance = function (outer, iid) {
+  self.createInstance = function(outer, iid) {
     if (outer) {
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
     return self.QueryInterface(iid);
   };
-
 
   function registerFactory() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
@@ -105,12 +103,16 @@ var AboutRequestPolicy = (function() {
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
-      function () {
+      function() {
         try {
           registerFactory();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(registerFactory);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(registerFactory);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
 

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-(function () {
+(function() {
   /* global Components */
   const {utils: Cu} = Components;
 
@@ -42,13 +42,9 @@
 
   //console.debug('[RPC] new framescript loading...');
 
-
-
-
   let framescriptEnv = new FrameScriptEnvironment(mm);
   let mlManager = framescriptEnv.mlManager;
   let overlayComm = new FramescriptToOverlayCommunication(framescriptEnv);
-
 
   // Create a scope for the sub-scripts, which also can
   // be removed easily when the framescript gets unloaded.
@@ -56,10 +52,10 @@
 
   function loadSubScripts() {
     Services.scriptloader.loadSubScript(
-        'chrome://rpcontinued/content/ui/frame.blocked-content.js',
+        "chrome://rpcontinued/content/ui/frame.blocked-content.js",
         framescriptScope);
     Services.scriptloader.loadSubScript(
-        'chrome://rpcontinued/content/ui/frame.dom-content-loaded.js',
+        "chrome://rpcontinued/content/ui/frame.dom-content-loaded.js",
         framescriptScope);
   }
   framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,
@@ -70,9 +66,6 @@
     framescriptScope = null;
   });
 
-
-
-
   function reloadDocument() {
     content.document.location.reload(false);
   }
@@ -81,11 +74,9 @@
   function setLocation(aUri) {
     content.document.location.href = aUri;
   }
-  mlManager.addListener("setLocation", function (message) {
+  mlManager.addListener("setLocation", function(message) {
     setLocation(message.data.uri);
   });
-
-
 
   // Listen for click events so that we can allow requests that result from
   // user-initiated link clicks and form submissions.
@@ -132,7 +123,6 @@
   framescriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
     framescriptEnv.elManager.addListener(mm, "click", mouseClicked, true);
   });
-
 
   // start up the framescript's environment
   framescriptEnv.startup();

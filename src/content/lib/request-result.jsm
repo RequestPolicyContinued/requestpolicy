@@ -88,11 +88,11 @@ function RequestResult(isAllowed, resultReason) {
 }
 
 RequestResult.prototype = {
-  matchedAllowRules : null,
-  matchedDenyRules : null,
+  matchedAllowRules: null,
+  matchedDenyRules: null,
 
-  isAllowed : undefined,  // whether the request will be or has been allowed
-  resultReason : undefined
+  isAllowed: undefined,  // whether the request will be or has been allowed
+  resultReason: undefined
 };
 
 RequestResult.prototype.allowRulesExist = function() {

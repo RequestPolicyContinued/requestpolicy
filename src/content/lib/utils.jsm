@@ -96,13 +96,9 @@ var Utils = (function() {
    * @param {Object} object
    * @param {...string} properties
    */
-  // FIXME: Re-enable (W119) when JSHint issue #2785 is fixed.
-  //        https://github.com/jshint/jshint/issues/2785
-  /* jshint -W119 */
   self.getObjectPath = function(object, ...properties) {
     return properties.reduce(self.getObjectProperty, object);
   };
-  /* jshint +W119 */
 
   /**
    * @private

@@ -7,7 +7,7 @@
   "latedef": "nofunc",
   "maxcomplexity": 6,
   "maxdepth": 5,
-  "moz": true,
+  "moz": false,
   "nonew": true,
   "singleGroups": true,
   "undef": true,

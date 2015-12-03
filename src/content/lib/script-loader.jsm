@@ -141,12 +141,14 @@ var ScriptLoader = (function() {
         if (moduleID in modulesCurrentlyBeingImported) {
           delete modulesCurrentlyBeingImported[moduleID];
         }
-      } catch (e if e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '", the file was not found!', e);
       } catch (e) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '".', e);
+        if (e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
+          logSevereError('Failed to import module with ID "' + moduleID +
+                         '", the file was not found!', e);
+        } else {
+          logSevereError('Failed to import module with ID "' + moduleID +
+                         '".', e);
+        }
       }
       return scope;
     },

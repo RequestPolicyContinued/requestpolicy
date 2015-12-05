@@ -11,9 +11,13 @@ function run_test() {
   "use strict";
 
   test_0();
+  test_1();
 }
 
 
+/**
+ * Usual rulues.
+ */
 function test_0() {
   "use strict";
 
@@ -81,6 +85,36 @@ function test_0() {
       {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}}
     ]);
   });
+}
+
+
+/**
+ * Rules where the URIs don't have an "authority" part.
+ */
+function test_1() {
+  "use strict";
+
+  testGetOldRulesAsNewRules(
+      [
+        "foo1: " +
+        "foo2:",
+
+        "foo3: " +
+        "foo4:",
+
+        "foo5o:|foo5d: " +
+        "foo6o:|foo6d:"
+      ],
+      [
+        {o: {s: "foo1"}},
+        {o: {s: "foo2"}},
+
+        {d: {s: "foo3"}},
+        {d: {s: "foo4"}},
+
+        {o: {s: "foo5o"}, d: {s: "foo5d"}},
+        {o: {s: "foo6o"}, d: {s: "foo6d"}}
+      ]);
 }
 
 

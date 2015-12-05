@@ -136,10 +136,12 @@ var OldRules = (function() {
     var spec = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
       let uriObj = DomainUtil.getUriObject(aEndpointString);
-      spec.h = uriObj.host;
       spec.s = uriObj.scheme;
-      if (uriObj.port !== -1) {
-        spec.port = uriObj.port;
+      if (DomainUtil.uriObjHasHost(uriObj)) {
+        spec.h = uriObj.host;
+        if (uriObj.port !== -1) {
+          spec.port = uriObj.port;
+        }
       }
     } else {
       spec.h = aEndpointString.split("/")[0];

@@ -4,11 +4,25 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
 #### Version 1.0.beta11
+* improvements
+  * Importing old rules: detect if a wildcard needs to be added
+    in front of a host or not, based on the host's base domain. (#730)
+* other changes
+  * The default policy for new installations is now "deny" again,
+    just as in the 0.5.x versions.
 * bugfixes
-  * With E10s enabled, the "Allow" button on the redirection notification
-    bar did not always work. (#620, a168f70)
-  * With E10s enabled, the redirection notification bar did not appear in
-    some cases. (#722, 41366d3)
+  * Importing old rules: Handle URIs without host correctly (#354)
+  * Automatic import of old rules: import if and only if both
+    conditions are true: (#731, 49894f6)
+    - the user is upgrading RP from v0.5 to v1.0
+    - the v1.0 rules file doesn't exist yet.
+  * E10s issues
+    * The "Allow" button on the redirection notification
+      bar did not always work. (#620, a168f70)
+    * The redirection notification bar did not appear in
+      some cases. (#722, 41366d3)
+  * Add-on compatibility: KeeFox (#427, a38cc57)
+  * Add-on compatibility: Enpass (#732, 566aa71)
 
 
 #### Version 1.0.beta10.2 (bugfix)

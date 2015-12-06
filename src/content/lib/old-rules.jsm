@@ -24,8 +24,8 @@
 /* global Components */
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-/* exported OldRules */
-this.EXPORTED_SYMBOLS = ["OldRules"];
+/* exported OldRules, OldRulesParseError */
+this.EXPORTED_SYMBOLS = ["OldRules", "OldRulesParseError"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
@@ -114,12 +114,20 @@ var OldRules = (function() {
     }
 
     for (let originToDest of originsToDests) {
-      let [origin, dest] = originToDest.split("|");
+      let parts = originToDest.split("|");
 
-      rules.push({
-        o: OldRules.getEndpointSpecFromString(origin, addHostWildcard),
-        d: OldRules.getEndpointSpecFromString(dest, addHostWildcard)
-      });
+      if (parts.length === 2) {
+        let [origin, dest] = parts;
+        if (origin !== "" && dest !== "") {
+          rules.push({
+            o: OldRules.getEndpointSpecFromString(origin, addHostWildcard),
+            d: OldRules.getEndpointSpecFromString(dest, addHostWildcard)
+          });
+          continue;
+        }
+      }
+
+      throw new OldRulesParseError(`Invalid old rule: "${originToDest}"`);
     }
 
     return rules;
@@ -177,3 +185,15 @@ var OldRules = (function() {
 
   return OldRules;
 }());
+
+//==============================================================================
+// ParseError
+//==============================================================================
+
+function OldRulesParseError() {
+  Error.apply(this, arguments);
+  this.name = 'OldRulesParseError';
+}
+
+OldRulesParseError.prototype = Object.create(Error.prototype);
+OldRulesParseError.prototype.constructor = Error;

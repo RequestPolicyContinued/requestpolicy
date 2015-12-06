@@ -1,7 +1,7 @@
 /* exported run_test */
 /* global Cc, Ci, Cu, equal, deepEqual */
 
-/* global OldRules */
+/* global OldRules, OldRulesParseError */
 Cu.import("chrome://rpcontinued/content/lib/old-rules.jsm");
 /* global rpPrefBranch */
 Cu.import("chrome://rpcontinued/content/lib/prefs.jsm");
@@ -12,6 +12,7 @@ function run_test() {
 
   test_0();
   test_1();
+  test_2();
 }
 
 
@@ -114,6 +115,44 @@ function test_1() {
 
         {o: {s: "foo5o"}, d: {s: "foo5d"}},
         {o: {s: "foo6o"}, d: {s: "foo6d"}}
+      ]);
+}
+
+
+/**
+ * Special cases.
+ */
+function test_2() {
+  "use strict";
+
+  // invalid rules
+
+  function testInvalidRule(originToDest) {
+    Assert.throws(function() {
+      testGetOldRulesAsNewRules(["", "", originToDest], []);
+    }, OldRulesParseError);
+  }
+
+  testInvalidRule("|");
+  testInvalidRule("zeroVerticalBars");
+  testInvalidRule("multiple|vertical|bars");
+  testInvalidRule("foo|");
+  testInvalidRule("|bar");
+  testInvalidRule("|foobar|");
+
+  // many spaces
+
+  testGetOldRulesAsNewRules(
+      [
+        "a     b",
+        " c    d ",
+        " e|f  g|h "
+      ],
+      [
+        {o: {h: "*.a"}}, {o: {h: "*.b"}},
+        {d: {h: "*.c"}}, {d: {h: "*.d"}},
+        {o: {h: "*.e"}, d: {h: "*.f"}},
+        {o: {h: "*.g"}, d: {h: "*.h"}}
       ]);
 }
 

@@ -112,42 +112,30 @@
   }*/
 
   window.onload = function() {
-    // Populate the form values based on the user's current settings.
-    // If the use has just upgrade from an 0.x version, populate based on the old
-    // preferences and also do a rule import based on the old strictness settings.
     if (Info.isRPUpgrade) {
-      var identLevel;
-      if (rpPrefBranch.prefHasUserValue("uriIdentificationLevel")) {
-        identLevel = rpPrefBranch.getIntPref("uriIdentificationLevel");
-      } else {
-        identLevel = 1;
-      }
-
-      $id("defaultdeny").checked = true;
-      handleDefaultPolicyChange();
-
-      $id("allowsamedomain").checked = identLevel === 1;
-      handleAllowSameDomainChange();
-
       // Skip the welcome screen.
       showConfigure();
-
-    } else {
-      var defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
-      $id("defaultallow").checked = !!defaultAllow;
-      $id("defaultdeny").checked = !defaultAllow;
-      if (!defaultAllow) {
-        $("#allowsamedomainblock").css("display", "block");
-      }
-
-      $id("allowsamedomain").checked =
-          rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
-      // Subscriptions are only simple here if we assume the user won't open the
-      // setup window again after changing their individual subscriptions through
-      // the preferences. So, let's assume that as the worst case is that the setup
-      // page shows such a setup-page-revisiting user the subscriptions as being
-      // enabled when they really aren't.
     }
+
+    // Populate the form values based on the user's current settings.
+
+    let defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
+    $id("defaultallow").checked = defaultAllow;
+    $id("defaultdeny").checked = !defaultAllow;
+    if (!defaultAllow) {
+      $("#allowsamedomainblock").css("display", "block");
+    }
+
+    $id("allowsamedomain").checked =
+        rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
+
+    // FIXME: Add a pref to disable subscriptions globally;  issue #713
+    // Subscriptions are only simple here if we assume the user
+    // won't open the setup window again after changing their
+    // individual subscriptions through the preferences.
+    // So, let's assume that as the worst case is that the setup
+    // page shows such a setup-page-revisiting user the subscriptions
+    // as being enabled when they really aren't.
 
     $("#showconfigure").click(showConfigure);
     $("input[name=defaultpolicy]").change(handleDefaultPolicyChange);

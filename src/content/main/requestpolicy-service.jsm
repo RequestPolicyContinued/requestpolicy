@@ -40,6 +40,7 @@ let {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
 let {C} = importModule("lib/utils/constants");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {WindowUtils} = importModule("lib/utils/windows");
+let {Info} = importModule("lib/utils/info");
 
 //==============================================================================
 // rpService
@@ -104,6 +105,18 @@ var rpService = (function() {
 
       if (typeof tabbrowser.addTab !== "function") {
         return;
+      }
+
+      if (Info.isRPUpgrade) {
+        // If the use has just upgraded from an 0.x version, set the
+        // default-policy preferences based on the old preferences.
+        rpPrefBranch.setBoolPref("defaultPolicy.allow", false);
+        if (rpPrefBranch.prefHasUserValue("uriIdentificationLevel")) {
+          let identLevel = rpPrefBranch.getIntPref("uriIdentificationLevel");
+          rpPrefBranch.setBoolPref("defaultPolicy.allowSameDomain",
+              identLevel === 1);
+        }
+        Services.prefs.savePrefFile(null);
       }
 
       tabbrowser.selectedTab = tabbrowser.addTab(url);

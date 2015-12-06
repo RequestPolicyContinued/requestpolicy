@@ -69,6 +69,25 @@ function test_0() {
         }
       ]);
 
+  // localhost IP address
+  testGetOldRulesAsNewRules(
+      [
+        // IPv4
+        "127.0.0.1 " +
+        "http://127.0.0.1:8080 " +
+        // IPv6
+        "::1 " +
+        "http://[::1]:8080",
+        "",
+        ""
+      ],
+      [
+        {o: {h: "127.0.0.1"}},
+        {o: {s: "http", h: "127.0.0.1", port: 8080}},
+        {o: {h: "::1"}},
+        {o: {s: "http", h: "::1", port: 8080}}
+      ]);
+
   // Get the old rules from the prefs.
   // The prefs don't exist.
   testGetOldRulesAsNewRules([undefined, undefined, undefined], []);

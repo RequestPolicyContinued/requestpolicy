@@ -40,7 +40,6 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
                                      should_autoimport=True)
 
     def test_autoimport__upgrade_without_welcomewin(self):
-        raise SkipTest("FIXME: issue #731")
         self._test_autoimport_or_not(is_upgrade=True,
                                      with_existing_rules_file=False,
                                      with_welcomewin=False,
@@ -53,7 +52,6 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
                                      should_autoimport=False)
 
     def test_no_autoimport__upgrade_with_existing_rules_file(self):
-        raise SkipTest("FIXME: issue #731")
         self._test_autoimport_or_not(is_upgrade=True,
                                      with_existing_rules_file=True,
                                      with_welcomewin=True,

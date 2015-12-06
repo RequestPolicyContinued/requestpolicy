@@ -28,6 +28,7 @@ const {utils: Cu} = Components;
 this.EXPORTED_SYMBOLS = ["Info"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
@@ -63,6 +64,14 @@ var Info = (function() {
       if (self.lastRPVersion !== self.curRPVersion) {
         Services.prefs.savePrefFile(null);
       }
+    });
+
+    XPCOMUtils.defineLazyGetter(self, "isRPUpgrade", function() {
+      // Compare with version 1.0.0a8 since that version introduced
+      // the "welcome window".
+      return self.lastRPVersion &&
+          Services.vc.compare(self.lastRPVersion, "0.0") > 0 &&
+          Services.vc.compare(self.lastRPVersion, "1.0.0a8") <= 0;
     });
   }
 

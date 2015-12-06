@@ -10,12 +10,9 @@
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   var {Info} = importModule("lib/utils/info");
   var {rpPrefBranch} = importModule("lib/prefs");
-  var {Logger} = importModule("lib/logger");
-  var {PolicyManager} = importModule("lib/policy-manager");
   var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");
   var {rpService} = importModule("main/requestpolicy-service");
-  var {OldRules} = importModule("lib/old-rules");
 
   //============================================================================
 
@@ -115,19 +112,10 @@
   }*/
 
   window.onload = function() {
-    // To retrieve the last RP version, `Info` needs to be used,
-    // because the pref "extensions.requestpolicy.lastVersion" has
-    // already been updated.
-    var lastRPVersion = Info.lastRPVersion;
-
     // Populate the form values based on the user's current settings.
     // If the use has just upgrade from an 0.x version, populate based on the old
     // preferences and also do a rule import based on the old strictness settings.
-    // Note: using version 1.0.0a8 instead of 1.0 as that was the last version
-    // before this setup window was added.
-    if (lastRPVersion &&
-        Services.vc.compare(lastRPVersion, "0.0") > 0 &&
-        Services.vc.compare(lastRPVersion, "1.0.0a8") <= 0) {
+    if (Info.isRPUpgrade) {
       var identLevel;
       if (rpPrefBranch.prefHasUserValue("uriIdentificationLevel")) {
         identLevel = rpPrefBranch.getIntPref("uriIdentificationLevel");
@@ -140,25 +128,6 @@
 
       $id("allowsamedomain").checked = identLevel === 1;
       handleAllowSameDomainChange();
-
-      // If the user doesn't have any new-style rules, automatically do an import
-      // of the old rules. We check for new-style rules just in case the user has
-      // opened the setup window again after initial upgrade.
-      var ruleCount;
-      try {
-        ruleCount = PolicyManager.getUserRuleCount();
-      } catch (e) {
-        Logger.warning(Logger.TYPE_INTERNAL,
-            "Unable to get new rule count: " + e);
-        ruleCount = -1;
-      }
-      Logger.dump("Rule count: " + ruleCount);
-      if (ruleCount <= 0) {
-        Logger.dump("Performing rule import.");
-        var oldRules = new OldRules();
-        var rules = oldRules.getAsNewRules();
-        PolicyManager.addAllowRules(rules);
-      }
 
       // Skip the welcome screen.
       showConfigure();

@@ -105,6 +105,14 @@ var ProcessEnvironment = (function() {
       ProcessEnvironmentBase.prototype);
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
+  Object.defineProperty(ParentProcessEnvironment.prototype, "controllers", {
+    get() {
+      return [
+        ScriptLoader.importModule("controllers/old-rules").OldRulesController
+      ];
+    }
+  });
+
   /**
    * @override
    */
@@ -143,6 +151,12 @@ var ProcessEnvironment = (function() {
     ], dummyScope);
 
     ProcessEnvironmentBase.prototype.startup.apply(self, arguments);
+
+    self.controllers.forEach(function(controller) {
+      if (typeof controller.startup === "function") {
+        controller.startup.apply(null, arguments);
+      }
+    });
   };
 
   /**
@@ -150,6 +164,12 @@ var ProcessEnvironment = (function() {
    */
   ParentProcessEnvironment.prototype.shutdown = function() {
     let self = this;
+
+    self.controllers.reverse().forEach(function(controller) {
+      if (typeof controller.shutdown === "function") {
+        controller.shutdown.apply(null, arguments);
+      }
+    });
 
     ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 

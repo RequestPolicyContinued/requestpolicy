@@ -167,6 +167,7 @@ var Logger = (function() {
   self.severe = doLog.bind(self, self.LEVEL_SEVERE);
   self.severeError = doLog.bind(self, self.LEVEL_SEVERE, self.TYPE_ERROR);
   self.warning = doLog.bind(self, self.LEVEL_WARNING);
+  self.error = doLog.bind(self, self.LEVEL_WARNING, self.TYPE_ERROR);
   self.info = doLog.bind(self, self.LEVEL_INFO);
   self.debug = doLog.bind(self, self.LEVEL_DEBUG);
   self.dump = doLog.bind(self, self.LEVEL_DEBUG, self.TYPE_INTERNAL);

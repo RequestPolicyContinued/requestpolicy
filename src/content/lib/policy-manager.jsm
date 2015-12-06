@@ -93,11 +93,13 @@ var PolicyManager = (function() {
     try {
       dprint("PolicyManager::loadUserRules loading user rules");
       rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
+      self.userRulesetExistedOnStartup = true;
     } catch (e) {
       // TODO: log a message about missing user.json ruleset file.
       // There's no user ruleset. This is either because RP has just been
       // installed, the file has been deleted, or something is wrong. For now,
       // we'll assume this is a new install.
+      self.userRulesetExistedOnStartup = false;
       rawRuleset = new RawRuleset();
     }
     userRulesets.user = {

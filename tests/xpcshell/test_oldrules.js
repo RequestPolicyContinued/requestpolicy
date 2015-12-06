@@ -49,20 +49,20 @@ function test_0() {
         "mozilla.org|mozilla.net"
       ],
       [
-        {o: {s: "https", h: "*.www.mozilla.org"}},
-        {o: {h: "*.www.mozilla.org"}},
+        {o: {s: "https", h: "www.mozilla.org"}},
+        {o: {h: "www.mozilla.org"}},
         {o: {h: "*.mozilla.org"}},
 
-        {d: {s: "https", h: "*.mozorg.cdn.mozilla.net"}},
-        {d: {h: "*.mozorg.cdn.mozilla.net"}},
+        {d: {s: "https", h: "mozorg.cdn.mozilla.net"}},
+        {d: {h: "mozorg.cdn.mozilla.net"}},
         {d: {h: "*.mozilla.net"}},
 
         {
-          o: {s: "https", h: "*.www.mozilla.org"},
-          d: {s: "https", h: "*.mozorg.cdn.mozilla.net"}
+          o: {s: "https", h: "www.mozilla.org"},
+          d: {s: "https", h: "mozorg.cdn.mozilla.net"}
         }, {
-          o: {h: "*.www.mozilla.org"},
-          d: {h: "*.mozorg.cdn.mozilla.net"}
+          o: {h: "www.mozilla.org"},
+          d: {h: "mozorg.cdn.mozilla.net"}
         }, {
           o: {h: "*.mozilla.org"},
           d: {h: "*.mozilla.net"}
@@ -149,10 +149,19 @@ function test_2() {
         " e|f  g|h "
       ],
       [
-        {o: {h: "*.a"}}, {o: {h: "*.b"}},
-        {d: {h: "*.c"}}, {d: {h: "*.d"}},
-        {o: {h: "*.e"}, d: {h: "*.f"}},
-        {o: {h: "*.g"}, d: {h: "*.h"}}
+        {o: {h: "a"}}, {o: {h: "b"}},
+        {d: {h: "c"}}, {d: {h: "d"}},
+        {o: {h: "e"}, d: {h: "f"}},
+        {o: {h: "g"}, d: {h: "h"}}
+      ]);
+
+  // UTF8 domain names
+
+  testGetOldRulesAsNewRules(
+      ["müller.de http://foo.bar.الاردن", "", ""],
+      [
+        {o: {h: "*.müller.de"}},
+        {o: {s: "http", h: "foo.bar.الاردن"}}
       ]);
 }
 
@@ -195,7 +204,7 @@ function testGetOldRulesAsNewRules(
   "use strict";
 
   var oldRules = new OldRules(origins, destinations, originsToDestinations);
-  var actualRuleSpecs = oldRules.getAsNewRules(true);
+  var actualRuleSpecs = oldRules.getAsNewRules();
   assertRuleSpecsEqual(actualRuleSpecs, expectedRuleSpecs);
 }
 

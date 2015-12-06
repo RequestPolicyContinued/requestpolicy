@@ -155,9 +155,8 @@
       Logger.dump("Rule count: " + ruleCount);
       if (ruleCount <= 0) {
         Logger.dump("Performing rule import.");
-        var addHostWildcard = identLevel === 1;
         var oldRules = new OldRules();
-        var rules = oldRules.getAsNewRules(addHostWildcard);
+        var rules = oldRules.getAsNewRules();
         PolicyManager.addAllowRules(rules);
       }
 

@@ -22,10 +22,12 @@
  */
 
 /* global Components */
-const {interfaces: Ci, utils: Cu} = Components;
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported OldRules, OldRulesParseError */
 this.EXPORTED_SYMBOLS = ["OldRules", "OldRulesParseError"];
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
@@ -97,19 +99,19 @@ var OldRules = (function() {
   /**
    * Convert the pref strings to rule objects.
    */
-  OldRules.prototype.getAsNewRules = function(addHostWildcard) {
+  OldRules.prototype.getAsNewRules = function() {
     var rules = [];
     var {origins, dests, originsToDests} = this.prefStringSets;
 
     for (let origin of origins) {
       rules.push({
-        o: OldRules.getEndpointSpecFromString(origin, addHostWildcard)
+        o: OldRules.getEndpointSpecFromString(origin)
       });
     }
 
     for (let dest of dests) {
       rules.push({
-        d: OldRules.getEndpointSpecFromString(dest, addHostWildcard)
+        d: OldRules.getEndpointSpecFromString(dest)
       });
     }
 
@@ -120,8 +122,8 @@ var OldRules = (function() {
         let [origin, dest] = parts;
         if (origin !== "" && dest !== "") {
           rules.push({
-            o: OldRules.getEndpointSpecFromString(origin, addHostWildcard),
-            d: OldRules.getEndpointSpecFromString(dest, addHostWildcard)
+            o: OldRules.getEndpointSpecFromString(origin),
+            d: OldRules.getEndpointSpecFromString(dest)
           });
           continue;
         }
@@ -135,28 +137,64 @@ var OldRules = (function() {
 
   /**
    * @static
+   * @param  {string|nsIURI} aEndpoint
+   * @return {boolean}
+   */
+  OldRules.shouldWildcardBeAddedToEndpoint = function(aEndpoint) {
+    if (!OldRules._IDNService) {
+      OldRules._IDNService = Cc["@mozilla.org/network/idn-service;1"].
+          getService(Ci.nsIIDNService);
+    }
+    let host;
+    let getBaseDomain;
+    if (aEndpoint instanceof Ci.nsIURI) {
+      let uri = aEndpoint;
+      host = uri.host;
+      getBaseDomain = () => Services.eTLD.getBaseDomain(uri, 0);
+    } else {
+      host = aEndpoint;
+      getBaseDomain = () => Services.eTLD.getBaseDomainFromHost(host, 0);
+    }
+
+    try {
+      let baseDomain = getBaseDomain();
+      baseDomain = OldRules._IDNService.convertToDisplayIDN(baseDomain, {});
+      return host === baseDomain;
+    } catch (e) {
+      if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
+        return false;
+      } else if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
+        return false;
+      } else {
+        throw e;
+      }
+    }
+  };
+
+  /**
+   * @static
    * @param {string} aEndpointString
-   * @param {boolean} aAddHostWildcard
    * @return {Object} The endpoints' specifications.
    */
-  OldRules.getEndpointSpecFromString = function(aEndpointString,
-                                                 aAddHostWildcard) {
+  OldRules.getEndpointSpecFromString = function(aEndpointString) {
     var spec = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
       let uriObj = DomainUtil.getUriObject(aEndpointString);
       spec.s = uriObj.scheme;
       if (DomainUtil.uriObjHasHost(uriObj)) {
         spec.h = uriObj.host;
+        if (OldRules.shouldWildcardBeAddedToEndpoint(uriObj)) {
+          spec.h = "*." + spec.h;
+        }
         if (uriObj.port !== -1) {
           spec.port = uriObj.port;
         }
       }
     } else {
       spec.h = aEndpointString.split("/")[0];
-    }
-    // FIXME: Issue #731;  Detect if the host is a Base Domain.
-    if (spec.h && aAddHostWildcard && OldRules._isHostname(spec.h)) {
-      spec.h = "*." + spec.h;
+      if (OldRules.shouldWildcardBeAddedToEndpoint(spec.h)) {
+        spec.h = "*." + spec.h;
+      }
     }
     return spec;
   };
@@ -186,12 +224,12 @@ var OldRules = (function() {
 }());
 
 //==============================================================================
-// ParseError
+// OldRulesParseError
 //==============================================================================
 
 function OldRulesParseError() {
   Error.apply(this, arguments);
-  this.name = 'OldRulesParseError';
+  this.name = "OldRulesParseError";
 }
 
 OldRulesParseError.prototype = Object.create(Error.prototype);

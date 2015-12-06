@@ -153,19 +153,19 @@ class ExemplaryOldRules(ExemplaryRules_Meta):
             },
             "expected": [
                 # origin-to-destination rules
-                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"},
-                            "d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"o": {"h": "*.www.mozilla.org"},
-                            "d": {"h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"o": {"s": "https", "h": "www.mozilla.org"},
+                            "d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),
+                self._rule({"o": {"h": "www.mozilla.org"},
+                            "d": {"h": "mozorg.cdn.mozilla.net"}}),
                 self._rule({"o": {"h": "*.mozilla.org"},
                             "d": {"h": "*.mozilla.net"}}),
                 # origin rules
-                self._rule({"o": {"s": "https", "h": "*.www.mozilla.org"}}),
-                self._rule({"o": {"h": "*.www.mozilla.org"}}),
+                self._rule({"o": {"s": "https", "h": "www.mozilla.org"}}),
+                self._rule({"o": {"h": "www.mozilla.org"}}),
                 self._rule({"o": {"h": "*.mozilla.org"}}),
                 # destination rules
-                self._rule({"d": {"s": "https", "h": "*.mozorg.cdn.mozilla.net"}}),
-                self._rule({"d": {"h": "*.mozorg.cdn.mozilla.net"}}),
+                self._rule({"d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),
+                self._rule({"d": {"h": "mozorg.cdn.mozilla.net"}}),
                 self._rule({"d": {"h": "*.mozilla.net"}})
             ]
         }

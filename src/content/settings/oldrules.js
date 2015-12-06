@@ -27,23 +27,23 @@
   });
 
   var rules = null;
-  var addHostWildcard = true;
 
-  function clearRulesTable() {
-    var table = $id("rules");
-    var children = table.getElementsByTagName("tr");
-    while (children.length) {
-      var child = children.item(0);
-      child.parentNode.removeChild(child);
-    }
-  }
+  // currently unused
+  // function clearRulesTable() {
+  //   var table = $id("rules");
+  //   var children = table.getElementsByTagName("tr");
+  //   while (children.length) {
+  //     var child = children.item(0);
+  //     child.parentNode.removeChild(child);
+  //   }
+  // }
 
   function populateRuleTable() {
     var table = $id("rules");
 
     var oldRules = new OldRules();
     // Setting the global rules var here.
-    rules = oldRules.getAsNewRules(addHostWildcard);
+    rules = oldRules.getAsNewRules();
 
     for (var i = 0; i < rules.length; i++) {
       var entry = rules[i];
@@ -93,12 +93,6 @@
     $("#importdone").show();
   };
 
-  function handleAddHostWildcardsChange(event) {
-    addHostWildcard = event.target.checked;
-    clearRulesTable();
-    populateRuleTable();
-  }
-
   window.onload = function() {
     var oldRulesExist = Prefs.oldRulesExist();
     if (!oldRulesExist) {
@@ -107,7 +101,6 @@
       return;
     }
     populateRuleTable();
-    $("#addhostwildcards").change(handleAddHostWildcardsChange);
   };
 
 }());

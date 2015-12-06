@@ -25,7 +25,7 @@ class TestOldRulesPage(RequestPolicyTestCase):
     def tearDown(self):
         try:
             self.prefs.old_rules.remove_all_prefs()
-            self.rules.remove_all()
+            self.rules.remove_all(store=True)
             self.marionette.set_context("chrome")
         finally:
             super(TestOldRulesPage, self).tearDown()

@@ -39,6 +39,7 @@ let {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
 let {C} = importModule("lib/utils/constants");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {WindowUtils} = importModule("lib/utils/windows");
 
 //==============================================================================
 // rpService
@@ -98,19 +99,14 @@ var rpService = (function() {
     if (!rpPrefBranch.getBoolPref("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
-      var wm = Cc["@mozilla.org/appshell/window-mediator;1"].
-          getService(Ci.nsIWindowMediator);
-      var windowtype = "navigator:browser";
-      var mostRecentWindow = wm.getMostRecentWindow(windowtype);
+      let win = WindowUtils.getMostRecentBrowserWindow();
+      let tabbrowser = win.getBrowser();
 
-      // the gBrowser object of the firefox window
-      var _gBrowser = mostRecentWindow.getBrowser();
-
-      if (typeof _gBrowser.addTab !== "function") {
+      if (typeof tabbrowser.addTab !== "function") {
         return;
       }
 
-      _gBrowser.selectedTab = _gBrowser.addTab(url);
+      tabbrowser.selectedTab = tabbrowser.addTab(url);
 
       rpPrefBranch.setBoolPref("welcomeWindowShown", true);
       Services.prefs.savePrefFile(null);

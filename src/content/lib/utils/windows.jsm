@@ -38,6 +38,15 @@ let {rpPrefBranch} = importModule("lib/prefs");
 var WindowUtils = (function() {
   let self = {};
 
+  self.getMostRecentWindow = function(aWindowType = null) {
+    let wm = Cc["@mozilla.org/appshell/window-mediator;1"].
+        getService(Ci.nsIWindowMediator);
+    return wm.getMostRecentWindow(aWindowType);
+  };
+
+  self.getMostRecentBrowserWindow = self.getMostRecentWindow.
+                                    bind(self, "navigator:browser");
+
   self.getChromeWindow = function(aContentWindow) {
     return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)

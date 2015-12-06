@@ -88,6 +88,7 @@ RequestProcessor = (function(self) {
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
     idArray.push("keefox@chris.tomlinson"); // KeeFox
+    idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
 
     for (let id of idArray) {
       Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
@@ -180,6 +181,7 @@ RequestProcessor = (function(self) {
             "Using extension compatibility rules for: " + ext.name);
         compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
         break;
+
       case "keefox@chris.tomlinson": // KeeFox
         Logger.info(Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
@@ -188,6 +190,16 @@ RequestProcessor = (function(self) {
           "ws://127.0.0.1",
           ext.name
         ]);
+
+      case "jid1-TPTs1Z1UvUn2fA@jetpack": // Enpass
+        Logger.info(Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        compatibilityRules.push([
+          "resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/",
+          "ws://localhost",
+          ext.name
+        ]);
+
       default :
         Logger.severe(Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);

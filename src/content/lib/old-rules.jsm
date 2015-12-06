@@ -22,7 +22,7 @@
  */
 
 /* global Components */
-const {interfaces: Ci, results: Cr, utils: Cu} = Components;
+const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported OldRules, OldRulesParseError */
 this.EXPORTED_SYMBOLS = ["OldRules", "OldRulesParseError"];
@@ -175,8 +175,7 @@ var OldRules = (function() {
     try {
       return rpPrefBranch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
     } catch (e) {
-      if (false === e.hasOwnProperty("result") ||
-          e.result !== Cr.NS_ERROR_UNEXPECTED) {
+      if (e.name !== "NS_ERROR_UNEXPECTED") {
         Cu.reportError(e);
       }
       return "";

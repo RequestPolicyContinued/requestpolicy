@@ -36,7 +36,7 @@ class TestDefaultPolicy(RequestPolicyTestCase):
 
     def test_new_install__typical(self):
         self._test(is_upgrade=False, with_welcomewin=True, ident_level=None,
-                   expected_defaultpolicy_allow=True,
+                   expected_defaultpolicy_allow=False,
                    expected_defaultpolicy_allowsamedomain=True)
 
     def _test(self, is_upgrade, with_welcomewin, ident_level,

@@ -87,6 +87,7 @@ RequestProcessor = (function(self) {
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
+    idArray.push("keefox@chris.tomlinson"); // KeeFox
 
     for (let id of idArray) {
       Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
@@ -179,6 +180,14 @@ RequestProcessor = (function(self) {
             "Using extension compatibility rules for: " + ext.name);
         compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
         break;
+      case "keefox@chris.tomlinson": // KeeFox
+        Logger.info(Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        compatibilityRules.push([
+          "resource://",
+          "ws://127.0.0.1",
+          ext.name
+        ]);
       default :
         Logger.severe(Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);

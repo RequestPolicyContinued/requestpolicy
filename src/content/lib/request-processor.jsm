@@ -310,16 +310,24 @@ var RequestProcessor = (function() {
         // only return requests from the given base domain
         continue;
       }
+      // #ifdef LOG_GETTING_SAVED_REQUESTS
       Logger.dump("test originUri: " + originUri);
+      // #endif
       let originUriRequests = requests[originUri];
       for (let destBase in originUriRequests) {
+        // #ifdef LOG_GETTING_SAVED_REQUESTS
         Logger.dump("test destBase: " + destBase);
+        // #endif
         let destBaseRequests = originUriRequests[destBase];
         for (let destIdent in destBaseRequests) {
+          // #ifdef LOG_GETTING_SAVED_REQUESTS
           Logger.dump("test destIdent: " + destIdent);
+          // #endif
           let destIdentRequests = destBaseRequests[destIdent];
           for (let destUri in destIdentRequests) {
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
             Logger.dump("test destUri: " + destUri);
+            // #endif
             let dest = destIdentRequests[destUri];
             for (let i in dest) {
               // TODO: This variable could have been created easily already in
@@ -385,8 +393,10 @@ var RequestProcessor = (function() {
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("Looking for other origins within allowed requests from " +
         originURI);
+    // #endif
     if (!checkedOrigins[originURI]) {
       // this "if" is needed for the first call of this function.
       checkedOrigins[originURI] = true;
@@ -398,8 +408,10 @@ var RequestProcessor = (function() {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
           for (var destURI in allowedRequests[destBase][destIdent]) {
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
             Logger.dump("Found allowed request to <" + destURI + "> " +
                 "from <" + originURI + ">");
+            // #endif
             reqSet.addRequest(originURI, destURI,
                               allowedRequests[destBase][destIdent][destURI]);
 
@@ -417,15 +429,19 @@ var RequestProcessor = (function() {
   }
 
   function _addAllDeniedRequestsFromURI(originURI, reqSet) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("Looking for other origins within denied requests from " +
         originURI);
+    // #endif
     var requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {
           for (var destUri in requests[destBase][destIdent]) {
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
             Logger.dump("Found denied request to <" + destUri + "> from <" +
                 originURI + ">");
+            // #endif
             reqSet.addRequest(originURI, destUri,
                 requests[destBase][destIdent][destUri]);
           }
@@ -1025,14 +1041,18 @@ var RequestProcessor = (function() {
 
   self.getDeniedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("## getDeniedRequests");
+    // #endif
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
   };
 
   self.getAllowedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("## getAllowedRequests");
+    // #endif
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);
   };

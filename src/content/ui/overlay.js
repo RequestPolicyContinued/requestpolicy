@@ -589,8 +589,10 @@ window.rpcontinued.overlay = (function() {
     try {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
+      // #ifdef LOG_FLAG_STATE
       Logger.debug(Logger.TYPE_INTERNAL,
           "Checking for blocked requests from page <" + uri + ">");
+      // #endif
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
@@ -598,10 +600,12 @@ window.rpcontinued.overlay = (function() {
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
+      // #ifdef LOG_FLAG_STATE
       let logText = documentContainsBlockedContent ?
                     "Requests have been blocked." :
                     "No requests have been blocked.";
       Logger.debug(Logger.TYPE_INTERNAL, logText);
+      // #endif
     } catch (e) {
       Logger.severeError(
           "Unable to complete _updateBlockedContentState actions: " + e, e);

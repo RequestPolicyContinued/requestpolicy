@@ -16,6 +16,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     conditions are true: (#731, 49894f6)
     - the user is upgrading RP from v0.5 to v1.0
     - the v1.0 rules file doesn't exist yet.
+  * Redirections with conflicting rules: The default policy should apply (#623)
   * E10s issues
     * The "Allow" button on the redirection notification
       bar did not always work. (#620, a168f70)

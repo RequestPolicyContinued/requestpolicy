@@ -190,6 +190,7 @@ RequestProcessor = (function(self) {
           "ws://127.0.0.1",
           ext.name
         ]);
+        break;
 
       case "jid1-TPTs1Z1UvUn2fA@jetpack": // Enpass
         Logger.info(Logger.TYPE_INTERNAL,
@@ -199,8 +200,9 @@ RequestProcessor = (function(self) {
           "ws://localhost",
           ext.name
         ]);
+        break;
 
-      default :
+      default:
         Logger.severe(Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);
         break;

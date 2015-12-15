@@ -106,7 +106,7 @@ var ProcessEnvironment = (function() {
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
   Object.defineProperty(ParentProcessEnvironment.prototype, "controllers", {
-    get() {
+    get: function() {
       return [
         ScriptLoader.importModule("controllers/old-rules").OldRulesController
       ];

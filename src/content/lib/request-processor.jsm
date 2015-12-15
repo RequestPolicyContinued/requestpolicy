@@ -1096,14 +1096,18 @@ var RequestProcessor = (function() {
 }());
 
 RequestProcessor = (function() {
-  let scope = {RequestProcessor};
+  let scope = {
+    RequestProcessor: RequestProcessor
+  };
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/request-processor.redirects.js", scope);
   return scope.RequestProcessor;
 }());
 
 RequestProcessor = (function() {
-  let scope = {RequestProcessor};
+  let scope = {
+    RequestProcessor: RequestProcessor
+  };
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);
   return scope.RequestProcessor;

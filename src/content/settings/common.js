@@ -139,5 +139,11 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     common.localize(COMMON_STRINGS);
   });
 
-  return {common, WinEnv, elManager, $id, $str};
+  return {
+    common: common,
+    WinEnv: WinEnv,
+    elManager: elManager,
+    $id: $id,
+    $str: $str
+  };
 }());

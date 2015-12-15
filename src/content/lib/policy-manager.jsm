@@ -348,7 +348,9 @@ var PolicyManager = (function() {
 }());
 
 PolicyManager = (function() {
-  let scope = {PolicyManager};
+  let scope = {
+    PolicyManager: PolicyManager
+  };
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/policy-manager.alias-functions.js",
       scope);

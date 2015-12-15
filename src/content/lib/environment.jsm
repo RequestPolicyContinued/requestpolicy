@@ -557,7 +557,9 @@ var Environment = (function() {
 //==============================================================================
 
 var ProcessEnvironment = (function() {
-  let scope = {Environment};
+  let scope = {
+    Environment: Environment
+  };
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/environment.process.js", scope);
   return scope.ProcessEnvironment;

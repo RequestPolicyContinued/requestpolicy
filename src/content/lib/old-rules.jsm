@@ -129,7 +129,8 @@ var OldRules = (function() {
         }
       }
 
-      throw new OldRulesParseError(`Invalid old rule: "${originToDest}"`);
+      throw new OldRulesParseError("Invalid old rule: \"" + originToDest +
+          "\"");
     }
 
     return rules;

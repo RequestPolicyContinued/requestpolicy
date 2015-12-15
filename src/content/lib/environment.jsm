@@ -214,7 +214,7 @@ var Environment = (function() {
     });
 
     // #ifdef LOG_ENVIRONMENT
-    log.debug(`created new Environment "${self.name}`);
+    log.debug("created new Environment \"" + self.name + "\"");
     // #endif
   }
 
@@ -326,7 +326,7 @@ var Environment = (function() {
       // #ifdef LOG_ENVIRONMENT
       let fName = f.name || "anonymous";
       log.debug("calling shutdown function immediately: " +
-          `"${fName}" (${self.name})`);
+          "\"" + fName + "\" (" + self.name + ")");
       // #endif
     } else {
       // The opposite, i.e. the startup process did not reach the function's
@@ -388,7 +388,8 @@ var Environment = (function() {
           Cu.reportError(e);
         }
         // #ifdef LOG_ENVIRONMENT
-        log.debug(`function called! (${aFunctions.length} functions left)`);
+        log.debug("function called! (" + aFunctions.length +
+            " functions left)");
         // #endif
       }
     }
@@ -409,7 +410,8 @@ var Environment = (function() {
       if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
         levelObj.levelState = LEVEL_STATES.PROCESSING;
         // #ifdef LOG_ENVIRONMENT
-        log.debug(`processing level ${aLevel} of startup (${self.uid})`);
+        log.debug("processing level " + aLevel + " of startup (" +
+            self.uid + ")");
         // #endif
 
         if (aStartupOrShutdown === "shutdown") {
@@ -423,8 +425,8 @@ var Environment = (function() {
 
         levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
         // #ifdef LOG_ENVIRONMENT
-        log.debug(`processing level ${aLevel} of startup ` +
-            `(${self.uid}) finished`);
+        log.debug("processing level " + aLevel + " of startup " +
+            "(" + self.uid + ") finished");
         // #endif
       }
     }

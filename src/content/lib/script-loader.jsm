@@ -82,12 +82,13 @@ var ScriptLoader = (function() {
         if (importedModuleURIs.hasOwnProperty(uri) &&
             moduleUnloadExceptions.hasOwnProperty(uri) === false) {
           // #ifdef LOG_SCRIPTLOADER
-          console.debug(`[RPC] [ScriptLoader] Cu.unload("${uri}");`);
+          console.debug("[RPC] [ScriptLoader] Cu.unload(\"" + uri + "\");");
           // #endif
           try {
             Cu.unload(uri);
           } catch (e) {
-            console.error(`[RPC] [ScriptLoader] failed to unload "${uri}"`);
+            console.error("[RPC] [ScriptLoader] failed to unload \"" + uri +
+                "\"");
             Cu.reportError(e);
           }
           delete importedModuleURIs[uri];
@@ -120,7 +121,8 @@ var ScriptLoader = (function() {
       }
 
       // #ifdef LOG_SCRIPTLOADER
-      console.debug(`[RPC] [ScriptLoader] importModule("${moduleID}") called.`);
+      console.debug("[RPC] [ScriptLoader] importModule(\"" + moduleID +
+          "\") called.");
       // #endif
 
       let uri = getModuleURI(moduleID);
@@ -131,7 +133,7 @@ var ScriptLoader = (function() {
         }
 
         // #ifdef LOG_SCRIPTLOADER
-        console.debug(`[RPC] [ScriptLoader] Cu.import("${uri}");`);
+        console.debug("[RPC] [ScriptLoader] Cu.import(\"" + uri + "\");");
         // #endif
         Cu.import(uri, scope);
         importedModuleURIs[uri] = true;
@@ -141,10 +143,11 @@ var ScriptLoader = (function() {
         }
       } catch (e) {
         if (e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
-          logSevereError(`Failed to import module with ID "${moduleID}", ` +
-                         "the file was not found!", e);
+          logSevereError("Failed to import module with ID \"" + moduleID +
+              "\", the file was not found!", e);
         } else {
-          logSevereError(`Failed to import module with ID "${moduleID}".`, e);
+          logSevereError("Failed to import module with ID \"" + moduleID +
+              "\".", e);
         }
       }
       return scope;
@@ -183,7 +186,7 @@ var ScriptLoader = (function() {
 
       // #ifdef LOG_SCRIPTLOADER
       console.debug("[RPC] [ScriptLoader] " +
-          `defineLazyModuleGetter("${moduleID}") called.`);
+          "defineLazyModuleGetter(\"" + moduleID + "\") called.");
       // #endif
       let uri = getModuleURI(moduleID);
       for (let i in names) {
@@ -193,7 +196,8 @@ var ScriptLoader = (function() {
         // #else
         /* jshint -W083 */ // "don't make functions within a loop"
         XPCOMUtils.defineLazyModuleGetter(scope, name, uri, null, function() {
-          console.debug(`[RPC] [ScriptLoader] lazily imported "${name}"`);
+          console.debug("[RPC] [ScriptLoader] lazily imported \"" + name +
+              "\"");
         });
         /* jshint +W083 */
         // #endif

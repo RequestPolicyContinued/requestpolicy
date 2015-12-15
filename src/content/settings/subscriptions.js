@@ -63,7 +63,8 @@
   }
 
   function getInputElement(subName) {
-    var elements = document.body.querySelectorAll(`input[name=${subName}]`);
+    var elements = document.body.querySelectorAll(
+        "input[name=" + subName + "]");
     if (elements.length <= 0) {
       return null;
     }

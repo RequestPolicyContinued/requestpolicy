@@ -278,7 +278,7 @@ DomainUtil.parseRefresh = function(refreshString) {
   if (url) {
     var first = url[0];
     var last = url[url.length - 1];
-    if (first === last && (first === "'" || first === `"`)) {
+    if (first === last && (first === "'" || first === "\"")) {
       url = url.substring(1, url.length - 1);
     }
   }

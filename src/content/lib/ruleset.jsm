@@ -30,6 +30,8 @@ this.EXPORTED_SYMBOLS = [
   "RawRuleset"
 ];
 
+/* global Iterator */
+
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
@@ -476,6 +478,22 @@ RawRuleset.prototype = {
 };
 
 //==============================================================================
+// RuleIterator
+//==============================================================================
+
+// FIXME: Again apply commit 36ad2b9 "[ref] Rules[Symbol.iterator]"
+// as soon as Pale Moon supports Symbol.iterator.
+
+function RuleIterator(rules) {
+  this._rulesIterator = new Iterator(rules);
+}
+
+RuleIterator.prototype.next = function() {
+  // The default Iterator over arrays returns a tuple of [index, item].
+  return this._rulesIterator.next()[1];
+};
+
+//==============================================================================
 // Rules
 //==============================================================================
 
@@ -503,29 +521,41 @@ Rules.prototype = {
     return this._rules.length === 0;
   },
 
-  [Symbol.iterator]: function*() {
-    yield* this._rules;
+  // FIXME: Again apply commit 36ad2b9 "[ref] Rules[Symbol.iterator]"
+  // as soon as Pale Moon supports Symbol.iterator.
+  /* jshint -W103 */
+  __iterator__: function() {
+    return new RuleIterator(this._rules);
   },
+  /* jshint +W103 */
 
   get: function(scheme, port) {
     let rule = new Rule(scheme, port);
-    for (let existingRule of this._rules) {
-      if (existingRule.isEqual(rule)) {
-        return existingRule;
+    for (let i = 0; ; i++) {
+      let item = this._rules[i];
+      if (!item) {
+        break;
+      }
+      if (item.isEqual(rule)) {
+        return item;
       }
     }
     return null;
   },
 
   add: function(scheme, port) {
-    let newRule = new Rule(scheme, port);
-    for (let existingRule of this._rules) {
-      if (existingRule.isEqual(newRule)) {
-        return existingRule;
+    let rule = new Rule(scheme, port);
+    for (let i = 0; ; i++) {
+      let item = this._rules[i];
+      if (!item) {
+        break;
+      }
+      if (item.isEqual(rule)) {
+        return item;
       }
     }
-    this._rules.push(newRule);
-    return newRule;
+    this._rules.push(rule);
+    return rule;
   }
 };
 
@@ -875,9 +905,16 @@ Ruleset.prototype = {
    * objects. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
+   * FIXME: Again apply commit 41fd1c1,
+   * "[ref] Ruleset.getHostMatches: convert to generator function".
+   * as soon as Pale Moon supports Generator Functions.
+   * Note: JSCS currently crashes here, because it does not support
+   * SpiderMonkey's Legacy generator function,
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/Legacy_generator_function
+   *
    * @param {string} host The host to get matching entries for.
    */
-  getHostMatches: function*(host) {
+  getHostMatches: function(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -943,9 +980,9 @@ Ruleset.prototype = {
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (let entry of this.getHostMatches(originHost)) {
+    originouterloop: for (let entry in this.getHostMatches(originHost)) {
       //dprint(entry);
-      for (let rule of entry.rules) {
+      for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);
         let ruleMatchedOrigin = rule.isMatch(origin);
 
@@ -977,9 +1014,9 @@ Ruleset.prototype = {
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
-          for (let destEntry of rule.destinations.getHostMatches(destHost)) {
+          for (let destEntry in rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
-            for (let destRule of destEntry.rules) {
+            for (let destRule in destEntry.rules) {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination && destRule.isMatch(dest)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
@@ -1027,9 +1064,9 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (let entry of this.getHostMatches(destHost)) {
+    destouterloop: for (let entry in this.getHostMatches(destHost)) {
       //dprint(entry);
-      for (let rule of entry.rules) {
+      for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);

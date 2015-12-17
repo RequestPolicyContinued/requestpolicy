@@ -48,7 +48,12 @@
 
   // Create a scope for the sub-scripts, which also can
   // be removed easily when the framescript gets unloaded.
-  var framescriptScope = {mm, framescriptEnv, mlManager, overlayComm};
+  var framescriptScope = {
+    mm: mm,
+    framescriptEnv: framescriptEnv,
+    mlManager: mlManager,
+    overlayComm: overlayComm
+  };
 
   function loadSubScripts() {
     Services.scriptloader.loadSubScript(

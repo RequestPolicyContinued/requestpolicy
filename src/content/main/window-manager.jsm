@@ -219,7 +219,9 @@ var rpWindowManager = (function() {
 }());
 
 rpWindowManager = (function() {
-  let scope = {rpWindowManager};
+  let scope = {
+    rpWindowManager: rpWindowManager
+  };
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
       scope);

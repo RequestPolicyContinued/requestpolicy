@@ -41,7 +41,8 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
             # might have broken RequestPolicy's functionality.
             self.restart()
         finally:
-            self._close_notice_tabs()
+            self.browser.tabbar.close_all_tabs(
+                exceptions=[self.browser.tabbar.tabs[0]])
             self.rp_addon.ignore_errors = False
 
             # It's highly probable that errors occur. However, the tests

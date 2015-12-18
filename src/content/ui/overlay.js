@@ -726,6 +726,17 @@ window.rpcontinued.overlay = (function() {
   };
 
   /**
+   * @this {nsContextMenu}
+   */
+  function onOpenLinkViaContextMenu() {
+    let origin = window.gContextMenuContentData ?
+        window.gContextMenuContentData.docLocation :
+        this.target.ownerDocument.URL;
+    let dest = this.linkURL;
+    RequestProcessor.registerLinkClicked(origin, dest);
+  }
+
+  /**
    * Wraps (overrides) the following methods of gContextMenu
    * - openLink()
    * - openLinkInPrivateWindow()
@@ -745,21 +756,12 @@ window.rpcontinued.overlay = (function() {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    Utils.wrapFunction(window.gContextMenu, "openLink", function() {
-      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
-                                           this.linkURL);
-    });
-
+    Utils.wrapFunction(window.gContextMenu, "openLink",
+        onOpenLinkViaContextMenu);
     Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow",
-        function() {
-      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
-                                           this.linkURL);
-    });
-
-    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent", function() {
-      RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL,
-                                           this.linkURL);
-    });
+        onOpenLinkViaContextMenu);
+    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent",
+        onOpenLinkViaContextMenu);
   };
 
   /**

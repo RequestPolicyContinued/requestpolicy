@@ -57,11 +57,6 @@ window.rpcontinued.overlay = (function() {
 
   let $id = document.getElementById.bind(document);
 
-  //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
-
-  //let _prefetchInfoUri = "http://www.requestpolicy.com/help/prefetch.html";
-  //let _prefetchDisablingInstructionsUri = "http://www.requestpolicy.com/help/prefetch.html#disable";
-
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(ProcessEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
@@ -1095,21 +1090,6 @@ window.rpcontinued.overlay = (function() {
     var xOffset = contentWidth - popupWidth - 2;
     popupElement.openPopup(anchor, "overlap", xOffset);
   };
-
-  //  showExtensionConflictInfo : function() {
-  //    var ext = RequestProcessor.getConflictingExtensions();
-  //    var extJson = JSON.stringify(ext);
-  //    self._openInNewTab(self._extensionConflictInfoUri
-  //        + encodeURIComponent(extJson));
-  //  },
-
-  //  showPrefetchInfo : function() {
-  //    self._openInNewTab(self._prefetchInfoUri);
-  //  },
-  //
-  //  showPrefetchDisablingInstructions : function() {
-  //    self._openInNewTab(self._prefetchDisablingInstructionsUri);
-  //  },
 
   self.openToolbarPopup = function(anchor) {
     // rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,

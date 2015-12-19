@@ -290,6 +290,24 @@ RequestProcessor = (function(self) {
     // Firefox 13 added links from about:newtab
     compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
+    // Firefox
+    if (appInfo.ID === "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}") {
+      Logger.info(Logger.TYPE_INTERNAL,
+          "Application detected: " + appInfo.vendor);
+
+      // Firefox Accounts
+      compatibilityRules.push([
+        "about:accounts",
+        "https://accounts.firefox.com/",
+        appInfo.vendor
+      ]);
+      compatibilityRules.push([
+        "https://accounts.firefox.com/",
+        "https://api.accounts.firefox.com/",
+        appInfo.vendor
+      ]);
+    }
+
     // Flock
     if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,

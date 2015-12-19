@@ -142,6 +142,17 @@ var RequestProcessor = (function() {
     }
   }
 
+  /**
+   * Remove all saved requests from a specific origin URI. Remove both
+   * accepted and rejected requests.
+   *
+   * @param {string} uri The origin URI.
+   */
+  function removeSavedRequestsByOriginURI(uri) {
+    self._allowedRequests.removeOriginUri(uri);
+    self._rejectedRequests.removeOriginUri(uri);
+  }
+
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
     Logger.warning(Logger.TYPE_CONTENT, "** BLOCKED ** reason: " + reason +
@@ -214,15 +225,16 @@ var RequestProcessor = (function() {
     return CP_OK;
   }
 
+  /**
+   * @param {string} originUri
+   * @param {string} destUri
+   * @param {Boolean} isInsert
+   * @param {RequestResult} requestResult
+   */
   function recordAllowedRequest(originUri, destUri, isInsert, requestResult) {
-    // Reset the accepted and rejected requests originating from this
-    // destination. That is, if this accepts a request to a uri that may itself
-    // originate further requests, reset the information about what that page is
-    // accepting and rejecting.
-    // If "isInsert" is set, then we don't want to clear the destUri info.
-    if (true !== isInsert) {
-      self._allowedRequests.removeOriginUri(destUri);
-      self._rejectedRequests.removeOriginUri(destUri);
+    if (!isInsert) {
+      // The destination URI may itself originate further requests.
+      removeSavedRequestsByOriginURI(destUri);
     }
     self._rejectedRequests.removeRequest(originUri, destUri);
     self._allowedRequests.addRequest(originUri, destUri, requestResult);
@@ -519,6 +531,7 @@ var RequestProcessor = (function() {
               Logger.TYPE_CONTENT,
               "Allowing request that appears to be a URL entered in the " +
               "location bar or some other good explanation: " + destURI);
+          removeSavedRequestsByOriginURI(destURI);
           return CP_OK;
         }
       }

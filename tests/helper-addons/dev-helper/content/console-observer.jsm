@@ -48,7 +48,8 @@ function isRPException(aMessage) {
 
 const knownBugs = [
   // issue #597
-  `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`
+  `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`,
+  `[JavaScript Warning: "Expected end of value but found '10'.  Error in parsing value for 'font-family'.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
 ];
 
 function isKnownBug(aMessage) {

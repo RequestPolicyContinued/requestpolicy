@@ -44,6 +44,10 @@ class RequestPolicyPuppeteer(object):
     def ctx_menu(self):
         pass
 
+    @use_class_as_property('ui.menu.Menu')
+    def menu(self):
+        pass
+
     @use_class_as_property('ui.redirect_notification.RedirectNotification')
     def redir(self):
         pass

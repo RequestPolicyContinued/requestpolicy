@@ -83,6 +83,15 @@ exports.mainTree = [
   },
 
   {
+    parent: {id: "contentAreaContextMenu"},
+
+    tag: "menuitem",
+    attributes: {id: "rpcontinuedContextMenuEntry",
+                 label: "RequestPolicy Continued"},
+    events: {command: ["overlay", "openMenu"]}
+  },
+
+  {
     parent: {special: {type: "__window__"}},
 
     tag: "keyset",

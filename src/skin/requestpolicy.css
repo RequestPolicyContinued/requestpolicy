@@ -268,6 +268,27 @@
 }
 
 /*********************************************
+ * Context menu entry
+ *********************************************/
+
+#rpcontinuedContextMenuEntry {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+}
+
+#rpcontinuedContextMenuEntry[rpcontinuedBlocked="true"] {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+  color: #a00;
+}
+
+#rpcontinuedContextMenuEntry[rpcontinuedPermissive="true"] {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+  color: #d07100;
+}
+
+/*********************************************
  * Request Log
  *********************************************/
 #rpcontinued-requestLog-close {

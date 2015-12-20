@@ -78,10 +78,6 @@ window.rpcontinued.overlay = (function() {
 
   //let statusbar = null;
 
-  // TODO: get back entry in context menu
-  // https://github.com/RequestPolicyContinued/requestpolicy/issues/353
-  //let rpContextMenu = null;
-
   let toolbox = null;
 
   let isFennec = false;
@@ -111,7 +107,6 @@ window.rpcontinued.overlay = (function() {
         popupElement = $id("rpc-popup");
 
         //statusbar = $id("status-bar");
-        //rpContextMenu = $id("rpcontinuedContextMenu");
         toolbox = $id("navigator-toolbox");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -130,7 +125,7 @@ window.rpcontinued.overlay = (function() {
         // object's observerBlockedRequests() method will be called.
         RequestProcessor.addRequestObserver(self);
 
-        //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
+        setContextMenuEntryEnabled(rpPrefBranch.getBoolPref("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -152,9 +147,10 @@ window.rpcontinued.overlay = (function() {
     }
   };
 
-  //setContextMenuEnabled : function(isEnabled) {
-  //  rpContextMenu.setAttribute("hidden", !isEnabled);
-  //},
+  function setContextMenuEntryEnabled(isEnabled) {
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
+    contextMenuEntry.setAttribute("hidden", !isEnabled);
+  }
 
   OverlayEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
@@ -208,10 +204,6 @@ window.rpcontinued.overlay = (function() {
                                         addContextMenuListener);
 
   function addTabContainerTabSelectListener() {
-    // We consider the default place for the popup to be attached to the
-    // context menu, so attach it there.
-    //self._attachPopupToContextMenu();
-
     // Listen for the user changing tab so we can update any notification or
     // indication of blocked requests.
     if (!isFennec) {
@@ -613,8 +605,10 @@ window.rpcontinued.overlay = (function() {
    */
   self._setContentBlockedState = function(isContentBlocked) {
     var button = $id(toolbarButtonId);
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
       button.setAttribute("rpcontinuedBlocked", isContentBlocked);
+      contextMenuEntry.setAttribute("rpcontinuedBlocked", isContentBlocked);
     }
   };
 
@@ -623,9 +617,11 @@ window.rpcontinued.overlay = (function() {
    */
   function updatePermissiveStatus() {
     var button = $id(toolbarButtonId);
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
       let isPermissive = Prefs.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
+      contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
   }
   /**
@@ -718,7 +714,6 @@ window.rpcontinued.overlay = (function() {
    */
   self._contextMenuOnPopupShowing = function() {
     rpcontinued.overlay._wrapOpenLink();
-    /*rpcontinued.overlay._attachPopupToContextMenu();*/
   };
 
   /**
@@ -937,12 +932,6 @@ window.rpcontinued.overlay = (function() {
       }
     }
     self._needsReloadOnMenuClose = false;
-    // if (event.currentTarget != event.originalTarget) {
-    //   return;
-    // }
-    // Leave the popup attached to the context menu, as we consider that the
-    // default location for it.
-    //self._attachPopupToContextMenu();
   };
 
   /**

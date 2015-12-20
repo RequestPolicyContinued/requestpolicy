@@ -189,7 +189,7 @@ var rpWindowManager = (function() {
     for (let i = 0, len = styleSheets.length; i < len; i++) {
       let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
       styleSheetService.loadAndRegisterSheet(styleSheetURI,
-          styleSheetService.USER_SHEET);
+          styleSheetService.AUTHOR_SHEET);
     }
   }
   function unloadStyleSheets() {
@@ -200,9 +200,9 @@ var rpWindowManager = (function() {
     for (let i = 0, len = styleSheets.length; i < len; i++) {
       let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
       if (styleSheetService.sheetRegistered(styleSheetURI,
-          styleSheetService.USER_SHEET)) {
+          styleSheetService.AUTHOR_SHEET)) {
         styleSheetService.unregisterSheet(styleSheetURI,
-            styleSheetService.USER_SHEET);
+            styleSheetService.AUTHOR_SHEET);
       }
     }
   }

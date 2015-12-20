@@ -1,27 +1,5 @@
 
 /*********************************************
- * Context menu
- *********************************************/
-/*
-#rpcontinuedContextMenu {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
-}
-
-#rpcontinuedContextMenu[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
-  color: #a00;
-}
-
-#rpcontinuedContextMenu[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
-  color: #d07100;
-}
-*/
-
-/*********************************************
  * ________________ Overview _________________
  *
  * The menu icon. To be distinguished:

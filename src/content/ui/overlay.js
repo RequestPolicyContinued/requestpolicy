@@ -47,6 +47,7 @@ window.rpcontinued.overlay = (function() {
   let {StringUtils} = importModule("lib/utils/strings");
   let {WindowUtils} = importModule("lib/utils/windows");
   let {Utils} = importModule("lib/utils");
+  let {DOMUtils} = importModule("lib/utils/dom");
   let {C} = importModule("lib/utils/constants");
 
   let rpcontinued = window.rpcontinued;
@@ -1072,18 +1073,21 @@ window.rpcontinued.overlay = (function() {
     gBrowser.selectedTab = gBrowser.addTab(uri);
   };
 
-  self.openMenuByHotkey = function() {
-    // Ideally we'd put the popup in its normal place based on the rp toolbar
-    // button but let's not count on that being visible. So, we'll be safe and
-    // anchor it within the content element. However, there's no good way to
-    // right-align a popup. So, we can either let it be left aligned or we can
-    // figure out where we think the top-left corner should be. And that's what
-    // we do.
+  /**
+   * Open the menu at the browsing content.
+   *
+   * The menu is aligned to the top right.
+   */
+  self.openMenuAtContent = function() {
+    // There's no good way to right-align a popup. So, we can either
+    // let it be left aligned or we can figure out where we think the
+    // top-left corner should be. And that's what we do.
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
     //Logger.dump('popup width: ' + popup.clientWidth);
-    var popupWidth = popupElement.clientWidth ? 730 : popupElement.clientWidth;
+    var popupWidth = popupElement.clientWidth === 0 ? 730 :
+        popupElement.clientWidth;
     var anchor = $id("content");
     var contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
@@ -1091,10 +1095,35 @@ window.rpcontinued.overlay = (function() {
     popupElement.openPopup(anchor, "overlap", xOffset);
   };
 
-  self.openToolbarPopup = function(anchor) {
+  self.openMenuAtToolbarButton = function() {
+    let anchor = $id("rpcontinuedToolbarButton");
     // rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
     //     null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
+  };
+
+  /**
+   * Open RequestPolicy's menu.
+   *
+   * If the toolbar button is visible, it will be placed there. Otherwise
+   * it will be placed near the browsing content.
+   */
+  self.openMenu = function() {
+    // `setTimeout` is needed in certain cases where the toolbar button
+    // is actually hidden. For example, it can reside in the Australis
+    // menu. By delaying "openMenu" the menu will be closed in the
+    // meantime, and the toolbar button will be detected as invisible.
+    window.setTimeout(function() {
+      if (self.isToolbarButtonVisible()) {
+        self.openMenuAtToolbarButton();
+      } else {
+        self.openMenuAtContent();
+      }
+    }, 0);
+  };
+
+  self.isToolbarButtonVisible = function() {
+    return DOMUtils.isElementVisible($id("rpcontinuedToolbarButton"));
   };
 
   function openLinkInNewTab(url, relatedToCurrent) {

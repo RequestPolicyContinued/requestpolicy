@@ -49,5 +49,28 @@ var DOMUtils = (function() {
     }
   };
 
+  function isThisElementVisible(aElement) {
+    let rects = aElement.getClientRects();
+    if (rects.length === 0) {
+      return false;
+    }
+    let rect = rects[0];
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  /**
+   * Check if the element and all of its parent elements is visible.
+   *
+   * @param  {Element} aElement
+   * @return {boolean}
+   */
+  self.isElementVisible = function(aElement) {
+    if (!isThisElementVisible(aElement)) {
+      return false;
+    }
+    let parent = aElement.parentElement;
+    return parent !== null ? self.isElementVisible(parent) : true;
+  };
+
   return self;
 }());

@@ -92,7 +92,7 @@ exports.mainTree = [
         tag: "key",
         attributes: {key: "r",
                      modifiers: "accel alt"},
-        events: {command: ["overlay", "openMenuByHotkey"]}
+        events: {command: ["overlay", "openMenu"]}
       }
     ]
   },

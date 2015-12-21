@@ -32,11 +32,11 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
-let {Info} = importModule("lib/utils/info");
 let {XULUtils} = importModule("lib/utils/xul");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {ToolbarButtonController} = importModule(
     "controllers/windows.toolbarbutton");
+let {StyleSheetsController} = importModule("controllers/windows.style-sheets");
 
 //==============================================================================
 // WindowListener
@@ -58,6 +58,7 @@ let WindowSubControllers = (function() {
 
   const SUBCONTROLLERS = Object.freeze([
     ToolbarButtonController,
+    StyleSheetsController,
   ]);
 
   const SUBCONTROLLERS_REVERSE = Object.freeze(
@@ -88,15 +89,6 @@ let WindowSubControllers = (function() {
 
 var rpWindowManager = (function() {
   let self = {};
-
-  let styleSheets = [
-    "chrome://rpcontinued/skin/requestpolicy.css"
-  ];
-  if (Info.isSeamonkey) {
-    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton-seamonkey.css");
-  } else {
-    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton.css");
-  }
 
   let frameScriptURI = "chrome://rpcontinued/content/ui/frame.js?" +
       Math.random();
@@ -188,8 +180,6 @@ var rpWindowManager = (function() {
         globalMM.loadFrameScript(frameScriptURI, true);
       });
 
-  ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, loadStyleSheets);
-
   ProcessEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
       function() {
@@ -210,34 +200,6 @@ var rpWindowManager = (function() {
         WindowSubControllers.shutdown();
         WindowListener.stopListening();
       });
-
-  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI,
-                                         unloadStyleSheets);
-
-  function loadStyleSheets() {
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
-
-    for (let i = 0, len = styleSheets.length; i < len; i++) {
-      let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
-      styleSheetService.loadAndRegisterSheet(styleSheetURI,
-          styleSheetService.AUTHOR_SHEET);
-    }
-  }
-  function unloadStyleSheets() {
-    // Unload stylesheets
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
-
-    for (let i = 0, len = styleSheets.length; i < len; i++) {
-      let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
-      if (styleSheetService.sheetRegistered(styleSheetURI,
-          styleSheetService.AUTHOR_SHEET)) {
-        styleSheetService.unregisterSheet(styleSheetURI,
-            styleSheetService.AUTHOR_SHEET);
-      }
-    }
-  }
 
   function forEachOpenWindow(functionToCall) {
     // Apply a function to all open browser windows

@@ -178,7 +178,7 @@ var RequestProcessor = (function() {
       let browser = request.getBrowser();
       let window = request.getChromeWindow();
 
-      if (!browser || !window) {
+      if (!browser || !window || typeof window.rpcontinued === "undefined") {
         Logger.warning(Logger.TYPE_CONTENT, "The user could not be notified " +
             "about the blocked top-level document request!");
       } else {

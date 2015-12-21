@@ -35,6 +35,8 @@ let {Logger} = importModule("lib/logger");
 let {Info} = importModule("lib/utils/info");
 let {XULUtils} = importModule("lib/utils/xul");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {ToolbarButtonController} = importModule(
+    "controllers/windows.toolbarbutton");
 
 //==============================================================================
 // WindowListener
@@ -45,6 +47,39 @@ let WindowListener = (function() {
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/main/window-manager.listener.js", scope);
   return scope.WindowListener;
+}());
+
+//==============================================================================
+// WindowSubControllers
+//==============================================================================
+
+let WindowSubControllers = (function() {
+  let self = {};
+
+  const SUBCONTROLLERS = Object.freeze([
+    ToolbarButtonController,
+  ]);
+
+  const SUBCONTROLLERS_REVERSE = Object.freeze(
+      SUBCONTROLLERS.slice().reverse());
+
+  function callForEachController(fnName, reverse, ...args) {
+    let controllers = reverse ? SUBCONTROLLERS_REVERSE : SUBCONTROLLERS;
+    controllers.forEach(function(controller) {
+      if (typeof controller[fnName] === "function") {
+        controller[fnName].apply(null, args);
+      }
+    });
+  }
+
+  self.startup = callForEachController.bind(null, "startup", false);
+  self.shutdown = callForEachController.bind(null, "shutdown", true);
+  self.loadIntoWindow = callForEachController.bind(null, "loadIntoWindow",
+                                                   false);
+  self.unloadFromWindow = callForEachController.bind(null, "unloadFromWindow",
+                                                     true);
+
+  return self;
 }());
 
 //==============================================================================
@@ -101,14 +136,9 @@ var rpWindowManager = (function() {
     }
 
     // ==================================
-    // # 4 : toolbar button
-    // --------------------
-    try {
-      self.addToolbarButtonToWindow(window);
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR, "Error while adding the toolbar " +
-                     "button to the window: " + e, e);
-    }
+    // # 4 : controllers
+    // -----------------
+    WindowSubControllers.loadIntoWindow(window);
 
     // ==================================
     // # 5 : init the overlay
@@ -127,9 +157,9 @@ var rpWindowManager = (function() {
     // # 5 : the overlay cares itself about shutdown.
     //       nothing to do here.
 
-    // # 4 : remove the toolbarbutton
-    // ------------------------------
-    self.removeToolbarButtonFromWindow(window);
+    // # 4 : controllers
+    // -----------------
+    WindowSubControllers.unloadFromWindow(window);
 
     // # 3 : remove all XUL elements
     XULUtils.removeTreeElementsFromWindow(window, "mainTree");
@@ -144,6 +174,7 @@ var rpWindowManager = (function() {
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
       function(data, reason) {
+        WindowSubControllers.startup();
         forEachOpenWindow(loadIntoWindow);
         WindowListener.setLoadFunction(loadIntoWindow);
         WindowListener.setUnloadFunction(unloadFromWindow);
@@ -176,6 +207,7 @@ var rpWindowManager = (function() {
         globalMM.removeDelayedFrameScript(frameScriptURI);
 
         forEachOpenWindow(unloadFromWindow);
+        WindowSubControllers.shutdown();
         WindowListener.stopListening();
       });
 
@@ -216,14 +248,4 @@ var rpWindowManager = (function() {
   }
 
   return self;
-}());
-
-rpWindowManager = (function() {
-  let scope = {
-    rpWindowManager: rpWindowManager
-  };
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
-      scope);
-  return scope.rpWindowManager;
 }());

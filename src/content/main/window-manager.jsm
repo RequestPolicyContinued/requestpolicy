@@ -31,9 +31,8 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-let {Logger} = importModule("lib/logger");
-let {XULUtils} = importModule("lib/utils/xul");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {OverlayController} = importModule("controllers/windows.overlay");
 let {ToolbarButtonController} = importModule(
     "controllers/windows.toolbarbutton");
 let {StyleSheetsController} = importModule("controllers/windows.style-sheets");
@@ -57,6 +56,7 @@ let WindowSubControllers = (function() {
   let self = {};
 
   const SUBCONTROLLERS = Object.freeze([
+    OverlayController,
     ToolbarButtonController,
     StyleSheetsController,
   ]);
@@ -94,73 +94,11 @@ var rpWindowManager = (function() {
       Math.random();
 
   function loadIntoWindow(window) {
-    // ==================================
-    // # 1 : create a scope variable for RP for this window
-    // ----------------------------------------------------
-    window.rpcontinued = {};
-
-    // ==================================
-    // # 2 : load the overlay's and menu's javascript
-    // ----------------------------------------------
-    try {
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/overlay.js",
-          window);
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/menu.js",
-          window);
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/classicmenu.js",
-          window);
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "Error loading subscripts for window: " + e, e);
-    }
-
-    // ==================================
-    // # 3 : add all XUL elements
-    // --------------------------
-    try {
-      XULUtils.addTreeElementsToWindow(window, "mainTree");
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "Couldn't add tree elements to window. " + e, e);
-    }
-
-    // ==================================
-    // # 4 : controllers
-    // -----------------
     WindowSubControllers.loadIntoWindow(window);
-
-    // ==================================
-    // # 5 : init the overlay
-    // ----------------------
-    try {
-      // init must be called last, because it assumes that
-      // everything else is ready
-      window.rpcontinued.overlay.init();
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-          "An error occurred while initializing the overlay: " + e, e);
-    }
   }
 
   function unloadFromWindow(window) {
-    // # 5 : the overlay cares itself about shutdown.
-    //       nothing to do here.
-
-    // # 4 : controllers
-    // -----------------
     WindowSubControllers.unloadFromWindow(window);
-
-    // # 3 : remove all XUL elements
-    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
-
-    // # 2 and 1 : remove the `rpcontinued` variable from the window
-    // ---------------------------------------------------------
-    // This wouldn't be needed when the window is closed, but this has to be
-    // done when RP is being disabled.
-    delete window.rpcontinued;
   }
 
   ProcessEnvironment.addStartupFunction(
@@ -168,6 +106,7 @@ var rpWindowManager = (function() {
       function(data, reason) {
         WindowSubControllers.startup();
         forEachOpenWindow(loadIntoWindow);
+
         WindowListener.setLoadFunction(loadIntoWindow);
         WindowListener.setUnloadFunction(unloadFromWindow);
         WindowListener.startListening();
@@ -198,6 +137,7 @@ var rpWindowManager = (function() {
 
         forEachOpenWindow(unloadFromWindow);
         WindowSubControllers.shutdown();
+
         WindowListener.stopListening();
       });
 

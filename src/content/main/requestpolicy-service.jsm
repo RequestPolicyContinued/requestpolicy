@@ -33,7 +33,7 @@ let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
-let {Prefs, rpPrefBranch} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 let {PolicyManager} = importModule("lib/policy-manager");
 let {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
@@ -97,7 +97,7 @@ var rpService = (function() {
 
   // TODO: move to window manager
   function showWelcomeWindow() {
-    if (!rpPrefBranch.getBoolPref("welcomeWindowShown")) {
+    if (!Prefs.get("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
@@ -110,10 +110,10 @@ var rpService = (function() {
       if (Info.isRPUpgrade) {
         // If the use has just upgraded from an 0.x version, set the
         // default-policy preferences based on the old preferences.
-        rpPrefBranch.setBoolPref("defaultPolicy.allow", false);
-        if (rpPrefBranch.prefHasUserValue("uriIdentificationLevel")) {
-          let identLevel = rpPrefBranch.getIntPref("uriIdentificationLevel");
-          rpPrefBranch.setBoolPref("defaultPolicy.allowSameDomain",
+        Prefs.set("defaultPolicy.allow", false);
+        if (Prefs.isSet("uriIdentificationLevel")) {
+          let identLevel = Prefs.get("uriIdentificationLevel");
+          Prefs.set("defaultPolicy.allowSameDomain",
               identLevel === 1);
         }
         Services.prefs.savePrefFile(null);
@@ -121,7 +121,7 @@ var rpService = (function() {
 
       tabbrowser.selectedTab = tabbrowser.addTab(url);
 
-      rpPrefBranch.setBoolPref("welcomeWindowShown", true);
+      Prefs.set("welcomeWindowShown", true);
       Services.prefs.savePrefFile(null);
     }
   }

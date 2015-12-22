@@ -6,7 +6,7 @@
 
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
   var {PolicyManager} = importModule("lib/policy-manager");
 
   //============================================================================

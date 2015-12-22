@@ -40,7 +40,7 @@ window.rpcontinued.overlay = (function() {
   let {ManagerForMessageListeners} = importModule(
       "lib/manager-for-message-listeners");
   let {Logger} = importModule("lib/logger");
-  let {rpPrefBranch, Prefs} = importModule("lib/prefs");
+  let {Prefs} = importModule("models/prefs");
   let {RequestProcessor} = importModule("lib/request-processor");
   let {PolicyManager} = importModule("lib/policy-manager");
   let {DomainUtil} = importModule("lib/utils/domains");
@@ -125,7 +125,7 @@ window.rpcontinued.overlay = (function() {
         // object's observerBlockedRequests() method will be called.
         RequestProcessor.addRequestObserver(self);
 
-        setContextMenuEntryEnabled(rpPrefBranch.getBoolPref("contextMenu"));
+        setContextMenuEntryEnabled(Prefs.get("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -232,9 +232,8 @@ window.rpcontinued.overlay = (function() {
 
     let blockedURIs = {};
 
-    if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
-      var indicateBlacklisted = rpPrefBranch
-          .getBoolPref("indicateBlacklistedObjects");
+    if (Prefs.get("indicateBlockedObjects")) {
+      var indicateBlacklisted = Prefs.get("indicateBlacklistedObjects");
 
       var rejectedRequests = RequestProcessor._rejectedRequests
           .getOriginUri(documentURI);
@@ -628,13 +627,8 @@ window.rpcontinued.overlay = (function() {
    * register a pref observer
    */
   function updatePermissiveStatusOnPrefChanges() {
-    OverlayEnvironment.obMan.observeRPPref(
-        ["startWithAllowAllEnabled"],
-        function(subject, topic, data) {
-          if (topic === "nsPref:changed") {
-            updatePermissiveStatus();
-          }
-        });
+    OverlayEnvironment.prefObs.addListener("startWithAllowAllEnabled",
+                                           updatePermissiveStatus);
   }
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);
@@ -926,7 +920,7 @@ window.rpcontinued.overlay = (function() {
   self.onPopupHidden = function(event) {
     var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
-      if (rpPrefBranch.getBoolPref("autoReload")) {
+      if (Prefs.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
         mm.sendAsyncMessage(C.MM_PREFIX + "reload");
       }

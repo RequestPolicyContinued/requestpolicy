@@ -34,7 +34,7 @@ let {ScriptLoader: {importModule}} = Cu.import(
 let {Logger} = importModule("lib/logger");
 let {DomainUtil} = importModule("lib/utils/domains");
 let {WindowUtils} = importModule("lib/utils/windows");
-let {Prefs} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 
 //==============================================================================
 // HttpResponse

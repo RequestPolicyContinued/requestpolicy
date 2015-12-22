@@ -10,7 +10,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   var {StringUtils} = importModule("lib/utils/strings");
-  var {Prefs} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
   var {UserSubscriptions, SUBSCRIPTION_ADDED_TOPIC,
        SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
   var {Environment, ProcessEnvironment} = importModule("lib/environment");

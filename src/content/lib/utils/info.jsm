@@ -32,7 +32,7 @@ let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-let {rpPrefBranch} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 let {C} = importModule("lib/utils/constants");
 let {ProcessEnvironment} = importModule("lib/environment");
 
@@ -54,12 +54,12 @@ var Info = (function() {
   // bad smell...
   // get/set last/current RP version
   if (ProcessEnvironment.isMainProcess) {
-    self.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
+    self.lastRPVersion = Prefs.get("lastVersion");
 
     self.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
     AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
-      rpPrefBranch.setCharPref("lastVersion", addon.version);
+      Prefs.set("lastVersion", addon.version);
       self.curRPVersion = addon.version;
       if (self.lastRPVersion !== self.curRPVersion) {
         Services.prefs.savePrefFile(null);
@@ -78,11 +78,11 @@ var Info = (function() {
   // bad smell...
   // get/set last/current app (e.g. firefox) version
   if (ProcessEnvironment.isMainProcess) {
-    self.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
+    self.lastAppVersion = Prefs.get("lastAppVersion");
 
     let curAppVersion = Services.appinfo.version;
     self.curAppVersion = curAppVersion;
-    rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
+    Prefs.set("lastAppVersion", curAppVersion);
 
     if (self.lastAppVersion !== self.curAppVersion) {
       Services.prefs.savePrefFile(null);

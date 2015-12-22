@@ -3,8 +3,8 @@
 
 /* global OldRules, OldRulesParseError */
 Cu.import("chrome://rpcontinued/content/lib/old-rules.jsm");
-/* global rpPrefBranch */
-Cu.import("chrome://rpcontinued/content/lib/prefs.jsm");
+/* global Prefs */
+Cu.import("chrome://rpcontinued/content/models/prefs.jsm");
 
 
 function run_test() {
@@ -202,7 +202,7 @@ function usingOldRulePrefs(aPrefs, aFunction) {
 
   // Clear the prefs.
   forEachPrefName(function (prefName) {
-    rpPrefBranch.clearUserPref(prefName);
+    Prefs.reset(prefName);
   });
 }
 
@@ -215,7 +215,8 @@ function setOldRulePref(aPrefName, aValue) {
   var str = Cc["@mozilla.org/supports-string;1"]
       .createInstance(Ci.nsISupportsString);
   str.data = aValue;
-  rpPrefBranch.setComplexValue(aPrefName, Ci.nsISupportsString, str);
+  Prefs.branches.rp.branch.
+      setComplexValue(aPrefName, Ci.nsISupportsString, str);
 }
 
 function testGetOldRulesAsNewRules(

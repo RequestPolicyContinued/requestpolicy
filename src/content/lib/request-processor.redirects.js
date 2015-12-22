@@ -29,7 +29,7 @@ const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
-let {Prefs} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 let {PolicyManager} = importModule("lib/policy-manager");
 let {DomainUtil} = importModule("lib/utils/domains");
 let {Utils} = importModule("lib/utils");

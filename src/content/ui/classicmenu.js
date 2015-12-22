@@ -32,7 +32,7 @@ window.rpcontinued.classicmenu = (function() {
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   let {Logger} = importModule("lib/logger");
-  let {rpPrefBranch} = importModule("lib/prefs");
+  let {Prefs} = importModule("models/prefs");
   let {StringUtils} = importModule("lib/utils/strings");
   let {DOMUtils} = importModule("lib/utils/dom");
 
@@ -45,7 +45,7 @@ window.rpcontinued.classicmenu = (function() {
   * be reloaded.
   */
   function conditionallyReloadDocument() {
-    if (rpPrefBranch.getBoolPref("autoReload")) {
+    if (Prefs.get("autoReload")) {
       window.content.document.location.reload(false);
     }
   }

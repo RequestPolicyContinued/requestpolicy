@@ -36,7 +36,7 @@ let {ScriptLoader} = Cu.import(
 let importModule = ScriptLoader.importModule;
 
 let {Logger} = importModule("lib/logger");
-let {Prefs} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 let {PolicyManager} = importModule("lib/policy-manager");
 let {DomainUtil} = importModule("lib/utils/domains");
 let {RequestResult, REQUEST_REASON_USER_POLICY,

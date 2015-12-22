@@ -9,7 +9,7 @@
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   var {Info} = importModule("lib/utils/info");
-  var {rpPrefBranch} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
   var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");
   var {rpService} = importModule("main/requestpolicy-service");
@@ -44,7 +44,7 @@
   }
 
   function handleDefaultPolicyChange() {
-    rpPrefBranch.setBoolPref("defaultPolicy.allow",
+    Prefs.set("defaultPolicy.allow",
         $id("defaultallow").checked);
     Services.prefs.savePrefFile(null);
     setAllowSameDomainBlockDisplay();
@@ -52,7 +52,7 @@
   }
 
   function handleAllowSameDomainChange() {
-    rpPrefBranch.setBoolPref("defaultPolicy.allowSameDomain",
+    Prefs.set("defaultPolicy.allowSameDomain",
         $id("allowsamedomain").checked);
     Services.prefs.savePrefFile(null);
   }
@@ -119,7 +119,7 @@
 
     // Populate the form values based on the user's current settings.
 
-    let defaultAllow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
+    let defaultAllow = Prefs.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
@@ -127,7 +127,7 @@
     }
 
     $id("allowsamedomain").checked =
-        rpPrefBranch.getBoolPref("defaultPolicy.allowSameDomain");
+        Prefs.get("defaultPolicy.allowSameDomain");
 
     // FIXME: Add a pref to disable subscriptions globally;  issue #713
     // Subscriptions are only simple here if we assume the user

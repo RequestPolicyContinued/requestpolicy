@@ -32,7 +32,7 @@ window.rpcontinued.menu = (function() {
 
   let {Environment} = importModule("lib/environment");
   let {Logger} = importModule("lib/logger");
-  let {rpPrefBranch, Prefs} = importModule("lib/prefs");
+  let {Prefs} = importModule("models/prefs");
   let {RequestProcessor} = importModule("lib/request-processor");
   let {PolicyManager} = importModule("lib/policy-manager");
   let {DomainUtil} = importModule("lib/utils/domains");
@@ -236,9 +236,8 @@ window.rpcontinued.menu = (function() {
 
     if (true === guiLocations) {
       // get prefs
-      let sorting = rpPrefBranch.getCharPref("menu.sorting");
-      let showNumRequests = rpPrefBranch.getBoolPref(
-          "menu.info.showNumRequests");
+      let sorting = Prefs.get("menu.sorting");
+      let showNumRequests = Prefs.get("menu.info.showNumRequests");
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -276,8 +275,7 @@ window.rpcontinued.menu = (function() {
   self._populateOrigin = function() {
     self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
 
-    let showNumRequests = rpPrefBranch
-        .getBoolPref("menu.info.showNumRequests");
+    let showNumRequests = Prefs.get("menu.info.showNumRequests");
 
     let props = self._getOriginGUILocationProperties();
 

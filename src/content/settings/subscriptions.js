@@ -8,7 +8,7 @@
 
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
   var {Logger} = importModule("lib/logger");
   var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");

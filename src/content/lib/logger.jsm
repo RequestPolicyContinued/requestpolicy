@@ -34,7 +34,7 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
-let {rpPrefBranch} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 
 //==============================================================================
 // Logger
@@ -104,9 +104,9 @@ var Logger = (function() {
   let types = self.TYPE_ALL;
 
   function updateLoggingSettings() {
-    enabled = rpPrefBranch.getBoolPref("log");
-    level = rpPrefBranch.getIntPref("log.level");
-    types = rpPrefBranch.getIntPref("log.types");
+    enabled = Prefs.get("log");
+    level = Prefs.get("log.level");
+    types = Prefs.get("log.types");
   }
 
   /**
@@ -120,14 +120,8 @@ var Logger = (function() {
       return;
     }
 
-    // rpPrefBranch is available now.
-    ProcessEnvironment.obMan.observeRPPref(
-        ["log"],
-        function(subject, topic) {
-          if (topic === "nsPref:changed") {
-            updateLoggingSettings();
-          }
-        });
+    // RequestPolicy's pref branch is available now.
+    ProcessEnvironment.prefObs.addListener("log", updateLoggingSettings);
     updateLoggingSettings();
 
     // don't call init() anymore when doLog() is called
@@ -144,9 +138,9 @@ var Logger = (function() {
     // #ifdef UNIT_TESTING
     if (aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE) {
       // increment the error count
-      let errorCount = rpPrefBranch.getIntPref("unitTesting.errorCount");
-      rpPrefBranch.setIntPref("unitTesting.errorCount", ++errorCount);
-      Services.prefs.savePrefFile(null);
+      let errorCount = Prefs.get("unitTesting.errorCount");
+      Prefs.set("unitTesting.errorCount", ++errorCount);
+      Prefs.save();
 
       // log even if logging is disabled
       shouldLog = true;

@@ -6,7 +6,7 @@
 
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
   var {PolicyManager} = importModule("lib/policy-manager");
   var {OldRules} = importModule("lib/old-rules");
 
@@ -67,9 +67,10 @@
   }
 
   window.deleteOldRules = function() {
-    Prefs.clearPref("allowedOrigins");
-    Prefs.clearPref("allowedDestinations");
-    Prefs.clearPref("allowedOriginsToDestinations");
+    Prefs.reset("allowedOrigins");
+    Prefs.reset("allowedDestinations");
+    Prefs.reset("allowedOriginsToDestinations");
+    Prefs.save();
     $("#doimport").hide();
     $("#deletedone").show();
     $("#showReimportOptions").hide();

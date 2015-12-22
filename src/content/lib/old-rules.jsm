@@ -32,7 +32,7 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {DomainUtil} = importModule("lib/utils/domains");
-let {rpPrefBranch} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 
 //==============================================================================
 // OldRules
@@ -212,7 +212,8 @@ var OldRules = (function() {
    */
   OldRules._getPrefString = function(aPrefName) {
     try {
-      return rpPrefBranch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
+      return Prefs.branches.rp.branch.
+          getComplexValue(aPrefName, Ci.nsISupportsString).data;
     } catch (e) {
       if (e.name !== "NS_ERROR_UNEXPECTED") {
         Cu.reportError(e);

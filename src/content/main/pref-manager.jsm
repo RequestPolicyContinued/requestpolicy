@@ -22,15 +22,12 @@
  */
 
 /* global Components */
-const {interfaces: Ci, utils: Cu} = Components;
+const {utils: Cu} = Components;
 
 /* exported PrefManager */
 this.EXPORTED_SYMBOLS = ["PrefManager"];
 
-let globalScope = this;
-
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
@@ -38,20 +35,8 @@ let {ScriptLoader: {importModule}} = Cu.import(
 let {C} = importModule("lib/utils/constants");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-//==============================================================================
-// pref branches
-//==============================================================================
-
-/* global rpPrefBranch */
-XPCOMUtils.defineLazyGetter(globalScope, "rpPrefBranch", function() {
-  return Services.prefs.getBranch("extensions.requestpolicy.")
-      .QueryInterface(Ci.nsIPrefBranch2);
-});
-
-/* global rootPrefBranch */
-XPCOMUtils.defineLazyGetter(globalScope, "rootPrefBranch", function() {
-  return Services.prefs.getBranch("").QueryInterface(Ci.nsIPrefBranch2);
-});
+// Import when the default prefs have been set.
+let Prefs;
 
 //==============================================================================
 // PrefManager
@@ -62,19 +47,18 @@ var PrefManager = (function() {
 
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
-    var resetLinkPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.link.restoreDefaultOnUninstall");
-    var resetDNSPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.dns.restoreDefaultOnUninstall");
+    var resetLinkPrefetch = Prefs.get("prefetch.link." +
+                                      "restoreDefaultOnUninstall");
+    var resetDNSPrefetch = Prefs.get("prefetch.dns.restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.prefetch-next")) {
-        rootPrefBranch.clearUserPref("network.prefetch-next");
+      if (Prefs.isSet("root/ network.prefetch-next")) {
+        Prefs.reset("root/ network.prefetch-next");
       }
     }
     if (resetDNSPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch")) {
-        rootPrefBranch.clearUserPref("network.dns.disablePrefetch");
+      if (Prefs.isSet("root/ network.dns.disablePrefetch")) {
+        Prefs.reset("root/ network.dns.disablePrefetch");
       }
     }
     Services.prefs.savePrefFile(null);
@@ -93,23 +77,30 @@ var PrefManager = (function() {
         {});
 
     // ================================
+    // Import `Prefs`
+    // --------------
+    /* jshint -W126 */ // JSHint issue #2775
+    ({Prefs} = importModule("models/prefs"));
+    /* jshint +W126 */
+
+    // ================================
     // Link/DNS prefetching
     // --------------------
     // Disable link prefetch.
-    if (rpPrefBranch.getBoolPref("prefetch.link.disableOnStartup")) {
-      if (rootPrefBranch.getBoolPref("network.prefetch-next")) {
-        rootPrefBranch.setBoolPref("network.prefetch-next", false);
+    if (Prefs.get("prefetch.link.disableOnStartup")) {
+      if (Prefs.get("root/ network.prefetch-next")) {
+        Prefs.set("root/ network.prefetch-next", false);
         console.info("Disabled link prefetch.");
       }
     }
     // Disable DNS prefetch.
-    if (rpPrefBranch.getBoolPref("prefetch.dns.disableOnStartup")) {
+    if (Prefs.get("prefetch.dns.disableOnStartup")) {
       // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
       // doesn't have a default value, at least in 3.1b2, but if and when it
       // does have a default it will be false).
-      if (!rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch") ||
-          !rootPrefBranch.getBoolPref("network.dns.disablePrefetch")) {
-        rootPrefBranch.setBoolPref("network.dns.disablePrefetch", true);
+      if (!Prefs.isSet("root/ network.dns.disablePrefetch") ||
+          !Prefs.get("root/ network.dns.disablePrefetch")) {
+        Prefs.set("root/ network.dns.disablePrefetch", true);
         console.info("Disabled DNS prefetch.");
       }
     }
@@ -122,9 +113,9 @@ var PrefManager = (function() {
       "temporarilyAllowedDestinations",
       "temporarilyAllowedOriginsToDestinations"
     ];
-    for (var i = 0; i < deletePrefs.length; i++) {
-      if (rpPrefBranch.prefHasUserValue(deletePrefs[i])) {
-        rpPrefBranch.clearUserPref(deletePrefs[i]);
+    for (let prefName of deletePrefs) {
+      if (Prefs.isSet(prefName)) {
+        Prefs.reset(prefName);
       }
     }
 

@@ -46,7 +46,9 @@ ScriptLoader.defineLazyModuleGetters({
   /* global ManagerForMessageListeners */
   "lib/manager-for-message-listeners": ["ManagerForMessageListeners"],
   /* global ObserverManager */
-  "lib/observer-manager": ["ObserverManager"]
+  "lib/observer-manager": ["ObserverManager"],
+  /* global PrefObserver */
+  "lib/classes/pref-observer": ["PrefObserver"]
 }, globalScope);
 
 //==============================================================================
@@ -217,6 +219,18 @@ var Environment = (function() {
     log.debug("created new Environment \"" + self.name + "\"");
     // #endif
   }
+
+  Object.defineProperty(Environment.prototype, "prefObs", {
+    get: function() {
+      if (!this._prefObserver) {
+        this._prefObserver = new PrefObserver();
+        this.addShutdownFunction(Environment.LEVELS.INTERFACE, () => {
+          this._prefObserver.removeAllListeners();
+        });
+      }
+      return this._prefObserver;
+    }
+  });
 
   Environment.LEVELS = LEVELS;
   Environment.ENV_STATES = ENV_STATES;

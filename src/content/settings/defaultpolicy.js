@@ -8,7 +8,7 @@
 
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {rpPrefBranch} = importModule("lib/prefs");
+  var {Prefs} = importModule("models/prefs");
 
   //============================================================================
 
@@ -30,7 +30,7 @@
   });
 
   function updateDisplay() {
-    var defaultallow = rpPrefBranch.getBoolPref("defaultPolicy.allow");
+    var defaultallow = Prefs.get("defaultPolicy.allow");
     if (defaultallow) {
       $id("defaultallow").checked = true;
       $id("defaultdenysetting").hidden = true;
@@ -39,8 +39,7 @@
       $id("defaultdenysetting").hidden = false;
     }
 
-    var allowsamedomain = rpPrefBranch.getBoolPref(
-        "defaultPolicy.allowSameDomain");
+    var allowsamedomain = Prefs.get("defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
   }
 
@@ -55,7 +54,7 @@
         $id("defaultallow"), "change",
         function(event) {
           var allow = event.target.checked;
-          rpPrefBranch.setBoolPref("defaultPolicy.allow", allow);
+          Prefs.set("defaultPolicy.allow", allow);
           Services.prefs.savePrefFile(null);
           // Reload all subscriptions because it's likely that different
           // subscriptions will now be active.
@@ -68,7 +67,7 @@
         $id("defaultdeny"), "change",
         function(event) {
           var deny = event.target.checked;
-          rpPrefBranch.setBoolPref("defaultPolicy.allow", !deny);
+          Prefs.set("defaultPolicy.allow", !deny);
           Services.prefs.savePrefFile(null);
           // Reload all subscriptions because it's likely that different
           // subscriptions will now be active.
@@ -81,13 +80,13 @@
         $id("allowsamedomain"), "change",
         function(event) {
           var allowSameDomain = event.target.checked;
-          rpPrefBranch.setBoolPref("defaultPolicy.allowSameDomain",
+          Prefs.set("defaultPolicy.allowSameDomain",
               allowSameDomain);
           Services.prefs.savePrefFile(null);
         });
 
     // call updateDisplay() every time a preference gets changed
-    WinEnv.obMan.observePrefChanges(updateDisplay);
+    WinEnv.prefObs.addListener("", updateDisplay);
   };
 
 }());

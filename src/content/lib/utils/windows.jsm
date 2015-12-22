@@ -29,7 +29,7 @@ this.EXPORTED_SYMBOLS = ["WindowUtils"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-let {rpPrefBranch} = importModule("lib/prefs");
+let {Prefs} = importModule("models/prefs");
 
 //==============================================================================
 // WindowUtils
@@ -124,7 +124,7 @@ var WindowUtils = (function() {
    */
   self.mayPermanentRulesBeAdded = function(aWindow) {
     return self.isWindowPrivate(aWindow) === false ||
-        rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
+        Prefs.get("privateBrowsingPermanentWhitelisting");
   };
 
   //

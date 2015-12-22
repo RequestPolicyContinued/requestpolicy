@@ -24,8 +24,8 @@
 /* global Components */
 const {utils: Cu} = Components;
 
-/* exported SingleTopicObserver, SinglePrefBranchObserver */
-this.EXPORTED_SYMBOLS = ["SingleTopicObserver", "SinglePrefBranchObserver"];
+/* exported SingleTopicObserver */
+this.EXPORTED_SYMBOLS = ["SingleTopicObserver"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -79,23 +79,4 @@ SingleTopicObserver.prototype._register = function() {
 };
 SingleTopicObserver.prototype._unregister = function() {
   Services.obs.removeObserver(this, this.topic);
-};
-
-//==============================================================================
-// SinglePrefBranchObserver
-//==============================================================================
-
-function SinglePrefBranchObserver(aBranch, aDomain, aCallback) {
-  this.branch = aBranch;
-  this.domain = aDomain;
-  Observer.call(this, aCallback);
-}
-SinglePrefBranchObserver.prototype = Object.create(Observer.prototype);
-SinglePrefBranchObserver.prototype.constructor = Observer;
-
-SinglePrefBranchObserver.prototype._register = function() {
-  this.branch.addObserver(this.domain, this, false);
-};
-SinglePrefBranchObserver.prototype._unregister = function() {
-  this.branch.removeObserver(this.domain, this);
 };

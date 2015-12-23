@@ -27,26 +27,14 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported rpWindowManager */
 this.EXPORTED_SYMBOLS = ["rpWindowManager"];
 
-let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Windows} = importModule("models/windows");
 let {OverlayController} = importModule("controllers/windows.overlay");
 let {ToolbarButtonController} = importModule(
     "controllers/windows.toolbarbutton");
 let {StyleSheetsController} = importModule("controllers/windows.style-sheets");
-
-//==============================================================================
-// WindowListener
-//==============================================================================
-
-let WindowListener = (function() {
-  let scope = {};
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/main/window-manager.listener.js", scope);
-  return scope.WindowListener;
-}());
 
 //==============================================================================
 // WindowSubControllers
@@ -105,11 +93,10 @@ var rpWindowManager = (function() {
       Environment.LEVELS.INTERFACE,
       function(data, reason) {
         WindowSubControllers.startup();
-        forEachOpenWindow(loadIntoWindow);
-
-        WindowListener.setLoadFunction(loadIntoWindow);
-        WindowListener.setUnloadFunction(unloadFromWindow);
-        WindowListener.startListening();
+        Windows.forEachOpenWindow(loadIntoWindow);
+        Windows.addListener("load", loadIntoWindow);
+        Windows.addListener("unload", unloadFromWindow);
+        Windows._startListening();
 
         // Load the framescript into all existing tabs.
         // Also tell the globalMM to load it into each new
@@ -135,19 +122,10 @@ var rpWindowManager = (function() {
             .getService(Ci.nsIMessageListenerManager);
         globalMM.removeDelayedFrameScript(frameScriptURI);
 
-        forEachOpenWindow(unloadFromWindow);
+        Windows._stopListening();
+        Windows.forEachOpenWindow(unloadFromWindow);
         WindowSubControllers.shutdown();
-
-        WindowListener.stopListening();
       });
-
-  function forEachOpenWindow(functionToCall) {
-    // Apply a function to all open browser windows
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      functionToCall(windows.getNext().QueryInterface(Ci.nsIDOMWindow));
-    }
-  }
 
   return self;
 }());

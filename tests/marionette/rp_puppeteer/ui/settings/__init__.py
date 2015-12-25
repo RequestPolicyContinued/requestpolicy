@@ -12,6 +12,10 @@ class Settings(BaseLib):
     def old_rules(self):
         pass
 
+    @use_class_as_property('ui.settings.subscriptions.SubscriptionsSettings')
+    def subscriptions(self):
+        pass
+
     @use_class_as_property('ui.settings.your_policy.YourPolicy')
     def your_policy(self):
         pass

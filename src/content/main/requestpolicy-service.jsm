@@ -22,7 +22,7 @@
  */
 
 /* global Components */
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const {utils: Cu} = Components;
 
 /* exported rpService */
 this.EXPORTED_SYMBOLS = ["rpService"];
@@ -37,7 +37,6 @@ let {Prefs} = importModule("models/prefs");
 let {PolicyManager} = importModule("lib/policy-manager");
 let {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
-let {C} = importModule("lib/utils/constants");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {WindowUtils} = importModule("lib/utils/windows");
 let {Info} = importModule("lib/utils/info");
@@ -63,10 +62,8 @@ var rpService = (function() {
     subscriptions = new UserSubscriptions();
     PolicyManager.loadUserRules();
 
-    let defaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
-
     let failures = PolicyManager.loadSubscriptionRules(
-        subscriptions.getSubscriptionInfo(defaultPolicy));
+        subscriptions.getSubscriptionInfo());
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
     // TODO: Maybe we should probably ship snapshot versions of the official
@@ -92,7 +89,7 @@ var rpService = (function() {
       Logger.info(Logger.TYPE_INTERNAL,
           "Subscription updates completed: " + result);
     }
-    subscriptions.update(updateCompleted, serials, defaultPolicy);
+    subscriptions.update(updateCompleted, serials);
   }
 
   // TODO: move to window manager
@@ -281,6 +278,10 @@ var rpService = (function() {
 
   self.observe = function(subject, topic, data) {
     switch (topic) {
+
+      // FIXME: The subscription logic should reside in the
+      // subscription module.
+
       case SUBSCRIPTION_UPDATED_TOPIC: {
         Logger.debug(Logger.TYPE_INTERNAL, "XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
@@ -328,13 +329,13 @@ var rpService = (function() {
         break;
 
       // support for old browsers (Firefox <20)
-      case "private-browsing" :
+      case "private-browsing":
         if (data === "exit") {
           PolicyManager.revokeTemporaryRules();
         }
         break;
 
-      default :
+      default:
         Logger.warning(Logger.TYPE_ERROR, "unknown topic observed: " + topic);
     }
   };

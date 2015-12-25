@@ -48,7 +48,6 @@
         $id("defaultallow").checked);
     Services.prefs.savePrefFile(null);
     setAllowSameDomainBlockDisplay();
-    handleSubscriptionsChange();
   }
 
   function handleAllowSameDomainChange() {
@@ -67,8 +66,6 @@
 
   function handleSubscriptionsChange() {
     var enableSubs = $id("enablesubs").checked;
-    var enableAllowSubs = enableSubs && $id("defaultdeny").checked;
-    var enableDenySubs = enableSubs && $id("defaultallow").checked;
     var subs = {
       "allow_embedded": {},
       "allow_extensions": {},
@@ -82,8 +79,8 @@
       var subInfo = {};
       subInfo.official = {};
       subInfo.official[subName] = true;
-      if (enableAllowSubs && subName.startsWith("allow_") ||
-          enableDenySubs && subName.startsWith("deny_")) {
+      // FIXME: Add a pref to disable subscriptions globally (#713)
+      if (enableSubs) {
         userSubs.addSubscription("official", subName);
         Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
             JSON.stringify(subInfo));

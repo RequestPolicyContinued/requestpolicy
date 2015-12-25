@@ -8,7 +8,6 @@
 
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("models/prefs");
   var {Logger} = importModule("lib/logger");
   var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
       importModule("lib/subscription");
@@ -37,30 +36,6 @@
   $(function() {
     common.localize(PAGE_STRINGS);
   });
-
-  /**
-   * @param {String} policy
-   *                 "allow" or "deny"
-   */
-  function getDefaultPolicyElements(policy) {
-    var selector = "[data-defaultpolicy=" + policy + "]";
-    var matches = document.body.querySelectorAll(selector);
-    var elements = Array.prototype.slice.call(matches);
-    return elements;
-  }
-
-  function displayDefaultPolicyElements(policy, display) {
-    // note: display could be undefined.
-    display = display === false ? false : true;
-    var elements = getDefaultPolicyElements(policy);
-    for (var i = 0, len = elements.length; i < len; i++) {
-      if (display) {
-        elements[i].removeAttribute("style");
-      } else {
-        elements[i].style.display = "none";
-      }
-    }
-  }
 
   function getInputElement(subName) {
     var elements = document.body.querySelectorAll(
@@ -92,18 +67,6 @@
       var element = allSubElements[i];
       element.input.checked = element.id in subsInfo.official;
     }
-
-    var currentPolicy;
-    var otherPolicy;
-    if (Prefs.isDefaultAllow()) {
-      currentPolicy = "allow";
-      otherPolicy = "deny";
-    } else {
-      currentPolicy = "deny";
-      otherPolicy = "allow";
-    }
-    displayDefaultPolicyElements(currentPolicy, true);
-    displayDefaultPolicyElements(otherPolicy, false);
   }
 
   function handleSubscriptionCheckboxChange(event) {
@@ -143,14 +106,6 @@
         continue;
       }
       elManager.addListener(el, "change", handleSubscriptionCheckboxChange);
-    }
-
-    var selector = "[data-defaultpolicy=" +
-      (Prefs.isDefaultAllow() ? "deny" : "allow") + "]";
-    var matches = document.body.querySelectorAll(selector);
-    var hideElements = Array.prototype.slice.call(matches);
-    for (var i = 0; i < hideElements.length; i++) {
-      hideElements[i].style.display = "none";
     }
 
     // call updateDisplay() every time a subscription is added or removed

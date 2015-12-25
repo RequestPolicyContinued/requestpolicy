@@ -56,9 +56,6 @@
           var allow = event.target.checked;
           Prefs.set("defaultPolicy.allow", allow);
           Services.prefs.savePrefFile(null);
-          // Reload all subscriptions because it's likely that different
-          // subscriptions will now be active.
-          common.switchSubscriptionPolicies();
           updateDisplay();
           showManageSubscriptionsLink();
         });
@@ -69,9 +66,6 @@
           var deny = event.target.checked;
           Prefs.set("defaultPolicy.allow", !deny);
           Services.prefs.savePrefFile(null);
-          // Reload all subscriptions because it's likely that different
-          // subscriptions will now be active.
-          common.switchSubscriptionPolicies();
           updateDisplay();
           showManageSubscriptionsLink();
         });

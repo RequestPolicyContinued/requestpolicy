@@ -5,14 +5,9 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
   /* global Components */
   const {utils: Cu} = Components;
 
-  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
   var {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   var {StringUtils} = importModule("lib/utils/strings");
-  var {Prefs} = importModule("models/prefs");
-  var {UserSubscriptions, SUBSCRIPTION_ADDED_TOPIC,
-       SUBSCRIPTION_REMOVED_TOPIC} = importModule("lib/subscription");
   var {Environment, ProcessEnvironment} = importModule("lib/environment");
 
   //============================================================================
@@ -39,52 +34,6 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
   var $str = StringUtils.$str;
 
   var common = {};
-
-  /*
-   Based on the user's current default policy (allow or deny), swaps out which
-   subscriptions are enabled. That is, each subscription are either intended to be
-   used with a default allow or a default policy policy. So, if this has changed
-   then calling this function will disable/enable the correct subscriptions.
-   */
-  // TODO: rename this function.
-  common.switchSubscriptionPolicies = function() {
-    var subscriptions = new UserSubscriptions();
-
-    var newDefaultPolicy = Prefs.isDefaultAllow() ? "allow" : "deny";
-    var oldDefaultPolicy = Prefs.isDefaultAllow() ? "deny" : "allow";
-
-    var listName;
-    var subName;
-    var subInfo;
-
-    var oldSubInfo = subscriptions.getSubscriptionInfo(oldDefaultPolicy);
-    for (listName in oldSubInfo) {
-      for (subName in oldSubInfo[listName]) {
-        if (!subName.startsWith("allow_") && subName.startsWith("deny_")) {
-          continue;
-        }
-        subInfo = {};
-        subInfo[listName] = {};
-        subInfo[listName][subName] = true;
-        Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
-            JSON.stringify(subInfo));
-      }
-    }
-
-    var newSubInfo = subscriptions.getSubscriptionInfo(newDefaultPolicy);
-    for (listName in newSubInfo) {
-      for (subName in newSubInfo[listName]) {
-        if (!subName.startsWith("allow_") && !subName.startsWith("deny_")) {
-          continue;
-        }
-        subInfo = {};
-        subInfo[listName] = {};
-        subInfo[listName][subName] = true;
-        Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
-            JSON.stringify(subInfo));
-      }
-    }
-  };
 
   /**
    * Get a string representation of an endpoint (origin or dest) specification.

@@ -125,7 +125,7 @@ UserSubscriptions.prototype = {
     FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
-  getSubscriptionInfo: function(defaultPolicy) {
+  getSubscriptionInfo: function() {
     var lists = this._data.lists;
     var result = {};
     for (var listName in lists) {
@@ -134,12 +134,6 @@ UserSubscriptions.prototype = {
       }
       result[listName] = {};
       for (let subName in lists[listName].subscriptions) {
-        if (defaultPolicy === "allow" && subName.indexOf("allow_") === 0) {
-          continue;
-        }
-        if (defaultPolicy === "deny" && subName.indexOf("deny_") === 0) {
-          continue;
-        }
         result[listName][subName] = null;
       }
     }
@@ -172,7 +166,7 @@ UserSubscriptions.prototype = {
   // make a big fat mess of the code, or more likely I'm just not good at
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
-  update: function(callback, serials, defaultPolicy) {
+  update: function(callback, serials) {
     var updatingLists = {};
     var updateResults = {};
 
@@ -205,16 +199,6 @@ UserSubscriptions.prototype = {
         if (!this._lists[listName].subscriptions[subName]) {
           dprint("Skipping update of unsubscribed subscription: " + listName +
               " " + subName);
-          continue;
-        }
-        if (defaultPolicy === "allow" && subName.indexOf("allow_") === 0) {
-          dprint("Skipping update of subscription that is only used " +
-              "with a default deny policy: " + subName);
-          continue;
-        }
-        if (defaultPolicy === "deny" && subName.indexOf("deny_") === 0) {
-          dprint("Skipping update of subscription that is only used " +
-              "with a default allow policy: " + subName);
           continue;
         }
         updateSubs[subName] = {"serial": serials[listName][subName]};

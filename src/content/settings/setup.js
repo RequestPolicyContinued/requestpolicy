@@ -97,13 +97,13 @@
 
   /*
   function getArguments(args) {
-    let urlQuery = document.location.search || "";
+    var urlQuery = document.location.search || "";
     if (urlQuery.length > 1) {
       urlQuery = decodeURIComponent(urlQuery.substr(1));
     }
-    let queryArgs = split("&");
-    for (let i in queryArgs) {
-      let tmp = queryArgs.split("=");
+    var queryArgs = split("&");
+    for (var i in queryArgs) {
+      var tmp = queryArgs.split("=");
       if (args.hasOwnProperty(tmp)) {
         args[tmp[0]] = tmp[1];
       }
@@ -119,7 +119,7 @@
 
     // Populate the form values based on the user's current settings.
 
-    let defaultAllow = Prefs.get("defaultPolicy.allow");
+    var defaultAllow = Prefs.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {

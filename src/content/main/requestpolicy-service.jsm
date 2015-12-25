@@ -96,13 +96,15 @@ var rpService = (function() {
   }
 
   // TODO: move to window manager
-  function showWelcomeWindow() {
+  function maybeShowSetupTab() {
     if (!Prefs.get("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
+      if (win === null) {
+        return;
+      }
       let tabbrowser = win.getBrowser();
-
       if (typeof tabbrowser.addTab !== "function") {
         return;
       }
@@ -174,18 +176,16 @@ var rpService = (function() {
      * @return {Boolean} whether opening the tab was successful
      */
     function openTab() {
-      var wm = Cc["@mozilla.org/appshell/window-mediator;1"]
-          .getService(Ci.nsIWindowMediator);
-      var mostRecentWindow = wm.getMostRecentWindow("navigator:browser");
-
-      // the gBrowser object of the firefox window
-      var _gBrowser = mostRecentWindow.getBrowser();
-
-      if (typeof _gBrowser.addTab !== "function") {
-        return false;
+      let win = WindowUtils.getMostRecentBrowserWindow();
+      if (win === null) {
+        return;
+      }
+      let tabbrowser = win.getBrowser();
+      if (typeof tabbrowser.addTab !== "function") {
+        return;
       }
 
-      _gBrowser.selectedTab = _gBrowser.addTab(NOTICE_URL);
+      tabbrowser.selectedTab = tabbrowser.addTab(NOTICE_URL);
 
       return true;
     }
@@ -223,7 +223,7 @@ var rpService = (function() {
      * Check if other RequestPolicy versions (with other extension IDs)
      * are installed. If so, a tab with a notice will be opened.
      */
-    function checkForOtherInstallations() {
+    function maybeShowMultipleInstallationsWarning() {
       if (initialCheckDone === true) {
         return;
       }
@@ -231,7 +231,10 @@ var rpService = (function() {
       AddonManager.getAddonsByIDs(addonIDs, addonListCallback);
     }
 
-    return {checkForOtherInstallations: checkForOtherInstallations};
+    return {
+      maybeShowMultipleInstallationsWarning:
+          maybeShowMultipleInstallationsWarning
+    };
   }());
 
   //----------------------------------------------------------------------------
@@ -261,12 +264,11 @@ var rpService = (function() {
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.UI,
       function(data, reason) {
-        if (reason !== C.APP_STARTUP) {
-          // In case of the app's startup, the following functions will be
-          // called when "sessionstore-windows-restored" is observed.
-          showWelcomeWindow();
-          DetectorForOtherInstallations.checkForOtherInstallations();
-        }
+        // In case of the app's startup and if they fail now, they
+        // will be successful when they are called by the
+        // "sessionstore-windows-restored" observer.
+        maybeShowSetupTab();
+        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
       });
 
   self.getSubscriptions = function() {
@@ -321,8 +323,8 @@ var rpService = (function() {
       }
 
       case "sessionstore-windows-restored":
-        showWelcomeWindow();
-        DetectorForOtherInstallations.checkForOtherInstallations();
+        maybeShowSetupTab();
+        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
         break;
 
       // support for old browsers (Firefox <20)

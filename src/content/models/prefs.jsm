@@ -52,6 +52,8 @@ var Prefs = (function() {
       "defaultPolicy.allowSameDomain": "BoolPref",
       "indicateBlacklistedObjects": "BoolPref",
       "indicateBlockedObjects": "BoolPref",
+      "keyboardShortcuts.openMenu.enabled": "BoolPref",
+      "keyboardShortcuts.openMenu.combo": "CharPref",
       "lastAppVersion": "CharPref",
       "lastVersion": "CharPref",
       "log": "BoolPref",

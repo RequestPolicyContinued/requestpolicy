@@ -43,7 +43,9 @@ var KeyboardShortcuts = (function() {
     keyboardShortcuts.push(new KeyboardShortcut("openMenu", "alt shift r",
         function(window) {
           window.rpcontinued.overlay.openMenu();
-        }));
+        },
+        "keyboardShortcuts.openMenu.enabled",
+        "keyboardShortcuts.openMenu.combo"));
   };
 
   self.shutdown = function() {

@@ -22,17 +22,19 @@ class Menu(BaseLib):
         return int(match.group(1))
 
     def open(self, trigger="api"):
-        if trigger == "button":
+        if callable(trigger):
+            trigger()
+        elif trigger == "button":
             self._toolbar_button.click()
-            Wait(self.marionette).until(lambda _: self._popup_state == "open")
         elif trigger == "shortcut":
             window = Windows(lambda: self.marionette).current
             window.send_shortcut("r", alt=True, shift=True)
-            Wait(self.marionette).until(lambda _: self._popup_state == "open")
         elif trigger == "api":
             self._ensure_popup_state("open")
         else:
             raise ValueError("Unknown opening method: \"{}\"".format(trigger))
+
+        Wait(self.marionette, timeout=1).until(lambda _: self.is_open())
 
     def is_open(self):
         return self._popup_state == "open"

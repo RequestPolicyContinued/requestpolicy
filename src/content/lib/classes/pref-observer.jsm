@@ -84,6 +84,12 @@ PrefObserver.prototype.removeListener = function(aDomain, aListener) {
   }
 };
 
+PrefObserver.prototype.removeListeners = function(aDomains, aListener) {
+  for (let domain of aDomains) {
+    this.removeListener(domain, aListener);
+  }
+};
+
 /**
  * Remove all listeners in this Pref Observer.
  */

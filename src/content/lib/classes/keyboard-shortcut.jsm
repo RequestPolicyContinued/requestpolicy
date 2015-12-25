@@ -31,7 +31,9 @@ let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Windows} = importModule("models/windows");
+let {Prefs} = importModule("models/prefs");
 let {XULUtils} = importModule("lib/utils/xul");
+let {ProcessEnvironment} = importModule("lib/environment");
 
 //==============================================================================
 // KeyboardShortcut
@@ -54,7 +56,8 @@ let {XULUtils} = importModule("lib/utils/xul");
  * - set element attributes (all windows)
  */
 
-function KeyboardShortcut(aID, aDefaultCombo, aCallback) {
+function KeyboardShortcut(aID, aDefaultCombo, aCallback, aUserEnabledPrefName,
+    aUserComboPrefName) {
   //----------------------------------------------------------------------------
   // initialize properties
   //----------------------------------------------------------------------------
@@ -63,6 +66,8 @@ function KeyboardShortcut(aID, aDefaultCombo, aCallback) {
   this._elementID = "rpKey_" + this._id;
   this._defaultCombo = aDefaultCombo;
   this._callback = aCallback;
+  this._userEnabledPrefName = aUserEnabledPrefName;
+  this._userComboPrefName = aUserComboPrefName;
 
   this._elementAttributes = {
     disabled: null,
@@ -73,8 +78,8 @@ function KeyboardShortcut(aID, aDefaultCombo, aCallback) {
   this._listeners = {
     onWindowLoad: this._loadIntoWindow.bind(this),
     onWindowUnload: this._unloadFromWindow.bind(this),
-    onKeyCommand: this._onPress.bind(this)
-    // prefChanged: this._onPrefChange.bind(this)
+    onKeyCommand: this._onPress.bind(this),
+    onPrefChange: this._onPrefChange.bind(this)
   };
 
   //----------------------------------------------------------------------------
@@ -86,6 +91,10 @@ function KeyboardShortcut(aID, aDefaultCombo, aCallback) {
 
   Windows.addListener("load", this._listeners.onWindowLoad);
   Windows.addListener("unload", this._listeners.onWindowUnload);
+  ProcessEnvironment.prefObs.addListeners([
+    this._userEnabledPrefName,
+    this._userComboPrefName
+  ], this._listeners.onPrefChange);
 }
 
 //------------------------------------------------------------------------------
@@ -96,6 +105,10 @@ KeyboardShortcut.prototype.destroy = function() {
   Windows.forEachOpenWindow(this._unloadFromWindow.bind(this));
   Windows.removeListener("load", this._listeners.onWindowLoad);
   Windows.removeListener("unload", this._listeners.onWindowUnload);
+  ProcessEnvironment.prefObs.removeListeners([
+    this._userEnabledPrefName,
+    this._userComboPrefName
+  ], this._listeners.onPrefChange);
 };
 
 KeyboardShortcut.prototype._loadIntoWindow = function(window) {
@@ -112,10 +125,10 @@ KeyboardShortcut.prototype._onPress = function(event) {
   this._callback.call(null, window);
 };
 
-// KeyboardShortcut.prototype._onPrefChange = function() {
-//   this._determineElementAttributes();
-//   Windows.forEachOpenWindow(this._loadIntoWindow.bind(this));
-// };
+KeyboardShortcut.prototype._onPrefChange = function() {
+  this._determineElementAttributes();
+  Windows.forEachOpenWindow(this._setElementAttributes.bind(this));
+};
 
 //------------------------------------------------------------------------------
 // assisting methods
@@ -152,15 +165,13 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
-    // will be changed to pref
-    return "default";
+    return Prefs.get(this._userComboPrefName);
   }
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
-    // will be changed to pref
-    return true;
+    return Prefs.get(this._userEnabledPrefName);
   }
 });
 

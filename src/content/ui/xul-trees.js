@@ -102,7 +102,7 @@ exports.mainTree = [
         // "oncommand" (or "command") is required! See
         // https://stackoverflow.com/questions/16779316/how-to-set-an-xul-key-dynamically-and-securely/16786770#16786770
         attributes: {key: "r",
-                     modifiers: "alt",
+                     modifiers: "alt shift",
                      oncommand: "void(0);"},
         events: {command: ["overlay", "openMenu"]}
       }

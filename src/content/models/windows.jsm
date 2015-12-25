@@ -127,8 +127,12 @@ var Windows = (function() {
 
   function onEvent(eventType, window) {
     if (topicsToListeners.has(eventType)) {
-      let listeners = topicsToListeners.get(eventType);
-      for (let listener of listeners.values()) {
+      let listeners = [...topicsToListeners.get(eventType)];
+      if (eventType === "unload") {
+        // the most recent listeners should be called first
+        listeners.reverse();
+      }
+      for (let listener of listeners) {
         listener.call(null, window);
       }
     }

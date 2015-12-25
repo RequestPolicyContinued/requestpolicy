@@ -107,8 +107,10 @@ var ProcessEnvironment = (function() {
 
   Object.defineProperty(ParentProcessEnvironment.prototype, "controllers", {
     get: function() {
+      let {importModule} = ScriptLoader;
       return [
-        ScriptLoader.importModule("controllers/old-rules").OldRulesController
+        importModule("controllers/keyboard-shortcuts").KeyboardShortcuts,
+        importModule("controllers/old-rules").OldRulesController,
       ];
     }
   });
@@ -141,6 +143,9 @@ var ProcessEnvironment = (function() {
       //       first. PrefManager will then be loaded and initialized when all
       //       other back end modules are loaded / initialized.
     }
+
+    // TODO: Initialize the "models" first. Then initialize the other
+    // controllers, which is currently "rpService", "ContentPolicy" etc.
 
     // import main modules:
     ScriptLoader.importModules([

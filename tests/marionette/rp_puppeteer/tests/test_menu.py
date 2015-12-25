@@ -14,11 +14,16 @@ class TestMenu(RequestPolicyTestCase):
             super(RequestPolicyTestCase, self).tearDown()
 
     def test_open_close(self):
-        self.assertFalse(self.menu.is_open())
-        self.menu.open()
-        self.assertTrue(self.menu.is_open())
-        self.menu.close()
-        self.assertFalse(self.menu.is_open())
+        def test(trigger):
+            self.assertFalse(self.menu.is_open())
+            self.menu.open(trigger=trigger)
+            self.assertTrue(self.menu.is_open())
+            self.menu.close()
+            self.assertFalse(self.menu.is_open())
+
+        test("api")
+        test("button")
+        test("shortcut")
 
     def test_total_num_requests(self):
         with self.marionette.using_context("content"):

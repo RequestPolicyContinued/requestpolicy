@@ -33,6 +33,7 @@ let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
 let {StringUtils} = importModule("lib/utils/strings");
+let {JSUtils} = importModule("lib/utils/javascript");
 let {C} = importModule("lib/utils/constants");
 
 //==============================================================================
@@ -323,3 +324,77 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
     }
   }
 };
+
+XULUtils.keyboardShortcuts = (function() {
+  let self = {};
+
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Attribute/modifiers
+  // See also the SDK Hotkeys API
+  // https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/hotkeys
+  const VALID_MODIFIERS = [
+    "shift",
+    "alt",
+    "meta",
+    "control",
+    "accel"
+  ];
+
+  function error(msg) {
+    return {success: false, errorMessage: msg};
+  }
+
+  function success(returnValue) {
+    returnValue.success = true;
+    return returnValue;
+  }
+
+  function isValidModifier(aModifier) {
+    return JSUtils.arrayIncludes(VALID_MODIFIERS, aModifier);
+  }
+
+  let keyRegEx = /^[a-z]$/;
+
+  function _getKeyAttributesFromCombo(aCombo) {
+    if (typeof aCombo !== "string") {
+      return error("Not a string!");
+    }
+    if (aCombo === "") {
+      return error("The string must not be empty.");
+    }
+
+    let parts = aCombo.split(" ");
+    // Take the last element as the key
+    let key = parts.slice(-1)[0];
+    // Take all elements except the last one as the modifiers.
+    let modifiers = parts.slice(0, -1);
+    // Remove duplicates
+    modifiers = [...new Set(modifiers)];
+
+    for (let modifier of modifiers) {
+      if (false === isValidModifier(modifier)) {
+        return error("Invalid modifier: \"" + modifier + "\"");
+      }
+    }
+
+    if (!keyRegEx.test(key)) {
+      return error("Invalid key: \"" + key + "\"");
+    }
+
+    return success({
+      modifiers: modifiers.join(" "),
+      key: key
+    });
+  }
+
+  /**
+   * Check if the <key modifiers="..."> string is valid.
+   *
+   * @param  {string} aCombo
+   * @return {Object}
+   */
+  self.getKeyAttributesFromCombo = function(aCombo) {
+    return _getKeyAttributesFromCombo(aCombo);
+  };
+
+  return self;
+}());

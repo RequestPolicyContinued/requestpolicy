@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_puppeteer.base import BaseLib
+from firefox_puppeteer.ui.windows import Windows
 from marionette_driver.wait import Wait
 import re
 
@@ -20,8 +21,18 @@ class Menu(BaseLib):
         match = re.match(r"^(\d+) \((\d+)\+(\d+)\)$", text)
         return int(match.group(1))
 
-    def open(self):
-        self._ensure_popup_state("open")
+    def open(self, trigger="api"):
+        if trigger == "button":
+            self._toolbar_button.click()
+            Wait(self.marionette).until(lambda _: self._popup_state == "open")
+        elif trigger == "shortcut":
+            window = Windows(lambda: self.marionette).current
+            window.send_shortcut("r", alt=True, shift=True)
+            Wait(self.marionette).until(lambda _: self._popup_state == "open")
+        elif trigger == "api":
+            self._ensure_popup_state("open")
+        else:
+            raise ValueError("Unknown opening method: \"{}\"".format(trigger))
 
     def is_open(self):
         return self._popup_state == "open"

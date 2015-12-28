@@ -5,6 +5,7 @@
 from rp_ui_harness.testcases import RequestPolicyTestCase
 from marionette_driver.errors import TimeoutException
 from marionette import SkipTest
+from rp_ui_harness.utils import redirections
 
 
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
@@ -33,119 +34,93 @@ class TestAutoRedirect(RequestPolicyTestCase):
         hidden when it's not expected.
         """
 
-        def test_no_appear(path):
-            test_url = "http://www.maindomain.test/" + path
-            # FIXME: Remove the following line when #726 is fixed.
-            test_url += "?test_redirect_notification_appears_or_not"
-
+        def test_no_appear((test_url, dest_url), info):
             with self.marionette.using_context("content"):
                 self.marionette.navigate(test_url)
 
-            self.assertNotEqual(self.marionette.get_url(), test_url,
-                                "The URL in the urlbar has changed.")
+            # The page might redirect with a delay. There shouldn't be the
+            # notification neither before nor after the redirection.
+            self.assertFalse(self.redir.is_shown(),
+                             "There's no redirect notification.")
+            redirections.wait_until_url_load(self, dest_url,
+                                             "The location has changed.")
             self.assertFalse(self.redir.is_shown(),
                              "There's no redirect notification.")
 
-        def test_appear(path, navigate_args={}):
-            test_url = "http://www.maindomain.test/" + path
-            # FIXME: Remove the following line when #726 is fixed.
-            test_url += "?test_redirect_notification_appears_or_not"
-
-            initial_uri = self.marionette.get_url()
-
-            self._navigate_expecting_r21n(test_url, **navigate_args)
+        def test_appear((test_url, dest_url), info):
+            self._load_about_blank()
+            self._navigate_expecting_r21n(test_url)
 
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed.")
-            self.assertIn(self.marionette.get_url(), [test_url, initial_uri],
-                          "The URL in the urlbar did not change.")
+            redirections.assert_url_does_not_load(self, dest_url,
+                expected_delay=info["delay"])
 
             self.redir.close()
 
-        test_appear("redirect-http-location-header.php",
-                    navigate_args={"on_e10s_use_locationbar": True})
-        test_appear("redirect-http-refresh-header.php",
-                    navigate_args={"on_e10s_use_locationbar": True})
+        def test(uris, info):
+            if info["is_same_host"]:
+                test_no_appear(uris, info)
+            else:
+                test_appear(uris, info)
 
-        test_appear("redirect-js-document-location-auto.html")
-        test_appear("redirect-meta-tag-01-immediate.html")
-        test_appear("redirect-meta-tag-02-delayed.html")
-        test_appear("redirect-meta-tag-03-multiple.html")
-        test_appear("redirect-meta-tag-08.html")
-
-        test_no_appear("redirect-meta-tag-04-relative-without-slash.html")
-        test_no_appear("redirect-meta-tag-05-relative-with-slash.html")
-        test_no_appear("redirect-meta-tag-06-different-formatting.html")
-        test_no_appear("redirect-meta-tag-07-different-formatting-delayed.html")
-        test_no_appear("redirect-meta-tag-09-relative.html")
+        redirections.for_each_possible_redirection_scenario(test, "auto")
 
     def test_allow(self):
+        def test((test_url, dest_uri), info):
+            if info["is_same_host"]:
+                # the notification won't appear
+                return
 
-        def test(path, dest_uri, navigate_args={}):
-            test_url = "http://www.maindomain.test/" + path
-            # FIXME: Remove the following line when #726 is fixed.
-            test_url += "?test_allow"
-
-            self._navigate_expecting_r21n(test_url, **navigate_args)
+            self._navigate_expecting_r21n(test_url)
             self.assertTrue(self.redir.is_shown())
             self.redir.allow()
             self.assertFalse(self.redir.is_shown())
             with self.marionette.using_context("content"):
                 self.assertEqual(self.marionette.get_url(), dest_uri)
 
-        # Header redirection
-        test("redirect-http-location-header.php",
-             "http://www.otherdomain.test/",
-             navigate_args={"on_e10s_use_locationbar": True})
-        # JavaScript redirection
-        test("redirect-js-document-location-auto.html",
-             "http://www.otherdomain.test/")
-        # <meta> redirection
-        test("redirect-meta-tag-01-immediate.html",
-             ("http://www.otherdomain.test/destination.html?"
-              "redirect-meta-tag-01%20redirected%20here."))
+        redirections.for_each_possible_redirection_scenario(test, "auto")
 
     def test_r21n_appears_again_after_allow(self):
         raise SkipTest("Skipping due to issue #726.")
 
-        def test(path, navigate_args={}):
-            test_url = "http://www.maindomain.test/" + path
+        def test((test_url, dest_url), info):
+            if info["is_same_host"]:
+                # the notification won't appear
+                return
 
-            self._navigate_expecting_r21n(test_url, **navigate_args)
+            self._load_about_blank()
+            self._navigate_expecting_r21n(test_url)
             self.assertTrue(self.redir.is_shown())
+            redirections.assert_url_does_not_load(self, dest_url,
+                expected_delay=info["delay"])
             self.redir.allow()
 
-            self._navigate_expecting_r21n(test_url, **navigate_args)
+            self._load_about_blank()
+            self._navigate_expecting_r21n(test_url)
             self.assertTrue(self.redir.is_shown())
+            redirections.assert_url_does_not_load(self, dest_url,
+                expected_delay=info["delay"])
             self.redir.close()
 
-        # Header redirection
-        test("redirect-http-location-header.php",
-             navigate_args={"on_e10s_use_locationbar": True})
-        # JavaScript redirection
-        test("redirect-js-document-location-auto.html")
-        # <meta> redirection
-        test("redirect-meta-tag-01-immediate.html")
+        redirections.for_each_possible_redirection_scenario(test, "auto")
 
     ##########################
     # Private Helper Methods #
     ##########################
 
-    def _navigate_expecting_r21n(self, url, on_e10s_use_locationbar=False):
+    def _navigate_expecting_r21n(self, url):
         """Navigate to a URL, catching all expected exceptions."""
 
         if self.browser_info.e10s_enabled:
             # On E10s there's no TimeoutException raised.
 
-            if on_e10s_use_locationbar:
-                # In some cases `navigate()` raises an IOError. The workaround
-                # is to use the location-bar.
-                # For details see Mozilla Bug 1219969 / Issue #727.
-                self.browser.navbar.locationbar.load_url(url)
-                self.tabs.wait_until_loaded(self.browser.tabbar.tabs[0])
-            else:
-                with self.marionette.using_context("content"):
-                    self.marionette.navigate(url)
+            # In case of HTTP header redirections `marionette.navigate()`
+            # raises an IOError. The workaround is to use the location-bar
+            # instead.
+            # For details see Mozilla Bug 1219969 / Issue #727.
+            self.browser.navbar.locationbar.load_url(url)
+            self.tabs.wait_until_loaded(self.browser.tabbar.tabs[0])
         else:
             with self.marionette.using_context("content"):
                 # On non-E10s, expect a TimeoutException, because when
@@ -159,3 +134,11 @@ class TestAutoRedirect(RequestPolicyTestCase):
                                   url)
 
                 self.marionette.timeouts("page load", 20000)
+
+    def _get_url(self):
+        with self.marionette.using_context("content"):
+            return self.marionette.get_url()
+
+    def _load_about_blank(self):
+        with self.marionette.using_context("content"):
+                self.marionette.navigate("about:blank")

@@ -3,12 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from rp_ui_harness.utils import redirections
 
 
-PRE_PATH = "http://www.maindomain.test/"
-PAGE_WITH_REDIRECT = PRE_PATH + "redirect-meta-tag-01-immediate.html"
-PAGE_WITH_REDIRECT__DEST = ("http://www.otherdomain.test/destination.html?"
-                            "redirect-meta-tag-01%20redirected%20here.")
+(PAGE_WITH_REDIRECT,
+ PAGE_WITH_REDIRECT__DEST) = redirections.get_auto_redirection_uri("<meta>")
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
 
 
@@ -28,8 +27,7 @@ class TestRedirectNotification(RequestPolicyTestCase):
 
     def test_allow(self):
         with self.marionette.using_context("content"):
-            # FIXME: Remove the "?..." part when #726 is fixed.
-            self.marionette.navigate(PAGE_WITH_REDIRECT + "?test_allow")
+            self.marionette.navigate(PAGE_WITH_REDIRECT)
 
         self.assertTrue(self.redir.is_shown())
         self.redir.allow()
@@ -41,8 +39,7 @@ class TestRedirectNotification(RequestPolicyTestCase):
 
     def test_close(self):
         with self.marionette.using_context("content"):
-            # FIXME: Remove the "?..." part when #726 is fixed.
-            self.marionette.navigate(PAGE_WITH_REDIRECT + "?test_close")
+            self.marionette.navigate(PAGE_WITH_REDIRECT)
 
         self.assertTrue(self.redir.is_shown())
         self.redir.close()

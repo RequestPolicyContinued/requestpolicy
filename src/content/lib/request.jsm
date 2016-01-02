@@ -116,6 +116,12 @@ NormalRequest.prototype.setDestURI = function(destURI) {
   this.aContentLocation = DomainUtil.getUriObject(destURI);
 };
 
+Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
+  get: function() {
+    return this.aContentLocation.spec;
+  }
+});
+
 NormalRequest.prototype.detailsToString = function() {
   // Note: try not to cause side effects of toString() during load, so "<HTML
   // Element>" is hard-coded.
@@ -286,3 +292,12 @@ function RedirectRequest(httpResponse) {
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;
+
+Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
+  get: function() {
+    if (!this.hasOwnProperty("_destURIWithRef")) {
+      this._destURIWithRef = this.httpResponse.destURI.spec;
+    }
+    return this._destURIWithRef;
+  }
+});

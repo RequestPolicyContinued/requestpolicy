@@ -672,7 +672,7 @@ window.rpcontinued.overlay = (function() {
    * blocked, it's better to set a timeout here.
    */
   self.observeBlockedTopLevelDocRequest = function(browser, originUri,
-                                                    destUri) {
+                                                   destUri) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     window.setTimeout(function() {

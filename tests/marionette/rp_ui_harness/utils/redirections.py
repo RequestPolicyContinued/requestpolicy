@@ -180,6 +180,13 @@ def for_each_possible_redirection_scenario(callback, uri_type):
         dest_pre_path="http://www.otherdomain.test/",
         dest_path="subdirectory/flag-gray.png")
 
+    # destination URI with "fragment" part
+    for_each(callback_wrapper,
+        base_info={"is_same_host": False, "is_relative_dest": False},
+        origin_pre_path="http://www.maindomain.test/",
+        dest_pre_path="http://www.otherdomain.test/",
+        dest_path="#this-is-a-fragment")
+
     #---------------------------------------------------------------------------
     # same-site redirections
     #---------------------------------------------------------------------------

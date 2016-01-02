@@ -183,7 +183,7 @@ var RequestProcessor = (function() {
             "about the blocked top-level document request!");
       } else {
         window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
-            browser, request.originURI, request.destURI);
+            browser, request.originURI, request.destURIWithRef);
       }
     }
 

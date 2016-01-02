@@ -313,7 +313,8 @@ RequestProcessor = (function(self) {
       if (!showNotification) {
         return false;
       }
-      return showNotification(browser, request.destURI, 0, request.originURI);
+      return showNotification(browser, request.destURIWithRef, 0,
+          request.originURI);
     });
     return true;
   }

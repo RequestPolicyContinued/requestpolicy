@@ -228,22 +228,6 @@ RequestProcessor = (function(self) {
         // show the URL of the previously displayed page.
         httpChannel.cancel(Cr.NS_BINDING_ABORTED);
 
-        let browser = request.browser;
-
-        if (browser !== null) {
-          // `browser` is null if it could not be found. One known
-          // example is a favicon request that is redirected.
-
-          // TODO: do not put data into the <browser> object. Maybe use
-          //       Map instead?
-
-          // save all blocked redirects directly in the browser element. the
-          // blocked elements will be checked later when the DOM content
-          // finished loading.
-          browser.rpcontinued = browser.rpcontinued || {blockedRedirects: {}};
-          browser.rpcontinued.blockedRedirects[originURI] = destURI;
-        }
-
         maybeShowRedirectNotification(request);
 
         // We try to trace the blocked redirect back to a link click or form

@@ -27,6 +27,9 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported WindowUtils */
 this.EXPORTED_SYMBOLS = ["WindowUtils"];
 
+let {PrivateBrowsingUtils} = Cu.import(
+    "resource://gre/modules/PrivateBrowsingUtils.jsm", {});
+
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Prefs} = importModule("models/prefs");
@@ -87,35 +90,9 @@ var WindowUtils = (function() {
   // Private Browsing
   //
 
-  // depending on the Firefox vesion, create the `isWindowPrivate` function
-  self.isWindowPrivate = (function() {
-    try {
-      // Firefox 20+
-      let {PrivateBrowsingUtils} = Cu.import("resource://gre/modules/" +
-                                             "PrivateBrowsingUtils.jsm", {});
-
-      return function(aWindow) {
-        return PrivateBrowsingUtils.isWindowPrivate(aWindow);
-      };
-    } catch (e) {
-      // pre Firefox 20
-      try {
-        let pbs = Cc["@mozilla.org/privatebrowsing;1"]
-            .getService(Ci.nsIPrivateBrowsingService);
-
-        return function(aWindow) {
-          return pbs.privateBrowsingEnabled;
-        };
-      } catch (e) {
-        Components.utils.reportError(e);
-        // It's uncertain if private browsing is possible at all, so assume
-        // that Private Browsing is not possible.
-        return function(aWindow) {
-          return true;
-        };
-      }
-    }
-  }());
+  self.isWindowPrivate = function(aWindow) {
+    return PrivateBrowsingUtils.isWindowPrivate(aWindow);
+  };
 
   /**
    * Should it be possible to add permanent rules in that window?

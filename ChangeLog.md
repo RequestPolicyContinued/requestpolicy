@@ -7,16 +7,26 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * improvements
   * Importing old rules: detect if a wildcard needs to be added
     in front of a host or not, based on the host's base domain. (#730)
+  * The menu can be opened using the context menu. (#353, 88c26b5)
+  * The keyboard shortcut for opening the menu can now be disabled, or
+    changed to a different combination. (#616, #460, afab797)
 * other changes
   * The default policy for new installations is now "deny" again,
     just as in the 0.5.x versions.
+  * The menu is positioned more intelligently (#690, d35dc9e)
+  * The default keyboard shortcut to open the menu is now "Alt Shift R". (#612)
 * bugfixes
   * Importing old rules: Handle URIs without host correctly (#354)
   * Automatic import of old rules: import if and only if both
     conditions are true: (#731, 49894f6)
     - the user is upgrading RP from v0.5 to v1.0
     - the v1.0 rules file doesn't exist yet.
+  * Subscription rules now apply regardless of the current default policy (#529)
   * Redirections with conflicting rules: The default policy should apply (#623)
+  * Sometimes the request counter in the menu was constantly increasing
+    with each page reload. (#611)
+  * The "fragment" part of URIs was removed for the redirection
+    notification. (#681)
   * E10s issues
     * The "Allow" button on the redirection notification
       bar did not always work. (#620, a168f70)
@@ -24,6 +34,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       some cases. (#722, 41366d3)
   * Add-on compatibility: KeeFox (#427, a38cc57)
   * Add-on compatibility: Enpass (#732, 566aa71)
+  * Browser compatibility: Firefox Accounts (#716)
 
 
 #### Version 1.0.beta10.2 (bugfix)

@@ -57,32 +57,27 @@ function RequestSet() {
 RequestSet.prototype = {
   _origins: null,
 
-  print: function(name) {
-    var log = Logger;
-    log.dump("-------------------------------------------------");
-    log.dump("== Request Set <" + name + "> ==");
+  print: function(name, printFn=Logger.dump) {
+    printFn("-------------------------------------------------");
+    printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
     var origins = this._origins;
     for (var oUri in origins) {
-      log.dump("      " + "Origin uri: <" + oUri + ">");
+      printFn("      " + "Origin uri: <" + oUri + ">");
       for (var dBase in origins[oUri]) {
         var dests = origins[oUri];
-        log.dump("        " + "Dest base domain: <" + dBase + ">");
+        printFn("        " + "Dest base domain: <" + dBase + ">");
         for (var dIdent in dests[dBase]) {
-          log.dump("          " + "Dest identifier: <" + dIdent + ">");
+          printFn("          " + "Dest identifier: <" + dIdent + ">");
           for (var dUri in dests[dBase][dIdent]) {
-            log.dump("            " + "Dest uri: <" + dUri + ">");
-            for (var i in dests[dBase][dIdent][dUri]) {
-              log.dump("              " + "#: " + i);
-              for (var ruleStr in dests[dBase][dIdent][dUri][i]) {
-                log.dump("                " + "Rule: <" + ruleStr + ">");
-              }
-            }
+            var n = dests[dBase][dIdent][dUri].length;
+            printFn("            " + "Dest uri: (" + n + " requests) <" +
+                dUri + ">");
           }
         }
       }
     }
-    log.dump("-------------------------------------------------");
+    printFn("-------------------------------------------------");
   },
 
   getAll: function() {

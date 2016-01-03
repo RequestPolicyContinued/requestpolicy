@@ -47,6 +47,7 @@ var Prefs = (function() {
   self.branches = {
     rp: new PrefBranch("extensions.requestpolicy.", {
       "autoReload": "BoolPref",
+      "confirmSiteInfo": "BoolPref",
       "contextMenu": "BoolPref",
       "defaultPolicy.allow": "BoolPref",
       "defaultPolicy.allowSameDomain": "BoolPref",

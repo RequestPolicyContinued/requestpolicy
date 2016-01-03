@@ -27,6 +27,9 @@ window.rpcontinued.menu = (function() {
   /* global Components */
   const {utils: Cu} = Components;
 
+  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+  let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 
@@ -104,6 +107,43 @@ window.rpcontinued.menu = (function() {
     }
   };
 
+  //----------------------------------------------------------------------------
+  // utilities
+  //----------------------------------------------------------------------------
+
+  /**
+   * Show a dialog with "OK" and "Cancel" buttons, as well as with a
+   * checkbox labeled "always ask?".
+   *
+   * @return {boolean} If the question has been confirmed or not.
+   */
+  function confirm(dialogMessage, alwaysAskPrefName, params={}) {
+    let shouldAsk = Prefs.get(alwaysAskPrefName);
+    if (shouldAsk === false) {
+      // never ask
+      return true;
+    }
+
+    let dialogTitle = params.dialogTitle || "RequestPolicy";
+    let checkboxObj = {value: shouldAsk};
+    let checkboxText = StringUtils.$str("alwaysAsk");
+
+    if (typeof params.onBeforeDialog === "function") {
+      params.onBeforeDialog.call();
+    }
+
+    let confirmed = Services.prompt.confirmCheck(window, dialogTitle,
+        dialogMessage, checkboxText, checkboxObj);
+
+    if (confirmed) {
+      // "OK" has been pressed
+      Prefs.set(alwaysAskPrefName, checkboxObj.value);
+      return true;
+    }
+    // "Cancel" has been pressed
+    return false;
+  }
+
   /**
    * Remove all children from a list, and remove all event listeners.
    *
@@ -125,6 +165,10 @@ window.rpcontinued.menu = (function() {
     // remove the children
     DOMUtils.removeChildren(aList);
   }
+
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
   self.prepareMenu = function() {
     try {
@@ -203,6 +247,10 @@ window.rpcontinued.menu = (function() {
       Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
       throw e;
     }
+  };
+
+  self.close = function() {
+    $id("rpc-popup").hidePopup();
   };
 
   self._populateMenuForUncontrollableOrigin = function() {
@@ -561,6 +609,45 @@ window.rpcontinued.menu = (function() {
     self._populateDetails();
   };
 
+  function openSiteInfoTab(domain) {
+    let url = "https://www.mywot.com/en/scorecard/" + domain;
+    window.openUILinkIn(url, "tab", {
+      relatedToCurrent: true,
+      inBackground: true
+    });
+  }
+
+  function maybeOpenSiteInfoTab(item) {
+    let domain = null;
+
+    if (item.value) {
+      domain = item.value;
+    } else {
+      let domainLabel = item.querySelector(".domainname");
+
+      if (domainLabel !== null) {
+        domain = domainLabel.value;
+      }
+    }
+
+    if (domain === null) {
+      console.error("Failed to determine the domain under the mouse button " +
+                    "after the middle-click.");
+      return;
+    }
+
+    let dialogMessage = StringUtils.$str("siteInfo.confirm",
+        [domain, "https://www.mywot.com"]);
+    let alwaysAskPrefName = "confirmSiteInfo";
+    let confirmed = confirm(dialogMessage, alwaysAskPrefName, {
+      // close the menu if the dialog needs to be shown
+      onBeforeDialog: self.close
+    });
+    if (confirmed) {
+      openSiteInfoTab(domain);
+    }
+  }
+
   self.itemSelected = function(event) {
     var item = event.target;
     // TODO: rather than compare IDs, this should probably compare against
@@ -572,11 +659,19 @@ window.rpcontinued.menu = (function() {
     }
     if (item.id === "rpc-origin" ||
         item.parentNode.id === "rpc-other-origins-list") {
-      self._activateOriginItem(item);
+      if (event.button === 1) {
+        maybeOpenSiteInfoTab(item);
+      } else {
+        self._activateOriginItem(item);
+      }
     } else if (item.parentNode.id === "rpc-blocked-destinations-list" ||
                item.parentNode.id === "rpc-mixed-destinations-list" ||
                item.parentNode.id === "rpc-allowed-destinations-list") {
-      self._activateDestinationItem(item);
+      if (event.button === 1) {
+        maybeOpenSiteInfoTab(item);
+      } else {
+        self._activateDestinationItem(item);
+      }
     } else if (item.parentNode.id === "rpc-rules-remove" ||
                item.parentNode.id === "rpc-rules-add") {
       self._processRuleSelection(item);

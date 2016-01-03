@@ -25,6 +25,8 @@ pref("extensions.requestpolicy.contextMenu", true);
 pref("extensions.requestpolicy.menu.sorting", "numRequests");
 pref("extensions.requestpolicy.menu.info.showNumRequests", true);
 
+pref("extensions.requestpolicy.confirmSiteInfo", true);
+
 pref("extensions.requestpolicy.keyboardShortcuts.openMenu.enabled", true);
 pref("extensions.requestpolicy.keyboardShortcuts.openMenu.combo", "default");
 

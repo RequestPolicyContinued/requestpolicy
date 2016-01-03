@@ -46,7 +46,8 @@ const FILENAMES = {
   "defaultpolicy": "defaultpolicy.html",
   "subscriptions": "subscriptions.html",
   "oldrules": "oldrules.html",
-  "setup": "setup.html"
+  "setup": "setup.html",
+  "experimental": "experimental.html",
 };
 
 function getURI(aURI) {

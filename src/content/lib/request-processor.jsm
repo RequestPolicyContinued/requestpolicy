@@ -470,6 +470,11 @@ var RequestProcessor = (function() {
   self._rejectedRequests = new RequestSet();
   self._allowedRequests = new RequestSet();
 
+  // needed to collect some memory usage information
+  self.clickedLinks = internal.clickedLinks;
+  self.clickedLinksReverse = internal.clickedLinksReverse;
+  self.faviconRequests = internal.faviconRequests;
+
   //----------------------------------------------------------------------------
   // public functions
   //----------------------------------------------------------------------------

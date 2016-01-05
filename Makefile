@@ -102,13 +102,6 @@ rp_deleted_files += $(off_amo__deleted_files)
 rp_empty_dirs += $(off_amo__empty_dirs)
 
 
-# __________________________________________
-# vars for generating a signed "off-AMO" XPI
-#
-
-signed_xpi_file := $(dist_path)$(extension_name)-signed.xpi
-
-
 # _________________________________
 # vars for generating the "AMO" XPI
 #
@@ -224,7 +217,7 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 # define targets
 # ==============================================================================
 
-.PHONY: all build dist sign
+.PHONY: all build dist
 
 # set "all" to be the default target
 .DEFAULT_GOAL := all
@@ -240,8 +233,6 @@ dist xpi: $(off_amo__xpi_file)
 # create the dist directory
 $(dist_path):
 	@mkdir -p $(dist_path)
-
-signed-xpi: $(signed_xpi_file)
 
 .PHONY: preprocessor
 preprocessor: $(build_dirname)/preprocess-content-types.txt
@@ -264,19 +255,6 @@ $(off_amo__xpi_file): $(off_amo__build_path) $(off_amo__all_files) | $(dist_path
 	@cd $(off_amo__build_path) && \
 	$(ZIP) $(abspath $(off_amo__xpi_file)) $(rp_all_files)
 	@echo "Creating XPI file: Done!"
-
-# _______________________________
-# create the signed "off-AMO" XPI
-#
-
-$(signed_xpi_file): $(off_amo__build_path) $(off_amo__all_files) $(off_amo__build_path)/META-INF/ | $(dist_path)
-	@rm -f $(signed_xpi_file)
-	@cd $(off_amo__build_path) && \
-	$(ZIP) $(abspath $(signed_xpi_file)) \
-		META-INF/zigbert.rsa && \
-	$(ZIP) -r -D $(abspath $(signed_xpi_file)) \
-		$(rp_all_files) META-INF \
-		-x META-INF/zigbert.rsa
 
 # ____________________
 # create the "AMO" XPI
@@ -377,16 +355,6 @@ $(off_amo__copy_files) : $(off_amo__build_path)% : $(source_path)%
 	@mkdir -p $(@D)
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $< $@
-
-# _____________________________________________
-# create the files for the signed "off-AMO" XPI
-#
-
-$(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
-	mkdir -p $(off_amo__build_path)/META-INF
-	signtool -d .signing \
-		-k "Open Source Developer, Martin Kimmerle's Unizeto Technologies S.A. ID" \
-		$(off_amo__build_path)
 
 # __________________________________
 # create the files for the "AMO" XPI

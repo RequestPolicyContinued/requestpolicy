@@ -187,11 +187,11 @@ dummy_ext__src__all_files := $(shell find $(dummy_ext__source_dirname) -type f -
 dummy_ext__xpi_file := $(dist_path)dummy-ext.xpi
 
 
-# ______________________________
-# vars for mozrunner and mozmill
+# __________________
+# vars for mozrunner
 #
 
-# the default XPI to use for mozrunner and mozmill
+# the default XPI to use for mozrunner
 moz_xpi := $(unit_testing__xpi_file)
 
 # select the default app. Can be overridden e.g. via `make run app='seamonkey'`
@@ -420,7 +420,7 @@ $(rp_deleted_files): FORCE
 # for running and unit-testing
 #
 
-.PHONY: venv venv-mozmill
+.PHONY: venv
 
 venv: .venv/bin/activate
 .venv/bin/activate: requirements.txt
@@ -432,17 +432,6 @@ venv: .venv/bin/activate
 	source .venv/bin/activate ; \
 	pip install -r requirements.txt ; \
 	touch --no-create .venv/bin/activate ; \
-	)
-
-# mozmill needs a separate venv
-#   ( because it uses '==' package dependencies instead of '>='
-#     see https://github.com/mozilla/mozmill/blob/2.0.10/mozmill/setup.py#L11 )
-venv-mozmill: .venv-mozmill/bin/activate
-.venv-mozmill/bin/activate:
-	test -d .venv-mozmill || virtualenv --prompt='(RP/mozmill)' .venv-mozmill
-	( \
-	source .venv-mozmill/bin/activate ; \
-	pip install mozmill ; \
 	)
 
 # ___________
@@ -470,42 +459,8 @@ run: venv $(moz_xpi) $(dev_helper__xpi_file)
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-mozmill_tests_dir := .mozilla/mozmill-tests
-mozmill_rpc_test_dir := $(mozmill_tests_dir)/firefox/tests/addons/rpcontinued@requestpolicy.org
-
-# Default mozmill manifest to use for testing
-mm_manifest := manifest.ini
-
-.PHONY: check test mozmill marionette mozmill-dirs
-check test: mozmill marionette
-
-mozmill: venv-mozmill $(moz_xpi) $(dev_helper__xpi_file) mozmill-dirs
-	( \
-	source .venv-mozmill/bin/activate ; \
-	mozmill -a $(moz_xpi) -a $(dev_helper__xpi_file) -b $(app_binary) \
-		-m $(mozmill_rpc_test_dir)/$(mm_manifest) $(moz_args) ; \
-	)
-
-
-
-mozmill-dirs: $(mozmill_tests_dir) \
-	$(mozmill_rpc_test_dir) \
-	$(mozmill_rpc_test_dir)/mozmill-tests \
-	$(mozmill_rpc_test_dir)/data
-
-$(mozmill_rpc_test_dir): $(mozmill_tests_dir)
-	@test -L $@ \
-	|| ln -ns ../../../../../tests/mozmill $@
-
-$(mozmill_rpc_test_dir)/mozmill-tests: $(mozmill_rpc_test_dir)
-	@test -L tests/mozmill/mozmill-tests \
-	|| ln -ns ../../$(mozmill_tests_dir) tests/mozmill/mozmill-tests
-
-$(mozmill_rpc_test_dir)/data: $(mozmill_rpc_test_dir)
-	@test -L tests/mozmill/data \
-	|| ln -ns ../../ tests/mozmill/data
-
-
+.PHONY: check test marionette
+check test: marionette
 
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini

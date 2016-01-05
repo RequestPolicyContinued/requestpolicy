@@ -226,6 +226,8 @@ window.rpcontinued.overlay = (function() {
 
   mlManager.addListener("notifyDocumentLoaded", function(message) {
     let {documentURI} = message.data;
+    // The document URI could contain a "fragment" part.
+    let originURI = DomainUtil.getUriObject(documentURI).specIgnoringRef;
 
     let blockedURIs = {};
 
@@ -233,7 +235,7 @@ window.rpcontinued.overlay = (function() {
       var indicateBlacklisted = Prefs.get("indicateBlacklistedObjects");
 
       var rejectedRequests = RequestProcessor._rejectedRequests
-          .getOriginUri(documentURI);
+          .getOriginUri(originURI);
       for (var destBase in rejectedRequests) {
         for (var destIdent in rejectedRequests[destBase]) {
           for (var destUri in rejectedRequests[destBase][destIdent]) {

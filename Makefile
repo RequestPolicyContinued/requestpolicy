@@ -369,14 +369,11 @@ $(specific_xpi__file):
 # empty directories and deleted files from the build directory.
 $(off_amo__build_path): $(off_amo__all_files) $(off_amo__deleted_files) $(off_amo__empty_dirs)
 
-# enable Secondary Expansion (so that $@ can be used in prerequisites via $$@)
-.SECONDEXPANSION:
-
-$(off_amo__jspp_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@) | preprocessor
+$(off_amo__jspp_files) : $(off_amo__build_path)% : $(source_path)% | preprocessor
 	@mkdir -p $(@D)
 	$(PREPROCESS) $< > $@
 
-$(off_amo__copy_files): $$(patsubst $$(off_amo__build_path)%,$$(source_path)%,$$@)
+$(off_amo__copy_files) : $(off_amo__build_path)% : $(source_path)%
 	@mkdir -p $(@D)
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $< $@
@@ -397,11 +394,11 @@ $(off_amo__build_path)/META-INF/: $(off_amo__build_path) $(off_amo__all_files)
 
 $(amo__build_path): $(amo__all_files) $(amo__deleted_files) $(amo__empty_dirs)
 
-$(amo__jspp_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@) | preprocessor
+$(amo__jspp_files) : $(amo__build_path)% : $(source_path)% | preprocessor
 	@mkdir -p $(@D)
 	$(PREPROCESS) -D AMO $< > $@
 
-$(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
+$(amo__copy_files) : $(amo__build_path)% : $(source_path)%
 	@mkdir -p $(@D)
 	cp --dereference $< $@
 
@@ -416,11 +413,11 @@ $(amo__copy_files): $$(patsubst $$(amo__build_path)%,$$(source_path)%,$$@)
 
 $(unit_testing__build_path): $(unit_testing__all_files) $(unit_testing__deleted_files) $(unit_testing__empty_dirs)
 
-$(unit_testing__jspp_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@) | preprocessor
+$(unit_testing__jspp_files) : $(unit_testing__build_path)% : $(source_path)% | preprocessor
 	@mkdir -p $(@D)
 	$(PREPROCESS) --keep-lines -D UNIT_TESTING $< > $@
 
-$(unit_testing__copy_files): $$(patsubst $$(unit_testing__build_path)%,$$(source_path)%,$$@)
+$(unit_testing__copy_files) : $(unit_testing__build_path)% : $(source_path)%
 	@mkdir -p $(@D)
 	cp --dereference $< $@
 

@@ -8,6 +8,7 @@
 
 SHELL      := /bin/bash
 ZIP        := zip
+GIT        := /usr/bin/git
 PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
 
 #-------------------------------------------------------------------------------
@@ -93,6 +94,10 @@ preprocess_args__off_amo      :=
 preprocess_args__amo          := -D AMO
 preprocess_args__unit_testing := --keep-lines -D UNIT_TESTING
 
+unique_version__off_amo      := yes
+unique_version__amo          := no
+unique_version__unit_testing := yes
+
 #-------------------------------------------------------------------------------
 # [VARIABLES] this configuration
 #-------------------------------------------------------------------------------
@@ -101,6 +106,7 @@ current_build__alias           := $(alias__$(BUILD))
 current_build__extension_id    := $(extension_id__$(BUILD))
 current_build__xpi_file        := $(xpi_file__$(BUILD))
 current_build__preprocess_args := $(preprocess_args__$(BUILD))
+current_build__unique_version := $(unique_version__$(BUILD))
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] collect source files
@@ -180,6 +186,13 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 		if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
 	  		echo 'install.rdf: changing the Extension ID !' ; \
 	  		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+		fi ; \
+		if [[ "$(current_build__unique_version)" == "yes" ]]; then \
+	  		echo 'install.rdf: making the version unique !' ; \
+				rev_count=`$(GIT) rev-list HEAD | wc --lines` ; \
+				commit_sha=`$(GIT) rev-parse --short HEAD` ; \
+				unique_suffix=.$${rev_count}.r$${commit_sha} ; \
+	  		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
 		fi ; \
 	fi
 

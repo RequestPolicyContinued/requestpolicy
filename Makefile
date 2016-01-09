@@ -64,8 +64,11 @@ endef
 .DEFAULT_GOAL := all
 
 all: xpi
-xpi:
-	$(call make_xpi,off_amo)
+xpi: nightly-xpi
+nightly-xpi:
+	$(call make_xpi,nightly)
+beta-xpi:
+	$(call make_xpi,beta)
 unit-testing-xpi:
 	$(call make_xpi,unit_testing)
 amo-xpi:
@@ -78,23 +81,28 @@ unit-testing-files:
 # [VARIABLES] configuration of different builds
 #-------------------------------------------------------------------------------
 
-alias__off_amo       := off-AMO
+alias__nightly       := nightly
+alias__beta          := beta
 alias__amo           := AMO
 alias__unit_testing  := unit-testing
 
-extension_id__off_amo      := $(off_amo__extension_id)
+extension_id__nightly      := $(off_amo__extension_id)
+extension_id__beta         := $(off_amo__extension_id)
 extension_id__amo          := $(amo__extension_id)
 extension_id__unit_testing := $(off_amo__extension_id)
 
-xpi_file__off_amo      := $(dist_dir)/$(extension_name).xpi
+xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
+xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
 xpi_file__amo          := $(dist_dir)/$(extension_name)-amo.xpi
 xpi_file__unit_testing := $(dist_dir)/$(extension_name)-unit-testing.xpi
 
-preprocess_args__off_amo      :=
+preprocess_args__nightly      :=
+preprocess_args__beta         :=
 preprocess_args__amo          := -D AMO
 preprocess_args__unit_testing := --keep-lines -D UNIT_TESTING
 
-unique_version__off_amo      := yes
+unique_version__nightly      := yes
+unique_version__beta         := no
 unique_version__amo          := no
 unique_version__unit_testing := yes
 

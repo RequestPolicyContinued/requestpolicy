@@ -18,6 +18,7 @@
     "advancedPreferences",
     "linkPrefetching",
     "dnsPrefetching",
+    "speculativePreConnections",
     "enabled",
     "disableOnStartup",
     "restoreDefaultOnUninstall",
@@ -56,6 +57,16 @@
 
     $id("pref-prefetch.dns.restoreDefaultOnUninstall").checked =
         Prefs.get("prefetch.dns.restoreDefaultOnUninstall");
+
+    // Speculative pre-connections.
+    $id("pref-speculativePreConnections").checked =
+        Prefs.get("root/ network.http.speculative-parallel-limit") !== 0;
+
+    $id("pref-prefetch.preconnections.disableOnStartup").checked =
+        Prefs.get("prefetch.preconnections.disableOnStartup");
+
+    $id("pref-prefetch.preconnections.restoreDefaultOnUninstall").checked =
+        Prefs.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
     // TODO: Create a class which acts as an API for preferences and which ensures
     // that the returned value is always a valid value for "string" preferences.
@@ -127,6 +138,29 @@
           Services.prefs.savePrefFile(null);
         });
 
+    // Speculative pre-connections.
+    elManager.addListener($id("pref-speculativePreConnections"), "change", function(event) {
+      Prefs.set("root/ network.http.speculative-parallel-limit",
+          event.target.checked ? 6 : 0);
+      Services.prefs.savePrefFile(null);
+    });
+
+    elManager.addListener(
+        $id("pref-prefetch.preconnections.disableOnStartup"), "change",
+        function(event) {
+          Prefs.set("prefetch.preconnections.disableOnStartup",
+              event.target.checked);
+          Services.prefs.savePrefFile(null);
+        });
+
+    elManager.addListener(
+        $id("pref-prefetch.preconnections.restoreDefaultOnUninstall"), "change",
+        function(event) {
+          Prefs.set("prefetch.preconnections.restoreDefaultOnUninstall",
+              event.target.checked);
+          Services.prefs.savePrefFile(null);
+        });
+
     var sortingListener = function(event) {
       Prefs.set("menu.sorting", event.target.value);
       Services.prefs.savePrefFile(null);
@@ -148,6 +182,7 @@
       "",
       "root/ network.prefetch-next",
       "root/ network.dns.disablePrefetch",
+      "root/ network.http.speculative-parallel-limit",
     ], updateDisplay);
   };
 

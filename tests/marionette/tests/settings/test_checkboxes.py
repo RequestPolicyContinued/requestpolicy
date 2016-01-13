@@ -49,6 +49,13 @@ class TestCheckboxes(RequestPolicyTestCase):
         self._test("pref-prefetch.dns.restoreDefaultOnUninstall",
                    RP_BRANCH + "prefetch.dns.restoreDefaultOnUninstall")
 
+        self._test("pref-speculativePreConnections",
+                   self._preconnect_pref("network.http.speculative-parallel-limit"))
+        self._test("pref-prefetch.preconnections.disableOnStartup",
+                   RP_BRANCH + "prefetch.preconnections.disableOnStartup")
+        self._test("pref-prefetch.preconnections.restoreDefaultOnUninstall",
+                   RP_BRANCH + "prefetch.preconnections.restoreDefaultOnUninstall")
+
         self._test("menu.info.showNumRequests",
                    RP_BRANCH + "menu.info.showNumRequests")
 
@@ -64,13 +71,15 @@ class TestCheckboxes(RequestPolicyTestCase):
     # Private Helper Methods #
     ##########################
 
-    def _test(self, checkbox_id, pref_name, inverse=False):
+    def _test(self, checkbox_id, pref, inverse=False):
+        if isinstance(pref, str):
+            pref = self._pref(pref)
+
         with self.marionette.using_context("content"):
             checkbox = self.marionette.find_element("id", checkbox_id)
-            compare = partial(self._compare, checkbox, pref_name,
-                              inverse=inverse)
+            compare = partial(self._compare, checkbox, pref, inverse=inverse)
 
-            initial_value = self.prefs.get_pref(pref_name)
+            initial_value = pref["get"]()
 
             compare(initial_value)
             checkbox.click()
@@ -78,14 +87,14 @@ class TestCheckboxes(RequestPolicyTestCase):
             checkbox.click()
             compare(initial_value)
 
-            self._toggle_pref(pref_name)
+            self._toggle_pref(pref)
             compare(not initial_value)
-            self._toggle_pref(pref_name)
+            self._toggle_pref(pref)
             compare(initial_value)
 
-    def _compare(self, checkbox, pref_name, expected_pref_value, inverse=False):
+    def _compare(self, checkbox, pref, expected_pref_value, inverse=False):
         cb_value = checkbox.get_attribute("checked") == "true"
-        pref_value = self.prefs.get_pref(pref_name)
+        pref_value = pref["get"]()
 
         try:
             self.assertIsInstance(cb_value, bool)
@@ -99,10 +108,26 @@ class TestCheckboxes(RequestPolicyTestCase):
                 self.assertNotEqual(cb_value, pref_value)
         except:
             print ("pref name: {}, checkbox: {}, pref: {}"
-                   .format(pref_name, str(cb_value), str(pref_value)))
+                   .format(pref["name"], str(cb_value), str(pref_value)))
             raise
 
-    def _toggle_pref(self, pref_name):
-        current_value = self.prefs.get_pref(pref_name)
-        self.prefs.set_pref(pref_name, not current_value)
+    def _toggle_pref(self, pref):
+        current_value = pref["get"]()
+        pref["set"](not current_value)
 
+    def _pref(self, pref_name):
+        return {
+            "name": pref_name,
+            "get": lambda: self.prefs.get_pref(pref_name),
+            "set": lambda v: self.prefs.set_pref(pref_name, v)
+        }
+
+    def _preconnect_pref(self, pref_name):
+        def value():
+            return self.prefs.get_pref(pref_name)
+        return {
+            "name": pref_name,
+            "get": lambda: False if value() == 0 else True,
+            "set": lambda v: self.prefs.set_pref(pref_name,
+                                                 0 if v == False else 6)
+        }

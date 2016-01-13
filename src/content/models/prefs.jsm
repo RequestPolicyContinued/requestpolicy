@@ -66,6 +66,8 @@ var Prefs = (function() {
       "prefetch.dns.restoreDefaultOnUninstall": "BoolPref",
       "prefetch.link.disableOnStartup": "BoolPref",
       "prefetch.link.restoreDefaultOnUninstall": "BoolPref",
+      "prefetch.preconnections.disableOnStartup": "BoolPref",
+      "prefetch.preconnections.restoreDefaultOnUninstall": "BoolPref",
       "privateBrowsingPermanentWhitelisting": "BoolPref",
       "startWithAllowAllEnabled": "BoolPref",
       "welcomeWindowShown": "BoolPref",
@@ -76,6 +78,7 @@ var Prefs = (function() {
 
     root: new PrefBranch("", {
       "network.dns.disablePrefetch": "BoolPref",
+      "network.http.speculative-parallel-limit": "IntPref",
       "network.prefetch-next": "BoolPref",
     })
   };

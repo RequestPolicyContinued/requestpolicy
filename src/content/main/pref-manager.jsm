@@ -50,6 +50,8 @@ var PrefManager = (function() {
     var resetLinkPrefetch = Prefs.get("prefetch.link." +
                                       "restoreDefaultOnUninstall");
     var resetDNSPrefetch = Prefs.get("prefetch.dns.restoreDefaultOnUninstall");
+    var resetPreConnections = Prefs.get("prefetch.preconnections." +
+                                        "restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
       if (Prefs.isSet("root/ network.prefetch-next")) {
@@ -59,6 +61,11 @@ var PrefManager = (function() {
     if (resetDNSPrefetch) {
       if (Prefs.isSet("root/ network.dns.disablePrefetch")) {
         Prefs.reset("root/ network.dns.disablePrefetch");
+      }
+    }
+    if (resetPreConnections) {
+      if (Prefs.isSet("root/ network.http.speculative-parallel-limit")) {
+        Prefs.reset("root/ network.http.speculative-parallel-limit");
       }
     }
     Services.prefs.savePrefFile(null);
@@ -84,7 +91,7 @@ var PrefManager = (function() {
     /* jshint +W126 */
 
     // ================================
-    // Link/DNS prefetching
+    // prefetching
     // --------------------
     // Disable link prefetch.
     if (Prefs.get("prefetch.link.disableOnStartup")) {
@@ -102,6 +109,14 @@ var PrefManager = (function() {
           !Prefs.get("root/ network.dns.disablePrefetch")) {
         Prefs.set("root/ network.dns.disablePrefetch", true);
         console.info("Disabled DNS prefetch.");
+      }
+    }
+    // Disable Speculative pre-connections.
+    if (Prefs.get("prefetch.preconnections.disableOnStartup")) {
+      if (!Prefs.isSet("root/ network.http.speculative-parallel-limit") ||
+          Prefs.get("root/ network.http.speculative-parallel-limit" !== 0)) {
+        Prefs.set("root/ network.http.speculative-parallel-limit", 0);
+        console.info("Disabled Speculative pre-connections.");
       }
     }
 

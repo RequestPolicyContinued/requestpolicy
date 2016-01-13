@@ -114,7 +114,7 @@ var PrefManager = (function() {
     // Disable Speculative pre-connections.
     if (Prefs.get("prefetch.preconnections.disableOnStartup")) {
       if (!Prefs.isSet("root/ network.http.speculative-parallel-limit") ||
-          Prefs.get("root/ network.http.speculative-parallel-limit" !== 0)) {
+          Prefs.get("root/ network.http.speculative-parallel-limit") !== 0) {
         Prefs.set("root/ network.http.speculative-parallel-limit", 0);
         console.info("Disabled Speculative pre-connections.");
       }

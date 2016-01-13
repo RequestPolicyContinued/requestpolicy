@@ -34,6 +34,14 @@ class Menu(BaseLib):
             return
         self._toggle(trigger=trigger)
 
+    @property
+    def preferences_button(self):
+        return self._popup.find_element("id", "rpc-link-prefs")
+
+    @property
+    def manage_policies_button(self):
+        return self._popup.find_element("id", "rpc-link-policies")
+
     ##################################
     # Private Properties and Methods #
     ##################################

@@ -40,5 +40,23 @@ var JSUtils = (function() {
     return false;
   };
 
+  self.leftRotateArray = function(array, n) {
+    n = n % array.length;
+    let firstPart = array.slice(0, n);
+    let secondPart = array.slice(n);
+    return [].concat(secondPart, firstPart);
+  };
+
+  /**
+   * Create an array containing the elements [0, ..., n-1].
+   */
+  self.range = function(n) {
+    let array = [];
+    for (let i = 0; i < n; i++) {
+      array.push(i);
+    }
+    return array;
+  };
+
   return self;
 }());

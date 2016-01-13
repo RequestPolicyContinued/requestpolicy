@@ -46,6 +46,7 @@ window.rpcontinued.overlay = (function() {
   let {DomainUtil} = importModule("lib/utils/domains");
   let {StringUtils} = importModule("lib/utils/strings");
   let {WindowUtils} = importModule("lib/utils/windows");
+  let {JSUtils} = importModule("lib/utils/javascript");
   let {Utils} = importModule("lib/utils");
   let {DOMUtils} = importModule("lib/utils/dom");
   let {C} = importModule("lib/utils/constants");
@@ -1116,11 +1117,36 @@ window.rpcontinued.overlay = (function() {
     popupElement.hidePopup();
   }
 
-  self.openPrefs = openLinkInNewTab.bind(this, "about:requestpolicy", true);
-  self.openPolicyManager = openLinkInNewTab.bind(this,
-      "about:requestpolicy?yourpolicy", true);
-  self.openHelp = openLinkInNewTab.bind(this, "https://github.com/" +
-      "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
+  function maybeOpenLinkInNewTab(url, equivalentURLs, relatedToCurrent) {
+    let possibleURLs = equivalentURLs.concat(url);
+    let tabbrowser = window.gBrowser;
+
+    let selectedTabIndex = tabbrowser.tabContainer.selectedIndex;
+    let numTabs = tabbrowser.tabs.length;
+
+    // Start iterating at the currently selected tab.
+    let indexes = JSUtils.leftRotateArray(JSUtils.range(numTabs),
+		selectedTabIndex);
+    for (let index of indexes) {
+      let currentBrowser = tabbrowser.getBrowserAtIndex(index);
+      let currentURI = currentBrowser.currentURI.spec;
+      if (JSUtils.arrayIncludes(possibleURLs, currentURI)) {
+        // The URL is already opened. Select this tab.
+        tabbrowser.selectedTab = tabbrowser.tabContainer.childNodes[index];
+        popupElement.hidePopup();
+        return;
+      }
+    }
+
+    openLinkInNewTab(url, relatedToCurrent);
+  }
+
+  self.openPrefs = maybeOpenLinkInNewTab.bind(this, "about:requestpolicy",
+      ["about:requestpolicy?basicprefs"], true);
+  self.openPolicyManager = maybeOpenLinkInNewTab.bind(this,
+      "about:requestpolicy?yourpolicy", [], true);
+  self.openHelp = maybeOpenLinkInNewTab.bind(this, "https://github.com/" +
+      "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support", []);
 
   self.clearRequestLog = function() {
     self.requestLog.clear();

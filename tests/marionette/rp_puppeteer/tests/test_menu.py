@@ -14,16 +14,24 @@ class TestMenu(RequestPolicyTestCase):
             super(RequestPolicyTestCase, self).tearDown()
 
     def test_open_close(self):
-        def test(trigger):
-            self.assertFalse(self.menu.is_open())
-            self.menu.open(trigger=trigger)
-            self.assertTrue(self.menu.is_open())
-            self.menu.close()
-            self.assertFalse(self.menu.is_open())
+        def test(trigger, test_close=True):
+            try:
+                self.assertFalse(self.menu.is_open())
+                self.menu.open(trigger=trigger)
+                self.assertTrue(self.menu.is_open())
+                if test_close:
+                    self.menu.close(trigger=trigger)
+                else:
+                    self.menu.close()
+                self.assertFalse(self.menu.is_open())
+            except:
+                print "trigger: " + trigger
+                raise
 
         test("api")
         test("button")
-        test("shortcut")
+        # The keyboard shortcut is not captured when the menu is open.
+        test("shortcut", test_close=False)
 
     def test_total_num_requests(self):
         with self.marionette.using_context("content"):

@@ -1092,6 +1092,21 @@ window.rpcontinued.overlay = (function() {
     }, 0);
   };
 
+  /**
+   * Close RequestPolicy's menu.
+   */
+  self.closeMenu = function() {
+    rpcontinued.menu.close();
+  };
+
+  self.toggleMenu = function() {
+    if ($id("rpc-popup").state === "closed") {
+      self.openMenu();
+    } else {
+      self.closeMenu();
+    }
+  };
+
   self.isToolbarButtonVisible = function() {
     return DOMUtils.isElementVisible($id("rpcontinuedToolbarButton"));
   };

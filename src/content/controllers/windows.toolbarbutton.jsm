@@ -84,7 +84,7 @@ var ToolbarButtonController = (function() {
         onCommand: function(aEvent) {
           // Bad smell
           let win = aEvent.target.ownerDocument.defaultView;
-          win.rpcontinued.overlay.openMenu();
+          win.rpcontinued.overlay.toggleMenu();
         }
       });
     }

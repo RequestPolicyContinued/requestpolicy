@@ -88,7 +88,7 @@ exports.mainTree = [
     tag: "menuitem",
     attributes: {id: "rpcontinuedContextMenuEntry",
                  label: "RequestPolicy Continued"},
-    events: {command: ["overlay", "openMenu"]}
+    events: {command: ["overlay", "toggleMenu"]}
   },
 
   {

@@ -22,25 +22,17 @@ class Menu(BaseLib):
         return int(match.group(1))
 
     def open(self, trigger="api"):
-        if callable(trigger):
-            trigger()
-        elif trigger == "button":
-            self._toolbar_button.click()
-        elif trigger == "shortcut":
-            window = Windows(lambda: self.marionette).current
-            window.send_shortcut("r", alt=True, shift=True)
-        elif trigger == "api":
-            self._ensure_popup_state("open")
-        else:
-            raise ValueError("Unknown opening method: \"{}\"".format(trigger))
-
-        Wait(self.marionette, timeout=1).until(lambda _: self.is_open())
+        if self.is_open():
+            return
+        self._toggle(trigger=trigger)
 
     def is_open(self):
         return self._popup_state == "open"
 
-    def close(self):
-        self._ensure_popup_state("closed")
+    def close(self, trigger="api"):
+        if not self.is_open():
+            return
+        self._toggle(trigger=trigger)
 
     ##################################
     # Private Properties and Methods #
@@ -57,6 +49,26 @@ class Menu(BaseLib):
     @property
     def _popup_state(self):
         return self._popup.get_attribute("state")
+
+    def _toggle(self, trigger="api"):
+        is_open = self.is_open()
+
+        if callable(trigger):
+            trigger()
+        elif trigger == "button":
+            self._toolbar_button.click()
+        elif trigger == "shortcut":
+            window = Windows(lambda: self.marionette).current
+            window.send_shortcut("r", alt=True, shift=True)
+        elif trigger == "api":
+            self._ensure_popup_state("closed" if is_open else "open")
+        else:
+            raise ValueError("Unknown trigger method: \"{}\"".format(trigger))
+
+        (
+            Wait(self.marionette, timeout=1)
+            .until(lambda _: self.is_open() is not is_open)
+        )
 
     def _ensure_popup_state(self, state):
         assert state in ["open", "closed"]

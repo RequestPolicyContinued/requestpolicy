@@ -144,7 +144,11 @@
         });
 
     // call updateDisplay() every time a preference gets changed
-    WinEnv.prefObs.addListener("", updateDisplay);
+    WinEnv.prefObs.addListeners([
+      "",
+      "root/ network.prefetch-next",
+      "root/ network.dns.disablePrefetch",
+    ], updateDisplay);
   };
 
 }());

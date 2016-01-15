@@ -9,11 +9,10 @@
 *.orig
 *.pyc
 
-gecko.log
-
 # build and dist directories in the root folder
 /build/
 /dist/
+/logs/
 
 /tests/mozmill/data
 /tests/mozmill/mozmill-tests

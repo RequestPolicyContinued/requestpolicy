@@ -26,10 +26,11 @@ off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 source_dir     := src
 build_dir_root := build
 dist_dir       := dist
+logs_dir       := logs
 
 # create the dist directory
-$(dist_dir):
-	@mkdir -p $(dist_dir)
+$(dist_dir) $(logs_dir):
+	@mkdir -p $@
 
 #-------------------------------------------------------------------------------
 # other
@@ -393,10 +394,19 @@ check test: marionette
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini
 
+marionette_logging := --gecko-log=$(logs_dir)/marionette.gecko.log
+marionette_logging += --log-html=$(logs_dir)/marionette.html
+marionette_logging += --log-tbpl=$(logs_dir)/marionette.tbpl.log
+#marionette_logging += --log-raw=$(logs_dir)/marionette.raw.log
+#marionette_logging += --log-xunit=$(logs_dir)/marionette.xunit.xml
+#marionette_logging += --log-mach=$(logs_dir)/marionette.mach.log
+#marionette_logging += --log-unittest=$(logs_dir)/marionette.unittest.log
+
 marionette_prefs :=
 
 .PHONY: marionette
 marionette: venv \
+		$(logs_dir) \
 		unit-testing-xpi \
 		dev-helper-xpi \
 		dummy-xpi \
@@ -408,7 +418,7 @@ marionette: venv \
 	source .venv/bin/activate ; \
 	export PYTHONPATH=tests/marionette/ ; \
 	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
-	firefox-ui-functional --binary=$(app_binary) --profile=$$profile_dir $(marionette_prefs) $(marionette_tests) ; \
+	firefox-ui-functional --binary=$(app_binary) --profile=$$profile_dir $(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \
 	exit $$exit_status \
@@ -433,7 +443,9 @@ jscs:
 # Clean all temporary files and directories created by 'make'.
 .PHONY: clean
 clean:
-	@rm -rf $(dist_dir)/*.xpi $(build_dir_root)/*
+	@rm -rf $(dist_dir)/*.xpi
+	@rm -rf $(build_dir_root)/*
+	@rm -rf $(logs_dir)/*
 	@echo "Cleanup is done."
 
 # Can force a target to be executed every time.

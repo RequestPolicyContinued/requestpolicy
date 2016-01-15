@@ -2,11 +2,11 @@
 <!ENTITY rp.requestLog.destination "Destination">
 <!ENTITY rp.requestLog.blocked "Bloqué">
 <!ENTITY rp.requestLog.time "Durée">
-<!ENTITY rp.requestLog.copyOriginToClipboard "Copier l'original dans le presse-papiers">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Copier l'origine dans le presse-papiers">
 <!ENTITY rp.requestLog.copyDestinationToClipboard "Copier la destination dans le presse-papiers">
-<!ENTITY rp.requestLog.openOriginInNewTab "Ouvrir l'original dans un nouvel onglet">
+<!ENTITY rp.requestLog.openOriginInNewTab "Ouvrir l'origine dans un nouvel onglet">
 <!ENTITY rp.requestLog.openDestinationInNewTab "Ouvrir la destination dans un nouvel onglet">
-<!ENTITY rp.requestLog.filterRequests "Filter Requests (RegEx)">
+<!ENTITY rp.requestLog.filterRequests "Filtrer les requêtes (via des expressions régulières)">
 <!ENTITY rp.requestLog.filterRequests.accesskey "F">
-<!ENTITY rp.requestLog.clearFilter "Clear Filter">
+<!ENTITY rp.requestLog.clearFilter "Supprimer les filtres">
 <!ENTITY rp.requestLog.clearFilter.accesskey "C">

@@ -106,12 +106,12 @@ function LoadAndUnloadListener(callback) {
 var Windows = (function() {
   let self = {};
 
-  self.forEachOpenWindow = function(aCallback) {
+  self.forEachOpenWindow = function(aCallback, aThisArg=null) {
     // Apply a function to all open browser windows
     let windows = Services.wm.getEnumerator("navigator:browser");
     while (windows.hasMoreElements()) {
       let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-      aCallback.call(null, window);
+      aCallback.call(aThisArg, window);
     }
   };
 

@@ -127,7 +127,15 @@ KeyboardShortcut.prototype._onPress = function(event) {
 
 KeyboardShortcut.prototype._onPrefChange = function() {
   this._determineElementAttributes();
-  Windows.forEachOpenWindow(this._setElementAttributes.bind(this));
+  Windows.forEachOpenWindow(function(window) {
+    this._setElementAttributes(window);
+
+    // Each time one of the key's attributes changes it's necessary to
+    // newly append the keyset to it's parent. Otherwise the
+    // keyboard shortcut doesn't get updated!
+    let keyset = window.document.getElementById("rpcontinuedKeyset");
+    keyset.parentNode.appendChild(keyset);
+  }, this);
 };
 
 //------------------------------------------------------------------------------
@@ -148,9 +156,6 @@ KeyboardShortcut.prototype._createElement = function(window) {
 
 KeyboardShortcut.prototype._setElementAttributes = function(window) {
   let element = window.document.getElementById(this._elementID);
-
-  // disable temporarily
-  element.setAttribute("disabled", "true");
 
   element.setAttribute("modifiers", this._elementAttributes.modifiers);
   element.setAttribute("key", this._elementAttributes.key);

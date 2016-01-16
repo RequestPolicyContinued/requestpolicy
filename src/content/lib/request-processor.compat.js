@@ -308,6 +308,27 @@ RequestProcessor = (function(self) {
       ]);
     }
 
+    // Firefox Hello
+    // FIXME: Along with #742, convert these rules into the following ones:
+    //   - ALLOW "about:loopconversation" -> "https://hlg.tokbox.com"
+    //   - ALLOW "about:loopconversation" -> "https://anvil.opentok.com"
+    //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://hlg.tokbox.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://anvil.opentok.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "wss://",
+      appInfo.vendor
+    ]);
+
     // Flock
     if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,

@@ -7,6 +7,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * improvements
   * Open MyWOT information in a new tab when the middle mouse button
     is clicked. (#456)
+  * Add settings to disable "speculative pre-connections". Disable by
+    default (#628, 7244262)
   * Importing old rules: detect if a wildcard needs to be added
     in front of a host or not, based on the host's base domain. (#730)
   * The menu can be opened using the context menu. (#353, 88c26b5)
@@ -18,6 +20,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
   * The menu is positioned more intelligently (#690, d35dc9e)
   * The default keyboard shortcut to open the menu is now "Alt Shift R". (#612)
   * Experimental feature: it's possible to free some memory (#673)
+* updated translation (fr)
 * bugfixes
   * Importing old rules: Handle URIs without host correctly (#354)
   * Automatic import of old rules: import if and only if both
@@ -38,7 +41,9 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       some cases. (#722, 41366d3)
   * Add-on compatibility: KeeFox (#427, a38cc57)
   * Add-on compatibility: Enpass (#732, 566aa71)
-  * Browser compatibility: Firefox Accounts (#716)
+  * Browser compatibility:
+    * Firefox Accounts (#716)
+    * Firefox Hello (#671, #715)
 
 
 #### Version 1.0.beta10.2 (bugfix)

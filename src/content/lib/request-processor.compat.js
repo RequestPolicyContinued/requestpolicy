@@ -308,12 +308,11 @@ RequestProcessor = (function(self) {
       ]);
     }
 
-    // Firefox 34 added hello (talk) service
-    compatibilityRules.push([
-      "about:loopconversation",
-      "wss://loop.services.mozilla.com/websocket",
-      appInfo.vendor
-    ]);
+    // Firefox Hello
+    // FIXME: Along with #742, convert these rules into the following ones:
+    //   - ALLOW "about:loopconversation" -> "https://hlg.tokbox.com"
+    //   - ALLOW "about:loopconversation" -> "https://anvil.opentok.com"
+    //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
     compatibilityRules.push([
       "about:loopconversation",
       "https://hlg.tokbox.com/",

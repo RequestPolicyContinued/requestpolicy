@@ -1,4 +1,5 @@
 /* global pref */
+// jscs:disable maximumLineLength
 
 pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);
@@ -46,3 +47,5 @@ pref("extensions.requestpolicy.unitTesting.loggingErrors.counter", 0);
 //pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
 //pref("extensions.requestpolicy.statusbarIcon", "standard");
 //pref("extensions.requestpolicy.initialSetupDialogShown", false);
+
+// jscs:enable maximumLineLength

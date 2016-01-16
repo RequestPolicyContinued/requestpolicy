@@ -57,7 +57,7 @@ function logSevereError(aMessage, aError) {
   // #ifdef UNIT_TESTING
   Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
   // #endif
-  Cu.reportError(e);
+  Cu.reportError(aError);
 }
 
 //==============================================================================

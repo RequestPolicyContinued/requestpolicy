@@ -139,7 +139,8 @@
         });
 
     // Speculative pre-connections.
-    elManager.addListener($id("pref-speculativePreConnections"), "change", function(event) {
+    elManager.addListener($id("pref-speculativePreConnections"), "change",
+        function(event) {
       Prefs.set("root/ network.http.speculative-parallel-limit",
           event.target.checked ? 6 : 0);
       Services.prefs.savePrefFile(null);

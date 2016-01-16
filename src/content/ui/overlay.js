@@ -516,7 +516,8 @@ window.rpcontinued.overlay = (function() {
 
       let notificationElem = notificationBox.appendNotification(
           notificationLabel, notificationValue,
-          "chrome://browser/skin/Info.png", priority, buttons);
+          "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
+          priority, buttons);
 
       // Let the notification persist at least 300ms. This is needed in the
       // following scenario:

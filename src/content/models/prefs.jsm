@@ -72,7 +72,8 @@ var Prefs = (function() {
       "startWithAllowAllEnabled": "BoolPref",
       "welcomeWindowShown": "BoolPref",
       // #ifdef UNIT_TESTING
-      "unitTesting.errorCount": "IntPref",
+      "unitTesting.consoleErrors.counter": "IntPref",
+      "unitTesting.loggingErrors.counter": "IntPref",
       // #endif
     }),
 

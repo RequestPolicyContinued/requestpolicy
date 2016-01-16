@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RPC Dev Helper - A helper add-on for RequestPolicy development.
- * Copyright (c) 2015 Martin Kimmerle
+ * Copyright (c) 2016 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,55 +22,18 @@
 
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-this.EXPORTED_SYMBOLS = ["ConsoleObserver"];
+this.EXPORTED_SYMBOLS = ["LoggingObserver"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 //==============================================================================
-// utilities
-//==============================================================================
-
-var regEx = /(Error|Warning|Exception)/i;
-
-function isRPException(aMessage) {
-  if (aMessage.indexOf("chrome://rpcontinued") === -1 ||
-      regEx.test(aMessage) === false) {
-    return false;
-  }
-
-  if (aMessage.indexOf("jquery.min.js") !== -1) {
-    // ignore logs caused by jQuery
-    return false;
-  }
-
-  return true;
-}
-
-const knownBugs = [
-  // issue #597
-  `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`,
-  `[JavaScript Warning: "Expected end of value but found '10'.  Error in parsing value for 'font-family'.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
-];
-
-function isKnownBug(aMessage) {
-  for (bugMsg of knownBugs) {
-    if (aMessage.startsWith(bugMsg)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-//==============================================================================
-// ConsoleObserver
+// LoggingObserver
 //==============================================================================
 
 /**
- * ConsoleObserver observes all messages sent to the
- * Browser Console and detects errors caused by
- * RequestPolicy.
+ * LoggingObserver observes all logs sent by RP's Logger module.
  */
-var ConsoleObserver = (function () {
+var LoggingObserver = (function () {
   let self = {};
 
   let messages = [];
@@ -98,21 +61,23 @@ var ConsoleObserver = (function () {
   self.startup = function () {
     prefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
         QueryInterface(Ci.nsIPrefBranch2);
-    Services.console.registerListener(self);
+    Services.obs.addObserver(self, "requestpolicy-log-error", false);
   };
 
   self.shutdown = function () {
-    Services.console.unregisterListener(self);
+    Services.obs.removeObserver(self, "requestpolicy-log-error");
     prefBranch = undefined;
   };
 
-  self.observe = function (aSubject) {
-    var msg = aSubject.message;
+  self.observe = function (aSubject, aTopic, aData) {
+    switch (aTopic) {
+      case "requestpolicy-log-error":
+        setNumErrors(self.getNumErrors() + 1);
+        messages.push(aData);
+        break;
 
-    if (isRPException(msg) && !isKnownBug(msg)) {
-      setNumErrors(self.getNumErrors() + 1);
-      messages.push(msg);
-      dump("[RequestPolicy] [Browser Console] " + msg + "\n");
+      default:
+        break;
     }
   };
 

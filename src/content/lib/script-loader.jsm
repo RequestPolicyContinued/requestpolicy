@@ -35,6 +35,7 @@ this.EXPORTED_SYMBOLS = ["ScriptLoader"];
 //         when the module to be imported wants to import ScriptLoader.
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 //==============================================================================
 // utilities
@@ -49,9 +50,14 @@ function getModuleURI(id) {
 /**
  * If the ScriptLoader catches an Exception, it will be a severe error.
  */
-function logSevereError(msg, e) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
-       (e.stack ? ", stack was: " + e.stack : "") + "\n");
+function logSevereError(aMessage, aError) {
+  let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
+       (aError.stack ? ", stack was: " + aError.stack : "");
+  dump(msg + "\n");
+  // #ifdef UNIT_TESTING
+  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
+  // #endif
+  Cu.reportError(e);
 }
 
 //==============================================================================

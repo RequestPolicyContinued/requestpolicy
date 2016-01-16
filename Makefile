@@ -418,7 +418,9 @@ marionette: venv \
 	source .venv/bin/activate ; \
 	export PYTHONPATH=tests/marionette/ ; \
 	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
-	firefox-ui-functional --binary=$(app_binary) --profile=$$profile_dir $(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
+	./tests/marionette/rp_ui_harness/runtests.py \
+		--binary=$(app_binary) --profile=$$profile_dir \
+		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \
 	exit $$exit_status \

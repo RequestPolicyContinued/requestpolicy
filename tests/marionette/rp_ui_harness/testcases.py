@@ -49,8 +49,9 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
         try:
             n_rules = self.rules.count_rules()
             self.assertEqual(n_rules, 0,
-                             "A test must not leak rules. Rule count is {}, "
-                             "but should be zero.".format(n_rules))
+                             ("A test must not leak rules. Rule count is {}, "
+                              "but should be zero."
+                              ).format(n_rules))
         finally:
             self.rules.remove_all()
 
@@ -59,17 +60,16 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
         n_rules = 0 if rules is None else len(rules)
         if n_rules != 0:
             self.rules.save()
-            self.fail("A test must not leak rules in the rules file. "
-                      "Rule count is {} but should be zero.".format(n_rules))
+            self.fail(("A test must not leak rules in the rules file. "
+                       "Rule count is {} but should be zero."
+                       ).format(n_rules))
 
     def _check_and_reset_error_counts(self):
         try:
             self.assertEqual(self.logging_error_detect.n_errors, 0,
                              "There should be no logging errers.")
             self.assertEqual(self.console_error_detect.n_errors, 0,
-                             "There should be no console errors. "
-                             "Messages were: {}"
-                             .format(self.console_error_detect.messages))
+                             "There should be no console errors.")
         finally:
             self.logging_error_detect.reset()
             self.console_error_detect.reset()

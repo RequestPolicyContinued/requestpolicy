@@ -3,30 +3,29 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_puppeteer.base import BaseLib
-from firefox_puppeteer.api.prefs import Preferences
-
-ERROR_COUNT_PREF = "extensions.requestpolicy.unitTesting.errorCount"
 
 
 class ErrorDetection(BaseLib):
+
     def _notify_observers(self, topic, data):
-        with self.marionette.using_context("chrome"):
-            self.marionette.execute_script(
-                """
-                Components.utils.import("resource://gre/modules/Services.jsm");
-                Services.obs.notifyObservers(null, "{}", "{}");
-                """.format(topic, data))
+        self.marionette.execute_script("""
+          Components.utils.import("resource://gre/modules/Services.jsm");
+          Services.obs.notifyObservers(null, "{}", "{}");
+        """.format(topic, data))
+
+    def _call(self):
+        raise NotImplementedError
 
     @property
     def n_errors(self):
-        raise NotImplementedError
+        return self._call("getNumErrors")
 
     @property
     def messages(self):
-        raise NotImplementedError
+        return self._call("getMessages")
 
     def reset(self):
-        raise NotImplementedError
+        self._call("reset")
 
     def trigger_error(self):
         raise NotImplementedError
@@ -34,17 +33,13 @@ class ErrorDetection(BaseLib):
 
 class LoggingErrorDetection(ErrorDetection):
 
-    def __init__(self, marionette_getter):
-        BaseLib.__init__(self, marionette_getter)
-
-        self.prefs = Preferences(marionette_getter)
-
-    @property
-    def n_errors(self):
-        return self.prefs.get_pref(ERROR_COUNT_PREF)
-
-    def reset(self):
-        self.prefs.set_pref(ERROR_COUNT_PREF, 0)
+    def _call(self, fn_name):
+        return self.marionette.execute_script("""
+          let fnName = arguments[0];
+          let {LoggingObserver} = Components.utils.import(
+              "chrome://rpc-dev-helper/content/logging-observer.jsm", {});
+          return LoggingObserver[fnName]();
+        """, script_args=[fn_name])
 
     def trigger_error(self, error_type, msg="[Marionette unit test]"):
         self._notify_observers("requestpolicy-trigger-logging-error",
@@ -53,35 +48,13 @@ class LoggingErrorDetection(ErrorDetection):
 
 class ConsoleErrorDetection(ErrorDetection):
 
-    @property
-    def n_errors(self):
-        with self.marionette.using_context("chrome"):
-            return self.marionette.execute_script(
-                """
-                let scope = {};
-                Components.utils.import("chrome://rpc-dev-helper/" +
-                    "content/console-observer.jsm", scope);
-                return scope.ConsoleObserver.getNumErrors();
-                """)
-
-    @property
-    def messages(self):
+    def _call(self, fn_name):
         return self.marionette.execute_script("""
-          let scope = {};
-          Components.utils.import("chrome://rpc-dev-helper/" +
-              "content/console-observer.jsm", scope);
-          return scope.ConsoleObserver.getMessages();
-        """)
-
-    def reset(self):
-        with self.marionette.using_context("chrome"):
-            return self.marionette.execute_script(
-                """
-                let scope = {};
-                Components.utils.import("chrome://rpc-dev-helper/content/" +
-                    "console-observer.jsm", scope);
-                scope.ConsoleObserver.reset();
-                """)
+          let fnName = arguments[0];
+          let {ConsoleObserver} = Components.utils.import(
+              "chrome://rpc-dev-helper/content/console-observer.jsm", {});
+          return ConsoleObserver[fnName]();
+        """, script_args=[fn_name])
 
     def trigger_error(self, error_type):
         self._notify_observers("requestpolicy-trigger-console-error",

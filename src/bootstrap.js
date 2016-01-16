@@ -27,6 +27,8 @@ const {utils: Cu} = Components;
 /* exported startup, shutdown, install, uninstall */
 /* global dump */
 
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
 //==============================================================================
 // utilities
 //==============================================================================
@@ -37,9 +39,13 @@ const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
  * If any Exception gets into bootstrap.js, it will be a severe error.
  * The Logger can't be used, as it might not be available.
  */
-function logSevereError(msg, e) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
-       (e.stack ? ", stack was: " + e.stack : "") + "\n");
+function logSevereError(aMessage, aError) {
+  let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
+       (aError.stack ? ", stack was: " + aError.stack : "");
+  dump(msg + "\n");
+  // #ifdef UNIT_TESTING
+  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
+  // #endif
   Cu.reportError(e);
 }
 

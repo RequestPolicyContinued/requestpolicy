@@ -136,12 +136,8 @@ var Logger = (function() {
     let shouldLog = enabled && aLevel >= level && types & aType;
 
     // #ifdef UNIT_TESTING
-    if (aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE) {
-      // increment the error count
-      let errorCount = Prefs.get("unitTesting.errorCount");
-      Prefs.set("unitTesting.errorCount", ++errorCount);
-      Prefs.save();
-
+    let isError = aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE;
+    if (isError) {
       // log even if logging is disabled
       shouldLog = true;
     }
@@ -153,8 +149,14 @@ var Logger = (function() {
 
       let stack = aError && aError.stack ?
                   ", stack was:\n" + aError.stack : "";
-      self.printFunc("[RequestPolicy] [" + levelName + "] " +
-          "[" + typeName + "] " + aMessage + stack + "\n");
+      let msg = "[RequestPolicy] [" + levelName + "] " +
+          "[" + typeName + "] " + aMessage + stack;
+      self.printFunc(msg + "\n");
+      // #ifdef UNIT_TESTING
+      if (isError) {
+        Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
+      }
+      // #endif
     }
   }
 

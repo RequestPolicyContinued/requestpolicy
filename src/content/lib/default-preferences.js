@@ -36,7 +36,8 @@ pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
 
 // #ifdef UNIT_TESTING
-pref("extensions.requestpolicy.unitTesting.errorCount", 0);
+pref("extensions.requestpolicy.unitTesting.consoleErrors.counter", 0);
+pref("extensions.requestpolicy.unitTesting.loggingErrors.counter", 0);
 // #endif
 
 // Old prefs that are no longer used.

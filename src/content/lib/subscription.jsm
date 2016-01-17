@@ -68,9 +68,7 @@ const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
 function setTimeout(func, delay) {
   var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   var event = {
-    notify: function() {
-      func();
-    }
+    notify: () => func()
   };
   timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
   return timer;
@@ -184,7 +182,7 @@ UserSubscriptions.prototype = {
       for (let i in updatingLists) {
         return; // What's that??
       }
-      setTimeout(function() { callback(updateResults); }, 0);
+      setTimeout(() => callback(updateResults), 0);
     }
 
     var listCount = 0;
@@ -253,7 +251,7 @@ UserSubscriptions.prototype = {
 
     if (listCount === 0) {
       dprint("No lists to update.");
-      setTimeout(function() { callback(updateResults); }, 0);
+      setTimeout(() => callback(updateResults), 0);
     }
   }
 };
@@ -299,13 +297,13 @@ SubscriptionList.prototype = {
         self._data = JSON.parse(req.responseText);
         // Maybe we don't need to write this to a file since we never read it
         // back again (we always grab new metadata when updating).
-        setTimeout(function() { successCallback(self); }, 0);
+        setTimeout(() => successCallback(self), 0);
       } catch (e) {
-        setTimeout(function() { errorCallback(self, e.toString()); }, 0);
+        setTimeout(() => errorCallback(self, e.toString()), 0);
       }
     };
     req.onerror = function(event) {
-      setTimeout(function() { errorCallback(self, req.statusText); }, 0);
+      setTimeout(() => errorCallback(self, req.statusText), 0);
     };
     req.open("GET", this._url);
     req.send(null);
@@ -327,15 +325,13 @@ SubscriptionList.prototype = {
         } else {
           dprint("No update needed for " + this._name + " " + subName);
           let curSub = sub;
-          setTimeout(function() {
+          setTimeout(() => {
             successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
           }, 0);
         }
       } catch (e) {
         let curSub = sub;
-        setTimeout(function() {
-          errorCallback(curSub, e.toString());
-        }, 0);
+        setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
   },
@@ -399,9 +395,7 @@ Subscription.prototype = {
         self._rawData = req.responseText;
         if (!self._rawData) {
           let error = "Empty response when requesting subscription file";
-          setTimeout(function() {
-            errorCallback(self, error);
-          }, 0);
+          setTimeout(() => errorCallback(self, error), 0);
           return;
         }
         self._data = JSON.parse(req.responseText);
@@ -413,16 +407,12 @@ Subscription.prototype = {
           serial = self._data.metadata.serial;
         } catch (e) {
           let error = "Ruleset has no serial number";
-          setTimeout(function() {
-            errorCallback(self, error);
-          }, 0);
+          setTimeout(() => errorCallback(self, error), 0);
           return;
         }
         if (typeof serial !== "number" || serial % 1 !== 0) {
           let error = "Ruleset has invalid serial number: " + serial;
-          setTimeout(function() {
-            errorCallback(self, error);
-          }, 0);
+          setTimeout(() => errorCallback(self, error), 0);
           return;
         }
         // The rest of the sanity checking is done by RawRuleset().
@@ -431,7 +421,7 @@ Subscription.prototype = {
           RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + ".json",
                 self._list);
         } catch (e) {
-          setTimeout(function() { errorCallback(self, e.toString()); }, 0);
+          setTimeout(() => errorCallback(self, e.toString()), 0);
           return;
         }
         var subInfo = {};
@@ -439,17 +429,15 @@ Subscription.prototype = {
         subInfo[self._list][self._name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
             JSON.stringify(subInfo));
-        setTimeout(function() {
+        setTimeout(() => {
           successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);
       } catch (e) {
-        setTimeout(function() { errorCallback(self, e.toString()); }, 0);
+        setTimeout(() => errorCallback(self, e.toString()), 0);
       }
     };
     req.onerror = function(event) {
-      setTimeout(function() {
-        errorCallback(self, req.statusText);
-      }, 0);
+      setTimeout(() => errorCallback(self, req.statusText), 0);
     };
     req.open("GET", this._url);
     req.send(null);

@@ -48,7 +48,7 @@ function test_1() {
   jsonData = JSON.stringify(readRuleset);
   var readJsonObj = JSON.parse(jsonData);
 
-  do_check_true(objectsAreEqual(readJsonObj, exampleJsonObj));
+  deepEqual(readJsonObj, exampleJsonObj);
 
   deleteFileFromProfile(filename);
 }

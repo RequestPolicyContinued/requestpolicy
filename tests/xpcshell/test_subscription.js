@@ -33,5 +33,5 @@ function test_1_completed(updateResults) {
   do_check_true(updateResults['official']['embedded']);
   do_check_true(false);
   do_test_finished();
-  //do_check_true(objectsAreEqual(readJsonObj, exampleJsonObj));
+  //deepEqual(readJsonObj, exampleJsonObj);
 }

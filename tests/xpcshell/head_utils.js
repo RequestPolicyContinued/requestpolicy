@@ -1,3 +1,8 @@
+/* exported
+    copyRulesetFileToProfile,
+    deleteFileFromProfile,
+*/
+
 Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm");
 
 function copyRulesetFileToProfile(filename, destFilename) {

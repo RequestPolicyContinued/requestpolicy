@@ -1,0 +1,10 @@
+{
+  "preset": "google",
+  "esnext": true,
+
+  "validateQuoteMarks": "\"",
+  "requireParenthesesAroundIIFE": true,
+
+  "requireCamelCaseOrUpperCaseIdentifiers": null,
+  "disallowMultipleLineBreaks": null
+}

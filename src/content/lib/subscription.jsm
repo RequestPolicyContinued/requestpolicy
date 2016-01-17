@@ -174,18 +174,19 @@ UserSubscriptions.prototype = {
         updateResults[listName][subName] = result;
         let list = updatingLists[listName];
         delete list[subName];
-        for (let i in list) {
+        for (let i in list) { // jshint ignore:line
           return; // What's that??
         }
       }
       delete updatingLists[listName];
-      for (let i in updatingLists) {
+      for (let i in updatingLists) { // jshint ignore:line
         return; // What's that??
       }
       setTimeout(() => callback(updateResults), 0);
     }
 
     var listCount = 0;
+    /* jshint -W083 */ // Don't make functions within a loop.
     for (var listName in serials) {
       if (!this._lists[listName] || !this._lists[listName].subscriptions) {
         dprint("Skipping update of unsubscribed list: " + listName);
@@ -248,6 +249,7 @@ UserSubscriptions.prototype = {
       dprint("Will update list: " + listName);
       list.updateMetadata(metadataSuccess, metadataError);
     }
+    /* jshint +W083 */ // Don't make functions within a loop.
 
     if (listCount === 0) {
       dprint("No lists to update.");
@@ -310,6 +312,7 @@ SubscriptionList.prototype = {
   },
 
   updateSubscriptions: function(userSubs, successCallback, errorCallback) {
+    /* jshint -W083 */ // Don't make functions within a loop.
     for (let subName in userSubs) {
       let sub;
       try {
@@ -334,6 +337,7 @@ SubscriptionList.prototype = {
         setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
+    /* jshint +W083 */ // Don't make functions within a loop.
   },
 
   // getSubscriptionNames : function () {

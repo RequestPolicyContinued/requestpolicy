@@ -1,4 +1,4 @@
-
+/* exported run_test */
 Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm");
 
 function run_test() {

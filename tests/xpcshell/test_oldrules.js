@@ -1,9 +1,5 @@
 /* exported run_test */
-/* global Cc, Ci, Cu, equal, deepEqual */
-
-/* global OldRules, OldRulesParseError */
 Cu.import("chrome://rpcontinued/content/lib/old-rules.jsm");
-/* global Prefs */
 Cu.import("chrome://rpcontinued/content/models/prefs.jsm");
 
 
@@ -98,7 +94,7 @@ function test_0() {
     "allowedOrigins": "mozilla.org",
     "allowedDestinations": "mozilla.net",
     "allowedOriginsToDestinations": "mozilla.org|mozilla.net"
-  }, function () {
+  }, function() {
     testGetOldRulesAsNewRules([undefined, undefined, undefined], [
       {o: {h: "*.mozilla.org"}},
       {d: {h: "*.mozilla.net"}},
@@ -193,7 +189,7 @@ function usingOldRulePrefs(aPrefs, aFunction) {
   }
 
   // Set the prefs.
-  forEachPrefName(function (prefName) {
+  forEachPrefName(function(prefName) {
     let prefValue = aPrefs[prefName];
     setOldRulePref(prefName, prefValue);
   });
@@ -201,7 +197,7 @@ function usingOldRulePrefs(aPrefs, aFunction) {
   aFunction.call(null);
 
   // Clear the prefs.
-  forEachPrefName(function (prefName) {
+  forEachPrefName(function(prefName) {
     Prefs.reset(prefName);
   });
 }

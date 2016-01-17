@@ -914,6 +914,8 @@ Ruleset.prototype = {
    *
    * @param {string} host The host to get matching entries for.
    */
+  /* jshint ignore:start */
+      // A yield statement shall be within a generator function
   getHostMatches: function(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
@@ -955,6 +957,7 @@ Ruleset.prototype = {
       }
     }
   },
+  /* jshint ignore:end */
 
   /**
    * @param {nsIURI} origin

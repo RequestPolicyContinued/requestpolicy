@@ -1,3 +1,4 @@
+/* exported run_test */
 Cu.import("chrome://rpcontinued/content/lib/utils/xul.jsm");
 
 function run_test() {

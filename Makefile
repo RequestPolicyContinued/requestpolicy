@@ -430,12 +430,15 @@ marionette: venv \
 # static code analysis
 #-------------------------------------------------------------------------------
 
-.PHONY: static-analysis jshint
+.PHONY: static-analysis jshint jscs
 static-analysis: jshint jscs
 jshint:
 	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
+	jshint tests/xpcshell/
 jscs:
-	jscs src/
+	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
+	cd src/; jscs .
+	cd tests/xpcshell/; jscs .
 
 
 #===============================================================================

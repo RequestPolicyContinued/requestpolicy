@@ -21,7 +21,7 @@
  */
 
 /* global Components */
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
 /* exported CustomUri */
 this.EXPORTED_SYMBOLS = ["CustomUri"];
@@ -33,7 +33,7 @@ let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 // CustomUri
 //==============================================================================
 
-var CustomUri = (function () {
+var CustomUri = (function() {
   let self = {};
 
   const DESTINATION_URI = "http://www.maindomain.test/destination.html";
@@ -48,15 +48,14 @@ var CustomUri = (function () {
                        Ci.nsIProtocolHandler.URI_NOAUTH |
                        Ci.nsIProtocolHandler.URI_LOADABLE_BY_ANYONE;
 
-
-  self.newURI = function (aSpec, aOriginCharset, aBaseURI) {
+  self.newURI = function(aSpec, aOriginCharset, aBaseURI) {
     var uri = Cc["@mozilla.org/network/simple-uri;1"]
         .createInstance(Ci.nsIURI);
     uri.spec = aSpec;
     return uri;
   };
 
-  self.newChannel = function (aURI) {
+  self.newChannel = function(aURI) {
     var path = aURI.path;
     var uri = Services.io.newURI(DESTINATION_URI + "?" + path, null, null);
     var channel = Services.io.newChannelFromURI(uri, null)
@@ -68,7 +67,7 @@ var CustomUri = (function () {
   // nsIFactory interface implementation
   //----------------------------------------------------------------------------
 
-  self.createInstance = function (outer, iid) {
+  self.createInstance = function(outer, iid) {
     if (outer) {
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
@@ -77,7 +76,6 @@ var CustomUri = (function () {
 
   self.startup = registerFactory;
   self.shutdown = unregisterFactory;
-
 
   function registerFactory() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)

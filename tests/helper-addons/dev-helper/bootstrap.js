@@ -20,27 +20,49 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* exported startup, shutdown, install, uninstall */
 
+/* global Components */
+const {utils: Cu} = Components;
+
+//==============================================================================
+// utilities
+//==============================================================================
+
+function getModules() {
+  return [
+    {
+      uri: "chrome://rpc-dev-helper/content/console-observer.jsm",
+      name: "ConsoleObserver"
+    }, {
+      uri: "chrome://rpc-dev-helper/content/logging-observer.jsm",
+      name: "LoggingObserver"
+    }, {
+      uri: "chrome://rpc-dev-helper/content/rpc-uri.jsm",
+      name: "CustomUri"
+    }
+  ];
+}
+
+function callBootstrapFn(uri, moduleName, fnName) {
+  Cu.import(uri, {})[moduleName][fnName]();
+}
+
+//==============================================================================
+// bootstrap functions
+//==============================================================================
 
 function startup(data, reason) {
-  Cu.import("chrome://rpc-dev-helper/content/console-observer.jsm");
-  ConsoleObserver.startup();
-  Cu.import("chrome://rpc-dev-helper/content/logging-observer.jsm");
-  LoggingObserver.startup();
-  Cu.import("chrome://rpc-dev-helper/content/rpc-uri.jsm");
-  CustomUri.startup();
+  for (let {uri, name} of getModules()) {
+    callBootstrapFn(uri, name, "startup");
+  }
 }
 
 function shutdown(data, reason) {
-  CustomUri.shutdown();
-  Cu.unload("chrome://rpc-dev-helper/content/rpc-uri.jsm");
-  LoggingObserver.shutdown();
-  Cu.unload("chrome://rpc-dev-helper/content/logging-observer.jsm");
-  ConsoleObserver.shutdown();
-  Cu.unload("chrome://rpc-dev-helper/content/console-observer.jsm");
+  for (let {uri, name} of getModules().reverse()) {
+    callBootstrapFn(uri, name, "shutdown");
+    Cu.unload(uri);
+  }
 }
 
 function install(data, reason) {

@@ -20,9 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
+/* exported ConsoleObserver */
 this.EXPORTED_SYMBOLS = ["ConsoleObserver"];
+
+/* global dump */
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -46,14 +50,16 @@ function isRPException(aMessage) {
   return true;
 }
 
+// jscs:disable maximumLineLength
 const knownBugs = [
   // issue #597
   `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`,
   `[JavaScript Warning: "Expected end of value but found '10'.  Error in parsing value for 'font-family'.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
 ];
+// jscs:enable maximumLineLength
 
 function isKnownBug(aMessage) {
-  for (bugMsg of knownBugs) {
+  for (let bugMsg of knownBugs) {
     if (aMessage.startsWith(bugMsg)) {
       return true;
     }
@@ -70,43 +76,43 @@ function isKnownBug(aMessage) {
  * Browser Console and detects errors caused by
  * RequestPolicy.
  */
-var ConsoleObserver = (function () {
+var ConsoleObserver = (function() {
   let self = {};
 
   let messages = [];
 
   let prefBranch;
 
-  self.getNumErrors = function () {
+  self.getNumErrors = function() {
     return prefBranch.getIntPref("unitTesting.loggingErrors.counter");
   };
 
-  self.getMessages = function () {
+  self.getMessages = function() {
     return messages;
   };
 
   function setNumErrors(aN) {
     prefBranch.setIntPref("unitTesting.loggingErrors.counter", aN);
     Services.prefs.savePrefFile(null);
-  };
+  }
 
-  self.reset = function () {
+  self.reset = function() {
     setNumErrors(0);
     messages = [];
   };
 
-  self.startup = function () {
+  self.startup = function() {
     prefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
         QueryInterface(Ci.nsIPrefBranch2);
     Services.console.registerListener(self);
   };
 
-  self.shutdown = function () {
+  self.shutdown = function() {
     Services.console.unregisterListener(self);
     prefBranch = undefined;
   };
 
-  self.observe = function (aSubject) {
+  self.observe = function(aSubject) {
     var msg = aSubject.message;
 
     if (isRPException(msg) && !isKnownBug(msg)) {

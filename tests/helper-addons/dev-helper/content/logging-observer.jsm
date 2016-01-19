@@ -20,8 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
+/* exported LoggingObserver */
 this.EXPORTED_SYMBOLS = ["LoggingObserver"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
@@ -33,43 +35,43 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 /**
  * LoggingObserver observes all logs sent by RP's Logger module.
  */
-var LoggingObserver = (function () {
+var LoggingObserver = (function() {
   let self = {};
 
   let messages = [];
 
   let prefBranch;
 
-  self.getNumErrors = function () {
+  self.getNumErrors = function() {
     return prefBranch.getIntPref("unitTesting.loggingErrors.counter");
   };
 
-  self.getMessages = function () {
+  self.getMessages = function() {
     return messages;
   };
 
   function setNumErrors(aN) {
     prefBranch.setIntPref("unitTesting.loggingErrors.counter", aN);
     Services.prefs.savePrefFile(null);
-  };
+  }
 
-  self.reset = function () {
+  self.reset = function() {
     setNumErrors(0);
     messages = [];
   };
 
-  self.startup = function () {
+  self.startup = function() {
     prefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
         QueryInterface(Ci.nsIPrefBranch2);
     Services.obs.addObserver(self, "requestpolicy-log-error", false);
   };
 
-  self.shutdown = function () {
+  self.shutdown = function() {
     Services.obs.removeObserver(self, "requestpolicy-log-error");
     prefBranch = undefined;
   };
 
-  self.observe = function (aSubject, aTopic, aData) {
+  self.observe = function(aSubject, aTopic, aData) {
     switch (aTopic) {
       case "requestpolicy-log-error":
         setNumErrors(self.getNumErrors() + 1);

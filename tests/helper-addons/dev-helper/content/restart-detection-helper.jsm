@@ -20,8 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* exported RestartDetectionHelper */
 this.EXPORTED_SYMBOLS = ["RestartDetectionHelper"];
 
-RestartDetectionHelper = {
+var RestartDetectionHelper = {
   mark: null
 };

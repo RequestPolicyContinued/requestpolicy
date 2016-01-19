@@ -435,10 +435,12 @@ static-analysis: jshint jscs
 jshint:
 	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
 	jshint tests/xpcshell/
+	jshint tests/helper-addons/
 jscs:
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
 	cd src/; jscs .
 	cd tests/xpcshell/; jscs .
+	cd tests/helper-addons/; jscs .
 
 
 #===============================================================================

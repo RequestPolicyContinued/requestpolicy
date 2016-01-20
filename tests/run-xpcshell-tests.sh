@@ -8,7 +8,8 @@ MOZ_BIN_DIR=$MOZ_OBJ_DIR/dist/bin
 
 if [ "$1" = "--help" ]; then
   echo 'Hints:'
-  echo '  Use --test-path="test_file.js" to run a single test.'
+  echo '  * Append a test filename to run a single test. Example:'
+  echo "      $0 test_file.js"
   echo
 else
   (cd `dirname $0`/.. ; make unit-testing-files)

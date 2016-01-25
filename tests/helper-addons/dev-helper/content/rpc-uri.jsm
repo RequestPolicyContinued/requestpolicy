@@ -36,7 +36,9 @@ let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 var CustomUri = (function() {
   let self = {};
 
-  const DESTINATION_URI = "http://www.maindomain.test/destination.html";
+  // A page with no other resources
+  const DESTINATION_URI = "http://www.maindomain.test/" +
+      "page-without-resources.html";
 
   self.classDescription = "RPC Protocol";
   self.contractID = "@mozilla.org/network/protocol;1?name=rpc";

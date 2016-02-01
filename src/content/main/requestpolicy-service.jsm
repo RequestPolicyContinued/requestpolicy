@@ -135,13 +135,16 @@ var rpService = (function() {
 
     // The other extension IDs of RequestPolicy.
     var addonIDs = Object.freeze([
+      // Detect the "original" add-on (v0.5; released on AMO).
       "requestpolicy@requestpolicy.com",
+      // Detect "RPC Legacy" (v0.5; AMO version).
+      "rpcontinued@requestpolicy.org",
       // #ifdef AMO
       // In the AMO version the non-AMO version needs to be detected.
       "rpcontinued@non-amo.requestpolicy.org",
       // #else
       // In the non-AMO version the AMO version needs to be detected.
-      "rpcontinued@requestpolicy.org",
+      "rpcontinued@amo.requestpolicy.org",
       // #endif
     ]);
 

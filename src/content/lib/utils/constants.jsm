@@ -30,7 +30,7 @@ this.EXPORTED_SYMBOLS = ["C"];
 var C = {};
 
 // #ifdef AMO
-C.EXTENSION_ID = "rpcontinued@requestpolicy.org";
+C.EXTENSION_ID = "rpcontinued@amo.requestpolicy.org";
 // #else
 C.EXTENSION_ID = "rpcontinued@non-amo.requestpolicy.org";
 // #endif

@@ -11,7 +11,7 @@ from marionette_driver.errors import NoSuchElementException
 RP_BETA_9 = {"id": "requestpolicy@requestpolicy.com",
              "xpi": "requestpolicy-v1.0.beta9.3__preprocess.py.xpi"}
 # AMO version
-RP_AMO = {"id": "rpcontinued@requestpolicy.org",
+RP_AMO = {"id": "rpcontinued@amo.requestpolicy.org",
           "xpi": "requestpolicy-amo.xpi"}
 
 NOTICE_URL = "chrome://rpcontinued/content/multiple-installations.html"

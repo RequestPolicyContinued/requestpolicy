@@ -16,7 +16,7 @@ PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-
 #-------------------------------------------------------------------------------
 
 extension_name        := requestpolicy
-amo__extension_id     := rpcontinued@requestpolicy.org
+amo__extension_id     := rpcontinued@amo.requestpolicy.org
 off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
 #-------------------------------------------------------------------------------

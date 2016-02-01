@@ -1,4 +1,4 @@
--e git+https://github.com/mozilla/firefox-ui-tests.git@mozilla-central#egg=firefox-ui-tests
+-e git+https://github.com/mozilla/firefox-ui-tests.git@76ffb49#egg=firefox-ui-tests
 #-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-puppeteer&subdirectory=firefox_puppeteer
 #-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-ui-harness&subdirectory=firefox_ui_harness
 #-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-ui-tests&subdirectory=firefox_ui_tests

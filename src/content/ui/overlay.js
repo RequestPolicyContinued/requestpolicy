@@ -680,7 +680,12 @@ window.rpcontinued.overlay = (function() {
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
     blockedContentCheckTimeoutId = window.setTimeout(function() {
-      rpcontinued.overlay._updateBlockedContentState(browser);
+      try {
+        rpcontinued.overlay._updateBlockedContentState(browser);
+      } catch (e) {
+        // It's possible that the add-on has been disabled
+        // in the meantime.
+      }
     }, blockedContentStateUpdateDelay);
   };
 

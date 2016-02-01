@@ -114,7 +114,6 @@ RequestProcessor = (function(self) {
     {
       let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
           destURIObj);
-      // For user rules, use the default policy if both types of rule match.
       if (result.denyRulesExist() && result.allowRulesExist()) {
         result.isAllowed = Prefs.isDefaultAllow();
         return result;
@@ -132,7 +131,10 @@ RequestProcessor = (function(self) {
     {
       let result = PolicyManager.checkRequestAgainstSubscriptionRules(
           originURIObj, destURIObj);
-      // For now, we always give priority to deny rules.
+      if (result.denyRulesExist() && result.allowRulesExist()) {
+        result.isAllowed = Prefs.isDefaultAllow();
+        return result;
+      }
       if (result.denyRulesExist()) {
         result.isAllowed = false;
         return result;

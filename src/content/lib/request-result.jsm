@@ -103,6 +103,28 @@ RequestResult.prototype.denyRulesExist = function() {
   return this.matchedDenyRules.length > 0;
 };
 
+function countOriginToDestRules(aMatchedRules) {
+  let n = 0;
+  for (let [, [type]] of aMatchedRules) {
+    if (type === "origin-to-dest") {
+      ++n;
+    }
+  }
+  return n;
+}
+
+RequestResult.prototype.resolveConflict = function() {
+  let nODAllowRules = countOriginToDestRules(this.matchedAllowRules);
+  let nODDenyRules = countOriginToDestRules(this.matchedDenyRules);
+  if (nODAllowRules === 0 && nODDenyRules > 0) {
+    return {conflictCanBeResolved: true, shouldAllow: false};
+  }
+  if (nODAllowRules > 0 && nODDenyRules === 0) {
+    return {conflictCanBeResolved: true, shouldAllow: true};
+  }
+  return {conflictCanBeResolved: false, shouldAllow: undefined};
+};
+
 RequestResult.prototype.isDefaultPolicyUsed = function() {
   // returns whether the default policy has been or will be used for this request.
   return this.resultReason === REQUEST_REASON_DEFAULT_POLICY ||

@@ -115,7 +115,9 @@ RequestProcessor = (function(self) {
       let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
           destURIObj);
       if (result.denyRulesExist() && result.allowRulesExist()) {
-        result.isAllowed = Prefs.isDefaultAllow();
+        let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
+        result.isAllowed = conflictCanBeResolved ? shouldAllow :
+                           Prefs.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {
@@ -132,7 +134,9 @@ RequestProcessor = (function(self) {
       let result = PolicyManager.checkRequestAgainstSubscriptionRules(
           originURIObj, destURIObj);
       if (result.denyRulesExist() && result.allowRulesExist()) {
-        result.isAllowed = Prefs.isDefaultAllow();
+        let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
+        result.isAllowed = conflictCanBeResolved ? shouldAllow :
+                           Prefs.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {

@@ -785,6 +785,17 @@ var RequestProcessor = (function() {
       // question.
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
+        let {conflictCanBeResolved, shouldAllow
+             } = request.requestResult.resolveConflict();
+        if (conflictCanBeResolved) {
+          request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+          request.requestResult.isAllowed = shouldAllow;
+          if (shouldAllow) {
+            return accept("Allowed by user policy", request);
+          } else {
+            return reject("Blocked by user policy", request);
+          }
+        }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
         if (Prefs.isDefaultAllow()) {
@@ -821,6 +832,18 @@ var RequestProcessor = (function() {
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
+        let {conflictCanBeResolved, shouldAllow
+             } = request.requestResult.resolveConflict();
+        if (conflictCanBeResolved) {
+          request.requestResult.resultReason =
+              REQUEST_REASON_SUBSCRIPTION_POLICY;
+          request.requestResult.isAllowed = shouldAllow;
+          if (shouldAllow) {
+            return accept("Allowed by subscription policy", request);
+          } else {
+            return reject("Blocked by subscription policy", request);
+          }
+        }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
         if (Prefs.isDefaultAllow()) {

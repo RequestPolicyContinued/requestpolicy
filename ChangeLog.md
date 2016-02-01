@@ -5,6 +5,9 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 
 #### Version 1.0.beta11
 * improvements
+  * Rules specifying both origin and destination (origin-to-dest rules)
+    should have precedence over origin-only and dest-only rules
+    (#491, 220a897)
   * Open MyWOT information in a new tab when the middle mouse button
     is clicked. (#456)
   * Add settings to disable "speculative pre-connections". Disable by

@@ -103,22 +103,18 @@ class CommonTests:
     """
 
     class OtherVersionActive_ThenInstallCurrentVersion(MultipleInstallationsTestCase):
-        def setUp(self):
-            MultipleInstallationsTestCase.setUp(self)
+        def test_notice_is_shown(self):
             self.rp_addon.uninstall()
             self.other_rp.install()
 
-        def test_notice_is_shown(self):
             self.rp_addon.install()
             self._assert_notice_tab()
 
     class OtherVersionActive_ThenEnableCurrentVersion(MultipleInstallationsTestCase):
-        def setUp(self):
-            MultipleInstallationsTestCase.setUp(self)
+        def test_notice_is_shown(self):
             self.rp_addon.disable()
             self.other_rp.install()
 
-        def test_notice_is_shown(self):
             self.rp_addon.enable()
             self._assert_notice_tab()
 
@@ -128,8 +124,7 @@ class CommonTests:
             self._assert_notice_tab()
 
     class OtherVersionNotActive_ThenEnable(MultipleInstallationsTestCase):
-        def setUp(self):
-            MultipleInstallationsTestCase.setUp(self)
+        def test_notice_is_shown(self):
             # After this preparation, both the current and the old version
             # will be installed, but the old version will be disabled.
             self.rp_addon.disable()
@@ -140,17 +135,14 @@ class CommonTests:
                               msg=("No 'notice' tab has been opened during "
                                    "preparation"))
 
-        def test_notice_is_shown(self):
             self.other_rp.enable()
             self._assert_notice_tab()
 
     class OtherAndCurrentVersionActiveAfterRestart(MultipleInstallationsTestCase):
-        def setUp(self):
-            MultipleInstallationsTestCase.setUp(self)
+        def test_notice_is_shown(self):
             self.other_rp.install()
             self._close_notice_tabs()
 
-        def test_notice_is_shown(self):
             self.restart()
             # Don't require the tab to be selected. It somehow doesn't get
             # selected in the unit test, but it works when done manually.

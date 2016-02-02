@@ -202,6 +202,8 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 		if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
 	  		echo 'install.rdf: changing the Extension ID !' ; \
 	  		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+	  		echo 'install.rdf: removing the updateURL !' ; \
+	  		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
 		fi ; \
 		if [[ "$(current_build__unique_version)" == "yes" ]]; then \
 	  		echo 'install.rdf: making the version unique !' ; \

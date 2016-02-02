@@ -59,7 +59,7 @@ define make_files
 endef
 
 .PHONY: all _xpi _files \
-	xpi unit-testing-xpi amo-xpi \
+	xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	unit-testing-files
 
 .DEFAULT_GOAL := all
@@ -72,8 +72,10 @@ beta-xpi:
 	$(call make_xpi,beta)
 unit-testing-xpi:
 	$(call make_xpi,unit_testing)
-amo-xpi:
-	$(call make_xpi,amo)
+amo-beta-xpi:
+	$(call make_xpi,amo_beta)
+amo-nightly-xpi:
+	$(call make_xpi,amo_nightly)
 
 unit-testing-files:
 	$(call make_files,unit_testing)
@@ -84,27 +86,32 @@ unit-testing-files:
 
 alias__nightly       := nightly
 alias__beta          := beta
-alias__amo           := AMO
+alias__amo_beta      := AMO-beta
+alias__amo_nightly   := AMO-nightly
 alias__unit_testing  := unit-testing
 
 extension_id__nightly      := $(off_amo__extension_id)
 extension_id__beta         := $(off_amo__extension_id)
-extension_id__amo          := $(amo__extension_id)
+extension_id__amo_beta     := $(amo__extension_id)
+extension_id__amo_nightly  := $(amo__extension_id)
 extension_id__unit_testing := $(off_amo__extension_id)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
-xpi_file__amo          := $(dist_dir)/$(extension_name)-amo.xpi
+xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
+xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
 xpi_file__unit_testing := $(dist_dir)/$(extension_name)-unit-testing.xpi
 
 preprocess_args__nightly      :=
 preprocess_args__beta         :=
-preprocess_args__amo          := -D AMO
+preprocess_args__amo_beta     := -D AMO
+preprocess_args__amo_nightly  := -D AMO
 preprocess_args__unit_testing := --keep-lines -D UNIT_TESTING
 
 unique_version__nightly      := yes
 unique_version__beta         := no
-unique_version__amo          := no
+unique_version__amo_beta     := no
+unique_version__amo_nightly  := yes
 unique_version__unit_testing := yes
 
 #-------------------------------------------------------------------------------
@@ -115,7 +122,7 @@ current_build__alias           := $(alias__$(BUILD))
 current_build__extension_id    := $(extension_id__$(BUILD))
 current_build__xpi_file        := $(xpi_file__$(BUILD))
 current_build__preprocess_args := $(preprocess_args__$(BUILD))
-current_build__unique_version := $(unique_version__$(BUILD))
+current_build__unique_version  := $(unique_version__$(BUILD))
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] collect source files
@@ -411,7 +418,7 @@ marionette: venv \
 		dev-helper-xpi \
 		dummy-xpi \
 		specific-xpi \
-		amo-xpi
+		amo-nightly-xpi
 	@# Due to Mozilla Bug 1173502, the profile needs to be created and
 	@# removed directly.
 	( \

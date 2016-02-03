@@ -3,6 +3,10 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta11.1
+* A JavaScript warning has been fixed. There's no change in
+  functionality, and no bugs have been fixed.
+
 #### Version 1.0.beta11
 * improvements
   * Rules specifying both origin and destination (origin-to-dest rules)

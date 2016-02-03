@@ -16,145 +16,87 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = ["rpWindowManager"];
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let globalScope = this;
+/* exported rpWindowManager */
+this.EXPORTED_SYMBOLS = ["rpWindowManager"];
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Windows} = importModule("models/windows");
+let {OverlayController} = importModule("controllers/windows.overlay");
+let {ToolbarButtonController} = importModule(
+    "controllers/windows.toolbarbutton");
+let {StyleSheetsController} = importModule("controllers/windows.style-sheets");
 
-var rpWindowManager = (function(self) {
+//==============================================================================
+// WindowSubControllers
+//==============================================================================
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+let WindowSubControllers = (function() {
+  let self = {};
 
-  Cu.import("resource://gre/modules/Services.jsm", globalScope);
-  Cu.import("resource://gre/modules/XPCOMUtils.jsm", globalScope);
+  const SUBCONTROLLERS = Object.freeze([
+    OverlayController,
+    ToolbarButtonController,
+    StyleSheetsController,
+  ]);
 
-  Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", globalScope);
-  ScriptLoader.importModules([
-    "lib/utils/info",
-    "lib/utils/xul",
-    "lib/utils/constants",
-    "lib/environment"
-  ], globalScope);
+  const SUBCONTROLLERS_REVERSE = Object.freeze(
+      SUBCONTROLLERS.slice().reverse());
 
-  // import the WindowListener
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/main/window-manager.listener.js",
-      globalScope);
-
-  let styleSheets = [
-    "chrome://rpcontinued/skin/requestpolicy.css"
-  ];
-  if (Info.isSeamonkey) {
-    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton-seamonkey.css");
-  } else {
-    styleSheets.push("chrome://rpcontinued/skin/toolbarbutton.css");
+  function callForEachController(fnName, reverse, ...args) {
+    let controllers = reverse ? SUBCONTROLLERS_REVERSE : SUBCONTROLLERS;
+    controllers.forEach(function(controller) {
+      if (typeof controller[fnName] === "function") {
+        controller[fnName].apply(null, args);
+      }
+    });
   }
+
+  self.startup = callForEachController.bind(null, "startup", false);
+  self.shutdown = callForEachController.bind(null, "shutdown", true);
+  self.loadIntoWindow = callForEachController.bind(null, "loadIntoWindow",
+                                                   false);
+  self.unloadFromWindow = callForEachController.bind(null, "unloadFromWindow",
+                                                     true);
+
+  return self;
+}());
+
+//==============================================================================
+// rpWindowManager
+//==============================================================================
+
+var rpWindowManager = (function() {
+  let self = {};
 
   let frameScriptURI = "chrome://rpcontinued/content/ui/frame.js?" +
       Math.random();
 
-
-
   function loadIntoWindow(window) {
-    // ==================================
-    // # 1 : create a scope variable for RP for this window
-    // ----------------------------------------------------
-    window.rpcontinued = {};
-
-
-    // ==================================
-    // # 2 : load the overlay's and menu's javascript
-    // ----------------------------------------------
-    try {
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/overlay.js",
-          window);
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/menu.js",
-          window);
-      Services.scriptloader.loadSubScript(
-          "chrome://rpcontinued/content/ui/classicmenu.js",
-          window);
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "Error loading subscripts for window: " + e, e);
-    }
-
-
-    // ==================================
-    // # 3 : add all XUL elements
-    // --------------------------
-    try {
-      XULUtils.addTreeElementsToWindow(window, "mainTree");
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "Couldn't add tree elements to window. " + e, e);
-    }
-
-
-    // ==================================
-    // # 4 : toolbar button
-    // --------------------
-    try {
-      self.addToolbarButtonToWindow(window);
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR, "Error while adding the toolbar " +
-                     "button to the window: "+e, e);
-    }
-
-
-    // ==================================
-    // # 5 : init the overlay
-    // ----------------------
-    try {
-      // init must be called last, because it assumes that
-      // everything else is ready
-      window.rpcontinued.overlay.init();
-    } catch (e) {
-      Logger.warning(Logger.TYPE_ERROR,
-                     "An error occurred while initializing the overlay: "+e, e);
-    }
+    WindowSubControllers.loadIntoWindow(window);
   }
 
   function unloadFromWindow(window) {
-    // # 5 : the overlay cares itself about shutdown.
-    //       nothing to do here.
-
-
-    // # 4 : remove the toolbarbutton
-    // ------------------------------
-    self.removeToolbarButtonFromWindow(window);
-
-
-    // # 3 : remove all XUL elements
-    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
-
-
-    // # 2 and 1 : remove the `rpcontinued` variable from the window
-    // ---------------------------------------------------------
-    // This wouldn't be needed when the window is closed, but this has to be
-    // done when RP is being disabled.
-    delete window.rpcontinued;
+    WindowSubControllers.unloadFromWindow(window);
   }
-
-
-
-
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
       function(data, reason) {
-        forEachOpenWindow(loadIntoWindow);
-        WindowListener.setLoadFunction(loadIntoWindow);
-        WindowListener.setUnloadFunction(unloadFromWindow);
-        WindowListener.startListening();
+        WindowSubControllers.startup();
+        Windows.forEachOpenWindow(loadIntoWindow);
+        Windows.addListener("load", loadIntoWindow);
+        Windows.addListener("unload", unloadFromWindow);
+        Windows._startListening();
 
         // Load the framescript into all existing tabs.
         // Also tell the globalMM to load it into each new
@@ -163,8 +105,6 @@ var rpWindowManager = (function(self) {
             .getService(Ci.nsIMessageListenerManager);
         globalMM.loadFrameScript(frameScriptURI, true);
       });
-
-  ProcessEnvironment.addStartupFunction(Environment.LEVELS.UI, loadStyleSheets);
 
   ProcessEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
@@ -182,56 +122,10 @@ var rpWindowManager = (function(self) {
             .getService(Ci.nsIMessageListenerManager);
         globalMM.removeDelayedFrameScript(frameScriptURI);
 
-        forEachOpenWindow(unloadFromWindow);
-        WindowListener.stopListening();
+        Windows._stopListening();
+        Windows.forEachOpenWindow(unloadFromWindow);
+        WindowSubControllers.shutdown();
       });
 
-  ProcessEnvironment.addShutdownFunction(Environment.LEVELS.UI,
-                                         unloadStyleSheets);
-
-
-
-
-
-  function loadStyleSheets() {
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
-
-    for (let i = 0, len = styleSheets.length; i < len; i++) {
-      let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
-      styleSheetService.loadAndRegisterSheet(styleSheetURI,
-          styleSheetService.USER_SHEET);
-    }
-  }
-  function unloadStyleSheets() {
-    // Unload stylesheets
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
-
-    for (let i = 0, len = styleSheets.length; i < len; i++) {
-      let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
-      if (styleSheetService.sheetRegistered(styleSheetURI,
-          styleSheetService.USER_SHEET)) {
-        styleSheetService.unregisterSheet(styleSheetURI,
-            styleSheetService.USER_SHEET);
-      }
-    }
-  }
-
-  function forEachOpenWindow(functionToCall) {
-    // Apply a function to all open browser windows
-    let windows = Services.wm.getEnumerator("navigator:browser");
-    while (windows.hasMoreElements()) {
-      functionToCall(windows.getNext().QueryInterface(Ci.nsIDOMWindow));
-    }
-  }
-
-
   return self;
-}(rpWindowManager || {}));
-
-
-// extend rpWindowManager
-Services.scriptloader.loadSubScript(
-    "chrome://rpcontinued/content/main/window-manager-toolbarbutton.js",
-    globalScope);
+}());

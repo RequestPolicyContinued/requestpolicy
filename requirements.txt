@@ -1,2 +1,10 @@
--e git+https://github.com/mozilla/firefox-ui-tests.git#egg=firefox-ui-tests
+-e git+https://github.com/mozilla/firefox-ui-tests.git@76ffb49#egg=firefox-ui-tests
+#-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-puppeteer&subdirectory=firefox_puppeteer
+#-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-ui-harness&subdirectory=firefox_ui_harness
+#-e git+https://github.com/mozilla/firefox-ui-tests.git@python_packages#egg=firefox-ui-tests&subdirectory=firefox_ui_tests
+# Not yet possible because of the firefox-ui-tests dependency.
+# See https://mxr.mozilla.org/mozilla-central/source/testing/firefox-ui/harness/requirements.txt
+# and https://bugzilla.mozilla.org/show_bug.cgi?id=1239988
+#firefox-puppeteer
+#firefox-ui-harness
 mozrunner >= 6.9

@@ -21,42 +21,39 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
+window.rpcontinued.classicmenu = (function() {
+  var self = {};
 
+  /* global Components */
+  const {utils: Cu} = Components;
 
-rpcontinued.classicmenu = (function() {
-  let self = {};
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Logger} = importModule("lib/logger");
+  let {Prefs} = importModule("models/prefs");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {DOMUtils} = importModule("lib/utils/dom");
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let rpcontinued = window.rpcontinued;
 
-
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {rpPrefBranch} = ScriptLoader.importModule("lib/prefs");
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-  let {DOMUtils} = ScriptLoader.importModule("lib/utils/dom");
-
+  //============================================================================
 
   /**
   * Reloads the current document if the user's preferences indicate it should
   * be reloaded.
   */
   function conditionallyReloadDocument() {
-    if (rpPrefBranch.getBoolPref("autoReload")) {
-      content.document.location.reload(false);
+    if (Prefs.get("autoReload")) {
+      window.content.document.location.reload(false);
     }
   }
-
 
   /**
    * Removes all menu items and removes all event listeners.
    */
-  self.emptyMenu = function (menu) {
+  self.emptyMenu = function(menu) {
     var menuitems = menu.getElementsByTagName("menuitem");
     for (let item of menuitems) {
       if (!item.hasOwnProperty("rpListener")) {
@@ -71,7 +68,6 @@ rpcontinued.classicmenu = (function() {
     DOMUtils.removeChildren(menu);
   };
 
-
   self.addMenuSeparator = function(menu) {
     var separator = document.createElement("menuseparator");
     menu.insertBefore(separator, menu.firstChild);
@@ -81,7 +77,7 @@ rpcontinued.classicmenu = (function() {
   self.addMenuItem = function(menu, label, aCallback) {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
-    var listener = function () {
+    var listener = function() {
       aCallback();
       conditionallyReloadDocument();
     };
@@ -92,10 +88,9 @@ rpcontinued.classicmenu = (function() {
     return menuItem;
   };
 
-
   self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
     var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.temporarilyAllowOrigin(originHost);
     };
     var item = self.addMenuItem(menu, label, callback);
@@ -105,18 +100,17 @@ rpcontinued.classicmenu = (function() {
 
   self.addMenuItemAllowOrigin = function(menu, originHost) {
     var label = StringUtils.$str("allowOrigin", [originHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.allowOrigin(originHost);
     };
     return self.addMenuItem(menu, label, callback);
   };
 
-
   self.addMenuItemTemporarilyAllowOriginToDest = function(menu, originHost,
                                                      destHost) {
     var label = StringUtils.$str("allowOriginToDestinationTemporarily",
                                  [originHost, destHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.temporarilyAllowOriginToDestination(originHost,
                                                               destHost);
     };
@@ -128,7 +122,7 @@ rpcontinued.classicmenu = (function() {
   self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
     var label = StringUtils.$str("allowOriginToDestination",
                                  [originHost, destHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.allowOriginToDestination(originHost, destHost);
     };
     var item = self.addMenuItem(menu, label, callback);
@@ -136,10 +130,9 @@ rpcontinued.classicmenu = (function() {
     return item;
   };
 
-
   self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
     var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.temporarilyAllowDestination(destHost);
     };
     var item = self.addMenuItem(menu, label, callback);
@@ -149,7 +142,7 @@ rpcontinued.classicmenu = (function() {
 
   self.addMenuItemAllowDest = function(menu, destHost) {
     var label = StringUtils.$str("allowDestination", [destHost]);
-    var callback = function () {
+    var callback = function() {
       rpcontinued.overlay.allowDestination(destHost);
     };
     return self.addMenuItem(menu, label, callback);

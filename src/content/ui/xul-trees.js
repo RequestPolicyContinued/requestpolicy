@@ -16,15 +16,16 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
+/* global exports: true, C, appID */
+
 // differences in seamonkey:
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 let isSeamonkey = appID === C.SEAMONKEY_ID;
-
 
 exports.toolbarbutton = [
   {
@@ -49,7 +50,7 @@ exports.toolbarbutton = [
 
 exports.mainTree = [
   {
-    parent: {id: (isSeamonkey ? "taskPopup" : "menu_ToolsPopup")},
+    parent: {id: isSeamonkey ? "taskPopup" : "menu_ToolsPopup"},
 
     tag: "menu",
     attributes: {label: "RequestPolicy Continued",
@@ -81,22 +82,21 @@ exports.mainTree = [
     ]
   },
 
+  {
+    parent: {id: "contentAreaContextMenu"},
+
+    tag: "menuitem",
+    attributes: {id: "rpcontinuedContextMenuEntry",
+                 label: "RequestPolicy Continued"},
+    events: {command: ["overlay", "toggleMenu"]}
+  },
 
   {
     parent: {special: {type: "__window__"}},
 
     tag: "keyset",
-    attributes: {id: "rpcontinuedKeyset"},
-    children: [
-      {
-        tag: "key",
-        attributes: {key: "r",
-                     modifiers: "accel alt"},
-        events: {command: ["overlay", "openMenuByHotkey"]}
-      }
-    ]
+    attributes: {id: "rpcontinuedKeyset"}
   },
-
 
   {
     parent: {special: {type: "__window__"}},
@@ -297,7 +297,6 @@ exports.mainTree = [
       }
     ]
   },
-
 
   {
     parent: {id: "appcontent"},

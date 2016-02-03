@@ -21,21 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
+/* exported ManagerForMessageListeners */
+this.EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+let {C} = importModule("lib/utils/constants");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger",
-  "lib/utils/constants"
-], globalScope);
-
+//==============================================================================
+// ManagerForMessageListeners
+//==============================================================================
 
 /**
  * This class provides an interface to a "Message Manager" which takes
@@ -65,9 +65,11 @@ function ManagerForMessageListeners(aEnv, aMM) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          Logger.dump('From now on new message listeners will be ' +
-                      'added immediately. Environment: "' +
-                      self.environment.name + '"');
+          // #ifdef LOG_MESSAGE_LISTENERS
+          Logger.dump("From now on new message listeners will be " +
+                      "added immediately. Environment: \"" +
+                      self.environment.name + "\"");
+          // #endif
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -81,8 +83,8 @@ function ManagerForMessageListeners(aEnv, aMM) {
     // aEnv is not defined! Try to report an error.
     if (!!Logger) {
       Logger.warning(Logger.TYPE_INTERNAL, "No Environment was specified for " +
-                     "a new ManagerForMessageListeners! This means that the listeners " +
-                     "won't be unregistered!");
+        "a new ManagerForMessageListeners! This means that the listeners " +
+        "won't be unregistered!");
     }
   }
 
@@ -95,7 +97,6 @@ function ManagerForMessageListeners(aEnv, aMM) {
     }
   }
 }
-
 
 /**
  * Add a listener. The class will then take care about adding
@@ -111,10 +112,9 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                                                             aCallback,
                                                             aAddImmediately) {
   let self = this;
-  if (typeof aCallback !== 'function') {
+  if (typeof aCallback !== "function") {
     Logger.warning(Logger.TYPE_ERROR, "The callback for a message listener" +
-                   'must be a function! The message name was "' + aMessageName +
-                   '"');
+        "must be a function! The message name was \"" + aMessageName + "\"");
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
@@ -122,7 +122,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                    "The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
-    aMessageName = aMessageName.substr(C.MM_PREFIX.length)
+    aMessageName = aMessageName.substr(C.MM_PREFIX.length);
   }
 
   let listener = {
@@ -132,16 +132,16 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     listening: false
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
-    Logger.dump('Immediately adding message listener for "' +
-                listener.messageName + '". Environment: "' +
-                self.environment.name + '"');
+    // #ifdef LOG_MESSAGE_LISTENERS
+    Logger.dump("Immediately adding message listener for \"" +
+                listener.messageName + "\". Environment: \"" +
+                self.environment.name + "\"");
+    // #endif
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
   }
   self.listeners.push(listener);
 };
-
-
 
 /**
  * The function will add all listeners already in the list.
@@ -150,9 +150,11 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      Logger.dump('Lazily adding message listener for "' +
-                  listener.messageName + '". Environment: "' +
-                  self.environment.name + '"');
+      // #ifdef LOG_MESSAGE_LISTENERS
+      Logger.dump("Lazily adding message listener for \"" +
+                  listener.messageName + "\". Environment: \"" +
+                  self.environment.name + "\"");
+      // #endif
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
     }
@@ -172,8 +174,10 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //                 'is undefined!');
     //  continue;
     //}
-    Logger.dump('Removing message listener for "' + listener.messageName +
-                '".');
+    // #ifdef LOG_MESSAGE_LISTENERS
+    Logger.dump("Removing message listener for \"" + listener.messageName +
+                "\".");
+    // #endif
     //try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
     //} catch (e) {

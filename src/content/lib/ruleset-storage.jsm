@@ -21,33 +21,37 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RulesetStorage"];
+/* exported RulesetStorage */
+this.EXPORTED_SYMBOLS = ["RulesetStorage"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/ruleset",
-  "lib/utils/files"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RawRuleset} = importModule("lib/ruleset");
+let {FileUtil} = importModule("lib/utils/files");
 
+//==============================================================================
+// RulesetStorage
+//==============================================================================
 
-let RulesetStorage = {
+var RulesetStorage = (function() {
+  let self = {};
 
   /**
+   * @param {String} filename
+   * @param {String} subscriptionListName
    * @return {RawRuleset}
    */
-  loadRawRulesetFromFile : function(/**string*/ filename,
-        /**string*/ subscriptionListName) {
+  self.loadRawRulesetFromFile = function(filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
     var policyFile = FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {
-      policyFile.appendRelativePath('subscriptions');
+      policyFile.appendRelativePath("subscriptions");
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
@@ -62,20 +66,27 @@ let RulesetStorage = {
     //  str = FileUtil.fileToString(policyFile);
     //}
     return new RawRuleset(str);
-  },
+  };
 
-  saveRawRulesetToFile : function(/**RawRuleset*/ policy, /**string*/ filename,
-        /**string*/ subscriptionListName) {
+  /**
+   * @param {RawRuleset} policy
+   * @param {String} filename
+   * @param {String} subscriptionListName
+   */
+  self.saveRawRulesetToFile = function(policy, filename,
+                                        subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to encode to stream.
+    let policyFile;
     if (subscriptionListName) {
-      var policyFile = FileUtil.getRPUserDir("policies",
-            'subscriptions', subscriptionListName);
+      policyFile = FileUtil.getRPUserDir("policies",
+            "subscriptions", subscriptionListName);
     } else {
-      var policyFile = FileUtil.getRPUserDir("policies");
+      policyFile = FileUtil.getRPUserDir("policies");
     }
     policyFile.appendRelativePath(filename);
     FileUtil.stringToFile(JSON.stringify(policy), policyFile);
-  }
+  };
 
-};
+  return self;
+}());

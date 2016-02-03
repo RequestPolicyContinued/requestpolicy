@@ -16,30 +16,33 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+/* exported XULUtils */
+this.EXPORTED_SYMBOLS = ["XULUtils"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/strings",
-  "lib/utils/constants"
-], this);
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-var EXPORTED_SYMBOLS = ["XULUtils"];
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {StringUtils} = importModule("lib/utils/strings");
+let {JSUtils} = importModule("lib/utils/javascript");
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// XULUtils
+//==============================================================================
 
 var XULUtils = {};
 
 var xulTrees = XULUtils.xulTrees = {};
-
 
 /**
  * IIFE: Import the XUL trees and ensure their integrity.
@@ -52,7 +55,7 @@ var xulTrees = XULUtils.xulTrees = {};
   };
 
   Services.scriptloader.loadSubScript(
-      'chrome://rpcontinued/content/ui/xul-trees.js',
+      "chrome://rpcontinued/content/ui/xul-trees.js",
       xulTreesScope);
 
   // For ensuring that each Element Spec has an ID.
@@ -72,13 +75,12 @@ var xulTrees = XULUtils.xulTrees = {};
 
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
-      aElementSpec.attributes.id = "rpc-autoid-" + (nextID++);
+      aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
       //Logger.dump("Automatically created ID '" + aElementSpec.attributes.id +
       //            "' for element <" + aElementSpec.tag + ">");
     }
   }
-})();
-
+}());
 
 /**
  * @param {Array<Object>} aElementSpecList
@@ -100,14 +102,14 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
     // Add all children recursively.
     if (elementSpec.hasOwnProperty("children")) {
-      let allChildrenSpecs = recursivelyGetAllElementSpecs(elementSpec.children)
+      let allChildrenSpecs = recursivelyGetAllElementSpecs(
+          elementSpec.children);
       allElementSpecs = allElementSpecs.concat(allChildrenSpecs);
     }
   }
 
   return allElementSpecs;
 }
-
 
 function getParentElement(aDocument, aElementSpec) {
   if (!aElementSpec.parent) {
@@ -178,12 +180,12 @@ function setAttributes(aElement, aElementSpec) {
   }
 }
 
-var {addEventListeners, removeEventListeners} = (function () {
+var {addEventListeners, removeEventListeners} = (function() {
   /**
    * @param {!Object} aRootObject
    * @param {Array<string>} aListenerSpec
    *
-   * @return {Function} The listener function.
+   * @return {?Function} The listener function.
    */
   function getEventListener(aRootObject, aListenerSpec) {
     var object = aRootObject;
@@ -208,7 +210,7 @@ var {addEventListeners, removeEventListeners} = (function () {
     }
     var rootObject = aEventTarget.ownerDocument.defaultView.rpcontinued;
 
-    return Object.keys(aEventList).map(function (eventName) {
+    return Object.keys(aEventList).map(function(eventName) {
       return [
         eventName,
         getEventListener(rootObject, aEventList[eventName])
@@ -223,14 +225,14 @@ var {addEventListeners, removeEventListeners} = (function () {
    */
   function addEventListeners(aEventTarget, {events}) {
     var listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function ([eventName, listener]) {
+    listeners.forEach(function([eventName, listener]) {
       aEventTarget.addEventListener(eventName, listener, false);
     });
   }
 
   function removeEventListeners(aEventTarget, {events}) {
     var listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function ([eventName, listener]) {
+    listeners.forEach(function([eventName, listener]) {
       aEventTarget.removeEventListener(eventName, listener, false);
     });
   }
@@ -239,8 +241,7 @@ var {addEventListeners, removeEventListeners} = (function () {
     addEventListeners: addEventListeners,
     removeEventListeners: removeEventListeners
   };
-})();
-
+}());
 
 function recursivelyAddXULElements(aDocument, aElementSpecList,
                                    aParentElement = null) {
@@ -279,13 +280,13 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
     }
     parentElement.appendChild(newElement);
   }
-};
+}
 
 XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
   if (xulTrees.hasOwnProperty(aTreeName)) {
     recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
-}
+};
 
 /**
  * Return a list of the IDs of the specified tree's root elements.
@@ -294,7 +295,7 @@ XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
  * @return {Array<string>} The list of IDs.
  */
 function getRootElementIDs(aTreeName) {
-  var ids = xulTrees[aTreeName].map(function (aElementSpec) {
+  var ids = xulTrees[aTreeName].map(function(aElementSpec) {
     return aElementSpec.attributes.id;
   });
   return ids;
@@ -322,4 +323,78 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
       node.parentNode.removeChild(node);
     }
   }
-}
+};
+
+XULUtils.keyboardShortcuts = (function() {
+  let self = {};
+
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Attribute/modifiers
+  // See also the SDK Hotkeys API
+  // https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/hotkeys
+  const VALID_MODIFIERS = [
+    "shift",
+    "alt",
+    "meta",
+    "control",
+    "accel"
+  ];
+
+  function error(msg) {
+    return {success: false, errorMessage: msg};
+  }
+
+  function success(returnValue) {
+    returnValue.success = true;
+    return returnValue;
+  }
+
+  function isValidModifier(aModifier) {
+    return JSUtils.arrayIncludes(VALID_MODIFIERS, aModifier);
+  }
+
+  let keyRegEx = /^[a-z]$/;
+
+  function _getKeyAttributesFromCombo(aCombo) {
+    if (typeof aCombo !== "string") {
+      return error("Not a string!");
+    }
+    if (aCombo === "") {
+      return error("The string must not be empty.");
+    }
+
+    let parts = aCombo.split(" ");
+    // Take the last element as the key
+    let key = parts.slice(-1)[0];
+    // Take all elements except the last one as the modifiers.
+    let modifiers = parts.slice(0, -1);
+    // Remove duplicates
+    modifiers = [...new Set(modifiers)];
+
+    for (let modifier of modifiers) {
+      if (false === isValidModifier(modifier)) {
+        return error("Invalid modifier: \"" + modifier + "\"");
+      }
+    }
+
+    if (!keyRegEx.test(key)) {
+      return error("Invalid key: \"" + key + "\"");
+    }
+
+    return success({
+      modifiers: modifiers.join(" "),
+      key: key
+    });
+  }
+
+  /**
+   * Check if the <key modifiers="..."> string is valid.
+   *
+   * @param  {string} aCombo
+   * @return {Object}
+   */
+  self.getKeyAttributesFromCombo = function(aCombo) {
+    return _getKeyAttributesFromCombo(aCombo);
+  };
+
+  return self;
+}());

@@ -21,23 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
+
 window.rpcontinued = window.rpcontinued || {};
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
-  let {Environment,
-       ProcessEnvironment} = ScriptLoader.importModule("lib/environment");
+  //============================================================================
 
   // create a new Environment for this window
   var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
@@ -48,15 +45,12 @@ window.rpcontinued.requestLog = (function (self) {
 
   let $id = window.document.getElementById.bind(window.document);
 
-
   self.isEmptyMessageDisplayed = true;
   self.rows = [];
   self.visibleRows = [];
 
-
-
   function init() {
-    self.tree = $id("rpcontinued-requestLog-tree")
+    self.tree = $id("rpcontinued-requestLog-tree");
 
     self.tree.view = self.treeView;
 
@@ -74,8 +68,6 @@ window.rpcontinued.requestLog = (function (self) {
 
   // call init() on the window's "load" event
   WinEnv.elManager.addListener(window, "load", init, false);
-
-
 
   return self;
 }(window.rpcontinued.requestLog || {}));

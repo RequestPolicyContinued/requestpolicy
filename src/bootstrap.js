@@ -21,41 +21,57 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-var mod = {};
+/* exported startup, shutdown, install, uninstall */
+/* global dump */
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// utilities
+//==============================================================================
+
 const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
 
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.
  * The Logger can't be used, as it might not be available.
  */
-function logSevereError(msg, e) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
-       (e.stack ? ", stack was: " + e.stack : "") + "\n");
-  Cu.reportError(e);
+function logSevereError(aMessage, aError) {
+  let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
+       (aError.stack ? ", stack was: " + aError.stack : "");
+  dump(msg + "\n");
+  // #ifdef UNIT_TESTING
+  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
+  // #endif
+  Cu.reportError(aError);
 }
+
+//==============================================================================
+// bootstrap functions
+//==============================================================================
 
 function startup(data, reason) {
   try {
-    // Import the ProcessEnvironment and call its startup() function.
-    Cu.import(envURI, mod);
-    mod.ProcessEnvironment.startup(arguments);
-  } catch(e) {
+    let {ProcessEnvironment} = Cu.import(envURI, {});
+    // Remark: startup() takes the arguments as an array!
+    ProcessEnvironment.startup([data, reason]);
+  } catch (e) {
     logSevereError("startup() failed!", e);
   }
 }
 
 function shutdown(data, reason) {
-
   try {
-    // shutdown, unset and unload.
-    mod.ProcessEnvironment.shutdown(arguments);
-    mod = {};
+    {
+      let {ProcessEnvironment} = Cu.import(envURI, {});
+      // Remark: shutdown() takes the arguments as an array!
+      ProcessEnvironment.shutdown([data, reason]);
+    }
     Cu.unload(envURI);
-  } catch(e) {
+  } catch (e) {
     logSevereError("shutdown() failed!", e);
   }
 }
@@ -68,7 +84,7 @@ function install(data, reason) {
   //               images and locales, their caches are flushed.
   // Note: Due to Bug 1144248 this has to be done in the
   //       `install` function.
-  Components.utils.import("resource://gre/modules/Services.jsm");
+  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
   Services.obs.notifyObservers(null, "chrome-flush-caches", null);
 }
 

@@ -16,24 +16,39 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["WindowUtils"];
+/* exported WindowUtils */
+this.EXPORTED_SYMBOLS = ["WindowUtils"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/prefs"], this);
+let {PrivateBrowsingUtils} = Cu.import(
+    "resource://gre/modules/PrivateBrowsingUtils.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Prefs} = importModule("models/prefs");
 
+//==============================================================================
+// WindowUtils
+//==============================================================================
 
-let WindowUtils = (function() {
+var WindowUtils = (function() {
   let self = {};
+
+  self.getMostRecentWindow = function(aWindowType = null) {
+    let wm = Cc["@mozilla.org/appshell/window-mediator;1"].
+        getService(Ci.nsIWindowMediator);
+    return wm.getMostRecentWindow(aWindowType);
+  };
+
+  self.getMostRecentBrowserWindow = self.getMostRecentWindow.
+                                    bind(self, "navigator:browser");
 
   self.getChromeWindow = function(aContentWindow) {
     return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -75,34 +90,9 @@ let WindowUtils = (function() {
   // Private Browsing
   //
 
-  // depending on the Firefox vesion, create the `isWindowPrivate` function
-  self.isWindowPrivate = (function() {
-    try {
-      // Firefox 20+
-      Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
-
-      return (function(aWindow) {
-        return PrivateBrowsingUtils.isWindowPrivate(aWindow)
-      });
-    } catch(e) {
-      // pre Firefox 20
-      try {
-        let pbs = Cc["@mozilla.org/privatebrowsing;1"]
-            .getService(Ci.nsIPrivateBrowsingService);
-
-        return (function(aWindow) {
-          return pbs.privateBrowsingEnabled;
-        });
-      } catch(e) {
-        Components.utils.reportError(e);
-        // It's uncertain if private browsing is possible at all, so assume
-        // that Private Browsing is not possible.
-        return (function(aWindow) {
-          return true;
-        });
-      }
-    }
-  }());
+  self.isWindowPrivate = function(aWindow) {
+    return PrivateBrowsingUtils.isWindowPrivate(aWindow);
+  };
 
   /**
    * Should it be possible to add permanent rules in that window?
@@ -111,9 +101,8 @@ let WindowUtils = (function() {
    */
   self.mayPermanentRulesBeAdded = function(aWindow) {
     return self.isWindowPrivate(aWindow) === false ||
-        rpPrefBranch.getBoolPref("privateBrowsingPermanentWhitelisting");
+        Prefs.get("privateBrowsingPermanentWhitelisting");
   };
-
 
   //
   // Window & DOM utilities

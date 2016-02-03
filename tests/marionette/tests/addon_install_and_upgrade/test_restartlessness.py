@@ -3,38 +3,54 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.ui.addons import RequestPolicy
+from marionette.marionette_test import SkipTest
+import time
 
 PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
 
 
-class TestRequestPolicyRestartlessness(RequestPolicyTestCase):
-    """These tests ensure that RequestPolicy can be uninstalled/installed and
-    disabled/enabled restartless.
-    """
+class CommonTests:
+    class TestRequestPolicyRestartlessness(RequestPolicyTestCase):
+        """These tests ensure that RequestPolicy can be uninstalled/installed and
+        disabled/enabled restartless.
+        """
 
+        def test_disable_enable(self):
+            self.assertTrue(self.rp_addon.is_active, msg="The addon is enabled.")
+            self.rp_addon.disable()
+            self.assertFalse(self.rp_addon.is_active,
+                             msg="The addon has been disabled.")
+            self.rp_addon.enable()
+            self.assertTrue(self.rp_addon.is_active,
+                            msg="The addon has been re-enabled.")
+
+        def test_uninstall_install(self):
+            # remove:
+            self.assertTrue(self.rp_addon.is_installed,
+                            msg="The addon is installed.")
+            self.rp_addon.uninstall()
+            self.assertFalse(self.rp_addon.is_installed,
+                             msg="The addon has been removed.")
+
+            # re-install:
+            self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, True)
+            self.rp_addon.install()
+            self.assertTrue(self.rp_addon.is_installed,
+                            msg="The addon has been re-installed.")
+
+
+class TestNormal(CommonTests.TestRequestPolicyRestartlessness):
     def setUp(self):
-        RequestPolicyTestCase.setUp(self)
-        self.rp = RequestPolicy(lambda: self.marionette)
+        super(TestNormal, self).setUp()
+        # Wait some time in order to ensure the browser is in idle.
+        time.sleep(0.2)
 
-    def test_disable_enable(self):
-        self.assertTrue(self.rp.is_enabled(), msg="The addon is enabled.")
-        self.rp.disable()
-        self.assertFalse(self.rp.is_enabled(),
-                         msg="The addon has been disabled.")
-        self.rp.enable()
-        self.assertTrue(self.rp.is_enabled(),
-                        msg="The addon has been re-enabled.")
 
-    def test_uninstall_install(self):
-        # remove:
-        self.assertTrue(self.rp.is_installed(), msg="The addon is installed.")
-        self.rp.remove()
-        self.assertFalse(self.rp.is_installed(),
-                         msg="The addon has been removed.")
+class TestAfterNavigate(CommonTests.TestRequestPolicyRestartlessness):
+    def setUp(self):
+        super(TestAfterNavigate, self).setUp()
 
-        # re-install:
-        self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, True)
-        self.rp.install()
-        self.assertTrue(self.rp.is_installed(),
-                        msg="The addon has been re-installed.")
+        raise SkipTest("Skipping due to issue #728.")
+
+        with self.marionette.using_context("content"):
+            self.marionette.navigate("http://localhost/")

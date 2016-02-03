@@ -21,20 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
+/* exported ManagerForEventListeners */
+this.EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger"
-], globalScope);
-
+//==============================================================================
+// ManagerForEventListeners
+//==============================================================================
 
 /**
  * This class provides an interface to multiple "Event Targets" which takes
@@ -64,9 +64,11 @@ function ManagerForEventListeners(aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          Logger.dump('From now on new event listeners will be ' +
-                      'added immediately. Environment: "' +
-                      self.environment.name + '"');
+          // #ifdef LOG_EVENT_LISTENERS
+          Logger.dump("From now on new event listeners will be " +
+                      "added immediately. Environment: \"" +
+                      self.environment.name + "\"");
+          // #endif
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -86,22 +88,20 @@ function ManagerForEventListeners(aEnv) {
   }
 }
 
-
 function addEvLis(listener) {
   listener.target.addEventListener(listener.eventType, listener.callback,
                                    listener.useCapture);
   listener.listening = true;
-};
-
+}
 
 ManagerForEventListeners.prototype.addListener = function(aEventTarget,
                                                           aEventType,
                                                           aCallback,
                                                           aUseCapture) {
   let self = this;
-  if (typeof aCallback !== 'function') {
+  if (typeof aCallback !== "function") {
     Logger.warning(Logger.TYPE_ERROR, "The callback for an event listener" +
-                   'must be a function! Event type was "' + aEventType + '"');
+                   "must be a function! Event type was \"" + aEventType + "\"");
     return;
   }
   let listener = {
@@ -112,15 +112,15 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     listening: false
   };
   if (self.addNewListenersImmediately) {
-    Logger.dump('Immediately adding event listener for "' +
-                listener.eventType + '". Environment: "' +
-                self.environment.name + '"');
+    // #ifdef LOG_EVENT_LISTENERS
+    Logger.dump("Immediately adding event listener for \"" +
+                listener.eventType + "\". Environment: \"" +
+                self.environment.name + "\"");
+    // #endif
     addEvLis(listener);
   }
   self.listeners.push(listener);
 };
-
-
 
 /**
  * The function will add all listeners already in the list.
@@ -129,9 +129,11 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      Logger.dump('Lazily adding event listener for "' +
-                  listener.eventType + '". Environment: "' +
-                  self.environment.name + '"');
+      // #ifdef LOG_EVENT_LISTENERS
+      Logger.dump("Lazily adding event listener for \"" +
+                  listener.eventType + "\". Environment: \"" +
+                  self.environment.name + "\"");
+      // #endif
       addEvLis(listener);
     }
   }
@@ -144,8 +146,10 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    Logger.dump('Removing event listener for "' + listener.eventType +
-                '". Environment: "' + self.environment.name + '"');
+    // #ifdef LOG_EVENT_LISTENERS
+    Logger.dump("Removing event listener for \"" + listener.eventType +
+                "\". Environment: \"" + self.environment.name + "\"");
+    // #endif
     listener.target.removeEventListener(listener.eventType, listener.callback,
                                         listener.useCapture);
   }

@@ -21,14 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["SingleTopicObserver", "SinglePrefBranchObserver"];
+/* exported SingleTopicObserver */
+this.EXPORTED_SYMBOLS = ["SingleTopicObserver"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
+//==============================================================================
+// Observer (metaclass)
+//==============================================================================
 
 /**
  * Generic Observer class.
@@ -56,6 +59,9 @@ Observer.prototype.unregister = function() {
   }
 };
 
+//==============================================================================
+// SingleTopicObserver
+//==============================================================================
 
 /**
  * An instance of this class registers itself to `nsIObserverService` on behalf
@@ -73,20 +79,4 @@ SingleTopicObserver.prototype._register = function() {
 };
 SingleTopicObserver.prototype._unregister = function() {
   Services.obs.removeObserver(this, this.topic);
-};
-
-
-function SinglePrefBranchObserver(aBranch, aDomain, aCallback) {
-  this.branch = aBranch;
-  this.domain = aDomain;
-  Observer.call(this, aCallback);
-}
-SinglePrefBranchObserver.prototype = Object.create(Observer.prototype);
-SinglePrefBranchObserver.prototype.constructor = Observer;
-
-SinglePrefBranchObserver.prototype._register = function() {
-  this.branch.addObserver(this.domain, this, false);
-};
-SinglePrefBranchObserver.prototype._unregister = function() {
-  this.branch.removeObserver(this.domain, this);
 };

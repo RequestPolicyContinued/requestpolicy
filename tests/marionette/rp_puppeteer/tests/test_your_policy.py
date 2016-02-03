@@ -3,8 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.api.rules import Rule
-from marionette import SkipTest
+from rp_ui_harness.test_data.rules import ExemplaryRules
 from functools import partial
 
 
@@ -14,65 +13,12 @@ class YourPolicyTestCase(RequestPolicyTestCase):
         super(YourPolicyTestCase, self).setUp()
 
         self.marionette.set_context("content")
-        self.your_policy.open()
+        self.settings.your_policy.open()
 
-        self.rules_table = self.your_policy.rules_table
-        self.add_rule_form = self.your_policy.add_rule_form
+        self.rules_table = self.settings.your_policy.rules_table
+        self.add_rule_form = self.settings.your_policy.add_rule_form
 
-        #=======================================================================
-        # Create some rules for the tests
-        #=======================================================================
-
-        # Alias for `create_rule()`
-        cr = self.rules.create_rule
-
-        # some rules that should not collide with each other
-        self.allow_rule = cr({"o": {"h": "w"}}, allow=True, temp=False)
-        self.temp_allow_rule = cr({"o": {"h": "x"}}, allow=True, temp=True)
-        self.deny_rule = cr({"o": {"h": "y"}}, allow=False, temp=False)
-        self.temp_deny_rule = cr({"o": {"h": "z"}}, allow=False, temp=True)
-        self.some_rules = [self.allow_rule, self.temp_allow_rule,
-                           self.deny_rule, self.temp_deny_rule]
-
-        self.rule_without_origin = cr({"d": {"h": "foo"}}, allow=True)
-        self.rule_without_dest = cr({"o": {"h": "bar"}}, allow=True)
-
-        # A list of all possible pre-paths, including the expected string.
-        self.pre_path_specs = {
-            "s": {"spec": {"s": "s1"},
-                  # The string "s1:*" could be confused with "*://s1:*"
-                  "expected_string": 'scheme "s1"'},
-            "h": {"spec": {"h": "h2"},
-                  "expected_string": "h2"},
-            "p": {"spec": {"port": 3},
-                  "expected_string": "*://*:3"},
-            "sh": {"spec": {"s": "s4", "h": "h4"},
-                   "expected_string": "s4://h4"},
-            "sp": {"spec": {"s": "s5", "port": 5},
-                   "expected_string": "s5://*:5"},
-            "hp": {"spec": {"h": "h6", "port": 6},
-                   "expected_string": "*://h6:6"},
-            "shp": {"spec": {"s": "s7", "h": "h7", "port": 7},
-                    "expected_string": "s7://h7:7"}
-        }
-
-        self.allow_rule_shp_shp = cr({"o": {"s": "os", "h": "oh", "port": 1},
-                                      "d": {"s": "ds", "h": "dh", "port": 2}},
-                                     allow=True, temp=False)
-        self.temp_deny_rule_shp_shp = cr(
-                {"o": {"s": "os", "h": "oh", "port": 3},
-                 "d": {"s": "ds", "h": "dh", "port": 4}},
-                allow=False, temp=True)
-
-        self.allow_rule_sh_p = cr({"o": {"s": "os", "h": "oh"}, "d": {"port": 5}},
-                                  allow=True, temp=False)
-        self.temp_deny_rule_s_hp = cr({"o": {"s": "os"},
-                                       "d": {"h": "dh", "port": 4}},
-                                      allow=False, temp=True)
-        self.arbitrary_rule_shp_shp = cr(
-            {"o": {"s": "fooscheme", "h": "barhost", "port": 18224},
-             "d": {"s": "bazscheme", "h": "xyzhost", "port": 34755}},
-            allow=False, temp=True)
+        self.data = ExemplaryRules(lambda: self.marionette)
 
     def tearDown(self):
         try:
@@ -92,209 +38,9 @@ class TestYourPolicy(YourPolicyTestCase):
         self.marionette.navigate("about:blank")
         self.assertNotEqual(self.marionette.get_url(),
                             "about:requestpolicy?yourpolicy")
-        self.your_policy.open()
+        self.settings.your_policy.open()
         self.assertEqual(self.marionette.get_url(),
                          "about:requestpolicy?yourpolicy")
-
-
-class TestRulesTable(YourPolicyTestCase):
-
-    def test_get_all_rule_rows(self):
-        raise SkipTest("The 'Rules' API doesn't support subscription rules "
-                       "yet.")
-
-    def test_get_user_rule_rows(self):
-        self.assertEqual(len(self._user_rule_rows), 0,
-                         "There are no user rules yet.")
-
-        # Add some rules
-        for rule in self.some_rules:
-            rule.add()
-
-        # Get the user rule rows.
-        user_rule_rows = self._user_rule_rows
-        # Compare the amount of rules.
-        self.assertEqual(len(user_rule_rows), len(self.some_rules),
-                         "The correct amount of rules have been added.")
-
-        # Convert rule-rows to `Rule` instances.
-        returned_rules = [row.create_rule() for row in user_rule_rows]
-
-        # Compare the two `Rule` lists.
-        self.assertEqual(returned_rules.sort(), self.some_rules.sort(),
-                         "All rules have been added and returned correctly.")
-
-    def test_get_rule_rows_by_ruleset_string(self):
-        permanent_rule = self.allow_rule
-        temporary_rule = self.temp_deny_rule
-
-        permanent_rule.add()
-        temporary_rule.add()
-
-        def get_rules(ruleset_string):
-            rule_rows = (
-                self.rules_table
-                .get_rule_rows_by_ruleset_string(ruleset_string)
-            )
-            return [row.create_rule() for row in rule_rows]
-
-        returned_temporary_rules = get_rules("Temporary")
-        returned_permanent_rules = get_rules("User")
-        rules_with_empty_ruleset_string = get_rules("")
-
-        self.assertEqual(returned_temporary_rules, [temporary_rule])
-        self.assertEqual(returned_permanent_rules, [permanent_rule])
-        self.assertEqual(rules_with_empty_ruleset_string, [])
-
-    def test_count_rules(self):
-        # Alias for `count_rules()`
-        count = self.rules_table.count_rules
-
-        self.assertEqual(self.rules.count_rules(), 0,
-                         "There are no user rules yet.")
-
-        # Remember the number of rule rows. The counter includes
-        # subscription rules.
-        num_rules_initial = count()
-
-        # Add a rule
-        self.some_rules[0].add()
-        self.assertEqual(count(), num_rules_initial + 1)
-
-        # Remove the rule
-        self.some_rules[0].remove()
-        self.assertEqual(count(), num_rules_initial)
-
-
-class TestRuleRow(YourPolicyTestCase):
-
-    def test_policy_property(self):
-        def assert_policy(policy_string_id):
-            # Get the localized policy string.
-            expected_policy_string = self.l10n.get_rp_property(policy_string_id)
-
-            rule_row = self._user_rule_rows[0]
-            returned_policy_string = rule_row.policy
-
-            self.assertEqual(returned_policy_string, expected_policy_string)
-
-        def test_rule(rule, policy_string_id):
-            rule.add()
-            assert_policy(policy_string_id)
-            rule.remove()
-
-        # Test using a rule with "allow" policy.
-        test_rule(self.allow_rule, "allow")
-
-        # Test using a rule with "deny" policy.
-        test_rule(self.deny_rule, "block")
-
-    def _test_endpoint(self, endpoint):
-        assert endpoint in ["origin", "dest"]
-
-        def test(spec_id):
-            self._test_pre_path_spec(endpoint, self.pre_path_specs[spec_id])
-
-        test("s")
-        test("h")
-        test("p")
-        test("sh")
-        test("sp")
-        test("hp")
-        test("shp")
-
-    def _test_pre_path_spec(self, endpoint, spec):
-        def create_rule():
-            """Create the rule from the spec info."""
-            endpoint_short = "o" if endpoint == "origin" else "d"
-            rule_data = {endpoint_short: spec["spec"]}
-            return self.rules.create_rule(rule_data, allow=True)
-
-        # Create and add the rule.
-        rule = create_rule()
-        rule.add()
-
-        # Check if the cell text matches the expected string.
-        rule_row = self._user_rule_rows[0]
-        returned_string = getattr(rule_row, endpoint)
-        self.assertEqual(returned_string, spec["expected_string"])
-
-        # Remove the rule again.
-        rule.remove()
-
-    def test_origin_property(self):
-        self._test_endpoint("origin")
-
-    def test_dest_property(self):
-        self._test_endpoint("dest")
-
-    def test_origin_empty(self):
-        self.rule_without_origin.add()
-        origin_string = self._user_rule_rows[0].origin
-        self.assertEqual(origin_string, "")
-
-    def test_dest_empty(self):
-        self.rule_without_dest.add()
-        dest_string = self._user_rule_rows[0].dest
-        self.assertEqual(dest_string, "")
-
-    def test_rule_set_property(self):
-        def test(rule, expected_ruleset_string):
-            rule.add()
-            self.assertEqual(self._user_rule_rows[0].rule_set,
-                             expected_ruleset_string)
-            rule.remove()
-
-        test(self.allow_rule, "User")
-        test(self.temp_allow_rule, "Temporary")
-
-    def test_create_rule(self):
-        def test(rule):
-            rule.add()
-            rule_row = self._user_rule_rows[0]
-            returned_rule = rule_row.create_rule()
-            self.assertIsInstance(returned_rule, Rule,
-                                  "`create_rule()` has returned a `Rule` "
-                                  "instance.")
-            self.assertEqual(returned_rule, rule,
-                             msg=("The returned rule is identical to what "
-                                  "has been added."))
-            rule.remove()
-
-        # Test rules with all origin/dest fields specified.
-        test(self.allow_rule_shp_shp)
-        test(self.temp_deny_rule_shp_shp)
-
-    def test_remove_rule(self):
-        for rule in self.some_rules:
-            rule.add()
-            self.assertTrue(rule.exists())
-            self._user_rule_rows[0].remove()
-            self.assertFalse(rule.exists())
-
-    def test_is_user_rule(self):
-        def test_rule(rule, is_user_rule):
-            rule.add()
-            self.assertEqual(self._user_rule_rows[0].is_user_rule(),
-                             is_user_rule)
-            rule.remove()
-
-        # Test some user rules, that is, both temporary and permanent rules.
-        test_rule(self.allow_rule, True)
-        test_rule(self.temp_allow_rule, True)
-
-        # TODO: Test some non-user rules (subscription rules).
-        #       In those cases `is_user_rule()` should return `False`.
-
-    def test_is_temporary(self):
-        def test_rule(rule, is_temp):
-            rule.add()
-            self.assertEqual(self._user_rule_rows[0].is_temporary(), is_temp)
-            rule.remove()
-
-        # Test both temporary and permanent rules.
-        test_rule(self.allow_rule, False)
-        test_rule(self.temp_allow_rule, True)
 
 
 class TestAddRuleForm(YourPolicyTestCase):
@@ -392,18 +138,19 @@ class TestAddRuleForm(YourPolicyTestCase):
                                               expected_field_value)))
 
         # Test some rules which make use of all fields.
-        test_rule(self.allow_rule_shp_shp)
-        test_rule(self.temp_deny_rule_shp_shp)
+        test_rule(self.data.allow_rule_shp_shp)
+        test_rule(self.data.temp_deny_rule_shp_shp)
 
         # Test some rules which make use of _some_ fields.
-        test_rule(self.allow_rule_sh_p)
-        test_rule(self.temp_deny_rule_s_hp)
-        test_rule(self.rule_without_dest)
-        test_rule(self.rule_without_origin)
+        test_rule(self.data.allow_rule_sh_p)
+        test_rule(self.data.temp_deny_rule_s_hp)
+        test_rule(self.data.rule_without_dest)
+        test_rule(self.data.rule_without_origin)
 
     def test_reset(self):
         # Set all fields.
-        self.add_rule_form.set_all_values_by_rule(self.temp_deny_rule_shp_shp)
+        self.add_rule_form.set_all_values_by_rule(
+            self.data.temp_deny_rule_shp_shp)
 
         # reset
         self.add_rule_form.reset()
@@ -432,18 +179,19 @@ class TestAddRuleForm(YourPolicyTestCase):
             self.add_rule_form.set_all_values_by_rule(rule)
             # Submit and compare.
             submit_and_compare(rule)
-            # Remove the rule again.
-            rule.remove()
+            # Remove the rule again. The rules file must be updated
+            # because submitting the form has saved the rule.
+            rule.remove(store=True)
 
         # Test some rules which make use of all fields.
-        test_rule(self.allow_rule_shp_shp)
-        test_rule(self.temp_deny_rule_shp_shp)
+        test_rule(self.data.allow_rule_shp_shp)
+        test_rule(self.data.temp_deny_rule_shp_shp)
 
         # Test some rules which make use of _some_ fields.
-        test_rule(self.allow_rule_sh_p)
-        test_rule(self.temp_deny_rule_s_hp)
-        test_rule(self.rule_without_dest)
-        test_rule(self.rule_without_origin)
+        test_rule(self.data.allow_rule_sh_p)
+        test_rule(self.data.temp_deny_rule_s_hp)
+        test_rule(self.data.rule_without_dest)
+        test_rule(self.data.rule_without_origin)
 
         # If all form fields are empty, no rule should be added.
         self.add_rule_form.reset()
@@ -472,5 +220,5 @@ class TestAddRuleForm(YourPolicyTestCase):
     def _fill_all_fields(self):
         """Fill all form fields with some data."""
 
-        rule = self.arbitrary_rule_shp_shp
+        rule = self.data.arbitrary_rule_shp_shp
         self.add_rule_form.set_all_values_by_rule(rule)

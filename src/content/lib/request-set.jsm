@@ -21,20 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RequestSet"];
+/* exported RequestSet */
+this.EXPORTED_SYMBOLS = ["RequestSet"];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/request-result"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {RequestResult} = importModule("lib/request-result");
 
-
+//==============================================================================
+// utilities
+//==============================================================================
 
 function getUriIdentifier(uri) {
   try {
@@ -46,67 +47,66 @@ function getUriIdentifier(uri) {
   }
 }
 
+//==============================================================================
+// RequestSet
+//==============================================================================
 
 function RequestSet() {
   this._origins = {};
 }
 RequestSet.prototype = {
-  _origins : null,
+  _origins: null,
 
-  print : function(name) {
-    var log = Logger;
-    log.dump("-------------------------------------------------");
-    log.dump("== Request Set <" + name + "> ==");
+  print: function(name, printFn=Logger.dump) {
+    printFn("-------------------------------------------------");
+    printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
     var origins = this._origins;
     for (var oUri in origins) {
-      log.dump("      " + "Origin uri: <" + oUri + ">");
+      printFn("      " + "Origin uri: <" + oUri + ">");
       for (var dBase in origins[oUri]) {
         var dests = origins[oUri];
-        log.dump("        " + "Dest base domain: <" + dBase + ">");
+        printFn("        " + "Dest base domain: <" + dBase + ">");
         for (var dIdent in dests[dBase]) {
-          log.dump("          " + "Dest identifier: <" + dIdent + ">");
+          printFn("          " + "Dest identifier: <" + dIdent + ">");
           for (var dUri in dests[dBase][dIdent]) {
-            log.dump("            " + "Dest uri: <" + dUri + ">");
-            for (var i in dests[dBase][dIdent][dUri]) {
-              log.dump("              " + "#: " + i);
-              for (var ruleStr in dests[dBase][dIdent][dUri][i]) {
-                log.dump("                " + "Rule: <" + ruleStr + ">");
-              }
-            }
+            var n = dests[dBase][dIdent][dUri].length;
+            printFn("            " + "Dest uri: (" + n + " requests) <" +
+                dUri + ">");
           }
         }
       }
     }
-    log.dump("-------------------------------------------------");
+    printFn("-------------------------------------------------");
   },
 
-  getAll : function() {
+  getAll: function() {
     return this._origins;
   },
 
   // TODO: the name of this method, getAllMergedOrigins, is confusing. Is it
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
-  getAllMergedOrigins : function() {
+  getAllMergedOrigins: function() {
     var result = {};
     for (var originUri in this._origins) {
       var dests = this._origins[originUri];
       for (var destBase in dests) {
         if (!result[destBase]) {
-           result[destBase] = {};
+          result[destBase] = {};
         }
         for (var destIdent in dests[destBase]) {
           if (!result[destBase][destIdent]) {
-             result[destBase][destIdent] = {};
+            result[destBase][destIdent] = {};
           }
           for (var destUri in dests[destBase][destIdent]) {
             if (!result[destBase][destIdent][destUri]) {
-              result[destBase][destIdent][destUri] = dests[destBase][destIdent][destUri];
+              result[destBase][destIdent][destUri] =
+                  dests[destBase][destIdent][destUri];
             } else {
               result[destBase][destIdent][destUri] =
-                    result[destBase][destIdent][destUri]
-                    .concat(dests[destBase][destIdent][destUri]);
+                  result[destBase][destIdent][destUri].
+                      concat(dests[destBase][destIdent][destUri]);
             }
           }
         }
@@ -115,21 +115,21 @@ RequestSet.prototype = {
     return result;
   },
 
-  getOriginUri : function(originUri) {
+  getOriginUri: function(originUri) {
     return this._origins[originUri] || {};
   },
 
   /**
-   * @param {Array} rules The rules that were triggered by this request.
+   * @param {string} originUri
+   * @param {string} destUri
+   * @param {RequestResult} requestResult
    */
-  addRequest : function(originUri, destUri, requestResult) {
-    if (requestResult == undefined) {
+  addRequest: function(originUri, destUri, requestResult) {
+    if (requestResult === undefined) {
       Logger.warning(Logger.TYPE_INTERNAL,
-          "addRequest() was called without a requestResult object!"
-          +" Creating a new one.\n"
-          +"\torigin: <"+originUri+">\n"
-          +"\tdestination: <"+destUri+">"
-      );
+          "addRequest() was called without a requestResult object!" +
+          " Creating a new one. -- " +
+          "origin: <" + originUri + ">, destination: <" + destUri + ">");
       requestResult = new RequestResult();
     }
 
@@ -152,7 +152,7 @@ RequestSet.prototype = {
     //   throw "addRequest 'rules' argument must be an object where each " +
     //         "key/val is ruleStr/rule";
     // }
-/*
+    /*
     if (!dests[destBase][destIdent][destUri]) {
       // TODO: this is a little sketchy. What if we clobber rules
       // that were already here? Arguably if we are told to add the
@@ -177,7 +177,7 @@ RequestSet.prototype = {
 
   /**
    */
-  removeRequest : function(originUri, destUri) {
+  removeRequest: function(originUri, destUri) {
     if (!this._origins[originUri]) {
       return;
     }
@@ -216,19 +216,22 @@ RequestSet.prototype = {
 
   /**
    */
-  removeOriginUri : function(originUri) {
+  removeOriginUri: function(originUri) {
     delete this._origins[originUri];
   },
 
-  containsBlockedRequests : function() {
-    var origins = this._origins
-    for (var originURI in origins) {
-      for (var destBase in origins[originURI]) {
-        for (var destIdent in origins[originURI][destBase]) {
-          for (var destURI in origins[originURI][destBase][destIdent]) {
-            for (var i in origins[originURI][destBase][destIdent][destURI]) {
-              if (true !==
-                  origins[originURI][destBase][destIdent][destURI][i].isAllowed) {
+  containsBlockedRequests: function() {
+    let origins = this._origins;
+    for (let originURI in origins) {
+      let originUriRequests = origins[originURI];
+      for (let destBase in originUriRequests) {
+        let destBaseRequests = originUriRequests[destBase];
+        for (let destIdent in destBaseRequests) {
+          let destIdentRequests = destBaseRequests[destIdent];
+          for (let destURI in destIdentRequests) {
+            let destUriRequests = destIdentRequests[destURI];
+            for (let request of destUriRequests) {
+              if (true !== request.isAllowed) {
                 return true;
               }
             }

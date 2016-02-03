@@ -20,61 +20,64 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
-var EXPORTED_SYMBOLS = ["CustomUri"];
+/* exported CustomUri */
+this.EXPORTED_SYMBOLS = ["CustomUri"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-const destinationURI = "http://www.maindomain.test/destination.html";
+//==============================================================================
+// CustomUri
+//==============================================================================
 
+var CustomUri = (function() {
+  let self = {};
 
-var CustomUri = (function () {
-  var self = {
-    classDescription: "RPC Protocol",
-    contractID: "@mozilla.org/network/protocol;1?name=rpc",
-    classID: Components.ID("{2d668f50-d8af-11e4-8830-0800200c9a66}"),
-    QueryInterface: XPCOMUtils.generateQI([Ci.nsIProtocolHandler]),
+  // A page with no other resources
+  const DESTINATION_URI = "http://www.maindomain.test/" +
+      "page-without-resources.html";
 
-    scheme: "rpc",
-    protocolFlags: Ci.nsIProtocolHandler.URI_NORELATIVE |
-                   Ci.nsIProtocolHandler.URI_NOAUTH |
-                   Ci.nsIProtocolHandler.URI_LOADABLE_BY_ANYONE,
+  self.classDescription = "RPC Protocol";
+  self.contractID = "@mozilla.org/network/protocol;1?name=rpc";
+  self.classID = Components.ID("{2d668f50-d8af-11e4-8830-0800200c9a66}");
+  self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIProtocolHandler]);
 
+  self.scheme = "rpc";
+  self.protocolFlags = Ci.nsIProtocolHandler.URI_NORELATIVE |
+                       Ci.nsIProtocolHandler.URI_NOAUTH |
+                       Ci.nsIProtocolHandler.URI_LOADABLE_BY_ANYONE;
 
-    newURI: function (aSpec, aOriginCharset, aBaseURI) {
-      var uri = Cc["@mozilla.org/network/simple-uri;1"]
-          .createInstance(Ci.nsIURI);
-      uri.spec = aSpec;
-      return uri;
-    },
-
-    newChannel: function (aURI) {
-      var path = aURI.path;
-      var uri = Services.io.newURI(destinationURI + "?" + path, null, null);
-      var channel = Services.io.newChannelFromURI(uri, null)
-          .QueryInterface(Ci.nsIHttpChannel);
-      return channel;
-    },
-
-    //
-    // nsIFactory interface implementation
-    //
-
-    createInstance: function (outer, iid) {
-      if (outer) {
-        throw Cr.NS_ERROR_NO_AGGREGATION;
-      }
-      return self.QueryInterface(iid);
-    },
-
-    startup: registerFactory,
-    shutdown: unregisterFactory
+  self.newURI = function(aSpec, aOriginCharset, aBaseURI) {
+    var uri = Cc["@mozilla.org/network/simple-uri;1"]
+        .createInstance(Ci.nsIURI);
+    uri.spec = aSpec;
+    return uri;
   };
 
+  self.newChannel = function(aURI) {
+    var path = aURI.path;
+    var uri = Services.io.newURI(DESTINATION_URI + "?" + path, null, null);
+    var channel = Services.io.newChannelFromURI(uri, null)
+        .QueryInterface(Ci.nsIHttpChannel);
+    return channel;
+  };
+
+  //----------------------------------------------------------------------------
+  // nsIFactory interface implementation
+  //----------------------------------------------------------------------------
+
+  self.createInstance = function(outer, iid) {
+    if (outer) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
+    }
+    return self.QueryInterface(iid);
+  };
+
+  self.startup = registerFactory;
+  self.shutdown = unregisterFactory;
 
   function registerFactory() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
@@ -88,4 +91,4 @@ var CustomUri = (function () {
   }
 
   return self;
-})();
+}());

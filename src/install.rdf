@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy Continued</em:name>
-    <em:version>1.0.beta10.2</em:version>
+    <em:version>1.0.beta11</em:version>
     <em:type>2</em:type>
     <em:id>rpcontinued@non-amo.requestpolicy.org</em:id>
 
@@ -18,7 +18,7 @@
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>
 
-    <em:updateURL>https://requestpolicycontinued.github.io/xpi/update-1.x-beta.rdf</em:updateURL>
+    <em:updateURL>https://requestpolicycontinued.github.io/updates/update-nightly.rdf</em:updateURL>
 
     <em:localized>
       <Description>
@@ -197,12 +197,12 @@
     <em:translator>Володимир Савчук / Volodymyr Savchuk (Ukrainian)</em:translator>
     <em:translator>Brad Horrocks</em:translator>
 
-    <!-- Firefox (Flock will recognize this, too) -->
+    <!-- Firefox -->
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-        <em:minVersion>16.0</em:minVersion>
-        <em:maxVersion>44.0a1</em:maxVersion>
+        <em:minVersion>24.0</em:minVersion>
+        <em:maxVersion>47.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
 
@@ -210,9 +210,18 @@
     <em:targetApplication>
       <Description>
         <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
-        <em:minVersion>2.13</em:minVersion>
-        <em:maxVersion>2.38.*</em:maxVersion>
+        <em:minVersion>2.21</em:minVersion>
+        <em:maxVersion>2.39.*</em:maxVersion>
       </Description>
+    </em:targetApplication>
+
+    <!-- Pale Moon -->
+    <em:targetApplication>
+       <Description>
+          <em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
+          <em:minVersion>25.0</em:minVersion>
+          <em:maxVersion>26.*</em:maxVersion>
+       </Description>
     </em:targetApplication>
 
   </Description>

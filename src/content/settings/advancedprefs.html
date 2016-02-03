@@ -8,7 +8,7 @@
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
 </head>
-<body onload="onload()">
+<body>
 <table>
   <tr>
     <td id="sidepad"></td>
@@ -24,9 +24,9 @@
                    data-string="preferences"></a></li>
             <li><a href="about:requestpolicy?yourpolicy"
                    data-string="managePolicies"></a></li>
-            <li><a href="https://github.com/RequestPolicyContinued/requestpolicy/wiki#help-and-support-for-users-and-developers"
+            <li><a href="https://requestpolicycontinued.github.io/#quick-start"
                    data-string="help" target="_blank"></a></li>
-            <li><a href="https://requestpolicycontinued.github.io/#about"
+            <li><a href="https://requestpolicycontinued.github.io/About.html"
                    data-string="about" target="_blank"></a></li>
           </ul>
         </div>
@@ -91,6 +91,32 @@
                 <label>
                   <input type="checkbox"
                          id="pref-prefetch.dns.restoreDefaultOnUninstall"/>
+                  <span data-string="restoreDefaultOnUninstall"></span>
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td data-string="speculativePreConnections"></td>
+            <td>
+              <div>
+                <label>
+                  <input type="checkbox"
+                         id="pref-speculativePreConnections"/>
+                  <span data-string="enabled"></span>
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox"
+                         id="pref-prefetch.preconnections.disableOnStartup"/>
+                  <span data-string="disableOnStartup"></span>
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="checkbox"
+                         id="pref-prefetch.preconnections.restoreDefaultOnUninstall"/>
                   <span data-string="restoreDefaultOnUninstall"></span>
                 </label>
               </div>

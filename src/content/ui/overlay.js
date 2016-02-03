@@ -21,54 +21,49 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window, document */
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-rpcontinued.overlay = (function() {
+window.rpcontinued.overlay = (function() {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  let {ScriptLoader, XPCOMUtils} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/XPCOMUtils.jsm", mod);
-    return mod;
-  }());
+  let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-  // iMod: Alias for ScriptLoader.importModule
-  let iMod = ScriptLoader.importModule;
-  let {Environment, ProcessEnvironment} = iMod("lib/environment");
-  let {ManagerForMessageListeners} = iMod("lib/manager-for-message-listeners");
-  let {Logger} = iMod("lib/logger");
-  let {rpPrefBranch, Prefs} = iMod("lib/prefs");
-  let {RequestProcessor} = iMod("lib/request-processor");
-  let {PolicyManager} = iMod("lib/policy-manager");
-  let {DomainUtil} = iMod("lib/utils/domains");
-  let {StringUtils} = iMod("lib/utils/strings");
-  let {WindowUtils} = iMod("lib/utils/windows");
-  let {Utils} = iMod("lib/utils");
-  let {C} = iMod("lib/utils/constants");
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {Environment, ProcessEnvironment} = importModule("lib/environment");
+  let {ManagerForMessageListeners} = importModule(
+      "lib/manager-for-message-listeners");
+  let {Logger} = importModule("lib/logger");
+  let {Prefs} = importModule("models/prefs");
+  let {RequestProcessor} = importModule("lib/request-processor");
+  let {PolicyManager} = importModule("lib/policy-manager");
+  let {DomainUtil} = importModule("lib/utils/domains");
+  let {StringUtils} = importModule("lib/utils/strings");
+  let {WindowUtils} = importModule("lib/utils/windows");
+  let {JSUtils} = importModule("lib/utils/javascript");
+  let {Utils} = importModule("lib/utils");
+  let {DOMUtils} = importModule("lib/utils/dom");
+  let {C} = importModule("lib/utils/constants");
+
+  let rpcontinued = window.rpcontinued;
+
+  //============================================================================
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
   let $id = document.getElementById.bind(document);
-
-  //let _extensionConflictInfoUri = "http://www.requestpolicy.com/conflict?ext=";
-
-  //let _prefetchInfoUri = "http://www.requestpolicy.com/help/prefetch.html";
-  //let _prefetchDisablingInstructionsUri = "http://www.requestpolicy.com/help/prefetch.html#disable";
-
 
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(ProcessEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);
-
 
   let initialized = false;
 
@@ -78,22 +73,15 @@ rpcontinued.overlay = (function() {
 
   let blockedContentStateUpdateDelay = 250; // milliseconds
   let blockedContentCheckTimeoutId = null;
-  let blockedContentCheckMinWaitOnObservedBlockedRequest = 500;
   let blockedContentCheckLastTime = 0;
 
   let popupElement = null;
 
   //let statusbar = null;
 
-  // TODO: get back entry in context menu
-  // https://github.com/RequestPolicyContinued/requestpolicy/issues/353
-  //let rpContextMenu = null;
-
   let toolbox = null;
 
   let isFennec = false;
-
-
 
   let self = {
     // This is set by request-log.js when it is initialized. We don't need to worry
@@ -101,7 +89,6 @@ rpcontinued.overlay = (function() {
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment
   };
-
 
   self.toString = function() {
     return "[rpcontinued.overlay " + overlayId + "]";
@@ -121,12 +108,11 @@ rpcontinued.overlay = (function() {
         popupElement = $id("rpc-popup");
 
         //statusbar = $id("status-bar");
-        //rpContextMenu = $id("rpcontinuedContextMenu");
         toolbox = $id("navigator-toolbox");
 
         var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
             .getService(Components.interfaces.nsIXULAppInfo);
-        isFennec = (appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}");
+        isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
 
         if (isFennec) {
           Logger.dump("Detected Fennec.");
@@ -140,7 +126,7 @@ rpcontinued.overlay = (function() {
         // object's observerBlockedRequests() method will be called.
         RequestProcessor.addRequestObserver(self);
 
-        //self.setContextMenuEnabled(rpPrefBranch.getBoolPref("contextMenu"));
+        setContextMenuEntryEnabled(Prefs.get("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -162,9 +148,10 @@ rpcontinued.overlay = (function() {
     }
   };
 
-  //setContextMenuEnabled : function(isEnabled) {
-  //  rpContextMenu.setAttribute("hidden", !isEnabled);
-  //},
+  function setContextMenuEntryEnabled(isEnabled) {
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
+    contextMenuEntry.setAttribute("hidden", !isEnabled);
+  }
 
   OverlayEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
@@ -218,10 +205,6 @@ rpcontinued.overlay = (function() {
                                         addContextMenuListener);
 
   function addTabContainerTabSelectListener() {
-    // We consider the default place for the popup to be attached to the
-    // context menu, so attach it there.
-    //self._attachPopupToContextMenu();
-
     // Listen for the user changing tab so we can update any notification or
     // indication of blocked requests.
     if (!isFennec) {
@@ -242,23 +225,18 @@ rpcontinued.overlay = (function() {
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         addTabContainerTabSelectListener);
 
-
-
-
   mlManager.addListener("notifyDocumentLoaded", function(message) {
     let {documentURI} = message.data;
-
-    // the <browser> element of the corresponding tab.
-    let browser = message.target;
+    // The document URI could contain a "fragment" part.
+    let originURI = DomainUtil.getUriObject(documentURI).specIgnoringRef;
 
     let blockedURIs = {};
 
-    if (rpPrefBranch.getBoolPref("indicateBlockedObjects")) {
-      var indicateBlacklisted = rpPrefBranch
-          .getBoolPref("indicateBlacklistedObjects");
+    if (Prefs.get("indicateBlockedObjects")) {
+      var indicateBlacklisted = Prefs.get("indicateBlacklistedObjects");
 
       var rejectedRequests = RequestProcessor._rejectedRequests
-          .getOriginUri(documentURI);
+          .getOriginUri(originURI);
       for (var destBase in rejectedRequests) {
         for (var destIdent in rejectedRequests[destBase]) {
           for (var destUri in rejectedRequests[destBase][destIdent]) {
@@ -283,25 +261,11 @@ rpcontinued.overlay = (function() {
       }
     }
 
-    if ("rpcontinued" in browser &&
-        documentURI in browser.rpcontinued.blockedRedirects) {
-      // bad smell: do not save blocked requests in the <browser> obj
-      var dest = browser.rpcontinued.blockedRedirects[documentURI];
-      Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "Showing notification for blocked redirect. To <" + dest +
-          "> " + "from <" + documentURI + ">");
-      self._showRedirectNotification(browser, dest);
-
-      delete browser.rpcontinued.blockedRedirects[documentURI];
-    }
-
     // send the list of blocked URIs back to the frame script
     return {blockedURIs: blockedURIs};
   });
 
-
-
-  mlManager.addListener("notifyTopLevelDocumentLoaded", function (message) {
+  mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
     // Clear any notifications that may have been present.
     self._setContentBlockedState(false);
     // We don't do this immediately anymore because slow systems might have
@@ -318,9 +282,7 @@ rpcontinued.overlay = (function() {
     self._updateBlockedContentStateAfterTimeout();
   });
 
-
-
-  mlManager.addListener("notifyDOMFrameContentLoaded", function (message) {
+  mlManager.addListener("notifyDOMFrameContentLoaded", function(message) {
     // This has an advantage over just relying on the
     // observeBlockedRequest() call in that this will clear a blocked
     // content notification if there no longer blocked content. Another way
@@ -331,27 +293,19 @@ rpcontinued.overlay = (function() {
     self._updateBlockedContentState(message.target);
   });
 
-
-
   mlManager.addListener("handleMetaRefreshes", function(message) {
     self.handleMetaRefreshes(message);
   });
 
-
-
-  mlManager.addListener("notifyLinkClicked", function (message) {
+  mlManager.addListener("notifyLinkClicked", function(message) {
     RequestProcessor.registerLinkClicked(message.data.origin,
                                          message.data.dest);
   });
 
-
-
-  mlManager.addListener("notifyFormSubmitted", function (message) {
+  mlManager.addListener("notifyFormSubmitted", function(message) {
     RequestProcessor.registerFormSubmitted(message.data.origin,
                                            message.data.dest);
   });
-
-
 
   self.handleMetaRefreshes = function(message) {
     Logger.dump("Handling meta refreshes...");
@@ -390,7 +344,6 @@ rpcontinued.overlay = (function() {
     }
   };
 
-
   /**
    * Takes an URI, crops it if necessary, and returns it.
    * It's ensured that the returned URI isn't longer than a specified length,
@@ -403,7 +356,7 @@ rpcontinued.overlay = (function() {
    * @param {String} aUri
    * @param {Int} aMaxLength
    *
-   * @returns {String} the URI, eventually cropped
+   * @returns {String} the URI, possibly cropped
    *
    */
   function cropUri(aUri, aMaxLength) {
@@ -416,12 +369,11 @@ rpcontinued.overlay = (function() {
     }
   }
 
-
   /**
    * Shows a notification that a redirect was requested by a page (meta refresh
    * or with headers).
    *
-   * @param {<browser> element} browser
+   * @param {Browser} browser
    * @param {string} redirectTargetUri
    * @param {number} delay
    * @param {string=} redirectOriginUri
@@ -470,7 +422,6 @@ rpcontinued.overlay = (function() {
           [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
-
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
     var cm = rpcontinued.classicmenu;
@@ -480,7 +431,8 @@ rpcontinued.overlay = (function() {
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
     var destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
 
-    var origin = null, dest = null;
+    var origin = null;
+    var dest = null;
     if (originBaseDomain !== null) {
       origin = m._addWildcard(originBaseDomain);
     }
@@ -517,9 +469,6 @@ rpcontinued.overlay = (function() {
       }
     }
 
-
-
-
     var notification = notificationBox
         .getNotificationWithValue(notificationValue);
     if (notification) {
@@ -539,8 +488,8 @@ rpcontinued.overlay = (function() {
             //       this is not necessary at all.
             // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
 
-            RequestProcessor.registerAllowedRedirect(
-                browser.documentURI.specIgnoringRef, redirectTargetUri);
+            RequestProcessor.registerAllowedRedirect(redirectOriginUri,
+                                                     redirectTargetUri);
 
             browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
                 {uri: redirectTargetUri});
@@ -564,12 +513,29 @@ rpcontinued.overlay = (function() {
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
       const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-      notificationBox.appendNotification(notificationLabel, notificationValue,
-          "chrome://browser/skin/Info.png", priority, buttons);
+
+      let notificationElem = notificationBox.appendNotification(
+          notificationLabel, notificationValue,
+          "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
+          priority, buttons);
+
+      // Let the notification persist at least 300ms. This is needed in the
+      // following scenario:
+      //     If an URL is entered on an empty tab (e.g. "about:blank"),
+      //     and that URL redirects to another URL with a different
+      //     host, and that redirect is blocked by RequestPolicy,
+      //     then immediately after blocking the redirect Firefox will make
+      //     a location change, maybe back from the blocked URL to
+      //     "about:blank". In any case, when the location changes, the
+      //     function `notificationbox.removeTransientNotifications()`
+      //     is called. It checks for the `persistence` and `timeout`
+      //     properties. See MDN documentation:
+      //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
+      // See also issue #722.
+      notificationElem.timeout = Date.now() + 300;
     }
     return true;
   };
-
 
   /**
    * Performs actions required to be performed after a tab change.
@@ -599,8 +565,10 @@ rpcontinued.overlay = (function() {
     try {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
+      // #ifdef LOG_FLAG_STATE
       Logger.debug(Logger.TYPE_INTERNAL,
           "Checking for blocked requests from page <" + uri + ">");
+      // #endif
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
@@ -608,10 +576,12 @@ rpcontinued.overlay = (function() {
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
+      // #ifdef LOG_FLAG_STATE
       let logText = documentContainsBlockedContent ?
                     "Requests have been blocked." :
                     "No requests have been blocked.";
       Logger.debug(Logger.TYPE_INTERNAL, logText);
+      // #endif
     } catch (e) {
       Logger.severeError(
           "Unable to complete _updateBlockedContentState actions: " + e, e);
@@ -623,8 +593,10 @@ rpcontinued.overlay = (function() {
    */
   self._setContentBlockedState = function(isContentBlocked) {
     var button = $id(toolbarButtonId);
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
       button.setAttribute("rpcontinuedBlocked", isContentBlocked);
+      contextMenuEntry.setAttribute("rpcontinuedBlocked", isContentBlocked);
     }
   };
 
@@ -633,22 +605,19 @@ rpcontinued.overlay = (function() {
    */
   function updatePermissiveStatus() {
     var button = $id(toolbarButtonId);
+    let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
       let isPermissive = Prefs.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
+      contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
   }
   /**
    * register a pref observer
    */
   function updatePermissiveStatusOnPrefChanges() {
-    OverlayEnvironment.obMan.observeRPPref(
-        ["startWithAllowAllEnabled"],
-        function(subject, topic, data) {
-          if (topic === "nsPref:changed") {
-            updatePermissiveStatus();
-          }
-        });
+    OverlayEnvironment.prefObs.addListener("startWithAllowAllEnabled",
+                                           updatePermissiveStatus);
   }
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);
@@ -661,10 +630,8 @@ rpcontinued.overlay = (function() {
    * fast as possible because request processing blocks until this function
    * returns.
    *
-   * @param {}
-   *          originUri
-   * @param {}
-   *          destUri
+   * @param {string} originUri
+   * @param {string} destUri
    */
   self.observeAllowedRequest = function(originUri, destUri) {
     if (self.requestLog) {
@@ -677,10 +644,8 @@ rpcontinued.overlay = (function() {
    * fast as possible because request processing blocks until this function
    * returns.
    *
-   * @param {}
-   *          originUri
-   * @param {}
-   *          destUri
+   * @param {string} originUri
+   * @param {string} destUri
    */
   self.observeBlockedRequest = function(originUri, destUri) {
     self._updateNotificationDueToBlockedContent();
@@ -695,8 +660,8 @@ rpcontinued.overlay = (function() {
    * This function is called during shouldLoad(). As shouldLoad shoudn't be
    * blocked, it's better to set a timeout here.
    */
-  self.observeBlockedTopLevelDocRequest = function (browser, originUri,
-                                                    destUri) {
+  self.observeBlockedTopLevelDocRequest = function(browser, originUri,
+                                                   destUri) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     window.setTimeout(function() {
@@ -715,7 +680,12 @@ rpcontinued.overlay = (function() {
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
     blockedContentCheckTimeoutId = window.setTimeout(function() {
-      rpcontinued.overlay._updateBlockedContentState(browser);
+      try {
+        rpcontinued.overlay._updateBlockedContentState(browser);
+      } catch (e) {
+        // It's possible that the add-on has been disabled
+        // in the meantime.
+      }
     }, blockedContentStateUpdateDelay);
   };
 
@@ -732,8 +702,18 @@ rpcontinued.overlay = (function() {
    */
   self._contextMenuOnPopupShowing = function() {
     rpcontinued.overlay._wrapOpenLink();
-    /*rpcontinued.overlay._attachPopupToContextMenu();*/
   };
+
+  /**
+   * @this {nsContextMenu}
+   */
+  function onOpenLinkViaContextMenu() {
+    let origin = window.gContextMenuContentData ?
+        window.gContextMenuContentData.docLocation :
+        this.target.ownerDocument.URL;
+    let dest = this.linkURL;
+    RequestProcessor.registerLinkClicked(origin, dest);
+  }
 
   /**
    * Wraps (overrides) the following methods of gContextMenu
@@ -755,31 +735,12 @@ rpcontinued.overlay = (function() {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    if (!gContextMenu.rpcontinuedMethodsOverridden) {
-      gContextMenu.rpcontinuedMethodsOverridden = true;
-
-      gContextMenu.openLink = function() {
-        RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-        return this.__proto__.openLink.call(this); // call the overridden method
-      };
-
-      // Below, we check whether the functions exist before overriding it, because
-      // those functions have been introduced in later versions of Firefox than openLink().
-
-      if (gContextMenu.openLinkInPrivateWindow) {
-        gContextMenu.openLinkInPrivateWindow = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInPrivateWindow.call(this);
-        };
-      }
-
-      if (gContextMenu.openLinkInCurrent) {
-        gContextMenu.openLinkInCurrent = function() {
-          RequestProcessor.registerLinkClicked(this.target.ownerDocument.URL, this.linkURL);
-          return this.__proto__.openLinkInCurrent.call(this);
-        };
-      }
-    }
+    Utils.wrapFunction(window.gContextMenu, "openLink",
+        onOpenLinkViaContextMenu);
+    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow",
+        onOpenLinkViaContextMenu);
+    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent",
+        onOpenLinkViaContextMenu);
   };
 
   /**
@@ -829,7 +790,7 @@ rpcontinued.overlay = (function() {
 
   self._addLocationObserver = function() {
     self.locationListener = {
-      onLocationChange : function(aProgress, aRequest, aURI) {
+      onLocationChange: function(aProgress, aRequest, aURI) {
         // This gets called both for tab changes and for history navigation.
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
@@ -853,33 +814,33 @@ rpcontinued.overlay = (function() {
   self._addHistoryObserver = function() {
     // Implements nsISHistoryListener (and nsISupportsWeakReference)
     self.historyListener = {
-      OnHistoryGoBack : function(backURI) {
+      OnHistoryGoBack: function(backURI) {
         RequestProcessor.registerHistoryRequest(backURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGoForward : function(forwardURI) {
+      OnHistoryGoForward: function(forwardURI) {
         RequestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGotoIndex : function(index, gotoURI) {
+      OnHistoryGotoIndex: function(index, gotoURI) {
         RequestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
         return true;
       },
 
-      OnHistoryNewEntry : function(newURI) {
+      OnHistoryNewEntry: function(newURI) {
       },
 
-      OnHistoryPurge : function(numEntries) {
+      OnHistoryPurge: function(numEntries) {
         return true;
       },
 
-      OnHistoryReload : function(reloadURI, reloadFlags) {
+      OnHistoryReload: function(reloadURI, reloadFlags) {
         return true;
       },
 
-      QueryInterface : function(aIID, aResult) {
+      QueryInterface: function(aIID, aResult) {
         if (aIID.equals(Components.interfaces.nsISHistoryListener) ||
             aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
             aIID.equals(Components.interfaces.nsISupports)) {
@@ -888,7 +849,7 @@ rpcontinued.overlay = (function() {
         throw Components.results.NS_NOINTERFACE;
       },
 
-      GetWeakReference : function() {
+      GetWeakReference: function() {
         return Components.classes["@mozilla.org/appshell/appShellService;1"]
             .createInstance(Components.interfaces.nsIWeakReference);
       }
@@ -896,21 +857,25 @@ rpcontinued.overlay = (function() {
 
     // there seems to be a bug in Firefox ESR 24 -- the session history is
     // null. After waiting a few miliseconds it's available. To be sure this
-    let tries = 0, waitTime = 20, maxTries = 10;
+    let tries = 0;
+    let waitTime = 20;
+    let maxTries = 10;
     let tryAddingSHistoryListener = function() {
       ++tries;
       try {
+        // FIXME: [e10s] The DocShell (and webNavigation) lives in the
+        //               content process.
         let sHistory = gBrowser.webNavigation.sessionHistory;
         sHistory.addSHistoryListener(self.historyListener);
         return;
       } catch (e) {
         if (tries >= maxTries) {
           Logger.severeError("Can't add session history listener, even " +
-              "after " + tries + " tries. "+e, e);
+              "after " + tries + " tries. " + e, e);
           return;
         }
         // call this function again in a few miliseconds.
-        setTimeout(function () {
+        window.setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);
@@ -932,37 +897,29 @@ rpcontinued.overlay = (function() {
   /**
    * Called before the popup menu is shown.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.onPopupShowing = function(event) {
-  //    if (event.currentTarget != event.originalTarget) {
-  //      return;
-  //    }
+    // if (event.currentTarget != event.originalTarget) {
+    //   return;
+    // }
     rpcontinued.menu.prepareMenu();
   };
 
   /**
    * Called after the popup menu has been hidden.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.onPopupHidden = function(event) {
     var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
-      if (rpPrefBranch.getBoolPref("autoReload")) {
+      if (Prefs.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
         mm.sendAsyncMessage(C.MM_PREFIX + "reload");
       }
     }
     self._needsReloadOnMenuClose = false;
-  //    if (event.currentTarget != event.originalTarget) {
-  //      return;
-  //    }
-    // Leave the popup attached to the context menu, as we consider that the
-    // default location for it.
-    //self._attachPopupToContextMenu();
   };
 
   /**
@@ -987,8 +944,7 @@ rpcontinued.overlay = (function() {
   /**
    * Toggles disabling of all blocking for the current session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
     var disabled = !Prefs.isBlockingDisabled();
@@ -1011,8 +967,7 @@ rpcontinued.overlay = (function() {
    * Allows the current document's origin to request from any destination for
    * the duration of the browser session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.temporarilyAllowCurrentOrigin = function(event) {
     // Note: the available variable "content" is different than the avaialable
@@ -1025,8 +980,7 @@ rpcontinued.overlay = (function() {
    * Allows a destination to be requested from any origin for the duration of
    * the browser session.
    *
-   * @param {String}
-   *          destHost
+   * @param {string} destHost
    */
   self.temporarilyAllowDestination = function(destHost) {
     PolicyManager.temporarilyAllowDestination(destHost);
@@ -1036,10 +990,8 @@ rpcontinued.overlay = (function() {
    * Allows a destination to be requested from a single origin for the duration
    * of the browser session.
    *
-   * @param {String}
-   *          originHost
-   * @param {String}
-   *          destHost
+   * @param {string} originHost
+   * @param {string} destHost
    */
   self.temporarilyAllowOriginToDestination = function(originHost, destHost) {
     PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
@@ -1056,8 +1008,7 @@ rpcontinued.overlay = (function() {
    * Allows the current document's origin to request from any destination,
    * including in future browser sessions.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.allowCurrentOrigin = function(event) {
     var host = self.getTopLevelDocumentUriIdentifier();
@@ -1067,8 +1018,7 @@ rpcontinued.overlay = (function() {
   /**
    * Allows requests to a destination, including in future browser sessions.
    *
-   * @param {String}
-   *          destHost
+   * @param {String} destHost
    */
   self.allowDestination = function(destHost) {
     PolicyManager.allowDestination(destHost);
@@ -1078,10 +1028,8 @@ rpcontinued.overlay = (function() {
    * Allows requests to a destination from a single origin, including in future
    * browser sessions.
    *
-   * @param {String}
-   *          originHost
-   * @param {String}
-   *          destHost
+   * @param {String} originHost
+   * @param {String} destHost
    */
   self.allowOriginToDestination = function(originHost, destHost) {
     PolicyManager.allowOriginToDestination(originHost, destHost);
@@ -1090,8 +1038,7 @@ rpcontinued.overlay = (function() {
   /**
    * Revokes all temporary permissions granted during the current session.
    *
-   * @param {Event}
-   *          event
+   * @param {Event} event
    */
   self.revokeTemporaryPermissions = function(event) {
     PolicyManager.revokeTemporaryRules();
@@ -1103,18 +1050,21 @@ rpcontinued.overlay = (function() {
     gBrowser.selectedTab = gBrowser.addTab(uri);
   };
 
-  self.openMenuByHotkey = function() {
-    // Ideally we'd put the popup in its normal place based on the rp toolbar
-    // button but let's not count on that being visible. So, we'll be safe and
-    // anchor it within the content element. However, there's no good way to
-    // right-align a popup. So, we can either let it be left aligned or we can
-    // figure out where we think the top-left corner should be. And that's what
-    // we do.
+  /**
+   * Open the menu at the browsing content.
+   *
+   * The menu is aligned to the top right.
+   */
+  self.openMenuAtContent = function() {
+    // There's no good way to right-align a popup. So, we can either
+    // let it be left aligned or we can figure out where we think the
+    // top-left corner should be. And that's what we do.
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
     //Logger.dump('popup width: ' + popup.clientWidth);
-    var popupWidth = popupElement.clientWidth ? 730 : popupElement.clientWidth;
+    var popupWidth = popupElement.clientWidth === 0 ? 730 :
+        popupElement.clientWidth;
     var anchor = $id("content");
     var contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
@@ -1122,25 +1072,50 @@ rpcontinued.overlay = (function() {
     popupElement.openPopup(anchor, "overlap", xOffset);
   };
 
-  //  showExtensionConflictInfo : function() {
-  //    var ext = RequestProcessor.getConflictingExtensions();
-  //    var extJson = JSON.stringify(ext);
-  //    self._openInNewTab(self._extensionConflictInfoUri
-  //        + encodeURIComponent(extJson));
-  //  },
-
-  //  showPrefetchInfo : function() {
-  //    self._openInNewTab(self._prefetchInfoUri);
-  //  },
-  //
-  //  showPrefetchDisablingInstructions : function() {
-  //    self._openInNewTab(self._prefetchDisablingInstructionsUri);
-  //  },
-
-  self.openToolbarPopup = function(anchor) {
-  //    rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
-  //        null);
+  self.openMenuAtToolbarButton = function() {
+    let anchor = $id("rpcontinuedToolbarButton");
+    // rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
+    //     null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
+  };
+
+  /**
+   * Open RequestPolicy's menu.
+   *
+   * If the toolbar button is visible, it will be placed there. Otherwise
+   * it will be placed near the browsing content.
+   */
+  self.openMenu = function() {
+    // `setTimeout` is needed in certain cases where the toolbar button
+    // is actually hidden. For example, it can reside in the Australis
+    // menu. By delaying "openMenu" the menu will be closed in the
+    // meantime, and the toolbar button will be detected as invisible.
+    window.setTimeout(function() {
+      if (self.isToolbarButtonVisible()) {
+        self.openMenuAtToolbarButton();
+      } else {
+        self.openMenuAtContent();
+      }
+    }, 0);
+  };
+
+  /**
+   * Close RequestPolicy's menu.
+   */
+  self.closeMenu = function() {
+    rpcontinued.menu.close();
+  };
+
+  self.toggleMenu = function() {
+    if ($id("rpc-popup").state === "closed") {
+      self.openMenu();
+    } else {
+      self.closeMenu();
+    }
+  };
+
+  self.isToolbarButtonVisible = function() {
+    return DOMUtils.isElementVisible($id("rpcontinuedToolbarButton"));
   };
 
   function openLinkInNewTab(url, relatedToCurrent) {
@@ -1148,12 +1123,36 @@ rpcontinued.overlay = (function() {
     popupElement.hidePopup();
   }
 
-  self.openPrefs = openLinkInNewTab.bind(this, "about:requestpolicy", true);
-  self.openPolicyManager = openLinkInNewTab.bind(this,
-      "about:requestpolicy?yourpolicy", true);
-  self.openHelp = openLinkInNewTab.bind(this,
-      "https://github.com/RequestPolicyContinued/requestpolicy/wiki/Help-and-Support");
+  function maybeOpenLinkInNewTab(url, equivalentURLs, relatedToCurrent) {
+    let possibleURLs = equivalentURLs.concat(url);
+    let tabbrowser = window.gBrowser;
 
+    let selectedTabIndex = tabbrowser.tabContainer.selectedIndex;
+    let numTabs = tabbrowser.tabs.length;
+
+    // Start iterating at the currently selected tab.
+    let indexes = JSUtils.leftRotateArray(JSUtils.range(numTabs),
+		selectedTabIndex);
+    for (let index of indexes) {
+      let currentBrowser = tabbrowser.getBrowserAtIndex(index);
+      let currentURI = currentBrowser.currentURI.spec;
+      if (JSUtils.arrayIncludes(possibleURLs, currentURI)) {
+        // The URL is already opened. Select this tab.
+        tabbrowser.selectedTab = tabbrowser.tabContainer.childNodes[index];
+        popupElement.hidePopup();
+        return;
+      }
+    }
+
+    openLinkInNewTab(url, relatedToCurrent);
+  }
+
+  self.openPrefs = maybeOpenLinkInNewTab.bind(this, "about:requestpolicy",
+      ["about:requestpolicy?basicprefs"], true);
+  self.openPolicyManager = maybeOpenLinkInNewTab.bind(this,
+      "about:requestpolicy?yourpolicy", [], true);
+  self.openHelp = maybeOpenLinkInNewTab.bind(this, "https://github.com/" +
+      "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support", []);
 
   self.clearRequestLog = function() {
     self.requestLog.clear();
@@ -1172,11 +1171,15 @@ rpcontinued.overlay = (function() {
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
           "chrome://rpcontinued/content/ui/request-log.xul");
-      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = false;
+      requestLog.hidden = false;
+      requestLogSplitter.hidden = false;
+      closeRequestLog.hidden = false;
       //openRequestLog.hidden = true;
     } else {
       requestLogFrame.setAttribute("src", "about:blank");
-      requestLog.hidden = requestLogSplitter.hidden = closeRequestLog.hidden = true;
+      requestLog.hidden = true;
+      requestLogSplitter.hidden = true;
+      closeRequestLog.hidden = true;
       //openRequestLog.hidden = false;
       self.requestLog = null;
     }

@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <title>RequestPolicy - Experimental Features</title>
+  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
+  <script src="chrome://rpcontinued/content/settings/common.js"></script>
+  <script src="chrome://rpcontinued/content/settings/experimental.js"></script>
+  <link href="chrome://rpcontinued/content/settings/settings.css"
+        rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<table>
+  <tr>
+    <td id="sidepad"></td>
+    <td id="side">
+      <div id="sidecontainer">
+        <div id="rpcontinued">
+          RequestPolicy
+          <br />&nbsp;&nbsp;Continued
+        </div>
+        <div id="mainnav" class="nav">
+          <ul>
+            <li><a href="about:requestpolicy?basicprefs"
+                   data-string="preferences"></a></li>
+            <li><a href="about:requestpolicy?yourpolicy"
+                   data-string="managePolicies"></a></li>
+            <li><a href="https://requestpolicycontinued.github.io/#quick-start"
+                   data-string="help" target="_blank"></a></li>
+            <li><a href="https://requestpolicycontinued.github.io/About.html"
+                   data-string="about" target="_blank"></a></li>
+            <li><a href="about:requestpolicy?experimental" selected="true">
+              Experimental
+            </a></li>
+          </ul>
+        </div>
+      </div>
+    </td>
+    <td id="contentpad"></td>
+    <td id="content">
+      <div id="contentcontainer" class="experimental">
+        <div id="pagetitle">
+          Experimental Features
+        </div>
+
+        <table class="settings">
+          <tr>
+            <td>
+              Memory Usage
+            </td>
+            <td id="memory-information">
+            </td>
+          </tr>
+            <tr>
+              <td>
+                Free Memory
+              </td>
+              <td>
+                <div>
+                  <button onclick="freeMemory()">
+                    Free Memory
+                  </button>
+                </div>
+                <div id="free-memory-results">
+                </div>
+              </td>
+            </tr>
+        </table>
+
+      </div>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

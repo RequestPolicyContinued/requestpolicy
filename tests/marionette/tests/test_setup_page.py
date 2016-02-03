@@ -4,7 +4,7 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.wait import Wait
-from rp_puppeteer.ui.addons import RequestPolicy
+import time
 
 
 PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
@@ -23,18 +23,22 @@ class TestSetupPageShowingUp(RequestPolicyTestCase):
 
 
     def test_on_install(self):
-        rp = RequestPolicy(lambda: self.marionette)
-        rp.remove()
+        # FIXME: Issue #728;   [Restartlessness] RP should not cause
+        #        JavaScript errors on shutdown while requests are being called.
+        time.sleep(0.2)
+
+        self.rp_addon.uninstall()
 
         self.prefs.set_pref(PREF_WELCOME_WIN_SHOWN, False)
 
-        with rp.install_in_two_steps():
-            setup_tab = Wait(self.marionette).until(
-                lambda m: self._get_setup_tab(),
-                message="RequestPolicy has opened its Setup page.")
-            self.assertTrue(self.prefs.get_pref(PREF_WELCOME_WIN_SHOWN),
-                            msg=("The 'welcome window shown' pref has "
-                                 "been set to `true`."))
-            self.assertTrue(setup_tab.selected,
-                            msg="The setup tab is selected.")
-            setup_tab.close()
+        self.rp_addon.install()
+
+        setup_tab = Wait(self.marionette).until(
+            lambda m: self._get_setup_tab(),
+            message="RequestPolicy has opened its Setup page.")
+        self.assertTrue(self.prefs.get_pref(PREF_WELCOME_WIN_SHOWN),
+                        msg=("The 'welcome window shown' pref has "
+                             "been set to `true`."))
+        self.assertTrue(setup_tab.selected,
+                        msg="The setup tab is selected.")
+        setup_tab.close()

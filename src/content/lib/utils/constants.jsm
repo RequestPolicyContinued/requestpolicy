@@ -16,21 +16,21 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci} = Components;
 
-let EXPORTED_SYMBOLS = ["C"];
+/* exported C */
+this.EXPORTED_SYMBOLS = ["C"];
 
-let C = {};
+var C = {};
 
 // #ifdef AMO
-C.EXTENSION_ID = "rpcontinued@requestpolicy.org";
+C.EXTENSION_ID = "rpcontinued@amo.requestpolicy.org";
 // #else
 C.EXTENSION_ID = "rpcontinued@non-amo.requestpolicy.org";
 // #endif

@@ -21,38 +21,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PolicyImplementation"];
+/* exported PolicyImplementation */
+this.EXPORTED_SYMBOLS = ["PolicyImplementation"];
 
-let globalScope = this;
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Logger} = importModule("lib/logger");
+let {NormalRequest} = importModule("lib/request");
+let {Utils} = importModule("lib/utils");
+let {RequestProcessor} = importModule("lib/request-processor");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/constants",
-  "lib/logger",
-  "lib/request",
-  "lib/utils",
-  "lib/request-processor",
-  "lib/environment"
-], globalScope);
-
+//==============================================================================
+// PolicyImplementation
+//==============================================================================
 
 // TODO: implement nsIChannelEventSink to catch redirects as Adblock Plus does.
-let PolicyImplementation = (function() {
-  let xpcom_categories = ["content-policy"];
+var PolicyImplementation = (function() {
+  let self = {};
 
-  let self = {
-    classDescription: "RequestPolicy ContentPolicy Implementation",
-    classID:          Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}"),
-    contractID:       "@requestpolicy.org/rpcontinued-service;1"
-  };
+  const XPCOM_CATEGORIES = ["content-policy"];
+
+  self.classDescription = "RequestPolicy ContentPolicy Implementation";
+  self.classID = Components.ID("{d734b30a-996c-4805-be24-25a0738249fe}");
+  self.contractID = "@requestpolicy.org/rpcontinued-service;1";
 
   /**
    * Registers the content policy on startup.
@@ -63,7 +61,7 @@ let PolicyImplementation = (function() {
                                        self.contractID, self);
 
     let catMan = Utils.categoryManager;
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
     }
@@ -72,22 +70,25 @@ let PolicyImplementation = (function() {
       // self.rejectCode = typeof(/ /) == "object" ? -4 : -3;
       self.rejectCode = Ci.nsIContentPolicy.REJECT_SERVER;
       self.mimeService =
-          Cc['@mozilla.org/uriloader/external-helper-app-service;1']
+          Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
           .getService(Ci.nsIMIMEService);
     }
   }
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
-      function () {
+      function() {
         try {
           register();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(register);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(register);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
-
 
   function unregister() {
     Logger.dump("shutting down PolicyImplementation...");
@@ -131,7 +132,7 @@ let PolicyImplementation = (function() {
     let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
     let catMan = Utils.categoryManager;
 
-    for (let category of xpcom_categories) {
+    for (let category of XPCOM_CATEGORIES) {
       catMan.deleteCategoryEntry(category, self.contractID, false);
     }
 
@@ -144,18 +145,18 @@ let PolicyImplementation = (function() {
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
 
-  //
+  //----------------------------------------------------------------------------
   // nsISupports interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
                                                Ci.nsIObserver,
                                                Ci.nsIFactory,
                                                Ci.nsISupportsWeakReference]);
 
-  //
+  //----------------------------------------------------------------------------
   // nsIContentPolicy interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   // https://developer.mozilla.org/en/nsIContentPolicy
 
@@ -170,11 +171,11 @@ let PolicyImplementation = (function() {
     //     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal);
   };
 
-  self.shouldProcess = (() => C.CP_OK);
+  self.shouldProcess = () => C.CP_OK;
 
-  //
+  //----------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //
+  //----------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {

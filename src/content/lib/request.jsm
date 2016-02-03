@@ -21,11 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported Request, NormalRequest, RedirectRequest,
+       REQUEST_TYPE_NORMAL, REQUEST_TYPE_REDIRECT */
+this.EXPORTED_SYMBOLS = [
   "Request",
   "NormalRequest",
   "RedirectRequest",
@@ -33,21 +34,24 @@ let EXPORTED_SYMBOLS = [
   "REQUEST_TYPE_REDIRECT"
 ];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils/domains",
-  "lib/utils/windows",
-  "lib/utils"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Logger} = importModule("lib/logger");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {WindowUtils} = importModule("lib/utils/windows");
 
+//==============================================================================
+// constants
+//==============================================================================
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
 
-
+//==============================================================================
+// Request
+//==============================================================================
 
 function Request(originURI, destURI, requestType) {
   // TODO: save a nsIURI objects here instead of strings
@@ -73,8 +77,9 @@ Request.prototype.detailsToString = function() {
   return "destination: " + this.destURI + ", origin: " + this.originURI;
 };
 
-
-
+//==============================================================================
+// NormalRequest
+//==============================================================================
 
 function NormalRequest(aContentType, aContentLocation, aRequestOrigin, aContext,
     aMimeTypeGuess, aExtra, aRequestPrincipal) {
@@ -111,15 +116,21 @@ NormalRequest.prototype.setDestURI = function(destURI) {
   this.aContentLocation = DomainUtil.getUriObject(destURI);
 };
 
+Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
+  get: function() {
+    return this.aContentLocation.spec;
+  }
+});
+
 NormalRequest.prototype.detailsToString = function() {
   // Note: try not to cause side effects of toString() during load, so "<HTML
   // Element>" is hard-coded.
+  let context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
+      "<HTML Element>" : this.aContext;
   return "type: " + this.aContentType +
       ", destination: " + this.destURI +
       ", origin: " + this.originURI +
-      ", context: " + ((this.aContext) instanceof (Ci.nsIDOMHTMLElement)
-          ? "<HTML Element>"
-          : this.aContext) +
+      ", context: " + context +
       ", mime: " + this.aMimeTypeGuess +
       ", " + this.aExtra;
 };
@@ -142,15 +153,15 @@ NormalRequest.prototype.isInternal = function() {
   // "moz-nullprincipal" always shows up when using "document.location"?
 
   // Not cross-site requests.
-  if (this.aContentLocation.scheme == "resource"
-      || this.aContentLocation.scheme == "about"
-      || this.aContentLocation.scheme == "data"
-      || this.aContentLocation.scheme == "chrome"
-      || this.aContentLocation.scheme == "moz-icon"
-      || this.aContentLocation.scheme == "moz-filedata"
-      || this.aContentLocation.scheme == "blob"
-      || this.aContentLocation.scheme == "wyciwyg"
-      || this.aContentLocation.scheme == "javascript") {
+  if (this.aContentLocation.scheme === "resource" ||
+      this.aContentLocation.scheme === "about" ||
+      this.aContentLocation.scheme === "data" ||
+      this.aContentLocation.scheme === "chrome" ||
+      this.aContentLocation.scheme === "moz-icon" ||
+      this.aContentLocation.scheme === "moz-filedata" ||
+      this.aContentLocation.scheme === "blob" ||
+      this.aContentLocation.scheme === "wyciwyg" ||
+      this.aContentLocation.scheme === "javascript") {
     Logger.info(Logger.TYPE_CONTENT,
                 "Allowing request with an internal destination.");
     return true;
@@ -187,21 +198,21 @@ NormalRequest.prototype.isInternal = function() {
 
   // "global" dest are [some sort of interal requests]
   // "browser" dest are [???]
-  if (destHost == "global" || destHost == "browser") {
+  if (destHost === "global" || destHost === "browser") {
     return true;
   }
 
   // see issue #180
-  if (this.aRequestOrigin.scheme == 'about' &&
-      this.aRequestOrigin.spec.indexOf("about:neterror?") == 0) {
+  if (this.aRequestOrigin.scheme === "about" &&
+      this.aRequestOrigin.spec.indexOf("about:neterror?") === 0) {
     return true;
   }
 
   // If there are entities in the document, they may trigger a local file
   // request. We'll only allow requests to .dtd files, though, so we don't
   // open up all file:// destinations.
-  if (this.aContentLocation.scheme == "file" &&
-      this.aContentType == Ci.nsIContentPolicy.TYPE_DTD) {
+  if (this.aContentLocation.scheme === "file" &&
+      this.aContentType === Ci.nsIContentPolicy.TYPE_DTD) {
     return true;
   }
 
@@ -217,7 +228,8 @@ NormalRequest.prototype.getContentWindow = function() {
     return null;
   }
 
-  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
+  if (context instanceof Ci.nsIDOMXULElement &&
+      context.localName === "browser") {
     return context.contentWindow;
   }
 
@@ -231,7 +243,7 @@ NormalRequest.prototype.getContentWindow = function() {
     } catch (e) {
       try {
         doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
-      } catch(e) {
+      } catch (e) {
         return null;
       }
     }
@@ -257,15 +269,17 @@ NormalRequest.prototype.getChromeWindow = function() {
  */
 NormalRequest.prototype.getBrowser = function() {
   let context = this.aContext;
-  if (context instanceof Ci.nsIDOMXULElement && context.localName === "browser") {
+  if (context instanceof Ci.nsIDOMXULElement &&
+      context.localName === "browser") {
     return context;
   } else {
     return WindowUtils.getBrowserForWindow(this.getContentWindow());
   }
 };
 
-
-
+//==============================================================================
+// RedirectRequest
+//==============================================================================
 
 function RedirectRequest(httpResponse) {
   Request.call(this, httpResponse.originURI.specIgnoringRef,
@@ -278,3 +292,12 @@ function RedirectRequest(httpResponse) {
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;
+
+Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
+  get: function() {
+    if (!this.hasOwnProperty("_destURIWithRef")) {
+      this._destURIWithRef = this.httpResponse.destURI.spec;
+    }
+    return this._destURIWithRef;
+  }
+});

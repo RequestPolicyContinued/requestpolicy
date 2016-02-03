@@ -21,12 +21,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-// ProcessEnvironment is either a ParentProcessEnvironment or
-// a ChildProcessEnvironment.
-let ProcessEnvironment = (function() {
+/* exported ProcessEnvironment */
+/* global Environment */
 
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm");
+let {C} = ScriptLoader.importModule("lib/utils/constants");
+
+//==============================================================================
+// ProcessEnvironment
+//==============================================================================
+
+/**
+ * ProcessEnvironment is either a ParentProcessEnvironment or
+ * a ChildProcessEnvironment.
+ */
+var ProcessEnvironment = (function() {
   // determine if this is the main process
   let isMainProcess = (function isMainProcess() {
     let xulRuntime = Cc["@mozilla.org/xre/app-info;1"]
@@ -37,8 +52,11 @@ let ProcessEnvironment = (function() {
     return xulRuntime.processType === xulRuntime.PROCESS_TYPE_DEFAULT;
   }());
 
-
   const shutdownMessage = C.MM_PREFIX + "shutdown";
+
+  //----------------------------------------------------------------------------
+  // ProcessEnvironmentBase
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -58,8 +76,9 @@ let ProcessEnvironment = (function() {
   ProcessEnvironmentBase.prototype = Object.create(Environment.prototype);
   ProcessEnvironmentBase.prototype.constructor = Environment;
 
-
-
+  //----------------------------------------------------------------------------
+  // ParentProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -70,12 +89,11 @@ let ProcessEnvironment = (function() {
     let self = this;
     ProcessEnvironmentBase.call(self, aName);
 
-
     function sendShutdownMessageToChildren() {
       let parentMM = Cc["@mozilla.org/parentprocessmessagemanager;1"]
           .getService(Ci.nsIMessageBroadcaster);
       parentMM.broadcastAsyncMessage(shutdownMessage);
-    };
+    }
 
     // Very important: The shutdown message must be sent *after*
     //     calling `removeDelayedFrameScript`, which is done in
@@ -83,10 +101,19 @@ let ProcessEnvironment = (function() {
     self.addShutdownFunction(Environment.LEVELS.BACKEND,
                              sendShutdownMessageToChildren);
   }
-  ParentProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ParentProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ParentProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
 
-
+  Object.defineProperty(ParentProcessEnvironment.prototype, "controllers", {
+    get: function() {
+      let {importModule} = ScriptLoader;
+      return [
+        importModule("controllers/keyboard-shortcuts").KeyboardShortcuts,
+        importModule("controllers/old-rules").OldRulesController,
+      ];
+    }
+  });
 
   /**
    * @override
@@ -100,7 +127,6 @@ let ProcessEnvironment = (function() {
     // However, the main modules register their startup and
     // shutdown functions anyway.
     let dummyScope = {};
-
 
     /**
      * The following section is not optimal – read on…
@@ -118,6 +144,9 @@ let ProcessEnvironment = (function() {
       //       other back end modules are loaded / initialized.
     }
 
+    // TODO: Initialize the "models" first. Then initialize the other
+    // controllers, which is currently "rpService", "ContentPolicy" etc.
+
     // import main modules:
     ScriptLoader.importModules([
       "main/requestpolicy-service",
@@ -127,8 +156,13 @@ let ProcessEnvironment = (function() {
     ], dummyScope);
 
     ProcessEnvironmentBase.prototype.startup.apply(self, arguments);
-  };
 
+    self.controllers.forEach(function(controller) {
+      if (typeof controller.startup === "function") {
+        controller.startup.apply(null, arguments);
+      }
+    });
+  };
 
   /**
    * @override
@@ -136,14 +170,21 @@ let ProcessEnvironment = (function() {
   ParentProcessEnvironment.prototype.shutdown = function() {
     let self = this;
 
+    self.controllers.reverse().forEach(function(controller) {
+      if (typeof controller.shutdown === "function") {
+        controller.shutdown.apply(null, arguments);
+      }
+    });
+
     ProcessEnvironmentBase.prototype.shutdown.apply(self, arguments);
 
     ScriptLoader.doShutdownTasks();
     Cu.unload("chrome://rpcontinued/content/lib/script-loader.jsm");
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ChildProcessEnvironment
+  //----------------------------------------------------------------------------
 
   /**
    * @constructor
@@ -170,15 +211,17 @@ let ProcessEnvironment = (function() {
       // Unloading `environment.jsm` has to be the last task.
       // After that task, any global object, such as
       // `Environment` or `Cu` is not available anymore.
-      //console.debug("unloading environment.jsm");
+      // #ifdef LOG_ENVIRONMENT
+      console.debug("unloading environment.jsm");
+      // #endif
       Cu.unload("chrome://rpcontinued/content/lib/environment.jsm");
-    };
+    }
 
     childMM.addMessageListener(shutdownMessage, receiveShutdownMessage);
   }
-  ChildProcessEnvironment.prototype = Object.create(ProcessEnvironmentBase.prototype);
+  ChildProcessEnvironment.prototype = Object.create(
+      ProcessEnvironmentBase.prototype);
   ChildProcessEnvironment.prototype.constructor = ProcessEnvironmentBase;
-
 
   /**
    * @override
@@ -194,18 +237,22 @@ let ProcessEnvironment = (function() {
 
   ChildProcessEnvironment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
-    if (self.envState === ENV_STATES.NOT_STARTED) {
+    if (self.envState === Environment.ENV_STATES.NOT_STARTED) {
       // The child Process Environment needs to start up when
       // the first framescript in that child is loading.
-      //console.debug("[RPC] Going to start up Child Process Environment.");
+      // #ifdef LOG_ENVIRONMENT
+      console.debug("[RPC] [Environment] Going to start up Child " +
+          "Process Environment.");
+      // #endif
       self.startup();
     }
     ProcessEnvironmentBase.prototype.registerInnerEnvironment.apply(self,
                                                                     arguments);
   };
 
-
-
+  //----------------------------------------------------------------------------
+  // ProcessEnvironment
+  //----------------------------------------------------------------------------
 
   if (isMainProcess === true) {
     return new ParentProcessEnvironment();
@@ -213,4 +260,4 @@ let ProcessEnvironment = (function() {
     return new ChildProcessEnvironment();
   }
 
-})();
+}());

@@ -20,13 +20,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let EXPORTED_SYMBOLS = ["ConsoleObserver"];
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* exported ConsoleObserver */
+this.EXPORTED_SYMBOLS = ["ConsoleObserver"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+/* global dump */
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+//==============================================================================
+// utilities
+//==============================================================================
 
 var regEx = /(Error|Warning|Exception)/i;
 
@@ -44,46 +50,77 @@ function isRPException(aMessage) {
   return true;
 }
 
+// jscs:disable maximumLineLength
+const knownBugs = [
+  // issue #597
+  `[JavaScript Error: "TypeError: sub is undefined" {file: "chrome://rpcontinued/content/lib/subscription.jsm"`,
+  `[JavaScript Warning: "Expected end of value but found '10'.  Error in parsing value for 'font-family'.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
+];
+// jscs:enable maximumLineLength
+
+function isKnownBug(aMessage) {
+  for (let bugMsg of knownBugs) {
+    if (aMessage.startsWith(bugMsg)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//==============================================================================
+// ConsoleObserver
+//==============================================================================
+
 /**
  * ConsoleObserver observes all messages sent to the
  * Browser Console and detects errors caused by
  * RequestPolicy.
  */
-var ConsoleObserver = (function (self) {
-  let numErrors = 0;
+var ConsoleObserver = (function() {
+  let self = {};
+
   let messages = [];
 
-  self.getNumErrors = function () {
-    return numErrors;
+  let prefBranch;
+
+  self.getNumErrors = function() {
+    return prefBranch.getIntPref("unitTesting.loggingErrors.counter");
   };
-  
-  self.getMessages = function () {
+
+  self.getMessages = function() {
     return messages;
   };
 
-  self.reset = function () {
-    numErrors = 0;
+  function setNumErrors(aN) {
+    prefBranch.setIntPref("unitTesting.loggingErrors.counter", aN);
+    Services.prefs.savePrefFile(null);
+  }
+
+  self.reset = function() {
+    setNumErrors(0);
     messages = [];
   };
 
-  self.startup = function () {
-    self.reset();
+  self.startup = function() {
+    prefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
+        QueryInterface(Ci.nsIPrefBranch2);
     Services.console.registerListener(self);
   };
 
-  self.shutdown = function () {
+  self.shutdown = function() {
     Services.console.unregisterListener(self);
+    prefBranch = undefined;
   };
 
-  self.observe = function (aSubject) {
+  self.observe = function(aSubject) {
     var msg = aSubject.message;
 
-    if (isRPException(msg)) {
-      ++numErrors;
+    if (isRPException(msg) && !isKnownBug(msg)) {
+      setNumErrors(self.getNumErrors() + 1);
       messages.push(msg);
       dump("[RequestPolicy] [Browser Console] " + msg + "\n");
     }
   };
 
   return self;
-}({}));
+}());

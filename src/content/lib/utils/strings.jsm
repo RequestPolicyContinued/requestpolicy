@@ -15,39 +15,40 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
 /**
- * Note: The string utils are used also in the content process (see
- * e10s/multiprocessor firefox), so this file shouldn't contain code which is
- * limited to the chrome process.
+ * [E10s]: This file runs both in PARENT and CHILD process.
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["StringUtils"];
+/* exported StringUtils */
+this.EXPORTED_SYMBOLS = ["StringUtils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+var {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
+//==============================================================================
+// StringUtils
+//==============================================================================
 
-let StringUtils = (function() {
+var StringUtils = (function() {
   let self = {};
 
   XPCOMUtils.defineLazyGetter(self, "strbundle", function() {
     return loadPropertiesFile(
         "chrome://rpcontinued/locale/requestpolicy.properties");
   });
+
   // from https://developer.mozilla.org/en-US/Add-ons/
   // How_to_convert_an_overlay_extension_to_restartless
   // #Step_10.3A_Bypass_cache_when_loading_properties_files
-  function loadPropertiesFile(path)
-  {
+  function loadPropertiesFile(path) {
     /* HACK: The string bundle cache is cleared on addon shutdown, however it
      * doesn't appear to do so reliably. Errors can erratically happen on next
      * load of the same file in certain instances. (at minimum, when strings are

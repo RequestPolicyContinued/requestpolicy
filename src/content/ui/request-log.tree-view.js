@@ -21,42 +21,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
+
 window.rpcontinued = window.rpcontinued || {};
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
-
-
-  let {ScriptLoader} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    return mod;
-  }());
-  let {StringUtils} = ScriptLoader.importModule("lib/utils/strings");
-
-
-
+  //============================================================================
 
   self.treebox = null;
 
   self.columnNameToIndexMap = {
-    "rpcontinued-requestLog-origin" : 0,
-    "rpcontinued-requestLog-destination" : 1,
-    "rpcontinued-requestLog-blocked" : 2,
-    "rpcontinued-requestLog-time" : 3
+    "rpcontinued-requestLog-origin": 0,
+    "rpcontinued-requestLog-destination": 1,
+    "rpcontinued-requestLog-blocked": 2,
+    "rpcontinued-requestLog-time": 3
   };
-
-  let aserv = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-
 
   function getVisibleRowAtIndex(index) {
     return self.visibleRows[self.visibleRows.length - index - 1];
-  };
-
-
+  }
 
   //
   // the interface.
@@ -89,8 +73,9 @@ window.rpcontinued.requestLog = (function (self) {
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
       var columnIndex = self.columnNameToIndexMap[aColumn.id];
-      if (columnIndex != 2) {
-        return getVisibleRowAtIndex(aIndex)[self.columnNameToIndexMap[aColumn.id]];
+      if (columnIndex !== 2) {
+        return getVisibleRowAtIndex(aIndex)
+            [self.columnNameToIndexMap[aColumn.id]];
       }
     },
 
@@ -133,7 +118,7 @@ window.rpcontinued.requestLog = (function (self) {
     toggleOpenState: function(aIndex) {},
 
     getImageSrc: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://rpcontinued/skin/dot.png";
         }
@@ -148,36 +133,21 @@ window.rpcontinued.requestLog = (function (self) {
     performAction: function(action) {},
     performActionOnCell: function(action, aIndex, aColumn) {},
 
-    getRowProperties: function(aIndex, aProps) {
-      var returnValue = (getVisibleRowAtIndex(aIndex)[2]) ? "blocked" : "allowed";
-
-      if (aProps) {
-        // Gecko version < 22
-        aProps.AppendElement(aserv.getAtom(returnValue));
-      } else {
-        // Gecko version >= 22
-        return returnValue;
-      }
+    getRowProperties: function(aIndex) {
+      return getVisibleRowAtIndex(aIndex)[2] ? "blocked" : "allowed";
     },
 
-    getCellProperties: function(aIndex, aColumn, aProps) {
-      if (self.columnNameToIndexMap[aColumn.id] == 2) {
+    getCellProperties: function(aIndex, aColumn) {
+      if (self.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
-          if (aProps) {
-            // Gecko version < 22
-            aProps.AppendElement(aserv.getAtom("blocked"));
-          } else {
-            // Gecko version >= 22
-            return "blocked";
-          }
+          return "blocked";
         }
       }
+      return "";
     },
 
-    getColumnProperties: function(aColumn, aProps) {
-      if (!aProps) {
-        return "";
-      }
+    getColumnProperties: function(aColumn) {
+      return "";
     }
   };
 

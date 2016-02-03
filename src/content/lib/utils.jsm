@@ -16,31 +16,30 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Utils"];
+/* exported Utils */
+this.EXPORTED_SYMBOLS = ["Utils"];
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-//Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+//let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
 
+//==============================================================================
+// Utils
+//==============================================================================
 
-
-
-
-let Utils = (function() {
+var Utils = (function() {
   let self = {};
 
   /**
@@ -67,7 +66,6 @@ let Utils = (function() {
       "@mozilla.org/categorymanager;1", "nsICategoryManager");
   XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
       "@mozilla.org/thread-manager;1", "nsIThreadManager");
-
 
   /**
    * Calls a function multiple times until it succeeds. The
@@ -112,11 +110,9 @@ let Utils = (function() {
     return undefined;
   };
 
-
   /**
-   * This function returns and eventually creates a module's `internal`
-   * variable. The `internal` can be accessed from all submodules of that
-   * module (which might be in different files).
+   * Return a module's `internal` object, which is a singleton.
+   * The `internal` can be accessed from all submodules of that module.
    *
    * The `internal` is added to `self`, and as soon as all modules have been
    * loaded, i.e. when the startup functions are called, the `internal` is
@@ -134,12 +130,11 @@ let Utils = (function() {
     aModuleScope.internal = aModuleScope.internal || {};
     function sealInternal() {
       delete aModuleScope.internal;
-    };
+    }
     ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL,
                                           sealInternal);
     return aModuleScope.internal;
   };
-
 
   /**
    * Wrap a function. Allow 'before' and 'after' functions.

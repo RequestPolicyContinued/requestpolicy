@@ -1,0 +1,9 @@
+{
+  "preset": "google",
+  "fileExtensions": [".js", ".jsm"],
+  "excludeFiles": ["**/jquery.min.js", "**/content/lib/ruleset.jsm"],
+  "esnext": true,
+
+  "validateQuoteMarks": "\"",
+  "requireParenthesesAroundIIFE": true
+}

@@ -1,110 +1,107 @@
-var PAGE_STRINGS = [
-  'importOldRules',
-  'deleteOldRules',
-  'showOldRuleReimportOptions',
-  'yourOldRulesHaveBeenDeleted',
-  'type',
-  'origin',
-  'destination'
-];
+/* global window, $, common, $id, $str */
 
-$(function () {
-  common.localize(PAGE_STRINGS);
-});
+(function() {
+  /* global Components */
+  const {utils: Cu} = Components;
 
+  var {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  var {Prefs} = importModule("models/prefs");
+  var {PolicyManager} = importModule("lib/policy-manager");
+  var {OldRules} = importModule("lib/old-rules");
 
-var rules = null;
-var addHostWildcard = true;
+  //============================================================================
 
+  var PAGE_STRINGS = [
+    "importOldRules",
+    "deleteOldRules",
+    "showOldRuleReimportOptions",
+    "yourOldRulesHaveBeenDeleted",
+    "type",
+    "origin",
+    "destination"
+  ];
 
-function clearRulesTable() {
-  var table = $id('rules');
-  var children = table.getElementsByTagName('tr');
-  while (children.length) {
-    var child = children.item(0);
-    child.parentNode.removeChild(child);
+  $(function() {
+    common.localize(PAGE_STRINGS);
+  });
+
+  var rules = null;
+
+  // currently unused
+  // function clearRulesTable() {
+  //   var table = $id("rules");
+  //   var children = table.getElementsByTagName("tr");
+  //   while (children.length) {
+  //     var child = children.item(0);
+  //     child.parentNode.removeChild(child);
+  //   }
+  // }
+
+  function populateRuleTable() {
+    var table = $id("rules");
+
+    var oldRules = new OldRules();
+    // Setting the global rules var here.
+    rules = oldRules.getAsNewRules();
+
+    for (var i = 0; i < rules.length; i++) {
+      var entry = rules[i];
+      var origin = entry.o ? common.ruleDataPartToDisplayString(entry.o) : "";
+      var dest = entry.d ? common.ruleDataPartToDisplayString(entry.d) : "";
+      addRulesTableRow(table, "allow", origin, dest, entry);
+    }
   }
-}
 
-function populateRuleTable() {
-  var table = $id('rules');
-  // Setting the global rules var here.
-  rules = common.getOldRulesAsNewRules(addHostWildcard);
+  function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
+    var actionClass = ruleAction === "allow" ? "allow" : "block";
+    var action = ruleAction === "allow" ? $str("allow") : $str("block");
 
-  for (var i = 0; i < rules.length; i++) {
-    var entry = rules[i];
-    var origin = entry['o'] ? ruleDataPartToDisplayString(entry['o']) : '';
-    var dest = entry['d'] ? ruleDataPartToDisplayString(entry['d']) : '';
-    addRulesTableRow(table, 'allow', origin, dest, entry);
+    var row = $("<tr>").addClass(actionClass).appendTo(table);
+
+    row.append(
+      $("<td>").text(action),
+      $("<td>").text(origin),
+      $("<td>").text(dest)
+    );
   }
-}
 
-function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
-  var actionClass = ruleAction == 'allow' ? 'allow' : 'block';
-  var action = ruleAction == 'allow' ? $str('allow') : $str('block');
+  window.deleteOldRules = function() {
+    Prefs.reset("allowedOrigins");
+    Prefs.reset("allowedDestinations");
+    Prefs.reset("allowedOriginsToDestinations");
+    Prefs.save();
+    $("#doimport").hide();
+    $("#deletedone").show();
+    $("#showReimportOptions").hide();
+    $("#reimportOldRules").hide();
+    $("#deleteOldRules").hide();
+  };
 
-  var row = $('<tr>').addClass(actionClass).appendTo(table);
+  window.showReimportOptions = function() {
+    $("#showReimportOptions").hide();
+    $("#reimportOldRules").show();
+  };
 
-  row.append(
-    $('<td>').text(action),
-    $('<td>').text(origin),
-    $('<td>').text(dest)
-  );
-}
+  window.importOldRules = function() {
+    if (!rules || rules.length === 0) {
+      throw "rules is undefined or empty";
+    }
+    PolicyManager.addAllowRules(rules);
+    $("#doimport").hide();
+    $("#policy").hide();
+    $("#importoptions").hide();
+    $("#importdone").show();
+  };
 
-// TODO: remove code duplication with menu.js
-function ruleDataPartToDisplayString(ruleDataPart) {
-  var str = "";
-  if (ruleDataPart["s"]) {
-    str += ruleDataPart["s"] + "://";
-  }
-  str += ruleDataPart["h"] || "*";
-  if (ruleDataPart["port"]) {
-    str += ":" + ruleDataPart["port"];
-  }
-  return str;
-}
+  window.onload = function() {
+    var oldRulesExist = Prefs.oldRulesExist();
+    if (!oldRulesExist) {
+      $("#hasrules").hide();
+      $("#norules").show();
+      return;
+    }
+    populateRuleTable();
+  };
 
-function deleteOldRules() {
-  common.clearPref('allowedOrigins');
-  common.clearPref('allowedDestinations');
-  common.clearPref('allowedOriginsToDestinations');
-  $("#doimport").hide();
-  $("#deletedone").show();
-  $("#showReimportOptions").hide();
-  $("#reimportOldRules").hide();
-  $("#deleteOldRules").hide();
-}
-
-function showReimportOptions() {
-  $("#showReimportOptions").hide();
-  $("#reimportOldRules").show();
-}
-
-function importOldRules() {
-  if (!rules || rules.length == 0) {
-    throw 'rules is undefined or empty';
-  }
-  common.addAllowRules(rules);
-  $("#doimport").hide();
-  $("#policy").hide();
-  $("#importoptions").hide();
-  $("#importdone").show();
-}
-
-function handleAddHostWildcardsChange(event) {
-  addHostWildcard = event.target.checked;
-  clearRulesTable();
-  populateRuleTable();
-}
-
-function onload() {
-  var oldRulesExist = Prefs.oldRulesExist();
-  if (!oldRulesExist) {
-    $("#hasrules").hide();
-    $("#norules").show();
-    return;
-  }
-  populateRuleTable();
-  $('#addhostwildcards').change(handleAddHostWildcardsChange);
-}
+}());

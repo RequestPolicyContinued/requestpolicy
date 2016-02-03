@@ -174,11 +174,11 @@ class TestGettingRequests(RequestPolicyTestCase):
             },
             {
                 "origin": "http://www.maindomain.test/img_1.html",
-                "dest": "http://www.maindomain.test/same-site-image.png",
+                "dest": "http://www.maindomain.test/subdirectory/flag-gray.png",
                 "isAllowed": True
             }, {
                 "origin": "http://www.maindomain.test/img_1.html",
-                "dest": "http://www.otherdomain.test/cross-site-image.png",
+                "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",
                 "isAllowed": False
             }
         ]

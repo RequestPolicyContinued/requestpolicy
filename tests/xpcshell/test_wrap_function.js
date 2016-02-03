@@ -1,3 +1,4 @@
+/* exported run_test */
 const MODULE_URI = "chrome://rpcontinued/content/lib/utils.jsm";
 
 var functionCalls = "";
@@ -81,7 +82,7 @@ function uut_unwrap() {
 function manualWrap() {
   var _orig = testObj.testFunction;
 
-  testObj.testFunction = function () {
+  testObj.testFunction = function() {
     functionCalls += "{";
     var rv = _orig.apply(testObj, arguments);
     functionCalls += "}";

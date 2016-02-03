@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.api.rules import Rule
+from rp_puppeteer.api.rules import Rule, RulesFile
 from marionette import SkipTest
 
 
@@ -168,6 +168,44 @@ class TestRules(RulesTestCase):
             rule.add()
         self.rules.remove_all()
         self.assertEqual(self.rules.count_rules(), 0)
+
+    def test_save(self):
+        self.rules_file.remove()
+        self.assertIsNone(self.rules_file.get_rules())
+
+        self.rules.save()
+        self.assertListEqual(self.rules_file.get_rules(), [])
+
+
+class TestRulesFile(RulesTestCase):
+
+    def setUp(self):
+        super(TestRulesFile, self).setUp()
+        self.nonexistant_file = RulesFile(lambda: self.marionette,
+                                          "foobar.json")
+
+    def test_get_rules_from_nonexistant_file(self):
+        self.assertIsNone(self.nonexistant_file.get_rules())
+
+    def test_get_rules(self):
+        # Some permanent rules.
+        rules = [self.baserule,
+                 self.baserule_variants["different_allow"],
+                 self.baserule_variants["different_rule_data"]]
+
+        # add the rules via API
+        for rule in rules:
+            rule.add()
+        self.rules.save()
+        self.assertListEqual(sorted(self.rules_file.get_rules()), sorted(rules))
+
+        self.rules.remove_all()
+        self.rules.save()
+        self.assertListEqual(self.rules_file.get_rules(), [])
+
+    def test_remove_nonexistant_file(self):
+        # remove() should not raise an exception.
+        self.nonexistant_file.remove()
 
 
 class TestRule(RulesTestCase):

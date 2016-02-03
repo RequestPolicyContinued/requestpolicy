@@ -21,12 +21,45 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-const Cu = Components.utils;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["RequestProcessor"];
+/* exported RequestProcessor */
+this.EXPORTED_SYMBOLS = ["RequestProcessor"];
+
+let globalScope = this;
+
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let importModule = ScriptLoader.importModule;
+
+let {Logger} = importModule("lib/logger");
+let {Prefs} = importModule("models/prefs");
+let {PolicyManager} = importModule("lib/policy-manager");
+let {DomainUtil} = importModule("lib/utils/domains");
+let {RequestResult, REQUEST_REASON_USER_POLICY,
+     REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,
+     REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
+     REQUEST_REASON_DEFAULT_SAME_DOMAIN, REQUEST_REASON_COMPATIBILITY,
+     REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
+     REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
+     REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
+     REQUEST_REASON_IDENTICAL_IDENTIFIER} =
+        importModule("lib/request-result");
+let {RequestSet} = importModule("lib/request-set");
+let {ProcessEnvironment} = importModule("lib/environment");
+let {Utils} = importModule("lib/utils");
+
+/* global PolicyImplementation */
+ScriptLoader.defineLazyModuleGetters({
+  "main/content-policy": ["PolicyImplementation"]
+}, globalScope);
+
+//==============================================================================
+// constants
+//==============================================================================
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
@@ -35,30 +68,18 @@ const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 // other callers. Was chosen randomly.
 const CP_MAPPEDDESTINATION = 0x178c40bf;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
+//==============================================================================
+// RequestProcessor
+//==============================================================================
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/prefs",
-  "lib/policy-manager",
-  "lib/utils/domains",
-  "lib/utils",
-  "lib/request",
-  "lib/request-result",
-  "lib/request-set",
-  "lib/environment"
-], this);
-ScriptLoader.defineLazyModuleGetters({
-  "main/content-policy": ["PolicyImplementation"]
-}, this);
+var RequestProcessor = (function() {
+  let self = {};
 
-
-
-var RequestProcessor = (function(self) {
   let internal = Utils.moduleInternal(self);
 
+  //----------------------------------------------------------------------------
+  // private properties
+  //----------------------------------------------------------------------------
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -76,10 +97,10 @@ var RequestProcessor = (function(self) {
    * @type {Object}
    */
   let lastShouldLoadCheck = {
-    "origin" : null,
-    "destination" : null,
-    "time" : 0,
-    "result" : null
+    "origin": null,
+    "destination": null,
+    "time": 0,
+    "result": null
   };
 
   let historyRequests = {};
@@ -96,14 +117,9 @@ var RequestProcessor = (function(self) {
 
   internal.requestObservers = [];
 
-
-
-
-
-
-
-
-
+  //----------------------------------------------------------------------------
+  // private functions
+  //----------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
     for (var i = 0; i < internal.requestObservers.length; i++) {
@@ -126,11 +142,16 @@ var RequestProcessor = (function(self) {
     }
   }
 
-
-
-
-
-
+  /**
+   * Remove all saved requests from a specific origin URI. Remove both
+   * accepted and rejected requests.
+   *
+   * @param {string} uri The origin URI.
+   */
+  function removeSavedRequestsByOriginURI(uri) {
+    self._allowedRequests.removeOriginUri(uri);
+    self._rejectedRequests.removeOriginUri(uri);
+  }
 
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
@@ -157,12 +178,12 @@ var RequestProcessor = (function(self) {
       let browser = request.getBrowser();
       let window = request.getChromeWindow();
 
-      if (!browser || !window) {
+      if (!browser || !window || typeof window.rpcontinued === "undefined") {
         Logger.warning(Logger.TYPE_CONTENT, "The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
         window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
-            browser, request.originURI, request.destURI);
+            browser, request.originURI, request.destURIWithRef);
       }
     }
 
@@ -174,7 +195,7 @@ var RequestProcessor = (function(self) {
         request.requestResult);
     self._allowedRequests.removeRequest(request.originURI, request.destURI);
     notifyRequestObserversOfBlockedRequest(request);
-  }
+  };
 
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
@@ -204,15 +225,16 @@ var RequestProcessor = (function(self) {
     return CP_OK;
   }
 
+  /**
+   * @param {string} originUri
+   * @param {string} destUri
+   * @param {Boolean} isInsert
+   * @param {RequestResult} requestResult
+   */
   function recordAllowedRequest(originUri, destUri, isInsert, requestResult) {
-    // Reset the accepted and rejected requests originating from this
-    // destination. That is, if this accepts a request to a uri that may itself
-    // originate further requests, reset the information about what that page is
-    // accepting and rejecting.
-    // If "isInsert" is set, then we don't want to clear the destUri info.
-    if (true !== isInsert) {
-      self._allowedRequests.removeOriginUri(destUri);
-      self._rejectedRequests.removeOriginUri(destUri);
+    if (!isInsert) {
+      // The destination URI may itself originate further requests.
+      removeSavedRequestsByOriginURI(destUri);
     }
     self._rejectedRequests.removeRequest(originUri, destUri);
     self._allowedRequests.addRequest(originUri, destUri, requestResult);
@@ -268,8 +290,8 @@ var RequestProcessor = (function(self) {
    * @return {boolean} True if the request is a duplicate of the previous one.
    */
   function isDuplicateRequest(request) {
-    if (lastShouldLoadCheck.origin == request.originURI &&
-        lastShouldLoadCheck.destination == request.destURI) {
+    if (lastShouldLoadCheck.origin === request.originURI &&
+        lastShouldLoadCheck.destination === request.destURI) {
       var date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
@@ -288,8 +310,6 @@ var RequestProcessor = (function(self) {
     return false;
   }
 
-
-
   function _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
       isAllowed) {
     var result = new RequestSet();
@@ -297,20 +317,31 @@ var RequestProcessor = (function(self) {
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
-    for (var originUri in requests) {
+    for (let originUri in requests) {
       if (DomainUtil.getBaseDomain(originUri) !== currentlySelectedOrigin) {
         // only return requests from the given base domain
         continue;
       }
-      Logger.dump("test destBase: " + destBase);
-      for (var destBase in requests[originUri]) {
+      // #ifdef LOG_GETTING_SAVED_REQUESTS
+      Logger.dump("test originUri: " + originUri);
+      // #endif
+      let originUriRequests = requests[originUri];
+      for (let destBase in originUriRequests) {
+        // #ifdef LOG_GETTING_SAVED_REQUESTS
         Logger.dump("test destBase: " + destBase);
-        for (var destIdent in requests[originUri][destBase]) {
+        // #endif
+        let destBaseRequests = originUriRequests[destBase];
+        for (let destIdent in destBaseRequests) {
+          // #ifdef LOG_GETTING_SAVED_REQUESTS
           Logger.dump("test destIdent: " + destIdent);
-          for (var destUri in requests[originUri][destBase][destIdent]) {
+          // #endif
+          let destIdentRequests = destBaseRequests[destIdent];
+          for (let destUri in destIdentRequests) {
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
             Logger.dump("test destUri: " + destUri);
-            var dest = requests[originUri][destBase][destIdent][destUri];
-            for (var i in dest) {
+            // #endif
+            let dest = destIdentRequests[destUri];
+            for (let i in dest) {
               // TODO: This variable could have been created easily already in
               //       getAllRequestsInBrowser(). ==> rewrite RequestSet to
               //       contain a blocked list, an allowed list (and maybe a list
@@ -327,55 +358,57 @@ var RequestProcessor = (function(self) {
     return result;
   }
 
-//  function _getOtherOriginsHelperFromDOM(document, reqSet) {
-//    var documentUri = DomainUtil
-//        .stripFragment(document.documentURI);
-//    Logger.dump("Looking for other origins within DOM of "
-//        + documentUri);
-//    // TODO: Check other elements besides iframes and frames?
-//    var frameTagTypes = {
-//      "iframe" : null,
-//      "frame" : null
-//    };
-//    for (var tagType in frameTagTypes) {
-//      var iframes = document.getElementsByTagName(tagType);
-//      for (var i = 0; i < iframes.length; i++) {
-//        var child = iframes[i];
-//        var childDocument = child.contentDocument;
-//        // Flock's special home page is about:myworld. It has (i)frames in it
-//        // that have no contentDocument. It's probably related to the fact that
-//        // that is an xul page, but I have no reason to fully understand the
-//        // problem in order to fix it.
-//        if (!childDocument) {
-//          continue;
-//        }
-//        var childUri = DomainUtil
-//            .stripFragment(childDocument.documentURI);
-//        if (childUri == "about:blank") {
-//          // iframe empty or not loaded yet, or maybe blocked.
-//          // childUri = child.src;
-//          // If it's not loaded or blocked, it's not the origin for anything
-//          // yet.
-//          continue;
-//        }
-//        Logger.dump("Found DOM child " + tagType
-//            + " with src <" + childUri + "> in document <" + documentUri + ">");
-//        //var childUriIdent = DomainUtil.getIdentifier(childUri,
-//        //    DomainUtil.LEVEL_SOP);
-//        // if (!origins[childUriIdent]) {
-//        //   origins[childUriIdent] = {};
-//        // }
-//        // origins[childUriIdent][childUri] = true;
-//        reqSet.addRequest(documentUri, childUri);
-//        _getOtherOriginsHelperFromDOM(childDocument, reqSet);
-//      }
-//    }
-//  },
+  // function _getOtherOriginsHelperFromDOM(document, reqSet) {
+  //   var documentUri = DomainUtil
+  //       .stripFragment(document.documentURI);
+  //   Logger.dump("Looking for other origins within DOM of "
+  //       + documentUri);
+  //   // TODO: Check other elements besides iframes and frames?
+  //   var frameTagTypes = {
+  //     "iframe" : null,
+  //     "frame" : null
+  //   };
+  //   for (var tagType in frameTagTypes) {
+  //     var iframes = document.getElementsByTagName(tagType);
+  //     for (var i = 0; i < iframes.length; i++) {
+  //       var child = iframes[i];
+  //       var childDocument = child.contentDocument;
+  //       // Flock's special home page is about:myworld. It has (i)frames in it
+  //       // that have no contentDocument. It's probably related to the fact that
+  //       // that is an xul page, but I have no reason to fully understand the
+  //       // problem in order to fix it.
+  //       if (!childDocument) {
+  //         continue;
+  //       }
+  //       var childUri = DomainUtil
+  //           .stripFragment(childDocument.documentURI);
+  //       if (childUri == "about:blank") {
+  //         // iframe empty or not loaded yet, or maybe blocked.
+  //         // childUri = child.src;
+  //         // If it's not loaded or blocked, it's not the origin for anything
+  //         // yet.
+  //         continue;
+  //       }
+  //       Logger.dump("Found DOM child " + tagType
+  //           + " with src <" + childUri + "> in document <" + documentUri + ">");
+  //       //var childUriIdent = DomainUtil.getIdentifier(childUri,
+  //       //    DomainUtil.LEVEL_SOP);
+  //       // if (!origins[childUriIdent]) {
+  //       //   origins[childUriIdent] = {};
+  //       // }
+  //       // origins[childUriIdent][childUri] = true;
+  //       reqSet.addRequest(documentUri, childUri);
+  //       _getOtherOriginsHelperFromDOM(childDocument, reqSet);
+  //     }
+  //   }
+  // },
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
-    Logger.dump("Looking for other origins within allowed requests from "
-            + originURI);
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
+    Logger.dump("Looking for other origins within allowed requests from " +
+        originURI);
+    // #endif
     if (!checkedOrigins[originURI]) {
       // this "if" is needed for the first call of this function.
       checkedOrigins[originURI] = true;
@@ -387,8 +420,10 @@ var RequestProcessor = (function(self) {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
           for (var destURI in allowedRequests[destBase][destIdent]) {
-            Logger.dump("Found allowed request to <"
-                + destURI + "> from <" + originURI + ">");
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
+            Logger.dump("Found allowed request to <" + destURI + "> " +
+                "from <" + originURI + ">");
+            // #endif
             reqSet.addRequest(originURI, destURI,
                               allowedRequests[destBase][destIdent][destURI]);
 
@@ -406,15 +441,19 @@ var RequestProcessor = (function(self) {
   }
 
   function _addAllDeniedRequestsFromURI(originURI, reqSet) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("Looking for other origins within denied requests from " +
         originURI);
+    // #endif
     var requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {
           for (var destUri in requests[destBase][destIdent]) {
+            // #ifdef LOG_GETTING_SAVED_REQUESTS
             Logger.dump("Found denied request to <" + destUri + "> from <" +
                 originURI + ">");
+            // #endif
             reqSet.addRequest(originURI, destUri,
                 requests[destBase][destIdent][destUri]);
           }
@@ -423,23 +462,22 @@ var RequestProcessor = (function(self) {
     }
   }
 
+  //----------------------------------------------------------------------------
+  // public properties
+  //----------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-    // TODO: make them private
+  // TODO: make them private
   self._rejectedRequests = new RequestSet();
   self._allowedRequests = new RequestSet();
 
+  // needed to collect some memory usage information
+  self.clickedLinks = internal.clickedLinks;
+  self.clickedLinksReverse = internal.clickedLinksReverse;
+  self.faviconRequests = internal.faviconRequests;
 
+  //----------------------------------------------------------------------------
+  // public functions
+  //----------------------------------------------------------------------------
 
   /**
    * Process a NormalRequest.
@@ -466,7 +504,7 @@ var RequestProcessor = (function(self) {
       var originURI = request.originURI;
       var destURI = request.destURI;
 
-      if (request.aRequestOrigin.scheme == "moz-nullprincipal") {
+      if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
         // Before RP has been forked, there was a hack: in case of a request
         // with the origin's scheme being 'moz-nullprincipal', RequestPolicy
         // used the documentURI of the request's context as the "real" origin
@@ -498,49 +536,54 @@ var RequestProcessor = (function(self) {
               Logger.TYPE_CONTENT,
               "Allowing request that appears to be a URL entered in the " +
               "location bar or some other good explanation: " + destURI);
+          removeSavedRequestsByOriginURI(destURI);
           return CP_OK;
         }
       }
 
-      if (request.aRequestOrigin.scheme == "view-source") {
-        var newOriginURI = originURI.split(":").slice(1).join(":");
+      if (request.aRequestOrigin.scheme === "view-source") {
+        let newOriginURI = originURI.split(":").slice(1).join(":");
         Logger.info(Logger.TYPE_CONTENT,
-          "Considering view-source origin <"
-            + originURI + "> to be origin <" + newOriginURI + ">");
+            "Considering view-source origin <" + originURI + "> " +
+            "to be origin <" + newOriginURI + ">");
         originURI = newOriginURI;
         request.setOriginURI(originURI);
       }
 
-      if (request.aContentLocation.scheme == "view-source") {
+      if (request.aContentLocation.scheme === "view-source") {
         var newDestURI = destURI.split(":").slice(1).join(":");
-        if (newDestURI.indexOf("data:text/html") == 0) {
+        if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
           Logger.info(Logger.TYPE_CONTENT,
-              "Allowing \"data:text/html\" view-source destination"
-                  + " (Selection Source)");
+              "Allowing \"data:text/html\" view-source destination" +
+              " (Selection Source)");
           return CP_OK;
         } else {
           Logger.info(Logger.TYPE_CONTENT,
-              "Considering view-source destination <"
-                  + destURI + "> to be destination <" + newDestURI + ">");
+              "Considering view-source destination <" + destURI + "> " +
+              "to be destination <" + newDestURI + ">");
           destURI = newDestURI;
           request.setDestURI(destURI);
         }
       }
 
-      if (originURI == "about:blank" && request.aContext) {
+      if (originURI === "about:blank" && request.aContext) {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
-        if (domNode && domNode.nodeType == Ci.nsIDOMNode.DOCUMENT_NODE) {
-          var newOriginURI;
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
+        if (domNode && domNode.nodeType === Ci.nsIDOMNode.DOCUMENT_NODE) {
+          let newOriginURI;
           if (request.aContext.documentURI &&
-              request.aContext.documentURI != "about:blank") {
+              request.aContext.documentURI !== "about:blank") {
             newOriginURI = request.aContext.documentURI;
           } else if (request.aContext.ownerDocument &&
               request.aContext.ownerDocument.documentURI &&
-              request.aContext.ownerDocument.documentURI != "about:blank") {
+              request.aContext.ownerDocument.documentURI !== "about:blank") {
             newOriginURI = request.aContext.ownerDocument.documentURI;
           }
           if (newOriginURI) {
@@ -553,7 +596,6 @@ var RequestProcessor = (function(self) {
         }
       }
 
-
       if (isDuplicateRequest(request)) {
         return lastShouldLoadCheck.result;
       }
@@ -565,28 +607,28 @@ var RequestProcessor = (function(self) {
       // all of that data was cleared due to the new request.
       // Example to test with: Click on "expand all" at
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
-      if (originURI == destURI) {
+      if (originURI === destURI) {
         Logger.warning(Logger.TYPE_CONTENT,
-            "Allowing (but not recording) request "
-                + "where origin is the same as the destination: " + originURI);
+            "Allowing (but not recording) request " +
+            "where origin is the same as the destination: " + originURI);
         return CP_OK;
       }
-
-
 
       if (request.aContext) {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
 
-        if (domNode && domNode.nodeName == "LINK" &&
-            (domNode.rel == "icon" || domNode.rel == "shortcut icon")) {
+        if (domNode && domNode.nodeName === "LINK" &&
+            (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
           internal.faviconRequests[destURI] = true;
         }
       }
-
-
 
       // Note: If changing the logic here, also make necessary changes to
       // isAllowedRedirect).
@@ -640,8 +682,8 @@ var RequestProcessor = (function(self) {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_HISTORY_REQUEST);
         return accept("History request", request, true);
-      } else if (internal.userAllowedRedirects[originURI]
-          && internal.userAllowedRedirects[originURI][destURI]) {
+      } else if (internal.userAllowedRedirects[originURI] &&
+          internal.userAllowedRedirects[originURI][destURI]) {
         // shouldLoad is called by location.href in overlay.js as of Fx
         // 3.7a5pre and SeaMonkey 2.1a.
         request.requestResult = new RequestResult(true,
@@ -649,15 +691,16 @@ var RequestProcessor = (function(self) {
         return accept("User-allowed redirect", request, true);
       }
 
-      if (request.aRequestOrigin.scheme == "chrome") {
-        if (request.aRequestOrigin.asciiHost == "browser") {
+      if (request.aRequestOrigin.scheme === "chrome") {
+        if (request.aRequestOrigin.asciiHost === "browser") {
           // "browser" origin shows up for favicon.ico and an address entered
           // in address bar.
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_USER_ACTION);
           return accept(
-              "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new window/tab opened)", request);
+              "User action (e.g. address entered in address bar) " +
+              "or other good explanation (e.g. new window/tab opened)",
+              request);
         } else {
           // TODO: It seems sketchy to allow all requests from chrome. If I
           // had to put my money on a possible bug (in terms of not blocking
@@ -669,8 +712,9 @@ var RequestProcessor = (function(self) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_USER_ACTION);
           return accept(
-              "User action (e.g. address entered in address bar) or other good "
-                  + "explanation (e.g. new window/tab opened)", request);
+              "User action (e.g. address entered in address bar) " +
+              "or other good explanation (e.g. new window/tab opened)",
+              request);
         }
       }
 
@@ -684,10 +728,14 @@ var RequestProcessor = (function(self) {
         let domNode;
         try {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-        } catch (e if e.result == Cr.NS_ERROR_NO_INTERFACE) {}
+        } catch (e) {
+          if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            throw e;
+          }
+        }
 
-        if (domNode && domNode.nodeName == "xul:browser" &&
-            domNode.currentURI && domNode.currentURI.spec == "about:blank") {
+        if (domNode && domNode.nodeName === "xul:browser" &&
+            domNode.currentURI && domNode.currentURI.spec === "about:blank") {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_NEW_WINDOW);
           return accept("New window (should probably only be an allowed " +
@@ -697,8 +745,8 @@ var RequestProcessor = (function(self) {
 
       // XMLHttpRequests made within chrome's context have these origins.
       // Greasemonkey uses such a method to provide their cross-site xhr.
-      if (originURI == "resource://gre/res/hiddenWindow.html" ||
-          originURI == "resource://gre-resources/hiddenWindow.html") {
+      if (originURI === "resource://gre/res/hiddenWindow.html" ||
+          originURI === "resource://gre-resources/hiddenWindow.html") {
       }
 
       // Now that we have blacklists, a user could prevent themselves from
@@ -719,13 +767,13 @@ var RequestProcessor = (function(self) {
 
       request.requestResult = PolicyManager.checkRequestAgainstUserRules(
           request.aRequestOrigin, request.aContentLocation);
-      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
-        Logger.dump('Matched deny rules');
-        Logger.vardump(request.requestResult.matchedDenyRules[i]);
+      for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
+        Logger.dump("Matched deny rules");
+        Logger.vardump(matchedDenyRule);
       }
-      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
-        Logger.dump('Matched allow rules');
-        Logger.vardump(request.requestResult.matchedAllowRules[i]);
+      for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
+        Logger.dump("Matched allow rules");
+        Logger.vardump(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
       // policy. I believe this is effectively the same as giving precedence
@@ -737,6 +785,17 @@ var RequestProcessor = (function(self) {
       // question.
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
+        let {conflictCanBeResolved, shouldAllow
+             } = request.requestResult.resolveConflict();
+        if (conflictCanBeResolved) {
+          request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+          request.requestResult.isAllowed = shouldAllow;
+          if (shouldAllow) {
+            return accept("Allowed by user policy", request);
+          } else {
+            return reject("Blocked by user policy", request);
+          }
+        }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
         if (Prefs.isDefaultAllow()) {
@@ -763,18 +822,28 @@ var RequestProcessor = (function(self) {
       request.requestResult = PolicyManager
           .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
               request.aContentLocation);
-      for (var i = 0; i < request.requestResult.matchedDenyRules.length; i++) {
-        Logger.dump('Matched deny rules');
-        Logger.vardump(
-            request.requestResult.matchedDenyRules[i]);
+      for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
+        Logger.dump("Matched deny rules");
+        Logger.vardump(matchedDenyRule);
       }
-      for (var i = 0; i < request.requestResult.matchedAllowRules.length; i++) {
-        Logger.dump('Matched allow rules');
-        Logger.vardump(
-            request.requestResult.matchedAllowRules[i]);
+      for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
+        Logger.dump("Matched allow rules");
+        Logger.vardump(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
+        let {conflictCanBeResolved, shouldAllow
+             } = request.requestResult.resolveConflict();
+        if (conflictCanBeResolved) {
+          request.requestResult.resultReason =
+              REQUEST_REASON_SUBSCRIPTION_POLICY;
+          request.requestResult.isAllowed = shouldAllow;
+          if (shouldAllow) {
+            return accept("Allowed by subscription policy", request);
+          } else {
+            return reject("Blocked by subscription policy", request);
+          }
+        }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
         if (Prefs.isDefaultAllow()) {
@@ -802,10 +871,9 @@ var RequestProcessor = (function(self) {
       }
 
       let compatibilityRules = self.getCompatibilityRules();
-      for (var i = 0; i < compatibilityRules.length; i++) {
-        var rule = compatibilityRules[i];
-        var allowOrigin = rule[0] ? originURI.indexOf(rule[0]) == 0 : true;
-        var allowDest = rule[1] ? destURI.indexOf(rule[1]) == 0 : true;
+      for (let rule of compatibilityRules) {
+        let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
+        let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
         if (allowOrigin && allowDest) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
@@ -819,16 +887,17 @@ var RequestProcessor = (function(self) {
       // destination but was changed into the current one), accept this
       // request if the original destination would have been accepted.
       // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
-      if (request.aExtra != CP_MAPPEDDESTINATION &&
+      if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
-        for (var mappedDest in internal.mappedDestinations[destURI]) {
-          var mappedDestUriObj = internal.mappedDestinations[destURI][mappedDest];
+        for (let mappedDest in internal.mappedDestinations[destURI]) {
+          var mappedDestUriObj = internal.mappedDestinations
+                                 [destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
-          var mappedResult = PolicyImplementation.shouldLoad(
+          let mappedResult = PolicyImplementation.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
-          if (mappedResult == CP_OK) {
+          if (mappedResult === CP_OK) {
             return CP_OK;
           }
         }
@@ -840,10 +909,10 @@ var RequestProcessor = (function(self) {
       } else {
         // We didn't match any of the conditions in which to allow the request,
         // so reject it.
-        return request.aExtra == CP_MAPPEDDESTINATION ? CP_REJECT :
+        return request.aExtra === CP_MAPPEDDESTINATION ?
+            CP_REJECT :
             reject("Denied by default policy", request);
       }
-
 
     } catch (e) {
       Logger.severe(Logger.TYPE_ERROR,
@@ -858,10 +927,6 @@ var RequestProcessor = (function(self) {
   //   request.shouldLoadResult = result;
   // };
 
-
-
-
-
   /**
    * Called as a http request is made. The channel is available to allow you to
    * modify headers and such.
@@ -873,7 +938,7 @@ var RequestProcessor = (function(self) {
     var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
-      if (httpChannel.getRequestHeader("X-moz") == "prefetch") {
+      if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
         // Seems to be too late to block it at this point. Calling the
         // cancel(status) method didn't stop it.
         Logger.warning(Logger.TYPE_CONTENT,
@@ -887,11 +952,6 @@ var RequestProcessor = (function(self) {
   ProcessEnvironment.obMan.observe(["http-on-modify-request"],
                                    examineHttpRequest);
 
-
-
-
-
-
   self.registerHistoryRequest = function(destinationUrl) {
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
@@ -901,7 +961,8 @@ var RequestProcessor = (function(self) {
   };
 
   self.registerFormSubmitted = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
@@ -913,36 +974,38 @@ var RequestProcessor = (function(self) {
     // we'll need to be dropping the query string there.
     destinationUrl = destinationUrl.split("?")[0];
 
-    if (internal.submittedForms[originUrl] == undefined) {
+    if (internal.submittedForms[originUrl] === undefined) {
       internal.submittedForms[originUrl] = {};
     }
-    if (internal.submittedForms[originUrl][destinationUrl] == undefined) {
+    if (internal.submittedForms[originUrl][destinationUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
       internal.submittedForms[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.submittedFormsReverse[destinationUrl] == undefined) {
+    if (internal.submittedFormsReverse[destinationUrl] === undefined) {
       internal.submittedFormsReverse[destinationUrl] = {};
     }
-    if (internal.submittedFormsReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.
+        submittedFormsReverse[destinationUrl][originUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
       internal.submittedFormsReverse[destinationUrl][originUrl] = true;
     }
   };
 
   self.registerLinkClicked = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
     Logger.info(Logger.TYPE_INTERNAL,
         "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.clickedLinks[originUrl] == undefined) {
+    if (internal.clickedLinks[originUrl] === undefined) {
       internal.clickedLinks[originUrl] = {};
     }
-    if (internal.clickedLinks[originUrl][destinationUrl] == undefined) {
+    if (internal.clickedLinks[originUrl][destinationUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp that can be used elsewhere
       // to determine if this is a recent click. This is probably necessary as
       // multiple calls to shouldLoad get made and we need a way to allow
@@ -956,27 +1019,29 @@ var RequestProcessor = (function(self) {
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.clickedLinksReverse[destinationUrl] == undefined) {
+    if (internal.clickedLinksReverse[destinationUrl] === undefined) {
       internal.clickedLinksReverse[destinationUrl] = {};
     }
-    if (internal.clickedLinksReverse[destinationUrl][originUrl] == undefined) {
+    if (internal.clickedLinksReverse[destinationUrl][originUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp, as described above.
       internal.clickedLinksReverse[destinationUrl][originUrl] = true;
     }
   };
 
   self.registerAllowedRedirect = function(originUrl, destinationUrl) {
-    originUrl = DomainUtil.ensureUriHasPath(DomainUtil.stripFragment(originUrl));
+    originUrl = DomainUtil.ensureUriHasPath(
+        DomainUtil.stripFragment(originUrl));
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
     Logger.info(Logger.TYPE_INTERNAL, "User-allowed redirect from <" +
         originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.userAllowedRedirects[originUrl] == undefined) {
+    if (internal.userAllowedRedirects[originUrl] === undefined) {
       internal.userAllowedRedirects[originUrl] = {};
     }
-    if (internal.userAllowedRedirects[originUrl][destinationUrl] == undefined) {
+    if (internal.
+        userAllowedRedirects[originUrl][destinationUrl] === undefined) {
       internal.userAllowedRedirects[originUrl][destinationUrl] = true;
     }
   };
@@ -989,8 +1054,8 @@ var RequestProcessor = (function(self) {
    */
   self.addRequestObserver = function(observer) {
     if (!("observeBlockedRequest" in observer)) {
-      throw "Observer passed to addRequestObserver does "
-          + "not have an observeBlockedRequest() method.";
+      throw "Observer passed to addRequestObserver does " +
+          "not have an observeBlockedRequest() method.";
     }
     Logger.debug(Logger.TYPE_INTERNAL,
         "Adding request observer: " + observer.toString());
@@ -1003,8 +1068,8 @@ var RequestProcessor = (function(self) {
    * @param {Object} observer
    */
   self.removeRequestObserver = function(observer) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (internal.requestObservers[i] == observer) {
+    for (let i = 0; i < internal.requestObservers.length; i++) {
+      if (internal.requestObservers[i] === observer) {
         Logger.debug(Logger.TYPE_INTERNAL,
             "Removing request observer: " + observer.toString());
         delete internal.requestObservers[i];
@@ -1015,16 +1080,20 @@ var RequestProcessor = (function(self) {
         "Could not find observer to remove " + "in removeRequestObserver()");
   };
 
-
-
-  self.getDeniedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+  self.getDeniedRequests = function(currentlySelectedOrigin,
+      allRequestsOnDocument) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("## getDeniedRequests");
+    // #endif
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
   };
 
-  self.getAllowedRequests = function(currentlySelectedOrigin, allRequestsOnDocument) {
+  self.getAllowedRequests = function(currentlySelectedOrigin,
+      allRequestsOnDocument) {
+    // #ifdef LOG_GETTING_SAVED_REQUESTS
     Logger.dump("## getAllowedRequests");
+    // #endif
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);
   };
@@ -1047,10 +1116,7 @@ var RequestProcessor = (function(self) {
    * the most recent iframe that loaded that source uri. It may also help in
    * cases where the user has multiple tabs/windows open to the same page.
    *
-   * @param {}
-   *          browser
-   * @return {}
-   *          RequestSet
+   * @param {Browser} browser
    */
   self.getAllRequestsInBrowser = function(browser) {
     //var origins = {};
@@ -1068,10 +1134,22 @@ var RequestProcessor = (function(self) {
   };
 
   return self;
-}(RequestProcessor || {}));
+}());
 
+RequestProcessor = (function() {
+  let scope = {
+    RequestProcessor: RequestProcessor
+  };
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/request-processor.redirects.js", scope);
+  return scope.RequestProcessor;
+}());
 
-Services.scriptloader.loadSubScript(
-    'chrome://rpcontinued/content/lib/request-processor.redirects.js');
-Services.scriptloader.loadSubScript(
-    'chrome://rpcontinued/content/lib/request-processor.compat.js');
+RequestProcessor = (function() {
+  let scope = {
+    RequestProcessor: RequestProcessor
+  };
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);
+  return scope.RequestProcessor;
+}());

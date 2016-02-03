@@ -3,35 +3,54 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.ui.addons import RequestPolicy, Addons
+from rp_puppeteer.api.addon import Addon
+from marionette_driver.errors import NoSuchElementException
 
 
-OLD_VERSION__ADDON_ID = "requestpolicy@requestpolicy.com"
-AMO_VERSION__ADDON_ID = "rpcontinued@requestpolicy.org"
-
-def _install_url(filename):
-    return "http://localhost/link.html?.dist/" + filename
-
-OLD_VERSION__INSTALL_URL = _install_url("requestpolicy-v1.0.beta9.3.xpi")
-AMO_VERSION__INSTALL_URL = _install_url("requestpolicy-amo.xpi")
-
+# v1.0.beta9.3
+RP_BETA_9 = {"id": "requestpolicy@requestpolicy.com",
+             "xpi": "requestpolicy-v1.0.beta9.3__preprocess.py.xpi"}
+# AMO version
+RP_AMO = {"id": "rpcontinued@amo.requestpolicy.org",
+          "xpi": "requestpolicy-amo-nightly.xpi"}
 
 NOTICE_URL = "chrome://rpcontinued/content/multiple-installations.html"
 
 
 class MultipleInstallationsTestCase(RequestPolicyTestCase):
+    OTHER_ADDON = None
+
     def setUp(self):
-        RequestPolicyTestCase.setUp(self)
-        self.rp = RequestPolicy(lambda: self.marionette)
-        self.addons = Addons(lambda: self.marionette)
+        super(MultipleInstallationsTestCase, self).setUp()
+
+        self.rp_addon.ignore_errors = True
+
+        assert self.OTHER_ADDON is not None
+        self.other_rp = Addon(lambda: self.marionette,
+                              addon_id=self.OTHER_ADDON["id"],
+                              install_url=("http://localhost/.dist/" +
+                                           self.OTHER_ADDON["xpi"]))
 
     def tearDown(self):
-        self._close_notice_tabs()
-        # Restart the browser. (It's a method of FirefoxTestCase.)
-        # It's necessary to restart because multiple installed versions
-        # might have broken RequestPolicy's functionality.
-        self.restart()
-        RequestPolicyTestCase.tearDown(self)
+        try:
+            self.other_rp.uninstall()
+            self.rp_addon.install()
+
+            # Restart the browser. (It's a method of FirefoxTestCase.)
+            # It's necessary to restart because multiple installed versions
+            # might have broken RequestPolicy's functionality.
+            self.restart()
+        finally:
+            self.browser.tabbar.close_all_tabs(
+                exceptions=[self.browser.tabbar.tabs[0]])
+            self.rp_addon.ignore_errors = False
+
+            # It's highly probable that errors occur. However, the tests
+            # in this file don't intend to avoid these errors.
+            self.logging_error_detect.reset()
+            self.console_error_detect.reset()
+
+            super(MultipleInstallationsTestCase, self).tearDown()
 
     def _get_notice_tabs(self):
         tabs = self.browser.tabbar.tabs
@@ -64,10 +83,11 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
             tab.select()
 
         with self.marionette.using_context("content"):
-            # check if the word "Notice" is on the page
-            notice = self.marionette.find_element(
-                "xpath",
-                "//*[contains(text(),'Notice')]")
+            try:
+                self.marionette.find_element("xpath",
+                                             "//*[contains(text(),'Notice')]")
+            except NoSuchElementException:
+                self.fail("The Notice Tab should contain the word 'Notice'.")
 
     def _close_notice_tabs(self):
         tabs = self._get_notice_tabs()
@@ -75,90 +95,97 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
             tab.close()
 
 
-class OldVersionTestCase(MultipleInstallationsTestCase):
-    INSTALL_URL = OLD_VERSION__INSTALL_URL
-    ADDON_ID = OLD_VERSION__ADDON_ID
-    def tearDown(self):
-        self.addons.remove_addon_by_id(self.ADDON_ID)
-        MultipleInstallationsTestCase.tearDown(self)
+class CommonTests:
+    """Common tests for all so-called "other" versions.
 
+    Idea from
+    https://stackoverflow.com/questions/1323455/python-unit-test-with-base-and-sub-class/25695512#25695512
+    """
 
-class TestOldVersionActive_ThenInstallCurrentVersion(OldVersionTestCase):
-    def setUp(self):
-        OldVersionTestCase.setUp(self)
-        self.rp.remove()
-        self.addons.install_addon(self.INSTALL_URL)
+    class OtherVersionActive_ThenInstallCurrentVersion(MultipleInstallationsTestCase):
+        def test_notice_is_shown(self):
+            self.rp_addon.uninstall()
+            self.other_rp.install()
 
-    def test_notice_is_shown(self):
-        with self.rp.install_in_two_steps():
+            self.rp_addon.install()
             self._assert_notice_tab()
 
-class TestOldVersionActive_ThenEnableCurrentVersion(OldVersionTestCase):
-    def setUp(self):
-        OldVersionTestCase.setUp(self)
-        self.rp.disable()
-        self.addons.install_addon(self.INSTALL_URL)
+    class OtherVersionActive_ThenEnableCurrentVersion(MultipleInstallationsTestCase):
+        def test_notice_is_shown(self):
+            self.rp_addon.disable()
+            self.other_rp.install()
 
-    def test_notice_is_shown(self):
-        self.rp.enable()
-        self._assert_notice_tab()
-
-class TestOldVersionNotActive_ThenInstall(OldVersionTestCase):
-    def test_notice_is_shown(self):
-        with self.addons.install_addon_in_two_steps(self.INSTALL_URL):
+            self.rp_addon.enable()
             self._assert_notice_tab()
 
-class TestOldVersionNotActive_ThenEnable(OldVersionTestCase):
-    def setUp(self):
-        OldVersionTestCase.setUp(self)
-        # After this preparation, both the current and the old version
-        # will be installed, but the old version will be disabled.
-        self.rp.disable()
-        self.addons.install_addon(self.INSTALL_URL)
-        self.addons.disable_addon_by_id(self.ADDON_ID)
-        self.rp.enable()
-        self.assertIsNone(self._notice_tab,
-                          msg=("No 'notice' tab has been opened during "
-                               "preparation"))
+    class OtherVersionNotActive_ThenInstall(MultipleInstallationsTestCase):
+        def test_notice_is_shown(self):
+            self.other_rp.install()
+            self._assert_notice_tab()
 
-    def test_notice_is_shown(self):
-        self.addons.enable_addon_by_id(self.ADDON_ID)
-        self._assert_notice_tab()
+    class OtherVersionNotActive_ThenEnable(MultipleInstallationsTestCase):
+        def test_notice_is_shown(self):
+            # After this preparation, both the current and the old version
+            # will be installed, but the old version will be disabled.
+            self.rp_addon.disable()
+            self.other_rp.install()
+            self.other_rp.disable()
+            self.rp_addon.enable()
+            self.assertIsNone(self._notice_tab,
+                              msg=("No 'notice' tab has been opened during "
+                                   "preparation"))
 
-class TestOldAndCurrentVersionActiveAfterRestart(OldVersionTestCase):
-    def setUp(self):
-        OldVersionTestCase.setUp(self)
-        self.addons.install_addon(self.INSTALL_URL)
-        self._close_notice_tabs()
+            self.other_rp.enable()
+            self._assert_notice_tab()
 
-    def test_notice_is_shown(self):
-        self.restart()
-        # Don't require the tab to be selected. It somehow doesn't get
-        # selected in the unit test, but it works when done manually.
-        self._assert_notice_tab(selected_required=False)
+    class OtherAndCurrentVersionActiveAfterRestart(MultipleInstallationsTestCase):
+        def test_notice_is_shown(self):
+            self.other_rp.install()
+            self._close_notice_tabs()
+
+            self.restart()
+            # Don't require the tab to be selected. It somehow doesn't get
+            # selected in the unit test, but it works when done manually.
+            self._assert_notice_tab(selected_required=False)
 
 
 class TestAMOVersionActive_ThenInstallCurrentVersion(\
-        TestOldVersionActive_ThenInstallCurrentVersion):
-    INSTALL_URL = AMO_VERSION__INSTALL_URL
-    ADDON_ID = AMO_VERSION__ADDON_ID
+        CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
+    OTHER_ADDON = RP_AMO
 
 class TestAMOVersionActive_ThenEnableCurrentVersion(\
-        TestOldVersionActive_ThenEnableCurrentVersion):
-    INSTALL_URL = AMO_VERSION__INSTALL_URL
-    ADDON_ID = AMO_VERSION__ADDON_ID
+        CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
+    OTHER_ADDON = RP_AMO
 
 class TestAMOVersionNotActive_ThenInstall(\
-        TestOldVersionNotActive_ThenInstall):
-    INSTALL_URL = AMO_VERSION__INSTALL_URL
-    ADDON_ID = AMO_VERSION__ADDON_ID
+        CommonTests.OtherVersionNotActive_ThenInstall):
+    OTHER_ADDON = RP_AMO
 
 class TestAMOVersionNotActive_ThenEnable(\
-        TestOldVersionNotActive_ThenEnable):
-    INSTALL_URL = AMO_VERSION__INSTALL_URL
-    ADDON_ID = AMO_VERSION__ADDON_ID
+        CommonTests.OtherVersionNotActive_ThenEnable):
+    OTHER_ADDON = RP_AMO
 
 class TestAMOAndNonAMOVersionActiveAfterRestart(\
-        TestOldAndCurrentVersionActiveAfterRestart):
-    INSTALL_URL = AMO_VERSION__INSTALL_URL
-    ADDON_ID = AMO_VERSION__ADDON_ID
+        CommonTests.OtherAndCurrentVersionActiveAfterRestart):
+    OTHER_ADDON = RP_AMO
+
+
+class TestOldVersionActive_ThenInstallCurrentVersion(\
+        CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
+    OTHER_ADDON = RP_BETA_9
+
+class TestOldVersionActive_ThenEnableCurrentVersion(\
+        CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
+    OTHER_ADDON = RP_BETA_9
+
+class TestOldVersionNotActive_ThenInstall(\
+        CommonTests.OtherVersionNotActive_ThenInstall):
+    OTHER_ADDON = RP_BETA_9
+
+class TestOldVersionNotActive_ThenEnable(\
+        CommonTests.OtherVersionNotActive_ThenEnable):
+    OTHER_ADDON = RP_BETA_9
+
+class TestOldAndCurrentVersionActiveAfterRestart(\
+        CommonTests.OtherAndCurrentVersionActiveAfterRestart):
+    OTHER_ADDON = RP_BETA_9

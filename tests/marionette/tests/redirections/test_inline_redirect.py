@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness.testcases import RequestPolicyTestCase
-import time
 
 
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
@@ -22,6 +21,10 @@ class TestInlineRedirect(RequestPolicyTestCase):
         finally:
             super(TestInlineRedirect, self).tearDown()
 
+    ################
+    # Test Methods #
+    ################
+
     def test_redirect_notification_doesnt_appear(self):
         """This test ensures that the redirect notification is _not_ shown
         when the URL of an inline element, such as <img>, causes a redirection.
@@ -33,14 +36,8 @@ class TestInlineRedirect(RequestPolicyTestCase):
             with self.marionette.using_context("content"):
                 self.marionette.navigate(test_url)
 
-            # Wait some time to be sure the test is not faster than the
-            # redirect notification.
-            # FIXME: Find a better solution than `sleep()`
-            time.sleep(0.1)
-
             self.assertFalse(self.redir.is_shown(),
                              "There's no redirect notification.")
 
         test_no_appear("redirect-inline-image.html")
         test_no_appear("redirect-iframe.html")
-

@@ -16,85 +16,85 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
+/* exported AboutRequestPolicy */
+this.EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Utils} = importModule("lib/utils");
 
+//==============================================================================
+// utilities, constants
+//==============================================================================
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/utils"
-], globalScope);
-
-
-var filenames = {
+const FILENAMES = {
   "basicprefs": "basicprefs.html",
   "advancedprefs": "advancedprefs.html",
   "yourpolicy": "yourpolicy.html",
   "defaultpolicy": "defaultpolicy.html",
   "subscriptions": "subscriptions.html",
   "oldrules": "oldrules.html",
-  "setup": "setup.html"
+  "setup": "setup.html",
+  "experimental": "experimental.html",
 };
 
 function getURI(aURI) {
   let id;
   let index = aURI.path.indexOf("?");
   if (index >= 0 && aURI.path.length > index) {
-    id = aURI.path.substr(index+1);
+    id = aURI.path.substr(index + 1);
   }
-  if (!id || !(id in filenames)) {
+  if (!id || !(id in FILENAMES)) {
     id = "basicprefs";
   }
-  return "chrome://rpcontinued/content/settings/" + filenames[id];
+  return "chrome://rpcontinued/content/settings/" + FILENAMES[id];
 }
 
+//==============================================================================
+// AboutRequestPolicy
+//==============================================================================
 
+var AboutRequestPolicy = (function() {
+  let self = {};
 
-let AboutRequestPolicy = (function() {
-  let self = {
-    classDescription: "about:requestpolicy",
-    contractID: "@mozilla.org/network/protocol/about;1?what=requestpolicy",
-    classID: Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}"),
-    QueryInterface: XPCOMUtils.generateQI([Ci.nsIAboutModule]),
+  self.classDescription = "about:requestpolicy";
+  self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
+  self.classID = Components.ID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
+  self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
 
-    getURIFlags: function(aURI) {
-      return Ci.nsIAboutModule.ALLOW_SCRIPT;
-    },
-
-    newChannel: function(aURI) {
-      let uri = getURI(aURI)
-      let channel = Services.io.newChannel(uri, null, null);
-      channel.originalURI = aURI;
-      return channel;
-    },
-
-    //
-    // nsIFactory interface implementation
-    //
-
-    createInstance: function(outer, iid) {
-      if (outer) {
-        throw Cr.NS_ERROR_NO_AGGREGATION;
-      }
-      return self.QueryInterface(iid);
-    }
+  self.getURIFlags = function(aURI) {
+    return Ci.nsIAboutModule.ALLOW_SCRIPT;
   };
 
+  self.newChannel = function(aURI) {
+    let uri = getURI(aURI);
+    let channel = Services.io.newChannel(uri, null, null);
+    channel.originalURI = aURI;
+    return channel;
+  };
+
+  //----------------------------------------------------------------------------
+  // nsIFactory interface implementation
+  //----------------------------------------------------------------------------
+
+  self.createInstance = function(outer, iid) {
+    if (outer) {
+      throw Cr.NS_ERROR_NO_AGGREGATION;
+    }
+    return self.QueryInterface(iid);
+  };
 
   function registerFactory() {
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
@@ -104,19 +104,22 @@ let AboutRequestPolicy = (function() {
 
   ProcessEnvironment.addStartupFunction(
       Environment.LEVELS.INTERFACE,
-      function () {
+      function() {
         try {
           registerFactory();
-        } catch (e if e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-          // When upgrading restartless the old factory might still exist.
-          Utils.runAsync(registerFactory);
+        } catch (e) {
+          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
+            // When upgrading restartless the old factory might still exist.
+            Utils.runAsync(registerFactory);
+          } else {
+            Cu.reportError(e);
+          }
         }
       });
 
   function unregisterFactory() {
     let registrar = Components.manager
         .QueryInterface(Ci.nsIComponentRegistrar);
-    let {Utils} = ScriptLoader.importModule("lib/utils");
 
     // This needs to run asynchronously, see Mozilla bug 753687
     Utils.runAsync(function() {

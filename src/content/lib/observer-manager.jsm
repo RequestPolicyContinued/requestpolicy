@@ -22,42 +22,31 @@
  */
 
 /* global Components */
-/* exported EXPORTED_SYMBOLS, ObserverManager */
+const {utils: Cu} = Components;
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* exported ObserverManager */
+this.EXPORTED_SYMBOLS = ["ObserverManager"];
 
-let EXPORTED_SYMBOLS = ["ObserverManager"];
-
-let globalScope = this;
-
-/* global ScriptLoader */
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/observers", /* global SingleTopicObserver,
-                            SinglePrefBranchObserver */
-  "lib/environment" /* global Environment, ProcessEnvironment */
-], globalScope);
-
-ScriptLoader.defineLazyModuleGetters({
-  "lib/prefs": [
-    "rpPrefBranch", /* global rpPrefBranch */
-    "rootPrefBranch" /* global rootPrefBranch */
-  ]
-}, globalScope);
-
-
+let {ScriptLoader} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let importModule = ScriptLoader.importModule;
+let {SingleTopicObserver} = importModule("lib/utils/observers");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
 // Load the Logger at startup-time, not at load-time!
 // ( On load-time Logger might be null. )
 let Logger;
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, function() {
-  Logger = ScriptLoader.importModule("lib/logger").Logger;
+  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
+  //        https://github.com/jshint/jshint/issues/2775
+  /* jshint -W126 */
+  ({Logger} = importModule("lib/logger"));
+  /* jshint +W126 */
 });
 
-
-
+//==============================================================================
+// ObserverManager
+//==============================================================================
 
 /**
  * An ObserverManager provides an interface to `nsIObserverService` which takes
@@ -88,7 +77,6 @@ function ObserverManager(aEnv) {
   // an object holding all observers for unregistering when unloading the page
   self.observers = [];
 }
-
 
 /**
  * Define 'observe' functions. Those function can be called from anywhere;
@@ -127,49 +115,7 @@ function ObserverManager(aEnv) {
       self.observeSingleTopic(topic, aCallback);
     });
   };
-
-  /**
-   * A shorthand for calling observe() with topic "rpcontinued-prefs-changed".
-   */
-  ObserverManager.prototype.observePrefChanges = function(aCallback) {
-    let self = this;
-    self.observeSingleTopic("rpcontinued-prefs-changed", aCallback);
-  };
-
-  //
-  // functions using nsIPrefBranch
-  //
-
-  /**
-   * Observe one single subdomain of a Pref Branch (using nsIPrefBranch).
-   * Details: https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefBranch#addObserver%28%29
-   *
-   * @param {string} aTopic - The topic to be observed.
-   * @param {Function} aCallback - The observer's callback function.
-   */
-  ObserverManager.prototype.observeSinglePrefBranch = function(aPrefBranch,
-                                                               aDomain,
-                                                               aCallback) {
-    let self = this;
-    let obs = new SinglePrefBranchObserver(aPrefBranch, aDomain, aCallback);
-    self.observers.push(obs);
-  };
-
-  ObserverManager.prototype.observeRPPref = function(aDomains, aCallback) {
-    let self = this;
-    aDomains.forEach(function(domain) {
-      self.observeSinglePrefBranch(rpPrefBranch, domain, aCallback);
-    });
-  };
-  ObserverManager.prototype.observeRootPref = function(aDomains, aCallback) {
-    let self = this;
-    aDomains.forEach(function(domain) {
-      self.observeSinglePrefBranch(rootPrefBranch, domain, aCallback);
-    });
-  };
 }
-
-
 
 /**
  * The function will unregister all registered observers.

@@ -21,20 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = [
+/* exported GUILocation, GUIOrigin, GUIDestination, GUILocationProperties */
+this.EXPORTED_SYMBOLS = [
   "GUILocation",
   "GUIOrigin",
   "GUIDestination",
   "GUILocationProperties"
 ];
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules(["lib/utils/constants"], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
 
+//==============================================================================
+// GUILocation
+//==============================================================================
 
 function GUILocation(value, properties) {
   this.value = value || null;
@@ -43,13 +47,13 @@ function GUILocation(value, properties) {
 
 GUILocation.prototype.toString = function() {
   return this.value;
-}
+};
 
 /**
  * @static
  */
-GUILocation.merge = function (guiLocation, location1, location2) {
-  return new guiLocation(
+GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
+  return new SubclassOfGUILocation(
     location1.value,  // we assume: location1.value == location2.value
     GUILocationProperties.merge(location1.properties, location2.properties));
 };
@@ -57,25 +61,23 @@ GUILocation.merge = function (guiLocation, location1, location2) {
 /**
  * @static
  */
-GUILocation.existsInArray = function (locationString, locations) {
-  return (GUILocation.indexOfLocationInArray(locationString, locations) != -1);
+GUILocation.existsInArray = function(locationString, locations) {
+  return GUILocation.indexOfLocationInArray(locationString, locations) !== -1;
 };
 
 /**
  * @static
- * @param {String}
- *          locationString The location saved in GUILocation.value
- * @param {String}
- *          locations Array of GUILocation objects
+ * @param {String} locationString The location saved in GUILocation.value
+ * @param {String} locations Array of GUILocation objects
  * @return {int} The index of the first GUILocation object which contains the
- *          specified locationString. If it doesn't exist, it returns -1.
+ *     specified locationString. If it doesn't exist, it returns -1.
  */
-GUILocation.indexOfLocationInArray = function (locationString, locations) {
+GUILocation.indexOfLocationInArray = function(locationString, locations) {
   if (locationString instanceof GUILocation) {
     locationString = locationString.value;
   }
   for (var i in locations) {
-    if (locations[i].value == locationString) {
+    if (locations[i].value === locationString) {
       return i;
     }
   }
@@ -87,23 +89,23 @@ GUILocation.indexOfLocationInArray = function (locationString, locations) {
  *
  * @static
  */
-GUILocation.sortByNumRequestsCompareFunction = function (a, b) {
+GUILocation.sortByNumRequestsCompareFunction = function(a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
-GUILocation.compareFunction = function (a, b, sortType) {
-  var a_default = (a.properties.numDefaultPolicyRequests > 0);
-  var b_default = (b.properties.numDefaultPolicyRequests > 0);
+GUILocation.compareFunction = function(a, b, sortType) {
+  var aDefault = 0 < a.properties.numDefaultPolicyRequests;
+  var bDefault = 0 < b.properties.numDefaultPolicyRequests;
 
-  if (a_default !== b_default) {
-    if (a_default === true) {
+  if (aDefault !== bDefault) {
+    if (aDefault === true) {
       // default-policy destinations first.
       return -1;
     } else {
-      return 1
+      return 1;
     }
   }
 
-  if (sortType == "sortByNumRequests") {
+  if (sortType === "sortByNumRequests") {
     if (a.properties.numRequests > b.properties.numRequests) {
       return -1;
     }
@@ -111,7 +113,6 @@ GUILocation.compareFunction = function (a, b, sortType) {
       return 1;
     }
   }
-
 
   if (a.value > b.value) {
     return 1;
@@ -122,9 +123,9 @@ GUILocation.compareFunction = function (a, b, sortType) {
   return 0;
 };
 
-
-
-
+//==============================================================================
+// GUIOrigin
+//==============================================================================
 
 /**
  * GUIOrigin objects are used to hand over not only "origin" strings, like
@@ -134,7 +135,7 @@ GUILocation.compareFunction = function (a, b, sortType) {
 function GUIOrigin(origin, properties) {
   GUILocation.call(this, origin, properties);
 }
-GUIOrigin.prototype = new GUILocation;
+GUIOrigin.prototype = new GUILocation();
 
 /**
  * @static
@@ -142,9 +143,9 @@ GUIOrigin.prototype = new GUILocation;
 GUIOrigin.merge = GUILocation.merge.bind(GUIOrigin, GUIOrigin);
 GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
 
-
-
-
+//==============================================================================
+// GUIDestination
+//==============================================================================
 
 /**
  * GUIDestination objects are used to hand over not only "destination" strings,
@@ -154,7 +155,7 @@ GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
 function GUIDestination(dest, properties) {
   GUILocation.call(this, dest, properties);
 }
-GUIDestination.prototype = new GUILocation;
+GUIDestination.prototype = new GUILocation();
 
 /**
  * @static
@@ -162,10 +163,9 @@ GUIDestination.prototype = new GUILocation;
 GUIDestination.merge = GUILocation.merge.bind(GUIDestination, GUIDestination);
 GUIDestination.indexOfDestInArray = GUILocation.indexOfLocationInArray;
 
-
-
-
-
+//==============================================================================
+// GUILocationProperties
+//==============================================================================
 
 function GUILocationProperties(value, properties) {
   this.reset();
@@ -189,25 +189,28 @@ GUILocationProperties.prototype.reset = function() {
   *        with the specified rule action without being checked.
   *        Otherwise the ruleAction will be checked for every single request.
   */
-GUILocationProperties.prototype.accumulate = function (requests, ruleAction) {
-  var extractRuleActions = (undefined === ruleAction);
+GUILocationProperties.prototype.accumulate = function(requests, ruleAction) {
+  var extractRuleActions = undefined === ruleAction;
   var ruleActionCounter = 0;
 
-  for (var destIdent in requests) {
-    for (var destUri in requests[destIdent]) {
-      for (var i in requests[destIdent][destUri]) {
+  for (let destIdent in requests) {
+    let destIdentRequests = requests[destIdent];
+    for (let destUri in destIdentRequests) {
+      let destUriRequests = destIdentRequests[destUri];
+      for (let i in destUriRequests) {
+        let request = destUriRequests[i];
         ++this.numRequests;
 
         // depending on ruleAction:
         if (!extractRuleActions) {
           ++ruleActionCounter;
-        } else if (requests[destIdent][destUri][i].isAllowed) {
+        } else if (request.isAllowed) {
           ++this.numAllowedRequests;
         } else {
           ++this.numBlockedRequests;
         }
 
-        if ( requests[destIdent][destUri][i].isDefaultPolicyUsed() ) {
+        if (request.isDefaultPolicyUsed()) {
           ++this.numDefaultPolicyRequests;
         }
       }
@@ -239,16 +242,15 @@ GUILocationProperties.requestCountProperties = [
 ];
 
 /**
- * @static
- *
  * Merge the given GUILocationProperties object to a new object
+ *
+ * @static
  */
-GUILocationProperties.merge = function (prop1, prop2) {
+GUILocationProperties.merge = function(prop1, prop2) {
   var requestCountProperties = GUILocationProperties.requestCountProperties;
   var newObj = new GUILocationProperties();
 
-  for (var i in requestCountProperties) {
-    var propertyName = requestCountProperties[i];
+  for (let propertyName of requestCountProperties) {
     newObj[propertyName] += prop1[propertyName] + prop2[propertyName];
   }
 

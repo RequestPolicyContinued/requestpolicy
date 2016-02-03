@@ -21,6 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global Components */
+const {utils: Cu} = Components;
+
+/* global PolicyManager: true */
+
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+
+//==============================================================================
+// PolicyManager (extension)
+//==============================================================================
 
 PolicyManager = (function(self) {
 
@@ -33,18 +45,19 @@ PolicyManager = (function(self) {
                                                          C.RULE_ACTION_DENY);
   self.removeDenyRule = self.removeRule.bind(this, C.RULE_ACTION_DENY);
 
+  self.addAllowRules = self.addRules.bind(this, C.RULE_ACTION_ALLOW);
+  self.addDenyRules = self.addRules.bind(this, C.RULE_ACTION_DENY);
 
   function getRuleData(aOrigin, aDest) {
     let ruleData = {};
     if (aOrigin !== undefined) {
-      ruleData["o"] = {"h": aOrigin};
+      ruleData.o = {"h": aOrigin};
     }
     if (aDest !== undefined) {
-      ruleData["d"] = {"h": aDest};
+      ruleData.d = {"h": aDest};
     }
     return ruleData;
   }
-
 
   function allowOrigin(aOrigin, noStore) {
     self.addAllowRule(getRuleData(aOrigin), noStore);
@@ -56,14 +69,12 @@ PolicyManager = (function(self) {
     allowOrigin(aOrigin, true);
   };
 
-
   self.temporarilyAllowOrigin = function(aOrigin) {
     PolicyManager.addTemporaryAllowRule(getRuleData(aOrigin));
   };
   self.temporarilyAllowDestination = function(aDest) {
     self.addTemporaryAllowRule(getRuleData(undefined, aDest));
   };
-
 
   function allowDestination(aDest, noStore) {
     self.addAllowRule(getRuleData(undefined, aDest), noStore);
@@ -75,10 +86,9 @@ PolicyManager = (function(self) {
     allowDestination(aDest, true);
   };
 
-
   function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
     self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
-  };
+  }
   self.allowOriginToDestination = function(originIdentifier, destIdentifier) {
     allowOriginToDestination(originIdentifier, destIdentifier, false);
   };
@@ -86,7 +96,6 @@ PolicyManager = (function(self) {
                                                      destIdentifier) {
     allowOriginToDestination(originIdentifier, destIdentifier, true);
   };
-
 
   self.temporarilyAllowOriginToDestination = function(originIdentifier,
                                                       destIdentifier) {

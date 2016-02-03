@@ -21,20 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global window */
 
-window.rpcontinued.requestLog = (function (self) {
+window.rpcontinued.requestLog = (function(self) {
+  /* global Components */
+  const {utils: Cu} = Components;
 
-  const Ci = Components.interfaces;
-  const Cc = Components.classes;
-  const Cu = Components.utils;
+  let {ScriptLoader: {importModule}} = Cu.import(
+      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+  let {WindowUtils} = importModule("lib/utils/windows");
 
-  let {ScriptLoader, Services} = (function() {
-    let mod = {};
-    Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm", mod);
-    Cu.import("resource://gre/modules/Services.jsm", mod);
-    return mod;
-  }());
-  let {WindowUtils} = ScriptLoader.importModule("lib/utils/windows");
+  //============================================================================
 
   let filterText = null;
 
@@ -48,7 +45,7 @@ window.rpcontinued.requestLog = (function (self) {
     let filterValue = elements.filterTextbox.value;
 
     // create a new regular expression
-    filterText = filterValue.length === 0 ? null : new RegExp(filterValue, 'i');
+    filterText = filterValue.length === 0 ? null : new RegExp(filterValue, "i");
     // enable/disable the "Clear Filter" button
     elements.clearFilterButton.disabled = filterValue.length === 0;
 
@@ -59,10 +56,7 @@ window.rpcontinued.requestLog = (function (self) {
     elements.filterTextbox.value = "";
     elements.filterTextbox.focus();
     self.filterChanged();
-  }
-
-
-
+  };
 
   /**
    * Check if the row should be displayed or filtered out.
@@ -102,9 +96,8 @@ window.rpcontinued.requestLog = (function (self) {
 
     // notify that the table rows has changed
     let newRowCount = self.treeView.rowCount;
-    self.treebox.rowCountChanged(0, newRowCount-oldRowCount);
+    self.treebox.rowCountChanged(0, newRowCount - oldRowCount);
   }
-
 
   return self;
 }(window.rpcontinued.requestLog || {}));

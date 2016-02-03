@@ -16,35 +16,61 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* exported DOMUtils */
+this.EXPORTED_SYMBOLS = ["DOMUtils"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+//==============================================================================
+// DOMUtils
+//==============================================================================
 
-let EXPORTED_SYMBOLS = ["DOMUtils"];
+var DOMUtils = (function() {
+  let self = {};
 
-let DOMUtils = {};
+  /**
+   * Function that takes a DOM Element or an Array of DOM elements and removes
+   * all their children.
+   */
+  self.removeChildren = function(aElements) {
+    // If aElements is not an Array, put the element in an Array.
+    let elements = Array.isArray(aElements) ? aElements : [aElements];
+    // Note on `isArray` (above):
+    //     using `instanceof` did not work. For details see
+    //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 
-/**
- * Function that takes a DOM Element or an Array of DOM elements and removes
- * all their children.
- */
-DOMUtils.removeChildren = function(aElements) {
-  // If aElements is not an Array, put the element in an Array.
-  let elements = Array.isArray(aElements) ? aElements : [aElements];
-  // Note on `isArray` (above):
-  //     using `instanceof` did not work. For details see
-  //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
-
-  for (let el of elements) {
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
+    for (let el of elements) {
+      while (el.firstChild) {
+        el.removeChild(el.firstChild);
+      }
     }
+  };
+
+  function isThisElementVisible(aElement) {
+    let rects = aElement.getClientRects();
+    if (rects.length === 0) {
+      return false;
+    }
+    let rect = rects[0];
+    return rect.width > 0 && rect.height > 0;
   }
-};
+
+  /**
+   * Check if the element and all of its parent elements is visible.
+   *
+   * @param  {Element} aElement
+   * @return {boolean}
+   */
+  self.isElementVisible = function(aElement) {
+    if (!isThisElementVisible(aElement)) {
+      return false;
+    }
+    let parent = aElement.parentElement;
+    return parent !== null ? self.isElementVisible(parent) : true;
+  };
+
+  return self;
+}());

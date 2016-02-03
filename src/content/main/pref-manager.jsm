@@ -21,60 +21,55 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["PrefManager"];
+/* exported PrefManager */
+this.EXPORTED_SYMBOLS = ["PrefManager"];
 
-let globalScope = this;
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {C} = importModule("lib/utils/constants");
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/utils/constants",
-  "lib/environment"
-], globalScope);
+// Import when the default prefs have been set.
+let Prefs;
 
-XPCOMUtils.defineLazyGetter(globalScope, "rpPrefBranch", function() {
-  return Services.prefs.getBranch("extensions.requestpolicy.")
-      .QueryInterface(Ci.nsIPrefBranch2);
-});
-XPCOMUtils.defineLazyGetter(globalScope, "rootPrefBranch", function() {
-  return Services.prefs.getBranch("").QueryInterface(Ci.nsIPrefBranch2);
-});
+//==============================================================================
+// PrefManager
+//==============================================================================
 
-
-
-
-
-let PrefManager = (function() {
+var PrefManager = (function() {
   let self = {};
-
 
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
-    var resetLinkPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.link.restoreDefaultOnUninstall");
-    var resetDNSPrefetch = rpPrefBranch.getBoolPref(
-        "prefetch.dns.restoreDefaultOnUninstall");
+    var resetLinkPrefetch = Prefs.get("prefetch.link." +
+                                      "restoreDefaultOnUninstall");
+    var resetDNSPrefetch = Prefs.get("prefetch.dns.restoreDefaultOnUninstall");
+    var resetPreConnections = Prefs.get("prefetch.preconnections." +
+                                        "restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.prefetch-next")) {
-        rootPrefBranch.clearUserPref("network.prefetch-next");
+      if (Prefs.isSet("root/ network.prefetch-next")) {
+        Prefs.reset("root/ network.prefetch-next");
       }
     }
     if (resetDNSPrefetch) {
-      if (rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch")) {
-        rootPrefBranch.clearUserPref("network.dns.disablePrefetch");
+      if (Prefs.isSet("root/ network.dns.disablePrefetch")) {
+        Prefs.reset("root/ network.dns.disablePrefetch");
+      }
+    }
+    if (resetPreConnections) {
+      if (Prefs.isSet("root/ network.http.speculative-parallel-limit")) {
+        Prefs.reset("root/ network.http.speculative-parallel-limit");
       }
     }
     Services.prefs.savePrefFile(null);
   }
-
 
   self.init = function() {
     // ================================
@@ -88,29 +83,42 @@ let PrefManager = (function() {
         "chrome://rpcontinued/content/main/default-pref-handler.js",
         {});
 
+    // ================================
+    // Import `Prefs`
+    // --------------
+    /* jshint -W126 */ // JSHint issue #2775
+    ({Prefs} = importModule("models/prefs"));
+    /* jshint +W126 */
 
     // ================================
-    // Link/DNS prefetching
+    // prefetching
     // --------------------
     // Disable link prefetch.
-    if (rpPrefBranch.getBoolPref("prefetch.link.disableOnStartup")) {
-      if (rootPrefBranch.getBoolPref("network.prefetch-next")) {
-        rootPrefBranch.setBoolPref("network.prefetch-next", false);
+    if (Prefs.get("prefetch.link.disableOnStartup")) {
+      if (Prefs.get("root/ network.prefetch-next")) {
+        Prefs.set("root/ network.prefetch-next", false);
         console.info("Disabled link prefetch.");
       }
     }
     // Disable DNS prefetch.
-    if (rpPrefBranch.getBoolPref("prefetch.dns.disableOnStartup")) {
+    if (Prefs.get("prefetch.dns.disableOnStartup")) {
       // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
       // doesn't have a default value, at least in 3.1b2, but if and when it
       // does have a default it will be false).
-      if (!rootPrefBranch.prefHasUserValue("network.dns.disablePrefetch") ||
-          !rootPrefBranch.getBoolPref("network.dns.disablePrefetch")) {
-        rootPrefBranch.setBoolPref("network.dns.disablePrefetch", true);
+      if (!Prefs.isSet("root/ network.dns.disablePrefetch") ||
+          !Prefs.get("root/ network.dns.disablePrefetch")) {
+        Prefs.set("root/ network.dns.disablePrefetch", true);
         console.info("Disabled DNS prefetch.");
       }
     }
-
+    // Disable Speculative pre-connections.
+    if (Prefs.get("prefetch.preconnections.disableOnStartup")) {
+      if (!Prefs.isSet("root/ network.http.speculative-parallel-limit") ||
+          Prefs.get("root/ network.http.speculative-parallel-limit") !== 0) {
+        Prefs.set("root/ network.http.speculative-parallel-limit", 0);
+        console.info("Disabled Speculative pre-connections.");
+      }
+    }
 
     // ================================
     // Clean up old, unused prefs (removed in 0.2.0).
@@ -120,26 +128,24 @@ let PrefManager = (function() {
       "temporarilyAllowedDestinations",
       "temporarilyAllowedOriginsToDestinations"
     ];
-    for (var i = 0; i < deletePrefs.length; i++) {
-      if (rpPrefBranch.prefHasUserValue(deletePrefs[i])) {
-        rpPrefBranch.clearUserPref(deletePrefs[i]);
+    for (let prefName of deletePrefs) {
+      if (Prefs.isSet(prefName)) {
+        Prefs.reset(prefName);
       }
     }
-
 
     Services.prefs.savePrefFile(null);
   };
 
-
-  function eventuallyHandleUninstallOrDisable(data, reason) {
-    if (reason == C.ADDON_DISABLE || reason == C.ADDON_UNINSTALL) {
+  function maybeHandleUninstallOrDisable(data, reason) {
+    if (reason === C.ADDON_DISABLE || reason === C.ADDON_UNINSTALL) {
       // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
       //       disabled when being uninstalled.
       handleUninstallOrDisable();
     }
   }
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-                                         eventuallyHandleUninstallOrDisable);
+                                         maybeHandleUninstallOrDisable);
 
   return self;
 }());

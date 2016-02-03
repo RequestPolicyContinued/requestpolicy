@@ -21,30 +21,32 @@
  * ***** END LICENSE BLOCK *****
  */
 
-Cu.import("resource://gre/modules/AddonManager.jsm");
+/* global Components */
+const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/logger",
-  "lib/utils",
-  "lib/environment"
-], this);
+/* global RequestProcessor: true */
 
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment, ProcessEnvironment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+
+//==============================================================================
+// RequestProcessor (extension)
+//==============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = Utils.moduleInternal(self);
-
-
   let conflictingExtensions = [];
   let compatibilityRules = [];
   let topLevelDocTranslationRules = {};
 
   // TODO: update compatibility rules etc. when addons are enabled/disabled
   let addonListener = {
-    onDisabling : function(addon, needsRestart) {},
-    onUninstalling : function(addon, needsRestart) {},
-    onOperationCancelled : function(addon, needsRestart) {}
+    onDisabling: function(addon, needsRestart) {},
+    onUninstalling: function(addon, needsRestart) {},
+    onOperationCancelled: function(addon, needsRestart) {}
   };
 
   function init() {
@@ -64,9 +66,8 @@ RequestProcessor = (function(self) {
   ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
   ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND, cleanup);
 
-
   function initializeExtensionCompatibility() {
-    if (compatibilityRules.length != 0) {
+    if (compatibilityRules.length !== 0) {
       return;
     }
 
@@ -86,15 +87,14 @@ RequestProcessor = (function(self) {
     idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
     idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
+    idArray.push("keefox@chris.tomlinson"); // KeeFox
+    idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
 
-    for (let i in idArray) {
-      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + idArray[i]);
-      AddonManager.getAddonByID(idArray[i], initializeExtCompatCallback);
+    for (let id of idArray) {
+      Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
+      AddonManager.getAddonByID(id, initializeExtCompatCallback);
     }
   }
-
-
-
 
   function initializeExtCompatCallback(ext) {
     if (!ext) {
@@ -122,9 +122,9 @@ RequestProcessor = (function(self) {
         compatibilityRules.push(
             ["resource://brief-content/", null, ext.name]);
         conflictingExtensions.push({
-          "id" : ext.id,
-          "name" : ext.name,
-          "version" : ext.version
+          "id": ext.id,
+          "name": ext.name,
+          "version": ext.version
         });
         break;
       case "foxmarks@kei.com" : // Xmarks Sync
@@ -181,15 +181,33 @@ RequestProcessor = (function(self) {
             "Using extension compatibility rules for: " + ext.name);
         compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
         break;
-      default :
+
+      case "keefox@chris.tomlinson": // KeeFox
+        Logger.info(Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        compatibilityRules.push([
+          "resource://",
+          "ws://127.0.0.1",
+          ext.name
+        ]);
+        break;
+
+      case "jid1-TPTs1Z1UvUn2fA@jetpack": // Enpass
+        Logger.info(Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        compatibilityRules.push([
+          "resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/",
+          "ws://localhost",
+          ext.name
+        ]);
+        break;
+
+      default:
         Logger.severe(Logger.TYPE_INTERNAL,
             "Unhandled extension (id typo?): " + ext.name);
         break;
     }
   }
-
-
-
 
   function initializeApplicationCompatibility() {
     var appInfo = Cc["@mozilla.org/xre/app-info;1"].
@@ -272,8 +290,47 @@ RequestProcessor = (function(self) {
     // Firefox 13 added links from about:newtab
     compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
+    // Firefox
+    if (appInfo.ID === "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}") {
+      Logger.info(Logger.TYPE_INTERNAL,
+          "Application detected: " + appInfo.vendor);
+
+      // Firefox Accounts
+      compatibilityRules.push([
+        "about:accounts",
+        "https://accounts.firefox.com/",
+        appInfo.vendor
+      ]);
+      compatibilityRules.push([
+        "https://accounts.firefox.com/",
+        "https://api.accounts.firefox.com/",
+        appInfo.vendor
+      ]);
+    }
+
+    // Firefox Hello
+    // FIXME: Along with #742, convert these rules into the following ones:
+    //   - ALLOW "about:loopconversation" -> "https://hlg.tokbox.com"
+    //   - ALLOW "about:loopconversation" -> "https://anvil.opentok.com"
+    //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://hlg.tokbox.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "https://anvil.opentok.com/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
+      "about:loopconversation",
+      "wss://",
+      appInfo.vendor
+    ]);
+
     // Flock
-    if (appInfo.ID == "{a463f10c-3994-11da-9945-000d60ca027b}") {
+    if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
       Logger.info(Logger.TYPE_INTERNAL,
           "Application detected: " + appInfo.vendor);
       compatibilityRules.push(
@@ -292,15 +349,12 @@ RequestProcessor = (function(self) {
     }
 
     // Seamonkey
-    if (appInfo.ID == "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
+    if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
       Logger.info(Logger.TYPE_INTERNAL, "Application detected: Seamonkey");
       compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
       compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
     }
   }
-
-
-
 
   self.getCompatibilityRules = function() {
     return compatibilityRules;

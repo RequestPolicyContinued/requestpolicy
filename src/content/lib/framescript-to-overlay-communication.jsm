@@ -21,32 +21,35 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
+/* exported FramescriptToOverlayCommunication */
+this.EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
 
-let globalScope = this;
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Environment} = importModule("lib/environment");
+let {Logger} = importModule("lib/logger");
+let {C} = importModule("lib/utils/constants");
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/environment",
-  "lib/logger",
-  "lib/utils/constants"
-], globalScope);
-
+//==============================================================================
+// constants
+//==============================================================================
 
 /**
  * The states of the communication channel to with the overlay.
  * @enum {number}
  */
-let States = Object.freeze({
+const States = {
   "WAITING": 0,
   "RUNNING": 1,
   "STOPPED": 2
-});
+};
 
+//==============================================================================
+// FramescriptToOverlayCommunication
+//==============================================================================
 
 /**
  * Sometimes the framescript loads and starts up faster than the
@@ -92,9 +95,10 @@ function FramescriptToOverlayCommunication(aEnv) {
                                stopCommunication.bind(null, self));
 }
 
-function dump(self, msg) {
+FramescriptToOverlayCommunication.prototype._dump = function(msg) {
+  let self = this;
   Logger.dump(self.env.uid + ": " + msg);
-}
+};
 
 /**
  * Check whether the Overlay is ready. If it is, start the
@@ -122,12 +126,12 @@ function startCommNowOrLater(self) {
  */
 function startCommunication(self) {
   if (self.state === States.WAITING) {
-    //dump(self, "The Overlay is ready!");
+    //self._dump("The Overlay is ready!");
     self.state = States.RUNNING;
 
     while (self.waitingRunnables.length !== 0) {
       let runnable = self.waitingRunnables.shift();
-      //dump(self, "Lazily running function.");
+      //self._dump("Lazily running function.");
       runnable.call(null);
     }
   }
@@ -149,17 +153,17 @@ FramescriptToOverlayCommunication.prototype.run = function(aRunnable) {
   let self = this;
   switch (self.state) {
     case States.RUNNING:
-      //dump(self, "Immediately running function.");
+      //self._dump("Immediately running function.");
       aRunnable.call(null);
       break;
 
     case States.WAITING:
-      //dump(self, "Remembering runnable.");
+      //self._dump("Remembering runnable.");
       self.waitingRunnables.push(aRunnable);
       break;
 
     default:
-      //dump(self, "Ignoring runnable.");
+      //self._dump("Ignoring runnable.");
       break;
   }
 };

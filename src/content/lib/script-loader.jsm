@@ -21,40 +21,50 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
-const Cr = Components.results;
+/* global Components */
+const {results: Cr, utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["ScriptLoader"];
+/* exported ScriptLoader */
+this.EXPORTED_SYMBOLS = ["ScriptLoader"];
+
+/* global dump */
 
 // import some modules
 // NOTICE: This file should NOT import any of RP's modules when it is loaded!
 //         Doing so would be a bad practice, and might produce import() loops
 //         when the module to be imported wants to import ScriptLoader.
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/devtools/Console.jsm");
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
+//==============================================================================
+// utilities
+//==============================================================================
 
-const rpChromeContentURI = 'chrome://rpcontinued/content/';
+const RP_CHROME_CONTENT_URI = "chrome://rpcontinued/content/";
 
 function getModuleURI(id) {
-  return rpChromeContentURI + id + ".jsm";
+  return RP_CHROME_CONTENT_URI + id + ".jsm";
 }
 
 /**
  * If the ScriptLoader catches an Exception, it will be a severe error.
  */
-function logSevereError(msg, e) {
-  dump("[RequestPolicy] [SEVERE] [ERROR] " + msg + " " + e +
-       (e.stack ? ", stack was: " + e.stack : "") + "\n");
+function logSevereError(aMessage, aError) {
+  let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
+       (aError.stack ? ", stack was: " + aError.stack : "");
+  dump(msg + "\n");
+  // #ifdef UNIT_TESTING
+  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
+  // #endif
+  Cu.reportError(aError);
 }
 
+//==============================================================================
+// ScriptLoader
+//==============================================================================
 
-
-let ScriptLoader = (function() {
-
+var ScriptLoader = (function() {
   let importedModuleURIs = {};
 
   // URIs in that variable will not be unloaded
@@ -64,11 +74,9 @@ let ScriptLoader = (function() {
   // EnvironmentManager has to be unloaded even later than ScriptLoader
   moduleUnloadExceptions[getModuleURI("lib/environment")] = true;
 
-
   // contains the module IDs that are currently being imported initially and
   // have not finished importing yet.
   let modulesCurrentlyBeingImported = {};
-
 
   let self = {
     /**
@@ -79,12 +87,15 @@ let ScriptLoader = (function() {
       for (let uri in importedModuleURIs) {
         if (importedModuleURIs.hasOwnProperty(uri) &&
             moduleUnloadExceptions.hasOwnProperty(uri) === false) {
-          //console.debug("[RPC] Unloading module "+uri);
+          // #ifdef LOG_SCRIPTLOADER
+          console.debug("[RPC] [ScriptLoader] Cu.unload(\"" + uri + "\");");
+          // #endif
           try {
             Cu.unload(uri);
-          } catch(e) {
-            console.error("[RPC] Failed to unload module "+uri);
-            Components.utils.reportError(e);
+          } catch (e) {
+            console.error("[RPC] [ScriptLoader] failed to unload \"" + uri +
+                "\"");
+            Cu.reportError(e);
           }
           delete importedModuleURIs[uri];
         }
@@ -115,28 +126,35 @@ let ScriptLoader = (function() {
         return scope;
       }
 
-      //console.debug("[RPC] `importModule` called for "+moduleID);
+      // #ifdef LOG_SCRIPTLOADER
+      console.debug("[RPC] [ScriptLoader] importModule(\"" + moduleID +
+          "\") called.");
+      // #endif
 
       let uri = getModuleURI(moduleID);
       try {
         if (!(uri in importedModuleURIs)) {
           // the module hasn't been imported yet
           modulesCurrentlyBeingImported[moduleID] = true;
-          //console.debug("[RPC] importing " + moduleID);
         }
 
+        // #ifdef LOG_SCRIPTLOADER
+        console.debug("[RPC] [ScriptLoader] Cu.import(\"" + uri + "\");");
+        // #endif
         Cu.import(uri, scope);
         importedModuleURIs[uri] = true;
 
         if (moduleID in modulesCurrentlyBeingImported) {
           delete modulesCurrentlyBeingImported[moduleID];
         }
-      } catch (e if e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '", the file was not found!', e);
       } catch (e) {
-        logSevereError('Failed to import module with ID "' + moduleID +
-                       '".', e);
+        if (e.result === Cr.NS_ERROR_FILE_NOT_FOUND) {
+          logSevereError("Failed to import module with ID \"" + moduleID +
+              "\", the file was not found!", e);
+        } else {
+          logSevereError("Failed to import module with ID \"" + moduleID +
+              "\".", e);
+        }
       }
       return scope;
     },
@@ -172,11 +190,23 @@ let ScriptLoader = (function() {
     defineLazyModuleGetter: function(moduleID, names, scope) {
       scope = scope || {};
 
-      //console.debug("[RPC] defining lazy module getter(s) for " + moduleID);
+      // #ifdef LOG_SCRIPTLOADER
+      console.debug("[RPC] [ScriptLoader] " +
+          "defineLazyModuleGetter(\"" + moduleID + "\") called.");
+      // #endif
       let uri = getModuleURI(moduleID);
       for (let i in names) {
         let name = names[i];
+        // #ifndef LOG_SCRIPTLOADER
         XPCOMUtils.defineLazyModuleGetter(scope, name, uri);
+        // #else
+        /* jshint -W083 */ // "don't make functions within a loop"
+        XPCOMUtils.defineLazyModuleGetter(scope, name, uri, null, function() {
+          console.debug("[RPC] [ScriptLoader] lazily imported \"" + name +
+              "\"");
+        });
+        /* jshint +W083 */
+        // #endif
       }
       importedModuleURIs[uri] = true;
 

@@ -16,63 +16,75 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this program. If not, see {tag: "http"://www.gnu.org/licenses}.
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
  */
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cu = Components.utils;
+/* global Components */
+const {utils: Cu} = Components;
 
-let EXPORTED_SYMBOLS = ["Info"];
+/* exported Info */
+this.EXPORTED_SYMBOLS = ["Info"];
 
-Cu.import("resource://gre/modules/Services.jsm");
+let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
+let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-Cu.import("chrome://rpcontinued/content/lib/script-loader.jsm");
-ScriptLoader.importModules([
-  "lib/prefs",
-  "lib/utils/constants",
-  "lib/environment"
-], this);
+let {ScriptLoader: {importModule}} = Cu.import(
+    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {Prefs} = importModule("models/prefs");
+let {C} = importModule("lib/utils/constants");
+let {ProcessEnvironment} = importModule("lib/environment");
 
+let AddonManager = null;
 if (ProcessEnvironment.isMainProcess) {
-  Cu.import("resource://gre/modules/AddonManager.jsm");
+  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
+  /* jshint -W126 */
+  ({AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {}));
+  /* jshint +W126 */
 }
 
+//==============================================================================
+// Info
+//==============================================================================
 
-
-let Info = (function() {
+var Info = (function() {
   let self = {};
-
-  self = {};
 
   // bad smell...
   // get/set last/current RP version
   if (ProcessEnvironment.isMainProcess) {
-    self.lastRPVersion = rpPrefBranch.getCharPref("lastVersion");
+    self.lastRPVersion = Prefs.get("lastVersion");
 
     self.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
     AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
-      rpPrefBranch.setCharPref("lastVersion", addon.version);
+      Prefs.set("lastVersion", addon.version);
       self.curRPVersion = addon.version;
-      if (self.lastRPVersion != self.curRPVersion) {
+      if (self.lastRPVersion !== self.curRPVersion) {
         Services.prefs.savePrefFile(null);
       }
+    });
+
+    XPCOMUtils.defineLazyGetter(self, "isRPUpgrade", function() {
+      // Compare with version 1.0.0a8 since that version introduced
+      // the "welcome window".
+      return self.lastRPVersion &&
+          Services.vc.compare(self.lastRPVersion, "0.0") > 0 &&
+          Services.vc.compare(self.lastRPVersion, "1.0.0a8") <= 0;
     });
   }
 
   // bad smell...
   // get/set last/current app (e.g. firefox) version
   if (ProcessEnvironment.isMainProcess) {
-    self.lastAppVersion = rpPrefBranch.getCharPref("lastAppVersion");
+    self.lastAppVersion = Prefs.get("lastAppVersion");
 
     let curAppVersion = Services.appinfo.version;
     self.curAppVersion = curAppVersion;
-    rpPrefBranch.setCharPref("lastAppVersion", curAppVersion);
+    Prefs.set("lastAppVersion", curAppVersion);
 
-    if (self.lastAppVersion != self.curAppVersion) {
+    if (self.lastAppVersion !== self.curAppVersion) {
       Services.prefs.savePrefFile(null);
     }
   }
@@ -81,7 +93,7 @@ let Info = (function() {
   self.isFirefox = appID === C.FIREFOX_ID;
   self.isSeamonkey = appID === C.SEAMONKEY_ID;
   self.isAustralis = self.isFirefox &&
-      Services.vc.compare(Services.appinfo.platformVersion, '29') >= 0;
+      Services.vc.compare(Services.appinfo.platformVersion, "29") >= 0;
 
   return self;
 }());

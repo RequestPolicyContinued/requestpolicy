@@ -12,6 +12,10 @@ class RequestPolicyPuppeteer(object):
     RequestPolicyTestCase instance.
     """
 
+    @use_class_as_property('api.browser_info.BrowserInfo')
+    def browser_info(self):
+        pass
+
     @use_class_as_property('api.l10n.L10n')
     def l10n(self):
         pass
@@ -24,12 +28,24 @@ class RequestPolicyPuppeteer(object):
     def requests(self):
         pass
 
+    @use_class_as_property('api.addon.RequestPolicy')
+    def rp_addon(self):
+        pass
+
     @use_class_as_property('api.rules.Rules')
     def rules(self):
         pass
 
+    @use_class_as_property('api.rules.RulesFile')
+    def rules_file(self):
+        pass
+
     @use_class_as_property('ui.context_menu.ContextMenu')
     def ctx_menu(self):
+        pass
+
+    @use_class_as_property('ui.menu.Menu')
+    def menu(self):
         pass
 
     @use_class_as_property('ui.redirect_notification.RedirectNotification')
@@ -40,14 +56,14 @@ class RequestPolicyPuppeteer(object):
     def request_log(self):
         pass
 
+    @use_class_as_property('ui.settings.Settings')
+    def settings(self):
+        pass
+
     @use_class_as_property('ui.tabs.Tabs')
     def tabs(self):
         pass
 
     @use_class_as_property('ui.web_utils.WebUtils')
     def web_utils(self):
-        pass
-
-    @use_class_as_property('ui.settings.your_policy.YourPolicy')
-    def your_policy(self):
         pass

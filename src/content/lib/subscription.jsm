@@ -314,15 +314,20 @@ SubscriptionList.prototype = {
   updateSubscriptions: function(userSubs, successCallback, errorCallback) {
     /* jshint -W083 */ // Don't make functions within a loop.
     for (let subName in userSubs) {
-      let sub;
+      let serial = this.getSubscriptionSerial(subName);
+      if (serial === null) {
+        continue;
+      }
+      dprint("Current serial for " + this._name + " " + subName + ": " +
+             userSubs[subName].serial);
+      dprint("Available serial for " + this._name + " " + subName + ": " +
+             serial);
+      let subUrl = this.getSubscriptionUrl(subName);
+      if (subUrl === null) {
+        continue;
+      }
+      let sub = new Subscription(this._name, subName, subUrl);
       try {
-        var serial = this.getSubscriptionSerial(subName);
-        dprint("Current serial for " + this._name + " " + subName + ": " +
-               userSubs[subName].serial);
-        dprint("Available serial for " + this._name + " " + subName + ": " +
-               serial);
-        var subUrl = this.getSubscriptionUrl(subName);
-        sub = new Subscription(this._name, subName, subUrl);
         if (serial > userSubs[subName].serial) {
           sub.update(successCallback, errorCallback);
         } else {
@@ -349,10 +354,16 @@ SubscriptionList.prototype = {
   // },
 
   getSubscriptionSerial: function(subName) {
+    if (!(subName in this._data.subscriptions)) {
+      return null;
+    }
     return this._data.subscriptions[subName].serial;
   },
 
   getSubscriptionUrl: function(subName) {
+    if (!(subName in this._data.subscriptions)) {
+      return null;
+    }
     return this._data.subscriptions[subName].url;
   }
 };

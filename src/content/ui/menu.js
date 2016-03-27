@@ -1070,30 +1070,6 @@ window.rpcontinued.menu = (function() {
     return item;
   };
 
-  self._ruleDataPartToDisplayString = function(ruleDataPart) {
-    var str = "";
-    if (ruleDataPart.s) {
-      str += ruleDataPart.s + "://";
-    }
-    str += ruleDataPart.h || "*";
-    if (ruleDataPart.port) {
-      str += ":" + ruleDataPart.port;
-    }
-    // TODO: path
-    return str;
-  };
-
-  self._ruleDataToFormatVariables = function(rawRule) {
-    var fmtVars = [];
-    if (rawRule.o) {
-      fmtVars.push(self._ruleDataPartToDisplayString(rawRule.o));
-    }
-    if (rawRule.d) {
-      fmtVars.push(self._ruleDataPartToDisplayString(rawRule.d));
-    }
-    return fmtVars;
-  };
-
   self._addMenuItemRemoveAllowRule = function(list, rawRule,
       subscriptionOverride) {
     if (rawRule.o && rawRule.d) {

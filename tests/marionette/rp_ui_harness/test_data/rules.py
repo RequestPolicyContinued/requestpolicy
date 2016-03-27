@@ -64,22 +64,15 @@ class ExemplaryRules(ExemplaryRules_Meta):
 
     @lazyprop
     def pre_path_specs(self):
-        """A list of all possible pre-paths, including the expected string."""
+        """A list of all possible pre-paths."""
 
         return {
-            "s": {"spec": {"s": "s1"},
-                  # The string "s1:*" could be confused with "*://s1:*"
-                  "expected_string": 'scheme "s1"'},
-            "h": {"spec": {"h": "h2"},
-                  "expected_string": "h2"},
-            "p": {"spec": {"port": 3},
-                  "expected_string": "*://*:3"},
-            "sh": {"spec": {"s": "s4", "h": "h4"},
-                   "expected_string": "s4://h4"},
-            "sp": {"spec": {"s": "s5", "port": 5},
-                   "expected_string": "s5://*:5"},
-            "hp": {"spec": {"h": "h6", "port": 6},
-                   "expected_string": "*://h6:6"},
+            "s": {"spec": {"s": "s1"}},
+            "h": {"spec": {"h": "h2"}},
+            "p": {"spec": {"port": 3}},
+            "sh": {"spec": {"s": "s4", "h": "h4"}},
+            "sp": {"spec": {"s": "s5", "port": 5}},
+            "hp": {"spec": {"h": "h6", "port": 6}},
             "shp": {"spec": {"s": "s7", "h": "h7", "port": 7},
                     "expected_string": "s7://h7:7"}
         }

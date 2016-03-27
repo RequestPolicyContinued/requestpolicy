@@ -8,6 +8,7 @@
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   var {Prefs} = importModule("models/prefs");
   var {PolicyManager} = importModule("lib/policy-manager");
+  var {RuleUtils} = importModule("lib/utils/rules");
 
   //============================================================================
 
@@ -80,8 +81,10 @@
     for (var entryType in entries) {
       for (var i = 0; i < entries[entryType].length; i++) {
         var entry = entries[entryType][i];
-        var origin = entry.o ? common.ruleDataPartToDisplayString(entry.o) : "";
-        var dest = entry.d ? common.ruleDataPartToDisplayString(entry.d) : "";
+        var origin = entry.o ?
+                     RuleUtils.endpointSpecToDisplayString(entry.o) : "";
+        var dest = entry.d ?
+                   RuleUtils.endpointSpecToDisplayString(entry.d) : "";
         if (filter) {
           if (origin.indexOf(filter) === -1 && dest.indexOf(filter) === -1) {
             continue;

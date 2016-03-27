@@ -150,12 +150,6 @@ class TestRuleRow(RulesTableTestCase):
             def test(spec_id):
                 test_pre_path_spec(endpoint, self.data.pre_path_specs[spec_id])
 
-            test("s")
-            test("h")
-            test("p")
-            test("sh")
-            test("sp")
-            test("hp")
             test("shp")
 
         test_endpoint("origin")

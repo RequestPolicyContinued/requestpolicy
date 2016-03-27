@@ -60,10 +60,26 @@ class RuleRow(ElementBaseLib):
         if string == "":
             return None
 
-        # Case: Only a scheme is specified.
-        match = re.match('^scheme "([^"]+)"$', string)
+        # Case: No host, empty host or host optional
+        match = re.match(r"""^
+                             ([^:]+):     # scheme
+                             (//)?<path>
+                             \s
+                             \(([^)]+)\)
+                             $""", string, flags=re.X)
         if match:
-            return {"s": match.group(1)}
+            scheme = match.group(1)
+            info = match.group(3)
+            spec = {}
+            if scheme != "*":
+                spec["s"] = scheme
+            if info == "no host":
+                spec["h"] = None
+            elif info == "empty host":
+                spec["h"] = ""
+            elif info != "host optional":
+                raise SyntaxError
+            return spec
 
         # Case: URI without host, but with path
         match = re.match(r"""^

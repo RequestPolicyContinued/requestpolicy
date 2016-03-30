@@ -378,17 +378,17 @@ venv: .venv/bin/activate
 #-------------------------------------------------------------------------------
 
 # arguments for mozrunner
-mozrunner_args := -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper)
-mozrunner_args += -b $(app_binary)
-mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
-mozrunner_args += $(moz_args)
+run_additional_xpis :=
+run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+run_additional_args :=
+run_args := $(addprefix -a ,$(run_xpis))
+run_args += -b $(app_binary)
+run_args += --preferences=$(mozrunner_prefs_ini):dev
+run_args += $(run_additional_args)
 
 .PHONY: run
 run: venv unit-testing-xpi dev-helper-xpi
-	( \
-	source .venv/bin/activate ; \
-	mozrunner $(mozrunner_args) ; \
-	)
+	source .venv/bin/activate ; mozrunner $(run_args)
 
 #-------------------------------------------------------------------------------
 # unit testing: Marionette

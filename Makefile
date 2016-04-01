@@ -439,17 +439,20 @@ marionette: venv \
 # static code analysis
 #-------------------------------------------------------------------------------
 
+jshint_args :=
+jscs_args :=
+
 .PHONY: static-analysis jshint jscs
 static-analysis: jshint jscs
 jshint:
-	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
-	jshint tests/xpcshell/
-	jshint tests/helper-addons/
+	jshint --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
+	jshint $(jshint_args) tests/xpcshell/
+	jshint $(jshint_args) tests/helper-addons/
 jscs:
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; jscs .
-	cd tests/xpcshell/; jscs .
-	cd tests/helper-addons/; jscs .
+	cd src/; jscs $(jscs_args) .
+	cd tests/xpcshell/; jscs $(jscs_args) .
+	cd tests/helper-addons/; jscs $(jscs_args) .
 
 
 #===============================================================================

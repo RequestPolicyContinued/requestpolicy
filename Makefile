@@ -361,17 +361,12 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 #-------------------------------------------------------------------------------
 
 .PHONY: venv
-venv: .venv/bin/activate
-.venv/bin/activate: requirements.txt
-	test -d .venv || virtualenv --prompt='(RP)' .venv
-
-	@# With the `touch` command, this target is only executed
-	@# when "requirements.txt" changes
-	( \
-	source .venv/bin/activate ; \
-	pip install -r requirements.txt ; \
-	touch --no-create .venv/bin/activate ; \
-	)
+venv: .venv/requirements
+.venv/requirements: requirements.txt | .venv/bin/activate
+	source $| ; pip install -r $<
+	touch $@
+.venv/bin/activate:
+	virtualenv --prompt='(RP)' .venv
 
 #-------------------------------------------------------------------------------
 # run firefox

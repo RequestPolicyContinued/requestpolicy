@@ -46,6 +46,12 @@ var KeyboardShortcuts = (function() {
         },
         "keyboardShortcuts.openMenu.enabled",
         "keyboardShortcuts.openMenu.combo"));
+    keyboardShortcuts.push(new KeyboardShortcut("openRequestLog", "none",
+        function(window) {
+          window.rpcontinued.overlay.toggleRequestLog();
+        },
+        "keyboardShortcuts.openRequestLog.enabled",
+        "keyboardShortcuts.openRequestLog.combo"));
   };
 
   self.shutdown = function() {

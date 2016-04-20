@@ -55,6 +55,8 @@ var Prefs = (function() {
       "indicateBlockedObjects": "BoolPref",
       "keyboardShortcuts.openMenu.enabled": "BoolPref",
       "keyboardShortcuts.openMenu.combo": "CharPref",
+      "keyboardShortcuts.openRequestLog.enabled": "BoolPref",
+      "keyboardShortcuts.openRequestLog.combo": "CharPref",
       "lastAppVersion": "CharPref",
       "lastVersion": "CharPref",
       "log": "BoolPref",

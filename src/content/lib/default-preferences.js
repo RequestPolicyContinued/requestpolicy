@@ -32,6 +32,8 @@ pref("extensions.requestpolicy.confirmSiteInfo", true);
 
 pref("extensions.requestpolicy.keyboardShortcuts.openMenu.enabled", true);
 pref("extensions.requestpolicy.keyboardShortcuts.openMenu.combo", "default");
+pref("extensions.requestpolicy.keyboardShortcuts.openRequestLog.enabled", true);
+pref("extensions.requestpolicy.keyboardShortcuts.openRequestLog.combo", "default");
 
 pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");

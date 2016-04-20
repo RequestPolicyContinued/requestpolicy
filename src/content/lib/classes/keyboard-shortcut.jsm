@@ -196,6 +196,10 @@ KeyboardShortcut.prototype._determineElementAttributes = function() {
   if (combo === "default") {
     combo = this._defaultCombo;
   }
+  if (combo === "none") {
+    this._elementAttributes = ELEMENT_ATTRIBUTES_WHEN_DISABLED;
+    return;
+  }
 
   let rv = XULUtils.keyboardShortcuts.getKeyAttributesFromCombo(combo);
   if (false === rv.success) {

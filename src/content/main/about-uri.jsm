@@ -32,9 +32,9 @@ let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RPService2} = importModule("main/rp-service-2");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {Utils} = importModule("lib/utils");
-let {Info} = importModule("lib/utils/info");
 
 //==============================================================================
 // utilities, constants
@@ -87,7 +87,7 @@ var AboutRequestPolicy = (function() {
   self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);
     let channel;
-    if (Info.isGeckoVersionAtLeast("48.0a1")) {
+    if (RPService2.info.isGeckoVersionAtLeast("48.0a1")) {
       // newChannelFromURIWithLoadInfo is available since Gecko 48.
       channel = Services.io.newChannelFromURIWithLoadInfo(uri, aLoadInfo);
     } else {

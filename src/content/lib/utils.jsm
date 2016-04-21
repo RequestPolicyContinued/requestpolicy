@@ -28,10 +28,10 @@ const {interfaces: Ci, utils: Cu} = Components;
 this.EXPORTED_SYMBOLS = ["Utils"];
 
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
-//let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+//let {RPService2: {console}} = importModule("main/rp-service-2");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {Logger} = importModule("lib/logger");
 

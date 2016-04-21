@@ -89,17 +89,12 @@ var Info = (function() {
     }
   }
 
-  let {ID: appID, name: appName, platformVersion} = Services.appinfo;
+  // FIXME: Move to RPService2.info.
+  let {ID: appID, platformVersion} = Services.appinfo;
   self.isFirefox = appID === C.FIREFOX_ID;
   self.isSeamonkey = appID === C.SEAMONKEY_ID;
-  self.isGecko = appName !== "Pale Moon";
   self.isAustralis = self.isFirefox &&
       Services.vc.compare(platformVersion, "29") >= 0;
-
-  self.isGeckoVersionAtLeast = function(aMinVersion) {
-    return self.isGecko &&
-        Services.vc.compare(platformVersion, aMinVersion) >= 0;
-  };
 
   return self;
 }());

@@ -28,11 +28,11 @@ window.rpcontinued.menu = (function() {
   const {utils: Cu} = Components;
 
   let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-  let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 
+  let {RPService2: {console}} = importModule("main/rp-service-2");
   let {Environment} = importModule("lib/environment");
   let {Logger} = importModule("lib/logger");
   let {Prefs} = importModule("models/prefs");

@@ -34,7 +34,6 @@ this.EXPORTED_SYMBOLS = ["ScriptLoader"];
 //         Doing so would be a bad practice, and might produce import() loops
 //         when the module to be imported wants to import ScriptLoader.
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
-let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 //==============================================================================
@@ -58,6 +57,12 @@ function logSevereError(aMessage, aError) {
   Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
   // #endif
   Cu.reportError(aError);
+}
+
+// FIXME: Integrate ScriptLoader into RPService2, and use Console.jsm then.
+let console = {
+  debug: Services.console.logStringMessage,
+  error: Services.console.logStringMessage
 }
 
 //==============================================================================

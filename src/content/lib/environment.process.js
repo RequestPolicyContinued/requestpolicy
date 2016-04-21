@@ -27,10 +27,9 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported ProcessEnvironment */
 /* global Environment */
 
-let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
-
 let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm");
+let {RPService2: {console}} = ScriptLoader.importModule("main/rp-service-2");
 let {C} = ScriptLoader.importModule("lib/utils/constants");
 
 //==============================================================================

@@ -63,7 +63,7 @@ function logSevereError(aMessage, aError) {
 let console = {
   debug: Services.console.logStringMessage,
   error: Services.console.logStringMessage
-}
+};
 
 //==============================================================================
 // ScriptLoader

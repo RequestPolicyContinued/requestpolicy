@@ -639,29 +639,52 @@ Rule.prototype = {
     this.destinations = new Ruleset();
   },
 
-  isMatch: function(uriObj) {
-    if (this.scheme && this.scheme !== uriObj.scheme) {
+  /**
+   * @param  {nsIURI} uriObj
+   * @param  {boolean} endpointSpecHasHost Whether the endpoint spec
+   *     corresponding to this "Rule" instance has a host.
+   * @return {boolean}
+   */
+  isMatch: function(uriObj, endpointSpecHasHost) {
+    if (this.scheme && this.scheme !== "*" && this.scheme !== uriObj.scheme) {
       //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
       //       this.scheme + "')");
       return false;
     }
 
     // Check the port only in case the URI has a host at all.
-    if (DomainUtil.uriObjHasHost(uriObj)) {
+    if (DomainUtil.uriObjHasPort(uriObj)) {
       if (this.port) {
         // If the rule's port is "*" it means any port. We use this convention
         // because we assume an empty port in a rule means default ports rather
         // than any port.
-        if (parseInt(this.port, 10) !== uriObj.port && this.port !== "*") {
-          //dprint("isMatch: wrong port (not the port specified by the rule)");
-          return false;
+        if (this.port !== "*") {
+          let rulePort = parseInt(this.port, 10);
+          if (
+              rulePort === uriObj.port ||
+              uriObj.port === -1 &&
+                  rulePort === DomainUtil.
+                               getDefaultPortForScheme(uriObj.scheme)
+          ) {
+            // Port Match is OK, so continue
+          } else {
+            //dprint("isMatch: wrong port (not the port specified by the rule)");
+            return false;
+          }
         }
       } else {
-        if (!DomainUtil.hasStandardPort(uriObj)) {
-          //dprint("isMatch: wrong port (not the default port and the rule assumes default)");
-          return false;
+        if (!endpointSpecHasHost) {
+          // Both host and port are undefined, so skip the default-port-check.
+        } else {
+          if (!DomainUtil.hasStandardPort(uriObj)) {
+            //dprint("isMatch: wrong port (not the default port and the rule assumes default)");
+            return false;
+          }
         }
       }
+    } else if (this.port) {
+      // The rule specifies a port, but the URI has no port.
+      return false;
     }
 
     if (this.path) {
@@ -925,7 +948,7 @@ Ruleset.prototype = {
       // origin is non-host-specific but the destination doesn't
       // have to be.
 
-      yield this;
+      yield [this, false];
     }
 
     if (!host) {
@@ -935,7 +958,7 @@ Ruleset.prototype = {
     if (DomainUtil.isIPAddress(host)) {
       var addrEntry = this._ipAddr[host];
       if (addrEntry) {
-        yield addrEntry;
+        yield [addrEntry, true];
       }
     } else {
       var parts = host.split(".");
@@ -947,12 +970,12 @@ Ruleset.prototype = {
           break;
         }
         curLevel = nextLevel;
-        yield nextLevel;
+        yield [nextLevel, true];
 
         // Check for *.domain rules at each level.
         nextLevel = curLevel.getLowerLevel("*");
         if (nextLevel) {
-          yield nextLevel;
+          yield [nextLevel, true];
         }
       }
     }
@@ -983,11 +1006,11 @@ Ruleset.prototype = {
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    originouterloop: for (let entry in this.getHostMatches(originHost)) {
+    for (let [entry, originSpecHasHost] in this.getHostMatches(originHost)) {
       //dprint(entry);
       for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);
-        let ruleMatchedOrigin = rule.isMatch(origin);
+        let ruleMatchedOrigin = rule.isMatch(origin, originSpecHasHost);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
           //dprint("ALLOW origin by rule " + entry + " " + rule);
@@ -997,31 +1020,18 @@ Ruleset.prototype = {
           //dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
-        // switch(rule.originRuleAction) {
-        //   case C.RULE_ACTION_ALLOW:
-        //     if (ruleMatchedOrigin) {
-        //       dprint("ALLOW origin by rule " + entry + " " + rule);
-        //       matchedAllowRules.push(["origin", entry, rule]);
-        //     }
-        //     break;
-        //   case C.RULE_ACTION_DENY:
-        //     if (ruleMatchedOrigin) {
-        //               dprint("DENY origin by rule " + entry + " " + rule);
-        //               matchedDenyRules.push(["origin", entry, rule]);
-        //               //break originouterloop;
-        //               break;
-        //             }
-        //             break;
-        // }
+
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
-          for (let destEntry in rule.destinations.getHostMatches(destHost)) {
+          for (let [destEntry, destSpecHasHost]
+               in rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
             for (let destRule in destEntry.rules) {
               //dprint("Checking rule: " + rule);
-              if (destRule.allowDestination && destRule.isMatch(dest)) {
+              if (destRule.allowDestination &&
+                  destRule.isMatch(dest, destSpecHasHost)) {
                 //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedAllowRules.push([
                   "origin-to-dest",
@@ -1031,7 +1041,8 @@ Ruleset.prototype = {
                   destRule
                 ]);
               }
-              if (destRule.denyDestination && destRule.isMatch(dest)) {
+              if (destRule.denyDestination &&
+                  destRule.isMatch(dest, destSpecHasHost)) {
                 //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedDenyRules.push([
                   "origin-to-dest",
@@ -1041,23 +1052,6 @@ Ruleset.prototype = {
                   destRule
                 ]);
               }
-
-              // switch(destRule.destinationRuleAction) {
-              //   case C.RULE_ACTION_ALLOW:
-              //     if (destRule.isMatch(dest)) {
-              //                     dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-              //                     matchedAllowRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-              //                   }
-              //     break;
-              //   case C.RULE_ACTION_DENY:
-              //     if (destRule.isMatch(dest)) {
-              //                     dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
-              //                     matchedDenyRules.push(["origin-to-dest", entry, rule, destEntry, destRule]);
-              //                     //break originouterloop;
-              //                     break;
-              //                   }
-              //                   break;
-              // }
             }
           }
           //dprint("Done checking origin-to-destination rules using this origin rule.");
@@ -1067,34 +1061,18 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    destouterloop: for (let entry in this.getHostMatches(destHost)) {
+    for (let [entry, destSpecHasHost] in this.getHostMatches(destHost)) {
       //dprint(entry);
       for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);
-        if (rule.allowDestination && rule.isMatch(dest)) {
+        if (rule.allowDestination && rule.isMatch(dest, destSpecHasHost)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);
           matchedAllowRules.push(["dest", entry, rule]);
         }
-        if (rule.denyDestination && rule.isMatch(dest)) {
+        if (rule.denyDestination && rule.isMatch(dest, destSpecHasHost)) {
           //dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
-        // switch(rule.destinationRuleAction) {
-        //   case C.RULE_ACTION_ALLOW:
-        //     if (rule.isMatch(dest)) {
-        //               dprint("ALLOW dest by rule " + entry + " " + rule);
-        //               matchedAllowRules.push(["dest", entry, rule]);
-        //             }
-        //     break;
-        //   case C.RULE_ACTION_DENY:
-        //     if (rule.isMatch(dest)) {
-        //       dprint("DENY dest by rule " + entry + " " + rule);
-        //       matchedDenyRules.push(["dest", entry, rule]);
-        //       //break destouterloop;
-        //       break;
-        //     }
-        //     break;
-        // }
       }
     }
 

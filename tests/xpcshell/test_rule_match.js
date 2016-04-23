@@ -88,11 +88,11 @@ add_test(function() {
   // test({           h: ""                          }, true,  "file:///etc/hosts");
 
   // FIXME; see PR #555
-  // // Any Host + Default port
-  // test({           h: "*"                         }, true,  "http://www.example.com/");
-  // test({           h: "*"                         }, true,  "http://localhost/");
-  // test({           h: "*"                         }, false, "http://www.example.com:81/");
-  // test({           h: "*"                         }, false, "http://localhost:81/");
+  // Any Host + Default port
+  test({           h: "*"                         }, true,  "http://www.example.com/");
+  test({           h: "*"                         }, true,  "http://localhost/");
+  test({           h: "*"                         }, false, "http://www.example.com:81/");
+  test({           h: "*"                         }, false, "http://localhost:81/");
 
   // Specific Scheme
   test({s: "http"                                 }, true,  "http://localhost/");

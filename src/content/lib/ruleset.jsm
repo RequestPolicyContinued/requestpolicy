@@ -963,7 +963,11 @@ Ruleset.prototype = {
     } else {
       var parts = host.split(".");
       var curLevel = this._domain;
-      var nextLevel;
+      // Start by checking for a wildcard at the highest level.
+      var nextLevel = curLevel.getLowerLevel("*");
+      if (nextLevel) {
+        yield [nextLevel, true];
+      }
       for (var i = parts.length - 1; i >= 0; i--) {
         nextLevel = curLevel.getLowerLevel(parts[i]);
         if (!nextLevel) {

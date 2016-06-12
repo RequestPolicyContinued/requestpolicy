@@ -135,6 +135,21 @@ NormalRequest.prototype.detailsToString = function() {
       ", " + this.aExtra;
 };
 
+const INTERNAL_SCHEMES = new Set([
+  "resource",
+  "about",
+  "chrome",
+  "moz-icon",
+  "moz-filedata",
+]);
+
+const SEMI_INTERNAL_SCHEMES = new Set([
+  "data",
+  "blob",
+  "wyciwyg",
+  "javascript",
+]);
+
 /**
   * Determines if a request is only related to internal resources.
   *
@@ -152,21 +167,6 @@ NormalRequest.prototype.isInternal = function() {
   // entire page's content which includes a form that it submits. Maybe
   // "moz-nullprincipal" always shows up when using "document.location"?
 
-  // Not cross-site requests.
-  if (this.aContentLocation.scheme === "resource" ||
-      this.aContentLocation.scheme === "about" ||
-      this.aContentLocation.scheme === "data" ||
-      this.aContentLocation.scheme === "chrome" ||
-      this.aContentLocation.scheme === "moz-icon" ||
-      this.aContentLocation.scheme === "moz-filedata" ||
-      this.aContentLocation.scheme === "blob" ||
-      this.aContentLocation.scheme === "wyciwyg" ||
-      this.aContentLocation.scheme === "javascript") {
-    Logger.info(Logger.TYPE_CONTENT,
-                "Allowing request with an internal destination.");
-    return true;
-  }
-
   if (this.aRequestOrigin === undefined || this.aRequestOrigin === null) {
     Logger.info(Logger.TYPE_CONTENT,
                 "Allowing request without an origin.");
@@ -179,6 +179,20 @@ NormalRequest.prototype.isInternal = function() {
     // aRequestOrigin be a virtually empty nsIURL object.
     Logger.info(Logger.TYPE_CONTENT,
         "Allowing request with empty aRequestOrigin spec!");
+    return true;
+  }
+
+  // Fully internal requests.
+  if (INTERNAL_SCHEMES.has(this.aRequestOrigin.scheme) &&
+      INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
+    Logger.info(Logger.TYPE_CONTENT, "Allowing internal request.");
+    return true;
+  }
+
+  // Semi-internal request.
+  if (SEMI_INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request with a semi-internal destination.");
     return true;
   }
 

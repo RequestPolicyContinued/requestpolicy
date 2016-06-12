@@ -9,6 +9,9 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     defaults to none. (#778, 5124b50)
   * Rule semantics: The scheme and host fields now accept "*" wildcards
     (0e9f13f, 977012d, #555).
+* bugfixes
+  * RequestPolicy did not block internal resources to websites. Obviously
+    Firefox allows websites to request some internal resources. (#783, d1f6976)
 * new translations
   * es-ES: #771, #772
 * updated translations

@@ -209,7 +209,7 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 	  		echo 'install.rdf: making the version unique !' ; \
 				rev_count=`$(GIT) rev-list HEAD | wc --lines` ; \
 				commit_sha=`$(GIT) rev-parse --short HEAD` ; \
-				unique_suffix=.$${rev_count}.r$${commit_sha} ; \
+				unique_suffix=.$${rev_count}.r$${commit_sha}.pre ; \
 	  		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
 		fi ; \
 	fi
@@ -361,34 +361,29 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 #-------------------------------------------------------------------------------
 
 .PHONY: venv
-venv: .venv/bin/activate
-.venv/bin/activate: requirements.txt
-	test -d .venv || virtualenv --prompt='(RP)' .venv
-
-	@# With the `touch` command, this target is only executed
-	@# when "requirements.txt" changes
-	( \
-	source .venv/bin/activate ; \
-	pip install -r requirements.txt ; \
-	touch --no-create .venv/bin/activate ; \
-	)
+venv: .venv/requirements
+.venv/requirements: requirements.txt | .venv/bin/activate
+	source $| ; pip install -r $<
+	touch $@
+.venv/bin/activate:
+	virtualenv --prompt='(RP)' .venv
 
 #-------------------------------------------------------------------------------
 # run firefox
 #-------------------------------------------------------------------------------
 
 # arguments for mozrunner
-mozrunner_args := -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper)
-mozrunner_args += -b $(app_binary)
-mozrunner_args += --preferences=$(mozrunner_prefs_ini):dev
-mozrunner_args += $(moz_args)
+run_additional_xpis :=
+run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+run_additional_args :=
+run_args := $(addprefix -a ,$(run_xpis))
+run_args += -b $(app_binary)
+run_args += --preferences=$(mozrunner_prefs_ini):dev
+run_args += $(run_additional_args)
 
 .PHONY: run
 run: venv unit-testing-xpi dev-helper-xpi
-	( \
-	source .venv/bin/activate ; \
-	mozrunner $(mozrunner_args) ; \
-	)
+	source .venv/bin/activate ; mozrunner $(run_args)
 
 #-------------------------------------------------------------------------------
 # unit testing: Marionette
@@ -439,17 +434,20 @@ marionette: venv \
 # static code analysis
 #-------------------------------------------------------------------------------
 
+jshint_args :=
+jscs_args :=
+
 .PHONY: static-analysis jshint jscs
 static-analysis: jshint jscs
 jshint:
-	jshint --extra-ext jsm --exclude '**/jquery.min.js' src/
-	jshint tests/xpcshell/
-	jshint tests/helper-addons/
+	jshint --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
+	jshint $(jshint_args) tests/xpcshell/
+	jshint $(jshint_args) tests/helper-addons/
 jscs:
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; jscs .
-	cd tests/xpcshell/; jscs .
-	cd tests/helper-addons/; jscs .
+	cd src/; jscs $(jscs_args) .
+	cd tests/xpcshell/; jscs $(jscs_args) .
+	cd tests/helper-addons/; jscs $(jscs_args) .
 
 
 #===============================================================================

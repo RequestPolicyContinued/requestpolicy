@@ -32,6 +32,7 @@ let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RPService2} = importModule("main/rp-service-2");
 let {Environment, ProcessEnvironment} = importModule("lib/environment");
 let {Utils} = importModule("lib/utils");
 
@@ -59,7 +60,8 @@ function getURI(aURI) {
   if (!id || !(id in FILENAMES)) {
     id = "basicprefs";
   }
-  return "chrome://rpcontinued/content/settings/" + FILENAMES[id];
+  let spec = "chrome://rpcontinued/content/settings/" + FILENAMES[id];
+  return Services.io.newURI(spec, null, null);
 }
 
 //==============================================================================
@@ -78,9 +80,20 @@ var AboutRequestPolicy = (function() {
     return Ci.nsIAboutModule.ALLOW_SCRIPT;
   };
 
-  self.newChannel = function(aURI) {
+  /**
+   * @param {nsIURI} aURI
+   * @param {nsILoadInfo} aLoadInfo Only available on Gecko 36+.
+   */
+  self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);
-    let channel = Services.io.newChannel(uri, null, null);
+    let channel;
+    if (RPService2.info.isGeckoVersionAtLeast("48.0a1")) {
+      // newChannelFromURIWithLoadInfo is available since Gecko 48.
+      channel = Services.io.newChannelFromURIWithLoadInfo(uri, aLoadInfo);
+    } else {
+      // newChannel is obsolete since Gecko 48 (Bug 1254752)
+      channel = Services.io.newChannelFromURI(uri);
+    }
     channel.originalURI = aURI;
     return channel;
   };

@@ -35,10 +35,10 @@ let globalScope = this;
 
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
 let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RPService2: {console}} = ScriptLoader.importModule("main/rp-service-2");
 
 ScriptLoader.defineLazyModuleGetters({
   /* global ManagerForEventListeners */

@@ -26,6 +26,9 @@ $MOZ_SRC_DIR/testing/mozbase/mozlog:\
 $MOZ_SRC_DIR/testing/mozbase/mozscreenshot
 
 python2.7 $MOZ_SRC_DIR/testing/xpcshell/runxpcshelltests.py \
+  --xre-path $MOZ_BIN_DIR \
+  --app-path $MOZ_BIN_DIR/browser \
+  --testing-modules-dir $MOZ_OBJ_DIR/_tests/modules \
   --build-info-json $MOZ_OBJ_DIR/mozinfo.json \
   --no-logfiles \
   --manifest $TEST_DIR/xpcshell.ini \

@@ -26,10 +26,9 @@ const {utils: Cu} = Components;
 /* exported KeyboardShortcut */
 this.EXPORTED_SYMBOLS = ["KeyboardShortcut"];
 
-let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
-
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
+let {RPService2: {console}} = importModule("main/rp-service-2");
 let {Windows} = importModule("models/windows");
 let {Prefs} = importModule("models/prefs");
 let {XULUtils} = importModule("lib/utils/xul");
@@ -195,6 +194,10 @@ KeyboardShortcut.prototype._determineElementAttributes = function() {
   let combo = this.userCombo;
   if (combo === "default") {
     combo = this._defaultCombo;
+  }
+  if (combo === "none") {
+    this._elementAttributes = ELEMENT_ATTRIBUTES_WHEN_DISABLED;
+    return;
   }
 
   let rv = XULUtils.keyboardShortcuts.getKeyAttributesFromCombo(combo);

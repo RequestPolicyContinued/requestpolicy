@@ -9,6 +9,7 @@
   var {Prefs} = importModule("models/prefs");
   var {PolicyManager} = importModule("lib/policy-manager");
   var {OldRules} = importModule("lib/old-rules");
+  var {RuleUtils} = importModule("lib/utils/rules");
 
   //============================================================================
 
@@ -47,8 +48,9 @@
 
     for (var i = 0; i < rules.length; i++) {
       var entry = rules[i];
-      var origin = entry.o ? common.ruleDataPartToDisplayString(entry.o) : "";
-      var dest = entry.d ? common.ruleDataPartToDisplayString(entry.d) : "";
+      var origin = entry.o ?
+                   RuleUtils.endpointSpecToDisplayString(entry.o) : "";
+      var dest = entry.d ? RuleUtils.endpointSpecToDisplayString(entry.d) : "";
       addRulesTableRow(table, "allow", origin, dest, entry);
     }
   }

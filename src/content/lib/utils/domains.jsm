@@ -141,6 +141,19 @@ DomainUtil.uriObjHasHost = function(aUriObj) {
 };
 
 /**
+ * @param {nsIURI} aUriObj
+ * @return {boolean}
+ */
+DomainUtil.uriObjHasPort = function(aUriObj) {
+  try {
+    aUriObj.port; // jshint ignore:line
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
  * Returns an nsIURI object from a uri string. Note that nsIURI objects will
  * automatically convert ACE formatting to UTF8 for IDNs in the various
  * attributes of the object that are available.
@@ -352,4 +365,17 @@ DomainUtil.hasStandardPort = function(uri) {
          uri.scheme !== "http" && uri.scheme !== "https" ||
          uri.port === 80 && uri.scheme === "http" ||
          uri.port === 443 && uri.scheme === "https";
+};
+
+DomainUtil.getDefaultPortForScheme = function(scheme) {
+  switch (scheme) {
+    case "http":
+      return 80;
+    case "https":
+      return 443;
+    default:
+      Logger.warning(Logger.TYPE_INTERNAL,
+          "Unknown default port for scheme " + scheme + ".");
+      return null;
+  }
 };

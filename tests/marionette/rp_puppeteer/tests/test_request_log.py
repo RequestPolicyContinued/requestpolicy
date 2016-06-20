@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+import time
 
 
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
@@ -30,6 +31,26 @@ class TestRequestLog(RequestLogTestCase):
         self.assertTrue(self.request_log.is_open())
         self.request_log.close()
         self.assertFalse(self.request_log.is_open())
+
+    def test_open_close_by_keyboard_shortcut(self):
+        pref_prefix = ("extensions.requestpolicy."
+                       "keyboardShortcuts.openRequestLog")
+        self.prefs.set_pref(pref_prefix + ".combo", "control alt shift x")
+        self.prefs.set_pref(pref_prefix + ".enabled", True)
+        time.sleep(0.001)
+
+        def press_shortcut():
+            self.browser.send_shortcut("x", ctrl=True, alt=True, shift=True)
+
+        self.assertFalse(self.request_log.is_open())
+        self.request_log.open(trigger=press_shortcut)
+        self.assertTrue(self.request_log.is_open())
+        self.request_log.close(trigger=press_shortcut)
+        self.assertFalse(self.request_log.is_open())
+
+        self.prefs.reset_pref(pref_prefix + ".enabled")
+        self.prefs.reset_pref(pref_prefix + ".combo")
+        time.sleep(0.001)
 
     def test_clear(self):
         self.request_log.open()

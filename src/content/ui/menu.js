@@ -28,11 +28,11 @@ window.rpcontinued.menu = (function() {
   const {utils: Cu} = Components;
 
   let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-  let {console} = Cu.import("resource://gre/modules/devtools/Console.jsm", {});
 
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 
+  let {RPService2: {console}} = importModule("main/rp-service-2");
   let {Environment} = importModule("lib/environment");
   let {Logger} = importModule("lib/logger");
   let {Prefs} = importModule("models/prefs");
@@ -1068,30 +1068,6 @@ window.rpcontinued.menu = (function() {
       }
     }
     return item;
-  };
-
-  self._ruleDataPartToDisplayString = function(ruleDataPart) {
-    var str = "";
-    if (ruleDataPart.s) {
-      str += ruleDataPart.s + "://";
-    }
-    str += ruleDataPart.h || "*";
-    if (ruleDataPart.port) {
-      str += ":" + ruleDataPart.port;
-    }
-    // TODO: path
-    return str;
-  };
-
-  self._ruleDataToFormatVariables = function(rawRule) {
-    var fmtVars = [];
-    if (rawRule.o) {
-      fmtVars.push(self._ruleDataPartToDisplayString(rawRule.o));
-    }
-    if (rawRule.d) {
-      fmtVars.push(self._ruleDataPartToDisplayString(rawRule.d));
-    }
-    return fmtVars;
   };
 
   self._addMenuItemRemoveAllowRule = function(list, rawRule,

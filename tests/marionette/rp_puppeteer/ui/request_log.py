@@ -56,9 +56,9 @@ class RequestLog(BaseLib):
           return rows;
         """, [self._tree])
 
-    def open(self):
+    def open(self, trigger="api"):
         if not self.is_open():
-            self._toggle()
+            self._toggle(trigger=trigger)
 
             # Briefly enter the iframe to make sure the it's loaded.
             with self.in_iframe():
@@ -68,8 +68,13 @@ class RequestLog(BaseLib):
         request_log_uri = "chrome://rpcontinued/content/ui/request-log.xul"
         return self._iframe.get_attribute("src") == request_log_uri
 
-    def close(self):
-        self._close_button.click()
+    def close(self, trigger="button"):
+        if not self.is_open():
+            return
+        if trigger == "button":
+            self._close_button.click()
+        else:
+            self._toggle(trigger=trigger)
 
     def clear(self):
         self._clear_button.click()
@@ -112,7 +117,12 @@ class RequestLog(BaseLib):
         return self.marionette.find_element("id",
                                             "rpcontinued-requestLog-tree")
 
-    def _toggle(self):
-        self.marionette.execute_script("""
-          window.rpcontinued.overlay.toggleRequestLog();
-        """)
+    def _toggle(self, trigger="api"):
+        if callable(trigger):
+            trigger()
+        elif trigger == "api":
+            self.marionette.execute_script("""
+              window.rpcontinued.overlay.toggleRequestLog();
+            """)
+        else:
+            raise ValueError("Unknown trigger method: \"{}\"".format(trigger))

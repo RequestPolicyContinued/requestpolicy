@@ -89,11 +89,12 @@ var Info = (function() {
     }
   }
 
-  let appID = Services.appinfo.ID;
+  // FIXME: Move to RPService2.info.
+  let {ID: appID, platformVersion} = Services.appinfo;
   self.isFirefox = appID === C.FIREFOX_ID;
   self.isSeamonkey = appID === C.SEAMONKEY_ID;
   self.isAustralis = self.isFirefox &&
-      Services.vc.compare(Services.appinfo.platformVersion, "29") >= 0;
+      Services.vc.compare(platformVersion, "29") >= 0;
 
   return self;
 }());

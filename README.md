@@ -21,7 +21,7 @@ git clone https://github.com/RequestPolicyContinued/requestpolicy.git
 
 ## Building the XPI Firefox addon
 
-Before building you need to install [GNU Make](https://www.gnu.org/software/make/), [Zip](http://www.info-zip.org/Zip.html) and [`preprocess.py`](https://code.google.com/p/preprocess/). On a debian-based system you could run:
+Before building you need to install [GNU Make](https://www.gnu.org/software/make/), [Zip](http://www.info-zip.org/Zip.html) and [`preprocess.py`](https://github.com/trentm/preprocess). On a debian-based system you could run:
 
 ```bash
 sudo apt-get install make zip preprocess

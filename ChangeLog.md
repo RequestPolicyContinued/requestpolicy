@@ -3,6 +3,22 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta12.0
+* improvements
+  * New preference to define a keyboard shortcut for opening the RequestLog,
+    defaults to none. (#778, 5124b50)
+  * Rule semantics: The scheme and host fields now accept "*" wildcards
+    (0e9f13f, 977012d, #555).
+* bugfixes
+  * RequestPolicy did not block internal resources to websites. Obviously
+    Firefox allows websites to request some internal resources. (#783, d1f6976)
+* new translations
+  * es-ES: #771, #772
+* updated translations
+  * fr: #765
+  * es-MX: #769, #770
+
+
 #### Version 1.0.beta11.1
 * A JavaScript warning has been fixed. There's no change in
   functionality, and no bugs have been fixed.

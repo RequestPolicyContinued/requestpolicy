@@ -3,7 +3,7 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
-#### Version 1.0.beta12
+#### Version 1.0.beta12.0
 * improvements
   * New preference to define a keyboard shortcut for opening the RequestLog,
     defaults to none. (#778, 5124b50)

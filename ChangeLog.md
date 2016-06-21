@@ -3,6 +3,12 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### next version
+* bugfixes
+  * Redirections made by Add-Ons via "nsIHttpChannel.redirectTo()" are
+    now intercepted, and visible in the request log. (#775)
+
+
 #### Version 1.0.beta12.0
 * improvements
   * New preference to define a keyboard shortcut for opening the RequestLog,

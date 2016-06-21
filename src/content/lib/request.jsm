@@ -34,13 +34,12 @@ this.EXPORTED_SYMBOLS = [
   "REQUEST_TYPE_REDIRECT"
 ];
 
-let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
-
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
 let {DomainUtil} = importModule("lib/utils/domains");
 let {WindowUtils} = importModule("lib/utils/windows");
+let {HttpChannelWrapper} = importModule("lib/http-channel-wrapper");
 
 //==============================================================================
 // constants
@@ -48,6 +47,21 @@ let {WindowUtils} = importModule("lib/utils/windows");
 
 const REQUEST_TYPE_NORMAL = 1;
 const REQUEST_TYPE_REDIRECT = 2;
+
+const INTERNAL_SCHEMES = new Set([
+  "resource",
+  "about",
+  "chrome",
+  "moz-icon",
+  "moz-filedata",
+]);
+
+const SEMI_INTERNAL_SCHEMES = new Set([
+  "data",
+  "blob",
+  "wyciwyg",
+  "javascript",
+]);
 
 //==============================================================================
 // Request
@@ -75,6 +89,82 @@ Request.prototype.detailsToString = function() {
   // Note: try not to cause side effects of toString() during load, so "<HTML
   // Element>" is hard-coded.
   return "destination: " + this.destURI + ", origin: " + this.originURI;
+};
+
+/**
+  * Determines if a request is only related to internal resources.
+  *
+  * @return {Boolean} true if the request is only related to internal
+  *         resources.
+  */
+Request.prototype.isInternal = function() {
+  // TODO: investigate "moz-nullprincipal". The following comment has been
+  //       created by @jsamuel in 2008, commit 46a04bb. More information about
+  //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
+  //
+  // Note: Don't OK the origin scheme "moz-nullprincipal" without further
+  // understanding. It appears to be the source when the `js_1.html` test is
+  // used. That is, javascript redirect to a "javascript:" url that creates the
+  // entire page's content which includes a form that it submits. Maybe
+  // "moz-nullprincipal" always shows up when using "document.location"?
+
+  let origin = this.originUriObj;
+  let dest = this.destUriObj;
+
+  if (origin === undefined || origin === null) {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request without an origin.");
+    return true;
+  }
+
+  if (origin.spec === "") {
+    // The spec can be empty if odd things are going on, like the Refcontrol
+    // extension causing back/forward button-initiated requests to have
+    // aRequestOrigin be a virtually empty nsIURL object.
+    Logger.info(Logger.TYPE_CONTENT,
+        "Allowing request with empty origin spec!");
+    return true;
+  }
+
+  // Fully internal requests.
+  if (INTERNAL_SCHEMES.has(origin.scheme) &&
+      INTERNAL_SCHEMES.has(dest.scheme)) {
+    Logger.info(Logger.TYPE_CONTENT, "Allowing internal request.");
+    return true;
+  }
+
+  // Semi-internal request.
+  if (SEMI_INTERNAL_SCHEMES.has(dest.scheme)) {
+    Logger.info(Logger.TYPE_CONTENT,
+                "Allowing request with a semi-internal destination.");
+    return true;
+  }
+
+  if (origin.asciiHost === undefined || dest.asciiHost === undefined) {
+    // The asciiHost values will exist but be empty strings for the "file"
+    // scheme, so we don't want to allow just because they are empty strings,
+    // only if not set at all.
+    Logger.info(Logger.TYPE_CONTENT,
+        "Allowing request with no asciiHost on either origin " +
+        "<" + origin.spec + "> or dest <" + dest.spec + ">");
+    return true;
+  }
+
+  let destHost = dest.asciiHost;
+
+  // "global" dest are [some sort of interal requests]
+  // "browser" dest are [???]
+  if (destHost === "global" || destHost === "browser") {
+    return true;
+  }
+
+  // see issue #180
+  if (origin.scheme === "about" &&
+      origin.spec.indexOf("about:neterror?") === 0) {
+    return true;
+  }
+
+  return false;
 };
 
 //==============================================================================
@@ -106,6 +196,18 @@ function NormalRequest(aContentType, aContentLocation, aRequestOrigin, aContext,
 NormalRequest.prototype = Object.create(Request.prototype);
 NormalRequest.prototype.constructor = Request;
 
+Object.defineProperty(NormalRequest.prototype, "originUriObj", {
+  get: function() {
+    return this.aRequestOrigin;
+  }
+});
+
+Object.defineProperty(NormalRequest.prototype, "destUriObj", {
+  get: function() {
+    return this.aContentLocation;
+  }
+});
+
 NormalRequest.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
   this.aRequestOrigin = DomainUtil.getUriObject(originURI);
@@ -135,21 +237,6 @@ NormalRequest.prototype.detailsToString = function() {
       ", " + this.aExtra;
 };
 
-const INTERNAL_SCHEMES = new Set([
-  "resource",
-  "about",
-  "chrome",
-  "moz-icon",
-  "moz-filedata",
-]);
-
-const SEMI_INTERNAL_SCHEMES = new Set([
-  "data",
-  "blob",
-  "wyciwyg",
-  "javascript",
-]);
-
 /**
   * Determines if a request is only related to internal resources.
   *
@@ -157,68 +244,8 @@ const SEMI_INTERNAL_SCHEMES = new Set([
   *         resources.
   */
 NormalRequest.prototype.isInternal = function() {
-  // TODO: investigate "moz-nullprincipal". The following comment has been
-  //       created by @jsamuel in 2008, commit 46a04bb. More information about
-  //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
-  //
-  // Note: Don't OK the origin scheme "moz-nullprincipal" without further
-  // understanding. It appears to be the source when the `js_1.html` test is
-  // used. That is, javascript redirect to a "javascript:" url that creates the
-  // entire page's content which includes a form that it submits. Maybe
-  // "moz-nullprincipal" always shows up when using "document.location"?
-
-  if (this.aRequestOrigin === undefined || this.aRequestOrigin === null) {
-    Logger.info(Logger.TYPE_CONTENT,
-                "Allowing request without an origin.");
-    return true;
-  }
-
-  if (this.aRequestOrigin.spec === "") {
-    // The spec can be empty if odd things are going on, like the Refcontrol
-    // extension causing back/forward button-initiated requests to have
-    // aRequestOrigin be a virtually empty nsIURL object.
-    Logger.info(Logger.TYPE_CONTENT,
-        "Allowing request with empty aRequestOrigin spec!");
-    return true;
-  }
-
-  // Fully internal requests.
-  if (INTERNAL_SCHEMES.has(this.aRequestOrigin.scheme) &&
-      INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
-    Logger.info(Logger.TYPE_CONTENT, "Allowing internal request.");
-    return true;
-  }
-
-  // Semi-internal request.
-  if (SEMI_INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
-    Logger.info(Logger.TYPE_CONTENT,
-                "Allowing request with a semi-internal destination.");
-    return true;
-  }
-
-  if (this.aRequestOrigin.asciiHost === undefined ||
-      this.aContentLocation.asciiHost === undefined) {
-    // The asciiHost values will exist but be empty strings for the "file"
-    // scheme, so we don't want to allow just because they are empty strings,
-    // only if not set at all.
-    Logger.info(Logger.TYPE_CONTENT,
-        "Allowing request with no asciiHost on either aRequestOrigin <" +
-        this.aRequestOrigin.spec + "> or aContentLocation <" +
-        this.aContentLocation.spec + ">");
-    return true;
-  }
-
-  var destHost = this.aContentLocation.asciiHost;
-
-  // "global" dest are [some sort of interal requests]
-  // "browser" dest are [???]
-  if (destHost === "global" || destHost === "browser") {
-    return true;
-  }
-
-  // see issue #180
-  if (this.aRequestOrigin.scheme === "about" &&
-      this.aRequestOrigin.spec.indexOf("about:neterror?") === 0) {
+  let rv = Request.prototype.isInternal.call(this);
+  if (rv === true) {
     return true;
   }
 
@@ -295,23 +322,44 @@ NormalRequest.prototype.getBrowser = function() {
 // RedirectRequest
 //==============================================================================
 
-function RedirectRequest(httpResponse) {
-  Request.call(this, httpResponse.originURI.specIgnoringRef,
-               httpResponse.destURI.specIgnoringRef, REQUEST_TYPE_REDIRECT);
-  this.httpResponse = httpResponse;
-
-  XPCOMUtils.defineLazyGetter(this, "browser", function() {
-    return httpResponse.browser;
-  });
+function RedirectRequest(aOldChannel, aNewChannel, aFlags) {
+  let oldChannel = new HttpChannelWrapper(aOldChannel);
+  let newChannel = new HttpChannelWrapper(aNewChannel);
+  Request.call(this, oldChannel.uri.specIgnoringRef,
+               newChannel.uri.specIgnoringRef, REQUEST_TYPE_REDIRECT);
+  this._oldChannel = oldChannel;
+  this._newChannel = newChannel;
+  this._redirectFlags = aFlags;
 }
 RedirectRequest.prototype = Object.create(Request.prototype);
 RedirectRequest.prototype.constructor = Request;
 
+Object.defineProperty(RedirectRequest.prototype, "browser", {
+  get: function() {
+    return this._oldChannel.browser;
+  }
+});
+
+Object.defineProperty(RedirectRequest.prototype, "loadFlags", {
+  get: function() {
+    return this._oldChannel._httpChannel.loadFlags;
+  }
+});
+
+Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
+  get: function() {
+    return this._oldChannel.uri;
+  }
+});
+
+Object.defineProperty(RedirectRequest.prototype, "destUriObj", {
+  get: function() {
+    return this._newChannel.uri;
+  }
+});
+
 Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
   get: function() {
-    if (!this.hasOwnProperty("_destURIWithRef")) {
-      this._destURIWithRef = this.httpResponse.destURI.spec;
-    }
-    return this._destURIWithRef;
+    return this._newChannel.uri.spec;
   }
 });

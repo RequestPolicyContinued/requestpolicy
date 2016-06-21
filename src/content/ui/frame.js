@@ -76,11 +76,16 @@
   }
   mlManager.addListener("reload", reloadDocument);
 
-  function setLocation(aUri) {
-    content.document.location.href = aUri;
+  function setLocation(aUri, aReplace) {
+    if (aReplace) {
+      content.document.location.replace(aUri);
+    } else {
+      content.document.location.assign(aUri);
+    }
   }
   mlManager.addListener("setLocation", function(message) {
-    setLocation(message.data.uri);
+    let replace = message.data.replaceUri === content.document.location.href;
+    setLocation(message.data.uri, replace);
   });
 
   // Listen for click events so that we can allow requests that result from

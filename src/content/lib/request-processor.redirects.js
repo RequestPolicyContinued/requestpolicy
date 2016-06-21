@@ -22,7 +22,7 @@
  */
 
 /* global Components */
-const {interfaces: Ci, results: Cr, utils: Cu} = Components;
+const {interfaces: Ci, utils: Cu} = Components;
 
 /* global RequestProcessor: true */
 
@@ -33,15 +33,17 @@ let {Prefs} = importModule("models/prefs");
 let {PolicyManager} = importModule("lib/policy-manager");
 let {DomainUtil} = importModule("lib/utils/domains");
 let {Utils} = importModule("lib/utils");
-let {Request, RedirectRequest} = importModule("lib/request");
+let {Request} = importModule("lib/request");
 let {RequestResult, REQUEST_REASON_COMPATIBILITY,
      REQUEST_REASON_RELATIVE_URL} = importModule("lib/request-result");
-let {HttpResponse} = importModule("lib/http-response");
 let {ProcessEnvironment} = importModule("lib/environment");
 
 //==============================================================================
 // constants
 //==============================================================================
+
+const CP_OK = Ci.nsIContentPolicy.ACCEPT;
+const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
@@ -60,11 +62,6 @@ RequestProcessor = (function(self) {
 
   internal.allowedRedirectsReverse = {};
 
-  ProcessEnvironment.obMan.observe(
-      ["http-on-examine-response"],
-      function(subject) {
-        examineHttpResponse(subject);
-      });
   ProcessEnvironment.obMan.observe(
       [HTTPS_EVERYWHERE_REWRITE_TOPIC],
       function(subject, topic, data) {
@@ -174,25 +171,70 @@ RequestProcessor = (function(self) {
     return true === checkRedirect(request).isAllowed;
   };
 
-  function processUrlRedirection(request) {
-    let httpResponse = request.httpResponse;
-    let httpChannel = httpResponse.httpChannel;
-    var originURI = request.originURI;
-    var destURI = request.destURI;
-    var headerType = httpResponse.redirHeaderType;
+  self.processUrlRedirection = function(request) {
+    // Currently, if a user clicks a link to download a file and that link
+    // redirects and is subsequently blocked, the user will see the blocked
+    // destination in the menu. However, after they have allowed it from
+    // the menu and attempted the download again, they won't see the allowed
+    // request in the menu. Fixing that might be a pain and also runs the
+    // risk of making the menu cluttered and confusing with destinations of
+    // followed links from the current page.
+
+    // TODO: Make user aware of blocked headers so they can allow them if
+    // desired.
+
+    // Check for internal redirections. For example, the add-on
+    // "Decentraleyes" redirects external resources like jQuery
+    // to a "data" URI.
+    if (request.isInternal()) {
+      Logger.debug(Logger.TYPE_CONTENT,
+                   "Allowing a redirection that seems to be internal. " +
+                   "Origin: " + request.originURI + ", Dest: " +
+                   request.destURI);
+      return CP_OK;
+    }
+
+    let {originURI, destURI} = request;
+
+    // Allow redirects of requests from privileged code.
+    // FIXME: should the check instead be ' === false' in case the
+    //        return value is `null`? See also #18.
+    if (!isContentRequest(request)) {
+      // However, favicon requests that are redirected appear as non-content
+      // requests. So, check if the original request was for a favicon.
+      let originPath = request.originUriObj.path;
+      // We always have to check "/favicon.ico" because Firefox will use this
+      // as a default path and that request won't pass through shouldLoad().
+      if (originPath === "/favicon.ico" ||
+          internal.faviconRequests[originURI]) {
+        // If the redirected request is allowed, we need to know that was a
+        // favicon request in case it is further redirected.
+        internal.faviconRequests[destURI] = true;
+        Logger.info(Logger.TYPE_HEADER_REDIRECT,
+            "Redirection from <" + originURI + "> to <" + destURI + "> " +
+            "appears to be a redirected favicon request. " +
+            "This will be treated as a content request.");
+      } else {
+        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
+            "** ALLOWED ** redirection from <" + originURI + "> " +
+            "to <" + destURI + ">. " +
+            "Original request is from privileged code.");
+        return CP_OK;
+      }
+    }
 
     // Ignore redirects to javascript. The browser will ignore them, as well.
-    if (httpResponse.destURI.schemeIs("javascript")) {
+    if (request.destUriObj.schemeIs("javascript")) {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
           "Ignoring redirect to javascript URI <" + destURI + ">");
-      return;
+      return CP_OK;
     }
 
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "** ALLOWED ** '" + headerType + "' header to <" + destURI + "> " +
-          "from <" + originURI + ">. " +
+          "** ALLOWED ** redirection from <" + originURI + "> " +
+          "to <" + destURI + ">. " +
           "Same hosts or allowed origin/destination.");
       internal.recordAllowedRequest(originURI, destURI, false,
                                     request.requestResult);
@@ -203,8 +245,8 @@ RequestProcessor = (function(self) {
       // destination of the target of the redirect. This is because future
       // requests (such as using back/forward) might show up as directly from
       // the initial origin to the ultimate redirected destination.
-      if (httpChannel.referrer) {
-        var realOrigin = httpChannel.referrer.spec;
+      if (request._oldChannel.referrer) {
+        let realOrigin = request._oldChannel.referrer.spec;
 
         if (internal.clickedLinks[realOrigin] &&
             internal.clickedLinks[realOrigin][originURI]) {
@@ -224,70 +266,71 @@ RequestProcessor = (function(self) {
         }
       }
 
-      return;
+      return CP_OK;
     }
 
     // The header isn't allowed, so remove it.
     try {
-      if (!Prefs.isBlockingDisabled()) {
-        // Cancel the request. As of Fx 37, this causes the location bar to
-        // show the URL of the previously displayed page.
-        httpChannel.cancel(Cr.NS_BINDING_ABORTED);
+      if (Prefs.isBlockingDisabled()) {
+        return CP_OK;
+      }
 
-        maybeShowRedirectNotification(request);
+      maybeShowRedirectNotification(request);
 
-        // We try to trace the blocked redirect back to a link click or form
-        // submission if we can. It may indicate, for example, a link that
-        // was to download a file but a redirect got blocked at some point.
-        // Example:
-        //   "link click" -> "first redirect" -> "second redirect"
-        {
-          let initialOrigin = getOriginOfInitialRedirect(request);
+      // We try to trace the blocked redirect back to a link click or form
+      // submission if we can. It may indicate, for example, a link that
+      // was to download a file but a redirect got blocked at some point.
+      // Example:
+      //   "link click" -> "first redirect" -> "second redirect"
+      {
+        let initialOrigin = getOriginOfInitialRedirect(request);
 
-          if (internal.clickedLinksReverse.hasOwnProperty(initialOrigin)) {
-            let linkClickDest = initialOrigin;
-            let linkClickOrigin;
+        if (internal.clickedLinksReverse.hasOwnProperty(initialOrigin)) {
+          let linkClickDest = initialOrigin;
+          let linkClickOrigin;
 
-            // fixme: bad smell! the same link (linkClickDest) could have
-            //        been clicked from different origins!
-            for (let i in internal.clickedLinksReverse[linkClickDest]) {
-              if (internal.clickedLinksReverse[linkClickDest].
-                      hasOwnProperty(i)) {
-                // We hope there's only one possibility of a source page
-                // (that is,ideally there will be one iteration of this loop).
-                linkClickOrigin = i;
-              }
+          // fixme: bad smell! the same link (linkClickDest) could have
+          //        been clicked from different origins!
+          for (let i in internal.clickedLinksReverse[linkClickDest]) {
+            if (internal.clickedLinksReverse[linkClickDest].
+                    hasOwnProperty(i)) {
+              // We hope there's only one possibility of a source page
+              // (that is,ideally there will be one iteration of this loop).
+              linkClickOrigin = i;
             }
-
-            // TODO: #633 - Review the following line (recordAllowedRequest).
-
-            // Maybe we just record the clicked link and each step in between as
-            // an allowed request, and the final blocked one as a blocked request.
-            // That is, make it show up in the requestpolicy menu like anything
-            // else.
-            // We set the "isInsert" parameter so we don't clobber the existing
-            // info about allowed and deleted requests.
-            internal.recordAllowedRequest(linkClickOrigin, linkClickDest, true,
-                                          request.requestResult);
           }
 
-          // TODO: implement for form submissions whose redirects are blocked
-          //if (internal.submittedFormsReverse[initialOrigin]) {
-          //}
+          // TODO: #633 - Review the following line (recordAllowedRequest).
+
+          // Maybe we just record the clicked link and each step in between as
+          // an allowed request, and the final blocked one as a blocked request.
+          // That is, make it show up in the requestpolicy menu like anything
+          // else.
+          // We set the "isInsert" parameter so we don't clobber the existing
+          // info about allowed and deleted requests.
+          internal.recordAllowedRequest(linkClickOrigin, linkClickDest, true,
+                                        request.requestResult);
         }
 
-        internal.recordRejectedRequest(request);
+        // TODO: implement for form submissions whose redirects are blocked
+        //if (internal.submittedFormsReverse[initialOrigin]) {
+        //}
       }
+
+      internal.recordRejectedRequest(request);
+
       Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-          "** BLOCKED ** '" + headerType + "' header to <" + destURI + ">" +
-          " found in response from <" + originURI + ">");
+          "** BLOCKED ** redirection from <" + originURI + "> " +
+          "to <" + destURI + ">.");
+      return CP_REJECT;
     } catch (e) {
-      Logger.severe(
-          Logger.TYPE_HEADER_REDIRECT, "Failed removing " +
-          "'" + headerType + "' header to <" + destURI + ">" +
-          "  in response from <" + originURI + ">. " + e, e);
+      Logger.severe(Logger.TYPE_ERROR,
+          "Fatal Error, " + e + ", stack was: " + e.stack);
+      Logger.severe(Logger.TYPE_CONTENT,
+          "Rejecting request due to internal error.");
+      return Prefs.isBlockingDisabled() ? CP_OK : CP_REJECT;
     }
-  }
+  };
 
   function showRedirectNotification(request) {
     let browser = request.browser;
@@ -303,8 +346,11 @@ RequestProcessor = (function(self) {
       if (!showNotification) {
         return false;
       }
+      // Parameter "replaceIfPossible" is set to true, because the "origin" of
+      // redirections going through "nsIChannelEventSink" is just an
+      // intermediate URI of a redirection chain, not a real site.
       return showNotification(browser, request.destURIWithRef, 0,
-          request.originURI);
+          request.originURI, true);
     });
     return true;
   }
@@ -315,7 +361,7 @@ RequestProcessor = (function(self) {
   function maybeShowRedirectNotification(aRequest) {
     // Check if the request corresponds to a top-level document load.
     {
-      let loadFlags = aRequest.httpResponse.httpChannel.loadFlags;
+      let {loadFlags} = aRequest;
       let topLevelDocFlag = Ci.nsIChannel.LOAD_INITIAL_DOCUMENT_URI;
 
       if ((loadFlags & topLevelDocFlag) !== topLevelDocFlag) {
@@ -361,73 +407,11 @@ RequestProcessor = (function(self) {
   }
 
   /**
-   * Called after a response has been received from the web server. Headers are
-   * available on the channel. The response can be accessed and modified via
-   * nsITraceableChannel.
-   */
-  function examineHttpResponse(aSubject) {
-    // Currently, if a user clicks a link to download a file and that link
-    // redirects and is subsequently blocked, the user will see the blocked
-    // destination in the menu. However, after they have allowed it from
-    // the menu and attempted the download again, they won't see the allowed
-    // request in the menu. Fixing that might be a pain and also runs the
-    // risk of making the menu cluttered and confusing with destinations of
-    // followed links from the current page.
-
-    // TODO: Make user aware of blocked headers so they can allow them if
-    // desired.
-
-    let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-    let httpResponse = new HttpResponse(httpChannel);
-
-    // the "raw" dest string might be a relative or absolute URI
-    let rawDestString = httpResponse.rawDestString;
-
-    if (httpResponse.hasRedirectionHeader === false || rawDestString === null) {
-      return;
-    }
-
-    let originString = httpResponse.originURI.specIgnoringRef;
-
-    // Allow redirects of requests from privileged code.
-    // Fixme: should the check instead be ' === false' in case the
-    //        return value is `null`? See also #18.
-    if (!isContentRequest(httpResponse)) {
-      // However, favicon requests that are redirected appear as non-content
-      // requests. So, check if the original request was for a favicon.
-      var originPath = httpResponse.originURI.path;
-      // We always have to check "/favicon.ico" because Firefox will use this
-      // as a default path and that request won't pass through shouldLoad().
-      if (originPath === "/favicon.ico" ||
-          internal.faviconRequests[originString]) {
-        // If the redirected request is allowed, we need to know that was a
-        // favicon request in case it is further redirected.
-        internal.faviconRequests[rawDestString] = true;
-        Logger.info(Logger.TYPE_HEADER_REDIRECT,
-            "'" + httpResponse.redirHeaderType + "' header " +
-            "to <" + rawDestString + "> " + "from <" + originString + "> " +
-            "appears to be a redirected favicon request. " +
-            "This will be treated as a content request.");
-      } else {
-        Logger.warning(Logger.TYPE_HEADER_REDIRECT,
-            "** ALLOWED ** '" + httpResponse.redirHeaderType +
-            "' header to <" + rawDestString + "> " +
-            "from <" + originString +
-            ">. Original request is from privileged code.");
-        return;
-      }
-    }
-
-    var request = new RedirectRequest(httpResponse);
-    processUrlRedirection(request);
-  }
-
-  /**
    * Checks whether a request is initiated by a content window. If it's from a
    * content window, then it's from unprivileged code.
    */
-  function isContentRequest(httpResponse) {
-    let loadContext = httpResponse.loadContext;
+  function isContentRequest(request) {
+    let loadContext = request._oldChannel.loadContext;
 
     if (loadContext === null) {
       return false;

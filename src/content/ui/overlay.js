@@ -383,7 +383,7 @@ window.rpcontinued.overlay = (function() {
   //                  object that contains everything. This requires
   //                  e.g. a `MetaRedirectRequest` class.
   self._showRedirectNotification = function(browser, redirectTargetUri, delay,
-                                            redirectOriginUri) {
+      redirectOriginUri, replaceIfPossible) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
 
@@ -491,8 +491,14 @@ window.rpcontinued.overlay = (function() {
             RequestProcessor.registerAllowedRedirect(redirectOriginUri,
                                                      redirectTargetUri);
 
+            let data = {
+              uri: redirectTargetUri
+            };
+            if (replaceIfPossible) {
+              data.replaceUri = redirectOriginUri;
+            }
             browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
-                {uri: redirectTargetUri});
+                data);
           }
         },
         {
@@ -665,7 +671,8 @@ window.rpcontinued.overlay = (function() {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     window.setTimeout(function() {
-      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0);
+      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0,
+          originUri);
     }, 0);
   };
 

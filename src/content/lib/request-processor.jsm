@@ -52,9 +52,9 @@ let {RequestSet} = importModule("lib/request-set");
 let {ProcessEnvironment} = importModule("lib/environment");
 let {Utils} = importModule("lib/utils");
 
-/* global PolicyImplementation */
+/* global RPContentPolicy */
 ScriptLoader.defineLazyModuleGetters({
-  "main/content-policy": ["PolicyImplementation"]
+  "main/content-policy": ["RPContentPolicy"]
 }, globalScope);
 
 //==============================================================================
@@ -894,7 +894,7 @@ var RequestProcessor = (function() {
                                  [destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
-          let mappedResult = PolicyImplementation.shouldLoad(
+          let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
           if (mappedResult === CP_OK) {

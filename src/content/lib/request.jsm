@@ -127,8 +127,14 @@ Request.prototype.isInternal = function() {
   }
 
   // Fully internal requests.
-  if (INTERNAL_SCHEMES.has(origin.scheme) &&
-      INTERNAL_SCHEMES.has(dest.scheme)) {
+  if (INTERNAL_SCHEMES.has(dest.scheme) &&
+      (
+        INTERNAL_SCHEMES.has(origin.scheme) ||
+        // e.g.
+        // data:application/vnd.mozilla.xul+xml;charset=utf-8,<window/>
+        // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
+        origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
+      )) {
     Logger.info(Logger.TYPE_CONTENT, "Allowing internal request.");
     return true;
   }

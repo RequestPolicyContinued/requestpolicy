@@ -9,6 +9,10 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     now intercepted, and visible in the request log. (#775)
 
 
+#### Version 1.0.beta12.1
+* bugfixes
+  * The menu overlay of some Add-Ons did not work; it stayed blank.
+
 #### Version 1.0.beta12.0
 * improvements
   * New preference to define a keyboard shortcut for opening the RequestLog,

@@ -183,8 +183,15 @@ NormalRequest.prototype.isInternal = function() {
   }
 
   // Fully internal requests.
-  if (INTERNAL_SCHEMES.has(this.aRequestOrigin.scheme) &&
-      INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
+  if (INTERNAL_SCHEMES.has(this.aContentLocation.scheme) &&
+      (
+        INTERNAL_SCHEMES.has(this.aRequestOrigin.scheme) ||
+        // e.g.
+        // data:application/vnd.mozilla.xul+xml;charset=utf-8,<window/>
+        // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
+        this.aRequestOrigin.spec.
+            startsWith("data:application/vnd.mozilla.xul+xml")
+      )) {
     Logger.info(Logger.TYPE_CONTENT, "Allowing internal request.");
     return true;
   }

@@ -7,6 +7,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * bugfixes
   * "about:blank" is now defined as an "internal" request and thus
     whitelisted (#784).
+  * Add-on compatibility: rikaichan (#784)
 
 #### Version 1.0.beta12.1
 * bugfixes

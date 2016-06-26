@@ -90,6 +90,7 @@ RequestProcessor = (function(self) {
     idArray.push("keefox@chris.tomlinson"); // KeeFox
     idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
     idArray.push("{0AA9101C-D3C1-4129-A9B7-D778C6A17F82}"); // rikaichan
+    idArray.push("{477c4c36-24eb-11da-94d4-00e08161165f}"); // Grab and Drag
 
     for (let id of idArray) {
       Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
@@ -207,6 +208,12 @@ RequestProcessor = (function(self) {
         Logger.info(Logger.TYPE_INTERNAL,
             "Using extension compatibility rules for: " + ext.name);
         compatibilityRules.push([null, "chrome://rikaichan/skin/", ext.name]);
+        break;
+
+      case "{477c4c36-24eb-11da-94d4-00e08161165f}": // Grab and Drag
+        Logger.info(Logger.TYPE_INTERNAL,
+            "Using extension compatibility rules for: " + ext.name);
+        compatibilityRules.push([null, "chrome://grabanddrag/skin/", ext.name]);
         break;
 
       default:

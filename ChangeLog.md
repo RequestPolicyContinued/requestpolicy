@@ -3,9 +3,16 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta12.2
+* bugfixes
+  * some destination URIs are now recognized to be "internal" and thus
+    whitelisted (#784)
+    * "about:blank" -- necessary for some websites
+    * "chrome://*/skin/" -- necessary for some Add-ons
+
 #### Version 1.0.beta12.1
 * bugfixes
-  * The menu overlay of some Add-Ons did not work; it stayed blank.
+  * The menu overlay of some Add-ons did not work; it stayed blank.
 
 #### Version 1.0.beta12.0
 * improvements

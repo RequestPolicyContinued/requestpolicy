@@ -223,7 +223,19 @@ NormalRequest.prototype.isInternal = function() {
     return true;
   }
 
-  // see issue #784
+  // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
+  // References:
+  // - RP issue #784
+  if (this.aContentLocation.scheme === "chrome" &&
+      this.aContentLocation.path.startsWith("/skin/")) {
+    return true;
+  }
+
+  // Empty iframes will have the "about:blank" URI. Sometimes websites
+  // create an empty iframe and then manipulate it.
+  // References:
+  // - NoScript FAQ: https://noscript.net/faq#qa1_9
+  // - RP issue #784
   if (this.aContentLocation.spec === "about:blank") {
     return true;
   }

@@ -3,6 +3,11 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta12.2
+* bugfixes
+  * "about:blank" is now defined as an "internal" request and thus
+    whitelisted (#784).
+
 #### Version 1.0.beta12.1
 * bugfixes
   * The menu overlay of some Add-Ons did not work; it stayed blank.

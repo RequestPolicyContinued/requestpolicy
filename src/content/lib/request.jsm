@@ -223,6 +223,11 @@ NormalRequest.prototype.isInternal = function() {
     return true;
   }
 
+  // see issue #784
+  if (this.aContentLocation.spec === "about:blank") {
+    return true;
+  }
+
   // see issue #180
   if (this.aRequestOrigin.scheme === "about" &&
       this.aRequestOrigin.spec.indexOf("about:neterror?") === 0) {

@@ -167,8 +167,7 @@ Request.prototype.isInternal = function() {
   // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
   // References:
   // - RP issue #784
-  if (this.aContentLocation.scheme === "chrome" &&
-      this.aContentLocation.path.startsWith("/skin/")) {
+  if (dest.scheme === "chrome" && dest.path.startsWith("/skin/")) {
     return true;
   }
 
@@ -177,7 +176,7 @@ Request.prototype.isInternal = function() {
   // References:
   // - NoScript FAQ: https://noscript.net/faq#qa1_9
   // - RP issue #784
-  if (this.aContentLocation.spec === "about:blank") {
+  if (dest.spec === "about:blank") {
     return true;
   }
 

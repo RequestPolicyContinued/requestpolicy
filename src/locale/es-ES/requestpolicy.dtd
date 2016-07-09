@@ -9,4 +9,4 @@
 <!ENTITY rp.requestLog.filterRequests "Filtrar peticiones (RegEx)">
 <!ENTITY rp.requestLog.filterRequests.accesskey "F">
 <!ENTITY rp.requestLog.clearFilter "Limpiar filtro">
-<!ENTITY rp.requestLog.clearFilter.accesskey "C">
+<!ENTITY rp.requestLog.clearFilter.accesskey "L">

@@ -16,6 +16,7 @@ def _get_random_string():
     # not a random string, but something unique
     return str(str(time.clock()))
 
+
 def get_auto_redirection_uri(redirection_method,
         append_random_querystring=True,
         origin_pre_path="http://www.maindomain.test/",
@@ -57,6 +58,7 @@ def get_auto_redirection_uri(redirection_method,
 
     return (origin_uri, dest_uri)
 
+
 def get_link_redirection_uri(redirection_method,
         append_random_querystring=True,
         origin_pre_path="http://www.maindomain.test/",
@@ -88,6 +90,7 @@ def get_link_redirection_uri(redirection_method,
                         urllib.quote(intermediate_uri))
     return (linkpage_uri, intermediate_uri, dest_uri)
 
+
 def get_info_for_redirection_method(redir_method):
     info = {"redirection_method": redir_method}
     if redir_method in ["<meta> delayed", "<meta> 2 delayed"]:
@@ -95,6 +98,7 @@ def get_info_for_redirection_method(redir_method):
     else:
         info["delay"] = 0
     return info
+
 
 def for_each_auto_redirection_uri(callback, base_info, *args, **kwargs):
     def call(redir_method):
@@ -110,6 +114,7 @@ def for_each_auto_redirection_uri(callback, base_info, *args, **kwargs):
     call("<meta> 2 delayed")
     call("js:document.location:<body> onload")
 
+
 def for_each_link_redirection_uri(callback, base_info, *args, **kwargs):
     def call(redir_method):
         info = base_info.copy()
@@ -124,6 +129,7 @@ def for_each_link_redirection_uri(callback, base_info, *args, **kwargs):
     call("<meta> 2 delayed")
     call("js:document.location:<body> onload")
     call("js:document.location:<a> href")
+
 
 def for_each_possible_redirection_scenario(callback, uri_type):
     """Call a function for many (or all) redirection scenarios.
@@ -221,10 +227,12 @@ def for_each_possible_redirection_scenario(callback, uri_type):
         dest_path="",
         expected_dest_pre_path="http://www.maindomain.test/")
 
+
 def assert_url_does_not_load(testcase, url, expected_delay):
     timeout = expected_delay + 0.25
     testcase.assertRaises(TimeoutException, wait_until_url_load, testcase, url,
                           timeout=timeout)
+
 
 def wait_until_url_load(testcase, url, message="", timeout=(DELAY + 0.25)):
     with testcase.marionette.using_context("content"):

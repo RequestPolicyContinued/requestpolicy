@@ -61,7 +61,6 @@ class ExemplaryRules(ExemplaryRules_Meta):
     def rule_without_dest(self):
         return self._rule({"o": {"h": "bar"}}, allow=True)
 
-
     @lazyprop
     def pre_path_specs(self):
         """A list of all possible pre-paths."""
@@ -77,7 +76,6 @@ class ExemplaryRules(ExemplaryRules_Meta):
                     "expected_string": "s7://h7:7"}
         }
 
-
     @lazyprop
     def allow_rule_shp_shp(self):
         return self._rule({"o": {"s": "os", "h": "oh", "port": 1},
@@ -90,7 +88,6 @@ class ExemplaryRules(ExemplaryRules_Meta):
                 {"o": {"s": "os", "h": "oh", "port": 3},
                  "d": {"s": "ds", "h": "dh", "port": 4}},
                 allow=False, temp=True)
-
 
     @lazyprop
     def allow_rule_sh_p(self):

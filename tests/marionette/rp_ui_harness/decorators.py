@@ -5,6 +5,7 @@
 
 def lazyprop(target):
     attr_name = '_lazy_' + target.__name__
+
     @property
     def wrapper(self, *args, **kwargs):
         if not hasattr(self, attr_name):

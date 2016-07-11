@@ -153,17 +153,21 @@ class TestAMOVersionActive_ThenInstallCurrentVersion(\
         CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
     OTHER_ADDON = RP_AMO
 
+
 class TestAMOVersionActive_ThenEnableCurrentVersion(\
         CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
     OTHER_ADDON = RP_AMO
+
 
 class TestAMOVersionNotActive_ThenInstall(\
         CommonTests.OtherVersionNotActive_ThenInstall):
     OTHER_ADDON = RP_AMO
 
+
 class TestAMOVersionNotActive_ThenEnable(\
         CommonTests.OtherVersionNotActive_ThenEnable):
     OTHER_ADDON = RP_AMO
+
 
 class TestAMOAndNonAMOVersionActiveAfterRestart(\
         CommonTests.OtherAndCurrentVersionActiveAfterRestart):
@@ -174,17 +178,21 @@ class TestOldVersionActive_ThenInstallCurrentVersion(\
         CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
     OTHER_ADDON = RP_BETA_9
 
+
 class TestOldVersionActive_ThenEnableCurrentVersion(\
         CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
     OTHER_ADDON = RP_BETA_9
+
 
 class TestOldVersionNotActive_ThenInstall(\
         CommonTests.OtherVersionNotActive_ThenInstall):
     OTHER_ADDON = RP_BETA_9
 
+
 class TestOldVersionNotActive_ThenEnable(\
         CommonTests.OtherVersionNotActive_ThenEnable):
     OTHER_ADDON = RP_BETA_9
+
 
 class TestOldAndCurrentVersionActiveAfterRestart(\
         CommonTests.OtherAndCurrentVersionActiveAfterRestart):

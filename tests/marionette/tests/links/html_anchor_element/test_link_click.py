@@ -14,7 +14,6 @@ class TestLinkClick(RequestPolicyTestCase):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
 
-
     def test_link_click(self):
         with self.marionette.using_context("content"):
             # load the test url

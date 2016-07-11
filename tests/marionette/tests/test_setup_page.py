@@ -21,7 +21,6 @@ class TestSetupPageShowingUp(RequestPolicyTestCase):
         else:
             return None
 
-
     def test_on_install(self):
         # FIXME: Issue #728;   [Restartlessness] RP should not cause
         #        JavaScript errors on shutdown while requests are being called.

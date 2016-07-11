@@ -14,6 +14,7 @@ class use_class_as_property(object):
 
     Note: return value of the wrapped function is ignored.
     """
+
     def __init__(self, lib):
         self.lib = lib
         self.mod_name, self.cls_name = self.lib.rsplit('.', 1)

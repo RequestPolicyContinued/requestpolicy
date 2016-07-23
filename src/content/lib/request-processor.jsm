@@ -250,12 +250,15 @@ var RequestProcessor = (function() {
     lastShouldLoadCheck.result = result;
   }
 
-  internal.checkByDefaultPolicy = function(originUri, destUri) {
+  internal.checkByDefaultPolicy = function(aRequest) {
     if (Prefs.isDefaultAllow()) {
       var result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
+
+    let originUri = aRequest.originURI;
+    let destUri = aRequest.destURI;
 
     if (Prefs.isDefaultAllowSameDomain()) {
       var originDomain = DomainUtil.getBaseDomain(originUri);
@@ -268,9 +271,17 @@ var RequestProcessor = (function() {
             REQUEST_REASON_DEFAULT_SAME_DOMAIN);
       }
     }
-    // We probably want to allow requests from http:80 to https:443 of the same
-    // domain. However, maybe this is so uncommon it's not worth any extra
-    // complexity.
+
+    let originObj = aRequest.originUriObj;
+    let destObj = aRequest.destUriObj;
+
+    // Allow requests from http:80 to https:443 of the same host.
+    if (originObj.scheme === "http" && destObj.scheme === "https" &&
+        originObj.port === -1 && destObj.port === -1 &&
+        originObj.host === destObj.host) {
+      return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+    }
+
     var originIdent = DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP);
     var destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
@@ -903,7 +914,7 @@ var RequestProcessor = (function() {
         }
       }
 
-      request.requestResult = internal.checkByDefaultPolicy(originURI, destURI);
+      request.requestResult = internal.checkByDefaultPolicy(request);
       if (request.requestResult.isAllowed) {
         return accept("Allowed by default policy", request);
       } else {

@@ -164,11 +164,17 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
-  // References:
-  // - RP issue #784
-  if (dest.scheme === "chrome" && dest.path.startsWith("/skin/")) {
-    return true;
+  if (dest.scheme === "chrome") {
+    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
+    // References:
+    // - RP issue #784
+    if (dest.path.startsWith("/skin/")) {
+      return true;
+    }
+    // See RP issue #797
+    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
+      return true;
+    }
   }
 
   // See RP issue #788

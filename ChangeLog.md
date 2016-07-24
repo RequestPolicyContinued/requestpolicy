@@ -13,6 +13,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
   * new "internal request" whitelist entries (due to #783):
     * view-source CSS file (#788)
     * NoScript icon for blocked flash content (#788)
+    * pluginproblem URI (#797, #788)
   * updated translations
     * es-ES: #790
 

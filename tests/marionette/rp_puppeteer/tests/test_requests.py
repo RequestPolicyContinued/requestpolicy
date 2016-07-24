@@ -97,7 +97,6 @@ class TestRequestObserver(RequestPolicyTestCase):
         requests_2 = Requests(lambda: self.marionette, sandbox=self.sandbox_1)
         self.assertFalse(requests_2.listening)
 
-
     def test_clear(self):
         self.assertFalse(self.requests.listening)
         self.requests.start_listening()

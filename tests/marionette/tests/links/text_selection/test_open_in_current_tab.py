@@ -15,7 +15,6 @@ class TestOpenInCurrentTab(RequestPolicyTestCase):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
 
-
     def test_open_in_current_tab(self):
         with self.marionette.using_context("content"):
             # load the test url

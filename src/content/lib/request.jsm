@@ -177,6 +177,11 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
+  // See RP issue #788
+  if (dest.scheme === "resource" && dest.host.startsWith("noscript_")) {
+    return true;
+  }
+
   // Empty iframes will have the "about:blank" URI. Sometimes websites
   // create an empty iframe and then manipulate it.
   // References:

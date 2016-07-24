@@ -171,6 +171,12 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
+  // See RP issue #788
+  if (origin.scheme === "view-source" &&
+      dest.spec === "resource://gre-resources/viewsource.css") {
+    return true;
+  }
+
   // Empty iframes will have the "about:blank" URI. Sometimes websites
   // create an empty iframe and then manipulate it.
   // References:

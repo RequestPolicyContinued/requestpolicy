@@ -3,6 +3,10 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta12.3
+* bugfixes
+  * The "show re-import options" button did not work on Fx48+ (#774)
+
 #### Version 1.0.beta12.2
 * bugfixes
   * some destination URIs are now recognized to be "internal" and thus

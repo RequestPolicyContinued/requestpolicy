@@ -7,6 +7,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * improvements
   * When the "allow same domain" setting is set to `false`, allow
     http:80 to https:443 if the host is the same.
+  * DNS Prefetching: Besides `network.dns.disablePrefetch`, also take into
+    account the `network.dns.disablePrefetchFromHTTPS` setting (#795)
 * bugfixes
   * Redirections made by Add-Ons via "nsIHttpChannel.redirectTo()" are
     now intercepted, and visible in the request log. (#775)

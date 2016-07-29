@@ -62,6 +62,9 @@ var PrefManager = (function() {
       if (Prefs.isSet("root/ network.dns.disablePrefetch")) {
         Prefs.reset("root/ network.dns.disablePrefetch");
       }
+      if (Prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS")) {
+        Prefs.reset("root/ network.dns.disablePrefetchFromHTTPS");
+      }
     }
     if (resetPreConnections) {
       if (Prefs.isSet("root/ network.http.speculative-parallel-limit")) {
@@ -95,7 +98,7 @@ var PrefManager = (function() {
     // --------------------
     // Disable link prefetch.
     if (Prefs.get("prefetch.link.disableOnStartup")) {
-      if (Prefs.get("root/ network.prefetch-next")) {
+      if (Prefs.get("root/ network.prefetch-next") === true) {
         Prefs.set("root/ network.prefetch-next", false);
         console.info("Disabled link prefetch.");
       }
@@ -106,9 +109,16 @@ var PrefManager = (function() {
       // doesn't have a default value, at least in 3.1b2, but if and when it
       // does have a default it will be false).
       if (!Prefs.isSet("root/ network.dns.disablePrefetch") ||
-          !Prefs.get("root/ network.dns.disablePrefetch")) {
+          Prefs.get("root/ network.dns.disablePrefetch") === false) {
         Prefs.set("root/ network.dns.disablePrefetch", true);
         console.info("Disabled DNS prefetch.");
+      }
+      // If no user-defined value exists, the default is "true".  So do not
+      // set the pref if there's no user-defined value yet.
+      if (Prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS") &&
+          Prefs.get("root/ network.dns.disablePrefetchFromHTTPS") === false) {
+        Prefs.set("root/ network.dns.disablePrefetchFromHTTPS", true);
+        console.info("Disabled DNS prefetch from HTTPS.");
       }
     }
     // Disable Speculative pre-connections.

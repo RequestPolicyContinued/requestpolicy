@@ -89,8 +89,6 @@ RequestProcessor = (function(self) {
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
     idArray.push("keefox@chris.tomlinson"); // KeeFox
     idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
-    idArray.push("{0AA9101C-D3C1-4129-A9B7-D778C6A17F82}"); // rikaichan
-    idArray.push("{477c4c36-24eb-11da-94d4-00e08161165f}"); // Grab and Drag
 
     for (let id of idArray) {
       Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);

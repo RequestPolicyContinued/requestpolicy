@@ -20,6 +20,7 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * es-ES: #790
 * minor changes
   * Don't change the font color in RP's context menu entry (#31).
+  * Ignore clicks on `[no origin]` in the menu (#761).
 
 
 #### Version 1.0.beta12.3

@@ -18,6 +18,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * pluginproblem URI (#797, #788)
   * updated translations
     * es-ES: #790
+* minor changes
+  * Don't change the font color in RP's context menu entry (#31).
 
 
 #### Version 1.0.beta12.3

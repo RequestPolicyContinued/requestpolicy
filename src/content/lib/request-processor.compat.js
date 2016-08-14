@@ -306,6 +306,11 @@ RequestProcessor = (function(self) {
         "https://api.accounts.firefox.com/",
         appInfo.vendor
       ]);
+      compatibilityRules.push([
+        "https://accounts.firefox.com/",
+        "https://accounts.cdn.mozilla.net/",
+        appInfo.vendor
+      ]);
     }
 
     // Firefox Hello

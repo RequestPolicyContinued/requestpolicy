@@ -16,6 +16,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * view-source CSS file (#788)
     * NoScript icon for blocked flash content (#788)
     * pluginproblem URI (#797, #788)
+  * Browser compatibility:
+    * Firefox Accounts (#687)
   * updated translations
     * es-ES: #790
 * minor changes

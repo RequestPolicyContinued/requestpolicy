@@ -23,6 +23,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * minor changes
   * Don't change the font color in RP's context menu entry (#31).
   * Ignore clicks on `[no origin]` in the menu (#761).
+  * In default-allow mode, add the menu option
+    "Block all requests from <origin domain>" (#559).
 
 
 #### Version 1.0.beta12.3

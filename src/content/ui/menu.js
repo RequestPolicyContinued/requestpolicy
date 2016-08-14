@@ -434,13 +434,10 @@ window.rpcontinued.menu = (function() {
 
     if (!self._currentlySelectedDest) {
       if (Prefs.isDefaultAllow()) {
-        // It seems pretty rare that someone will want to add a rule to block all
-        // requests from a given origin.
-        //if (mayPermRulesBeAdded === true) {
-        //  var item = self._addMenuItemDenyOrigin(
-        //    lists.addRules, ruleData);
-        //}
-        //var item = self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
+        if (mayPermRulesBeAdded === true) {
+          self._addMenuItemDenyOrigin(lists.addRules, ruleData);
+        }
+        self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
       } else {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemAllowOrigin(lists.addRules, ruleData);

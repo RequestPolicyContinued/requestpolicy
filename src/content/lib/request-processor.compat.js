@@ -40,6 +40,7 @@ let {Logger} = importModule("lib/logger");
 RequestProcessor = (function(self) {
   let conflictingExtensions = [];
   let compatibilityRules = [];
+  let whitelistedBaseURIs = new Map();
   let topLevelDocTranslationRules = {};
 
   // TODO: update compatibility rules etc. when addons are enabled/disabled
@@ -121,6 +122,11 @@ RequestProcessor = (function(self) {
         Logger.info(Logger.TYPE_INTERNAL, "Conflicting extension: " + ext.name);
         compatibilityRules.push(
             ["resource://brief-content/", null, ext.name]);
+        if (ext.id === "{899DF1F8-2F43-4394-8315-37F6744E6319}") {
+          // NewsFox
+          whitelistedBaseURIs.set("chrome://newsfox/content/newsfox.xul",
+                                  ext.name);
+        }
         conflictingExtensions.push({
           "id": ext.id,
           "name": ext.name,
@@ -363,6 +369,10 @@ RequestProcessor = (function(self) {
 
   self.getCompatibilityRules = function() {
     return compatibilityRules;
+  };
+
+  self.getWhitelistedBaseURIs = function() {
+    return whitelistedBaseURIs;
   };
 
   self.getConflictingExtensions = function() {

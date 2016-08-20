@@ -16,6 +16,9 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * view-source CSS file (#788)
     * NoScript icon for blocked flash content (#788)
     * pluginproblem URI (#797, #788)
+  * Add-on compatibility:
+    * NewsFox showed a redirection notification when clicking on a
+      news' title (#707)
   * Browser compatibility:
     * Firefox Accounts (#687)
   * updated translations

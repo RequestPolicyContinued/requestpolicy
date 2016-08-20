@@ -894,6 +894,19 @@ var RequestProcessor = (function() {
         }
       }
 
+      if (request.aContext) {
+        let whitelistedBaseURIs = self.getWhitelistedBaseURIs();
+        let baseURI = request.aContext.baseURI;
+        if (whitelistedBaseURIs.has(baseURI)) {
+          request.requestResult = new RequestResult(true,
+              REQUEST_REASON_COMPATIBILITY);
+          let extName = whitelistedBaseURIs.get(baseURI);
+          return accept(
+              "Extension/application compatibility rule matched [" + extName +
+              "]", request, true);
+        }
+      }
+
       // If the destination has a mapping (i.e. it was originally a different
       // destination but was changed into the current one), accept this
       // request if the original destination would have been accepted.

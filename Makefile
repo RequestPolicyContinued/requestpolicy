@@ -437,8 +437,8 @@ marionette: venv \
 jshint_args :=
 jscs_args :=
 
-.PHONY: static-analysis jshint jscs
-static-analysis: jshint jscs
+.PHONY: static-analysis jshint jscs addons-linter
+static-analysis: jshint jscs addons-linter
 jshint:
 	jshint --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
 	jshint $(jshint_args) tests/xpcshell/
@@ -448,6 +448,8 @@ jscs:
 	cd src/; jscs $(jscs_args) .
 	cd tests/xpcshell/; jscs $(jscs_args) .
 	cd tests/helper-addons/; jscs $(jscs_args) .
+addons-linter: nightly-xpi
+	addons-linter $(xpi_file__nightly)
 
 
 #===============================================================================

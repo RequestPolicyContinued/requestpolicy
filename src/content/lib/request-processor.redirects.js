@@ -162,7 +162,7 @@ RequestProcessor = (function(self) {
       }
     }
 
-    let result = internal.checkByDefaultPolicy(originURI, destURI);
+    let result = internal.checkByDefaultPolicy(request);
     return result;
   }
 

@@ -73,6 +73,7 @@ window.rpcontinued.menu = (function() {
 
     _originItem: null,
     _originDomainnameItem: null,
+    _isUncontrollableOrigin: null,
     _originNumRequestsItem: null,
 
     _isCurrentlySelectedDestBlocked: null,
@@ -256,6 +257,7 @@ window.rpcontinued.menu = (function() {
   self._populateMenuForUncontrollableOrigin = function() {
     self._originDomainnameItem.setAttribute("value",
         StringUtils.$str("noOrigin"));
+    self._isUncontrollableOrigin = true;
     self._originNumRequestsItem.setAttribute("value", "");
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
@@ -322,6 +324,7 @@ window.rpcontinued.menu = (function() {
 
   self._populateOrigin = function() {
     self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
+    self._isUncontrollableOrigin = false;
 
     let showNumRequests = Prefs.get("menu.info.showNumRequests");
 
@@ -431,13 +434,10 @@ window.rpcontinued.menu = (function() {
 
     if (!self._currentlySelectedDest) {
       if (Prefs.isDefaultAllow()) {
-        // It seems pretty rare that someone will want to add a rule to block all
-        // requests from a given origin.
-        //if (mayPermRulesBeAdded === true) {
-        //  var item = self._addMenuItemDenyOrigin(
-        //    lists.addRules, ruleData);
-        //}
-        //var item = self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
+        if (mayPermRulesBeAdded === true) {
+          self._addMenuItemDenyOrigin(lists.addRules, ruleData);
+        }
+        self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
       } else {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemAllowOrigin(lists.addRules, ruleData);
@@ -573,6 +573,9 @@ window.rpcontinued.menu = (function() {
   self._activateOriginItem = function(item) {
     if (item.id === "rpc-origin") {
       // it's _the_ origin
+      if (self._isUncontrollableOrigin) {
+        return;
+      }
       self._currentlySelectedOrigin = self._originDomainnameItem.value;
     } else if (item.parentNode.id === "rpc-other-origins-list") {
       // it's an otherOrigin

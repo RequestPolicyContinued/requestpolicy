@@ -81,6 +81,7 @@ var Prefs = (function() {
 
     root: new PrefBranch("", {
       "network.dns.disablePrefetch": "BoolPref",
+      "network.dns.disablePrefetchFromHTTPS": "BoolPref",
       "network.http.speculative-parallel-limit": "IntPref",
       "network.prefetch-next": "BoolPref",
     })

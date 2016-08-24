@@ -4,10 +4,32 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
 #### next version
+* improvements
+  * When the "allow same domain" setting is set to `false`, allow
+    http:80 to https:443 if the host is the same.
+  * DNS Prefetching: Besides `network.dns.disablePrefetch`, also take into
+    account the `network.dns.disablePrefetchFromHTTPS` setting (#795)
 * bugfixes
   * Redirections made by Add-Ons via "nsIHttpChannel.redirectTo()" are
     now intercepted, and visible in the request log. (#775)
+  * new "internal request" whitelist entries (due to #783):
+    * view-source CSS file (#788)
+    * NoScript icon for blocked flash content (#788)
+    * pluginproblem URI (#797, #788)
+  * Browser compatibility:
+    * Firefox Accounts (#687)
+  * updated translations
+    * es-ES: #790
+* minor changes
+  * Don't change the font color in RP's context menu entry (#31).
+  * Ignore clicks on `[no origin]` in the menu (#761).
+  * In default-allow mode, add the menu option
+    "Block all requests from <origin domain>" (#559).
 
+
+#### Version 1.0.beta12.3
+* bugfixes
+  * The "show re-import options" button did not work on Fx48+ (#774)
 
 #### Version 1.0.beta12.2
 * bugfixes

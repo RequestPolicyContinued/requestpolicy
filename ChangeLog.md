@@ -16,6 +16,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * view-source CSS file (#788)
     * NoScript icon for blocked flash content (#788)
     * pluginproblem URI (#797, #788)
+  * The menu does not open when the RP menu icon (flag) hasn't been visible
+    in the current window yet (#815).
   * Add-on compatibility:
     * NewsFox showed a redirection notification when clicking on a
       news' title (#707)

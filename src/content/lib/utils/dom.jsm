@@ -50,6 +50,9 @@ var DOMUtils = (function() {
   };
 
   function isThisElementVisible(aElement) {
+    if (!aElement || !aElement.getClientRects) {
+      return false;
+    }
     let rects = aElement.getClientRects();
     if (rects.length === 0) {
       return false;

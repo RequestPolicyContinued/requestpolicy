@@ -143,7 +143,7 @@ const INTERNAL_SCHEMES = new Set([
   "moz-filedata",
 ]);
 
-const SEMI_INTERNAL_SCHEMES = new Set([
+const WHITELISTED_INTERNAL_SCHEMES = new Set([
   "data",
   "blob",
   "wyciwyg",
@@ -196,8 +196,8 @@ NormalRequest.prototype.isInternal = function() {
     return true;
   }
 
-  // Semi-internal request.
-  if (SEMI_INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
+  // Whitelisted internal request.
+  if (WHITELISTED_INTERNAL_SCHEMES.has(this.aContentLocation.scheme)) {
     Logger.info(Logger.TYPE_CONTENT,
                 "Allowing request with a semi-internal destination.");
     return true;

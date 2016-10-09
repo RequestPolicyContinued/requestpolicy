@@ -40,7 +40,7 @@ class RuleRow(ElementBaseLib):
         return self.element.find_elements("tag name", "td")
 
     def _get_cell_text_content(self, column_index):
-        return self._cells[column_index].get_attribute("textContent")
+        return self._cells[column_index].text
 
     @staticmethod
     def _get_rule_data_from_strings(origin_string, dest_string):

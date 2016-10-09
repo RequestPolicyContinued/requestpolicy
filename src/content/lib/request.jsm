@@ -56,11 +56,16 @@ const INTERNAL_SCHEMES = new Set([
   "moz-filedata",
 ]);
 
-const SEMI_INTERNAL_SCHEMES = new Set([
+const WHITELISTED_INTERNAL_SCHEMES = new Set([
   "data",
   "blob",
   "wyciwyg",
   "javascript",
+  // "moz-extension" -- scheme for WebExtensions.
+  // * Necessary to whitelist for installation of WebExtensions.
+  //   See https://bugzil.la/1298856.
+  // * Necessary to whitelist for web_accessible_resources.
+  "moz-extension",
 ]);
 
 //==============================================================================
@@ -139,8 +144,8 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  // Semi-internal request.
-  if (SEMI_INTERNAL_SCHEMES.has(dest.scheme)) {
+  // Whitelisted internal request.
+  if (WHITELISTED_INTERNAL_SCHEMES.has(dest.scheme)) {
     Logger.info(Logger.TYPE_CONTENT,
                 "Allowing request with a semi-internal destination.");
     return true;

@@ -290,19 +290,24 @@ dev-helper-xpi:
 	$(call make_other_xpi,dev_helper)
 dummy-xpi:
 	$(call make_other_xpi,dummy)
+webext-apply-css-xpi:
+	$(call make_other_xpi,we_apply_css)
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] configuration of different builds
 #-------------------------------------------------------------------------------
 
-alias__dev_helper  := RPC Dev Helper
-alias__dummy       := Dummy
+alias__dev_helper   := RPC Dev Helper
+alias__dummy        := Dummy
+alias__we_apply_css := Dummy WebExtension
 
-source_path__dev_helper := tests/helper-addons/dev-helper/
-source_path__dummy      := tests/helper-addons/dummy-ext/
+source_path__dev_helper   := tests/helper-addons/dev-helper/
+source_path__dummy        := tests/helper-addons/dummy-ext/
+source_path__we_apply_css := tests/helper-addons/external/webext-apply-css/
 
-xpi_file__dev_helper  := $(dist_dir)/rpc-dev-helper.xpi
-xpi_file__dummy       := $(dist_dir)/dummy-ext.xpi
+xpi_file__dev_helper   := $(dist_dir)/rpc-dev-helper.xpi
+xpi_file__dummy        := $(dist_dir)/dummy-ext.xpi
+xpi_file__we_apply_css := $(dist_dir)/webext-apply-css.xpi
 
 #-------------------------------------------------------------------------------
 # intermediate targets
@@ -414,6 +419,7 @@ marionette: venv \
 		unit-testing-xpi \
 		dev-helper-xpi \
 		dummy-xpi \
+		webext-apply-css-xpi \
 		specific-xpi \
 		amo-nightly-xpi
 	@# Due to Mozilla Bug 1173502, the profile needs to be created and

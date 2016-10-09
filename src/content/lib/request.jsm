@@ -148,6 +148,11 @@ const WHITELISTED_INTERNAL_SCHEMES = new Set([
   "blob",
   "wyciwyg",
   "javascript",
+  // "moz-extension" -- scheme for WebExtensions.
+  // * Necessary to whitelist for installation of WebExtensions.
+  //   See https://bugzil.la/1298856.
+  // * Necessary to whitelist for web_accessible_resources.
+  "moz-extension",
 ]);
 
 /**

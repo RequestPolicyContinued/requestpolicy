@@ -1,7 +1,11 @@
 {
   "preset": "google",
   "fileExtensions": [".js", ".jsm"],
-  "excludeFiles": ["**/jquery.min.js", "**/content/lib/ruleset.jsm"],
+  "excludeFiles": [
+    "**/jquery.min.js",
+    "**/content/lib/ruleset.jsm",
+    "external/"
+  ],
   "esnext": true,
 
   "validateQuoteMarks": "\"",

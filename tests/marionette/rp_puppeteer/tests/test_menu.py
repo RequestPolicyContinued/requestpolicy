@@ -34,8 +34,14 @@ class TestMenu(RequestPolicyTestCase):
         test("shortcut", test_close=False)
 
     def test_total_num_requests(self):
-        with self.marionette.using_context("content"):
-            self.marionette.navigate("http://www.maindomain.test/img_1.html" +
-                                     "?TestMenu.test_total_num_requests")
+        with self.requests.listen():
+            with self.marionette.using_context("content"):
+                self.marionette.navigate(
+                    "http://www.maindomain.test/img_1.html" +
+                    "?TestMenu.test_total_num_requests")
+        expected_num_requests = 0
+        for request in self.requests.all:
+            if request["origin"].startswith("http://www.maindomain.test/"):
+                expected_num_requests += 1
         self.menu.open()
-        self.assertEqual(4, self.menu.total_num_requests)
+        self.assertEqual(expected_num_requests, self.menu.total_num_requests)

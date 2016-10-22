@@ -15,7 +15,7 @@ class TestWebUtils(RequestPolicyTestCase):
 
             # Find the element and get its text content.
             element = self.marionette.find_element("id", "text_url_1")
-            element_text = element.get_attribute("textContent")
+            element_text = element.text
 
             # FUNCTION UNDER TEST:
             # Select the element's text.

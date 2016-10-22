@@ -184,9 +184,12 @@ class TestGettingRequests(RequestPolicyTestCase):
 
         # Requests that are recorded _sometimes_.
         possible_additional_requests = [
+            # favicon requests: they aren't performed on each page load.
             {
-                # The favicon is only loaded if it's the first load of
-                # the domain.
+                "origin": "http://www.maindomain.test/img_1.html",
+                "dest": "http://www.maindomain.test/favicon.ico",
+                "isAllowed": True
+            }, {
                 "origin": "http://www.maindomain.test/favicon.ico",
                 "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",
                 "isAllowed": False

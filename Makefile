@@ -400,16 +400,18 @@ run: venv unit-testing-xpi dev-helper-xpi
 .PHONY: check test marionette
 check test: marionette
 
+logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
+
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini
 
-marionette_logging := --gecko-log=$(logs_dir)/marionette.gecko.log
-marionette_logging += --log-html=$(logs_dir)/marionette.html
-marionette_logging += --log-tbpl=$(logs_dir)/marionette.tbpl.log
-#marionette_logging += --log-raw=$(logs_dir)/marionette.raw.log
-#marionette_logging += --log-xunit=$(logs_dir)/marionette.xunit.xml
-#marionette_logging += --log-mach=$(logs_dir)/marionette.mach.log
-#marionette_logging += --log-unittest=$(logs_dir)/marionette.unittest.log
+marionette_logging := --gecko-log=$(logs_dir)/$(logfile_prefix)marionette.gecko.log
+marionette_logging += --log-html=$(logs_dir)/$(logfile_prefix)marionette.html
+marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.log
+#marionette_logging += --log-raw=$(logs_dir)/$(logfile_prefix)marionette.raw.log
+#marionette_logging += --log-xunit=$(logs_dir)/$(logfile_prefix)marionette.xunit.xml
+#marionette_logging += --log-mach=$(logs_dir)/$(logfile_prefix)marionette.mach.log
+#marionette_logging += --log-unittest=$(logs_dir)/$(logfile_prefix)marionette.unittest.log
 
 # localhost:28xxx
 marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)

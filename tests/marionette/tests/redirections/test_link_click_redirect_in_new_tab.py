@@ -96,13 +96,7 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
 
         def test_variant(*args):
             def test(test_url, dest_url, info):
-                if info["redirection_method"] == "js:document.location:<a> href":
-                    # If the link URL is
-                    #     javascript:document.location = 'http://www.example.com/'
-                    # there should _always_ be a notification, regardless
-                    # of where that came from.
-                    test_appear(test_url, dest_url, info, *args)
-                elif info["is_same_host"]:
+                if info["is_same_host"]:
                     test_no_appear(test_url, dest_url, info, *args)
                 else:
                     test_appear(test_url, dest_url, info, *args)
@@ -115,6 +109,21 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                         # This works for a left-click, but not for
                         # "open in new tab". In a new tab, an absolute URI
                         # is needed.
+                        return
+
+                    if info["is_same_host"]:
+                        # Example:
+                        #     On site "http://www.maindomain.test/...":
+                        #     javascript:document.location =
+                        #         'http://www.maindomain.test/'
+                        # Up to Fx51, the origin of the request when
+                        # middle-clicking is "about:blank". However,
+                        # on Fx52, the origin is the real URL, i.e.,
+                        # "http://www.maindomain.test/...". -- So depending
+                        # on the firefox version, the request is allowed
+                        # or not. Allowing the request is okay, since it's
+                        # a same-site request, so we simply skip this
+                        # test case.
                         return
 
                     # FIXME: Issue #725;  This test fails with E10s enabled.

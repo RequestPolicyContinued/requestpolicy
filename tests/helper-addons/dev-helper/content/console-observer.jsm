@@ -52,14 +52,26 @@ function isRPException(aMessage) {
 
 // jscs:disable maximumLineLength
 const knownBugs = [
+  // Since Fx 49 (mercurial changeset 0af3c129a366), it's ‘foo’, not 'foo'
+  // (unicode U+2019 and U+201A).
   `[JavaScript Warning: "Expected end of value but found '10'.  Error in parsing value for 'font-family'.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
+  // For whatever reason, this does not work ...
+  //     `[JavaScript Warning: "Expected end of value but found \u{2019}10\u{201A}.  Error in parsing value for \u{2019}font-family\u{201A}.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
+  // ... so use a regex instead:
+  /^\[JavaScript Warning: "Expected end of value but found \W10\W\.  Error in parsing value for \Wfont-family\W\.  Declaration dropped\." {file: "chrome:\/\/rpcontinued\/skin\//,
 ];
 // jscs:enable maximumLineLength
 
 function isKnownBug(aMessage) {
   for (let bugMsg of knownBugs) {
-    if (aMessage.startsWith(bugMsg)) {
-      return true;
+    if (bugMsg instanceof RegExp) {
+      if (bugMsg.test(aMessage)) {
+        return true;
+      }
+    } else {
+      if (aMessage.startsWith(bugMsg)) {
+        return true;
+      }
     }
   }
   return false;

@@ -411,6 +411,10 @@ marionette_logging += --log-tbpl=$(logs_dir)/marionette.tbpl.log
 #marionette_logging += --log-mach=$(logs_dir)/marionette.mach.log
 #marionette_logging += --log-unittest=$(logs_dir)/marionette.unittest.log
 
+# localhost:28xxx
+marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
+marionette_address := localhost:$(marionette_port)
+
 marionette_prefs :=
 
 .PHONY: marionette
@@ -430,6 +434,7 @@ marionette: venv \
 	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
 	./tests/marionette/rp_ui_harness/runtests.py \
 		--binary=$(app_binary) --profile=$$profile_dir \
+		--address=$(marionette_address) \
 		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \

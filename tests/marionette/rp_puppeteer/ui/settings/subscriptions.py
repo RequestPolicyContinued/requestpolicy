@@ -24,7 +24,7 @@ class SubscriptionsSettings(BaseLib):
             self.toggle(subscription_name)
 
     def is_enabled(self, subscription_name):
-        return self._get(subscription_name).get_attribute("checked")
+        return self._get(subscription_name).get_property("checked")
 
     def toggle(self, subscription_name):
         self._get(subscription_name).click()

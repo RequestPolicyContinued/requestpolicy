@@ -16,9 +16,9 @@ class TestImagePlaceholder(RequestPolicyTestCase):
             # "http://www.maindomain.test/img_1.html".
             self.marionette.navigate("about:blank")
         self._test("http://www.maindomain.test/img_1.html#fragment-part")
-        
+
     def _test(self, test_url):
         with self.marionette.using_context("content"):
             self.marionette.navigate(test_url)
             image = self.marionette.find_element("id", "cross-site-image")
-            self.assertTrue(image.get_attribute("rpcontinuedIdentified"))
+            self.assertTrue(image.get_property("rpcontinuedIdentified"))

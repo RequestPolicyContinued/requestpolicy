@@ -21,7 +21,7 @@ class ContextMenu(BaseLib):
 
     @property
     def state(self):
-        return self.element.get_attribute("state")
+        return self.element.get_property("state")
 
     def select_entry(self, entry_id, context_element):
         """Select a specific entry in the context menu of an HTMLElement."""

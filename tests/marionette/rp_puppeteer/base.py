@@ -48,7 +48,7 @@ class HTMLFormBaseLib(ElementBaseLib):
 
     def _get_input_field_value(self, find_method, find_target):
         input_field = self._get_input_field(find_method, find_target)
-        return input_field.get_attribute("value")
+        return input_field.get_property("value")
 
     def _set_input_field_value(self, find_method, find_target, value):
         self.marionette.execute_script("""

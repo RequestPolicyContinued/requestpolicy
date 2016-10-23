@@ -17,7 +17,7 @@ class Menu(BaseLib):
     @property
     def total_num_requests(self):
         label_element = self._popup.find_element("id", "rpc-origin-num-requests")
-        text = label_element.get_attribute("value")
+        text = label_element.get_property("value")
         match = re.match(r"^(\d+) \((\d+)\+(\d+)\)$", text)
         return int(match.group(1))
 
@@ -56,7 +56,7 @@ class Menu(BaseLib):
 
     @property
     def _popup_state(self):
-        return self._popup.get_attribute("state")
+        return self._popup.get_property("state")
 
     def _toggle(self, trigger="api"):
         is_open = self.is_open()

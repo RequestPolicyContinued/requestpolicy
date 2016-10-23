@@ -93,7 +93,7 @@ class TestCheckboxes(RequestPolicyTestCase):
             compare(initial_value)
 
     def _compare(self, checkbox, pref, expected_pref_value, inverse=False):
-        cb_value = checkbox.get_attribute("checked") == "true"
+        cb_value = checkbox.get_property("checked")
         pref_value = pref["get"]()
 
         try:

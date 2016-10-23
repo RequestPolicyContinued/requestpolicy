@@ -56,7 +56,7 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
                         "than displayed here!\n\n"
                         ).format(n_diff)
             msg += "\n\n".join(logging_errors)
-            rv["Logging Errors"] = msg
+            rv["Logging Errors"] = self._plaintext_to_html(msg)
 
         n_console_errors = console_error_detect.n_errors
         console_errors = console_error_detect.messages
@@ -68,22 +68,28 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
                         "than displayed here!\n\n"
                         ).format(n_diff)
             msg += "\n".join(console_errors)
-            rv["console errors"] = msg
+            rv["console errors"] = self._plaintext_to_html(msg)
 
         with self._gecko_log_file() as gecko_log:
+            msg = ""
             # Take all lines except the last one, which is empty.
             lines = gecko_log.read().split("\n")[:-1]
             first_line = self.next_gecko_log_starting_line
             last_line = len(lines)
             self.next_gecko_log_starting_line = last_line + 1
+            msg += "Lines {}-{}:\n\n".format(first_line, last_line)
 
             less_lines = lines[(first_line - 1):]
-            rv["gecko-log"] = (("Lines {}-{}:\n\n"
-                                ).format(first_line, last_line) +
-                               "\n".join(less_lines))
+            msg += "\n".join(less_lines)
+            rv["gecko-log"] = self._plaintext_to_html(msg)
 
     @contextmanager
     def _gecko_log_file(self):
         abspath = os.path.abspath(self.gecko_log_relpath)
         with codecs.open(abspath, "r", "utf-8") as file_obj:
             yield file_obj
+
+    def _plaintext_to_html(self, text):
+        text_escaped = text.replace("<", "&lt;").replace(">", "&gt;")
+
+        return u"<pre>{}</pre>".format(text_escaped)

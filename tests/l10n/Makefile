@@ -18,7 +18,11 @@ check_locale_targets :=
 define fn_create_check_locale
 check_locale_targets += check-locale-$(1)
 .PHONY: check-locale-$(1)
+ifeq "$(1)" "$(reference_locale)"
 check-locale-$(1):
+else
+check-locale-$(1): check-locale-$(reference_locale)
+endif
 	@$(BASE_DIR)/tests/l10n/check-property-file.sh \
 	  "$(L10N_DIR)/$(1)/requestpolicy.properties" \
 	  "$(L10N_DIR)/$(reference_locale)/requestpolicy.properties"

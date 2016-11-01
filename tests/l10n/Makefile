@@ -3,6 +3,9 @@ L10N_DIR := $(BASE_DIR)/src/locale
 
 reference_locale := en-US
 all_locales := $(patsubst $(L10N_DIR)/%,%,$(wildcard $(L10N_DIR)/*))
+ifeq "$(all_locales)" ""
+$(error No locales found in $(L10N_DIR)!)
+endif
 
 fail = (echo "$(1)" && exit 1)
 
@@ -29,8 +32,5 @@ $(foreach l,$(all_locales),$(eval $(call fn_create_check_locale,$l)))
 # main target
 #-------------------------------------------------------------------------------
 
-.PHONY: check-locales check-locales-variable
-check-locales: check-locale-variables $(check_locale_targets)
-check-locale-variables:
-	@test "$(all_locales)" != "" || \
-	  $(call fail,No locales found in $(L10N_DIR)!)
+.PHONY: check-locales
+check-locales: $(check_locale_targets)

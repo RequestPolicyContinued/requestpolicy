@@ -25,6 +25,8 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
     * Firefox Accounts (#687)
   * updated translations
     * es-ES: #790
+  * new translations
+    * pl: #806
 * minor changes
   * Don't change the font color in RP's context menu entry (#31).
   * Ignore clicks on `[no origin]` in the menu (#761).

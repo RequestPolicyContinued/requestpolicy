@@ -1,0 +1,12 @@
+<!ENTITY rp.requestLog.origin "Źródło">
+<!ENTITY rp.requestLog.destination "Cel">
+<!ENTITY rp.requestLog.blocked "Blokada?">
+<!ENTITY rp.requestLog.time "Czas">
+<!ENTITY rp.requestLog.copyOriginToClipboard "Kopiuj adres źródłowy do schowka">
+<!ENTITY rp.requestLog.copyDestinationToClipboard "Kopiuj adres docelowy do schowka">
+<!ENTITY rp.requestLog.openOriginInNewTab "Otwórz adres źródłowy w nowej karcie">
+<!ENTITY rp.requestLog.openDestinationInNewTab "Otwórz adres docelowy w nowej karcie">
+<!ENTITY rp.requestLog.filterRequests "Filtruj połączenia (RegEx)">
+<!ENTITY rp.requestLog.filterRequests.accesskey "F">
+<!ENTITY rp.requestLog.clearFilter "Wyczyść filtr">
+<!ENTITY rp.requestLog.clearFilter.accesskey "W">

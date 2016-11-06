@@ -57,18 +57,10 @@ check_key_order () {
 check_key_order
 
 check_placeholders () {
-  # FIXME: The "convert" function is very slow!
   convert () {
     echo "$1" | \
-    while IFS= read -r line; do
-      local key=$(echo "${line}" | grep -Eo '^[^=]+')
-      local placeholders=$(echo "${line}" | \
-        grep -Eo -e '%S' -e '%[0-9]+\$S' | \
-        sort -u | \
-        tr '\n' ' ' \
-      )
-      echo "${key}=${placeholders}"
-    done
+      grep -Eon -e '^[^=]+' -e '%S' -e '%[0-9]+\$S' | \
+      sort -n | uniq
   }
   local main__converted=$(convert "${main__lines}")
   local ref__converted=$(convert "${ref__lines}")

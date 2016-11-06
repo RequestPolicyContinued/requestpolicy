@@ -22,10 +22,12 @@
     "allow",
     "block",
     "temporary",
+    "createRule",
     "addRule",
     "learnMoreAboutRules",
     "removeOldRules",
     "ruleSet",
+    "activeRules",
     "filterRules",
     "policy"
   ];

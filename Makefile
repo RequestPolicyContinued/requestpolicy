@@ -428,9 +428,8 @@ marionette: venv \
 		webext-apply-css-xpi \
 		specific-xpi \
 		amo-nightly-xpi
-	@# Due to Mozilla Bug 1173502, the profile needs to be created and
+	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
-	( \
 	source .venv/bin/activate ; \
 	export PYTHONPATH=tests/marionette/ ; \
 	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
@@ -441,7 +440,6 @@ marionette: venv \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \
 	exit $$exit_status \
-	)
 
 #-------------------------------------------------------------------------------
 # static code analysis

@@ -469,13 +469,16 @@ include tests/l10n/Makefile
 # other targets
 #===============================================================================
 
-# Clean all temporary files and directories created by 'make'.
-.PHONY: clean
+# Cleanup targets
+.PHONY: clean mostlyclean distclean clean-dev-environment
 clean:
 	@rm -rf $(dist_dir)/*.xpi
 	@rm -rf $(build_dir_root)/*
+mostlyclean: clean
 	@rm -rf $(logs_dir)/*
-	@echo "Cleanup is done."
+clean-dev-environment:
+	@rm -rf .venv
+distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.
 .PHONY: FORCE

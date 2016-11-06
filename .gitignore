@@ -2,6 +2,7 @@
 !.github/
 !.gitignore
 !.jshintrc
+!.jshintignore
 !.jscsrc
 !tests/content/.htaccess
 *.jar

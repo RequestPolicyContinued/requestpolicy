@@ -371,7 +371,7 @@ venv: .venv/requirements
 	source $| ; pip install -r $<
 	touch $@
 .venv/bin/activate:
-	virtualenv --prompt='(RP)' .venv
+	virtualenv --no-site-packages --prompt='(RP)' .venv
 
 #-------------------------------------------------------------------------------
 # run firefox

@@ -13,7 +13,7 @@ class TestWebExtension(RequestPolicyTestCase):
         self.addon = Addon(
             lambda: self.marionette,
             addon_id="apply-css@mozilla.org",
-            install_url="http://localhost/.dist/webext-apply-css.xpi"
+            install_url="http://localhost/dist/webext-apply-css.xpi"
         )
 
     def tearDown(self):

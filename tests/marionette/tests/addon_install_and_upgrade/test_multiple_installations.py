@@ -28,7 +28,7 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
         assert self.OTHER_ADDON is not None
         self.other_rp = Addon(lambda: self.marionette,
                               addon_id=self.OTHER_ADDON["id"],
-                              install_url=("http://localhost/.dist/" +
+                              install_url=("http://localhost/dist/" +
                                            self.OTHER_ADDON["xpi"]))
 
     def tearDown(self):

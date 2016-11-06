@@ -12,7 +12,7 @@ class TestAddon(RequestPolicyTestCase):
         super(TestAddon, self).setUp()
         self.addon = Addon(lambda: self.marionette,
                            addon_id="dummy-ext@requestpolicy.org",
-                           install_url="http://localhost/.dist/dummy-ext.xpi")
+                           install_url="http://localhost/dist/dummy-ext.xpi")
         self.addon.install()
 
     def tearDown(self):

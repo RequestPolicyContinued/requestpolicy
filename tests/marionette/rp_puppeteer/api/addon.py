@@ -204,7 +204,7 @@ class RequestPolicy(Addon):
     def __init__(self, marionette_getter):
         Addon.__init__(self, marionette_getter,
                        addon_id="rpcontinued@non-amo.requestpolicy.org",
-                       install_url=("http://localhost/.dist/"
+                       install_url=("http://localhost/dist/"
                                     "requestpolicy-unit-testing.xpi"))
 
         self.pref_welcome_win = "extensions.requestpolicy.welcomeWindowShown"

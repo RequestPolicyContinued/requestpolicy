@@ -16,5 +16,7 @@
 /dist/
 /logs/
 
+/dev_env/python/
+
 /tests/mozmill/data
 /tests/mozmill/mozmill-tests

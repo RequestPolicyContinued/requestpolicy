@@ -28,6 +28,9 @@ build_dir_root := build
 dist_dir       := dist
 logs_dir       := logs
 
+dev_env_dir    := dev_env
+python_env_dir := $(dev_env_dir)/python
+
 # create the dist directory
 $(dist_dir) $(logs_dir):
 	@mkdir -p $@
@@ -341,6 +344,36 @@ $(other_build__xpi_file): $(other_build__src__all_files) FORCE | $(dist_dir)
 
 
 #===============================================================================
+# Development environment
+#===============================================================================
+
+#-------------------------------------------------------------------------------
+# python
+#-------------------------------------------------------------------------------
+
+IN_PYTHON_ENV = source $(python_env_dir)/bin/activate && ($1)
+
+# timestamp/target files
+# NOTE: The timestamp files must reside inside the venv dir,
+#   so that when the venv dir is removed, the timestamp files
+#   will be removed as well.
+T_PYTHON_PACKAGES := $(python_env_dir)/.timestamp_requirements
+T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
+
+.PHONY: python-venv
+python-venv: $(T_PYTHON_PACKAGES)
+$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt | $(T_PYTHON_VIRTUALENV)
+	$(call IN_PYTHON_ENV, \
+		pip install -r $< \
+	)
+	touch $@
+$(T_PYTHON_VIRTUALENV):
+	mkdir -p $(python_env_dir)
+	virtualenv --no-site-packages --prompt='(RP)' $(python_env_dir)
+	touch $@
+
+
+#===============================================================================
 # Running and Testing RequestPolicy
 #===============================================================================
 
@@ -362,18 +395,6 @@ app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 #-------------------------------------------------------------------------------
-# virtual python environments
-#-------------------------------------------------------------------------------
-
-.PHONY: venv
-venv: .venv/requirements
-.venv/requirements: requirements.txt | .venv/bin/activate
-	source $| ; pip install -r $<
-	touch $@
-.venv/bin/activate:
-	virtualenv --no-site-packages --prompt='(RP)' .venv
-
-#-------------------------------------------------------------------------------
 # run firefox
 #-------------------------------------------------------------------------------
 
@@ -387,8 +408,10 @@ run_args += --preferences=$(mozrunner_prefs_ini):dev
 run_args += $(run_additional_args)
 
 .PHONY: run
-run: venv unit-testing-xpi dev-helper-xpi
-	source .venv/bin/activate ; mozrunner $(run_args)
+run: python-venv unit-testing-xpi dev-helper-xpi
+	$(call IN_PYTHON_ENV, \
+		mozrunner $(run_args) \
+	)
 
 #-------------------------------------------------------------------------------
 # unit testing: Marionette
@@ -420,7 +443,7 @@ marionette_address := localhost:$(marionette_port)
 marionette_prefs :=
 
 .PHONY: marionette
-marionette: venv \
+marionette: python-venv \
 		$(logs_dir) \
 		unit-testing-xpi \
 		dev-helper-xpi \
@@ -430,16 +453,23 @@ marionette: venv \
 		amo-nightly-xpi
 	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
-	source .venv/bin/activate ; \
-	export PYTHONPATH=tests/marionette/ ; \
-	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
+	$(call IN_PYTHON_ENV, \
+	export PYTHONPATH=tests/marionette/ && \
+	profile_dir=`mozprofile \
+		--addon=$(xpi_file__unit_testing) \
+		--addon=$(xpi_file__dev_helper) \
+		--preferences=$(mozrunner_prefs_ini):marionette \
+		` && \
+	( \
 	./tests/marionette/rp_ui_harness/runtests.py \
 		--binary=$(app_binary) --profile=$$profile_dir \
 		--address=$(marionette_address) \
 		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \
+	) ; \
 	exit $$exit_status \
+	)
 
 #-------------------------------------------------------------------------------
 # static code analysis
@@ -477,7 +507,7 @@ clean:
 mostlyclean: clean
 	@rm -rf $(logs_dir)/*
 clean-dev-environment:
-	@rm -rf .venv
+	@rm -rf $(python_env_dir)
 distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.

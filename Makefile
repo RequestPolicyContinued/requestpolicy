@@ -30,6 +30,12 @@ logs_dir       := logs
 
 dev_env_dir    := dev_env
 python_env_dir := $(dev_env_dir)/python
+node_env_dir   := $(dev_env_dir)/node
+
+NPM            := npm --prefix=$(node_env_dir)
+JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
+JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint
+ADDONS_LINTER  := $(abspath $(node_env_dir))/node_modules/.bin/addons-linter
 
 # create the dist directory
 $(dist_dir) $(logs_dir):
@@ -347,6 +353,9 @@ $(other_build__xpi_file): $(other_build__src__all_files) FORCE | $(dist_dir)
 # Development environment
 #===============================================================================
 
+PHONY: development-environment
+development-environment: python-venv node-packages
+
 #-------------------------------------------------------------------------------
 # python
 #-------------------------------------------------------------------------------
@@ -370,6 +379,19 @@ $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt | $(T_PYTHON_VIRTUA
 $(T_PYTHON_VIRTUALENV):
 	mkdir -p $(python_env_dir)
 	virtualenv --no-site-packages --prompt='(RP)' $(python_env_dir)
+	touch $@
+
+#-------------------------------------------------------------------------------
+# node.js
+#-------------------------------------------------------------------------------
+
+# timestamp/target files
+T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
+
+.PHONY: node-packages
+node-packages: $(T_NODE_PACKAGES)
+$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt
+	grep -Ev '^\#' $< | xargs $(NPM) install
 	touch $@
 
 
@@ -480,17 +502,17 @@ jscs_args :=
 
 .PHONY: static-analysis jshint jscs addons-linter
 static-analysis: jshint jscs addons-linter check-locales
-jshint:
-	jshint --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
-	jshint $(jshint_args) tests/xpcshell/
-	jshint $(jshint_args) tests/helper-addons/
-jscs:
+jshint: node-packages
+	$(JSHINT) --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
+	$(JSHINT) $(jshint_args) tests/xpcshell/
+	$(JSHINT) $(jshint_args) tests/helper-addons/
+jscs: node-packages
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; jscs $(jscs_args) .
-	cd tests/xpcshell/; jscs $(jscs_args) .
-	cd tests/helper-addons/; jscs $(jscs_args) .
-addons-linter: nightly-xpi
-	addons-linter $(xpi_file__nightly)
+	cd src/; $(JSCS) $(jscs_args) .
+	cd tests/xpcshell/; $(JSCS) $(jscs_args) .
+	cd tests/helper-addons/; $(JSCS) $(jscs_args) .
+addons-linter: nightly-xpi node-packages
+	$(ADDONS_LINTER) $(xpi_file__nightly)
 # localization checks
 include tests/l10n/Makefile
 

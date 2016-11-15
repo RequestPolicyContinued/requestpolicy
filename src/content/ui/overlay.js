@@ -1139,7 +1139,7 @@ window.rpcontinued.overlay = (function() {
 
     // Start iterating at the currently selected tab.
     let indexes = JSUtils.leftRotateArray(JSUtils.range(numTabs),
-		selectedTabIndex);
+        selectedTabIndex);
     for (let index of indexes) {
       let currentBrowser = tabbrowser.getBrowserAtIndex(index);
       let currentURI = currentBrowser.currentURI.spec;

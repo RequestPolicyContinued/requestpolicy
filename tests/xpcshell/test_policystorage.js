@@ -3,6 +3,8 @@ Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset-storage.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
 
+// jscs:disable validateIndentation
+
 // We expect JSON data to represent the following data structure.
 var exampleJsonObj = {
   "metadata": {

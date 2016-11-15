@@ -110,8 +110,10 @@
     if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                        {origin: event.target.ownerDocument.URL,
-                         dest: event.target.href});
+                        {
+                          origin: event.target.ownerDocument.URL,
+                          dest: event.target.href
+                        });
       });
       return;
     }
@@ -123,8 +125,10 @@
         event.target.form && event.target.form.action) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
-                        {origin: event.target.ownerDocument.URL,
-                         dest: event.target.form.action});
+                        {
+                          origin: event.target.ownerDocument.URL,
+                          dest: event.target.form.action
+                        });
       });
       return;
     }

@@ -52,7 +52,7 @@ window.rpcontinued.requestLog = (function(self) {
      * "This property should be set to the total number of rows in the tree."
      * (getter function)
      */
-    get rowCount () {
+    get rowCount() {
       return self.visibleRows.length;
     },
 

@@ -1,6 +1,5 @@
 {
   "preset": "google",
-  "esnext": true,
 
   "validateQuoteMarks": "\"",
   "requireParenthesesAroundIIFE": true,

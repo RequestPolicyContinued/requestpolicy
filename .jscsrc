@@ -6,7 +6,6 @@
     "**/content/lib/ruleset.jsm",
     "external/"
   ],
-  "esnext": true,
 
   "validateQuoteMarks": "\"",
   "requireParenthesesAroundIIFE": true

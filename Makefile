@@ -360,13 +360,11 @@ development-environment: python-venv node-packages
 # timestamps for remakes every x hours/days
 #-------------------------------------------------------------------------------
 
-T_24h_ago := $(build_dir_root)/.timestamp_24h_ago
-$(T_24h_ago): FORCE
-	@touch -d '24 hours ago' $@
-
-T_7d_ago := $(build_dir_root)/.timestamp_7d_ago
-$(T_7d_ago): FORCE
-	@touch -d '7 days ago' $@
+space :=
+space +=
+update_every = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
+$(build_dir_root)/.timestamp_%_ago: FORCE
+	@touch -d '$(subst _, ,$*) ago' $@
 
 #-------------------------------------------------------------------------------
 # python
@@ -383,7 +381,7 @@ T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 
 .PHONY: python-venv
 python-venv: $(T_PYTHON_PACKAGES)
-$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt $(T_7d_ago) | $(T_PYTHON_VIRTUALENV)
+$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt $(call update_every,7 days) | $(T_PYTHON_VIRTUALENV)
 	$(call IN_PYTHON_ENV, \
 		pip install --upgrade -r $< \
 	)
@@ -401,7 +399,7 @@ $(T_PYTHON_VIRTUALENV):
 T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
 
 .PHONY: node-packages
-node-packages: $(T_NODE_PACKAGES) $(T_7d_ago)
+node-packages: $(T_NODE_PACKAGES) $(call update_every,7 days)
 $(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt
 	grep -Ev '^\#' $< | xargs $(NPM) install
 	touch $@

@@ -399,8 +399,8 @@ $(T_PYTHON_VIRTUALENV):
 T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
 
 .PHONY: node-packages
-node-packages: $(T_NODE_PACKAGES) $(call update_every,7 days)
-$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt
+node-packages: $(T_NODE_PACKAGES)
+$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt $(call update_every,7 days)
 	grep -Ev '^\#' $< | xargs $(NPM) install
 	touch $@
 

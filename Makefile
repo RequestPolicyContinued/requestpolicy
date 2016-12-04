@@ -540,6 +540,7 @@ mostlyclean: clean
 	@rm -rf $(logs_dir)/*
 clean-dev-environment:
 	@rm -rf $(python_env_dir)
+	@rm -rf $(node_env_dir)
 distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.

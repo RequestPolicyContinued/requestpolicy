@@ -1,3 +1,4 @@
 firefox-puppeteer
 firefox-ui-harness
 mozrunner >= 6.9
+mozdownload

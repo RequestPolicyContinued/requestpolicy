@@ -31,6 +31,7 @@ logs_dir       := logs
 dev_env_dir    := dev_env
 python_env_dir := $(dev_env_dir)/python
 node_env_dir   := $(dev_env_dir)/node
+firefox_dir    := $(dev_env_dir)/browsers/firefox
 
 NPM            := npm --prefix=$(node_env_dir)
 JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
@@ -354,7 +355,7 @@ $(other_build__xpi_file): $(other_build__src__all_files) FORCE | $(dist_dir)
 #===============================================================================
 
 PHONY: development-environment
-development-environment: python-venv node-packages
+development-environment: python-venv node-packages firefox-all
 
 #-------------------------------------------------------------------------------
 # timestamps for remakes every x hours/days
@@ -410,6 +411,66 @@ $(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
 	grep -Ev '^\#' $< | xargs $(NPM) install
 	touch $@
 
+#-------------------------------------------------------------------------------
+# firefox
+#-------------------------------------------------------------------------------
+
+# TODO: Add support for seamonkey. https://archive.mozilla.org/pub/seamonkey/
+
+# FIXME: Add support for fx-release and fx-beta (unbranded)
+#          https://github.com/mozilla/mozdownload/issues/407
+#        Maybe use "get-firefox" instead?
+#          https://www.npmjs.com/package/get-firefox
+#firefox_branches := esr release beta aurora nightly
+firefox_branches := esr aurora nightly
+
+mozdl_opts_firefox_esr             := --type release --version latest-esr
+# There is no option for "add-on-devel" (unbranded releases) yet; see above.
+#mozdl_opts_firefox_release         := --type tinderbox --branch mozilla-release --??? add-on-devel
+#mozdl_opts_firefox_beta            := --type tinderbox --branch mozilla-beta --??? add-on-devel
+mozdl_opts_firefox_aurora          := --type daily --branch mozilla-aurora
+mozdl_opts_firefox_nightly         := --type daily --branch mozilla-central
+
+# timestamp of last mozdownload execution
+T_FIREFOX = $(firefox_dir)/downloads/$1/.timestamp
+
+define fn_create_firefox_target
+.PHONY: firefox-$1
+firefox-$1: $(firefox_dir)/extracted/$1/firefox
+$(firefox_dir)/extracted/$1/firefox: \
+		$(firefox_dir)/downloads/latest-$1.tar.bz2
+	rm -rf $(firefox_dir)/extracted/$1/
+	mkdir -p $(firefox_dir)/extracted/$1/
+	tar -xjf $$< -C $(firefox_dir)/extracted/$1/ --strip-components=1
+	touch $$@
+# The T_FIREFOX timestamp file is decoupled from the tarball-target.
+# Make will check for the newest tarball in fixed intervals (force_every),
+# but the tarball will only be extracted iff a new tarball has been
+# downloaded (i.e., a new update has been available).
+$(firefox_dir)/downloads/latest-$1.tar.bz2: $(T_PYTHON_PACKAGES) \
+		$(call force_every,12 hours,$(call T_FIREFOX,$1))
+	mkdir -p $(firefox_dir)/downloads/$1/
+	$$(call IN_PYTHON_ENV, \
+	  mozdownload \
+	    --destination $(firefox_dir)/downloads/$1/ \
+	    --extension tar.bz2 --application firefox \
+	    $$(mozdl_opts_firefox_$1) \
+	)
+	ln -sf $$$$(cd $$(dir $$@); ls -t $1/*.tar.bz2 | head -n 1) $$@
+	touch --reference="$$$$(readlink -f $$@)" $$@
+	touch $(call T_FIREFOX,$1)
+.PHONY: clean-old-firefox-tarballs-$1
+clean-old-firefox-tarballs-$1:
+	@# Remove all but the latest tarball
+	@rm -rf $$$$(ls -t $(firefox_dir)/downloads/$1/*.tar.bz2 | tail -n +2)
+endef
+$(foreach b,$(firefox_branches),$(eval $(call fn_create_firefox_target,$b)))
+
+.PHONY: firefox-all
+firefox-all: $(addprefix firefox-,$(firefox_branches))
+.PHONY: clean-old-firefox-tarballs
+clean-old-firefox-tarballs: \
+		$(addprefix clean-old-firefox-tarballs-,$(firefox_branches))
 
 #===============================================================================
 # Running and Testing RequestPolicy
@@ -428,7 +489,7 @@ else
 	app_branch := release
 endif
 binary_filename := $(app)
-app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
+app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
 
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
@@ -446,7 +507,7 @@ run_args += --preferences=$(mozrunner_prefs_ini):dev
 run_args += $(run_additional_args)
 
 .PHONY: run
-run: python-venv unit-testing-xpi dev-helper-xpi
+run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 	$(call IN_PYTHON_ENV, \
 		mozrunner $(run_args) \
 	)
@@ -488,7 +549,8 @@ marionette: python-venv \
 		dummy-xpi \
 		webext-apply-css-xpi \
 		specific-xpi \
-		amo-nightly-xpi
+		amo-nightly-xpi \
+		$(app_binary)
 	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
 	$(call IN_PYTHON_ENV, \
@@ -539,7 +601,7 @@ include tests/l10n/Makefile
 
 # Cleanup targets
 .PHONY: clean mostlyclean distclean clean-dev-environment
-clean:
+clean: clean-old-firefox-tarballs
 	@rm -rf $(dist_dir)/*.xpi
 	@rm -rf $(build_dir_root)/*
 mostlyclean: clean
@@ -547,6 +609,7 @@ mostlyclean: clean
 clean-dev-environment:
 	@rm -rf $(python_env_dir)
 	@rm -rf $(node_env_dir)
+	@rm -rf $(firefox_dir)
 distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.

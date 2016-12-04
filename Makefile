@@ -31,7 +31,7 @@ logs_dir       := logs
 dev_env_dir    := dev_env
 python_env_dir := $(dev_env_dir)/python
 node_env_dir   := $(dev_env_dir)/node
-firefox_dir    := $(dev_env_dir)/browsers/firefox
+browsers_dir   := $(dev_env_dir)/browsers
 
 NPM            := npm --prefix=$(node_env_dir)
 JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
@@ -412,10 +412,13 @@ $(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
 	touch $@
 
 #-------------------------------------------------------------------------------
-# firefox
+# browsers
 #-------------------------------------------------------------------------------
 
-# TODO: Add support for seamonkey. https://archive.mozilla.org/pub/seamonkey/
+# TODO: Automatically download seamonkey tarball.
+#         https://archive.mozilla.org/pub/seamonkey/
+#       However, mozdownload only supports 'b2g', 'firefox', 'fennec' and
+#       'thunderbird' as --application. So maybe use wget instead.
 
 # FIXME: Add support for fx-release and fx-beta (unbranded)
 #          https://github.com/mozilla/mozdownload/issues/407
@@ -423,6 +426,7 @@ $(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
 #          https://www.npmjs.com/package/get-firefox
 #firefox_branches := esr release beta aurora nightly
 firefox_branches := esr aurora nightly
+seamonkey_branches := release
 
 mozdl_opts_firefox_esr             := --type release --version latest-esr
 # There is no option for "add-on-devel" (unbranded releases) yet; see above.
@@ -431,46 +435,64 @@ mozdl_opts_firefox_esr             := --type release --version latest-esr
 mozdl_opts_firefox_aurora          := --type daily --branch mozilla-aurora
 mozdl_opts_firefox_nightly         := --type daily --branch mozilla-central
 
-# timestamp of last mozdownload execution
-T_FIREFOX = $(firefox_dir)/downloads/$1/.timestamp
+mozdl_supported_browsers := firefox
 
-define fn_create_firefox_target
-.PHONY: firefox-$1
-firefox-$1: $(firefox_dir)/extracted/$1/firefox
-$(firefox_dir)/extracted/$1/firefox: \
-		$(firefox_dir)/downloads/latest-$1.tar.bz2
-	rm -rf $(firefox_dir)/extracted/$1/
-	mkdir -p $(firefox_dir)/extracted/$1/
-	tar -xjf $$< -C $(firefox_dir)/extracted/$1/ --strip-components=1
+# timestamp of last mozdownload execution
+T_BROWSER = $(browsers_dir)/$1/downloads/$2/.timestamp
+
+define fn_create_browser_target
+.PHONY: $1-$2
+$1-$2: $(browsers_dir)/$1/extracted/$2/$1
+$(browsers_dir)/$1/extracted/$2/$1: \
+		$(browsers_dir)/$1/downloads/latest-$2.tar.bz2
+	rm -rf $(browsers_dir)/$1/extracted/$2/
+	mkdir -p $(browsers_dir)/$1/extracted/$2/
+	tar -xjf $$< -C $(browsers_dir)/$1/extracted/$2/ --strip-components=1
 	touch $$@
-# The T_FIREFOX timestamp file is decoupled from the tarball-target.
+ifneq "$(filter $(mozdl_supported_browsers),$1)" ""
+# The T_BROWSER timestamp file is decoupled from the tarball-target.
 # Make will check for the newest tarball in fixed intervals (force_every),
 # but the tarball will only be extracted iff a new tarball has been
 # downloaded (i.e., a new update has been available).
-$(firefox_dir)/downloads/latest-$1.tar.bz2: $(T_PYTHON_PACKAGES) \
-		$(call force_every,12 hours,$(call T_FIREFOX,$1))
-	mkdir -p $(firefox_dir)/downloads/$1/
+$(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
+		$(call force_every,12 hours,$(call T_BROWSER,$1,$2)) \
+		| python-venv
+	mkdir -p $(browsers_dir)/$1/downloads/$2/
 	$$(call IN_PYTHON_ENV, \
 	  mozdownload \
-	    --destination $(firefox_dir)/downloads/$1/ \
-	    --extension tar.bz2 --application firefox \
-	    $$(mozdl_opts_firefox_$1) \
+	    --destination $(browsers_dir)/$1/downloads/$2/ \
+	    --extension tar.bz2 --application $1 \
+	    $$(mozdl_opts_$1_$2) \
 	)
-	ln -sf $$$$(cd $$(dir $$@); ls -t $1/*.tar.bz2 | head -n 1) $$@
+	ln -sf $$$$(cd $$(dir $$@); ls -t $2/*.tar.bz2 | head -n 1) $$@
 	touch --reference="$$$$(readlink -f $$@)" $$@
-	touch $(call T_FIREFOX,$1)
-.PHONY: clean-old-firefox-tarballs-$1
-clean-old-firefox-tarballs-$1:
+	touch $(call T_BROWSER,$1,$2)
+else
+$(browsers_dir)/$1/downloads/latest-$2.tar.bz2:
+	$$(error \
+	  $1 cannot be downloaded automatically, yet. \
+	  Please put the $1 tarball at "$$@". \
+	  The tarball will then be extracted automatically. \
+	  Make sure to download the correct file (32 bit or 64 bit) \
+	  as the 32-bit version won't work on 64-bit systems. \
+	)
+endif
+.PHONY: clean-old-$1-tarballs-$2
+clean-old-$1-tarballs-$2:
 	@# Remove all but the latest tarball
-	@rm -rf $$$$(ls -t $(firefox_dir)/downloads/$1/*.tar.bz2 | tail -n +2)
+	@rm -rf $$$$(ls -t $(browsers_dir)/$1/downloads/$2/*.tar.bz2 | tail -n +2)
 endef
-$(foreach b,$(firefox_branches),$(eval $(call fn_create_firefox_target,$b)))
+$(foreach b,$(firefox_branches),$(eval $(call fn_create_browser_target,firefox,$b)))
+$(foreach b,$(seamonkey_branches),$(eval $(call fn_create_browser_target,seamonkey,$b)))
 
 .PHONY: firefox-all
 firefox-all: $(addprefix firefox-,$(firefox_branches))
 .PHONY: clean-old-firefox-tarballs
 clean-old-firefox-tarballs: \
 		$(addprefix clean-old-firefox-tarballs-,$(firefox_branches))
+.PHONY: clean-old-browser-tarballs
+clean-old-browser-tarballs: \
+		clean-old-firefox-tarballs
 
 #===============================================================================
 # Running and Testing RequestPolicy
@@ -601,7 +623,7 @@ include tests/l10n/Makefile
 
 # Cleanup targets
 .PHONY: clean mostlyclean distclean clean-dev-environment
-clean: clean-old-firefox-tarballs
+clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
 	@rm -rf $(build_dir_root)/*
 mostlyclean: clean
@@ -609,7 +631,10 @@ mostlyclean: clean
 clean-dev-environment:
 	@rm -rf $(python_env_dir)
 	@rm -rf $(node_env_dir)
-	@rm -rf $(firefox_dir)
+	@rm -rf $(browsers_dir)/firefox
+	# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
+	# are put there manually.
+	@rm -rf $(browsers_dir)/seamonkey/extracted
 distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.

@@ -362,9 +362,12 @@ development-environment: python-venv node-packages
 
 space :=
 space +=
-update_every = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
-$(build_dir_root)/.timestamp_%_ago: FORCE
-	@touch -d '$(subst _, ,$*) ago' $@
+fn_timestamp_file = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
+force_every = $(shell \
+  touch -d '$1 ago' $(call fn_timestamp_file,$1); \
+  test $(call fn_timestamp_file,$1) -nt $2 && \
+    echo -n FORCE \
+)
 
 #-------------------------------------------------------------------------------
 # python
@@ -381,7 +384,9 @@ T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 
 .PHONY: python-venv
 python-venv: $(T_PYTHON_PACKAGES)
-$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt $(call update_every,7 days) | $(T_PYTHON_VIRTUALENV)
+$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
+		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
+		| $(T_PYTHON_VIRTUALENV)
 	$(call IN_PYTHON_ENV, \
 		pip install --upgrade -r $< \
 	)
@@ -400,7 +405,8 @@ T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
 
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
-$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt $(call update_every,7 days)
+$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
+		$(call force_every,7 days,$(T_NODE_PACKAGES))
 	grep -Ev '^\#' $< | xargs $(NPM) install
 	touch $@
 

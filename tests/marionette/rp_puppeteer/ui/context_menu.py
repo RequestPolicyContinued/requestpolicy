@@ -4,12 +4,20 @@
 
 from firefox_puppeteer.base import BaseLib
 from firefox_puppeteer.api.keys import Keys
+from firefox_puppeteer.api.appinfo import AppInfo
+from firefox_puppeteer.api.utils import Utils
 from marionette_driver.marionette import Actions
 from marionette_driver.wait import Wait
 from rp_puppeteer.errors import ElementNotDisplayedException
 
 
 class ContextMenu(BaseLib):
+
+    def __init__(self, marionette_getter):
+        BaseLib.__init__(self, marionette_getter)
+
+        self.app_info = AppInfo(marionette_getter)
+        self.utils = Utils(marionette_getter)
 
     #################################
     # Public Properties and Methods #
@@ -21,6 +29,9 @@ class ContextMenu(BaseLib):
 
     @property
     def state(self):
+        if self.utils.compare_version(self.app_info.version, "49") < 0:
+            # up to Firefox 48 (Bug 1272653)
+            return self.element.get_attribute("state")
         return self.element.get_property("state")
 
     def select_entry(self, entry_id, context_element):

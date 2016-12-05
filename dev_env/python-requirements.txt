@@ -1,4 +1,5 @@
-firefox-puppeteer
+# firefox-puppeteer v52 conflicts with the latest pypi version of firefox-ui-harness
+firefox-puppeteer < 52
 firefox-ui-harness
 mozrunner >= 6.9
 mozdownload

@@ -3,10 +3,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_puppeteer.base import BaseLib
+from firefox_puppeteer.api.appinfo import AppInfo
+from firefox_puppeteer.api.utils import Utils
 import time
 
 
 class SubscriptionsSettings(BaseLib):
+
+    def __init__(self, marionette_getter):
+        BaseLib.__init__(self, marionette_getter)
+
+        self.app_info = AppInfo(marionette_getter)
+        self.utils = Utils(marionette_getter)
 
     #################################
     # Public Properties and Methods #
@@ -24,6 +32,9 @@ class SubscriptionsSettings(BaseLib):
             self.toggle(subscription_name)
 
     def is_enabled(self, subscription_name):
+        if self.utils.compare_version(self.app_info.version, "49") < 0:
+            # up to Firefox 48 (Bug 1272653)
+            return self._get(subscription_name).get_attribute("checked")
         return self._get(subscription_name).get_property("checked")
 
     def toggle(self, subscription_name):

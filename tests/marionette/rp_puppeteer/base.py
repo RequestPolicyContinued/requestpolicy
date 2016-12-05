@@ -3,6 +3,8 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_puppeteer.base import BaseLib
+from firefox_puppeteer.api.appinfo import AppInfo
+from firefox_puppeteer.api.utils import Utils
 from marionette_driver.marionette import HTMLElement
 
 
@@ -14,6 +16,9 @@ class ElementBaseLib(BaseLib):
 
         BaseLib.__init__(self, marionette_getter)
         self._element = element
+
+        self.app_info = AppInfo(marionette_getter)
+        self.utils = Utils(marionette_getter)
 
     @property
     def element(self):
@@ -48,6 +53,9 @@ class HTMLFormBaseLib(ElementBaseLib):
 
     def _get_input_field_value(self, find_method, find_target):
         input_field = self._get_input_field(find_method, find_target)
+        if self.utils.compare_version(self.app_info.version, "49") < 0:
+            # up to Firefox 48 (Bug 1272653)
+            return input_field.get_attribute("value")
         return input_field.get_property("value")
 
     def _set_input_field_value(self, find_method, find_target, value):

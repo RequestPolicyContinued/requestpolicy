@@ -14,10 +14,12 @@ dist=$dir
 
 # make "install.rdf" em:version unique 
 version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ sum = $1 } END { print sum + 1 }'`
-XPI="$APP-$version~pre.xpi"
+XPI="$APP-$version"
 if [ "$1" ]; then
 	version=$1
 	XPI="$XPI.xpi"
+else
+	XPI="$XPI~pre.xpi"
 fi
 sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $src/install.rdf
 
@@ -33,6 +35,7 @@ echo "JavaScript .jsm" > $build/preprocess.txt
 ( cd $build
 	for f in `find . -iname '*.jsm'` ; do
 		preprocess --content-types-path $build/preprocess.txt $src/$f > $build/$f
+#		preprocess --content-types-path $build/preprocess.txt -D LOG_ENVIRONMENT $src/$f > $build/$f
 	done
 )
 

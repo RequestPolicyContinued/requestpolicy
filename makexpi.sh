@@ -14,14 +14,9 @@ dist=$dir
 
 # make "install.rdf" em:version unique 
 version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ sum = $1 } END { print sum + 1 }'`
-XPI="$APP-$version"
-if [ "$1" ]; then
-	version=$1
-	XPI="$XPI.xpi"
-else
-	XPI="$XPI~pre.xpi"
-fi
 sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $src/install.rdf
+
+XPI="$APP-$version~pre.xpi"
 
 # redirect make.sh output (optional)
 # exec > $dist/$appdate-$APP-$version.log 2>&1

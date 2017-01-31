@@ -13,7 +13,7 @@ mkdir -p $build
 dist=$dir
 
 # get unique "install.rdf" em:version
-version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ sum = $1 } END { print sum + 1 }'`
+version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ print $1 + 1 }'`
 
 # redirect make.sh output (optional)
 # exec > $dist/$appdate-$APP-$version.log 2>&1
@@ -32,6 +32,7 @@ echo "JavaScript .jsm" > $build/preprocess.txt
 		preprocess --content-types-path $build/preprocess.txt $src/$f > $build/$f
 #		preprocess --content-types-path $build/preprocess.txt -D LOG_ENVIRONMENT $src/$f > $build/$f
 	done
+	rm -f preprocess.txt
 )
 
 # make a zip, or xpi

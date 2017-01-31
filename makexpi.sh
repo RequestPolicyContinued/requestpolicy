@@ -12,6 +12,8 @@ mkdir -p $build
 
 dist=$dir
 
+## get unique manifest.json (for example "version": "2.0.41" => "version": "2.0.42"),
+#version=`grep -P '"version": "([0-9]+\.)?' src/manifest.json |  grep -oP '[0-9]+"' | awk '{ print $1 + 1 }'`
 # get unique "install.rdf" em:version
 version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ print $1 + 1 }'`
 
@@ -22,6 +24,8 @@ version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ print $1 + 1 }'
 cp --dereference -pr $src/* $build/
 cp --dereference -p README.md $build/README.md
 
+## make $src/manifest.json unique => "version": "2.0.42"
+#sed -i 's/\.[0-9]*"/\.'$version'"/' $src/manifest.json
 # make "install.rdf" em:version unique
 sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $build/install.rdf
 

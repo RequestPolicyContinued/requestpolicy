@@ -20,14 +20,16 @@ version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ print $1 + 1 }'
 # redirect make.sh output (optional)
 # exec > $dist/$appdate-$APP-$version.log 2>&1
 
+## make $src/manifest.json unique => "version": "2.0.42"
+# INFO: This is recommended, to write into 'src/manifest.json': Going to make real new unique "version", each time.
+#sed -i 's/\.[0-9]*"/\.'$version'"/' $src/manifest.json
+# make "install.rdf" em:version unique
+# INFO: This is recommended, to write into 'src/install.rdf': Going to make real new unique <em:version>, each time.
+sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $src/install.rdf
+
 # copy $src/* to $build/
 cp --dereference -pr $src/* $build/
 cp --dereference -p README.md $build/README.md
-
-## make $src/manifest.json unique => "version": "2.0.42"
-#sed -i 's/\.[0-9]*"/\.'$version'"/' $src/manifest.json
-# make "install.rdf" em:version unique
-sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $build/install.rdf
 
 # preprocess (optional)
 echo "JavaScript .jsm" > $build/preprocess.txt
@@ -43,5 +45,5 @@ echo "JavaScript .jsm" > $build/preprocess.txt
 XPI="$APP-$version~pre.xpi"
 rm -f $dist/$XPI
 (cd $build && zip -pr $dist/$XPI * )
-echo 'Created XPI '$XPI'.'
+echo 'D'$appdate' '$dir'/makexpi.sh: Created '$XPI'.'
 

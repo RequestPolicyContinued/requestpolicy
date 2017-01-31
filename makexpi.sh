@@ -12,11 +12,8 @@ mkdir -p $build
 
 dist=$dir
 
-# make "install.rdf" em:version unique 
+# get unique "install.rdf" em:version
 version=`grep -o '[0-9]*</em:version>' $src/install.rdf | awk '{ sum = $1 } END { print sum + 1 }'`
-sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $src/install.rdf
-
-XPI="$APP-$version~pre.xpi"
 
 # redirect make.sh output (optional)
 # exec > $dist/$appdate-$APP-$version.log 2>&1
@@ -24,6 +21,9 @@ XPI="$APP-$version~pre.xpi"
 # copy $src/* to $build/
 cp --dereference -pr $src/* $build/
 cp --dereference -p README.md $build/README.md
+
+# make "install.rdf" em:version unique
+sed -i 's/[0-9]*<\/em:version>/'$version'<\/em:version>/' $build/install.rdf
 
 # preprocess (optional)
 echo "JavaScript .jsm" > $build/preprocess.txt
@@ -35,5 +35,6 @@ echo "JavaScript .jsm" > $build/preprocess.txt
 )
 
 # make a zip, or xpi
+XPI="$APP-$version~pre.xpi"
 cd $build && zip -pr $dist/$XPI *
 

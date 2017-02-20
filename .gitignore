@@ -22,3 +22,5 @@
 
 /tests/mozmill/data
 /tests/mozmill/mozmill-tests
+
+/firefox/

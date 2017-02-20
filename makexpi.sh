@@ -42,7 +42,7 @@ echo "JavaScript .jsm" > $build/preprocess.txt
 )
 
 # make a zip, or xpi
-XPI="$APP-$version~pre.xpi"
+XPI="$APP~pre.xpi"
 rm -f $dist/$XPI
 (cd $build && zip -pr $dist/$XPI * )
 echo 'D'$appdate' '$dir'/makexpi.sh: Created '$XPI'.'

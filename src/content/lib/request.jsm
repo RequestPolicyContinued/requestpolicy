@@ -68,6 +68,12 @@ const WHITELISTED_INTERNAL_SCHEMES = new Set([
   "moz-extension",
 ]);
 
+const WHITELISTED_RESOURCE_URIS = new Set([
+  // Viewing images (png, jpg, etc.) directly in a tab
+  "resource://gre/res/ImageDocument.css",
+  "resource://gre/res/TopLevelImageDocument.css",
+]);
+
 //==============================================================================
 // Request
 //==============================================================================
@@ -188,8 +194,10 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  // See RP issue #788
-  if (dest.scheme === "resource" && dest.host.startsWith("noscript_")) {
+  if (dest.scheme === "resource" && (
+        dest.host.startsWith("noscript_") || // RP issue #788
+        WHITELISTED_RESOURCE_URIS.has(dest.spec)
+      )) {
     return true;
   }
 

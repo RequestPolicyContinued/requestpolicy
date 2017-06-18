@@ -30,8 +30,6 @@ this.EXPORTED_SYMBOLS = [
   "RawRuleset"
 ];
 
-/* global Iterator */
-
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {Logger} = importModule("lib/logger");
@@ -478,22 +476,6 @@ RawRuleset.prototype = {
 };
 
 //==============================================================================
-// RuleIterator
-//==============================================================================
-
-// FIXME: Again apply commit 36ad2b9 "[ref] Rules[Symbol.iterator]"
-// as soon as Pale Moon supports Symbol.iterator.
-
-function RuleIterator(rules) {
-  this._rulesIterator = new Iterator(rules);
-}
-
-RuleIterator.prototype.next = function() {
-  // The default Iterator over arrays returns a tuple of [index, item].
-  return this._rulesIterator.next()[1];
-};
-
-//==============================================================================
 // Rules
 //==============================================================================
 
@@ -521,41 +503,29 @@ Rules.prototype = {
     return this._rules.length === 0;
   },
 
-  // FIXME: Again apply commit 36ad2b9 "[ref] Rules[Symbol.iterator]"
-  // as soon as Pale Moon supports Symbol.iterator.
-  /* jshint -W103 */
-  __iterator__: function() {
-    return new RuleIterator(this._rules);
+  [Symbol.iterator]: function*() {
+    yield* this._rules;
   },
-  /* jshint +W103 */
 
   get: function(scheme, port) {
     let rule = new Rule(scheme, port);
-    for (let i = 0; ; i++) {
-      let item = this._rules[i];
-      if (!item) {
-        break;
-      }
-      if (item.isEqual(rule)) {
-        return item;
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(rule)) {
+        return existingRule;
       }
     }
     return null;
   },
 
   add: function(scheme, port) {
-    let rule = new Rule(scheme, port);
-    for (let i = 0; ; i++) {
-      let item = this._rules[i];
-      if (!item) {
-        break;
-      }
-      if (item.isEqual(rule)) {
-        return item;
+    let newRule = new Rule(scheme, port);
+    for (let existingRule of this._rules) {
+      if (existingRule.isEqual(newRule)) {
+        return existingRule;
       }
     }
-    this._rules.push(rule);
-    return rule;
+    this._rules.push(newRule);
+    return newRule;
   }
 };
 
@@ -1005,7 +975,7 @@ Ruleset.prototype = {
     // First, check for rules for each part of the origin host.
     for (let [entry, originSpecHasHost] of this.getHostMatches(originHost)) {
       //dprint(entry);
-      for (let rule in entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         let ruleMatchedOrigin = rule.isMatch(origin, originSpecHasHost);
 
@@ -1025,7 +995,7 @@ Ruleset.prototype = {
           for (let [destEntry, destSpecHasHost]
                of rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
-            for (let destRule in destEntry.rules) {
+            for (let destRule of destEntry.rules) {
               //dprint("Checking rule: " + rule);
               if (destRule.allowDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
@@ -1060,7 +1030,7 @@ Ruleset.prototype = {
     // Last, check for rules for each part of the destination host.
     for (let [entry, destSpecHasHost] of this.getHostMatches(destHost)) {
       //dprint(entry);
-      for (let rule in entry.rules) {
+      for (let rule of entry.rules) {
         //dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest, destSpecHasHost)) {
           //dprint("ALLOW dest by rule " + entry + " " + rule);

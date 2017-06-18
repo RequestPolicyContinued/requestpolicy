@@ -923,23 +923,17 @@ Ruleset.prototype = {
     }
   },
 
+  // jscs:disable jsDoc // https://github.com/jsdoc3/jsdoc/issues/555
   /**
    * Yields all matching hosts, that is, DomainEntry or IPAddressEntry
    * objects. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
-   * FIXME: Again apply commit 41fd1c1,
-   * "[ref] Ruleset.getHostMatches: convert to generator function".
-   * as soon as Pale Moon supports Generator Functions.
-   * Note: JSCS currently crashes here, because it does not support
-   * SpiderMonkey's Legacy generator function,
-   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/Legacy_generator_function
-   *
    * @param {string} host The host to get matching entries for.
+   * @return {Generator<DomainEntry|IPAddressEntry>}
    */
-  /* jshint ignore:start */
-      // A yield statement shall be within a generator function
-  getHostMatches: function(host) {
+  // jscs:enable jsDoc
+  getHostMatches: function*(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -984,7 +978,6 @@ Ruleset.prototype = {
       }
     }
   },
-  /* jshint ignore:end */
 
   /**
    * @param {nsIURI} origin
@@ -1010,7 +1003,7 @@ Ruleset.prototype = {
 
     //dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
-    for (let [entry, originSpecHasHost] in this.getHostMatches(originHost)) {
+    for (let [entry, originSpecHasHost] of this.getHostMatches(originHost)) {
       //dprint(entry);
       for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);
@@ -1030,7 +1023,7 @@ Ruleset.prototype = {
         if (ruleMatchedOrigin && rule.destinations) {
           //dprint("There are origin-to-destination rules using this origin rule.");
           for (let [destEntry, destSpecHasHost]
-               in rule.destinations.getHostMatches(destHost)) {
+               of rule.destinations.getHostMatches(destHost)) {
             //dprint(destEntry);
             for (let destRule in destEntry.rules) {
               //dprint("Checking rule: " + rule);
@@ -1065,7 +1058,7 @@ Ruleset.prototype = {
 
     //dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
-    for (let [entry, destSpecHasHost] in this.getHostMatches(destHost)) {
+    for (let [entry, destSpecHasHost] of this.getHostMatches(destHost)) {
       //dprint(entry);
       for (let rule in entry.rules) {
         //dprint("Checking rule: " + rule);

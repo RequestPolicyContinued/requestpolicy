@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global $, window */
 /* exported common, WinEnv, elManager, $id, $str */
 

@@ -1,4 +1,4 @@
-"use strict"; /* jshint strict: global, node: true */
+"use strict"; /* jshint node: true */
 
 /* jscs:disable disallowSpacesInsideObjectBrackets */
 /* jscs:disable maximumLineLength */

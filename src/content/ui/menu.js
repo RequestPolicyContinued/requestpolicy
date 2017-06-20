@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global window, document */
 
 window.rpcontinued.menu = (function() {

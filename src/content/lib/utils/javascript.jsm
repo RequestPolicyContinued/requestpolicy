@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* exported JSUtils */
 /* exported EXPORTED_SYMBOLS */
 var EXPORTED_SYMBOLS = ["JSUtils"];
@@ -29,7 +31,6 @@ var EXPORTED_SYMBOLS = ["JSUtils"];
 //==============================================================================
 
 var JSUtils = (function() {
-  "use strict";
   let self = {};
 
   self.arrayIncludes = function(array, searchElement) {

@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* exported RuleUtils */
 /* exported EXPORTED_SYMBOLS */
 var EXPORTED_SYMBOLS = ["RuleUtils"];

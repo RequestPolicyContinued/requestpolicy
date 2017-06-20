@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {utils: Cu} = Components;
 
@@ -31,8 +33,6 @@ var EXPORTED_SYMBOLS = [
   "ProcessEnvironment"
 ];
 
-let globalScope = this;
-
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -40,16 +40,13 @@ let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});
 let {RPService2: {console}} = ScriptLoader.importModule("main/rp-service-2");
 
+let lazyModules = {};
 ScriptLoader.defineLazyModuleGetters({
-  /* global ManagerForEventListeners */
   "lib/manager-for-event-listeners": ["ManagerForEventListeners"],
-  /* global ManagerForMessageListeners */
   "lib/manager-for-message-listeners": ["ManagerForMessageListeners"],
-  /* global ObserverManager */
   "lib/observer-manager": ["ObserverManager"],
-  /* global PrefObserver */
   "lib/classes/pref-observer": ["PrefObserver"]
-}, globalScope);
+}, lazyModules);
 
 //==============================================================================
 // utilities
@@ -201,13 +198,13 @@ var Environment = (function() {
     // Using that Getter is more convenient than doing it manually, as the
     // Environment has to be created *before* the ObserverManager.
     XPCOMUtils.defineLazyGetter(self, "obMan", function() {
-      return new ObserverManager(self);
+      return new lazyModules.ObserverManager(self);
     });
 
     // Define a Lazy Getter to get an instance of `ManagerForEventListeners` for
     // this Environment.
     XPCOMUtils.defineLazyGetter(self, "elManager", function() {
-      return new ManagerForEventListeners(self);
+      return new lazyModules.ManagerForEventListeners(self);
     });
 
     // generate an unique ID for debugging purposes
@@ -223,7 +220,7 @@ var Environment = (function() {
   Object.defineProperty(Environment.prototype, "prefObs", {
     get: function() {
       if (!this._prefObserver) {
-        this._prefObserver = new PrefObserver();
+        this._prefObserver = new lazyModules.PrefObserver();
         this.addShutdownFunction(Environment.LEVELS.INTERFACE, () => {
           this._prefObserver.removeAllListeners();
         });
@@ -425,6 +422,7 @@ var Environment = (function() {
      * @param {integer} aLevel
      */
     function processLevel(aStartupOrShutdown, aLevel, aBootstrapArgs) {
+      /* jshint validthis: true */
       let self = this;
 
       let levelObj = self.levels[aStartupOrShutdown][aLevel];
@@ -462,6 +460,7 @@ var Environment = (function() {
      * @param {integer=} aUntilLevel
      */
     function processLevels(aStartupOrShutdown, aBootstrapArgs, aUntilLevel) {
+      /* jshint validthis: true */
       let self = this;
       iterateLevels(aStartupOrShutdown, function(level) {
         processLevel.call(self, aStartupOrShutdown, level, aBootstrapArgs);
@@ -486,6 +485,7 @@ var Environment = (function() {
      * @param {string} aStartupOrShutdown
      */
     function logStartupOrShutdown(aStartupOrShutdown) {
+      /* jshint validthis: true */
       let self = this;
       log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
                 (self.outerEnv ?
@@ -506,6 +506,7 @@ var Environment = (function() {
     function bootstrap(aStartupOrShutdown,
                        aBootstrapArgs,
                        aUntilLevel=BOOTSTRAP[aStartupOrShutdown].lastLevel) {
+      /* jshint validthis: true */
       let self = this;
 
       let {
@@ -618,7 +619,7 @@ var FrameScriptEnvironment = (function() {
 
     // a "MessageListener"-Manager for this environment
     XPCOMUtils.defineLazyGetter(self, "mlManager", function() {
-      return new ManagerForMessageListeners(self, self.mm);
+      return new lazyModules.ManagerForMessageListeners(self, self.mm);
     });
   }
   FrameScriptEnvironment.prototype = Object.create(Environment.prototype);

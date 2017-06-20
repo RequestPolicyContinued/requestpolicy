@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* exported ManagerForBlockedContent */
 
 var ManagerForBlockedContent = (function() {

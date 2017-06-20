@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global window, $, common, WinEnv, elManager, $id */
 
 (function() {

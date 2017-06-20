@@ -10,6 +10,7 @@
   "moz": false,
   "nonew": true,
   "singleGroups": true,
+  "strict": "global",
   "undef": true,
   "unused": "vars"
 }

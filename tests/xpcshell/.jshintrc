@@ -1,5 +1,5 @@
 {
-  "extends": "../../.jshintrc",
+  "extends": "../../tests/.jshintrc",
 
   "undef": false,
   "forin": false,

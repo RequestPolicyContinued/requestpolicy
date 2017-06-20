@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* exported ManagerForDOMContentLoaded */
 /* global mm, overlayComm, framescriptEnv, ManagerForBlockedContent */
 

@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {results: Cr, utils: Cu} = Components;
 

@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* exported MapOfSets */
 /* exported EXPORTED_SYMBOLS */
 var EXPORTED_SYMBOLS = ["MapOfSets"];

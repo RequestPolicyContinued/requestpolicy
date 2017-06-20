@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 (function() {
   /* global Components */
   const {utils: Cu} = Components;
@@ -36,7 +38,7 @@
       "lib/framescript-to-overlay-communication");
 
   // the ContentFrameMessageManager of this framescript
-  let mm = this;
+  let mm = Function("return this")(); // jshint ignore:line
   let {content, sendSyncMessage} = mm;
 
   //============================================================================

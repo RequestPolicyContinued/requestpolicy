@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global window, document, dump */
 
 /**
@@ -744,6 +746,7 @@ window.rpcontinued.overlay = (function() {
    * @this {nsContextMenu}
    */
   function onOpenLinkViaContextMenu() {
+    /* jshint validthis: true */
     let origin = window.gContextMenuContentData ?
         window.gContextMenuContentData.docLocation :
         this.target.ownerDocument.URL;

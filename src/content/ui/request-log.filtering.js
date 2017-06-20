@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global window */
 
 window.rpcontinued.requestLog = (function(self) {

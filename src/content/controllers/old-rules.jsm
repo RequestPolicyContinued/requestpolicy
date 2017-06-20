@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {utils: Cu} = Components;
 
@@ -39,8 +41,6 @@ var {PolicyManager} = importModule("lib/policy-manager");
 //==============================================================================
 
 var OldRulesController = (function() {
-  "use strict";
-
   let self = {};
 
   self.startup = function() {

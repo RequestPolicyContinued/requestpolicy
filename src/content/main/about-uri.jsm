@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 

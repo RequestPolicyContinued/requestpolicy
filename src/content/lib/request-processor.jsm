@@ -21,14 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 /* exported RequestProcessor */
 /* exported EXPORTED_SYMBOLS */
 var EXPORTED_SYMBOLS = ["RequestProcessor"];
-
-let globalScope = this;
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
@@ -53,10 +53,10 @@ let {RequestSet} = importModule("lib/request-set");
 let {ProcessEnvironment} = importModule("lib/environment");
 let {Utils} = importModule("lib/utils");
 
-/* global RPContentPolicy */
+let lazyModules = {};
 ScriptLoader.defineLazyModuleGetters({
   "main/content-policy": ["RPContentPolicy"]
-}, globalScope);
+}, lazyModules);
 
 //==============================================================================
 // constants
@@ -919,7 +919,7 @@ var RequestProcessor = (function() {
                                  [destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
-          let mappedResult = RPContentPolicy.shouldLoad(
+          let mappedResult = lazyModules.RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
           if (mappedResult === CP_OK) {

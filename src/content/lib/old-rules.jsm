@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
@@ -40,8 +42,6 @@ let {Prefs} = importModule("models/prefs");
 //==============================================================================
 
 var OldRules = (function() {
-  "use strict";
-
   function OldRules(aOrigins = "", aDestinations = "",
                     aOriginsToDestinations = "") {
     this._customPrefStrings = null;

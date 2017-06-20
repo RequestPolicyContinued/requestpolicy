@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
 const {interfaces: Ci, utils: Cu} = Components;
 
@@ -87,7 +89,7 @@ var Logger = (function() {
    */
   function initialLog() {
     init();
-    log.apply(this, arguments);
+    log.apply(null, arguments);
   }
 
   /**

@@ -46,8 +46,6 @@ export var Utils = (function() {
     self.threadManager.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
   };
-  XPCOMUtils.defineLazyServiceGetter(self, "categoryManager",
-      "@mozilla.org/categorymanager;1", "nsICategoryManager");
   XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
       "@mozilla.org/thread-manager;1", "nsIThreadManager");
 

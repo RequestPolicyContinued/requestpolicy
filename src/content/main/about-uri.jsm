@@ -24,7 +24,8 @@
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 /* exported AboutRequestPolicy */
-this.EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["AboutRequestPolicy"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});

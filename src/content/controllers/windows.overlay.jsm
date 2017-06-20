@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported OverlayController */
-this.EXPORTED_SYMBOLS = ["OverlayController"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["OverlayController"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

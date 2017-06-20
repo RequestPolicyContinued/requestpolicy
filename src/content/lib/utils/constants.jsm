@@ -24,7 +24,8 @@
 const {interfaces: Ci} = Components;
 
 /* exported C */
-this.EXPORTED_SYMBOLS = ["C"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["C"];
 
 var C = {};
 

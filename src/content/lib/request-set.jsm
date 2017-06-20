@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported RequestSet */
-this.EXPORTED_SYMBOLS = ["RequestSet"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RequestSet"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

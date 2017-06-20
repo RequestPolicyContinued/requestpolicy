@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported ManagerForEventListeners */
-this.EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["ManagerForEventListeners"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

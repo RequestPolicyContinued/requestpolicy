@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported PrefManager */
-this.EXPORTED_SYMBOLS = ["PrefManager"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["PrefManager"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

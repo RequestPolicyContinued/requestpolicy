@@ -24,7 +24,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported rpWindowManager */
-this.EXPORTED_SYMBOLS = ["rpWindowManager"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["rpWindowManager"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

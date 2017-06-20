@@ -21,7 +21,8 @@
  */
 
 /* exported MapOfSets */
-this.EXPORTED_SYMBOLS = ["MapOfSets"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["MapOfSets"];
 
 //==============================================================================
 // MapOfSets

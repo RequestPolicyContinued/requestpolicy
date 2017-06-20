@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported OldRulesController */
-this.EXPORTED_SYMBOLS = ["OldRulesController"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["OldRulesController"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

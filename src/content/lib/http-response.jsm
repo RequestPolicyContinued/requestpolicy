@@ -25,7 +25,8 @@
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 /* exported HttpResponse */
-this.EXPORTED_SYMBOLS = ["HttpResponse"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["HttpResponse"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

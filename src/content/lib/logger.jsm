@@ -25,7 +25,8 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported Logger */
-this.EXPORTED_SYMBOLS = ["Logger"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["Logger"];
 
 /* global dump */
 

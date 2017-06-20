@@ -29,7 +29,8 @@ const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 /* exported UserSubscriptions, SubscriptionList,
        Subscription, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
        SUBSCRIPTION_REMOVED_TOPIC */
-this.EXPORTED_SYMBOLS = [
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = [
   "UserSubscriptions",
   "SubscriptionList",
   "Subscription",

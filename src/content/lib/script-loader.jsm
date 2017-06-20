@@ -24,7 +24,8 @@
 const {results: Cr, utils: Cu} = Components;
 
 /* exported ScriptLoader */
-this.EXPORTED_SYMBOLS = ["ScriptLoader"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["ScriptLoader"];
 
 /* global dump */
 

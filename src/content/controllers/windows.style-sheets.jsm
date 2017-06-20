@@ -24,7 +24,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported StyleSheetsController */
-this.EXPORTED_SYMBOLS = ["StyleSheetsController"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["StyleSheetsController"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

@@ -25,7 +25,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported FileUtil */
-this.EXPORTED_SYMBOLS = ["FileUtil"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["FileUtil"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

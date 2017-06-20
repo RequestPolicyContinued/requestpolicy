@@ -25,7 +25,8 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported PolicyManager, RULES_CHANGED_TOPIC */
-this.EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["PolicyManager", "RULES_CHANGED_TOPIC"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

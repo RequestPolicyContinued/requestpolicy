@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported PrefObserver */
-this.EXPORTED_SYMBOLS = ["PrefObserver"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["PrefObserver"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

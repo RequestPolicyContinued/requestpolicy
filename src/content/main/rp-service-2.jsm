@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported rpService */
-this.EXPORTED_SYMBOLS = ["RPService2"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RPService2"];
 
 // NOTICE: This file should NOT import any of RP's modules when it is loaded!
 //         This module will be the new "root module", being the only module

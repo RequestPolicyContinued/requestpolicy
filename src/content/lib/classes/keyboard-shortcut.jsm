@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported KeyboardShortcut */
-this.EXPORTED_SYMBOLS = ["KeyboardShortcut"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["KeyboardShortcut"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

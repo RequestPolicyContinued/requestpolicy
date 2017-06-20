@@ -24,7 +24,8 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported Windows */
-this.EXPORTED_SYMBOLS = ["Windows"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["Windows"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

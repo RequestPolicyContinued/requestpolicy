@@ -22,7 +22,8 @@
  */
 
 /* exported DOMUtils */
-this.EXPORTED_SYMBOLS = ["DOMUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["DOMUtils"];
 
 //==============================================================================
 // DOMUtils

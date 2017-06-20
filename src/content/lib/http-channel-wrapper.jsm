@@ -24,7 +24,8 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported HttpChannelWrapper */
-this.EXPORTED_SYMBOLS = ["HttpChannelWrapper"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["HttpChannelWrapper"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

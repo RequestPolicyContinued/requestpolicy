@@ -25,7 +25,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported OldRules, OldRulesParseError */
-this.EXPORTED_SYMBOLS = ["OldRules", "OldRulesParseError"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["OldRules", "OldRulesParseError"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

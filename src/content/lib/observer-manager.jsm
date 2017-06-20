@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported ObserverManager */
-this.EXPORTED_SYMBOLS = ["ObserverManager"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["ObserverManager"];
 
 let {ScriptLoader} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

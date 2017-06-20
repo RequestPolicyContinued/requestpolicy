@@ -26,7 +26,8 @@ const {utils: Cu} = Components;
 /* global dump */
 
 /* exported ManagerForMessageListeners */
-this.EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

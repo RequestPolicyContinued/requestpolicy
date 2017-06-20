@@ -25,7 +25,8 @@
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 /* exported RPContentPolicy, RPChannelEventSink */
-this.EXPORTED_SYMBOLS = ["RPContentPolicy", "RPChannelEventSink"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RPContentPolicy", "RPChannelEventSink"];
 
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 

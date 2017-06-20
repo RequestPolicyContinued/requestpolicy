@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported XULUtils */
-this.EXPORTED_SYMBOLS = ["XULUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["XULUtils"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

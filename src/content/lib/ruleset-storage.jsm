@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported RulesetStorage */
-this.EXPORTED_SYMBOLS = ["RulesetStorage"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RulesetStorage"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

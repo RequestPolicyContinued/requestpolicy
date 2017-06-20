@@ -21,7 +21,8 @@
  */
 
 /* exported RestartDetectionHelper */
-this.EXPORTED_SYMBOLS = ["RestartDetectionHelper"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RestartDetectionHelper"];
 
 var RestartDetectionHelper = {
   mark: null

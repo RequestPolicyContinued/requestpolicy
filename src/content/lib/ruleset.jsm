@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported Ruleset, RawRuleset */
-this.EXPORTED_SYMBOLS = [
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = [
   "Ruleset",
   "RawRuleset"
 ];

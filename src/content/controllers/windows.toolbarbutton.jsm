@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported ToolbarButtonController */
-this.EXPORTED_SYMBOLS = ["ToolbarButtonController"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["ToolbarButtonController"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported GUILocation, GUIOrigin, GUIDestination, GUILocationProperties */
-this.EXPORTED_SYMBOLS = [
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = [
   "GUILocation",
   "GUIOrigin",
   "GUIDestination",

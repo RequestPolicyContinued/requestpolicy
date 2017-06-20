@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported Environment, FrameScriptEnvironment, ProcessEnvironment */
-this.EXPORTED_SYMBOLS = [
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = [
   "Environment",
   "FrameScriptEnvironment",
   "ProcessEnvironment"

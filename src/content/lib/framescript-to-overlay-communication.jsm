@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported FramescriptToOverlayCommunication */
-this.EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["FramescriptToOverlayCommunication"];
 
 let {ScriptLoader: {importModule}} = Cu.import(
     "chrome://rpcontinued/content/lib/script-loader.jsm", {});

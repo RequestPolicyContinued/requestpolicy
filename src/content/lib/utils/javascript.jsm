@@ -21,7 +21,8 @@
  */
 
 /* exported JSUtils */
-this.EXPORTED_SYMBOLS = ["JSUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["JSUtils"];
 
 //==============================================================================
 // JSUtils

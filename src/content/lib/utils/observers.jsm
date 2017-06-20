@@ -24,7 +24,8 @@
 const {utils: Cu} = Components;
 
 /* exported SingleTopicObserver */
-this.EXPORTED_SYMBOLS = ["SingleTopicObserver"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["SingleTopicObserver"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

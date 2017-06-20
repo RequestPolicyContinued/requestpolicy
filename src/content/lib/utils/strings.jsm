@@ -29,7 +29,8 @@
 const {utils: Cu} = Components;
 
 /* exported StringUtils */
-this.EXPORTED_SYMBOLS = ["StringUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["StringUtils"];
 
 var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 var {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});

@@ -25,7 +25,8 @@
 const {interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 /* exported RequestProcessor */
-this.EXPORTED_SYMBOLS = ["RequestProcessor"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RequestProcessor"];
 
 let globalScope = this;
 

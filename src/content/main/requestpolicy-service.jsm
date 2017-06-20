@@ -25,7 +25,8 @@
 const {utils: Cu} = Components;
 
 /* exported rpService */
-this.EXPORTED_SYMBOLS = ["rpService"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["rpService"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});

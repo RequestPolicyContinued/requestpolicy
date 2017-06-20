@@ -25,7 +25,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 
 /* exported WindowUtils */
-this.EXPORTED_SYMBOLS = ["WindowUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["WindowUtils"];
 
 let {PrivateBrowsingUtils} = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {});

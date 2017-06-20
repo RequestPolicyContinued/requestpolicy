@@ -24,7 +24,8 @@
 const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported PrefBranch */
-this.EXPORTED_SYMBOLS = ["PrefBranch"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["PrefBranch"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 

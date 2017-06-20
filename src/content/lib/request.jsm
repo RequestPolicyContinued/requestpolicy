@@ -26,7 +26,8 @@ const {interfaces: Ci, utils: Cu} = Components;
 
 /* exported Request, NormalRequest, RedirectRequest,
        REQUEST_TYPE_NORMAL, REQUEST_TYPE_REDIRECT */
-this.EXPORTED_SYMBOLS = [
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = [
   "Request",
   "NormalRequest",
   "RedirectRequest",

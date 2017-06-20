@@ -22,7 +22,8 @@
  */
 
 /* exported RuleUtils */
-this.EXPORTED_SYMBOLS = ["RuleUtils"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["RuleUtils"];
 
 //==============================================================================
 // RuleUtils

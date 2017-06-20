@@ -1,0 +1,11 @@
+{
+  "preset": "google",
+
+  "validateQuoteMarks": "\"",
+  "requireParenthesesAroundIIFE": true,
+
+  "maximumLineLength": {
+    "value": 100,
+    "allExcept": ["comments", "regex"]
+  }
+}

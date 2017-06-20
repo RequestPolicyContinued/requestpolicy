@@ -3,7 +3,7 @@
     "level": "warn"
   },
   "braces_spacing": {
-    "level": "warn",
+    "level": "ignore",
     "spaces": 0,
     "empty_object_spaces": 0
   },
@@ -46,7 +46,7 @@
   },
   "max_line_length": {
     "value": 80,
-    "level": "error",
+    "level": "ignore",
     "limitComments": true
   },
   "missing_fat_arrows": {

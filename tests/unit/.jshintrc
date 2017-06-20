@@ -1,0 +1,9 @@
+{
+  "extends": "../../tests/.jshintrc",
+
+  "node": true,
+  "globals": {
+    "describe": true,
+    "it": true
+  }
+}

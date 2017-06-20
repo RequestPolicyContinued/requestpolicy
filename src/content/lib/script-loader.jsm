@@ -45,7 +45,11 @@ let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 const RP_CHROME_CONTENT_URI = "chrome://rpcontinued/content/";
 
 function getModuleURI(id) {
-  return RP_CHROME_CONTENT_URI + id + ".jsm";
+  let ext = ".jsm";
+  if (id === "lib/logger") {
+    ext = ".js";
+  }
+  return RP_CHROME_CONTENT_URI + id + ext;
 }
 
 /**

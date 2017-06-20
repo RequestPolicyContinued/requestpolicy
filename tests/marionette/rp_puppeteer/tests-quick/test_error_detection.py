@@ -28,7 +28,7 @@ class ErrorDetectionTests(object):
 
     def test_reference_error(self, n=1):
         self.error_triggerer.trigger_error("ReferenceError")
-        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.jsm, line [0-9]+: ReferenceError: ")
+        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.js, line [0-9]+: ReferenceError: ")
 
     ##########################
     # Private Helper Methods #

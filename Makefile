@@ -1,12 +1,18 @@
 # NOTE: in this file tab indentation is used.
 # Otherwise .RECIPEPREFIX would have to be set.
 
+# http://clarkgrubb.com/makefile-style-guide
+MAKEFLAGS += --warn-undefined-variables
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := all
+.DELETE_ON_ERROR:
+.SUFFIXES:
 
 #===============================================================================
 # general variables and targets
 #===============================================================================
 
-SHELL      := /bin/bash
 ZIP        := zip
 GIT        := /usr/bin/git
 PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
@@ -71,8 +77,6 @@ endef
 .PHONY: all _xpi _files \
 	xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	unit-testing-files
-
-.DEFAULT_GOAL := all
 
 all: xpi
 xpi: nightly-xpi
@@ -177,6 +181,8 @@ build__copy_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__co
 
 # detect deleted files and empty directories
 ifdef BUILD
+build__deleted_files :=
+build__empty_dirs :=
 ifneq "$(wildcard $(current_build_dir))" ""
 	# files that have been deleted but still exist in the build directory.
 	build__deleted_files := $(shell find $(current_build_dir) -type f | \
@@ -321,20 +327,25 @@ xpi_file__we_apply_css := $(dist_dir)/webext-apply-css.xpi
 # intermediate targets
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 other_build__alias       := $(alias__$(OTHER_BUILD))
 other_build__source_path := $(source_path__$(OTHER_BUILD))
 other_build__xpi_file    := $(xpi_file__$(OTHER_BUILD))
+endif
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] collect source files
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 other_build__src__all_files := $(shell find $(other_build__source_path) -type f)
+endif
 
 #-------------------------------------------------------------------------------
 # TARGETS
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 _other_xpi: $(other_build__xpi_file)
 
 # For now use FORCE, i.e. create the XPI every time. If the
@@ -346,6 +357,7 @@ $(other_build__xpi_file): $(other_build__src__all_files) FORCE | $(dist_dir)
 	@cd $(other_build__source_path) && \
 	$(ZIP) $(abspath $(other_build__xpi_file)) $(patsubst $(other_build__source_path)%,%,$(other_build__src__all_files))
 	@echo "Creating \"$(other_build__alias)\" XPI: Done!"
+endif
 
 
 #===============================================================================

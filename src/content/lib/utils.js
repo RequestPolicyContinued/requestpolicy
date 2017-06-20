@@ -43,11 +43,9 @@ export var Utils = (function() {
         callback.apply(thisPtr, params);
       }
     };
-    self.threadManager.currentThread.dispatch(runnable,
+    Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
   };
-  XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
-      "@mozilla.org/thread-manager;1", "nsIThreadManager");
 
   /**
    * Calls a function multiple times until it succeeds. The

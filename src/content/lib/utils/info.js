@@ -23,6 +23,7 @@
 
 import {Prefs} from "models/prefs";
 import {C} from "lib/utils/constants";
+import {JSUtils} from "lib/utils/javascript";
 
 //==============================================================================
 // Info
@@ -50,7 +51,7 @@ export var Info = (function() {
       console.dir(e);
     });
 
-    XPCOMUtils.defineLazyGetter(self, "isRPUpgrade", function() {
+    JSUtils.defineLazyGetter(self, "isRPUpgrade", function() {
       // Compare with version 1.0.0a8 since that version introduced
       // the "welcome window".
       return self.lastRPVersion &&

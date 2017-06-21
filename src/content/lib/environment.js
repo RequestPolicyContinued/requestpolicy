@@ -23,6 +23,7 @@
 import {ManagerForEventListeners} from "lib/manager-for-event-listeners";
 import {ObserverManager} from "lib/observer-manager";
 import {Logger} from "lib/logger";
+import {JSUtils} from "lib/utils/javascript";
 
 //==============================================================================
 // utilities
@@ -169,18 +170,18 @@ export var Environment = (function() {
     // Define a Lazy Getter to get an ObserverManager for this Environment.
     // Using that Getter is more convenient than doing it manually, as the
     // Environment has to be created *before* the ObserverManager.
-    XPCOMUtils.defineLazyGetter(self, "obMan", function() {
+    JSUtils.defineLazyGetter(self, "obMan", function() {
       return new ObserverManager(self);
     });
 
     // Define a Lazy Getter to get an instance of `ManagerForEventListeners` for
     // this Environment.
-    XPCOMUtils.defineLazyGetter(self, "elManager", function() {
+    JSUtils.defineLazyGetter(self, "elManager", function() {
       return new ManagerForEventListeners(self);
     });
 
     // generate an unique ID for debugging purposes
-    XPCOMUtils.defineLazyGetter(self, "uid", function() {
+    JSUtils.defineLazyGetter(self, "uid", function() {
       return Math.random().toString(36).substr(2, 5);
     });
 

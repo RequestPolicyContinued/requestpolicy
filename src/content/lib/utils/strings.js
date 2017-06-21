@@ -21,9 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/**
- * [E10s]: This file runs both in PARENT and CHILD process.
- */
+import {JSUtils} from "lib/utils/javascript";
 
 //==============================================================================
 // StringUtils
@@ -32,7 +30,7 @@
 export var StringUtils = (function() {
   let self = {};
 
-  XPCOMUtils.defineLazyGetter(self, "strbundle", function() {
+  JSUtils.defineLazyGetter(self, "strbundle", function() {
     return loadPropertiesFile(
         "chrome://rpcontinued/locale/requestpolicy.properties");
   });

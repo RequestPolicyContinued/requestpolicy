@@ -5,6 +5,7 @@
 .*
 !.github/
 !.gitignore
+!.gitkeep
 !.babelrc
 !.eslintrc.*
 !.eslintignore

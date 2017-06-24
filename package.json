@@ -30,5 +30,8 @@
     "tslint": "^5.5.0",
     "typescript": "^2.4.2",
     "web-ext-types": "github:myrdd/web-ext-types"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
   }
 }

@@ -589,8 +589,8 @@ marionette: python-venv \
 		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
 	exit_status=$$? ; \
 	rm -rf $$profile_dir ; \
+	exit $$exit_status ; \
 	) ; \
-	exit $$exit_status \
 	)
 
 #-------------------------------------------------------------------------------

@@ -128,7 +128,7 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
                 # Set the timeout to a low value in order to speed up the
                 # test.
-                self.marionette.set_page_load_timeout(100.0) # seconds
+                self.marionette.timeouts("page load", 100) # seconds
                 # The following code can be used when Bug 1316622 lands:
                 #original_page_load_timeout = self.marionette.timeout.page_load
                 #self.marionette.timeout.page_load = 0.1 # miliseconds
@@ -136,7 +136,7 @@ class TestAutoRedirect(RequestPolicyTestCase):
                 self.assertRaises(TimeoutException, self.marionette.navigate,
                                   url)
 
-                self.marionette.set_page_load_timeout(20000)
+                self.marionette.timeouts("page load", 20000)
                 #self.marionette.timeout.page_load = original_page_load_timeout
 
     def _get_url(self):

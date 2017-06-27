@@ -5,6 +5,7 @@
 from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.api.addon import Addon
 from marionette_driver.errors import NoSuchElementException
+import os
 
 
 # v1.0.beta9.3
@@ -26,10 +27,11 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
         self.rp_addon.ignore_errors = True
 
         assert self.OTHER_ADDON is not None
+        install_url = ("file://{}/dist/{}"
+                       .format(os.getcwd(), self.OTHER_ADDON["xpi"]))
         self.other_rp = Addon(lambda: self.marionette,
                               addon_id=self.OTHER_ADDON["id"],
-                              install_url=("http://localhost/dist/" +
-                                           self.OTHER_ADDON["xpi"]))
+                              install_url=install_url)
 
     def tearDown(self):
         try:

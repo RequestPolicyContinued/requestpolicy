@@ -8,6 +8,7 @@ from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
                                               ConsoleErrorDetection)
 from contextlib import contextmanager
 import time
+import os
 
 
 class Addon(BaseLib):
@@ -202,10 +203,12 @@ class RequestPolicy(Addon):
     ignore_errors = False
 
     def __init__(self, marionette_getter):
+        install_url = ("file://{}/dist/requestpolicy-unit-testing.xpi"
+                       .format(os.getcwd()))
+
         Addon.__init__(self, marionette_getter,
                        addon_id="rpcontinued@non-amo.requestpolicy.org",
-                       install_url=("http://localhost/dist/"
-                                    "requestpolicy-unit-testing.xpi"))
+                       install_url=install_url)
 
         self.pref_welcome_win = "extensions.requestpolicy.welcomeWindowShown"
 

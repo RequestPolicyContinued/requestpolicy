@@ -36,8 +36,11 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL
         } from "lib/request-result";
 import {RequestSet} from "lib/request-set";
-import {Environment, MainEnvironment} from "lib/environment";
+import {MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
+import {MapOfSets} from "lib/classes/map-of-sets";
+import APP_COMPAT_RULES from "lib/compatibility-rules.apps";
+import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 import RPContentPolicy from "main/content-policy";
 
@@ -885,29 +888,27 @@ export var RequestProcessor = (function() {
         return accept("Allowed by subscription policy", request);
       }
 
-      let compatibilityRules = self.getCompatibilityRules();
-      for (let rule of compatibilityRules) {
-        let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
-        let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
+      self.forEachCompatibilityRule(rule => {
+        let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
+                          true;
+        let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
         if (allowOrigin && allowDest) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
           return accept(
-              "Extension/application compatibility rule matched [" + rule[2] +
-              "]", request, true);
+              "Extension/application compatibility rule matched [" +
+              rule.info + "]", request, true);
         }
-      }
+      });
 
       if (request.aContext) {
-        let whitelistedBaseURIs = self.getWhitelistedBaseURIs();
-        let baseURI = request.aContext.baseURI;
-        if (whitelistedBaseURIs.has(baseURI)) {
+        let info = self.checkBaseUriWhitelist(request.aContext.baseURI);
+        if (info.isWhitelisted) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
-          let extName = whitelistedBaseURIs.get(baseURI);
           return accept(
-              "Extension/application compatibility rule matched [" + extName +
-              "]", request, true);
+              "Extension/application compatibility rule matched [" +
+              info.addonName + "]", request, true);
         }
       }
 
@@ -1269,14 +1270,13 @@ RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    let compatibilityRules = self.getCompatibilityRules();
-    for (let rule of compatibilityRules) {
-      let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
-      let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
+    self.forEachCompatibilityRule(rule => {
+      let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
+      let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
         return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
       }
-    }
+    });
 
     let result = internal.checkByDefaultPolicy(request);
     return result;
@@ -1558,339 +1558,169 @@ RequestProcessor = (function(self) {
 // RequestProcessor (compatibility part)
 //==============================================================================
 
-RequestProcessor = (function(self) {
-  let conflictingExtensions = [];
-  let compatibilityRules = [];
-  let whitelistedBaseURIs = new Map();
-  let topLevelDocTranslationRules = {};
+/**
+ * Detect other installed extensions and the current application and do
+ * what is needed to allow their requests.
+ */
 
-  // TODO: update compatibility rules etc. when addons are enabled/disabled
-  function onAddonEvent(aExtensionInfo) {
+RequestProcessor = (function(self) {
+  updateExtensionCompatibility();
+  initializeApplicationCompatibility();
+
+  browser.management.onEnabled.addListener(updateExtensionCompatibility);
+  browser.management.onDisabled.addListener(updateExtensionCompatibility);
+
+  //----------------------------------------------------------------------------
+  // Extensions compatibility
+  //----------------------------------------------------------------------------
+
+  let addonIdsToNames = new Map();
+  let extRulesToIds = new MapOfSets();
+  let whitelistedBaseUrisToIds = new MapOfSets();
+  let topLevelDocTranslationRules = new Map();
+
+  function updateExtensionCompatibility() {
+    browser.management.getAll().
+        then(extensionInfos => {
+          ({
+            addonIdsToNames,
+            extRulesToIds,
+            whitelistedBaseUrisToIds,
+            topLevelDocTranslationRules
+          } = extensionInfosToCompatibilityRules(extensionInfos));
+          return;
+        }).
+        catch(e => {
+          console.error("Could not update extension compatibility.");
+          console.dir(e);
+        });
   }
 
-  function init() {
-    // Detect other installed extensions and the current application and do
-    // what is needed to allow their requests.
-    initializeExtensionCompatibility();
+  function maybeForEach(aObj, aPropName, aCallback) {
+    if (aObj.hasOwnProperty(aPropName)) {
+      aObj[aPropName].forEach(aCallback);
+    }
+  }
+
+  function extensionInfosToCompatibilityRules(aExtensionInfos) {
+    let addonIdsToNames = new Map();
+    let extRulesToIds = new MapOfSets();
+    let whitelistedBaseUrisToIds = new MapOfSets();
+    let topLevelDocTranslationRules = new Map();
+
+    const enabledAddons = aExtensionInfos.map(addon => addon.enabled);
+    let idsToExtInfos = new Map();
+    for (let addon of enabledAddons) {
+      idsToExtInfos.set(addon.id, addon);
+      addonIdsToNames.set(addon.id, addon.name);
+    }
+
+    EXT_COMPAT_RULES.forEach(spec => {
+      // jshint -W083
+      const enabledAddonIds = spec.ids.filter(id => idsToExtInfos.has(id));
+      if (enabledAddonIds.length === 0) {
+        return;
+      }
+      maybeForEach(spec, "rules", rule => {
+        for (let id of enabledAddonIds) {
+          extRulesToIds.addToSet(rule, id);
+        }
+      });
+      maybeForEach(spec, "whitelistedBaseURIs", baseUri => {
+        for (let id of enabledAddonIds) {
+          whitelistedBaseUrisToIds.addToSet(baseUri, id);
+        }
+      });
+      maybeForEach(spec, "topLevelDocTranslationRules", rules => {
+        rules.forEach(rule => {
+          let [uriToBeTranslated, translatedUri] = rule;
+          if (topLevelDocTranslationRules.has(uriToBeTranslated)) {
+            console.error("Multiple definitions of traslation rule " +
+                `"${uriToBeTranslated}".`);
+          }
+          topLevelDocTranslationRules.set(uriToBeTranslated, {
+            extensionIds: enabledAddonIds,
+            translatedUri,
+          });
+        });
+      });
+    });
+
+    return {
+      addonIdsToNames,
+      extRulesToIds,
+      whitelistedBaseUrisToIds,
+      topLevelDocTranslationRules
+    };
+  }
+
+  //----------------------------------------------------------------------------
+  // Application compatibility
+  //----------------------------------------------------------------------------
+
+  let appCompatRules = [];
+  let appName;
+
+  function initializeApplicationCompatibility() {
     browser.runtime.getBrowserInfo().
-        then(initializeApplicationCompatibility).
+        then(appInfo => {
+          appName = appInfo.name;
+          appCompatRules = getAppCompatRules(appName);
+          return;
+        }).
         catch(e => {
           console.error("Could not init app compatibility.");
           console.dir(e);
         });
-
-    browser.management.onEnabled.addListener(onAddonEvent);
-    browser.management.onDisabled.addListener(onAddonEvent);
   }
 
-  // stop observers / listeners
-  function cleanup() {
-    browser.management.onEnabled.removeListener(onAddonEvent);
-    browser.management.onDisabled.removeListener(onAddonEvent);
+  function getAppCompatRules(appName) {
+    let rules = [];
+
+    let addRules = rule => {
+      rules.push(rule);
+    };
+    APP_COMPAT_RULES.all.forEach(addRules);
+    if (APP_COMPAT_RULES.hasOwnProperty(appName)) {
+      APP_COMPAT_RULES[appName].forEach(addRules);
+    }
+
+    return rules;
   }
 
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND, cleanup);
+  //----------------------------------------------------------------------------
+  // exported functions
+  //----------------------------------------------------------------------------
 
-  function initializeExtensionCompatibility() {
-    if (compatibilityRules.length !== 0) {
-      return;
-    }
-
-    var idArray = [];
-    idArray.push("greasefire@skrul.com"); // GreaseFire
-    idArray.push("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}"); // Sage-Too
-    idArray.push("{899DF1F8-2F43-4394-8315-37F6744E6319}"); // NewsFox
-    idArray.push("brief@mozdev.org"); // Brief
-    idArray.push("foxmarks@kei.com"); // Xmarks Sync (a.k.a. Foxmarks)
-    // Norton Safe Web Lite Toolbar
-    idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
-    // Norton Toolbar (a.k.a. NIS Toolbar)
-    idArray.push("{0C55C096-0F1D-4F28-AAA2-85EF591126E7}");
-    // Norton Toolbar 2011.7.0.8
-    idArray.push("{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}");
-    idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
-    idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
-    idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
-    idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
-    idArray.push("keefox@chris.tomlinson"); // KeeFox
-    idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
-
-    for (let id of idArray) {
-      Logger.info("Extension check: " + id);
-      browser.management.get(id).
-          then(initializeExtCompatCallback).
-          catch(initializeExtCompatErrorCallback);
-    }
-  }
-
-  function initializeExtCompatErrorCallback(e) {
-    if (!e) {
-      // the extension does not exist
-      return;
-    }
-    console.error("initializeExtCompatCallback error:");
-    console.dir(e);
-  }
-
-  function initializeExtCompatCallback(ext) {
-    if (!ext) {
-      return;
-    }
-
-    if (ext.isActive === false) {
-      Logger.info("Extension is not active: " + ext.name);
-      return;
-    }
-
-    switch (ext.id) {
-      case "greasefire@skrul.com" : // Greasefire
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push(
-            ["file://", "http://userscripts.org/", ext.name]);
-        compatibilityRules.push(
-            ["file://", "http://static.userscripts.org/", ext.name]);
-        break;
-      case "{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}" : // Sage-Too
-      case "{899DF1F8-2F43-4394-8315-37F6744E6319}" : // NewsFox
-      case "brief@mozdev.org" : // Brief
-        Logger.info("Conflicting extension: " + ext.name);
-        compatibilityRules.push(
-            ["resource://brief-content/", null, ext.name]);
-        if (ext.id === "{899DF1F8-2F43-4394-8315-37F6744E6319}") {
-          // NewsFox
-          whitelistedBaseURIs.set("chrome://newsfox/content/newsfox.xul",
-                                  ext.name);
-        }
-        conflictingExtensions.push({
-          "id": ext.id,
-          "name": ext.name,
-          "version": ext.version
-        });
-        break;
-      case "foxmarks@kei.com" : // Xmarks Sync
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "https://login.xmarks.com/",
-          "https://static.xmarks.com/",
-          ext.name
-        ]);
-        break;
-      case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
-      case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
-      case "{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}" : // Norton Toolbar
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([null, "symnst:", ext.name]);
-        compatibilityRules.push([null, "symres:", ext.name]);
-        break;
-      case "{c45c406e-ab73-11d8-be73-000a95be3b12}" : // Web Developer
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "about:blank",
-          "http://jigsaw.w3.org/css-validator/validator",
-          ext.name
-        ]);
-        compatibilityRules.push(
-            ["about:blank", "http://validator.w3.org/check", ext.name]);
-        break;
-      case "{c07d1a49-9894-49ff-a594-38960ede8fb9}" : // Update Scanner
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        var orig = "chrome://updatescan/content/diffPage.xul";
-        var translated = "data:text/html";
-        topLevelDocTranslationRules[orig] = translated;
-        break;
-      case "FirefoxAddon@similarWeb.com" : // SimilarWeb
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "http://api2.similarsites.com/",
-          "http://images2.similargroup.com/",
-          ext.name
-        ]);
-        compatibilityRules.push([
-          "http://www.similarweb.com/",
-          "http://go.similarsites.com/",
-          ext.name
-        ]);
-        break;
-      case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
-        break;
-
-      case "keefox@chris.tomlinson": // KeeFox
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "resource://",
-          "ws://127.0.0.1",
-          ext.name
-        ]);
-        break;
-
-      case "jid1-TPTs1Z1UvUn2fA@jetpack": // Enpass
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/",
-          "ws://localhost",
-          ext.name
-        ]);
-        break;
-
-      default:
-        console.error("Unhandled extension (id typo?): " + ext.name);
-        break;
-    }
-  }
-
-  function initializeApplicationCompatibility(appInfo) {
-    // Mozilla updates (doing this for all applications, not just individual
-    // applications from the Mozilla community that I'm aware of).
-    // At least the http url is needed for Firefox updates, adding the https
-    // one as well to be safe.
-    compatibilityRules.push(
-        ["http://download.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://download.mozilla.org/", null, appInfo.vendor]);
-    // There are redirects from 'addons' to 'releases' when installing addons
-    // from AMO. Adding the origin of 'releases' to be safe in case those
-    // start redirecting elsewhere at some point.
-    compatibilityRules.push(
-        ["http://addons.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://addons.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["http://releases.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://releases.mozilla.org/", null, appInfo.vendor]);
-    // Firefox 4 has the about:addons page open an iframe to the mozilla site.
-    // That opened page grabs content from other mozilla domains.
-    compatibilityRules.push([
-      "about:addons",
-      "https://services.addons.mozilla.org/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:addons",
-      "https://discovery.addons.mozilla.org/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://static.addons.mozilla.net/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://addons.mozilla.org/",
-      appInfo.vendor]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://www.mozilla.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://www.getpersonas.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://static-cdn.addons.mozilla.net/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://addons.cdn.mozilla.net/",
-      appInfo.vendor
-    ]);
-    // Firefox 4 uses an about:home page that is locally stored but can be
-    // the origin for remote requests. See bug #140 for more info.
-    compatibilityRules.push(["about:home", null, appInfo.vendor]);
-    // Firefox Sync uses a google captcha.
-    compatibilityRules.push([
-      "https://auth.services.mozilla.com/",
-      "https://api-secure.recaptcha.net/challenge?",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://api-secure.recaptcha.net/challenge?",
-      "https://www.google.com/recaptcha/api/challenge?",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://auth.services.mozilla.com/",
-      "https://www.google.com/recaptcha/api/",
-      appInfo.vendor
-    ]);
-    // Firefox 13 added links from about:newtab
-    compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
-
-    // Firefox
-    if (appInfo.name === "Firefox") {
-      Logger.info("Application detected: " + appInfo.vendor);
-
-      // Firefox Accounts
-      compatibilityRules.push([
-        "about:accounts",
-        "https://accounts.firefox.com/",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "https://accounts.firefox.com/",
-        "https://api.accounts.firefox.com/",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "https://accounts.firefox.com/",
-        "https://accounts.cdn.mozilla.net/",
-        appInfo.vendor
-      ]);
-    }
-
-    // Firefox Hello
-    // FIXME: Along with #742, convert these rules into the following ones:
-    //   - ALLOW "about:loopconversation" -> "https://hlg.tokbox.com"
-    //   - ALLOW "about:loopconversation" -> "https://anvil.opentok.com"
-    //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
-    compatibilityRules.push([
-      "about:loopconversation",
-      "https://hlg.tokbox.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:loopconversation",
-      "https://anvil.opentok.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:loopconversation",
-      "wss://",
-      appInfo.vendor
-    ]);
-
-    // Seamonkey
-    if (appInfo.name === "SeaMonkey") {
-      Logger.info("Application detected: Seamonkey");
-      compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
-      compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
-    }
-  }
-
-  self.getCompatibilityRules = function() {
-    return compatibilityRules;
+  self.forEachCompatibilityRule = function(aCallback) {
+    extRulesToIds.forEach((rule, addonIds) => {
+      const addonNames = addonIds.
+          map(id => addonIdsToNames.get(id)).
+          join(", ");
+      const [origin, dest] = rule;
+      aCallback.call(null, {origin, dest, info: addonNames});
+    });
+    appCompatRules.forEach(([origin, dest]) => {
+      aCallback.call(null, {origin, dest, info: appName});
+    });
   };
 
-  self.getWhitelistedBaseURIs = function() {
-    return whitelistedBaseURIs;
-  };
-
-  self.getConflictingExtensions = function() {
-    return conflictingExtensions;
+  self.checkBaseUriWhitelist = function(aBaseUri) {
+    if (!whitelistedBaseUrisToIds.has(aBaseUri)) {
+      return {isWhitelisted: false};
+    }
+    let addonId = whitelistedBaseUrisToIds.get(aBaseUri);
+    let addonName = addonIdsToNames.get(addonId);
+    return {isWhitelisted: true, addonName};
   };
 
   self.getTopLevelDocTranslation = function(uri) {
     // We're not sure if the array will be fully populated during init. This
     // is especially a concern given the async addon manager API in Firefox 4.
-    return topLevelDocTranslationRules[uri] || null;
+    if (topLevelDocTranslationRules.has(uri)) {
+      return topLevelDocTranslationRules.get(uri).translatedUri;
+    }
+    return null;
   };
 
   return self;

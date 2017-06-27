@@ -147,11 +147,6 @@ export var rpService = (function() {
       browser.management.onInstalled.addListener(checkAddon);
     });
 
-    MainEnvironment.addShutdownFunction(Environment.LEVELS.UI, function() {
-      browser.management.onEnabled.removeListener(checkAddon);
-      browser.management.onInstalled.removeListener(checkAddon);
-    });
-
     /**
      * Open the tab with the 'multiple installations' notice.
      *

@@ -224,6 +224,24 @@ BUILDS.forEach(build => {
       return stream;
     });
 
+    addBuildTask("manifest-json", [TASK_NAMES.ppContext], () => {
+      let file;
+      switch (extensionType) {
+        case "webextension":
+          file = "manifest.json";
+          break;
+        case "legacy":
+          file = "content/bootstrap/data/manifest.json";
+          break;
+      }
+      file = inAnyRoot([file]);
+      let stream = gulp.src(file, { base: "src" }).
+          pipe(rename(mergeInConditional)).
+          pipe(preprocess({ context: buildData.ppContext })).
+          pipe(gulp.dest(buildDir));
+      return stream;
+    });
+
     // ---
 
     if (extensionType === "legacy") {

@@ -21,6 +21,7 @@
  */
 
 import * as Utils from "./lib/utils/webext-utils";
+import {Manifest} from "./models/manifest";
 import {Prefs} from "./models/prefs";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
@@ -50,6 +51,10 @@ function genNewPromise(promiseExecutor, onErrorMessage) {
   let p = new Promise(promiseExecutor);
   promiseCatch(p, onErrorMessage);
   return p;
+}
+
+function manifestHasPermission(perm) {
+  return Manifest.permissions.includes(perm);
 }
 
 //==============================================================================
@@ -115,6 +120,10 @@ export var ContentScriptsApi = {
 //==============================================================================
 
 (function() {
+  if (!manifestHasPermission("management")) {
+    return;
+  }
+
   //----------------------------------------------------------------------------
   // utils
   //----------------------------------------------------------------------------
@@ -266,6 +275,10 @@ export var ContentScriptsApi = {
 //==============================================================================
 
 (function() {
+  if (!manifestHasPermission("storage")) {
+    return;
+  }
+
   /*let onStorageChangedListener =*/ Utils.
       createWebextOnEventApi(Api.browser.storage, ["onChanged"]);
 

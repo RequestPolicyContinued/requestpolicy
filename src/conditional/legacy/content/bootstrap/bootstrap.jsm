@@ -170,10 +170,11 @@ var FakeWebExt = (function() {
     commonjsEnv.unload();
     commonjsEnv = undefined;
   });
-  const exports = commonjsEnv.load("web-extension-fake-api/api", [
+  const exports = commonjsEnv.load("web-extension-fake-api/main", [
     ["Bootstrap", Bootstrap],
   ]);
 
   FakeWebExt.Api = exports.Api;
   FakeWebExt.ContentScriptsApi = exports.ContentScriptsApi;
+  FakeWebExt.Manifest = exports.Manifest;
 }());

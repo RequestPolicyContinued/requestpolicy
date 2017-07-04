@@ -71,10 +71,10 @@ function startup(data, reason) {
       getGlobals());
   Services.prefs.savePrefFile(null);
 
-  const {Api, createCommonjsEnv} = FakeWebExt;
+  const {Api, createCommonjsEnv, Manifest} = FakeWebExt;
   FakeWebExt.startup();
   commonjsEnv = createCommonjsEnv();
-  commonjsEnv.load("main", [
+  commonjsEnv.load(Manifest.background.scripts[0], [
     ["browser", Api.browser],
     ["LegacyApi", Api.LegacyApi],
     ["_setBackgroundPage", Api._setBackgroundPage],

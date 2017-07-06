@@ -971,62 +971,6 @@ window.rpcontinued.overlay = (function() {
   };
 
   /**
-   * Allows requests from the specified origin to any destination for the
-   * duration of the browser session.
-   */
-  self.temporarilyAllowOrigin = function(originHost) {
-    PolicyManager.temporarilyAllowOrigin(originHost);
-  };
-
-  /**
-   * Allows a destination to be requested from any origin for the duration of
-   * the browser session.
-   *
-   * @param {string} destHost
-   */
-  self.temporarilyAllowDestination = function(destHost) {
-    PolicyManager.temporarilyAllowDestination(destHost);
-  };
-
-  /**
-   * Allows a destination to be requested from a single origin for the duration
-   * of the browser session.
-   *
-   * @param {string} originHost
-   * @param {string} destHost
-   */
-  self.temporarilyAllowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
-  };
-
-  /**
-   * Allows requests from an origin, including in future browser sessions.
-   */
-  self.allowOrigin = function(originHost) {
-    PolicyManager.allowOrigin(originHost);
-  };
-
-  /**
-   * Allows requests to a destination, including in future browser sessions.
-   *
-   * @param {String} destHost
-   */
-  self.allowDestination = function(destHost) {
-    PolicyManager.allowDestination(destHost);
-  };
-
-  /**
-   * Allows requests to a destination from a single origin, including in future
-   * browser sessions.
-   *
-   * @param {String} originHost
-   * @param {String} destHost
-   */
-  self.allowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.allowOriginToDestination(originHost, destHost);
-  };
-
-  /**
    * Revokes all temporary permissions granted during the current session.
    *
    * @param {Event} event

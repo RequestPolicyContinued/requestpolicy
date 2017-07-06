@@ -32,11 +32,10 @@ window.rpcontinued.classicmenu = (function() {
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   let {Logger} = importModule("lib/logger");
+  let {PolicyManager} = importModule("lib/policy-manager");
   let {Prefs} = importModule("models/prefs");
   let {StringUtils} = importModule("lib/utils/strings");
   let {DOMUtils} = importModule("lib/utils/dom");
-
-  let rpcontinued = window.rpcontinued;
 
   //============================================================================
 
@@ -153,7 +152,7 @@ window.rpcontinued.classicmenu = (function() {
     }
     originAndOrDestArray = Object.freeze(originAndOrDestArray);
 
-    let allowFn = rpcontinued.overlay[allowFnName];
+    let allowFn = PolicyManager[allowFnName];
     let callbackFn = allowFn.bind(null, ...originAndOrDestArray);
     const label = StringUtils.$str(labelName, originAndOrDestArray);
 

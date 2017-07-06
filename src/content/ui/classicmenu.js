@@ -125,9 +125,7 @@ window.rpcontinued.classicmenu = (function() {
     var callback = function() {
       rpcontinued.overlay.allowOriginToDestination(originHost, destHost);
     };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedAllowOriginToDest");
-    return item;
+    return self.addMenuItem(menu, label, callback);
   };
 
   self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {

@@ -971,19 +971,6 @@ window.rpcontinued.overlay = (function() {
   };
 
   /**
-   * Allows the current document's origin to request from any destination for
-   * the duration of the browser session.
-   *
-   * @param {Event} event
-   */
-  self.temporarilyAllowCurrentOrigin = function(event) {
-    // Note: the available variable "content" is different than the avaialable
-    // "window.target".
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.temporarilyAllowOrigin(host);
-  };
-
-  /**
    * Allows a destination to be requested from any origin for the duration of
    * the browser session.
    *
@@ -1009,17 +996,6 @@ window.rpcontinued.overlay = (function() {
    */
   self.allowOrigin = function(originHost) {
     PolicyManager.allowOrigin(originHost);
-  };
-
-  /**
-   * Allows the current document's origin to request from any destination,
-   * including in future browser sessions.
-   *
-   * @param {Event} event
-   */
-  self.allowCurrentOrigin = function(event) {
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.allowOrigin(host);
   };
 
   /**
@@ -1051,10 +1027,6 @@ window.rpcontinued.overlay = (function() {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
-  };
-
-  self._openInNewTab = function(uri) {
-    gBrowser.selectedTab = gBrowser.addTab(uri);
   };
 
   /**

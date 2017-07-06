@@ -65,9 +65,6 @@ PolicyManager = (function(self) {
   self.allowOrigin = function(aOrigin) {
     allowOrigin(aOrigin, false);
   };
-  self.allowOriginDelayStore = function(aOrigin) {
-    allowOrigin(aOrigin, true);
-  };
 
   self.temporarilyAllowOrigin = function(aOrigin) {
     PolicyManager.addTemporaryAllowRule(getRuleData(aOrigin));
@@ -82,19 +79,12 @@ PolicyManager = (function(self) {
   self.allowDestination = function(aDest) {
     allowDestination(aDest, false);
   };
-  self.allowDestinationDelayStore = function(aDest) {
-    allowDestination(aDest, true);
-  };
 
   function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
     self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
   }
   self.allowOriginToDestination = function(originIdentifier, destIdentifier) {
     allowOriginToDestination(originIdentifier, destIdentifier, false);
-  };
-  self.allowOriginToDestinationDelayStore = function(originIdentifier,
-                                                     destIdentifier) {
-    allowOriginToDestination(originIdentifier, destIdentifier, true);
   };
 
   self.temporarilyAllowOriginToDestination = function(originIdentifier,

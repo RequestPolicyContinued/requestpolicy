@@ -424,8 +424,8 @@ window.rpcontinued.overlay = (function() {
 
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
-    var cm = rpcontinued.classicmenu;
-    cm.emptyMenu(addRulePopup);
+    const {classicmenu} = rpcontinued;
+    classicmenu.emptyMenu(addRulePopup);
 
     let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
@@ -442,30 +442,38 @@ window.rpcontinued.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
+    function addMenuItem(aRuleSpec) {
+      aRuleSpec.allow = true;
+      classicmenu.addMenuItem(addRulePopup, aRuleSpec);
+    }
+    function addMenuSeparator() {
+      classicmenu.addMenuSeparator(addRulePopup);
+    }
+
     if (destBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
+      addMenuItem({dest});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowDest(addRulePopup, dest);
+        addMenuItem({dest});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
     }
 
     if (originBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
+      addMenuItem({origin, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOrigin(addRulePopup, origin);
+        addMenuItem({origin});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
 
-      cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
+      addMenuItem({origin, dest, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+        addMenuItem({origin, dest});
       }
     }
 

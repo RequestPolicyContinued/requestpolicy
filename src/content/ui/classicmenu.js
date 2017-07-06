@@ -74,7 +74,7 @@ window.rpcontinued.classicmenu = (function() {
     return separator;
   };
 
-  self.addMenuItem = function(menu, label, aCallback) {
+  self._addMenuItem = function(menu, label, aCallback) {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     var listener = function() {
@@ -88,62 +88,80 @@ window.rpcontinued.classicmenu = (function() {
     return menuItem;
   };
 
-  self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowOrigin(originHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
+  function getInfoFromRuleSpec(aRuleSpec) {
+    const isTemp = "temp" in aRuleSpec && aRuleSpec.temp;
+    const isAllow = "allow" in aRuleSpec && aRuleSpec.allow;
+    const hasOrigin = "origin" in aRuleSpec && aRuleSpec.origin;
+    const hasDest = "dest" in aRuleSpec && aRuleSpec.dest;
+    const type = "" +
+        (isTemp ? "t" : "") +
+        (isAllow ? "a" : "d") +
+        (hasOrigin ? "o" : "") +
+        (hasDest ? "d" : "");
+    return Object.freeze({isTemp, isAllow, hasOrigin, hasDest, type});
+  }
+
+  self.addMenuItem = function(aMenu, aRuleSpec) {
+    const {isTemp, isAllow, hasOrigin, hasDest, type} =
+        getInfoFromRuleSpec(aRuleSpec);
+
+    if (!isAllow) {
+      Logger.error("invalid addMenuItem rule-spec");
+      Logger.vardump(aRuleSpec);
+      return;
+    }
+
+    let allowFnName;
+    let labelName;
+    switch (type) {
+      case "tao":
+        allowFnName = "temporarilyAllowOrigin";
+        labelName = "allowOriginTemporarily";
+        break;
+      case "ao":
+        allowFnName = "allowOrigin";
+        labelName = "allowOrigin";
+        break;
+      case "taod":
+        allowFnName = "temporarilyAllowOriginToDestination";
+        labelName = "allowOriginToDestinationTemporarily";
+        break;
+      case "aod":
+        allowFnName = "allowOriginToDestination";
+        labelName = "allowOriginToDestination";
+        break;
+      case "tad":
+        allowFnName = "temporarilyAllowDestination";
+        labelName = "allowDestinationTemporarily";
+        break;
+      case "ad":
+        allowFnName = "allowDestination";
+        labelName = "allowDestination";
+        break;
+      default:
+        Logger.error("invalid addMenuItem rule-spec");
+        Logger.vardump(aRuleSpec);
+        return;
+    }
+
+    let originAndOrDestArray = []; // contains origin and/or dest
+    if (hasOrigin) {
+      originAndOrDestArray.push(aRuleSpec.origin);
+    }
+    if (hasDest) {
+      originAndOrDestArray.push(aRuleSpec.dest);
+    }
+    originAndOrDestArray = Object.freeze(originAndOrDestArray);
+
+    let allowFn = rpcontinued.overlay[allowFnName];
+    let callbackFn = allowFn.bind(null, ...originAndOrDestArray);
+    const label = StringUtils.$str(labelName, originAndOrDestArray);
+
+    const item = self._addMenuItem(aMenu, label, callbackFn);
+    if (isTemp) {
+      item.setAttribute("class", "rpcontinuedTemporary");
+    }
     return item;
-  };
-
-  self.addMenuItemAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOrigin", [originHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowOrigin(originHost);
-    };
-    return self.addMenuItem(menu, label, callback);
-  };
-
-  self.addMenuItemTemporarilyAllowOriginToDest = function(menu, originHost,
-                                                     destHost) {
-    var label = StringUtils.$str("allowOriginToDestinationTemporarily",
-                                 [originHost, destHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowOriginToDestination(originHost,
-                                                              destHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
-    return item;
-  };
-
-  self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
-    var label = StringUtils.$str("allowOriginToDestination",
-                                 [originHost, destHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowOriginToDestination(originHost, destHost);
-    };
-    return self.addMenuItem(menu, label, callback);
-  };
-
-  self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowDestination(destHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
-    return item;
-  };
-
-  self.addMenuItemAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestination", [destHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowDestination(destHost);
-    };
-    return self.addMenuItem(menu, label, callback);
   };
 
   return self;

@@ -32,23 +32,11 @@ window.rpcontinued.classicmenu = (function() {
   let {ScriptLoader: {importModule}} = Cu.import(
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   let {Logger} = importModule("lib/logger");
-  let {Prefs} = importModule("models/prefs");
+  let {PolicyManager} = importModule("lib/policy-manager");
   let {StringUtils} = importModule("lib/utils/strings");
   let {DOMUtils} = importModule("lib/utils/dom");
 
-  let rpcontinued = window.rpcontinued;
-
   //============================================================================
-
-  /**
-  * Reloads the current document if the user's preferences indicate it should
-  * be reloaded.
-  */
-  function conditionallyReloadDocument() {
-    if (Prefs.get("autoReload")) {
-      window.content.document.location.reload(false);
-    }
-  }
 
   /**
    * Removes all menu items and removes all event listeners.
@@ -74,78 +62,85 @@ window.rpcontinued.classicmenu = (function() {
     return separator;
   };
 
-  self.addMenuItem = function(menu, label, aCallback) {
+  self._addMenuItem = function(menu, label, aCallback) {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
-    var listener = function() {
-      aCallback();
-      conditionallyReloadDocument();
-    };
-    menuItem.addEventListener("command", listener, false);
-    menuItem.rpListener = listener;
+    menuItem.addEventListener("command", aCallback, false);
+    menuItem.rpListener = aCallback;
     // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
     menu.insertBefore(menuItem, menu.firstChild);
     return menuItem;
   };
 
-  self.addMenuItemTemporarilyAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOriginTemporarily", [originHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowOrigin(originHost);
+  function getInfoFromRuleSpec(aRuleSpec) {
+    const isTemp = "temp" in aRuleSpec && aRuleSpec.temp;
+    const isAllow = "allow" in aRuleSpec && aRuleSpec.allow;
+    const hasOrigin = "origin" in aRuleSpec && aRuleSpec.origin;
+    const hasDest = "dest" in aRuleSpec && aRuleSpec.dest;
+    const type = "" +
+        (isTemp ? "t" : "") +
+        (isAllow ? "a" : "d") +
+        (hasOrigin ? "o" : "") +
+        (hasDest ? "d" : "");
+    return Object.freeze({isTemp, isAllow, hasOrigin, hasDest, type});
+  }
+
+  self.addMenuItem = function(aMenu, aRuleSpec, aAllowRedirectFn) {
+    const {isTemp, isAllow, hasOrigin, hasDest, type} =
+        getInfoFromRuleSpec(aRuleSpec);
+
+    if (!isAllow) {
+      Logger.error("invalid addMenuItem rule-spec");
+      Logger.vardump(aRuleSpec);
+      return;
+    }
+
+    let labelName;
+    switch (type) {
+      case "tao":
+        labelName = "allowOriginTemporarily";
+        break;
+      case "ao":
+        labelName = "allowOrigin";
+        break;
+      case "taod":
+        labelName = "allowOriginToDestinationTemporarily";
+        break;
+      case "aod":
+        labelName = "allowOriginToDestination";
+        break;
+      case "tad":
+        labelName = "allowDestinationTemporarily";
+        break;
+      case "ad":
+        labelName = "allowDestination";
+        break;
+      default:
+        Logger.error("invalid addMenuItem rule-spec");
+        Logger.vardump(aRuleSpec);
+        return;
+    }
+
+    let originAndOrDestArray = []; // contains origin and/or dest
+    if (hasOrigin) {
+      originAndOrDestArray.push(aRuleSpec.origin);
+    }
+    if (hasDest) {
+      originAndOrDestArray.push(aRuleSpec.dest);
+    }
+    originAndOrDestArray = Object.freeze(originAndOrDestArray);
+
+    const callbackFn = function() {
+      PolicyManager.addRuleBySpec(aRuleSpec);
+      aAllowRedirectFn();
     };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
+    const label = StringUtils.$str(labelName, originAndOrDestArray);
+
+    const item = self._addMenuItem(aMenu, label, callbackFn);
+    if (isTemp) {
+      item.setAttribute("class", "rpcontinuedTemporary");
+    }
     return item;
-  };
-
-  self.addMenuItemAllowOrigin = function(menu, originHost) {
-    var label = StringUtils.$str("allowOrigin", [originHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowOrigin(originHost);
-    };
-    return self.addMenuItem(menu, label, callback);
-  };
-
-  self.addMenuItemTemporarilyAllowOriginToDest = function(menu, originHost,
-                                                     destHost) {
-    var label = StringUtils.$str("allowOriginToDestinationTemporarily",
-                                 [originHost, destHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowOriginToDestination(originHost,
-                                                              destHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
-    return item;
-  };
-
-  self.addMenuItemAllowOriginToDest = function(menu, originHost, destHost) {
-    var label = StringUtils.$str("allowOriginToDestination",
-                                 [originHost, destHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowOriginToDestination(originHost, destHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedAllowOriginToDest");
-    return item;
-  };
-
-  self.addMenuItemTemporarilyAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestinationTemporarily", [destHost]);
-    var callback = function() {
-      rpcontinued.overlay.temporarilyAllowDestination(destHost);
-    };
-    var item = self.addMenuItem(menu, label, callback);
-    item.setAttribute("class", "rpcontinuedTemporary");
-    return item;
-  };
-
-  self.addMenuItemAllowDest = function(menu, destHost) {
-    var label = StringUtils.$str("allowDestination", [destHost]);
-    var callback = function() {
-      rpcontinued.overlay.allowDestination(destHost);
-    };
-    return self.addMenuItem(menu, label, callback);
   };
 
   return self;

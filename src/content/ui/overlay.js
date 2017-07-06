@@ -424,8 +424,8 @@ window.rpcontinued.overlay = (function() {
 
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
-    var cm = rpcontinued.classicmenu;
-    cm.emptyMenu(addRulePopup);
+    const {classicmenu} = rpcontinued;
+    classicmenu.emptyMenu(addRulePopup);
 
     let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
@@ -442,30 +442,60 @@ window.rpcontinued.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
+    const allowRedirection = function() {
+      // Fx 3.7a5+ calls shouldLoad for location.href changes.
+
+      // TODO: currently the allow button ignores any additional
+      //       HTTP response headers [1]. Maybe there is a way to take
+      //       those headers into account (e.g. `Set-Cookie`?), or maybe
+      //       this is not necessary at all.
+      // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
+
+      RequestProcessor.registerAllowedRedirect(redirectOriginUri,
+                                               redirectTargetUri);
+
+      let data = {
+        uri: redirectTargetUri
+      };
+      if (replaceIfPossible) {
+        data.replaceUri = redirectOriginUri;
+      }
+      browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
+          data);
+    };
+
+    function addMenuItem(aRuleSpec) {
+      aRuleSpec.allow = true;
+      classicmenu.addMenuItem(addRulePopup, aRuleSpec);
+    }
+    function addMenuSeparator() {
+      classicmenu.addMenuSeparator(addRulePopup);
+    }
+
     if (destBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
+      addMenuItem({dest});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowDest(addRulePopup, dest);
+        addMenuItem({dest});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
     }
 
     if (originBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
+      addMenuItem({origin, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOrigin(addRulePopup, origin);
+        addMenuItem({origin});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
 
-      cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
+      addMenuItem({origin, dest, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+        addMenuItem({origin, dest});
       }
     }
 
@@ -479,27 +509,7 @@ window.rpcontinued.overlay = (function() {
           label: StringUtils.$str("allow"),
           accessKey: StringUtils.$str("allow.accesskey"),
           popup: null,
-          callback: function() {
-            // Fx 3.7a5+ calls shouldLoad for location.href changes.
-
-            // TODO: currently the allow button ignores any additional
-            //       HTTP response headers [1]. Maybe there is a way to take
-            //       those headers into account (e.g. `Set-Cookie`?), or maybe
-            //       this is not necessary at all.
-            // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
-
-            RequestProcessor.registerAllowedRedirect(redirectOriginUri,
-                                                     redirectTargetUri);
-
-            let data = {
-              uri: redirectTargetUri
-            };
-            if (replaceIfPossible) {
-              data.replaceUri = redirectOriginUri;
-            }
-            browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
-                data);
-          }
+          callback: allowRedirection
         },
         {
           label: StringUtils.$str("deny"),
@@ -963,86 +973,6 @@ window.rpcontinued.overlay = (function() {
   };
 
   /**
-   * Allows requests from the specified origin to any destination for the
-   * duration of the browser session.
-   */
-  self.temporarilyAllowOrigin = function(originHost) {
-    PolicyManager.temporarilyAllowOrigin(originHost);
-  };
-
-  /**
-   * Allows the current document's origin to request from any destination for
-   * the duration of the browser session.
-   *
-   * @param {Event} event
-   */
-  self.temporarilyAllowCurrentOrigin = function(event) {
-    // Note: the available variable "content" is different than the avaialable
-    // "window.target".
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.temporarilyAllowOrigin(host);
-  };
-
-  /**
-   * Allows a destination to be requested from any origin for the duration of
-   * the browser session.
-   *
-   * @param {string} destHost
-   */
-  self.temporarilyAllowDestination = function(destHost) {
-    PolicyManager.temporarilyAllowDestination(destHost);
-  };
-
-  /**
-   * Allows a destination to be requested from a single origin for the duration
-   * of the browser session.
-   *
-   * @param {string} originHost
-   * @param {string} destHost
-   */
-  self.temporarilyAllowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
-  };
-
-  /**
-   * Allows requests from an origin, including in future browser sessions.
-   */
-  self.allowOrigin = function(originHost) {
-    PolicyManager.allowOrigin(originHost);
-  };
-
-  /**
-   * Allows the current document's origin to request from any destination,
-   * including in future browser sessions.
-   *
-   * @param {Event} event
-   */
-  self.allowCurrentOrigin = function(event) {
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.allowOrigin(host);
-  };
-
-  /**
-   * Allows requests to a destination, including in future browser sessions.
-   *
-   * @param {String} destHost
-   */
-  self.allowDestination = function(destHost) {
-    PolicyManager.allowDestination(destHost);
-  };
-
-  /**
-   * Allows requests to a destination from a single origin, including in future
-   * browser sessions.
-   *
-   * @param {String} originHost
-   * @param {String} destHost
-   */
-  self.allowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.allowOriginToDestination(originHost, destHost);
-  };
-
-  /**
    * Revokes all temporary permissions granted during the current session.
    *
    * @param {Event} event
@@ -1051,10 +981,6 @@ window.rpcontinued.overlay = (function() {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
-  };
-
-  self._openInNewTab = function(uri) {
-    gBrowser.selectedTab = gBrowser.addTab(uri);
   };
 
   /**

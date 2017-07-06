@@ -1,11 +1,21 @@
 Read first: https://requestpolicycontinued.github.io/Contributing
 
+__Browser and Add-ons:__
+
+- Browser: e.g. Firefox 52.2.0
+- RequestPolicy version: e.g. 1.0.beta12.4
+- Other add-ons: …
+
+RequestPolicy settings:
+- Default policy: "allow" / "deny"
+
 __Steps to reproduce:__
 
-1. Create a new Firefox profile
-2. Set RP's default policy to: "allow" / "deny"
-3. …
-4. … Be as detailed as possible.
+1. Create a new browser profile
+2. install above add-ons
+3. configure the add-ons as described above
+4. …
+5. … Be as detailed as possible.
 
 __What happens?__
 

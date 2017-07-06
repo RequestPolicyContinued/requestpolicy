@@ -442,6 +442,28 @@ window.rpcontinued.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
+    const allowRedirection = function() {
+      // Fx 3.7a5+ calls shouldLoad for location.href changes.
+
+      // TODO: currently the allow button ignores any additional
+      //       HTTP response headers [1]. Maybe there is a way to take
+      //       those headers into account (e.g. `Set-Cookie`?), or maybe
+      //       this is not necessary at all.
+      // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
+
+      RequestProcessor.registerAllowedRedirect(redirectOriginUri,
+                                               redirectTargetUri);
+
+      let data = {
+        uri: redirectTargetUri
+      };
+      if (replaceIfPossible) {
+        data.replaceUri = redirectOriginUri;
+      }
+      browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
+          data);
+    };
+
     function addMenuItem(aRuleSpec) {
       aRuleSpec.allow = true;
       classicmenu.addMenuItem(addRulePopup, aRuleSpec);
@@ -487,27 +509,7 @@ window.rpcontinued.overlay = (function() {
           label: StringUtils.$str("allow"),
           accessKey: StringUtils.$str("allow.accesskey"),
           popup: null,
-          callback: function() {
-            // Fx 3.7a5+ calls shouldLoad for location.href changes.
-
-            // TODO: currently the allow button ignores any additional
-            //       HTTP response headers [1]. Maybe there is a way to take
-            //       those headers into account (e.g. `Set-Cookie`?), or maybe
-            //       this is not necessary at all.
-            // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
-
-            RequestProcessor.registerAllowedRedirect(redirectOriginUri,
-                                                     redirectTargetUri);
-
-            let data = {
-              uri: redirectTargetUri
-            };
-            if (replaceIfPossible) {
-              data.replaceUri = redirectOriginUri;
-            }
-            browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
-                data);
-          }
+          callback: allowRedirection
         },
         {
           label: StringUtils.$str("deny"),

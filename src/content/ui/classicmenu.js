@@ -33,21 +33,10 @@ window.rpcontinued.classicmenu = (function() {
       "chrome://rpcontinued/content/lib/script-loader.jsm", {});
   let {Logger} = importModule("lib/logger");
   let {PolicyManager} = importModule("lib/policy-manager");
-  let {Prefs} = importModule("models/prefs");
   let {StringUtils} = importModule("lib/utils/strings");
   let {DOMUtils} = importModule("lib/utils/dom");
 
   //============================================================================
-
-  /**
-  * Reloads the current document if the user's preferences indicate it should
-  * be reloaded.
-  */
-  function conditionallyReloadDocument() {
-    if (Prefs.get("autoReload")) {
-      window.content.document.location.reload(false);
-    }
-  }
 
   /**
    * Removes all menu items and removes all event listeners.
@@ -76,12 +65,8 @@ window.rpcontinued.classicmenu = (function() {
   self._addMenuItem = function(menu, label, aCallback) {
     var menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
-    var listener = function() {
-      aCallback();
-      conditionallyReloadDocument();
-    };
-    menuItem.addEventListener("command", listener, false);
-    menuItem.rpListener = listener;
+    menuItem.addEventListener("command", aCallback, false);
+    menuItem.rpListener = aCallback;
     // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
     menu.insertBefore(menuItem, menu.firstChild);
     return menuItem;
@@ -100,7 +85,7 @@ window.rpcontinued.classicmenu = (function() {
     return Object.freeze({isTemp, isAllow, hasOrigin, hasDest, type});
   }
 
-  self.addMenuItem = function(aMenu, aRuleSpec) {
+  self.addMenuItem = function(aMenu, aRuleSpec, aAllowRedirectFn) {
     const {isTemp, isAllow, hasOrigin, hasDest, type} =
         getInfoFromRuleSpec(aRuleSpec);
 
@@ -147,6 +132,7 @@ window.rpcontinued.classicmenu = (function() {
 
     const callbackFn = function() {
       PolicyManager.addRuleBySpec(aRuleSpec);
+      aAllowRedirectFn();
     };
     const label = StringUtils.$str(labelName, originAndOrDestArray);
 

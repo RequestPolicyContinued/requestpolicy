@@ -59,38 +59,12 @@ PolicyManager = (function(self) {
     return ruleData;
   }
 
-  function allowOrigin(aOrigin, noStore) {
-    self.addAllowRule(getRuleData(aOrigin), noStore);
-  }
-  self.allowOrigin = function(aOrigin) {
-    allowOrigin(aOrigin, false);
-  };
+  self.addRuleBySpec = function(aSpec, noStore) {
+    const fn = aSpec.temp ? self.addTemporaryRule : self.addRule;
+    const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
+    const ruleData = getRuleData(aSpec.origin, aSpec.dest);
 
-  self.temporarilyAllowOrigin = function(aOrigin) {
-    PolicyManager.addTemporaryAllowRule(getRuleData(aOrigin));
-  };
-  self.temporarilyAllowDestination = function(aDest) {
-    self.addTemporaryAllowRule(getRuleData(undefined, aDest));
-  };
-
-  function allowDestination(aDest, noStore) {
-    self.addAllowRule(getRuleData(undefined, aDest), noStore);
-  }
-  self.allowDestination = function(aDest) {
-    allowDestination(aDest, false);
-  };
-
-  function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
-    self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
-  }
-  self.allowOriginToDestination = function(originIdentifier, destIdentifier) {
-    allowOriginToDestination(originIdentifier, destIdentifier, false);
-  };
-
-  self.temporarilyAllowOriginToDestination = function(originIdentifier,
-                                                      destIdentifier) {
-    PolicyManager.addTemporaryAllowRule(getRuleData(originIdentifier,
-                                                    destIdentifier));
+    fn(ruleAction, ruleData, noStore);
   };
 
   return self;

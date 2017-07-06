@@ -110,31 +110,24 @@ window.rpcontinued.classicmenu = (function() {
       return;
     }
 
-    let allowFnName;
     let labelName;
     switch (type) {
       case "tao":
-        allowFnName = "temporarilyAllowOrigin";
         labelName = "allowOriginTemporarily";
         break;
       case "ao":
-        allowFnName = "allowOrigin";
         labelName = "allowOrigin";
         break;
       case "taod":
-        allowFnName = "temporarilyAllowOriginToDestination";
         labelName = "allowOriginToDestinationTemporarily";
         break;
       case "aod":
-        allowFnName = "allowOriginToDestination";
         labelName = "allowOriginToDestination";
         break;
       case "tad":
-        allowFnName = "temporarilyAllowDestination";
         labelName = "allowDestinationTemporarily";
         break;
       case "ad":
-        allowFnName = "allowDestination";
         labelName = "allowDestination";
         break;
       default:
@@ -152,8 +145,9 @@ window.rpcontinued.classicmenu = (function() {
     }
     originAndOrDestArray = Object.freeze(originAndOrDestArray);
 
-    let allowFn = PolicyManager[allowFnName];
-    let callbackFn = allowFn.bind(null, ...originAndOrDestArray);
+    const callbackFn = function() {
+      PolicyManager.addRuleBySpec(aRuleSpec);
+    };
     const label = StringUtils.$str(labelName, originAndOrDestArray);
 
     const item = self._addMenuItem(aMenu, label, callbackFn);

@@ -246,6 +246,11 @@ RequestProcessor = (function(self) {
       appInfo.vendor
     ]);
     compatibilityRules.push([
+      "about:addons",
+      "https://discovery.addons.mozilla.org/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
       "https://services.addons.mozilla.org/",
       "https://static.addons.mozilla.net/",
       appInfo.vendor

@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy Continued</em:name>
-    <em:version>0.5.30</em:version>
+    <em:version>0.5.31</em:version>
     <em:type>2</em:type>
     <em:description>Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.</em:description>
     <em:id>rpcontinued@requestpolicy.org</em:id>
@@ -45,7 +45,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>16.0</em:minVersion>
-        <em:maxVersion>43.0</em:maxVersion>
+        <em:maxVersion>52.0a1</em:maxVersion>
       </Description>
     </em:targetApplication>
 

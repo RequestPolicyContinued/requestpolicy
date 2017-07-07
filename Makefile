@@ -217,9 +217,7 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 		fi ; \
 		if [[ "$(current_build__unique_version)" == "yes" ]]; then \
 	  		echo 'install.rdf: making the version unique !' ; \
-				rev_count=`$(GIT) rev-list HEAD | wc --lines` ; \
-				commit_sha=`$(GIT) rev-parse --short HEAD` ; \
-				unique_suffix=.$${rev_count}.r$${commit_sha}.pre ; \
+				unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
 	  		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
 		fi ; \
 	fi

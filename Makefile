@@ -372,7 +372,19 @@ force_every = $(shell \
 # python
 #-------------------------------------------------------------------------------
 
+# $1: command(s) to be wrapped
 IN_PYTHON_ENV = source $(python_env_dir)/bin/activate && ($1)
+
+# $1: variable name which will contain the profile dir
+# $2: parameters to mozprofile
+# $3: command(s) to be wrapped
+WITH_MOZPROFILE = \
+	$1=`mozprofile $2` && ( \
+		($3); \
+		exit_status=$$? ; \
+		rm -rf $$$1 ; \
+		exit $$exit_status ; \
+	) ;
 
 # timestamp/target files
 # NOTE: The timestamp files must reside inside the venv dir,
@@ -519,17 +531,20 @@ mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 # arguments for mozrunner
 run_additional_xpis :=
-run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+run_additional_prefs := default
+_run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
-run_args := $(addprefix -a ,$(run_xpis))
-run_args += -b $(app_binary)
-run_args += --preferences=$(mozrunner_prefs_ini):dev
-run_args += $(run_additional_args)
+_run_mozrunner_args := \
+	$(addprefix --addon=,$(_run_xpis)) \
+	--binary=$(app_binary) \
+	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_run_prefs)) \
+	$(run_additional_args)
 
 .PHONY: run
 run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 	$(call IN_PYTHON_ENV, \
-		mozrunner $(run_args) \
+		mozrunner $(_run_mozrunner_args) \
 	)
 
 #-------------------------------------------------------------------------------
@@ -556,10 +571,22 @@ marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.lo
 #marionette_logging += --log-unittest=$(logs_dir)/$(logfile_prefix)marionette.unittest.log
 
 # localhost:28xxx
-marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
-marionette_address := localhost:$(marionette_port)
+_marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
+_marionette_address := localhost:$(_marionette_port)
 
-marionette_prefs :=
+_marionette_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper)
+_marionette_prefs := common marionette
+_marionette_mozprofile_args := \
+	$(addprefix --addon=,$(_marionette_xpis)) \
+	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
+marionette_additional_args :=
+_marionette_runtests_args := \
+	--binary=$(app_binary) \
+	--profile="$$profile_dir" \
+	--address=$(_marionette_address) \
+	$(marionette_logging) \
+	$(marionette_additional_args) \
+	$(marionette_tests)
 
 .PHONY: marionette
 marionette: python-venv \
@@ -574,22 +601,11 @@ marionette: python-venv \
 	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
 	$(call IN_PYTHON_ENV, \
-	export PYTHONPATH=tests/marionette/ && \
-	profile_dir=`mozprofile \
-		--addon=$(xpi_file__unit_testing) \
-		--addon=$(xpi_file__dev_helper) \
-		--preferences=$(mozrunner_prefs_ini):marionette \
-		` && \
-	( \
-	./tests/marionette/rp_ui_harness/runtests.py \
-		--binary=$(app_binary) --profile=$$profile_dir \
-		--address=$(marionette_address) \
-		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
-	exit_status=$$? ; \
-	rm -rf $$profile_dir ; \
-	exit $$exit_status ; \
-	) ; \
-	)
+	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
+		export PYTHONPATH=tests/marionette/ && \
+		./tests/marionette/rp_ui_harness/runtests.py \
+			$(_marionette_runtests_args) ; \
+	))
 
 #-------------------------------------------------------------------------------
 # static code analysis

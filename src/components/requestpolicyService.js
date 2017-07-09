@@ -29,7 +29,8 @@ const CP_NOP = function() {
 };
 const CP_REJECT = CI.nsIContentPolicy.REJECT_SERVER;
 
-const EXTENSION_ID = "requestpolicy@requestpolicy.com";
+const EXTENSION_ID = "rpcontinued@requestpolicy.org";
+const OTHER_EXTENSION_ID = "requestpolicy@requestpolicy.com";
 
 // A value intended to not conflict with aExtra passed to shouldLoad() by any
 // other callers. Was chosen randomly.
@@ -205,8 +206,7 @@ RequestPolicyService.prototype = {
       _gBrowser.selectedTab = _gBrowser.addTab(url);
     }
 
-    AddonManager.getAddonByID("requestpolicy@requestpolicy.com",
-                              addonCallback);
+    AddonManager.getAddonByID(OTHER_EXTENSION_ID, addonCallback);
   },
 
   _initializeExtensionCompatibility : function() {

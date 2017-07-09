@@ -5,9 +5,6 @@
 from firefox_ui_harness.testcases import FirefoxTestCase
 from rp_puppeteer import RequestPolicyPuppeteer
 
-from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
-                                              ConsoleErrorDetection)
-
 
 class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
     """Base testcase class for RequestPolicy Marionette tests.
@@ -24,20 +21,12 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
     # Public Properties and Methods #
     #################################
 
-    def setUp(self, *args, **kwargs):
-        FirefoxTestCase.setUp(self, *args, **kwargs)
-
-        marionette_getter = lambda: self.marionette
-        self.logging_error_detect = LoggingErrorDetection(marionette_getter)
-        self.console_error_detect = ConsoleErrorDetection(marionette_getter)
-
-        self._check_and_reset_error_counts()
-
     def tearDown(self, *args, **kwargs):
         try:
             self._check_and_fix_leaked_rules()
             self._check_and_fix_leaked_rules_in_rules_file()
-            self._check_and_reset_error_counts()
+            self._check_and_fix_ignoring_errors()
+            self._check_gecko_log()
         finally:
             FirefoxTestCase.tearDown(self, *args, **kwargs)
 
@@ -64,12 +53,17 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
                        "Rule count is {} but should be zero."
                        ).format(n_rules))
 
-    def _check_and_reset_error_counts(self):
-        try:
-            self.assertEqual(self.logging_error_detect.n_errors, 0,
-                             "There should be no logging errers.")
-            self.assertEqual(self.console_error_detect.n_errors, 0,
-                             "There should be no console errors.")
-        finally:
-            self.logging_error_detect.reset()
-            self.console_error_detect.reset()
+    def _check_and_fix_ignoring_errors(self):
+        ignoring = self.gecko_log.currently_ignoring_errors()
+        if ignoring:
+            self.gecko_log.stop_ignoring_errors()
+        self.assertFalse(ignoring, msg="A test must stop ignoring errors on teardown.")
+
+
+    def _check_gecko_log(self):
+        error_lines = self.gecko_log.get_error_lines_of_current_test()
+        if len(error_lines) != 0:
+            for line in error_lines:
+                print line
+            self.fail("Found " + str(len(error_lines)) + " error lines! " +
+                "First line: " + str(error_lines[0]))

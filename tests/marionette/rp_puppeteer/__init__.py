@@ -16,6 +16,14 @@ class RequestPolicyPuppeteer(object):
     def browser_info(self):
         pass
 
+    @use_class_as_property('api.error_triggerer.ErrorTriggerer')
+    def error_triggerer(self):
+        pass
+
+    @use_class_as_property('api.gecko_log.GeckoLog')
+    def gecko_log(self):
+        pass
+
     @use_class_as_property('api.l10n.L10n')
     def l10n(self):
         pass

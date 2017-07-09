@@ -562,7 +562,8 @@ logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini
 
-marionette_logging := --gecko-log=$(logs_dir)/$(logfile_prefix)marionette.gecko.log
+_marionette_gecko_log := $(logs_dir)/$(logfile_prefix)marionette.gecko.log
+marionette_logging := --gecko-log=$(_marionette_gecko_log)
 marionette_logging += --log-html=$(logs_dir)/$(logfile_prefix)marionette.html
 marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.log
 #marionette_logging += --log-raw=$(logs_dir)/$(logfile_prefix)marionette.raw.log
@@ -602,10 +603,11 @@ marionette: python-venv \
 	@# removed directly.
 	$(call IN_PYTHON_ENV, \
 	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
-		export PYTHONPATH=tests/marionette/ && \
 		./tests/marionette/rp_ui_harness/runtests.py \
 			$(_marionette_runtests_args) ; \
 	))
+	@echo "Checking for undetected errors"
+	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 
 #-------------------------------------------------------------------------------
 # static code analysis

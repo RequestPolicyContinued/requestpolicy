@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RPC Dev Helper - A helper add-on for RequestPolicy development.
- * Copyright (c) 2016 Martin Kimmerle
+ * Copyright (c) 2017 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,66 +21,32 @@
  */
 
 /* global Components */
-const {interfaces: Ci, utils: Cu} = Components;
+const {utils: Cu} = Components;
 
-/* exported LoggingObserver */
-this.EXPORTED_SYMBOLS = ["LoggingObserver"];
+/* exported CustomUri */
+this.EXPORTED_SYMBOLS = ["Dump"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 //==============================================================================
-// LoggingObserver
+// Dump
 //==============================================================================
 
-/**
- * LoggingObserver observes all logs sent by RP's Logger module.
- */
-var LoggingObserver = (function() {
+var Dump = (function() {
   let self = {};
 
-  let messages = [];
-
-  let prefBranch;
-
-  self.getNumErrors = function() {
-    return prefBranch.getIntPref("unitTesting.loggingErrors.counter");
-  };
-
-  self.getMessages = function() {
-    return messages;
-  };
-
-  function setNumErrors(aN) {
-    prefBranch.setIntPref("unitTesting.loggingErrors.counter", aN);
-    Services.prefs.savePrefFile(null);
-  }
-
-  self.reset = function() {
-    setNumErrors(0);
-    messages = [];
-  };
+  const topic = "requestpolicy-dump-string";
 
   self.startup = function() {
-    prefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
-        QueryInterface(Ci.nsIPrefBranch2);
-    Services.obs.addObserver(self, "requestpolicy-log-error", false);
+    Services.obs.addObserver(self, topic, false);
   };
 
   self.shutdown = function() {
-    Services.obs.removeObserver(self, "requestpolicy-log-error");
-    prefBranch = undefined;
+    Services.obs.removeObserver(self, topic);
   };
 
   self.observe = function(aSubject, aTopic, aData) {
-    switch (aTopic) {
-      case "requestpolicy-log-error":
-        setNumErrors(self.getNumErrors() + 1);
-        messages.push(aData);
-        break;
-
-      default:
-        break;
-    }
+    dump(aData + "\n");
   };
 
   return self;

@@ -52,9 +52,6 @@ function logSevereError(aMessage, aError) {
   let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
        (aError.stack ? ", stack was: " + aError.stack : "");
   dump(msg + "\n");
-  // #ifdef UNIT_TESTING
-  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
-  // #endif
   Cu.reportError(aError);
 }
 

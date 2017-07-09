@@ -73,10 +73,6 @@ var Prefs = (function() {
       "privateBrowsingPermanentWhitelisting": "BoolPref",
       "startWithAllowAllEnabled": "BoolPref",
       "welcomeWindowShown": "BoolPref",
-      // #ifdef UNIT_TESTING
-      "unitTesting.consoleErrors.counter": "IntPref",
-      "unitTesting.loggingErrors.counter": "IntPref",
-      // #endif
     }),
 
     root: new PrefBranch("", {

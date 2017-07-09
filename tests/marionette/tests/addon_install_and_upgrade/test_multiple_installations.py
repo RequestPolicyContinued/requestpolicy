@@ -24,8 +24,6 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
     def setUp(self):
         super(MultipleInstallationsTestCase, self).setUp()
 
-        self.rp_addon.ignore_errors = True
-
         assert self.OTHER_ADDON is not None
         install_url = ("file://{}/dist/{}"
                        .format(os.getcwd(), self.OTHER_ADDON["xpi"]))
@@ -42,15 +40,10 @@ class MultipleInstallationsTestCase(RequestPolicyTestCase):
             # It's necessary to restart because multiple installed versions
             # might have broken RequestPolicy's functionality.
             self.restart()
+            self.gecko_log.stop_ignoring_errors()
         finally:
             self.browser.tabbar.close_all_tabs(
                 exceptions=[self.browser.tabbar.tabs[0]])
-            self.rp_addon.ignore_errors = False
-
-            # It's highly probable that errors occur. However, the tests
-            # in this file don't intend to avoid these errors.
-            self.logging_error_detect.reset()
-            self.console_error_detect.reset()
 
             super(MultipleInstallationsTestCase, self).tearDown()
 
@@ -107,6 +100,7 @@ class CommonTests:
     class OtherVersionActive_ThenInstallCurrentVersion(MultipleInstallationsTestCase):
         def test_notice_is_shown(self):
             self.rp_addon.uninstall()
+            self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
 
             self.rp_addon.install()
@@ -115,6 +109,7 @@ class CommonTests:
     class OtherVersionActive_ThenEnableCurrentVersion(MultipleInstallationsTestCase):
         def test_notice_is_shown(self):
             self.rp_addon.disable()
+            self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
 
             self.rp_addon.enable()
@@ -122,6 +117,7 @@ class CommonTests:
 
     class OtherVersionNotActive_ThenInstall(MultipleInstallationsTestCase):
         def test_notice_is_shown(self):
+            self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
             self._assert_notice_tab()
 
@@ -130,6 +126,7 @@ class CommonTests:
             # After this preparation, both the current and the old version
             # will be installed, but the old version will be disabled.
             self.rp_addon.disable()
+            self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
             self.other_rp.disable()
             self.rp_addon.enable()
@@ -142,6 +139,7 @@ class CommonTests:
 
     class OtherAndCurrentVersionActiveAfterRestart(MultipleInstallationsTestCase):
         def test_notice_is_shown(self):
+            self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
             self._close_notice_tabs()
 

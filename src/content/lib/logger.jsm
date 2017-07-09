@@ -152,11 +152,6 @@ var Logger = (function() {
       let msg = "[RequestPolicy] [" + levelName + "] " +
           "[" + typeName + "] " + aMessage + stack;
       self.printFunc(msg + "\n");
-      // #ifdef UNIT_TESTING
-      if (isError) {
-        Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
-      }
-      // #endif
     }
   }
 
@@ -209,17 +204,14 @@ var Logger = (function() {
 var UnitTestObserver = (function() {
   let self = {};
 
-  var loggingErrorTopic = "requestpolicy-trigger-logging-error";
-  var consoleErrorTopic = "requestpolicy-trigger-console-error";
+  const topic = "requestpolicy-trigger-error";
 
   self.startup = function() {
-    Services.obs.addObserver(self, loggingErrorTopic, false);
-    Services.obs.addObserver(self, consoleErrorTopic, false);
+    Services.obs.addObserver(self, topic, false);
   };
 
   self.shutdown = function() {
-    Services.obs.removeObserver(self, loggingErrorTopic);
-    Services.obs.removeObserver(self, consoleErrorTopic);
+    Services.obs.removeObserver(self, topic);
   };
 
   /**
@@ -240,25 +232,14 @@ var UnitTestObserver = (function() {
   }
 
   self.observe = function(aSubject, aTopic, aData) {
-    switch (aTopic) {
-      case loggingErrorTopic:
-        let [logLevel, logMessage] = splitColon(aData);
+    let [type, message] = splitColon(aData);
 
-        if (logLevel === "warning") {
-          Logger.warning(Logger.TYPE_ERROR, logMessage);
-        } else if (logLevel === "severe") {
-          Logger.severe(Logger.TYPE_INTERNAL, logMessage);
-        }
-        break;
-
-      case consoleErrorTopic:
-        if (aData === "ReferenceError") {
-          runAsync(produceReferenceError);
-        }
-        break;
-
-      default:
-        break;
+    if (type === "normal error") {
+      Logger.warning(Logger.TYPE_ERROR, message);
+    } else if (type === "severe error") {
+      Logger.severe(Logger.TYPE_INTERNAL, message);
+    } else if (type === "ReferenceError") {
+      runAsync(produceReferenceError);
     }
   };
 

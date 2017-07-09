@@ -3,43 +3,104 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
-from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
-                                              ConsoleErrorDetection)
+from marionette import expectedFailure
+from marionette_driver import Wait
+import re
 
 
-class TestErrorDetection(RequestPolicyTestCase):
+msg = "[Marionette] test_logging_error_detection"
+msg_regexp = "\[Marionette\] test_logging_error_detection"
 
-    def test_logging_error_detection(self):
-        error_detect = LoggingErrorDetection(lambda: self.marionette)
 
-        def assert_n_errors(n):
-            self.assertEqual(n, error_detect.n_errors)
-            self.assertEqual(n, len(error_detect.messages))
+class ErrorDetectionTests(object):
 
-        assert_n_errors(0)
+    ################
+    # Test Methods #
+    ################
 
-        error_detect.trigger_error(
-            "warning", msg="[Marionette] test_logging_error_detection")
-        assert_n_errors(1)
+    def test_normal_error(self, n=1):
+        self.error_triggerer.trigger_error("normal error", msg=msg)
+        self._do_checks(n, "^\[RequestPolicy\] \[WARNING\] \[ERROR\] " + msg_regexp + "$")
 
-        error_detect.trigger_error(
-            "severe", msg="[Marionette] test_logging_error_detection")
-        assert_n_errors(2)
+    def test_severe_error(self, n=1):
+        self.error_triggerer.trigger_error("severe error", msg=msg)
+        self._do_checks(n, "^\[RequestPolicy\] \[SEVERE\] \[INTERNAL\] " + msg_regexp + "$")
 
-        error_detect.reset()
-        assert_n_errors(0)
+    def test_reference_error(self, n=1):
+        self.error_triggerer.trigger_error("ReferenceError")
+        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.jsm, line [0-9]+: ReferenceError: ")
 
-    def test_console_error_detection(self):
-        error_detect = ConsoleErrorDetection(lambda: self.marionette)
+    ##########################
+    # Private Helper Methods #
+    ##########################
 
-        def assert_n_errors(n):
-            self.assertEqual(n, error_detect.n_errors)
-            self.assertEqual(n, len(error_detect.messages))
+    def _do_checks(self, n, message_regexp):
+        raise NotImplementedError
 
-        assert_n_errors(0)
 
-        error_detect.trigger_error("ReferenceError")
-        assert_n_errors(1)
+class ErrorDetectionTestCase(RequestPolicyTestCase):
 
-        error_detect.reset()
-        assert_n_errors(0)
+    expected_error = False
+
+    def setUp(self):
+        super(ErrorDetectionTestCase, self).setUp()
+        self.gecko_log.start_ignoring_errors(expected=self.expected_error)
+
+    def tearDown(self):
+        try:
+            self.gecko_log.stop_ignoring_errors()
+        finally:
+            super(ErrorDetectionTestCase, self).tearDown()
+
+
+class TestGeckoLog(ErrorDetectionTests, ErrorDetectionTestCase):
+
+    def setUp(self):
+        super(TestGeckoLog, self).setUp()
+
+        self._assert_n_errors(0)
+
+    ##########################
+    # Private Helper Methods #
+    ##########################
+
+    def _do_checks(self, n, message_regexp):
+        self._assert_n_errors(n)
+        self._assert_error(message_regexp)
+
+    def _get_error_lines_including_ignored_errors(self):
+        return self.gecko_log.get_error_lines_of_current_test(
+            return_ignored_as_well=True)
+
+    def _get_error_lines(self):
+        return self.gecko_log.get_error_lines_of_current_test()
+
+    def _assert_n_errors(self, n):
+        Wait(self.marionette).until(
+            lambda _: len(self._get_error_lines_including_ignored_errors()) == n)
+        self.assertEqual(0, len(self._get_error_lines()))
+
+    def _assert_error(self, message_regexp):
+        error_lines = self._get_error_lines_including_ignored_errors()
+        line = error_lines[-1]
+        self.assertTrue(re.search(message_regexp, line),
+            msg=("String \"" + line + "\" matched!"))
+
+
+class TestFailureOnTearDown(ErrorDetectionTests, ErrorDetectionTestCase):
+
+    expected_error = True
+
+    @expectedFailure
+    def tearDown(self):
+        super(TestFailureOnTearDown, self).tearDown()
+
+    ##########################
+    # Private Helper Methods #
+    ##########################
+
+    # Explicitly do *not* perform checks in _do_checks(), to test if the TestRunner's
+    # tearDown fn waits long enough to detect all logging errors.
+
+    def _do_checks(self, n, message_regexp):
+        pass

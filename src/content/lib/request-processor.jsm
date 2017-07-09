@@ -1175,3 +1175,5 @@ RequestProcessor = (function() {
       "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);
   return scope.RequestProcessor;
 }());
+
+RequestProcessor.whenReady = Promise.resolve();

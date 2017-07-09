@@ -593,7 +593,7 @@ window.rpcontinued.overlay = (function() {
    * notifications.
    */
   self._updateBlockedContentState = function() {
-    try {
+    RequestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       // #ifdef LOG_FLAG_STATE
@@ -613,10 +613,10 @@ window.rpcontinued.overlay = (function() {
                     "No requests have been blocked.";
       Logger.debug(Logger.TYPE_INTERNAL, logText);
       // #endif
-    } catch (e) {
+    }).catch(e => {
       Logger.severeError(
           "Unable to complete _updateBlockedContentState actions: " + e, e);
-    }
+    });
   };
 
   /**

@@ -59,6 +59,7 @@ const knownBugs = [
   //     `[JavaScript Warning: "Expected end of value but found \u{2019}10\u{201A}.  Error in parsing value for \u{2019}font-family\u{201A}.  Declaration dropped." {file: "chrome://rpcontinued/skin/`,
   // ... so use a regex instead:
   /^\[JavaScript Warning: "Expected end of value but found \W10\W\.  Error in parsing value for \Wfont-family\W\.  Declaration dropped\." {file: "chrome:\/\/rpcontinued\/skin\//,
+  `[JavaScript Warning: "ReferenceError: reference to undefined property entryPart.s" {file: "chrome://rpcontinued/content/lib/ruleset.jsm" line: 151}]`,
 ];
 // jscs:enable maximumLineLength
 

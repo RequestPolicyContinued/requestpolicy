@@ -85,7 +85,8 @@
     }
   }
   mlManager.addListener("setLocation", function(message) {
-    let replace = message.data.replaceUri === content.document.location.href;
+    let replace = "replaceUri" in message.data &&
+        message.data.replaceUri === content.document.location.href;
     setLocation(message.data.uri, replace);
   });
 

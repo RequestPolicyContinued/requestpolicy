@@ -114,6 +114,7 @@ function startCommNowOrLater(self) {
     // Add the listener immediately.
     self.env.mlManager.addListener("overlayIsReady",
                                    startCommunication.bind(null, self),
+                                   undefined,
                                    true);
   }
 }

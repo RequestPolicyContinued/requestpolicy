@@ -23,6 +23,8 @@
 /* global Components */
 const {utils: Cu} = Components;
 
+/* global dump */
+
 /* exported ManagerForMessageListeners */
 this.EXPORTED_SYMBOLS = ["ManagerForMessageListeners"];
 
@@ -103,12 +105,14 @@ function ManagerForMessageListeners(aEnv, aMM) {
  *
  * @param {string} aMessageName
  * @param {function} aCallback
+ * @param {boolean} aCallbackOnShutdown
  * @param {boolean} aAddImmediately - Whether the listener should be
  *     added immediately, i.e. without waiting for the environment
  *     to start up.
  */
 ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                                                             aCallback,
+                                                            aCallbackOnShutdown,
                                                             aAddImmediately) {
   let self = this;
   if (typeof aCallback !== "function") {
@@ -127,7 +131,17 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
   let listener = {
     messageName: aMessageName,
     messageID: C.MM_PREFIX + aMessageName,
-    callback: aCallback,
+    callback: function(aMessage) {
+      if (self.environment.envState === Environment.ENV_STATES.SHUTTING_DOWN) {
+        dump("[RequestPolicy] Warning: listener for " + aMessageName +
+            " has been called, but RP is already shutting down.");
+        if (typeof aCallbackOnShutdown === "function") {
+          return aCallbackOnShutdown(aMessage);
+        }
+        return;
+      }
+      return aCallback(aMessage);
+    },
     listening: false
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {

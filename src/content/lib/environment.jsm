@@ -235,6 +235,14 @@ var Environment = (function() {
   Environment.ENV_STATES = ENV_STATES;
 
   /**
+   * Registers the environment to its outer environment.
+   */
+  Environment.prototype.isShuttingDownOrShutDown = function() {
+    let self = this;
+    return self.envState >= ENV_STATES.SHUTTING_DOWN;
+  };
+
+  /**
    * This function creates one "Level Object" for each level. Those objects
    * mainly will hold the startup- or shutdown-functions of the corresponding
    * level. All of the Level Objects are put together in another object which
@@ -305,7 +313,7 @@ var Environment = (function() {
    */
   Environment.prototype.addStartupFunction = function(aLevel, f) {
     let self = this;
-    if (self.envState >= ENV_STATES.SHUTTING_DOWN) {
+    if (self.isShuttingDownOrShutDown()) {
       // the environment is shutting down or already shut down.
       return;
     }

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, document */
+/* global window, document, dump */
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -64,6 +64,17 @@ window.rpcontinued.overlay = (function() {
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);
+
+  function setTimeout(aFn, aDelay) {
+    return window.setTimeout(function() {
+      if (OverlayEnvironment.isShuttingDownOrShutDown()) {
+        dump("[RequestPolicy] Warning: not calling delayed function " +
+            "because of add-on shutdown.\n");
+        return;
+      }
+      aFn.call(null);
+    }, aDelay);
+  }
 
   let initialized = false;
 
@@ -135,6 +146,8 @@ window.rpcontinued.overlay = (function() {
         // listener must be added immediately.
         mlManager.addListener("isOverlayReady", function() {
           return true;
+        }, function() {
+          return false;
         });
         window.messageManager.broadcastAsyncMessage(C.MM_PREFIX +
                                                     "overlayIsReady", true);
@@ -263,6 +276,8 @@ window.rpcontinued.overlay = (function() {
 
     // send the list of blocked URIs back to the frame script
     return {blockedURIs: blockedURIs};
+  }, function(message) {
+    return {blockedURIs: {}};
   });
 
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
@@ -680,7 +695,7 @@ window.rpcontinued.overlay = (function() {
                                                    destUri) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
-    window.setTimeout(function() {
+    setTimeout(function() {
       rpcontinued.overlay._showRedirectNotification(browser, destUri, 0,
           originUri);
     }, 0);
@@ -696,7 +711,7 @@ window.rpcontinued.overlay = (function() {
 
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
-    blockedContentCheckTimeoutId = window.setTimeout(function() {
+    blockedContentCheckTimeoutId = setTimeout(function() {
       try {
         rpcontinued.overlay._updateBlockedContentState(browser);
       } catch (e) {
@@ -892,7 +907,7 @@ window.rpcontinued.overlay = (function() {
           return;
         }
         // call this function again in a few miliseconds.
-        window.setTimeout(function() {
+        setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);
@@ -1023,7 +1038,7 @@ window.rpcontinued.overlay = (function() {
     // is actually hidden. For example, it can reside in the Australis
     // menu. By delaying "openMenu" the menu will be closed in the
     // meantime, and the toolbar button will be detected as invisible.
-    window.setTimeout(function() {
+    setTimeout(function() {
       if (self.isToolbarButtonVisible()) {
         self.openMenuAtToolbarButton();
       } else {

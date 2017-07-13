@@ -115,29 +115,29 @@ var RequestProcessor = (function() {
 
   internal.mappedDestinations = {};
 
-  internal.requestObservers = [];
+  internal.requestObservers = new Set();
 
   //----------------------------------------------------------------------------
   // private functions
   //----------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
+    for (let observer of internal.requestObservers) {
+      if (!observer) {
         continue;
       }
-      internal.requestObservers[i].observeBlockedRequest(request.originURI,
+      observer.observeBlockedRequest(request.originURI,
           request.destURI, request.requestResult);
     }
   }
 
   function notifyRequestObserversOfAllowedRequest(originUri,
       destUri, requestResult) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
+    for (let observer of internal.requestObservers) {
+      if (!observer) {
         continue;
       }
-      internal.requestObservers[i].observeAllowedRequest(originUri, destUri,
+      observer.observeAllowedRequest(originUri, destUri,
           requestResult);
     }
   }
@@ -1083,7 +1083,7 @@ var RequestProcessor = (function() {
     }
     Logger.debug(Logger.TYPE_INTERNAL,
         "Adding request observer: " + observer.toString());
-    internal.requestObservers.push(observer);
+    internal.requestObservers.add(observer);
   };
 
   /**
@@ -1092,13 +1092,11 @@ var RequestProcessor = (function() {
    * @param {Object} observer
    */
   self.removeRequestObserver = function(observer) {
-    for (let i = 0; i < internal.requestObservers.length; i++) {
-      if (internal.requestObservers[i] === observer) {
-        Logger.debug(Logger.TYPE_INTERNAL,
-            "Removing request observer: " + observer.toString());
-        delete internal.requestObservers[i];
-        return;
-      }
+    if (internal.requestObservers.has(observer)) {
+      Logger.debug(Logger.TYPE_INTERNAL,
+          "Removing request observer: " + observer.toString());
+      internal.requestObservers.delete(observer);
+      return;
     }
     Logger.warning(Logger.TYPE_INTERNAL,
         "Could not find observer to remove " + "in removeRequestObserver()");

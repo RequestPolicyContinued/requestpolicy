@@ -5,6 +5,7 @@
 from firefox_ui_harness.runners.base import FirefoxUITestRunner
 from mozlog import get_default_logger
 import time
+import ptvsd
 
 from rp_puppeteer.api.gecko_log import GeckoLog
 
@@ -13,7 +14,16 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
 
     gecko_log_relpath = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, vscode_debug_secret=None,
+                 vscode_debug_address=None, vscode_debug_port=None, **kwargs):
+        if vscode_debug_secret is not None:
+            ptvsd.enable_attach(
+                vscode_debug_secret,
+                address=(vscode_debug_address, int(vscode_debug_port))
+            )
+            print "Waiting for VS Code to attach"
+            ptvsd.wait_for_attach()
+
         if kwargs["gecko_log"] is None:
             kwargs["gecko_log"] = ("logs/marionette.{}.gecko.log"
                                    ).format(int(time.time()))

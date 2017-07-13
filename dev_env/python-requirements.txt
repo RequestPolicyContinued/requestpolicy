@@ -21,3 +21,6 @@ mozversion == 1.4
 wptserve == 1.4
 
 mozdownload
+
+# https://github.com/DonJayamanne/pythonVSCode/issues/981#issuecomment-309217245
+ptvsd == 3.0.0

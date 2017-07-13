@@ -13,13 +13,13 @@ if __name__ == '__main__' and __package__ is None:
 
 from marionette.runtests import cli as mn_cli
 
-from firefox_ui_harness.arguments import FirefoxUIArguments
+from rp_ui_harness.arguments import RequestPolicyUIArguments
 from rp_ui_harness.runner import RequestPolicyUITestRunner
 
 
 def cli(args=None):
     mn_cli(runner_class=RequestPolicyUITestRunner,
-           parser_class=FirefoxUIArguments,
+           parser_class=RequestPolicyUIArguments,
            args=args
            )
 

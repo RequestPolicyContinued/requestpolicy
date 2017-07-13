@@ -69,9 +69,15 @@ const WHITELISTED_INTERNAL_SCHEMES = new Set([
 ]);
 
 const WHITELISTED_RESOURCE_URIS = new Set([
-  // Viewing images (png, jpg, etc.) directly in a tab
+  // Viewing resources (text files, images, etc.) directly in a tab
+
+  // images (png, jpg, etc.)
   "resource://gre/res/ImageDocument.css",
   "resource://gre/res/TopLevelImageDocument.css",
+  // plain text
+  "resource://gre-resources/plaintext.css",
+  // videos
+  "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
 //==============================================================================

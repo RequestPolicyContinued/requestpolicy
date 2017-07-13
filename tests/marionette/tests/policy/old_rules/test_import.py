@@ -39,6 +39,12 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
                                      welcomewin_shown=False,
                                      should_autoimport=True)
 
+    def test_autoimport__usual_first_upgrade_without_last_rp_version(self):
+        self._test_autoimport_or_not(last_rp_version=None,
+                                     with_existing_rules_file=False,
+                                     welcomewin_shown=False,
+                                     should_autoimport=True)
+
     def test_autoimport__upgrade_without_welcomewin(self):
         self._test_autoimport_or_not(last_rp_version="0.5.28",
                                      with_existing_rules_file=False,

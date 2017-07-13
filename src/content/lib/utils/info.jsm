@@ -70,7 +70,6 @@ var Info = (function() {
       // Compare with version 1.0.0a8 since that version introduced
       // the "welcome window".
       return self.lastRPVersion &&
-          Services.vc.compare(self.lastRPVersion, "0.0") > 0 &&
           Services.vc.compare(self.lastRPVersion, "1.0.0a8") <= 0;
     });
   }

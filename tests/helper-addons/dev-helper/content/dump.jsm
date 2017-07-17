@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global Components */
+/* global Components, dump */
 const {utils: Cu} = Components;
 
-/* exported CustomUri */
+/* exported Dump */
 this.EXPORTED_SYMBOLS = ["Dump"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});

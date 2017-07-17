@@ -41,7 +41,7 @@ browsers_dir   := $(dev_env_dir)/browsers
 
 NPM            := npm --prefix=$(node_env_dir)
 JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
-JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint
+JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint --extra-ext jsm
 ADDONS_LINTER  := $(abspath $(node_env_dir))/node_modules/.bin/addons-linter
 
 # create the dist directory
@@ -390,7 +390,7 @@ force_every = $(shell \
 #-------------------------------------------------------------------------------
 
 # $1: command(s) to be wrapped
-IN_PYTHON_ENV = source $(python_env_dir)/bin/activate && ($1)
+IN_PYTHON_ENV = set +u && source $(python_env_dir)/bin/activate && ($1)
 
 # $1: variable name which will contain the profile dir
 # $2: parameters to mozprofile
@@ -636,7 +636,7 @@ jscs_args :=
 .PHONY: static-analysis jshint jscs addons-linter
 static-analysis: jshint jscs addons-linter check-locales
 jshint: node-packages
-	$(JSHINT) --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
+	$(JSHINT) --exclude '**/jquery.min.js' $(jshint_args) src/
 	$(JSHINT) $(jshint_args) tests/xpcshell/
 	$(JSHINT) $(jshint_args) tests/helper-addons/
 jscs: node-packages

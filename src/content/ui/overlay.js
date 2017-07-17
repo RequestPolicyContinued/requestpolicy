@@ -481,7 +481,11 @@ window.rpcontinued.overlay = (function() {
 
     function addMenuItem(aRuleSpec) {
       aRuleSpec.allow = true;
-      classicmenu.addMenuItem(addRulePopup, aRuleSpec);
+      classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
+        if (Prefs.get("autoReload")) {
+          allowRedirection();
+        }
+      });
     }
     function addMenuSeparator() {
       classicmenu.addMenuSeparator(addRulePopup);

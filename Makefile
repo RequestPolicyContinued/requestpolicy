@@ -490,7 +490,7 @@ endif
 .PHONY: clean-old-$1-tarballs-$2
 clean-old-$1-tarballs-$2:
 	@# Remove all but the latest tarball
-	@rm -rf $$$$(ls -t $(browsers_dir)/$1/downloads/$2/*.tar.bz2 | tail -n +2)
+	@rm -rf $$$$(ls -t $(browsers_dir)/$1/downloads/$2/*.tar.bz2 2>/dev/null | tail -n +2)
 endef
 $(foreach b,$(firefox_branches),$(eval $(call fn_create_browser_target,firefox,$b)))
 $(foreach b,$(seamonkey_branches),$(eval $(call fn_create_browser_target,seamonkey,$b)))

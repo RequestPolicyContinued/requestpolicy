@@ -145,7 +145,6 @@ current_build__unique_version  := $(unique_version__$(BUILD))
 # files which are simply copied
 src__copy_files := \
 		$(source_dir)/chrome.manifest \
-		$(source_dir)/install.rdf \
 		$(source_dir)/README \
 		$(source_dir)/LICENSE \
 		$(wildcard $(source_dir)/content/settings/*.css) \
@@ -159,15 +158,18 @@ src__copy_files := \
 		$(wildcard $(source_dir)/skin/*.svg) \
 		$(shell find $(source_dir) -type f -iname "jquery*.js")
 
+src__install_rdf := \
+	$(source_dir)/install.rdf
+
 # JavaScript files which will be (pre)processed.
 # The `copy_files` will be filtered out.
 src__jspp_files := \
-		$(filter-out $(src__copy_files), \
+		$(filter-out $(src__copy_files) $(src__install_rdf), \
 				$(shell find $(source_dir) -type f -regex ".*\.jsm?") \
 		)
 
 # all source files
-src__all_files := $(src__copy_files) $(src__jspp_files)
+src__all_files := $(src__copy_files) $(src__install_rdf) $(src__jspp_files)
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] paths in the "build" directory
@@ -178,6 +180,7 @@ current_build_dir := $(build_dir_root)/$(BUILD)
 build__all_files  := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__all_files))
 build__jspp_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__jspp_files))
 build__copy_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__copy_files))
+build__install_rdf := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__install_rdf))
 
 # detect deleted files and empty directories
 ifdef BUILD
@@ -214,18 +217,20 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $< $@
 
-	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
-		if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
-	  		echo 'install.rdf: changing the Extension ID !' ; \
-	  		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
-	  		echo 'install.rdf: removing the updateURL !' ; \
-	  		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
-		fi ; \
-		if [[ "$(current_build__unique_version)" == "yes" ]]; then \
-	  		echo 'install.rdf: making the version unique !' ; \
-				unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
-	  		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
-		fi ; \
+# force rebuild of install.rdf because the version suffix might change
+$(build__install_rdf) : $(current_build_dir)/% : $(source_dir)/% \
+		FORCE
+	cp --dereference $< $@
+	@if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
+		echo 'install.rdf: changing the Extension ID !' ; \
+		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+		echo 'install.rdf: removing the updateURL !' ; \
+		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
+	fi ; \
+	if [[ "$(current_build__unique_version)" == "yes" ]]; then \
+		echo 'install.rdf: making the version unique !' ; \
+			unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
+		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
 	fi
 
 #-------------------------------------------------------------------------------

@@ -11,7 +11,9 @@ module.exports = {
     "Services": true,
     "XPCOMUtils": true,
 
-    "console": true
+    "clearTimeout": true,
+    "console": true,
+    "setTimeout": true,
   },
 
   "parserOptions": {

@@ -3,17 +3,19 @@
 
   "globals": {
     "browser": true,
-    "console": true,
+    "LegacyApi": true,
+
     "Cc": true,
     "Ci": true,
     "Cm": true,
     "Cr": true,
     "Cu": true,
     "ComponentsID": true,
-    "LegacyApi": true,
     "require": true,
     "Services": true,
-    "XPCOMUtils": true
+    "XPCOMUtils": true,
+
+    "console": true
   },
 
   "strict": "implied"

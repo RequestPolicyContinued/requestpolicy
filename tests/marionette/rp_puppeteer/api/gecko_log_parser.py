@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import codecs
+import re
 from contextlib import contextmanager
 
 
@@ -14,12 +15,14 @@ WHITELIST = [
   # quotation marks are no longer <'>, but <\u2019> and <\u201A>.
   known_bug_1.format("'", "'", "{"),
   known_bug_1.format(u"\u2019", u"\u201A", "{"),
-  """JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset.jsm, line 151: ReferenceError: reference to undefined property entryPart.s""",
+  re.compile(r"""^JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset\.jsm, line [0-9]+: ReferenceError: reference to undefined property entryPart\.s"""),
 
   # other
 
   "[RequestPolicy] Warning:",
 ]
+
+retype = type(re.compile(r"^"))
 
 
 class IgnoreHelper(object):
@@ -119,8 +122,13 @@ class GeckoLogParser(object):
         if line.find("jquery.min.js") != -1:
             return False
 
-        for known_bug in WHITELIST:
-            if line.find(known_bug) == 0:
-                return False
+        for pattern in WHITELIST:
+            if isinstance(pattern, retype):
+                if pattern.match(line):
+                    return False
+            else:
+                # string
+                if line.find(pattern) == 0:
+                    return False
 
         return True

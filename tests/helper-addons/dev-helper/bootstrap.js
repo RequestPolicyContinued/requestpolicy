@@ -32,11 +32,8 @@ const {utils: Cu} = Components;
 function getModules() {
   return [
     {
-      uri: "chrome://rpc-dev-helper/content/console-observer.jsm",
-      name: "ConsoleObserver"
-    }, {
-      uri: "chrome://rpc-dev-helper/content/logging-observer.jsm",
-      name: "LoggingObserver"
+      uri: "chrome://rpc-dev-helper/content/dump.jsm",
+      name: "Dump"
     }, {
       uri: "chrome://rpc-dev-helper/content/rpc-uri.jsm",
       name: "CustomUri"

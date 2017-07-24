@@ -3,6 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from firefox_puppeteer.api.appinfo import AppInfo
+from firefox_puppeteer.api.utils import Utils
 from functools import partial
 
 
@@ -10,6 +12,13 @@ RP_BRANCH = "extensions.requestpolicy."
 
 
 class TestCheckboxes(RequestPolicyTestCase):
+
+    def setUp(self):
+        super(TestCheckboxes, self).setUp()
+
+        app_version = AppInfo(lambda: self.marionette).version
+        utils = Utils(lambda: self.marionette)
+        self.fx_older_than_v49 = utils.compare_version(app_version, "49") < 0
 
     ################
     # Test Methods #
@@ -93,7 +102,11 @@ class TestCheckboxes(RequestPolicyTestCase):
             compare(initial_value)
 
     def _compare(self, checkbox, pref, expected_pref_value, inverse=False):
-        cb_value = checkbox.get_attribute("checked") == "true"
+        if self.fx_older_than_v49:
+            # up to Firefox 48 (Bug 1272653)
+            cb_value = checkbox.get_attribute("checked") == "true"
+        else:
+            cb_value = checkbox.get_property("checked")
         pref_value = pref["get"]()
 
         try:

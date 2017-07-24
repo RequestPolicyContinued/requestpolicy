@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,9 +52,6 @@ function logSevereError(aMessage, aError) {
   let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
        (aError.stack ? ", stack was: " + aError.stack : "");
   dump(msg + "\n");
-  // #ifdef UNIT_TESTING
-  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
-  // #endif
   Cu.reportError(aError);
 }
 

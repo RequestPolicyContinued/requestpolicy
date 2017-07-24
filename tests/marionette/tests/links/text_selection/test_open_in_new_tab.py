@@ -15,7 +15,6 @@ class TestOpenInNewTab(RequestPolicyTestCase):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
 
-
     def test_open_in_new_tab(self):
         with self.marionette.using_context("content"):
             # load the test url
@@ -23,7 +22,7 @@ class TestOpenInNewTab(RequestPolicyTestCase):
 
             # find the URL string and its wrapping element
             url_wrapper = self.marionette.find_element("id", "text_url_1")
-            url = url_wrapper.get_attribute("textContent")
+            url = url_wrapper.text
 
             # select the URL
             self.web_utils.select_element_text(url_wrapper)

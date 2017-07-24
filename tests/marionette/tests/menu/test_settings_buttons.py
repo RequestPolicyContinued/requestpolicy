@@ -53,7 +53,6 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._test__should_open("preferences_1", "policies")
         self._test__should_open("preferences_2", "policies")
 
-
     def _test__basic(self, url_id, settings_id):
         """Exactly one settings tab is open, which is at the same
         time the one to be opened."""
@@ -74,7 +73,6 @@ class TestSettingsButtons(RequestPolicyTestCase):
 
     def test_policies__basic(self):
         self._test__basic("policies", "policies")
-
 
     def _test__multiple_equivalent_urls(self, url_id_1, url_id_2, settings_id):
         """Multiple settings tabs are open, but all are equivalent.
@@ -102,7 +100,6 @@ class TestSettingsButtons(RequestPolicyTestCase):
                                              "preferences")
         self._test__multiple_equivalent_urls("preferences_2", "preferences_1",
                                              "preferences")
-
 
     def _test__multiple_non_equivalent_urls(self, url_id, non_equivalent_url_id,
                                             settings_id):

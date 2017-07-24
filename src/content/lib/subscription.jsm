@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2012 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,8 @@
 
 /* global Components */
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+
+/* global dump */
 
 /* exported UserSubscriptions, SubscriptionList,
        Subscription, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
@@ -44,6 +46,7 @@ let {Logger} = importModule("lib/logger");
 let {RawRuleset} = importModule("lib/ruleset");
 let {FileUtil} = importModule("lib/utils/files");
 let {RulesetStorage} = importModule("lib/ruleset-storage");
+let {ProcessEnvironment} = importModule("lib/environment");
 
 //==============================================================================
 // Constants
@@ -65,10 +68,29 @@ const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
 // utilities
 //==============================================================================
 
+function maybeCallback(aCallback) {
+  return function() {
+    let ok = true;
+    try {
+      ok = ProcessEnvironment.isShuttingDownOrShutDown() === false;
+    } catch (e) {
+      // Probably ProcessEnvironment is not available anymore, because RP already
+      // being shut down.
+      ok = false;
+      dump("[RequestPolicy] Warning: Catched error: " + e + "\n");
+    }
+    if (!ok) {
+      dump("[RequestPolicy] Warning: Did not call callback function\n");
+      return;
+    }
+    aCallback.apply(null, arguments);
+  };
+}
+
 function setTimeout(func, delay) {
   var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   var event = {
-    notify: () => func()
+    notify: maybeCallback(func)
   };
   timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
   return timer;
@@ -294,7 +316,7 @@ SubscriptionList.prototype = {
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Components.interfaces.nsIXMLHttpRequest);
     var self = this;
-    req.onload = function(event) {
+    req.onload = maybeCallback(function(event) {
       try {
         self._data = JSON.parse(req.responseText);
         // Maybe we don't need to write this to a file since we never read it
@@ -303,10 +325,10 @@ SubscriptionList.prototype = {
       } catch (e) {
         setTimeout(() => errorCallback(self, e.toString()), 0);
       }
-    };
-    req.onerror = function(event) {
+    });
+    req.onerror = maybeCallback(function(event) {
       setTimeout(() => errorCallback(self, req.statusText), 0);
-    };
+    });
     req.open("GET", this._url);
     req.send(null);
   },
@@ -405,7 +427,7 @@ Subscription.prototype = {
     var req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Components.interfaces.nsIXMLHttpRequest);
     var self = this;
-    req.onload = function(event) {
+    req.onload = maybeCallback(function(event) {
       try {
         self._rawData = req.responseText;
         if (!self._rawData) {
@@ -450,10 +472,10 @@ Subscription.prototype = {
       } catch (e) {
         setTimeout(() => errorCallback(self, e.toString()), 0);
       }
-    };
-    req.onerror = function(event) {
+    });
+    req.onerror = maybeCallback(function(event) {
       setTimeout(() => errorCallback(self, req.statusText), 0);
-    };
+    });
     req.open("GET", this._url);
     req.send(null);
   }

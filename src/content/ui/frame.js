@@ -3,6 +3,7 @@
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
  * Copyright (c) 2011 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,11 +77,17 @@
   }
   mlManager.addListener("reload", reloadDocument);
 
-  function setLocation(aUri) {
-    content.document.location.href = aUri;
+  function setLocation(aUri, aReplace) {
+    if (aReplace) {
+      content.document.location.replace(aUri);
+    } else {
+      content.document.location.assign(aUri);
+    }
   }
   mlManager.addListener("setLocation", function(message) {
-    setLocation(message.data.uri);
+    let replace = "replaceUri" in message.data &&
+        message.data.replaceUri === content.document.location.href;
+    setLocation(message.data.uri, replace);
   });
 
   // Listen for click events so that we can allow requests that result from
@@ -105,8 +112,10 @@
     if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                        {origin: event.target.ownerDocument.URL,
-                         dest: event.target.href});
+                        {
+                          origin: event.target.ownerDocument.URL,
+                          dest: event.target.href
+                        });
       });
       return;
     }
@@ -118,8 +127,10 @@
         event.target.form && event.target.form.action) {
       overlayComm.run(function() {
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
-                        {origin: event.target.ownerDocument.URL,
-                         dest: event.target.form.action});
+                        {
+                          origin: event.target.ownerDocument.URL,
+                          dest: event.target.form.action
+                        });
       });
       return;
     }

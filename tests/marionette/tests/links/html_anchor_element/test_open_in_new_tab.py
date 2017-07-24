@@ -15,7 +15,6 @@ class TestOpenInNewTab(RequestPolicyTestCase):
         RequestPolicyTestCase.setUp(self)
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
 
-
     def test_open_in_new_tab(self):
         with self.marionette.using_context("content"):
             # load the test url
@@ -49,7 +48,6 @@ class TestOpenInNewTab(RequestPolicyTestCase):
                                   "redirect in the destination tab."))
 
                 dest_tab.close()
-
 
     def open_link_multi(self, link):
         """Open a link in new tabs using different methods."""

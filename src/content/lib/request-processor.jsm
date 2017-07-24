@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,9 +52,9 @@ let {RequestSet} = importModule("lib/request-set");
 let {ProcessEnvironment} = importModule("lib/environment");
 let {Utils} = importModule("lib/utils");
 
-/* global PolicyImplementation */
+/* global RPContentPolicy */
 ScriptLoader.defineLazyModuleGetters({
-  "main/content-policy": ["PolicyImplementation"]
+  "main/content-policy": ["RPContentPolicy"]
 }, globalScope);
 
 //==============================================================================
@@ -115,29 +115,29 @@ var RequestProcessor = (function() {
 
   internal.mappedDestinations = {};
 
-  internal.requestObservers = [];
+  internal.requestObservers = new Set();
 
   //----------------------------------------------------------------------------
   // private functions
   //----------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
+    for (let observer of internal.requestObservers) {
+      if (!observer) {
         continue;
       }
-      internal.requestObservers[i].observeBlockedRequest(request.originURI,
+      observer.observeBlockedRequest(request.originURI,
           request.destURI, request.requestResult);
     }
   }
 
   function notifyRequestObserversOfAllowedRequest(originUri,
       destUri, requestResult) {
-    for (var i = 0; i < internal.requestObservers.length; i++) {
-      if (!internal.requestObservers[i]) {
+    for (let observer of internal.requestObservers) {
+      if (!observer) {
         continue;
       }
-      internal.requestObservers[i].observeAllowedRequest(originUri, destUri,
+      observer.observeAllowedRequest(originUri, destUri,
           requestResult);
     }
   }
@@ -250,12 +250,15 @@ var RequestProcessor = (function() {
     lastShouldLoadCheck.result = result;
   }
 
-  internal.checkByDefaultPolicy = function(originUri, destUri) {
+  internal.checkByDefaultPolicy = function(aRequest) {
     if (Prefs.isDefaultAllow()) {
       var result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
+
+    let originUri = aRequest.originURI;
+    let destUri = aRequest.destURI;
 
     if (Prefs.isDefaultAllowSameDomain()) {
       var originDomain = DomainUtil.getBaseDomain(originUri);
@@ -268,9 +271,17 @@ var RequestProcessor = (function() {
             REQUEST_REASON_DEFAULT_SAME_DOMAIN);
       }
     }
-    // We probably want to allow requests from http:80 to https:443 of the same
-    // domain. However, maybe this is so uncommon it's not worth any extra
-    // complexity.
+
+    let originObj = aRequest.originUriObj;
+    let destObj = aRequest.destUriObj;
+
+    // Allow requests from http:80 to https:443 of the same host.
+    if (originObj.scheme === "http" && destObj.scheme === "https" &&
+        originObj.port === -1 && destObj.port === -1 &&
+        originObj.host === destObj.host) {
+      return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+    }
+
     var originIdent = DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP);
     var destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
@@ -883,6 +894,19 @@ var RequestProcessor = (function() {
         }
       }
 
+      if (request.aContext) {
+        let whitelistedBaseURIs = self.getWhitelistedBaseURIs();
+        let baseURI = request.aContext.baseURI;
+        if (whitelistedBaseURIs.has(baseURI)) {
+          request.requestResult = new RequestResult(true,
+              REQUEST_REASON_COMPATIBILITY);
+          let extName = whitelistedBaseURIs.get(baseURI);
+          return accept(
+              "Extension/application compatibility rule matched [" + extName +
+              "]", request, true);
+        }
+      }
+
       // If the destination has a mapping (i.e. it was originally a different
       // destination but was changed into the current one), accept this
       // request if the original destination would have been accepted.
@@ -894,7 +918,7 @@ var RequestProcessor = (function() {
                                  [destURI][mappedDest];
           Logger.warning(Logger.TYPE_CONTENT,
               "Checking mapped destination: " + mappedDest);
-          let mappedResult = PolicyImplementation.shouldLoad(
+          let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
           if (mappedResult === CP_OK) {
@@ -903,7 +927,7 @@ var RequestProcessor = (function() {
         }
       }
 
-      request.requestResult = internal.checkByDefaultPolicy(originURI, destURI);
+      request.requestResult = internal.checkByDefaultPolicy(request);
       if (request.requestResult.isAllowed) {
         return accept("Allowed by default policy", request);
       } else {
@@ -1059,7 +1083,7 @@ var RequestProcessor = (function() {
     }
     Logger.debug(Logger.TYPE_INTERNAL,
         "Adding request observer: " + observer.toString());
-    internal.requestObservers.push(observer);
+    internal.requestObservers.add(observer);
   };
 
   /**
@@ -1068,13 +1092,11 @@ var RequestProcessor = (function() {
    * @param {Object} observer
    */
   self.removeRequestObserver = function(observer) {
-    for (let i = 0; i < internal.requestObservers.length; i++) {
-      if (internal.requestObservers[i] === observer) {
-        Logger.debug(Logger.TYPE_INTERNAL,
-            "Removing request observer: " + observer.toString());
-        delete internal.requestObservers[i];
-        return;
-      }
+    if (internal.requestObservers.has(observer)) {
+      Logger.debug(Logger.TYPE_INTERNAL,
+          "Removing request observer: " + observer.toString());
+      internal.requestObservers.delete(observer);
+      return;
     }
     Logger.warning(Logger.TYPE_INTERNAL,
         "Could not find observer to remove " + "in removeRequestObserver()");
@@ -1153,3 +1175,5 @@ RequestProcessor = (function() {
       "chrome://rpcontinued/content/lib/request-processor.compat.js", scope);
   return scope.RequestProcessor;
 }());
+
+RequestProcessor.whenReady = Promise.resolve();

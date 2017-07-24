@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,14 +26,15 @@ const {utils: Cu} = Components;
 /* exported startup, shutdown, install, uninstall */
 /* global dump */
 
-let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
 //==============================================================================
 // utilities
 //==============================================================================
 
 const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
 
+function log(aMessage) {
+  dump("[RequestPolicy] " + aMessage + "\n");
+}
 /**
  * If any Exception gets into bootstrap.js, it will be a severe error.
  * The Logger can't be used, as it might not be available.
@@ -43,9 +43,6 @@ function logSevereError(aMessage, aError) {
   let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
        (aError.stack ? ", stack was: " + aError.stack : "");
   dump(msg + "\n");
-  // #ifdef UNIT_TESTING
-  Services.obs.notifyObservers(null, "requestpolicy-log-error", msg);
-  // #endif
   Cu.reportError(aError);
 }
 
@@ -55,6 +52,7 @@ function logSevereError(aMessage, aError) {
 
 function startup(data, reason) {
   try {
+    log("starting up");
     let {ProcessEnvironment} = Cu.import(envURI, {});
     // Remark: startup() takes the arguments as an array!
     ProcessEnvironment.startup([data, reason]);
@@ -65,6 +63,7 @@ function startup(data, reason) {
 
 function shutdown(data, reason) {
   try {
+    log("shutting down");
     {
       let {ProcessEnvironment} = Cu.import(envURI, {});
       // Remark: shutdown() takes the arguments as an array!

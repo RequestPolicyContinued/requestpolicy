@@ -28,7 +28,7 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
 
             # find the URL string and its wrapping element
             url_wrapper = self.marionette.find_element("id", "text_url_1")
-            url = url_wrapper.get_attribute("textContent")
+            url = url_wrapper.text
 
             # select the URL
             self.web_utils.select_element_text(url_wrapper)

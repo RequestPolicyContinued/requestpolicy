@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2011 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -70,7 +70,6 @@ var Info = (function() {
       // Compare with version 1.0.0a8 since that version introduced
       // the "welcome window".
       return self.lastRPVersion &&
-          Services.vc.compare(self.lastRPVersion, "0.0") > 0 &&
           Services.vc.compare(self.lastRPVersion, "1.0.0a8") <= 0;
     });
   }

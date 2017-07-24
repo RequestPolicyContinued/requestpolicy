@@ -2,6 +2,7 @@
 !.github/
 !.gitignore
 !.jshintrc
+!.jshintignore
 !.jscsrc
 !tests/content/.htaccess
 *.jar
@@ -14,6 +15,11 @@
 /build/
 /dist/
 /logs/
+
+/dev_env/browsers/
+/dev_env/node/
+/dev_env/python/
+/node_modules/
 
 /tests/mozmill/data
 /tests/mozmill/mozmill-tests

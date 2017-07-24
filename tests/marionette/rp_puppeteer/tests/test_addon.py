@@ -4,15 +4,18 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.api.addon import Addon
+import os
 
 
 class TestAddon(RequestPolicyTestCase):
 
     def setUp(self):
         super(TestAddon, self).setUp()
+        install_url = ("file://{}/dist/dummy-ext.xpi"
+                       .format(os.getcwd()))
         self.addon = Addon(lambda: self.marionette,
                            addon_id="dummy-ext@requestpolicy.org",
-                           install_url="http://localhost/.dist/dummy-ext.xpi")
+                           install_url=install_url)
         self.addon.install()
 
     def tearDown(self):

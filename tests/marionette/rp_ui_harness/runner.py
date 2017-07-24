@@ -5,20 +5,25 @@
 from firefox_ui_harness.runners.base import FirefoxUITestRunner
 from mozlog import get_default_logger
 import time
-import os
-import codecs
-from contextlib import contextmanager
+import ptvsd
 
-from rp_puppeteer.api.error_detection import (LoggingErrorDetection,
-                                              ConsoleErrorDetection)
+from rp_puppeteer.api.gecko_log import GeckoLog
 
 
 class RequestPolicyUITestRunner(FirefoxUITestRunner):
 
-    next_gecko_log_starting_line = 1
     gecko_log_relpath = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, vscode_debug_secret=None,
+                 vscode_debug_address=None, vscode_debug_port=None, **kwargs):
+        if vscode_debug_secret is not None:
+            ptvsd.enable_attach(
+                vscode_debug_secret,
+                address=(vscode_debug_address, int(vscode_debug_port))
+            )
+            print "Waiting for VS Code to attach"
+            ptvsd.wait_for_attach()
+
         if kwargs["gecko_log"] is None:
             kwargs["gecko_log"] = ("logs/marionette.{}.gecko.log"
                                    ).format(int(time.time()))
@@ -42,48 +47,9 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
         self.result_callbacks.append(gather_debug)
 
     def _add_logging_info(self, rv, marionette):
-        m_getter = lambda: self.marionette
-        logging_error_detect = LoggingErrorDetection(m_getter)
-        console_error_detect = ConsoleErrorDetection(m_getter)
-
-        n_logging_errors = logging_error_detect.n_errors
-        logging_errors = logging_error_detect.messages
-        if n_logging_errors > 0:
-            msg = ""
-            n_diff = n_logging_errors - len(logging_errors)
-            if n_diff != 0:
-                msg += ("There are actually {} more logging erros "
-                        "than displayed here!\n\n"
-                        ).format(n_diff)
-            msg += "\n\n".join(logging_errors)
-            rv["Logging Errors"] = msg
-
-        n_console_errors = console_error_detect.n_errors
-        console_errors = console_error_detect.messages
-        if n_console_errors > 0:
-            msg = ""
-            n_diff = n_console_errors - len(console_errors)
-            if n_diff != 0:
-                msg += ("There are actually {} more console erros "
-                        "than displayed here!\n\n"
-                        ).format(n_diff)
-            msg += "\n".join(console_errors)
-            rv["console errors"] = msg
-
-        with self._gecko_log_file() as gecko_log:
-            # Take all lines except the last one, which is empty.
-            lines = gecko_log.read().split("\n")[:-1]
-            first_line = self.next_gecko_log_starting_line
-            last_line = len(lines)
-            self.next_gecko_log_starting_line = last_line + 1
-
-            less_lines = lines[(first_line - 1):]
-            rv["gecko-log"] = (("Lines {}-{}:\n\n"
-                                ).format(first_line, last_line) +
-                               "\n".join(less_lines))
-
-    @contextmanager
-    def _gecko_log_file(self):
-        abspath = os.path.abspath(self.gecko_log_relpath)
-        with codecs.open(abspath, "r", "utf-8") as file_obj:
-            yield file_obj
+        gecko_log = GeckoLog(lambda: self.marionette)
+        lines = gecko_log.get_lines_of_current_test()
+        rv["gecko-log"] = "\n".join(lines)
+        error_lines = gecko_log.get_error_lines_of_current_test()
+        if len(error_lines) > 0:
+            rv["detected-error-lines"] = "\n".join(error_lines)

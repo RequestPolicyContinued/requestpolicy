@@ -1,12 +1,18 @@
 # NOTE: in this file tab indentation is used.
 # Otherwise .RECIPEPREFIX would have to be set.
 
+# http://clarkgrubb.com/makefile-style-guide
+MAKEFLAGS += --warn-undefined-variables
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := all
+.DELETE_ON_ERROR:
+.SUFFIXES:
 
 #===============================================================================
 # general variables and targets
 #===============================================================================
 
-SHELL      := /bin/bash
 ZIP        := zip
 GIT        := /usr/bin/git
 PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
@@ -27,6 +33,16 @@ source_dir     := src
 build_dir_root := build
 dist_dir       := dist
 logs_dir       := logs
+
+dev_env_dir    := dev_env
+python_env_dir := $(dev_env_dir)/python
+node_env_dir   := $(dev_env_dir)/node
+browsers_dir   := $(dev_env_dir)/browsers
+
+NPM            := npm --prefix=$(node_env_dir)
+JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
+JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint --extra-ext jsm
+ADDONS_LINTER  := $(abspath $(node_env_dir))/node_modules/.bin/addons-linter
 
 # create the dist directory
 $(dist_dir) $(logs_dir):
@@ -61,8 +77,6 @@ endef
 .PHONY: all _xpi _files \
 	xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	unit-testing-files
-
-.DEFAULT_GOAL := all
 
 all: xpi
 xpi: nightly-xpi
@@ -131,7 +145,6 @@ current_build__unique_version  := $(unique_version__$(BUILD))
 # files which are simply copied
 src__copy_files := \
 		$(source_dir)/chrome.manifest \
-		$(source_dir)/install.rdf \
 		$(source_dir)/README \
 		$(source_dir)/LICENSE \
 		$(wildcard $(source_dir)/content/settings/*.css) \
@@ -145,15 +158,18 @@ src__copy_files := \
 		$(wildcard $(source_dir)/skin/*.svg) \
 		$(shell find $(source_dir) -type f -iname "jquery*.js")
 
+src__install_rdf := \
+	$(source_dir)/install.rdf
+
 # JavaScript files which will be (pre)processed.
 # The `copy_files` will be filtered out.
 src__jspp_files := \
-		$(filter-out $(src__copy_files), \
+		$(filter-out $(src__copy_files) $(src__install_rdf), \
 				$(shell find $(source_dir) -type f -regex ".*\.jsm?") \
 		)
 
 # all source files
-src__all_files := $(src__copy_files) $(src__jspp_files)
+src__all_files := $(src__copy_files) $(src__install_rdf) $(src__jspp_files)
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] paths in the "build" directory
@@ -164,9 +180,12 @@ current_build_dir := $(build_dir_root)/$(BUILD)
 build__all_files  := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__all_files))
 build__jspp_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__jspp_files))
 build__copy_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__copy_files))
+build__install_rdf := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__install_rdf))
 
 # detect deleted files and empty directories
 ifdef BUILD
+build__deleted_files :=
+build__empty_dirs :=
 ifneq "$(wildcard $(current_build_dir))" ""
 	# files that have been deleted but still exist in the build directory.
 	build__deleted_files := $(shell find $(current_build_dir) -type f | \
@@ -198,20 +217,20 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 	@# Use `--dereference` to copy the files instead of the symlinks.
 	cp --dereference $< $@
 
-	@if [[ "$(notdir $@)" == "install.rdf" ]]; then \
-		if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
-	  		echo 'install.rdf: changing the Extension ID !' ; \
-	  		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
-	  		echo 'install.rdf: removing the updateURL !' ; \
-	  		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
-		fi ; \
-		if [[ "$(current_build__unique_version)" == "yes" ]]; then \
-	  		echo 'install.rdf: making the version unique !' ; \
-				rev_count=`$(GIT) rev-list HEAD | wc --lines` ; \
-				commit_sha=`$(GIT) rev-parse --short HEAD` ; \
-				unique_suffix=.$${rev_count}.r$${commit_sha}.pre ; \
-	  		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
-		fi ; \
+# force rebuild of install.rdf because the version suffix might change
+$(build__install_rdf) : $(current_build_dir)/% : $(source_dir)/% \
+		FORCE
+	cp --dereference $< $@
+	@if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
+		echo 'install.rdf: changing the Extension ID !' ; \
+		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
+		echo 'install.rdf: removing the updateURL !' ; \
+		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
+	fi ; \
+	if [[ "$(current_build__unique_version)" == "yes" ]]; then \
+		echo 'install.rdf: making the version unique !' ; \
+			unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
+		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
 	fi
 
 #-------------------------------------------------------------------------------
@@ -313,20 +332,25 @@ xpi_file__we_apply_css := $(dist_dir)/webext-apply-css.xpi
 # intermediate targets
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 other_build__alias       := $(alias__$(OTHER_BUILD))
 other_build__source_path := $(source_path__$(OTHER_BUILD))
 other_build__xpi_file    := $(xpi_file__$(OTHER_BUILD))
+endif
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] collect source files
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 other_build__src__all_files := $(shell find $(other_build__source_path) -type f)
+endif
 
 #-------------------------------------------------------------------------------
 # TARGETS
 #-------------------------------------------------------------------------------
 
+ifdef OTHER_BUILD
 _other_xpi: $(other_build__xpi_file)
 
 # For now use FORCE, i.e. create the XPI every time. If the
@@ -338,7 +362,164 @@ $(other_build__xpi_file): $(other_build__src__all_files) FORCE | $(dist_dir)
 	@cd $(other_build__source_path) && \
 	$(ZIP) $(abspath $(other_build__xpi_file)) $(patsubst $(other_build__source_path)%,%,$(other_build__src__all_files))
 	@echo "Creating \"$(other_build__alias)\" XPI: Done!"
+endif
 
+
+#===============================================================================
+# Development environment
+#===============================================================================
+
+PHONY: development-environment
+development-environment: python-venv node-packages firefox-all
+
+#-------------------------------------------------------------------------------
+# timestamps for remakes every x hours/days
+#-------------------------------------------------------------------------------
+
+space :=
+space +=
+fn_timestamp_file = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
+force_every = $(shell \
+  touch -d '$1 ago' $(call fn_timestamp_file,$1); \
+  test $(call fn_timestamp_file,$1) -nt $2 && \
+    echo -n FORCE \
+)
+
+#-------------------------------------------------------------------------------
+# python
+#-------------------------------------------------------------------------------
+
+# $1: command(s) to be wrapped
+IN_PYTHON_ENV = set +u && source $(python_env_dir)/bin/activate && ($1)
+
+# $1: variable name which will contain the profile dir
+# $2: parameters to mozprofile
+# $3: command(s) to be wrapped
+WITH_MOZPROFILE = \
+	$1=`mozprofile $2` && ( \
+		($3); \
+		exit_status=$$? ; \
+		rm -rf $$$1 ; \
+		exit $$exit_status ; \
+	) ;
+
+# timestamp/target files
+# NOTE: The timestamp files must reside inside the venv dir,
+#   so that when the venv dir is removed, the timestamp files
+#   will be removed as well.
+T_PYTHON_PACKAGES := $(python_env_dir)/.timestamp_requirements
+T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
+
+.PHONY: python-venv
+python-venv: $(T_PYTHON_PACKAGES)
+$(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
+		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
+		| $(T_PYTHON_VIRTUALENV)
+	$(call IN_PYTHON_ENV, \
+		pip install --upgrade -r $< \
+	)
+	touch $@
+$(T_PYTHON_VIRTUALENV):
+	mkdir -p $(python_env_dir)
+	virtualenv --no-site-packages --prompt='(RP)' $(python_env_dir)
+	touch $@
+
+#-------------------------------------------------------------------------------
+# node.js
+#-------------------------------------------------------------------------------
+
+# timestamp/target files
+T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
+
+.PHONY: node-packages
+node-packages: $(T_NODE_PACKAGES)
+$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
+		$(call force_every,7 days,$(T_NODE_PACKAGES))
+	grep -Ev '^\#' $< | xargs $(NPM) install
+	touch $@
+
+#-------------------------------------------------------------------------------
+# browsers
+#-------------------------------------------------------------------------------
+
+# TODO: Automatically download seamonkey tarball.
+#         https://archive.mozilla.org/pub/seamonkey/
+#       However, mozdownload only supports 'b2g', 'firefox', 'fennec' and
+#       'thunderbird' as --application. So maybe use wget instead.
+
+# FIXME: Add support for fx-release and fx-beta (unbranded)
+#          https://github.com/mozilla/mozdownload/issues/407
+#        Maybe use "get-firefox" instead?
+#          https://www.npmjs.com/package/get-firefox
+#firefox_branches := esr release beta aurora nightly
+firefox_branches := esr aurora nightly
+seamonkey_branches := release
+
+mozdl_opts_firefox_esr             := --type release --version latest-esr
+# There is no option for "add-on-devel" (unbranded releases) yet; see above.
+#mozdl_opts_firefox_release         := --type tinderbox --branch mozilla-release --??? add-on-devel
+#mozdl_opts_firefox_beta            := --type tinderbox --branch mozilla-beta --??? add-on-devel
+mozdl_opts_firefox_aurora          := --type daily --branch mozilla-aurora
+mozdl_opts_firefox_nightly         := --type daily --branch mozilla-central
+
+mozdl_supported_browsers := firefox
+
+# timestamp of last mozdownload execution
+T_BROWSER = $(browsers_dir)/$1/downloads/$2/.timestamp
+
+define fn_create_browser_target
+.PHONY: $1-$2
+$1-$2: $(browsers_dir)/$1/extracted/$2/$1
+$(browsers_dir)/$1/extracted/$2/$1: \
+		$(browsers_dir)/$1/downloads/latest-$2.tar.bz2
+	rm -rf $(browsers_dir)/$1/extracted/$2/
+	mkdir -p $(browsers_dir)/$1/extracted/$2/
+	tar -xjf $$< -C $(browsers_dir)/$1/extracted/$2/ --strip-components=1
+	touch $$@
+ifneq "$(filter $(mozdl_supported_browsers),$1)" ""
+# The T_BROWSER timestamp file is decoupled from the tarball-target.
+# Make will check for the newest tarball in fixed intervals (force_every),
+# but the tarball will only be extracted iff a new tarball has been
+# downloaded (i.e., a new update has been available).
+$(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
+		$(call force_every,12 hours,$(call T_BROWSER,$1,$2)) \
+		| python-venv
+	mkdir -p $(browsers_dir)/$1/downloads/$2/
+	$$(call IN_PYTHON_ENV, \
+	  mozdownload \
+	    --destination $(browsers_dir)/$1/downloads/$2/ \
+	    --extension tar.bz2 --application $1 \
+	    $$(mozdl_opts_$1_$2) \
+	)
+	ln -sf $$$$(cd $$(dir $$@); ls -t $2/*.tar.bz2 | head -n 1) $$@
+	touch --reference="$$$$(readlink -f $$@)" $$@
+	touch $(call T_BROWSER,$1,$2)
+else
+$(browsers_dir)/$1/downloads/latest-$2.tar.bz2:
+	$$(error \
+	  $1 cannot be downloaded automatically, yet. \
+	  Please put the $1 tarball at "$$@". \
+	  The tarball will then be extracted automatically. \
+	  Make sure to download the correct file (32 bit or 64 bit) \
+	  as the 32-bit version won't work on 64-bit systems. \
+	)
+endif
+.PHONY: clean-old-$1-tarballs-$2
+clean-old-$1-tarballs-$2:
+	@# Remove all but the latest tarball
+	@rm -rf $$$$(ls -t $(browsers_dir)/$1/downloads/$2/*.tar.bz2 2>/dev/null | tail -n +2)
+endef
+$(foreach b,$(firefox_branches),$(eval $(call fn_create_browser_target,firefox,$b)))
+$(foreach b,$(seamonkey_branches),$(eval $(call fn_create_browser_target,seamonkey,$b)))
+
+.PHONY: firefox-all
+firefox-all: $(addprefix firefox-,$(firefox_branches))
+.PHONY: clean-old-firefox-tarballs
+clean-old-firefox-tarballs: \
+		$(addprefix clean-old-firefox-tarballs-,$(firefox_branches))
+.PHONY: clean-old-browser-tarballs
+clean-old-browser-tarballs: \
+		clean-old-firefox-tarballs
 
 #===============================================================================
 # Running and Testing RequestPolicy
@@ -357,21 +538,9 @@ else
 	app_branch := release
 endif
 binary_filename := $(app)
-app_binary := .mozilla/software/$(app)/$(app_branch)/$(binary_filename)
+app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
 
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
-
-#-------------------------------------------------------------------------------
-# virtual python environments
-#-------------------------------------------------------------------------------
-
-.PHONY: venv
-venv: .venv/requirements
-.venv/requirements: requirements.txt | .venv/bin/activate
-	source $| ; pip install -r $<
-	touch $@
-.venv/bin/activate:
-	virtualenv --prompt='(RP)' .venv
 
 #-------------------------------------------------------------------------------
 # run firefox
@@ -379,16 +548,21 @@ venv: .venv/requirements
 
 # arguments for mozrunner
 run_additional_xpis :=
-run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+run_additional_prefs := default
+_run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
-run_args := $(addprefix -a ,$(run_xpis))
-run_args += -b $(app_binary)
-run_args += --preferences=$(mozrunner_prefs_ini):dev
-run_args += $(run_additional_args)
+_run_mozrunner_args := \
+	$(addprefix --addon=,$(_run_xpis)) \
+	--binary=$(app_binary) \
+	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_run_prefs)) \
+	$(run_additional_args)
 
 .PHONY: run
-run: venv unit-testing-xpi dev-helper-xpi
-	source .venv/bin/activate ; mozrunner $(run_args)
+run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
+	$(call IN_PYTHON_ENV, \
+		mozrunner $(_run_mozrunner_args) \
+	)
 
 #-------------------------------------------------------------------------------
 # unit testing: Marionette
@@ -400,41 +574,57 @@ run: venv unit-testing-xpi dev-helper-xpi
 .PHONY: check test marionette
 check test: marionette
 
+logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
+
 marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
 marionette_tests += tests/marionette/tests/manifest.ini
 
-marionette_logging := --gecko-log=$(logs_dir)/marionette.gecko.log
-marionette_logging += --log-html=$(logs_dir)/marionette.html
-marionette_logging += --log-tbpl=$(logs_dir)/marionette.tbpl.log
-#marionette_logging += --log-raw=$(logs_dir)/marionette.raw.log
-#marionette_logging += --log-xunit=$(logs_dir)/marionette.xunit.xml
-#marionette_logging += --log-mach=$(logs_dir)/marionette.mach.log
-#marionette_logging += --log-unittest=$(logs_dir)/marionette.unittest.log
+_marionette_gecko_log := $(logs_dir)/$(logfile_prefix)marionette.gecko.log
+marionette_logging := --gecko-log=$(_marionette_gecko_log)
+marionette_logging += --log-html=$(logs_dir)/$(logfile_prefix)marionette.html
+marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.log
+#marionette_logging += --log-raw=$(logs_dir)/$(logfile_prefix)marionette.raw.log
+#marionette_logging += --log-xunit=$(logs_dir)/$(logfile_prefix)marionette.xunit.xml
+#marionette_logging += --log-mach=$(logs_dir)/$(logfile_prefix)marionette.mach.log
+#marionette_logging += --log-unittest=$(logs_dir)/$(logfile_prefix)marionette.unittest.log
 
-marionette_prefs :=
+# localhost:28xxx
+_marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
+_marionette_address := localhost:$(_marionette_port)
+
+_marionette_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper)
+_marionette_prefs := common marionette
+_marionette_mozprofile_args := \
+	$(addprefix --addon=,$(_marionette_xpis)) \
+	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
+marionette_additional_args :=
+_marionette_runtests_args := \
+	--binary=$(app_binary) \
+	--profile="$$profile_dir" \
+	--address=$(_marionette_address) \
+	$(marionette_logging) \
+	$(marionette_additional_args) \
+	$(marionette_tests)
 
 .PHONY: marionette
-marionette: venv \
+marionette: python-venv \
 		$(logs_dir) \
 		unit-testing-xpi \
 		dev-helper-xpi \
 		dummy-xpi \
 		webext-apply-css-xpi \
 		specific-xpi \
-		amo-nightly-xpi
-	@# Due to Mozilla Bug 1173502, the profile needs to be created and
+		amo-nightly-xpi \
+		$(app_binary)
+	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
-	( \
-	source .venv/bin/activate ; \
-	export PYTHONPATH=tests/marionette/ ; \
-	profile_dir=`mozprofile -a $(xpi_file__unit_testing) -a $(xpi_file__dev_helper) --preferences=$(mozrunner_prefs_ini):marionette` ; \
-	./tests/marionette/rp_ui_harness/runtests.py \
-		--binary=$(app_binary) --profile=$$profile_dir \
-		$(marionette_logging) $(marionette_prefs) $(marionette_tests) ; \
-	exit_status=$$? ; \
-	rm -rf $$profile_dir ; \
-	exit $$exit_status \
-	)
+	$(call IN_PYTHON_ENV, \
+	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
+		./tests/marionette/rp_ui_harness/runtests.py \
+			$(_marionette_runtests_args) ; \
+	))
+	@echo "Checking for undetected errors"
+	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 
 #-------------------------------------------------------------------------------
 # static code analysis
@@ -443,30 +633,42 @@ marionette: venv \
 jshint_args :=
 jscs_args :=
 
-.PHONY: static-analysis jshint jscs
-static-analysis: jshint jscs
-jshint:
-	jshint --extra-ext jsm --exclude '**/jquery.min.js' $(jshint_args) src/
-	jshint $(jshint_args) tests/xpcshell/
-	jshint $(jshint_args) tests/helper-addons/
-jscs:
+.PHONY: static-analysis jshint jscs addons-linter
+static-analysis: jshint jscs addons-linter check-locales
+jshint: node-packages
+	$(JSHINT) --exclude '**/jquery.min.js' $(jshint_args) src/
+	$(JSHINT) $(jshint_args) tests/xpcshell/
+	$(JSHINT) $(jshint_args) tests/helper-addons/
+jscs: node-packages
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; jscs $(jscs_args) .
-	cd tests/xpcshell/; jscs $(jscs_args) .
-	cd tests/helper-addons/; jscs $(jscs_args) .
+	cd src/; $(JSCS) $(jscs_args) .
+	cd tests/xpcshell/; $(JSCS) $(jscs_args) .
+	cd tests/helper-addons/; $(JSCS) $(jscs_args) .
+addons-linter: nightly-xpi node-packages
+	$(ADDONS_LINTER) $(xpi_file__nightly)
+# localization checks
+include tests/l10n/Makefile
 
 
 #===============================================================================
 # other targets
 #===============================================================================
 
-# Clean all temporary files and directories created by 'make'.
-.PHONY: clean
-clean:
+# Cleanup targets
+.PHONY: clean mostlyclean distclean clean-dev-environment
+clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
 	@rm -rf $(build_dir_root)/*
+mostlyclean: clean
 	@rm -rf $(logs_dir)/*
-	@echo "Cleanup is done."
+clean-dev-environment:
+	@rm -rf $(python_env_dir)
+	@rm -rf $(node_env_dir)
+	@rm -rf $(browsers_dir)/firefox
+	# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
+	# are put there manually.
+	@rm -rf $(browsers_dir)/seamonkey/extracted
+distclean: mostlyclean clean-dev-environment
 
 # Can force a target to be executed every time.
 .PHONY: FORCE

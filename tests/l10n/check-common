@@ -1,0 +1,30 @@
+fail () {
+  echo -e "Check failed: $1"
+  exit 1
+}
+
+check_file_exists () {
+  local filename="$1"
+  test -f "${filename}" || \
+    fail "File '${filename}' does not exist."
+}
+
+check_line_endings () {
+  local n_lines=$(grep -E $'\r'\$ "$1" | wc -l)
+  test "${n_lines}" = "0" || \
+    fail "File '$1' does not have Unix line endings."
+}
+
+check_whitespace () {
+  local n_lines=$(grep -E '[[:space:]]$' "$1" | wc -l)
+  test "${n_lines}" = "0" || \
+    fail "File '$1' contains lines with EOL-whitespace."
+}
+
+_check_diff () {
+  local diff=$(diff <(echo "${1}") <(echo "${2}"))
+  if [[ "${diff}" != "" ]]; then
+    local sbs_diff=$(diff --side-by-side <(echo "${1}") <(echo "${2}"))
+    fail "${3}\nDiff:\n${sbs_diff}"
+  fi
+}

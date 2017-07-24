@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2011 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,48 +59,12 @@ PolicyManager = (function(self) {
     return ruleData;
   }
 
-  function allowOrigin(aOrigin, noStore) {
-    self.addAllowRule(getRuleData(aOrigin), noStore);
-  }
-  self.allowOrigin = function(aOrigin) {
-    allowOrigin(aOrigin, false);
-  };
-  self.allowOriginDelayStore = function(aOrigin) {
-    allowOrigin(aOrigin, true);
-  };
+  self.addRuleBySpec = function(aSpec, noStore) {
+    const fn = aSpec.temp ? self.addTemporaryRule : self.addRule;
+    const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
+    const ruleData = getRuleData(aSpec.origin, aSpec.dest);
 
-  self.temporarilyAllowOrigin = function(aOrigin) {
-    PolicyManager.addTemporaryAllowRule(getRuleData(aOrigin));
-  };
-  self.temporarilyAllowDestination = function(aDest) {
-    self.addTemporaryAllowRule(getRuleData(undefined, aDest));
-  };
-
-  function allowDestination(aDest, noStore) {
-    self.addAllowRule(getRuleData(undefined, aDest), noStore);
-  }
-  self.allowDestination = function(aDest) {
-    allowDestination(aDest, false);
-  };
-  self.allowDestinationDelayStore = function(aDest) {
-    allowDestination(aDest, true);
-  };
-
-  function allowOriginToDestination(originIdentifier, destIdentifier, noStore) {
-    self.addAllowRule(getRuleData(originIdentifier, destIdentifier), noStore);
-  }
-  self.allowOriginToDestination = function(originIdentifier, destIdentifier) {
-    allowOriginToDestination(originIdentifier, destIdentifier, false);
-  };
-  self.allowOriginToDestinationDelayStore = function(originIdentifier,
-                                                     destIdentifier) {
-    allowOriginToDestination(originIdentifier, destIdentifier, true);
-  };
-
-  self.temporarilyAllowOriginToDestination = function(originIdentifier,
-                                                      destIdentifier) {
-    PolicyManager.addTemporaryAllowRule(getRuleData(originIdentifier,
-                                                    destIdentifier));
+    fn(ruleAction, ruleData, noStore);
   };
 
   return self;

@@ -6,6 +6,8 @@ from rp_ui_harness import RequestPolicyTestCase
 
 
 class TestTotalNumRequestsAfterReload(RequestPolicyTestCase):
+    """Reloading a Tab should reset the request counter.
+    """
 
     TEST_URL = "http://www.maindomain.test/img_1.html";
 

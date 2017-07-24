@@ -1,0 +1,26 @@
+firefox-puppeteer == 50
+firefox-ui-harness == 1.3
+
+marionette-client == 2.3
+marionette-driver == 1.4
+
+browsermob-proxy == 0.7
+manifestparser == 1.1
+mozcrash == 0.17
+mozdevice == 0.48
+mozfile == 1.2
+mozinfo == 0.9
+mozinstall == 1.12
+mozlog == 3.1
+moznetwork == 0.27
+mozprocess == 0.22
+mozprofile == 0.28
+mozrunner == 6.13
+moztest == 0.7
+mozversion == 1.4
+wptserve == 1.4
+
+mozdownload
+
+# https://github.com/DonJayamanne/pythonVSCode/issues/981#issuecomment-309217245
+ptvsd == 3.0.0

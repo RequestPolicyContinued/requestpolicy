@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2008-2009 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, document */
+/* global window, document, dump */
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -64,6 +64,17 @@ window.rpcontinued.overlay = (function() {
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);
+
+  function setTimeout(aFn, aDelay) {
+    return window.setTimeout(function() {
+      if (OverlayEnvironment.isShuttingDownOrShutDown()) {
+        dump("[RequestPolicy] Warning: not calling delayed function " +
+            "because of add-on shutdown.\n");
+        return;
+      }
+      aFn.call(null);
+    }, aDelay);
+  }
 
   let initialized = false;
 
@@ -135,6 +146,8 @@ window.rpcontinued.overlay = (function() {
         // listener must be added immediately.
         mlManager.addListener("isOverlayReady", function() {
           return true;
+        }, function() {
+          return false;
         });
         window.messageManager.broadcastAsyncMessage(C.MM_PREFIX +
                                                     "overlayIsReady", true);
@@ -263,6 +276,8 @@ window.rpcontinued.overlay = (function() {
 
     // send the list of blocked URIs back to the frame script
     return {blockedURIs: blockedURIs};
+  }, function(message) {
+    return {blockedURIs: {}};
   });
 
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
@@ -383,7 +398,7 @@ window.rpcontinued.overlay = (function() {
   //                  object that contains everything. This requires
   //                  e.g. a `MetaRedirectRequest` class.
   self._showRedirectNotification = function(browser, redirectTargetUri, delay,
-                                            redirectOriginUri) {
+      redirectOriginUri, replaceIfPossible) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
 
@@ -424,8 +439,8 @@ window.rpcontinued.overlay = (function() {
 
     var addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
     var addRulePopup = $id(addRuleMenuName);
-    var cm = rpcontinued.classicmenu;
-    cm.emptyMenu(addRulePopup);
+    const {classicmenu} = rpcontinued;
+    classicmenu.emptyMenu(addRulePopup);
 
     let m = rpcontinued.menu;
     var originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
@@ -442,30 +457,64 @@ window.rpcontinued.overlay = (function() {
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
 
+    const allowRedirection = function() {
+      // Fx 3.7a5+ calls shouldLoad for location.href changes.
+
+      // TODO: currently the allow button ignores any additional
+      //       HTTP response headers [1]. Maybe there is a way to take
+      //       those headers into account (e.g. `Set-Cookie`?), or maybe
+      //       this is not necessary at all.
+      // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
+
+      RequestProcessor.registerAllowedRedirect(redirectOriginUri,
+                                               redirectTargetUri);
+
+      let data = {
+        uri: redirectTargetUri
+      };
+      if (replaceIfPossible) {
+        data.replaceUri = redirectOriginUri;
+      }
+      browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
+          data);
+    };
+
+    function addMenuItem(aRuleSpec) {
+      aRuleSpec.allow = true;
+      classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
+        if (Prefs.get("autoReload")) {
+          allowRedirection();
+        }
+      });
+    }
+    function addMenuSeparator() {
+      classicmenu.addMenuSeparator(addRulePopup);
+    }
+
     if (destBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowDest(addRulePopup, dest);
+      addMenuItem({dest});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowDest(addRulePopup, dest);
+        addMenuItem({dest});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
     }
 
     if (originBaseDomain !== null) {
-      cm.addMenuItemTemporarilyAllowOrigin(addRulePopup, origin);
+      addMenuItem({origin, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOrigin(addRulePopup, origin);
+        addMenuItem({origin});
       }
     }
 
     if (originBaseDomain !== null && destBaseDomain !== null) {
-      cm.addMenuSeparator(addRulePopup);
+      addMenuSeparator();
 
-      cm.addMenuItemTemporarilyAllowOriginToDest(addRulePopup, origin, dest);
+      addMenuItem({origin, dest, temp: true});
       if (mayPermRulesBeAdded) {
-        cm.addMenuItemAllowOriginToDest(addRulePopup, origin, dest);
+        addMenuItem({origin, dest});
       }
     }
 
@@ -479,21 +528,7 @@ window.rpcontinued.overlay = (function() {
           label: StringUtils.$str("allow"),
           accessKey: StringUtils.$str("allow.accesskey"),
           popup: null,
-          callback: function() {
-            // Fx 3.7a5+ calls shouldLoad for location.href changes.
-
-            // TODO: currently the allow button ignores any additional
-            //       HTTP response headers [1]. Maybe there is a way to take
-            //       those headers into account (e.g. `Set-Cookie`?), or maybe
-            //       this is not necessary at all.
-            // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
-
-            RequestProcessor.registerAllowedRedirect(redirectOriginUri,
-                                                     redirectTargetUri);
-
-            browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
-                {uri: redirectTargetUri});
-          }
+          callback: allowRedirection
         },
         {
           label: StringUtils.$str("deny"),
@@ -562,7 +597,7 @@ window.rpcontinued.overlay = (function() {
    * notifications.
    */
   self._updateBlockedContentState = function() {
-    try {
+    RequestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       // #ifdef LOG_FLAG_STATE
@@ -582,10 +617,10 @@ window.rpcontinued.overlay = (function() {
                     "No requests have been blocked.";
       Logger.debug(Logger.TYPE_INTERNAL, logText);
       // #endif
-    } catch (e) {
+    }).catch(e => {
       Logger.severeError(
           "Unable to complete _updateBlockedContentState actions: " + e, e);
-    }
+    });
   };
 
   /**
@@ -664,8 +699,9 @@ window.rpcontinued.overlay = (function() {
                                                    destUri) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
-    window.setTimeout(function() {
-      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0);
+    setTimeout(function() {
+      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0,
+          originUri);
     }, 0);
   };
 
@@ -679,7 +715,7 @@ window.rpcontinued.overlay = (function() {
 
   self._updateBlockedContentStateAfterTimeout = function() {
     const browser = gBrowser.selectedBrowser;
-    blockedContentCheckTimeoutId = window.setTimeout(function() {
+    blockedContentCheckTimeoutId = setTimeout(function() {
       try {
         rpcontinued.overlay._updateBlockedContentState(browser);
       } catch (e) {
@@ -875,7 +911,7 @@ window.rpcontinued.overlay = (function() {
           return;
         }
         // call this function again in a few miliseconds.
-        window.setTimeout(function() {
+        setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
           tryAddingSHistoryListener();
         }, waitTime);
@@ -956,86 +992,6 @@ window.rpcontinued.overlay = (function() {
   };
 
   /**
-   * Allows requests from the specified origin to any destination for the
-   * duration of the browser session.
-   */
-  self.temporarilyAllowOrigin = function(originHost) {
-    PolicyManager.temporarilyAllowOrigin(originHost);
-  };
-
-  /**
-   * Allows the current document's origin to request from any destination for
-   * the duration of the browser session.
-   *
-   * @param {Event} event
-   */
-  self.temporarilyAllowCurrentOrigin = function(event) {
-    // Note: the available variable "content" is different than the avaialable
-    // "window.target".
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.temporarilyAllowOrigin(host);
-  };
-
-  /**
-   * Allows a destination to be requested from any origin for the duration of
-   * the browser session.
-   *
-   * @param {string} destHost
-   */
-  self.temporarilyAllowDestination = function(destHost) {
-    PolicyManager.temporarilyAllowDestination(destHost);
-  };
-
-  /**
-   * Allows a destination to be requested from a single origin for the duration
-   * of the browser session.
-   *
-   * @param {string} originHost
-   * @param {string} destHost
-   */
-  self.temporarilyAllowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.temporarilyAllowOriginToDestination(originHost, destHost);
-  };
-
-  /**
-   * Allows requests from an origin, including in future browser sessions.
-   */
-  self.allowOrigin = function(originHost) {
-    PolicyManager.allowOrigin(originHost);
-  };
-
-  /**
-   * Allows the current document's origin to request from any destination,
-   * including in future browser sessions.
-   *
-   * @param {Event} event
-   */
-  self.allowCurrentOrigin = function(event) {
-    var host = self.getTopLevelDocumentUriIdentifier();
-    PolicyManager.allowOrigin(host);
-  };
-
-  /**
-   * Allows requests to a destination, including in future browser sessions.
-   *
-   * @param {String} destHost
-   */
-  self.allowDestination = function(destHost) {
-    PolicyManager.allowDestination(destHost);
-  };
-
-  /**
-   * Allows requests to a destination from a single origin, including in future
-   * browser sessions.
-   *
-   * @param {String} originHost
-   * @param {String} destHost
-   */
-  self.allowOriginToDestination = function(originHost, destHost) {
-    PolicyManager.allowOriginToDestination(originHost, destHost);
-  };
-
-  /**
    * Revokes all temporary permissions granted during the current session.
    *
    * @param {Event} event
@@ -1044,10 +1000,6 @@ window.rpcontinued.overlay = (function() {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
-  };
-
-  self._openInNewTab = function(uri) {
-    gBrowser.selectedTab = gBrowser.addTab(uri);
   };
 
   /**
@@ -1090,7 +1042,7 @@ window.rpcontinued.overlay = (function() {
     // is actually hidden. For example, it can reside in the Australis
     // menu. By delaying "openMenu" the menu will be closed in the
     // meantime, and the toolbar button will be detected as invisible.
-    window.setTimeout(function() {
+    setTimeout(function() {
       if (self.isToolbarButtonVisible()) {
         self.openMenuAtToolbarButton();
       } else {
@@ -1132,7 +1084,7 @@ window.rpcontinued.overlay = (function() {
 
     // Start iterating at the currently selected tab.
     let indexes = JSUtils.leftRotateArray(JSUtils.range(numTabs),
-		selectedTabIndex);
+        selectedTabIndex);
     for (let index of indexes) {
       let currentBrowser = tabbrowser.getBrowserAtIndex(index);
       let currentURI = currentBrowser.currentURI.spec;

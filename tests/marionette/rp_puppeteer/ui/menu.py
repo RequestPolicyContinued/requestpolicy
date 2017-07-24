@@ -3,12 +3,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from firefox_puppeteer.base import BaseLib
+from firefox_puppeteer.api.appinfo import AppInfo
+from firefox_puppeteer.api.utils import Utils
 from firefox_puppeteer.ui.windows import Windows
 from marionette_driver.wait import Wait
 import re
 
 
 class Menu(BaseLib):
+
+    def __init__(self, marionette_getter):
+        BaseLib.__init__(self, marionette_getter)
+
+        self.app_info = AppInfo(marionette_getter)
+        self.utils = Utils(marionette_getter)
 
     #################################
     # Public Properties and Methods #
@@ -17,7 +25,11 @@ class Menu(BaseLib):
     @property
     def total_num_requests(self):
         label_element = self._popup.find_element("id", "rpc-origin-num-requests")
-        text = label_element.get_attribute("value")
+        if self.utils.compare_version(self.app_info.version, "49") < 0:
+            # up to Firefox 48 (Bug 1272653)
+            text = label_element.get_attribute("value")
+        else:
+            text = label_element.get_property("value")
         match = re.match(r"^(\d+) \((\d+)\+(\d+)\)$", text)
         return int(match.group(1))
 
@@ -56,7 +68,10 @@ class Menu(BaseLib):
 
     @property
     def _popup_state(self):
-        return self._popup.get_attribute("state")
+        if self.utils.compare_version(self.app_info.version, "49") < 0:
+            # up to Firefox 48 (Bug 1272653)
+            return self._popup.get_attribute("state")
+        return self._popup.get_property("state")
 
     def _toggle(self, trigger="api"):
         is_open = self.is_open()

@@ -4,6 +4,7 @@
 
 from rp_ui_harness import RequestPolicyTestCase
 from rp_puppeteer.api.addon import Addon
+import os
 
 
 class TestWebExtension(RequestPolicyTestCase):
@@ -13,7 +14,8 @@ class TestWebExtension(RequestPolicyTestCase):
         self.addon = Addon(
             lambda: self.marionette,
             addon_id="apply-css@mozilla.org",
-            install_url="http://localhost/.dist/webext-apply-css.xpi"
+            install_url=("file://{}/dist/webext-apply-css.xpi"
+                         .format(os.getcwd()))
         )
 
     def tearDown(self):

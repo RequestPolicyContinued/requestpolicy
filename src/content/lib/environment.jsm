@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -236,6 +235,14 @@ var Environment = (function() {
   Environment.ENV_STATES = ENV_STATES;
 
   /**
+   * Registers the environment to its outer environment.
+   */
+  Environment.prototype.isShuttingDownOrShutDown = function() {
+    let self = this;
+    return self.envState >= ENV_STATES.SHUTTING_DOWN;
+  };
+
+  /**
    * This function creates one "Level Object" for each level. Those objects
    * mainly will hold the startup- or shutdown-functions of the corresponding
    * level. All of the Level Objects are put together in another object which
@@ -306,7 +313,7 @@ var Environment = (function() {
    */
   Environment.prototype.addStartupFunction = function(aLevel, f) {
     let self = this;
-    if (self.envState >= ENV_STATES.SHUTTING_DOWN) {
+    if (self.isShuttingDownOrShutDown()) {
       // the environment is shutting down or already shut down.
       return;
     }

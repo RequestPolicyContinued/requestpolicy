@@ -215,9 +215,10 @@ function setOldRulePref(aPrefName, aValue) {
       setComplexValue(aPrefName, Ci.nsISupportsString, str);
 }
 
-function testGetOldRulesAsNewRules(
-    [origins, destinations, originsToDestinations], expectedRuleSpecs) {
+function testGetOldRulesAsNewRules(oldRulePrefValues, expectedRuleSpecs) {
   "use strict";
+
+  let [origins, destinations, originsToDestinations] = oldRulePrefValues;
 
   var oldRules = new OldRules(origins, destinations, originsToDestinations);
   var actualRuleSpecs = oldRules.getAsNewRules();

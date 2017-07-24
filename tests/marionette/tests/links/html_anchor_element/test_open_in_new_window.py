@@ -15,11 +15,9 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
         self.main_window = self.windows.current
 
-
     def tearDown(self):
         self.windows.close_all(exceptions=[self.main_window])
         RequestPolicyTestCase.tearDown(self)
-
 
     def test_open_in_new_window(self):
         with self.marionette.using_context("content"):
@@ -65,7 +63,6 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
                 self.assertFalse(self.redir.is_shown(),
                                  ("Following the link didn't cause a "
                                   "redirect in the origin tab."))
-
 
     def open_link_multi(self, link):
         """Open a link in new window using different methods."""

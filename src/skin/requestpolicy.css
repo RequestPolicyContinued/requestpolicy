@@ -279,13 +279,11 @@
 #rpcontinuedContextMenuEntry[rpcontinuedBlocked="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
-  color: #a00;
 }
 
 #rpcontinuedContextMenuEntry[rpcontinuedPermissive="true"] {
   list-style-image:
     url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
-  color: #d07100;
 }
 
 /*********************************************

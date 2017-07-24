@@ -2,8 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2012 Justin Samuel
- * Copyright (c) 2014-2015 Martin Kimmerle
+ * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ let {Logger} = importModule("lib/logger");
 RequestProcessor = (function(self) {
   let conflictingExtensions = [];
   let compatibilityRules = [];
+  let whitelistedBaseURIs = new Map();
   let topLevelDocTranslationRules = {};
 
   // TODO: update compatibility rules etc. when addons are enabled/disabled
@@ -89,8 +90,6 @@ RequestProcessor = (function(self) {
     idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
     idArray.push("keefox@chris.tomlinson"); // KeeFox
     idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
-    idArray.push("{0AA9101C-D3C1-4129-A9B7-D778C6A17F82}"); // rikaichan
-    idArray.push("{477c4c36-24eb-11da-94d4-00e08161165f}"); // Grab and Drag
 
     for (let id of idArray) {
       Logger.info(Logger.TYPE_INTERNAL, "Extension check: " + id);
@@ -123,6 +122,11 @@ RequestProcessor = (function(self) {
         Logger.info(Logger.TYPE_INTERNAL, "Conflicting extension: " + ext.name);
         compatibilityRules.push(
             ["resource://brief-content/", null, ext.name]);
+        if (ext.id === "{899DF1F8-2F43-4394-8315-37F6744E6319}") {
+          // NewsFox
+          whitelistedBaseURIs.set("chrome://newsfox/content/newsfox.xul",
+                                  ext.name);
+        }
         conflictingExtensions.push({
           "id": ext.id,
           "name": ext.name,
@@ -242,6 +246,11 @@ RequestProcessor = (function(self) {
       appInfo.vendor
     ]);
     compatibilityRules.push([
+      "about:addons",
+      "https://discovery.addons.mozilla.org/",
+      appInfo.vendor
+    ]);
+    compatibilityRules.push([
       "https://services.addons.mozilla.org/",
       "https://static.addons.mozilla.net/",
       appInfo.vendor
@@ -308,6 +317,11 @@ RequestProcessor = (function(self) {
         "https://api.accounts.firefox.com/",
         appInfo.vendor
       ]);
+      compatibilityRules.push([
+        "https://accounts.firefox.com/",
+        "https://accounts.cdn.mozilla.net/",
+        appInfo.vendor
+      ]);
     }
 
     // Firefox Hello
@@ -360,6 +374,10 @@ RequestProcessor = (function(self) {
 
   self.getCompatibilityRules = function() {
     return compatibilityRules;
+  };
+
+  self.getWhitelistedBaseURIs = function() {
+    return whitelistedBaseURIs;
   };
 
   self.getConflictingExtensions = function() {

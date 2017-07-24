@@ -4,6 +4,10 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
 #### next version
+no changes yet
+
+
+#### Version 1.0.beta13.0
 * improvements
   * When the "allow same domain" setting is set to `false`, allow
     http:80 to https:443 if the host is the same.

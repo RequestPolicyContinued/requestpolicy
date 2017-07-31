@@ -298,7 +298,12 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
 
   // Recursively remove all event listeners.
   for (let elementSpec of recursivelyGetAllElementSpecs(xulTrees[aTreeName])) {
-    let eventTarget = $id(elementSpec.attributes.id);
+    let {id} = elementSpec.attributes;
+    let eventTarget = $id(id);
+    if (!eventTarget) {
+      console.error(`Could not find element with ID "${id}".`);
+      continue;
+    }
     removeEventListeners(eventTarget, elementSpec);
   }
 

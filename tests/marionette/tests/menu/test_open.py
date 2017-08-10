@@ -6,6 +6,7 @@ from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.errors import TimeoutException
 from marionette_driver.wait import Wait
 import time
+import unittest
 
 
 class TestOpenMenu(RequestPolicyTestCase):
@@ -28,6 +29,7 @@ class TestOpenMenu(RequestPolicyTestCase):
         self.prefs.reset_pref(pref_name)
         time.sleep(0.001)
 
+    @unittest.skip("self.browser.send_shortcut currently is buggy")
     def test_custom_shortcut_combo(self):
         pref_name = ("extensions.requestpolicy."
                      "keyboardShortcuts.openMenu.combo")

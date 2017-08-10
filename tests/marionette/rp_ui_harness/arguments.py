@@ -22,6 +22,14 @@ class RequestPolicyUIBaseArguments(object):
       (['--vscode-debug-port'], dict(
         default='3000'
       )),
+
+      (["--wait-before-first-test"], dict(
+        action="store_true"
+      )),
+      (["--wait-on-failure"], dict(
+        action="store_true"
+      )),
+
       (["-m", "--no-make-dependencies"], dict(
         dest="make_deps", action="store_false", default=True
       )),

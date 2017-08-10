@@ -17,7 +17,9 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
     _nth_test = 0
 
     def __init__(self, vscode_debug_secret=None,
-                 vscode_debug_address=None, vscode_debug_port=None, **kwargs):
+                 vscode_debug_address=None, vscode_debug_port=None,
+                 wait_before_first_test=False,
+                 wait_on_failure=False, **kwargs):
         if vscode_debug_secret is not None:
             ptvsd.enable_attach(
                 vscode_debug_secret,
@@ -25,6 +27,9 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
             )
             print "Waiting for VS Code to attach"
             ptvsd.wait_for_attach()
+
+        self.wait_before_first_test = wait_before_first_test
+        self.wait_on_failure = wait_on_failure
 
         if kwargs["gecko_log"] is None:
             kwargs["gecko_log"] = ("logs/marionette.{}.gecko.log"
@@ -36,6 +41,9 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
         def gather_debug(test, status):
             rv = {}
             marionette = test._marionette_weakref()
+
+            if self.wait_on_failure:
+                raw_input("Press Enter to continue...")
 
             try:
                 self._add_logging_info(rv)
@@ -49,6 +57,8 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
 
     def run_test(self, *args, **kwargs):
         self._nth_test += 1
+        if self.wait_before_first_test and self._nth_test == 1:
+            raw_input("Press Enter to start the tests...")
         super(RequestPolicyUITestRunner, self).run_test(*args, **kwargs)
 
     @lazyprop

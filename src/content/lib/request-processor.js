@@ -1855,24 +1855,6 @@ RequestProcessor = (function(self) {
       appInfo.vendor
     ]);
 
-    // Flock
-    if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
-      Logger.info("Application detected: " + appInfo.vendor);
-      compatibilityRules.push(
-          ["about:myworld", "http://www.flock.com/", appInfo.vendor]);
-      compatibilityRules.push(["about:flock", null, appInfo.vendor]);
-      compatibilityRules.push([
-        "http://www.flock.com/rss",
-        "http://feeds.feedburner.com/flock",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "http://feeds.feedburner.com/",
-        "http://www.flock.com/",
-        appInfo.vendor
-      ]);
-    }
-
     // Seamonkey
     if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
       Logger.info("Application detected: Seamonkey");

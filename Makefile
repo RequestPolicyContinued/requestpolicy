@@ -641,15 +641,20 @@ marionette-non-quick marionette-quick: \
 	@echo "Checking for undetected errors"
 	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 
-#-------------------------------------------------------------------------------
+#===============================================================================
 # static code analysis
+#===============================================================================
+
+.PHONY: static-analysis
+static-analysis: jshint jscs addons-linter check-locales
+
 #-------------------------------------------------------------------------------
 
 jshint_args :=
 jscs_args :=
 
-.PHONY: static-analysis jshint jscs addons-linter check-locales
-static-analysis: jshint jscs addons-linter check-locales
+.PHONY: jshint jscs addons-linter check-locales
+
 jshint: node-packages
 	$(JSHINT) $(jshint_args) src/
 	$(JSHINT) $(jshint_args) tests/xpcshell/

@@ -41,8 +41,6 @@ import {Utils} from "lib/utils";
 
 import RPContentPolicy from "main/content-policy";
 
-let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
-
 //==============================================================================
 // constants
 //==============================================================================
@@ -1565,11 +1563,8 @@ RequestProcessor = (function(self) {
   let topLevelDocTranslationRules = {};
 
   // TODO: update compatibility rules etc. when addons are enabled/disabled
-  let addonListener = {
-    onDisabling: function(addon, needsRestart) {},
-    onUninstalling: function(addon, needsRestart) {},
-    onOperationCancelled: function(addon, needsRestart) {}
-  };
+  function onAddonEvent(aExtensionInfo) {
+  }
 
   function init() {
     // Detect other installed extensions and the current application and do
@@ -1582,12 +1577,14 @@ RequestProcessor = (function(self) {
           console.dir(e);
         });
 
-    AddonManager.addAddonListener(addonListener);
+    browser.management.onEnabled.addListener(onAddonEvent);
+    browser.management.onDisabled.addListener(onAddonEvent);
   }
 
   // stop observers / listeners
   function cleanup() {
-    AddonManager.removeAddonListener(addonListener);
+    browser.management.onEnabled.removeListener(onAddonEvent);
+    browser.management.onDisabled.removeListener(onAddonEvent);
   }
 
   MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
@@ -1619,8 +1616,19 @@ RequestProcessor = (function(self) {
 
     for (let id of idArray) {
       Logger.info("Extension check: " + id);
-      AddonManager.getAddonByID(id, initializeExtCompatCallback);
+      browser.management.get(id).
+          then(initializeExtCompatCallback).
+          catch(initializeExtCompatErrorCallback);
     }
+  }
+
+  function initializeExtCompatErrorCallback(e) {
+    if (!e) {
+      // the extension does not exist
+      return;
+    }
+    console.error("initializeExtCompatCallback error:");
+    console.dir(e);
   }
 
   function initializeExtCompatCallback(ext) {

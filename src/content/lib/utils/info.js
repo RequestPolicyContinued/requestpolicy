@@ -24,8 +24,6 @@
 import {Prefs} from "models/prefs";
 import {C} from "lib/utils/constants";
 
-let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
-
 //==============================================================================
 // Info
 //==============================================================================
@@ -40,12 +38,16 @@ export var Info = (function() {
 
     self.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
-    AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
+    browser.management.getSelf().then(addon => {
       Prefs.set("lastVersion", addon.version);
       self.curRPVersion = addon.version;
       if (self.lastRPVersion !== self.curRPVersion) {
         Services.prefs.savePrefFile(null);
       }
+      return;
+    }).catch(e => {
+      console.error("Error setting lastRPVersion. Details:");
+      console.dir(e);
     });
 
     XPCOMUtils.defineLazyGetter(self, "isRPUpgrade", function() {

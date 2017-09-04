@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
+
 const rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
       QueryInterface(Ci.nsIPrefBranch2);
 
@@ -57,6 +59,7 @@ function genNewPromise(promiseExecutor, onErrorMessage) {
 export var Api = {
   browser: {
     extension: {},
+    management: {},
     runtime: {
       onMessage: {}
     },
@@ -105,6 +108,113 @@ export var ContentScriptsApi = {
   Api.browser.extension.getBackgroundPage = function() {
     return backgroundPage;
   };
+}());
+
+//==============================================================================
+// browser.management
+//==============================================================================
+
+(function() {
+  const MANAGEMENT_EVENTS = Object.freeze([
+    "onEnabled",
+    "onDisabled",
+    "onInstalled",
+    "onUninstalled",
+  ]);
+
+  let managementListeners = {};
+  for (let event of MANAGEMENT_EVENTS) {
+    managementListeners[event] = new Set();
+  }
+
+  function onAddonListenerEvent(aEvent, aAddon) {
+    managementListeners[aEvent].forEach(listener => {
+      listener.call(null, aAddon);
+    });
+  }
+
+  let addonListener = {};
+  MANAGEMENT_EVENTS.forEach(aEvent => {
+    addonListener[aEvent] = onAddonListenerEvent.bind(null, aEvent);
+  });
+
+  Bootstrap.onStartup(() => {
+    AddonManager.addAddonListener(addonListener);
+  });
+  Bootstrap.onShutdown(() => {
+    AddonManager.removeAddonListener(addonListener);
+  });
+
+  /**
+   * @param {Addon} aAddon
+   * @return {ExtensionInfo}
+   */
+  function getExtensionInfo(aAddon) {
+    let {
+      id,
+      isActive: enabled,
+      name,
+      version,
+    } = aAddon;
+
+    return {
+      enabled,
+      id,
+      name,
+      version,
+    };
+  }
+
+  Api.browser.management.get = function(aId) {
+    let p = new Promise((resolve, reject) => {
+      AddonManager.getAddonByID(aId, addon => {
+        try {
+          if (addon) {
+            resolve(getExtensionInfo(addon));
+          } else {
+            reject();
+          }
+        } catch (e) {
+          console.error("browser.management.get()");
+          console.dir(e);
+          reject(e);
+        }
+      });
+    });
+    p.catch(e => {
+      if (!e) {
+        // the extension does not exist
+        return;
+      }
+      log.error("browser.management.get", e);
+    });
+    return p;
+  };
+
+  Api.browser.management.getAll = function() {
+    let pExtensionInfo =
+        (new Promise(resolve => AddonManager.getAllAddons(resolve))).
+            then(addons => addons.map(getExtensionInfo));
+    promiseCatch(pExtensionInfo, "browser.management.getAll");
+    return pExtensionInfo;
+  };
+
+  Api.browser.management.getSelf =
+      Api.browser.management.get.bind(null, "/* @echo EXTENSION_ID */");
+
+  function addManagementListener(aEvent, aListener) {
+    managementListeners[aEvent].add(aListener);
+  }
+  function removeManagementListener(aEvent, aListener) {
+    managementListeners[aEvent].delete(aListener);
+  }
+
+  MANAGEMENT_EVENTS.forEach(aEvent => {
+    Api.browser.management[aEvent] = {
+      addListener: addManagementListener.bind(null, aEvent),
+      removeListener: removeManagementListener.bind(null, aEvent),
+    };
+  });
 }());
 
 //==============================================================================

@@ -689,6 +689,10 @@ export function loadOverlayIntoWindow(window) {
     RequestProcessor.registerLinkClicked(origin, dest);
   }
 
+  function wrapFunctionErrorCallback(aMessage, aError) {
+    Logger.error(aMessage, aError);
+  }
+
   /**
    * Wraps (overrides) the following methods of gContextMenu
    * - openLink()
@@ -709,11 +713,14 @@ export function loadOverlayIntoWindow(window) {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    Utils.wrapFunction(window.gContextMenu, "openLink",
+    Utils.wrapFunction(
+        window.gContextMenu, "openLink", wrapFunctionErrorCallback,
         onOpenLinkViaContextMenu);
-    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow",
-        onOpenLinkViaContextMenu);
-    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent",
+    Utils.wrapFunction(
+        window.gContextMenu, "openLinkInPrivateWindow",
+        wrapFunctionErrorCallback, onOpenLinkViaContextMenu);
+    Utils.wrapFunction(
+        window.gContextMenu, "openLinkInCurrent", wrapFunctionErrorCallback,
         onOpenLinkViaContextMenu);
   };
 
@@ -731,7 +738,7 @@ export function loadOverlayIntoWindow(window) {
    * - See mozilla-central: "base/content/tabbrowser.xml"
    */
   function wrapAddTab() {
-    Utils.wrapFunction(gBrowser, "addTab", tabAdded);
+    Utils.wrapFunction(gBrowser, "addTab", wrapFunctionErrorCallback, tabAdded);
   }
 
   /**

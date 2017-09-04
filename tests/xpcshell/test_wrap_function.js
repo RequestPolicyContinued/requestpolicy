@@ -67,8 +67,12 @@ function run_test() {
   callAndCheck("{_1_0_2}");
 }
 
+function errorCallback(aMessage, aError) {
+  ok(false, aMessage);
+}
+
 function uut_wrap(f1, f2) {
-  mod.Utils.wrapFunction(testObj, "testFunction", f1, f2);
+  mod.Utils.wrapFunction(testObj, "testFunction", errorCallback, f1, f2);
 }
 
 function uut_unwrap() {

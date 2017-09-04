@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-
 //==============================================================================
 // Utils
 //==============================================================================
@@ -125,12 +123,13 @@ export var Utils = (function() {
    * @param {Object} aOwnerObject The object which contains (a reference to)
    *     the function which should be wrapped.
    * @param {string} aFunctionName The function's name in the object.
+   * @param {Function=} aErrorCallback
    * @param {Function=} aBeforeFunction The function to be called before the
    *     original function.
    * @param {Function=} aAfterFunction The function to be called after the
    *     original function.
    */
-  self.wrapFunction = function(aOwnerObject, aFunctionName,
+  self.wrapFunction = function(aOwnerObject, aFunctionName, aErrorCallback,
                                aBeforeFunction = null, aAfterFunction = null) {
     initWrapperFunction(aOwnerObject, aFunctionName);
 
@@ -150,15 +149,24 @@ export var Utils = (function() {
    * @param {string} aFunctionName The function's name in the object.
    */
   self.unwrapFunction = function(aOwnerObject, aFunctionName) {
-    self.wrapFunction(aOwnerObject, aFunctionName, null, null);
+    self.wrapFunction(aOwnerObject, aFunctionName, null, null, null);
   };
 
   /**
    * @param {Object} aOwnerObject The object which contains (a reference to)
    *     the function which should be wrapped.
    * @param {string} aFunctionName The function's name in the object.
+   * @param {Function} aErrorCallback
    */
-  function initWrapperFunction(aOwnerObject, aFunctionName) {
+  function initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback) {
+    function onError(aError, aWhen) {
+      if (typeof aErrorCallback === "function") {
+        aErrorCallback(
+            `The "${aWhen}" function of the \`${aFunctionName}()\` wrapper ` +
+            `has thrown an error.`, aError);
+      }
+    }
+
     // create metadata object
     if (!aOwnerObject.hasOwnProperty("rpcontinuedWrappedFunctions")) {
       aOwnerObject.rpcontinuedWrappedFunctions = {};
@@ -188,9 +196,7 @@ export var Utils = (function() {
           before.apply(aOwnerObject, arguments);
         }
       } catch (e) {
-        Logger.error("The 'before' function of the " +
-                       "`" + aFunctionName + "()` wrapper has thrown an " +
-                       "error.", e);
+        onError(e, "before");
       }
 
       // Execute original function.
@@ -202,9 +208,7 @@ export var Utils = (function() {
           after.apply(aOwnerObject, arguments);
         }
       } catch (e) {
-        Logger.error("The 'after' function of the " +
-                       "`" + aFunctionName + "()` wrapper has thrown an " +
-                       "error.", e);
+        onError(e, "after");
       }
 
       // return the original result

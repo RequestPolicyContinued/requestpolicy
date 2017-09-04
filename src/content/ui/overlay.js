@@ -113,7 +113,7 @@ export function loadOverlayIntoWindow(window) {
 
         var appInfo = Cc["@mozilla.org/xre/app-info;1"].
             getService(Ci.nsIXULAppInfo);
-        isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
+        isFennec = appInfo.name === "Fennec";
 
         if (isFennec) {
           Logger.debug("Detected Fennec.");

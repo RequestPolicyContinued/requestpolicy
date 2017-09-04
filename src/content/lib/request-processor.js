@@ -1813,7 +1813,7 @@ RequestProcessor = (function(self) {
     compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
 
     // Firefox
-    if (appInfo.ID === "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}") {
+    if (appInfo.name === "Firefox") {
       Logger.info("Application detected: " + appInfo.vendor);
 
       // Firefox Accounts
@@ -1856,7 +1856,7 @@ RequestProcessor = (function(self) {
     ]);
 
     // Seamonkey
-    if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
+    if (appInfo.name === "SeaMonkey") {
       Logger.info("Application detected: Seamonkey");
       compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
       compatibilityRules.push([null, "mailbox:", "Seamonkey"]);

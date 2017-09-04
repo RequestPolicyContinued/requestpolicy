@@ -63,7 +63,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 export var RequestProcessor = (function() {
   let self = {};
 
-  let internal = Utils.moduleInternal(self);
+  let internal = Utils.createModuleInternal(self);
 
   //----------------------------------------------------------------------------
   // private properties
@@ -1169,7 +1169,7 @@ export var RequestProcessor = (function() {
 //==============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = Utils.moduleInternal(self);
+  let internal = self.getInternal();
 
   /**
    * These are redirects that the user allowed when presented with a redirect
@@ -1902,4 +1902,5 @@ RequestProcessor = (function(self) {
   return self;
 }(RequestProcessor));
 
+RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

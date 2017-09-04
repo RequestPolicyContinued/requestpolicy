@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
 import {Logger} from "lib/logger";
 
 //==============================================================================
@@ -100,26 +99,22 @@ export var Utils = (function() {
    * Return a module's `internal` object, which is a singleton.
    * The `internal` can be accessed from all submodules of that module.
    *
-   * The `internal` is added to `self`, and as soon as all modules have been
-   * loaded, i.e. when the startup functions are called, the `internal` is
-   * removed from `self` (the module is „sealed“).
-   *
-   *   This function can be used as follows:
-   *   let MyModule = (function(self) {
-   *     let internal = Utils.moduleInternal(self);
-   *   }(MyModule || {}));
-   *
    * @param {Object} aModuleScope
    * @returns {Object} the module's `internal`
    */
-  self.moduleInternal = function(aModuleScope) {
-    aModuleScope.internal = aModuleScope.internal || {};
-    function sealInternal() {
-      delete aModuleScope.internal;
-    }
-    MainEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL,
-                                          sealInternal);
-    return aModuleScope.internal;
+  self.createModuleInternal = function(aModuleScope) {
+    let internal = {};
+    let sealed = false;
+    aModuleScope.getInternal = function() {
+      if (sealed) {
+        return undefined;
+      }
+      return internal;
+    };
+    aModuleScope.sealInternal = function() {
+      sealed = true;
+    };
+    return internal;
   };
 
   /**

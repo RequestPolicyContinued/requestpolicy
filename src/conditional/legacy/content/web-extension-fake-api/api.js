@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import * as Utils from "./lib/utils/webext-utils";
+
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
 const rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
@@ -60,12 +62,9 @@ export var Api = {
   browser: {
     extension: {},
     management: {},
-    runtime: {
-      onMessage: {}
-    },
+    runtime: {},
     storage: {
       local: {},
-      onChanged: {},
     },
   },
 };
@@ -115,6 +114,34 @@ export var ContentScriptsApi = {
 //==============================================================================
 
 (function() {
+  //----------------------------------------------------------------------------
+  // utils
+  //----------------------------------------------------------------------------
+
+  /**
+   * @param {Addon} aAddon
+   * @return {ExtensionInfo}
+   */
+  function mapAddonInfoToWebextExtensionInfo(aAddon) {
+    let {
+      id,
+      isActive: enabled,
+      name,
+      version,
+    } = aAddon;
+
+    return Object.freeze({
+      enabled,
+      id,
+      name,
+      version,
+    });
+  }
+
+  //----------------------------------------------------------------------------
+  // onEnabled, onDisabled, onInstalled, onUninstalled
+  //----------------------------------------------------------------------------
+
   const MANAGEMENT_EVENTS = Object.freeze([
     "onEnabled",
     "onDisabled",
@@ -122,14 +149,25 @@ export var ContentScriptsApi = {
     "onUninstalled",
   ]);
 
-  let managementListeners = {};
-  for (let event of MANAGEMENT_EVENTS) {
-    managementListeners[event] = new Set();
+  const managementListeners = Utils.
+      createWebextOnEventApi(Api.browser.management, MANAGEMENT_EVENTS);
+
+  function mapAddonListenerCallbackToManagementEventName(aCallbackName) {
+    switch (aCallbackName) {
+      case "onEnabled": return "onEnabled";
+      case "onDisabled": return "onDisabled";
+      case "onInstalled": return "onInstalled";
+      case "onUninstalled": return "onUninstalled";
+      default: throw `Unhandled callback name "${aCallbackName}".`;
+    }
   }
 
-  function onAddonListenerEvent(aEvent, aAddon) {
-    managementListeners[aEvent].forEach(listener => {
-      listener.call(null, aAddon);
+  function onAddonListenerEvent(aALCallbackName, aAddon) {
+    let webextEventName =
+        mapAddonListenerCallbackToManagementEventName(aALCallbackName);
+    let extensionInfo = mapAddonInfoToWebextExtensionInfo(aAddon);
+    managementListeners[webextEventName].forEach(listener => {
+      listener.call(null, extensionInfo);
     });
   }
 
@@ -145,32 +183,16 @@ export var ContentScriptsApi = {
     AddonManager.removeAddonListener(addonListener);
   });
 
-  /**
-   * @param {Addon} aAddon
-   * @return {ExtensionInfo}
-   */
-  function getExtensionInfo(aAddon) {
-    let {
-      id,
-      isActive: enabled,
-      name,
-      version,
-    } = aAddon;
-
-    return {
-      enabled,
-      id,
-      name,
-      version,
-    };
-  }
+  //----------------------------------------------------------------------------
+  // get(), getAll(), getSelf()
+  //----------------------------------------------------------------------------
 
   Api.browser.management.get = function(aId) {
     let p = new Promise((resolve, reject) => {
       AddonManager.getAddonByID(aId, addon => {
         try {
           if (addon) {
-            resolve(getExtensionInfo(addon));
+            resolve(mapAddonInfoToWebextExtensionInfo(addon));
           } else {
             reject();
           }
@@ -194,27 +216,13 @@ export var ContentScriptsApi = {
   Api.browser.management.getAll = function() {
     let pExtensionInfo =
         (new Promise(resolve => AddonManager.getAllAddons(resolve))).
-            then(addons => addons.map(getExtensionInfo));
+            then(addons => addons.map(mapAddonInfoToWebextExtensionInfo));
     promiseCatch(pExtensionInfo, "browser.management.getAll");
     return pExtensionInfo;
   };
 
   Api.browser.management.getSelf =
       Api.browser.management.get.bind(null, "/* @echo EXTENSION_ID */");
-
-  function addManagementListener(aEvent, aListener) {
-    managementListeners[aEvent].add(aListener);
-  }
-  function removeManagementListener(aEvent, aListener) {
-    managementListeners[aEvent].delete(aListener);
-  }
-
-  MANAGEMENT_EVENTS.forEach(aEvent => {
-    Api.browser.management[aEvent] = {
-      addListener: addManagementListener.bind(null, aEvent),
-      removeListener: removeManagementListener.bind(null, aEvent),
-    };
-  });
 }());
 
 //==============================================================================
@@ -228,21 +236,8 @@ export var ContentScriptsApi = {
   };
 
   const listeners = {
-    backgroundPage: {
-      onMessage: new Set(),
-    },
-  };
-
-  Api.browser.runtime.onMessage.addListener = function(aListener) {
-    listeners.backgroundPage.onMessage.add(aListener);
-  };
-
-  Api.browser.runtime.onMessage.removeListener = function(aListener) {
-    listeners.backgroundPage.onMessage.delete(aListener);
-  };
-
-  Api.browser.runtime.onMessage.hasListener = function(aListener) {
-    return listeners.backgroundPage.onMessage.has(aListener);
+    backgroundPage: Utils.createWebextOnEventApi(
+        Api.browser.runtime, ["onMessage"]),
   };
 
   ContentScriptsApi.browser.runtime.sendMessage = function(aMessage) {
@@ -270,6 +265,9 @@ export var ContentScriptsApi = {
 //==============================================================================
 
 (function() {
+  /*let onStorageChangedListener =*/ Utils.
+      createWebextOnEventApi(Api.browser.storage, ["onChanged"]);
+
   Api.browser.storage.local.get = function(aKeys) {
     let results = {};
     ["log", "log.level"].
@@ -281,19 +279,5 @@ export var ContentScriptsApi = {
   };
 
   Api.browser.storage.local.set = function() {
-  };
-
-  Api.browser.storage.onChanged._listeners = new Set();
-
-  Api.browser.storage.onChanged.addListener = function(aListener) {
-    Api.browser.storage.onChanged._listeners.add(aListener);
-  };
-
-  Api.browser.storage.onChanged.removeListener = function(aListener) {
-    Api.browser.storage.onChanged._listeners.delete(aListener);
-  };
-
-  Api.browser.storage.onChanged.hasListener = function(aListener) {
-    return Api.browser.storage.onChanged._listeners.has(aListener);
   };
 }());

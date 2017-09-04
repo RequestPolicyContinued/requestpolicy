@@ -168,7 +168,7 @@ BUILDS.forEach(build => {
         "src/content/settings/*.css",
         "src/content/settings/*.html",
         "src/content/*.html",
-        "src/content/ui/*.xul",
+        "src/content/ui/**/*.xul",
         "src/locale/*/*.dtd",
         "src/locale/*/*.properties",
         "src/content/lib/third-party/**/*.js",

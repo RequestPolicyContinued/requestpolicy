@@ -28,10 +28,10 @@
 
 <page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/x-javascript" src="request-log.js" />
-  <script type="application/x-javascript" src="request-log.interface.js" />
-  <script type="application/x-javascript" src="request-log.tree-view.js" />
-  <script type="application/x-javascript" src="request-log.filtering.js" />
+  <script type="application/x-javascript" src="main.js" />
+  <script type="application/x-javascript" src="interface.js" />
+  <script type="application/x-javascript" src="tree-view.js" />
+  <script type="application/x-javascript" src="filtering.js" />
 
   <popupset>
     <menupopup id="rpcontinuedRequestLogContext">

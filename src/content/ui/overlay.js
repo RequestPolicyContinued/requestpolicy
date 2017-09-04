@@ -97,7 +97,7 @@ window.rpcontinued.overlay = (function() {
   let isFennec = false;
 
   let self = {
-    // This is set by request-log.js when it is initialized. We don't need to worry
+    // This is set by request-log/main.js when it is initialized. We don't need to worry
     // about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment
@@ -1125,7 +1125,7 @@ window.rpcontinued.overlay = (function() {
 
     if (requestLog.hidden) {
       requestLogFrame.setAttribute("src",
-          "chrome://rpcontinued/content/ui/request-log.xul");
+          "chrome://rpcontinued/content/ui/request-log/request-log.xul");
       requestLog.hidden = false;
       requestLogSplitter.hidden = false;
       closeRequestLog.hidden = false;

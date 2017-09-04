@@ -10,6 +10,7 @@
     "Cr": true,
     "Cu": true,
     "ComponentsID": true,
+    "LegacyApi": true,
     "require": true,
     "Services": true,
     "XPCOMUtils": true

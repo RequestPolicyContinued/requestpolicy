@@ -76,6 +76,7 @@ function startup(data, reason) {
   commonjsEnv = createCommonjsEnv();
   commonjsEnv.load("main", [
     ["browser", Api.browser],
+    ["LegacyApi", Api.LegacyApi],
     ["_setBackgroundPage", Api._setBackgroundPage],
   ]);
 }

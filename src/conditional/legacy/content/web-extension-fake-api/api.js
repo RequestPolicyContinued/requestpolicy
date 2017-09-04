@@ -67,6 +67,9 @@ export var Api = {
       local: {},
     },
   },
+  LegacyApi: {
+    storage: {},
+  },
 };
 
 export var ContentScriptsApi = {

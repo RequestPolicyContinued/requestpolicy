@@ -60,10 +60,10 @@
 
   function loadSubScripts() {
     Services.scriptloader.loadSubScript(
-        "chrome://rpcontinued/content/ui/frame.blocked-content.js",
+        "chrome://rpcontinued/content/framescripts/blocked-content.js",
         framescriptScope);
     Services.scriptloader.loadSubScript(
-        "chrome://rpcontinued/content/ui/frame.dom-content-loaded.js",
+        "chrome://rpcontinued/content/framescripts/dom-content-loaded.js",
         framescriptScope);
   }
   framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,

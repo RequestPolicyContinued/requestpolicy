@@ -80,7 +80,7 @@ let WindowSubControllers = (function() {
 var rpWindowManager = (function() {
   let self = {};
 
-  let frameScriptURI = "chrome://rpcontinued/content/ui/frame.js?" +
+  let frameScriptURI = "chrome://rpcontinued/content/framescripts/misc.js?" +
       Math.random();
 
   function loadIntoWindow(window) {

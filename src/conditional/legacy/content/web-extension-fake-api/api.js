@@ -112,6 +112,11 @@ export var ContentScriptsApi = {
 //==============================================================================
 
 (function() {
+  Api.browser.runtime.getBrowserInfo = function() {
+    let {name, vendor, version, appBuildID: buildID} = Services.appinfo;
+    return Promise.resolve({name, vendor, version, buildID});
+  };
+
   const listeners = {
     backgroundPage: {
       onMessage: new Set(),

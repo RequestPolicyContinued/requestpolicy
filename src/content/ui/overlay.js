@@ -115,12 +115,18 @@ export function loadOverlayIntoWindow(window) {
             getService(Ci.nsIXULAppInfo);
         isFennec = appInfo.name === "Fennec";
 
-        if (isFennec) {
-          Logger.debug("Detected Fennec.");
-          // Set an attribute for CSS usage.
-          popupElement.setAttribute("fennec", "true");
-          popupElement.setAttribute("position", "after_end");
-        }
+        browser.runtime.getBrowserInfo().then((appInfo) => {
+          if (appInfo.name === "Fennec") {
+            Logger.debug("Detected Fennec.");
+            // Set an attribute for CSS usage.
+            popupElement.setAttribute("fennec", "true");
+            popupElement.setAttribute("position", "after_end");
+          }
+          return;
+        }).catch(e => {
+          console.error("Error on Fennec detection. Details:");
+          console.dir(e);
+        });
 
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this

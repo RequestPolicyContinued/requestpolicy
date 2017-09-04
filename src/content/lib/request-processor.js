@@ -1575,7 +1575,12 @@ RequestProcessor = (function(self) {
     // Detect other installed extensions and the current application and do
     // what is needed to allow their requests.
     initializeExtensionCompatibility();
-    initializeApplicationCompatibility();
+    browser.runtime.getBrowserInfo().
+        then(initializeApplicationCompatibility).
+        catch(e => {
+          console.error("Could not init app compatibility.");
+          console.dir(e);
+        });
 
     AddonManager.addAddonListener(addonListener);
   }
@@ -1726,10 +1731,7 @@ RequestProcessor = (function(self) {
     }
   }
 
-  function initializeApplicationCompatibility() {
-    var appInfo = Cc["@mozilla.org/xre/app-info;1"].
-        getService(Ci.nsIXULAppInfo);
-
+  function initializeApplicationCompatibility(appInfo) {
     // Mozilla updates (doing this for all applications, not just individual
     // applications from the Mozilla community that I'm aware of).
     // At least the http url is needed for Firefox updates, adding the https

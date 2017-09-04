@@ -576,19 +576,24 @@ run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 	)
 
 #-------------------------------------------------------------------------------
+# Testing
+#-------------------------------------------------------------------------------
+
+.PHONY: test-quick test
+test-quick: static-analysis marionette-quick
+test-non-quick: test-makefile marionette-non-quick
+test: test-quick test-non-quick
+
+#-------------------------------------------------------------------------------
 # unit testing: Marionette
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-.PHONY: check test marionette
-check test: marionette test-makefile
+.PHONY: marionette
 
 logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
-
-marionette_tests := tests/marionette/rp_puppeteer/tests/manifest.ini
-marionette_tests += tests/marionette/tests/manifest.ini
 
 _marionette_gecko_log := $(logs_dir)/$(logfile_prefix)marionette.gecko.log
 marionette_logging := --gecko-log=$(_marionette_gecko_log)
@@ -614,11 +619,14 @@ _marionette_runtests_args := \
 	--profile="$$profile_dir" \
 	--address=$(_marionette_address) \
 	$(marionette_logging) \
-	$(marionette_additional_args) \
-	$(marionette_tests)
+	$(marionette_additional_args)
 
-.PHONY: marionette
-marionette: python-venv \
+.PHONY: marionette marionette-quick marionette-non-quick
+marionette: marionette-quick marionette-non-quick
+marionette-quick:     marionette_tests := tests/marionette/tests-quick.manifest.ini
+marionette-non-quick: marionette_tests := tests/marionette/tests-non-quick.manifest.ini
+marionette-non-quick marionette-quick: \
+		python-venv \
 		$(logs_dir) \
 		unit-testing-xpi \
 		dev-helper-xpi \
@@ -632,7 +640,8 @@ marionette: python-venv \
 	$(call IN_PYTHON_ENV, \
 	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
 		./tests/marionette/rp_ui_harness/runtests.py \
-			$(_marionette_runtests_args) ; \
+			$(_marionette_runtests_args) \
+			$(marionette_tests) ; \
 	))
 	@echo "Checking for undetected errors"
 	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)

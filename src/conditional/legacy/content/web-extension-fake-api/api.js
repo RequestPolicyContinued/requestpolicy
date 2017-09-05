@@ -25,9 +25,6 @@ import {Prefs} from "./models/prefs";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
-const rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
-      QueryInterface(Ci.nsIPrefBranch2);
-
 //==============================================================================
 // utilities
 //==============================================================================
@@ -272,17 +269,40 @@ export var ContentScriptsApi = {
   /*let onStorageChangedListener =*/ Utils.
       createWebextOnEventApi(Api.browser.storage, ["onChanged"]);
 
+  //----------------------------------------------------------------------------
+  // get(), set()
+  //----------------------------------------------------------------------------
+
   Api.browser.storage.local.get = function(aKeys) {
+    if (typeof aKeys === "string") {
+      return Promise.resolve(Prefs.get(aKeys));
+    }
+    let keys;
+    if (Array.isArray(aKeys)) {
+      keys = aKeys;
+    } else if (typeof aKeys === "object") {
+      keys = Object.keys(aKeys);
+    } else {
+      keys = Prefs.ALL_KEYS;
+    }
     let results = {};
-    ["log", "log.level"].
-        filter(prefName => prefName in aKeys).
-        forEach(prefName => {
-          results[prefName] = rpPrefBranch.getBoolPref(prefName);
-        });
+    keys.forEach(key => {
+      results[key] = Prefs.get(key);
+    });
     return Promise.resolve(results);
   };
 
-  Api.browser.storage.local.set = function() {
+  Api.browser.storage.local.set = function(aKeys) {
+    if (typeof aKeys !== "object") {
+      let msg = "browser.storage.local.set(): aKeys must be an object!";
+      log.error(msg, aKeys);
+      return Promise.reject(new Error(msg));
+    }
+    Object.keys(aKeys).forEach(key => {
+      Prefs.set(key, aKeys[key]);
+    });
+    Prefs.save();
+    return Promise.resolve();
   };
 
   Api.LegacyApi.prefs = Prefs;

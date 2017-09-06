@@ -660,8 +660,8 @@ addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
 jscs: node-packages
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; $(JSCS) .
-	cd tests/xpcshell/; $(JSCS) .
+	cd src/;                 $(JSCS) .
+	cd tests/xpcshell/;      $(JSCS) .
 	cd tests/helper-addons/; $(JSCS) .
 jshint: node-packages
 	$(JSHINT) src/

@@ -65,6 +65,7 @@ $(dist_dir) $(logs_dir):
 GIT            := /usr/bin/git
 NPM            := npm
 ZIP            := zip
+PYTHON         := $(python_env_dir)/bin/python
 
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
@@ -80,6 +81,10 @@ TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 
 # python
 PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
+PY_MOZDOWNLOAD := $(abspath $(python_env_dir))/bin/mozdownload
+PY_MOZPROFILE  := $(abspath $(python_env_dir))/bin/mozprofile
+PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
+
 
 #-------------------------------------------------------------------------------
 # helper targets
@@ -289,14 +294,11 @@ force_every = $(shell \
 # python
 #-------------------------------------------------------------------------------
 
-# $1: command(s) to be wrapped
-IN_PYTHON_ENV = set +u && source $(python_env_dir)/bin/activate && ($1)
-
 # $1: variable name which will contain the profile dir
 # $2: parameters to mozprofile
 # $3: command(s) to be wrapped
 WITH_MOZPROFILE = \
-	$1=`mozprofile $2` && ( \
+	$1=`$(PY_MOZPROFILE) $2` && ( \
 		($3); \
 		exit_status=$$? ; \
 		rm -rf $$$1 ; \
@@ -318,9 +320,7 @@ python-venv python-packages: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
 		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
 		$(T_PYTHON_VIRTUALENV)
-	$(call IN_PYTHON_ENV, \
-		pip install --upgrade -r $< \
-	)
+	$(PYTHON) -m pip install --upgrade -r $<
 	touch $@
 $(T_PYTHON_VIRTUALENV): \
 		$(call _VAR_STAMP_,__python_venv__) \
@@ -394,12 +394,10 @@ $(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
 		$(call force_every,12 hours,$(call T_BROWSER,$1,$2)) \
 		| python-venv
 	mkdir -p $(browsers_dir)/$1/downloads/$2/
-	$$(call IN_PYTHON_ENV, \
-	  mozdownload \
+	$(PY_MOZDOWNLOAD) \
 	    --destination $(browsers_dir)/$1/downloads/$2/ \
 	    --extension tar.bz2 --application $1 \
-	    $$(mozdl_opts_$1_$2) \
-	)
+	    $$(mozdl_opts_$1_$2)
 	ln -sf $$$$(cd $$(dir $$@); ls -t $2/*.tar.bz2 | head -n 1) $$@
 	touch --reference="$$$$(readlink -f $$@)" $$@
 	touch $(call T_BROWSER,$1,$2)
@@ -448,9 +446,7 @@ _run_mozrunner_args := \
 
 .PHONY: run
 run: python-venv dev-xpi dev-helper-xpi $(app_binary)
-	$(call IN_PYTHON_ENV, \
-		mozrunner $(_run_mozrunner_args) \
-	)
+	$(PY_MOZRUNNER) $(_run_mozrunner_args)
 
 
 #===============================================================================
@@ -533,12 +529,10 @@ marionette-non-quick marionette-quick: \
 		$(app_binary)
 	@# Due to Mozilla Bug 1315522, the profile needs to be created and
 	@# removed directly.
-	$(call IN_PYTHON_ENV, \
 	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
 		./tests/marionette/rp_ui_harness/runtests.py \
-			$(_marionette_runtests_args) \
-			$(marionette_tests) ; \
-	))
+			$(_marionette_runtests_args) ; \
+	)
 	@echo "Checking for undetected errors"
 	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 

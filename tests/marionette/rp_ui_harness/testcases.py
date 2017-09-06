@@ -57,7 +57,7 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
         ignoring = self.gecko_log.currently_ignoring_errors()
         if ignoring:
             self.gecko_log.stop_ignoring_errors()
-        self.assertFalse(ignoring, msg="A test must stop ignoring errors on teardown.")
+            self.fail(msg="A test must stop ignoring errors on teardown.")
 
 
     def _check_gecko_log(self):

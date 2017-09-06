@@ -22,49 +22,50 @@
 
 "use strict";
 
-interface EvListener<T extends Function> {
-    addListener: (callback: T) => void;
-    removeListener: (listener: T) => void;
-    hasListener: (listener: T) => boolean;
+type Callback = (...args: any[]) => void;
+interface IEvListener {
+  addListener: (callback: Callback) => void;
+  removeListener: (listener: Callback) => void;
+  hasListener: (listener: Callback) => boolean;
 }
-type Listener<T> = EvListener<(arg: T) => void>;
-interface WebextOnEventOwner {
-  [onEvent: string]: Listener<any>;
+type Listener = IEvListener;
+interface IWebextOnEventOwner {
+  [onEvent: string]: Listener;
 }
 
-type WebextOnEventListeners = Set<Function>;
-interface WebextOnEventListenersOwner {
+type WebextOnEventListeners = Set<() => void>;
+interface IWebextOnEventListenersOwner {
   [onEvent: string]: WebextOnEventListeners;
 }
 
 function _createWebextOnEventApi(
-    aApiObj: WebextOnEventOwner,
-    aOnEvent: string
+    aApiObj: IWebextOnEventOwner,
+    aOnEvent: string,
 ): WebextOnEventListeners {
   if (aApiObj.hasOwnProperty(aOnEvent)) {
-    throw `Event "${aOnEvent} is already defined.`
+    throw new Error(`Event "${aOnEvent} is already defined.`);
   }
-  let listeners: WebextOnEventListeners = new Set();
+  const listeners: WebextOnEventListeners = new Set();
   aApiObj[aOnEvent] = {
-    addListener: function(listener: Function) {
+    addListener(listener: Callback) {
       listeners.add(listener);
     },
-    removeListener: function(listener: Function) {
+    removeListener(listener: Callback) {
       listeners.delete(listener);
     },
-    hasListener: function(listener: Function) {
+    hasListener(listener: Callback) {
       return listeners.has(listener);
-    }
+    },
   };
   return listeners;
 }
 
 export function createWebextOnEventApi(
-    aApiObj: WebextOnEventOwner,
-    aOnEvents: string[]
-): WebextOnEventListenersOwner {
-  let listeners: WebextOnEventListenersOwner = {};
-  aOnEvents.forEach(onEvent => {
+    aApiObj: IWebextOnEventOwner,
+    aOnEvents: string[],
+): IWebextOnEventListenersOwner {
+  const listeners: IWebextOnEventListenersOwner = {};
+  aOnEvents.forEach((onEvent) => {
     listeners[onEvent] = _createWebextOnEventApi(aApiObj, onEvent);
   });
   return listeners;

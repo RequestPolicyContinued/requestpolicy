@@ -7,7 +7,12 @@ import re
 from contextlib import contextmanager
 
 
-known_bug_1 = u"""[JavaScript Warning: "Expected end of value but found {0}10{1}.  Error in parsing value for {0}font-family{1}.  Declaration dropped." {2}file: "chrome://rpcontinued/skin/"""
+known_bug_1 = (
+    u"""[JavaScript Warning: "Expected end of value but found {0}10{1}.  """
+    u"""Error in parsing value for {0}font-family{1}.  """
+    u"""Declaration dropped." """
+    u"""{2}file: "chrome://rpcontinued/skin/"""
+)
 WHITELIST = [
   # known bugs
 
@@ -15,7 +20,11 @@ WHITELIST = [
   # quotation marks are no longer <'>, but <\u2019> and <\u201A>.
   known_bug_1.format("'", "'", "{"),
   known_bug_1.format(u"\u2019", u"\u201A", "{"),
-  re.compile(r"""^JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset\.js, line [0-9]+: ReferenceError: reference to undefined property entryPart\.s"""),
+  re.compile(
+      r"""^JavaScript strict warning: """
+      r"""chrome://rpcontinued/content/lib/ruleset\.js, line [0-9]+: """
+      r"""ReferenceError: reference to undefined property entryPart\.s"""
+  ),
 
   # other
 
@@ -50,7 +59,7 @@ class GeckoLogParser(object):
     EXPECT_ERRORS_END = "[RP Puppeteer] GeckoLog expect errors: end"
 
     def __init__(self, gecko_log_path):
-      self.path = gecko_log_path
+        self.path = gecko_log_path
 
     #################################
     # Public Properties and Methods #

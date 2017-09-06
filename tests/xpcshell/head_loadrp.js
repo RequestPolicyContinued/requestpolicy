@@ -23,7 +23,7 @@ function getRPChromeManifest() {
   var cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
   var manifestFile = cwd.parent.parent.clone();
-  manifestFile.appendRelativePath("build/unit_testing/chrome.manifest");
+  manifestFile.appendRelativePath("build/nightly/chrome.manifest");
   return manifestFile;
 }
 

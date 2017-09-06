@@ -101,7 +101,7 @@ endef
 
 .PHONY: all _xpi _files \
 	xpi nightly-xpi beta-xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
-	unit-testing-files
+	nightly-files
 
 all: xpi
 xpi: nightly-xpi
@@ -116,8 +116,8 @@ amo-beta-xpi: node-packages
 amo-nightly-xpi: node-packages
 	$(call make_xpi,amo_nightly)
 
-unit-testing-files: node-packages
-	$(call make_files,unit_testing)
+nightly-files: node-packages
+	$(call make_files,nightly)
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] configuration of different builds

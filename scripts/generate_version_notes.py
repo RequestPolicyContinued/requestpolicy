@@ -35,29 +35,58 @@ def main():
 
         changelog_hash = "next-version"
 
-    diffs = ["""<a href="{base_uri}/compare/{prev}...{current}">{prev}...{current}</a>"""]
+    diffs = [
+        (
+            """<a href="{base_uri}/compare/{prev}...{current}">"""
+            """{prev}...{current}"""
+            """</a>"""
+        ),
+    ]
     if prev != prev_version:
-        diffs.append("""<a href="{base_uri}/compare/{prev_version}...{current}">{prev_version}...{current}</a>""")
+        diffs.append(
+            """<a href="{base_uri}/compare/{prev_version}...{current}">"""
+            """{prev_version}...{current}"""
+            """</a>"""
+        )
     if len(diffs) == 1:
-        diff_str = """Source code Diff: {}""".format(diffs[0])
+        print_str__diff = """Source code Diff: {}""".format(diffs[0])
     else:
-        diff_str = """Source code Diffs: <ul>\n{}\n</ul>""".format("\n".join(
+        print_str__diff = (
+            """Source code Diffs: <ul>\n{}\n</ul>"""
+        ).format("\n".join(
             ["<li>" + diff + "</li>" for diff in diffs]
         ))
 
-    print (
-        textwrap.dedent("""\
-            <a href="{base_uri}/blob/{current}/ChangeLog.md#{changelog_hash}">Changes since {prev_version}</a>
-
-            Source code of this release: <a href="{base_uri}/tree/{current}">{current}</a>"""
-        ) + "\n" +
-        diff_str
-    ).format(
+    print_kwargs = dict(
         base_uri=base_uri,
         changelog_hash=changelog_hash,
         current=current,
         prev=prev,
         prev_version=prev_version,
+
+    )
+
+    uri_to_changes = (
+        """{base_uri}/blob/{current}/ChangeLog.md#{changelog_hash}"""
+    ).format(**print_kwargs)
+    link_to_changes = (
+        """<a href="{uri_to_changes}">Changes since {prev_version}</a>"""
+    ).format(uri_to_changes=uri_to_changes, **print_kwargs)
+
+    link_to_code = (
+        """<a href="{base_uri}/tree/{current}">{current}</a>"""
+    ).format(**print_kwargs)
+
+    print (
+        textwrap.dedent("""\
+            {link_to_changes}
+
+            Source code of this release: {link_to_code}
+            {diff}""")
+    ).format(
+        link_to_changes=link_to_changes,
+        link_to_code=link_to_code,
+        diff=print_str__diff
     )
 
 

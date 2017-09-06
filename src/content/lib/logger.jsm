@@ -194,24 +194,26 @@ var Logger = (function() {
 // @ifdef UNIT_TESTING
 
 //==============================================================================
-// unit testing part
+// ErrorTriggeringService
 //==============================================================================
 
 /**
  * Triggers errors for a RequestPolicy unit test.
  * It's used to test Error Detection from the unit tests.
  */
-var UnitTestObserver = (function() {
+var ErrorTriggeringService = (function() {
   let self = {};
 
   const topic = "requestpolicy-trigger-error";
 
+  const observer = {};
+
   self.startup = function() {
-    Services.obs.addObserver(self, topic, false);
+    Services.obs.addObserver(observer, topic, false);
   };
 
   self.shutdown = function() {
-    Services.obs.removeObserver(self, topic);
+    Services.obs.removeObserver(observer, topic);
   };
 
   /**
@@ -231,7 +233,7 @@ var UnitTestObserver = (function() {
     return [part1, part2];
   }
 
-  self.observe = function(aSubject, aTopic, aData) {
+  observer.observe = function(aSubject, aTopic, aData) {
     let [type, message] = splitColon(aData);
 
     if (type === "normal error") {
@@ -257,7 +259,7 @@ var UnitTestObserver = (function() {
 }());
 
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-                                      UnitTestObserver.startup);
+                                      ErrorTriggeringService.startup);
 ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-                                       UnitTestObserver.shutdown);
+                                       ErrorTriggeringService.shutdown);
 // @endif

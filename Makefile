@@ -646,15 +646,19 @@ marionette-non-quick marionette-quick: \
 #===============================================================================
 
 .PHONY: static-analysis
-static-analysis: jshint jscs addons-linter check-locales
+static-analysis: lint check-locales
 
 #-------------------------------------------------------------------------------
+# linting
+#-------------------------------------------------------------------------------
+
+.PHONY: lint
+lint: jshint jscs addons-linter
 
 jshint_args :=
 jscs_args :=
 
-.PHONY: jshint jscs addons-linter check-locales
-
+.PHONY: jshint jscs addons-linter
 jshint: node-packages
 	$(JSHINT) $(jshint_args) src/
 	$(JSHINT) $(jshint_args) tests/xpcshell/
@@ -666,7 +670,12 @@ jscs: node-packages
 	cd tests/helper-addons/; $(JSCS) $(jscs_args) .
 addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
+
+#-------------------------------------------------------------------------------
 # localization checks
+#-------------------------------------------------------------------------------
+
+.PHONY: check-locales
 include tests/l10n/Makefile
 
 #-------------------------------------------------------------------------------

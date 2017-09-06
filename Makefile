@@ -550,7 +550,7 @@ clean-old-browser-tarballs: \
 
 # arguments for mozrunner
 run_additional_xpis :=
-_run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__nightly) $(xpi_file__dev_helper) $(run_additional_xpis)
 run_additional_prefs := default
 _run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
@@ -561,7 +561,7 @@ _run_mozrunner_args := \
 	$(run_additional_args)
 
 .PHONY: run
-run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
+run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
 	$(call IN_PYTHON_ENV, \
 		mozrunner $(_run_mozrunner_args) \
 	)

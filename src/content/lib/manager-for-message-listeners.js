@@ -24,6 +24,8 @@ import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";
 import {C} from "lib/utils/constants";
 
+const {LOG_MESSAGE_LISTENERS} = C;
+
 //==============================================================================
 // ManagerForMessageListeners
 //==============================================================================
@@ -56,11 +58,11 @@ export function ManagerForMessageListeners(aEnv, aMM) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          // @ifdef LOG_MESSAGE_LISTENERS
-          Logger.debug(
-              "From now on new message listeners will be added immediately. " +
-              "Environment: \"" + self.environment.name + "\"");
-          // @endif
+          if (LOG_MESSAGE_LISTENERS) {
+            Logger.debug(
+                "From now on new message listeners will be added " +
+                "immediately. Environment: \"" + self.environment.name + "\"");
+          }
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -135,12 +137,12 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     listening: false
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
-    // @ifdef LOG_MESSAGE_LISTENERS
-    Logger.debug(
-        "Immediately adding message listener for \"" +
-        listener.messageName + "\". Environment: \"" +
-        self.environment.name + "\"");
-    // @endif
+    if (LOG_MESSAGE_LISTENERS) {
+      Logger.debug(
+          "Immediately adding message listener for \"" +
+          listener.messageName + "\". Environment: \"" +
+          self.environment.name + "\"");
+    }
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
   }
@@ -154,12 +156,12 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      // @ifdef LOG_MESSAGE_LISTENERS
-      Logger.debug(
-          "Lazily adding message listener for \"" +
-          listener.messageName + "\". Environment: \"" +
-          self.environment.name + "\"");
-      // @endif
+      if (LOG_MESSAGE_LISTENERS) {
+        Logger.debug(
+            "Lazily adding message listener for \"" +
+            listener.messageName + "\". Environment: \"" +
+            self.environment.name + "\"");
+      }
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
     }
@@ -179,10 +181,10 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //                 'is undefined!');
     //  continue;
     //}
-    // @ifdef LOG_MESSAGE_LISTENERS
-    Logger.debug(
-        "Removing message listener for \"" + listener.messageName + "\".");
-    // @endif
+    if (LOG_MESSAGE_LISTENERS) {
+      Logger.debug(
+          "Removing message listener for \"" + listener.messageName + "\".");
+    }
     //try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
     //} catch (e) {

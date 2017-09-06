@@ -36,6 +36,8 @@ import {Utils} from "lib/utils";
 import {DOMUtils} from "lib/utils/dom";
 import {C} from "lib/utils/constants";
 
+const {LOG_FLAG_STATE} = C;
+
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
@@ -542,10 +544,10 @@ export function loadOverlayIntoWindow(window) {
     RequestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
-      // @ifdef LOG_FLAG_STATE
-      Logger.debug(
-          "Checking for blocked requests from page <" + uri + ">");
-      // @endif
+      if (LOG_FLAG_STATE) {
+        Logger.debug(
+            "Checking for blocked requests from page <" + uri + ">");
+      }
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
@@ -553,12 +555,12 @@ export function loadOverlayIntoWindow(window) {
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
-      // @ifdef LOG_FLAG_STATE
-      let logText = documentContainsBlockedContent ?
-                    "Requests have been blocked." :
-                    "No requests have been blocked.";
-      Logger.debug(logText);
-      // @endif
+      if (LOG_FLAG_STATE) {
+        let logText = documentContainsBlockedContent ?
+                      "Requests have been blocked." :
+                      "No requests have been blocked.";
+        Logger.debug(logText);
+      }
 
       return Promise.resolve();
     }).catch(e => {

@@ -21,6 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {C} from "lib/utils/constants";
+
+const {UI_TESTING} = C;
+
 //==============================================================================
 // Logger
 //==============================================================================
@@ -85,12 +89,10 @@ export var Logger = (function() {
       return true;
     }
 
-    // @ifdef UI_TESTING
-    if (aLevel >= LevelEnum.WARNING) {
+    if (UI_TESTING && aLevel >= LevelEnum.WARNING) {
       // log even if logging is disabled
       return true;
     }
-    // @endif
 
     if (aLevel >= MINIMUM_LOGGING_LEVEL) {
       // log even if logging is disabled

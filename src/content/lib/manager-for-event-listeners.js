@@ -22,6 +22,9 @@
 
 import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";
+import {C} from "lib/utils/constants";
+
+const {LOG_EVENT_LISTENERS} = C;
 
 //==============================================================================
 // ManagerForEventListeners
@@ -55,11 +58,11 @@ export function ManagerForEventListeners(aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          // @ifdef LOG_EVENT_LISTENERS
-          Logger.debug("From now on new event listeners will be " +
-              "added immediately. Environment: \"" +
-              self.environment.name + "\"");
-          // @endif
+          if (LOG_EVENT_LISTENERS) {
+            Logger.debug("From now on new event listeners will be " +
+                "added immediately. Environment: \"" +
+                self.environment.name + "\"");
+          }
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -103,11 +106,11 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     listening: false
   };
   if (self.addNewListenersImmediately) {
-    // @ifdef LOG_EVENT_LISTENERS
-    Logger.debug("Immediately adding event listener for \"" +
-        listener.eventType + "\". Environment: \"" +
-        self.environment.name + "\"");
-    // @endif
+    if (LOG_EVENT_LISTENERS) {
+      Logger.debug("Immediately adding event listener for \"" +
+          listener.eventType + "\". Environment: \"" +
+          self.environment.name + "\"");
+    }
     addEvLis(listener);
   }
   self.listeners.push(listener);
@@ -120,11 +123,11 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      // @ifdef LOG_EVENT_LISTENERS
-      Logger.debug("Lazily adding event listener for \"" +
-          listener.eventType + "\". Environment: \"" +
-          self.environment.name + "\"");
-      // @endif
+      if (LOG_EVENT_LISTENERS) {
+        Logger.debug("Lazily adding event listener for \"" +
+            listener.eventType + "\". Environment: \"" +
+            self.environment.name + "\"");
+      }
       addEvLis(listener);
     }
   }
@@ -137,10 +140,10 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    // @ifdef LOG_EVENT_LISTENERS
-    Logger.debug("Removing event listener for \"" + listener.eventType +
-        "\". Environment: \"" + self.environment.name + "\"");
-    // @endif
+    if (LOG_EVENT_LISTENERS) {
+      Logger.debug("Removing event listener for \"" + listener.eventType +
+          "\". Environment: \"" + self.environment.name + "\"");
+    }
     listener.target.removeEventListener(listener.eventType, listener.callback,
                                         listener.useCapture);
   }

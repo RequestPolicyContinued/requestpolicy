@@ -27,8 +27,11 @@ import {PolicyManager} from "lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
 import {Environment, MainEnvironment} from "lib/environment";
+import {C} from "lib/utils/constants";
 import {WindowUtils} from "lib/utils/windows";
 import {Info} from "lib/utils/info";
+
+const {AMO} = C;
 
 //==============================================================================
 // rpService
@@ -126,14 +129,10 @@ export var rpService = (function() {
       "requestpolicy@requestpolicy.com",
       // Detect "RPC Legacy" (v0.5; AMO version).
       "rpcontinued@requestpolicy.org",
-      // @ifdef AMO
-      // In the AMO version the non-AMO version needs to be detected.
-      "rpcontinued@non-amo.requestpolicy.org",
-      // @endif
-      // @ifndef AMO
-      // In the non-AMO version the AMO version needs to be detected.
-      "rpcontinued@amo.requestpolicy.org",
-      // @endif
+      AMO ? // In the AMO version the non-AMO version needs to be detected.
+            "rpcontinued@non-amo.requestpolicy.org" :
+            // In the non-AMO version the AMO version needs to be detected.
+            "rpcontinued@amo.requestpolicy.org",
     ]));
 
     function checkAddon(addon) {

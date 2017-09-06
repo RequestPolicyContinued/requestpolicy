@@ -22,7 +22,19 @@
 
 /* global RUN_ID */ // see bootstrap.jsm
 
-export var C = {};
+const env = str => str[0] !== "undefined";
+
+export var C = {
+  LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */`,
+  LOG_EVENT_LISTENERS: env`/* @echo LOG_EVENT_LISTENERS */`,
+  LOG_FLAG_STATE: env`/* @echo LOG_FLAG_STATE */`,
+  LOG_GETTING_SAVED_REQUESTS: env`/* @echo LOG_GETTING_SAVED_REQUESTS */`,
+  LOG_MESSAGE_LISTENERS: env`/* @echo LOG_MESSAGE_LISTENERS */`,
+  LOG_REQUESTS: env`/* @echo LOG_REQUESTS */`,
+
+  AMO: env`/* @echo AMO */`,
+  UI_TESTING: env`/* @echo UI_TESTING */`,
+};
 
 C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
 

@@ -122,6 +122,8 @@ all: xpi
 xpi: nightly-xpi
 nightly-xpi: node-packages
 	$(call make_xpi,nightly)
+dev-xpi: node-packages
+	$(call make_xpi,dev)
 beta-xpi: node-packages
 	$(call make_xpi,beta)
 ui-testing-xpi: node-packages
@@ -135,6 +137,7 @@ nightly-files: node-packages
 	$(call make_files,nightly)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
+xpi_file__dev          := $(dist_dir)/$(extension_name)-dev.xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
 xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
@@ -424,7 +427,7 @@ clean-old-browser-tarballs: \
 
 # arguments for mozrunner
 run_additional_xpis :=
-_run_xpis := $(xpi_file__nightly) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__dev) $(xpi_file__dev_helper) $(run_additional_xpis)
 run_additional_prefs := default
 _run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
@@ -435,7 +438,7 @@ _run_mozrunner_args := \
 	$(run_additional_args)
 
 .PHONY: run
-run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
+run: python-venv dev-xpi dev-helper-xpi $(app_binary)
 	$(call IN_PYTHON_ENV, \
 		mozrunner $(_run_mozrunner_args) \
 	)

@@ -5,7 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import argparse
-from rp_puppeteer.api.gecko_log_parser import GeckoLogParser
+from rp_utils.utils import get_gecko_log_error_lines
 
 
 def parse_args():
@@ -19,8 +19,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    parser = GeckoLogParser(args.file)
-    lines = parser.get_all_error_lines(return_expected_as_well=False)
+    lines = get_gecko_log_error_lines(args.file)
     if len(lines) > 0:
         if args.do_print:
             for line in lines:

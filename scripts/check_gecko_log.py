@@ -1,14 +1,8 @@
-#!/usr/bin/env python2.7
+#!./dev_env/python/bin/python2.7
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-from os import sys, path
-sys.path.append(path.join(
-    path.dirname(path.dirname(path.abspath(__file__))),
-    "tests/marionette/"
-))
 
 import argparse
 from rp_puppeteer.api.gecko_log_parser import GeckoLogParser

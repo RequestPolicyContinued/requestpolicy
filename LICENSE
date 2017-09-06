@@ -51,7 +51,7 @@ The icons for blocked and allowed destinations in the menu are based on the
 Tango base icon theme, which is available at <http://tango.freedesktop.org> under a Public Domain License.
 
 ===============================================================================
-The MozMill unit tests are distributed under the Mozilla Public License, v. 2.0.
+The tests are distributed under the Mozilla Public License, v. 2.0.
 You can obtain a copy of the MPL at http://mozilla.org/MPL/2.0/.
 
 ===============================================================================

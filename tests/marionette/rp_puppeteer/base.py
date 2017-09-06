@@ -48,8 +48,11 @@ class HTMLFormBaseLib(ElementBaseLib):
 
         return property(
             lambda self: self._get_input_field_value(find_method, find_target),
-            lambda self, value: self._set_input_field_value(find_method,
-                                                            find_target, value))
+            lambda self, value: (
+                self._set_input_field_value(
+                    find_method, find_target, value)
+            )
+        )
 
     def _get_input_field_value(self, find_method, find_target):
         input_field = self._get_input_field(find_method, find_target)

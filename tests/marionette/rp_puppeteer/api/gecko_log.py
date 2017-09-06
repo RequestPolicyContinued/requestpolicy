@@ -26,15 +26,17 @@ class GeckoLog(BaseLib, GeckoLogParser):
         return self._current_ignore_type() is not None
 
     def start_ignoring_errors(self, expected=False):
-        assert self.currently_ignoring_errors() == False
-        msg = self.IGNORE_ERRORS_START if not expected else self.EXPECT_ERRORS_START
+        assert self.currently_ignoring_errors() is False
+        msg = (self.IGNORE_ERRORS_START if not expected
+               else self.EXPECT_ERRORS_START)
         self.dump_and_wait(msg)
 
     def stop_ignoring_errors(self):
         current_type = self._current_ignore_type()
         assert current_type is not None
         is_expect = current_type == "expect"
-        msg = self.IGNORE_ERRORS_END if not is_expect else self.EXPECT_ERRORS_END
+        msg = (self.IGNORE_ERRORS_END if not is_expect
+               else self.EXPECT_ERRORS_END)
         self.dump_and_wait(msg)
 
     def dump_and_wait(self, message):
@@ -47,10 +49,16 @@ class GeckoLog(BaseLib, GeckoLogParser):
             lambda _: self.find([message], min_line=min_line) == message)
 
     def _current_ignore_type(self):
-        last_ignore = self.find([self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END])
+        last_ignore = self.find([
+            self.IGNORE_ERRORS_START,
+            self.IGNORE_ERRORS_END
+        ])
         if last_ignore is not None and last_ignore == self.IGNORE_ERRORS_START:
             return "ignore"
-        last_expect = self.find([self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END])
+        last_expect = self.find([
+            self.EXPECT_ERRORS_START,
+            self.EXPECT_ERRORS_END
+        ])
         if last_expect is not None and last_expect == self.EXPECT_ERRORS_START:
             return "expect"
         return None

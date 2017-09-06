@@ -46,7 +46,8 @@ class TestDefaultPolicy(RequestPolicyTestCase):
 
         # Don't know why this is necessary here... Without the sleep,
         # strange errors are thrown, like "rpPrefBranch is undefined".
-        import time; time.sleep(.1)
+        import time
+        time.sleep(.1)
 
         with self.rp_addon.tmp_disabled():
             self.prefs.reset_pref(PREF_DEFAULT_ALLOW)

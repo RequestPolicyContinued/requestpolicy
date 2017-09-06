@@ -84,21 +84,26 @@ class GeckoLogParser(object):
         return lines
 
     def get_error_lines_of_current_test(self, **kwargs):
-        return self._filter_error_lines(self.get_lines_of_current_test(), **kwargs)
+        return self._filter_error_lines(
+            self.get_lines_of_current_test(), **kwargs)
 
     ##################################
     # Private Properties and Methods #
     ##################################
 
     def _filter_error_lines(self, lines,
-            return_ignored_as_well=False,
-            return_expected_as_well=True):
+                            return_ignored_as_well=False,
+                            return_expected_as_well=True):
         error_lines = []
         ignore_helpers = []
         if not return_ignored_as_well:
-            ignore_helpers.append(IgnoreHelper(self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END))
+            ignore_helpers.append(IgnoreHelper(
+                self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END
+            ))
         if not return_expected_as_well:
-            ignore_helpers.append(IgnoreHelper(self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END))
+            ignore_helpers.append(IgnoreHelper(
+                self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END
+            ))
         prepend_to_next_line = ""
         for line in lines:
             line = prepend_to_next_line + line
@@ -133,7 +138,10 @@ class GeckoLogParser(object):
         if not self._is_exception(line):
             return False
 
-        if line.find("[RequestPolicy]") == -1 and line.find("chrome://rpcontinued/") == -1:
+        if (
+            line.find("[RequestPolicy]") == -1 and
+            line.find("chrome://rpcontinued/") == -1
+        ):
             return False
 
         if line.find("/third-party/") != -1:

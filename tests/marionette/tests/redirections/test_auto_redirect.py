@@ -53,7 +53,8 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed.")
-            redirections.assert_url_does_not_load(self, dest_url,
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
 
             self.redir.close()
@@ -92,14 +93,16 @@ class TestAutoRedirect(RequestPolicyTestCase):
             self._load_about_blank()
             self._navigate_expecting_r21n(test_url)
             self.assertTrue(self.redir.is_shown())
-            redirections.assert_url_does_not_load(self, dest_url,
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
             self.redir.allow()
 
             self._load_about_blank()
             self._navigate_expecting_r21n(test_url)
             self.assertTrue(self.redir.is_shown())
-            redirections.assert_url_does_not_load(self, dest_url,
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
             self.redir.close()
 
@@ -128,16 +131,18 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
                 # Set the timeout to a low value in order to speed up the
                 # test.
-                self.marionette.timeouts("page load", 100) # seconds
+                self.marionette.timeouts("page load", 100)  # seconds
                 # The following code can be used when Bug 1316622 lands:
-                #original_page_load_timeout = self.marionette.timeout.page_load
-                #self.marionette.timeout.page_load = 0.1 # miliseconds
+                # original_page_load_timeout = (
+                #     self.marionette.timeout.page_load)
+                # self.marionette.timeout.page_load = 0.1  # miliseconds
 
                 self.assertRaises(TimeoutException, self.marionette.navigate,
                                   url)
 
                 self.marionette.timeouts("page load", 20000)
-                #self.marionette.timeout.page_load = original_page_load_timeout
+                # self.marionette.timeout.page_load = (
+                #     original_page_load_timeout)
 
     def _get_url(self):
         with self.marionette.using_context("content"):

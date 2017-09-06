@@ -4,7 +4,8 @@ import argparse
 import textwrap
 from subprocess import check_output
 
-base_uri="https://github.com/RequestPolicyContinued/requestpolicy"
+base_uri = "https://github.com/RequestPolicyContinued/requestpolicy"
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Generate version notes.')
@@ -13,6 +14,7 @@ def parse_args():
     parser.add_argument("-c", "--current", action="store")
     parser.add_argument("-pv", "--prev-version", action="store")
     return parser.parse_args()
+
 
 def main():
     args = parse_args()
@@ -25,7 +27,7 @@ def main():
         prev_version = prev
 
         changelog_hash = "version-{}".format(args.current.replace(".", ""))
-    else: # nightly
+    else:  # nightly
         assert args.prev is not None
         assert args.prev_version is not None
 

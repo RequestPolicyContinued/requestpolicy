@@ -62,7 +62,8 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
             self.assertTrue(self.redir.is_shown(),
                             "The redirect notification has been displayed "
                             "in the destination tab.")
-            redirections.assert_url_does_not_load(self, dest_url,
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
 
             # Close the new tab.
@@ -72,7 +73,9 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                              "There's no redirect notification in the "
                              "origin tab.")
 
-        def open_page_and_open_first_link_in_new_tab(test_url, open_tab_method):
+        def open_page_and_open_first_link_in_new_tab(
+            test_url, open_tab_method
+        ):
             with self.marionette.using_context("content"):
                 self.marionette.navigate(test_url)
                 link = self.marionette.find_element("tag name", "a")
@@ -82,12 +85,13 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                     Actions(self.marionette).click(link, 1).perform()
             elif open_tab_method == "contextMenu":
                 self.ctx_menu.select_entry("context-openlinkintab", link)
-                # TODO: Use the "tabs" library as soon as it has been ported
-                #       to Marionette, see Mozilla Bug 1121725.
-                #       The mozmill code to open the link in a new tab was:
-                #       ```
-                #       tabBrowser.openTab({method: "contextMenu", target: link});
-                #       ```
+                # TODO:
+                #   Use the "tabs" library as soon as it has been ported
+                #   to Marionette, see Mozilla Bug 1121725.
+                #   The mozmill code to open the link in a new tab was:
+                #   ```
+                #   tabBrowser.openTab({method: "contextMenu", target: link});
+                #   ```
 
         def expand_url(path, option="page with link"):
             if option == "page with link":
@@ -102,7 +106,10 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                     test_appear(test_url, dest_url, info, *args)
 
             def maybe_test((test_url, _, dest_url), info):
-                if info["redirection_method"] == "js:document.location:<a> href":
+                if (
+                    info["redirection_method"] ==
+                        "js:document.location:<a> href"
+                ):
                     if info["is_relative_dest"]:
                         # Examplary relative href:
                         #     javascript:document.location = '/index.html'
@@ -126,11 +133,12 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
                         # test case.
                         return
 
-                    # FIXME: Issue #725;  This test fails with E10s enabled.
-                    #        When FxPuppeteer's `TabBar.get_handle_for_tab()` is
-                    #        executed for the new tab with the test URL, the
-                    #        `contentWindowAsCPOW` either is `null` or does not
-                    #        have a `QueryInterface()` function.
+                    # FIXME: Issue #725
+                    #   This test fails with E10s enabled.
+                    #   When FxPuppeteer's `TabBar.get_handle_for_tab()` is
+                    #   executed for the new tab with the test URL, the
+                    #   `contentWindowAsCPOW` either is `null` or does not
+                    #   have a `QueryInterface()` function.
                     if self.browser_info.e10s_enabled:
                         return
 

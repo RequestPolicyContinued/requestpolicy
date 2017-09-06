@@ -11,7 +11,9 @@ class L10n(FxL10n):
     """
 
     def get_rp_property(self, property_id):
-        property_urls = ["chrome://rpcontinued/locale/requestpolicy.properties"]
+        property_urls = [
+            "chrome://rpcontinued/locale/requestpolicy.properties",
+        ]
         return FxL10n.get_property(self, property_urls, property_id)
 
     def get_rp_entity(self, dtd_id):

@@ -22,9 +22,9 @@ class ExemplaryRules(ExemplaryRules_Meta):
     # Public Properties and Methods #
     #################################
 
-    #===========================================================================
+    # =========================================================================
     # Allow/Temp combinations.
-    #===========================================================================
+    # =========================================================================
 
     @lazyprop
     def allow_rule(self):
@@ -49,9 +49,9 @@ class ExemplaryRules(ExemplaryRules_Meta):
         return [self.allow_rule, self.temp_allow_rule,
                 self.deny_rule, self.temp_deny_rule]
 
-    #===========================================================================
+    # =========================================================================
     # Origin/Dest and Scheme/Host/Port combinations.
-    #===========================================================================
+    # =========================================================================
 
     @lazyprop
     def rule_without_origin(self):
@@ -79,8 +79,8 @@ class ExemplaryRules(ExemplaryRules_Meta):
     @lazyprop
     def allow_rule_shp_shp(self):
         return self._rule({"o": {"s": "os", "h": "oh", "port": 1},
-                                      "d": {"s": "ds", "h": "dh", "port": 2}},
-                                     allow=True, temp=False)
+                           "d": {"s": "ds", "h": "dh", "port": 2}},
+                          allow=True, temp=False)
 
     @lazyprop
     def temp_deny_rule_shp_shp(self):
@@ -144,7 +144,7 @@ class ExemplaryOldRules(ExemplaryRules_Meta):
             "expected": [
                 # origin-to-destination rules
                 self._rule({"o": {"s": "https", "h": "www.mozilla.org"},
-                            "d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),
+                            "d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),  # noqa
                 self._rule({"o": {"h": "www.mozilla.org"},
                             "d": {"h": "mozorg.cdn.mozilla.net"}}),
                 self._rule({"o": {"h": "*.mozilla.org"},
@@ -154,7 +154,7 @@ class ExemplaryOldRules(ExemplaryRules_Meta):
                 self._rule({"o": {"h": "www.mozilla.org"}}),
                 self._rule({"o": {"h": "*.mozilla.org"}}),
                 # destination rules
-                self._rule({"d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),
+                self._rule({"d": {"s": "https", "h": "mozorg.cdn.mozilla.net"}}),  # noqa
                 self._rule({"d": {"h": "mozorg.cdn.mozilla.net"}}),
                 self._rule({"d": {"h": "*.mozilla.net"}})
             ]

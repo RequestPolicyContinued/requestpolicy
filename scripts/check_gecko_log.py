@@ -9,11 +9,13 @@ from rp_puppeteer.api.gecko_log_parser import GeckoLogParser
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Check a Gecko logfile for errors.')
+    parser = argparse.ArgumentParser(
+        description='Check a Gecko logfile for errors.')
     parser.add_argument("-p", "--print", dest="do_print", action="store_true",
                         help='print error lines')
     parser.add_argument('file', help='path to the gecko log')
     return parser.parse_args()
+
 
 def main():
     args = parse_args()

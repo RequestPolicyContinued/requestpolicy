@@ -31,6 +31,8 @@ class TestWebExtension(RequestPolicyTestCase):
         self.requests.stop_listening()
         self.assertTrue(self.addon.is_installed)
         for request in self.requests.all:
-            if (request["dest"].startswith("moz-extension://") and
-                not request["isAllowed"]):
+            if (
+                request["dest"].startswith("moz-extension://") and
+                not request["isAllowed"]
+            ):
                 self.fail("A moz-extension request has been blocked.")

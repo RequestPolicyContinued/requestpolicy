@@ -63,8 +63,10 @@ class TestAutomaticRulesImportOnUpgrade(RulesImportTestCase):
                                      welcomewin_shown=False,
                                      should_autoimport=False)
 
-    def _test_autoimport_or_not(self, last_rp_version, with_existing_rules_file,
-                                welcomewin_shown, should_autoimport):
+    def _test_autoimport_or_not(
+        self, last_rp_version, with_existing_rules_file,
+        welcomewin_shown, should_autoimport
+    ):
         if with_existing_rules_file:
             # Ensure that a user.json file exists.
             self.rules.save()

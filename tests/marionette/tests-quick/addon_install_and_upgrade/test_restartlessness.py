@@ -16,7 +16,9 @@ class CommonTests:
         """
 
         def test_disable_enable(self):
-            self.assertTrue(self.rp_addon.is_active, msg="The addon is enabled.")
+            self.assertTrue(
+                self.rp_addon.is_active,
+                msg="The addon is enabled.")
             self.rp_addon.disable()
             self.assertFalse(self.rp_addon.is_active,
                              msg="The addon has been disabled.")

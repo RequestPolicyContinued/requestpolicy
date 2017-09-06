@@ -17,12 +17,14 @@ def _get_random_string():
     return str(str(time.clock()))
 
 
-def get_auto_redirection_uri(redirection_method,
-        append_random_querystring=True,
-        origin_pre_path="http://www.maindomain.test/",
-        dest_pre_path="http://www.otherdomain.test/",
-        dest_path="",
-        expected_dest_pre_path=None):
+def get_auto_redirection_uri(
+    redirection_method,
+    append_random_querystring=True,
+    origin_pre_path="http://www.maindomain.test/",
+    dest_pre_path="http://www.otherdomain.test/",
+    dest_path="",
+    expected_dest_pre_path=None
+):
     additional_parameters = ""
     if redirection_method == "http:location":
         filename = "redirect-http-location-header.php"
@@ -59,18 +61,27 @@ def get_auto_redirection_uri(redirection_method,
     return (origin_uri, dest_uri)
 
 
-def get_link_redirection_uri(redirection_method,
-        append_random_querystring=True,
-        origin_pre_path="http://www.maindomain.test/",
-        dest_pre_path="http://www.otherdomain.test/",  # set to "" to get a relative url
-        dest_path="",
-        expected_dest_pre_path=None):
+def get_link_redirection_uri(
+    redirection_method,
+    append_random_querystring=True,
+    origin_pre_path="http://www.maindomain.test/",
+    # set dest_pre_path to "" to get a relative url
+    dest_pre_path="http://www.otherdomain.test/",
+    dest_path="",
+    expected_dest_pre_path=None
+):
     if redirection_method == "js:document.location:<a> href":
         filename = "redirect-js-document-location-link.php"
 
-        linkpage_uri = (origin_pre_path + filename +
-                    "?pre_path=" + urllib.quote(dest_pre_path) +
-                    "&path=" + urllib.quote(dest_path))
+        linkpage_uri = (
+            "{origin_pre_path}{filename}"
+            "?pre_path={dest_pre_path}&path={dest_path}"
+        ).format(
+            origin_pre_path=origin_pre_path,
+            filename=filename,
+            dest_pre_path=urllib.quote(dest_pre_path),
+            dest_path=urllib.quote(dest_path),
+        )
 
         intermediate_uri = None
 
@@ -160,19 +171,21 @@ def for_each_possible_redirection_scenario(callback, uri_type):
             print "uris: " + str(uris)
             raise
 
-    #---------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # cross-site redirections
-    #---------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     # usual cross-site redirection
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": False, "is_relative_dest": False},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="http://www.otherdomain.test/",
         dest_path="")
 
     # destination relative to "http" scheme
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": False, "is_relative_dest": True},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="//www.otherdomain.test/",
@@ -180,32 +193,36 @@ def for_each_possible_redirection_scenario(callback, uri_type):
         expected_dest_pre_path="http://www.otherdomain.test/")
 
     # redirection to PNG image (test against #351)
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": False, "is_relative_dest": False},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="http://www.otherdomain.test/",
         dest_path="subdirectory/flag-gray.png")
 
     # destination URI with "fragment" part
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": False, "is_relative_dest": False},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="http://www.otherdomain.test/",
         dest_path="#this-is-a-fragment")
 
-    #---------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # same-site redirections
-    #---------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     # destination relative to the host
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": True, "is_relative_dest": True},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="",
         dest_path="subdirectory/")
 
     # destination relative to the host, with slash
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": True, "is_relative_dest": True},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="/",
@@ -213,14 +230,16 @@ def for_each_possible_redirection_scenario(callback, uri_type):
         expected_dest_pre_path="http://www.maindomain.test/")
 
     # destination host and protocol specified
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": True, "is_relative_dest": False},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="http://www.maindomain.test/",
         dest_path="")
 
     # destination relative to "http" scheme, but same host
-    for_each(callback_wrapper,
+    for_each(
+        callback_wrapper,
         base_info={"is_same_host": True, "is_relative_dest": True},
         origin_pre_path="http://www.maindomain.test/",
         dest_pre_path="//www.maindomain.test/",

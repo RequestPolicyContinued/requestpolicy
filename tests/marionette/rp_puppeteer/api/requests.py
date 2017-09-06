@@ -42,7 +42,8 @@ class Requests(BaseLib):
         """Whether or not requests are currently observed."""
 
         return self.marionette.execute_script("""
-          return typeof this.listening === "boolean" && this.listening === true;
+          return (typeof this.listening === "boolean" &&
+                  this.listening === true);
         """, sandbox=self._sandbox, new_sandbox=False)
 
     @property

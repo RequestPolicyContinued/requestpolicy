@@ -16,7 +16,10 @@ class ErrorIgnoringTests(object):
         self.gecko_log.stop_ignoring_errors()
         self.assertFalse(self.gecko_log.currently_ignoring_errors())
 
+
 class TestIgnoringErrors(ErrorIgnoringTests, RequestPolicyTestCase):
     pass
+
+
 class TestIgnoringExpectedErrors(ErrorIgnoringTests, RequestPolicyTestCase):
     expected_error = True

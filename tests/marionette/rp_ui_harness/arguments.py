@@ -21,6 +21,11 @@ class RequestPolicyUIBaseArguments(object):
       ))
     ]
 
+    def parse_args_handler(self, args):
+        args.tests = ([("tests/marionette/tests-special/"
+                        "test_before_all_other_tests.py")] +
+                      args.tests)
+
 
 class RequestPolicyUIArguments(FirefoxUIArguments):
 

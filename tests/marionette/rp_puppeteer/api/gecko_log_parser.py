@@ -65,13 +65,20 @@ class GeckoLogParser(object):
     # Public Properties and Methods #
     #################################
 
+    # lines
+
     def get_all_lines(self):
         with self._gecko_log_file() as gecko_log:
             # Take all lines except the last one, which is empty.
             return gecko_log.read().split("\n")[:-1]
 
-    def get_all_error_lines(self, **kwargs):
-        return self._filter_error_lines(self.get_all_lines(), **kwargs)
+    def get_lines_before_first_test(self):
+        lines = []
+        for line in self.get_all_lines():
+            if line.find("TEST-START") != -1:
+                break
+            lines.append(line)
+        return lines
 
     def get_lines_of_current_test(self):
         all_lines = self.get_all_lines()
@@ -83,9 +90,18 @@ class GeckoLogParser(object):
         lines.reverse()
         return lines
 
+    # error lines
+
+    def get_all_error_lines(self, **kwargs):
+        return self._filter_error_lines(self.get_all_lines(), **kwargs)
+
     def get_error_lines_of_current_test(self, **kwargs):
         return self._filter_error_lines(
             self.get_lines_of_current_test(), **kwargs)
+
+    def get_error_lines_before_first_test(self, **kwargs):
+        return self._filter_error_lines(
+            self.get_lines_before_first_test(), **kwargs)
 
     ##################################
     # Private Properties and Methods #

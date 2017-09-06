@@ -38,12 +38,13 @@ class GeckoLog(BaseLib, GeckoLogParser):
         self.dump_and_wait(msg)
 
     def dump_and_wait(self, message):
-        min_line = len(self.get_all_lines()) - 1
+        min_line = len(self.get_all_lines())
         self.marionette.execute_script("""
           Components.utils.import("resource://gre/modules/Services.jsm");
           Services.obs.notifyObservers(null, "{}", "{}");
         """.format("requestpolicy-dump-string", message))
-        Wait(self.marionette).until(lambda _: self.find([message]) == message)
+        Wait(self.marionette).until(
+            lambda _: self.find([message], min_line=min_line) == message)
 
     def _current_ignore_type(self):
         last_ignore = self.find([self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END])

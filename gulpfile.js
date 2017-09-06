@@ -69,9 +69,10 @@ const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder)
     name = namePrefix + ":" + name;
     deps = forcedDeps.concat(deps);
     tasks.push(name);
+    taskFn = taskFn.bind(null, namePrefix);
     gulp.task(name, deps, taskFn);
   });
-  taskAdder(addTaskFn);
+  taskAdder(addTaskFn, namePrefix);
   // finally, when all tasks are added, add the meta-task
   gulp.task(namePrefix, tasks);
 });
@@ -200,7 +201,7 @@ BUILDS.forEach(build => {
   // main build tasks
   //----------------------------------------------------------------------------
 
-  addGulpTasks(`build:${build.alias}`, [`clean:${build.alias}`], addBuildTask => {
+  addGulpTasks(`build:${build.alias}`, [`clean:${build.alias}`], (addBuildTask, buildTaskPrefix) => {
     addBuildTask("copiedFiles", () => {
       let files = [
         "README",

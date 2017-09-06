@@ -663,7 +663,7 @@ mostlyclean: clean
 	@rm -rf $(logs_dir)/*
 clean-dev-environment:
 	@rm -rf $(python_env_dir)
-	@rm -rf $(node_env_dir)
+	@rm -rf $(node_env_dir)/node_modules
 	@rm -rf $(browsers_dir)/firefox
 	# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
 	# are put there manually.

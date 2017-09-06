@@ -138,10 +138,9 @@ export var Logger = (function() {
 function createErrorTriggeringService() {
   let self = {};
 
-  const where = MainEnvironment.isMainEnvironment ?
-      "backgroundscript" :
-      "contentscript";
-
+  const isMainEnvironment =
+      typeof browser.extension.getBackgroundPage === "function";
+  const where = isMainEnvironment ? "backgroundscript" : "contentscript";
   const topic = "requestpolicy-trigger-error-" + where;
 
   const observer = {};

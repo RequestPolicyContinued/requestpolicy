@@ -653,23 +653,23 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: jshint jscs addons-linter
+lint: addons-linter jscs jshint
 
 jshint_args :=
 jscs_args :=
 
-.PHONY: jshint jscs addons-linter
-jshint: node-packages
-	$(JSHINT) $(jshint_args) src/
-	$(JSHINT) $(jshint_args) tests/xpcshell/
-	$(JSHINT) $(jshint_args) tests/helper-addons/
+.PHONY: addons-linter jscs jshint
+addons-linter: nightly-xpi node-packages
+	$(ADDONS_LINTER) $(xpi_file__nightly)
 jscs: node-packages
 	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
 	cd src/; $(JSCS) $(jscs_args) .
 	cd tests/xpcshell/; $(JSCS) $(jscs_args) .
 	cd tests/helper-addons/; $(JSCS) $(jscs_args) .
-addons-linter: nightly-xpi node-packages
-	$(ADDONS_LINTER) $(xpi_file__nightly)
+jshint: node-packages
+	$(JSHINT) $(jshint_args) src/
+	$(JSHINT) $(jshint_args) tests/xpcshell/
+	$(JSHINT) $(jshint_args) tests/helper-addons/
 
 #-------------------------------------------------------------------------------
 # localization checks

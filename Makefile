@@ -295,18 +295,27 @@ WITH_MOZPROFILE = \
 T_PYTHON_PACKAGES := $(python_env_dir)/.timestamp_requirements
 T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 
+# increment the value when changing the target
+__python_venv__ := v0
+
 .PHONY: python-venv
 python-venv: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
 		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
-		| $(T_PYTHON_VIRTUALENV)
+		$(T_PYTHON_VIRTUALENV)
 	$(call IN_PYTHON_ENV, \
 		pip install --upgrade -r $< \
 	)
 	touch $@
-$(T_PYTHON_VIRTUALENV):
+$(T_PYTHON_VIRTUALENV): \
+		$(call _VAR_STAMP_,__python_venv__) \
+		$(call _VAR_STAMP_,CURDIR) \
+		$(call _VAR_STAMP_,python_env_dir)
+	rm -rf $(python_env_dir)
 	mkdir -p $(python_env_dir)
 	virtualenv --no-site-packages --prompt='(RP)' $(python_env_dir)
+	@echo $(CURDIR)/tests/python \
+	  > $(python_env_dir)/lib/python2.7/site-packages/requestpolicy.pth
 	touch $@
 
 #-------------------------------------------------------------------------------

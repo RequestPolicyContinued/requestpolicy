@@ -296,7 +296,7 @@ T_PYTHON_PACKAGES := $(python_env_dir)/.timestamp_requirements
 T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 
 # increment the value when changing the target
-__python_venv__ := v0
+__python_venv__ := v1
 
 .PHONY: python-venv
 python-venv: $(T_PYTHON_PACKAGES)

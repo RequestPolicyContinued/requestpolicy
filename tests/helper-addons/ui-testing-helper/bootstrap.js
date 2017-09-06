@@ -32,8 +32,8 @@ const {utils: Cu} = Components;
 function getModules() {
   return [
     {
-      uri: "chrome://rpc-dev-helper/content/rpc-uri.jsm",
-      name: "CustomUri"
+      uri: "chrome://rpc-ui-testing-helper/content/dump.jsm",
+      name: "Dump"
     },
   ];
 }

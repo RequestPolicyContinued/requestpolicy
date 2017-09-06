@@ -169,10 +169,12 @@ define make_other_xpi
 endef
 
 .PHONY: _other_xpi \
-	dev-helper-xpi dummy-xpi webext-apply-css-xpi
+	dev-helper-xpi ui-testing-helper-xpi dummy-xpi webext-apply-css-xpi
 
 dev-helper-xpi:
 	$(call make_other_xpi,dev_helper)
+ui-testing-helper-xpi:
+	$(call make_other_xpi,ui_testing_helper)
 dummy-xpi:
 	$(call make_other_xpi,dummy)
 webext-apply-css-xpi:
@@ -182,17 +184,20 @@ webext-apply-css-xpi:
 # [VARIABLES] configuration of different builds
 #-------------------------------------------------------------------------------
 
-alias__dev_helper   := RPC Dev Helper
-alias__dummy        := Dummy
-alias__we_apply_css := Dummy WebExtension
+alias__dev_helper        := RPC Dev Helper
+alias__ui_testing_helper := RPC UI Testing Helper
+alias__dummy             := Dummy
+alias__we_apply_css      := Dummy WebExtension
 
-source_path__dev_helper   := tests/helper-addons/dev-helper/
-source_path__dummy        := tests/helper-addons/dummy-ext/
-source_path__we_apply_css := tests/helper-addons/external/webext-apply-css/
+source_path__dev_helper        := tests/helper-addons/dev-helper/
+source_path__ui_testing_helper := tests/helper-addons/ui-testing-helper/
+source_path__dummy             := tests/helper-addons/dummy-ext/
+source_path__we_apply_css      := tests/helper-addons/external/webext-apply-css/
 
-xpi_file__dev_helper   := $(dist_dir)/rpc-dev-helper.xpi
-xpi_file__dummy        := $(dist_dir)/dummy-ext.xpi
-xpi_file__we_apply_css := $(dist_dir)/webext-apply-css.xpi
+xpi_file__dev_helper         := $(dist_dir)/rpc-dev-helper.xpi
+xpi_file__ui_testing_helper  := $(dist_dir)/rpc-ui-testing-helper.xpi
+xpi_file__dummy              := $(dist_dir)/dummy-ext.xpi
+xpi_file__we_apply_css       := $(dist_dir)/webext-apply-css.xpi
 
 #-------------------------------------------------------------------------------
 # intermediate targets
@@ -461,7 +466,7 @@ marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.lo
 _marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
 _marionette_address := localhost:$(_marionette_port)
 
-_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper)
+_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper) $(xpi_file__ui_testing_helper)
 _marionette_prefs := common ui_tests
 _marionette_mozprofile_args := \
 	$(addprefix --addon=,$(_marionette_xpis)) \
@@ -483,6 +488,7 @@ marionette-non-quick marionette-quick: \
 		$(logs_dir) \
 		ui-testing-xpi \
 		dev-helper-xpi \
+		ui-testing-helper-xpi \
 		dummy-xpi \
 		webext-apply-css-xpi \
 		specific-xpi \

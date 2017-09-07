@@ -545,12 +545,8 @@ clean-old-browser-tarballs: \
 		clean-old-firefox-tarballs
 
 #===============================================================================
-# Running and Testing RequestPolicy
+# Running a Browser + RequestPolicy
 #===============================================================================
-
-#-------------------------------------------------------------------------------
-# run firefox
-#-------------------------------------------------------------------------------
 
 # arguments for mozrunner
 run_additional_xpis :=
@@ -570,9 +566,10 @@ run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 		mozrunner $(_run_mozrunner_args) \
 	)
 
-#-------------------------------------------------------------------------------
+
+#===============================================================================
 # Testing
-#-------------------------------------------------------------------------------
+#===============================================================================
 
 .PHONY: test-quick test
 test-quick: static-analysis marionette-quick
@@ -580,7 +577,7 @@ test-non-quick: test-makefile marionette-non-quick
 test: test-quick test-non-quick
 
 #-------------------------------------------------------------------------------
-# Testing: Marionette
+# Marionette tests
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
@@ -642,7 +639,7 @@ marionette-non-quick marionette-quick: \
 	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 
 #===============================================================================
-# static code analysis
+# static analysis
 #===============================================================================
 
 .PHONY: static-analysis

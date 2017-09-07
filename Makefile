@@ -580,7 +580,7 @@ test-non-quick: test-makefile marionette-non-quick
 test: test-quick test-non-quick
 
 #-------------------------------------------------------------------------------
-# unit testing: Marionette
+# Testing: Marionette
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.

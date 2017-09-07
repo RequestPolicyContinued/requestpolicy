@@ -100,7 +100,7 @@ define make_files
 endef
 
 .PHONY: all _xpi _files \
-	xpi nightly-xpi beta-xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
+	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	nightly-files
 
 all: xpi
@@ -109,8 +109,8 @@ nightly-xpi: node-packages
 	$(call make_xpi,nightly)
 beta-xpi: node-packages
 	$(call make_xpi,beta)
-unit-testing-xpi: node-packages
-	$(call make_xpi,unit_testing)
+ui-testing-xpi: node-packages
+	$(call make_xpi,ui_testing)
 amo-beta-xpi: node-packages
 	$(call make_xpi,amo_beta)
 amo-nightly-xpi: node-packages
@@ -127,19 +127,19 @@ alias__nightly       := nightly
 alias__beta          := beta
 alias__amo_beta      := AMO-beta
 alias__amo_nightly   := AMO-nightly
-alias__unit_testing  := unit-testing
+alias__ui_testing    := ui-testing
 
 extension_id__nightly      := $(off_amo__extension_id)
 extension_id__beta         := $(off_amo__extension_id)
 extension_id__amo_beta     := $(amo__extension_id)
 extension_id__amo_nightly  := $(amo__extension_id)
-extension_id__unit_testing := $(off_amo__extension_id)
+extension_id__ui_testing   := $(off_amo__extension_id)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
 xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
-xpi_file__unit_testing := $(dist_dir)/$(extension_name)-unit-testing.xpi
+xpi_file__ui_testing   := $(dist_dir)/$(extension_name)-ui-testing.xpi
 
 UNIQUE_VERSION_SUFFIX         := $(shell ./scripts/get_unique_version_suffix.sh)
 preproc_context____ALL        := "UNIQUE_VERSION_SUFFIX": "$(UNIQUE_VERSION_SUFFIX)"
@@ -150,13 +150,13 @@ preproc_context__nightly      := $(preproc_context____ALL), $(preproc_context___
 preproc_context__beta         := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
 preproc_context__amo_beta     := $(preproc_context____ALL), $(preproc_context____AMO)
 preproc_context__amo_nightly  := $(preproc_context____ALL), $(preproc_context____AMO)
-preproc_context__unit_testing := $(preproc_context____ALL), $(preproc_context____OFF_AMO), "UNIT_TESTING": "TRUE"
+preproc_context__ui_testing   := $(preproc_context____ALL), $(preproc_context____OFF_AMO), "UI_TESTING": "TRUE"
 
 unique_version__nightly      := yes
 unique_version__beta         := no
 unique_version__amo_beta     := no
 unique_version__amo_nightly  := yes
-unique_version__unit_testing := yes
+unique_version__ui_testing   := yes
 
 ifdef BUILD
 
@@ -572,18 +572,21 @@ run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
 #===============================================================================
 
 .PHONY: test-quick test
-test-quick: static-analysis marionette-quick
-test-non-quick: test-makefile marionette-non-quick
+test-quick: static-analysis ui-tests-quick
+test-non-quick: test-makefile ui-tests-non-quick
 test: test-quick test-non-quick
 
 #-------------------------------------------------------------------------------
-# Marionette tests
+# UI tests
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-.PHONY: marionette
+.PHONY: ui-tests ui-tests-quick ui-tests-non-quick
+ui-tests: marionette
+ui-tests-quick: marionette-quick
+ui-tests-non-quick: marionette-non-quick
 
 logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
 
@@ -600,8 +603,8 @@ marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.lo
 _marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
 _marionette_address := localhost:$(_marionette_port)
 
-_marionette_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper)
-_marionette_prefs := common marionette
+_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper)
+_marionette_prefs := common ui_tests
 _marionette_mozprofile_args := \
 	$(addprefix --addon=,$(_marionette_xpis)) \
 	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
@@ -620,7 +623,7 @@ marionette-non-quick: marionette_tests := tests/marionette/tests-non-quick.manif
 marionette-non-quick marionette-quick: \
 		python-venv \
 		$(logs_dir) \
-		unit-testing-xpi \
+		ui-testing-xpi \
 		dev-helper-xpi \
 		dummy-xpi \
 		webext-apply-css-xpi \

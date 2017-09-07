@@ -199,7 +199,7 @@ class RequestPolicy(Addon):
     """Class to install/uninstall/enable/disable RequestPolicy."""
 
     def __init__(self, marionette_getter):
-        install_url = ("file://{}/dist/requestpolicy-unit-testing.xpi"
+        install_url = ("file://{}/dist/requestpolicy-ui-testing.xpi"
                        .format(os.getcwd()))
 
         Addon.__init__(self, marionette_getter,

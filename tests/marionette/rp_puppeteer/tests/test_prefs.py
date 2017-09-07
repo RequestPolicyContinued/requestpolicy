@@ -10,14 +10,14 @@ class TestPrefs(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
 
-        self.new_pref = 'marionette.unittest.using_pref'
+        self.new_pref = 'marionette.ui_test.using_pref'
 
     def test_using_pref(self):
         self.assertEqual(self.prefs.get_pref(self.new_pref), None,
                          msg="The pref initially doesn't exist.")
 
-        with self.prefs.using_pref(self.new_pref, 'unittest'):
-            self.assertEqual(self.prefs.get_pref(self.new_pref), 'unittest',
+        with self.prefs.using_pref(self.new_pref, 'ui_test'):
+            self.assertEqual(self.prefs.get_pref(self.new_pref), 'ui_test',
                              msg="The pref has been set.")
 
         self.assertEqual(self.prefs.get_pref(self.new_pref), None,

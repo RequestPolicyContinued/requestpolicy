@@ -145,7 +145,7 @@ class CommonTests:
 
             self.restart()
             # Don't require the tab to be selected. It somehow doesn't get
-            # selected in the unit test, but it works when done manually.
+            # selected in the UI test, but it works when done manually.
             self._assert_notice_tab(selected_required=False)
 
 

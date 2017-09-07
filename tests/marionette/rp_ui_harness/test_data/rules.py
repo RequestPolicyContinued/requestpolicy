@@ -8,7 +8,7 @@ from ..decorators import lazyprop
 
 
 class ExemplaryRules_Meta(BaseLib):
-    """Some rules for unit tests."""
+    """Some rules for UI tests."""
 
     def __init__(self, marionette_getter):
         super(ExemplaryRules_Meta, self).__init__(marionette_getter)

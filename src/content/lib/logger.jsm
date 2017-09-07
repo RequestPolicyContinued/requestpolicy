@@ -135,7 +135,7 @@ var Logger = (function() {
   function log(aLevel, aType, aMessage, aError) {
     let shouldLog = enabled && aLevel >= level && types & aType;
 
-    // @ifdef UNIT_TESTING
+    // @ifdef UI_TESTING
     let isError = aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE;
     if (isError) {
       // log even if logging is disabled
@@ -191,15 +191,15 @@ var Logger = (function() {
   return self;
 }());
 
-// @ifdef UNIT_TESTING
+// @ifdef UI_TESTING
 
 //==============================================================================
 // ErrorTriggeringService
 //==============================================================================
 
 /**
- * Triggers errors for a RequestPolicy unit test.
- * It's used to test Error Detection from the unit tests.
+ * Triggers errors for a RequestPolicy UI test.
+ * It's used to test Error Detection from the UI tests.
  */
 var ErrorTriggeringService = (function() {
   let self = {};

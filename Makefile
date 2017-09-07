@@ -83,7 +83,7 @@ define make_files
 endef
 
 .PHONY: all _xpi _files \
-	xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
+	xpi nightly-xpi beta-xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	unit-testing-files
 
 all: xpi
@@ -308,7 +308,7 @@ define make_other_xpi
 endef
 
 .PHONY: _other_xpi \
-	dev-helper-xpi dummy-xpi
+	dev-helper-xpi dummy-xpi webext-apply-css-xpi
 
 dev-helper-xpi:
 	$(call make_other_xpi,dev_helper)
@@ -374,7 +374,7 @@ endif
 # Development environment
 #===============================================================================
 
-PHONY: development-environment
+.PHONY: development-environment
 development-environment: python-venv node-packages firefox-all
 
 #-------------------------------------------------------------------------------
@@ -648,7 +648,7 @@ marionette-non-quick marionette-quick: \
 jshint_args :=
 jscs_args :=
 
-.PHONY: static-analysis jshint jscs addons-linter
+.PHONY: static-analysis jshint jscs addons-linter check-locales
 static-analysis: jshint jscs addons-linter check-locales
 jshint: node-packages
 	$(JSHINT) $(jshint_args) src/

@@ -47,7 +47,6 @@ $(dist_dir) $(logs_dir):
 # system
 GIT            := /usr/bin/git
 NPM            := npm
-PREPROCESS     := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
 ZIP            := zip
 
 # nodejs
@@ -55,14 +54,8 @@ ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint --extra-ext jsm
 
-#-------------------------------------------------------------------------------
-# other
-#-------------------------------------------------------------------------------
-
-.PHONY: preprocessor
-preprocessor: $(build_dir_root)/preprocess-content-types.txt
-$(build_dir_root)/preprocess-content-types.txt:
-	echo 'JavaScript .jsm' > $@
+# node --eval
+PREPROCESS = node --eval 'require("preprocess").preprocessFileSync("$2", "$3", {$4}, {type: "$1"});'
 
 #-------------------------------------------------------------------------------
 # helpers
@@ -94,18 +87,18 @@ endef
 
 all: xpi
 xpi: nightly-xpi
-nightly-xpi:
+nightly-xpi: node-packages
 	$(call make_xpi,nightly)
-beta-xpi:
+beta-xpi: node-packages
 	$(call make_xpi,beta)
-unit-testing-xpi:
+unit-testing-xpi: node-packages
 	$(call make_xpi,unit_testing)
-amo-beta-xpi:
+amo-beta-xpi: node-packages
 	$(call make_xpi,amo_beta)
-amo-nightly-xpi:
+amo-nightly-xpi: node-packages
 	$(call make_xpi,amo_nightly)
 
-unit-testing-files:
+unit-testing-files: node-packages
 	$(call make_files,unit_testing)
 
 #-------------------------------------------------------------------------------
@@ -130,11 +123,16 @@ xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
 xpi_file__unit_testing := $(dist_dir)/$(extension_name)-unit-testing.xpi
 
-preprocess_args__nightly      :=
-preprocess_args__beta         :=
-preprocess_args__amo_beta     := -D AMO
-preprocess_args__amo_nightly  := -D AMO
-preprocess_args__unit_testing := --keep-lines -D UNIT_TESTING
+UNIQUE_VERSION_SUFFIX         := $(shell ./scripts/get_unique_version_suffix.sh)
+preproc_context____ALL        := "UNIQUE_VERSION_SUFFIX": "$(UNIQUE_VERSION_SUFFIX)"
+preproc_context____AMO        := "AMO": "TRUE", "EXTENSION_ID": "$(amo__extension_id)"
+preproc_context____OFF_AMO    :=                "EXTENSION_ID": "$(off_amo__extension_id)"
+
+preproc_context__nightly      := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
+preproc_context__beta         := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
+preproc_context__amo_beta     := $(preproc_context____ALL), $(preproc_context____AMO)
+preproc_context__amo_nightly  := $(preproc_context____ALL), $(preproc_context____AMO)
+preproc_context__unit_testing := $(preproc_context____ALL), $(preproc_context____OFF_AMO), "UNIT_TESTING": "TRUE"
 
 unique_version__nightly      := yes
 unique_version__beta         := no
@@ -151,7 +149,7 @@ ifdef BUILD
 current_build__alias           := $(alias__$(BUILD))
 current_build__extension_id    := $(extension_id__$(BUILD))
 current_build__xpi_file        := $(xpi_file__$(BUILD))
-current_build__preprocess_args := $(preprocess_args__$(BUILD))
+current_build__preproc_context := $(preproc_context__$(BUILD))
 current_build__unique_version  := $(unique_version__$(BUILD))
 
 #-------------------------------------------------------------------------------
@@ -224,9 +222,9 @@ _files: $(build_files_including_removals)
 # [TARGETS] preprocess and/or copy files (src/ --> build/)
 #-------------------------------------------------------------------------------
 
-$(build__jspp_files) : $(current_build_dir)/% : $(source_dir)/% | preprocessor
+$(build__jspp_files) : $(current_build_dir)/% : $(source_dir)/%
 	@mkdir -p $(@D)
-	$(PREPROCESS) $(current_build__preprocess_args) $< > $@
+	$(call PREPROCESS,js,$<,$@,$(current_build__preproc_context))
 
 $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 	@mkdir -p $(@D)
@@ -236,18 +234,7 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 # force rebuild of install.rdf because the version suffix might change
 $(build__install_rdf) : $(current_build_dir)/% : $(source_dir)/% \
 		FORCE
-	cp --dereference $< $@
-	@if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
-		echo 'install.rdf: changing the Extension ID !' ; \
-		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
-		echo 'install.rdf: removing the updateURL !' ; \
-		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
-	fi ; \
-	if [[ "$(current_build__unique_version)" == "yes" ]]; then \
-		echo 'install.rdf: making the version unique !' ; \
-			unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
-		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
-	fi
+	$(call PREPROCESS,xml,$<,$@,$(current_build__preproc_context))
 
 #-------------------------------------------------------------------------------
 # [TARGETS] remove files/dirs no longer existant in the source

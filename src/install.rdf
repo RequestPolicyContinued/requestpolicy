@@ -5,9 +5,9 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy Continued</em:name>
-    <em:version>1.0.beta13.0</em:version>
+    <em:version>1.0.beta13.0<!-- @echo UNIQUE_VERSION_SUFFIX --></em:version>
     <em:type>2</em:type>
-    <em:id>rpcontinued@non-amo.requestpolicy.org</em:id>
+    <em:id><!-- @echo EXTENSION_ID --></em:id>
 
     <em:unpack>false</em:unpack>
     <em:bootstrap>true</em:bootstrap>
@@ -18,7 +18,9 @@
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>
 
+    <!-- @ifndef AMO -->
     <em:updateURL>https://requestpolicycontinued.github.io/updates/update-nightly.rdf</em:updateURL>
+    <!-- @endif -->
 
     <em:localized>
       <Description>

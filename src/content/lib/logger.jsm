@@ -135,13 +135,13 @@ var Logger = (function() {
   function log(aLevel, aType, aMessage, aError) {
     let shouldLog = enabled && aLevel >= level && types & aType;
 
-    // #ifdef UNIT_TESTING
+    // @ifdef UNIT_TESTING
     let isError = aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE;
     if (isError) {
       // log even if logging is disabled
       shouldLog = true;
     }
-    // #endif
+    // @endif
 
     if (shouldLog) {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
@@ -191,7 +191,7 @@ var Logger = (function() {
   return self;
 }());
 
-// #ifdef UNIT_TESTING
+// @ifdef UNIT_TESTING
 
 //==============================================================================
 // unit testing part
@@ -260,4 +260,4 @@ ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
                                       UnitTestObserver.startup);
 ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
                                        UnitTestObserver.shutdown);
-// #endif
+// @endif

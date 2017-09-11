@@ -28,11 +28,12 @@ this.EXPORTED_SYMBOLS = ["C"];
 
 var C = {};
 
-// #ifdef AMO
+// @ifdef AMO
 C.EXTENSION_ID = "rpcontinued@amo.requestpolicy.org";
-// #else
+// @endif
+// @ifndef AMO
 C.EXTENSION_ID = "rpcontinued@non-amo.requestpolicy.org";
-// #endif
+// @endif
 
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";

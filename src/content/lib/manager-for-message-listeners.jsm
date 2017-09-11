@@ -66,11 +66,11 @@ function ManagerForMessageListeners(aEnv, aMM) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          // #ifdef LOG_MESSAGE_LISTENERS
+          // @ifdef LOG_MESSAGE_LISTENERS
           Logger.dump("From now on new message listeners will be " +
                       "added immediately. Environment: \"" +
                       self.environment.name + "\"");
-          // #endif
+          // @endif
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -145,11 +145,11 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     listening: false
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
-    // #ifdef LOG_MESSAGE_LISTENERS
+    // @ifdef LOG_MESSAGE_LISTENERS
     Logger.dump("Immediately adding message listener for \"" +
                 listener.messageName + "\". Environment: \"" +
                 self.environment.name + "\"");
-    // #endif
+    // @endif
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
   }
@@ -163,11 +163,11 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      // #ifdef LOG_MESSAGE_LISTENERS
+      // @ifdef LOG_MESSAGE_LISTENERS
       Logger.dump("Lazily adding message listener for \"" +
                   listener.messageName + "\". Environment: \"" +
                   self.environment.name + "\"");
-      // #endif
+      // @endif
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
     }
@@ -187,10 +187,10 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //                 'is undefined!');
     //  continue;
     //}
-    // #ifdef LOG_MESSAGE_LISTENERS
+    // @ifdef LOG_MESSAGE_LISTENERS
     Logger.dump("Removing message listener for \"" + listener.messageName +
                 "\".");
-    // #endif
+    // @endif
     //try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
     //} catch (e) {

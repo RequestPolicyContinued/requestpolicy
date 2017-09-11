@@ -16,6 +16,7 @@ const gulpIgnore = require("gulp-ignore");
 const preprocess = require("gulp-preprocess");
 const rename = require("gulp-rename");
 const replace = require("gulp-replace");
+const sourcemaps = require("gulp-sourcemaps");
 const ts = require("gulp-typescript");
 const zip = require("gulp-zip");
 const mergeStream = require("merge-stream");
@@ -345,7 +346,8 @@ BUILDS.forEach(build => {
     // ---
 
     const tsProject = ts.createProject("tsconfig.json", {
-      outDir: buildDir,
+      rootDir: srcDir,
+      outDir: srcDir, // virtual (!) output directory
       // <hack>
       // For whatever inexplicable reason, "content/settings/common.js" and
       // "content/ui/request-log/tree-view.js" are removed by tsProject() if
@@ -378,7 +380,7 @@ BUILDS.forEach(build => {
               }
           )).
           pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
-          pipe(rename(mergeInConditional));
+          pipe(gulpif(build.isDev, sourcemaps.init()));
 
       stream = mergeStream(
           // non-jsm files
@@ -391,6 +393,14 @@ BUILDS.forEach(build => {
               pipe(fileFilter.include({isModule: false})));
 
       stream = stream.
+          // WORKAROUND NOTICE:
+          // `mergeInConditional` is applied _after_ typescript because I had
+          // sourcemapping issues when it was the other way around.
+          // (gulp-typescript did not correctly respect the previously created
+          // sourcemap.)
+          pipe(rename(mergeInConditional)).
+
+          pipe(gulpif(build.isDev, sourcemaps.write({ destPath: buildDir, sourceRoot: `file://${srcDir}` }))).
           pipe(gulp.dest(buildDir));
       return stream;
     });

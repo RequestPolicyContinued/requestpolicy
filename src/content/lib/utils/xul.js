@@ -100,6 +100,16 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
   return allElementSpecs;
 }
 
+function getParentElementOfSubobject(aDocument, aElementSpec) {
+  let subobjectTree = aElementSpec.parent.special.tree;
+  let parentElement = aDocument.getElementById(
+      aElementSpec.parent.special.id);
+  for (let i = 0, len = subobjectTree.length; i < len; ++i) {
+    parentElement = parentElement[subobjectTree[i]];
+  }
+  return parentElement;
+}
+
 function getParentElement(aDocument, aElementSpec) {
   if (!aElementSpec.parent) {
     return false;
@@ -112,13 +122,7 @@ function getParentElement(aDocument, aElementSpec) {
           return aDocument.querySelector("window");
 
         case "subobject":
-          let subobjectTree = aElementSpec.parent.special.tree;
-          let parentElement = aDocument.getElementById(aElementSpec.parent
-                                                                   .special.id);
-          for (let i = 0, len = subobjectTree.length; i < len; ++i) {
-            parentElement = parentElement[subobjectTree[i]];
-          }
-          return parentElement;
+          return getParentElementOfSubobject(aDocument, aElementSpec);
 
         default:
           return false;

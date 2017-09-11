@@ -150,9 +150,11 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
 
       /* start - be careful when editing here */
       try {
+        /* eslint-disable new-cap */
         this._loadContext = this.httpChannel.notificationCallbacks
                                .QueryInterface(Ci.nsIInterfaceRequestor)
                                .getInterface(Ci.nsILoadContext);
+        /* eslint-enable new-cap */
       } catch (ex) {
         try {
           this._loadContext = this.httpChannel.loadGroup
@@ -216,9 +218,11 @@ Object.defineProperty(HttpResponse.prototype, "docShell", {
   get: function() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
+        /* eslint-disable new-cap */
         this._docShell = this.httpChannel.notificationCallbacks.
                          QueryInterface(Ci.nsIInterfaceRequestor).
                          getInterface(Ci.nsIDocShell);
+        /* eslint-enable new-cap */
       } catch (e) {
         Logger.warning(
             "The redirection's DocShell couldn't be found!", e);

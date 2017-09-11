@@ -31,8 +31,10 @@
  */
 export function PrefBranch(aBranchRoot, aPrefNameToTypeMap) {
   this.branchRoot = aBranchRoot;
+  /* eslint-disable new-cap */
   this.branch = Services.prefs.getBranch(aBranchRoot).
       QueryInterface(Ci.nsIPrefBranch2);
+  /* eslint-enable new-cap */
 
   // How should a pref name "foo.bar.baz" be translated to
   // "getBoolPref" or "setIntPref"?

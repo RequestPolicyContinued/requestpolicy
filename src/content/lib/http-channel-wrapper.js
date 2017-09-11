@@ -48,9 +48,11 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
 
       /* start - be careful when editing here */
       try {
+        /* eslint-disable new-cap */
         this._loadContext = this._httpChannel.notificationCallbacks.
                             QueryInterface(Ci.nsIInterfaceRequestor).
                             getInterface(Ci.nsILoadContext);
+        /* eslint-enable new-cap */
       } catch (ex) {
         try {
           this._loadContext = this._httpChannel.loadGroup.
@@ -114,9 +116,11 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
   get: function() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
+        /* eslint-disable new-cap */
         this._docShell = this._httpChannel.notificationCallbacks.
                          QueryInterface(Ci.nsIInterfaceRequestor).
                          getInterface(Ci.nsIDocShell);
+        /* eslint-enable new-cap */
       } catch (e) {
         Logger.warning("The HTTPChannel's DocShell couldn't be found!", e);
         this._docShell = null;

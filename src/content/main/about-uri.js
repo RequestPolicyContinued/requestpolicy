@@ -61,6 +61,7 @@ export const AboutRequestPolicy = (function() {
 
   self.classDescription = "about:requestpolicy";
   self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
 
@@ -96,10 +97,12 @@ export const AboutRequestPolicy = (function() {
       // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
   function registerFactory() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar)
         .registerFactory(self.classID, self.classDescription,
                          self.contractID, self);
@@ -122,6 +125,7 @@ export const AboutRequestPolicy = (function() {
       });
 
   function unregisterFactory() {
+    // eslint-disable-next-line new-cap
     let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
     // This needs to run asynchronously, see Mozilla bug 753687

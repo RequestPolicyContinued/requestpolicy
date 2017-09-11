@@ -195,10 +195,12 @@ export const ManagerForDOMContentLoaded = (function() {
 
       Logger.info("Number of meta refreshes found: " + metaRefreshes.length);
 
+      /* eslint-disable new-cap */
       const docShell = doc.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShell);
+      /* eslint-enable new-cap */
       if (!docShell.allowMetaRedirects) {
         Logger.warning(
             "Another extension disabled docShell.allowMetaRedirects.");

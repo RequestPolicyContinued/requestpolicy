@@ -342,6 +342,7 @@ DomainUtil.determineRedirectUri = function(originUri, destPath) {
   const urlType = Ci.nsIStandardURL.URLTYPE_AUTHORITY;
   const newUri = Cc[STANDARDURL_CONTRACTID].createInstance(Ci.nsIStandardURL);
   newUri.init(urlType, 0, destPath, null, baseUri);
+  // eslint-disable-next-line new-cap
   const resolvedUri = newUri.QueryInterface(Ci.nsIURI);
   return resolvedUri.spec;
 };

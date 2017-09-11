@@ -98,6 +98,7 @@ function createCommonjsEnv() {
       aAdditionalGlobals.forEach(([key, val]) => {
         globals[key] = val;
       });
+      // eslint-disable-next-line new-cap
       loaderWrapper.loader = Loader.Loader({
         paths: {
           "toolkit/": "resource://gre/modules/commonjs/toolkit/",

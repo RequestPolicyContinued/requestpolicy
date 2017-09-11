@@ -100,6 +100,7 @@ export const Windows = (function() {
     // Apply a function to all open browser windows
     let windows = Services.wm.getEnumerator("navigator:browser");
     while (windows.hasMoreElements()) {
+      // eslint-disable-next-line new-cap
       let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
       aCallback.call(aThisArg, window);
     }
@@ -132,6 +133,7 @@ export const Windows = (function() {
 
   let windowMediatorListener = {
     onOpenWindow: function(xulWindow) {
+      // eslint-disable-next-line new-cap
       let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
           .getInterface(Ci.nsIDOMWindow);
       loadAndUnloadListener.listenTo("load", window);

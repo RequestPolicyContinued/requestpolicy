@@ -63,6 +63,7 @@ export const FileUtil = {
     const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
+    // eslint-disable-next-line new-cap
     stream.QueryInterface(Ci.nsILineInputStream);
     const line = {};
     const lines = [];
@@ -100,6 +101,7 @@ export const FileUtil = {
     const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
+    // eslint-disable-next-line new-cap
     stream.QueryInterface(Ci.nsILineInputStream);
 
     const cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].

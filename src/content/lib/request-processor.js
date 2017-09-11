@@ -592,6 +592,7 @@ export let RequestProcessor = (function() {
       if (originURI === "about:blank" && request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
@@ -642,6 +643,7 @@ export let RequestProcessor = (function() {
       if (request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
@@ -751,6 +753,7 @@ export let RequestProcessor = (function() {
       if (request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
@@ -976,6 +979,7 @@ export let RequestProcessor = (function() {
    * @param {string} aSubject
    */
   let examineHttpRequest = function(aSubject) {
+    // eslint-disable-next-line new-cap
     const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
@@ -1215,6 +1219,7 @@ RequestProcessor = (function(self) {
    * @param {string} newSpec
    */
   function handleHttpsEverywhereUriRewrite(oldURI, newSpec) {
+    // eslint-disable-next-line new-cap
     oldURI = oldURI.QueryInterface(Ci.nsIURI);
     mapDestinations(oldURI.spec, newSpec);
   }

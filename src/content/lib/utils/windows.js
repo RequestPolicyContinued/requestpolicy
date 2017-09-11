@@ -43,12 +43,14 @@ export const WindowUtils = (function() {
                                     bind(self, "navigator:browser");
 
   self.getChromeWindow = function(aContentWindow) {
+    /* eslint-disable new-cap */
     return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShellTreeItem)
                              .rootTreeItem
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIDOMWindow);
+    /* eslint-enable new-cap */
   };
 
   self.getBrowserForWindow = function(aContentWindow) {
@@ -63,10 +65,12 @@ export const WindowUtils = (function() {
   };
 
   self.getChromeWindowForDocShell = function(aDocShell) {
+    /* eslint-disable new-cap */
     return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
                     .rootTreeItem
                     .QueryInterface(Ci.nsIInterfaceRequestor)
                     .getInterface(Ci.nsIDOMWindow);
+    /* eslint-enable new-cap */
   };
 
   self.getTabBrowser = function(window) {

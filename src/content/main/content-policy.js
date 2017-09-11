@@ -47,6 +47,7 @@ export const RPContentPolicy = (function() {
   const XPCOM_CATEGORIES = ["content-policy"];
 
   self.classDescription = "RequestPolicy ContentPolicy Implementation";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{d734b30a-996c-4805-be24-25a0738249fe}");
   self.contractID = "@requestpolicy.org/content-policy;1";
 
@@ -54,6 +55,7 @@ export const RPContentPolicy = (function() {
    * Registers the content policy on startup.
    */
   function register() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
@@ -120,6 +122,7 @@ export const RPContentPolicy = (function() {
       // above.
       self.shouldLoad = () => finalReturnValue;
 
+      // eslint-disable-next-line new-cap
       let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
       for (let category of XPCOM_CATEGORIES) {
@@ -173,6 +176,7 @@ export const RPContentPolicy = (function() {
       // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
@@ -189,6 +193,7 @@ export const RPChannelEventSink = (function() {
   const XPCOM_CATEGORIES = ["net-channel-event-sinks"];
 
   self.classDescription = "RequestPolicy ChannelEventSink Implementation";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{dc6e2000-2ff0-11e6-bdf4-0800200c9a66}");
   self.contractID = "@requestpolicy.org/net-channel-event-sinks;1";
 
@@ -196,6 +201,7 @@ export const RPChannelEventSink = (function() {
    * Registers the channel event sink on startup.
    */
   function register() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
@@ -228,6 +234,7 @@ export const RPChannelEventSink = (function() {
 
       self.asyncOnChannelRedirect = () => {};
 
+      // eslint-disable-next-line new-cap
       let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
       for (let category of XPCOM_CATEGORIES) {
@@ -282,6 +289,7 @@ export const RPChannelEventSink = (function() {
       // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 

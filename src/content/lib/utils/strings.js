@@ -57,6 +57,7 @@ export const StringUtils = (function() {
       return self.strbundle.formatStringFromName(aName, aParams,
                                                  aParams.length);
     } else {
+      // eslint-disable-next-line new-cap
       return self.strbundle.GetStringFromName(aName);
     }
   };

@@ -331,13 +331,16 @@ NormalRequest.prototype.getContentWindow = function() {
 
   let win;
   try {
+    // eslint-disable-next-line new-cap
     win = context.QueryInterface(Ci.nsIDOMWindow);
   } catch (e) {
     let doc;
     try {
+      // eslint-disable-next-line new-cap
       doc = context.QueryInterface(Ci.nsIDOMDocument);
     } catch (e) {
       try {
+        // eslint-disable-next-line new-cap
         doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
       } catch (e) {
         return null;

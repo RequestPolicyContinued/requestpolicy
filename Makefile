@@ -75,6 +75,8 @@ JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
 MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
+TSC            := $(abspath $(node_modules_dir))/.bin/tsc
+TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 
 # python
 PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
@@ -93,6 +95,9 @@ _VAR_STAMP_ = $(shell \
 #-------------------------------------------------------------------------------
 # helpers
 #-------------------------------------------------------------------------------
+
+# in a pipe
+_remove_leading_empty_lines := sed '/./,$$!d'
 
 # $1: command(s) to be wrapped
 _remove_all_files_and_dirs_in = find '$1/' '!' -path '$1/' -delete
@@ -545,15 +550,16 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-coffee lint-js lint-python lint-xpi
+lint: lint-coffee lint-js lint-python lint-ts lint-xpi
 
-.PHONY: lint-coffee lint-js lint-python lint-xpi
+.PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
 lint-coffee: coffeelint
 lint-js: eslint jscs jshint
 lint-python: pep8
+lint-ts: ts tslint
 lint-xpi: addons-linter
 
-.PHONY: addons-linter coffeelint eslint jscs jshint pep8
+.PHONY: addons-linter coffeelint eslint jscs jshint pep8 ts tslint
 addons-linter: nightly-xpi node-packages
 	@echo $@
 	@$(ADDONS_LINTER) $(xpi_file__nightly)
@@ -585,6 +591,13 @@ pep8: python-packages
 	@echo $@
 	@$(PY_PEP8) scripts/
 	@$(PY_PEP8) tests/marionette/
+ts: node-packages
+	@echo $@
+	@$(TSC)
+tslint: node-packages
+	@echo $@
+	@$(TSLINT) --exclude '**/third-party/**/*' 'src/**/*.ts' \
+		| $(_remove_leading_empty_lines)
 
 #-------------------------------------------------------------------------------
 # localization checks

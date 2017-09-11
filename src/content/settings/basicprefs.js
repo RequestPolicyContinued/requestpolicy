@@ -39,7 +39,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "dontIndicateBlacklisted",
     "autoReload",
     "menu",
-    "allowAddingNonTemporaryRulesInPBM"
+    "allowAddingNonTemporaryRulesInPBM",
   ];
 
   $(function() {

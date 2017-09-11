@@ -111,7 +111,7 @@ export const PrefManager = (function() {
     let deletePrefs = [
       "temporarilyAllowedOrigins",
       "temporarilyAllowedDestinations",
-      "temporarilyAllowedOriginsToDestinations"
+      "temporarilyAllowedOriginsToDestinations",
     ];
     for (let prefName of deletePrefs) {
       if (LegacyApi.prefs.isSet(prefName)) {

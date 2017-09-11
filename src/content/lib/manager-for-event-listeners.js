@@ -105,7 +105,7 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     eventType: aEventType,
     callback: aCallback,
     useCapture: !!aUseCapture,
-    listening: false
+    listening: false,
   };
   if (self.addNewListenersImmediately) {
     if (LOG_EVENT_LISTENERS) {

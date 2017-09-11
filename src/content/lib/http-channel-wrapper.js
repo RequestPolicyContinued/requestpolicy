@@ -37,7 +37,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "uri", {
       this._uri = Services.io.newURI(this._httpChannel.name, null, null);
     }
     return this._uri;
-  }
+  },
 });
 
 Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
@@ -71,7 +71,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
       /* end - be careful when editing here */
     }
     return this._loadContext;
-  }
+  },
 });
 
 /**
@@ -105,7 +105,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "browser", {
       }
     }
     return this._browser;
-  }
+  },
 });
 
 /**
@@ -127,5 +127,5 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
       }
     }
     return this._docShell;
-  }
+  },
 });

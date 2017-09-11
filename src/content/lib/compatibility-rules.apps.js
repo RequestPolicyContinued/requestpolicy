@@ -42,22 +42,22 @@ export default {
     ["about:addons", "https://discovery.addons.mozilla.org/"],
     [
       "https://services.addons.mozilla.org/",
-      "https://static.addons.mozilla.net/"
+      "https://static.addons.mozilla.net/",
     ], [
       "https://services.addons.mozilla.org/",
-      "https://addons.mozilla.org/"
+      "https://addons.mozilla.org/",
     ], [
       "https://services.addons.mozilla.org/",
-      "https://www.mozilla.com/"
+      "https://www.mozilla.com/",
     ], [
       "https://services.addons.mozilla.org/",
-      "https://www.getpersonas.com/"
+      "https://www.getpersonas.com/",
     ], [
       "https://services.addons.mozilla.org/",
-      "https://static-cdn.addons.mozilla.net/"
+      "https://static-cdn.addons.mozilla.net/",
     ], [
       "https://services.addons.mozilla.org/",
-      "https://addons.cdn.mozilla.net/"
+      "https://addons.cdn.mozilla.net/",
     ],
     // Firefox 4 uses an about:home page that is locally stored but can be
     // the origin for remote requests. See bug #140 for more info.
@@ -65,13 +65,13 @@ export default {
     // Firefox Sync uses a google captcha.
     [
       "https://auth.services.mozilla.com/",
-      "https://api-secure.recaptcha.net/challenge?"
+      "https://api-secure.recaptcha.net/challenge?",
     ], [
       "https://api-secure.recaptcha.net/challenge?",
-      "https://www.google.com/recaptcha/api/challenge?"
+      "https://www.google.com/recaptcha/api/challenge?",
     ], [
       "https://auth.services.mozilla.com/",
-      "https://www.google.com/recaptcha/api/"
+      "https://www.google.com/recaptcha/api/",
     ],
     // Firefox 13 added links from about:newtab
     ["about:newtab", null],
@@ -83,13 +83,13 @@ export default {
     //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
     [
       "about:loopconversation",
-      "https://hlg.tokbox.com/"
+      "https://hlg.tokbox.com/",
     ], [
       "about:loopconversation",
-      "https://anvil.opentok.com/"
+      "https://anvil.opentok.com/",
     ], [
       "about:loopconversation",
-      "wss://"
+      "wss://",
     ],
   ],
 
@@ -97,13 +97,13 @@ export default {
     // Firefox Accounts
     [
       "about:accounts",
-      "https://accounts.firefox.com/"
+      "https://accounts.firefox.com/",
     ], [
       "https://accounts.firefox.com/",
-      "https://api.accounts.firefox.com/"
+      "https://api.accounts.firefox.com/",
     ], [
       "https://accounts.firefox.com/",
-      "https://accounts.cdn.mozilla.net/"
+      "https://accounts.cdn.mozilla.net/",
     ],
   ],
 

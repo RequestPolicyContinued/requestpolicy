@@ -252,13 +252,13 @@ NormalRequest.prototype.constructor = Request;
 Object.defineProperty(NormalRequest.prototype, "originUriObj", {
   get: function() {
     return this.aRequestOrigin;
-  }
+  },
 });
 
 Object.defineProperty(NormalRequest.prototype, "destUriObj", {
   get: function() {
     return this.aContentLocation;
-  }
+  },
 });
 
 NormalRequest.prototype.setOriginURI = function(originURI) {
@@ -274,7 +274,7 @@ NormalRequest.prototype.setDestURI = function(destURI) {
 Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
   get: function() {
     return this.aContentLocation.spec;
-  }
+  },
 });
 
 NormalRequest.prototype.detailsToString = function() {
@@ -399,29 +399,29 @@ RedirectRequest.prototype.constructor = Request;
 Object.defineProperty(RedirectRequest.prototype, "browser", {
   get: function() {
     return this._oldChannel.browser;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "loadFlags", {
   get: function() {
     return this._oldChannel._httpChannel.loadFlags;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
   get: function() {
     return this._oldChannel.uri;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "destUriObj", {
   get: function() {
     return this._newChannel.uri;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
   get: function() {
     return this._newChannel.uri.spec;
-  }
+  },
 });

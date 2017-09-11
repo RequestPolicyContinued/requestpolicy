@@ -135,7 +135,7 @@ let observer = {
         logSevereError("shutdown() failed!", e);
       }
     }
-  }
+  },
 };
 
 observerService.addObserver(observer, "sdk:loader:destroy", false);

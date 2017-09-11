@@ -17,8 +17,8 @@ function test_1() {
       "functionality": 0,
       "mozilla": 0,
       "sameorg": 0,
-      "trackers": 0
-    }
+      "trackers": 0,
+    },
   };
   // var serials = {
   // };

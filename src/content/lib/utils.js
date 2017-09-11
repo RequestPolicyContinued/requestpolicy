@@ -40,7 +40,7 @@ export const Utils = (function() {
     let runnable = {
       run: function() {
         callback.apply(thisPtr, params);
-      }
+      },
     };
     Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
@@ -182,7 +182,7 @@ export const Utils = (function() {
     metadata[aFunctionName] = {
       main: aOwnerObject[aFunctionName], // the original function
       before: null,
-      after: null
+      after: null,
     };
 
     // actually wrap the object

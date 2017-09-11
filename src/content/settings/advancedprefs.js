@@ -50,7 +50,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "hint",
     "menuSortingHint",
     "menuIndicatedInformation",
-    "menuIndicateNumRequests"
+    "menuIndicateNumRequests",
   ];
 
   $(function() {

@@ -241,7 +241,7 @@ GUILocationProperties.requestCountProperties = [
   "numRequests",
   "numDefaultPolicyRequests",
   "numBlockedRequests",
-  "numAllowedRequests"
+  "numAllowedRequests",
 ];
 
 /**

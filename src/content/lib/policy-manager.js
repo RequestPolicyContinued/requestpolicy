@@ -94,7 +94,7 @@ export let PolicyManager = (function() {
     }
     userRulesets.user = {
       "rawRuleset": rawRuleset,
-      "ruleset": rawRuleset.toRuleset("user")
+      "ruleset": rawRuleset.toRuleset("user"),
     };
     userRulesets.user.ruleset.userRuleset = true;
     // userRulesets.user.ruleset.print();
@@ -130,7 +130,7 @@ export let PolicyManager = (function() {
         let list = subscriptionRulesets[listName];
         list[subName] = {
           "rawRuleset": rawRuleset,
-          "ruleset": rawRuleset.toRuleset(subName)
+          "ruleset": rawRuleset.toRuleset(subName),
         };
         list[subName].ruleset.userRuleset = false;
         // list[subName].ruleset.print();
@@ -286,7 +286,7 @@ export let PolicyManager = (function() {
     const rawRuleset = new RawRuleset();
     userRulesets.temp = {
       "rawRuleset": rawRuleset,
-      "ruleset": rawRuleset.toRuleset("temp")
+      "ruleset": rawRuleset.toRuleset("temp"),
     };
     userRulesets.temp.ruleset.userRuleset = true;
 

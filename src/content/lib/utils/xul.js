@@ -39,7 +39,7 @@ const xulTrees = XULUtils.xulTrees = {};
   const xulTreesScope = {
     "exports": xulTrees,
     "C": C,
-    "appID": Services.appinfo.ID
+    "appID": Services.appinfo.ID,
   };
 
   Services.scriptloader.loadSubScript(
@@ -208,7 +208,7 @@ const {addEventListeners, removeEventListeners} = (function() {
     return Object.keys(aEventList).map(function(eventName) {
       return [
         eventName,
-        getEventListener(rootObject, aEventList[eventName])
+        getEventListener(rootObject, aEventList[eventName]),
       ];
     });
   }
@@ -234,7 +234,7 @@ const {addEventListeners, removeEventListeners} = (function() {
 
   return {
     addEventListeners: addEventListeners,
-    removeEventListeners: removeEventListeners
+    removeEventListeners: removeEventListeners,
   };
 })();
 
@@ -334,7 +334,7 @@ XULUtils.keyboardShortcuts = (function() {
     "alt",
     "meta",
     "control",
-    "accel"
+    "accel",
   ];
 
   function error(msg) {
@@ -380,7 +380,7 @@ XULUtils.keyboardShortcuts = (function() {
 
     return success({
       modifiers: modifiers.join(" "),
-      key: key
+      key: key,
     });
   }
 

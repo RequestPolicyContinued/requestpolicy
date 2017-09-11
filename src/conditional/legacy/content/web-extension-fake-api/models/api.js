@@ -36,7 +36,7 @@ const log = {
     if (error) {
       console.dir(error);
     }
-  }
+  },
 };
 
 function genErrorCallback(message) {

@@ -31,7 +31,7 @@ export const FramescriptServices = {
     for (let fn of initFunctions) {
       fn();
     }
-  }
+  },
 };
 
 // notifyDocumentLoaded

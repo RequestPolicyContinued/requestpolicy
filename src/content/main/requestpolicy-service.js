@@ -206,7 +206,7 @@ export const rpService = (function() {
 
     return {
       maybeShowMultipleInstallationsWarning:
-          maybeShowMultipleInstallationsWarning
+          maybeShowMultipleInstallationsWarning,
     };
   })();
 
@@ -228,7 +228,7 @@ export const rpService = (function() {
       // support for old browsers (Firefox <20)
       // TODO: support per-window temporary rules
       //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
-      "private-browsing"
+      "private-browsing",
     ], self.observe);
   }
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,

@@ -49,7 +49,7 @@ import {$id, common} from "./common";
     "subscriptionPolicies",
     "subscriptionPoliciesDefinition",
     "yesUseSubscriptions",
-    "noDoNotUseSubscriptions"
+    "noDoNotUseSubscriptions",
   ];
 
   $(function() {
@@ -90,7 +90,7 @@ import {$id, common} from "./common";
       "allow_functionality": {},
       "allow_mozilla": {},
       "allow_sameorg": {},
-      "deny_trackers": {}
+      "deny_trackers": {},
     };
     var userSubs = rpService.getSubscriptions();
     for (var subName in subs) {

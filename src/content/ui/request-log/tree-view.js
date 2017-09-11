@@ -32,7 +32,7 @@ export function loadRLTreeViewIntoWindow(window) {
     "rpcontinued-requestLog-origin": 0,
     "rpcontinued-requestLog-destination": 1,
     "rpcontinued-requestLog-blocked": 2,
-    "rpcontinued-requestLog-time": 3
+    "rpcontinued-requestLog-time": 3,
   };
 
   function getVisibleRowAtIndex(index) {
@@ -151,6 +151,6 @@ export function loadRLTreeViewIntoWindow(window) {
 
     getColumnProperties: function(aColumn) {
       return "";
-    }
+    },
   };
 }

@@ -34,7 +34,7 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
         REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
         REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
-        REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL
+        REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL,
         } from "lib/request-result";
 import {RequestSet} from "lib/request-set";
 import {MainEnvironment} from "lib/environment";
@@ -92,7 +92,7 @@ export let RequestProcessor = (function() {
     "origin": null,
     "destination": null,
     "time": 0,
-    "result": null
+    "result": null,
   };
 
   let historyRequests = {};
@@ -818,7 +818,7 @@ export let RequestProcessor = (function() {
       // question.
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
-        let {conflictCanBeResolved, shouldAllow
+        let {conflictCanBeResolved, shouldAllow,
              } = request.requestResult.resolveConflict();
         if (conflictCanBeResolved) {
           request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
@@ -865,7 +865,7 @@ export let RequestProcessor = (function() {
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
-        let {conflictCanBeResolved, shouldAllow
+        let {conflictCanBeResolved, shouldAllow,
              } = request.requestResult.resolveConflict();
         if (conflictCanBeResolved) {
           request.requestResult.resultReason =
@@ -1609,7 +1609,7 @@ RequestProcessor = (function(self) {
             addonIdsToNames,
             extRulesToIds,
             whitelistedBaseUrisToIds,
-            topLevelDocTranslationRules
+            topLevelDocTranslationRules,
           } = extensionInfosToCompatibilityRules(extensionInfos));
           return;
         }).
@@ -1673,7 +1673,7 @@ RequestProcessor = (function(self) {
       addonIdsToNames,
       extRulesToIds,
       whitelistedBaseUrisToIds,
-      topLevelDocTranslationRules
+      topLevelDocTranslationRules,
     };
   }
 

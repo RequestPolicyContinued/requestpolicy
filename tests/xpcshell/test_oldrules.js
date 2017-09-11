@@ -22,12 +22,12 @@ function test_0() {
       [
         "mozilla.org",
         "mozilla.net",
-        "mozilla.org|mozilla.net"
+        "mozilla.org|mozilla.net",
       ],
       [
         {o: {h: "*.mozilla.org"}},
         {d: {h: "*.mozilla.net"}},
-        {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}}
+        {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}},
       ]);
 
   testGetOldRulesAsNewRules(
@@ -42,7 +42,7 @@ function test_0() {
 
         "https://www.mozilla.org|https://mozorg.cdn.mozilla.net " +
         "www.mozilla.org|mozorg.cdn.mozilla.net " +
-        "mozilla.org|mozilla.net"
+        "mozilla.org|mozilla.net",
       ],
       [
         {o: {s: "https", h: "www.mozilla.org"}},
@@ -55,14 +55,14 @@ function test_0() {
 
         {
           o: {s: "https", h: "www.mozilla.org"},
-          d: {s: "https", h: "mozorg.cdn.mozilla.net"}
+          d: {s: "https", h: "mozorg.cdn.mozilla.net"},
         }, {
           o: {h: "www.mozilla.org"},
-          d: {h: "mozorg.cdn.mozilla.net"}
+          d: {h: "mozorg.cdn.mozilla.net"},
         }, {
           o: {h: "*.mozilla.org"},
-          d: {h: "*.mozilla.net"}
-        }
+          d: {h: "*.mozilla.net"},
+        },
       ]);
 
   // localhost IP address
@@ -75,13 +75,13 @@ function test_0() {
         "::1 " +
         "http://[::1]:8080",
         "",
-        ""
+        "",
       ],
       [
         {o: {h: "127.0.0.1"}},
         {o: {s: "http", h: "127.0.0.1", port: 8080}},
         {o: {h: "::1"}},
-        {o: {s: "http", h: "::1", port: 8080}}
+        {o: {s: "http", h: "::1", port: 8080}},
       ]);
 
   // Get the old rules from the prefs.
@@ -93,12 +93,12 @@ function test_0() {
   usingOldRulePrefs({
     "allowedOrigins": "mozilla.org",
     "allowedDestinations": "mozilla.net",
-    "allowedOriginsToDestinations": "mozilla.org|mozilla.net"
+    "allowedOriginsToDestinations": "mozilla.org|mozilla.net",
   }, function() {
     testGetOldRulesAsNewRules([undefined, undefined, undefined], [
       {o: {h: "*.mozilla.org"}},
       {d: {h: "*.mozilla.net"}},
-      {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}}
+      {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}},
     ]);
   });
 }
@@ -119,7 +119,7 @@ function test_1() {
         "foo4:",
 
         "foo5o:|foo5d: " +
-        "foo6o:|foo6d:"
+        "foo6o:|foo6d:",
       ],
       [
         {o: {s: "foo1"}},
@@ -129,7 +129,7 @@ function test_1() {
         {d: {s: "foo4"}},
 
         {o: {s: "foo5o"}, d: {s: "foo5d"}},
-        {o: {s: "foo6o"}, d: {s: "foo6d"}}
+        {o: {s: "foo6o"}, d: {s: "foo6d"}},
       ]);
 }
 
@@ -161,13 +161,13 @@ function test_2() {
       [
         "a     b",
         " c    d ",
-        " e|f  g|h "
+        " e|f  g|h ",
       ],
       [
         {o: {h: "a"}}, {o: {h: "b"}},
         {d: {h: "c"}}, {d: {h: "d"}},
         {o: {h: "e"}, d: {h: "f"}},
-        {o: {h: "g"}, d: {h: "h"}}
+        {o: {h: "g"}, d: {h: "h"}},
       ]);
 
   // UTF8 domain names
@@ -176,7 +176,7 @@ function test_2() {
       ["müller.de http://foo.bar.الاردن", "", ""],
       [
         {o: {h: "*.müller.de"}},
-        {o: {s: "http", h: "foo.bar.الاردن"}}
+        {o: {s: "http", h: "foo.bar.الاردن"}},
       ]);
 }
 

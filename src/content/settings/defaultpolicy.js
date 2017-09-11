@@ -41,7 +41,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "learnMore",
     "allowRequestsToTheSameDomain",
     "differentSubscriptionsAreAvailable",
-    "manageSubscriptions"
+    "manageSubscriptions",
   ];
 
   $(function() {

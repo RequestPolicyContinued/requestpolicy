@@ -120,7 +120,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
       }
     }
     return this._rawDestString;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "destURI", {
@@ -130,7 +130,7 @@ Object.defineProperty(HttpResponse.prototype, "destURI", {
                                          this.originURI);
     }
     return this._destURI;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "originURI", {
@@ -139,7 +139,7 @@ Object.defineProperty(HttpResponse.prototype, "originURI", {
       this._originURI = Services.io.newURI(this.httpChannel.name, null, null);
     }
     return this._originURI;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "loadContext", {
@@ -173,7 +173,7 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
       /* end - be careful when editing here */
     }
     return this._loadContext;
-  }
+  },
 });
 
 /**
@@ -207,7 +207,7 @@ Object.defineProperty(HttpResponse.prototype, "browser", {
       }
     }
     return this._browser;
-  }
+  },
 });
 
 /**
@@ -230,5 +230,5 @@ Object.defineProperty(HttpResponse.prototype, "docShell", {
       }
     }
     return this._docShell;
-  }
+  },
 });

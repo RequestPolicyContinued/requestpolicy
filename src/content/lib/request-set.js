@@ -236,5 +236,5 @@ RequestSet.prototype = {
       }
     }
     return false;
-  }
+  },
 };

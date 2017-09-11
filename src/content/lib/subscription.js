@@ -74,7 +74,7 @@ function maybeCallback(aCallback) {
 function setTimeout(func, delay) {
   const timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   const event = {
-    notify: maybeCallback(func)
+    notify: maybeCallback(func),
   };
   timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
   return timer;
@@ -110,9 +110,9 @@ export function UserSubscriptions() {
           "allow_functionality": {},
           "allow_mozilla": {},
           "allow_sameorg": {},
-          "deny_trackers": {}
-        }
-      }
+          "deny_trackers": {},
+        },
+      },
     };
   }
   this._lists = this._data.lists;
@@ -261,7 +261,7 @@ UserSubscriptions.prototype = {
       dprint("No lists to update.");
       setTimeout(() => callback(updateResults), 0);
     }
-  }
+  },
 };
 
 // =============================================================================
@@ -371,7 +371,7 @@ SubscriptionList.prototype = {
       return null;
     }
     return this._data.subscriptions[subName].url;
-  }
+  },
 };
 
 // =============================================================================
@@ -462,6 +462,6 @@ Subscription.prototype = {
     });
     req.open("GET", this._url);
     req.send(null);
-  }
+  },
 
 };

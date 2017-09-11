@@ -483,7 +483,7 @@ RawRuleset.prototype = {
     // Note: unrecognized keys in the metadata and entries are preserved.
     const tempObj = {"metadata": this._metadata, "entries": this._entries};
     return tempObj;
-  }
+  },
 };
 
 // =============================================================================
@@ -537,7 +537,7 @@ Rules.prototype = {
     }
     this._rules.push(newRule);
     return newRule;
-  }
+  },
 };
 
 // =============================================================================
@@ -684,7 +684,7 @@ Rule.prototype = {
     }
     // dprint("isMatch: MATCH");
     return true;
-  }
+  },
 };
 
 // =============================================================================
@@ -746,7 +746,7 @@ DomainEntry.prototype = {
       return this._lower[name];
     }
     return null;
-  }
+  },
 };
 
 // =============================================================================
@@ -777,7 +777,7 @@ IPAddressEntry.prototype = {
 
   deleteAllRules: function() {
 
-  }
+  },
 };
 
 // =============================================================================
@@ -1024,7 +1024,7 @@ Ruleset.prototype = {
                   entry,
                   rule,
                   destEntry,
-                  destRule
+                  destRule,
                 ]);
               }
               if (destRule.denyDestination &&
@@ -1037,7 +1037,7 @@ Ruleset.prototype = {
                   entry,
                   rule,
                   destEntry,
-                  destRule
+                  destRule,
                 ]);
               }
             }
@@ -1066,7 +1066,7 @@ Ruleset.prototype = {
     }
 
     return [matchedAllowRules, matchedDenyRules];
-  }
+  },
 };
 
 /**

@@ -49,7 +49,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     "ruleSet",
     "activeRules",
     "filterRules",
-    "policy"
+    "policy",
   ];
 
   $(function() {

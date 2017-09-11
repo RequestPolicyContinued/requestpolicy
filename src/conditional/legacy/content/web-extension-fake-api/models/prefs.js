@@ -69,7 +69,7 @@ export const Prefs = (function() {
       "network.dns.disablePrefetchFromHTTPS": "BoolPref",
       "network.http.speculative-parallel-limit": "IntPref",
       "network.prefetch-next": "BoolPref",
-    })
+    }),
   };
 
   /**
@@ -86,12 +86,12 @@ export const Prefs = (function() {
     if (aFakePrefName.startsWith("root/ ")) {
       return {
         branch: self.branches.root,
-        name: aFakePrefName.slice(6)
+        name: aFakePrefName.slice(6),
       };
     }
     return {
       branch: self.branches.rp,
-      name: aFakePrefName
+      name: aFakePrefName,
     };
   }
 
@@ -169,8 +169,8 @@ export const Prefs = (function() {
 
       // As an example, this will become `isBlockingDisabled()` and
       // `setBlockingDisabled()`:
-      ["startWithAllowAllEnabled", "BlockingDisabled"]
-    ]
+      ["startWithAllowAllEnabled", "BlockingDisabled"],
+    ],
   };
 
   // Dynamically create functions like `isDefaultAllow` or

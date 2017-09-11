@@ -11,7 +11,7 @@ describe("Utils", function() {
 
     let testObj = {
       testProp: "foo",
-      testFunction: wrappedFunction
+      testFunction: wrappedFunction,
     };
 
     it("Basic check", function() {

@@ -55,14 +55,14 @@ export const ToolbarButtonController = (function() {
 
     function removeToolbarButtonFromAustralis() {
       const {
-        attributes: {id}
+        attributes: {id},
       } = XULUtils.xulTrees.toolbarbutton[0];
       CustomizableUI.destroyWidget(id);
     }
 
     function addToolbarButtonToAustralis() {
       const {
-        attributes: {id, label, tooltiptext}
+        attributes: {id, label, tooltiptext},
       } = XULUtils.xulTrees.toolbarbutton[0];
 
       CustomizableUI.createWidget({
@@ -74,7 +74,7 @@ export const ToolbarButtonController = (function() {
           // Bad smell
           let win = aEvent.target.ownerDocument.defaultView;
           win.rpcontinued.overlay.toggleMenu();
-        }
+        },
       });
     }
 

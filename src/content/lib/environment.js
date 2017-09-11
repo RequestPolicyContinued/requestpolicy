@@ -36,7 +36,7 @@ const log = LOG_ENVIRONMENT ? {
   debug: function(message) {
     // eslint-disable-next-line no-console
     console.debug(`[Environment] ${message}`);
-  }
+  },
 } : null;
 
 // =============================================================================
@@ -53,7 +53,7 @@ export const Environment = (function() {
     "STARTING_UP": 1,
     "STARTUP_DONE": 2,
     "SHUTTING_DOWN": 3,
-    "SHUT_DOWN": 4
+    "SHUT_DOWN": 4,
   };
 
   const LEVELS = {
@@ -68,14 +68,14 @@ export const Environment = (function() {
     // Factories.
     "INTERFACE": 3,
     // UI functions will enable/disable UI elements such as the menu.
-    "UI": 4
+    "UI": 4,
   };
 
   // a level can be entered, being processed, or finished being processed.
   const LEVEL_STATES = {
     "NOT_ENTERED": 0,
     "PROCESSING": 1,
-    "FINISHED_PROCESSING": 2
+    "FINISHED_PROCESSING": 2,
   };
 
   let BOOTSTRAP = {
@@ -84,13 +84,13 @@ export const Environment = (function() {
         LEVELS.ESSENTIAL,
         LEVELS.BACKEND,
         LEVELS.INTERFACE,
-        LEVELS.UI
+        LEVELS.UI,
       ],
       lastLevel: LEVELS.UI,
       envStates: {
         "beforeProcessing": ENV_STATES.NOT_STARTED,
         "duringProcessing": ENV_STATES.STARTING_UP,
-        "afterProcessing": ENV_STATES.STARTUP_DONE
+        "afterProcessing": ENV_STATES.STARTUP_DONE,
       },
       functions: {
         /**
@@ -99,21 +99,21 @@ export const Environment = (function() {
         "beforeProcessing": function() {
           this.register();
         },
-        "afterProcessing": function() {}
-      }
+        "afterProcessing": function() {},
+      },
     },
     "shutdown": {
       levelSequence: [
         LEVELS.UI,
         LEVELS.INTERFACE,
         LEVELS.BACKEND,
-        LEVELS.ESSENTIAL
+        LEVELS.ESSENTIAL,
       ],
       lastLevel: LEVELS.ESSENTIAL,
       envStates: {
         "beforeProcessing": ENV_STATES.STARTUP_DONE,
         "duringProcessing": ENV_STATES.SHUTTING_DOWN,
-        "afterProcessing": ENV_STATES.SHUT_DOWN
+        "afterProcessing": ENV_STATES.SHUT_DOWN,
       },
       functions: {
         "beforeProcessing": function() {},
@@ -123,9 +123,9 @@ export const Environment = (function() {
         "afterProcessing": function() {
           this.innerEnvs.length = 0;
           this.unregister();
-        }
-      }
-    }
+        },
+      },
+    },
   };
   function getBootstrapMetadata(startupOrShutdown) {
     return BOOTSTRAP[startupOrShutdown];
@@ -165,7 +165,7 @@ export const Environment = (function() {
 
     self.levels = {
       "startup": generateLevelObjects(),
-      "shutdown": generateLevelObjects()
+      "shutdown": generateLevelObjects(),
     };
 
     // Define a Lazy Getter to get an ObserverManager for this Environment.
@@ -469,7 +469,7 @@ export const Environment = (function() {
       let {
         lastLevel,
         envStates,
-        functions
+        functions,
       } = getBootstrapMetadata(aStartupOrShutdown);
 
       if (self.envState === envStates.beforeProcessing) {

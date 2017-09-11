@@ -71,7 +71,7 @@ RequestResult.prototype = {
   matchedDenyRules: null,
 
   isAllowed: undefined, // whether the request will be or has been allowed
-  resultReason: undefined
+  resultReason: undefined,
 };
 
 RequestResult.prototype.allowRulesExist = function() {

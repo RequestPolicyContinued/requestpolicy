@@ -139,7 +139,7 @@ export const Windows = (function() {
       loadAndUnloadListener.listenTo("load", window);
     },
     onCloseWindow: function(xulWindow) {},
-    onWindowTitleChange: function(xulWindow, newTitle) {}
+    onWindowTitleChange: function(xulWindow, newTitle) {},
   };
 
   // ---------------------------------------------------------------------------

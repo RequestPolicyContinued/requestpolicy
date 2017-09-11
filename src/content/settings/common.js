@@ -46,7 +46,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     "about",
     "help",
     "basic",
-    "advanced"
+    "advanced",
   ];
 
   var $str = StringUtils.$str;
@@ -71,7 +71,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     WinEnv: WinEnv,
     elManager: elManager,
     $id: $id,
-    $str: $str
+    $str: $str,
   };
 })();
 

@@ -28,7 +28,7 @@ import {RequestProcessor} from "lib/request-processor";
 import {PolicyManager} from "lib/policy-manager";
 import {DomainUtil} from "lib/utils/domains";
 import {Ruleset} from "lib/ruleset";
-import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties
+import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "lib/classes/gui-location";
 import {StringUtils} from "lib/utils/strings";
 import {DOMUtils} from "lib/utils/dom";
@@ -54,7 +54,7 @@ export function loadMenuIntoWindow(window) {
     mixedDestinations: null,
     allowedDestinations: null,
     removeRules: null,
-    addRules: null
+    addRules: null,
   };
 
   let self = {
@@ -68,7 +68,7 @@ export function loadMenuIntoWindow(window) {
     _isCurrentlySelectedDestBlocked: null,
     _isCurrentlySelectedDestAllowed: null,
 
-    _ruleChangeQueues: {}
+    _ruleChangeQueues: {},
   };
 
   self.init = function() {
@@ -257,7 +257,7 @@ export function loadMenuIntoWindow(window) {
       lists.mixedDestinations,
       lists.allowedDestinations,
       lists.removeRules,
-      lists.addRules
+      lists.addRules,
     ].forEach(emptyList);
 
     $id("rpc-other-origins").hidden = true;
@@ -411,8 +411,8 @@ export function loadMenuIntoWindow(window) {
 
     let ruleData = {
       "o": {
-        "h": self._addWildcard(origin)
-      }
+        "h": self._addWildcard(origin),
+      },
     };
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(window);
@@ -436,12 +436,12 @@ export function loadMenuIntoWindow(window) {
 
     if (dest) {
       ruleData.d = {
-        "h": self._addWildcard(dest)
+        "h": self._addWildcard(dest),
       };
       const destOnlyRuleData = {
         "d": {
-          "h": self._addWildcard(dest)
-        }
+          "h": self._addWildcard(dest),
+        },
       };
       // if (Storage.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
@@ -604,7 +604,7 @@ export function loadMenuIntoWindow(window) {
     let url = "https://www.mywot.com/en/scorecard/" + domain;
     window.openUILinkIn(url, "tab", {
       relatedToCurrent: true,
-      inBackground: true
+      inBackground: true,
     });
   }
 
@@ -632,7 +632,7 @@ export function loadMenuIntoWindow(window) {
     let alwaysAskPrefName = "confirmSiteInfo";
     let confirmed = confirm(dialogMessage, alwaysAskPrefName, {
       // close the menu if the dialog needs to be shown
-      onBeforeDialog: self.close
+      onBeforeDialog: self.close,
     });
     if (confirmed) {
       openSiteInfoTab(domain);
@@ -1279,11 +1279,11 @@ export function loadMenuIntoWindow(window) {
     for (let destHost in destHosts) {
       let ruleData = {
         "o": {
-          "h": self._addWildcard(origin)
+          "h": self._addWildcard(origin),
         },
         "d": {
-          "h": destHost
-        }
+          "h": destHost,
+        },
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
@@ -1295,8 +1295,8 @@ export function loadMenuIntoWindow(window) {
 
       let destOnlyRuleData = {
         "d": {
-          "h": destHost
-        }
+          "h": destHost,
+        },
       };
       if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {

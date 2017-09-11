@@ -33,7 +33,7 @@ function getModules() {
   return [
     {
       uri: "chrome://rpc-dev-helper/content/rpc-uri.jsm",
-      name: "CustomUri"
+      name: "CustomUri",
     },
   ];
 }

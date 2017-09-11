@@ -207,5 +207,5 @@ export const FileUtil = {
     }
 
     return file;
-  }
+  },
 };

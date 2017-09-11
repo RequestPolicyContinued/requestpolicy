@@ -33,7 +33,7 @@ function getModules() {
   return [
     {
       uri: "chrome://rpc-ui-testing-helper/content/dump.jsm",
-      name: "Dump"
+      name: "Dump",
     },
   ];
 }

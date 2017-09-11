@@ -45,12 +45,12 @@ export const JSUtils = (function() {
           value,
           writable: true,
           configurable: true,
-          enumerable: true
+          enumerable: true,
         });
         return value;
       },
       configurable: true,
-      enumerable: true
+      enumerable: true,
     });
   };
 

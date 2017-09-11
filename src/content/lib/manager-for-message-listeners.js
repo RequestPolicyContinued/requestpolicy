@@ -138,7 +138,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
       }
       return aCallback(aMessage);
     },
-    listening: false
+    listening: false,
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {

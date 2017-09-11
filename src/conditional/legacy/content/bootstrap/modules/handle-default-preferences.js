@@ -87,13 +87,13 @@ let prefInitFunctions = {
     string.data = text;
     branch = branch || Services.prefs;
     branch.setComplexValue(prefName, Ci.nsISupportsString, string);
-  }
+  },
 };
 
 let defaultPrefScriptScope = {
   pref: prefInitFunctions.setDefaultPref,
   setGenericPref: prefInitFunctions.setGenericPref,
-  setUCharPref: prefInitFunctions.setUCharPref
+  setUCharPref: prefInitFunctions.setUCharPref,
 };
 
 //

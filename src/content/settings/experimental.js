@@ -91,7 +91,7 @@
     var list = $("<ul>");
     info.append(list);
 
-    var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests
+    var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests,
         } = getMemoryInfo();
     list.append("<li>RequestResult objects: " + nRRTotal +
         " (" + nRRAllowed + " allowed requests, " +

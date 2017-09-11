@@ -92,7 +92,7 @@ export function loadOverlayIntoWindow(window) {
     // This is set by the request log when it is initialized.
     // We don't need to worry about setting it here.
     requestLog: null,
-    OverlayEnvironment: OverlayEnvironment
+    OverlayEnvironment: OverlayEnvironment,
   };
 
   self.toString = function() {
@@ -429,7 +429,7 @@ export function loadOverlayIntoWindow(window) {
                                                redirectTargetUri);
 
       let data = {
-        uri: redirectTargetUri
+        uri: redirectTargetUri,
       };
       if (replaceIfPossible) {
         data.replaceUri = redirectOriginUri;
@@ -487,7 +487,7 @@ export function loadOverlayIntoWindow(window) {
           label: StringUtils.$str("allow"),
           accessKey: StringUtils.$str("allow.accesskey"),
           popup: null,
-          callback: allowRedirection
+          callback: allowRedirection,
         },
         {
           label: StringUtils.$str("deny"),
@@ -495,14 +495,14 @@ export function loadOverlayIntoWindow(window) {
           popup: null,
           callback: function() {
             // Do nothing. The notification closes when this is called.
-          }
+          },
         },
         {
           label: StringUtils.$str("addRule"),
           accessKey: StringUtils.$str("addRule.accesskey"),
           popup: addRuleMenuName,
-          callback: null
-        }
+          callback: null,
+        },
         // TODO: add a "read more about URL redirection" button, targetting to
         //       https://en.wikipedia.org/wiki/URL_redirection
       ];
@@ -804,7 +804,7 @@ export function loadOverlayIntoWindow(window) {
       },
 
       QueryInterface: XPCOMUtils.generateQI(["nsIWebProgressListener",
-                                             "nsISupportsWeakReference"])
+                                             "nsISupportsWeakReference"]),
     };
 
     // https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
@@ -857,7 +857,7 @@ export function loadOverlayIntoWindow(window) {
       GetWeakReference: function() {
         return Cc["@mozilla.org/appshell/appShellService;1"]
             .createInstance(Ci.nsIWeakReference);
-      }
+      },
     };
 
     // there seems to be a bug in Firefox ESR 24 -- the session history is

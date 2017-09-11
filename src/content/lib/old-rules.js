@@ -35,7 +35,7 @@ export const OldRules = (function() {
       this._customPrefStrings = {
         origins: String(aOrigins),
         dests: String(aDestinations),
-        originsToDests: String(aOriginsToDestinations)
+        originsToDests: String(aOriginsToDestinations),
       };
     }
   }
@@ -50,11 +50,11 @@ export const OldRules = (function() {
           origins: OldRules._getPrefString("allowedOrigins"),
           dests: OldRules._getPrefString("allowedDestinations"),
           originsToDests: OldRules._getPrefString(
-              "allowedOriginsToDestinations")
+              "allowedOriginsToDestinations"),
         };
       }
       return this._prefStrings;
-    }
+    },
   });
 
   /**
@@ -76,11 +76,11 @@ export const OldRules = (function() {
         this._prefStringSets = {
           origins: splitString(origins),
           dests: splitString(dests),
-          originsToDests: splitString(originsToDests)
+          originsToDests: splitString(originsToDests),
         };
       }
       return this._prefStringSets;
-    }
+    },
   });
 
   /**
@@ -94,13 +94,13 @@ export const OldRules = (function() {
 
     for (let origin of origins) {
       rules.push({
-        o: OldRules.getEndpointSpecFromString(origin)
+        o: OldRules.getEndpointSpecFromString(origin),
       });
     }
 
     for (let dest of dests) {
       rules.push({
-        d: OldRules.getEndpointSpecFromString(dest)
+        d: OldRules.getEndpointSpecFromString(dest),
       });
     }
 
@@ -112,7 +112,7 @@ export const OldRules = (function() {
         if (origin !== "" && dest !== "") {
           rules.push({
             o: OldRules.getEndpointSpecFromString(origin),
-            d: OldRules.getEndpointSpecFromString(dest)
+            d: OldRules.getEndpointSpecFromString(dest),
           });
           continue;
         }

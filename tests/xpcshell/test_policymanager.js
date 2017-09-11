@@ -10,13 +10,13 @@ const config = {
     "foo": {
       "name": "The Foo RP whitelist and blacklist.",
       "updateUrls": {
-        "http://foo.com/rp.json": {}
+        "http://foo.com/rp.json": {},
       },
       "infoUrls": {
-        "About": "http://foo.com/about.html"
-      }
-    }
-  }
+        "About": "http://foo.com/about.html",
+      },
+    },
+  },
 };
 
 

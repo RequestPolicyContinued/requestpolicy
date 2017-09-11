@@ -40,7 +40,7 @@ import {common, $id, $str} from "./common";
     "yourOldRulesHaveBeenDeleted",
     "type",
     "origin",
-    "destination"
+    "destination",
   ];
 
   $(function() {

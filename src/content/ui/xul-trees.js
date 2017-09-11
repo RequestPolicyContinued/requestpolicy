@@ -36,8 +36,8 @@ exports.toolbarbutton = [
       special: {
         type: "subobject",
         id: "navigator-toolbox",
-        tree: ["palette"]
-      }
+        tree: ["palette"],
+      },
     },
 
     tag: "toolbarbutton",
@@ -45,9 +45,9 @@ exports.toolbarbutton = [
       id: "rpcontinuedToolbarButton",
       label: "RequestPolicy",
       tooltiptext: "RequestPolicy Continued",
-      popup: "rpc-popup"
-    }
-  }
+      popup: "rpc-popup",
+    },
+  },
 ];
 
 exports.mainTree = [
@@ -65,23 +65,23 @@ exports.mainTree = [
             tag: "menuitem",
             attributes: {label: "&rp.menu.managePolicies;",
                          accesskey: "m"},
-            events: {command: ["overlay", "openPolicyManager"]}
+            events: {command: ["overlay", "openPolicyManager"]},
           },
           {
             tag: "menuitem",
             attributes: {label: "&rp.requestLog.title;",
                          accesskey: "l"},
-            events: {command: ["overlay", "toggleRequestLog"]}
+            events: {command: ["overlay", "toggleRequestLog"]},
           },
           {
             tag: "menuitem",
             attributes: {label: "&rp.menu.preferences;",
                          accesskey: "p"},
-            events: {command: ["overlay", "openPrefs"]}
-          }
-        ]
-      }
-    ]
+            events: {command: ["overlay", "openPrefs"]},
+          },
+        ],
+      },
+    ],
   },
 
   {
@@ -90,14 +90,14 @@ exports.mainTree = [
     tag: "menuitem",
     attributes: {id: "rpcontinuedContextMenuEntry",
                  label: "RequestPolicy Continued"},
-    events: {command: ["overlay", "toggleMenu"]}
+    events: {command: ["overlay", "toggleMenu"]},
   },
 
   {
     parent: {special: {type: "__window__"}},
 
     tag: "keyset",
-    attributes: {id: "rpcontinuedKeyset"}
+    attributes: {id: "rpcontinuedKeyset"},
   },
 
   {
@@ -108,7 +108,7 @@ exports.mainTree = [
     children: [
       {
         tag: "menupopup",
-        attributes: {id: "rpcontinuedRedirectAddRuleMenu"}
+        attributes: {id: "rpcontinuedRedirectAddRuleMenu"},
       }, {
         tag: "menupopup",
         attributes: {id: "rpc-popup",
@@ -140,13 +140,13 @@ exports.mainTree = [
                             tag: "label",
                             attributes: {id: "rpc-origin-domainname",
                                          class: "domainname",
-                                         flex: "2"}
+                                         flex: "2"},
                           }, {
                             tag: "label",
                             attributes: {id: "rpc-origin-num-requests",
-                                         class: "numRequests"}
-                          }
-                        ]
+                                         class: "numRequests"},
+                          },
+                        ],
                       },
                       {
                         tag: "vbox",
@@ -155,13 +155,13 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-other-origins-title",
-                                         value: "&rp.menu.otherOrigins;"}
+                                         value: "&rp.menu.otherOrigins;"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-other-origins-list",
-                                         class: "rpc-label-list"}
-                          }
-                        ]
+                                         class: "rpc-label-list"},
+                          },
+                        ],
                       },
                       {
                         tag: "vbox",
@@ -170,13 +170,13 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-blocked-destinations-title",
-                                         value: "&rp.menu.blockedDestinations;"}
+                                         value: "&rp.menu.blockedDestinations;"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-blocked-destinations-list",
-                                         class: "rpc-label-list"}
-                          }
-                        ]
+                                         class: "rpc-label-list"},
+                          },
+                        ],
                       }, {
                         tag: "vbox",
                         attributes: {id: "rpc-mixed-destinations"},
@@ -184,13 +184,13 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-mixed-destinations-title",
-                                         value: "&rp.menu.mixedDestinations;"}
+                                         value: "&rp.menu.mixedDestinations;"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-mixed-destinations-list",
-                                         class: "rpc-label-list"}
-                          }
-                        ]
+                                         class: "rpc-label-list"},
+                          },
+                        ],
                       }, {
                         tag: "vbox",
                         attributes: {id: "rpc-allowed-destinations"},
@@ -198,15 +198,15 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-allowed-destinations-title",
-                                         value: "&rp.menu.allowedDestinations;"}
+                                         value: "&rp.menu.allowedDestinations;"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-allowed-destinations-list",
-                                         class: "rpc-label-list"}
-                          }
-                        ]
-                      }
-                    ]
+                                         class: "rpc-label-list"},
+                          },
+                        ],
+                      },
+                    ],
                   },
                   // [END] LEFT MENU COLUMN
                   // [BEGIN] RIGHT MENU COLUMN
@@ -216,18 +216,18 @@ exports.mainTree = [
                     children: [
                       {
                         tag: "vbox",
-                        attributes: {id: "rpc-rules-remove"}
+                        attributes: {id: "rpc-rules-remove"},
                       }, {
                         tag: "vbox",
-                        attributes: {id: "rpc-rules-add"}
+                        attributes: {id: "rpc-rules-add"},
                       }, {
                         tag: "vbox",
-                        attributes: {id: "rpc-rules-info"}
-                      }
-                    ]
-                  }
+                        attributes: {id: "rpc-rules-info"},
+                      },
+                    ],
+                  },
                   // [END] RIGHT MENU COLUMN
-                ]
+                ],
               }, {
                 tag: "hbox",
                 attributes: {id: "rpc-revoke-temporary-permissions",
@@ -236,9 +236,9 @@ exports.mainTree = [
                   {
                     tag: "label",
                     attributes: {value: "&rp.menu.revokeTemporaryPermissions;"},
-                    events: {click: ["overlay", "revokeTemporaryPermissions"]}
-                  }
-                ]
+                    events: {click: ["overlay", "revokeTemporaryPermissions"]},
+                  },
+                ],
               },
               // [BEGIN] MENU FOOTER
               {
@@ -255,56 +255,56 @@ exports.mainTree = [
                                      class: "rpc-footer-link",
                                      value: "&rp.menu.enableBlocking;"},
                         events: {click: ["overlay",
-                                         "toggleTemporarilyAllowAll"]}
+                                         "toggleTemporarilyAllowAll"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-disable-blocking",
                                      class: "rpc-footer-link",
                                      value: "&rp.menu.disableBlocking;"},
                         events: {click: ["overlay",
-                                         "toggleTemporarilyAllowAll"]}
+                                         "toggleTemporarilyAllowAll"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-help",
                                      class: "rpc-footer-link",
                                      value: "&rp.menu.help;"},
-                        events: {click: ["overlay", "openHelp"]}
+                        events: {click: ["overlay", "openHelp"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-prefs",
                                      class: "rpc-footer-link",
                                      value: "&rp.menu.preferences;"},
-                        events: {click: ["overlay", "openPrefs"]}
+                        events: {click: ["overlay", "openPrefs"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-policies",
                                      class: "rpc-footer-link",
                                      value: "&rp.menu.managePolicies;"},
-                        events: {click: ["overlay", "openPolicyManager"]}
+                        events: {click: ["overlay", "openPolicyManager"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-request-log",
                                      class: "rpc-footer-link",
                                      value: "&rp.requestLog.title;"},
-                        events: {click: ["overlay", "toggleRequestLog"]}
-                      }
-                    ]
-                  }
-                ]
-              }
+                        events: {click: ["overlay", "toggleRequestLog"]},
+                      },
+                    ],
+                  },
+                ],
+              },
               // [END] MENU FOOTER
-            ]
-          }
-        ]
-      }
-    ]
+            ],
+          },
+        ],
+      },
+    ],
   },
 
   {
     parent: {id: "appcontent"},
     tag: "splitter",
     attributes: {id: "rpcontinued-requestLog-splitter",
-                 hidden: "true"}
+                 hidden: "true"},
   },
   {
     parent: {id: "appcontent"},
@@ -328,24 +328,24 @@ exports.mainTree = [
                 attributes: {id: "rpcontinued-requestLog-title",
                              control: "rpcontinued-requestLog-frame",
                              value: "&rp.requestLog.title;",
-                             crop: "end"}
+                             crop: "end"},
               }, {
                 tag: "button",
                 attributes: {id: "rpcontinued-requestLog-clear",
                              label: "&rp.requestLog.clear;"},
-                events: {command: ["overlay", "clearRequestLog"]}
+                events: {command: ["overlay", "clearRequestLog"]},
               }, {
                 tag: "vbox",
-                attributes: {flex: "1"}
+                attributes: {flex: "1"},
               }, {
                 tag: "toolbarbutton",
                 attributes: {id: "rpcontinued-requestLog-close",
                              align: "right"},
-                events: {command: ["overlay", "toggleRequestLog"]}
-              }
-            ]
-          }
-        ]
+                events: {command: ["overlay", "toggleRequestLog"]},
+              },
+            ],
+          },
+        ],
       },
       // The src of this iframe is set to
       // chrome://rpcontinued/content/ui/request-log/request-log.xul in overlay.js
@@ -353,8 +353,8 @@ exports.mainTree = [
         tag: "iframe",
         attributes: {id: "rpcontinued-requestLog-frame",
                      type: "chrome",
-                     flex: "1"}
-      }
-    ]
-  }
+                     flex: "1"},
+      },
+    ],
+  },
 ];

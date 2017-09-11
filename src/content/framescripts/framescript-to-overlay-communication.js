@@ -36,7 +36,7 @@ import {mlManager} from "framescripts/managers";
 const States = {
   "WAITING": 0,
   "RUNNING": 1,
-  "STOPPED": 2
+  "STOPPED": 2,
 };
 
 // =============================================================================

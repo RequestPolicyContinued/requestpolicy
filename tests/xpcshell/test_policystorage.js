@@ -8,7 +8,7 @@ const exampleJsonObj = {
   "metadata": {
     "version": 1,
     "name": "policyname", // unique name for this policy, used in filename
-    "source": "user" // "user" or "subscription"
+    "source": "user", // "user" or "subscription"
   },
   "entries": {
     "allow": [
@@ -29,8 +29,8 @@ const exampleJsonObj = {
     "deny": [
       {"d": {"h": "google-analytics.com"}},
       {"o": {"s": "https"}, "d": {"s": "http"}},
-    ]
-  }
+    ],
+  },
 };
 
 function run_test() {

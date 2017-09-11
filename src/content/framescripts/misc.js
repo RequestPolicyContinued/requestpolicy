@@ -73,7 +73,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                         {
                           origin: event.target.ownerDocument.URL,
-                          dest: event.target.href
+                          dest: event.target.href,
                         });
       });
       return;
@@ -88,7 +88,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
                         {
                           origin: event.target.ownerDocument.URL,
-                          dest: event.target.form.action
+                          dest: event.target.form.action,
                         });
       });
       return;

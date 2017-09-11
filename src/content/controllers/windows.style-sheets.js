@@ -33,7 +33,7 @@ export const StyleSheetsController = (function() {
     "chrome://rpcontinued/skin/requestpolicy.css",
     Info.isSeamonkey ?
         "chrome://rpcontinued/skin/toolbarbutton-seamonkey.css" :
-        "chrome://rpcontinued/skin/toolbarbutton.css"
+        "chrome://rpcontinued/skin/toolbarbutton.css",
   ]);
 
   function loadStyleSheets() {

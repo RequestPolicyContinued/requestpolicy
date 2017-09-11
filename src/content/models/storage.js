@@ -63,6 +63,6 @@ export const Storage = new StorageClass({
   boolAliases: [
     ["defaultPolicy.allow", "DefaultAllow"],
     ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
-    ["startWithAllowAllEnabled", "BlockingDisabled"]
+    ["startWithAllowAllEnabled", "BlockingDisabled"],
   ],
 });

@@ -25,6 +25,7 @@
 // constants
 // =============================================================================
 
+/* eslint-disable no-multi-spaces */
 export const REQUEST_REASON_USER_POLICY           = 1;
 export const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
 export const REQUEST_REASON_DEFAULT_POLICY        = 3;
@@ -41,6 +42,7 @@ export const REQUEST_REASON_NEW_WINDOW            = 12;
 export const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
 export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
+/* eslint-enable no-multi-spaces */
 
 // =============================================================================
 // RequestResult
@@ -68,7 +70,7 @@ RequestResult.prototype = {
   matchedAllowRules: null,
   matchedDenyRules: null,
 
-  isAllowed: undefined,  // whether the request will be or has been allowed
+  isAllowed: undefined, // whether the request will be or has been allowed
   resultReason: undefined
 };
 

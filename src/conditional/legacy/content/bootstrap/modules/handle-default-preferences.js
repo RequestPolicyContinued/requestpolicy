@@ -76,7 +76,7 @@ let prefInitFunctions = {
     this.setGenericPref(defaultBranch, prefName, prefValue);
   },
 
-  getUCharPref: function(prefName, branch) {  // Unicode getCharPref
+  getUCharPref: function(prefName, branch) { // Unicode getCharPref
     branch = branch || Services.prefs;
     return branch.getComplexValue(prefName, Ci.nsISupportsString).data;
   },

@@ -3,6 +3,7 @@
 
 /* jscs:disable disallowSpacesInsideObjectBrackets */
 /* jscs:disable maximumLineLength */
+/* eslint no-multi-spaces: off */
 
 // -----------------------------------------------------------------------------
 // imports

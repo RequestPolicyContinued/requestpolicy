@@ -51,8 +51,6 @@ var Utils = (function() {
    * @param {Object} thisPtr
    */
   self.runAsync = function(callback, thisPtr) {
-    //console.log("registering async execution. Caller is "+
-    //            Components.stack.caller.filename);
     let params = Array.prototype.slice.call(arguments, 2);
     let runnable = {
       run: function() {
@@ -76,7 +74,6 @@ var Utils = (function() {
    */
   self.tryMultipleTimes = function(aFunction, aTries=10) {
     if (aTries <= 0) {
-      //console.log("no more tries!");
       return;
     }
     let triesLeft = aTries - 1;

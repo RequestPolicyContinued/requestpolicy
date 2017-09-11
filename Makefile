@@ -517,7 +517,12 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: addons-linter coffeelint eslint jscs jshint
+lint: lint-coffee lint-js lint-xpi
+
+.PHONY: lint-coffee lint-js lint-xpi
+lint-coffee: coffeelint
+lint-js: eslint jscs jshint
+lint-xpi: addons-linter
 
 .PHONY: addons-linter coffeelint eslint jscs jshint
 addons-linter: nightly-xpi node-packages

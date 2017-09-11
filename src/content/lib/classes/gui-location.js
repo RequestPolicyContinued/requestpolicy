@@ -45,7 +45,7 @@ GUILocation.prototype.toString = function() {
  */
 GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
   return new SubclassOfGUILocation(
-    location1.value,  // we assume: location1.value == location2.value
+    location1.value, // we assume: location1.value == location2.value
     GUILocationProperties.merge(location1.properties, location2.properties));
 };
 

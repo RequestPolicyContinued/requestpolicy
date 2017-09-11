@@ -102,8 +102,8 @@ export const ToolbarButtonController = (function() {
     function addToolbarButtonToNavBar(win) {
       // SeaMonkey users have to use a toolbar button now. At the moment I can't
       // justify a bunch of special cases to support the statusbar when such a
-      // tiny number of users have seamonkey and I can't even be sure that many of
-      // those users want a statusbar icon.
+      // tiny number of users have seamonkey and I can't even be sure that many
+      // of those users want a statusbar icon.
       // if (!Info.isFirefox) {
       //   Logger.info(
       //     "Not performing toolbar button check: not Firefox.");

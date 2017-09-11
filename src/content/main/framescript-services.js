@@ -72,8 +72,8 @@ export const FramescriptServices = {
             // case 2a: all requests have been blocked because of a blacklist
             //          ==> do *not* indicate
             //
-            // case 2b: at least one of the blocked (identical) requests has been
-            //          blocked by a rule *other than* the blacklist
+            // case 2b: at least one of the blocked (identical) requests
+            //          has been blocked by a rule *other than* the blacklist
             //          ==> *do* indicate
             const requests = rejectedRequests[destBase][destIdent][destUri];
             if (indicateBlacklisted ||

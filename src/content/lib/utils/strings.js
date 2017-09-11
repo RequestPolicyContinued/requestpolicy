@@ -43,12 +43,13 @@ export const StringUtils = (function() {
      * doesn't appear to do so reliably. Errors can erratically happen on next
      * load of the same file in certain instances. (at minimum, when strings are
      * added/removed) The apparently accepted solution to reliably load new
-     * versions is to always create bundles with a unique URL so as to bypass the
-     * cache. This is accomplished by passing a random number in a parameter after
-     * a '?'. (this random ID is otherwise ignored) The loaded string bundle is
-     * still cached on startup and should still be cleared out of the cache on
-     * addon shutdown. This just bypasses the built-in cache for repeated loads of
-     * the same path so that a newly installed update loads cleanly. */
+     * versions is to always create bundles with a unique URL so as to bypass
+     * the cache. This is accomplished by passing a random number in a parameter
+     * after a '?'. (this random ID is otherwise ignored) The loaded string
+     * bundle is still cached on startup and should still be cleared out of the
+     * cache on addon shutdown. This just bypasses the built-in cache for
+     * repeated loads of the same path so that a newly installed update loads
+     * cleanly. */
     return Services.strings.createBundle(path + "?" + Math.random());
   }
 

@@ -89,8 +89,8 @@ export function loadOverlayIntoWindow(window) {
   let isFennec = false;
 
   let self = {
-    // This is set by the request log when it is initialized. We don't need to worry
-    // about setting it here.
+    // This is set by the request log when it is initialized.
+    // We don't need to worry about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment
   };
@@ -245,9 +245,9 @@ export function loadOverlayIntoWindow(window) {
     // this slow down the loading of the page, which is noticable
     // especially with CSS loading delays (it's not unlikely that slow
     // webservers have a hand in this, too).
-    // Note that the change to _updateBlockedContentStateAfterTimeout seems to have
-    // added a bug where opening a blank tab and then quickly switching back
-    // to the original tab can cause the original tab's blocked content
+    // Note that the change to _updateBlockedContentStateAfterTimeout seems to
+    // have added a bug where opening a blank tab and then quickly switching
+    // back to the original tab can cause the original tab's blocked content
     // notification to be cleared. A simple compensation was to decrease
     // the timeout from 1000ms to 250ms, making it much less likely the tab
     // switch can be done in time for a blank opened tab. This isn't a real
@@ -305,7 +305,8 @@ export function loadOverlayIntoWindow(window) {
       // the docShell has allowMetaRedirects disabled, it will be respected.
       if (!Storage.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
-        // Ignore redirects to javascript. The browser will ignore them, as well.
+        // Ignore redirects to javascript. The browser will ignore them
+        // as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
           Logger.warning(
               "Ignoring redirect to javascript URI <" + destURI + ">");
@@ -724,14 +725,15 @@ export function loadOverlayIntoWindow(window) {
    * The original methods are defined in Firefox' nsContextMenu.js:
    * http://mxr.mozilla.org/mozilla-central/source/browser/base/content/nsContextMenu.js
    *
-   * The openLinkInTab() method doesn't need to be wrapped because new tabs are already
-   * recognized by tabAdded(), which is wrapped elsewhere. The tabAdded() function ends up
-   * being called when openLinkInTab() is called.
+   * The openLinkInTab() method doesn't need to be wrapped because new tabs
+   * are already recognized by tabAdded(), which is wrapped elsewhere.
+   * The tabAdded() function ends up being called when openLinkInTab()
+   * is called.
    *
    * TODO: There are even more similar methods in gContextMenu (frame-specific),
-   *       and perhaps the number will increase in future. Frame-specific contextMenu-
-   *       entries are working, but are registered e.g. as "new window opened" by
-   *       the subsequent shouldLoad() call.
+   *       and perhaps the number will increase in future. Frame-specific
+   *       contextMenu entries are working, but are registered e.g. as
+   *       "new window opened" by the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
     Utils.wrapFunction(
@@ -996,8 +998,8 @@ export function loadOverlayIntoWindow(window) {
 
   self.openMenuAtToolbarButton = function() {
     let anchor = $id("rpcontinuedToolbarButton");
-    // rpcontinued.overlay._toolbox.insertBefore(rpcontinued.overlay.popupElement,
-    //     null);
+    // rpcontinued.overlay._toolbox.insertBefore(
+    //     rpcontinued.overlay.popupElement, null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
   };
 

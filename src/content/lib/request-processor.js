@@ -371,6 +371,8 @@ export let RequestProcessor = (function() {
     return result;
   }
 
+  /* eslint-disable */
+
   // function _getOtherOriginsHelperFromDOM(document, reqSet) {
   //   var documentUri = DomainUtil
   //       .stripFragment(document.documentURI);
@@ -415,6 +417,8 @@ export let RequestProcessor = (function() {
   //     }
   //   }
   // },
+
+  /* eslint-enable */
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {

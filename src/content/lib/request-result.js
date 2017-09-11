@@ -25,7 +25,7 @@
 // constants
 // =============================================================================
 
-/* eslint-disable no-multi-spaces */
+/* eslint-disable no-multi-spaces, max-len */
 export const REQUEST_REASON_USER_POLICY           = 1;
 export const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
 export const REQUEST_REASON_DEFAULT_POLICY        = 3;
@@ -42,7 +42,7 @@ export const REQUEST_REASON_NEW_WINDOW            = 12;
 export const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
 export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
-/* eslint-enable no-multi-spaces */
+/* eslint-enable no-multi-spaces, max-len */
 
 // =============================================================================
 // RequestResult
@@ -105,7 +105,8 @@ RequestResult.prototype.resolveConflict = function() {
 };
 
 RequestResult.prototype.isDefaultPolicyUsed = function() {
-  // returns whether the default policy has been or will be used for this request.
+  // returns whether the default policy has been or will be used
+  // for this request.
   return this.resultReason === REQUEST_REASON_DEFAULT_POLICY ||
       this.resultReason === REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
       this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;

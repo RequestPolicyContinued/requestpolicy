@@ -71,10 +71,11 @@ export function loadRLTreeViewIntoWindow(window) {
      * @return {number}
      */
     getCellText: function(aIndex, aColumn) {
-      // Row 0 is actually the last element in the array so that we don't have to
-      // unshift() the array and can just push().
-      // TODO: Do an actual speed test with push vs. unshift to see if it matters
-      // with this javascript array implementation, though I'm assuming it does.
+      // Row 0 is actually the last element in the array so that we don't
+      // have to unshift() the array and can just push().
+      // TODO: Do an actual speed test with push vs. unshift to see if it
+      // matters with this javascript array implementation, though I'm
+      // assuming it does.
       const columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
         return getVisibleRowAtIndex(aIndex)[columnIndex];

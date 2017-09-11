@@ -448,8 +448,8 @@ export function loadMenuIntoWindow(window) {
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         // show "Block requests" if the destination was allowed
-        // OR if there's no blocking rule (i.e. the request was blocked "by default")
-        //  -- this enables support for blacklisting.
+        // OR if there's no blocking rule (i.e. the request was blocked
+        // "by default") -- this enables support for blacklisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
@@ -471,8 +471,8 @@ export function loadMenuIntoWindow(window) {
               !PolicyManager.ruleExists(C.RULE_ACTION_ALLOW,
                                         destOnlyRuleData)) {
         // show "Allow requests" if the destination was blocked
-        // OR if there's no allow-rule (i.e. the request was allowed "by default")
-        //  -- this enables support for whitelisting.
+        // OR if there's no allow-rule (i.e. the request was allowed
+        // "by default") -- this enables support for whitelisting.
         if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
             !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
@@ -699,8 +699,8 @@ export function loadMenuIntoWindow(window) {
     Logger.debug("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
-    // only cares whether it's an allow/deny and temporary and drops the ruleData
-    // argument straight into the ruleset?
+    // only cares whether it's an allow/deny and temporary and drops the
+    // ruleData argument straight into the ruleset?
     /* eslint-disable no-unused-vars */
     let origin;
     let dest;
@@ -863,7 +863,8 @@ export function loadMenuIntoWindow(window) {
       let addThisOriginBase = false;
 
       for (let destBase in allRequests[originUri]) {
-        // Search for a destBase which wouldn't be allowed by the default policy.
+        // Search for a destBase which wouldn't be allowed by the default
+        // policy.
         // TODO: some users might want to know those "other origins" as well.
         //       this should be made possible.
 

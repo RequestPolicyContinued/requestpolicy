@@ -1,7 +1,7 @@
 "use strict";
 
+/* eslint-disable max-len */
 /* global pref, setGenericPref, setUCharPref */ // eslint-disable-line no-unused-vars
-// jscs:disable maximumLineLength
 
 pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);
@@ -46,4 +46,4 @@ pref("extensions.requestpolicy.lastAppVersion", "0.0");
 // pref("extensions.requestpolicy.statusbarIcon", "standard");
 // pref("extensions.requestpolicy.initialSetupDialogShown", false);
 
-// jscs:enable maximumLineLength
+/* eslint-enable max-len */

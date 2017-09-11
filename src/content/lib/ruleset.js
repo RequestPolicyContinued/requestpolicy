@@ -37,6 +37,7 @@ function dwarn(msg) {
   Logger.warning("[POLICY] " + msg);
 }
 
+/* eslint-disable max-len */
 /*
 // We expect JSON data to represent the following data structure.
 exampleRawDataObj = {
@@ -64,6 +65,7 @@ exampleRawDataObj = {
   }
 };
 */
+/* eslint-enable max-len */
 
 /*
 // currently unused.
@@ -359,8 +361,9 @@ RawRuleset.prototype = {
   },
 
   /**
-   * Removes the rule from the entries of this |RawRuleset| instance as well as the
-   * |Ruleset| optionally provided as the policy argument.
+   * Removes the rule from the entries of this |RawRuleset|
+   * instance as well as the |Ruleset| optionally provided
+   * as the policy argument.
    *
    * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
    * @param {RuleSpec} ruleData
@@ -646,7 +649,8 @@ Rule.prototype = {
           ) {
             // Port Match is OK, so continue
           } else {
-            // dprint("isMatch: wrong port (not the port specified by the rule)");
+            // dprint(
+            //     "isMatch: wrong port (not the port specified by the rule)");
             return false;
           }
         }
@@ -655,7 +659,8 @@ Rule.prototype = {
           // Both host and port are undefined, so skip the default-port-check.
         } else {
           if (!DomainUtil.hasStandardPort(uriObj)) {
-            // dprint("isMatch: wrong port (not the default port and the rule assumes default)");
+            // dprint("isMatch: wrong port (not the default port and the " +
+            //     "rule assumes default)");
             return false;
           }
         }
@@ -668,7 +673,8 @@ Rule.prototype = {
     if (this.path) {
       if (typeof this.path === "string") {
         if (uriObj.path.indexOf(this.path) !== 0) {
-          // dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
+          // dprint("isMatch: wrong path (string): " +
+          //     this.path + " vs " + uriObj.path);
           return false;
         }
       } else if (!this.path.test(uriObj.path)) {
@@ -1001,7 +1007,8 @@ Ruleset.prototype = {
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
-          // dprint("There are origin-to-destination rules using this origin rule.");
+          // dprint("There are origin-to-destination " +
+          //     "rules using this origin rule.");
           for (let [destEntry, destSpecHasHost]
                of rule.destinations.getHostMatches(destHost)) {
             // dprint(destEntry);
@@ -1009,7 +1016,9 @@ Ruleset.prototype = {
               // dprint("Checking rule: " + rule);
               if (destRule.allowDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                // dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("ALLOW origin-to-dest by rule origin " +
+                //     entry + " " + rule + " to dest " + destEntry +
+                //     " " + destRule);
                 matchedAllowRules.push([
                   "origin-to-dest",
                   entry,
@@ -1020,7 +1029,9 @@ Ruleset.prototype = {
               }
               if (destRule.denyDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                // dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("DENY origin-to-dest by rule origin " +
+                //     entry + " " + rule + " to dest " + destEntry +
+                //     " " + destRule);
                 matchedDenyRules.push([
                   "origin-to-dest",
                   entry,
@@ -1031,7 +1042,8 @@ Ruleset.prototype = {
               }
             }
           }
-          // dprint("Done checking origin-to-destination rules using this origin rule.");
+          // dprint("Done checking origin-to-destination " +
+          //     "rules using this origin rule.");
         } // end: if (rule.destinations)
       }
     }

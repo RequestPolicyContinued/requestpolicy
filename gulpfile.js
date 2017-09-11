@@ -2,8 +2,7 @@
 "use strict";
 
 /* jscs:disable disallowSpacesInsideObjectBrackets */
-/* jscs:disable maximumLineLength */
-/* eslint no-multi-spaces: off */
+/* eslint max-len: [error, 100], no-multi-spaces: off */
 
 // -----------------------------------------------------------------------------
 // imports

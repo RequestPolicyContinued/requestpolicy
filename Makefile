@@ -13,10 +13,6 @@ SHELL := /bin/bash
 # general variables and targets
 #===============================================================================
 
-ZIP        := zip
-GIT        := /usr/bin/git
-PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
-
 #-------------------------------------------------------------------------------
 # extension metadata
 #-------------------------------------------------------------------------------
@@ -39,14 +35,26 @@ python_env_dir := $(dev_env_dir)/python
 node_env_dir   := $(dev_env_dir)/node
 browsers_dir   := $(dev_env_dir)/browsers
 
-NPM            := npm --prefix=$(node_env_dir)
-JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
-JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint --extra-ext jsm
-ADDONS_LINTER  := $(abspath $(node_env_dir))/node_modules/.bin/addons-linter
+node_modules_dir := $(node_env_dir)/node_modules
 
 # create the dist directory
 $(dist_dir) $(logs_dir):
 	@mkdir -p $@
+
+#-------------------------------------------------------------------------------
+# programs and scripts
+#-------------------------------------------------------------------------------
+
+# system
+GIT            := /usr/bin/git
+NPM            := npm --prefix=$(node_env_dir)
+PREPROCESS     := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
+ZIP            := zip
+
+# nodejs
+ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
+JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint --extra-ext jsm
 
 #-------------------------------------------------------------------------------
 # other
@@ -440,7 +448,7 @@ $(T_PYTHON_VIRTUALENV):
 #-------------------------------------------------------------------------------
 
 # timestamp/target files
-T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
+T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
@@ -691,7 +699,7 @@ mostlyclean: clean
 	@-$(call _remove_all_files_and_dirs_in,$(logs_dir))
 clean-dev-environment:
 	@-$(call _remove_all_files_and_dirs_in,$(python_env_dir))
-	@-$(call _remove_all_files_and_dirs_in,$(node_env_dir)/node_modules)
+	@-$(call _remove_all_files_and_dirs_in,$(node_modules_dir))
 	@rm -rf $(browsers_dir)/firefox
 	@# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
 	@# are put there manually.

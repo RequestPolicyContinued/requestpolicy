@@ -125,4 +125,4 @@ export const Logger = (function() {
   };
 
   return self;
-}());
+})();

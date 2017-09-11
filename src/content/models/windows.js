@@ -107,7 +107,7 @@ export const Windows = (function() {
   };
 
   return self;
-}());
+})();
 
 // =============================================================================
 // Windows (listening functionality)
@@ -184,4 +184,4 @@ export const Windows = (function() {
   };
 
   return self;
-}(Windows));
+})(Windows);

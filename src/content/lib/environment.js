@@ -507,7 +507,7 @@ export const Environment = (function() {
       }
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
-  }(Environment));
+  })(Environment);
 
   /**
    * Tell the Environment to shut down when an EventTarget's
@@ -529,7 +529,7 @@ export const Environment = (function() {
   };
 
   return Environment;
-}());
+})();
 
 // =============================================================================
 // MainEnvironment

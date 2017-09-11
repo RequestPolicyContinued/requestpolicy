@@ -50,4 +50,4 @@ var Dump = (function() {
   };
 
   return self;
-}());
+})();

@@ -70,4 +70,4 @@ export const StyleSheetsController = (function() {
   };
 
   return self;
-}());
+})();

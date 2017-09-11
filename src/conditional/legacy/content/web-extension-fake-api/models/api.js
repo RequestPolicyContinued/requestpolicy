@@ -113,7 +113,7 @@ export const ContentScriptsApi = {
   Api.browser.extension.getBackgroundPage = function() {
     return backgroundPage;
   };
-}());
+})();
 
 // =============================================================================
 // browser.management
@@ -234,7 +234,7 @@ export const ContentScriptsApi = {
 
   Api.browser.management.getSelf =
       Api.browser.management.get.bind(null, "/* @echo EXTENSION_ID */");
-}());
+})();
 
 // =============================================================================
 // browser.runtime
@@ -269,7 +269,7 @@ export const ContentScriptsApi = {
       }
     }, "browser.runtime.sendMessage");
   };
-}());
+})();
 
 // =============================================================================
 // browser.storage
@@ -320,4 +320,4 @@ export const ContentScriptsApi = {
   };
 
   Api.LegacyApi.prefs = Prefs;
-}());
+})();

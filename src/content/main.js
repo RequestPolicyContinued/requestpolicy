@@ -162,4 +162,4 @@ observerService.addObserver(observer, "sdk:loader:destroy", false);
       controller.startup.apply(null);
     }
   });
-}());
+})();

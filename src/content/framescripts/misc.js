@@ -97,4 +97,4 @@ import {mlManager, overlayComm} from "framescripts/managers";
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
     MainEnvironment.elManager.addListener(cfmm, "click", mouseClicked, true);
   });
-}());
+})();

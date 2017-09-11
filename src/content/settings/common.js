@@ -73,6 +73,6 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     $id: $id,
     $str: $str
   };
-}());
+})();
 
 export {common, WinEnv, elManager, $id, $str};

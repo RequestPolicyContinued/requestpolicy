@@ -134,4 +134,4 @@ export const WindowUtils = (function() {
   };
 
   return self;
-}());
+})();

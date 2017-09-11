@@ -104,4 +104,4 @@ export const FramescriptServices = {
   initFunctions.push(() => {
     browser.runtime.onMessage.addListener(onMessage);
   });
-}());
+})();

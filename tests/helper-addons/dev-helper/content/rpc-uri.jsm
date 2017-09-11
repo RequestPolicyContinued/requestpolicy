@@ -98,4 +98,4 @@ var CustomUri = (function() {
   }
 
   return self;
-}());
+})();

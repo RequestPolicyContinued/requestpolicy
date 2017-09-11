@@ -217,4 +217,4 @@ export const Utils = (function() {
   }
 
   return self;
-}());
+})();

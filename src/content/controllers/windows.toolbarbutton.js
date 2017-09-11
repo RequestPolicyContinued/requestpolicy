@@ -85,7 +85,7 @@ export const ToolbarButtonController = (function() {
     self.shutdown = function() {
       removeToolbarButtonFromAustralis();
     };
-  }());
+  })();
 
   // ---------------------------------------------------------------------------
   // Case 2: non-Australis
@@ -163,7 +163,7 @@ export const ToolbarButtonController = (function() {
     self.unloadFromWindow = function(win) {
       XULUtils.removeTreeElementsFromWindow(win, "toolbarbutton");
     };
-  }());
+  })();
 
   return self;
-}());
+})();

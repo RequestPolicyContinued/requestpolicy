@@ -132,4 +132,4 @@ import {common, WinEnv, elManager} from "./common";
       SUBSCRIPTION_REMOVED_TOPIC
     ], updateDisplay);
   };
-}());
+})();

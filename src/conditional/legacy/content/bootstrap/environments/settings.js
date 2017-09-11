@@ -29,4 +29,4 @@
       "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
   FakeWebExt.startupSettingsPage(window);
-}());
+})();

@@ -73,4 +73,4 @@ export const OldRulesController = (function() {
   };
 
   return self;
-}());
+})();

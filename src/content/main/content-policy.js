@@ -134,7 +134,7 @@ export const RPContentPolicy = (function() {
         registrar.unregisterFactory(self.classID, self);
       });
     };
-  }());
+  })();
 
   MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
@@ -181,7 +181,7 @@ export const RPContentPolicy = (function() {
   };
 
   return self;
-}());
+})();
 
 // =============================================================================
 // RPChannelEventSink
@@ -246,7 +246,7 @@ export const RPChannelEventSink = (function() {
         registrar.unregisterFactory(self.classID, self);
       });
     };
-  }());
+  })();
 
   MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE, unregister);
 
@@ -294,4 +294,4 @@ export const RPChannelEventSink = (function() {
   };
 
   return self;
-}());
+})();

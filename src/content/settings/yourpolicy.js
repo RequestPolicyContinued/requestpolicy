@@ -263,4 +263,4 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
       populateRuleTable(search.value);
     });
   };
-}());
+})();

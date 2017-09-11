@@ -146,7 +146,7 @@ export const Prefs = (function() {
   };
 
   return self;
-}());
+})();
 
 // =============================================================================
 // Prefs - Aliases
@@ -207,4 +207,4 @@ export const Prefs = (function() {
              isOldRulePrefEmpty("allowedDestinations") &&
              isOldRulePrefEmpty("allowedOriginsToDestinations"));
   };
-}(Prefs));
+})(Prefs);

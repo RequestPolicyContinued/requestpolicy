@@ -69,7 +69,7 @@ const xulTrees = XULUtils.xulTrees = {};
       //     "' for element <" + aElementSpec.tag + ">");
     }
   }
-}());
+})();
 
 /**
  * @param {Array<Object>} aElementSpecList
@@ -232,7 +232,7 @@ const {addEventListeners, removeEventListeners} = (function() {
     addEventListeners: addEventListeners,
     removeEventListeners: removeEventListeners
   };
-}());
+})();
 
 function recursivelyAddXULElements(aDocument, aElementSpecList,
                                    aParentElement = null) {
@@ -391,4 +391,4 @@ XULUtils.keyboardShortcuts = (function() {
   };
 
   return self;
-}());
+})();

@@ -63,4 +63,4 @@ export const StringUtils = (function() {
   };
 
   return self;
-}());
+})();

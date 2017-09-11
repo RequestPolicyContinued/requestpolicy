@@ -54,4 +54,4 @@ export const KeyboardShortcuts = (function() {
   };
 
   return self;
-}());
+})();

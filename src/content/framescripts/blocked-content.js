@@ -94,4 +94,4 @@ export const ManagerForBlockedContent = (function() {
   };
 
   return self;
-}());
+})();

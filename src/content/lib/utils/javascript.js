@@ -76,4 +76,4 @@ export const JSUtils = (function() {
   };
 
   return self;
-}());
+})();

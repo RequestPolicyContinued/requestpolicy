@@ -338,7 +338,7 @@ export let PolicyManager = (function() {
   }
 
   return self;
-}());
+})();
 
 // =============================================================================
 // PolicyManager (alias functions)
@@ -377,4 +377,4 @@ PolicyManager = (function(self) {
   };
 
   return self;
-}(PolicyManager));
+})(PolicyManager);

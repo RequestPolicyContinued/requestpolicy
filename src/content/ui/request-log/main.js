@@ -73,7 +73,7 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
   WinEnv.elManager.addListener(window, "load", init, false);
 
   return requestLog;
-}());
+})();
 
 loadRLInterfaceIntoWindow(window);
 loadRLTreeViewIntoWindow(window);

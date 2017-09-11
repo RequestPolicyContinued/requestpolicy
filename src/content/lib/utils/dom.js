@@ -75,4 +75,4 @@ export const DOMUtils = (function() {
   };
 
   return self;
-}());
+})();

@@ -133,4 +133,4 @@ export const PrefManager = (function() {
                                       maybeHandleUninstallOrDisable);
 
   return self;
-}());
+})();

@@ -33,4 +33,4 @@
   /* jshint +W061 */
 
   FakeWebExt.startupFramescript(cfmm);
-}());
+})();

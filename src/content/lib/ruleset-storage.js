@@ -81,4 +81,4 @@ export const RulesetStorage = (function() {
   };
 
   return self;
-}());
+})();

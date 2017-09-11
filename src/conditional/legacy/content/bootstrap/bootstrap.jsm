@@ -287,4 +287,4 @@ var FakeWebExt = (function() {
   };
 
   return FakeWebExt;
-}());
+})();

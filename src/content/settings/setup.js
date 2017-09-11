@@ -157,4 +157,4 @@ import {$id, common} from "./common";
     $("input[name=subscriptions]").change(handleSubscriptionsChange);
     $("#allowsamedomain").change(handleAllowSameDomainChange);
   };
-}());
+})();

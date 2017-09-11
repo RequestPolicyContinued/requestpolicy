@@ -1176,7 +1176,7 @@ export let RequestProcessor = (function() {
   };
 
   return self;
-}());
+})();
 
 // =============================================================================
 // RequestProcessor (redirections part)
@@ -1570,7 +1570,7 @@ RequestProcessor = (function(self) {
   }
 
   return self;
-}(RequestProcessor));
+})(RequestProcessor);
 
 // =============================================================================
 // RequestProcessor (compatibility part)
@@ -1742,7 +1742,7 @@ RequestProcessor = (function(self) {
   };
 
   return self;
-}(RequestProcessor));
+})(RequestProcessor);
 
 RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

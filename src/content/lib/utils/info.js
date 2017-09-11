@@ -85,4 +85,4 @@ export const Info = (function() {
   };
 
   return self;
-}());
+})();

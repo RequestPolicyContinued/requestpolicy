@@ -38,4 +38,4 @@ export const Manifest = (function() {
   inputStream.close();
 
   return Object.freeze(JSON.parse(data));
-}());
+})();

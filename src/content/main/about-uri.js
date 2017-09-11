@@ -137,4 +137,4 @@ export const AboutRequestPolicy = (function() {
                                          unregisterFactory);
 
   return self;
-}());
+})();

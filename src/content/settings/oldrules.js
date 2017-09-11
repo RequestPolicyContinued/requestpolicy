@@ -126,4 +126,4 @@ import {common, $id, $str} from "./common";
     }
     populateRuleTable();
   };
-}());
+})();

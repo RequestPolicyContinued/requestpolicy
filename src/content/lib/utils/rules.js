@@ -75,4 +75,4 @@ export const RuleUtils = (function() {
   };
 
   return self;
-}());
+})();

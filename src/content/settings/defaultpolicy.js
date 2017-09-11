@@ -99,4 +99,4 @@ import {common, WinEnv, elManager, $id} from "./common";
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);
   };
-}());
+})();

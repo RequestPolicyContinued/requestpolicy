@@ -60,7 +60,7 @@ let WindowSubControllers = (function() {
                                                      true);
 
   return self;
-}());
+})();
 
 // =============================================================================
 // rpWindowManager
@@ -123,4 +123,4 @@ export const rpWindowManager = (function() {
       });
 
   return self;
-}());
+})();

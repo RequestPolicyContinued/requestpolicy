@@ -332,4 +332,4 @@ export const ManagerForDOMContentLoaded = (function() {
                                         onDOMFrameContentLoaded, true);
 
   return self;
-}());
+})();

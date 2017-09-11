@@ -115,7 +115,7 @@ const fileFilter = (function() {
       return gulpif(conditionFactory(aFilter), aThen, aElse);
     },
   };
-}());
+})();
 
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
@@ -146,7 +146,7 @@ gulp.task = (function() {
     // eslint-disable-next-line no-invalid-this
     origGulpTask.call(this, name, deps, fn);
   });
-}());
+})();
 
 const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder) => {
   const tasks = [];

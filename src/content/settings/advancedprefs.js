@@ -207,4 +207,4 @@ import {common, WinEnv, elManager, $id} from "./common";
       "root/ network.http.speculative-parallel-limit",
     ], updateDisplay);
   };
-}());
+})();

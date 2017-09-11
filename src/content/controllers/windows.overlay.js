@@ -60,4 +60,4 @@ export const OverlayController = (function() {
   };
 
   return self;
-}());
+})();

@@ -208,7 +208,7 @@ export const rpService = (function() {
       maybeShowMultipleInstallationsWarning:
           maybeShowMultipleInstallationsWarning
     };
-  }());
+  })();
 
   // ---------------------------------------------------------------------------
   // startup and shutdown functions
@@ -315,4 +315,4 @@ export const rpService = (function() {
   };
 
   return self;
-}());
+})();

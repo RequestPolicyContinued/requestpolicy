@@ -214,7 +214,7 @@ export const OldRules = (function() {
   };
 
   return OldRules;
-}());
+})();
 
 // =============================================================================
 // OldRulesParseError

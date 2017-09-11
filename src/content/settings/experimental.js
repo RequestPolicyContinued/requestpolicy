@@ -113,4 +113,4 @@
     list.append("<li>" + nClickedLinks + " clicked links</li>");
     list.append("<li>" + nFaviconRequests + " favicon requests</li>");
   };
-}());
+})();

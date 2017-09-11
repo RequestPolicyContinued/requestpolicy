@@ -56,6 +56,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
   common.localize = function(stringNames) {
     stringNames.forEach(function(name) {
       $("[data-string=\"" + name + "\"]").each(function() {
+        // eslint-disable-next-line no-invalid-this
         $(this).text($str(name));
       });
     });

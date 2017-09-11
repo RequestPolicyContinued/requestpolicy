@@ -122,6 +122,7 @@ function _sanitizeArgsForAddTask(aFn) {
       fn = deps;
       deps = [];
     }
+    // eslint-disable-next-line no-invalid-this
     aFn.call(this, name, deps, fn);
   };
 }
@@ -141,6 +142,7 @@ gulp.task = (function() {
         return rv;
       };
     }
+    // eslint-disable-next-line no-invalid-this
     origGulpTask.call(this, name, deps, fn);
   });
 }());

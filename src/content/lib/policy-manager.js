@@ -345,17 +345,17 @@ export let PolicyManager = (function() {
 // =============================================================================
 
 PolicyManager = (function(self) {
-  self.addAllowRule = self.addRule.bind(this, C.RULE_ACTION_ALLOW);
-  self.addTemporaryAllowRule = self.addTemporaryRule.bind(this,
+  self.addAllowRule = self.addRule.bind(null, C.RULE_ACTION_ALLOW);
+  self.addTemporaryAllowRule = self.addTemporaryRule.bind(null,
                                                           C.RULE_ACTION_ALLOW);
-  self.removeAllowRule = self.removeRule.bind(this, C.RULE_ACTION_ALLOW);
-  self.addDenyRule = self.addRule.bind(this, C.RULE_ACTION_DENY);
-  self.addTemporaryDenyRule = self.addTemporaryRule.bind(this,
+  self.removeAllowRule = self.removeRule.bind(null, C.RULE_ACTION_ALLOW);
+  self.addDenyRule = self.addRule.bind(null, C.RULE_ACTION_DENY);
+  self.addTemporaryDenyRule = self.addTemporaryRule.bind(null,
                                                          C.RULE_ACTION_DENY);
-  self.removeDenyRule = self.removeRule.bind(this, C.RULE_ACTION_DENY);
+  self.removeDenyRule = self.removeRule.bind(null, C.RULE_ACTION_DENY);
 
-  self.addAllowRules = self.addRules.bind(this, C.RULE_ACTION_ALLOW);
-  self.addDenyRules = self.addRules.bind(this, C.RULE_ACTION_DENY);
+  self.addAllowRules = self.addRules.bind(null, C.RULE_ACTION_ALLOW);
+  self.addDenyRules = self.addRules.bind(null, C.RULE_ACTION_DENY);
 
   function getRuleData(aOrigin, aDest) {
     let ruleData = {};

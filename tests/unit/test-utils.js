@@ -102,12 +102,10 @@ describe("Utils", function() {
     }
 
     function wrappedFunction(param1, param2) {
-      /* jshint validthis: true */
-
       functionCalls += "_0";
 
       // check that "this" is correctly set
-      isTrue(this.testProp === "foo");
+      isTrue(this.testProp === "foo"); // eslint-disable-line no-invalid-this
 
       // check that the parameters have been passed correctly
       isTrue(param1 === "foo");

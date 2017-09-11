@@ -20,9 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// import the logger first! It needs to get logging prefs from storage (async).
+import {Logger} from "lib/logger";
+
 import {Environment, MainEnvironment} from "lib/environment";
 import {PrefManager} from "main/pref-manager";
-import {Logger} from "lib/logger";
 import {C} from "lib/utils/constants";
 
 import "main/requestpolicy-service";
@@ -80,12 +82,9 @@ _setBackgroundPage({
 
 //==============================================================================
 
-/**
- * If any Exception gets here, it will be a severe error.
- * The Logger can't be used, as it might not be available.
- */
 function logSevereError(aMessage, aError) {
-  Logger.error("[SEVERE] " + aMessage, aError);
+  console.error("[SEVERE] " + aMessage);
+  console.dir(aError);
 }
 
 const shutdownMessage = C.MM_PREFIX + "shutdown";

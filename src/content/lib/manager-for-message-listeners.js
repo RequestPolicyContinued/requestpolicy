@@ -73,7 +73,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   } else {
     // aEnv is not defined! Try to report an error.
     if (!!Logger) {
-      Logger.error(
+      console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
           "won't be unregistered!");
@@ -107,7 +107,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
                                                             aAddImmediately) {
   let self = this;
   if (typeof aCallback !== "function") {
-    Logger.error("The callback for a message listener" +
+    console.error("The callback for a message listener" +
         "must be a function! The message name was \"" + aMessageName + "\"");
     return;
   }
@@ -174,7 +174,7 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
     //if (typeof listener.callback == 'undefined') {
-    //  Logger.error("Can't remove message listener '" +
+    //  console.error("Can't remove message listener '" +
     //                 'for "' + listener.messageName + '", the callback ' +
     //                 'is undefined!');
     //  continue;
@@ -186,7 +186,7 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
     //} catch (e) {
-    //  Logger.error('Failed to remove message listener ' +
+    //  console.error('Failed to remove message listener ' +
     //                 'for "' + listener.messageName + '". ' +
     //                 'Env "' + self.environment.uid + '" (' +
     //                 self.environment.name + '). Error was: ' + e, e);

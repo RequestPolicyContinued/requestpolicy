@@ -944,7 +944,8 @@ export var RequestProcessor = (function() {
       }
 
     } catch (e) {
-      Logger.error("Fatal Error", e);
+      console.error("Fatal Error:");
+      console.dir(e);
       if (Prefs.isBlockingDisabled()) {
         Logger.warning("Allowing request due to internal error.");
         return CP_OK;
@@ -1451,7 +1452,8 @@ RequestProcessor = (function(self) {
       // @endif
       return CP_REJECT;
     } catch (e) {
-      Logger.error("Fatal Error", e);
+      console.error("Fatal Error:");
+      console.dir(e);
       if (Prefs.isBlockingDisabled()) {
         Logger.warning("Allowing request due to internal error.");
         return CP_OK;
@@ -1734,7 +1736,7 @@ RequestProcessor = (function(self) {
         break;
 
       default:
-        Logger.error("Unhandled extension (id typo?): " + ext.name);
+        console.error("Unhandled extension (id typo?): " + ext.name);
         break;
     }
   }

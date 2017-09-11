@@ -204,7 +204,7 @@ export var OldRules = (function() {
           getComplexValue(aPrefName, Ci.nsISupportsString).data;
     } catch (e) {
       if (e.name !== "NS_ERROR_UNEXPECTED") {
-        Cu.reportError(e);
+        console.dir(e);
       }
       return "";
     }

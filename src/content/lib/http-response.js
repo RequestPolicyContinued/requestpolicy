@@ -53,7 +53,7 @@ HttpResponse.prototype._getResponseHeader = function(aHeaderName) {
     return this.httpChannel.getResponseHeader(aHeaderName);
   } catch (e) {
     if (e.result !== Cr.NS_ERROR_NOT_AVAILABLE) {
-      Cu.reportError(e);
+      console.dir(e);
     }
     // The header is not set in the response.
     return undefined;

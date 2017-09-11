@@ -25,7 +25,6 @@ import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import {XULUtils} from "lib/utils/xul";
 import {MainEnvironment} from "lib/environment";
-import {Logger} from "lib/logger";
 
 //==============================================================================
 // KeyboardShortcut
@@ -195,8 +194,8 @@ KeyboardShortcut.prototype._determineElementAttributes = function() {
 
   let rv = XULUtils.keyboardShortcuts.getKeyAttributesFromCombo(combo);
   if (false === rv.success) {
-    Logger.error("Error parsing keyboard combination for shortcut \"" +
-        this._id + "\": " + rv.errorMessage);
+    console.error("Error parsing keyboard combination for shortcut " +
+        `"${this._id}": ${rv.errorMessage}`);
     this._elementAttributes = ELEMENT_ATTRIBUTES_WHEN_DISABLED;
     return;
   }

@@ -318,7 +318,7 @@ export var rpService = (function() {
         break;
 
       default:
-        Logger.error("unknown topic observed: " + topic);
+        console.error("unknown topic observed: " + topic);
     }
   };
 

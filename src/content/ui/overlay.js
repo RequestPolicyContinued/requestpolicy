@@ -149,7 +149,8 @@ export function loadOverlayIntoWindow(window) {
                                                     "overlayIsReady", true);
       }
     } catch (e) {
-      Logger.error("[FATAL] Unable to initialize rpcontinued.overlay.", e);
+      console.error("[FATAL] Unable to initialize rpcontinued.overlay.");
+      console.dir(e);
       throw e;
     }
   };
@@ -561,8 +562,9 @@ export function loadOverlayIntoWindow(window) {
 
       return Promise.resolve();
     }).catch(e => {
-      Logger.error("[SEVERE] " +
-          "Unable to complete _updateBlockedContentState actions", e);
+      console.error("[SEVERE] " +
+          "Unable to complete _updateBlockedContentState actions");
+      console.dir(e);
     });
   };
 
@@ -696,7 +698,8 @@ export function loadOverlayIntoWindow(window) {
   }
 
   function wrapFunctionErrorCallback(aMessage, aError) {
-    Logger.error(aMessage, aError);
+    console.error(aMessage);
+    console.dir(aError);
   }
 
   /**
@@ -857,8 +860,9 @@ export function loadOverlayIntoWindow(window) {
         return;
       } catch (e) {
         if (tries >= maxTries) {
-          Logger.error("[SEVERE] Can't add session history listener, even " +
-              "after " + tries + " tries.", e);
+          console.error("[SEVERE] Can't add session history listener, even " +
+              "after " + tries + " tries.");
+          console.dir(e);
           return;
         }
         // call this function again in a few miliseconds.

@@ -107,21 +107,14 @@ export var Logger = (function() {
       let msg = `[RequestPolicy] ${aMessage}`;
       aFn(msg);
       if (aError) {
-        self.reportError(aError);
+        console.dir(aError);
       }
     }
   }
 
-  self.error = log.bind(self, LevelEnum.ERROR, console.error);
   self.warning = log.bind(self, LevelEnum.WARNING, console.warn);
   self.info = log.bind(self, LevelEnum.INFO, console.info);
   self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
-
-  self.trace = console.trace.bind(null);
-
-  self.reportError = function reportError(e) {
-    console.dir(e);
-  };
 
   self.vardump = function(obj) {
     if (shouldLog(LevelEnum.DEBUG)) {
@@ -182,7 +175,7 @@ function createErrorTriggeringService() {
     let [type, message] = splitColon(aData);
 
     if (type === "error") {
-      Logger.error(message);
+      console.error(message);
     } else if (type === "ReferenceError") {
       runAsync(produceReferenceError);
     }

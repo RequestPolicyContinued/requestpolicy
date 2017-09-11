@@ -113,7 +113,8 @@ export var AboutRequestPolicy = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(registerFactory);
           } else {
-            Cu.reportError(e);
+            console.error("Failed to register factory!");
+            console.dir(e);
           }
         }
       });

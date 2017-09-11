@@ -72,7 +72,7 @@ export function ManagerForEventListeners(aEnv) {
   } else {
     // aEnv is not defined! Try to report an error.
     if (!!Logger) {
-      Logger.error(
+      console.error(
           "No Environment was specified for a new ManagerForEventListeners! " +
           "This means that the listeners won't be removed!");
     }
@@ -91,8 +91,8 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
                                                           aUseCapture) {
   let self = this;
   if (typeof aCallback !== "function") {
-    Logger.error("The callback for an event listener" +
-                 "must be a function! Event type was \"" + aEventType + "\"");
+    console.error("The callback for an event listener" +
+        `must be a function! Event type was "${aEventType}"`);
     return;
   }
   let listener = {

@@ -14,6 +14,7 @@ const debug = require("gulp-debug"); /* jshint ignore:line */ /* (ignore if unus
 const gulpif = require("gulp-if");
 const preprocess = require("gulp-preprocess");
 const rename = require("gulp-rename");
+const replace = require("gulp-replace");
 const ts = require("gulp-typescript");
 const zip = require("gulp-zip");
 
@@ -264,6 +265,15 @@ BUILDS.forEach(build => {
       let stream = gulp.src(files, { base: "src" }).
           pipe(rename(mergeInConditional)).
           pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
+          pipe(replace(
+              /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
+              (match, fn, stringDelim) => {
+                let argsPrefix = stringDelim === "" ?
+                    `"[RequestPolicy] " + ` :
+                    `${stringDelim}[RequestPolicy] `;
+                return `console.${fn}(${argsPrefix}`;
+              }
+          )).
           pipe(gulpif(
               file => !isJsm(file),
               tsProject()

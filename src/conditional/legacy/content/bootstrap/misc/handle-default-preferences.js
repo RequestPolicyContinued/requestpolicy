@@ -112,6 +112,6 @@ try {
       defaultPrefScriptScope);
   Services.prefs.savePrefFile(null);
 } catch (e) {
-  console.log("Error handling default preferences!");
+  console.error("Error handling default preferences!");
   console.dir(e);
 }

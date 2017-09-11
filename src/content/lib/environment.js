@@ -28,17 +28,13 @@ import {Logger} from "lib/logger";
 // utilities
 //==============================================================================
 
-const LOG_PREFIX = "[Environment] ";
-
-function consoleLog(method, message) {
-  Logger[method](LOG_PREFIX + message);
-}
-
-let log = {
-  debug: consoleLog.bind(null, "debug"),
-  warning: consoleLog.bind(null, "warning"),
-  error: consoleLog.bind(null, "error")
+// @ifdef LOG_ENVIRONMENT
+const log = {
+  debug: function(message) {
+    console.debug(`[Environment] ${message}`);
+  }
 };
+// @endif
 
 //==============================================================================
 // Environment
@@ -245,7 +241,7 @@ export var Environment = (function() {
   Environment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
     if (self.envState === ENV_STATES.NOT_STARTED) {
-      log.warning("registerInnerEnvironment() has been called but " +
+      Logger.warning("registerInnerEnvironment() has been called but " +
           "the outer environment hasn't started up yet. " +
           "Starting up now.");
       self.startup();
@@ -264,7 +260,7 @@ export var Environment = (function() {
     let self = this;
 
     if (self.innerEnvs.has(aEnv) === false) {
-      log.error("it seems like an inner Environment did not register.");
+      console.error("it seems like an inner Environment did not register.");
     } else {
       self.innerEnvs.delete(aEnv);
     }
@@ -368,7 +364,8 @@ export var Environment = (function() {
         try {
           f.apply(null, aBootstrapArgs);
         } catch (e) {
-          Cu.reportError(e);
+          console.error("Error in Bootstrap function:");
+          console.dir(e);
         }
         // @ifdef LOG_ENVIRONMENT
         log.debug("function called! (" + aFunctions.length +

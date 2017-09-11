@@ -82,8 +82,8 @@ export var ManagerForDOMContentLoaded = (function() {
     }).then((aResponse) => {
       if (typeof aResponse !== "object" ||
           typeof aResponse.blockedURIs !== "object") {
-        Logger.error("There seems to be no message " +
-                     "listener for \"notifyDocumentLoaded\".");
+        console.error("There seems to be no message " +
+                      "listener for \"notifyDocumentLoaded\".");
         return null;
       }
 

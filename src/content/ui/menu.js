@@ -230,7 +230,8 @@ export function loadMenuIntoWindow(window) {
       self._activateOriginItem($id("rpc-origin"));
 
     } catch (e) {
-      Logger.error("[Fatal] Unable to prepare menu", e);
+      console.error("[Fatal] Unable to prepare menu");
+      console.dir(e);
       throw e;
     }
   };
@@ -618,7 +619,7 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (domain === null) {
-      Logger.error("Failed to determine the domain under the mouse button " +
+      console.error("Failed to determine the domain under the mouse button " +
           "after the middle-click.");
       return;
     }
@@ -663,7 +664,7 @@ export function loadMenuIntoWindow(window) {
                item.parentNode.id === "rpc-rules-add") {
       self._processRuleSelection(item);
     } else {
-      Logger.error("Unable to figure out which item type was selected.");
+      console.error("Unable to figure out which item type was selected.");
     }
   };
 
@@ -681,11 +682,11 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (!ruleData) {
-      Logger.error("ruleData is empty in menu._processRuleSelection()");
+      console.error("ruleData is empty in menu._processRuleSelection()");
       return;
     }
     if (!ruleAction) {
-      Logger.error("ruleAction is empty in menu._processRuleSelection()");
+      console.error("ruleAction is empty in menu._processRuleSelection()");
       return;
     }
 

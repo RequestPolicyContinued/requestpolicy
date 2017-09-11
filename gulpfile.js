@@ -37,7 +37,6 @@ const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
 
 const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) */
-
   function _array(aAny) {
     return Array.isArray(aAny) ? aAny : [aAny];
   }

@@ -231,7 +231,6 @@ export function loadMenuIntoWindow(window) {
       self._populateOrigin();
       self._populateOtherOrigins();
       self._activateOriginItem($id("rpc-origin"));
-
     } catch (e) {
       console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);
@@ -737,7 +736,6 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._processRuleChange = function(ruleAction, ruleData) {
-
     switch (ruleAction) {
       case "allow":
         PolicyManager.addAllowRule(ruleData);
@@ -1114,17 +1112,14 @@ export function loadMenuIntoWindow(window) {
     //      self._currentlySelectedDest);
 
     for (let destBase in requests) {
-
       if (self._currentlySelectedDest &&
           self._currentlySelectedDest !== destBase) {
         continue;
       }
 
       for (let destIdent in requests[destBase]) {
-
         const destinations = requests[destBase][destIdent];
         for (let destUri in destinations) {
-
           // This will be null when the request was denied because of a default
           // allow rule. However about any other time?
           // TODO: we at least in default allow mode, we need to give an option
@@ -1140,7 +1135,6 @@ export function loadMenuIntoWindow(window) {
           // several requests with identical origin and destination URI.)
 
           for (let i in results.matchedAllowRules) {
-
             let [ruleset, match] = results.matchedAllowRules[i];
             let rawRule = Ruleset.matchToRawRule(match);
 
@@ -1195,17 +1189,14 @@ export function loadMenuIntoWindow(window) {
     //     self._currentlySelectedDest);
 
     for (let destBase in requests) {
-
       if (self._currentlySelectedDest &&
         self._currentlySelectedDest !== destBase) {
         continue;
       }
 
       for (let destIdent in requests[destBase]) {
-
         let destinations = requests[destBase][destIdent];
         for (let destUri in destinations) {
-
           // This will be null when the request was denied because of a default
           // deny rule. However about any other time?
           // TODO: we at least in default deny mode, we need to give an option
@@ -1221,7 +1212,6 @@ export function loadMenuIntoWindow(window) {
           // several requests with identical origin and destination URI.)
 
           for (let i in results.matchedDenyRules) {
-
             let [ruleset, match] = results.matchedDenyRules[i];
             let rawRule = Ruleset.matchToRawRule(match);
 

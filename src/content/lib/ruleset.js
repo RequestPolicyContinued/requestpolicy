@@ -166,7 +166,6 @@ RawRuleset.prototype = {
       } else {
         r.denyDestination = true;
       }
-
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
       // r.originRuleAction = ruleAction;
@@ -175,7 +174,6 @@ RawRuleset.prototype = {
       } else {
         r.denyOrigin = true;
       }
-
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
       // r.destinationRuleAction = ruleAction;
@@ -184,7 +182,6 @@ RawRuleset.prototype = {
       } else {
         r.denyDestination = true;
       }
-
     } else {
       // TODO: Issue warning about bad entry and return or throw error.
       return;
@@ -302,7 +299,6 @@ RawRuleset.prototype = {
         // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else if (o && !d) {
       if (o.h) {
         let originEntry = policy.getHost(o.h);
@@ -329,7 +325,6 @@ RawRuleset.prototype = {
         // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else if (!o && d) {
       if (d.h) {
         let destEntry = policy.getHost(d.h);
@@ -356,7 +351,6 @@ RawRuleset.prototype = {
         // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else {
       // TODO: Issue warning about bad entry and return or throw error.
       return;

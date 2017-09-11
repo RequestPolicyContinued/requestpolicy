@@ -345,7 +345,6 @@ export let PolicyManager = (function() {
 // =============================================================================
 
 PolicyManager = (function(self) {
-
   self.addAllowRule = self.addRule.bind(this, C.RULE_ACTION_ALLOW);
   self.addTemporaryAllowRule = self.addTemporaryRule.bind(this,
                                                           C.RULE_ACTION_ALLOW);

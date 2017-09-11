@@ -254,7 +254,6 @@ export const rpService = (function() {
 
   self.observe = function(subject, topic, data) {
     switch (topic) {
-
       // FIXME: The subscription logic should reside in the
       // subscription module.
 

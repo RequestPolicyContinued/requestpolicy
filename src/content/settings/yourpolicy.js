@@ -143,8 +143,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
   }
 
   function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source,
-      readOnly) {
-
+                            readOnly) {
     if (ruleAction !== "allow") {
       ruleAction = "block";
     }

@@ -682,7 +682,6 @@ export let RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_LINK_CLICK);
         return accept("User-initiated request by link click", request);
-
       } else if (internal.submittedForms[originURI] &&
           internal.submittedForms[originURI][destURI.split("?")[0]]) {
         // Note: we dropped the query string from the destURI because form GET
@@ -698,7 +697,6 @@ export let RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_FORM_SUBMISSION);
         return accept("User-initiated request by form submission", request);
-
       } else if (historyRequests[destURI]) {
         // When the user goes back and forward in their history, a request for
         // the url comes through but is not followed by requests for any of
@@ -952,7 +950,6 @@ export let RequestProcessor = (function() {
             CP_REJECT :
             reject("Denied by default policy", request);
       }
-
     } catch (e) {
       console.error("Fatal Error:");
       console.dir(e);
@@ -1392,7 +1389,6 @@ RequestProcessor = (function(self) {
                 "from <" + realOrigin + ">");
           }
           self.registerLinkClicked(realOrigin, destURI);
-
         } else if (internal.submittedForms[realOrigin] &&
             internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
           if (LOG_REQUESTS) {

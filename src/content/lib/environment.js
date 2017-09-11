@@ -43,7 +43,6 @@ const log = LOG_ENVIRONMENT ? {
 // =============================================================================
 
 export const Environment = (function() {
-
   // ---------------------------------------------------------------------------
   // constants, metadata
   // ---------------------------------------------------------------------------
@@ -507,7 +506,6 @@ export const Environment = (function() {
       }
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
-
   }(Environment));
 
   /**

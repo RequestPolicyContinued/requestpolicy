@@ -282,8 +282,6 @@ BUILDS.forEach(build => {
       files.push("!**/third-party/**/*");
 
       let stream = gulp.src(files, { base: "src" }).
-          pipe(rename(mergeInConditional)).
-          pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
           pipe(replace(
               /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
               (match, fn, stringDelim) => {
@@ -293,6 +291,8 @@ BUILDS.forEach(build => {
                 return `console.${fn}(${argsPrefix}`;
               }
           )).
+          pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
+          pipe(rename(mergeInConditional)).
           pipe(gulpif(
               file => !isJsm(file),
               tsProject()

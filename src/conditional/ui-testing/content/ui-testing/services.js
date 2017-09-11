@@ -91,7 +91,8 @@ function createErrorTriggeringService() {
   }
 
   function produceReferenceError() {
-    var localVar = nonexistantVariable; // jshint ignore:line
+    // eslint-disable-next-line no-unused-vars, no-undef
+    const localVar = nonexistantVariable;
   }
 
   function runAsync(aFunction) {

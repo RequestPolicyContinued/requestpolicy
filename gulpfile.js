@@ -11,7 +11,7 @@
 const exec = require("child_process").exec;
 const del = require("del");
 const gulp = require("gulp");
-const debug = require("gulp-debug"); /* jshint ignore:line */ /* (ignore if unused) */
+const debug = require("gulp-debug"); // eslint-disable-line no-unused-vars
 const gulpif = require("gulp-if");
 const gulpIgnore = require("gulp-ignore");
 const preprocess = require("gulp-preprocess");
@@ -30,13 +30,13 @@ const config = require("./config.json");
 // -----------------------------------------------------------------------------
 
 const srcDirRelative = `src`;
-const srcDir = `${__dirname}/${srcDirRelative}`; /* jshint ignore:line */ /* (ignore if unused) */
+const srcDir = `${__dirname}/${srcDirRelative}`; // eslint-disable-line no-unused-vars
 
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
 
-const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) */
+const fileFilter = (function() {
   function _array(aAny) {
     return Array.isArray(aAny) ? aAny : [aAny];
   }

@@ -1525,7 +1525,7 @@ RequestProcessor = (function(self) {
    */
   function getOriginOfInitialRedirect(aRequest) {
     let initialOrigin = aRequest.originURI;
-    let initialDest = aRequest.destURI;
+    let initialDest = aRequest.destURI; // eslint-disable-line no-unused-vars
 
     // Prevent infinite loops, that is, bound the number of iterations.
     // Note: An apparent redirect loop doesn't mean a problem with a

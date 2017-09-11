@@ -1,6 +1,6 @@
 "use strict";
 
-/* global pref, setGenericPref, setUCharPref */  // jshint ignore:line
+/* global pref, setGenericPref, setUCharPref */ // eslint-disable-line no-unused-vars
 // jscs:disable maximumLineLength
 
 pref("extensions.requestpolicy.log", false);

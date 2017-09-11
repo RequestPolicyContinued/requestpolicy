@@ -151,6 +151,7 @@ RawRuleset.prototype = {
     //    notes: 'pathPre' => path prefix (must start with "/")
     const o = entry.o;
     const d = entry.d;
+    // eslint-disable-next-line no-unused-vars
     let rules;
     let r;
 

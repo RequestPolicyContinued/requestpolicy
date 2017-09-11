@@ -78,13 +78,12 @@ export function loadOverlayIntoWindow(window) {
 
   let blockedContentStateUpdateDelay = 250; // milliseconds
   let blockedContentCheckTimeoutId = null;
-  let blockedContentCheckLastTime = 0;
+  // let blockedContentCheckLastTime = 0;
 
   let popupElement = null;
 
   // let statusbar = null;
-
-  let toolbox = null;
+  // let toolbox = null;
 
   let isFennec = false;
 
@@ -113,7 +112,7 @@ export function loadOverlayIntoWindow(window) {
         popupElement = $id("rpc-popup");
 
         // statusbar = $id("status-bar");
-        toolbox = $id("navigator-toolbox");
+        // toolbox = $id("navigator-toolbox");
 
         const appInfo = Cc["@mozilla.org/xre/app-info;1"].
             getService(Ci.nsIXULAppInfo);
@@ -261,7 +260,7 @@ export function loadOverlayIntoWindow(window) {
     // content notification if there no longer blocked content. Another way
     // to solve this would be to observe allowed requests as well as blocked
     // requests.
-    blockedContentCheckLastTime = (new Date()).getTime();
+    // blockedContentCheckLastTime = (new Date()).getTime();
     self._stopBlockedContentCheckTimeout();
     self._updateBlockedContentState(message.target);
   });

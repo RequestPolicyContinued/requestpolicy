@@ -701,8 +701,10 @@ export function loadMenuIntoWindow(window) {
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
     // argument straight into the ruleset?
+    /* eslint-disable no-unused-vars */
     let origin;
     let dest;
+    /* eslint-enable no-unused-vars */
     if (ruleData.o && ruleData.o.h) {
       origin = ruleData.o.h;
     }

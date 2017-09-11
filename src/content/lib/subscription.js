@@ -59,9 +59,11 @@ function maybeCallback(aCallback) {
       // Probably MainEnvironment is not available anymore, because RP already
       // being shut down.
       ok = false;
-      console.warn("[RequestPolicy] Catched error: ", e);
+      console.error("[RequestPolicy] Catched error: ");
+      console.dir(e);
     }
     if (!ok) {
+      // eslint-disable-next-line no-console
       console.debug("[RequestPolicy] Did not call callback function");
       return;
     }

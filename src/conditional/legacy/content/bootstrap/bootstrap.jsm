@@ -167,6 +167,7 @@ var FakeWebExt = (function() {
   // ---------------------------------------------------------------------------
 
   FakeWebExt.startup = function() {
+    // eslint-disable-next-line no-console
     console.debug("starting up");
 
     // create the fake environment
@@ -199,6 +200,7 @@ var FakeWebExt = (function() {
   // ---------------------------------------------------------------------------
 
   FakeWebExt.shutdown = function(aReason) {
+    // eslint-disable-next-line no-console
     console.debug("shutting down");
 
     // shut down the add-on

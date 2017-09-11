@@ -60,16 +60,16 @@ DomainUtil.getIdentifier = function(uri, level) {
   level = this.LEVEL_SOP;
 
   switch (level) {
-    case this.LEVEL_DOMAIN :
+    case this.LEVEL_DOMAIN:
       identifierGettingFunctionName = "getDomain";
       break;
-    case this.LEVEL_HOST :
+    case this.LEVEL_HOST:
       identifierGettingFunctionName = "getHost";
       break;
-    case this.LEVEL_SOP :
+    case this.LEVEL_SOP:
       identifierGettingFunctionName = "getPrePath";
       break;
-    default :
+    default:
     // eslint-disable-next-line no-throw-literal
       throw "Invalid identifier level specified " +
           "in DomainUtil.getIdentifier(): " + level;

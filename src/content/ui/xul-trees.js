@@ -27,7 +27,7 @@
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 let isSeamonkey = appID === C.SEAMONKEY_ID;
 
-// jscs:disable validateIndentation
+/* eslint-disable max-len */
 
 exports.toolbarbutton = [
   {

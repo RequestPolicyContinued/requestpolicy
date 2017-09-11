@@ -925,8 +925,8 @@ export let RequestProcessor = (function() {
       if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
-          const mappedDestUriObj = internal.mappedDestinations
-                                 [destURI][mappedDest];
+          const mappedDestUriObj =
+              internal.mappedDestinations[destURI][mappedDest];
           if (LOG_REQUESTS) {
             Logger.debug("Checking mapped destination: " + mappedDest);
           }

@@ -567,8 +567,8 @@ export function loadMenuIntoWindow(window) {
       self._currentlySelectedOrigin = self._originDomainnameItem.value;
     } else if (item.parentNode.id === "rpc-other-origins-list") {
       // it's an otherOrigin
-      self._currentlySelectedOrigin = item.getElementsByClassName("domainname")
-                                      [0].value;
+      self._currentlySelectedOrigin =
+          item.getElementsByClassName("domainname")[0].value;
     }
     self._currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
@@ -581,8 +581,8 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._activateDestinationItem = function(item) {
-    self._currentlySelectedDest = item.getElementsByClassName("domainname")
-                                  [0].value;
+    self._currentlySelectedDest =
+        item.getElementsByClassName("domainname")[0].value;
 
     if (item.parentNode.id === "rpc-blocked-destinations-list") {
       self._isCurrentlySelectedDestBlocked = true;

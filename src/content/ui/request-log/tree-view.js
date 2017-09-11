@@ -77,8 +77,7 @@ export function loadRLTreeViewIntoWindow(window) {
       // with this javascript array implementation, though I'm assuming it does.
       const columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
-        return getVisibleRowAtIndex(aIndex)
-            [requestLog.columnNameToIndexMap[aColumn.id]];
+        return getVisibleRowAtIndex(aIndex)[columnIndex];
       }
     },
 

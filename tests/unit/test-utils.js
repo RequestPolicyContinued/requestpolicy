@@ -81,9 +81,9 @@ describe("Utils", function() {
     function manualWrap() {
       const _orig = testObj.testFunction;
 
-      testObj.testFunction = function() {
+      testObj.testFunction = function(...args) {
         functionCalls += "{";
-        const rv = _orig.apply(testObj, arguments);
+        const rv = _orig.apply(testObj, args);
         functionCalls += "}";
         return rv;
       };

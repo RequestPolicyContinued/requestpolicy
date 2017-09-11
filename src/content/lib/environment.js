@@ -348,7 +348,7 @@ export const Environment = (function() {
      * @param {Array.<function()>} aFunctions
      * @param {Array} aBootstrapArgs - the arguments to apply
      */
-    function callFunctions(aFunctions, aBootstrapArgs) {
+    function callFunctions(aFunctions, aBootstrapArgs=[]) {
       // process the Array as long as it contains elements
       while (aFunctions.length > 0) {
         // The following is either `fnArray.pop()` or `fnArray.shift()`
@@ -357,7 +357,7 @@ export const Environment = (function() {
 
         // call the function
         try {
-          f.apply(null, aBootstrapArgs);
+          f(...aBootstrapArgs);
         } catch (e) {
           console.error("Error in Bootstrap function! Details:");
           console.dir(e);

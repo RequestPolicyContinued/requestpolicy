@@ -51,7 +51,7 @@ const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
 // =============================================================================
 
 function maybeCallback(aCallback) {
-  return function() {
+  return function(...args) {
     let ok = true;
     try {
       ok = MainEnvironment.isShuttingDownOrShutDown() === false;
@@ -67,7 +67,7 @@ function maybeCallback(aCallback) {
       console.debug("[RequestPolicy] Did not call callback function");
       return;
     }
-    aCallback.apply(null, arguments);
+    aCallback(...args);
   };
 }
 

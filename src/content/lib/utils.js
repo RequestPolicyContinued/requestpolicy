@@ -36,8 +36,7 @@ export const Utils = (function() {
    * @param {Function} callback
    * @param {Object} thisPtr
    */
-  self.runAsync = function(callback, thisPtr) {
-    let params = Array.prototype.slice.call(arguments, 2);
+  self.runAsync = function(callback, thisPtr, ...params) {
     let runnable = {
       run: function() {
         callback.apply(thisPtr, params);
@@ -187,25 +186,25 @@ export const Utils = (function() {
     };
 
     // actually wrap the object
-    aOwnerObject[aFunctionName] = function() {
+    aOwnerObject[aFunctionName] = function(...args) {
       const {main, before, after} = metadata[aFunctionName];
 
       // Execute some action before the original function call.
       try {
         if (before) {
-          before.apply(aOwnerObject, arguments);
+          before.apply(aOwnerObject, args);
         }
       } catch (e) {
         onError(e, "before");
       }
 
       // Execute original function.
-      const rv = main.apply(aOwnerObject, arguments);
+      const rv = main.apply(aOwnerObject, args);
 
       // Execute some action afterwards.
       try {
         if (after) {
-          after.apply(aOwnerObject, arguments);
+          after.apply(aOwnerObject, args);
         }
       } catch (e) {
         onError(e, "after");

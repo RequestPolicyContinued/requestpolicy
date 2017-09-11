@@ -34,10 +34,10 @@
  *
  * @return {number}
  */
-function getOctalInt() {
+function getOctalInt(...args) {
   let result = 0;
-  for (let i = 0, len = arguments.length; i < len; ++i) {
-    result += arguments[len - i - 1] * Math.pow(8, i);
+  for (let i = 0, len = args.length; i < len; ++i) {
+    result += args[len - i - 1] * Math.pow(8, i);
   }
   return result;
 }

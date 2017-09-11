@@ -220,8 +220,8 @@ export const OldRules = (function() {
 // OldRulesParseError
 // =============================================================================
 
-export function OldRulesParseError() {
-  Error.apply(this, arguments);
+export function OldRulesParseError(...args) {
+  Error.apply(this, args);
   this.name = "OldRulesParseError";
 }
 

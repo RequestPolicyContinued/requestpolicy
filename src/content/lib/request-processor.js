@@ -45,9 +45,9 @@ import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 import RPContentPolicy from "main/content-policy";
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 const {LOG_REQUESTS, LOG_GETTING_SAVED_REQUESTS} = C;
 
@@ -60,18 +60,18 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor
-//==============================================================================
+// =============================================================================
 
 export var RequestProcessor = (function() {
   let self = {};
 
   let internal = Utils.createModuleInternal(self);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // private properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -109,9 +109,9 @@ export var RequestProcessor = (function() {
 
   internal.requestObservers = new Set();
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // private functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
     for (let observer of internal.requestObservers) {
@@ -473,9 +473,9 @@ export var RequestProcessor = (function() {
     }
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // public properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   // TODO: make them private
   self._rejectedRequests = new RequestSet();
@@ -486,9 +486,9 @@ export var RequestProcessor = (function() {
   self.clickedLinksReverse = internal.clickedLinksReverse;
   self.faviconRequests = internal.faviconRequests;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // public functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Process a NormalRequest.
@@ -497,12 +497,12 @@ export var RequestProcessor = (function() {
    */
   self.process = function(request) {
     // uncomment for debugging:
-    //Logger.debug("request: " +
-    //            (request.aRequestOrigin ? request.aRequestOrigin.spec :
-    //             "<unknown>") +
-    //            " -->  "+request.aContentLocation.spec);
-    //Logger.vardump(request.aRequestOrigin);
-    //Logger.vardump(request.aContentLocation);
+    // Logger.debug("request: " +
+    //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
+    //               "<unknown>") +
+    //              " -->  "+request.aContentLocation.spec);
+    // Logger.vardump(request.aRequestOrigin);
+    // Logger.vardump(request.aContentLocation);
     try {
       if (request.isInternal()) {
         if (LOG_REQUESTS) {
@@ -1150,14 +1150,14 @@ export var RequestProcessor = (function() {
    * @param {Browser} browser
    */
   self.getAllRequestsInBrowser = function(browser) {
-    //var origins = {};
+    // var origins = {};
     var reqSet = new RequestSet();
 
     // If we get these from the DOM, then we won't know the relevant
     // rules that were involved with allowing/denying the request.
     // Maybe just look up the allowed/blocked requests in the
     // main allowed/denied request sets before adding them.
-    //_getOtherOriginsHelperFromDOM(document, reqSet);
+    // _getOtherOriginsHelperFromDOM(document, reqSet);
 
     var uri = DomainUtil.stripFragment(browser.currentURI.spec);
     _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
@@ -1167,9 +1167,9 @@ export var RequestProcessor = (function() {
   return self;
 }());
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor (redirections part)
-//==============================================================================
+// =============================================================================
 
 RequestProcessor = (function(self) {
   let internal = self.getInternal();
@@ -1442,8 +1442,8 @@ RequestProcessor = (function(self) {
         }
 
         // TODO: implement for form submissions whose redirects are blocked
-        //if (internal.submittedFormsReverse[initialOrigin]) {
-        //}
+        // if (internal.submittedFormsReverse[initialOrigin]) {
+        // }
       }
 
       internal.recordRejectedRequest(request);
@@ -1557,9 +1557,9 @@ RequestProcessor = (function(self) {
   return self;
 }(RequestProcessor));
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor (compatibility part)
-//==============================================================================
+// =============================================================================
 
 /**
  * Detect other installed extensions and the current application and do
@@ -1573,9 +1573,9 @@ RequestProcessor = (function(self) {
   browser.management.onEnabled.addListener(updateExtensionCompatibility);
   browser.management.onDisabled.addListener(updateExtensionCompatibility);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Extensions compatibility
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let addonIdsToNames = new Map();
   let extRulesToIds = new MapOfSets();
@@ -1657,9 +1657,9 @@ RequestProcessor = (function(self) {
     };
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Application compatibility
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let appCompatRules = [];
   let appName;
@@ -1691,9 +1691,9 @@ RequestProcessor = (function(self) {
     return rules;
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // exported functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.forEachCompatibilityRule = function(aCallback) {
     extRulesToIds.forEach((rule, addonIds) => {

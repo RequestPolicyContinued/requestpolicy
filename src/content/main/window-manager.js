@@ -27,9 +27,9 @@ import {ToolbarButtonController} from "controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "controllers/windows.style-sheets";
 import {FramescriptServices} from "main/framescript-services";
 
-//==============================================================================
+// =============================================================================
 // WindowSubControllers
-//==============================================================================
+// =============================================================================
 
 let WindowSubControllers = (function() {
   let self = {};
@@ -62,9 +62,9 @@ let WindowSubControllers = (function() {
   return self;
 }());
 
-//==============================================================================
+// =============================================================================
 // rpWindowManager
-//==============================================================================
+// =============================================================================
 
 export var rpWindowManager = (function() {
   let self = {};

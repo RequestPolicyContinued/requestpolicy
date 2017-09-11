@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 export const REQUEST_REASON_USER_POLICY           = 1;
 export const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
@@ -42,9 +42,9 @@ export const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
 export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
 
-//==============================================================================
+// =============================================================================
 // RequestResult
-//==============================================================================
+// =============================================================================
 
 // TODO: merge this Class with the "Request" class and/or some kind of
 // "RememberedRequest" or "RequestInfo" class.

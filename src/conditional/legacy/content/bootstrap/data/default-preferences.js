@@ -40,10 +40,10 @@ pref("extensions.requestpolicy.lastVersion", "0.0");
 pref("extensions.requestpolicy.lastAppVersion", "0.0");
 
 // Old prefs that are no longer used.
-//pref("extensions.requestpolicy.allowedOrigins", "");
-//pref("extensions.requestpolicy.allowedDestinations", "");
-//pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
-//pref("extensions.requestpolicy.statusbarIcon", "standard");
-//pref("extensions.requestpolicy.initialSetupDialogShown", false);
+// pref("extensions.requestpolicy.allowedOrigins", "");
+// pref("extensions.requestpolicy.allowedDestinations", "");
+// pref("extensions.requestpolicy.allowedOriginsToDestinations", "");
+// pref("extensions.requestpolicy.statusbarIcon", "standard");
+// pref("extensions.requestpolicy.initialSetupDialogShown", false);
 
 // jscs:enable maximumLineLength

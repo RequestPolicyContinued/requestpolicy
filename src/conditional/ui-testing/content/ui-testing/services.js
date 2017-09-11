@@ -22,9 +22,9 @@
 
 import {Environment, MainEnvironment} from "lib/environment";
 
-//==============================================================================
+// =============================================================================
 // ErrorTriggeringService
-//==============================================================================
+// =============================================================================
 
 var ErrorTriggeringService = createErrorTriggeringService();
 ErrorTriggeringService.bootstrap();

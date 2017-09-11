@@ -31,7 +31,7 @@ import {common, WinEnv, elManager} from "./common";
     rpService,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "yourPolicy",

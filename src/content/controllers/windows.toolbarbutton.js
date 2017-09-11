@@ -33,9 +33,9 @@ if (Info.isAustralis) {
   /* jshint +W126 */
 }
 
-//==============================================================================
+// =============================================================================
 // ToolbarButtonController
-//==============================================================================
+// =============================================================================
 
 export var ToolbarButtonController = (function() {
   let self = {};
@@ -44,9 +44,9 @@ export var ToolbarButtonController = (function() {
 
   let isAustralis = Info.isAustralis;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Case 1: Australis (Firefox >= 29)
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   (function() {
     if (!isAustralis) {
@@ -87,12 +87,12 @@ export var ToolbarButtonController = (function() {
     };
   }());
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Case 2: non-Australis
   //   - Firefox < 29
   //   - SeaMonkey
   //   - Pale Moon
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   (function() {
     if (isAustralis) {
@@ -104,11 +104,11 @@ export var ToolbarButtonController = (function() {
       // justify a bunch of special cases to support the statusbar when such a
       // tiny number of users have seamonkey and I can't even be sure that many of
       // those users want a statusbar icon.
-      //if (!Info.isFirefox) {
-      //  Logger.info(
-      //    "Not performing toolbar button check: not Firefox.");
-      //  return;
-      //}
+      // if (!Info.isFirefox) {
+      //   Logger.info(
+      //     "Not performing toolbar button check: not Firefox.");
+      //   return;
+      // }
       let doc = win.document;
 
       let isFirstRun = false;

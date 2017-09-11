@@ -23,7 +23,7 @@
 (function() {
   var {RequestProcessor} = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   function getNRequestResultObjects(aRequestSet) {
     var n = 0;

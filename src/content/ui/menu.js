@@ -38,7 +38,7 @@ import {C} from "lib/utils/constants";
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
 
-  //============================================================================
+  // ===========================================================================
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
@@ -97,9 +97,9 @@ export function loadMenuIntoWindow(window) {
     }
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // utilities
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Show a dialog with "OK" and "Cancel" buttons, as well as with a
@@ -156,9 +156,9 @@ export function loadMenuIntoWindow(window) {
     DOMUtils.removeChildren(aList);
   }
 
-  //----------------------------------------------------------------------------
-  //----------------------------------------------------------------------------
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.prepareMenu = function() {
     try {
@@ -189,11 +189,11 @@ export function loadMenuIntoWindow(window) {
       self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
-      //Logger.info("self._currentUri: " + self._currentUri);
+      // Logger.info("self._currentUri: " + self._currentUri);
       self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
 
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
-      //self._currentUriIsHttps = self._currentUriObj.scheme === "https";
+      // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
 
       Logger.info("self._currentUri: " + self._currentUri);
 
@@ -440,7 +440,7 @@ export function loadMenuIntoWindow(window) {
           "h": self._addWildcard(dest)
         }
       };
-      //if (Storage.isDefaultAllow()) {
+      // if (Storage.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
@@ -843,9 +843,9 @@ export function loadMenuIntoWindow(window) {
       // near here in the first place.
       // Is this an issue anymore? This may have been slipping through due to
       // a bug that has since been fixed. Disabling for now.
-      //if (originBase === 'browser') {
-      //  continue;
-      //}
+      // if (originBase === 'browser') {
+      //   continue;
+      // }
 
       var guiOriginsIndex = GUIOrigin.indexOfOriginInArray(originBase,
           guiOrigins);
@@ -1044,7 +1044,7 @@ export function loadMenuIntoWindow(window) {
     var item = self._addListItem(list, "rpc-od-item", label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;
-    //var statustext = ''; // TODO
+    // var statustext = ''; // TODO
     item.setAttribute("class", "rpc-od-item " + cssClass);
     var canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
     if (self._ruleChangeQueues[ruleAction]) {
@@ -1095,15 +1095,15 @@ export function loadMenuIntoWindow(window) {
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     let requests = reqSet.getAllMergedOrigins();
 
-    //var rules = {};
+    // var rules = {};
 
     let userRules = {};
     let subscriptionRules = {};
 
-    //reqSet.print('allowedRequests');
+    // reqSet.print('allowedRequests');
 
     // TODO: there is no dest if no dest is selected (origin only).
-    //var destBase = DomainUtil.getBaseDomain(
+    // var destBase = DomainUtil.getBaseDomain(
     //      self._currentlySelectedDest);
 
     for (let destBase in requests) {
@@ -1144,7 +1144,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            //Logger.info("matched allow rule: " + rawRuleStr);
+            // Logger.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1176,7 +1176,7 @@ export function loadMenuIntoWindow(window) {
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     let requests = reqSet.getAllMergedOrigins();
 
-    //var rules = {};
+    // var rules = {};
 
     let userRules = {};
     let subscriptionRules = {};
@@ -1184,8 +1184,8 @@ export function loadMenuIntoWindow(window) {
     reqSet.print("deniedRequests");
 
     // TODO: there is no dest if no dest is selected (origin only).
-    //var destBase = DomainUtil.getBaseDomain(
-    //      self._currentlySelectedDest);
+    // var destBase = DomainUtil.getBaseDomain(
+    //     self._currentlySelectedDest);
 
     for (let destBase in requests) {
 
@@ -1225,7 +1225,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            //Logger.info("matched allow rule: " + rawRuleStr);
+            // Logger.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {

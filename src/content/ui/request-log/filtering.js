@@ -27,7 +27,7 @@ let {
 export function loadRLFilteringIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   let filterText = null;
 

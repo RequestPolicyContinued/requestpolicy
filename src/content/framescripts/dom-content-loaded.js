@@ -34,7 +34,7 @@ export var ManagerForDOMContentLoaded = (function() {
 
   let {content} = cfmm;
 
-  //============================================================================
+  // ===========================================================================
 
   function htmlAnchorTagClicked(event) {
     // Notify the main thread that a link has been clicked.
@@ -236,10 +236,10 @@ export var ManagerForDOMContentLoaded = (function() {
     // TODO: Is it necessary to wrap the window's open() and
     //       openDialog() methods?
 
-    //wrapWindowFunctions(doc.defaultView);
-    //DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
-    //  unwrapWindowFunctions(doc.defaultView);
-    //});
+    // wrapWindowFunctions(doc.defaultView);
+    // DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+    //   unwrapWindowFunctions(doc.defaultView);
+    // });
   }
 
   // If the following code will be used again, the Utils.wrapFunction()

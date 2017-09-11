@@ -30,7 +30,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "yourPolicy",

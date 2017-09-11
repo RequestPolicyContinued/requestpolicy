@@ -23,7 +23,7 @@
 export var ManagerForBlockedContent = (function() {
   let self = {};
 
-  //============================================================================
+  // ===========================================================================
 
   const MISSING_IMAGE_DATA_URI = "data:image/png;base64," +
       "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c" +

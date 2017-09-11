@@ -24,7 +24,7 @@
 export function loadRLTreeViewIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   requestLog.treebox = null;
 

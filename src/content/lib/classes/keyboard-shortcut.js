@@ -26,9 +26,9 @@ import {Storage} from "models/storage";
 import {XULUtils} from "lib/utils/xul";
 import {MainEnvironment} from "lib/environment";
 
-//==============================================================================
+// =============================================================================
 // KeyboardShortcut
-//==============================================================================
+// =============================================================================
 
 /**
  * Overview of events:
@@ -49,9 +49,9 @@ import {MainEnvironment} from "lib/environment";
 
 export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
     aUserEnabledPrefName, aUserComboPrefName) {
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // initialize properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   this._id = aID;
   this._elementID = "rpKey_" + this._id;
@@ -73,9 +73,9 @@ export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
     onPrefChange: this._onPrefChange.bind(this)
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // initialize
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   this._determineElementAttributes();
   Windows.forEachOpenWindow(this._loadIntoWindow.bind(this));
@@ -88,9 +88,9 @@ export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
   ], this._listeners.onPrefChange);
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // main methods
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 KeyboardShortcut.prototype.destroy = function() {
   Windows.forEachOpenWindow(this._unloadFromWindow.bind(this));
@@ -129,9 +129,9 @@ KeyboardShortcut.prototype._onPrefChange = function() {
   }, this);
 };
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // assisting methods
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 KeyboardShortcut.prototype._createElement = function(window) {
   let keyset = window.document.getElementById("rpcontinuedKeyset");

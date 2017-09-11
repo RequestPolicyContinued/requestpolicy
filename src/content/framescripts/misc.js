@@ -28,7 +28,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
 (function() {
   let {content, sendSyncMessage} = cfmm;
 
-  //==============================================================================
+  // =============================================================================
 
   function reloadDocument() {
     content.document.location.reload(false);

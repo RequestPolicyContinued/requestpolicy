@@ -24,9 +24,9 @@
 import {RawRuleset} from "lib/ruleset";
 import {FileUtil} from "lib/utils/files";
 
-//==============================================================================
+// =============================================================================
 // RulesetStorage
-//==============================================================================
+// =============================================================================
 
 export var RulesetStorage = (function() {
   let self = {};
@@ -53,10 +53,10 @@ export var RulesetStorage = (function() {
     // existed or not. This is a bad implementation.
     // TODO: solve this mess
     let str = FileUtil.fileToString(policyFile);
-    //let str;
-    //if (policyFile.exists()) {
-    //  str = FileUtil.fileToString(policyFile);
-    //}
+    // let str;
+    // if (policyFile.exists()) {
+    //   str = FileUtil.fileToString(policyFile);
+    // }
     return new RawRuleset(str);
   };
 

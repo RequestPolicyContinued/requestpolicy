@@ -25,9 +25,9 @@ import {Logger} from "lib/logger";
 import {C} from "lib/utils/constants";
 import {mlManager} from "framescripts/managers";
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 /**
  * The states of the communication channel to with the overlay.
@@ -39,9 +39,9 @@ const States = {
   "STOPPED": 2
 };
 
-//==============================================================================
+// =============================================================================
 // FramescriptToOverlayCommunication
-//==============================================================================
+// =============================================================================
 
 /**
  * Sometimes the framescript loads and starts up faster than the
@@ -117,12 +117,12 @@ function startCommNowOrLater(self) {
  */
 function startCommunication(self) {
   if (self.state === States.WAITING) {
-    //self._dump("The Overlay is ready!");
+    // self._dump("The Overlay is ready!");
     self.state = States.RUNNING;
 
     while (self.waitingRunnables.length !== 0) {
       let runnable = self.waitingRunnables.shift();
-      //self._dump("Lazily running function.");
+      // self._dump("Lazily running function.");
       runnable.call(null);
     }
   }
@@ -144,17 +144,17 @@ FramescriptToOverlayCommunication.prototype.run = function(aRunnable) {
   let self = this;
   switch (self.state) {
     case States.RUNNING:
-      //self._dump("Immediately running function.");
+      // self._dump("Immediately running function.");
       aRunnable.call(null);
       break;
 
     case States.WAITING:
-      //self._dump("Remembering runnable.");
+      // self._dump("Remembering runnable.");
       self.waitingRunnables.push(aRunnable);
       break;
 
     default:
-      //self._dump("Ignoring runnable.");
+      // self._dump("Ignoring runnable.");
       break;
   }
 };

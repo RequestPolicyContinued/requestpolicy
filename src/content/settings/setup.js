@@ -32,7 +32,7 @@ import {$id, common} from "./common";
     rpService,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "welcomeToRequestPolicy",

@@ -31,7 +31,7 @@ import {common, $id, $str} from "./common";
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "importOldRules",

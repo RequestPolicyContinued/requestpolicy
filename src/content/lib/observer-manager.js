@@ -24,9 +24,9 @@ import {SingleTopicObserver} from "lib/utils/observers";
 import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";
 
-//==============================================================================
+// =============================================================================
 // ObserverManager
-//==============================================================================
+// =============================================================================
 
 /**
  * An ObserverManager provides an interface to `nsIObserverService` which takes

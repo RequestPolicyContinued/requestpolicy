@@ -26,9 +26,9 @@ import {C} from "lib/utils/constants";
 
 const {LOG_MESSAGE_LISTENERS} = C;
 
-//==============================================================================
+// =============================================================================
 // ManagerForMessageListeners
-//==============================================================================
+// =============================================================================
 
 /**
  * This class provides an interface to a "Message Manager" which takes
@@ -175,23 +175,23 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    //if (typeof listener.callback == 'undefined') {
-    //  console.error("Can't remove message listener '" +
-    //                 'for "' + listener.messageName + '", the callback ' +
-    //                 'is undefined!');
-    //  continue;
-    //}
+    // if (typeof listener.callback == 'undefined') {
+    //   console.error("Can't remove message listener '" +
+    //                  'for "' + listener.messageName + '", the callback ' +
+    //                  'is undefined!');
+    //   continue;
+    // }
     if (LOG_MESSAGE_LISTENERS) {
       Logger.debug(
           "Removing message listener for \"" + listener.messageName + "\".");
     }
-    //try {
+    // try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
-    //} catch (e) {
-    //  console.error('Failed to remove message listener ' +
-    //                 'for "' + listener.messageName + '". ' +
-    //                 'Env "' + self.environment.uid + '" (' +
-    //                 self.environment.name + '). Error was: ' + e, e);
-    //}
+    // } catch (e) {
+    //   console.error('Failed to remove message listener ' +
+    //                  'for "' + listener.messageName + '". ' +
+    //                  'Env "' + self.environment.uid + '" (' +
+    //                  self.environment.name + '). Error was: ' + e, e);
+    // }
   }
 };

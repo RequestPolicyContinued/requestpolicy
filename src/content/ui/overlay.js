@@ -45,7 +45,7 @@ const {LOG_FLAG_STATE} = C;
 export function loadOverlayIntoWindow(window) {
   let {document, rpcontinued} = window;
 
-  //============================================================================
+  // ===========================================================================
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
@@ -80,7 +80,7 @@ export function loadOverlayIntoWindow(window) {
 
   let popupElement = null;
 
-  //let statusbar = null;
+  // let statusbar = null;
 
   let toolbox = null;
 
@@ -110,7 +110,7 @@ export function loadOverlayIntoWindow(window) {
 
         popupElement = $id("rpc-popup");
 
-        //statusbar = $id("status-bar");
+        // statusbar = $id("status-bar");
         toolbox = $id("navigator-toolbox");
 
         var appInfo = Cc["@mozilla.org/xre/app-info;1"].
@@ -972,7 +972,7 @@ export function loadOverlayIntoWindow(window) {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    //Logger.debug('popup width: ' + popup.clientWidth);
+    // Logger.debug('popup width: ' + popup.clientWidth);
     var popupWidth = popupElement.clientWidth === 0 ? 730 :
         popupElement.clientWidth;
     var anchor = $id("content");
@@ -1072,10 +1072,10 @@ export function loadOverlayIntoWindow(window) {
     var requestLog = $id("rpcontinued-requestLog");
     var requestLogSplitter = $id("rpcontinued-requestLog-splitter");
     var requestLogFrame = $id("rpcontinued-requestLog-frame");
-    //var openRequestLog = $id("rpcontinuedOpenRequestLog");
+    // var openRequestLog = $id("rpcontinuedOpenRequestLog");
 
     // TODO: figure out how this should interact with the new menu.
-    //var closeRequestLog = $id("requestpolicyCloseRequestLog");
+    // var closeRequestLog = $id("requestpolicyCloseRequestLog");
     var closeRequestLog = {};
 
     if (requestLog.hidden) {
@@ -1084,13 +1084,13 @@ export function loadOverlayIntoWindow(window) {
       requestLog.hidden = false;
       requestLogSplitter.hidden = false;
       closeRequestLog.hidden = false;
-      //openRequestLog.hidden = true;
+      // openRequestLog.hidden = true;
     } else {
       requestLogFrame.setAttribute("src", "about:blank");
       requestLog.hidden = true;
       requestLogSplitter.hidden = true;
       closeRequestLog.hidden = true;
-      //openRequestLog.hidden = false;
+      // openRequestLog.hidden = false;
       self.requestLog = null;
     }
   };

@@ -26,9 +26,9 @@ import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
 import {Storage} from "models/storage";
 
-//==============================================================================
+// =============================================================================
 // HttpResponse
-//==============================================================================
+// =============================================================================
 
 export function HttpResponse(aHttpChannel) {
   this.httpChannel = aHttpChannel;

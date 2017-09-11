@@ -23,9 +23,9 @@
 import {Environment} from "lib/environment";
 import {PrefObserver} from "web-extension-fake-api/lib/classes/pref-observer";
 
-//==============================================================================
+// =============================================================================
 // ManagerForPrefObservers
-//==============================================================================
+// =============================================================================
 
 export var ManagerForPrefObservers = (function() {
   let self = {};

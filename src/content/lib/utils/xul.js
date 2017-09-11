@@ -24,9 +24,9 @@ import {StringUtils} from "lib/utils/strings";
 import {JSUtils} from "lib/utils/javascript";
 import {C} from "lib/utils/constants";
 
-//==============================================================================
+// =============================================================================
 // XULUtils
-//==============================================================================
+// =============================================================================
 
 export var XULUtils = {};
 
@@ -64,9 +64,9 @@ var xulTrees = XULUtils.xulTrees = {};
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
       aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
-      //Logger.debug(
-      //    "Automatically created ID '" + aElementSpec.attributes.id +
-      //    "' for element <" + aElementSpec.tag + ">");
+      // Logger.debug(
+      //     "Automatically created ID '" + aElementSpec.attributes.id +
+      //     "' for element <" + aElementSpec.tag + ">");
     }
   }
 }());

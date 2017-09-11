@@ -29,7 +29,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     Storage,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "basic",

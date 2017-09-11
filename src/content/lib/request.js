@@ -29,9 +29,9 @@ import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 
 const {LOG_REQUESTS} = C;
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 export const REQUEST_TYPE_NORMAL = 1;
 export const REQUEST_TYPE_REDIRECT = 2;
@@ -68,9 +68,9 @@ const WHITELISTED_RESOURCE_URIS = new Set([
   "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
-//==============================================================================
+// =============================================================================
 // Request
-//==============================================================================
+// =============================================================================
 
 export function Request(originURI, destURI, requestType) {
   // TODO: save a nsIURI objects here instead of strings
@@ -220,9 +220,9 @@ Request.prototype.isInternal = function() {
   return false;
 };
 
-//==============================================================================
+// =============================================================================
 // NormalRequest
-//==============================================================================
+// =============================================================================
 
 export function NormalRequest(aContentType, aContentLocation, aRequestOrigin,
     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
@@ -371,9 +371,9 @@ NormalRequest.prototype.getBrowser = function() {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // RedirectRequest
-//==============================================================================
+// =============================================================================
 
 export function RedirectRequest(aOldChannel, aNewChannel, aFlags) {
   let oldChannel = new HttpChannelWrapper(aOldChannel);

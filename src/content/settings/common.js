@@ -28,7 +28,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     MainEnvironment,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   // create a new Environment for this window
   var WinEnv = new Environment(MainEnvironment, "WinEnv");

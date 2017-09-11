@@ -30,7 +30,7 @@ export function loadClassicmenuIntoWindow(window) {
 
   let {document} = window;
 
-  //============================================================================
+  // ===========================================================================
 
   /**
    * Removes all menu items and removes all event listeners.

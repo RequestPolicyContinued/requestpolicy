@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // utilities and constants
-//==============================================================================
+// =============================================================================
 
 /**
  * creates an integer from the arguments
@@ -45,9 +45,9 @@ const OCTAL_700 = getOctalInt(7, 0, 0); // octal: 0700
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
-//==============================================================================
+// =============================================================================
 // FileUtil
-//==============================================================================
+// =============================================================================
 
 export var FileUtil = {
 
@@ -89,10 +89,10 @@ export var FileUtil = {
     //
     //        The subscription system urgently needs to rewritten,
     //        see issue #597.
-    //if (file.exists() === false) {
-    //  // prevent NS_ERROR_FILE_NOT_FOUND
-    //  return "";
-    //}
+    // if (file.exists() === false) {
+    //   // prevent NS_ERROR_FILE_NOT_FOUND
+    //   return "";
+    // }
     var stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);

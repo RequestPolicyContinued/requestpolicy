@@ -25,9 +25,9 @@ import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {C} from "lib/utils/constants";
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 function dprint(msg) {
   Logger.info("[POLICY] " + msg);
@@ -94,9 +94,9 @@ function dump(arr, level=0) {
 }
 */
 
-//==============================================================================
+// =============================================================================
 // RawRuleset
-//==============================================================================
+// =============================================================================
 
 export function RawRuleset(jsonData) {
   this._metadata = {"version": 1};
@@ -154,13 +154,13 @@ RawRuleset.prototype = {
     var rules;
     var r;
 
-    //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
+    // dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
     if (o && d) {
       [rules, r] = this._addEntryHelper(o, policy);
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
-      //r.destinationRuleAction = ruleAction;
+      // r.destinationRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
@@ -169,7 +169,7 @@ RawRuleset.prototype = {
 
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
-      //r.originRuleAction = ruleAction;
+      // r.originRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
@@ -178,7 +178,7 @@ RawRuleset.prototype = {
 
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
-      //r.destinationRuleAction = ruleAction;
+      // r.destinationRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
@@ -217,7 +217,7 @@ RawRuleset.prototype = {
    */
   addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
-    //dprint("addRule: adding entry");
+    // dprint("addRule: adding entry");
     var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
@@ -289,7 +289,7 @@ RawRuleset.prototype = {
       // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
+      // dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
       } else if (ruleAction === C.RULE_ACTION_DENY) {
@@ -364,7 +364,7 @@ RawRuleset.prototype = {
    */
   removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
-    //dprint("removeRule: removing entry");
+    // dprint("removeRule: removing entry");
     var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
@@ -405,7 +405,7 @@ RawRuleset.prototype = {
     var policy = new Ruleset(name);
 
     for (var actionStr in this._entries) {
-      //dprint("actionStr: " + actionStr);
+      // dprint("actionStr: " + actionStr);
       if (actionStr !== "allow" && actionStr !== "deny") {
         dwarn("Invalid entry type: " + actionStr);
         continue;
@@ -414,7 +414,7 @@ RawRuleset.prototype = {
           C.RULE_ACTION_DENY;
       var entryArray = this._entries[actionStr];
       for (var i in entryArray) {
-        //dprint("toRuleset: adding entry");
+        // dprint("toRuleset: adding entry");
         this._addEntryToRuleset(entryArray[i], ruleAction, policy);
       }
     }
@@ -447,8 +447,8 @@ RawRuleset.prototype = {
     // TODO: wrap in try/catch block
     var dataObj = JSON.parse(data);
 
-    //dprint(typeof dataObj);
-    //dprint(dump(dataObj));
+    // dprint(typeof dataObj);
+    // dprint(dump(dataObj));
     this._checkDataObj(dataObj);
     this._metadata = dataObj.metadata;
     this._entries = dataObj.entries;
@@ -466,9 +466,9 @@ RawRuleset.prototype = {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // Rules
-//==============================================================================
+// =============================================================================
 
 function Rules() {
   /**
@@ -520,9 +520,9 @@ Rules.prototype = {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // Rule
-//==============================================================================
+// =============================================================================
 
 /*
  * Semantics of rules:
@@ -608,8 +608,8 @@ Rule.prototype = {
    */
   isMatch: function(uriObj, endpointSpecHasHost) {
     if (this.scheme && this.scheme !== "*" && this.scheme !== uriObj.scheme) {
-      //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
-      //       this.scheme + "')");
+      // dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
+      //        this.scheme + "')");
       return false;
     }
 
@@ -629,7 +629,7 @@ Rule.prototype = {
           ) {
             // Port Match is OK, so continue
           } else {
-            //dprint("isMatch: wrong port (not the port specified by the rule)");
+            // dprint("isMatch: wrong port (not the port specified by the rule)");
             return false;
           }
         }
@@ -638,7 +638,7 @@ Rule.prototype = {
           // Both host and port are undefined, so skip the default-port-check.
         } else {
           if (!DomainUtil.hasStandardPort(uriObj)) {
-            //dprint("isMatch: wrong port (not the default port and the rule assumes default)");
+            // dprint("isMatch: wrong port (not the default port and the rule assumes default)");
             return false;
           }
         }
@@ -651,22 +651,22 @@ Rule.prototype = {
     if (this.path) {
       if (typeof this.path === "string") {
         if (uriObj.path.indexOf(this.path) !== 0) {
-          //dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
+          // dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
           return false;
         }
       } else if (!this.path.test(uriObj.path)) {
-        //dprint("isMatch: wrong path (regex)");
+        // dprint("isMatch: wrong path (regex)");
         return false;
       }
     }
-    //dprint("isMatch: MATCH");
+    // dprint("isMatch: MATCH");
     return true;
   }
 };
 
-//==============================================================================
+// =============================================================================
 // DomainEntry
-//==============================================================================
+// =============================================================================
 
 function DomainEntry(name, fullName, higher) {
   if (typeof name !== "string" && name !== null) {
@@ -724,9 +724,9 @@ DomainEntry.prototype = {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // IPAddressEntry
-//==============================================================================
+// =============================================================================
 
 function IPAddressEntry(address) {
   this.address = address;
@@ -755,9 +755,9 @@ IPAddressEntry.prototype = {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // Ruleset
-//==============================================================================
+// =============================================================================
 
 export function Ruleset(name) {
   this._name = name || null;
@@ -769,9 +769,9 @@ export function Ruleset(name) {
 }
 
 // TODO: remove
-//if (!print) {
-//  var print;
-//}
+// if (!print) {
+//   var print;
+// }
 
 Ruleset.prototype = {
   /**
@@ -809,7 +809,7 @@ Ruleset.prototype = {
     }
     dprint(indent + this.toString());
     this._domain.print(depth + 1);
-    //this._ipAddr.print(depth + 1);
+    // this._ipAddr.print(depth + 1);
     this.rules.print(depth + 1);
   },
 
@@ -832,7 +832,7 @@ Ruleset.prototype = {
     var nextLevel;
     var fullName = "";
     for (var i = parts.length - 1; i >= 0; i--) {
-      //dprint(parts[i]);
+      // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
@@ -849,12 +849,12 @@ Ruleset.prototype = {
     var nextLevel;
     var fullName = "";
     for (var i = parts.length - 1; i >= 0; i--) {
-      //dprint(parts[i]);
+      // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
         nextLevel = new DomainEntry(parts[i], fullName, curLevel);
-        //dprint(nextLevel);
+        // dprint(nextLevel);
         curLevel.addLowerLevel(parts[i], nextLevel);
       }
       curLevel = nextLevel;
@@ -962,35 +962,35 @@ Ruleset.prototype = {
       destHost = "";
     }
 
-    //dprint("Checking origin rules and origin-to-destination rules.");
+    // dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
     for (let [entry, originSpecHasHost] of this.getHostMatches(originHost)) {
-      //dprint(entry);
+      // dprint(entry);
       for (let rule of entry.rules) {
-        //dprint("Checking rule: " + rule);
+        // dprint("Checking rule: " + rule);
         let ruleMatchedOrigin = rule.isMatch(origin, originSpecHasHost);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
-          //dprint("ALLOW origin by rule " + entry + " " + rule);
+          // dprint("ALLOW origin by rule " + entry + " " + rule);
           matchedAllowRules.push(["origin", entry, rule]);
         }
         if (rule.denyOrigin && ruleMatchedOrigin) {
-          //dprint("DENY origin by rule " + entry + " " + rule);
+          // dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
 
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
-          //dprint("There are origin-to-destination rules using this origin rule.");
+          // dprint("There are origin-to-destination rules using this origin rule.");
           for (let [destEntry, destSpecHasHost]
                of rule.destinations.getHostMatches(destHost)) {
-            //dprint(destEntry);
+            // dprint(destEntry);
             for (let destRule of destEntry.rules) {
-              //dprint("Checking rule: " + rule);
+              // dprint("Checking rule: " + rule);
               if (destRule.allowDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedAllowRules.push([
                   "origin-to-dest",
                   entry,
@@ -1001,7 +1001,7 @@ Ruleset.prototype = {
               }
               if (destRule.denyDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
                 matchedDenyRules.push([
                   "origin-to-dest",
                   entry,
@@ -1012,23 +1012,23 @@ Ruleset.prototype = {
               }
             }
           }
-          //dprint("Done checking origin-to-destination rules using this origin rule.");
+          // dprint("Done checking origin-to-destination rules using this origin rule.");
         } // end: if (rule.destinations)
       }
     }
 
-    //dprint("Checking dest rules.");
+    // dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
     for (let [entry, destSpecHasHost] of this.getHostMatches(destHost)) {
-      //dprint(entry);
+      // dprint(entry);
       for (let rule of entry.rules) {
-        //dprint("Checking rule: " + rule);
+        // dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest, destSpecHasHost)) {
-          //dprint("ALLOW dest by rule " + entry + " " + rule);
+          // dprint("ALLOW dest by rule " + entry + " " + rule);
           matchedAllowRules.push(["dest", entry, rule]);
         }
         if (rule.denyDestination && rule.isMatch(dest, destSpecHasHost)) {
-          //dprint("DENY dest by rule " + entry + " " + rule);
+          // dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
       }

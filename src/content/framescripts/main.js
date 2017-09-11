@@ -34,7 +34,7 @@ import {Environment, MainEnvironment} from "lib/environment";
 
 const unloadSubject = require("@loader/unload");
 
-//==============================================================================
+// =============================================================================
 
 MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
   // shut down the framescript on the message manager"s

@@ -27,15 +27,15 @@ import {RequestResult} from "lib/request-result";
 import {Ruleset, RawRuleset} from "lib/ruleset";
 import {RulesetStorage} from "lib/ruleset-storage";
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 function dprint(msg) {
   Logger.info("[POLICY] " + msg);
@@ -49,9 +49,9 @@ function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
-//==============================================================================
+// =============================================================================
 // PolicyManager
-//==============================================================================
+// =============================================================================
 
 /**
  * Provides a simplified interface to handling multiple
@@ -70,7 +70,7 @@ export var PolicyManager = (function() {
     return subscriptionRulesets;
   };
 
-  //self._rulesets = null;
+  // self._rulesets = null;
 
   self.getUserRuleCount = function() {
     let rawRuleset = userRulesets.user.rawRuleset;
@@ -97,7 +97,7 @@ export var PolicyManager = (function() {
       "ruleset": rawRuleset.toRuleset("user")
     };
     userRulesets.user.ruleset.userRuleset = true;
-    //userRulesets.user.ruleset.print();
+    // userRulesets.user.ruleset.print();
     // Temporary rules. These are never stored.
     self.revokeTemporaryRules();
 
@@ -133,7 +133,7 @@ export var PolicyManager = (function() {
           "ruleset": rawRuleset.toRuleset(subName)
         };
         list[subName].ruleset.userRuleset = false;
-        //list[subName].ruleset.print();
+        // list[subName].ruleset.print();
       }
     }
 
@@ -195,7 +195,7 @@ export var PolicyManager = (function() {
   self.addRule = function(ruleAction, ruleData, noStore) {
     dprint("PolicyManager::addRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets.user.ruleset.print();
+    // userRulesets.user.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
@@ -212,7 +212,7 @@ export var PolicyManager = (function() {
           userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets.user.ruleset.print();
+    // userRulesets.user.ruleset.print();
 
     notifyRulesChanged();
   };
@@ -234,14 +234,14 @@ export var PolicyManager = (function() {
   self.addTemporaryRule = function(ruleAction, ruleData) {
     dprint("PolicyManager::addTemporaryRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets.temp.ruleset.print();
+    // userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
     userRulesets.temp.rawRuleset.addRule(ruleAction, ruleData,
           userRulesets.temp.ruleset);
 
-    //userRulesets.temp.ruleset.print();
+    // userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
@@ -249,8 +249,8 @@ export var PolicyManager = (function() {
   self.removeRule = function(ruleAction, ruleData, noStore) {
     dprint("PolicyManager::removeRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
-    //userRulesets.user.ruleset.print();
-    //userRulesets.temp.ruleset.print();
+    // userRulesets.user.ruleset.print();
+    // userRulesets.temp.ruleset.print();
 
     assertRuleAction(ruleAction);
     // TODO: check rule format validity
@@ -270,8 +270,8 @@ export var PolicyManager = (function() {
           userRulesets.user.rawRuleset, "user.json");
     }
 
-    //userRulesets.user.ruleset.print();
-    //userRulesets.temp.ruleset.print();
+    // userRulesets.user.ruleset.print();
+    // userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
   };
@@ -317,8 +317,8 @@ export var PolicyManager = (function() {
     }
     for (let name in aRuleset) {
       let {ruleset} = aRuleset[name];
-      //ruleset.setPrintFunction(print);
-      //ruleset.print();
+      // ruleset.setPrintFunction(print);
+      // ruleset.print();
 
       // TODO wrap this in a try/catch.
       let [tempAllows, tempDenies] = ruleset.check(origin, dest);
@@ -337,9 +337,9 @@ export var PolicyManager = (function() {
   return self;
 }());
 
-//==============================================================================
+// =============================================================================
 // PolicyManager (alias functions)
-//==============================================================================
+// =============================================================================
 
 PolicyManager = (function(self) {
 

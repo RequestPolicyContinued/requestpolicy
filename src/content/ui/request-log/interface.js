@@ -29,7 +29,7 @@ let {
 export function loadRLInterfaceIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   requestLog.clear = function() {
     var count = requestLog.treeView.rowCount;

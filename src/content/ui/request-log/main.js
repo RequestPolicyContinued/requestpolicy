@@ -37,7 +37,7 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
 (function() {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   // create a new Environment for this window
   var WinEnv = new Environment(MainEnvironment, "WinEnv");

@@ -24,6 +24,9 @@ const config = require("./config.json");
 // constants, utilities
 //------------------------------------------------------------------------------
 
+const srcDir = `src`;
+const srcDirAbsolute = `${__dirname}/${srcDir}`; /* jshint ignore:line */ /* (ignore if unused) */
+
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
@@ -173,7 +176,7 @@ BUILDS.forEach(build => {
       concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
       map(name => `conditional/${name}`);
   const conditionalDirsWithSrc = conditionalDirs.
-      map(dir => `src/${dir}`);
+      map(dir => `${srcDir}/${dir}`);
 
   function mergeInConditional(path) {
     conditionalDirs.forEach(dir => {
@@ -183,7 +186,7 @@ BUILDS.forEach(build => {
   }
 
   function inAnyRoot(aFilenames) {
-    const roots = ["src"].concat(conditionalDirsWithSrc);
+    const roots = [srcDir].concat(conditionalDirsWithSrc);
     return aFilenames.reduce((accumulator, curFilename) => {
       if (curFilename.startsWith("**")) {
         throw new Error("paths passed must not start with '**'");
@@ -219,7 +222,7 @@ BUILDS.forEach(build => {
           break;
       }
       files = inAnyRoot(files);
-      let stream = gulp.src(files, { base: "src" }).
+      let stream = gulp.src(files, { base: srcDir }).
           pipe(rename(mergeInConditional)).
           pipe(gulp.dest(buildDir));
       return stream;
@@ -236,7 +239,7 @@ BUILDS.forEach(build => {
           break;
       }
       file = inAnyRoot([file]);
-      let stream = gulp.src(file, { base: "src" }).
+      let stream = gulp.src(file, { base: srcDir }).
           pipe(rename(mergeInConditional)).
           pipe(preprocess({ context: buildData.ppContext })).
           pipe(gulp.dest(buildDir));
@@ -248,7 +251,7 @@ BUILDS.forEach(build => {
     if (extensionType === "legacy") {
       addBuildTask("install-rdf", [TASK_NAMES.ppContext], () => {
         let file = inAnyRoot(["install.rdf"]);
-        let stream = gulp.src(file, { base: "src" }).
+        let stream = gulp.src(file, { base: srcDir }).
             pipe(rename(mergeInConditional)).
             pipe(preprocess({ context: buildData.ppContext })).
             pipe(gulp.dest(buildDir));
@@ -281,7 +284,7 @@ BUILDS.forEach(build => {
       files = inAnyRoot(files);
       files.push("!**/third-party/**/*");
 
-      let stream = gulp.src(files, { base: "src" }).
+      let stream = gulp.src(files, { base: srcDir }).
           pipe(replace(
               /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
               (match, fn, stringDelim) => {

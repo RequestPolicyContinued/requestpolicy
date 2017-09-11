@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:name>RequestPolicy Continued</em:name>
-    <em:version>1.0.beta13.0<!-- @echo UNIQUE_VERSION_SUFFIX --></em:version>
+    <em:version><!-- @echo RP_VERSION --></em:version>
     <em:type>2</em:type>
     <em:id><!-- @echo EXTENSION_ID --></em:id>
 
@@ -13,7 +13,7 @@
     <em:bootstrap>true</em:bootstrap>
     <em:multiprocessCompatible>false</em:multiprocessCompatible>
 
-    <em:homepageURL>https://requestpolicycontinued.github.io/</em:homepageURL>
+    <em:homepageURL><!-- @echo RP_HOMEPAGE_URL --></em:homepageURL>
     <em:optionsURL>about:requestpolicy</em:optionsURL>
     <em:optionsType>3</em:optionsType>
     <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>

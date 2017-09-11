@@ -18,8 +18,6 @@ SHELL := /bin/bash
 #-------------------------------------------------------------------------------
 
 extension_name        := requestpolicy
-amo__extension_id     := rpcontinued@amo.requestpolicy.org
-off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
 #-------------------------------------------------------------------------------
 # running, UI testing
@@ -68,12 +66,10 @@ ZIP            := zip
 
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+GULP           := $(abspath $(node_modules_dir))/.bin/gulp
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
-
-# node --eval
-PREPROCESS = node --eval 'require("preprocess").preprocessFileSync("$2", "$3", {$4}, {type: "$1"});'
 
 #-------------------------------------------------------------------------------
 # helpers
@@ -92,14 +88,14 @@ _remove_all_files_and_dirs_in = find '$1/' '!' -path '$1/' -delete
 #-------------------------------------------------------------------------------
 
 define make_xpi
-	@$(MAKE) --no-print-directory _xpi BUILD=$(1)
+	$(GULP) xpi:$(1)
 endef
 
 define make_files
-	@$(MAKE) --no-print-directory _files BUILD=$(1)
+	$(GULP) build:$(1)
 endef
 
-.PHONY: all _xpi _files \
+.PHONY: all \
 	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
 	nightly-files
 
@@ -110,30 +106,14 @@ nightly-xpi: node-packages
 beta-xpi: node-packages
 	$(call make_xpi,beta)
 ui-testing-xpi: node-packages
-	$(call make_xpi,ui_testing)
+	$(call make_xpi,ui-testing)
 amo-beta-xpi: node-packages
-	$(call make_xpi,amo_beta)
+	$(call make_xpi,amo-beta)
 amo-nightly-xpi: node-packages
-	$(call make_xpi,amo_nightly)
+	$(call make_xpi,amo-nightly)
 
 nightly-files: node-packages
 	$(call make_files,nightly)
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] configuration of different builds
-#-------------------------------------------------------------------------------
-
-alias__nightly       := nightly
-alias__beta          := beta
-alias__amo_beta      := AMO-beta
-alias__amo_nightly   := AMO-nightly
-alias__ui_testing    := ui-testing
-
-extension_id__nightly      := $(off_amo__extension_id)
-extension_id__beta         := $(off_amo__extension_id)
-extension_id__amo_beta     := $(amo__extension_id)
-extension_id__amo_nightly  := $(amo__extension_id)
-extension_id__ui_testing   := $(off_amo__extension_id)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
@@ -141,145 +121,6 @@ xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
 xpi_file__ui_testing   := $(dist_dir)/$(extension_name)-ui-testing.xpi
 
-UNIQUE_VERSION_SUFFIX         := $(shell ./scripts/get_unique_version_suffix.sh)
-preproc_context____ALL        := "UNIQUE_VERSION_SUFFIX": "$(UNIQUE_VERSION_SUFFIX)"
-preproc_context____AMO        := "AMO": "TRUE", "EXTENSION_ID": "$(amo__extension_id)"
-preproc_context____OFF_AMO    :=                "EXTENSION_ID": "$(off_amo__extension_id)"
-
-preproc_context__nightly      := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
-preproc_context__beta         := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
-preproc_context__amo_beta     := $(preproc_context____ALL), $(preproc_context____AMO)
-preproc_context__amo_nightly  := $(preproc_context____ALL), $(preproc_context____AMO)
-preproc_context__ui_testing   := $(preproc_context____ALL), $(preproc_context____OFF_AMO), "UI_TESTING": "TRUE"
-
-unique_version__nightly      := yes
-unique_version__beta         := no
-unique_version__amo_beta     := no
-unique_version__amo_nightly  := yes
-unique_version__ui_testing   := yes
-
-ifdef BUILD
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] this configuration
-#-------------------------------------------------------------------------------
-
-current_build__alias           := $(alias__$(BUILD))
-current_build__extension_id    := $(extension_id__$(BUILD))
-current_build__xpi_file        := $(xpi_file__$(BUILD))
-current_build__preproc_context := $(preproc_context__$(BUILD))
-current_build__unique_version  := $(unique_version__$(BUILD))
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] collect source files
-#-------------------------------------------------------------------------------
-
-# files which are simply copied
-src__copy_files := \
-		$(source_dir)/chrome.manifest \
-		$(source_dir)/README \
-		$(source_dir)/LICENSE \
-		$(wildcard $(source_dir)/content/settings/*.css) \
-		$(wildcard $(source_dir)/content/settings/*.html) \
-		$(wildcard $(source_dir)/content/*.html) \
-		$(wildcard $(source_dir)/content/ui/*.xul) \
-		$(wildcard $(source_dir)/locale/*/*.dtd) \
-		$(wildcard $(source_dir)/locale/*/*.properties) \
-		$(wildcard $(source_dir)/skin/*.css) \
-		$(wildcard $(source_dir)/skin/*.png) \
-		$(wildcard $(source_dir)/skin/*.svg) \
-		$(shell find $(source_dir)/content/lib/third-party/ -iname "*.js")
-
-src__install_rdf := \
-	$(source_dir)/install.rdf
-
-# JavaScript files which will be (pre)processed.
-# The `copy_files` will be filtered out.
-src__jspp_files := \
-		$(filter-out $(src__copy_files) $(src__install_rdf), \
-				$(shell find $(source_dir) -type f -regex ".*\.jsm?") \
-		)
-
-# all source files
-src__all_files := $(src__copy_files) $(src__install_rdf) $(src__jspp_files)
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] paths in the "build" directory
-#-------------------------------------------------------------------------------
-
-current_build_dir := $(build_dir_root)/$(BUILD)
-
-build__all_files  := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__all_files))
-build__jspp_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__jspp_files))
-build__copy_files := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__copy_files))
-build__install_rdf := $(patsubst $(source_dir)/%,$(current_build_dir)/%,$(src__install_rdf))
-
-# detect deleted files and empty directories
-ifdef BUILD
-build__deleted_files :=
-build__empty_dirs :=
-ifneq "$(wildcard $(current_build_dir))" ""
-	# files that have been deleted but still exist in the build directory.
-	build__deleted_files := $(shell find $(current_build_dir) -type f | \
-		grep -F -v $(addprefix -e ,$(build__all_files)))
-	# empty directories. -mindepth 1 to exclude the build directory itself.
-	build__empty_dirs := $(shell find $(current_build_dir) -mindepth 1 -type d -empty)
-endif
-endif
-
-build_files_including_removals := $(build__all_files) $(build__deleted_files) $(build__empty_dirs)
-
-#-------------------------------------------------------------------------------
-# [TARGETS] intermediate targets
-#-------------------------------------------------------------------------------
-
-_xpi: $(current_build__xpi_file)
-_files: $(build_files_including_removals)
-
-#-------------------------------------------------------------------------------
-# [TARGETS] preprocess and/or copy files (src/ --> build/)
-#-------------------------------------------------------------------------------
-
-$(build__jspp_files) : $(current_build_dir)/% : $(source_dir)/%
-	@mkdir -p $(@D)
-	$(call PREPROCESS,js,$<,$@,$(current_build__preproc_context))
-
-$(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
-	@mkdir -p $(@D)
-	@# Use `--dereference` to copy the files instead of the symlinks.
-	cp --dereference $< $@
-
-# force rebuild of install.rdf because the version suffix might change
-$(build__install_rdf) : $(current_build_dir)/% : $(source_dir)/% \
-		FORCE
-	$(call PREPROCESS,xml,$<,$@,$(current_build__preproc_context))
-
-#-------------------------------------------------------------------------------
-# [TARGETS] remove files/dirs no longer existant in the source
-#-------------------------------------------------------------------------------
-
-$(build__empty_dirs): FORCE
-	rmdir $@
-
-$(build__deleted_files): FORCE
-	@# delete:
-	rm $@
-	@# delete parent dirs if empty:
-	@rmdir --parents --ignore-fail-on-non-empty $(@D)
-
-#-------------------------------------------------------------------------------
-# [TARGETS] package the files to a XPI
-#-------------------------------------------------------------------------------
-
-$(current_build__xpi_file): $(build_files_including_removals) | $(dist_dir)
-	@rm -f $(current_build__xpi_file)
-	@echo "Creating \"$(current_build__alias)\" XPI file."
-	@cd $(current_build_dir) && \
-	$(ZIP) $(abspath $(current_build__xpi_file)) \
-		$(patsubst $(source_dir)/%,%,$(src__all_files))
-	@echo "Creating \"$(current_build__alias)\" XPI file: Done!"
-
-endif
 
 #===============================================================================
 # Create a XPI from any git-tag or git-commit
@@ -663,10 +504,12 @@ jscs: node-packages
 	cd src/;                 $(JSCS) .
 	cd tests/xpcshell/;      $(JSCS) .
 	cd tests/helper-addons/; $(JSCS) .
+	cd .;                    $(JSCS) gulpfile.js
 jshint: node-packages
 	$(JSHINT) src/
 	$(JSHINT) tests/xpcshell/
 	$(JSHINT) tests/helper-addons/
+	$(JSHINT) gulpfile.js
 
 #-------------------------------------------------------------------------------
 # localization checks

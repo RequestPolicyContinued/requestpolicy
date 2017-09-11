@@ -1,8 +1,12 @@
 {
   "devDependencies": {
     "addons-linter": "^0.22.2",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-debug": "^3.1.0",
+    "gulp-preprocess": "^2.0.0",
+    "gulp-zip": "^4.0.0",
     "jscs": "^3.0.7",
-    "jshint": "^2.9.4",
-    "preprocess": "^3.1.0"
+    "jshint": "^2.9.4"
   }
 }

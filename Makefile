@@ -82,7 +82,6 @@ TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 # python
 PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
 PY_MOZDOWNLOAD := $(abspath $(python_env_dir))/bin/mozdownload
-PY_MOZPROFILE  := $(abspath $(python_env_dir))/bin/mozprofile
 PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
 
 
@@ -293,17 +292,6 @@ force_every = $(shell \
 # python
 #-------------------------------------------------------------------------------
 
-# $1: variable name which will contain the profile dir
-# $2: parameters to mozprofile
-# $3: command(s) to be wrapped
-WITH_MOZPROFILE = \
-	$1=`$(PY_MOZPROFILE) $2` && ( \
-		($3); \
-		exit_status=$$? ; \
-		rm -rf $$$1 ; \
-		exit $$exit_status ; \
-	) ;
-
 # timestamp/target files
 # NOTE: The timestamp files must reside inside the venv dir,
 #   so that when the venv dir is removed, the timestamp files
@@ -483,57 +471,24 @@ ui-tests: marionette
 ui-tests-quick: marionette-quick
 ui-tests-non-quick: marionette-non-quick
 
-logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
-
-_marionette_gecko_log := $(logs_dir)/$(logfile_prefix)marionette.gecko.log
-marionette_logging := --gecko-log=$(_marionette_gecko_log)
-marionette_logging += --log-html=$(logs_dir)/$(logfile_prefix)marionette.html
-marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.log
-#marionette_logging += --log-raw=$(logs_dir)/$(logfile_prefix)marionette.raw.log
-#marionette_logging += --log-xunit=$(logs_dir)/$(logfile_prefix)marionette.xunit.xml
-#marionette_logging += --log-mach=$(logs_dir)/$(logfile_prefix)marionette.mach.log
-#marionette_logging += --log-unittest=$(logs_dir)/$(logfile_prefix)marionette.unittest.log
-
-# localhost:28xxx
-_marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
-_marionette_address := localhost:$(_marionette_port)
-
-_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper) $(xpi_file__ui_testing_helper)
-_marionette_prefs := common ui_tests
-_marionette_mozprofile_args := \
-	$(addprefix --addon=,$(_marionette_xpis)) \
-	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
-marionette_additional_args :=
-_marionette_runtests_args := \
-	--binary=$(app_binary) \
-	--profile="$$profile_dir" \
-	--address=$(_marionette_address) \
-	$(marionette_logging) \
-	$(marionette_additional_args)
 
 .PHONY: marionette marionette-quick marionette-non-quick
 marionette: marionette-quick marionette-non-quick
-marionette-quick:     marionette_tests := tests/marionette/tests-quick.manifest.ini
-marionette-non-quick: marionette_tests := tests/marionette/tests-non-quick.manifest.ini
-marionette-non-quick marionette-quick: \
-		python-venv \
-		$(logs_dir) \
-		ui-testing-xpi \
-		dev-helper-xpi \
-		ui-testing-helper-xpi \
-		dummy-xpi \
-		webext-apply-css-xpi \
-		specific-xpi \
-		amo-nightly-xpi \
-		$(app_binary)
-	@# Due to Mozilla Bug 1315522, the profile needs to be created and
-	@# removed directly.
-	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
-		./tests/marionette/rp_ui_harness/runtests.py \
-			$(_marionette_runtests_args) ; \
-	)
-	@echo "Checking for undetected errors"
-	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
+
+marionette-quick: _args := --quick
+marionette-non-quick: _args := --non-quick
+
+marionette-quick marionette-non-quick: _marionette_dependencies
+	./scripts/run_marionette_tests.py --no-make-dependencies $(_args)
+
+
+.PHONY: _marionette_dependencies
+_marionette_dependencies: \
+	python-venv $(logs_dir) \
+	ui-testing-xpi \
+	amo-nightly-xpi specific-xpi \
+	dev-helper-xpi ui-testing-helper-xpi \
+	dummy-xpi webext-apply-css-xpi
 
 #===============================================================================
 # static analysis

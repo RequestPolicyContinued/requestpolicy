@@ -555,30 +555,36 @@ lint-xpi: addons-linter
 
 .PHONY: addons-linter coffeelint eslint jscs jshint pep8
 addons-linter: nightly-xpi node-packages
-	$(ADDONS_LINTER) $(xpi_file__nightly)
+	@echo $@
+	@$(ADDONS_LINTER) $(xpi_file__nightly)
 coffeelint: node-packages
-	$(COFFEELINT) $(wildcard tests/unit/*.coffee)
+	@echo $@
+	@$(COFFEELINT) $(wildcard tests/unit/*.coffee)
 eslint: node-packages
-	$(ESLINT) src/
-	$(ESLINT) tests/unit/
-	$(ESLINT) tests/xpcshell/
-	$(ESLINT) tests/helper-addons/
-	$(ESLINT) gulpfile.js
+	@echo $@
+	@$(ESLINT) src/
+	@$(ESLINT) tests/unit/
+	@$(ESLINT) tests/xpcshell/
+	@$(ESLINT) tests/helper-addons/
+	@$(ESLINT) gulpfile.js
 jscs: node-packages
-	cd src/;                 $(JSCS) .
-	cd tests/unit/;          $(JSCS) .
-	cd tests/xpcshell/;      $(JSCS) .
-	cd tests/helper-addons/; $(JSCS) .
-	cd .;                    $(JSCS) gulpfile.js
+	@echo $@
+	@cd src/;                 $(JSCS) .
+	@cd tests/unit/;          $(JSCS) .
+	@cd tests/xpcshell/;      $(JSCS) .
+	@cd tests/helper-addons/; $(JSCS) .
+	@cd .;                    $(JSCS) gulpfile.js
 jshint: node-packages
-	$(JSHINT) src/
-	$(JSHINT) tests/unit/
-	$(JSHINT) tests/xpcshell/
-	$(JSHINT) tests/helper-addons/
-	$(JSHINT) gulpfile.js
+	@echo $@
+	@$(JSHINT) src/
+	@$(JSHINT) tests/unit/
+	@$(JSHINT) tests/xpcshell/
+	@$(JSHINT) tests/helper-addons/
+	@$(JSHINT) gulpfile.js
 pep8: python-packages
-	$(PY_PEP8) scripts/
-	$(PY_PEP8) tests/marionette/
+	@echo $@
+	@$(PY_PEP8) scripts/
+	@$(PY_PEP8) tests/marionette/
 
 #-------------------------------------------------------------------------------
 # localization checks

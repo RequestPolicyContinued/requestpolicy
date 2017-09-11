@@ -1,6 +1,9 @@
 {
   "devDependencies": {
     "addons-linter": "^0.22.2",
+    "chai": "^4.0.2",
+    "coffeelint": "^1.16.0",
+    "coffeescript": "^1.12.6",
     "del": "^3.0.0",
     "eslint": "^4.6.1",
     "eslint-plugin-promise": "^3.5.0",
@@ -13,6 +16,7 @@
     "gulp-zip": "^4.0.0",
     "jscs": "^3.0.7",
     "jshint": "^2.9.4",
+    "mocha": "^3.4.2",
     "typescript": "^2.4.2"
   }
 }

@@ -66,11 +66,13 @@ ZIP            := zip
 
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+COFFEELINT     := $(abspath $(node_modules_dir))/.bin/coffeelint
 ESLINT         := $(abspath $(node_modules_dir))/.bin/eslint --ext .js,.jsm
 GULP           := $(abspath $(node_modules_dir))/.bin/gulp
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
+MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
 
 #-------------------------------------------------------------------------------
 # helpers
@@ -414,9 +416,23 @@ run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
 #===============================================================================
 
 .PHONY: test-quick test
-test-quick: static-analysis ui-tests-quick
+test-quick: static-analysis unit-tests ui-tests-quick
 test-non-quick: test-makefile ui-tests-non-quick
 test: test-quick test-non-quick
+
+#-------------------------------------------------------------------------------
+# Testing: unit tests
+#-------------------------------------------------------------------------------
+
+.PHONY: unit-tests
+unit-tests: mocha
+
+.PHONY: mocha
+mocha: node-packages nightly-files
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/nightly/content/ \
+	$(MOCHA) \
+		--compilers coffee:coffeescript/register \
+		tests/unit/
 
 #-------------------------------------------------------------------------------
 # UI tests
@@ -495,23 +511,28 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: addons-linter eslint jscs jshint
+lint: addons-linter coffeelint eslint jscs jshint
 
-.PHONY: addons-linter eslint jscs jshint
+.PHONY: addons-linter coffeelint eslint jscs jshint
 addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
+coffeelint: node-packages
+	$(COFFEELINT) $(wildcard tests/unit/*.coffee)
 eslint: node-packages
 	$(ESLINT) src/
+	$(ESLINT) tests/unit/
 	$(ESLINT) tests/xpcshell/
 	$(ESLINT) tests/helper-addons/
 	$(ESLINT) gulpfile.js
 jscs: node-packages
 	cd src/;                 $(JSCS) .
+	cd tests/unit/;          $(JSCS) .
 	cd tests/xpcshell/;      $(JSCS) .
 	cd tests/helper-addons/; $(JSCS) .
 	cd .;                    $(JSCS) gulpfile.js
 jshint: node-packages
 	$(JSHINT) src/
+	$(JSHINT) tests/unit/
 	$(JSHINT) tests/xpcshell/
 	$(JSHINT) tests/helper-addons/
 	$(JSHINT) gulpfile.js

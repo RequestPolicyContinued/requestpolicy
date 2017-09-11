@@ -767,11 +767,11 @@ export let RequestProcessor = (function() {
         }
       }
 
-      // XMLHttpRequests made within chrome's context have these origins.
-      // Greasemonkey uses such a method to provide their cross-site xhr.
-      if (originURI === "resource://gre/res/hiddenWindow.html" ||
-          originURI === "resource://gre-resources/hiddenWindow.html") {
-      }
+      // // XMLHttpRequests made within chrome's context have these origins.
+      // // Greasemonkey uses such a method to provide their cross-site xhr.
+      // if (originURI === "resource://gre/res/hiddenWindow.html" ||
+      //     originURI === "resource://gre-resources/hiddenWindow.html") {
+      // }
 
       // Now that we have blacklists, a user could prevent themselves from
       // being able to reload a page by blocking requests from * to the

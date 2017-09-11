@@ -79,6 +79,7 @@ export function loadRLInterfaceIntoWindow(window) {
         forbidden = false;
       }
     } catch (e) {
+      console.error(e);
     }
 
     if (forbidden) {

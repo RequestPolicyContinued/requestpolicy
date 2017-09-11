@@ -23,20 +23,15 @@
 
 "use strict";
 
-/* global window, document, $, common, WinEnv, elManager */
+import {common, WinEnv, elManager} from "./common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Logger} = importModule("lib/logger");
-  var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
-      importModule("lib/subscription");
-  var {rpService} = importModule("main/requestpolicy-service");
+  var {
+    Logger,
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC,
+    rpService,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -127,7 +122,7 @@
     for (var subName in available) {
       var el = getInputElement(subName);
       if (!el) {
-        Logger.dump("Skipping unexpected official subName: " + subName);
+        Logger.debug("Skipping unexpected official subName: " + subName);
         continue;
       }
       elManager.addListener(el, "change", handleSubscriptionCheckboxChange);
@@ -139,5 +134,4 @@
       SUBSCRIPTION_REMOVED_TOPIC
     ], updateDisplay);
   };
-
 }());

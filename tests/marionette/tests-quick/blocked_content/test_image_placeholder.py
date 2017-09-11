@@ -7,6 +7,10 @@ from firefox_puppeteer.api.appinfo import AppInfo
 from firefox_puppeteer.api.utils import Utils
 
 
+IMAGE_PLACEHOLDER = """data:image/gif;base64,R0lGODlhAQABAIAAA
+AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7""".replace("\n", "")
+
+
 class TestImagePlaceholder(RequestPolicyTestCase):
 
     def setUp(self):
@@ -40,6 +44,6 @@ class TestImagePlaceholder(RequestPolicyTestCase):
             image = self.marionette.find_element("id", "cross-site-image")
             if self.fx_older_than_v49:
                 # up to Firefox 48 (Bug 1272653)
-                self.assertTrue(image.get_attribute("rpcontinuedIdentified"))
+                self.assertEqual(image.get_attribute("src"), IMAGE_PLACEHOLDER)
             else:
-                self.assertTrue(image.get_property("rpcontinuedIdentified"))
+                self.assertTrue(image.get_property("src"), IMAGE_PLACEHOLDER)

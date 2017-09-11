@@ -23,17 +23,14 @@
 
 "use strict";
 
-/* global window */
-
-window.rpcontinued = window.rpcontinued || {};
-
-window.rpcontinued.requestLog = (function(self) {
+export function loadRLTreeViewIntoWindow(window) {
+  let {requestLog} = window.rpcontinued;
 
   //============================================================================
 
-  self.treebox = null;
+  requestLog.treebox = null;
 
-  self.columnNameToIndexMap = {
+  requestLog.columnNameToIndexMap = {
     "rpcontinued-requestLog-origin": 0,
     "rpcontinued-requestLog-destination": 1,
     "rpcontinued-requestLog-blocked": 2,
@@ -41,7 +38,7 @@ window.rpcontinued.requestLog = (function(self) {
   };
 
   function getVisibleRowAtIndex(index) {
-    return self.visibleRows[self.visibleRows.length - index - 1];
+    return requestLog.visibleRows[requestLog.visibleRows.length - index - 1];
   }
 
   //
@@ -49,13 +46,13 @@ window.rpcontinued.requestLog = (function(self) {
   // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
   //
 
-  self.treeView = {
+  requestLog.treeView = {
     /**
      * "This property should be set to the total number of rows in the tree."
      * (getter function)
      */
     get rowCount() {
-      return self.visibleRows.length;
+      return requestLog.visibleRows.length;
     },
 
     /**
@@ -63,7 +60,7 @@ window.rpcontinued.requestLog = (function(self) {
      * column."
      */
     setTree: function(aTreebox) {
-      self.treebox = aTreebox;
+      requestLog.treebox = aTreebox;
     },
 
     /**
@@ -74,10 +71,10 @@ window.rpcontinued.requestLog = (function(self) {
       // unshift() the array and can just push().
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
-      var columnIndex = self.columnNameToIndexMap[aColumn.id];
+      var columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
         return getVisibleRowAtIndex(aIndex)
-            [self.columnNameToIndexMap[aColumn.id]];
+            [requestLog.columnNameToIndexMap[aColumn.id]];
       }
     },
 
@@ -120,7 +117,7 @@ window.rpcontinued.requestLog = (function(self) {
     toggleOpenState: function(aIndex) {},
 
     getImageSrc: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] === 2) {
+      if (requestLog.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://rpcontinued/skin/dot.png";
         }
@@ -140,7 +137,7 @@ window.rpcontinued.requestLog = (function(self) {
     },
 
     getCellProperties: function(aIndex, aColumn) {
-      if (self.columnNameToIndexMap[aColumn.id] === 2) {
+      if (requestLog.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "blocked";
         }
@@ -152,6 +149,4 @@ window.rpcontinued.requestLog = (function(self) {
       return "";
     }
   };
-
-  return self;
-}(window.rpcontinued.requestLog || {}));
+}

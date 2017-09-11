@@ -23,37 +23,27 @@
 
 "use strict";
 
-/* global window, document, dump */
+import {Environment, MainEnvironment} from "lib/environment";
+import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
+import {Logger} from "lib/logger";
+import {Prefs} from "models/prefs";
+import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {RequestProcessor} from "lib/request-processor";
+import {PolicyManager} from "lib/policy-manager";
+import {DomainUtil} from "lib/utils/domains";
+import {StringUtils} from "lib/utils/strings";
+import {WindowUtils} from "lib/utils/windows";
+import {JSUtils} from "lib/utils/javascript";
+import {Utils} from "lib/utils";
+import {DOMUtils} from "lib/utils/dom";
+import {C} from "lib/utils/constants";
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
  */
-window.rpcontinued.overlay = (function() {
-
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Environment, ProcessEnvironment} = importModule("lib/environment");
-  let {ManagerForMessageListeners} = importModule(
-      "lib/manager-for-message-listeners");
-  let {Logger} = importModule("lib/logger");
-  let {Prefs} = importModule("models/prefs");
-  let {RequestProcessor} = importModule("lib/request-processor");
-  let {PolicyManager} = importModule("lib/policy-manager");
-  let {DomainUtil} = importModule("lib/utils/domains");
-  let {StringUtils} = importModule("lib/utils/strings");
-  let {WindowUtils} = importModule("lib/utils/windows");
-  let {JSUtils} = importModule("lib/utils/javascript");
-  let {Utils} = importModule("lib/utils");
-  let {DOMUtils} = importModule("lib/utils/dom");
-  let {C} = importModule("lib/utils/constants");
-
-  let rpcontinued = window.rpcontinued;
+export function loadOverlayIntoWindow(window) {
+  let {document, rpcontinued} = window;
 
   //============================================================================
 
@@ -62,7 +52,7 @@ window.rpcontinued.overlay = (function() {
   let $id = document.getElementById.bind(document);
 
   // create an environment for this overlay.
-  let OverlayEnvironment = new Environment(ProcessEnvironment, "OverlayEnv");
+  let OverlayEnvironment = new Environment(MainEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
   let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
                                                  window.messageManager);
@@ -70,8 +60,8 @@ window.rpcontinued.overlay = (function() {
   function setTimeout(aFn, aDelay) {
     return window.setTimeout(function() {
       if (OverlayEnvironment.isShuttingDownOrShutDown()) {
-        dump("[RequestPolicy] Warning: not calling delayed function " +
-            "because of add-on shutdown.\n");
+        console.debug("[RequestPolicy] Not calling delayed function " +
+            "because of add-on shutdown.");
         return;
       }
       aFn.call(null);
@@ -123,12 +113,12 @@ window.rpcontinued.overlay = (function() {
         //statusbar = $id("status-bar");
         toolbox = $id("navigator-toolbox");
 
-        var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]
-            .getService(Components.interfaces.nsIXULAppInfo);
+        var appInfo = Cc["@mozilla.org/xre/app-info;1"].
+            getService(Ci.nsIXULAppInfo);
         isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
 
         if (isFennec) {
-          Logger.dump("Detected Fennec.");
+          Logger.debug("Detected Fennec.");
           // Set an attribute for CSS usage.
           popupElement.setAttribute("fennec", "true");
           popupElement.setAttribute("position", "after_end");
@@ -155,10 +145,7 @@ window.rpcontinued.overlay = (function() {
                                                     "overlayIsReady", true);
       }
     } catch (e) {
-      Logger.severe(Logger.TYPE_ERROR,
-          "Fatal Error, " + e + ", stack was: " + e.stack);
-      Logger.severe(Logger.TYPE_ERROR,
-          "Unable to initialize rpcontinued.overlay.");
+      Logger.error("[FATAL] Unable to initialize rpcontinued.overlay.", e);
       throw e;
     }
   };
@@ -240,48 +227,6 @@ window.rpcontinued.overlay = (function() {
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         addTabContainerTabSelectListener);
 
-  mlManager.addListener("notifyDocumentLoaded", function(message) {
-    let {documentURI} = message.data;
-    // The document URI could contain a "fragment" part.
-    let originURI = DomainUtil.getUriObject(documentURI).specIgnoringRef;
-
-    let blockedURIs = {};
-
-    if (Prefs.get("indicateBlockedObjects")) {
-      var indicateBlacklisted = Prefs.get("indicateBlacklistedObjects");
-
-      var rejectedRequests = RequestProcessor._rejectedRequests
-          .getOriginUri(originURI);
-      for (var destBase in rejectedRequests) {
-        for (var destIdent in rejectedRequests[destBase]) {
-          for (var destUri in rejectedRequests[destBase][destIdent]) {
-            // case 1: indicateBlacklisted == true
-            //         ==> indicate the object has been blocked
-            //
-            // case 2: indicateBlacklisted == false
-            // case 2a: all requests have been blocked because of a blacklist
-            //          ==> do *not* indicate
-            //
-            // case 2b: at least one of the blocked (identical) requests has been
-            //          blocked by a rule *other than* the blacklist
-            //          ==> *do* indicate
-            let requests = rejectedRequests[destBase][destIdent][destUri];
-            if (indicateBlacklisted ||
-                self._containsNonBlacklistedRequests(requests)) {
-              blockedURIs[destUri] = blockedURIs[destUri] ||
-                  {identifier: DomainUtil.getIdentifier(destUri)};
-            }
-          }
-        }
-      }
-    }
-
-    // send the list of blocked URIs back to the frame script
-    return {blockedURIs: blockedURIs};
-  }, function(message) {
-    return {blockedURIs: {}};
-  });
-
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
     // Clear any notifications that may have been present.
     self._setContentBlockedState(false);
@@ -325,7 +270,7 @@ window.rpcontinued.overlay = (function() {
   });
 
   self.handleMetaRefreshes = function(message) {
-    Logger.dump("Handling meta refreshes...");
+    Logger.debug("Handling meta refreshes...");
 
     let {documentURI, metaRefreshes} = message.data;
     let browser = message.target;
@@ -333,12 +278,12 @@ window.rpcontinued.overlay = (function() {
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       let {delay, destURI, originalDestURI} = metaRefreshes[i];
 
-      Logger.info(Logger.TYPE_META_REFRESH, "meta refresh to <" +
+      Logger.debug("meta refresh to <" +
           destURI + "> (" + delay + " second delay) found in document at <" +
           documentURI + ">");
 
       if (originalDestURI) {
-        Logger.info(Logger.TYPE_META_REFRESH,
+        Logger.debug(
             "meta refresh destination <" + originalDestURI + "> " +
             "appeared to be relative to <" + documentURI + ">, so " +
             "it has been resolved to <" + destURI + ">");
@@ -351,7 +296,7 @@ window.rpcontinued.overlay = (function() {
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them, as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
-          Logger.warning(Logger.TYPE_META_REFRESH,
+          Logger.warning(
               "Ignoring redirect to javascript URI <" + destURI + ">");
           continue;
         }
@@ -420,7 +365,7 @@ window.rpcontinued.overlay = (function() {
     redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {
-      Logger.warning(Logger.TYPE_INTERNAL,
+      Logger.warning(
           "Should have shown redirect notification to <" + redirectTargetUri +
           ">, but it's not implemented yet on Fennec.");
       return false;
@@ -584,16 +529,6 @@ window.rpcontinued.overlay = (function() {
     // self._updateBlockedContentState(content.document);
   };
 
-  self._containsNonBlacklistedRequests = function(requests) {
-    for (let i = 0, len = requests.length; i < len; i++) {
-      if (!requests[i].isOnBlacklist()) {
-        // This request has not been blocked by the blacklist
-        return true;
-      }
-    }
-    return false;
-  };
-
   /**
    * Checks if the document has blocked content and shows appropriate
    * notifications.
@@ -603,7 +538,7 @@ window.rpcontinued.overlay = (function() {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       // @ifdef LOG_FLAG_STATE
-      Logger.debug(Logger.TYPE_INTERNAL,
+      Logger.debug(
           "Checking for blocked requests from page <" + uri + ">");
       // @endif
 
@@ -617,11 +552,13 @@ window.rpcontinued.overlay = (function() {
       let logText = documentContainsBlockedContent ?
                     "Requests have been blocked." :
                     "No requests have been blocked.";
-      Logger.debug(Logger.TYPE_INTERNAL, logText);
+      Logger.debug(logText);
       // @endif
+
+      return Promise.resolve();
     }).catch(e => {
-      Logger.severeError(
-          "Unable to complete _updateBlockedContentState actions: " + e, e);
+      Logger.error("[SEVERE] " +
+          "Unable to complete _updateBlockedContentState actions", e);
     });
   };
 
@@ -653,8 +590,8 @@ window.rpcontinued.overlay = (function() {
    * register a pref observer
    */
   function updatePermissiveStatusOnPrefChanges() {
-    OverlayEnvironment.prefObs.addListener("startWithAllowAllEnabled",
-                                           updatePermissiveStatus);
+    ManagerForPrefObservers.get(OverlayEnvironment).
+        addListener("startWithAllowAllEnabled", updatePermissiveStatus);
   }
   OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);
@@ -818,7 +755,7 @@ window.rpcontinued.overlay = (function() {
 
     // The second argument can be an object of parameters.
     if (typeof aReferrerURI === "object" &&
-        !(referrerURI instanceof Components.interfaces.nsIURI)) {
+        !(referrerURI instanceof Ci.nsIURI)) {
       referrerURI = aReferrerURI.referrerURI;
     }
 
@@ -880,17 +817,17 @@ window.rpcontinued.overlay = (function() {
       },
 
       QueryInterface: function(aIID, aResult) {
-        if (aIID.equals(Components.interfaces.nsISHistoryListener) ||
-            aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
-            aIID.equals(Components.interfaces.nsISupports)) {
+        if (aIID.equals(Ci.nsISHistoryListener) ||
+            aIID.equals(Ci.nsISupportsWeakReference) ||
+            aIID.equals(Ci.nsISupports)) {
           return this;
         }
-        throw Components.results.NS_NOINTERFACE;
+        throw Cr.NS_NOINTERFACE;
       },
 
       GetWeakReference: function() {
-        return Components.classes["@mozilla.org/appshell/appShellService;1"]
-            .createInstance(Components.interfaces.nsIWeakReference);
+        return Cc["@mozilla.org/appshell/appShellService;1"]
+            .createInstance(Ci.nsIWeakReference);
       }
     };
 
@@ -909,8 +846,8 @@ window.rpcontinued.overlay = (function() {
         return;
       } catch (e) {
         if (tries >= maxTries) {
-          Logger.severeError("Can't add session history listener, even " +
-              "after " + tries + " tries. " + e, e);
+          Logger.error("[SEVERE] Can't add session history listener, even " +
+              "after " + tries + " tries.", e);
           return;
         }
         // call this function again in a few miliseconds.
@@ -1017,7 +954,7 @@ window.rpcontinued.overlay = (function() {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    //Logger.dump('popup width: ' + popup.clientWidth);
+    //Logger.debug('popup width: ' + popup.clientWidth);
     var popupWidth = popupElement.clientWidth === 0 ? 730 :
         popupElement.clientWidth;
     var anchor = $id("content");
@@ -1102,11 +1039,11 @@ window.rpcontinued.overlay = (function() {
     openLinkInNewTab(url, relatedToCurrent);
   }
 
-  self.openPrefs = maybeOpenLinkInNewTab.bind(this, "about:requestpolicy",
+  self.openPrefs = maybeOpenLinkInNewTab.bind(null, "about:requestpolicy",
       ["about:requestpolicy?basicprefs"], true);
-  self.openPolicyManager = maybeOpenLinkInNewTab.bind(this,
+  self.openPolicyManager = maybeOpenLinkInNewTab.bind(null,
       "about:requestpolicy?yourpolicy", [], true);
-  self.openHelp = maybeOpenLinkInNewTab.bind(this, "https://github.com/" +
+  self.openHelp = maybeOpenLinkInNewTab.bind(null, "https://github.com/" +
       "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support", []);
 
   self.clearRequestLog = function() {
@@ -1140,5 +1077,5 @@ window.rpcontinued.overlay = (function() {
     }
   };
 
-  return self;
-}());
+  window.rpcontinued.overlay = self;
+}

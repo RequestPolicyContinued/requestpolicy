@@ -5,7 +5,6 @@
 
 pref("extensions.requestpolicy.log", false);
 pref("extensions.requestpolicy.log.level", 0);
-pref("extensions.requestpolicy.log.types", 1023);
 
 pref("extensions.requestpolicy.autoReload", true);
 

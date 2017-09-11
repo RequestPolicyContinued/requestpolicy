@@ -23,24 +23,18 @@
 
 "use strict";
 
-/* exported ManagerForDOMContentLoaded */
-/* global mm, overlayComm, framescriptEnv, ManagerForBlockedContent */
+import {Logger} from "lib/logger";
+import {DomainUtil} from "lib/utils/domains";
+import {Environment, MainEnvironment} from "lib/environment";
+import {C} from "lib/utils/constants";
 
-var ManagerForDOMContentLoaded = (function() {
+import {overlayComm} from "framescripts/managers";
+import {ManagerForBlockedContent} from "framescripts/blocked-content.js";
+
+export var ManagerForDOMContentLoaded = (function() {
   let self = {};
 
-  /* global Components */
-  const {interfaces: Ci, utils: Cu} = Components;
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Logger} = importModule("lib/logger");
-  let {DomainUtil} = importModule("lib/utils/domains");
-  let {Utils} = importModule("lib/utils");
-  let {Environment} = importModule("lib/environment");
-  let {C} = importModule("lib/utils/constants");
-
-  let {content} = mm;
+  let {content} = cfmm;
 
   //============================================================================
 
@@ -49,9 +43,9 @@ var ManagerForDOMContentLoaded = (function() {
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
     overlayComm.run(function() {
-      mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                         {origin: event.currentTarget.ownerDocument.URL,
-                          dest: event.currentTarget.href});
+      cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+                           {origin: event.currentTarget.ownerDocument.URL,
+                            dest: event.currentTarget.href});
     });
   }
 
@@ -84,33 +78,42 @@ var ManagerForDOMContentLoaded = (function() {
 
     onDocumentLoaded(doc);
 
-    overlayComm.run(function() {
-      let answers = mm.sendSyncMessage(C.MM_PREFIX + "notifyDocumentLoaded",
-                                       {documentURI: doc.documentURI});
-      if (answers.length === 0) {
-        Logger.warning(Logger.TYPE_ERROR, "There seems to be no message " +
-                       "listener for \"notifyDocumentLoaded\".");
-      } else {
-        // take only one answer. If there are more answers, they are ignored
-        // ==> there must be only one listener for 'notifyDocumentLoaded'
-        let answer = answers[0];
-
-        var blockedURIs = answer.blockedURIs;
-        //console.debug("Received " +
-        //              Object.getOwnPropertyNames(blockedURIs).length +
-        //              " blocked URIs.");
-
-        // Indicating blocked visible objects isn't an urgent task, so this should
-        // be done async.
-        Utils.runAsync(function() {
-          ManagerForBlockedContent.indicateBlockedVisibleObjects(doc,
-              blockedURIs);
-        });
+    let pBlockedURIs = browser.runtime.sendMessage({
+      type: "notifyDocumentLoaded",
+      documentURI: doc.documentURI,
+    }).then((aResponse) => {
+      if (typeof aResponse !== "object" ||
+          typeof aResponse.blockedURIs !== "object") {
+        Logger.error("There seems to be no message " +
+                     "listener for \"notifyDocumentLoaded\".");
+        return null;
       }
 
-      if (isActiveTopLevelDocument(doc)) {
-        mm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
+      const {blockedURIs} = aResponse;
+      // Logger.debug("Received " +
+      //              Object.getOwnPropertyNames(blockedURIs).length +
+      //              " blocked URIs.");
+
+      return blockedURIs;
+    });
+
+    pBlockedURIs.then((blockedURIs) => {
+      if (blockedURIs !== null) {
+        ManagerForBlockedContent.indicateBlockedVisibleObjects(doc,
+            blockedURIs);
       }
+      return;
+    }).catch(e => {
+      console.error(e);
+    });
+
+    pBlockedURIs.then((blockedURIs) => {
+      if (blockedURIs !== null && isActiveTopLevelDocument(doc)) {
+        cfmm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
+      }
+      return;
+    }).catch(e => {
+      console.error(e);
     });
   }
 
@@ -137,7 +140,7 @@ var ManagerForDOMContentLoaded = (function() {
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
       overlayComm.run(function() {
-        mm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
+        cfmm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
       });
     }
   }
@@ -151,7 +154,7 @@ var ManagerForDOMContentLoaded = (function() {
   function onDocumentLoaded(doc) {
     // Create a new Environment for this Document and shut it down when
     // the document is unloaded.
-    let DocEnv = new Environment(framescriptEnv, "DocEnv");
+    let DocEnv = new Environment(MainEnvironment, "DocEnv");
     DocEnv.shutdownOnUnload(doc.defaultView);
     // start up the Environment immediately, as it won't have any startup
     // functions.
@@ -192,20 +195,19 @@ var ManagerForDOMContentLoaded = (function() {
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      Logger.info(Logger.TYPE_META_REFRESH,
-                  "Number of meta refreshes found: " + metaRefreshes.length);
+      Logger.info("Number of meta refreshes found: " + metaRefreshes.length);
 
       var docShell = doc.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShell);
       if (!docShell.allowMetaRedirects) {
-        Logger.warning(Logger.TYPE_META_REFRESH,
+        Logger.warning(
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 
       overlayComm.run(function() {
-        mm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
+        cfmm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
             {documentURI: documentURI, metaRefreshes: metaRefreshes});
       });
     }
@@ -296,9 +298,9 @@ var ManagerForDOMContentLoaded = (function() {
   //  wrapWindowFunction(aWindow, "open",
   //      function(url, windowName, windowFeatures) {
   //        overlayComm.run(function() {
-  //          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-  //                             {origin: aWindow.document.documentURI,
-  //                              dest: url});
+  //          cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+  //                               {origin: aWindow.document.documentURI,
+  //                                dest: url});
   //        });
   //      });
   //
@@ -306,9 +308,9 @@ var ManagerForDOMContentLoaded = (function() {
   //      function() {
   //        // openDialog(url, name, features, arg1, arg2, ...)
   //        overlayComm.run(function() {
-  //          mm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-  //                             {origin: aWindow.document.documentURI,
-  //                              dest: arguments[0]});
+  //          cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
+  //                               {origin: aWindow.document.documentURI,
+  //                                dest: arguments[0]});
   //        });
   //      });
   //}
@@ -318,13 +320,13 @@ var ManagerForDOMContentLoaded = (function() {
   //  delete aWindow.rpOriginalFunctions;
   //}
 
-  framescriptEnv.elManager.addListener(mm, "DOMContentLoaded",
-                                       onDOMContentLoaded, true);
+  MainEnvironment.elManager.addListener(cfmm, "DOMContentLoaded",
+                                        onDOMContentLoaded, true);
 
   // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
   // enclosed frames.
-  framescriptEnv.elManager.addListener(mm, "DOMFrameContentLoaded",
-                                       onDOMFrameContentLoaded, true);
+  MainEnvironment.elManager.addListener(cfmm, "DOMFrameContentLoaded",
+                                        onDOMFrameContentLoaded, true);
 
   return self;
 }());

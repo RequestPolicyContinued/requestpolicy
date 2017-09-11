@@ -22,15 +22,12 @@
 
 "use strict";
 
-/* global window */
+let {
+  WindowUtils,
+} = browser.extension.getBackgroundPage();
 
-window.rpcontinued.requestLog = (function(self) {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {WindowUtils} = importModule("lib/utils/windows");
+export function loadRLFilteringIntoWindow(window) {
+  let {requestLog} = window.rpcontinued;
 
   //============================================================================
 
@@ -42,7 +39,7 @@ window.rpcontinued.requestLog = (function(self) {
         clearFilterButton: "rpcontinued-requestLog-clearFilter"
       });
 
-  self.filterChanged = function() {
+  requestLog.filterChanged = function() {
     let filterValue = elements.filterTextbox.value;
 
     // create a new regular expression
@@ -53,10 +50,10 @@ window.rpcontinued.requestLog = (function(self) {
     loadTable();
   };
 
-  self.clearFilter = function() {
+  requestLog.clearFilter = function() {
     elements.filterTextbox.value = "";
     elements.filterTextbox.focus();
-    self.filterChanged();
+    requestLog.filterChanged();
   };
 
   /**
@@ -66,7 +63,7 @@ window.rpcontinued.requestLog = (function(self) {
    *
    * @param {Array} aRow
    */
-  self.isRowFilteredOut = function(aRow) {
+  requestLog.isRowFilteredOut = function(aRow) {
     if (filterText === null) {
       return false;
     }
@@ -76,29 +73,27 @@ window.rpcontinued.requestLog = (function(self) {
   };
 
   function addRowOrFilterOut(aRow) {
-    if (self.isRowFilteredOut(aRow)) {
+    if (requestLog.isRowFilteredOut(aRow)) {
       return;
     }
-    self.visibleRows.push(aRow);
+    requestLog.visibleRows.push(aRow);
   }
 
   // This function is called every time the tree is sorted, filtered or reloaded
   function loadTable() {
-    let oldRowCount = self.treeView.rowCount;
+    let oldRowCount = requestLog.treeView.rowCount;
 
     if (!filterText) {
       // there's no filter ==> show all rows
-      self.visibleRows = self.rows;
+      requestLog.visibleRows = requestLog.rows;
     } else {
       // filter out the rows we want to display
-      self.visibleRows = [];
-      self.rows.forEach(addRowOrFilterOut);
+      requestLog.visibleRows = [];
+      requestLog.rows.forEach(addRowOrFilterOut);
     }
 
     // notify that the table rows has changed
-    let newRowCount = self.treeView.rowCount;
-    self.treebox.rowCountChanged(0, newRowCount - oldRowCount);
+    let newRowCount = requestLog.treeView.rowCount;
+    requestLog.treebox.rowCountChanged(0, newRowCount - oldRowCount);
   }
-
-  return self;
-}(window.rpcontinued.requestLog || {}));
+}

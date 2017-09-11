@@ -1,0 +1,88 @@
+/*
+ * ***** BEGIN LICENSE BLOCK *****
+ *
+ * RequestPolicy - A Firefox extension for control over cross-site requests.
+ * Copyright (c) 2011 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * ***** END LICENSE BLOCK *****
+ */
+
+"use strict";
+
+import {Prefs} from "models/prefs";
+import {C} from "lib/utils/constants";
+
+let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
+
+//==============================================================================
+// Info
+//==============================================================================
+
+export var Info = (function() {
+  let self = {};
+
+  // bad smell...
+  // get/set last/current RP version
+  {
+    self.lastRPVersion = Prefs.get("lastVersion");
+
+    self.curRPVersion = "0.0";
+    // curRPVersion needs to be set asynchronously
+    AddonManager.getAddonByID(C.EXTENSION_ID, function(addon) {
+      Prefs.set("lastVersion", addon.version);
+      self.curRPVersion = addon.version;
+      if (self.lastRPVersion !== self.curRPVersion) {
+        Services.prefs.savePrefFile(null);
+      }
+    });
+
+    XPCOMUtils.defineLazyGetter(self, "isRPUpgrade", function() {
+      // Compare with version 1.0.0a8 since that version introduced
+      // the "welcome window".
+      return self.lastRPVersion &&
+          Services.vc.compare(self.lastRPVersion, "1.0.0a8") <= 0;
+    });
+  }
+
+  // bad smell...
+  // get/set last/current app (e.g. firefox) version
+  {
+    self.lastAppVersion = Prefs.get("lastAppVersion");
+
+    let curAppVersion = Services.appinfo.version;
+    self.curAppVersion = curAppVersion;
+    Prefs.set("lastAppVersion", curAppVersion);
+
+    if (self.lastAppVersion !== self.curAppVersion) {
+      Services.prefs.savePrefFile(null);
+    }
+  }
+
+  let {ID: appID, name: appName, platformVersion} = Services.appinfo;
+  self.isFirefox = appID === C.FIREFOX_ID;
+  self.isSeamonkey = appID === C.SEAMONKEY_ID;
+  self.isGecko = appName !== "Pale Moon";
+  self.isAustralis = self.isFirefox &&
+      Services.vc.compare(platformVersion, "29") >= 0;
+
+  self.isGeckoVersionAtLeast = function(aMinVersion) {
+    return self.isGecko &&
+        Services.vc.compare(platformVersion, aMinVersion) >= 0;
+  };
+
+  return self;
+}());

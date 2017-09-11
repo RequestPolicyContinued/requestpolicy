@@ -22,9 +22,7 @@
 
 "use strict";
 
-/* exported ManagerForBlockedContent */
-
-var ManagerForBlockedContent = (function() {
+export var ManagerForBlockedContent = (function() {
   let self = {};
 
   //============================================================================

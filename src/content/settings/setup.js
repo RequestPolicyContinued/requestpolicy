@@ -23,21 +23,16 @@
 
 "use strict";
 
-/* global window, $, common, $id */
+import {$id, common} from "./common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Info} = importModule("lib/utils/info");
-  var {Prefs} = importModule("models/prefs");
-  var {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC} =
-      importModule("lib/subscription");
-  var {rpService} = importModule("main/requestpolicy-service");
+  var {
+    Info,
+    Prefs,
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC,
+    rpService,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -164,5 +159,4 @@
     $("input[name=subscriptions]").change(handleSubscriptionsChange);
     $("#allowsamedomain").change(handleAllowSameDomainChange);
   };
-
 }());

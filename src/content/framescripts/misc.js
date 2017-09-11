@@ -23,56 +23,14 @@
 
 "use strict";
 
+import {C} from "lib/utils/constants";
+import {Environment, MainEnvironment} from "lib/environment";
+import {mlManager, overlayComm} from "framescripts/managers";
+
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
+  let {content, sendSyncMessage} = cfmm;
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  //let {RPService2: {console}} = importModule("main/rp-service-2");
-  let {C} = importModule("lib/utils/constants");
-  let {Environment, FrameScriptEnvironment} = importModule("lib/environment");
-  let {FramescriptToOverlayCommunication} = importModule(
-      "lib/framescript-to-overlay-communication");
-
-  // the ContentFrameMessageManager of this framescript
-  let mm = Function("return this")(); // jshint ignore:line
-  let {content, sendSyncMessage} = mm;
-
-  //============================================================================
-
-  //console.debug('[RPC] new framescript loading...');
-
-  let framescriptEnv = new FrameScriptEnvironment(mm);
-  let mlManager = framescriptEnv.mlManager;
-  let overlayComm = new FramescriptToOverlayCommunication(framescriptEnv);
-
-  // Create a scope for the sub-scripts, which also can
-  // be removed easily when the framescript gets unloaded.
-  var framescriptScope = {
-    mm: mm,
-    framescriptEnv: framescriptEnv,
-    mlManager: mlManager,
-    overlayComm: overlayComm
-  };
-
-  function loadSubScripts() {
-    Services.scriptloader.loadSubScript(
-        "chrome://rpcontinued/content/framescripts/blocked-content.js",
-        framescriptScope);
-    Services.scriptloader.loadSubScript(
-        "chrome://rpcontinued/content/framescripts/dom-content-loaded.js",
-        framescriptScope);
-  }
-  framescriptEnv.addStartupFunction(Environment.LEVELS.ESSENTIAL,
-                                    loadSubScripts);
-
-  framescriptEnv.addShutdownFunction(Environment.LEVELS.ESSENTIAL, function() {
-    //console.debug("removing framescriptScope '" + framescriptEnv.uid + "'");
-    framescriptScope = null;
-  });
+  //==============================================================================
 
   function reloadDocument() {
     content.document.location.reload(false);
@@ -138,10 +96,7 @@
     }
   }
 
-  framescriptEnv.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
-    framescriptEnv.elManager.addListener(mm, "click", mouseClicked, true);
+  MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
+    MainEnvironment.elManager.addListener(cfmm, "click", mouseClicked, true);
   });
-
-  // start up the framescript's environment
-  framescriptEnv.startup();
 }());

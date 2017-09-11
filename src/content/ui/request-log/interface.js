@@ -23,46 +23,39 @@
 
 "use strict";
 
-/* global window */
+let {
+  DomainUtil,
+  StringUtils,
+} = browser.extension.getBackgroundPage();
 
-window.rpcontinued = window.rpcontinued || {};
-
-window.rpcontinued.requestLog = (function(self) {
-  /* global Components */
-  const {classes: Cc, utils: Cu} = Components;
-
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {DomainUtil} = importModule("lib/utils/domains");
-  let {StringUtils} = importModule("lib/utils/strings");
+export function loadRLInterfaceIntoWindow(window) {
+  let {requestLog} = window.rpcontinued;
 
   //============================================================================
 
-  self.clear = function() {
-    var count = self.treeView.rowCount;
+  requestLog.clear = function() {
+    var count = requestLog.treeView.rowCount;
     if (count === 0) {
       return;
     }
-    self.rows = [];
-    self.visibleRows = [];
-    if (!self.treebox) {
+    requestLog.rows = [];
+    requestLog.visibleRows = [];
+    if (!requestLog.treebox) {
       return;
     }
-    self.treebox.rowCountChanged(0, -count);
+    requestLog.treebox.rowCountChanged(0, -count);
   };
 
   /**
    * Copy the content of a cell to the clipboard. The row used will be the one
    * selected when the context menu was opened.
    */
-  self.copyToClipboard = function(columnName) {
-    var content = self.treeView.getCellText(self.tree.currentIndex,
-        self.tree.columns.getNamedColumn(columnName));
+  requestLog.copyToClipboard = function(columnName) {
+    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+        requestLog.tree.columns.getNamedColumn(columnName));
 
     const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-        .getService(Components.interfaces.nsIClipboardHelper);
+        .getService(Ci.nsIClipboardHelper);
     clipboardHelper.copyString(content);
   };
 
@@ -70,9 +63,9 @@ window.rpcontinued.requestLog = (function(self) {
    * Open the content of a cell in a new tab. The row used will be the one
    * selected when the context menu was opened.
    */
-  self.openInNewTab = function(columnName) {
-    var content = self.treeView.getCellText(self.tree.currentIndex,
-        self.tree.columns.getNamedColumn(columnName));
+  requestLog.openInNewTab = function(columnName) {
+    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+        requestLog.tree.columns.getNamedColumn(columnName));
 
     var forbidden = true;
     try {
@@ -95,34 +88,32 @@ window.rpcontinued.requestLog = (function(self) {
   };
 
   function addRow(aRow) {
-    self.rows.push(aRow);
+    requestLog.rows.push(aRow);
 
-    if (!self.isRowFilteredOut(aRow)) {
-      if (self.isEmptyMessageDisplayed) {
+    if (!requestLog.isRowFilteredOut(aRow)) {
+      if (requestLog.isEmptyMessageDisplayed) {
         // If this were to be called in a multithreaded manner, there's probably
         // a race condition here.
-        self.visibleRows.shift();
-        self.isEmptyMessageDisplayed = false;
-        self.treebox.rowCountChanged(0, -1);
+        requestLog.visibleRows.shift();
+        requestLog.isEmptyMessageDisplayed = false;
+        requestLog.treebox.rowCountChanged(0, -1);
       }
 
-      self.visibleRows.push(aRow);
+      requestLog.visibleRows.push(aRow);
 
-      if (!self.treebox) {
+      if (!requestLog.treebox) {
         return;
       }
 
-      self.treebox.rowCountChanged(0, 1);
+      requestLog.treebox.rowCountChanged(0, 1);
     }
   }
 
-  self.addAllowedRequest = function(originURI, destURI) {
+  requestLog.addAllowedRequest = function(originURI, destURI) {
     addRow([originURI, destURI, false, (new Date()).toLocaleTimeString()]);
   };
 
-  self.addBlockedRequest = function(originURI, destURI) {
+  requestLog.addBlockedRequest = function(originURI, destURI) {
     addRow([originURI, destURI, true, (new Date()).toLocaleTimeString()]);
   };
-
-  return self;
-}(window.rpcontinued.requestLog || {}));
+}

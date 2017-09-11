@@ -23,17 +23,13 @@
 
 "use strict";
 
-/* global window, $, common, WinEnv, elManager, $id */
+import {common, WinEnv, elManager, $id} from "./common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("models/prefs");
+  var {
+    Prefs,
+    ManagerForPrefObservers,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -90,7 +86,7 @@
         $id("pref-dontIndicateBlacklistedObjects"), "change",
         function(event) {
           Prefs.set("indicateBlacklistedObjects",
-                                   !event.target.checked);
+              !event.target.checked);
           Services.prefs.savePrefFile(null);
           updateDisplay();
         });
@@ -105,13 +101,12 @@
         $id("pref-privateBrowsingPermanentWhitelisting"), "change",
         function(event) {
           Prefs.set("privateBrowsingPermanentWhitelisting",
-                                   event.target.checked);
+              event.target.checked);
           Services.prefs.savePrefFile(null);
           updateDisplay();
         });
 
     // call updateDisplay() every time a preference gets changed
-    WinEnv.prefObs.addListener("", updateDisplay);
+    ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);
   };
-
 }());

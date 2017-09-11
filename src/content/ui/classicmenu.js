@@ -23,20 +23,15 @@
 
 "use strict";
 
-/* global window, document */
+import {Logger} from "lib/logger";
+import {PolicyManager} from "lib/policy-manager";
+import {StringUtils} from "lib/utils/strings";
+import {DOMUtils} from "lib/utils/dom";
 
-window.rpcontinued.classicmenu = (function() {
-  var self = {};
+export function loadClassicmenuIntoWindow(window) {
+  let self = {};
 
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {Logger} = importModule("lib/logger");
-  let {PolicyManager} = importModule("lib/policy-manager");
-  let {StringUtils} = importModule("lib/utils/strings");
-  let {DOMUtils} = importModule("lib/utils/dom");
+  let {document} = window;
 
   //============================================================================
 
@@ -47,8 +42,7 @@ window.rpcontinued.classicmenu = (function() {
     var menuitems = menu.getElementsByTagName("menuitem");
     for (let item of menuitems) {
       if (!item.hasOwnProperty("rpListener")) {
-        Logger.warning(Logger.TYPE_ERROR, "There's a menuitem without " +
-                       "listener!");
+        Logger.error("There's a menuitem without listener!");
         continue;
       }
 
@@ -145,5 +139,5 @@ window.rpcontinued.classicmenu = (function() {
     return item;
   };
 
-  return self;
-}());
+  window.rpcontinued.classicmenu = self;
+}

@@ -23,21 +23,7 @@
 
 "use strict";
 
-/* global Components */
-const {interfaces: Ci, utils: Cu} = Components;
-
-/* exported Logger */
-/* exported EXPORTED_SYMBOLS */
-var EXPORTED_SYMBOLS = ["Logger"];
-
-/* global dump */
-
-let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-let {ScriptLoader: {importModule}} = Cu.import(
-    "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-let {Environment, ProcessEnvironment} = importModule("lib/environment");
-let {Prefs} = importModule("models/prefs");
+import {Environment, MainEnvironment} from "lib/environment";
 
 //==============================================================================
 // Logger
@@ -46,149 +32,103 @@ let {Prefs} = importModule("models/prefs");
 /**
  * Provides logging methods
  */
-var Logger = (function() {
+export var Logger = (function() {
+  let self = {};
 
-  let self = {
-    TYPE_CONTENT: 1, // content whose origin isn't known more specifically
-    TYPE_META_REFRESH: 2, // info related to meta refresh
-    TYPE_HEADER_REDIRECT: 4, // info related to header redirects
-    TYPE_INTERNAL: 8, // internal happenings of the extension
-    TYPE_ERROR: 16, // errors
-    TYPE_POLICY: 32, // Policy changes, storage, etc.
-    TYPE_ALL: 0x0 - 1, // all
+  //----------------------------------------------------------------------------
+  // constants
+  //----------------------------------------------------------------------------
 
-    LEVEL_OFF: Number.MAX_VALUE, // no logging
-    LEVEL_SEVERE: 1000,
-    LEVEL_WARNING: 900,
-    LEVEL_INFO: 800,
-    LEVEL_DEBUG: 700,
-    LEVEL_ALL: Number.MIN_VALUE, // log everything
-  };
+  const LevelEnum = Object.freeze({
+    OFF: Number.MAX_VALUE, // no logging
+    ERROR: 1000,
+    WARNING: 900,
+    INFO: 800,
+    DEBUG: 700,
+    ALL: Number.MIN_VALUE, // log everything
+  });
 
-  self._TYPE_NAMES = {};
-  self._TYPE_NAMES[self.TYPE_CONTENT.toString()] = "CONTENT";
-  self._TYPE_NAMES[self.TYPE_META_REFRESH.toString()] = "META_REFRESH";
-  self._TYPE_NAMES[self.TYPE_HEADER_REDIRECT.toString()] = "HEADER_REDIRECT";
-  self._TYPE_NAMES[self.TYPE_INTERNAL.toString()] = "INTERNAL";
-  self._TYPE_NAMES[self.TYPE_ERROR.toString()] = "ERROR";
-  self._TYPE_NAMES[self.TYPE_POLICY.toString()] = "POLICY";
+  const MINIMUM_LOGGING_LEVEL = LevelEnum.ERROR;
 
-  self._LEVEL_NAMES = {};
-  self._LEVEL_NAMES[self.LEVEL_SEVERE.toString()] = "SEVERE";
-  self._LEVEL_NAMES[self.LEVEL_WARNING.toString()] = "WARNING";
-  self._LEVEL_NAMES[self.LEVEL_INFO.toString()] = "INFO";
-  self._LEVEL_NAMES[self.LEVEL_DEBUG.toString()] = "DEBUG";
+  //----------------------------------------------------------------------------
+  // settings
+  //----------------------------------------------------------------------------
 
-  // function to use to print out the log
-  self.printFunc = dump;
+  let loggingLevel = LevelEnum.ALL;
+  let loggingEnabled = true;
 
-  let initialized = false;
+  browser.storage.local.get([
+    "log",
+    "log.level",
+  ]).then(result => {
+    loggingEnabled = result.log;
+    loggingLevel = result["log.level"];
+    return;
+  }).catch(error => {
+    console.error("Error initializing the Logger! Details:");
+    console.dir(error);
+  });
 
-  /**
-   * This function will be called in case Logger isn't fully initialized yet.
-   */
-  function initialLog() {
-    init();
-    log.apply(null, arguments);
+  function onStorageChange(aChanges, aAreaName) {
+    if (aChanges.hasOwnProperty("log")) {
+      loggingEnabled = aChanges.log.newValue;
+    }
+    if (aChanges.hasOwnProperty("log.level")) {
+      loggingLevel = aChanges["log.level"].newValue;
+    }
   }
 
-  /**
-  * Initially call initialLog() on doLog().
-  * After initialization it will be log().
-  */
-  let doLog = initialLog;
+  browser.storage.onChanged.addListener(onStorageChange);
 
-  // initially, enable logging. later the logging preferences of the user will
-  // will be loaded.
-  let enabled = true;
-  // These can be set to change logging level, what types of messages are
-  // logged, and to enable/disable logging.
-  let level = self.LEVEL_INFO;
-  let types = self.TYPE_ALL;
+  //----------------------------------------------------------------------------
+  // logging
+  //----------------------------------------------------------------------------
 
-  function updateLoggingSettings() {
-    enabled = Prefs.get("log");
-    level = Prefs.get("log.level");
-    types = Prefs.get("log.types");
-  }
-
-  /**
-   * init() is called by doLog() until initialization was successful.
-   * For the case that nothing is logged at all, init is registered as a
-   * startup-function.
-   */
-  function init() {
-    if (initialized === true) {
-      // don't initialize several times
-      return;
+  function shouldLog(aLevel) {
+    if (loggingEnabled && aLevel >= loggingLevel) {
+      return true;
     }
 
-    // RequestPolicy's pref branch is available now.
-    ProcessEnvironment.prefObs.addListener("log", updateLoggingSettings);
-    updateLoggingSettings();
-
-    // don't call init() anymore when doLog() is called
-    doLog = log;
-
-    initialized = true;
-  }
-
-  ProcessEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL, init);
-
-  function log(aLevel, aType, aMessage, aError) {
-    let shouldLog = enabled && aLevel >= level && types & aType;
-
     // @ifdef UI_TESTING
-    let isError = aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE;
-    if (isError) {
+    if (aLevel >= LevelEnum.WARNING) {
       // log even if logging is disabled
-      shouldLog = true;
+      return true;
     }
     // @endif
 
-    if (shouldLog) {
-      let levelName = self._LEVEL_NAMES[aLevel.toString()];
-      let typeName = self._TYPE_NAMES[aType.toString()];
+    if (aLevel >= MINIMUM_LOGGING_LEVEL) {
+      // log even if logging is disabled
+      return true;
+    }
 
-      let stack = aError && aError.stack ?
-                  ", stack was:\n" + aError.stack : "";
-      let msg = "[RequestPolicy] [" + levelName + "] " +
-          "[" + typeName + "] " + aMessage + stack;
-      self.printFunc(msg + "\n");
+    return false;
+  }
+
+  function log(aLevel, aFn, aMessage, aError) {
+    if (shouldLog(aLevel)) {
+      let msg = `[RequestPolicy] ${aMessage}`;
+      aFn(msg);
+      if (aError) {
+        self.reportError(aError);
+      }
     }
   }
 
-  self.severe = doLog.bind(self, self.LEVEL_SEVERE);
-  self.severeError = doLog.bind(self, self.LEVEL_SEVERE, self.TYPE_ERROR);
-  self.warning = doLog.bind(self, self.LEVEL_WARNING);
-  self.error = doLog.bind(self, self.LEVEL_WARNING, self.TYPE_ERROR);
-  self.info = doLog.bind(self, self.LEVEL_INFO);
-  self.debug = doLog.bind(self, self.LEVEL_DEBUG);
-  self.dump = doLog.bind(self, self.LEVEL_DEBUG, self.TYPE_INTERNAL);
+  self.error = log.bind(self, LevelEnum.ERROR, console.error);
+  self.warning = log.bind(self, LevelEnum.WARNING, console.warn);
+  self.info = log.bind(self, LevelEnum.INFO, console.info);
+  self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
 
-  self.vardump = function(obj, name, ignoreFunctions) {
-    if (name !== undefined) {
-      self.dump(name + " : " + obj);
-    } else {
-      self.dump(obj);
+  self.trace = console.trace.bind(null);
+
+  self.reportError = function reportError(e) {
+    console.dir(e);
+  };
+
+  self.vardump = function(obj) {
+    if (shouldLog(LevelEnum.DEBUG)) {
+      console.dir(obj);
     }
-    // Iterate through all keys in the whole prototype chain.
-    /* jshint -W089 */ // don't require checking hasOwnProperty()
-    for (let key in obj) {
-      let value = obj[key];
-      try {
-        if (typeof value === "function") {
-          if (!ignoreFunctions) {
-            self.dump("    => key: " + key + " / value: instanceof Function");
-          }
-        } else {
-          self.dump("    => key: " + key + " / value: " + value);
-        }
-      } catch (e) {
-        self.dump("    => key: " + key + " / value: [unable to access value]");
-      }
-    }
-    /* jshint +W089 */
   };
 
   return self;
@@ -204,10 +144,14 @@ var Logger = (function() {
  * Triggers errors for a RequestPolicy UI test.
  * It's used to test Error Detection from the UI tests.
  */
-var ErrorTriggeringService = (function() {
+function createErrorTriggeringService() {
   let self = {};
 
-  const topic = "requestpolicy-trigger-error";
+  const where = MainEnvironment.isMainEnvironment ?
+      "backgroundscript" :
+      "contentscript";
+
+  const topic = "requestpolicy-trigger-error-" + where;
 
   const observer = {};
 
@@ -239,10 +183,8 @@ var ErrorTriggeringService = (function() {
   observer.observe = function(aSubject, aTopic, aData) {
     let [type, message] = splitColon(aData);
 
-    if (type === "normal error") {
-      Logger.warning(Logger.TYPE_ERROR, message);
-    } else if (type === "severe error") {
-      Logger.severe(Logger.TYPE_INTERNAL, message);
+    if (type === "error") {
+      Logger.error(message);
     } else if (type === "ReferenceError") {
       runAsync(produceReferenceError);
     }
@@ -259,10 +201,17 @@ var ErrorTriggeringService = (function() {
   }
 
   return self;
-}());
+}
 
-ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-                                      ErrorTriggeringService.startup);
-ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-                                       ErrorTriggeringService.shutdown);
+var ErrorTriggeringService;
 // @endif
+
+Logger.bootstrap = function() {
+  // @ifdef UI_TESTING
+  ErrorTriggeringService = createErrorTriggeringService();
+  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
+      ErrorTriggeringService.startup);
+  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
+      ErrorTriggeringService.shutdown);
+  // @endif
+};

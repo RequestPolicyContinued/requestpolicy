@@ -15,7 +15,7 @@ WHITELIST = [
   # quotation marks are no longer <'>, but <\u2019> and <\u201A>.
   known_bug_1.format("'", "'", "{"),
   known_bug_1.format(u"\u2019", u"\u201A", "{"),
-  re.compile(r"""^JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset\.jsm, line [0-9]+: ReferenceError: reference to undefined property entryPart\.s"""),
+  re.compile(r"""^JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset\.js, line [0-9]+: ReferenceError: reference to undefined property entryPart\.s"""),
 
   # other
 
@@ -90,7 +90,13 @@ class GeckoLogParser(object):
             ignore_helpers.append(IgnoreHelper(self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END))
         if not return_expected_as_well:
             ignore_helpers.append(IgnoreHelper(self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END))
+        prepend_to_next_line = ""
         for line in lines:
+            line = prepend_to_next_line + line
+            prepend_to_next_line = ""
+            if re.match(r"^console.\w+:\s*$", line):
+                prepend_to_next_line = line
+                continue
             ignoring = False
             for helper in ignore_helpers:
                 if helper.update_and_check(line) is True:
@@ -107,6 +113,8 @@ class GeckoLogParser(object):
 
     def _is_exception(self, line):
         line = line.lower()
+        if re.match(r"^console\.(?!error)", line):
+            return False
         for word in ["error", "warning", "exception"]:
             if line.find(word) != -1:
                 return True

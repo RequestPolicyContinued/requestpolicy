@@ -34,11 +34,6 @@
  * [1] https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
  */
 
-/* global Components */
-const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
-
-let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
 //==============================================================================
 
 let prefInitFunctions = {
@@ -108,11 +103,12 @@ let defaultPrefScriptScope = {
 //
 
 try {
-  // this is necessary for restartless extensions:
-  // ( See https://developer.mozilla.org/en-US/Add-ons/
-  //   How_to_convert_an_overlay_extension_to_restartless
-  //   #Step_4.3A_Manually_handle_default_preferences )
+  // This is necessary for restartless extensions.
+  // https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/lib/default-preferences.js",
       defaultPrefScriptScope);
-} catch (e) {}
+} catch (e) {
+  console.log("Error handling default preferences!");
+  console.dir(e);
+}

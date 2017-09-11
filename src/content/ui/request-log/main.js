@@ -23,23 +23,26 @@
 
 "use strict";
 
-/* global window */
+import {loadRLInterfaceIntoWindow} from "./interface";
+import {loadRLTreeViewIntoWindow} from "./tree-view";
+import {loadRLFilteringIntoWindow} from "./filtering";
+
+let {
+  StringUtils,
+  Environment,
+  MainEnvironment,
+} = browser.extension.getBackgroundPage();
 
 window.rpcontinued = window.rpcontinued || {};
+window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
 
-window.rpcontinued.requestLog = (function(self) {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  let {StringUtils} = importModule("lib/utils/strings");
-  let {Environment, ProcessEnvironment} = importModule("lib/environment");
+(function() {
+  let {requestLog} = window.rpcontinued;
 
   //============================================================================
 
   // create a new Environment for this window
-  var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
+  var WinEnv = new Environment(MainEnvironment, "WinEnv");
   // The Environment has to be shut down when the content window gets unloaded.
   WinEnv.shutdownOnUnload(window);
   // start up right now, as there won't be any startup functions
@@ -47,29 +50,33 @@ window.rpcontinued.requestLog = (function(self) {
 
   let $id = window.document.getElementById.bind(window.document);
 
-  self.isEmptyMessageDisplayed = true;
-  self.rows = [];
-  self.visibleRows = [];
+  requestLog.isEmptyMessageDisplayed = true;
+  requestLog.rows = [];
+  requestLog.visibleRows = [];
 
   function init() {
-    self.tree = $id("rpcontinued-requestLog-tree");
+    requestLog.tree = $id("rpcontinued-requestLog-tree");
 
-    self.tree.view = self.treeView;
+    requestLog.tree.view = requestLog.treeView;
 
     showLogIsEmptyMessage();
 
     // Give the requestpolicy overlay direct access to the the request log.
-    window.parent.rpcontinued.overlay.requestLog = self;
+    window.parent.rpcontinued.overlay.requestLog = requestLog;
   }
   function showLogIsEmptyMessage() {
     var message = StringUtils.$str("requestLogIsEmpty");
     var directions = StringUtils.$str("requestLogDirections");
-    self.visibleRows.push([message, directions, false, ""]);
-    self.treebox.rowCountChanged(0, 1);
+    requestLog.visibleRows.push([message, directions, false, ""]);
+    requestLog.treebox.rowCountChanged(0, 1);
   }
 
   // call init() on the window's "load" event
   WinEnv.elManager.addListener(window, "load", init, false);
 
-  return self;
-}(window.rpcontinued.requestLog || {}));
+  return requestLog;
+}());
+
+loadRLInterfaceIntoWindow(window);
+loadRLTreeViewIntoWindow(window);
+loadRLFilteringIntoWindow(window);

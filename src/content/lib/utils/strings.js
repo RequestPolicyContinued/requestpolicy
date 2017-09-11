@@ -53,7 +53,7 @@ export const StringUtils = (function() {
   }
 
   self.$str = function(aName, aParams) {
-    if (!!aParams) {
+    if (aParams) {
       return self.strbundle.formatStringFromName(aName, aParams,
                                                  aParams.length);
     } else {

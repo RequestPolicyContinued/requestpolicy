@@ -57,7 +57,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
 
   // Note: the startup functions have to be defined *last*, as they might get
   //       called immediately.
-  if (!!aEnv) {
+  if (aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
@@ -77,7 +77,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (!!Logger) {
+    if (Logger) {
       console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
@@ -88,7 +88,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   self.mm = aMM;
 
   if (!self.mm) {
-    if (!!Logger) {
+    if (Logger) {
       Logger.warning("No Message Manager was specified " +
                      "for a new ManagerForMessageListeners!");
     }

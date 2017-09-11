@@ -56,7 +56,7 @@ export function ManagerForEventListeners(aEnv) {
 
   // Note: the startup functions have to be defined *last*, as they might get
   //       called immediately.
-  if (!!aEnv) {
+  if (aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
@@ -76,7 +76,7 @@ export function ManagerForEventListeners(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (!!Logger) {
+    if (Logger) {
       console.error(
           "No Environment was specified for a new ManagerForEventListeners! " +
           "This means that the listeners won't be removed!");

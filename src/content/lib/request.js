@@ -358,7 +358,7 @@ NormalRequest.prototype.getContentWindow = function() {
  */
 NormalRequest.prototype.getChromeWindow = function() {
   let contentWindow = this.getContentWindow();
-  if (!!contentWindow) {
+  if (contentWindow) {
     return WindowUtils.getChromeWindow(contentWindow);
   } else {
     return null;

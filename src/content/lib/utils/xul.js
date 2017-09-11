@@ -241,7 +241,7 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
       console.error("Element spec incomplete!");
       continue;
     }
-    let parentElement = !!aParentElement ? aParentElement :
+    let parentElement = aParentElement ? aParentElement :
         getParentElement(aDocument, elementSpec);
     if (false === parentElement) {
       console.error("The parent element could not " +

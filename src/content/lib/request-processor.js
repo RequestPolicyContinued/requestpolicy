@@ -498,6 +498,7 @@ export let RequestProcessor = (function() {
    * @param {NormalRequest} request
    * @return {number}
    */
+  // eslint-disable-next-line complexity
   self.process = function(request) {
     // uncomment for debugging:
     // Logger.debug("request: " +

@@ -46,8 +46,8 @@ const fileFilter = (function() {
     return new Set(_array(aAny));
   }
 
+  // eslint-disable-next-line complexity
   function pathMatches(aPath, aFilter) {
-    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
     if (Array.isArray(aFilter)) {
       return aFilter.some(filter => pathMatches(aPath, filter));
     }
@@ -84,8 +84,8 @@ const fileFilter = (function() {
     ]);
   }
 
+  // eslint-disable-next-line complexity
   function fileMatches(aFilter, aVinylFile) {
-    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
     if (Array.isArray(aFilter)) {
       return aFilter.some(filter => fileMatches(filter, aVinylFile));
     }

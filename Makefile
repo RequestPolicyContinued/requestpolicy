@@ -52,7 +52,8 @@ ZIP            := zip
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
-JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint --extra-ext jsm
+JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
+	--extra-ext jsm  --exclude '**/third-party/'
 
 # node --eval
 PREPROCESS = node --eval 'require("preprocess").preprocessFileSync("$2", "$3", {$4}, {type: "$1"});'
@@ -170,7 +171,7 @@ src__copy_files := \
 		$(wildcard $(source_dir)/skin/*.css) \
 		$(wildcard $(source_dir)/skin/*.png) \
 		$(wildcard $(source_dir)/skin/*.svg) \
-		$(shell find $(source_dir) -type f -iname "jquery*.js")
+		$(shell find $(source_dir)/content/lib/third-party/ -iname "*.js")
 
 src__install_rdf := \
 	$(source_dir)/install.rdf
@@ -650,7 +651,7 @@ jscs_args :=
 .PHONY: static-analysis jshint jscs addons-linter
 static-analysis: jshint jscs addons-linter check-locales
 jshint: node-packages
-	$(JSHINT) --exclude '**/jquery.min.js' $(jshint_args) src/
+	$(JSHINT) $(jshint_args) src/
 	$(JSHINT) $(jshint_args) tests/xpcshell/
 	$(JSHINT) $(jshint_args) tests/helper-addons/
 jscs: node-packages

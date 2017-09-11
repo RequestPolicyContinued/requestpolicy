@@ -2,7 +2,7 @@
   "preset": "google",
   "fileExtensions": [".js", ".jsm"],
   "excludeFiles": [
-    "**/jquery.min.js",
+    "**/third-party/",
     "**/content/lib/ruleset.jsm",
     "external/"
   ],

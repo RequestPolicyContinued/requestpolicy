@@ -511,7 +511,7 @@ Rules.prototype = {
     return this._rules.length === 0;
   },
 
-  [Symbol.iterator]: function*() {
+  [Symbol.iterator]: function* () {
     yield* this._rules;
   },
 
@@ -913,7 +913,7 @@ Ruleset.prototype = {
    * @param {string} host The host to get matching entries for.
    * @yield {Generator<DomainEntry|IPAddressEntry>}
    */
-  getHostMatches: function*(host) {
+  getHostMatches: function* (host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).

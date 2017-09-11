@@ -32,6 +32,8 @@ ErrorTriggeringService.bootstrap();
 /**
  * Triggers errors for a RequestPolicy UI test.
  * It's used to test Error Detection from the UI tests.
+ *
+ * @return {ErrorTriggeringService}
  */
 function createErrorTriggeringService() {
   let self = {};
@@ -74,6 +76,9 @@ function createErrorTriggeringService() {
    * to two strings:
    *   ["foo", "bar:baz"]
    * Only the first colon counts.
+   *
+   * @param {string} aString
+   * @return {[string, string]}
    */
   function splitColon(aString) {
     const index = aString.indexOf(":");

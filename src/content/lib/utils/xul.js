@@ -131,6 +131,9 @@ function getParentElement(aDocument, aElementSpec) {
 
 /**
  * Get the localized value of an attribute.
+ *
+ * @param {string} aRawValue
+ * @return {string}
  */
 function getLocalizedValue(aRawValue) {
   if (typeof aRawValue !== "string") {

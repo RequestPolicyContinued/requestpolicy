@@ -31,6 +31,8 @@
  * The reason for this function is that octal integer literals (integer with
  * leading zero like 0700) are deprecated. Using them would cause a JavaScript
  * strict warning. See http://www.ecma-international.org/ecma-262/5.1/#sec-B.1
+ *
+ * @return {number}
  */
 function getOctalInt() {
   let result = 0;
@@ -55,6 +57,7 @@ export const FileUtil = {
    * Returns the lines of the file in an array.
    *
    * @param {nsIFile} file
+   * @return {Array<string>}
    */
   fileToArray: function(file) {
     const stream = Cc["@mozilla.org/network/file-input-stream;1"]
@@ -76,6 +79,7 @@ export const FileUtil = {
    * Returns the contents of the file as a string.
    *
    * @param {nsIFile} file
+   * @return {string}
    */
   fileToString: function(file) {
     // FIXME: This function MUST NOT check for the file to exist,
@@ -166,6 +170,9 @@ export const FileUtil = {
    * it doesn't already exist. Each subdir, if specified, is created if it does
    * not exist.
    *
+   * @param {string?} subdir1
+   * @param {string?} subdir2
+   * @param {string?} subdir3
    * @return {nsIFile}
    */
   getRPUserDir: function(subdir1, subdir2, subdir3) {

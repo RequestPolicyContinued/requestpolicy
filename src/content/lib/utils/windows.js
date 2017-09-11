@@ -89,6 +89,7 @@ export const WindowUtils = (function() {
   /**
    * Should it be possible to add permanent rules in that window?
    *
+   * @param {Window} aWindow
    * @return {boolean}
    */
   self.mayPermanentRulesBeAdded = function(aWindow) {
@@ -104,6 +105,10 @@ export const WindowUtils = (function() {
    * Wait for a window to be loaded and then add a list of Elements „by ID“ to
    * a scope. The scope is optional, but in any case will be returned.
    *
+   * @param {Window} aWindow
+   * @param {Array<string>} aElementIDs
+   * @param {Object?} aScope
+   * @param {function?} aCallback
    * @return {Object} the scope of the elements
    */
   self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,

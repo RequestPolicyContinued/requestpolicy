@@ -41,6 +41,8 @@ const {LOG_FLAG_STATE} = C;
 /**
  * Provides functionality for the overlay. An instance of this class exists for
  * each tab/window.
+ *
+ * @param {Window} window
  */
 export function loadOverlayIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -326,7 +328,7 @@ export function loadOverlayIntoWindow(window) {
    * @param {String} aUri
    * @param {Int} aMaxLength
    *
-   * @returns {String} the URI, possibly cropped
+   * @return {String} the URI, possibly cropped
    *
    */
   function cropUri(aUri, aMaxLength) {
@@ -573,6 +575,8 @@ export function loadOverlayIntoWindow(window) {
 
   /**
    * Sets the blocked content notifications visible to the user.
+   *
+   * @param {boolean} isContentBlocked
    */
   self._setContentBlockedState = function(isContentBlocked) {
     const button = $id(toolbarButtonId);
@@ -642,6 +646,10 @@ export function loadOverlayIntoWindow(window) {
    * blocked.
    * This function is called during shouldLoad(). As shouldLoad shoudn't be
    * blocked, it's better to set a timeout here.
+   *
+   * @param {browser} browser
+   * @param {string} originUri
+   * @param {string} destUri
    */
   self.observeBlockedTopLevelDocRequest = function(browser, originUri,
                                                    destUri) {
@@ -928,6 +936,8 @@ export function loadOverlayIntoWindow(window) {
 
   /**
    * Get the top-level document's uri.
+   *
+   * @return {string}
    */
   self.getTopLevelDocumentUri = function() {
     let uri = gBrowser.selectedBrowser.currentURI.spec;

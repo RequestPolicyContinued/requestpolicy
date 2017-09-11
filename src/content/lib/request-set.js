@@ -168,6 +168,8 @@ RequestSet.prototype = {
   },
 
   /**
+   * @param {string} originUri
+   * @param {string} destUri
    */
   removeRequest: function(originUri, destUri) {
     if (!this._origins[originUri]) {
@@ -207,6 +209,7 @@ RequestSet.prototype = {
   },
 
   /**
+   * @param {string} originUri
    */
   removeOriginUri: function(originUri) {
     delete this._origins[originUri];

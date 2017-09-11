@@ -315,6 +315,8 @@ NormalRequest.prototype.isInternal = function() {
 
 /**
  * Get the content window (nsIDOMWindow) related to this request.
+ *
+ * @return {?Window}
  */
 NormalRequest.prototype.getContentWindow = function() {
   let context = this.aContext;
@@ -347,7 +349,9 @@ NormalRequest.prototype.getContentWindow = function() {
 };
 
 /**
- * Get the chrome window (nsIDOMWindow) related to this request.
+ * Get the chrome window related to this request.
+ *
+ * @return {?nsIDOMWindow}
  */
 NormalRequest.prototype.getChromeWindow = function() {
   let contentWindow = this.getContentWindow();
@@ -359,7 +363,9 @@ NormalRequest.prototype.getChromeWindow = function() {
 };
 
 /**
- * Get the <browser> (nsIDOMXULElement) related to this request.
+ * Get the <browser> related to this request.
+ *
+ * @return {nsIDOMXULElement}
  */
 NormalRequest.prototype.getBrowser = function() {
   let context = this.aContext;

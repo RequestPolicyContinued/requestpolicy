@@ -105,6 +105,9 @@ export function loadMenuIntoWindow(window) {
    * Show a dialog with "OK" and "Cancel" buttons, as well as with a
    * checkbox labeled "always ask?".
    *
+   * @param {string} dialogMessage
+   * @param {string} alwaysAskPrefName
+   * @param {Object=} params
    * @return {boolean} If the question has been confirmed or not.
    */
   function confirm(dialogMessage, alwaysAskPrefName, params={}) {

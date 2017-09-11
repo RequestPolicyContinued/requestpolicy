@@ -85,6 +85,8 @@ export const OldRules = (function() {
 
   /**
    * Convert the pref strings to rule objects.
+   *
+   * @return {Array<Object>}
    */
   OldRules.prototype.getAsNewRules = function() {
     const rules = [];

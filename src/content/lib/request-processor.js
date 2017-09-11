@@ -200,6 +200,7 @@ export let RequestProcessor = (function() {
    * @param {string} reason
    * @param {Request} request
    * @param {boolean} unforbidable
+   * @return {number}
    */
   function accept(reason, request, unforbidable) {
     if (LOG_REQUESTS) {
@@ -495,6 +496,7 @@ export let RequestProcessor = (function() {
    * Process a NormalRequest.
    *
    * @param {NormalRequest} request
+   * @return {number}
    */
   self.process = function(request) {
     // uncomment for debugging:
@@ -970,6 +972,8 @@ export let RequestProcessor = (function() {
    *
    * Currently this just looks for prefetch requests that are getting through
    * which we currently can't stop.
+   *
+   * @param {string} aSubject
    */
   let examineHttpRequest = function(aSubject) {
     const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
@@ -1149,6 +1153,7 @@ export let RequestProcessor = (function() {
    * cases where the user has multiple tabs/windows open to the same page.
    *
    * @param {Browser} browser
+   * @return {RequestSet}
    */
   self.getAllRequestsInBrowser = function(browser) {
     // var origins = {};
@@ -1516,6 +1521,7 @@ RequestProcessor = (function(self) {
 
   /**
    * @param {RedirectRequest} aRequest
+   * @return {string}
    */
   function getOriginOfInitialRedirect(aRequest) {
     let initialOrigin = aRequest.originURI;
@@ -1544,6 +1550,9 @@ RequestProcessor = (function(self) {
   /**
    * Checks whether a request is initiated by a content window. If it's from a
    * content window, then it's from unprivileged code.
+   *
+   * @param {RedirectRequest} request
+   * @return {boolean}
    */
   function isContentRequest(request) {
     let loadContext = request._oldChannel.loadContext;

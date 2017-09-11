@@ -34,6 +34,8 @@ const {LOG_EVENT_LISTENERS} = C;
  * This class provides an interface to multiple "Event Targets" which takes
  * care of adding/removing event listeners at startup/shutdown.
  * Every instance of this class is bound to an environment.
+ *
+ * @param {Environment} aEnv
  */
 export function ManagerForEventListeners(aEnv) {
   let self = this;

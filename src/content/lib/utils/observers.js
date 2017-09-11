@@ -26,6 +26,8 @@
 
 /**
  * Generic Observer class.
+ *
+ * @param {function} aCallback
  */
 function Observer(aCallback) {
   // As the `observe` function, take directly the parameter.
@@ -57,6 +59,9 @@ Observer.prototype.unregister = function() {
 /**
  * An instance of this class registers itself to `nsIObserverService` on behalf
  * of some other object.
+ *
+ * @param {string} aTopic
+ * @param {function} aCallback
  */
 export function SingleTopicObserver(aTopic, aCallback) {
   this.topic = aTopic;

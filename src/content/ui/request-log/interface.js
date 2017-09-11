@@ -47,6 +47,8 @@ export function loadRLInterfaceIntoWindow(window) {
   /**
    * Copy the content of a cell to the clipboard. The row used will be the one
    * selected when the context menu was opened.
+   *
+   * @param {string} columnName
    */
   requestLog.copyToClipboard = function(columnName) {
     const content = requestLog.treeView.getCellText(
@@ -61,6 +63,8 @@ export function loadRLInterfaceIntoWindow(window) {
   /**
    * Open the content of a cell in a new tab. The row used will be the one
    * selected when the context menu was opened.
+   *
+   * @param {string} columnName
    */
   requestLog.openInNewTab = function(columnName) {
     const content = requestLog.treeView.getCellText(

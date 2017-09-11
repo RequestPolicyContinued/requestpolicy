@@ -32,6 +32,8 @@ import {Logger} from "lib/logger";
  * An ObserverManager provides an interface to `nsIObserverService` which takes
  * care of unregistering the observed topics. Every ObserverManager is bound to
  * an environment.
+ *
+ * @param {Environment} aEnv
  */
 export function ObserverManager(aEnv) {
   let self = this;

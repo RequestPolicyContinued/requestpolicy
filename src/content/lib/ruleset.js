@@ -214,6 +214,8 @@ RawRuleset.prototype = {
    * |Ruleset| optionally provided as the policy argument.
    *
    * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
+   * @param {RuleSpec} ruleData
+   * @param {Ruleset} policy
    */
   addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
@@ -361,6 +363,8 @@ RawRuleset.prototype = {
    * |Ruleset| optionally provided as the policy argument.
    *
    * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
+   * @param {RuleSpec} ruleData
+   * @param {Ruleset} policy
    */
   removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
@@ -400,6 +404,9 @@ RawRuleset.prototype = {
   /**
    * Returns a |Ruleset| object initialized to reflect the contents of this
    * |RawRuleset|.
+   *
+   * @param {string} name
+   * @return {Ruleset}
    */
   toRuleset: function(name) {
     const policy = new Ruleset(name);
@@ -440,6 +447,8 @@ RawRuleset.prototype = {
 
   /**
    * Initializes this |RawRuleset| from JSON data.
+   *
+   * @param {string} data
    */
   _fromJSON: function(data) {
     // TODO: sanity check imported data, decide whether to ignore unrecognized
@@ -458,6 +467,8 @@ RawRuleset.prototype = {
    * Returns a simple object representing this |RawRuleset|. This function
    * is automatically invoked when |JSON.stringify(rawRulesetObj)| is called and
    * the result is passed through stringify before being returned.
+   *
+   * @return {Object}
    */
   toJSON: function() {
     // Note: unrecognized keys in the metadata and entries are preserved.
@@ -884,16 +895,14 @@ Ruleset.prototype = {
     }
   },
 
-  // jscs:disable jsDoc // https://github.com/jsdoc3/jsdoc/issues/555
   /**
    * Yields all matching hosts, that is, DomainEntry or IPAddressEntry
    * objects. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
    * @param {string} host The host to get matching entries for.
-   * @return {Generator<DomainEntry|IPAddressEntry>}
+   * @yield {Generator<DomainEntry|IPAddressEntry>}
    */
-  // jscs:enable jsDoc
   getHostMatches: function*(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
@@ -1040,6 +1049,10 @@ Ruleset.prototype = {
 
 /**
  * @static
+ * @param {?} rawRule
+ * @param {("o"|"d")} originOrDest
+ * @param {?} entry
+ * @param {?} rule
  */
 Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
@@ -1059,6 +1072,8 @@ Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
 
 /**
  * @static
+ * @param {?} match
+ * @return {RawRule}
  */
 Ruleset.matchToRawRule = function(match) {
   // The matches are in the format
@@ -1093,6 +1108,10 @@ Ruleset.matchToRawRule = function(match) {
 
 /**
  * @static
+ * @param {?} rawRule
+ * @param {("o"|"d")} originOrDest
+ * @param {Array} parts
+ * @return {string}
  */
 Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
     parts) {

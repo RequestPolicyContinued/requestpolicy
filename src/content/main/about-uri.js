@@ -71,6 +71,7 @@ export const AboutRequestPolicy = (function() {
   /**
    * @param {nsIURI} aURI
    * @param {nsILoadInfo} aLoadInfo Only available on Gecko 36+.
+   * @return {nsIChannel}
    */
   self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);

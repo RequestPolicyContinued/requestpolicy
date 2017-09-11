@@ -194,9 +194,6 @@ export const Environment = (function() {
   Environment.LEVELS = LEVELS;
   Environment.ENV_STATES = ENV_STATES;
 
-  /**
-   * Registers the environment to its outer environment.
-   */
   Environment.prototype.isShuttingDownOrShutDown = function() {
     let self = this;
     return self.envState >= ENV_STATES.SHUTTING_DOWN;
@@ -207,6 +204,8 @@ export const Environment = (function() {
    * mainly will hold the startup- or shutdown-functions of the corresponding
    * level. All of the Level Objects are put together in another object which
    * is then returned.
+   *
+   * @return {Object}
    */
   function generateLevelObjects() {
     let obj = {};
@@ -268,9 +267,6 @@ export const Environment = (function() {
     }
   };
 
-  /**
-   * Add a startup function to the environment.
-   */
   Environment.prototype.addStartupFunction = function(aLevel, f) {
     let self = this;
     if (self.isShuttingDownOrShutDown()) {
@@ -292,9 +288,6 @@ export const Environment = (function() {
     }
   };
 
-  /**
-   * Add a shutdown function to the environment.
-   */
   Environment.prototype.addShutdownFunction = function(aLevel, f) {
     let self = this;
     if (self.levels.shutdown[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
@@ -383,6 +376,7 @@ export const Environment = (function() {
      * @this {Environment}
      * @param {string} aStartupOrShutdown - either "startup" or "shutdown"
      * @param {integer} aLevel
+     * @param {Object} aBootstrapArgs
      */
     function processLevel(aStartupOrShutdown, aLevel, aBootstrapArgs) {
       /* jshint validthis: true */

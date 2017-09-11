@@ -52,6 +52,9 @@ export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user contr
  * RequestResult objects are used to hand over the result of a check
  * whether a request is allowed or not. Sometimes only the boolean value of
  * isAllowed is needed; in that case the other arguments may be unused.
+ *
+ * @param {boolean} isAllowed
+ * @param {number} resultReason
  */
 export function RequestResult(isAllowed, resultReason) {
   this.matchedAllowRules = [];

@@ -38,6 +38,10 @@ GUILocation.prototype.toString = function() {
 
 /**
  * @static
+ * @param {function(new:GUILocation, value, properties)} SubclassOfGUILocation
+ * @param {GUILocation} location1
+ * @param {GUILocation} location2
+ * @return {GUILocation}
  */
 GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
   return new SubclassOfGUILocation(
@@ -47,6 +51,9 @@ GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
 
 /**
  * @static
+ * @param {(string|GUILocation)} locationString
+ * @param {Array<GUILocation>} locations
+ * @return {boolean}
  */
 GUILocation.existsInArray = function(locationString, locations) {
   return GUILocation.indexOfLocationInArray(locationString, locations) !== -1;
@@ -75,6 +82,9 @@ GUILocation.indexOfLocationInArray = function(locationString, locations) {
  * compare functions used to sort an Array of GUIDestination objects.
  *
  * @static
+ * @param {GUILocation} a
+ * @param {GUILocation} b
+ * @return {number}
  */
 GUILocation.sortByNumRequestsCompareFunction = function(a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
@@ -118,6 +128,9 @@ GUILocation.compareFunction = function(a, b, sortType) {
  * GUIOrigin objects are used to hand over not only "origin" strings, like
  * "example.com", but also properties which might be useful to display more
  * information on the GUI.
+ *
+ * @param {string} origin
+ * @param {GUILocationProperties} properties
  */
 export function GUIOrigin(origin, properties) {
   GUILocation.call(this, origin, properties);
@@ -138,6 +151,9 @@ GUIOrigin.indexOfOriginInArray = GUILocation.indexOfLocationInArray;
  * GUIDestination objects are used to hand over not only "destination" strings,
  * like "example.com", but also properties which might be useful to display more
  * information on the GUI.
+ *
+ * @param {string} dest
+ * @param {GUILocationProperties} properties
  */
 export function GUIDestination(dest, properties) {
   GUILocation.call(this, dest, properties);
@@ -232,6 +248,9 @@ GUILocationProperties.requestCountProperties = [
  * Merge the given GUILocationProperties object to a new object
  *
  * @static
+ * @param {GUILocationProperties} prop1
+ * @param {GUILocationProperties} prop2
+ * @return {GUILocationProperties}
  */
 GUILocationProperties.merge = function(prop1, prop2) {
   const requestCountProperties = GUILocationProperties.requestCountProperties;

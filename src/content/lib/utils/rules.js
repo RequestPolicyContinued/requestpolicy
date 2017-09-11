@@ -33,6 +33,9 @@ export const RuleUtils = (function() {
    *
    * Example cases can be found in the unit test corresponding
    * to this function.
+   *
+   * @param {Object} aEndpointSpec
+   * @return {string}
    */
   self.endpointSpecToDisplayString = function(aEndpointSpec) {
     if (aEndpointSpec.port !== undefined &&

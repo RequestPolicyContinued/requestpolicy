@@ -78,6 +78,9 @@ export const Prefs = (function() {
    * Valid "fake pref names" are:
    *   - "root/ network.prefetch-next" (root pref branch)
    *   - "welcomeWindowShown" (RequestPolicy pref branch)
+   *
+   * @param {string} aFakePrefName
+   * @return {Object}
    */
   function getBranchAndRealName(aFakePrefName) {
     if (aFakePrefName.startsWith("root/ ")) {

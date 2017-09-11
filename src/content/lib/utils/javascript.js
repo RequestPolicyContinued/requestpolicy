@@ -63,6 +63,9 @@ export const JSUtils = (function() {
 
   /**
    * Create an array containing the elements [0, ..., n-1].
+   *
+   * @param {number} n
+   * @return {Array<number>}
    */
   self.range = function(n) {
     let array = [];

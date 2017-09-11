@@ -56,6 +56,8 @@ export function loadRLTreeViewIntoWindow(window) {
     /**
      * "This method should return the text contents at the specified row and
      * column."
+     *
+     * @param {nsITreeBoxObject} aTreebox
      */
     setTree: function(aTreebox) {
       requestLog.treebox = aTreebox;
@@ -63,6 +65,10 @@ export function loadRLTreeViewIntoWindow(window) {
 
     /**
      * This method is called once to set the tree element on the view.
+     *
+     * @param {number} aIndex
+     * @param {nsITreeColumn} aColumn
+     * @return {number}
      */
     getCellText: function(aIndex, aColumn) {
       // Row 0 is actually the last element in the array so that we don't have to

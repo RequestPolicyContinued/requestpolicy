@@ -60,6 +60,7 @@ export function loadRLFilteringIntoWindow(window) {
    * This function searches the first two columns for the filterText.
    *
    * @param {Array} aRow
+   * @return {boolean}
    */
   requestLog.isRowFilteredOut = function(aRow) {
     if (filterText === null) {

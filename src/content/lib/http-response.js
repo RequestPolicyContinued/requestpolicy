@@ -45,6 +45,7 @@ HttpResponse.prototype.removeResponseHeader = function() {
 /**
  * Get the value of a particular response header.
  *
+ * @param {string} aHeaderName
  * @return {String|undefined} The header's value, or `undefined`
  *     if the header does not exist.
  */

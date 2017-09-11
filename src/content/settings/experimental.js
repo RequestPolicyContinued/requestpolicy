@@ -62,6 +62,8 @@
 
   /**
    * Delete all own properties of an object.
+   *
+   * @param {Object} obj
    */
   function deleteOwnProperties(obj) {
     for (var key in obj) {

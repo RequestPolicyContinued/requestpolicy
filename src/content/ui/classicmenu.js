@@ -34,6 +34,8 @@ export function loadClassicmenuIntoWindow(window) {
 
   /**
    * Removes all menu items and removes all event listeners.
+   *
+   * @param {menupopup} menu
    */
   self.emptyMenu = function(menu) {
     const menuitems = menu.getElementsByTagName("menuitem");

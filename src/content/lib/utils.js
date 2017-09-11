@@ -74,6 +74,7 @@ export const Utils = (function() {
    *
    * @param {Object} object
    * @param {...string} properties
+   * @return {any}
    */
   self.getObjectPath = function(object, ...properties) {
     return properties.reduce(self.getObjectProperty, object);
@@ -81,6 +82,9 @@ export const Utils = (function() {
 
   /**
    * @private
+   * @param {Object} object
+   * @param {string} property
+   * @return {any}
    */
   self.getObjectProperty = function(object, property) {
     if (!!object && object.hasOwnProperty(property)) {
@@ -94,7 +98,7 @@ export const Utils = (function() {
    * The `internal` can be accessed from all submodules of that module.
    *
    * @param {Object} aModuleScope
-   * @returns {Object} the module's `internal`
+   * @return {Object} the module's `internal`
    */
   self.createModuleInternal = function(aModuleScope) {
     let internal = {};

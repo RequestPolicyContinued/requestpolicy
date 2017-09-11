@@ -34,6 +34,9 @@ const {LOG_MESSAGE_LISTENERS} = C;
  * This class provides an interface to a "Message Manager" which takes
  * care of adding/removing message listeners at startup/shutdown.
  * Every instance of this class is bound to an environment and a MessageManager.
+ *
+ * @param {Environment} aEnv
+ * @param {nsIMessageListenerManager} aMM
  */
 export function ManagerForMessageListeners(aEnv, aMM) {
   let self = this;

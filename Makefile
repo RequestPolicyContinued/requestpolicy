@@ -30,12 +30,11 @@ build_dir_root := build
 dist_dir       := dist
 logs_dir       := logs
 
-dev_env_dir    := dev_env
-python_env_dir := $(dev_env_dir)/python
-node_env_dir   := $(dev_env_dir)/node
-browsers_dir   := $(dev_env_dir)/browsers
+dev_env_dir      := dev_env
+python_env_dir   := $(dev_env_dir)/python
+browsers_dir     := $(dev_env_dir)/browsers
 
-node_modules_dir := $(node_env_dir)/node_modules
+node_modules_dir := ./node_modules
 
 # create the dist directory
 $(dist_dir) $(logs_dir):
@@ -47,7 +46,7 @@ $(dist_dir) $(logs_dir):
 
 # system
 GIT            := /usr/bin/git
-NPM            := npm --prefix=$(node_env_dir)
+NPM            := npm
 PREPROCESS     := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
 ZIP            := zip
 
@@ -452,9 +451,9 @@ T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
-$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
+$(T_NODE_PACKAGES): package.json \
 		$(call force_every,7 days,$(T_NODE_PACKAGES))
-	grep -Ev '^\#' $< | xargs $(NPM) install
+	$(NPM) install
 	touch $@
 
 #-------------------------------------------------------------------------------

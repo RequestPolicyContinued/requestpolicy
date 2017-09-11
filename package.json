@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "addons-linter": "^0.22.2",
+    "jscs": "^3.0.7",
+    "jshint": "^2.9.4"
+  }
+}

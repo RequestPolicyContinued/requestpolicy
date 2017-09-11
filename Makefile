@@ -22,6 +22,23 @@ amo__extension_id     := rpcontinued@amo.requestpolicy.org
 off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
 
 #-------------------------------------------------------------------------------
+# running, UI testing
+#-------------------------------------------------------------------------------
+
+# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
+app := firefox
+# default app branch
+ifeq ($(app),firefox)
+	app_branch := nightly
+else
+	app_branch := release
+endif
+binary_filename := $(app)
+app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
+
+mozrunner_prefs_ini := tests/mozrunner-prefs.ini
+
+#-------------------------------------------------------------------------------
 # directories
 #-------------------------------------------------------------------------------
 
@@ -530,23 +547,6 @@ clean-old-browser-tarballs: \
 #===============================================================================
 # Running and Testing RequestPolicy
 #===============================================================================
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] general variables
-#-------------------------------------------------------------------------------
-
-# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
-app := firefox
-# default app branch
-ifeq ($(app),firefox)
-	app_branch := nightly
-else
-	app_branch := release
-endif
-binary_filename := $(app)
-app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
-
-mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 #-------------------------------------------------------------------------------
 # run firefox

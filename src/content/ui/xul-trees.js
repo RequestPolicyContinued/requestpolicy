@@ -133,18 +133,18 @@ exports.mainTree = [
                       {
                         tag: "hbox",
                         attributes: {id: "rpc-origin",
-                                     "class": "rpc-od-item"},
+                                     class: "rpc-od-item"},
                         events: {click: ["menu", "itemSelected"]},
                         children: [
                           {
                             tag: "label",
                             attributes: {id: "rpc-origin-domainname",
-                                         "class": "domainname",
+                                         class: "domainname",
                                          flex: "2"}
                           }, {
                             tag: "label",
                             attributes: {id: "rpc-origin-num-requests",
-                                         "class": "numRequests"}
+                                         class: "numRequests"}
                           }
                         ]
                       },
@@ -159,7 +159,7 @@ exports.mainTree = [
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-other-origins-list",
-                                         "class": "rpc-label-list"}
+                                         class: "rpc-label-list"}
                           }
                         ]
                       },
@@ -174,7 +174,7 @@ exports.mainTree = [
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-blocked-destinations-list",
-                                         "class": "rpc-label-list"}
+                                         class: "rpc-label-list"}
                           }
                         ]
                       }, {
@@ -188,7 +188,7 @@ exports.mainTree = [
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-mixed-destinations-list",
-                                         "class": "rpc-label-list"}
+                                         class: "rpc-label-list"}
                           }
                         ]
                       }, {
@@ -202,7 +202,7 @@ exports.mainTree = [
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-allowed-destinations-list",
-                                         "class": "rpc-label-list"}
+                                         class: "rpc-label-list"}
                           }
                         ]
                       }
@@ -252,39 +252,39 @@ exports.mainTree = [
                       {
                         tag: "label",
                         attributes: {id: "rpc-link-enable-blocking",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.menu.enableBlocking;"},
                         events: {click: ["overlay",
                                          "toggleTemporarilyAllowAll"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-disable-blocking",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.menu.disableBlocking;"},
                         events: {click: ["overlay",
                                          "toggleTemporarilyAllowAll"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-help",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.menu.help;"},
                         events: {click: ["overlay", "openHelp"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-prefs",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.menu.preferences;"},
                         events: {click: ["overlay", "openPrefs"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-policies",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.menu.managePolicies;"},
                         events: {click: ["overlay", "openPolicyManager"]}
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-request-log",
-                                     "class": "rpc-footer-link",
+                                     class: "rpc-footer-link",
                                      value: "&rp.requestLog.title;"},
                         events: {click: ["overlay", "toggleRequestLog"]}
                       }

@@ -595,6 +595,7 @@ export let RequestProcessor = (function() {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -644,6 +645,7 @@ export let RequestProcessor = (function() {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -754,6 +756,7 @@ export let RequestProcessor = (function() {
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -1094,6 +1097,7 @@ export let RequestProcessor = (function() {
    */
   self.addRequestObserver = function(observer) {
     if (!("observeBlockedRequest" in observer)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Observer passed to addRequestObserver does " +
           "not have an observeBlockedRequest() method.";
     }

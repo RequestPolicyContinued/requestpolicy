@@ -168,6 +168,7 @@ export const ContentScriptsApi = {
       case "onDisabled": return "onDisabled";
       case "onInstalled": return "onInstalled";
       case "onUninstalled": return "onUninstalled";
+      // eslint-disable-next-line no-throw-literal
       default: throw `Unhandled callback name "${aCallbackName}".`;
     }
   }

@@ -156,6 +156,7 @@ export function loadOverlayIntoWindow(window) {
       console.error(
           "[FATAL] Unable to initialize rpcontinued.overlay. Details:");
       console.dir(e);
+      // eslint-disable-next-line no-throw-literal
       throw e;
     }
   };
@@ -847,6 +848,7 @@ export function loadOverlayIntoWindow(window) {
             aIID.equals(Ci.nsISupports)) {
           return this;
         }
+        // eslint-disable-next-line no-throw-literal
         throw Cr.NS_NOINTERFACE;
       },
 

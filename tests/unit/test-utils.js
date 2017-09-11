@@ -140,7 +140,7 @@ describe("Utils", function() {
       isTrue(param2 === "bar");
 
       // test that errors are catched
-      throw "test error";
+      throw "test error"; // eslint-disable-line no-throw-literal
     }
   });
 });

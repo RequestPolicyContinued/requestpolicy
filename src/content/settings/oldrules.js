@@ -107,6 +107,7 @@ import {common, $id, $str} from "./common";
 
   window.importOldRules = function() {
     if (!rules || rules.length === 0) {
+      // eslint-disable-next-line no-throw-literal
       throw "rules is undefined or empty";
     }
     PolicyManager.addAllowRules(rules);

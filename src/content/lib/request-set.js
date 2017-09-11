@@ -35,6 +35,7 @@ function getUriIdentifier(uri) {
   } catch (e) {
     const msg = "getUriIdentifier exception on uri <" + uri + "> " +
         ". Exception was: " + e;
+    // eslint-disable-next-line no-throw-literal
     throw new Error(msg);
   }
 }

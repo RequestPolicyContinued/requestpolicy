@@ -170,6 +170,7 @@ export const RPContentPolicy = (function() {
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
     return self.QueryInterface(iid);
@@ -278,6 +279,7 @@ export const RPChannelEventSink = (function() {
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
     return self.QueryInterface(iid);

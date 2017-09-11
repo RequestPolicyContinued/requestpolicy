@@ -235,6 +235,7 @@ export function loadMenuIntoWindow(window) {
     } catch (e) {
       console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);
+      // eslint-disable-next-line no-throw-literal
       throw e;
     }
   };
@@ -757,6 +758,7 @@ export function loadMenuIntoWindow(window) {
         PolicyManager.removeDenyRule(ruleData);
         break;
       default:
+        // eslint-disable-next-line no-throw-literal
         throw "action not implemented: " + ruleAction;
     }
   };
@@ -1070,6 +1072,7 @@ export function loadMenuIntoWindow(window) {
       return self._addMenuItemStopAllowingDest(list, rawRule,
           subscriptionOverride);
     } else {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid rule data: no origin or destination parts.";
     }
   };
@@ -1086,6 +1089,7 @@ export function loadMenuIntoWindow(window) {
       return self._addMenuItemStopDenyingDest(list, rawRule,
           subscriptionOverride);
     } else {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid rule data: no origin or destination parts.";
     }
   };

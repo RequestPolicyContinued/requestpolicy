@@ -118,6 +118,7 @@ export const OldRules = (function() {
         }
       }
 
+      // eslint-disable-next-line no-throw-literal
       throw new OldRulesParseError("Invalid old rule: \"" + originToDest +
           "\"");
     }
@@ -156,6 +157,7 @@ export const OldRules = (function() {
       } else if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
         return false;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw e;
       }
     }

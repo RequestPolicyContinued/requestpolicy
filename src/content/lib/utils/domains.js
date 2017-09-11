@@ -70,6 +70,7 @@ DomainUtil.getIdentifier = function(uri, level) {
       identifierGettingFunctionName = "getPrePath";
       break;
     default :
+    // eslint-disable-next-line no-throw-literal
       throw "Invalid identifier level specified " +
           "in DomainUtil.getIdentifier(): " + level;
   }
@@ -162,6 +163,7 @@ DomainUtil.getUriObject = function(uri) {
   } catch (e) {
     const msg = "DomainUtil.getUriObject exception on uri <" + uri + ">.";
     Logger.debug(msg);
+    // eslint-disable-next-line no-throw-literal
     throw e;
   }
 };
@@ -206,6 +208,7 @@ DomainUtil.getBaseDomain = function(uri) {
     } else if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
       return host;
     } else {
+      // eslint-disable-next-line no-throw-literal
       throw e;
     }
   }
@@ -270,6 +273,7 @@ DomainUtil.parseRefresh = function(refreshString) {
   const parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
   const delay = parseFloat(parts[1]);
   if (isNaN(delay)) {
+    // eslint-disable-next-line no-throw-literal
     throw "Invalid delay value in refresh string: " + parts[1];
   }
   let url = parts[3];

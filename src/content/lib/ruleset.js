@@ -195,6 +195,7 @@ RawRuleset.prototype = {
     const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
 
@@ -223,6 +224,7 @@ RawRuleset.prototype = {
     const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
 
@@ -297,6 +299,7 @@ RawRuleset.prototype = {
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
 
@@ -323,6 +326,7 @@ RawRuleset.prototype = {
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
 
@@ -349,6 +353,7 @@ RawRuleset.prototype = {
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
 
@@ -372,6 +377,7 @@ RawRuleset.prototype = {
     const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
     const ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
@@ -391,6 +397,7 @@ RawRuleset.prototype = {
       const begin = entries.slice(0, removeIndex);
       const end = entries.slice(Number(removeIndex) + 1);
       if (begin.length + end.length + 1 !== entries.length) {
+        // eslint-disable-next-line no-throw-literal
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
       this._entries[actionStr] = begin.concat(end);
@@ -431,16 +438,20 @@ RawRuleset.prototype = {
 
   _checkDataObj: function(dataObj) {
     if (!("metadata" in dataObj)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'metadata' key";
     }
     if (!("version" in dataObj.metadata)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'version' key";
     }
     if (dataObj.metadata.version !== 1) {
+      // eslint-disable-next-line no-throw-literal
       throw "Wrong metadata version. Expected 1, was " +
           dataObj.metadata.version;
     }
     if (!("entries" in dataObj)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'entries' key";
     }
   },
@@ -681,6 +692,7 @@ Rule.prototype = {
 
 function DomainEntry(name, fullName, higher) {
   if (typeof name !== "string" && name !== null) {
+    // eslint-disable-next-line no-throw-literal
     throw "Invalid type: DomainEntry name must be a string or null.";
   }
   this._name = name;
@@ -722,6 +734,7 @@ DomainEntry.prototype = {
 
   addLowerLevel: function(name, entry) {
     if (this._lower.hasOwnProperty(name)) {
+      // eslint-disable-next-line no-throw-literal
       throw "ENTRY_ALREADY_EXISTS";
     }
     this._lower[name] = entry;
@@ -875,6 +888,7 @@ Ruleset.prototype = {
 
   getHost: function(host) {
     if (!host) {
+      // eslint-disable-next-line no-throw-literal
       throw "INVALID_HOST";
     }
     if (DomainUtil.isIPAddress(host)) {
@@ -886,6 +900,7 @@ Ruleset.prototype = {
 
   addHost: function(host) {
     if (!host) {
+      // eslint-disable-next-line no-throw-literal
       throw "INVALID_HOST";
     }
     if (DomainUtil.isIPAddress(host)) {
@@ -1099,6 +1114,7 @@ Ruleset.matchToRawRule = function(match) {
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
+    // eslint-disable-next-line no-throw-literal
     throw "[matchToRawRule] Invalid match type: " + actionStr +
         " from match: " + match;
   }

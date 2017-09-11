@@ -72,6 +72,7 @@ function LoadAndUnloadListener(callback) {
 
   this.listenTo = function(eventName, window) {
     if (eventName !== "load" && eventName !== "unload") {
+      // eslint-disable-next-line no-throw-literal
       throw "incorrect event type!";
     }
     windows.add(window);
@@ -145,6 +146,7 @@ export const Windows = (function() {
 
   self.addListener = function(aEventType, aListener) {
     if (aEventType !== "load" && aEventType !== "unload") {
+      // eslint-disable-next-line no-throw-literal
       throw "incorrect event type!";
     }
     topicsToListeners.addToSet(aEventType, aListener);

@@ -170,6 +170,7 @@ export let PolicyManager = (function() {
   function assertRuleAction(ruleAction) {
     if (ruleAction !== C.RULE_ACTION_ALLOW &&
         ruleAction !== C.RULE_ACTION_DENY) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid rule type: " + ruleAction;
     }
   }
@@ -307,9 +308,11 @@ export let PolicyManager = (function() {
 
   function checkRequest(origin, dest, aRuleset, result) {
     if (!(origin instanceof Ci.nsIURI)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Origin must be an nsIURI.";
     }
     if (!(dest instanceof Ci.nsIURI)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Destination must be an nsIURI.";
     }
     if (!result) {

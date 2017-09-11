@@ -93,6 +93,7 @@ export const AboutRequestPolicy = (function() {
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
     return self.QueryInterface(iid);

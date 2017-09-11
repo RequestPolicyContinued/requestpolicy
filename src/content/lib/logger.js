@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
-
 //==============================================================================
 // Logger
 //==============================================================================
@@ -124,84 +122,3 @@ export var Logger = (function() {
 
   return self;
 }());
-
-// @ifdef UI_TESTING
-
-//==============================================================================
-// ErrorTriggeringService
-//==============================================================================
-
-/**
- * Triggers errors for a RequestPolicy UI test.
- * It's used to test Error Detection from the UI tests.
- */
-function createErrorTriggeringService() {
-  let self = {};
-
-  const isMainEnvironment =
-      typeof browser.extension.getBackgroundPage === "function";
-  const where = isMainEnvironment ? "backgroundscript" : "contentscript";
-  const topic = "requestpolicy-trigger-error-" + where;
-
-  const observer = {};
-
-  self.startup = function() {
-    Services.obs.addObserver(observer, topic, false);
-  };
-
-  self.shutdown = function() {
-    Services.obs.removeObserver(observer, topic);
-  };
-
-  /**
-   * Split a string like
-   *   "foo:bar:baz"
-   * to two strings:
-   *   ["foo", "bar:baz"]
-   * Only the first colon counts.
-   */
-  function splitColon(aString) {
-    var index = aString.indexOf(":");
-    if (index === -1) {
-      return [aString, ""];
-    }
-    var part1 = aString.substr(0, index);
-    var part2 = aString.substr(index + 1);
-    return [part1, part2];
-  }
-
-  observer.observe = function(aSubject, aTopic, aData) {
-    let [type, message] = splitColon(aData);
-
-    if (type === "error") {
-      console.error(message);
-    } else if (type === "ReferenceError") {
-      runAsync(produceReferenceError);
-    }
-  };
-
-  function produceReferenceError() {
-    var localVar = nonexistantVariable; // jshint ignore:line
-  }
-
-  function runAsync(aFunction) {
-    var runnable = {run: aFunction};
-    Services.tm.currentThread.dispatch(runnable,
-        Ci.nsIEventTarget.DISPATCH_NORMAL);
-  }
-
-  return self;
-}
-
-var ErrorTriggeringService;
-// @endif
-
-Logger.bootstrap = function() {
-  // @ifdef UI_TESTING
-  ErrorTriggeringService = createErrorTriggeringService();
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-      ErrorTriggeringService.startup);
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-      ErrorTriggeringService.shutdown);
-  // @endif
-};

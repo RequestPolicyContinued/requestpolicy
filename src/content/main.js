@@ -49,9 +49,9 @@ import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
 import {rpService} from "main/requestpolicy-service";
 import {WindowUtils} from "lib/utils/windows";
 
-let modules = [
-  Logger,
-];
+// @ifdef UI_TESTING
+import "ui-testing/services";
+// @endif
 
 let controllers = [
   KeyboardShortcuts,
@@ -146,12 +146,6 @@ observerService.addObserver(observer, "sdk:loader:destroy", false);
 
 (function startup() {
   PrefManager.init();
-
-  modules.forEach(m => {
-    if (typeof m.bootstrap === "function") {
-      m.bootstrap.apply(null);
-    }
-  });
 
   // TODO: Initialize the "models" first. Then initialize the other
   // controllers, which is currently "rpService", "ContentPolicy" etc.

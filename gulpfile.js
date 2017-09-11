@@ -170,6 +170,7 @@ BUILDS.forEach(build => {
   const extensionType = "legacy";
 
   const conditionalDirs = [extensionType].
+      concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
       map(name => `conditional/${name}`);
   const conditionalDirsWithSrc = conditionalDirs.
       map(dir => `src/${dir}`);

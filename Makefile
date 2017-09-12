@@ -57,6 +57,13 @@ preprocessor: $(build_dir_root)/preprocess-content-types.txt
 $(build_dir_root)/preprocess-content-types.txt:
 	echo 'JavaScript .jsm' > $@
 
+#-------------------------------------------------------------------------------
+# helpers
+#-------------------------------------------------------------------------------
+
+# $1: command(s) to be wrapped
+_remove_all_files_and_dirs_in = find '$1/' '!' -path '$1/' -delete
+
 
 #===============================================================================
 # Building RequestPolicy
@@ -658,15 +665,15 @@ include tests/l10n/Makefile
 .PHONY: clean mostlyclean distclean clean-dev-environment
 clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
-	@rm -rf $(build_dir_root)/*
+	@-$(call _remove_all_files_and_dirs_in,$(build_dir_root))
 mostlyclean: clean
-	@rm -rf $(logs_dir)/*
+	@-$(call _remove_all_files_and_dirs_in,$(logs_dir))
 clean-dev-environment:
-	@rm -rf $(python_env_dir)
-	@rm -rf $(node_env_dir)/node_modules
+	@-$(call _remove_all_files_and_dirs_in,$(python_env_dir))
+	@-$(call _remove_all_files_and_dirs_in,$(node_env_dir)/node_modules)
 	@rm -rf $(browsers_dir)/firefox
-	# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
-	# are put there manually.
+	@# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
+	@# are put there manually.
 	@rm -rf $(browsers_dir)/seamonkey/extracted
 distclean: mostlyclean clean-dev-environment
 

@@ -20,5 +20,5 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export {Api, ContentScriptsApi} from "./api";
+export {Api, ContentScriptsApi} from "./models/api";
 export {Manifest} from "./models/manifest";

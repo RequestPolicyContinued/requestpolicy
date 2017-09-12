@@ -26,7 +26,7 @@
 
 (function() {
   let {createCommonjsEnv, Api} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
+      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).FakeWebExt;
 
   let commonjsEnv = createCommonjsEnv();
 

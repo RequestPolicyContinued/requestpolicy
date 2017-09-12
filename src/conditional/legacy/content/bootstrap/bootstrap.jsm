@@ -24,12 +24,9 @@
 
 /* global Components */
 
-/* exported EXPORTED_SYMBOLS, Api, ContentScriptsApi */
+/* exported EXPORTED_SYMBOLS, FakeWebExt */
 var EXPORTED_SYMBOLS = [
-  "Api",
-  "ContentScriptsApi",
-  "createCommonjsEnv",
-  "getGlobals",
+  "FakeWebExt",
 ];
 
 //============================================================================
@@ -118,11 +115,65 @@ function createCommonjsEnv() {
 }
 
 //==============================================================================
+// FakeWebExt
+//==============================================================================
+
+var FakeWebExt = (function() {
+  let FakeWebExt = {
+    createCommonjsEnv,
+    getGlobals,
+  };
+
+  let bootstrapFunctions = {
+    onStartup: [],
+    onShutdown: [],
+  };
+
+  const FIFO_ADD = "push";
+  const LIFO_ADD = "unshift";
+
+  /**
+   * @param {String} aEvent "onStartup" or "onShutdown"
+   * @param {String} aArrayAddFn "push" or "unshift"
+   * @param {Function} aFn
+   */
+  function addBootstrapFn(aEvent, aArrayAddFn, aFn) {
+    bootstrapFunctions[aEvent][aArrayAddFn](aFn);
+  }
+
+  FakeWebExt.onStartup = addBootstrapFn.bind(null, "onStartup", FIFO_ADD);
+  FakeWebExt.onShutdown = addBootstrapFn.bind(null, "onShutdown", LIFO_ADD);
+
+  function onBootstrapEvent(aEvent) {
+    bootstrapFunctions[aEvent].forEach(fn => {
+      fn.call(null);
+    });
+  }
+
+  FakeWebExt.startup = onBootstrapEvent.bind(null, "onStartup");
+  FakeWebExt.shutdown = onBootstrapEvent.bind(null, "onShutdown");
+
+  return FakeWebExt;
+}());
+
+//==============================================================================
 // Api
 //==============================================================================
 
-var {Api, ContentScriptsApi} = (function() {
+(function() {
   let commonjsEnv = createCommonjsEnv();
-  return commonjsEnv.load("web-extension-fake-api/api", [
+  const Bootstrap = {
+    onStartup: FakeWebExt.onStartup,
+    onShutdown: FakeWebExt.onShutdown,
+  };
+  Bootstrap.onShutdown(() => {
+    commonjsEnv.unload();
+    commonjsEnv = undefined;
+  });
+  const exports = commonjsEnv.load("web-extension-fake-api/api", [
+    ["Bootstrap", Bootstrap],
   ]);
+
+  FakeWebExt.Api = exports.Api;
+  FakeWebExt.ContentScriptsApi = exports.ContentScriptsApi;
 }());

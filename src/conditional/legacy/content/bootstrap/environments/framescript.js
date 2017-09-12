@@ -26,7 +26,7 @@
 
 (function() {
   let {createCommonjsEnv, ContentScriptsApi} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
+      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).FakeWebExt;
 
   /* jshint -W061 */
   let cfmm = Function("return this")(); // ContentFrameMessageManager

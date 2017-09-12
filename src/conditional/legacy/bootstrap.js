@@ -53,8 +53,8 @@ function reasonConstantToString(c) {
 let commonjsEnv;
 
 function startup(data, reason) {
-  const _bootstrap = Components.utils.import(BOOTSTRAP, {});
-  let {getGlobals, createCommonjsEnv} = _bootstrap;
+  const {FakeWebExt} = Cu.import(BOOTSTRAP, {});
+  const {getGlobals} = FakeWebExt;
   let {console, Services} = getGlobals();
 
   console.debug("starting up");
@@ -71,7 +71,8 @@ function startup(data, reason) {
       getGlobals());
   Services.prefs.savePrefFile(null);
 
-  let {Api} = _bootstrap;
+  const {Api, createCommonjsEnv} = FakeWebExt;
+  FakeWebExt.startup();
   commonjsEnv = createCommonjsEnv();
   commonjsEnv.load("main", [
     ["browser", Api.browser],
@@ -85,13 +86,14 @@ function shutdown(data, reason) {
     return;
   }
 
-  const _bootstrap = Components.utils.import(BOOTSTRAP, {});
-  let {getGlobals} = _bootstrap;
+  const {FakeWebExt} = Cu.import(BOOTSTRAP, {});
+  let {getGlobals} = FakeWebExt;
   let {console} = getGlobals();
   console.debug("shutting down");
 
   commonjsEnv.unload(reasonString);
   commonjsEnv = undefined;
+  FakeWebExt.shutdown();
 
   Cu.unload(BOOTSTRAP);
 }

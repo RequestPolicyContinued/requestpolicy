@@ -2,6 +2,7 @@
   "extends": "../../../../../src/.jshintrc",
 
   "globals": {
+    "Bootstrap": true,
     "console": true,
     "Cc": true,
     "Ci": true,

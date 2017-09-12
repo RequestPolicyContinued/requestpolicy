@@ -70,7 +70,7 @@ ZIP            := zip
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
-	--extra-ext jsm  --exclude '**/third-party/'
+	--extra-ext jsm  --exclude '**/third-party/' --verbose
 
 # node --eval
 PREPROCESS = node --eval 'require("preprocess").preprocessFileSync("$2", "$3", {$4}, {type: "$1"});'

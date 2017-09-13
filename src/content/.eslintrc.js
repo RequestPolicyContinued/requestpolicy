@@ -1,5 +1,5 @@
 module.exports = {
-  "extends": "../../.eslintrc.js",
+  "extends": "../../src/.eslintrc.js",
 
   "parserOptions": {
     "sourceType": "module",

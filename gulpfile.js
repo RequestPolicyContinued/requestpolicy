@@ -24,8 +24,8 @@ const config = require("./config.json");
 // constants, utilities
 //------------------------------------------------------------------------------
 
-const srcDir = `src`;
-const srcDirAbsolute = `${__dirname}/${srcDir}`; /* jshint ignore:line */ /* (ignore if unused) */
+const srcDirRelative = `src`;
+const srcDir = `${__dirname}/${srcDirRelative}`; /* jshint ignore:line */ /* (ignore if unused) */
 
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
@@ -122,7 +122,8 @@ const BUILDS = [
 ];
 
 BUILDS.forEach(build => {
-  const buildDir = `build/${build.alias}`;
+  const buildDirRelative = `build/${build.alias}`;
+  const buildDir = `${__dirname}/${buildDirRelative}`;
 
   const TASK_NAMES = {
     ppContext: `buildData:${build.alias}:preprocessContext`,
@@ -172,14 +173,14 @@ BUILDS.forEach(build => {
 
   const extensionType = "legacy";
 
-  const conditionalDirs = [extensionType].
+  const conditionalDirsRelative = [extensionType].
       concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
       map(name => `conditional/${name}`);
-  const conditionalDirsWithSrc = conditionalDirs.
+  const conditionalDirsWithSrc = conditionalDirsRelative.
       map(dir => `${srcDir}/${dir}`);
 
   function mergeInConditional(path) {
-    conditionalDirs.forEach(dir => {
+    conditionalDirsRelative.forEach(dir => {
       path.dirname = path.dirname.replace(dir + "/", "");  // non-root files
       path.dirname = path.dirname.replace(dir, "");  // root files, e.g. conditional/legacy/bootstrap.js
     });

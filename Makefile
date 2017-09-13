@@ -76,6 +76,9 @@ JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
 MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
 
+# python
+PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
+
 #-------------------------------------------------------------------------------
 # helper targets
 #-------------------------------------------------------------------------------
@@ -298,8 +301,8 @@ T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 # increment the value when changing the target
 __python_venv__ := v1
 
-.PHONY: python-venv
-python-venv: $(T_PYTHON_PACKAGES)
+.PHONY: python-venv python-packages
+python-venv python-packages: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
 		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
 		$(T_PYTHON_VIRTUALENV)
@@ -539,14 +542,15 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-coffee lint-js lint-xpi
+lint: lint-coffee lint-js lint-python lint-xpi
 
-.PHONY: lint-coffee lint-js lint-xpi
+.PHONY: lint-coffee lint-js lint-python lint-xpi
 lint-coffee: coffeelint
 lint-js: eslint jscs jshint
+lint-python: pep8
 lint-xpi: addons-linter
 
-.PHONY: addons-linter coffeelint eslint jscs jshint
+.PHONY: addons-linter coffeelint eslint jscs jshint pep8
 addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
 coffeelint: node-packages
@@ -569,6 +573,9 @@ jshint: node-packages
 	$(JSHINT) tests/xpcshell/
 	$(JSHINT) tests/helper-addons/
 	$(JSHINT) gulpfile.js
+pep8: python-packages
+	$(PY_PEP8) scripts/
+	$(PY_PEP8) tests/marionette/
 
 #-------------------------------------------------------------------------------
 # localization checks

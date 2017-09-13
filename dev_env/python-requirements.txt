@@ -1,3 +1,5 @@
+pep8
+
 firefox-puppeteer == 50
 firefox-ui-harness == 1.3
 

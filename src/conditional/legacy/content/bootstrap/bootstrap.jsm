@@ -167,18 +167,6 @@ var FakeWebExt = (function() {
   FakeWebExt.startup = function() {
     console.debug("starting up");
 
-    // Before anything else, handle default preferences.
-    //
-    // The following script needs to be called because bootsrapped addons have
-    // to handle their default preferences manually, see Mozilla Bug 564675:
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
-    // The scope of that script doesn't need to be remembered.
-    Services.scriptloader.loadSubScript(
-        "chrome://rpcontinued/content/bootstrap/misc/" +
-        "handle-default-preferences.js",
-        getGlobals());
-    Services.prefs.savePrefFile(null);
-
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
     fakeEnv.exports = fakeEnv.commonjsEnv.load("web-extension-fake-api/main", [

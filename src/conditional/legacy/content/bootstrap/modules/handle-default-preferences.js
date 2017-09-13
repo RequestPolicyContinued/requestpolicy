@@ -20,10 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
-/* global console, Cc, Ci, Cm, Cr, Cu, Services, XPCOMUtils */ /* jshint ignore:line */ /* (ignore if unused) */
-
 /**
  * This file has to be called only once. It handles the default
  * preferences [1], so it has to be called quite early at the

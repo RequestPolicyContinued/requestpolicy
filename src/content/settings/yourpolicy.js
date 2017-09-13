@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, WinEnv, elManager, $id, $str} from "settings/common";
 
 (function() {

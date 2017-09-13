@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {Windows} from "models/windows";
 import {OverlayController} from "controllers/windows.overlay";

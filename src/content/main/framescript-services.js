@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {RequestProcessor} from "lib/request-processor";
 import {DomainUtil} from "lib/utils/domains";
 import {Prefs} from "models/prefs";

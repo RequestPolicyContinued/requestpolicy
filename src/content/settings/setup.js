@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {$id, common} from "./common";
 
 (function() {

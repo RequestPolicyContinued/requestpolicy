@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {MainEnvironment} from "lib/environment";
 import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
 import {FramescriptToOverlayCommunication}

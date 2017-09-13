@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 /**
  * [E10s]: This file runs both in PARENT and CHILD process.
  */

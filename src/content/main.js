@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {PrefManager} from "main/pref-manager";
 import {Logger} from "lib/logger";

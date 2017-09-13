@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {loadRLInterfaceIntoWindow} from "./interface";
 import {loadRLTreeViewIntoWindow} from "./tree-view";
 import {loadRLFilteringIntoWindow} from "./filtering";

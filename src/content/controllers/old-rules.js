@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {Info} from "lib/utils/info";
 import {OldRules} from "lib/old-rules";

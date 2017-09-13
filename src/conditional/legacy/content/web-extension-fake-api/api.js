@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 const rpPrefBranch = Services.prefs.getBranch("extensions.requestpolicy.").
       QueryInterface(Ci.nsIPrefBranch2);
 

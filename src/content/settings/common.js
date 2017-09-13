@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 var {common, WinEnv, elManager, $id, $str} = (function() {
   var {
     StringUtils,

@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
 import {Info} from "lib/utils/info";

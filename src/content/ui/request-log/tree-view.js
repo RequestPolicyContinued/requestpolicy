@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 export function loadRLTreeViewIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 

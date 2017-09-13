@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 export var ManagerForBlockedContent = (function() {
   let self = {};
 

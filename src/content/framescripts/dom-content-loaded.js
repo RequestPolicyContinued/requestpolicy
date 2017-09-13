@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {Environment, MainEnvironment} from "lib/environment";

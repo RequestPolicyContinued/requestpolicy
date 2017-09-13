@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {StringUtils} from "lib/utils/strings";
 import {JSUtils} from "lib/utils/javascript";

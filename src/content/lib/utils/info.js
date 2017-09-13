@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Prefs} from "models/prefs";
 import {C} from "lib/utils/constants";
 

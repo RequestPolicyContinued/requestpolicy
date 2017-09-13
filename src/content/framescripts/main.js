@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import "framescripts/misc.js";
 import "framescripts/blocked-content.js";
 import "framescripts/dom-content-loaded.js";

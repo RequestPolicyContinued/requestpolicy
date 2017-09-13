@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {MapOfSets} from "lib/classes/map-of-sets";
 import {Prefs} from "models/prefs";
 

@@ -13,5 +13,7 @@
     "require": true,
     "Services": true,
     "XPCOMUtils": true
-  }
+  },
+
+  "strict": "implied"
 }

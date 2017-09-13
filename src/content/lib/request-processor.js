@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {Prefs} from "models/prefs";
 import {PolicyManager} from "lib/policy-manager";

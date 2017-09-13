@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {Prefs} from "models/prefs";
 import {Logger} from "lib/logger";

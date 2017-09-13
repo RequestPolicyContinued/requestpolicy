@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment} from "lib/environment";
 import {PrefObserver} from "lib/classes/pref-observer";
 

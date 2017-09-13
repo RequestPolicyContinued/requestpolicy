@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {PrefBranch} from "lib/classes/pref-branch";
 
 //==============================================================================

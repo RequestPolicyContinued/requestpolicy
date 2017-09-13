@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {ManagerForEventListeners} from "lib/manager-for-event-listeners";
 import {ObserverManager} from "lib/observer-manager";
 import {Logger} from "lib/logger";

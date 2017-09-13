@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {XULUtils} from "lib/utils/xul";
 import {Info} from "lib/utils/info";
 import {Logger} from "lib/logger";

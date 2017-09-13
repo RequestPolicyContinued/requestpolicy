@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Windows} from "models/windows";
 import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";

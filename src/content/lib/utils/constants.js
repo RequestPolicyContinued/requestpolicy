@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 /* global RUN_ID */ // see bootstrap.jsm
 
 export var C = {};

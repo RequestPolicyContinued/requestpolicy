@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {DomainUtil} from "lib/utils/domains";
 import {Prefs} from "models/prefs";
 

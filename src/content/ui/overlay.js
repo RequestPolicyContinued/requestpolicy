@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
 import {Logger} from "lib/logger";

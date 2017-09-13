@@ -49,7 +49,7 @@ const REQUESTPOLICY_DIR = "requestpolicy";
 // FileUtil
 // =============================================================================
 
-export var FileUtil = {
+export const FileUtil = {
 
   /**
    * Returns the lines of the file in an array.
@@ -57,13 +57,13 @@ export var FileUtil = {
    * @param {nsIFile} file
    */
   fileToArray: function(file) {
-    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
-    var line = {};
-    var lines = [];
-    var hasmore;
+    const line = {};
+    const lines = [];
+    let hasmore;
     do {
       hasmore = stream.readLine(line);
       lines.push(line.value);
@@ -93,17 +93,17 @@ export var FileUtil = {
     //   // prevent NS_ERROR_FILE_NOT_FOUND
     //   return "";
     // }
-    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
     stream.QueryInterface(Ci.nsILineInputStream);
 
-    var cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
+    const cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
                   createInstance(Ci.nsIConverterInputStream);
     cstream.init(stream, "UTF-8", 0, 0);
 
-    var str = "";
-    var data = {};
+    let str = "";
+    const data = {};
     let read;
     do {
       // Read as much as we can and put it in |data.value|.
@@ -123,16 +123,16 @@ export var FileUtil = {
    * @param {nsIFile} file
    */
   arrayToFile: function(lines, file) {
-    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
+    const cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
 
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       cos.writeString(lines[i] + "\n");
     }
     cos.close();
@@ -147,12 +147,12 @@ export var FileUtil = {
    * @param {nsIFile} file
    */
   stringToFile: function(str, file) {
-    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
+    const cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
     cos.writeString(str);
@@ -169,8 +169,8 @@ export var FileUtil = {
    * @return {nsIFile}
    */
   getRPUserDir: function(subdir1, subdir2, subdir3) {
-    var profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
-    var file = profileDir.clone();
+    const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
+    const file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if (!file.exists()) {
       file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);

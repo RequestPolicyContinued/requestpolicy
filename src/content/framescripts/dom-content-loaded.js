@@ -29,7 +29,7 @@ import {C} from "lib/utils/constants";
 import {overlayComm} from "framescripts/managers";
 import {ManagerForBlockedContent} from "framescripts/blocked-content.js";
 
-export var ManagerForDOMContentLoaded = (function() {
+export const ManagerForDOMContentLoaded = (function() {
   let self = {};
 
   let {content} = cfmm;
@@ -68,7 +68,7 @@ export var ManagerForDOMContentLoaded = (function() {
     // called once.
     //    <--- the above comment is very old – is it (still) true that
     //         onDOMContentLoaded is called multiple times?
-    var doc = event.originalTarget;
+    const doc = event.originalTarget;
     if (doc.nodeName !== "#document") {
       // only documents
       return;
@@ -123,7 +123,7 @@ export var ManagerForDOMContentLoaded = (function() {
   function onDOMFrameContentLoaded(event) {
     // TODO: This only works for (i)frames that are direct children of the main
     // document, not (i)frames within those (i)frames.
-    var iframe = event.target;
+    const iframe = event.target;
     // Flock's special home page is about:myworld. It has (i)frames in it
     // that have no contentDocument. It's probably related to the fact that
     // that is an xul page.
@@ -163,8 +163,8 @@ export var ManagerForDOMContentLoaded = (function() {
     let metaRefreshes = [];
 
     // Find all meta redirects.
-    var metaTags = doc.getElementsByTagName("meta");
-    for (var i = 0; i < metaTags.length; i++) {
+    const metaTags = doc.getElementsByTagName("meta");
+    for (let i = 0; i < metaTags.length; i++) {
       let metaTag = metaTags[i];
       if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() !== "refresh") {
         continue;
@@ -195,7 +195,7 @@ export var ManagerForDOMContentLoaded = (function() {
 
       Logger.info("Number of meta refreshes found: " + metaRefreshes.length);
 
-      var docShell = doc.defaultView
+      const docShell = doc.defaultView
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShell);
@@ -223,7 +223,7 @@ export var ManagerForDOMContentLoaded = (function() {
     // dynamically added links whose target of the click event isn't the anchor
     // tag.
     // TODO: is it possible to implement this differently?
-    var anchorTags = doc.getElementsByTagName("a");
+    const anchorTags = doc.getElementsByTagName("a");
     for (let anchorTag of anchorTags) {
       anchorTag.addEventListener("click", htmlAnchorTagClicked, false);
     }
@@ -241,6 +241,8 @@ export var ManagerForDOMContentLoaded = (function() {
     //   unwrapWindowFunctions(doc.defaultView);
     // });
   }
+
+  /* eslint-disable */
 
   // If the following code will be used again, the Utils.wrapFunction()
   // and Utils.unwrapFunction() functions can be used instead.
@@ -317,6 +319,7 @@ export var ManagerForDOMContentLoaded = (function() {
   //  unwrapWindowFunction(aWindow, "openDialog");
   //  delete aWindow.rpOriginalFunctions;
   //}
+  /* eslint-enable */
 
   MainEnvironment.elManager.addListener(cfmm, "DOMContentLoaded",
                                         onDOMContentLoaded, true);

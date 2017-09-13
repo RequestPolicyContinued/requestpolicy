@@ -32,7 +32,7 @@ const {UI_TESTING} = C;
 /**
  * Provides logging methods
  */
-export var Logger = (function() {
+export const Logger = (function() {
   let self = {};
 
   // ---------------------------------------------------------------------------

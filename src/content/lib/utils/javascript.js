@@ -24,7 +24,7 @@
 // JSUtils
 // =============================================================================
 
-export var JSUtils = (function() {
+export const JSUtils = (function() {
   let self = {};
 
   self.arrayIncludes = function(array, searchElement) {

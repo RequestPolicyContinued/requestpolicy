@@ -42,7 +42,7 @@ const log = LOG_ENVIRONMENT ? {
 // Environment
 // =============================================================================
 
-export var Environment = (function() {
+export const Environment = (function() {
 
   // ---------------------------------------------------------------------------
   // constants, metadata
@@ -543,7 +543,7 @@ export var Environment = (function() {
 // =============================================================================
 
 // Main Environments are the outermost environments.
-export var MainEnvironment = new Environment(null, "Main Environment");
+export const MainEnvironment = new Environment(null, "Main Environment");
 
 MainEnvironment.isMainEnvironment =
     typeof browser.extension.getBackgroundPage === "function";

@@ -32,7 +32,7 @@ export function loadRLInterfaceIntoWindow(window) {
   // ===========================================================================
 
   requestLog.clear = function() {
-    var count = requestLog.treeView.rowCount;
+    const count = requestLog.treeView.rowCount;
     if (count === 0) {
       return;
     }
@@ -49,7 +49,8 @@ export function loadRLInterfaceIntoWindow(window) {
    * selected when the context menu was opened.
    */
   requestLog.copyToClipboard = function(columnName) {
-    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+    const content = requestLog.treeView.getCellText(
+        requestLog.tree.currentIndex,
         requestLog.tree.columns.getNamedColumn(columnName));
 
     const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
@@ -62,12 +63,13 @@ export function loadRLInterfaceIntoWindow(window) {
    * selected when the context menu was opened.
    */
   requestLog.openInNewTab = function(columnName) {
-    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+    const content = requestLog.treeView.getCellText(
+        requestLog.tree.currentIndex,
         requestLog.tree.columns.getNamedColumn(columnName));
 
-    var forbidden = true;
+    let forbidden = true;
     try {
-      var uri = DomainUtil.getUriObject(content);
+      const uri = DomainUtil.getUriObject(content);
       if (uri.scheme === "http" || uri.scheme === "https" ||
           uri.scheme === "ftp") {
         forbidden = false;
@@ -76,8 +78,8 @@ export function loadRLInterfaceIntoWindow(window) {
     }
 
     if (forbidden) {
-      var alertTitle = StringUtils.$str("actionForbidden");
-      var alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
+      const alertTitle = StringUtils.$str("actionForbidden");
+      const alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

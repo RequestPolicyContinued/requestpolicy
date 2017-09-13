@@ -27,7 +27,7 @@ import {JSUtils} from "lib/utils/javascript";
 // StringUtils
 // =============================================================================
 
-export var StringUtils = (function() {
+export const StringUtils = (function() {
   let self = {};
 
   JSUtils.defineLazyGetter(self, "strbundle", function() {

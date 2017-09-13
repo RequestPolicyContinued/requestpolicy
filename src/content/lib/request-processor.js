@@ -64,7 +64,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 // RequestProcessor
 // =============================================================================
 
-export var RequestProcessor = (function() {
+export let RequestProcessor = (function() {
   let self = {};
 
   let internal = Utils.createModuleInternal(self);
@@ -239,7 +239,7 @@ export var RequestProcessor = (function() {
   internal.recordAllowedRequest = recordAllowedRequest;
 
   function cacheShouldLoadResult(result, originUri, destUri) {
-    var date = new Date();
+    const date = new Date();
     lastShouldLoadCheck.time = date.getTime();
     lastShouldLoadCheck.destination = destUri;
     lastShouldLoadCheck.origin = originUri;
@@ -248,7 +248,7 @@ export var RequestProcessor = (function() {
 
   internal.checkByDefaultPolicy = function(aRequest) {
     if (Storage.isDefaultAllow()) {
-      var result = new RequestResult(true,
+      const result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
@@ -257,8 +257,8 @@ export var RequestProcessor = (function() {
     let destUri = aRequest.destURI;
 
     if (Storage.isDefaultAllowSameDomain()) {
-      var originDomain = DomainUtil.getBaseDomain(originUri);
-      var destDomain = DomainUtil.getBaseDomain(destUri);
+      const originDomain = DomainUtil.getBaseDomain(originUri);
+      const destDomain = DomainUtil.getBaseDomain(destUri);
 
       if (originDomain !== null && destDomain !== null) {
         // apply this rule only if both origin and dest URIs
@@ -278,8 +278,9 @@ export var RequestProcessor = (function() {
       return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
     }
 
-    var originIdent = DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP);
-    var destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
+    const originIdent = DomainUtil.getIdentifier(
+        originUri, DomainUtil.LEVEL_SOP);
+    const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
         REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   };
@@ -299,7 +300,7 @@ export var RequestProcessor = (function() {
   function isDuplicateRequest(request) {
     if (lastShouldLoadCheck.origin === request.originURI &&
         lastShouldLoadCheck.destination === request.destURI) {
-      var date = new Date();
+      const date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
         if (LOG_REQUESTS) {
@@ -323,8 +324,8 @@ export var RequestProcessor = (function() {
 
   function _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
       isAllowed) {
-    var result = new RequestSet();
-    var requests = allRequestsOnDocument.getAll();
+    const result = new RequestSet();
+    const requests = allRequestsOnDocument.getAll();
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
@@ -425,12 +426,12 @@ export var RequestProcessor = (function() {
       checkedOrigins[originURI] = true;
     }
     _addAllDeniedRequestsFromURI(originURI, reqSet);
-    var allowedRequests = RequestProcessor._allowedRequests
+    const allowedRequests = RequestProcessor._allowedRequests
         .getOriginUri(originURI);
     if (allowedRequests) {
-      for (var destBase in allowedRequests) {
-        for (var destIdent in allowedRequests[destBase]) {
-          for (var destURI in allowedRequests[destBase][destIdent]) {
+      for (let destBase in allowedRequests) {
+        for (let destIdent in allowedRequests[destBase]) {
+          for (let destURI in allowedRequests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
               Logger.debug("Found allowed request to <" + destURI + "> " +
                   "from <" + originURI + ">");
@@ -456,11 +457,11 @@ export var RequestProcessor = (function() {
       Logger.debug("Looking for other origins within denied requests from " +
           originURI);
     }
-    var requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
+    const requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
-      for (var destBase in requests) {
-        for (var destIdent in requests[destBase]) {
-          for (var destUri in requests[destBase][destIdent]) {
+      for (let destBase in requests) {
+        for (let destIdent in requests[destBase]) {
+          for (let destUri in requests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
               Logger.debug("Found denied request to <" + destUri + "> from <" +
                   originURI + ">");
@@ -513,8 +514,8 @@ export var RequestProcessor = (function() {
         return CP_OK;
       }
 
-      var originURI = request.originURI;
-      var destURI = request.destURI;
+      let originURI = request.originURI;
+      let destURI = request.destURI;
 
       if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
         // Before RP has been forked, there was a hack: in case of a request
@@ -566,7 +567,7 @@ export var RequestProcessor = (function() {
       }
 
       if (request.aContentLocation.scheme === "view-source") {
-        var newDestURI = destURI.split(":").slice(1).join(":");
+        const newDestURI = destURI.split(":").slice(1).join(":");
         if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
           if (LOG_REQUESTS) {
@@ -775,8 +776,8 @@ export var RequestProcessor = (function() {
       // destination page. As a simple hack around this, for now we'll always
       // allow request to the same origin. It would be nice to have a a better
       // solution but I'm not sure what that solution is.
-      var originIdent = DomainUtil.getIdentifier(originURI);
-      var destIdent = DomainUtil.getIdentifier(destURI);
+      const originIdent = DomainUtil.getIdentifier(originURI);
+      const destIdent = DomainUtil.getIdentifier(destURI);
       if (originIdent === destIdent &&
           originIdent !== null && destIdent !== null) {
         request.requestResult = new RequestResult(true,
@@ -922,7 +923,7 @@ export var RequestProcessor = (function() {
       if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
-          var mappedDestUriObj = internal.mappedDestinations
+          const mappedDestUriObj = internal.mappedDestinations
                                  [destURI][mappedDest];
           if (LOG_REQUESTS) {
             Logger.debug("Checking mapped destination: " + mappedDest);
@@ -971,7 +972,7 @@ export var RequestProcessor = (function() {
    * which we currently can't stop.
    */
   let examineHttpRequest = function(aSubject) {
-    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
       if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
@@ -1151,7 +1152,7 @@ export var RequestProcessor = (function() {
    */
   self.getAllRequestsInBrowser = function(browser) {
     // var origins = {};
-    var reqSet = new RequestSet();
+    const reqSet = new RequestSet();
 
     // If we get these from the DOM, then we won't know the relevant
     // rules that were involved with allowing/denying the request.
@@ -1159,7 +1160,7 @@ export var RequestProcessor = (function() {
     // main allowed/denied request sets before adding them.
     // _getOtherOriginsHelperFromDOM(document, reqSet);
 
-    var uri = DomainUtil.stripFragment(browser.currentURI.spec);
+    const uri = DomainUtil.stripFragment(browser.currentURI.spec);
     _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
     return reqSet;
   };
@@ -1222,11 +1223,11 @@ RequestProcessor = (function(self) {
     // This is not including link clicks, form submissions, and user-allowed
     // redirects.
 
-    var originURI = request.originURI;
-    var destURI = request.destURI;
+    const originURI = request.originURI;
+    const destURI = request.destURI;
 
-    var originURIObj = DomainUtil.getUriObject(originURI);
-    var destURIObj = DomainUtil.getUriObject(destURI);
+    const originURIObj = DomainUtil.getUriObject(originURI);
+    const destURIObj = DomainUtil.getUriObject(destURI);
 
     {
       let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
@@ -1286,7 +1287,7 @@ RequestProcessor = (function(self) {
   }
 
   self.isAllowedRedirect = function(originURI, destURI) {
-    var request = new Request(originURI, destURI);
+    const request = new Request(originURI, destURI);
     return true === checkRedirect(request).isAllowed;
   };
 
@@ -1472,10 +1473,10 @@ RequestProcessor = (function(self) {
       return false;
     }
 
-    var window = browser.ownerGlobal;
+    const window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(function() {
-      var showNotification = Utils.getObjectPath(window, "rpcontinued",
+      const showNotification = Utils.getObjectPath(window, "rpcontinued",
           "overlay", "_showRedirectNotification");
       if (!showNotification) {
         return false;
@@ -1517,8 +1518,8 @@ RequestProcessor = (function(self) {
    * @param {RedirectRequest} aRequest
    */
   function getOriginOfInitialRedirect(aRequest) {
-    var initialOrigin = aRequest.originURI;
-    var initialDest = aRequest.destURI;
+    let initialOrigin = aRequest.originURI;
+    let initialDest = aRequest.destURI;
 
     // Prevent infinite loops, that is, bound the number of iterations.
     // Note: An apparent redirect loop doesn't mean a problem with a

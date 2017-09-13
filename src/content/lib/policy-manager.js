@@ -57,7 +57,7 @@ function notifyRulesChanged() {
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-export var PolicyManager = (function() {
+export let PolicyManager = (function() {
   let self = {};
 
   let userRulesets = {};
@@ -143,7 +143,7 @@ export var PolicyManager = (function() {
   };
 
   self.unloadSubscriptionRules = function(subscriptionInfo) {
-    var failures = {};
+    const failures = {};
 
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
@@ -282,7 +282,7 @@ export var PolicyManager = (function() {
   };
 
   self.revokeTemporaryRules = function() {
-    var rawRuleset = new RawRuleset();
+    const rawRuleset = new RawRuleset();
     userRulesets.temp = {
       "rawRuleset": rawRuleset,
       "ruleset": rawRuleset.toRuleset("temp")
@@ -297,7 +297,7 @@ export var PolicyManager = (function() {
   };
 
   self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
-    var result = new RequestResult();
+    const result = new RequestResult();
     for (let listName in subscriptionRulesets) {
       let ruleset = subscriptionRulesets[listName];
       checkRequest(origin, dest, ruleset, result);

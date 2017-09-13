@@ -27,7 +27,7 @@ import {DomainUtil} from "lib/utils/domains";
 // OldRules
 // =============================================================================
 
-export var OldRules = (function() {
+export const OldRules = (function() {
   function OldRules(aOrigins = "", aDestinations = "",
                     aOriginsToDestinations = "") {
     this._customPrefStrings = null;
@@ -63,7 +63,7 @@ export var OldRules = (function() {
   Object.defineProperty(OldRules.prototype, "prefStringSets", {
     get: function() {
       function splitString(aRulesString) {
-        var rules = new Set(aRulesString.split(" "));
+        const rules = new Set(aRulesString.split(" "));
 
         // The string might contain double spaces.
         rules.delete("");
@@ -87,8 +87,8 @@ export var OldRules = (function() {
    * Convert the pref strings to rule objects.
    */
   OldRules.prototype.getAsNewRules = function() {
-    var rules = [];
-    var {origins, dests, originsToDests} = this.prefStringSets;
+    const rules = [];
+    const {origins, dests, originsToDests} = this.prefStringSets;
 
     for (let origin of origins) {
       rules.push({
@@ -165,7 +165,7 @@ export var OldRules = (function() {
    * @return {Object} The endpoints' specifications.
    */
   OldRules.getEndpointSpecFromString = function(aEndpointString) {
-    var spec = {};
+    const spec = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
       let uriObj = DomainUtil.getUriObject(aEndpointString);
       spec.s = uriObj.scheme;

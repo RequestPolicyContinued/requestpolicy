@@ -22,6 +22,8 @@
 
 "use strict";
 
+/* eslint-disable no-var */
+
 /* global Components */
 
 /* exported EXPORTED_SYMBOLS, FakeWebExt */

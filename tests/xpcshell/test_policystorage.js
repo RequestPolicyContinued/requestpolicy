@@ -6,7 +6,7 @@ Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
 // jscs:disable validateIndentation
 
 // We expect JSON data to represent the following data structure.
-var exampleJsonObj = {
+const exampleJsonObj = {
   "metadata": {
     "version": 1,
     "name": "policyname", // unique name for this policy, used in filename
@@ -41,19 +41,19 @@ function run_test() {
 }
 
 function test_1() {
-  var filename = "foo.json";
+  const filename = "foo.json";
 
-  var jsonData = JSON.stringify(exampleJsonObj);
-  var rawRuleset = new RawRuleset(jsonData);
+  let jsonData = JSON.stringify(exampleJsonObj);
+  const rawRuleset = new RawRuleset(jsonData);
 
   // Write it to the file. This will create the file in the policies directory.
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
 
   // Read it back from the file.
-  var readRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
+  const readRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
   jsonData = JSON.stringify(readRuleset);
-  var readJsonObj = JSON.parse(jsonData);
+  const readJsonObj = JSON.parse(jsonData);
 
   deepEqual(readJsonObj, exampleJsonObj);
 
@@ -62,13 +62,13 @@ function test_1() {
 
 
 function test_2() {
-  var filename = "foo.json";
-  var rules = {"origin":         {"o": {"h": "*.foo.com"}},
-               "dest":           {"d": {"h": "www.example.com"}},
-               "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                  "d": {"h": "www.example.com"}}};
+  const filename = "foo.json";
+  const rules = {"origin":         {"o": {"h": "*.foo.com"}},
+                 "dest":           {"d": {"h": "www.example.com"}},
+                 "origin-to-dest": {"o": {"h": "*.foo.com"},
+                                    "d": {"h": "www.example.com"}}};
 
-  var rawRuleset = new RawRuleset();
+  let rawRuleset = new RawRuleset();
 
   do_check_eq(Object.keys(rawRuleset._metadata).length, 1);
   do_check_eq(rawRuleset._metadata.version, 1);

@@ -41,7 +41,7 @@ const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 // RPContentPolicy
 // =============================================================================
 
-export var RPContentPolicy = (function() {
+export const RPContentPolicy = (function() {
   let self = {};
 
   const XPCOM_CATEGORIES = ["content-policy"];
@@ -114,7 +114,7 @@ export var RPContentPolicy = (function() {
       //     Similarly like described above this is necessary
       //     because the `C` variable is not available anymore
       //     after RP has been shut down.
-      var finalReturnValue = CP_OK;
+      const finalReturnValue = CP_OK;
 
       // Actually create the final function, as it is described
       // above.
@@ -153,7 +153,7 @@ export var RPContentPolicy = (function() {
 
   self.shouldLoad = function(aContentType, aContentLocation, aRequestOrigin,
       aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-    var request = new NormalRequest(
+    const request = new NormalRequest(
         aContentType, aContentLocation, aRequestOrigin, aContext,
         aMimeTypeGuess, aExtra, aRequestPrincipal);
     return RequestProcessor.process(request);
@@ -182,7 +182,7 @@ export var RPContentPolicy = (function() {
 // RPChannelEventSink
 // =============================================================================
 
-export var RPChannelEventSink = (function() {
+export const RPChannelEventSink = (function() {
   let self = {};
 
   const XPCOM_CATEGORIES = ["net-channel-event-sinks"];

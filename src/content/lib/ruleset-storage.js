@@ -28,7 +28,7 @@ import {FileUtil} from "lib/utils/files";
 // RulesetStorage
 // =============================================================================
 
-export var RulesetStorage = (function() {
+export const RulesetStorage = (function() {
   let self = {};
 
   /**
@@ -39,7 +39,7 @@ export var RulesetStorage = (function() {
   self.loadRawRulesetFromFile = function(filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to decode from stream.
-    var policyFile = FileUtil.getRPUserDir("policies");
+    const policyFile = FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {

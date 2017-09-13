@@ -25,7 +25,7 @@
 // RuleUtils
 // =============================================================================
 
-export var RuleUtils = (function() {
+export const RuleUtils = (function() {
   let self = {};
 
   /**
@@ -59,7 +59,7 @@ export var RuleUtils = (function() {
           break;
       }
     }
-    var str = "";
+    let str = "";
     if (scheme !== "*" || aEndpointSpec.port) {
       str += scheme + "://";
     }

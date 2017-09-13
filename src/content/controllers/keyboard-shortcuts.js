@@ -26,7 +26,7 @@ import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
 // KeyboardShortcuts
 // =============================================================================
 
-export var KeyboardShortcuts = (function() {
+export const KeyboardShortcuts = (function() {
   let self = {};
 
   let keyboardShortcuts = [];

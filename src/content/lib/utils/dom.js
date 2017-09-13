@@ -25,7 +25,7 @@
 // DOMUtils
 // =============================================================================
 
-export var DOMUtils = (function() {
+export const DOMUtils = (function() {
   let self = {};
 
   /**

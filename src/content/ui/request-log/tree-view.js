@@ -69,7 +69,7 @@ export function loadRLTreeViewIntoWindow(window) {
       // unshift() the array and can just push().
       // TODO: Do an actual speed test with push vs. unshift to see if it matters
       // with this javascript array implementation, though I'm assuming it does.
-      var columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
+      const columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
         return getVisibleRowAtIndex(aIndex)
             [requestLog.columnNameToIndexMap[aColumn.id]];

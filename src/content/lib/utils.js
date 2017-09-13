@@ -25,7 +25,7 @@
 // Utils
 // =============================================================================
 
-export var Utils = (function() {
+export const Utils = (function() {
   let self = {};
 
   /**
@@ -129,7 +129,7 @@ export var Utils = (function() {
                                aBeforeFunction = null, aAfterFunction = null) {
     initWrapperFunction(aOwnerObject, aFunctionName);
 
-    var fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
+    const fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
     fnMetadata.before = aBeforeFunction;
     fnMetadata.after = aAfterFunction;
   };
@@ -168,7 +168,7 @@ export var Utils = (function() {
       aOwnerObject.rpcontinuedWrappedFunctions = {};
     }
 
-    var metadata = aOwnerObject.rpcontinuedWrappedFunctions;
+    const metadata = aOwnerObject.rpcontinuedWrappedFunctions;
 
     if (metadata.hasOwnProperty(aFunctionName)) {
       // the function is already wrapped by RequestPolicy
@@ -184,7 +184,7 @@ export var Utils = (function() {
 
     // actually wrap the object
     aOwnerObject[aFunctionName] = function() {
-      var {main, before, after} = metadata[aFunctionName];
+      const {main, before, after} = metadata[aFunctionName];
 
       // Execute some action before the original function call.
       try {
@@ -196,7 +196,7 @@ export var Utils = (function() {
       }
 
       // Execute original function.
-      var rv = main.apply(aOwnerObject, arguments);
+      const rv = main.apply(aOwnerObject, arguments);
 
       // Execute some action afterwards.
       try {

@@ -61,7 +61,7 @@ function manifestHasPermission(perm) {
 // API
 // =============================================================================
 
-export var Api = {
+export const Api = {
   browser: {
     extension: {},
     management: {},
@@ -75,7 +75,7 @@ export var Api = {
   },
 };
 
-export var ContentScriptsApi = {
+export const ContentScriptsApi = {
   browser: {
     extension: {
       getURL: null,

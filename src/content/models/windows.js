@@ -92,7 +92,7 @@ function LoadAndUnloadListener(callback) {
 // Windows
 // =============================================================================
 
-export var Windows = (function() {
+export const Windows = (function() {
   let self = {};
 
   self.forEachOpenWindow = function(aCallback, aThisArg=null) {

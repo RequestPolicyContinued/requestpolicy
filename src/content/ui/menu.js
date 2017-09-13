@@ -48,7 +48,7 @@ export function loadMenuIntoWindow(window) {
 
   // TODO: Create a "List" class which also contains functions like
   //       _populateList() and emptyList().
-  var lists = {
+  const lists = {
     otherOrigins: null,
     blockedDestinations: null,
     mixedDestinations: null,
@@ -162,7 +162,7 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
-      var disabled = Storage.isBlockingDisabled();
+      const disabled = Storage.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
@@ -214,7 +214,7 @@ export function loadMenuIntoWindow(window) {
 
       self._setPrivateBrowsingStyles();
 
-      // var hidePrefetchInfo = !LegacyApi.prefs.isPrefetchEnabled();
+      // const hidePrefetchInfo = !LegacyApi.prefs.isPrefetchEnabled();
       // self._itemPrefetchWarning.hidden = hidePrefetchInfo;
       // self._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
       //
@@ -435,7 +435,7 @@ export function loadMenuIntoWindow(window) {
       ruleData.d = {
         "h": self._addWildcard(dest)
       };
-      var destOnlyRuleData = {
+      const destOnlyRuleData = {
         "d": {
           "h": self._addWildcard(dest)
         }
@@ -500,19 +500,19 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._addListItem = function(list, cssClass, value, numRequests) {
-    var hbox = document.createElement("hbox");
+    const hbox = document.createElement("hbox");
     hbox.setAttribute("class", cssClass + " listen-click");
     hbox.addEventListener("click", self.itemSelected, false);
     list.insertBefore(hbox, null);
 
-    var destLabel = document.createElement("label");
+    const destLabel = document.createElement("label");
     destLabel.setAttribute("value", value);
     destLabel.setAttribute("class", "domainname");
     destLabel.setAttribute("flex", "2");
     hbox.insertBefore(destLabel, null);
 
     if (numRequests) {
-      var numReqLabel = document.createElement("label");
+      const numReqLabel = document.createElement("label");
       numReqLabel.setAttribute("value", numRequests);
       numReqLabel.setAttribute("class", "numRequests");
       hbox.insertBefore(numReqLabel, null);
@@ -534,8 +534,8 @@ export function loadMenuIntoWindow(window) {
 
   self._resetSelectedOrigin = function() {
     self._originItem.setAttribute("selected-origin", "false");
-    for (var i = 0; i < lists.otherOrigins.childNodes.length; i++) {
-      var child = lists.otherOrigins.childNodes[i];
+    for (let i = 0; i < lists.otherOrigins.childNodes.length; i++) {
+      const child = lists.otherOrigins.childNodes[i];
       child.setAttribute("selected-origin", "false");
     }
   };
@@ -637,7 +637,7 @@ export function loadMenuIntoWindow(window) {
   }
 
   self.itemSelected = function(event) {
-    var item = event.target;
+    let item = event.target;
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
@@ -669,10 +669,10 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._processRuleSelection = function(item) {
-    var ruleData = item.requestpolicyRuleData;
-    var ruleAction = item.requestpolicyRuleAction;
+    const ruleData = item.requestpolicyRuleData;
+    const ruleAction = item.requestpolicyRuleAction;
 
-    var undo;
+    let undo;
     if (item.getAttribute("selected-rule") === "true") {
       item.setAttribute("selected-rule", "false");
       undo = true;
@@ -690,7 +690,7 @@ export function loadMenuIntoWindow(window) {
       return;
     }
 
-    var canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
+    const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
     Logger.debug("ruleData: " + canonicalRule);
     Logger.debug("ruleAction: " + ruleAction);
     Logger.debug("undo: " + undo);
@@ -698,8 +698,8 @@ export function loadMenuIntoWindow(window) {
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
     // argument straight into the ruleset?
-    var origin;
-    var dest;
+    let origin;
+    let dest;
     if (ruleData.o && ruleData.o.h) {
       origin = ruleData.o.h;
     }
@@ -765,13 +765,13 @@ export function loadMenuIntoWindow(window) {
   //  else there will be errors from within getDeniedRequests().“
 
   self._getBlockedDestinationsAsGUILocations = function() {
-    var reqSet = RequestProcessor.getDeniedRequests(
+    const reqSet = RequestProcessor.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
-    var requests = reqSet.getAllMergedOrigins();
+    const requests = reqSet.getAllMergedOrigins();
 
-    var result = [];
-    for (var destBase in requests) {
-      var properties = new GUILocationProperties();
+    const result = [];
+    for (let destBase in requests) {
+      const properties = new GUILocationProperties();
       properties.accumulate(requests[destBase], C.RULE_ACTION_DENY);
       result.push(new GUIDestination(destBase, properties));
     }
@@ -779,12 +779,12 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._getAllowedDestinationsAsGUILocations = function() {
-    var reqSet = RequestProcessor.getAllowedRequests(
+    const reqSet = RequestProcessor.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
-    var requests = reqSet.getAllMergedOrigins();
+    const requests = reqSet.getAllMergedOrigins();
 
-    var result = [];
-    for (var destBase in requests) {
+    const result = [];
+    for (let destBase in requests) {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
@@ -794,7 +794,7 @@ export function loadMenuIntoWindow(window) {
         }
       }
 
-      var properties = new GUILocationProperties();
+      const properties = new GUILocationProperties();
       properties.accumulate(requests[destBase], C.RULE_ACTION_ALLOW);
       result.push(new GUIDestination(destBase, properties));
     }
@@ -809,17 +809,17 @@ export function loadMenuIntoWindow(window) {
    *         the properties of the "main" origin (the one in the location bar).
    */
   self._getOriginGUILocationProperties = function() {
-    var allRequests = self._allRequestsOnDocument.getAll();
+    const allRequests = self._allRequestsOnDocument.getAll();
 
-    var properties = new GUILocationProperties();
+    const properties = new GUILocationProperties();
 
-    for (var originUri in allRequests) {
-      var originBase = DomainUtil.getBaseDomain(originUri);
+    for (let originUri in allRequests) {
+      const originBase = DomainUtil.getBaseDomain(originUri);
       if (originBase !== self._currentBaseDomain) {
         continue;
       }
 
-      for (var destBase in allRequests[originUri]) {
+      for (let destBase in allRequests[originUri]) {
         properties.accumulate(allRequests[originUri][destBase]);
       }
     }
@@ -827,14 +827,14 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._getOtherOriginsAsGUILocations = function() {
-    var allRequests = self._allRequestsOnDocument.getAll();
+    const allRequests = self._allRequestsOnDocument.getAll();
 
-    var allowSameDomain = Storage.isDefaultAllow() ||
+    const allowSameDomain = Storage.isDefaultAllow() ||
         Storage.isDefaultAllowSameDomain();
 
-    var guiOrigins = [];
-    for (var originUri in allRequests) {
-      var originBase = DomainUtil.getBaseDomain(originUri);
+    const guiOrigins = [];
+    for (let originUri in allRequests) {
+      const originBase = DomainUtil.getBaseDomain(originUri);
       if (originBase === self._currentBaseDomain) {
         continue;
       }
@@ -847,17 +847,17 @@ export function loadMenuIntoWindow(window) {
       //   continue;
       // }
 
-      var guiOriginsIndex = GUIOrigin.indexOfOriginInArray(originBase,
+      const guiOriginsIndex = GUIOrigin.indexOfOriginInArray(originBase,
           guiOrigins);
-      var properties;
+      let properties;
       if (guiOriginsIndex === -1) {
         properties = new GUILocationProperties();
       } else {
         properties = guiOrigins[guiOriginsIndex].properties;
       }
-      var addThisOriginBase = false;
+      let addThisOriginBase = false;
 
-      for (var destBase in allRequests[originUri]) {
+      for (let destBase in allRequests[originUri]) {
         // Search for a destBase which wouldn't be allowed by the default policy.
         // TODO: some users might want to know those "other origins" as well.
         //       this should be made possible.
@@ -899,25 +899,25 @@ export function loadMenuIntoWindow(window) {
 
   self._addMenuItemStopAllowingOrigin = function(list, ruleData,
       subscriptionOverride) {
-    var originHost = ruleData.o.h;
-    var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
+    const originHost = ruleData.o.h;
+    const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
     return self._addMenuItemHelper(list, ruleData, "stopAllowingOrigin",
         [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
   };
 
   self._addMenuItemStopAllowingDest = function(list, ruleData,
       subscriptionOverride) {
-    var destHost = ruleData.d.h;
-    var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
+    const destHost = ruleData.d.h;
+    const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
     return self._addMenuItemHelper(list, ruleData, "stopAllowingDestination",
         [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
   };
 
   self._addMenuItemStopAllowingOriginToDest = function(list, ruleData,
       subscriptionOverride) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
-    var ruleAction = subscriptionOverride ? "deny" : "stop-allow";
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
+    const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
     return self._addMenuItemHelper(list, ruleData,
         "stopAllowingOriginToDestination", [originHost, destHost], ruleAction,
         "rpc-stop-rule rpc-stop-allow");
@@ -926,20 +926,20 @@ export function loadMenuIntoWindow(window) {
   // Allow
 
   self._addMenuItemAllowOrigin = function(list, ruleData) {
-    var originHost = ruleData.o.h;
+    const originHost = ruleData.o.h;
     return self._addMenuItemHelper(list, ruleData, "allowOrigin",
         [originHost], "allow", "rpc-start-rule rpc-allow");
   };
 
   self._addMenuItemAllowDest = function(list, ruleData) {
-    var destHost = ruleData.d.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData, "allowDestination",
         [destHost], "allow", "rpc-start-rule rpc-allow");
   };
 
   self._addMenuItemAllowOriginToDest = function(list, ruleData) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData, "allowOriginToDestination",
         [originHost, destHost], "allow", "rpc-start-rule rpc-allow");
   };
@@ -947,21 +947,21 @@ export function loadMenuIntoWindow(window) {
   // Allow temp
 
   self._addMenuItemTempAllowOrigin = function(list, ruleData) {
-    var originHost = ruleData.o.h;
+    const originHost = ruleData.o.h;
     return self._addMenuItemHelper(list, ruleData, "allowOriginTemporarily",
         [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
   };
 
   self._addMenuItemTempAllowDest = function(list, ruleData) {
-    var destHost = ruleData.d.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData,
         "allowDestinationTemporarily", [destHost], "allow-temp",
         "rpc-start-rule rpc-allow rpc-temporary");
   };
 
   self._addMenuItemTempAllowOriginToDest = function(list, ruleData) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData,
         "allowOriginToDestinationTemporarily", [originHost, destHost],
         "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
@@ -971,25 +971,25 @@ export function loadMenuIntoWindow(window) {
 
   self._addMenuItemStopDenyingOrigin = function(list, ruleData,
       subscriptionOverride) {
-    var originHost = ruleData.o.h;
-    var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
+    const originHost = ruleData.o.h;
+    const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
     return self._addMenuItemHelper(list, ruleData, "stopDenyingOrigin",
         [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
   };
 
   self._addMenuItemStopDenyingDest = function(list, ruleData,
       subscriptionOverride) {
-    var destHost = ruleData.d.h;
-    var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
+    const destHost = ruleData.d.h;
+    const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
     return self._addMenuItemHelper(list, ruleData, "stopDenyingDestination",
         [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
   };
 
   self._addMenuItemStopDenyingOriginToDest = function(list, ruleData,
       subscriptionOverride) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
-    var ruleAction = subscriptionOverride ? "allow" : "stop-deny";
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
+    const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
     return self._addMenuItemHelper(list, ruleData,
         "stopDenyingOriginToDestination", [originHost, destHost], ruleAction,
         "rpc-stop-rule rpc-stop-deny");
@@ -998,20 +998,20 @@ export function loadMenuIntoWindow(window) {
   // Deny
 
   self._addMenuItemDenyOrigin = function(list, ruleData) {
-    var originHost = ruleData.o.h;
+    const originHost = ruleData.o.h;
     return self._addMenuItemHelper(list, ruleData, "denyOrigin",
         [originHost], "deny", "rpc-start-rule rpc-deny");
   };
 
   self._addMenuItemDenyDest = function(list, ruleData) {
-    var destHost = ruleData.d.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData, "denyDestination",
         [destHost], "deny", "rpc-start-rule rpc-deny");
   };
 
   self._addMenuItemDenyOriginToDest = function(list, ruleData) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData, "denyOriginToDestination",
         [originHost, destHost], "deny", "rpc-start-rule rpc-deny");
   };
@@ -1019,20 +1019,20 @@ export function loadMenuIntoWindow(window) {
   // Deny temp
 
   self._addMenuItemTempDenyOrigin = function(list, ruleData) {
-    var originHost = ruleData.o.h;
+    const originHost = ruleData.o.h;
     return self._addMenuItemHelper(list, ruleData, "denyOriginTemporarily",
         [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
   };
 
   self._addMenuItemTempDenyDest = function(list, ruleData) {
-    var destHost = ruleData.d.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData, "denyDestinationTemporarily",
         [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
   };
 
   self._addMenuItemTempDenyOriginToDest = function(list, ruleData) {
-    var originHost = ruleData.o.h;
-    var destHost = ruleData.d.h;
+    const originHost = ruleData.o.h;
+    const destHost = ruleData.d.h;
     return self._addMenuItemHelper(list, ruleData,
         "denyOriginToDestinationTemporarily", [originHost, destHost],
         "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
@@ -1040,13 +1040,13 @@ export function loadMenuIntoWindow(window) {
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
       ruleAction, cssClass) {
-    var label = StringUtils.$str(fmtStrName, fmtStrArgs);
-    var item = self._addListItem(list, "rpc-od-item", label);
+    const label = StringUtils.$str(fmtStrName, fmtStrArgs);
+    const item = self._addListItem(list, "rpc-od-item", label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;
     // var statustext = ''; // TODO
     item.setAttribute("class", "rpc-od-item " + cssClass);
-    var canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
+    const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
     if (self._ruleChangeQueues[ruleAction]) {
       if (self._ruleChangeQueues[ruleAction][canonicalRule]) {
         item.setAttribute("selected-rule", "true");
@@ -1115,7 +1115,7 @@ export function loadMenuIntoWindow(window) {
 
       for (let destIdent in requests[destBase]) {
 
-        var destinations = requests[destBase][destIdent];
+        const destinations = requests[destBase][destIdent];
         for (let destUri in destinations) {
 
           // This will be null when the request was denied because of a default
@@ -1128,7 +1128,7 @@ export function loadMenuIntoWindow(window) {
             continue;
           }
 
-          var results = destinations[destUri][0]; // TODO: Do not look only
+          const results = destinations[destUri][0]; // TODO: Do not look only
           // at the first RequestResult object, but at all. (there might be
           // several requests with identical origin and destination URI.)
 

@@ -36,7 +36,7 @@ export function loadClassicmenuIntoWindow(window) {
    * Removes all menu items and removes all event listeners.
    */
   self.emptyMenu = function(menu) {
-    var menuitems = menu.getElementsByTagName("menuitem");
+    const menuitems = menu.getElementsByTagName("menuitem");
     for (let item of menuitems) {
       if (!item.hasOwnProperty("rpListener")) {
         console.error("There's a menuitem without listener!");
@@ -50,13 +50,13 @@ export function loadClassicmenuIntoWindow(window) {
   };
 
   self.addMenuSeparator = function(menu) {
-    var separator = document.createElement("menuseparator");
+    const separator = document.createElement("menuseparator");
     menu.insertBefore(separator, menu.firstChild);
     return separator;
   };
 
   self._addMenuItem = function(menu, label, aCallback) {
-    var menuItem = document.createElement("menuitem");
+    const menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     menuItem.addEventListener("command", aCallback, false);
     menuItem.rpListener = aCallback;

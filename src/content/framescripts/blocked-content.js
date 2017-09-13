@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export var ManagerForBlockedContent = (function() {
+export const ManagerForBlockedContent = (function() {
   let self = {};
 
   // ===========================================================================
@@ -70,8 +70,8 @@ export var ManagerForBlockedContent = (function() {
     // original, blocked image src. With "web page, complete" the saved source
     // has changes we make here to show the blocked request indicator.
 
-    for (var i = 0; i < images.length; i++) {
-      var img = images[i];
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i];
       // Note: we're no longer checking img.rpcontinuedBlocked here.
       if (!img.rpcontinuedIdentified && img.src in blockedURIs) {
         img.rpcontinuedIdentified = true;

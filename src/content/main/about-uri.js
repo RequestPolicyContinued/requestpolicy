@@ -56,7 +56,7 @@ function getURI(aURI) {
 // AboutRequestPolicy
 // =============================================================================
 
-export var AboutRequestPolicy = (function() {
+export const AboutRequestPolicy = (function() {
   let self = {};
 
   self.classDescription = "about:requestpolicy";

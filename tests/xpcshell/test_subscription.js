@@ -8,9 +8,9 @@ function run_test() {
 function test_1() {
   do_test_pending();
 
-  var userSubs = new UserSubscriptions();
+  const userSubs = new UserSubscriptions();
   userSubs.save();
-  var serials = {
+  const serials = {
     "official": {
       "embedded": 2329159661,
       "extensions": 0,

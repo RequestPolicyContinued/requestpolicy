@@ -79,11 +79,11 @@ describe("Utils", function() {
      * multiple addons are wrapping the same function.
      */
     function manualWrap() {
-      var _orig = testObj.testFunction;
+      const _orig = testObj.testFunction;
 
       testObj.testFunction = function() {
         functionCalls += "{";
-        var rv = _orig.apply(testObj, arguments);
+        const rv = _orig.apply(testObj, arguments);
         functionCalls += "}";
         return rv;
       };
@@ -94,7 +94,7 @@ describe("Utils", function() {
       functionCalls = "";
 
       // call the function, remember the return value
-      var rv = testObj.testFunction("foo", "bar");
+      const rv = testObj.testFunction("foo", "bar");
 
       // do checks
       strictEqual(rv, "baz");

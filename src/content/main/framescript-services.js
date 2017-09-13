@@ -26,7 +26,7 @@ import {Storage} from "models/storage";
 
 const initFunctions = [];
 
-export var FramescriptServices = {
+export const FramescriptServices = {
   init: function() {
     for (let fn of initFunctions) {
       fn();

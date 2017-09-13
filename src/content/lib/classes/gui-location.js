@@ -63,7 +63,7 @@ GUILocation.indexOfLocationInArray = function(locationString, locations) {
   if (locationString instanceof GUILocation) {
     locationString = locationString.value;
   }
-  for (var i in locations) {
+  for (let i in locations) {
     if (locations[i].value === locationString) {
       return i;
     }
@@ -80,8 +80,8 @@ GUILocation.sortByNumRequestsCompareFunction = function(a, b) {
   return GUILocation.compareFunction(a, b, "sortByNumRequests");
 };
 GUILocation.compareFunction = function(a, b, sortType) {
-  var aDefault = 0 < a.properties.numDefaultPolicyRequests;
-  var bDefault = 0 < b.properties.numDefaultPolicyRequests;
+  const aDefault = 0 < a.properties.numDefaultPolicyRequests;
+  const bDefault = 0 < b.properties.numDefaultPolicyRequests;
 
   if (aDefault !== bDefault) {
     if (aDefault === true) {
@@ -177,8 +177,8 @@ GUILocationProperties.prototype.reset = function() {
   *        Otherwise the ruleAction will be checked for every single request.
   */
 GUILocationProperties.prototype.accumulate = function(requests, ruleAction) {
-  var extractRuleActions = undefined === ruleAction;
-  var ruleActionCounter = 0;
+  const extractRuleActions = undefined === ruleAction;
+  let ruleActionCounter = 0;
 
   for (let destIdent in requests) {
     let destIdentRequests = requests[destIdent];
@@ -234,8 +234,8 @@ GUILocationProperties.requestCountProperties = [
  * @static
  */
 GUILocationProperties.merge = function(prop1, prop2) {
-  var requestCountProperties = GUILocationProperties.requestCountProperties;
-  var newObj = new GUILocationProperties();
+  const requestCountProperties = GUILocationProperties.requestCountProperties;
+  const newObj = new GUILocationProperties();
 
   for (let propertyName of requestCountProperties) {
     newObj[propertyName] += prop1[propertyName] + prop2[propertyName];

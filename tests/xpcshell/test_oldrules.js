@@ -208,7 +208,7 @@ function setOldRulePref(aPrefName, aValue) {
 
   // Not using just setCharPref because these values may contain Unicode
   // strings (e.g. for IDNs).
-  var str = Cc["@mozilla.org/supports-string;1"]
+  const str = Cc["@mozilla.org/supports-string;1"]
       .createInstance(Ci.nsISupportsString);
   str.data = aValue;
   Prefs.branches.rp.branch.
@@ -220,8 +220,8 @@ function testGetOldRulesAsNewRules(oldRulePrefValues, expectedRuleSpecs) {
 
   let [origins, destinations, originsToDestinations] = oldRulePrefValues;
 
-  var oldRules = new OldRules(origins, destinations, originsToDestinations);
-  var actualRuleSpecs = oldRules.getAsNewRules();
+  const oldRules = new OldRules(origins, destinations, originsToDestinations);
+  const actualRuleSpecs = oldRules.getAsNewRules();
   assertRuleSpecsEqual(actualRuleSpecs, expectedRuleSpecs);
 }
 

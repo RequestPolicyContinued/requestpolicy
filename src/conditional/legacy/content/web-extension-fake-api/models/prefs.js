@@ -27,7 +27,7 @@ import {PrefBranch} from "web-extension-fake-api/lib/classes/pref-branch";
 // Prefs
 // =============================================================================
 
-export var Prefs = (function() {
+export const Prefs = (function() {
   let self = {};
 
   self.save = function() {

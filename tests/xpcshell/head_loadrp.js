@@ -20,9 +20,9 @@ do_get_profile();
 // -----------------------------------------------------------------------------
 
 function getRPChromeManifest() {
-  var cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
+  const cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
-  var manifestFile = cwd.parent.parent.clone();
+  const manifestFile = cwd.parent.parent.clone();
   manifestFile.appendRelativePath("build/nightly/chrome.manifest");
   return manifestFile;
 }

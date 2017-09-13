@@ -70,8 +70,8 @@ function maybeCallback(aCallback) {
 }
 
 function setTimeout(func, delay) {
-  var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-  var event = {
+  const timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  const event = {
     notify: maybeCallback(func)
   };
   timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
@@ -92,7 +92,7 @@ function dprint(msg) {
  * subscriptions.
  */
 export function UserSubscriptions() {
-  var userSubsFile = FileUtil.getRPUserDir();
+  const userSubsFile = FileUtil.getRPUserDir();
   userSubsFile.appendRelativePath("subscriptions.json");
   let jsonData = "{}";
   if (userSubsFile.exists()) {
@@ -122,15 +122,15 @@ UserSubscriptions.prototype = {
   },
 
   save: function() {
-    var userSubsFile = FileUtil.getRPUserDir();
+    const userSubsFile = FileUtil.getRPUserDir();
     userSubsFile.appendRelativePath("subscriptions.json");
     FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
   getSubscriptionInfo: function() {
-    var lists = this._data.lists;
-    var result = {};
-    for (var listName in lists) {
+    const lists = this._data.lists;
+    const result = {};
+    for (let listName in lists) {
       if (!lists[listName].subscriptions) {
         continue;
       }
@@ -143,7 +143,7 @@ UserSubscriptions.prototype = {
   },
 
   addSubscription: function(listName, subName) {
-    var lists = this._data.lists;
+    const lists = this._data.lists;
     if (!lists[listName]) {
       lists[listName] = {};
     }
@@ -155,7 +155,7 @@ UserSubscriptions.prototype = {
   },
 
   removeSubscription: function(listName, subName) {
-    var lists = this._data.lists;
+    const lists = this._data.lists;
     if (lists[listName] && lists[listName].subscriptions &&
         lists[listName].subscriptions[subName]) {
       delete lists[listName].subscriptions[subName];
@@ -169,8 +169,8 @@ UserSubscriptions.prototype = {
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
   update: function(callback, serials) {
-    var updatingLists = {};
-    var updateResults = {};
+    const updatingLists = {};
+    const updateResults = {};
 
     function recordDone(listName, subName, result) {
       dprint("Recording done: " + listName + " " + subName);
@@ -189,15 +189,15 @@ UserSubscriptions.prototype = {
       setTimeout(() => callback(updateResults), 0);
     }
 
-    var listCount = 0;
+    let listCount = 0;
     /* jshint -W083 */ // Don't make functions within a loop.
-    for (var listName in serials) {
+    for (let listName in serials) {
       if (!this._lists[listName] || !this._lists[listName].subscriptions) {
         dprint("Skipping update of unsubscribed list: " + listName);
         continue;
       }
       let updateSubs = {};
-      var subCount = 0;
+      let subCount = 0;
       for (let subName in serials[listName]) {
         if (!this._lists[listName].subscriptions[subName]) {
           dprint("Skipping update of unsubscribed subscription: " + listName +
@@ -211,7 +211,7 @@ UserSubscriptions.prototype = {
         dprint("Skipping list with no subscriptions: " + listName);
         continue;
       }
-      var url = this._lists[listName].url;
+      let url = this._lists[listName].url;
       if (!url) {
         url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + ".json";
       }
@@ -219,7 +219,7 @@ UserSubscriptions.prototype = {
         dprint("Skipping list without url: " + listName);
         continue;
       }
-      var list = new SubscriptionList(listName, url);
+      const list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
       for (let subName in updateSubs) {
         dprint("Will update subscription: " + listName + " " + subName);
@@ -295,9 +295,9 @@ SubscriptionList.prototype = {
 
   updateMetadata: function(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
-    var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+    const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Ci.nsIXMLHttpRequest);
-    var self = this;
+    const self = this;
     req.onload = maybeCallback(function(event) {
       try {
         self._data = JSON.parse(req.responseText);
@@ -406,9 +406,9 @@ Subscription.prototype = {
   update: function(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
 
-    var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
+    const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
         createInstance(Ci.nsIXMLHttpRequest);
-    var self = this;
+    const self = this;
     req.onload = maybeCallback(function(event) {
       try {
         self._rawData = req.responseText;
@@ -436,14 +436,14 @@ Subscription.prototype = {
         }
         // The rest of the sanity checking is done by RawRuleset().
         try {
-          var rawRuleset = new RawRuleset(self._rawData);
+          const rawRuleset = new RawRuleset(self._rawData);
           RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + ".json",
                 self._list);
         } catch (e) {
           setTimeout(() => errorCallback(self, e.toString()), 0);
           return;
         }
-        var subInfo = {};
+        const subInfo = {};
         subInfo[self._list] = {};
         subInfo[self._list][self._name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,

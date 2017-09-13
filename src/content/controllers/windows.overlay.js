@@ -29,7 +29,7 @@ import {loadClassicmenuIntoWindow} from "ui/classicmenu.js";
 // OverlayController
 // =============================================================================
 
-export var OverlayController = (function() {
+export const OverlayController = (function() {
   let self = {};
 
   self.loadIntoWindow = function(window) {

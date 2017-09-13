@@ -37,7 +37,7 @@ if (Info.isAustralis) {
 // ToolbarButtonController
 // =============================================================================
 
-export var ToolbarButtonController = (function() {
+export const ToolbarButtonController = (function() {
   let self = {};
 
   const toolbarButtonId = "rpcontinuedToolbarButton";

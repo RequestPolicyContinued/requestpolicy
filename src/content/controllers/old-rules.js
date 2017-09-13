@@ -29,7 +29,7 @@ import {PolicyManager} from "lib/policy-manager";
 // OldRulesController
 // =============================================================================
 
-export var OldRulesController = (function() {
+export const OldRulesController = (function() {
   let self = {};
 
   self.startup = function() {

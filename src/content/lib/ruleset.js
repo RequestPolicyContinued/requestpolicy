@@ -149,10 +149,10 @@ RawRuleset.prototype = {
   _addEntryToRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry.o;
-    var d = entry.d;
-    var rules;
-    var r;
+    const o = entry.o;
+    const d = entry.d;
+    let rules;
+    let r;
 
     // dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
@@ -192,16 +192,16 @@ RawRuleset.prototype = {
   },
 
   ruleExists: function(ruleAction, ruleData) {
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
 
-    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[actionStr];
-    for (var i in entries) {
-      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
+    const ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
+    const entries = this._entries[actionStr];
+    for (let i in entries) {
+      const curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr === curRuleStr) {
         return true;
       }
@@ -218,7 +218,7 @@ RawRuleset.prototype = {
   addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     // dprint("addRule: adding entry");
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
@@ -250,10 +250,10 @@ RawRuleset.prototype = {
   _removeEntryFromRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry.o;
-    var d = entry.d;
-    var rules;
-    var r;
+    const o = entry.o;
+    const d = entry.d;
+    let rules;
+    let r;
 
     // TODO: refactor like done with _addEntryToRuleset
 
@@ -365,16 +365,16 @@ RawRuleset.prototype = {
   removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
     // dprint("removeRule: removing entry");
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
       throw "Invalid ruleAction: " + ruleAction;
     }
-    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[actionStr];
-    var removeIndex = false;
-    for (var i in entries) {
-      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
+    const ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
+    const entries = this._entries[actionStr];
+    let removeIndex = false;
+    for (let i in entries) {
+      const curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr === curRuleStr) {
         // |i| is a string which will cause bugs when we use it in arithmetic
         // expressions below. Why does this form of iterator give us string
@@ -384,8 +384,8 @@ RawRuleset.prototype = {
       }
     }
     if (removeIndex !== false) {
-      var begin = entries.slice(0, removeIndex);
-      var end = entries.slice(Number(removeIndex) + 1);
+      const begin = entries.slice(0, removeIndex);
+      const end = entries.slice(Number(removeIndex) + 1);
       if (begin.length + end.length + 1 !== entries.length) {
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
@@ -402,18 +402,18 @@ RawRuleset.prototype = {
    * |RawRuleset|.
    */
   toRuleset: function(name) {
-    var policy = new Ruleset(name);
+    const policy = new Ruleset(name);
 
-    for (var actionStr in this._entries) {
+    for (let actionStr in this._entries) {
       // dprint("actionStr: " + actionStr);
       if (actionStr !== "allow" && actionStr !== "deny") {
         dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
+      const ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
           C.RULE_ACTION_DENY;
-      var entryArray = this._entries[actionStr];
-      for (var i in entryArray) {
+      const entryArray = this._entries[actionStr];
+      for (let i in entryArray) {
         // dprint("toRuleset: adding entry");
         this._addEntryToRuleset(entryArray[i], ruleAction, policy);
       }
@@ -445,7 +445,7 @@ RawRuleset.prototype = {
     // TODO: sanity check imported data, decide whether to ignore unrecognized
     // keys.
     // TODO: wrap in try/catch block
-    var dataObj = JSON.parse(data);
+    const dataObj = JSON.parse(data);
 
     // dprint(typeof dataObj);
     // dprint(dump(dataObj));
@@ -461,7 +461,7 @@ RawRuleset.prototype = {
    */
   toJSON: function() {
     // Note: unrecognized keys in the metadata and entries are preserved.
-    var tempObj = {"metadata": this._metadata, "entries": this._entries};
+    const tempObj = {"metadata": this._metadata, "entries": this._entries};
     return tempObj;
   }
 };
@@ -576,8 +576,8 @@ Rule.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
@@ -696,15 +696,15 @@ DomainEntry.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
     if (this.rules) {
       this.rules.print(depth + 1);
     }
-    for (var entryName in this._lower) {
+    for (let entryName in this._lower) {
       this._lower[entryName].print(depth + 1);
     }
   },
@@ -740,8 +740,8 @@ IPAddressEntry.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
@@ -803,8 +803,8 @@ Ruleset.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
@@ -827,11 +827,11 @@ Ruleset.prototype = {
   },
 
   _getDomain: function(domain) {
-    var parts = domain.split(".");
-    var curLevel = this._domain;
-    var nextLevel;
-    var fullName = "";
-    for (var i = parts.length - 1; i >= 0; i--) {
+    const parts = domain.split(".");
+    let curLevel = this._domain;
+    let nextLevel;
+    let fullName = "";
+    for (let i = parts.length - 1; i >= 0; i--) {
       // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
@@ -844,11 +844,11 @@ Ruleset.prototype = {
   },
 
   _addDomain: function(domain) {
-    var parts = domain.split(".");
-    var curLevel = this._domain;
-    var nextLevel;
-    var fullName = "";
-    for (var i = parts.length - 1; i >= 0; i--) {
+    const parts = domain.split(".");
+    let curLevel = this._domain;
+    let nextLevel;
+    let fullName = "";
+    for (let i = parts.length - 1; i >= 0; i--) {
       // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
@@ -911,19 +911,19 @@ Ruleset.prototype = {
     }
 
     if (DomainUtil.isIPAddress(host)) {
-      var addrEntry = this._ipAddr[host];
+      const addrEntry = this._ipAddr[host];
       if (addrEntry) {
         yield [addrEntry, true];
       }
     } else {
-      var parts = host.split(".");
-      var curLevel = this._domain;
+      const parts = host.split(".");
+      let curLevel = this._domain;
       // Start by checking for a wildcard at the highest level.
-      var nextLevel = curLevel.getLowerLevel("*");
+      let nextLevel = curLevel.getLowerLevel("*");
       if (nextLevel) {
         yield [nextLevel, true];
       }
-      for (var i = parts.length - 1; i >= 0; i--) {
+      for (let i = parts.length - 1; i >= 0; i--) {
         nextLevel = curLevel.getLowerLevel(parts[i]);
         if (!nextLevel) {
           break;
@@ -947,10 +947,10 @@ Ruleset.prototype = {
    *     and "deny" rules, respectively.
    */
   check: function(origin, dest) {
-    var matchedAllowRules = [];
-    var matchedDenyRules = [];
-    var originHost;
-    var destHost;
+    const matchedAllowRules = [];
+    const matchedDenyRules = [];
+    let originHost;
+    let destHost;
     try {
       originHost = origin.host;
     } catch (e) {
@@ -1066,12 +1066,12 @@ Ruleset.matchToRawRule = function(match) {
   // or
   //     [actionStr, originEntry, originRule, destEntry, destRule]
   // as returned by calls to |Ruleset.check()|.
-  var rawRule = {};
-  var entry;
-  var rule;
-  var destEntry;
-  var destRule;
-  var actionStr = match[0];
+  const rawRule = {};
+  let entry;
+  let rule;
+  let destEntry;
+  let destRule;
+  let actionStr = match[0];
 
   if (actionStr === "origin") {
     [actionStr, entry, rule] = match;
@@ -1098,7 +1098,7 @@ Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
     parts) {
   if (rawRule[originOrDest]) {
     parts.push("\"" + originOrDest + "\":{");
-    var needComma = false;
+    let needComma = false;
     if (rawRule[originOrDest].h) {
       parts.push("\"h\":\"" + rawRule[originOrDest].h + "\"");
       needComma = true;
@@ -1123,7 +1123,7 @@ Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
 };
 
 Ruleset.rawRuleToCanonicalString = function(rawRule) {
-  var parts = ["{"];
+  const parts = ["{"];
   if (rawRule.d) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }

@@ -72,7 +72,7 @@ let prefInitFunctions = {
   },
 
   setDefaultPref: function(prefName, prefValue) {
-    var defaultBranch = Services.prefs.getDefaultBranch(null);
+    const defaultBranch = Services.prefs.getDefaultBranch(null);
     this.setGenericPref(defaultBranch, prefName, prefValue);
   },
 
@@ -82,7 +82,7 @@ let prefInitFunctions = {
   },
 
   setUCharPref: function(prefName, text, branch) { // Unicode setCharPref
-    var string = Cc["@mozilla.org/supports-string;1"]
+    const string = Cc["@mozilla.org/supports-string;1"]
         .createInstance(Ci.nsISupportsString);
     string.data = text;
     branch = branch || Services.prefs;

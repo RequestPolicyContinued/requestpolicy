@@ -28,7 +28,7 @@ import {JSUtils} from "lib/utils/javascript";
 // Info
 // =============================================================================
 
-export var Info = (function() {
+export const Info = (function() {
   let self = {};
 
   // bad smell...

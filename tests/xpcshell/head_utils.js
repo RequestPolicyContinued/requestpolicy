@@ -9,9 +9,9 @@ function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {
     destFilename = "";
   }
-  var testResources = do_get_file("resources", false);
-  var profilePolicyDir = FileUtil.getRPUserDir("policies");
-  var file = testResources.clone();
+  const testResources = do_get_file("resources", false);
+  const profilePolicyDir = FileUtil.getRPUserDir("policies");
+  const file = testResources.clone();
   file.append(filename);
   if (!file.exists()) {
     throw "Test resource does not exist: " + file.path;
@@ -24,8 +24,8 @@ function copyRulesetFileToProfile(filename, destFilename) {
  * @throws If the file to delete doesn't exist.
  */
 function deleteFileFromProfile(filename) {
-  var profilePolicyDir = FileUtil.getRPUserDir("policies");
-  var file = profilePolicyDir.clone();
+  const profilePolicyDir = FileUtil.getRPUserDir("policies");
+  const file = profilePolicyDir.clone();
   file.append(filename);
   file.remove(false);
 }

@@ -30,7 +30,7 @@ let {PrivateBrowsingUtils} = Cu.import(
 // WindowUtils
 // =============================================================================
 
-export var WindowUtils = (function() {
+export const WindowUtils = (function() {
   let self = {};
 
   self.getMostRecentWindow = function(aWindowType = null) {

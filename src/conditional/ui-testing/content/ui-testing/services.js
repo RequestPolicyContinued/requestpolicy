@@ -26,7 +26,7 @@ import {Environment, MainEnvironment} from "lib/environment";
 // ErrorTriggeringService
 // =============================================================================
 
-var ErrorTriggeringService = createErrorTriggeringService();
+const ErrorTriggeringService = createErrorTriggeringService();
 ErrorTriggeringService.bootstrap();
 
 /**
@@ -76,12 +76,12 @@ function createErrorTriggeringService() {
    * Only the first colon counts.
    */
   function splitColon(aString) {
-    var index = aString.indexOf(":");
+    const index = aString.indexOf(":");
     if (index === -1) {
       return [aString, ""];
     }
-    var part1 = aString.substr(0, index);
-    var part2 = aString.substr(index + 1);
+    const part1 = aString.substr(0, index);
+    const part2 = aString.substr(index + 1);
     return [part1, part2];
   }
 
@@ -90,7 +90,7 @@ function createErrorTriggeringService() {
   }
 
   function runAsync(aFunction) {
-    var runnable = {run: aFunction};
+    const runnable = {run: aFunction};
     Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
   }

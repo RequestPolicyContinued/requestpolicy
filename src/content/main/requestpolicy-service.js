@@ -37,7 +37,7 @@ const {AMO} = C;
 // rpService
 // =============================================================================
 
-export var rpService = (function() {
+export const rpService = (function() {
   let self = {};
 
   // ---------------------------------------------------------------------------
@@ -67,7 +67,7 @@ export var rpService = (function() {
         serials[listName][subName] = -1;
       }
     }
-    var loadedSubs = PolicyManager.getSubscriptionRulesets();
+    const loadedSubs = PolicyManager.getSubscriptionRulesets();
     for (let listName in loadedSubs) {
       for (let subName in loadedSubs[listName]) {
         if (!serials[listName]) {
@@ -86,7 +86,7 @@ export var rpService = (function() {
   // TODO: move to window manager
   function maybeShowSetupTab() {
     if (!Storage.get("welcomeWindowShown")) {
-      var url = "about:requestpolicy?setup";
+      const url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
       if (win === null) {
@@ -119,12 +119,12 @@ export var rpService = (function() {
    * Module for detecting installations of other RequestPolicy versions,
    * which have a different extension ID.
    */
-  var DetectorForOtherInstallations = (function() {
+  const DetectorForOtherInstallations = (function() {
     const NOTICE_URL = "chrome://rpcontinued/content/" +
         "multiple-installations.html";
 
     // The other extension IDs of RequestPolicy.
-    var addonIDs = Object.freeze(new Set([
+    const addonIDs = Object.freeze(new Set([
       // Detect the "original" add-on (v0.5; released on AMO).
       "requestpolicy@requestpolicy.com",
       // Detect "RPC Legacy" (v0.5; AMO version).
@@ -167,10 +167,10 @@ export var rpService = (function() {
     }
 
     // On startup, the tab should be opened only once.
-    var initialCheckDone = false;
+    let initialCheckDone = false;
 
     function addonListCallback(addons) {
-      var activeAddons = addons.
+      const activeAddons = addons.
           filter(addon => addonIDs.has(addon.id)).
           filter(addon => addon.enabled);
       if (activeAddons.length === 0) {
@@ -182,7 +182,7 @@ export var rpService = (function() {
         return;
       }
 
-      var rv = openTab();
+      const rv = openTab();
 
       if (rv === true) {
         initialCheckDone = true;

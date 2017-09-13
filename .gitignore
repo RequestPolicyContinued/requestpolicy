@@ -6,6 +6,8 @@
 !.github/
 !.gitignore
 !.babelrc
+!.eslintrc.js
+!.eslintignore
 !.jshintrc
 !.jshintignore
 !.jscsrc

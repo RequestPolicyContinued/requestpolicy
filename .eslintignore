@@ -1,0 +1,4 @@
+**/third-party/**/*
+**/node_modules/**/*
+
+/tests/helper-addons/external

@@ -66,6 +66,7 @@ ZIP            := zip
 
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+ESLINT         := $(abspath $(node_modules_dir))/.bin/eslint --ext .js,.jsm
 GULP           := $(abspath $(node_modules_dir))/.bin/gulp
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
@@ -494,11 +495,16 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: addons-linter jscs jshint
+lint: addons-linter eslint jscs jshint
 
-.PHONY: addons-linter jscs jshint
+.PHONY: addons-linter eslint jscs jshint
 addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
+eslint: node-packages
+	$(ESLINT) src/
+	$(ESLINT) tests/xpcshell/
+	$(ESLINT) tests/helper-addons/
+	$(ESLINT) gulpfile.js
 jscs: node-packages
 	cd src/;                 $(JSCS) .
 	cd tests/xpcshell/;      $(JSCS) .

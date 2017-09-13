@@ -10,6 +10,7 @@
     "gulp": "^3.9.1",
     "gulp-debug": "^3.1.0",
     "gulp-if": "^2.0.2",
+    "gulp-ignore": "^2.0.2",
     "gulp-preprocess": "^2.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
@@ -17,6 +18,7 @@
     "gulp-zip": "^4.0.0",
     "jscs": "^3.0.7",
     "jshint": "^2.9.4",
+    "merge-stream": "^1.0.1",
     "mocha": "^3.4.2",
     "typescript": "^2.4.2"
   }

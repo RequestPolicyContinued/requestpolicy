@@ -12,11 +12,14 @@ const del = require("del");
 const gulp = require("gulp");
 const debug = require("gulp-debug"); /* jshint ignore:line */ /* (ignore if unused) */
 const gulpif = require("gulp-if");
+const gulpIgnore = require("gulp-ignore");
 const preprocess = require("gulp-preprocess");
 const rename = require("gulp-rename");
 const replace = require("gulp-replace");
 const ts = require("gulp-typescript");
 const zip = require("gulp-zip");
+const mergeStream = require("merge-stream");
+const nodePath = require("path");
 
 const config = require("./config.json");
 
@@ -31,9 +34,86 @@ const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
 
-function isJsm(aVinylFile) {
-  return aVinylFile.path.endsWith(".jsm");
-}
+const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) */
+
+  function _array(aAny) {
+    return Array.isArray(aAny) ? aAny : [aAny];
+  }
+
+  function _set(aAny) {
+    return new Set(_array(aAny));
+  }
+
+  function pathMatches(aPath, aFilter) {
+    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
+    if (Array.isArray(aFilter)) {
+      return aFilter.some(filter => pathMatches(aPath, filter));
+    }
+    let {name: stem, ext} = nodePath.parse(aPath);
+    if ("pathRegex" in aFilter) {
+      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) { return false; }
+    }
+    if ("stem" in aFilter) {
+      if (!_set(aFilter.stem).has(stem)) { return false; }
+    }
+    if ("ext" in aFilter) {
+      if (!_set(aFilter.ext).has(ext)) { return false; }
+    }
+    return true;
+  }
+
+  const nonModulePaths = [
+    "content/bootstrap/data/",
+    "content/bootstrap/environments/",
+  ];
+  const nonModuleStems = [
+    "bootstrap",
+  ];
+
+  function originalPath(aVinylFile) {
+    return aVinylFile.history[0];
+  }
+
+  function isModule(aVinylFile) {
+    return !pathMatches(originalPath(aVinylFile), [
+      {ext: ".jsm"},
+      {pathRegex: nonModulePaths},
+      {stem: nonModuleStems},
+    ]);
+  }
+
+  function fileMatches(aFilter, aVinylFile) {
+    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
+    if (Array.isArray(aFilter)) {
+      return aFilter.some(filter => fileMatches(filter, aVinylFile));
+    }
+    if (!pathMatches(aVinylFile.path, aFilter)) { return false; }
+    if ("originalPath" in aFilter) {
+      if (!pathMatches(originalPath(aVinylFile), aFilter.originalPath)) { return false; }
+    }
+    if ("isModule" in aFilter) {
+      if (isModule(aVinylFile) !== aFilter.isModule) { return false; }
+    }
+    if ("not" in aFilter) {
+      if (fileMatches(aFilter.not, aVinylFile)) { return false; }
+    }
+    return true;
+  }
+
+  function conditionFactory(aFilter) {
+    return aVinylFile => fileMatches(aFilter, aVinylFile);
+  }
+
+  return {
+    include(aFilter) {
+      return gulpIgnore.include(conditionFactory(aFilter));
+    },
+
+    if(aFilter, aThen, aElse) {
+      return gulpif(conditionFactory(aFilter), aThen, aElse);
+    },
+  };
+}());
 
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
@@ -298,12 +378,18 @@ BUILDS.forEach(build => {
               }
           )).
           pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
-          pipe(rename(mergeInConditional)).
-          pipe(gulpif(
-              file => !isJsm(file),
-              tsProject()
-          ));
-      stream = stream.js || stream; // gulp-typescript
+          pipe(rename(mergeInConditional));
+
+      stream = mergeStream(
+          // non-jsm files
+          stream.
+              pipe(fileFilter.include({isModule: true})).
+              pipe(tsProject()).js,
+
+          // jsm files
+          stream.
+              pipe(fileFilter.include({isModule: false})));
+
       stream = stream.
           pipe(gulp.dest(buildDir));
       return stream;

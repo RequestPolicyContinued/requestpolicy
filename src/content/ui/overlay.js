@@ -87,7 +87,7 @@ export function loadOverlayIntoWindow(window) {
   let isFennec = false;
 
   let self = {
-    // This is set by request-log/main.js when it is initialized. We don't need to worry
+    // This is set by the request log when it is initialized. We don't need to worry
     // about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment

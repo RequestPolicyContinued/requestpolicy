@@ -72,7 +72,8 @@ export var rpWindowManager = (function() {
   let self = {};
 
   let frameScriptURI =
-      "chrome://rpcontinued/content/framescripts/bootstrap.js?" + Math.random();
+      "chrome://rpcontinued/content/bootstrap/environments/framescript.js?" +
+      Math.random();
 
   function loadIntoWindow(window) {
     WindowSubControllers.loadIntoWindow(window);

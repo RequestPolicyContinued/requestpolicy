@@ -22,7 +22,7 @@
 
 "use strict";
 
-/* global Components, -browser, -Cc, -Ci, -Cm, -Cr, -Cu, -console, -Services, -XPCOMUtils */
+/* global Components, window */
 
 (function() {
   let {createCommonjsEnv, Api} = Components.utils.import(

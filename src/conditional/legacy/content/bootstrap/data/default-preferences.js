@@ -1,6 +1,6 @@
 "use strict";
 
-/* global pref */
+/* global pref, setGenericPref, setUCharPref */  // jshint ignore:line
 // jscs:disable maximumLineLength
 
 pref("extensions.requestpolicy.log", false);

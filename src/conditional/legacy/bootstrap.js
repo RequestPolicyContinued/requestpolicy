@@ -66,7 +66,8 @@ function startup(data, reason) {
   // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
   // The scope of that script doesn't need to be remembered.
   Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/main/default-pref-handler.js",
+      "chrome://rpcontinued/content/bootstrap/misc/" +
+      "handle-default-preferences.js",
       getGlobals());
   Services.prefs.savePrefFile(null);
 

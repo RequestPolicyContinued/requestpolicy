@@ -22,6 +22,8 @@
 
 "use strict";
 
+/* global console, Cc, Ci, Cm, Cr, Cu, Services, XPCOMUtils */ /* jshint ignore:line */ /* (ignore if unused) */
+
 /**
  * This file has to be called only once. It handles the default
  * preferences [1], so it has to be called quite early at the
@@ -106,8 +108,9 @@ try {
   // This is necessary for restartless extensions.
   // https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
   Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/lib/default-preferences.js",
+      "chrome://rpcontinued/content/bootstrap/data/default-preferences.js",
       defaultPrefScriptScope);
+  Services.prefs.savePrefFile(null);
 } catch (e) {
   console.log("Error handling default preferences!");
   console.dir(e);

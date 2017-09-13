@@ -22,23 +22,38 @@
 
 "use strict";
 
-/* global Components, -browser, -Cc, -Ci, -Cm, -Cr, -Cu, -console, -Services, -XPCOMUtils */
+/* global Components */
 
 (function() {
-  let {createCommonjsEnv, Api} = Components.utils.import(
+  let {createCommonjsEnv, ContentScriptsApi} = Components.utils.import(
       "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
-  let commonjsEnv = createCommonjsEnv();
+  /* jshint -W061 */
+  let cfmm = Function("return this")(); // ContentFrameMessageManager
+  /* jshint +W061 */
 
-  function onDOMContentLoaded() {
-    document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
-    let pageName = document.documentElement.id;
-    commonjsEnv.load("settings/" + pageName, [
-      ["$", $],
-      ["window", window],
-      ["document", document],
-      ["browser", Api.browser],
-    ]);
+  let commonjsEnv = createCommonjsEnv();
+  commonjsEnv.load("framescripts/main", [
+    ["cfmm", cfmm],
+    ["browser", ContentScriptsApi.browser],
+  ]);
+
+  function unload() {
+    commonjsEnv.unload();
+    commonjsEnv = undefined;
   }
-  document.addEventListener("DOMContentLoaded", onDOMContentLoaded);
+
+  const shutdownMessage = "/* @echo EXTENSION_ID */" + ":shutdown";
+
+  function onShutdown() {
+    cfmm.removeMessageListener(shutdownMessage, onShutdown);
+    unload();
+  }
+  cfmm.addMessageListener(shutdownMessage, onShutdown);
+
+  function onDocumentUnload() {
+    cfmm.removeEventListener("unload", onDocumentUnload);
+    unload();
+  }
+  cfmm.addEventListener("unload", onDocumentUnload);
 }());

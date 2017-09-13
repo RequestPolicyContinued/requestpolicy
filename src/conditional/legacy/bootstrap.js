@@ -50,35 +50,9 @@ function reasonConstantToString(c) {
 // bootstrap functions
 //==============================================================================
 
-let commonjsEnv;
-
 function startup(data, reason) {
   const {FakeWebExt} = Cu.import(BOOTSTRAP, {});
-  const {getGlobals} = FakeWebExt;
-  let {console, Services} = getGlobals();
-
-  console.debug("starting up");
-
-  // Before anything else, handle default preferences.
-  //
-  // The following script needs to be called because bootsrapped addons have
-  // to handle their default preferences manually, see Mozilla Bug 564675:
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
-  // The scope of that script doesn't need to be remembered.
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/bootstrap/misc/" +
-      "handle-default-preferences.js",
-      getGlobals());
-  Services.prefs.savePrefFile(null);
-
-  const {Api, createCommonjsEnv, Manifest} = FakeWebExt;
   FakeWebExt.startup();
-  commonjsEnv = createCommonjsEnv();
-  commonjsEnv.load(Manifest.background.scripts[0], [
-    ["browser", Api.browser],
-    ["LegacyApi", Api.LegacyApi],
-    ["_setBackgroundPage", Api._setBackgroundPage],
-  ]);
 }
 
 function shutdown(data, reason) {
@@ -88,13 +62,7 @@ function shutdown(data, reason) {
   }
 
   const {FakeWebExt} = Cu.import(BOOTSTRAP, {});
-  let {getGlobals} = FakeWebExt;
-  let {console} = getGlobals();
-  console.debug("shutting down");
-
-  commonjsEnv.unload(reasonString);
-  commonjsEnv = undefined;
-  FakeWebExt.shutdown();
+  FakeWebExt.shutdown(reasonString);
 
   Cu.unload(BOOTSTRAP);
 }

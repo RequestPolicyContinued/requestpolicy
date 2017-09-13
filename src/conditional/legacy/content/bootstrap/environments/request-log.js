@@ -25,13 +25,8 @@
 /* global Components, window */
 
 (function() {
-  let {createCommonjsEnv, Api} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).FakeWebExt;
+  let {FakeWebExt} = Components.utils.import(
+      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
-  let commonjsEnv = createCommonjsEnv();
-
-  commonjsEnv.load("ui/request-log/main", [
-    ["window", window],
-    ["browser", Api.browser],
-  ]);
+  FakeWebExt.startupRequestLog(window);
 }());

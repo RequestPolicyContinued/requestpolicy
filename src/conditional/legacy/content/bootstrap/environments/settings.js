@@ -22,23 +22,11 @@
 
 "use strict";
 
-/* global Components, $, document, window */
+/* global Components, window */
 
 (function() {
-  let {createCommonjsEnv, Api} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).FakeWebExt;
+  let {FakeWebExt} = Components.utils.import(
+      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
-  let commonjsEnv = createCommonjsEnv();
-
-  function onDOMContentLoaded() {
-    document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
-    let pageName = document.documentElement.id;
-    commonjsEnv.load("settings/" + pageName, [
-      ["$", $],
-      ["window", window],
-      ["document", document],
-      ["browser", Api.browser],
-    ]);
-  }
-  document.addEventListener("DOMContentLoaded", onDOMContentLoaded);
+  FakeWebExt.startupSettingsPage(window);
 }());

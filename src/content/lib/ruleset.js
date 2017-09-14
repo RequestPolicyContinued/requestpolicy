@@ -135,7 +135,9 @@ RawRuleset.prototype = {
     } else {
       rules = policy.rules;
     }
-    let r = rules.add(entryPart.s, entryPart.port);
+    let r = rules.add(
+        "s" in entryPart ? entryPart.s : undefined,
+        "port" in entryPart ? entryPart.port : undefined);
     if (entryPart.pathPre) {
       r.pathPre = entryPart.pathPre;
     } else if (entryPart.pathRegex) {

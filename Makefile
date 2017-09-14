@@ -387,6 +387,7 @@ space :=
 space +=
 fn_timestamp_file = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
 force_every = $(shell \
+  mkdir -p $(dir $(call fn_timestamp_file,$1)); \
   touch -d '$1 ago' $(call fn_timestamp_file,$1); \
   test $(call fn_timestamp_file,$1) -nt $2 && \
     echo -n FORCE \

@@ -583,7 +583,7 @@ run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 .PHONY: check test marionette
-check test: marionette
+check test: marionette test-makefile
 
 logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
 
@@ -659,6 +659,14 @@ addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
 # localization checks
 include tests/l10n/Makefile
+
+#-------------------------------------------------------------------------------
+# Makefile tests
+#-------------------------------------------------------------------------------
+
+.PHONY: test-makefile
+test-makefile:
+	./scripts/run_makefile_tests
 
 
 #===============================================================================

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+testdir="build/testing/makefile-tests"
+exitcode=0
+
+function check {
+  local alias="$1"
+  local patch="$2"
+  local dir="$testdir/$alias"
+
+  rm -rf "$dir"
+  mkdir "$dir"
+  git archive HEAD | (cd "$dir"; tar x)
+
+  echo -n > "$dir.log" 2> "$dir.errors.log"
+
+  if [ "$patch" '!=' 'no_patch' ] && [ -n "$(git diff $patch)" ]; then
+    (cd "$dir"; patch -p1) < <(git diff $patch) >> "$dir.log" 2>> "$dir.errors.log"
+  fi
+
+  echo
+  echo "=== start testing '$alias' ==="
+
+  (cd "$dir" && make) >> "$dir.log" 2>> "$dir.errors.log"
+
+  if [ -n "$(cat $dir.errors.log)" ]; then
+    cat "$dir.errors.log"
+    exitcode=1
+  fi
+
+  echo "=== done testing '$alias' ==="
+  echo
+}
+
+mkdir -p "$testdir"
+
+test_head='yes'
+
+if [ -n "$(git diff --cached)" ]; then
+  check "index"   '--cached'
+  test_head='no'
+fi
+
+if [ "$(git diff --cached)" '!=' "$(git diff HEAD)" ]; then
+  check "workdir" 'HEAD'
+fi
+
+if [ "$test_head" '=' 'yes' ]; then
+  check "HEAD"    'no_patch'
+fi
+
+exit $exitcode

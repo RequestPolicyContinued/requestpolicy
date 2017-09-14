@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {PrefBranch} from "lib/classes/pref-branch";
+import {PrefBranch} from "web-extension-fake-api/lib/classes/pref-branch";
 
 //==============================================================================
 // Prefs

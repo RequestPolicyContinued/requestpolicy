@@ -21,7 +21,7 @@
  */
 
 import {MapOfSets} from "lib/classes/map-of-sets";
-import {Prefs} from "models/prefs";
+import {Prefs} from "web-extension-fake-api/models/prefs";
 
 //==============================================================================
 // PrefObserver

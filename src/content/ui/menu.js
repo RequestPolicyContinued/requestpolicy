@@ -23,7 +23,7 @@
 
 import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {RequestProcessor} from "lib/request-processor";
 import {PolicyManager} from "lib/policy-manager";
 import {DomainUtil} from "lib/utils/domains";
@@ -108,7 +108,7 @@ export function loadMenuIntoWindow(window) {
    * @return {boolean} If the question has been confirmed or not.
    */
   function confirm(dialogMessage, alwaysAskPrefName, params={}) {
-    let shouldAsk = Prefs.get(alwaysAskPrefName);
+    let shouldAsk = Storage.get(alwaysAskPrefName);
     if (shouldAsk === false) {
       // never ask
       return true;
@@ -127,7 +127,7 @@ export function loadMenuIntoWindow(window) {
 
     if (confirmed) {
       // "OK" has been pressed
-      Prefs.set(alwaysAskPrefName, checkboxObj.value);
+      Storage.set(alwaysAskPrefName, checkboxObj.value);
       return true;
     }
     // "Cancel" has been pressed
@@ -162,7 +162,7 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
-      var disabled = Prefs.isBlockingDisabled();
+      var disabled = Storage.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
@@ -214,7 +214,7 @@ export function loadMenuIntoWindow(window) {
 
       self._setPrivateBrowsingStyles();
 
-      // var hidePrefetchInfo = !Prefs.isPrefetchEnabled();
+      // var hidePrefetchInfo = !LegacyApi.prefs.isPrefetchEnabled();
       // self._itemPrefetchWarning.hidden = hidePrefetchInfo;
       // self._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
       //
@@ -272,8 +272,8 @@ export function loadMenuIntoWindow(window) {
 
     if (true === guiLocations) {
       // get prefs
-      let sorting = Prefs.get("menu.sorting");
-      let showNumRequests = Prefs.get("menu.info.showNumRequests");
+      let sorting = Storage.get("menu.sorting");
+      let showNumRequests = Storage.get("menu.info.showNumRequests");
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -312,7 +312,7 @@ export function loadMenuIntoWindow(window) {
     self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
     self._isUncontrollableOrigin = false;
 
-    let showNumRequests = Prefs.get("menu.info.showNumRequests");
+    let showNumRequests = Storage.get("menu.info.showNumRequests");
 
     let props = self._getOriginGUILocationProperties();
 
@@ -418,7 +418,7 @@ export function loadMenuIntoWindow(window) {
     // rule. We won't be able to use just "allow temporarily".
 
     if (!self._currentlySelectedDest) {
-      if (Prefs.isDefaultAllow()) {
+      if (Storage.isDefaultAllow()) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemDenyOrigin(lists.addRules, ruleData);
         }
@@ -440,7 +440,7 @@ export function loadMenuIntoWindow(window) {
           "h": self._addWildcard(dest)
         }
       };
-      //if (Prefs.isDefaultAllow()) {
+      //if (Storage.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
@@ -489,8 +489,8 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (self._currentlySelectedDest) {
-      if (!Prefs.isDefaultAllow() &&
-          !Prefs.isDefaultAllowSameDomain()) {
+      if (!Storage.isDefaultAllow() &&
+          !Storage.isDefaultAllowSameDomain()) {
         self._populateDetailsAddSubdomainAllowRules(lists.addRules);
       }
     }
@@ -788,7 +788,7 @@ export function loadMenuIntoWindow(window) {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
-      if (Prefs.isDefaultAllow() || Prefs.isDefaultAllowSameDomain()) {
+      if (Storage.isDefaultAllow() || Storage.isDefaultAllowSameDomain()) {
         if (destBase === self._currentlySelectedOrigin) {
           continue;
         }
@@ -829,8 +829,8 @@ export function loadMenuIntoWindow(window) {
   self._getOtherOriginsAsGUILocations = function() {
     var allRequests = self._allRequestsOnDocument.getAll();
 
-    var allowSameDomain = Prefs.isDefaultAllow() ||
-        Prefs.isDefaultAllowSameDomain();
+    var allowSameDomain = Storage.isDefaultAllow() ||
+        Storage.isDefaultAllowSameDomain();
 
     var guiOrigins = [];
     for (var originUri in allRequests) {

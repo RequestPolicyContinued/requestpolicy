@@ -21,6 +21,7 @@
  */
 
 import * as Utils from "./lib/utils/webext-utils";
+import {Prefs} from "./models/prefs";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -283,4 +284,6 @@ export var ContentScriptsApi = {
 
   Api.browser.storage.local.set = function() {
   };
+
+  Api.LegacyApi.prefs = Prefs;
 }());

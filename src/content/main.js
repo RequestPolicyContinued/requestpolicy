@@ -36,7 +36,7 @@ import {KeyboardShortcuts} from "controllers/keyboard-shortcuts";
 import {OldRulesController} from "controllers/old-rules";
 
 import {RequestProcessor} from "lib/request-processor";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
 import {OldRules} from "lib/old-rules";
 import {RuleUtils} from "lib/utils/rules";
@@ -70,7 +70,8 @@ _setBackgroundPage({
   ManagerForPrefObservers,
   OldRules,
   PolicyManager,
-  Prefs,
+  LegacyApi,
+  Storage,
   RequestProcessor,
   rpService,
   RuleUtils,

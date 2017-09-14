@@ -21,8 +21,8 @@
  */
 
 import {Windows} from "models/windows";
-import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {Storage} from "models/storage";
 import {XULUtils} from "lib/utils/xul";
 import {MainEnvironment} from "lib/environment";
 
@@ -161,13 +161,13 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
-    return Prefs.get(this._userComboPrefName);
+    return Storage.get(this._userComboPrefName);
   }
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
-    return Prefs.get(this._userEnabledPrefName);
+    return Storage.get(this._userEnabledPrefName);
   }
 });
 

@@ -22,7 +22,7 @@
 
 import {RequestProcessor} from "lib/request-processor";
 import {DomainUtil} from "lib/utils/domains";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 
 const initFunctions = [];
 
@@ -57,8 +57,8 @@ export var FramescriptServices = {
 
     const blockedURIs = {};
 
-    if (Prefs.get("indicateBlockedObjects")) {
-      const indicateBlacklisted = Prefs.get("indicateBlacklistedObjects");
+    if (Storage.get("indicateBlockedObjects")) {
+      const indicateBlacklisted = Storage.get("indicateBlacklistedObjects");
 
       const rejectedRequests = RequestProcessor._rejectedRequests.
           getOriginUri(originURI);

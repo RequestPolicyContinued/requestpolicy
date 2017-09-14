@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Prefs} from "models/prefs";
 import {C} from "lib/utils/constants";
 import {JSUtils} from "lib/utils/javascript";
 
@@ -35,15 +34,15 @@ export var Info = (function() {
   // bad smell...
   // get/set last/current RP version
   {
-    self.lastRPVersion = Prefs.get("lastVersion");
+    self.lastRPVersion = LegacyApi.prefs.get("lastVersion");
 
     self.curRPVersion = "0.0";
     // curRPVersion needs to be set asynchronously
     browser.management.getSelf().then(addon => {
-      Prefs.set("lastVersion", addon.version);
+      LegacyApi.prefs.set("lastVersion", addon.version);
       self.curRPVersion = addon.version;
       if (self.lastRPVersion !== self.curRPVersion) {
-        Services.prefs.savePrefFile(null);
+        LegacyApi.prefs.save();
       }
       return;
     }).catch(e => {
@@ -62,14 +61,14 @@ export var Info = (function() {
   // bad smell...
   // get/set last/current app (e.g. firefox) version
   {
-    self.lastAppVersion = Prefs.get("lastAppVersion");
+    self.lastAppVersion = LegacyApi.prefs.get("lastAppVersion");
 
     let curAppVersion = Services.appinfo.version;
     self.curAppVersion = curAppVersion;
-    Prefs.set("lastAppVersion", curAppVersion);
+    LegacyApi.prefs.set("lastAppVersion", curAppVersion);
 
     if (self.lastAppVersion !== self.curAppVersion) {
-      Services.prefs.savePrefFile(null);
+      LegacyApi.prefs.save();
     }
   }
 

@@ -26,7 +26,7 @@ import {$id, common} from "./common";
 (function() {
   var {
     Info,
-    Prefs,
+    Storage,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rpService,
@@ -62,16 +62,16 @@ import {$id, common} from "./common";
   }
 
   function handleDefaultPolicyChange() {
-    Prefs.set("defaultPolicy.allow",
-        $id("defaultallow").checked);
-    Services.prefs.savePrefFile(null);
+    Storage.set({
+      "defaultPolicy.allow": $id("defaultallow").checked,
+    });
     setAllowSameDomainBlockDisplay();
   }
 
   function handleAllowSameDomainChange() {
-    Prefs.set("defaultPolicy.allowSameDomain",
-        $id("allowsamedomain").checked);
-    Services.prefs.savePrefFile(null);
+    Storage.set({
+      "defaultPolicy.allowSameDomain": $id("allowsamedomain").checked,
+    });
   }
 
   function setAllowSameDomainBlockDisplay() {
@@ -134,7 +134,7 @@ import {$id, common} from "./common";
 
     // Populate the form values based on the user's current settings.
 
-    var defaultAllow = Prefs.get("defaultPolicy.allow");
+    var defaultAllow = Storage.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
@@ -142,7 +142,7 @@ import {$id, common} from "./common";
     }
 
     $id("allowsamedomain").checked =
-        Prefs.get("defaultPolicy.allowSameDomain");
+        Storage.get("defaultPolicy.allowSameDomain");
 
     // FIXME: Add a pref to disable subscriptions globally;  issue #713
     // Subscriptions are only simple here if we assume the user

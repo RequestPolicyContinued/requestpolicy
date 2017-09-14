@@ -24,8 +24,8 @@
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {Storage} from "models/storage";
 import {RequestProcessor} from "lib/request-processor";
 import {PolicyManager} from "lib/policy-manager";
 import {DomainUtil} from "lib/utils/domains";
@@ -133,7 +133,7 @@ export function loadOverlayIntoWindow(window) {
         // object's observerBlockedRequests() method will be called.
         RequestProcessor.addRequestObserver(self);
 
-        setContextMenuEntryEnabled(Prefs.get("contextMenu"));
+        setContextMenuEntryEnabled(Storage.get("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -297,7 +297,7 @@ export function loadOverlayIntoWindow(window) {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!Prefs.isBlockingDisabled() &&
+      if (!Storage.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them, as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
@@ -434,7 +434,7 @@ export function loadOverlayIntoWindow(window) {
     function addMenuItem(aRuleSpec) {
       aRuleSpec.allow = true;
       classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
-        if (Prefs.get("autoReload")) {
+        if (Storage.get("autoReload")) {
           allowRedirection();
         }
       });
@@ -587,7 +587,7 @@ export function loadOverlayIntoWindow(window) {
     var button = $id(toolbarButtonId);
     let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
-      let isPermissive = Prefs.isBlockingDisabled();
+      let isPermissive = Storage.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
@@ -905,7 +905,7 @@ export function loadOverlayIntoWindow(window) {
   self.onPopupHidden = function(event) {
     var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
-      if (Prefs.get("autoReload")) {
+      if (Storage.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
         mm.sendAsyncMessage(C.MM_PREFIX + "reload");
       }
@@ -938,8 +938,8 @@ export function loadOverlayIntoWindow(window) {
    * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
-    var disabled = !Prefs.isBlockingDisabled();
-    Prefs.setBlockingDisabled(disabled);
+    var disabled = !Storage.isBlockingDisabled();
+    Storage.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
     $id("rpc-link-enable-blocking").hidden = !disabled;

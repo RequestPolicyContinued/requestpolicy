@@ -22,7 +22,7 @@
  */
 
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
@@ -82,7 +82,7 @@ export var rpService = (function() {
 
   // TODO: move to window manager
   function maybeShowSetupTab() {
-    if (!Prefs.get("welcomeWindowShown")) {
+    if (!Storage.get("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
@@ -97,19 +97,18 @@ export var rpService = (function() {
       if (Info.isRPUpgrade) {
         // If the use has just upgraded from an 0.x version, set the
         // default-policy preferences based on the old preferences.
-        Prefs.set("defaultPolicy.allow", false);
-        if (Prefs.isSet("uriIdentificationLevel")) {
-          let identLevel = Prefs.get("uriIdentificationLevel");
-          Prefs.set("defaultPolicy.allowSameDomain",
-              identLevel === 1);
+        Storage.set({"defaultPolicy.allow": false});
+        if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
+          let identLevel = Storage.get("uriIdentificationLevel");
+          Storage.set({
+            "defaultPolicy.allowSameDomain": identLevel === 1,
+          });
         }
-        Services.prefs.savePrefFile(null);
       }
 
       tabbrowser.selectedTab = tabbrowser.addTab(url);
 
-      Prefs.set("welcomeWindowShown", true);
-      Services.prefs.savePrefFile(null);
+      Storage.set({"welcomeWindowShown": true});
     }
   }
 

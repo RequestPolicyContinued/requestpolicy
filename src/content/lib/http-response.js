@@ -24,7 +24,7 @@
 import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 
 //==============================================================================
 // HttpResponse
@@ -106,7 +106,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
           } catch (e) {
             Logger.warning(
                 "Invalid refresh header: <" + this.redirHeaderValue + ">");
-            if (!Prefs.isBlockingDisabled()) {
+            if (!Storage.isBlockingDisabled()) {
               this.removeResponseHeader();
             }
             this._rawDestString = null;

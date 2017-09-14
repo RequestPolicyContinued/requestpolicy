@@ -135,6 +135,8 @@ unique_version__amo_beta     := no
 unique_version__amo_nightly  := yes
 unique_version__unit_testing := yes
 
+ifdef BUILD
+
 #-------------------------------------------------------------------------------
 # [VARIABLES] this configuration
 #-------------------------------------------------------------------------------
@@ -265,6 +267,7 @@ $(current_build__xpi_file): $(build_files_including_removals) | $(dist_dir)
 		$(patsubst $(source_dir)/%,%,$(src__all_files))
 	@echo "Creating \"$(current_build__alias)\" XPI file: Done!"
 
+endif
 
 #===============================================================================
 # Create a XPI from any git-tag or git-commit

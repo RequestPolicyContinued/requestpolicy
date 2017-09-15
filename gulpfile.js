@@ -1,4 +1,5 @@
-"use strict"; /* jshint node: true */
+/* eslint-env node */
+"use strict";
 
 /* jscs:disable disallowSpacesInsideObjectBrackets */
 /* jscs:disable maximumLineLength */

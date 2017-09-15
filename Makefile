@@ -72,9 +72,6 @@ ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
 COFFEELINT     := $(abspath $(node_modules_dir))/.bin/coffeelint
 ESLINT         := $(abspath $(node_modules_dir))/.bin/eslint --ext .js,.jsm
 GULP           := $(abspath $(node_modules_dir))/.bin/gulp
-JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
-JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
-	--extra-ext jsm  --exclude '**/third-party/' --verbose
 MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
 TSC            := $(abspath $(node_modules_dir))/.bin/tsc
 TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
@@ -506,12 +503,12 @@ lint: lint-coffee lint-js lint-python lint-ts lint-xpi
 
 .PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
 lint-coffee: coffeelint
-lint-js: eslint jscs jshint
+lint-js: eslint
 lint-python: pep8
 lint-ts: ts tslint
 lint-xpi: addons-linter
 
-.PHONY: addons-linter coffeelint eslint jscs jshint pep8 ts tslint
+.PHONY: addons-linter coffeelint eslint pep8 ts tslint
 addons-linter: nightly-xpi node-packages
 	@echo $@
 	@$(ADDONS_LINTER) $(xpi_file__nightly)
@@ -525,20 +522,6 @@ eslint: node-packages
 	@$(ESLINT) tests/xpcshell/
 	@$(ESLINT) tests/helper-addons/
 	@$(ESLINT) gulpfile.js
-jscs: node-packages
-	@echo $@
-	@cd src/;                 $(JSCS) .
-	@cd tests/unit/;          $(JSCS) .
-	@cd tests/xpcshell/;      $(JSCS) .
-	@cd tests/helper-addons/; $(JSCS) .
-	@cd .;                    $(JSCS) gulpfile.js
-jshint: node-packages
-	@echo $@
-	@$(JSHINT) src/
-	@$(JSHINT) tests/unit/
-	@$(JSHINT) tests/xpcshell/
-	@$(JSHINT) tests/helper-addons/
-	@$(JSHINT) gulpfile.js
 pep8: python-packages
 	@echo $@
 	@$(PY_PEP8) scripts/

@@ -66,7 +66,7 @@ export var OldRulesController = (function() {
       PolicyManager.addAllowRules(rules);
       return true;
     } catch (e) {
-      console.error("Failed to import old rules.");
+      console.error("Failed to import old rules. Details:");
       console.dir(e);
       return false;
     }

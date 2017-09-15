@@ -1594,7 +1594,7 @@ RequestProcessor = (function(self) {
           return;
         }).
         catch(e => {
-          console.error("Could not update extension compatibility.");
+          console.error("Could not update extension compatibility. Details:");
           console.dir(e);
         });
   }

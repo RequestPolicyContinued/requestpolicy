@@ -64,7 +64,7 @@ Storage.prototype.set = function(aKeys) {
     LegacyApi.prefs.save();
     return Promise.resolve();
   } catch (error) {
-    console.error("Error when saving to storage!");
+    console.error("Error when saving to storage! Details:");
     console.dir(aKeys);
     console.dir(error);
     return Promise.reject(error);

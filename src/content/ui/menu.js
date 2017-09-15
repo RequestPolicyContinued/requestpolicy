@@ -230,7 +230,7 @@ export function loadMenuIntoWindow(window) {
       self._activateOriginItem($id("rpc-origin"));
 
     } catch (e) {
-      console.error("[Fatal] Unable to prepare menu");
+      console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);
       throw e;
     }

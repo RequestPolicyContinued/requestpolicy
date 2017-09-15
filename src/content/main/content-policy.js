@@ -74,7 +74,7 @@ export var RPContentPolicy = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(register);
           } else {
-            console.error("Failed to register factory!");
+            console.error("Failed to register factory! Details:");
             console.dir(e);
           }
         }
@@ -215,7 +215,7 @@ export var RPChannelEventSink = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(register);
           } else {
-            console.error("Failed to register factory!");
+            console.error("Failed to register factory! Details:");
             console.dir(e);
           }
         }

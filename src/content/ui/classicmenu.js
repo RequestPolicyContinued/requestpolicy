@@ -83,7 +83,7 @@ export function loadClassicmenuIntoWindow(window) {
         getInfoFromRuleSpec(aRuleSpec);
 
     if (!isAllow) {
-      console.error("invalid addMenuItem rule-spec");
+      console.error("Invalid addMenuItem rule-spec:");
       console.dir(aRuleSpec);
       return;
     }
@@ -109,7 +109,7 @@ export function loadClassicmenuIntoWindow(window) {
         labelName = "allowDestination";
         break;
       default:
-        console.error("invalid addMenuItem rule-spec");
+        console.error("Invalid addMenuItem rule-spec:");
         console.dir(aRuleSpec);
         return;
     }

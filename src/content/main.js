@@ -84,7 +84,7 @@ _setBackgroundPage({
 //==============================================================================
 
 function logSevereError(aMessage, aError) {
-  console.error("[SEVERE] " + aMessage);
+  console.error("[SEVERE] " + aMessage + " - Details:");
   console.dir(aError);
 }
 

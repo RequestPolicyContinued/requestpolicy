@@ -366,7 +366,7 @@ export var Environment = (function() {
         try {
           f.apply(null, aBootstrapArgs);
         } catch (e) {
-          console.error("Error in Bootstrap function:");
+          console.error("Error in Bootstrap function! Details:");
           console.dir(e);
         }
         if (LOG_ENVIRONMENT) {

@@ -52,13 +52,13 @@ const fileFilter = (function() {
     }
     let {name: stem, ext} = nodePath.parse(aPath);
     if ("pathRegex" in aFilter) {
-      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) { return false; }
+      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) return false;
     }
     if ("stem" in aFilter) {
-      if (!_set(aFilter.stem).has(stem)) { return false; }
+      if (!_set(aFilter.stem).has(stem)) return false;
     }
     if ("ext" in aFilter) {
-      if (!_set(aFilter.ext).has(ext)) { return false; }
+      if (!_set(aFilter.ext).has(ext)) return false;
     }
     return true;
   }
@@ -88,15 +88,15 @@ const fileFilter = (function() {
     if (Array.isArray(aFilter)) {
       return aFilter.some(filter => fileMatches(filter, aVinylFile));
     }
-    if (!pathMatches(aVinylFile.path, aFilter)) { return false; }
+    if (!pathMatches(aVinylFile.path, aFilter)) return false;
     if ("originalPath" in aFilter) {
-      if (!pathMatches(originalPath(aVinylFile), aFilter.originalPath)) { return false; }
+      if (!pathMatches(originalPath(aVinylFile), aFilter.originalPath)) return false;
     }
     if ("isModule" in aFilter) {
-      if (isModule(aVinylFile) !== aFilter.isModule) { return false; }
+      if (isModule(aVinylFile) !== aFilter.isModule) return false;
     }
     if ("not" in aFilter) {
-      if (fileMatches(aFilter.not, aVinylFile)) { return false; }
+      if (fileMatches(aFilter.not, aVinylFile)) return false;
     }
     return true;
   }
@@ -259,8 +259,8 @@ BUILDS.forEach(build => {
           "RP_VERSION": versionData[build.version],
         };
 
-        if (build.isAMO) { context.AMO = "TRUE"; }
-        if (build.alias === "ui-testing") { context.UI_TESTING = "TRUE"; }
+        if (build.isAMO) context.AMO = "TRUE";
+        if (build.alias === "ui-testing") context.UI_TESTING = "TRUE";
 
         return Promise.resolve();
       });

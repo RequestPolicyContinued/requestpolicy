@@ -48,6 +48,8 @@ logs_dir       := logs
 dev_env_dir      := dev_env
 python_env_dir   := $(dev_env_dir)/python
 browsers_dir     := $(dev_env_dir)/browsers
+stamps_dir       := $(dev_env_dir)/.stamps
+varstamps_dir    := $(stamps_dir)/vars
 
 node_modules_dir := ./node_modules
 
@@ -73,6 +75,17 @@ JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
 MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
+
+#-------------------------------------------------------------------------------
+# helper targets
+#-------------------------------------------------------------------------------
+
+# $1: variable name
+_VAR_STAMP_ = $(shell \
+  mkdir -p $(varstamps_dir); \
+  ./scripts/update_stamp.sh "$(varstamps_dir)/$1" "$($1)"; \
+  echo "$(varstamps_dir)/$1" \
+)
 
 #-------------------------------------------------------------------------------
 # helpers
@@ -578,6 +591,7 @@ mostlyclean: clean
 clean-dev-environment:
 	@-$(call _remove_all_files_and_dirs_in,$(python_env_dir))
 	@-$(call _remove_all_files_and_dirs_in,$(node_modules_dir))
+	@-$(call _remove_all_files_and_dirs_in,$(stamps_dir))
 	@rm -rf $(browsers_dir)/firefox
 	@# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
 	@# are put there manually.

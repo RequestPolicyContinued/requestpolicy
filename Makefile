@@ -135,6 +135,8 @@ unique_version__amo_beta     := no
 unique_version__amo_nightly  := yes
 unique_version__unit_testing := yes
 
+ifdef BUILD
+
 #-------------------------------------------------------------------------------
 # [VARIABLES] this configuration
 #-------------------------------------------------------------------------------
@@ -265,6 +267,7 @@ $(current_build__xpi_file): $(build_files_including_removals) | $(dist_dir)
 		$(patsubst $(source_dir)/%,%,$(src__all_files))
 	@echo "Creating \"$(current_build__alias)\" XPI file: Done!"
 
+endif
 
 #===============================================================================
 # Create a XPI from any git-tag or git-commit
@@ -387,6 +390,7 @@ space :=
 space +=
 fn_timestamp_file = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
 force_every = $(shell \
+  mkdir -p $(dir $(call fn_timestamp_file,$1)); \
   touch -d '$1 ago' $(call fn_timestamp_file,$1); \
   test $(call fn_timestamp_file,$1) -nt $2 && \
     echo -n FORCE \
@@ -579,7 +583,7 @@ run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
 .PHONY: check test marionette
-check test: marionette
+check test: marionette test-makefile
 
 logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
 
@@ -655,6 +659,14 @@ addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
 # localization checks
 include tests/l10n/Makefile
+
+#-------------------------------------------------------------------------------
+# Makefile tests
+#-------------------------------------------------------------------------------
+
+.PHONY: test-makefile
+test-makefile:
+	./scripts/run_makefile_tests
 
 
 #===============================================================================

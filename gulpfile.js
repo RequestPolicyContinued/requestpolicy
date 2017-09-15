@@ -1,8 +1,7 @@
 /* eslint-env node */
 "use strict";
 
-/* jscs:disable disallowSpacesInsideObjectBrackets */
-/* eslint max-len: [error, 100], no-multi-spaces: off */
+/* eslint max-len: [error, 100], no-multi-spaces: off, object-curly-spacing: off */
 
 // -----------------------------------------------------------------------------
 // imports

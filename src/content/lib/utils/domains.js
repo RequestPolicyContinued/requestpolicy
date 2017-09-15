@@ -123,7 +123,7 @@ DomainUtil.getHost = function(uri) {
 DomainUtil.uriObjHasHost = function(aUriObj) {
   try {
     // simply access the host.
-    aUriObj.host; // jshint ignore:line
+    aUriObj.host;
     return true;
   } catch (e) {
     // it's an URI without host
@@ -137,7 +137,7 @@ DomainUtil.uriObjHasHost = function(aUriObj) {
  */
 DomainUtil.uriObjHasPort = function(aUriObj) {
   try {
-    aUriObj.port; // jshint ignore:line
+    aUriObj.port;
     return true;
   } catch (e) {
     return false;

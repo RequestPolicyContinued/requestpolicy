@@ -28,9 +28,7 @@
   let {FakeWebExt} = Components.utils.import(
       "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
-  /* jshint -W061 */
   let cfmm = Function("return this")(); // ContentFrameMessageManager
-  /* jshint +W061 */
 
   FakeWebExt.startupFramescript(cfmm);
 })();

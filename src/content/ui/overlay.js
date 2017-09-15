@@ -702,7 +702,6 @@ export function loadOverlayIntoWindow(window) {
    * @this {nsContextMenu}
    */
   function onOpenLinkViaContextMenu() {
-    /* jshint validthis: true */
     let origin = window.gContextMenuContentData ?
         window.gContextMenuContentData.docLocation :
         this.target.ownerDocument.URL;

@@ -379,7 +379,6 @@ export const Environment = (function() {
      * @param {Object} aBootstrapArgs
      */
     function processLevel(aStartupOrShutdown, aLevel, aBootstrapArgs) {
-      /* jshint validthis: true */
       let self = this;
 
       let levelObj = self.levels[aStartupOrShutdown][aLevel];
@@ -417,7 +416,6 @@ export const Environment = (function() {
      * @param {integer=} aUntilLevel
      */
     function processLevels(aStartupOrShutdown, aBootstrapArgs, aUntilLevel) {
-      /* jshint validthis: true */
       let self = this;
       iterateLevels(aStartupOrShutdown, function(level) {
         processLevel.call(self, aStartupOrShutdown, level, aBootstrapArgs);
@@ -441,7 +439,6 @@ export const Environment = (function() {
      * @param {string} aStartupOrShutdown
      */
     function logStartupOrShutdown(aStartupOrShutdown) {
-      /* jshint validthis: true */
       let self = this;
       if (LOG_ENVIRONMENT) {
         log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
@@ -463,7 +460,6 @@ export const Environment = (function() {
     function bootstrap(aStartupOrShutdown,
                        aBootstrapArgs,
                        aUntilLevel=BOOTSTRAP[aStartupOrShutdown].lastLevel) {
-      /* jshint validthis: true */
       let self = this;
 
       let {

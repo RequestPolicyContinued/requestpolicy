@@ -26,11 +26,8 @@ import {Logger} from "lib/logger";
 
 let CustomizableUI = null;
 if (Info.isAustralis) {
-  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
-  /* jshint -W126 */
   ({CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm",
                                 {}));
-  /* jshint +W126 */
 }
 
 // =============================================================================

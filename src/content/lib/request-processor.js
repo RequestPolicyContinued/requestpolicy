@@ -1639,7 +1639,6 @@ RequestProcessor = (function(self) {
     }
 
     EXT_COMPAT_RULES.forEach(spec => {
-      // jshint -W083
       const enabledAddonIds = spec.ids.filter(id => idsToExtInfos.has(id));
       if (enabledAddonIds.length === 0) {
         return;

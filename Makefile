@@ -85,6 +85,10 @@ PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
 # helper targets
 #-------------------------------------------------------------------------------
 
+# Can force a target to be executed every time.
+.PHONY: FORCE
+FORCE:
+
 # $1: variable name
 _VAR_STAMP_ = $(shell \
   mkdir -p $(varstamps_dir); \
@@ -616,10 +620,9 @@ test-makefile:
 
 
 #===============================================================================
-# other targets
+# cleanup targets
 #===============================================================================
 
-# Cleanup targets
 .PHONY: clean mostlyclean distclean clean-dev-environment
 clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
@@ -635,7 +638,3 @@ clean-dev-environment:
 	@# are put there manually.
 	@rm -rf $(browsers_dir)/seamonkey/extracted
 distclean: mostlyclean clean-dev-environment
-
-# Can force a target to be executed every time.
-.PHONY: FORCE
-FORCE:

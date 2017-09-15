@@ -286,8 +286,7 @@ fn_timestamp_file = $(stamps_dir)/.timestamp_$(subst $(space),_,$1)_ago
 force_every = $(shell \
   mkdir -p $(dir $(call fn_timestamp_file,$1)); \
   touch -d '$1 ago' $(call fn_timestamp_file,$1); \
-  test $(call fn_timestamp_file,$1) -nt $2 && \
-    echo -n FORCE \
+  echo $(call fn_timestamp_file,$1) \
 )
 
 #-------------------------------------------------------------------------------
@@ -318,7 +317,7 @@ __python_venv__ := v1
 .PHONY: python-venv python-packages
 python-venv python-packages: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
-		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
+		$(call force_every,7 days) \
 		$(T_PYTHON_VIRTUALENV)
 	$(PYTHON) -m pip install --upgrade -r $<
 	touch $@
@@ -343,7 +342,7 @@ T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
 $(T_NODE_PACKAGES): package.json \
-		$(call force_every,7 days,$(T_NODE_PACKAGES))
+		$(call force_every,7 days)
 	$(NPM) install
 	touch $@
 
@@ -391,7 +390,7 @@ ifneq "$(filter $(mozdl_supported_browsers),$1)" ""
 # but the tarball will only be extracted iff a new tarball has been
 # downloaded (i.e., a new update has been available).
 $(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
-		$(call force_every,12 hours,$(call T_BROWSER,$1,$2)) \
+		$(call force_every,12 hours) \
 		| python-venv
 	mkdir -p $(browsers_dir)/$1/downloads/$2/
 	$(PY_MOZDOWNLOAD) \

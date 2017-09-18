@@ -205,14 +205,19 @@ const BUILDS = [
   { alias: "amo-beta",    isDev: false, isAMO: true,  version: "nonUniqueVersion" },
 ];
 
+const DEFAULT_EXTENSION_TYPE = "legacy";
+
 BUILDS.forEach(build => {
-  const extensionType = "legacy";
+  gulp.task(`build:${build.alias}`, [`build:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
+  gulp.task(`xpi:${build.alias}`, [`xpi:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
+
+  const extensionType = DEFAULT_EXTENSION_TYPE;
 
   const buildDirRelative = `build/${extensionType}/${build.alias}`;
   const buildDir = `${__dirname}/${buildDirRelative}`;
 
   const TASK_NAMES = {
-    ppContext: `buildData:${build.alias}:preprocessContext`,
+    ppContext: `buildData:${extensionType}:${build.alias}:preprocessContext`,
     version: `versionData:${build.version}`,
   };
 
@@ -220,15 +225,15 @@ BUILDS.forEach(build => {
   // clean, XPI
   //----------------------------------------------------------------------------
 
-  gulp.task(`clean:${build.alias}`, () => {
+  gulp.task(`clean:${extensionType}:${build.alias}`, () => {
     return del([buildDir]);
   });
 
-  gulp.task(`xpi:${build.alias}`,
-            [`build:${build.alias}`],
+  gulp.task(`xpi:${extensionType}:${build.alias}`,
+            [`build:${extensionType}:${build.alias}`],
             () => {
     const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix :
-                      `-${build.alias}`;
+                      `-${extensionType}-${build.alias}`;
     let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
         pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
         pipe(gulp.dest("dist"));
@@ -241,7 +246,7 @@ BUILDS.forEach(build => {
 
   const buildData = {};
 
-  addGulpTasks(`buildData:${build.alias}`, addTask => {
+  addGulpTasks(`buildData:${extensionType}:${build.alias}`, addTask => {
     addTask("preprocessContext", [TASK_NAMES.version], () => {
       const context = buildData.ppContext = {
         "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
@@ -290,8 +295,8 @@ BUILDS.forEach(build => {
   // main build tasks
   //----------------------------------------------------------------------------
 
-  addGulpTasks(`build:${build.alias}`,
-               [`clean:${build.alias}`],
+  addGulpTasks(`build:${extensionType}:${build.alias}`,
+               [`clean:${extensionType}:${build.alias}`],
                (addBuildTask, buildTaskPrefix) => {
     addBuildTask("copiedFiles", () => {
       let files = [

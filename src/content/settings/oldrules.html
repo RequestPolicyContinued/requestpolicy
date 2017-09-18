@@ -3,7 +3,12 @@
 <head>
   <title>RequestPolicy - Old Rules</title>
   <script src="chrome://rpcontinued/content/lib/third-party/jquery.min.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/bootstrap/environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="chrome://rpcontinued/content/settings/main.js"></script>
+  <!-- @endif -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
 </head>

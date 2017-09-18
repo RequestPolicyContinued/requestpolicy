@@ -209,6 +209,8 @@ BUILDS.forEach(build => {
   const buildDirRelative = `build/${build.alias}`;
   const buildDir = `${__dirname}/${buildDirRelative}`;
 
+  const extensionType = "legacy";
+
   const TASK_NAMES = {
     ppContext: `buildData:${build.alias}:preprocessContext`,
     version: `versionData:${build.version}`,
@@ -243,6 +245,7 @@ BUILDS.forEach(build => {
     addTask("preprocessContext", [TASK_NAMES.version], () => {
       const context = buildData.ppContext = {
         "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
+        "EXTENSION_TYPE": extensionType,
         "RP_HOMEPAGE_URL": config.homepage,
         "RP_VERSION": versionData[build.version],
       };
@@ -257,8 +260,6 @@ BUILDS.forEach(build => {
   //----------------------------------------------------------------------------
   // build utilities
   //----------------------------------------------------------------------------
-
-  const extensionType = "legacy";
 
   const conditionalDirsRelative = [extensionType].
       concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
@@ -297,7 +298,6 @@ BUILDS.forEach(build => {
         "README",
         "LICENSE",
         "content/**/*.css",
-        "content/**/*.html",
         "content/lib/third-party/**/*.js",
         "skin/*.css",
         "skin/*.png",
@@ -320,24 +320,6 @@ BUILDS.forEach(build => {
       return stream;
     });
 
-    addBuildTask("manifest-json", [TASK_NAMES.ppContext], () => {
-      let file;
-      switch (extensionType) {
-        case "webextension":
-          file = "manifest.json";
-          break;
-        case "legacy":
-          file = "content/bootstrap/data/manifest.json";
-          break;
-      }
-      file = inAnyRoot([file]);
-      let stream = gulp.src(file, { base: srcDir }).
-          pipe(rename(mergeInConditional)).
-          pipe(preprocess({ context: buildData.ppContext })).
-          pipe(gulp.dest(buildDir));
-      return stream;
-    });
-
     // ---
 
     function addPreprocessedFilesBuildTask(aFileType, aFiles) {
@@ -352,6 +334,7 @@ BUILDS.forEach(build => {
     }
 
     addPreprocessedFilesBuildTask("xml", [
+      "content/**/*.html",
     ].concat(
       extensionType === "webextension" ? [
       ] : extensionType === "legacy" ? [

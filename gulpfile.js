@@ -332,16 +332,33 @@ BUILDS.forEach(build => {
 
     // ---
 
-    if (extensionType === "legacy") {
-      addBuildTask("install-rdf", [TASK_NAMES.ppContext], () => {
-        let file = inAnyRoot(["install.rdf"]);
-        let stream = gulp.src(file, { base: srcDir }).
+    function addPreprocessedFilesBuildTask(aFileType, aFiles) {
+      return addBuildTask(`${aFileType}TypePreprocessedFiles`, [TASK_NAMES.ppContext], () => {
+        let files = inAnyRoot(aFiles);
+        let stream = gulp.src(files, { base: srcDir }).
             pipe(rename(mergeInConditional)).
-            pipe(preprocess({ context: buildData.ppContext })).
+            pipe(preprocess({ context: buildData.ppContext, extension: aFileType })).
             pipe(gulp.dest(buildDir));
         return stream;
       });
     }
+
+    addPreprocessedFilesBuildTask("xml", [
+    ].concat(
+      extensionType === "webextension" ? [
+      ] : extensionType === "legacy" ? [
+        "install.rdf",
+      ] : []
+    ));
+
+    addPreprocessedFilesBuildTask("js", [
+    ].concat(
+      extensionType === "webextension" ? [
+        "manifest.json",
+      ] : extensionType === "legacy" ? [
+        "content/bootstrap/data/manifest.json",
+      ] : []
+    ));
 
     // ---
 

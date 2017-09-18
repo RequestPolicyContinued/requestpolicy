@@ -24,7 +24,8 @@
 const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
 
 /* exported CustomUri */
-this.EXPORTED_SYMBOLS = ["CustomUri"];
+/* exported EXPORTED_SYMBOLS */
+var EXPORTED_SYMBOLS = ["CustomUri"];
 
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});

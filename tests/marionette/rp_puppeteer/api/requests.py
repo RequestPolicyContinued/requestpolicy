@@ -6,6 +6,13 @@ from firefox_puppeteer.base import BaseLib
 from contextlib import contextmanager
 
 
+GET_BACKGROUND_PAGE = """
+    Components.utils.
+        import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).
+        Api.browser.extension.getBackgroundPage()
+"""
+
+
 class Requests(BaseLib):
     """Class for observing requests."""
 
@@ -56,8 +63,7 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "request-processor.jsm");
+          const {RequestProcessor} = """ + GET_BACKGROUND_PAGE + """;
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];
@@ -85,6 +91,7 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
+          const {RequestProcessor} = """ + GET_BACKGROUND_PAGE + """;
           RequestProcessor.removeRequestObserver(this.requestObserver);
           this.listening = false;
         """, sandbox=self._sandbox, new_sandbox=False)

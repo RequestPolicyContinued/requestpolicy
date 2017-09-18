@@ -1,4 +1,4 @@
-"use strict"; /* jshint strict: global, node: true */
+"use strict"; /* jshint node: true */
 
 /* jscs:disable disallowSpacesInsideObjectBrackets */
 /* jscs:disable maximumLineLength */
@@ -11,7 +11,10 @@ const exec = require("child_process").exec;
 const del = require("del");
 const gulp = require("gulp");
 const debug = require("gulp-debug"); /* jshint ignore:line */ /* (ignore if unused) */
+const gulpif = require("gulp-if");
 const preprocess = require("gulp-preprocess");
+const rename = require("gulp-rename");
+const ts = require("gulp-typescript");
 const zip = require("gulp-zip");
 
 const config = require("./config.json");
@@ -23,6 +26,10 @@ const config = require("./config.json");
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
+
+function isJsm(aVinylFile) {
+  return aVinylFile.path.endsWith(".jsm");
+}
 
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
@@ -156,45 +163,113 @@ BUILDS.forEach(build => {
   });
 
   //----------------------------------------------------------------------------
-  // build
+  // build utilities
+  //----------------------------------------------------------------------------
+
+  const extensionType = "legacy";
+
+  const conditionalDirs = [extensionType].
+      map(name => `conditional/${name}`);
+  const conditionalDirsWithSrc = conditionalDirs.
+      map(dir => `src/${dir}`);
+
+  function mergeInConditional(path) {
+    conditionalDirs.forEach(dir => {
+      path.dirname = path.dirname.replace(dir + "/", "");  // non-root files
+      path.dirname = path.dirname.replace(dir, "");  // root files, e.g. conditional/legacy/bootstrap.js
+    });
+  }
+
+  function inAnyRoot(aFilenames) {
+    const roots = ["src"].concat(conditionalDirsWithSrc);
+    return aFilenames.reduce((accumulator, curFilename) => {
+      if (curFilename.startsWith("**")) {
+        throw new Error("paths passed must not start with '**'");
+      }
+      return accumulator.concat(roots.map(root => `${root}/${curFilename}`));
+    }, []);
+  }
+
+  //----------------------------------------------------------------------------
+  // main build tasks
   //----------------------------------------------------------------------------
 
   addGulpTasks(`build:${build.alias}`, [`clean:${build.alias}`], addBuildTask => {
     addBuildTask("copiedFiles", () => {
-      let stream = gulp.src([
-        "src/chrome.manifest",
-        "src/README",
-        "src/LICENSE",
-        "src/content/settings/*.css",
-        "src/content/settings/*.html",
-        "src/content/*.html",
-        "src/content/ui/*.xul",
-        "src/locale/*/*.dtd",
-        "src/locale/*/*.properties",
-        "src/content/lib/third-party/**/*.js",
-        "src/skin/*.css",
-        "src/skin/*.png",
-        "src/skin/*.svg",
-      ], { base: "src" }).
+      let files = [
+        "README",
+        "LICENSE",
+        "content/**/*.css",
+        "content/**/*.html",
+        "content/lib/third-party/**/*.js",
+        "skin/*.css",
+        "skin/*.png",
+        "skin/*.svg",
+      ];
+      switch (extensionType) {
+        case "legacy":
+          files = files.concat([
+            "chrome.manifest",
+            "content/**/*.xul",
+            "locale/*/*.dtd",
+            "locale/*/*.properties",
+          ]);
+          break;
+      }
+      files = inAnyRoot(files);
+      let stream = gulp.src(files, { base: "src" }).
+          pipe(rename(mergeInConditional)).
           pipe(gulp.dest(buildDir));
       return stream;
     });
 
     // ---
 
-    addBuildTask("install-rdf", [TASK_NAMES.ppContext], () => {
-      let stream = gulp.src("src/install.rdf", { base: "src" }).
-          pipe(preprocess({ context: buildData.ppContext })).
-          pipe(gulp.dest(buildDir));
-      return stream;
-    });
+    if (extensionType === "legacy") {
+      addBuildTask("install-rdf", [TASK_NAMES.ppContext], () => {
+        let file = inAnyRoot(["install.rdf"]);
+        let stream = gulp.src(file, { base: "src" }).
+            pipe(rename(mergeInConditional)).
+            pipe(preprocess({ context: buildData.ppContext })).
+            pipe(gulp.dest(buildDir));
+        return stream;
+      });
+    }
 
     // ---
+
+    const tsProject = ts.createProject("tsconfig.json", {
+      outDir: buildDir,
+      // <hack>
+      // For whatever inexplicable reason, "content/settings/common.js" and
+      // "content/ui/request-log/tree-view.js" are removed by tsProject() if
+      // `isolatedModules` is false. However, when the two files are renamed
+      // to "common_.js" and "tree-view_.js", respectively, the files are created
+      // correctly in the build directory. This is very likely a bug in the
+      // "gulp-typescript" module.
+      isolatedModules: true,
+      // </hack>
+    });
 
     addBuildTask("js", [TASK_NAMES.ppContext], () => {
-      let sources = ["src/**/*.js", "src/**/*.jsm", "!**/third-party/**/*"];
-      let stream = gulp.src(sources, { base: "src" }).
+      let files = [`content/**/*.*(js|jsm|ts)`];
+      switch (extensionType) {
+        case "legacy":
+          files.push(`bootstrap.js`);
+          break;
+      }
+      files = inAnyRoot(files);
+      files.push("!**/third-party/**/*");
+
+      let stream = gulp.src(files, { base: "src" }).
+          pipe(rename(mergeInConditional)).
           pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
+          pipe(gulpif(
+              file => !isJsm(file),
+              tsProject()
+          ));
+      stream = stream.js || stream; // gulp-typescript
+      stream = stream.
           pipe(gulp.dest(buildDir));
       return stream;
     });

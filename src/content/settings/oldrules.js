@@ -21,18 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, $, common, $id, $str */
+"use strict";
+
+import {common, $id, $str} from "./common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("models/prefs");
-  var {PolicyManager} = importModule("lib/policy-manager");
-  var {OldRules} = importModule("lib/old-rules");
-  var {RuleUtils} = importModule("lib/utils/rules");
+  var {
+    Prefs,
+    PolicyManager,
+    OldRules,
+    RuleUtils,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -128,5 +127,4 @@
     }
     populateRuleTable();
   };
-
 }());

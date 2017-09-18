@@ -19,16 +19,12 @@ class ErrorDetectionTests(object):
     ################
 
     def test_normal_error(self, n=1):
-        self.error_triggerer.trigger_error("normal error", msg=msg)
-        self._do_checks(n, "^\[RequestPolicy\] \[WARNING\] \[ERROR\] " + msg_regexp + "$")
-
-    def test_severe_error(self, n=1):
-        self.error_triggerer.trigger_error("severe error", msg=msg)
-        self._do_checks(n, "^\[RequestPolicy\] \[SEVERE\] \[INTERNAL\] " + msg_regexp + "$")
+        self.error_triggerer.trigger_error("error", "backgroundscript", msg=msg)
+        self._do_checks(n, "^console.error:\s+\[RequestPolicy\] " + msg_regexp + "$")
 
     def test_reference_error(self, n=1):
-        self.error_triggerer.trigger_error("ReferenceError")
-        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.jsm, line [0-9]+: ReferenceError: ")
+        self.error_triggerer.trigger_error("ReferenceError", "backgroundscript")
+        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.js, line [0-9]+: ReferenceError: ")
 
     ##########################
     # Private Helper Methods #

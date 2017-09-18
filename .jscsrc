@@ -3,7 +3,6 @@
   "fileExtensions": [".js", ".jsm"],
   "excludeFiles": [
     "**/third-party/",
-    "**/content/lib/ruleset.jsm",
     "external/"
   ],
 

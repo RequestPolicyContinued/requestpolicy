@@ -20,59 +20,79 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global Components */
-const {utils: Cu} = Components;
-
 /* exported startup, shutdown, install, uninstall */
-/* global dump */
 
 //==============================================================================
-// utilities
+// utilities, constants
 //==============================================================================
 
-const envURI = "chrome://rpcontinued/content/lib/environment.jsm";
+const {utils: Cu} = Components;
+const BOOTSTRAP = "chrome://rpcontinued/content/bootstrap/bootstrap.jsm";
 
-function log(aMessage) {
-  dump("[RequestPolicy] " + aMessage + "\n");
-}
-/**
- * If any Exception gets into bootstrap.js, it will be a severe error.
- * The Logger can't be used, as it might not be available.
- */
-function logSevereError(aMessage, aError) {
-  let msg = "[RequestPolicy] [SEVERE] [ERROR] " + aMessage + " " + aError +
-       (aError.stack ? ", stack was: " + aError.stack : "");
-  dump(msg + "\n");
-  Cu.reportError(aError);
+function reasonConstantToString(c) {
+  switch (c) {
+    case 1: return "APP_STARTUP";
+    case 2: return "APP_SHUTDOWN";
+    case 3: return "ADDON_ENABLE";
+    case 4: return "ADDON_DISABLE";
+    case 5: return "ADDON_INSTALL";
+    case 6: return "ADDON_UNINSTALL";
+    case 7: return "ADDON_UPGRADE";
+    case 8: return "ADDON_DOWNGRADE";
+    default: return "";
+  }
 }
 
 //==============================================================================
 // bootstrap functions
 //==============================================================================
 
+let commonjsEnv;
+
 function startup(data, reason) {
-  try {
-    log("starting up");
-    let {ProcessEnvironment} = Cu.import(envURI, {});
-    // Remark: startup() takes the arguments as an array!
-    ProcessEnvironment.startup([data, reason]);
-  } catch (e) {
-    logSevereError("startup() failed!", e);
-  }
+  const _bootstrap = Components.utils.import(BOOTSTRAP, {});
+  let {getGlobals, createCommonjsEnv} = _bootstrap;
+  let {console, Services} = getGlobals();
+
+  console.debug("starting up");
+
+  // Before anything else, handle default preferences.
+  //
+  // The following script needs to be called because bootsrapped addons have
+  // to handle their default preferences manually, see Mozilla Bug 564675:
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=564675
+  // The scope of that script doesn't need to be remembered.
+  Services.scriptloader.loadSubScript(
+      "chrome://rpcontinued/content/main/default-pref-handler.js",
+      getGlobals());
+  Services.prefs.savePrefFile(null);
+
+  let {Api} = _bootstrap;
+  commonjsEnv = createCommonjsEnv();
+  commonjsEnv.load("main", [
+    ["browser", Api.browser],
+    ["_setBackgroundPage", Api._setBackgroundPage],
+  ]);
 }
 
 function shutdown(data, reason) {
-  try {
-    log("shutting down");
-    {
-      let {ProcessEnvironment} = Cu.import(envURI, {});
-      // Remark: shutdown() takes the arguments as an array!
-      ProcessEnvironment.shutdown([data, reason]);
-    }
-    Cu.unload(envURI);
-  } catch (e) {
-    logSevereError("shutdown() failed!", e);
+  let reasonString = reasonConstantToString(reason);
+  if (reasonString === "APP_SHUTDOWN") {
+    return;
   }
+
+  const _bootstrap = Components.utils.import(BOOTSTRAP, {});
+  let {getGlobals} = _bootstrap;
+  let {console} = getGlobals();
+  console.debug("shutting down");
+
+  commonjsEnv.unload(reasonString);
+  commonjsEnv = undefined;
+
+  Cu.unload(BOOTSTRAP);
 }
 
 function install(data, reason) {

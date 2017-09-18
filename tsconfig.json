@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "module": "commonjs",
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "es2015",
+    "lib": [
+      "es5",
+      "es2015.collection",
+      "es2015.core", // except `RegExp.prototype.unicode` (Fx46)
+      "es2015.generator",
+      "es2015.iterable", // except `Array.prototype.values()`
+      "es2015.promise",
+      // "es2015.proxy",
+      "es2015.symbol",
+      // "es2015.symbol.wellknown",
+      "es2016.array.include"
+      // "es2017.object" // support since Fx47
+    ],
+
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+
+    "outDir": "build/ts",
+    "baseUrl": "src/content",
+    "paths": {
+      "*": [
+        "*",
+        "../conditional/legacy/content/*",
+        "../conditional/ui-testing/content/*",
+        "../conditional/webextension/content/*"
+      ]
+    }
+  }
+  ,
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/third-party"
+  ]
+}

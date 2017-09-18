@@ -21,17 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, $, common, WinEnv, elManager, $id */
+"use strict";
+
+import {common, WinEnv, elManager, $id} from "./common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("models/prefs");
+  var {
+    Prefs,
+    ManagerForPrefObservers,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -202,12 +200,11 @@
         });
 
     // call updateDisplay() every time a preference gets changed
-    WinEnv.prefObs.addListeners([
+    ManagerForPrefObservers.get(WinEnv).addListeners([
       "",
       "root/ network.prefetch-next",
       "root/ network.dns.disablePrefetch",
       "root/ network.http.speculative-parallel-limit",
     ], updateDisplay);
   };
-
 }());

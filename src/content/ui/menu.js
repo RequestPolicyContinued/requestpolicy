@@ -21,33 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, document */
+"use strict";
 
-window.rpcontinued.menu = (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
+import {Environment} from "lib/environment";
+import {Logger} from "lib/logger";
+import {Prefs} from "models/prefs";
+import {RequestProcessor} from "lib/request-processor";
+import {PolicyManager} from "lib/policy-manager";
+import {DomainUtil} from "lib/utils/domains";
+import {Ruleset} from "lib/ruleset";
+import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties
+        } from "lib/classes/gui-location";
+import {StringUtils} from "lib/utils/strings";
+import {DOMUtils} from "lib/utils/dom";
+import {WindowUtils} from "lib/utils/windows";
+import {C} from "lib/utils/constants";
 
-  let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
-
-  let {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-
-  let {RPService2: {console}} = importModule("main/rp-service-2");
-  let {Environment} = importModule("lib/environment");
-  let {Logger} = importModule("lib/logger");
-  let {Prefs} = importModule("models/prefs");
-  let {RequestProcessor} = importModule("lib/request-processor");
-  let {PolicyManager} = importModule("lib/policy-manager");
-  let {DomainUtil} = importModule("lib/utils/domains");
-  let {Ruleset} = importModule("lib/ruleset");
-  let {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties} =
-      importModule("lib/gui-location");
-  let {StringUtils} = importModule("lib/utils/strings");
-  let {DOMUtils} = importModule("lib/utils/dom");
-  let {WindowUtils} = importModule("lib/utils/windows");
-  let {C} = importModule("lib/utils/constants");
-
-  let rpcontinued = window.rpcontinued;
+export function loadMenuIntoWindow(window) {
+  let {document, rpcontinued} = window;
 
   //============================================================================
 
@@ -185,13 +176,13 @@ window.rpcontinued.menu = (function() {
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
         if (self._currentBaseDomain === null) {
-          Logger.info(Logger.TYPE_INTERNAL, "Unable to prepare menu because " +
+          Logger.info("Unable to prepare menu because " +
               "the current uri has no host: " + self._currentUri);
           self._populateMenuForUncontrollableOrigin();
           return;
         }
       } catch (e) {
-        Logger.info(Logger.TYPE_INTERNAL, "Unable to prepare menu because " +
+        Logger.info("Unable to prepare menu because " +
             "base domain can't be determined: " + self._currentUri);
         self._populateMenuForUncontrollableOrigin();
         return;
@@ -200,15 +191,13 @@ window.rpcontinued.menu = (function() {
       self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
-      //Logger.info(Logger.TYPE_POLICY,
-      //                              "self._currentUri: " + self._currentUri);
+      //Logger.info("self._currentUri: " + self._currentUri);
       self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
 
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
       //self._currentUriIsHttps = self._currentUriObj.scheme === "https";
 
-      Logger.info(Logger.TYPE_INTERNAL,
-          "self._currentUri: " + self._currentUri);
+      Logger.info("self._currentUri: " + self._currentUri);
 
       if (self._isChromeUri) {
         self._populateMenuForUncontrollableOrigin();
@@ -243,9 +232,7 @@ window.rpcontinued.menu = (function() {
       self._activateOriginItem($id("rpc-origin"));
 
     } catch (e) {
-      Logger.severe(Logger.TYPE_ERROR,
-          "Fatal Error, " + e + ", stack was: " + e.stack);
-      Logger.severe(Logger.TYPE_ERROR, "Unable to prepare menu due to error.");
+      Logger.error("[Fatal] Unable to prepare menu", e);
       throw e;
     }
   };
@@ -384,8 +371,7 @@ window.rpcontinued.menu = (function() {
         destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
         if (destsMixedIndex !== -1) {
-          Logger.info(Logger.TYPE_INTERNAL,
-              "Merging dest: <" + allowedGUIDest + ">");
+          Logger.info("Merging dest: <" + allowedGUIDest + ">");
           destsMixed[destsMixedIndex] = GUIDestination.merge(
               allowedGUIDest, destsMixed[destsMixedIndex]);
         } else {
@@ -393,7 +379,7 @@ window.rpcontinued.menu = (function() {
           // destsWithAllowedRequests, but not in destsMixed.
           // This should never happen, the destsMixed destination should have
           // been added in the destsWithBlockedRequests-loop.
-          Logger.warning(Logger.TYPE_INTERNAL, "mixed dest was" +
+          Logger.warning("mixed dest was" +
               " not added to `destsMixed` list: <" + allowedGUIDest + ">");
           destsMixed.push(allowedGUIDest);
         }
@@ -634,8 +620,8 @@ window.rpcontinued.menu = (function() {
     }
 
     if (domain === null) {
-      console.error("Failed to determine the domain under the mouse button " +
-                    "after the middle-click.");
+      Logger.error("Failed to determine the domain under the mouse button " +
+          "after the middle-click.");
       return;
     }
 
@@ -679,8 +665,7 @@ window.rpcontinued.menu = (function() {
                item.parentNode.id === "rpc-rules-add") {
       self._processRuleSelection(item);
     } else {
-      Logger.severe(Logger.TYPE_ERROR,
-          "Unable to figure out which item type was selected.");
+      Logger.error("Unable to figure out which item type was selected.");
     }
   };
 
@@ -698,20 +683,18 @@ window.rpcontinued.menu = (function() {
     }
 
     if (!ruleData) {
-      Logger.severe(Logger.TYPE_ERROR,
-          "ruleData is empty in menu._processRuleSelection()");
+      Logger.error("ruleData is empty in menu._processRuleSelection()");
       return;
     }
     if (!ruleAction) {
-      Logger.severe(Logger.TYPE_ERROR,
-          "ruleAction is empty in menu._processRuleSelection()");
+      Logger.error("ruleAction is empty in menu._processRuleSelection()");
       return;
     }
 
     var canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    Logger.dump("ruleData: " + canonicalRule);
-    Logger.dump("ruleAction: " + ruleAction);
-    Logger.dump("undo: " + undo);
+    Logger.debug("ruleData: " + canonicalRule);
+    Logger.debug("ruleAction: " + ruleAction);
+    Logger.debug("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the ruleData
@@ -1141,7 +1124,7 @@ window.rpcontinued.menu = (function() {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            Logger.dump("destinations[destUri] is null or undefined for " +
+            Logger.debug("destinations[destUri] is null or undefined for " +
                 "destUri: " + destUri);
             continue;
           }
@@ -1162,8 +1145,7 @@ window.rpcontinued.menu = (function() {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            //Logger.info(Logger.TYPE_POLICY,
-            //       "matched allow rule: " + rawRuleStr);
+            //Logger.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1223,7 +1205,7 @@ window.rpcontinued.menu = (function() {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            Logger.dump("destinations[destUri] is null or undefined " +
+            Logger.debug("destinations[destUri] is null or undefined " +
                 "for destUri: " + destUri);
             continue;
           }
@@ -1244,8 +1226,7 @@ window.rpcontinued.menu = (function() {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            //Logger.info(Logger.TYPE_POLICY,
-            //       "matched allow rule: " + rawRuleStr);
+            //Logger.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1328,5 +1309,5 @@ window.rpcontinued.menu = (function() {
     }
   };
 
-  return self;
-}());
+  window.rpcontinued.menu = self;
+}

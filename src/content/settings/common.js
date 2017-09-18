@@ -21,22 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global $, window */
-/* exported common, WinEnv, elManager, $id, $str */
+"use strict";
 
 var {common, WinEnv, elManager, $id, $str} = (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {StringUtils} = importModule("lib/utils/strings");
-  var {Environment, ProcessEnvironment} = importModule("lib/environment");
+  var {
+    StringUtils,
+    Environment,
+    MainEnvironment,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
   // create a new Environment for this window
-  var WinEnv = new Environment(ProcessEnvironment, "WinEnv");
+  var WinEnv = new Environment(MainEnvironment, "WinEnv");
   // The Environment has to be shut down when the content window gets unloaded.
   WinEnv.shutdownOnUnload(window);
   // start up right now, as there won't be any startup functions
@@ -78,3 +75,5 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     $str: $str
   };
 }());
+
+export {common, WinEnv, elManager, $id, $str};

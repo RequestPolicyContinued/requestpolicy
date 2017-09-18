@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+"use strict";
+
 /* global exports: true, C, appID */
 
 // differences in seamonkey:
@@ -348,7 +350,7 @@ exports.mainTree = [
         ]
       },
       // The src of this iframe is set to
-      // chrome://rpcontinued/content/ui/request-log.xul in overlay.js
+      // chrome://rpcontinued/content/ui/request-log/request-log.xul in overlay.js
       {
         tag: "iframe",
         attributes: {id: "rpcontinued-requestLog-frame",

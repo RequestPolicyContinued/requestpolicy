@@ -1,0 +1,7 @@
+{
+  "extends": "../../../src/content/.jshintrc",
+
+  "globals": {
+    "cfmm": true
+  }
+}

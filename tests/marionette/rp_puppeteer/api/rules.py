@@ -8,6 +8,13 @@ import os.path
 import json
 
 
+GET_BACKGROUND_PAGE = """
+    Components.utils.
+        import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).
+        Api.browser.extension.getBackgroundPage()
+"""
+
+
 class Rules(BaseLib):
     """Class for managing user rules."""
 
@@ -76,10 +83,8 @@ class Rules(BaseLib):
         """Save the rules to the json file."""
 
         return self.marionette.execute_script("""
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
-          mod.PolicyManager.storeRules();
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          PolicyManager.storeRules();
         """)
 
     ##################################
@@ -95,11 +100,10 @@ class Rules(BaseLib):
         return self.marionette.execute_script("""
           var rulesetName = arguments[0];
           var allow = arguments[1];
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
-          var rawRuleset = mod.PolicyManager.getUserRulesets()[rulesetName]
-                                            .rawRuleset;
+
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          var rawRuleset = PolicyManager.getUserRulesets()[rulesetName]
+                                        .rawRuleset;
           if (allow === true) {
             return rawRuleset.getAllowRuleCount();
           } else {
@@ -116,11 +120,10 @@ class Rules(BaseLib):
         rule_data_list = self.marionette.execute_script("""
           var rulesetName = arguments[0];
           var ruleActionString = arguments[1];
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
-          var rawRuleset = mod.PolicyManager.getUserRulesets()[rulesetName]
-                                            .rawRuleset;
+
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          var rawRuleset = PolicyManager.getUserRulesets()[rulesetName]
+                                        .rawRuleset;
           return rawRuleset._entries[ruleActionString];
         """, script_args=[ruleset_name, rule_action_string])
 
@@ -220,13 +223,12 @@ class Rule(BaseLib):
           var ruleData = arguments[1];
           var temp = arguments[2];
           var noStore = arguments[3];
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
+
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
           if (temp === true) {
-            mod.PolicyManager.addTemporaryRule(ruleAction, ruleData);
+            PolicyManager.addTemporaryRule(ruleAction, ruleData);
           } else {
-            mod.PolicyManager.addRule(ruleAction, ruleData, noStore);
+            PolicyManager.addRule(ruleAction, ruleData, noStore);
           }
         """, script_args=[self._rule_action, self.rule_data, self.temp,
                           not store])
@@ -238,10 +240,9 @@ class Rule(BaseLib):
           var ruleAction = arguments[0];
           var ruleData = arguments[1];
           var noStore = arguments[2];
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
-          mod.PolicyManager.removeRule(ruleAction, ruleData, noStore);
+
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          PolicyManager.removeRule(ruleAction, ruleData, noStore);
         """, script_args=[self._rule_action, self.rule_data, not store])
 
     def exists(self):
@@ -251,12 +252,11 @@ class Rule(BaseLib):
           var rulesetName = arguments[0];
           var ruleAction = arguments[1];
           var ruleData = arguments[2];
-          var mod = {};
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "policy-manager.jsm", mod);
-          return mod.PolicyManager.getUserRulesets()[rulesetName]
-                                  .rawRuleset
-                                  .ruleExists(ruleAction, ruleData);
+
+          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          return PolicyManager.getUserRulesets()[rulesetName]
+                              .rawRuleset
+                              .ruleExists(ruleAction, ruleData);
         """, script_args=[self._ruleset_name, self._rule_action,
                           self.rule_data])
 

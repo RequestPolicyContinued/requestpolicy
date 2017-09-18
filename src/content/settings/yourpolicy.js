@@ -21,17 +21,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, document, $, common, WinEnv, elManager, $id, $str */
+"use strict";
+
+import {common, WinEnv, elManager, $id, $str} from "settings/common";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {Prefs} = importModule("models/prefs");
-  var {PolicyManager} = importModule("lib/policy-manager");
-  var {RuleUtils} = importModule("lib/utils/rules");
+  var {
+    Prefs,
+    PolicyManager,
+    RuleUtils,
+  } = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -266,5 +265,4 @@
       populateRuleTable(search.value);
     });
   };
-
 }());

@@ -20,15 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global window, $ */
+"use strict";
 
 (function() {
-  /* global Components */
-  const {utils: Cu} = Components;
-
-  var {ScriptLoader: {importModule}} = Cu.import(
-      "chrome://rpcontinued/content/lib/script-loader.jsm", {});
-  var {RequestProcessor} = importModule("lib/request-processor");
+  var {RequestProcessor} = browser.extension.getBackgroundPage();
 
   //============================================================================
 
@@ -118,5 +113,4 @@
     list.append("<li>" + nClickedLinks + " clicked links</li>");
     list.append("<li>" + nFaviconRequests + " favicon requests</li>");
   };
-
 }());

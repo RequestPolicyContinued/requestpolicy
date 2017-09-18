@@ -21,9 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 
 let {PrivateBrowsingUtils} = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {});
@@ -95,7 +93,7 @@ export var WindowUtils = (function() {
    */
   self.mayPermanentRulesBeAdded = function(aWindow) {
     return self.isWindowPrivate(aWindow) === false ||
-        Prefs.get("privateBrowsingPermanentWhitelisting");
+        Storage.get("privateBrowsingPermanentWhitelisting");
   };
 
   //

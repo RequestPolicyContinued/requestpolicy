@@ -21,13 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {NormalRequest, RedirectRequest} from "lib/request";
 import {Utils} from "lib/utils";
 import {RequestProcessor} from "lib/request-processor";
 import {Environment, MainEnvironment} from "lib/environment";
+
+let catMan = Cc["@mozilla.org/categorymanager;1"].
+    getService(Ci.nsICategoryManager);
 
 //==============================================================================
 // constants
@@ -57,7 +58,6 @@ export var RPContentPolicy = (function() {
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
 
-    let catMan = Utils.categoryManager;
     for (let category of XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
@@ -74,62 +74,64 @@ export var RPContentPolicy = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(register);
           } else {
-            Cu.reportError(e);
+            console.error("Failed to register factory! Details:");
+            console.dir(e);
           }
         }
       });
 
-  function unregister() {
-    Logger.debug("shutting down RPContentPolicy...");
+  let unregister = (function() {
+    return function() {
+      Logger.debug("shutting down RPContentPolicy...");
 
-    // Below the shouldLoad function is replaced by a new one
-    // which always allows *all* requests.
-    //
-    // What's the reason?
-    // ------------------
-    // The function for unregistering, which is `unregisterFactory`,
-    // has to be called async; this means that the unregistering
-    // will be done at a later time. However, it's necessary to
-    // disable blocking *right now*.
-    //
-    // Why is that necessary?
-    // ----------------------
-    // It's possible (or always true) that async functions
-    // get called *after* the addon finished shutting down.
-    // After the shutdown RequestPolicy's modules and
-    // functions can't be used anymore, the modules have
-    // been unloaded already. There might be still some
-    // objects or closures, but it's unreliable to use
-    // them.
-    // However, the shouldLoad function needs many of
-    // RequestPolicy's other modules and functions. So any
-    // call to RP's `shouldLoad` might cause exceptions,
-    // given that the call happens between now and the
-    // time when the factory is actually unregistered.
+      // Below the shouldLoad function is replaced by a new one
+      // which always allows *all* requests.
+      //
+      // What's the reason?
+      // ------------------
+      // The function for unregistering, which is `unregisterFactory`,
+      // has to be called async; this means that the unregistering
+      // will be done at a later time. However, it's necessary to
+      // disable blocking *right now*.
+      //
+      // Why is that necessary?
+      // ----------------------
+      // It's possible (or always true) that async functions
+      // get called *after* the addon finished shutting down.
+      // After the shutdown RequestPolicy's modules and
+      // functions can't be used anymore, the modules have
+      // been unloaded already. There might be still some
+      // objects or closures, but it's unreliable to use
+      // them.
+      // However, the shouldLoad function needs many of
+      // RequestPolicy's other modules and functions. So any
+      // call to RP's `shouldLoad` might cause exceptions,
+      // given that the call happens between now and the
+      // time when the factory is actually unregistered.
 
-    // Before defining the new shouldLoad ...
-    // ... save the return value in the closure of this function.
-    //     Similarly like described above this is necessary
-    //     because the `C` variable is not available anymore
-    //     after RP has been shut down.
-    var finalReturnValue = CP_OK;
+      // Before defining the new shouldLoad ...
+      // ... save the return value in the closure of this function.
+      //     Similarly like described above this is necessary
+      //     because the `C` variable is not available anymore
+      //     after RP has been shut down.
+      var finalReturnValue = CP_OK;
 
-    // Actually create the final function, as it is described
-    // above.
-    self.shouldLoad = () => finalReturnValue;
+      // Actually create the final function, as it is described
+      // above.
+      self.shouldLoad = () => finalReturnValue;
 
-    let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
-    let catMan = Utils.categoryManager;
+      let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
-    for (let category of XPCOM_CATEGORIES) {
-      catMan.deleteCategoryEntry(category, self.contractID, false);
-    }
+      for (let category of XPCOM_CATEGORIES) {
+        catMan.deleteCategoryEntry(category, self.contractID, false);
+      }
 
-    // This needs to run asynchronously, see bug 753687
-    Utils.runAsync(function() {
-      registrar.unregisterFactory(self.classID, self);
-    });
-  }
+      // This needs to run asynchronously, see bug 753687
+      Utils.runAsync(function() {
+        registrar.unregisterFactory(self.classID, self);
+      });
+    };
+  }());
 
   MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
@@ -197,7 +199,6 @@ export var RPChannelEventSink = (function() {
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
 
-    let catMan = Utils.categoryManager;
     for (let category of XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
           true);
@@ -214,31 +215,32 @@ export var RPChannelEventSink = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(register);
           } else {
-            Cu.reportError(e);
+            console.error("Failed to register factory! Details:");
+            console.dir(e);
           }
         }
       });
 
-  function unregister() {
-    Logger.debug("shutting down RPChannelEventSink...");
+  let unregister = (function() {
+    return function unregister() {
+      Logger.debug("shutting down RPChannelEventSink...");
 
-    self.asyncOnChannelRedirect = () => {};
+      self.asyncOnChannelRedirect = () => {};
 
-    let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
-    let catMan = Utils.categoryManager;
+      let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
-    for (let category of XPCOM_CATEGORIES) {
-      catMan.deleteCategoryEntry(category, self.contractID, false);
-    }
+      for (let category of XPCOM_CATEGORIES) {
+        catMan.deleteCategoryEntry(category, self.contractID, false);
+      }
 
-    // This needs to run asynchronously, see bug 753687
-    Utils.runAsync(function() {
-      registrar.unregisterFactory(self.classID, self);
-    });
-  }
+      // This needs to run asynchronously, see bug 753687
+      Utils.runAsync(function() {
+        registrar.unregisterFactory(self.classID, self);
+      });
+    };
+  }());
 
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
-                                         unregister);
+  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE, unregister);
 
   //----------------------------------------------------------------------------
   // nsISupports interface implementation

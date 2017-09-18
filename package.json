@@ -1,16 +1,27 @@
 {
   "devDependencies": {
     "addons-linter": "^0.22.2",
+    "chai": "^4.0.2",
+    "coffeelint": "^1.16.0",
+    "coffeescript": "^1.12.6",
     "del": "^3.0.0",
+    "eslint": "^4.6.1",
+    "eslint-plugin-promise": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-debug": "^3.1.0",
     "gulp-if": "^2.0.2",
+    "gulp-ignore": "^2.0.2",
     "gulp-preprocess": "^2.0.0",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-sourcemaps": "^2.6.0",
     "gulp-typescript": "^3.2.1",
     "gulp-zip": "^4.0.0",
     "jscs": "^3.0.7",
     "jshint": "^2.9.4",
+    "merge-stream": "^1.0.1",
+    "mocha": "^3.4.2",
+    "tslint": "^5.5.0",
     "typescript": "^2.4.2"
   }
 }

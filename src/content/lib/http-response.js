@@ -21,12 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 
 //==============================================================================
 // HttpResponse
@@ -55,7 +53,7 @@ HttpResponse.prototype._getResponseHeader = function(aHeaderName) {
     return this.httpChannel.getResponseHeader(aHeaderName);
   } catch (e) {
     if (e.result !== Cr.NS_ERROR_NOT_AVAILABLE) {
-      Cu.reportError(e);
+      console.dir(e);
     }
     // The header is not set in the response.
     return undefined;
@@ -108,7 +106,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
           } catch (e) {
             Logger.warning(
                 "Invalid refresh header: <" + this.redirHeaderValue + ">");
-            if (!Prefs.isBlockingDisabled()) {
+            if (!Storage.isBlockingDisabled()) {
               this.removeResponseHeader();
             }
             this._rawDestString = null;

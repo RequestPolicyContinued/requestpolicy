@@ -106,7 +106,8 @@ class TestRuleRow(RulesTableTestCase):
     def test_policy_property(self):
         def assert_policy(policy_string_id):
             # Get the localized policy string.
-            expected_policy_string = self.l10n.get_rp_property(policy_string_id)
+            expected_policy_string = self.l10n.get_rp_property(
+                policy_string_id)
 
             rule_row = self.table.user_rule_rows[0]
             returned_policy_string = rule_row.policy
@@ -170,7 +171,8 @@ class TestRuleRow(RulesTableTestCase):
             def create_rule():
                 spec = self.data.pre_path_specs[spec_id]
                 rule_data = {"o": spec["spec"], "d": spec["spec"]}
-                return self.rules.create_rule(rule_data, allow=allow, temp=temp)
+                return self.rules.create_rule(
+                    rule_data, allow=allow, temp=temp)
 
             # Create and add the rule.
             rule = create_rule()

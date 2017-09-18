@@ -65,7 +65,8 @@ class RequestLog(BaseLib):
                 pass
 
     def is_open(self):
-        request_log_uri = "chrome://rpcontinued/content/ui/request-log/request-log.xul"
+        request_log_uri = (
+            "chrome://rpcontinued/content/ui/request-log/request-log.xul")
         return self._iframe.get_attribute("src") == request_log_uri
 
     def close(self, trigger="button"):

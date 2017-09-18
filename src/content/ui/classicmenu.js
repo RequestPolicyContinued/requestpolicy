@@ -21,9 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
-import {Logger} from "lib/logger";
 import {PolicyManager} from "lib/policy-manager";
 import {StringUtils} from "lib/utils/strings";
 import {DOMUtils} from "lib/utils/dom";
@@ -42,7 +39,7 @@ export function loadClassicmenuIntoWindow(window) {
     var menuitems = menu.getElementsByTagName("menuitem");
     for (let item of menuitems) {
       if (!item.hasOwnProperty("rpListener")) {
-        Logger.error("There's a menuitem without listener!");
+        console.error("There's a menuitem without listener!");
         continue;
       }
 
@@ -86,8 +83,8 @@ export function loadClassicmenuIntoWindow(window) {
         getInfoFromRuleSpec(aRuleSpec);
 
     if (!isAllow) {
-      Logger.error("invalid addMenuItem rule-spec");
-      Logger.vardump(aRuleSpec);
+      console.error("Invalid addMenuItem rule-spec:");
+      console.dir(aRuleSpec);
       return;
     }
 
@@ -112,8 +109,8 @@ export function loadClassicmenuIntoWindow(window) {
         labelName = "allowDestination";
         break;
       default:
-        Logger.error("invalid addMenuItem rule-spec");
-        Logger.vardump(aRuleSpec);
+        console.error("Invalid addMenuItem rule-spec:");
+        console.dir(aRuleSpec);
         return;
     }
 

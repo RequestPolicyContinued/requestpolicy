@@ -57,8 +57,7 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
         ignoring = self.gecko_log.currently_ignoring_errors()
         if ignoring:
             self.gecko_log.stop_ignoring_errors()
-        self.assertFalse(ignoring, msg="A test must stop ignoring errors on teardown.")
-
+            self.fail(msg="A test must stop ignoring errors on teardown.")
 
     def _check_gecko_log(self):
         error_lines = self.gecko_log.get_error_lines_of_current_test()
@@ -66,4 +65,4 @@ class RequestPolicyTestCase(RequestPolicyPuppeteer, FirefoxTestCase):
             for line in error_lines:
                 print line
             self.fail("Found " + str(len(error_lines)) + " error lines! " +
-                "First line: " + str(error_lines[0]))
+                      "First line: " + str(error_lines[0]))

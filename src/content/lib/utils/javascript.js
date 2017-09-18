@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 //==============================================================================
 // JSUtils
 //==============================================================================
@@ -36,6 +34,24 @@ export var JSUtils = (function() {
       }
     }
     return false;
+  };
+
+  self.defineLazyGetter = function(aOnObj, aKey, aValueFn) {
+    Object.defineProperty(aOnObj, aKey, {
+      get: function() {
+        delete aOnObj[aKey];
+        let value = aValueFn.call(aOnObj);
+        Object.defineProperty(aOnObj, aKey, {
+          value,
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+        return value;
+      },
+      configurable: true,
+      enumerable: true
+    });
   };
 
   self.leftRotateArray = function(array, n) {

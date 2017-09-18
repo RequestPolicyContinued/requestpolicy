@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {C} from "lib/utils/constants";
 import {Logger} from "lib/logger";
 import {RequestResult} from "lib/request-result";

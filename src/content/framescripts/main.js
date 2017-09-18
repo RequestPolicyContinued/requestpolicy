@@ -20,18 +20,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import "framescripts/misc.js";
 import "framescripts/blocked-content.js";
 import "framescripts/dom-content-loaded.js";
 
+import {C} from "lib/utils/constants";
+
+if (C.UI_TESTING) {
+  require("ui-testing/services");
+}
+
 import {Environment, MainEnvironment} from "lib/environment";
-import {Logger} from "lib/logger";
 
 const unloadSubject = require("@loader/unload");
-
-Logger.bootstrap();
 
 //==============================================================================
 

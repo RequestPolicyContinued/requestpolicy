@@ -20,14 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Windows} from "models/windows";
-import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {Storage} from "models/storage";
 import {XULUtils} from "lib/utils/xul";
 import {MainEnvironment} from "lib/environment";
-import {Logger} from "lib/logger";
 
 //==============================================================================
 // KeyboardShortcut
@@ -164,13 +161,13 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
-    return Prefs.get(this._userComboPrefName);
+    return Storage.get(this._userComboPrefName);
   }
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
-    return Prefs.get(this._userEnabledPrefName);
+    return Storage.get(this._userEnabledPrefName);
   }
 });
 
@@ -197,8 +194,8 @@ KeyboardShortcut.prototype._determineElementAttributes = function() {
 
   let rv = XULUtils.keyboardShortcuts.getKeyAttributesFromCombo(combo);
   if (false === rv.success) {
-    Logger.error("Error parsing keyboard combination for shortcut \"" +
-        this._id + "\": " + rv.errorMessage);
+    console.error("Error parsing keyboard combination for shortcut " +
+        `"${this._id}": ${rv.errorMessage}`);
     this._elementAttributes = ELEMENT_ATTRIBUTES_WHEN_DISABLED;
     return;
   }

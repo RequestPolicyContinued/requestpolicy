@@ -24,12 +24,9 @@
 
 /* global Components */
 
-/* exported EXPORTED_SYMBOLS, Api, ContentScriptsApi */
+/* exported EXPORTED_SYMBOLS, FakeWebExt */
 var EXPORTED_SYMBOLS = [
-  "Api",
-  "ContentScriptsApi",
-  "createCommonjsEnv",
-  "getGlobals",
+  "FakeWebExt",
 ];
 
 //============================================================================
@@ -118,11 +115,171 @@ function createCommonjsEnv() {
 }
 
 //==============================================================================
-// Api
+// FakeWebExt
 //==============================================================================
 
-var {Api, ContentScriptsApi} = (function() {
-  let commonjsEnv = createCommonjsEnv();
-  return commonjsEnv.load("web-extension-fake-api/api", [
-  ]);
+var FakeWebExt = (function() {
+  let FakeWebExt = {
+    createCommonjsEnv,
+    getGlobals,
+  };
+
+  let bootstrapFunctions = {
+    onStartup: [],
+    onShutdown: [],
+  };
+
+  const FIFO_ADD = "push";
+  const LIFO_ADD = "unshift";
+
+  /**
+   * @param {String} aEvent "onStartup" or "onShutdown"
+   * @param {String} aArrayAddFn "push" or "unshift"
+   * @param {Function} aFn
+   */
+  function addBootstrapFn(aEvent, aArrayAddFn, aFn) {
+    bootstrapFunctions[aEvent][aArrayAddFn](aFn);
+  }
+
+  FakeWebExt.onStartup = addBootstrapFn.bind(null, "onStartup", FIFO_ADD);
+  FakeWebExt.onShutdown = addBootstrapFn.bind(null, "onShutdown", LIFO_ADD);
+
+  function runBootstrapFunctions(aEvent) {
+    bootstrapFunctions[aEvent].forEach(fn => {
+      fn.call(null);
+    });
+  }
+
+  let fakeEnv = {
+    commonjsEnv: null,
+    exports: null,
+  };
+  let addon = {
+    commonjsEnv: null,
+  };
+
+  FakeWebExt.Api = null;
+
+  //----------------------------------------------------------------------------
+  // startup
+  //----------------------------------------------------------------------------
+
+  FakeWebExt.startup = function() {
+    console.debug("starting up");
+
+    // create the fake environment
+    fakeEnv.commonjsEnv = createCommonjsEnv();
+    fakeEnv.exports = fakeEnv.commonjsEnv.load("web-extension-fake-api/main", [
+      ["Bootstrap", {
+        onStartup: FakeWebExt.onStartup,
+        onShutdown: FakeWebExt.onShutdown,
+      }],
+    ]);
+
+    // "export" fake environment Api (for usage by UI tests)
+    FakeWebExt.Api = fakeEnv.exports.Api;
+
+    // initialize the fake environment
+    runBootstrapFunctions("onStartup");
+
+    // start up the add-on
+    const {Api, Manifest} = fakeEnv.exports;
+    addon.commonjsEnv = createCommonjsEnv();
+    addon.commonjsEnv.load(Manifest.background.scripts[0], [
+      ["browser", Api.browser],
+      ["LegacyApi", Api.LegacyApi],
+      ["_setBackgroundPage", Api._setBackgroundPage],
+    ]);
+  };
+
+  //----------------------------------------------------------------------------
+  // shutdown
+  //----------------------------------------------------------------------------
+
+  FakeWebExt.shutdown = function(aReason) {
+    console.debug("shutting down");
+
+    // shut down the add-on
+    addon.commonjsEnv.unload(aReason);
+    addon.commonjsEnv = null;
+
+    // shut down the fake environment
+    runBootstrapFunctions("onShutdown");
+    fakeEnv.commonjsEnv.unload();
+
+    // clean up
+    fakeEnv.commonjsEnv = null;
+    fakeEnv.exports = null;
+    FakeWebExt.Api = null;
+  };
+
+  //----------------------------------------------------------------------------
+  // startupFramescript
+  //----------------------------------------------------------------------------
+
+  const mmShutdownMessage = "/* @echo EXTENSION_ID */" + ":shutdown";
+
+  FakeWebExt.startupFramescript = function(cfmm) {
+    const {ContentScriptsApi} = fakeEnv.exports;
+
+    const commonjsEnv = createCommonjsEnv();
+    commonjsEnv.load("framescripts/main", [
+      ["cfmm", cfmm],
+      ["browser", ContentScriptsApi.browser],
+    ]);
+
+    function unload() {
+      commonjsEnv.unload();
+    }
+    function onShutdownMessage() {
+      cfmm.removeMessageListener(mmShutdownMessage, onShutdownMessage);
+      unload();
+    }
+    function onDocumentUnload() {
+      cfmm.removeEventListener("unload", onDocumentUnload);
+      unload();
+    }
+    cfmm.addMessageListener(mmShutdownMessage, onShutdownMessage);
+    cfmm.addEventListener("unload", onDocumentUnload);
+  };
+
+  //----------------------------------------------------------------------------
+  // startupSettingsPage
+  //----------------------------------------------------------------------------
+
+  FakeWebExt.startupSettingsPage = function(window) {
+    const {document, $} = window;
+    const {Api} = fakeEnv.exports;
+
+    const commonjsEnv = createCommonjsEnv();
+
+    function onDOMContentLoaded() {
+      document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
+      const pageName = document.documentElement.id;
+      commonjsEnv.load("settings/" + pageName, [
+        ["$", $],
+        ["window", window],
+        ["document", document],
+        ["browser", Api.browser],
+      ]);
+    }
+    document.addEventListener("DOMContentLoaded", onDOMContentLoaded);
+  };
+
+  //----------------------------------------------------------------------------
+  // startupRequestLog
+  //----------------------------------------------------------------------------
+
+  FakeWebExt.startupRequestLog = function(window) {
+    let {Api} = fakeEnv.exports;
+
+    const commonjsEnv = createCommonjsEnv();
+
+    commonjsEnv.load("ui/request-log/main", [
+      ["window", window],
+      ["browser", Api.browser],
+    ]);
+  };
+
+  return FakeWebExt;
 }());

@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 /* global exports: true, C, appID */
 
 // differences in seamonkey:

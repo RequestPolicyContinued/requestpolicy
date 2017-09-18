@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {RequestResult} from "lib/request-result";

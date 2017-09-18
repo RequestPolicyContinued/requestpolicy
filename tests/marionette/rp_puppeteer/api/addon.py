@@ -108,22 +108,27 @@ class Addon(BaseLib):
     def _addon(self):
         """Provide an `Addon` object in the sandbox."""
 
-        self.marionette.execute_script("""
-          Components.utils.import("resource://gre/modules/AddonManager.jsm");
+        self.marionette.execute_script(
+            """
+              Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
-          var addonID = arguments[0];
+              var addonID = arguments[0];
 
-          var globalScope = this;
-          globalScope.addon = null;
-          globalScope.addonCallbackCalled = false;
+              var globalScope = this;
+              globalScope.addon = null;
+              globalScope.addonCallbackCalled = false;
 
-          var addonCallback = function (addon) {
-            globalScope.addon = addon;
-            globalScope.addonCallbackCalled = true;
-          };
+              var addonCallback = function (addon) {
+                globalScope.addon = addon;
+                globalScope.addonCallbackCalled = true;
+              };
 
-          AddonManager.getAddonByID(addonID, addonCallback);
-        """, sandbox=self.sandbox, new_sandbox=False, script_args=[self.addon_id])
+              AddonManager.getAddonByID(addonID, addonCallback);
+            """,
+            sandbox=self.sandbox,
+            new_sandbox=False,
+            script_args=[self.addon_id]
+        )
 
         self._wait_until_true("addonCallbackCalled")
 
@@ -141,23 +146,28 @@ class Addon(BaseLib):
     def _addon_install(self):
         """Provide an `AddonInstall` object in the sandbox."""
 
-        self.marionette.execute_script("""
-          Components.utils.import("resource://gre/modules/AddonManager.jsm");
+        self.marionette.execute_script(
+            """
+              Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
-          var installUrl = arguments[0];
+              var installUrl = arguments[0];
 
-          var globalScope = this;
-          globalScope.addonInstall = null;
-          globalScope.installCallbackCalled = false;
+              var globalScope = this;
+              globalScope.addonInstall = null;
+              globalScope.installCallbackCalled = false;
 
-          var installCallback = function (addonInstall) {
-            globalScope.addonInstall = addonInstall;
-            globalScope.installCallbackCalled = true;
-          };
+              var installCallback = function (addonInstall) {
+                globalScope.addonInstall = addonInstall;
+                globalScope.installCallbackCalled = true;
+              };
 
-          AddonManager.getInstallForURL(installUrl, installCallback,
-                                        "application/x-xpinstall");
-        """, sandbox=self.sandbox, new_sandbox=False, script_args=[self.install_url])
+              AddonManager.getInstallForURL(installUrl, installCallback,
+                                            "application/x-xpinstall");
+            """,
+            sandbox=self.sandbox,
+            new_sandbox=False,
+            script_args=[self.install_url]
+        )
 
         self._wait_until_true("installCallbackCalled")
 

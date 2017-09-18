@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
+import {C} from "lib/utils/constants";
 
-import {Environment, MainEnvironment} from "lib/environment";
+const {UI_TESTING} = C;
 
 //==============================================================================
 // Logger
@@ -89,12 +89,10 @@ export var Logger = (function() {
       return true;
     }
 
-    // @ifdef UI_TESTING
-    if (aLevel >= LevelEnum.WARNING) {
+    if (UI_TESTING && aLevel >= LevelEnum.WARNING) {
       // log even if logging is disabled
       return true;
     }
-    // @endif
 
     if (aLevel >= MINIMUM_LOGGING_LEVEL) {
       // log even if logging is disabled
@@ -109,21 +107,14 @@ export var Logger = (function() {
       let msg = `[RequestPolicy] ${aMessage}`;
       aFn(msg);
       if (aError) {
-        self.reportError(aError);
+        console.dir(aError);
       }
     }
   }
 
-  self.error = log.bind(self, LevelEnum.ERROR, console.error);
   self.warning = log.bind(self, LevelEnum.WARNING, console.warn);
   self.info = log.bind(self, LevelEnum.INFO, console.info);
   self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
-
-  self.trace = console.trace.bind(null);
-
-  self.reportError = function reportError(e) {
-    console.dir(e);
-  };
 
   self.vardump = function(obj) {
     if (shouldLog(LevelEnum.DEBUG)) {
@@ -133,85 +124,3 @@ export var Logger = (function() {
 
   return self;
 }());
-
-// @ifdef UI_TESTING
-
-//==============================================================================
-// ErrorTriggeringService
-//==============================================================================
-
-/**
- * Triggers errors for a RequestPolicy UI test.
- * It's used to test Error Detection from the UI tests.
- */
-function createErrorTriggeringService() {
-  let self = {};
-
-  const where = MainEnvironment.isMainEnvironment ?
-      "backgroundscript" :
-      "contentscript";
-
-  const topic = "requestpolicy-trigger-error-" + where;
-
-  const observer = {};
-
-  self.startup = function() {
-    Services.obs.addObserver(observer, topic, false);
-  };
-
-  self.shutdown = function() {
-    Services.obs.removeObserver(observer, topic);
-  };
-
-  /**
-   * Split a string like
-   *   "foo:bar:baz"
-   * to two strings:
-   *   ["foo", "bar:baz"]
-   * Only the first colon counts.
-   */
-  function splitColon(aString) {
-    var index = aString.indexOf(":");
-    if (index === -1) {
-      return [aString, ""];
-    }
-    var part1 = aString.substr(0, index);
-    var part2 = aString.substr(index + 1);
-    return [part1, part2];
-  }
-
-  observer.observe = function(aSubject, aTopic, aData) {
-    let [type, message] = splitColon(aData);
-
-    if (type === "error") {
-      Logger.error(message);
-    } else if (type === "ReferenceError") {
-      runAsync(produceReferenceError);
-    }
-  };
-
-  function produceReferenceError() {
-    var localVar = nonexistantVariable; // jshint ignore:line
-  }
-
-  function runAsync(aFunction) {
-    var runnable = {run: aFunction};
-    Services.tm.currentThread.dispatch(runnable,
-        Ci.nsIEventTarget.DISPATCH_NORMAL);
-  }
-
-  return self;
-}
-
-var ErrorTriggeringService;
-// @endif
-
-Logger.bootstrap = function() {
-  // @ifdef UI_TESTING
-  ErrorTriggeringService = createErrorTriggeringService();
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-      ErrorTriggeringService.startup);
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-      ErrorTriggeringService.shutdown);
-  // @endif
-};

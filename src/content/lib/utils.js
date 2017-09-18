@@ -21,11 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
-import {Environment, MainEnvironment} from "lib/environment";
-import {Logger} from "lib/logger";
-
 //==============================================================================
 // Utils
 //==============================================================================
@@ -48,13 +43,9 @@ export var Utils = (function() {
         callback.apply(thisPtr, params);
       }
     };
-    self.threadManager.currentThread.dispatch(runnable,
+    Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
   };
-  XPCOMUtils.defineLazyServiceGetter(self, "categoryManager",
-      "@mozilla.org/categorymanager;1", "nsICategoryManager");
-  XPCOMUtils.defineLazyServiceGetter(self, "threadManager",
-      "@mozilla.org/thread-manager;1", "nsIThreadManager");
 
   /**
    * Calls a function multiple times until it succeeds. The
@@ -102,26 +93,22 @@ export var Utils = (function() {
    * Return a module's `internal` object, which is a singleton.
    * The `internal` can be accessed from all submodules of that module.
    *
-   * The `internal` is added to `self`, and as soon as all modules have been
-   * loaded, i.e. when the startup functions are called, the `internal` is
-   * removed from `self` (the module is „sealed“).
-   *
-   *   This function can be used as follows:
-   *   let MyModule = (function(self) {
-   *     let internal = Utils.moduleInternal(self);
-   *   }(MyModule || {}));
-   *
    * @param {Object} aModuleScope
    * @returns {Object} the module's `internal`
    */
-  self.moduleInternal = function(aModuleScope) {
-    aModuleScope.internal = aModuleScope.internal || {};
-    function sealInternal() {
-      delete aModuleScope.internal;
-    }
-    MainEnvironment.addStartupFunction(Environment.LEVELS.ESSENTIAL,
-                                          sealInternal);
-    return aModuleScope.internal;
+  self.createModuleInternal = function(aModuleScope) {
+    let internal = {};
+    let sealed = false;
+    aModuleScope.getInternal = function() {
+      if (sealed) {
+        return undefined;
+      }
+      return internal;
+    };
+    aModuleScope.sealInternal = function() {
+      sealed = true;
+    };
+    return internal;
   };
 
   /**
@@ -132,12 +119,13 @@ export var Utils = (function() {
    * @param {Object} aOwnerObject The object which contains (a reference to)
    *     the function which should be wrapped.
    * @param {string} aFunctionName The function's name in the object.
+   * @param {Function=} aErrorCallback
    * @param {Function=} aBeforeFunction The function to be called before the
    *     original function.
    * @param {Function=} aAfterFunction The function to be called after the
    *     original function.
    */
-  self.wrapFunction = function(aOwnerObject, aFunctionName,
+  self.wrapFunction = function(aOwnerObject, aFunctionName, aErrorCallback,
                                aBeforeFunction = null, aAfterFunction = null) {
     initWrapperFunction(aOwnerObject, aFunctionName);
 
@@ -157,15 +145,24 @@ export var Utils = (function() {
    * @param {string} aFunctionName The function's name in the object.
    */
   self.unwrapFunction = function(aOwnerObject, aFunctionName) {
-    self.wrapFunction(aOwnerObject, aFunctionName, null, null);
+    self.wrapFunction(aOwnerObject, aFunctionName, null, null, null);
   };
 
   /**
    * @param {Object} aOwnerObject The object which contains (a reference to)
    *     the function which should be wrapped.
    * @param {string} aFunctionName The function's name in the object.
+   * @param {Function} aErrorCallback
    */
-  function initWrapperFunction(aOwnerObject, aFunctionName) {
+  function initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback) {
+    function onError(aError, aWhen) {
+      if (typeof aErrorCallback === "function") {
+        aErrorCallback(
+            `The "${aWhen}" function of the \`${aFunctionName}()\` wrapper ` +
+            `has thrown an error.`, aError);
+      }
+    }
+
     // create metadata object
     if (!aOwnerObject.hasOwnProperty("rpcontinuedWrappedFunctions")) {
       aOwnerObject.rpcontinuedWrappedFunctions = {};
@@ -195,9 +192,7 @@ export var Utils = (function() {
           before.apply(aOwnerObject, arguments);
         }
       } catch (e) {
-        Logger.error("The 'before' function of the " +
-                       "`" + aFunctionName + "()` wrapper has thrown an " +
-                       "error.", e);
+        onError(e, "before");
       }
 
       // Execute original function.
@@ -209,9 +204,7 @@ export var Utils = (function() {
           after.apply(aOwnerObject, arguments);
         }
       } catch (e) {
-        Logger.error("The 'after' function of the " +
-                       "`" + aFunctionName + "()` wrapper has thrown an " +
-                       "error.", e);
+        onError(e, "after");
       }
 
       // return the original result

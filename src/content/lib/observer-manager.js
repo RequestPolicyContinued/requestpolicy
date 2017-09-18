@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {SingleTopicObserver} from "lib/utils/observers";
 import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";

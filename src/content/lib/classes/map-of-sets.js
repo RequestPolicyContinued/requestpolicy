@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 //==============================================================================
 // MapOfSets
 //==============================================================================
@@ -60,4 +58,12 @@ MapOfSets.prototype.deleteFromSet = function(aMapKey, aValue) {
     // automatically remove the Set from the Map
     this._map.delete(aMapKey);
   }
+};
+
+MapOfSets.prototype.forEach = function(aCallback) {
+  this._map.forEach((set, mapKey) => {
+    set.forEach((setValue) => {
+      aCallback.call(null, setValue, mapKey);
+    });
+  });
 };

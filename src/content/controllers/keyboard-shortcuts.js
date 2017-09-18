@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
 
 //==============================================================================

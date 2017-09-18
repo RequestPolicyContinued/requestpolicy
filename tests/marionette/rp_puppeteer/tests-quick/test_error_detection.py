@@ -19,12 +19,23 @@ class ErrorDetectionTests(object):
     ################
 
     def test_normal_error(self, n=1):
-        self.error_triggerer.trigger_error("error", "backgroundscript", msg=msg)
-        self._do_checks(n, "^console.error:\s+\[RequestPolicy\] " + msg_regexp + "$")
+        self.error_triggerer.trigger_error(
+            "error", "backgroundscript", msg=msg)
+        self._do_checks(
+            n,
+            "^console.error:\s+\[RequestPolicy\] " + msg_regexp + "$")
 
     def test_reference_error(self, n=1):
-        self.error_triggerer.trigger_error("ReferenceError", "backgroundscript")
-        self._do_checks(n, "^JavaScript error: chrome://rpcontinued/content/lib/logger\.js, line [0-9]+: ReferenceError: ")
+        self.error_triggerer.trigger_error(
+            "ReferenceError", "backgroundscript")
+        self._do_checks(
+            n,
+            (
+                r"^JavaScript error: "
+                r"chrome://rpcontinued/content/ui-testing/services\.js, "
+                r"line [0-9]+: ReferenceError: "
+            )
+        )
 
     ##########################
     # Private Helper Methods #
@@ -73,13 +84,17 @@ class TestGeckoLog(ErrorDetectionTests, ErrorDetectionTestCase):
 
     def _assert_n_errors(self, n):
         Wait(self.marionette).until(
-            lambda _: len(self._get_error_lines_including_ignored_errors()) == n)
+            lambda _: (
+                len(self._get_error_lines_including_ignored_errors()) == n
+            )
+        )
         self.assertEqual(0, len(self._get_error_lines()))
 
     def _assert_error(self, message_regexp):
         error_lines = self._get_error_lines_including_ignored_errors()
         line = error_lines[-1]
-        self.assertTrue(re.search(message_regexp, line),
+        self.assertTrue(
+            re.search(message_regexp, line),
             msg=("String \"" + line + "\" matched!"))
 
 
@@ -95,8 +110,8 @@ class TestFailureOnTearDown(ErrorDetectionTests, ErrorDetectionTestCase):
     # Private Helper Methods #
     ##########################
 
-    # Explicitly do *not* perform checks in _do_checks(), to test if the TestRunner's
-    # tearDown fn waits long enough to detect all logging errors.
+    # Explicitly do *not* perform checks in _do_checks(), to test if the
+    # TestRunner's tearDown fn waits long enough to detect all logging errors.
 
     def _do_checks(self, n, message_regexp):
         pass

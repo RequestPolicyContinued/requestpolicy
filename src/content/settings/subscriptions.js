@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, WinEnv, elManager} from "./common";
 
 (function() {

@@ -21,14 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, WinEnv, elManager, $id} from "./common";
 
 (function() {
   var {
-    Prefs,
     ManagerForPrefObservers,
+    Storage,
   } = browser.extension.getBackgroundPage();
 
   //============================================================================
@@ -51,7 +49,7 @@ import {common, WinEnv, elManager, $id} from "./common";
   });
 
   function updateDisplay() {
-    var defaultallow = Prefs.get("defaultPolicy.allow");
+    var defaultallow = Storage.get("defaultPolicy.allow");
     if (defaultallow) {
       $id("defaultallow").checked = true;
       $id("defaultdenysetting").hidden = true;
@@ -60,7 +58,7 @@ import {common, WinEnv, elManager, $id} from "./common";
       $id("defaultdenysetting").hidden = false;
     }
 
-    var allowsamedomain = Prefs.get("defaultPolicy.allowSameDomain");
+    var allowsamedomain = Storage.get("defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
   }
 
@@ -75,8 +73,7 @@ import {common, WinEnv, elManager, $id} from "./common";
         $id("defaultallow"), "change",
         function(event) {
           var allow = event.target.checked;
-          Prefs.set("defaultPolicy.allow", allow);
-          Services.prefs.savePrefFile(null);
+          Storage.set({"defaultPolicy.allow": allow});
           updateDisplay();
           showManageSubscriptionsLink();
         });
@@ -85,8 +82,7 @@ import {common, WinEnv, elManager, $id} from "./common";
         $id("defaultdeny"), "change",
         function(event) {
           var deny = event.target.checked;
-          Prefs.set("defaultPolicy.allow", !deny);
-          Services.prefs.savePrefFile(null);
+          Storage.set({"defaultPolicy.allow": !deny});
           updateDisplay();
           showManageSubscriptionsLink();
         });
@@ -95,9 +91,9 @@ import {common, WinEnv, elManager, $id} from "./common";
         $id("allowsamedomain"), "change",
         function(event) {
           var allowSameDomain = event.target.checked;
-          Prefs.set("defaultPolicy.allowSameDomain",
-              allowSameDomain);
-          Services.prefs.savePrefFile(null);
+          Storage.set({
+            "defaultPolicy.allowSameDomain": allowSameDomain,
+          });
         });
 
     // call updateDisplay() every time a preference gets changed

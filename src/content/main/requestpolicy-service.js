@@ -21,18 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
 import {Environment, MainEnvironment} from "lib/environment";
+import {C} from "lib/utils/constants";
 import {WindowUtils} from "lib/utils/windows";
 import {Info} from "lib/utils/info";
 
-let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
+const {AMO} = C;
 
 //==============================================================================
 // rpService
@@ -86,7 +85,7 @@ export var rpService = (function() {
 
   // TODO: move to window manager
   function maybeShowSetupTab() {
-    if (!Prefs.get("welcomeWindowShown")) {
+    if (!Storage.get("welcomeWindowShown")) {
       var url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
@@ -101,19 +100,18 @@ export var rpService = (function() {
       if (Info.isRPUpgrade) {
         // If the use has just upgraded from an 0.x version, set the
         // default-policy preferences based on the old preferences.
-        Prefs.set("defaultPolicy.allow", false);
-        if (Prefs.isSet("uriIdentificationLevel")) {
-          let identLevel = Prefs.get("uriIdentificationLevel");
-          Prefs.set("defaultPolicy.allowSameDomain",
-              identLevel === 1);
+        Storage.set({"defaultPolicy.allow": false});
+        if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
+          let identLevel = Storage.get("uriIdentificationLevel");
+          Storage.set({
+            "defaultPolicy.allowSameDomain": identLevel === 1,
+          });
         }
-        Services.prefs.savePrefFile(null);
       }
 
       tabbrowser.selectedTab = tabbrowser.addTab(url);
 
-      Prefs.set("welcomeWindowShown", true);
-      Services.prefs.savePrefFile(null);
+      Storage.set({"welcomeWindowShown": true});
     }
   }
 
@@ -126,41 +124,26 @@ export var rpService = (function() {
         "multiple-installations.html";
 
     // The other extension IDs of RequestPolicy.
-    var addonIDs = Object.freeze([
+    var addonIDs = Object.freeze(new Set([
       // Detect the "original" add-on (v0.5; released on AMO).
       "requestpolicy@requestpolicy.com",
       // Detect "RPC Legacy" (v0.5; AMO version).
       "rpcontinued@requestpolicy.org",
-      // @ifdef AMO
-      // In the AMO version the non-AMO version needs to be detected.
-      "rpcontinued@non-amo.requestpolicy.org",
-      // @endif
-      // @ifndef AMO
-      // In the non-AMO version the AMO version needs to be detected.
-      "rpcontinued@amo.requestpolicy.org",
-      // @endif
-    ]);
-
-    var addonListener = {
-      onEnabled: checkAddon,
-      onInstalled: checkAddon
-    };
+      AMO ? // In the AMO version the non-AMO version needs to be detected.
+            "rpcontinued@non-amo.requestpolicy.org" :
+            // In the non-AMO version the AMO version needs to be detected.
+            "rpcontinued@amo.requestpolicy.org",
+    ]));
 
     function checkAddon(addon) {
-      for (let id of addonIDs) {
-        if (addon.id === id) {
-          openTab();
-          return;
-        }
+      if (addonIDs.has(addon.id)) {
+        openTab();
       }
     }
 
     MainEnvironment.addStartupFunction(Environment.LEVELS.UI, function() {
-      AddonManager.addAddonListener(addonListener);
-    });
-
-    MainEnvironment.addShutdownFunction(Environment.LEVELS.UI, function() {
-      AddonManager.removeAddonListener(addonListener);
+      browser.management.onEnabled.addListener(checkAddon);
+      browser.management.onInstalled.addListener(checkAddon);
     });
 
     /**
@@ -183,19 +166,13 @@ export var rpService = (function() {
       return true;
     }
 
-    function isAddonActive(addon) {
-      if (addon === null) {
-        return false;
-      }
-
-      return addon.isActive;
-    }
-
     // On startup, the tab should be opened only once.
     var initialCheckDone = false;
 
     function addonListCallback(addons) {
-      var activeAddons = addons.filter(isAddonActive);
+      var activeAddons = addons.
+          filter(addon => addonIDs.has(addon.id)).
+          filter(addon => addon.enabled);
       if (activeAddons.length === 0) {
         // no other RequestPolicy version is active
         return;
@@ -221,7 +198,10 @@ export var rpService = (function() {
         return;
       }
 
-      AddonManager.getAddonsByIDs(addonIDs, addonListCallback);
+      browser.management.getAll().then(addonListCallback).catch(e => {
+        console.error("Error getting the list of addons! Details:");
+        console.dir(e);
+      });
     }
 
     return {
@@ -331,7 +311,7 @@ export var rpService = (function() {
         break;
 
       default:
-        Logger.error("unknown topic observed: " + topic);
+        console.error("unknown topic observed: " + topic);
     }
   };
 

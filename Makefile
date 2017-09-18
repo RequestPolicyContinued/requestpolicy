@@ -48,6 +48,8 @@ logs_dir       := logs
 dev_env_dir      := dev_env
 python_env_dir   := $(dev_env_dir)/python
 browsers_dir     := $(dev_env_dir)/browsers
+stamps_dir       := $(dev_env_dir)/.stamps
+varstamps_dir    := $(stamps_dir)/vars
 
 node_modules_dir := ./node_modules
 
@@ -63,17 +65,47 @@ $(dist_dir) $(logs_dir):
 GIT            := /usr/bin/git
 NPM            := npm
 ZIP            := zip
+PYTHON         := $(python_env_dir)/bin/python
 
 # nodejs
 ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+COFFEELINT     := $(abspath $(node_modules_dir))/.bin/coffeelint
+ESLINT         := $(abspath $(node_modules_dir))/.bin/eslint --ext .js,.jsm
 GULP           := $(abspath $(node_modules_dir))/.bin/gulp
 JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
 JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
 	--extra-ext jsm  --exclude '**/third-party/' --verbose
+MOCHA          := $(abspath $(node_modules_dir))/.bin/mocha
+TSC            := $(abspath $(node_modules_dir))/.bin/tsc
+TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
+
+# python
+PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
+PY_MOZDOWNLOAD := $(abspath $(python_env_dir))/bin/mozdownload
+PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
+
+
+#-------------------------------------------------------------------------------
+# helper targets
+#-------------------------------------------------------------------------------
+
+# Can force a target to be executed every time.
+.PHONY: FORCE
+FORCE:
+
+# $1: variable name
+_VAR_STAMP_ = $(shell \
+  mkdir -p $(varstamps_dir); \
+  ./scripts/update_stamp.sh "$(varstamps_dir)/$1" "$($1)"; \
+  echo "$(varstamps_dir)/$1" \
+)
 
 #-------------------------------------------------------------------------------
 # helpers
 #-------------------------------------------------------------------------------
+
+# in a pipe
+_remove_leading_empty_lines := sed '/./,$$!d'
 
 # $1: command(s) to be wrapped
 _remove_all_files_and_dirs_in = find '$1/' '!' -path '$1/' -delete
@@ -103,6 +135,8 @@ all: xpi
 xpi: nightly-xpi
 nightly-xpi: node-packages
 	$(call make_xpi,nightly)
+dev-xpi: node-packages
+	$(call make_xpi,dev)
 beta-xpi: node-packages
 	$(call make_xpi,beta)
 ui-testing-xpi: node-packages
@@ -116,6 +150,7 @@ nightly-files: node-packages
 	$(call make_files,nightly)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
+xpi_file__dev          := $(dist_dir)/$(extension_name)-dev.xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
 xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
@@ -166,10 +201,12 @@ define make_other_xpi
 endef
 
 .PHONY: _other_xpi \
-	dev-helper-xpi dummy-xpi webext-apply-css-xpi
+	dev-helper-xpi ui-testing-helper-xpi dummy-xpi webext-apply-css-xpi
 
 dev-helper-xpi:
 	$(call make_other_xpi,dev_helper)
+ui-testing-helper-xpi:
+	$(call make_other_xpi,ui_testing_helper)
 dummy-xpi:
 	$(call make_other_xpi,dummy)
 webext-apply-css-xpi:
@@ -179,17 +216,20 @@ webext-apply-css-xpi:
 # [VARIABLES] configuration of different builds
 #-------------------------------------------------------------------------------
 
-alias__dev_helper   := RPC Dev Helper
-alias__dummy        := Dummy
-alias__we_apply_css := Dummy WebExtension
+alias__dev_helper        := RPC Dev Helper
+alias__ui_testing_helper := RPC UI Testing Helper
+alias__dummy             := Dummy
+alias__we_apply_css      := Dummy WebExtension
 
-source_path__dev_helper   := tests/helper-addons/dev-helper/
-source_path__dummy        := tests/helper-addons/dummy-ext/
-source_path__we_apply_css := tests/helper-addons/external/webext-apply-css/
+source_path__dev_helper        := tests/helper-addons/dev-helper/
+source_path__ui_testing_helper := tests/helper-addons/ui-testing-helper/
+source_path__dummy             := tests/helper-addons/dummy-ext/
+source_path__we_apply_css      := tests/helper-addons/external/webext-apply-css/
 
-xpi_file__dev_helper   := $(dist_dir)/rpc-dev-helper.xpi
-xpi_file__dummy        := $(dist_dir)/dummy-ext.xpi
-xpi_file__we_apply_css := $(dist_dir)/webext-apply-css.xpi
+xpi_file__dev_helper         := $(dist_dir)/rpc-dev-helper.xpi
+xpi_file__ui_testing_helper  := $(dist_dir)/rpc-ui-testing-helper.xpi
+xpi_file__dummy              := $(dist_dir)/dummy-ext.xpi
+xpi_file__we_apply_css       := $(dist_dir)/webext-apply-css.xpi
 
 #-------------------------------------------------------------------------------
 # intermediate targets
@@ -241,31 +281,16 @@ development-environment: python-venv node-packages firefox-all
 
 space :=
 space +=
-fn_timestamp_file = $(build_dir_root)/.timestamp_$(subst $(space),_,$1)_ago
+fn_timestamp_file = $(stamps_dir)/.timestamp_$(subst $(space),_,$1)_ago
 force_every = $(shell \
   mkdir -p $(dir $(call fn_timestamp_file,$1)); \
   touch -d '$1 ago' $(call fn_timestamp_file,$1); \
-  test $(call fn_timestamp_file,$1) -nt $2 && \
-    echo -n FORCE \
+  echo $(call fn_timestamp_file,$1) \
 )
 
 #-------------------------------------------------------------------------------
 # python
 #-------------------------------------------------------------------------------
-
-# $1: command(s) to be wrapped
-IN_PYTHON_ENV = set +u && source $(python_env_dir)/bin/activate && ($1)
-
-# $1: variable name which will contain the profile dir
-# $2: parameters to mozprofile
-# $3: command(s) to be wrapped
-WITH_MOZPROFILE = \
-	$1=`mozprofile $2` && ( \
-		($3); \
-		exit_status=$$? ; \
-		rm -rf $$$1 ; \
-		exit $$exit_status ; \
-	) ;
 
 # timestamp/target files
 # NOTE: The timestamp files must reside inside the venv dir,
@@ -274,18 +299,25 @@ WITH_MOZPROFILE = \
 T_PYTHON_PACKAGES := $(python_env_dir)/.timestamp_requirements
 T_PYTHON_VIRTUALENV := $(python_env_dir)/.timestamp_virtualenv
 
-.PHONY: python-venv
-python-venv: $(T_PYTHON_PACKAGES)
+# increment the value when changing the target
+__python_venv__ := v1
+
+.PHONY: python-venv python-packages
+python-venv python-packages: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
-		$(call force_every,7 days,$(T_PYTHON_PACKAGES)) \
-		| $(T_PYTHON_VIRTUALENV)
-	$(call IN_PYTHON_ENV, \
-		pip install --upgrade -r $< \
-	)
+		$(call force_every,7 days) \
+		$(T_PYTHON_VIRTUALENV)
+	$(PYTHON) -m pip install --upgrade -r $<
 	touch $@
-$(T_PYTHON_VIRTUALENV):
+$(T_PYTHON_VIRTUALENV): \
+		$(call _VAR_STAMP_,__python_venv__) \
+		$(call _VAR_STAMP_,CURDIR) \
+		$(call _VAR_STAMP_,python_env_dir)
+	rm -rf $(python_env_dir)
 	mkdir -p $(python_env_dir)
 	virtualenv --no-site-packages --prompt='(RP)' $(python_env_dir)
+	@echo $(CURDIR)/tests/python \
+	  > $(python_env_dir)/lib/python2.7/site-packages/requestpolicy.pth
 	touch $@
 
 #-------------------------------------------------------------------------------
@@ -298,7 +330,7 @@ T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
 $(T_NODE_PACKAGES): package.json \
-		$(call force_every,7 days,$(T_NODE_PACKAGES))
+		$(call force_every,7 days)
 	$(NPM) install
 	touch $@
 
@@ -346,15 +378,13 @@ ifneq "$(filter $(mozdl_supported_browsers),$1)" ""
 # but the tarball will only be extracted iff a new tarball has been
 # downloaded (i.e., a new update has been available).
 $(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
-		$(call force_every,12 hours,$(call T_BROWSER,$1,$2)) \
+		$(call force_every,12 hours) \
 		| python-venv
 	mkdir -p $(browsers_dir)/$1/downloads/$2/
-	$$(call IN_PYTHON_ENV, \
-	  mozdownload \
+	$(PY_MOZDOWNLOAD) \
 	    --destination $(browsers_dir)/$1/downloads/$2/ \
 	    --extension tar.bz2 --application $1 \
-	    $$(mozdl_opts_$1_$2) \
-	)
+	    $$(mozdl_opts_$1_$2)
 	ln -sf $$$$(cd $$(dir $$@); ls -t $2/*.tar.bz2 | head -n 1) $$@
 	touch --reference="$$$$(readlink -f $$@)" $$@
 	touch $(call T_BROWSER,$1,$2)
@@ -391,7 +421,7 @@ clean-old-browser-tarballs: \
 
 # arguments for mozrunner
 run_additional_xpis :=
-_run_xpis := $(xpi_file__nightly) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__dev) $(xpi_file__dev_helper) $(run_additional_xpis)
 run_additional_prefs := default
 _run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
@@ -402,10 +432,8 @@ _run_mozrunner_args := \
 	$(run_additional_args)
 
 .PHONY: run
-run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
-	$(call IN_PYTHON_ENV, \
-		mozrunner $(_run_mozrunner_args) \
-	)
+run: python-venv dev-xpi dev-helper-xpi $(app_binary)
+	$(PY_MOZRUNNER) $(_run_mozrunner_args)
 
 
 #===============================================================================
@@ -413,9 +441,23 @@ run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
 #===============================================================================
 
 .PHONY: test-quick test
-test-quick: static-analysis ui-tests-quick
+test-quick: static-analysis unit-tests ui-tests-quick
 test-non-quick: test-makefile ui-tests-non-quick
 test: test-quick test-non-quick
+
+#-------------------------------------------------------------------------------
+# Testing: unit tests
+#-------------------------------------------------------------------------------
+
+.PHONY: unit-tests
+unit-tests: mocha
+
+.PHONY: mocha
+mocha: node-packages nightly-files
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/nightly/content/ \
+	$(MOCHA) \
+		--compilers coffee:coffeescript/register \
+		tests/unit/
 
 #-------------------------------------------------------------------------------
 # UI tests
@@ -429,58 +471,24 @@ ui-tests: marionette
 ui-tests-quick: marionette-quick
 ui-tests-non-quick: marionette-non-quick
 
-logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
-
-_marionette_gecko_log := $(logs_dir)/$(logfile_prefix)marionette.gecko.log
-marionette_logging := --gecko-log=$(_marionette_gecko_log)
-marionette_logging += --log-html=$(logs_dir)/$(logfile_prefix)marionette.html
-marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.log
-#marionette_logging += --log-raw=$(logs_dir)/$(logfile_prefix)marionette.raw.log
-#marionette_logging += --log-xunit=$(logs_dir)/$(logfile_prefix)marionette.xunit.xml
-#marionette_logging += --log-mach=$(logs_dir)/$(logfile_prefix)marionette.mach.log
-#marionette_logging += --log-unittest=$(logs_dir)/$(logfile_prefix)marionette.unittest.log
-
-# localhost:28xxx
-_marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
-_marionette_address := localhost:$(_marionette_port)
-
-_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper)
-_marionette_prefs := common ui_tests
-_marionette_mozprofile_args := \
-	$(addprefix --addon=,$(_marionette_xpis)) \
-	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
-marionette_additional_args :=
-_marionette_runtests_args := \
-	--binary=$(app_binary) \
-	--profile="$$profile_dir" \
-	--address=$(_marionette_address) \
-	$(marionette_logging) \
-	$(marionette_additional_args)
 
 .PHONY: marionette marionette-quick marionette-non-quick
 marionette: marionette-quick marionette-non-quick
-marionette-quick:     marionette_tests := tests/marionette/tests-quick.manifest.ini
-marionette-non-quick: marionette_tests := tests/marionette/tests-non-quick.manifest.ini
-marionette-non-quick marionette-quick: \
-		python-venv \
-		$(logs_dir) \
-		ui-testing-xpi \
-		dev-helper-xpi \
-		dummy-xpi \
-		webext-apply-css-xpi \
-		specific-xpi \
-		amo-nightly-xpi \
-		$(app_binary)
-	@# Due to Mozilla Bug 1315522, the profile needs to be created and
-	@# removed directly.
-	$(call IN_PYTHON_ENV, \
-	$(call WITH_MOZPROFILE,profile_dir,$(_marionette_mozprofile_args), \
-		./tests/marionette/rp_ui_harness/runtests.py \
-			$(_marionette_runtests_args) \
-			$(marionette_tests) ; \
-	))
-	@echo "Checking for undetected errors"
-	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
+
+marionette-quick: _args := --quick
+marionette-non-quick: _args := --non-quick
+
+marionette-quick marionette-non-quick: _marionette_dependencies
+	./scripts/run_marionette_tests.py --no-make-dependencies $(_args)
+
+
+.PHONY: _marionette_dependencies
+_marionette_dependencies: \
+	python-venv $(logs_dir) \
+	ui-testing-xpi \
+	amo-nightly-xpi specific-xpi \
+	dev-helper-xpi ui-testing-helper-xpi \
+	dummy-xpi webext-apply-css-xpi
 
 #===============================================================================
 # static analysis
@@ -494,21 +502,54 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: addons-linter jscs jshint
+lint: lint-coffee lint-js lint-python lint-ts lint-xpi
 
-.PHONY: addons-linter jscs jshint
+.PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
+lint-coffee: coffeelint
+lint-js: eslint jscs jshint
+lint-python: pep8
+lint-ts: ts tslint
+lint-xpi: addons-linter
+
+.PHONY: addons-linter coffeelint eslint jscs jshint pep8 ts tslint
 addons-linter: nightly-xpi node-packages
-	$(ADDONS_LINTER) $(xpi_file__nightly)
+	@echo $@
+	@$(ADDONS_LINTER) $(xpi_file__nightly)
+coffeelint: node-packages
+	@echo $@
+	@$(COFFEELINT) $(wildcard tests/unit/*.coffee)
+eslint: node-packages
+	@echo $@
+	@$(ESLINT) src/
+	@$(ESLINT) tests/unit/
+	@$(ESLINT) tests/xpcshell/
+	@$(ESLINT) tests/helper-addons/
+	@$(ESLINT) gulpfile.js
 jscs: node-packages
-	cd src/;                 $(JSCS) .
-	cd tests/xpcshell/;      $(JSCS) .
-	cd tests/helper-addons/; $(JSCS) .
-	cd .;                    $(JSCS) gulpfile.js
+	@echo $@
+	@cd src/;                 $(JSCS) .
+	@cd tests/unit/;          $(JSCS) .
+	@cd tests/xpcshell/;      $(JSCS) .
+	@cd tests/helper-addons/; $(JSCS) .
+	@cd .;                    $(JSCS) gulpfile.js
 jshint: node-packages
-	$(JSHINT) src/
-	$(JSHINT) tests/xpcshell/
-	$(JSHINT) tests/helper-addons/
-	$(JSHINT) gulpfile.js
+	@echo $@
+	@$(JSHINT) src/
+	@$(JSHINT) tests/unit/
+	@$(JSHINT) tests/xpcshell/
+	@$(JSHINT) tests/helper-addons/
+	@$(JSHINT) gulpfile.js
+pep8: python-packages
+	@echo $@
+	@$(PY_PEP8) scripts/
+	@$(PY_PEP8) tests/marionette/
+ts: node-packages
+	@echo $@
+	@$(TSC)
+tslint: node-packages
+	@echo $@
+	@$(TSLINT) --exclude '**/third-party/**/*' 'src/**/*.ts' \
+		| $(_remove_leading_empty_lines)
 
 #-------------------------------------------------------------------------------
 # localization checks
@@ -527,10 +568,9 @@ test-makefile:
 
 
 #===============================================================================
-# other targets
+# cleanup targets
 #===============================================================================
 
-# Cleanup targets
 .PHONY: clean mostlyclean distclean clean-dev-environment
 clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
@@ -540,12 +580,9 @@ mostlyclean: clean
 clean-dev-environment:
 	@-$(call _remove_all_files_and_dirs_in,$(python_env_dir))
 	@-$(call _remove_all_files_and_dirs_in,$(node_modules_dir))
+	@-$(call _remove_all_files_and_dirs_in,$(stamps_dir))
 	@rm -rf $(browsers_dir)/firefox
 	@# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
 	@# are put there manually.
 	@rm -rf $(browsers_dir)/seamonkey/extracted
 distclean: mostlyclean clean-dev-environment
-
-# Can force a target to be executed every time.
-.PHONY: FORCE
-FORCE:

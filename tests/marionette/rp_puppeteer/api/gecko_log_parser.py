@@ -7,7 +7,12 @@ import re
 from contextlib import contextmanager
 
 
-known_bug_1 = u"""[JavaScript Warning: "Expected end of value but found {0}10{1}.  Error in parsing value for {0}font-family{1}.  Declaration dropped." {2}file: "chrome://rpcontinued/skin/"""
+known_bug_1 = (
+    u"""[JavaScript Warning: "Expected end of value but found {0}10{1}.  """
+    u"""Error in parsing value for {0}font-family{1}.  """
+    u"""Declaration dropped." """
+    u"""{2}file: "chrome://rpcontinued/skin/"""
+)
 WHITELIST = [
   # known bugs
 
@@ -15,7 +20,11 @@ WHITELIST = [
   # quotation marks are no longer <'>, but <\u2019> and <\u201A>.
   known_bug_1.format("'", "'", "{"),
   known_bug_1.format(u"\u2019", u"\u201A", "{"),
-  re.compile(r"""^JavaScript strict warning: chrome://rpcontinued/content/lib/ruleset\.js, line [0-9]+: ReferenceError: reference to undefined property entryPart\.s"""),
+  re.compile(
+      r"""^JavaScript strict warning: """
+      r"""chrome://rpcontinued/content/lib/ruleset\.js, line [0-9]+: """
+      r"""ReferenceError: reference to undefined property entryPart\.s"""
+  ),
 
   # other
 
@@ -50,19 +59,26 @@ class GeckoLogParser(object):
     EXPECT_ERRORS_END = "[RP Puppeteer] GeckoLog expect errors: end"
 
     def __init__(self, gecko_log_path):
-      self.path = gecko_log_path
+        self.path = gecko_log_path
 
     #################################
     # Public Properties and Methods #
     #################################
+
+    # lines
 
     def get_all_lines(self):
         with self._gecko_log_file() as gecko_log:
             # Take all lines except the last one, which is empty.
             return gecko_log.read().split("\n")[:-1]
 
-    def get_all_error_lines(self, **kwargs):
-        return self._filter_error_lines(self.get_all_lines(), **kwargs)
+    def get_lines_before_first_test(self):
+        lines = []
+        for line in self.get_all_lines():
+            if line.find("TEST-START") != -1:
+                break
+            lines.append(line)
+        return lines
 
     def get_lines_of_current_test(self):
         all_lines = self.get_all_lines()
@@ -74,22 +90,36 @@ class GeckoLogParser(object):
         lines.reverse()
         return lines
 
+    # error lines
+
+    def get_all_error_lines(self, **kwargs):
+        return self._filter_error_lines(self.get_all_lines(), **kwargs)
+
     def get_error_lines_of_current_test(self, **kwargs):
-        return self._filter_error_lines(self.get_lines_of_current_test(), **kwargs)
+        return self._filter_error_lines(
+            self.get_lines_of_current_test(), **kwargs)
+
+    def get_error_lines_before_first_test(self, **kwargs):
+        return self._filter_error_lines(
+            self.get_lines_before_first_test(), **kwargs)
 
     ##################################
     # Private Properties and Methods #
     ##################################
 
     def _filter_error_lines(self, lines,
-            return_ignored_as_well=False,
-            return_expected_as_well=True):
+                            return_ignored_as_well=False,
+                            return_expected_as_well=True):
         error_lines = []
         ignore_helpers = []
         if not return_ignored_as_well:
-            ignore_helpers.append(IgnoreHelper(self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END))
+            ignore_helpers.append(IgnoreHelper(
+                self.IGNORE_ERRORS_START, self.IGNORE_ERRORS_END
+            ))
         if not return_expected_as_well:
-            ignore_helpers.append(IgnoreHelper(self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END))
+            ignore_helpers.append(IgnoreHelper(
+                self.EXPECT_ERRORS_START, self.EXPECT_ERRORS_END
+            ))
         prepend_to_next_line = ""
         for line in lines:
             line = prepend_to_next_line + line
@@ -124,7 +154,10 @@ class GeckoLogParser(object):
         if not self._is_exception(line):
             return False
 
-        if line.find("[RequestPolicy]") == -1 and line.find("chrome://rpcontinued/") == -1:
+        if (
+            line.find("[RequestPolicy]") == -1 and
+            line.find("chrome://rpcontinued/") == -1
+        ):
             return False
 
         if line.find("/third-party/") != -1:

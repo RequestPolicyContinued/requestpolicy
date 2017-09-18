@@ -65,9 +65,9 @@ class TestOldRulesPrefs(RequestPolicyTestCase):
         self.assertDictEqual(self.old_rules.get_rules(), expected_rules,
                              "The unspecified prefs have been emptied.")
 
-    #===========================================================================
+    # =========================================================================
     # Test Getter/Setter properties
-    #===========================================================================
+    # =========================================================================
 
     def test_set_origin_rules(self):
         self.old_rules.origin_rules = "mozilla.org"
@@ -84,7 +84,8 @@ class TestOldRulesPrefs(RequestPolicyTestCase):
     def test_set_origin_to_dest_rules(self):
         self.old_rules.origin_to_dest_rules = "mozilla.org|mozilla.net"
         expected_rules = self._data__prefs_removed
-        expected_rules["allowedOriginsToDestinations"] = "mozilla.org|mozilla.net"
+        expected_rules["allowedOriginsToDestinations"] = (
+            "mozilla.org|mozilla.net")
         self.assertDictEqual(self.old_rules.get_rules(), expected_rules)
 
     def test_get_origin_rules(self):

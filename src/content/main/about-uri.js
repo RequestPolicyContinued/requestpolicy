@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
 import {Info} from "lib/utils/info";
@@ -115,7 +113,8 @@ export var AboutRequestPolicy = (function() {
             // When upgrading restartless the old factory might still exist.
             Utils.runAsync(registerFactory);
           } else {
-            Cu.reportError(e);
+            console.error("Failed to register factory! Details:");
+            console.dir(e);
           }
         }
       });

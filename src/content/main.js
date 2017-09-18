@@ -20,11 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
+// import the logger first! It needs to get logging prefs from storage (async).
+import {Logger} from "lib/logger";
 
 import {Environment, MainEnvironment} from "lib/environment";
 import {PrefManager} from "main/pref-manager";
-import {Logger} from "lib/logger";
 import {C} from "lib/utils/constants";
 
 import "main/requestpolicy-service";
@@ -36,7 +36,7 @@ import {KeyboardShortcuts} from "controllers/keyboard-shortcuts";
 import {OldRulesController} from "controllers/old-rules";
 
 import {RequestProcessor} from "lib/request-processor";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
 import {OldRules} from "lib/old-rules";
 import {RuleUtils} from "lib/utils/rules";
@@ -49,9 +49,9 @@ import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
 import {rpService} from "main/requestpolicy-service";
 import {WindowUtils} from "lib/utils/windows";
 
-let modules = [
-  Logger,
-];
+// @ifdef UI_TESTING
+import "ui-testing/services";
+// @endif
 
 let controllers = [
   KeyboardShortcuts,
@@ -70,7 +70,8 @@ _setBackgroundPage({
   ManagerForPrefObservers,
   OldRules,
   PolicyManager,
-  Prefs,
+  LegacyApi,
+  Storage,
   RequestProcessor,
   rpService,
   RuleUtils,
@@ -82,12 +83,9 @@ _setBackgroundPage({
 
 //==============================================================================
 
-/**
- * If any Exception gets here, it will be a severe error.
- * The Logger can't be used, as it might not be available.
- */
 function logSevereError(aMessage, aError) {
-  Logger.error("[SEVERE] " + aMessage, aError);
+  console.error("[SEVERE] " + aMessage + " - Details:");
+  console.dir(aError);
 }
 
 const shutdownMessage = C.MM_PREFIX + "shutdown";
@@ -148,12 +146,6 @@ observerService.addObserver(observer, "sdk:loader:destroy", false);
 
 (function startup() {
   PrefManager.init();
-
-  modules.forEach(m => {
-    if (typeof m.bootstrap === "function") {
-      m.bootstrap.apply(null);
-    }
-  });
 
   // TODO: Initialize the "models" first. Then initialize the other
   // controllers, which is currently "rpService", "ContentPolicy" etc.

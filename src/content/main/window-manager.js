@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {Windows} from "models/windows";
 import {OverlayController} from "controllers/windows.overlay";
@@ -72,7 +70,8 @@ export var rpWindowManager = (function() {
   let self = {};
 
   let frameScriptURI =
-      "chrome://rpcontinued/content/framescripts/bootstrap.js?" + Math.random();
+      "chrome://rpcontinued/content/bootstrap/environments/framescript.js?" +
+      Math.random();
 
   function loadIntoWindow(window) {
     WindowSubControllers.loadIntoWindow(window);

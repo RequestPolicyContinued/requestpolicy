@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {Info} from "lib/utils/info";
 import {OldRules} from "lib/old-rules";
@@ -54,7 +52,7 @@ export var OldRulesController = (function() {
     Logger.info("Performing automatic rule import.");
     let rv = self.importOldRules();
     if (false === rv) {
-      Logger.error("Failed to automatically import old rules.");
+      console.error("Failed to automatically import old rules.");
     }
   }
 
@@ -68,7 +66,8 @@ export var OldRulesController = (function() {
       PolicyManager.addAllowRules(rules);
       return true;
     } catch (e) {
-      Cu.reportError(e);
+      console.error("Failed to import old rules. Details:");
+      console.dir(e);
       return false;
     }
   };

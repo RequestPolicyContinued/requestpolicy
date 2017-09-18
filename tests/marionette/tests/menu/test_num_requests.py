@@ -9,7 +9,7 @@ class TestTotalNumRequestsAfterReload(RequestPolicyTestCase):
     """Reloading a Tab should reset the request counter.
     """
 
-    TEST_URL = "http://www.maindomain.test/img_1.html";
+    TEST_URL = "http://www.maindomain.test/img_1.html"
 
     def setUp(self):
         super(TestTotalNumRequestsAfterReload, self).setUp()

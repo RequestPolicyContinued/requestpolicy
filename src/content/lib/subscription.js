@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {RawRuleset} from "lib/ruleset";
 import {FileUtil} from "lib/utils/files";

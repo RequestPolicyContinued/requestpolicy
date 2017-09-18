@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {WindowUtils} from "lib/utils/windows";
 
@@ -120,8 +118,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
                          QueryInterface(Ci.nsIInterfaceRequestor).
                          getInterface(Ci.nsIDocShell);
       } catch (e) {
-        Logger.warning("The HTTPChannel's DocShell couldn't be found!");
-        Logger.reportError(e);
+        Logger.warning("The HTTPChannel's DocShell couldn't be found!", e);
         this._docShell = null;
       }
     }

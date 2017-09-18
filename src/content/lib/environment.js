@@ -20,27 +20,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {ManagerForEventListeners} from "lib/manager-for-event-listeners";
 import {ObserverManager} from "lib/observer-manager";
 import {Logger} from "lib/logger";
+import {C} from "lib/utils/constants";
+import {JSUtils} from "lib/utils/javascript";
+
+const {LOG_ENVIRONMENT} = C;
 
 //==============================================================================
 // utilities
 //==============================================================================
 
-const LOG_PREFIX = "[Environment] ";
-
-function consoleLog(method, message) {
-  Logger[method](LOG_PREFIX + message);
-}
-
-let log = {
-  debug: consoleLog.bind(null, "debug"),
-  warning: consoleLog.bind(null, "warning"),
-  error: consoleLog.bind(null, "error")
-};
+const log = LOG_ENVIRONMENT ? {
+  debug: function(message) {
+    console.debug(`[Environment] ${message}`);
+  }
+} : null;
 
 //==============================================================================
 // Environment
@@ -175,24 +171,24 @@ export var Environment = (function() {
     // Define a Lazy Getter to get an ObserverManager for this Environment.
     // Using that Getter is more convenient than doing it manually, as the
     // Environment has to be created *before* the ObserverManager.
-    XPCOMUtils.defineLazyGetter(self, "obMan", function() {
+    JSUtils.defineLazyGetter(self, "obMan", function() {
       return new ObserverManager(self);
     });
 
     // Define a Lazy Getter to get an instance of `ManagerForEventListeners` for
     // this Environment.
-    XPCOMUtils.defineLazyGetter(self, "elManager", function() {
+    JSUtils.defineLazyGetter(self, "elManager", function() {
       return new ManagerForEventListeners(self);
     });
 
     // generate an unique ID for debugging purposes
-    XPCOMUtils.defineLazyGetter(self, "uid", function() {
+    JSUtils.defineLazyGetter(self, "uid", function() {
       return Math.random().toString(36).substr(2, 5);
     });
 
-    // @ifdef LOG_ENVIRONMENT
-    log.debug("created new Environment \"" + self.name + "\"");
-    // @endif
+    if (LOG_ENVIRONMENT) {
+      log.debug("created new Environment \"" + self.name + "\"");
+    }
   }
 
   Environment.LEVELS = LEVELS;
@@ -247,14 +243,14 @@ export var Environment = (function() {
   Environment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
     if (self.envState === ENV_STATES.NOT_STARTED) {
-      log.warning("registerInnerEnvironment() has been called but " +
+      Logger.warning("registerInnerEnvironment() has been called but " +
           "the outer environment hasn't started up yet. " +
           "Starting up now.");
       self.startup();
     }
-    // @ifdef LOG_ENVIRONMENT
-    log.debug("registering inner environment");
-    // @endif
+    if (LOG_ENVIRONMENT) {
+      log.debug("registering inner environment");
+    }
     self.innerEnvs.add(aEnv);
   };
   /**
@@ -266,7 +262,7 @@ export var Environment = (function() {
     let self = this;
 
     if (self.innerEnvs.has(aEnv) === false) {
-      log.error("it seems like an inner Environment did not register.");
+      console.error("it seems like an inner Environment did not register.");
     } else {
       self.innerEnvs.delete(aEnv);
     }
@@ -308,11 +304,11 @@ export var Environment = (function() {
       //
       // ==> call the function immediately.
       f();
-      // @ifdef LOG_ENVIRONMENT
-      let fName = f.name || "anonymous";
-      log.debug("calling shutdown function immediately: " +
-          "\"" + fName + "\" (" + self.name + ")");
-      // @endif
+      if (LOG_ENVIRONMENT) {
+        let fName = f.name || "anonymous";
+        log.debug("calling shutdown function immediately: " +
+            "\"" + fName + "\" (" + self.name + ")");
+      }
     } else {
       // The opposite, i.e. the startup process did not reach the function's
       // level yet.
@@ -370,12 +366,13 @@ export var Environment = (function() {
         try {
           f.apply(null, aBootstrapArgs);
         } catch (e) {
-          Cu.reportError(e);
+          console.error("Error in Bootstrap function! Details:");
+          console.dir(e);
         }
-        // @ifdef LOG_ENVIRONMENT
-        log.debug("function called! (" + aFunctions.length +
-            " functions left)");
-        // @endif
+        if (LOG_ENVIRONMENT) {
+          log.debug("function called! (" + aFunctions.length +
+              " functions left)");
+        }
       }
     }
 
@@ -395,10 +392,10 @@ export var Environment = (function() {
 
       if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
         levelObj.levelState = LEVEL_STATES.PROCESSING;
-        // @ifdef LOG_ENVIRONMENT
-        log.debug("processing level " + aLevel + " of startup (" +
-            self.uid + ")");
-        // @endif
+        if (LOG_ENVIRONMENT) {
+          log.debug("processing level " + aLevel + " of startup (" +
+              self.uid + ")");
+        }
 
         if (aStartupOrShutdown === "shutdown") {
           // shut down all inner environments
@@ -410,10 +407,10 @@ export var Environment = (function() {
         callFunctions(levelObj.functions, aBootstrapArgs);
 
         levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
-        // @ifdef LOG_ENVIRONMENT
-        log.debug("processing level " + aLevel + " of startup " +
-            "(" + self.uid + ") finished");
-        // @endif
+        if (LOG_ENVIRONMENT) {
+          log.debug("processing level " + aLevel + " of startup " +
+              "(" + self.uid + ") finished");
+        }
       }
     }
 
@@ -443,7 +440,6 @@ export var Environment = (function() {
       return "'" + env.name + "' (" + env.uid + ")";
     }
 
-    // @ifdef LOG_ENVIRONMENT
     /**
      * Log some debug information on startup or shutdown.
      *
@@ -453,12 +449,13 @@ export var Environment = (function() {
     function logStartupOrShutdown(aStartupOrShutdown) {
       /* jshint validthis: true */
       let self = this;
-      log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
-                (self.outerEnv ?
-                 " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
-                 " No OuterEnv."));
+      if (LOG_ENVIRONMENT) {
+        log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
+                  (self.outerEnv ?
+                  " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
+                  " No OuterEnv."));
+      }
     }
-    // @endif
 
     /**
      * Actual body of the functions startup() and shutdown().
@@ -482,9 +479,9 @@ export var Environment = (function() {
       } = getBootstrapMetadata(aStartupOrShutdown);
 
       if (self.envState === envStates.beforeProcessing) {
-        // @ifdef LOG_ENVIRONMENT
-        logStartupOrShutdown.call(self, aStartupOrShutdown);
-        // @endif
+        if (LOG_ENVIRONMENT) {
+          logStartupOrShutdown.call(self, aStartupOrShutdown);
+        }
         functions.beforeProcessing.call(self);
 
         self.envState = envStates.duringProcessing;
@@ -503,17 +500,17 @@ export var Environment = (function() {
 
     Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
-      // @ifdef LOG_ENVIRONMENT
-      log.debug("starting up: " + self.name);
-      // @endif
+      if (LOG_ENVIRONMENT) {
+        log.debug("starting up: " + self.name);
+      }
       bootstrap.call(self, "startup", aBootstrapArgs, aUntilLevel);
     };
 
     Environment.prototype.shutdown = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
-      // @ifdef LOG_ENVIRONMENT
-      log.debug("shutting down: " + self.name);
-      // @endif
+      if (LOG_ENVIRONMENT) {
+        log.debug("shutting down: " + self.name);
+      }
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
 
@@ -529,11 +526,11 @@ export var Environment = (function() {
   Environment.prototype.shutdownOnUnload = function(aEventTarget) {
     let self = this;
     self.elManager.addListener(aEventTarget, "unload", function() {
-      // @ifdef LOG_ENVIRONMENT
-      log.debug("an EventTarget's `unload` function " +
-          "has been called. Going to shut down Environment \"" +
-          self.name + "\"");
-      // @endif
+      if (LOG_ENVIRONMENT) {
+        log.debug("an EventTarget's `unload` function " +
+            "has been called. Going to shut down Environment \"" +
+            self.name + "\"");
+      }
       self.shutdown();
     });
   };

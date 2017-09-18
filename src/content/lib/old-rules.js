@@ -21,10 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {DomainUtil} from "lib/utils/domains";
-import {Prefs} from "models/prefs";
 
 //==============================================================================
 // OldRules
@@ -202,11 +199,11 @@ export var OldRules = (function() {
    */
   OldRules._getPrefString = function(aPrefName) {
     try {
-      return Prefs.branches.rp.branch.
+      return LegacyApi.prefs.branches.rp.branch.
           getComplexValue(aPrefName, Ci.nsISupportsString).data;
     } catch (e) {
       if (e.name !== "NS_ERROR_UNEXPECTED") {
-        Cu.reportError(e);
+        console.dir(e);
       }
       return "";
     }

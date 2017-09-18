@@ -21,10 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {Logger} from "lib/logger";
 
 //==============================================================================
@@ -36,31 +34,33 @@ export var PrefManager = (function() {
 
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
-    var resetLinkPrefetch = Prefs.get("prefetch.link." +
-                                      "restoreDefaultOnUninstall");
-    var resetDNSPrefetch = Prefs.get("prefetch.dns.restoreDefaultOnUninstall");
-    var resetPreConnections = Prefs.get("prefetch.preconnections." +
-                                        "restoreDefaultOnUninstall");
+    var resetLinkPrefetch =
+        Storage.get("prefetch.link.restoreDefaultOnUninstall");
+    var resetDNSPrefetch =
+        Storage.get("prefetch.dns.restoreDefaultOnUninstall");
+    var resetPreConnections =
+        Storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
-      if (Prefs.isSet("root/ network.prefetch-next")) {
-        Prefs.reset("root/ network.prefetch-next");
+      if (LegacyApi.prefs.isSet("root/ network.prefetch-next")) {
+        LegacyApi.prefs.reset("root/ network.prefetch-next");
       }
     }
     if (resetDNSPrefetch) {
-      if (Prefs.isSet("root/ network.dns.disablePrefetch")) {
-        Prefs.reset("root/ network.dns.disablePrefetch");
+      if (LegacyApi.prefs.isSet("root/ network.dns.disablePrefetch")) {
+        LegacyApi.prefs.reset("root/ network.dns.disablePrefetch");
       }
-      if (Prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS")) {
-        Prefs.reset("root/ network.dns.disablePrefetchFromHTTPS");
+      if (LegacyApi.prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS")) {
+        LegacyApi.prefs.reset("root/ network.dns.disablePrefetchFromHTTPS");
       }
     }
     if (resetPreConnections) {
-      if (Prefs.isSet("root/ network.http.speculative-parallel-limit")) {
-        Prefs.reset("root/ network.http.speculative-parallel-limit");
+      let prefName = "root/ network.http.speculative-parallel-limit";
+      if (LegacyApi.prefs.isSet(prefName)) {
+        LegacyApi.prefs.reset(prefName);
       }
     }
-    Services.prefs.savePrefFile(null);
+    LegacyApi.prefs.save();
   }
 
   self.init = function() {
@@ -68,35 +68,39 @@ export var PrefManager = (function() {
     // prefetching
     // --------------------
     // Disable link prefetch.
-    if (Prefs.get("prefetch.link.disableOnStartup")) {
-      if (Prefs.get("root/ network.prefetch-next") === true) {
-        Prefs.set("root/ network.prefetch-next", false);
+    if (LegacyApi.prefs.get("prefetch.link.disableOnStartup")) {
+      if (LegacyApi.prefs.get("root/ network.prefetch-next") === true) {
+        LegacyApi.prefs.set("root/ network.prefetch-next", false);
         Logger.info("Disabled link prefetch.");
       }
     }
     // Disable DNS prefetch.
-    if (Prefs.get("prefetch.dns.disableOnStartup")) {
+    if (LegacyApi.prefs.get("prefetch.dns.disableOnStartup")) {
       // network.dns.disablePrefetch only exists starting in Firefox 3.1 (and it
       // doesn't have a default value, at least in 3.1b2, but if and when it
       // does have a default it will be false).
-      if (!Prefs.isSet("root/ network.dns.disablePrefetch") ||
-          Prefs.get("root/ network.dns.disablePrefetch") === false) {
-        Prefs.set("root/ network.dns.disablePrefetch", true);
+      let prefName = "root/ network.dns.disablePrefetch";
+      if (!LegacyApi.prefs.isSet(prefName) ||
+          LegacyApi.prefs.get(prefName) === false) {
+        LegacyApi.prefs.set(prefName, true);
         Logger.info("Disabled DNS prefetch.");
       }
+
+      prefName = "root/ network.dns.disablePrefetchFromHTTPS";
       // If no user-defined value exists, the default is "true".  So do not
       // set the pref if there's no user-defined value yet.
-      if (Prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS") &&
-          Prefs.get("root/ network.dns.disablePrefetchFromHTTPS") === false) {
-        Prefs.set("root/ network.dns.disablePrefetchFromHTTPS", true);
+      if (LegacyApi.prefs.isSet(prefName) &&
+          LegacyApi.prefs.get(prefName) === false) {
+        LegacyApi.prefs.set(prefName, true);
         Logger.info("Disabled DNS prefetch from HTTPS.");
       }
     }
     // Disable Speculative pre-connections.
-    if (Prefs.get("prefetch.preconnections.disableOnStartup")) {
-      if (!Prefs.isSet("root/ network.http.speculative-parallel-limit") ||
-          Prefs.get("root/ network.http.speculative-parallel-limit") !== 0) {
-        Prefs.set("root/ network.http.speculative-parallel-limit", 0);
+    if (Storage.get("prefetch.preconnections.disableOnStartup")) {
+      let prefName = "root/ network.http.speculative-parallel-limit";
+      if (!LegacyApi.prefs.isSet(prefName) ||
+          LegacyApi.prefs.get(prefName) !== 0) {
+        LegacyApi.prefs.set(prefName, 0);
         Logger.info("Disabled Speculative pre-connections.");
       }
     }
@@ -110,12 +114,12 @@ export var PrefManager = (function() {
       "temporarilyAllowedOriginsToDestinations"
     ];
     for (let prefName of deletePrefs) {
-      if (Prefs.isSet(prefName)) {
-        Prefs.reset(prefName);
+      if (LegacyApi.prefs.isSet(prefName)) {
+        LegacyApi.prefs.reset(prefName);
       }
     }
 
-    Services.prefs.savePrefFile(null);
+    LegacyApi.prefs.save();
   };
 
   function maybeHandleUninstallOrDisable(data, reason) {

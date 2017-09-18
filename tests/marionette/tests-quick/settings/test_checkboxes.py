@@ -58,12 +58,15 @@ class TestCheckboxes(RequestPolicyTestCase):
         self._test("pref-prefetch.dns.restoreDefaultOnUninstall",
                    RP_BRANCH + "prefetch.dns.restoreDefaultOnUninstall")
 
-        self._test("pref-speculativePreConnections",
-                   self._preconnect_pref("network.http.speculative-parallel-limit"))
-        self._test("pref-prefetch.preconnections.disableOnStartup",
-                   RP_BRANCH + "prefetch.preconnections.disableOnStartup")
-        self._test("pref-prefetch.preconnections.restoreDefaultOnUninstall",
-                   RP_BRANCH + "prefetch.preconnections.restoreDefaultOnUninstall")
+        self._test(
+            "pref-speculativePreConnections",
+            self._preconnect_pref("network.http.speculative-parallel-limit"))
+        self._test(
+            "pref-prefetch.preconnections.disableOnStartup",
+            RP_BRANCH + "prefetch.preconnections.disableOnStartup")
+        self._test(
+            "pref-prefetch.preconnections.restoreDefaultOnUninstall",
+            RP_BRANCH + "prefetch.preconnections.restoreDefaultOnUninstall")
 
         self._test("menu.info.showNumRequests",
                    RP_BRANCH + "menu.info.showNumRequests")
@@ -142,5 +145,5 @@ class TestCheckboxes(RequestPolicyTestCase):
             "name": pref_name,
             "get": lambda: False if value() == 0 else True,
             "set": lambda v: self.prefs.set_pref(pref_name,
-                                                 0 if v == False else 6)
+                                                 0 if v is False else 6)
         }

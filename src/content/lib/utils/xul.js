@@ -20,9 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
-import {Logger} from "lib/logger";
 import {StringUtils} from "lib/utils/strings";
 import {JSUtils} from "lib/utils/javascript";
 import {C} from "lib/utils/constants";
@@ -85,7 +82,7 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
   for (let elementSpec of aElementSpecList) {
     if (!elementSpec) {
-      Logger.error("An element spec is null!");
+      console.error("An element spec is null!");
       continue;
     }
 
@@ -149,9 +146,8 @@ function getLocalizedValue(aRawValue) {
     let name = aRawValue.slice(1, -1);
     return StringUtils.$str(name);
   } catch (e) {
-    Logger.error(
-        "It was not possible to get the localized value for '" + aRawValue +
-        "'. ", e);
+    console.error(
+        `It was not possible to get the localized value for "${aRawValue}".`);
     return aRawValue;
   }
 }
@@ -239,19 +235,19 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
                                    aParentElement = null) {
   for (let elementSpec of aElementSpecList) {
     if (!elementSpec || !elementSpec.tag) {
-      Logger.error("Element spec incomplete!");
+      console.error("Element spec incomplete!");
       continue;
     }
     let parentElement = !!aParentElement ? aParentElement :
         getParentElement(aDocument, elementSpec);
     if (false === parentElement) {
-      Logger.error("The parent element could not " +
+      console.error("The parent element could not " +
           "be determined. Tag: " + elementSpec.tag + "; " +
           "ID: " + elementSpec.attributes.id);
       continue;
     }
     if (parentElement === null) {
-      Logger.error(
+      console.error(
           "parentElement of '" + elementSpec.attributes.id + "' is null!");
       continue;
     }
@@ -294,7 +290,7 @@ function getRootElementIDs(aTreeName) {
 
 XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
   if (!xulTrees.hasOwnProperty(aTreeName)) {
-    Logger.error("There's no tree with name '" + aTreeName + "'.");
+    console.error("There's no tree with name '" + aTreeName + "'.");
     return;
   }
 
@@ -302,7 +298,12 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
 
   // Recursively remove all event listeners.
   for (let elementSpec of recursivelyGetAllElementSpecs(xulTrees[aTreeName])) {
-    let eventTarget = $id(elementSpec.attributes.id);
+    let {id} = elementSpec.attributes;
+    let eventTarget = $id(id);
+    if (!eventTarget) {
+      console.error(`Could not find element with ID "${id}".`);
+      continue;
+    }
     removeEventListeners(eventTarget, elementSpec);
   }
 

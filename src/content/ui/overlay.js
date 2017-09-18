@@ -21,13 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {Storage} from "models/storage";
 import {RequestProcessor} from "lib/request-processor";
 import {PolicyManager} from "lib/policy-manager";
 import {DomainUtil} from "lib/utils/domains";
@@ -37,6 +35,8 @@ import {JSUtils} from "lib/utils/javascript";
 import {Utils} from "lib/utils";
 import {DOMUtils} from "lib/utils/dom";
 import {C} from "lib/utils/constants";
+
+const {LOG_FLAG_STATE} = C;
 
 /**
  * Provides functionality for the overlay. An instance of this class exists for
@@ -87,7 +87,7 @@ export function loadOverlayIntoWindow(window) {
   let isFennec = false;
 
   let self = {
-    // This is set by request-log/main.js when it is initialized. We don't need to worry
+    // This is set by the request log when it is initialized. We don't need to worry
     // about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment
@@ -115,21 +115,27 @@ export function loadOverlayIntoWindow(window) {
 
         var appInfo = Cc["@mozilla.org/xre/app-info;1"].
             getService(Ci.nsIXULAppInfo);
-        isFennec = appInfo.ID === "{a23983c0-fd0e-11dc-95ff-0800200c9a66}";
+        isFennec = appInfo.name === "Fennec";
 
-        if (isFennec) {
-          Logger.debug("Detected Fennec.");
-          // Set an attribute for CSS usage.
-          popupElement.setAttribute("fennec", "true");
-          popupElement.setAttribute("position", "after_end");
-        }
+        browser.runtime.getBrowserInfo().then((appInfo) => {
+          if (appInfo.name === "Fennec") {
+            Logger.debug("Detected Fennec.");
+            // Set an attribute for CSS usage.
+            popupElement.setAttribute("fennec", "true");
+            popupElement.setAttribute("position", "after_end");
+          }
+          return;
+        }).catch(e => {
+          console.error("Error on Fennec detection. Details:");
+          console.dir(e);
+        });
 
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
         RequestProcessor.addRequestObserver(self);
 
-        setContextMenuEntryEnabled(Prefs.get("contextMenu"));
+        setContextMenuEntryEnabled(Storage.get("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -145,7 +151,9 @@ export function loadOverlayIntoWindow(window) {
                                                     "overlayIsReady", true);
       }
     } catch (e) {
-      Logger.error("[FATAL] Unable to initialize rpcontinued.overlay.", e);
+      console.error(
+          "[FATAL] Unable to initialize rpcontinued.overlay. Details:");
+      console.dir(e);
       throw e;
     }
   };
@@ -292,7 +300,7 @@ export function loadOverlayIntoWindow(window) {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!Prefs.isBlockingDisabled() &&
+      if (!Storage.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them, as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
@@ -429,7 +437,7 @@ export function loadOverlayIntoWindow(window) {
     function addMenuItem(aRuleSpec) {
       aRuleSpec.allow = true;
       classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
-        if (Prefs.get("autoReload")) {
+        if (Storage.get("autoReload")) {
           allowRedirection();
         }
       });
@@ -537,10 +545,10 @@ export function loadOverlayIntoWindow(window) {
     RequestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
-      // @ifdef LOG_FLAG_STATE
-      Logger.debug(
-          "Checking for blocked requests from page <" + uri + ">");
-      // @endif
+      if (LOG_FLAG_STATE) {
+        Logger.debug(
+            "Checking for blocked requests from page <" + uri + ">");
+      }
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
@@ -548,17 +556,18 @@ export function loadOverlayIntoWindow(window) {
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
-      // @ifdef LOG_FLAG_STATE
-      let logText = documentContainsBlockedContent ?
-                    "Requests have been blocked." :
-                    "No requests have been blocked.";
-      Logger.debug(logText);
-      // @endif
+      if (LOG_FLAG_STATE) {
+        let logText = documentContainsBlockedContent ?
+                      "Requests have been blocked." :
+                      "No requests have been blocked.";
+        Logger.debug(logText);
+      }
 
       return Promise.resolve();
     }).catch(e => {
-      Logger.error("[SEVERE] " +
-          "Unable to complete _updateBlockedContentState actions", e);
+      console.error("[SEVERE] " +
+          "Unable to complete _updateBlockedContentState actions. Details:");
+      console.dir(e);
     });
   };
 
@@ -581,7 +590,7 @@ export function loadOverlayIntoWindow(window) {
     var button = $id(toolbarButtonId);
     let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
-      let isPermissive = Prefs.isBlockingDisabled();
+      let isPermissive = Storage.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
@@ -691,6 +700,11 @@ export function loadOverlayIntoWindow(window) {
     RequestProcessor.registerLinkClicked(origin, dest);
   }
 
+  function wrapFunctionErrorCallback(aMessage, aError) {
+    console.error(aMessage);
+    console.dir(aError);
+  }
+
   /**
    * Wraps (overrides) the following methods of gContextMenu
    * - openLink()
@@ -711,11 +725,14 @@ export function loadOverlayIntoWindow(window) {
    *       the subsequent shouldLoad() call.
    */
   self._wrapOpenLink = function() {
-    Utils.wrapFunction(window.gContextMenu, "openLink",
+    Utils.wrapFunction(
+        window.gContextMenu, "openLink", wrapFunctionErrorCallback,
         onOpenLinkViaContextMenu);
-    Utils.wrapFunction(window.gContextMenu, "openLinkInPrivateWindow",
-        onOpenLinkViaContextMenu);
-    Utils.wrapFunction(window.gContextMenu, "openLinkInCurrent",
+    Utils.wrapFunction(
+        window.gContextMenu, "openLinkInPrivateWindow",
+        wrapFunctionErrorCallback, onOpenLinkViaContextMenu);
+    Utils.wrapFunction(
+        window.gContextMenu, "openLinkInCurrent", wrapFunctionErrorCallback,
         onOpenLinkViaContextMenu);
   };
 
@@ -733,7 +750,7 @@ export function loadOverlayIntoWindow(window) {
    * - See mozilla-central: "base/content/tabbrowser.xml"
    */
   function wrapAddTab() {
-    Utils.wrapFunction(gBrowser, "addTab", tabAdded);
+    Utils.wrapFunction(gBrowser, "addTab", wrapFunctionErrorCallback, tabAdded);
   }
 
   /**
@@ -846,8 +863,9 @@ export function loadOverlayIntoWindow(window) {
         return;
       } catch (e) {
         if (tries >= maxTries) {
-          Logger.error("[SEVERE] Can't add session history listener, even " +
-              "after " + tries + " tries.", e);
+          console.error("[SEVERE] Can't add session history listener, even " +
+              "after " + tries + " tries. Details:");
+          console.dir(e);
           return;
         }
         // call this function again in a few miliseconds.
@@ -890,7 +908,7 @@ export function loadOverlayIntoWindow(window) {
   self.onPopupHidden = function(event) {
     var rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
-      if (Prefs.get("autoReload")) {
+      if (Storage.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
         mm.sendAsyncMessage(C.MM_PREFIX + "reload");
       }
@@ -923,8 +941,8 @@ export function loadOverlayIntoWindow(window) {
    * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
-    var disabled = !Prefs.isBlockingDisabled();
-    Prefs.setBlockingDisabled(disabled);
+    var disabled = !Storage.isBlockingDisabled();
+    Storage.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
     $id("rpc-link-enable-blocking").hidden = !disabled;

@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 (function() {
   var {RequestProcessor} = browser.extension.getBackgroundPage();
 

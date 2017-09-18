@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {C} from "lib/utils/constants";
 import {Environment, MainEnvironment} from "lib/environment";
 import {mlManager, overlayComm} from "framescripts/managers";

@@ -21,13 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, $id, $str} from "./common";
 
 (function() {
   var {
-    Prefs,
+    LegacyApi,
     PolicyManager,
     OldRules,
     RuleUtils,
@@ -91,10 +89,10 @@ import {common, $id, $str} from "./common";
   }
 
   window.deleteOldRules = function() {
-    Prefs.reset("allowedOrigins");
-    Prefs.reset("allowedDestinations");
-    Prefs.reset("allowedOriginsToDestinations");
-    Prefs.save();
+    LegacyApi.prefs.reset("allowedOrigins");
+    LegacyApi.prefs.reset("allowedDestinations");
+    LegacyApi.prefs.reset("allowedOriginsToDestinations");
+    LegacyApi.prefs.save();
     $("#doimport").hide();
     $("#deletedone").show();
     $("#showReimportOptions").hide();
@@ -119,7 +117,7 @@ import {common, $id, $str} from "./common";
   };
 
   window.onload = function() {
-    var oldRulesExist = Prefs.oldRulesExist();
+    var oldRulesExist = LegacyApi.prefs.oldRulesExist();
     if (!oldRulesExist) {
       $("#hasrules").hide();
       $("#norules").show();

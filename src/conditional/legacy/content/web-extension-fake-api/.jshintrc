@@ -2,7 +2,9 @@
   "extends": "../../../../../src/.jshintrc",
 
   "globals": {
-    "console": true,
+    "Bootstrap": true,
+    "Manifest": true,
+
     "Cc": true,
     "Ci": true,
     "Cm": true,
@@ -11,6 +13,10 @@
     "ComponentsID": true,
     "require": true,
     "Services": true,
-    "XPCOMUtils": true
-  }
+    "XPCOMUtils": true,
+
+    "console": true
+  },
+
+  "strict": "implied"
 }

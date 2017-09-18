@@ -21,11 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
-import {Prefs} from "models/prefs";
+import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
+import {C} from "lib/utils/constants";
 import {DomainUtil} from "lib/utils/domains";
 import {Request} from "lib/request";
 import {RequestResult, REQUEST_REASON_USER_POLICY,
@@ -38,16 +37,19 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL
         } from "lib/request-result";
 import {RequestSet} from "lib/request-set";
-import {Environment, MainEnvironment} from "lib/environment";
+import {MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
+import {MapOfSets} from "lib/classes/map-of-sets";
+import APP_COMPAT_RULES from "lib/compatibility-rules.apps";
+import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 import RPContentPolicy from "main/content-policy";
-
-let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
 //==============================================================================
 // constants
 //==============================================================================
+
+const {LOG_REQUESTS, LOG_GETTING_SAVED_REQUESTS} = C;
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
@@ -65,7 +67,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 export var RequestProcessor = (function() {
   let self = {};
 
-  let internal = Utils.moduleInternal(self);
+  let internal = Utils.createModuleInternal(self);
 
   //----------------------------------------------------------------------------
   // private properties
@@ -145,12 +147,12 @@ export var RequestProcessor = (function() {
 
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
-    // @ifdef LOG_REQUESTS
-    Logger.debug("** BLOCKED ** reason: " + reason +
-        ". " + request.detailsToString());
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("** BLOCKED ** reason: " + reason +
+          ". " + request.detailsToString());
+    }
 
-    if (Prefs.isBlockingDisabled()) {
+    if (Storage.isBlockingDisabled()) {
       return CP_OK;
     }
 
@@ -200,10 +202,10 @@ export var RequestProcessor = (function() {
    * @param {boolean} unforbidable
    */
   function accept(reason, request, unforbidable) {
-    // @ifdef LOG_REQUESTS
-    Logger.debug("** ALLOWED ** reason: " +
-        reason + ". " + request.detailsToString());
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("** ALLOWED ** reason: " +
+          reason + ". " + request.detailsToString());
+    }
 
     cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
     // We aren't recording the request so it doesn't show up in the menu, but we
@@ -245,7 +247,7 @@ export var RequestProcessor = (function() {
   }
 
   internal.checkByDefaultPolicy = function(aRequest) {
-    if (Prefs.isDefaultAllow()) {
+    if (Storage.isDefaultAllow()) {
       var result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
@@ -254,7 +256,7 @@ export var RequestProcessor = (function() {
     let originUri = aRequest.originURI;
     let destUri = aRequest.destURI;
 
-    if (Prefs.isDefaultAllowSameDomain()) {
+    if (Storage.isDefaultAllowSameDomain()) {
       var originDomain = DomainUtil.getBaseDomain(originUri);
       var destDomain = DomainUtil.getBaseDomain(destUri);
 
@@ -300,20 +302,20 @@ export var RequestProcessor = (function() {
       var date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
-        // @ifdef LOG_REQUESTS
-        Logger.debug(
-            "Using cached shouldLoad() result of " +
-            lastShouldLoadCheck.result + " for request to <" +
-            request.destURI + "> from <" + request.originURI + ">.");
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.debug(
+              "Using cached shouldLoad() result of " +
+              lastShouldLoadCheck.result + " for request to <" +
+              request.destURI + "> from <" + request.originURI + ">.");
+        }
         return true;
       } else {
-        // @ifdef LOG_REQUESTS
-        Logger.debug(
-            "shouldLoad() cache expired for result of " +
-            lastShouldLoadCheck.result + " for request to <" +
-            request.destURI + "> from <" + request.originURI + ">.");
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.debug(
+              "shouldLoad() cache expired for result of " +
+              lastShouldLoadCheck.result + " for request to <" +
+              request.destURI + "> from <" + request.originURI + ">.");
+        }
       }
     }
     return false;
@@ -331,24 +333,24 @@ export var RequestProcessor = (function() {
         // only return requests from the given base domain
         continue;
       }
-      // @ifdef LOG_GETTING_SAVED_REQUESTS
-      Logger.debug("test originUri: " + originUri);
-      // @endif
+      if (LOG_GETTING_SAVED_REQUESTS) {
+        Logger.debug("test originUri: " + originUri);
+      }
       let originUriRequests = requests[originUri];
       for (let destBase in originUriRequests) {
-        // @ifdef LOG_GETTING_SAVED_REQUESTS
-        Logger.debug("test destBase: " + destBase);
-        // @endif
+        if (LOG_GETTING_SAVED_REQUESTS) {
+          Logger.debug("test destBase: " + destBase);
+        }
         let destBaseRequests = originUriRequests[destBase];
         for (let destIdent in destBaseRequests) {
-          // @ifdef LOG_GETTING_SAVED_REQUESTS
-          Logger.debug("test destIdent: " + destIdent);
-          // @endif
+          if (LOG_GETTING_SAVED_REQUESTS) {
+            Logger.debug("test destIdent: " + destIdent);
+          }
           let destIdentRequests = destBaseRequests[destIdent];
           for (let destUri in destIdentRequests) {
-            // @ifdef LOG_GETTING_SAVED_REQUESTS
-            Logger.debug("test destUri: " + destUri);
-            // @endif
+            if (LOG_GETTING_SAVED_REQUESTS) {
+              Logger.debug("test destUri: " + destUri);
+            }
             let dest = destIdentRequests[destUri];
             for (let i in dest) {
               // TODO: This variable could have been created easily already in
@@ -414,10 +416,10 @@ export var RequestProcessor = (function() {
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
-    // @ifdef LOG_GETTING_SAVED_REQUESTS
-    Logger.debug("Looking for other origins within allowed requests from " +
-        originURI);
-    // @endif
+    if (LOG_GETTING_SAVED_REQUESTS) {
+      Logger.debug("Looking for other origins within allowed requests from " +
+          originURI);
+    }
     if (!checkedOrigins[originURI]) {
       // this "if" is needed for the first call of this function.
       checkedOrigins[originURI] = true;
@@ -429,10 +431,10 @@ export var RequestProcessor = (function() {
       for (var destBase in allowedRequests) {
         for (var destIdent in allowedRequests[destBase]) {
           for (var destURI in allowedRequests[destBase][destIdent]) {
-            // @ifdef LOG_GETTING_SAVED_REQUESTS
-            Logger.debug("Found allowed request to <" + destURI + "> " +
-                "from <" + originURI + ">");
-            // @endif
+            if (LOG_GETTING_SAVED_REQUESTS) {
+              Logger.debug("Found allowed request to <" + destURI + "> " +
+                  "from <" + originURI + ">");
+            }
             reqSet.addRequest(originURI, destURI,
                               allowedRequests[destBase][destIdent][destURI]);
 
@@ -450,19 +452,19 @@ export var RequestProcessor = (function() {
   }
 
   function _addAllDeniedRequestsFromURI(originURI, reqSet) {
-    // @ifdef LOG_GETTING_SAVED_REQUESTS
-    Logger.debug("Looking for other origins within denied requests from " +
-        originURI);
-    // @endif
+    if (LOG_GETTING_SAVED_REQUESTS) {
+      Logger.debug("Looking for other origins within denied requests from " +
+          originURI);
+    }
     var requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (var destBase in requests) {
         for (var destIdent in requests[destBase]) {
           for (var destUri in requests[destBase][destIdent]) {
-            // @ifdef LOG_GETTING_SAVED_REQUESTS
-            Logger.debug("Found denied request to <" + destUri + "> from <" +
-                originURI + ">");
-            // @endif
+            if (LOG_GETTING_SAVED_REQUESTS) {
+              Logger.debug("Found denied request to <" + destUri + "> from <" +
+                  originURI + ">");
+            }
             reqSet.addRequest(originURI, destUri,
                 requests[destBase][destIdent][destUri]);
           }
@@ -503,11 +505,11 @@ export var RequestProcessor = (function() {
     //Logger.vardump(request.aContentLocation);
     try {
       if (request.isInternal()) {
-        // @ifdef LOG_REQUESTS
-        Logger.debug("Allowing a request that seems to be internal. " +
-                     "Origin: " + request.originURI + ", Dest: " +
-                     request.destURI);
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.debug("Allowing a request that seems to be internal. " +
+                      "Origin: " + request.originURI + ", Dest: " +
+                      request.destURI);
+        }
         return CP_OK;
       }
 
@@ -542,11 +544,11 @@ export var RequestProcessor = (function() {
         //   milestone was Firefox 16.
         //   -> https://bugzilla.mozilla.org/show_bug.cgi?id=767134#c15
         if (request.aRequestPrincipal) {
-          // @ifdef LOG_REQUESTS
-          Logger.debug(
-              "Allowing request that appears to be a URL entered in the " +
-              "location bar or some other good explanation: " + destURI);
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug(
+                "Allowing request that appears to be a URL entered in the " +
+                "location bar or some other good explanation: " + destURI);
+          }
           removeSavedRequestsByOriginURI(destURI);
           return CP_OK;
         }
@@ -554,11 +556,11 @@ export var RequestProcessor = (function() {
 
       if (request.aRequestOrigin.scheme === "view-source") {
         let newOriginURI = originURI.split(":").slice(1).join(":");
-        // @ifdef LOG_REQUESTS
-        Logger.debug(
-            "Considering view-source origin <" + originURI + "> " +
-            "to be origin <" + newOriginURI + ">");
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.debug(
+              "Considering view-source origin <" + originURI + "> " +
+              "to be origin <" + newOriginURI + ">");
+        }
         originURI = newOriginURI;
         request.setOriginURI(originURI);
       }
@@ -567,18 +569,18 @@ export var RequestProcessor = (function() {
         var newDestURI = destURI.split(":").slice(1).join(":");
         if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
-          // @ifdef LOG_REQUESTS
-          Logger.debug(
-              "Allowing \"data:text/html\" view-source destination" +
-              " (Selection Source)");
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug(
+                "Allowing \"data:text/html\" view-source destination" +
+                " (Selection Source)");
+          }
           return CP_OK;
         } else {
-          // @ifdef LOG_REQUESTS
-          Logger.debug(
-              "Considering view-source destination <" + destURI + "> " +
-              "to be destination <" + newDestURI + ">");
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug(
+                "Considering view-source destination <" + destURI + "> " +
+                "to be destination <" + newDestURI + ">");
+          }
           destURI = newDestURI;
           request.setDestURI(destURI);
         }
@@ -625,11 +627,11 @@ export var RequestProcessor = (function() {
       // Example to test with: Click on "expand all" at
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
       if (originURI === destURI) {
-        // @ifdef LOG_REQUESTS
-        Logger.debug(
-            "Allowing (but not recording) request " +
-            "where origin is the same as the destination: " + originURI);
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.debug(
+              "Allowing (but not recording) request " +
+              "where origin is the same as the destination: " + originURI);
+        }
         return CP_OK;
       }
 
@@ -817,7 +819,7 @@ export var RequestProcessor = (function() {
         }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-        if (Prefs.isDefaultAllow()) {
+        if (Storage.isDefaultAllow()) {
           request.requestResult.isAllowed = true;
           return accept("User policy indicates both allow and block. " +
               "Using default allow policy", request);
@@ -865,7 +867,7 @@ export var RequestProcessor = (function() {
         }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-        if (Prefs.isDefaultAllow()) {
+        if (Storage.isDefaultAllow()) {
           request.requestResult.isAllowed = true;
           return accept(
               "Subscription rules indicate both allow and block. " +
@@ -889,29 +891,27 @@ export var RequestProcessor = (function() {
         return accept("Allowed by subscription policy", request);
       }
 
-      let compatibilityRules = self.getCompatibilityRules();
-      for (let rule of compatibilityRules) {
-        let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
-        let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
+      self.forEachCompatibilityRule(rule => {
+        let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
+                          true;
+        let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
         if (allowOrigin && allowDest) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
           return accept(
-              "Extension/application compatibility rule matched [" + rule[2] +
-              "]", request, true);
+              "Extension/application compatibility rule matched [" +
+              rule.info + "]", request, true);
         }
-      }
+      });
 
       if (request.aContext) {
-        let whitelistedBaseURIs = self.getWhitelistedBaseURIs();
-        let baseURI = request.aContext.baseURI;
-        if (whitelistedBaseURIs.has(baseURI)) {
+        let info = self.checkBaseUriWhitelist(request.aContext.baseURI);
+        if (info.isWhitelisted) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
-          let extName = whitelistedBaseURIs.get(baseURI);
           return accept(
-              "Extension/application compatibility rule matched [" + extName +
-              "]", request, true);
+              "Extension/application compatibility rule matched [" +
+              info.addonName + "]", request, true);
         }
       }
 
@@ -924,9 +924,9 @@ export var RequestProcessor = (function() {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
           var mappedDestUriObj = internal.mappedDestinations
                                  [destURI][mappedDest];
-          // @ifdef LOG_REQUESTS
-          Logger.debug("Checking mapped destination: " + mappedDest);
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug("Checking mapped destination: " + mappedDest);
+          }
           let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
@@ -948,8 +948,9 @@ export var RequestProcessor = (function() {
       }
 
     } catch (e) {
-      Logger.error("Fatal Error", e);
-      if (Prefs.isBlockingDisabled()) {
+      console.error("Fatal Error:");
+      console.dir(e);
+      if (Storage.isBlockingDisabled()) {
         Logger.warning("Allowing request due to internal error.");
         return CP_OK;
       }
@@ -1112,18 +1113,18 @@ export var RequestProcessor = (function() {
 
   self.getDeniedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
-    // @ifdef LOG_GETTING_SAVED_REQUESTS
-    Logger.debug("## getDeniedRequests");
-    // @endif
+    if (LOG_GETTING_SAVED_REQUESTS) {
+      Logger.debug("## getDeniedRequests");
+    }
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
   };
 
   self.getAllowedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
-    // @ifdef LOG_GETTING_SAVED_REQUESTS
-    Logger.debug("## getAllowedRequests");
-    // @endif
+    if (LOG_GETTING_SAVED_REQUESTS) {
+      Logger.debug("## getAllowedRequests");
+    }
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);
   };
@@ -1171,7 +1172,7 @@ export var RequestProcessor = (function() {
 //==============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = Utils.moduleInternal(self);
+  let internal = self.getInternal();
 
   /**
    * These are redirects that the user allowed when presented with a redirect
@@ -1233,7 +1234,7 @@ RequestProcessor = (function(self) {
       if (result.denyRulesExist() && result.allowRulesExist()) {
         let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
         result.isAllowed = conflictCanBeResolved ? shouldAllow :
-                           Prefs.isDefaultAllow();
+                           Storage.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {
@@ -1252,7 +1253,7 @@ RequestProcessor = (function(self) {
       if (result.denyRulesExist() && result.allowRulesExist()) {
         let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
         result.isAllowed = conflictCanBeResolved ? shouldAllow :
-                           Prefs.isDefaultAllow();
+                           Storage.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {
@@ -1272,14 +1273,13 @@ RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    let compatibilityRules = self.getCompatibilityRules();
-    for (let rule of compatibilityRules) {
-      let allowOrigin = rule[0] ? originURI.indexOf(rule[0]) === 0 : true;
-      let allowDest = rule[1] ? destURI.indexOf(rule[1]) === 0 : true;
+    self.forEachCompatibilityRule(rule => {
+      let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
+      let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
         return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
       }
-    }
+    });
 
     let result = internal.checkByDefaultPolicy(request);
     return result;
@@ -1306,12 +1306,12 @@ RequestProcessor = (function(self) {
     // "Decentraleyes" redirects external resources like jQuery
     // to a "data" URI.
     if (request.isInternal()) {
-      // @ifdef LOG_REQUESTS
-      Logger.debug(
-          "Allowing a redirection that seems to be internal. " +
-          "Origin: " + request.originURI + ", Dest: " +
-          request.destURI);
-      // @endif
+      if (LOG_REQUESTS) {
+        Logger.debug(
+            "Allowing a redirection that seems to be internal. " +
+            "Origin: " + request.originURI + ", Dest: " +
+            request.destURI);
+      }
       return CP_OK;
     }
 
@@ -1336,12 +1336,12 @@ RequestProcessor = (function(self) {
             "appears to be a redirected favicon request. " +
             "This will be treated as a content request.");
       } else {
-        // @ifdef LOG_REQUESTS
-        Logger.warning(
-            "** ALLOWED ** redirection from <" + originURI + "> " +
-            "to <" + destURI + ">. " +
-            "Original request is from privileged code.");
-        // @endif
+        if (LOG_REQUESTS) {
+          Logger.warning(
+              "** ALLOWED ** redirection from <" + originURI + "> " +
+              "to <" + destURI + ">. " +
+              "Original request is from privileged code.");
+        }
         return CP_OK;
       }
     }
@@ -1355,12 +1355,12 @@ RequestProcessor = (function(self) {
 
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
-      // @ifdef LOG_REQUESTS
-      Logger.warning(
-          "** ALLOWED ** redirection from <" + originURI + "> " +
-          "to <" + destURI + ">. " +
-          "Same hosts or allowed origin/destination.");
-      // @endif
+      if (LOG_REQUESTS) {
+        Logger.warning(
+            "** ALLOWED ** redirection from <" + originURI + "> " +
+            "to <" + destURI + ">. " +
+            "Same hosts or allowed origin/destination.");
+      }
       internal.recordAllowedRequest(originURI, destURI, false,
                                     request.requestResult);
       internal.allowedRedirectsReverse[destURI] = originURI;
@@ -1375,22 +1375,22 @@ RequestProcessor = (function(self) {
 
         if (internal.clickedLinks[realOrigin] &&
             internal.clickedLinks[realOrigin][originURI]) {
-          // @ifdef LOG_REQUESTS
-          Logger.debug(
-              "This redirect was from a link click." +
-              " Registering an additional click to <" + destURI + "> " +
-              "from <" + realOrigin + ">");
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug(
+                "This redirect was from a link click." +
+                " Registering an additional click to <" + destURI + "> " +
+                "from <" + realOrigin + ">");
+          }
           self.registerLinkClicked(realOrigin, destURI);
 
         } else if (internal.submittedForms[realOrigin] &&
             internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
-          // @ifdef LOG_REQUESTS
-          Logger.debug(
-              "This redirect was from a form submission." +
-              " Registering an additional form submission to <" + destURI +
-              "> " + "from <" + realOrigin + ">");
-          // @endif
+          if (LOG_REQUESTS) {
+            Logger.debug(
+                "This redirect was from a form submission." +
+                " Registering an additional form submission to <" + destURI +
+                "> " + "from <" + realOrigin + ">");
+          }
           self.registerFormSubmitted(realOrigin, destURI);
         }
       }
@@ -1400,7 +1400,7 @@ RequestProcessor = (function(self) {
 
     // The header isn't allowed, so remove it.
     try {
-      if (Prefs.isBlockingDisabled()) {
+      if (Storage.isBlockingDisabled()) {
         return CP_OK;
       }
 
@@ -1448,15 +1448,16 @@ RequestProcessor = (function(self) {
 
       internal.recordRejectedRequest(request);
 
-      // @ifdef LOG_REQUESTS
-      Logger.warning(
-          "** BLOCKED ** redirection from <" + originURI + "> " +
-          "to <" + destURI + ">.");
-      // @endif
+      if (LOG_REQUESTS) {
+        Logger.warning(
+            "** BLOCKED ** redirection from <" + originURI + "> " +
+            "to <" + destURI + ">.");
+      }
       return CP_REJECT;
     } catch (e) {
-      Logger.error("Fatal Error", e);
-      if (Prefs.isBlockingDisabled()) {
+      console.error("Fatal Error:");
+      console.dir(e);
+      if (Storage.isBlockingDisabled()) {
         Logger.warning("Allowing request due to internal error.");
         return CP_OK;
       }
@@ -1560,348 +1561,173 @@ RequestProcessor = (function(self) {
 // RequestProcessor (compatibility part)
 //==============================================================================
 
+/**
+ * Detect other installed extensions and the current application and do
+ * what is needed to allow their requests.
+ */
+
 RequestProcessor = (function(self) {
-  let conflictingExtensions = [];
-  let compatibilityRules = [];
-  let whitelistedBaseURIs = new Map();
-  let topLevelDocTranslationRules = {};
+  updateExtensionCompatibility();
+  initializeApplicationCompatibility();
 
-  // TODO: update compatibility rules etc. when addons are enabled/disabled
-  let addonListener = {
-    onDisabling: function(addon, needsRestart) {},
-    onUninstalling: function(addon, needsRestart) {},
-    onOperationCancelled: function(addon, needsRestart) {}
-  };
+  browser.management.onEnabled.addListener(updateExtensionCompatibility);
+  browser.management.onDisabled.addListener(updateExtensionCompatibility);
 
-  function init() {
-    // Detect other installed extensions and the current application and do
-    // what is needed to allow their requests.
-    initializeExtensionCompatibility();
-    initializeApplicationCompatibility();
+  //----------------------------------------------------------------------------
+  // Extensions compatibility
+  //----------------------------------------------------------------------------
 
-    AddonManager.addAddonListener(addonListener);
-  }
+  let addonIdsToNames = new Map();
+  let extRulesToIds = new MapOfSets();
+  let whitelistedBaseUrisToIds = new MapOfSets();
+  let topLevelDocTranslationRules = new Map();
 
-  // stop observers / listeners
-  function cleanup() {
-    AddonManager.removeAddonListener(addonListener);
-  }
-
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND, init);
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND, cleanup);
-
-  function initializeExtensionCompatibility() {
-    if (compatibilityRules.length !== 0) {
-      return;
-    }
-
-    var idArray = [];
-    idArray.push("greasefire@skrul.com"); // GreaseFire
-    idArray.push("{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}"); // Sage-Too
-    idArray.push("{899DF1F8-2F43-4394-8315-37F6744E6319}"); // NewsFox
-    idArray.push("brief@mozdev.org"); // Brief
-    idArray.push("foxmarks@kei.com"); // Xmarks Sync (a.k.a. Foxmarks)
-    // Norton Safe Web Lite Toolbar
-    idArray.push("{203FB6B2-2E1E-4474-863B-4C483ECCE78E}");
-    // Norton Toolbar (a.k.a. NIS Toolbar)
-    idArray.push("{0C55C096-0F1D-4F28-AAA2-85EF591126E7}");
-    // Norton Toolbar 2011.7.0.8
-    idArray.push("{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}");
-    idArray.push("{c45c406e-ab73-11d8-be73-000a95be3b12}"); // Web Developer
-    idArray.push("{c07d1a49-9894-49ff-a594-38960ede8fb9}"); // Update Scanner
-    idArray.push("FirefoxAddon@similarWeb.com"); // SimilarWeb
-    idArray.push("{6614d11d-d21d-b211-ae23-815234e1ebb5}"); // Dr. Web Link Checker
-    idArray.push("keefox@chris.tomlinson"); // KeeFox
-    idArray.push("jid1-TPTs1Z1UvUn2fA@jetpack"); // Enpass
-
-    for (let id of idArray) {
-      Logger.info("Extension check: " + id);
-      AddonManager.getAddonByID(id, initializeExtCompatCallback);
-    }
-  }
-
-  function initializeExtCompatCallback(ext) {
-    if (!ext) {
-      return;
-    }
-
-    if (ext.isActive === false) {
-      Logger.info("Extension is not active: " + ext.name);
-      return;
-    }
-
-    switch (ext.id) {
-      case "greasefire@skrul.com" : // Greasefire
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push(
-            ["file://", "http://userscripts.org/", ext.name]);
-        compatibilityRules.push(
-            ["file://", "http://static.userscripts.org/", ext.name]);
-        break;
-      case "{0f9daf7e-2ee2-4fcf-9d4f-d43d93963420}" : // Sage-Too
-      case "{899DF1F8-2F43-4394-8315-37F6744E6319}" : // NewsFox
-      case "brief@mozdev.org" : // Brief
-        Logger.info("Conflicting extension: " + ext.name);
-        compatibilityRules.push(
-            ["resource://brief-content/", null, ext.name]);
-        if (ext.id === "{899DF1F8-2F43-4394-8315-37F6744E6319}") {
-          // NewsFox
-          whitelistedBaseURIs.set("chrome://newsfox/content/newsfox.xul",
-                                  ext.name);
-        }
-        conflictingExtensions.push({
-          "id": ext.id,
-          "name": ext.name,
-          "version": ext.version
+  function updateExtensionCompatibility() {
+    browser.management.getAll().
+        then(extensionInfos => {
+          ({
+            addonIdsToNames,
+            extRulesToIds,
+            whitelistedBaseUrisToIds,
+            topLevelDocTranslationRules
+          } = extensionInfosToCompatibilityRules(extensionInfos));
+          return;
+        }).
+        catch(e => {
+          console.error("Could not update extension compatibility. Details:");
+          console.dir(e);
         });
-        break;
-      case "foxmarks@kei.com" : // Xmarks Sync
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "https://login.xmarks.com/",
-          "https://static.xmarks.com/",
-          ext.name
-        ]);
-        break;
-      case "{203FB6B2-2E1E-4474-863B-4C483ECCE78E}" : // Norton Safe Web Lite
-      case "{0C55C096-0F1D-4F28-AAA2-85EF591126E7}" : // Norton NIS Toolbar
-      case "{2D3F3651-74B9-4795-BDEC-6DA2F431CB62}" : // Norton Toolbar
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([null, "symnst:", ext.name]);
-        compatibilityRules.push([null, "symres:", ext.name]);
-        break;
-      case "{c45c406e-ab73-11d8-be73-000a95be3b12}" : // Web Developer
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "about:blank",
-          "http://jigsaw.w3.org/css-validator/validator",
-          ext.name
-        ]);
-        compatibilityRules.push(
-            ["about:blank", "http://validator.w3.org/check", ext.name]);
-        break;
-      case "{c07d1a49-9894-49ff-a594-38960ede8fb9}" : // Update Scanner
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        var orig = "chrome://updatescan/content/diffPage.xul";
-        var translated = "data:text/html";
-        topLevelDocTranslationRules[orig] = translated;
-        break;
-      case "FirefoxAddon@similarWeb.com" : // SimilarWeb
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "http://api2.similarsites.com/",
-          "http://images2.similargroup.com/",
-          ext.name
-        ]);
-        compatibilityRules.push([
-          "http://www.similarweb.com/",
-          "http://go.similarsites.com/",
-          ext.name
-        ]);
-        break;
-      case "{6614d11d-d21d-b211-ae23-815234e1ebb5}" : // Dr. Web Link Checker
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([null, "http://st.drweb.com/", ext.name]);
-        break;
+  }
 
-      case "keefox@chris.tomlinson": // KeeFox
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "resource://",
-          "ws://127.0.0.1",
-          ext.name
-        ]);
-        break;
-
-      case "jid1-TPTs1Z1UvUn2fA@jetpack": // Enpass
-        Logger.info("Using extension compatibility rules for: " + ext.name);
-        compatibilityRules.push([
-          "resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/",
-          "ws://localhost",
-          ext.name
-        ]);
-        break;
-
-      default:
-        Logger.error("Unhandled extension (id typo?): " + ext.name);
-        break;
+  function maybeForEach(aObj, aPropName, aCallback) {
+    if (aObj.hasOwnProperty(aPropName)) {
+      aObj[aPropName].forEach(aCallback);
     }
   }
+
+  function extensionInfosToCompatibilityRules(aExtensionInfos) {
+    let addonIdsToNames = new Map();
+    let extRulesToIds = new MapOfSets();
+    let whitelistedBaseUrisToIds = new MapOfSets();
+    let topLevelDocTranslationRules = new Map();
+
+    const enabledAddons = aExtensionInfos.map(addon => addon.enabled);
+    let idsToExtInfos = new Map();
+    for (let addon of enabledAddons) {
+      idsToExtInfos.set(addon.id, addon);
+      addonIdsToNames.set(addon.id, addon.name);
+    }
+
+    EXT_COMPAT_RULES.forEach(spec => {
+      // jshint -W083
+      const enabledAddonIds = spec.ids.filter(id => idsToExtInfos.has(id));
+      if (enabledAddonIds.length === 0) {
+        return;
+      }
+      maybeForEach(spec, "rules", rule => {
+        for (let id of enabledAddonIds) {
+          extRulesToIds.addToSet(rule, id);
+        }
+      });
+      maybeForEach(spec, "whitelistedBaseURIs", baseUri => {
+        for (let id of enabledAddonIds) {
+          whitelistedBaseUrisToIds.addToSet(baseUri, id);
+        }
+      });
+      maybeForEach(spec, "topLevelDocTranslationRules", rules => {
+        rules.forEach(rule => {
+          let [uriToBeTranslated, translatedUri] = rule;
+          if (topLevelDocTranslationRules.has(uriToBeTranslated)) {
+            console.error("Multiple definitions of traslation rule " +
+                `"${uriToBeTranslated}".`);
+          }
+          topLevelDocTranslationRules.set(uriToBeTranslated, {
+            extensionIds: enabledAddonIds,
+            translatedUri,
+          });
+        });
+      });
+    });
+
+    return {
+      addonIdsToNames,
+      extRulesToIds,
+      whitelistedBaseUrisToIds,
+      topLevelDocTranslationRules
+    };
+  }
+
+  //----------------------------------------------------------------------------
+  // Application compatibility
+  //----------------------------------------------------------------------------
+
+  let appCompatRules = [];
+  let appName;
 
   function initializeApplicationCompatibility() {
-    var appInfo = Cc["@mozilla.org/xre/app-info;1"].
-        getService(Ci.nsIXULAppInfo);
-
-    // Mozilla updates (doing this for all applications, not just individual
-    // applications from the Mozilla community that I'm aware of).
-    // At least the http url is needed for Firefox updates, adding the https
-    // one as well to be safe.
-    compatibilityRules.push(
-        ["http://download.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://download.mozilla.org/", null, appInfo.vendor]);
-    // There are redirects from 'addons' to 'releases' when installing addons
-    // from AMO. Adding the origin of 'releases' to be safe in case those
-    // start redirecting elsewhere at some point.
-    compatibilityRules.push(
-        ["http://addons.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://addons.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["http://releases.mozilla.org/", null, appInfo.vendor]);
-    compatibilityRules.push(
-        ["https://releases.mozilla.org/", null, appInfo.vendor]);
-    // Firefox 4 has the about:addons page open an iframe to the mozilla site.
-    // That opened page grabs content from other mozilla domains.
-    compatibilityRules.push([
-      "about:addons",
-      "https://services.addons.mozilla.org/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:addons",
-      "https://discovery.addons.mozilla.org/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://static.addons.mozilla.net/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://addons.mozilla.org/",
-      appInfo.vendor]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://www.mozilla.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://www.getpersonas.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://static-cdn.addons.mozilla.net/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://services.addons.mozilla.org/",
-      "https://addons.cdn.mozilla.net/",
-      appInfo.vendor
-    ]);
-    // Firefox 4 uses an about:home page that is locally stored but can be
-    // the origin for remote requests. See bug #140 for more info.
-    compatibilityRules.push(["about:home", null, appInfo.vendor]);
-    // Firefox Sync uses a google captcha.
-    compatibilityRules.push([
-      "https://auth.services.mozilla.com/",
-      "https://api-secure.recaptcha.net/challenge?",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://api-secure.recaptcha.net/challenge?",
-      "https://www.google.com/recaptcha/api/challenge?",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "https://auth.services.mozilla.com/",
-      "https://www.google.com/recaptcha/api/",
-      appInfo.vendor
-    ]);
-    // Firefox 13 added links from about:newtab
-    compatibilityRules.push(["about:newtab", null, appInfo.vendor]);
-
-    // Firefox
-    if (appInfo.ID === "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}") {
-      Logger.info("Application detected: " + appInfo.vendor);
-
-      // Firefox Accounts
-      compatibilityRules.push([
-        "about:accounts",
-        "https://accounts.firefox.com/",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "https://accounts.firefox.com/",
-        "https://api.accounts.firefox.com/",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "https://accounts.firefox.com/",
-        "https://accounts.cdn.mozilla.net/",
-        appInfo.vendor
-      ]);
-    }
-
-    // Firefox Hello
-    // FIXME: Along with #742, convert these rules into the following ones:
-    //   - ALLOW "about:loopconversation" -> "https://hlg.tokbox.com"
-    //   - ALLOW "about:loopconversation" -> "https://anvil.opentok.com"
-    //   - ALLOW "about:loopconversation" -> "wss://*.tokbox.com"
-    compatibilityRules.push([
-      "about:loopconversation",
-      "https://hlg.tokbox.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:loopconversation",
-      "https://anvil.opentok.com/",
-      appInfo.vendor
-    ]);
-    compatibilityRules.push([
-      "about:loopconversation",
-      "wss://",
-      appInfo.vendor
-    ]);
-
-    // Flock
-    if (appInfo.ID === "{a463f10c-3994-11da-9945-000d60ca027b}") {
-      Logger.info("Application detected: " + appInfo.vendor);
-      compatibilityRules.push(
-          ["about:myworld", "http://www.flock.com/", appInfo.vendor]);
-      compatibilityRules.push(["about:flock", null, appInfo.vendor]);
-      compatibilityRules.push([
-        "http://www.flock.com/rss",
-        "http://feeds.feedburner.com/flock",
-        appInfo.vendor
-      ]);
-      compatibilityRules.push([
-        "http://feeds.feedburner.com/",
-        "http://www.flock.com/",
-        appInfo.vendor
-      ]);
-    }
-
-    // Seamonkey
-    if (appInfo.ID === "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}") {
-      Logger.info("Application detected: Seamonkey");
-      compatibilityRules.push(["mailbox:", null, "Seamonkey"]);
-      compatibilityRules.push([null, "mailbox:", "Seamonkey"]);
-    }
+    browser.runtime.getBrowserInfo().
+        then(appInfo => {
+          appName = appInfo.name;
+          appCompatRules = getAppCompatRules(appName);
+          return;
+        }).
+        catch(e => {
+          console.error("Could not init app compatibility.");
+          console.dir(e);
+        });
   }
 
-  self.getCompatibilityRules = function() {
-    return compatibilityRules;
+  function getAppCompatRules(appName) {
+    let rules = [];
+
+    let addRules = rule => {
+      rules.push(rule);
+    };
+    APP_COMPAT_RULES.all.forEach(addRules);
+    if (APP_COMPAT_RULES.hasOwnProperty(appName)) {
+      APP_COMPAT_RULES[appName].forEach(addRules);
+    }
+
+    return rules;
+  }
+
+  //----------------------------------------------------------------------------
+  // exported functions
+  //----------------------------------------------------------------------------
+
+  self.forEachCompatibilityRule = function(aCallback) {
+    extRulesToIds.forEach((rule, addonIds) => {
+      const addonNames = addonIds.
+          map(id => addonIdsToNames.get(id)).
+          join(", ");
+      const [origin, dest] = rule;
+      aCallback.call(null, {origin, dest, info: addonNames});
+    });
+    appCompatRules.forEach(([origin, dest]) => {
+      aCallback.call(null, {origin, dest, info: appName});
+    });
   };
 
-  self.getWhitelistedBaseURIs = function() {
-    return whitelistedBaseURIs;
-  };
-
-  self.getConflictingExtensions = function() {
-    return conflictingExtensions;
+  self.checkBaseUriWhitelist = function(aBaseUri) {
+    if (!whitelistedBaseUrisToIds.has(aBaseUri)) {
+      return {isWhitelisted: false};
+    }
+    let addonId = whitelistedBaseUrisToIds.get(aBaseUri);
+    let addonName = addonIdsToNames.get(addonId);
+    return {isWhitelisted: true, addonName};
   };
 
   self.getTopLevelDocTranslation = function(uri) {
     // We're not sure if the array will be fully populated during init. This
     // is especially a concern given the async addon manager API in Firefox 4.
-    return topLevelDocTranslationRules[uri] || null;
+    if (topLevelDocTranslationRules.has(uri)) {
+      return topLevelDocTranslationRules.get(uri).translatedUri;
+    }
+    return null;
   };
 
   return self;
 }(RequestProcessor));
 
+RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {Environment, MainEnvironment} from "lib/environment";
@@ -84,8 +82,8 @@ export var ManagerForDOMContentLoaded = (function() {
     }).then((aResponse) => {
       if (typeof aResponse !== "object" ||
           typeof aResponse.blockedURIs !== "object") {
-        Logger.error("There seems to be no message " +
-                     "listener for \"notifyDocumentLoaded\".");
+        console.error("There seems to be no message " +
+                      "listener for \"notifyDocumentLoaded\".");
         return null;
       }
 

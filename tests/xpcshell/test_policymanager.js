@@ -24,6 +24,7 @@ function run_test() {
   test_0();
   test_1();
   test_2();
+  test_3();
 }
 
 
@@ -317,7 +318,7 @@ function test_2() {
  * Test both persistent and temporary rules whenever adding rules. A
  * single remove should remove from both.
  */
-function test_2() {
+function test_3() {
   var noStore = true;
   var manager = new PolicyManager();
   manager.loadUserRules();

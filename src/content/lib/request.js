@@ -21,12 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {Logger} from "lib/logger";
+import {C} from "lib/utils/constants";
 import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
+
+const {LOG_REQUESTS} = C;
 
 //==============================================================================
 // constants
@@ -116,9 +117,9 @@ Request.prototype.isInternal = function() {
   let dest = this.destUriObj;
 
   if (origin === undefined || origin === null) {
-    // @ifdef LOG_REQUESTS
-    Logger.debug("Allowing request without an origin.");
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("Allowing request without an origin.");
+    }
     return true;
   }
 
@@ -126,9 +127,9 @@ Request.prototype.isInternal = function() {
     // The spec can be empty if odd things are going on, like the Refcontrol
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
-    // @ifdef LOG_REQUESTS
-    Logger.debug("Allowing request with empty origin spec!");
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("Allowing request with empty origin spec!");
+    }
     return true;
   }
 
@@ -141,17 +142,17 @@ Request.prototype.isInternal = function() {
         // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
         origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
       )) {
-    // @ifdef LOG_REQUESTS
-    Logger.debug("Allowing internal request.");
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("Allowing internal request.");
+    }
     return true;
   }
 
   // Whitelisted internal request.
   if (WHITELISTED_INTERNAL_SCHEMES.has(dest.scheme)) {
-    // @ifdef LOG_REQUESTS
-    Logger.debug("Allowing request with a semi-internal destination.");
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug("Allowing request with a semi-internal destination.");
+    }
     return true;
   }
 
@@ -159,11 +160,11 @@ Request.prototype.isInternal = function() {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
-    // @ifdef LOG_REQUESTS
-    Logger.debug(
-        "Allowing request with no asciiHost on either origin " +
-        "<" + origin.spec + "> or dest <" + dest.spec + ">");
-    // @endif
+    if (LOG_REQUESTS) {
+      Logger.debug(
+          "Allowing request with no asciiHost on either origin " +
+          "<" + origin.spec + "> or dest <" + dest.spec + ">");
+    }
     return true;
   }
 

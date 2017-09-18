@@ -21,14 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, WinEnv, elManager, $id} from "./common";
 
 (function() {
   var {
-    Prefs,
     ManagerForPrefObservers,
+    Storage,
   } = browser.extension.getBackgroundPage();
 
   //============================================================================
@@ -49,20 +47,20 @@ import {common, WinEnv, elManager, $id} from "./common";
   });
 
   function updateDisplay() {
-    var indicate = Prefs.get("indicateBlockedObjects");
+    var indicate = Storage.get("indicateBlockedObjects");
     $id("pref-indicateBlockedObjects").checked = indicate;
     $id("indicateBlockedImages-details").hidden = !indicate;
 
     $id("pref-dontIndicateBlacklistedObjects").checked =
-        !Prefs.get("indicateBlacklistedObjects");
+        !Storage.get("indicateBlacklistedObjects");
 
     $id("pref-autoReload").checked =
-        Prefs.get("autoReload");
+        Storage.get("autoReload");
 
     $id("pref-privateBrowsingPermanentWhitelisting").checked =
-        Prefs.get("privateBrowsingPermanentWhitelisting");
+        Storage.get("privateBrowsingPermanentWhitelisting");
 
-    // if (Prefs.get("defaultPolicy.allow")) {
+    // if (Storage.get("defaultPolicy.allow")) {
     //   var word = "allow";
     // } else {
     //   var word = "block";
@@ -76,33 +74,32 @@ import {common, WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-indicateBlockedObjects"), "change",
         function(event) {
-          Prefs.set("indicateBlockedObjects",
-              event.target.checked);
-          Services.prefs.savePrefFile(null);
+          Storage.set({
+            "indicateBlockedObjects": event.target.checked,
+          });
           updateDisplay();
         });
 
     elManager.addListener(
         $id("pref-dontIndicateBlacklistedObjects"), "change",
         function(event) {
-          Prefs.set("indicateBlacklistedObjects",
-              !event.target.checked);
-          Services.prefs.savePrefFile(null);
+          Storage.set({
+            "indicateBlacklistedObjects": !event.target.checked,
+          });
           updateDisplay();
         });
 
     elManager.addListener($id("pref-autoReload"), "change", function(event) {
-      Prefs.set("autoReload", event.target.checked);
-      Services.prefs.savePrefFile(null);
+      Storage.set({"autoReload": event.target.checked});
       updateDisplay();
     });
 
     elManager.addListener(
         $id("pref-privateBrowsingPermanentWhitelisting"), "change",
         function(event) {
-          Prefs.set("privateBrowsingPermanentWhitelisting",
-              event.target.checked);
-          Services.prefs.savePrefFile(null);
+          Storage.set({
+            "privateBrowsingPermanentWhitelisting": event.target.checked,
+          });
           updateDisplay();
         });
 

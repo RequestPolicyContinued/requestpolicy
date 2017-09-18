@@ -21,13 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-"use strict";
-
 import {common, WinEnv, elManager, $id, $str} from "settings/common";
 
 (function() {
   var {
-    Prefs,
+    LegacyApi,
     PolicyManager,
     RuleUtils,
   } = browser.extension.getBackgroundPage();
@@ -255,7 +253,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
       }, SEARCH_DELAY);
     }, false);
     populateRuleTable(search.value);
-    if (Prefs.oldRulesExist()) {
+    if (LegacyApi.prefs.oldRulesExist()) {
       $("#oldrulesexist").show();
     }
 

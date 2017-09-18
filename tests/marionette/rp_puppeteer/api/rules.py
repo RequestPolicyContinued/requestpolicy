@@ -11,7 +11,7 @@ import json
 GET_BACKGROUND_PAGE = """
     Components.utils.
         import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).
-        Api.browser.extension.getBackgroundPage()
+        FakeWebExt.Api.browser.extension.getBackgroundPage()
 """
 
 

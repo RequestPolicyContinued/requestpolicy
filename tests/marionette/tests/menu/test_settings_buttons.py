@@ -18,7 +18,7 @@ URLS = {
 
 class TestSettingsButtons(RequestPolicyTestCase):
 
-    TEST_URL = "http://www.maindomain.test/img_1.html";
+    TEST_URL = "http://www.maindomain.test/img_1.html"
 
     def setUp(self):
         super(TestSettingsButtons, self).setUp()
@@ -101,8 +101,9 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._test__multiple_equivalent_urls("preferences_2", "preferences_1",
                                              "preferences")
 
-    def _test__multiple_non_equivalent_urls(self, url_id, non_equivalent_url_id,
-                                            settings_id):
+    def _test__multiple_non_equivalent_urls(
+        self, url_id, non_equivalent_url_id, settings_id
+    ):
         """Multiple settings tabs are open, but they are _not_ equivalent."""
 
         # Already on the correct tab

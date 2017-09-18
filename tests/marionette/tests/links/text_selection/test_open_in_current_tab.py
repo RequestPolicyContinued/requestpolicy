@@ -5,7 +5,7 @@
 from rp_ui_harness import RequestPolicyTestCase
 
 
-TEST_URL = "http://www.maindomain.test/link_1.html";
+TEST_URL = "http://www.maindomain.test/link_1.html"
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
 
 
@@ -13,7 +13,7 @@ class TestOpenInCurrentTab(RequestPolicyTestCase):
 
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
-        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False)
 
     def test_open_in_current_tab(self):
         with self.marionette.using_context("content"):
@@ -29,7 +29,8 @@ class TestOpenInCurrentTab(RequestPolicyTestCase):
 
         with self.marionette.using_context("chrome"):
             # perform right-click and entry selection
-            self.ctx_menu.select_entry("context-openlinkincurrent", url_wrapper)
+            self.ctx_menu.select_entry(
+                "context-openlinkincurrent", url_wrapper)
 
             tab = self.browser.tabbar.selected_tab
             self.tabs.wait_until_loaded(tab)

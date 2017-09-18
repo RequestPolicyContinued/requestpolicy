@@ -33,8 +33,13 @@ class Preferences(FxPreferences):
 
 def _pref_proprety(pref_name):
     full_pref_name = PREF_PREFIX + pref_name
-    getter = lambda self: self.prefs.get_pref(full_pref_name)
-    setter = lambda self, value: self.prefs.set_pref(full_pref_name, value)
+
+    def getter(self):
+        return self.prefs.get_pref(full_pref_name)
+
+    def setter(self, value):
+        return self.prefs.set_pref(full_pref_name, value)
+
     return property(getter, setter)
 
 

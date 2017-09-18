@@ -24,7 +24,8 @@ class Menu(BaseLib):
 
     @property
     def total_num_requests(self):
-        label_element = self._popup.find_element("id", "rpc-origin-num-requests")
+        label_element = self._popup.find_element(
+            "id", "rpc-origin-num-requests")
         if self.utils.compare_version(self.app_info.version, "49") < 0:
             # up to Firefox 48 (Bug 1272653)
             text = label_element.get_attribute("value")

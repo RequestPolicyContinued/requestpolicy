@@ -135,13 +135,13 @@ var Logger = (function() {
   function log(aLevel, aType, aMessage, aError) {
     let shouldLog = enabled && aLevel >= level && types & aType;
 
-    // #ifdef UNIT_TESTING
+    // @ifdef UI_TESTING
     let isError = aType === self.TYPE_ERROR || aLevel === self.LEVEL_SEVERE;
     if (isError) {
       // log even if logging is disabled
       shouldLog = true;
     }
-    // #endif
+    // @endif
 
     if (shouldLog) {
       let levelName = self._LEVEL_NAMES[aLevel.toString()];
@@ -191,27 +191,29 @@ var Logger = (function() {
   return self;
 }());
 
-// #ifdef UNIT_TESTING
+// @ifdef UI_TESTING
 
 //==============================================================================
-// unit testing part
+// ErrorTriggeringService
 //==============================================================================
 
 /**
- * Triggers errors for a RequestPolicy unit test.
- * It's used to test Error Detection from the unit tests.
+ * Triggers errors for a RequestPolicy UI test.
+ * It's used to test Error Detection from the UI tests.
  */
-var UnitTestObserver = (function() {
+var ErrorTriggeringService = (function() {
   let self = {};
 
   const topic = "requestpolicy-trigger-error";
 
+  const observer = {};
+
   self.startup = function() {
-    Services.obs.addObserver(self, topic, false);
+    Services.obs.addObserver(observer, topic, false);
   };
 
   self.shutdown = function() {
-    Services.obs.removeObserver(self, topic);
+    Services.obs.removeObserver(observer, topic);
   };
 
   /**
@@ -231,7 +233,7 @@ var UnitTestObserver = (function() {
     return [part1, part2];
   }
 
-  self.observe = function(aSubject, aTopic, aData) {
+  observer.observe = function(aSubject, aTopic, aData) {
     let [type, message] = splitColon(aData);
 
     if (type === "normal error") {
@@ -257,7 +259,7 @@ var UnitTestObserver = (function() {
 }());
 
 ProcessEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-                                      UnitTestObserver.startup);
+                                      ErrorTriggeringService.startup);
 ProcessEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
-                                       UnitTestObserver.shutdown);
-// #endif
+                                       ErrorTriggeringService.shutdown);
+// @endif

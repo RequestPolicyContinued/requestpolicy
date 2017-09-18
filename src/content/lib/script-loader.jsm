@@ -88,9 +88,9 @@ var ScriptLoader = (function() {
       for (let uri in importedModuleURIs) {
         if (importedModuleURIs.hasOwnProperty(uri) &&
             moduleUnloadExceptions.hasOwnProperty(uri) === false) {
-          // #ifdef LOG_SCRIPTLOADER
+          // @ifdef LOG_SCRIPTLOADER
           console.debug("[RPC] [ScriptLoader] Cu.unload(\"" + uri + "\");");
-          // #endif
+          // @endif
           try {
             Cu.unload(uri);
           } catch (e) {
@@ -127,10 +127,10 @@ var ScriptLoader = (function() {
         return scope;
       }
 
-      // #ifdef LOG_SCRIPTLOADER
+      // @ifdef LOG_SCRIPTLOADER
       console.debug("[RPC] [ScriptLoader] importModule(\"" + moduleID +
           "\") called.");
-      // #endif
+      // @endif
 
       let uri = getModuleURI(moduleID);
       try {
@@ -139,9 +139,9 @@ var ScriptLoader = (function() {
           modulesCurrentlyBeingImported[moduleID] = true;
         }
 
-        // #ifdef LOG_SCRIPTLOADER
+        // @ifdef LOG_SCRIPTLOADER
         console.debug("[RPC] [ScriptLoader] Cu.import(\"" + uri + "\");");
-        // #endif
+        // @endif
         Cu.import(uri, scope);
         importedModuleURIs[uri] = true;
 
@@ -191,23 +191,24 @@ var ScriptLoader = (function() {
     defineLazyModuleGetter: function(moduleID, names, scope) {
       scope = scope || {};
 
-      // #ifdef LOG_SCRIPTLOADER
+      // @ifdef LOG_SCRIPTLOADER
       console.debug("[RPC] [ScriptLoader] " +
           "defineLazyModuleGetter(\"" + moduleID + "\") called.");
-      // #endif
+      // @endif
       let uri = getModuleURI(moduleID);
       for (let i in names) {
         let name = names[i];
-        // #ifndef LOG_SCRIPTLOADER
+        // @ifndef LOG_SCRIPTLOADER
         XPCOMUtils.defineLazyModuleGetter(scope, name, uri);
-        // #else
+        // @endif
+        // @ifdef LOG_SCRIPTLOADER
         /* jshint -W083 */ // "don't make functions within a loop"
         XPCOMUtils.defineLazyModuleGetter(scope, name, uri, null, function() {
           console.debug("[RPC] [ScriptLoader] lazily imported \"" + name +
               "\"");
         });
         /* jshint +W083 */
-        // #endif
+        // @endif
       }
       importedModuleURIs[uri] = true;
 

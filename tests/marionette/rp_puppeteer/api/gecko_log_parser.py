@@ -119,7 +119,7 @@ class GeckoLogParser(object):
         if line.find("[RequestPolicy]") == -1 and line.find("chrome://rpcontinued/") == -1:
             return False
 
-        if line.find("jquery.min.js") != -1:
+        if line.find("/third-party/") != -1:
             return False
 
         for pattern in WHITELIST:

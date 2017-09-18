@@ -214,9 +214,9 @@ var Environment = (function() {
       return Math.random().toString(36).substr(2, 5);
     });
 
-    // #ifdef LOG_ENVIRONMENT
+    // @ifdef LOG_ENVIRONMENT
     log.debug("created new Environment \"" + self.name + "\"");
-    // #endif
+    // @endif
   }
 
   Object.defineProperty(Environment.prototype, "prefObs", {
@@ -288,9 +288,9 @@ var Environment = (function() {
           "Starting up now.");
       self.startup();
     }
-    // #ifdef LOG_ENVIRONMENT
+    // @ifdef LOG_ENVIRONMENT
     log.debug("registering inner environment");
-    // #endif
+    // @endif
     self.innerEnvs.add(aEnv);
   };
   /**
@@ -344,11 +344,11 @@ var Environment = (function() {
       //
       // ==> call the function immediately.
       f();
-      // #ifdef LOG_ENVIRONMENT
+      // @ifdef LOG_ENVIRONMENT
       let fName = f.name || "anonymous";
       log.debug("calling shutdown function immediately: " +
           "\"" + fName + "\" (" + self.name + ")");
-      // #endif
+      // @endif
     } else {
       // The opposite, i.e. the startup process did not reach the function's
       // level yet.
@@ -408,10 +408,10 @@ var Environment = (function() {
         } catch (e) {
           Cu.reportError(e);
         }
-        // #ifdef LOG_ENVIRONMENT
+        // @ifdef LOG_ENVIRONMENT
         log.debug("function called! (" + aFunctions.length +
             " functions left)");
-        // #endif
+        // @endif
       }
     }
 
@@ -430,10 +430,10 @@ var Environment = (function() {
 
       if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
         levelObj.levelState = LEVEL_STATES.PROCESSING;
-        // #ifdef LOG_ENVIRONMENT
+        // @ifdef LOG_ENVIRONMENT
         log.debug("processing level " + aLevel + " of startup (" +
             self.uid + ")");
-        // #endif
+        // @endif
 
         if (aStartupOrShutdown === "shutdown") {
           // shut down all inner environments
@@ -445,10 +445,10 @@ var Environment = (function() {
         callFunctions(levelObj.functions, aBootstrapArgs);
 
         levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
-        // #ifdef LOG_ENVIRONMENT
+        // @ifdef LOG_ENVIRONMENT
         log.debug("processing level " + aLevel + " of startup " +
             "(" + self.uid + ") finished");
-        // #endif
+        // @endif
       }
     }
 
@@ -477,7 +477,7 @@ var Environment = (function() {
       return "'" + env.name + "' (" + env.uid + ")";
     }
 
-    // #ifdef LOG_ENVIRONMENT
+    // @ifdef LOG_ENVIRONMENT
     /**
      * Log some debug information on startup or shutdown.
      *
@@ -491,7 +491,7 @@ var Environment = (function() {
                  " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
                  " No OuterEnv."));
     }
-    // #endif
+    // @endif
 
     /**
      * Actual body of the functions startup() and shutdown().
@@ -514,9 +514,9 @@ var Environment = (function() {
       } = getBootstrapMetadata(aStartupOrShutdown);
 
       if (self.envState === envStates.beforeProcessing) {
-        // #ifdef LOG_ENVIRONMENT
+        // @ifdef LOG_ENVIRONMENT
         logStartupOrShutdown.call(self, aStartupOrShutdown);
-        // #endif
+        // @endif
         functions.beforeProcessing.call(self);
 
         self.envState = envStates.duringProcessing;
@@ -535,17 +535,17 @@ var Environment = (function() {
 
     Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
-      // #ifdef LOG_ENVIRONMENT
+      // @ifdef LOG_ENVIRONMENT
       log.debug("starting up: " + self.name);
-      // #endif
+      // @endif
       bootstrap.call(self, "startup", aBootstrapArgs, aUntilLevel);
     };
 
     Environment.prototype.shutdown = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
-      // #ifdef LOG_ENVIRONMENT
+      // @ifdef LOG_ENVIRONMENT
       log.debug("shutting down: " + self.name);
-      // #endif
+      // @endif
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
 
@@ -561,11 +561,11 @@ var Environment = (function() {
   Environment.prototype.shutdownOnUnload = function(aEventTarget) {
     let self = this;
     self.elManager.addListener(aEventTarget, "unload", function() {
-      // #ifdef LOG_ENVIRONMENT
+      // @ifdef LOG_ENVIRONMENT
       log.debug("an EventTarget's `unload` function " +
           "has been called. Going to shut down Environment \"" +
           self.name + "\"");
-      // #endif
+      // @endif
       self.shutdown();
     });
   };

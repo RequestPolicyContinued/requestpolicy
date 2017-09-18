@@ -139,13 +139,14 @@ var rpService = (function() {
       "requestpolicy@requestpolicy.com",
       // Detect "RPC Legacy" (v0.5; AMO version).
       "rpcontinued@requestpolicy.org",
-      // #ifdef AMO
+      // @ifdef AMO
       // In the AMO version the non-AMO version needs to be detected.
       "rpcontinued@non-amo.requestpolicy.org",
-      // #else
+      // @endif
+      // @ifndef AMO
       // In the non-AMO version the AMO version needs to be detected.
       "rpcontinued@amo.requestpolicy.org",
-      // #endif
+      // @endif
     ]);
 
     var addonListener = {

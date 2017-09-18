@@ -13,10 +13,6 @@ SHELL := /bin/bash
 # general variables and targets
 #===============================================================================
 
-ZIP        := zip
-GIT        := /usr/bin/git
-PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-types.txt
-
 #-------------------------------------------------------------------------------
 # extension metadata
 #-------------------------------------------------------------------------------
@@ -24,6 +20,23 @@ PREPROCESS := /usr/bin/preprocess --content-types-path build/preprocess-content-
 extension_name        := requestpolicy
 amo__extension_id     := rpcontinued@amo.requestpolicy.org
 off_amo__extension_id := rpcontinued@non-amo.requestpolicy.org
+
+#-------------------------------------------------------------------------------
+# running, UI testing
+#-------------------------------------------------------------------------------
+
+# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
+app := firefox
+# default app branch
+ifeq ($(app),firefox)
+	app_branch := nightly
+else
+	app_branch := release
+endif
+binary_filename := $(app)
+app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
+
+mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 
 #-------------------------------------------------------------------------------
 # directories
@@ -34,28 +47,33 @@ build_dir_root := build
 dist_dir       := dist
 logs_dir       := logs
 
-dev_env_dir    := dev_env
-python_env_dir := $(dev_env_dir)/python
-node_env_dir   := $(dev_env_dir)/node
-browsers_dir   := $(dev_env_dir)/browsers
+dev_env_dir      := dev_env
+python_env_dir   := $(dev_env_dir)/python
+browsers_dir     := $(dev_env_dir)/browsers
 
-NPM            := npm --prefix=$(node_env_dir)
-JSCS           := $(abspath $(node_env_dir))/node_modules/.bin/jscs
-JSHINT         := $(abspath $(node_env_dir))/node_modules/.bin/jshint --extra-ext jsm
-ADDONS_LINTER  := $(abspath $(node_env_dir))/node_modules/.bin/addons-linter
+node_modules_dir := ./node_modules
 
 # create the dist directory
 $(dist_dir) $(logs_dir):
 	@mkdir -p $@
 
 #-------------------------------------------------------------------------------
-# other
+# programs and scripts
 #-------------------------------------------------------------------------------
 
-.PHONY: preprocessor
-preprocessor: $(build_dir_root)/preprocess-content-types.txt
-$(build_dir_root)/preprocess-content-types.txt:
-	echo 'JavaScript .jsm' > $@
+# system
+GIT            := /usr/bin/git
+NPM            := npm
+ZIP            := zip
+
+# nodejs
+ADDONS_LINTER  := $(abspath $(node_modules_dir))/.bin/addons-linter
+JSCS           := $(abspath $(node_modules_dir))/.bin/jscs
+JSHINT         := $(abspath $(node_modules_dir))/.bin/jshint \
+	--extra-ext jsm  --exclude '**/third-party/' --verbose
+
+# node --eval
+PREPROCESS = node --eval 'require("preprocess").preprocessFileSync("$2", "$3", {$4}, {type: "$1"});'
 
 #-------------------------------------------------------------------------------
 # helpers
@@ -82,24 +100,24 @@ define make_files
 endef
 
 .PHONY: all _xpi _files \
-	xpi unit-testing-xpi amo-beta-xpi amo-nightly-xpi \
-	unit-testing-files
+	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
+	nightly-files
 
 all: xpi
 xpi: nightly-xpi
-nightly-xpi:
+nightly-xpi: node-packages
 	$(call make_xpi,nightly)
-beta-xpi:
+beta-xpi: node-packages
 	$(call make_xpi,beta)
-unit-testing-xpi:
-	$(call make_xpi,unit_testing)
-amo-beta-xpi:
+ui-testing-xpi: node-packages
+	$(call make_xpi,ui_testing)
+amo-beta-xpi: node-packages
 	$(call make_xpi,amo_beta)
-amo-nightly-xpi:
+amo-nightly-xpi: node-packages
 	$(call make_xpi,amo_nightly)
 
-unit-testing-files:
-	$(call make_files,unit_testing)
+nightly-files: node-packages
+	$(call make_files,nightly)
 
 #-------------------------------------------------------------------------------
 # [VARIABLES] configuration of different builds
@@ -109,31 +127,36 @@ alias__nightly       := nightly
 alias__beta          := beta
 alias__amo_beta      := AMO-beta
 alias__amo_nightly   := AMO-nightly
-alias__unit_testing  := unit-testing
+alias__ui_testing    := ui-testing
 
 extension_id__nightly      := $(off_amo__extension_id)
 extension_id__beta         := $(off_amo__extension_id)
 extension_id__amo_beta     := $(amo__extension_id)
 extension_id__amo_nightly  := $(amo__extension_id)
-extension_id__unit_testing := $(off_amo__extension_id)
+extension_id__ui_testing   := $(off_amo__extension_id)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
 xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
 xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
 xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
-xpi_file__unit_testing := $(dist_dir)/$(extension_name)-unit-testing.xpi
+xpi_file__ui_testing   := $(dist_dir)/$(extension_name)-ui-testing.xpi
 
-preprocess_args__nightly      :=
-preprocess_args__beta         :=
-preprocess_args__amo_beta     := -D AMO
-preprocess_args__amo_nightly  := -D AMO
-preprocess_args__unit_testing := --keep-lines -D UNIT_TESTING
+UNIQUE_VERSION_SUFFIX         := $(shell ./scripts/get_unique_version_suffix.sh)
+preproc_context____ALL        := "UNIQUE_VERSION_SUFFIX": "$(UNIQUE_VERSION_SUFFIX)"
+preproc_context____AMO        := "AMO": "TRUE", "EXTENSION_ID": "$(amo__extension_id)"
+preproc_context____OFF_AMO    :=                "EXTENSION_ID": "$(off_amo__extension_id)"
+
+preproc_context__nightly      := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
+preproc_context__beta         := $(preproc_context____ALL), $(preproc_context____OFF_AMO)
+preproc_context__amo_beta     := $(preproc_context____ALL), $(preproc_context____AMO)
+preproc_context__amo_nightly  := $(preproc_context____ALL), $(preproc_context____AMO)
+preproc_context__ui_testing   := $(preproc_context____ALL), $(preproc_context____OFF_AMO), "UI_TESTING": "TRUE"
 
 unique_version__nightly      := yes
 unique_version__beta         := no
 unique_version__amo_beta     := no
 unique_version__amo_nightly  := yes
-unique_version__unit_testing := yes
+unique_version__ui_testing   := yes
 
 ifdef BUILD
 
@@ -144,7 +167,7 @@ ifdef BUILD
 current_build__alias           := $(alias__$(BUILD))
 current_build__extension_id    := $(extension_id__$(BUILD))
 current_build__xpi_file        := $(xpi_file__$(BUILD))
-current_build__preprocess_args := $(preprocess_args__$(BUILD))
+current_build__preproc_context := $(preproc_context__$(BUILD))
 current_build__unique_version  := $(unique_version__$(BUILD))
 
 #-------------------------------------------------------------------------------
@@ -165,7 +188,7 @@ src__copy_files := \
 		$(wildcard $(source_dir)/skin/*.css) \
 		$(wildcard $(source_dir)/skin/*.png) \
 		$(wildcard $(source_dir)/skin/*.svg) \
-		$(shell find $(source_dir) -type f -iname "jquery*.js")
+		$(shell find $(source_dir)/content/lib/third-party/ -iname "*.js")
 
 src__install_rdf := \
 	$(source_dir)/install.rdf
@@ -217,9 +240,9 @@ _files: $(build_files_including_removals)
 # [TARGETS] preprocess and/or copy files (src/ --> build/)
 #-------------------------------------------------------------------------------
 
-$(build__jspp_files) : $(current_build_dir)/% : $(source_dir)/% | preprocessor
+$(build__jspp_files) : $(current_build_dir)/% : $(source_dir)/%
 	@mkdir -p $(@D)
-	$(PREPROCESS) $(current_build__preprocess_args) $< > $@
+	$(call PREPROCESS,js,$<,$@,$(current_build__preproc_context))
 
 $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 	@mkdir -p $(@D)
@@ -229,18 +252,7 @@ $(build__copy_files) : $(current_build_dir)/% : $(source_dir)/%
 # force rebuild of install.rdf because the version suffix might change
 $(build__install_rdf) : $(current_build_dir)/% : $(source_dir)/% \
 		FORCE
-	cp --dereference $< $@
-	@if [[ "$(current_build__extension_id)" == "$(amo__extension_id)" ]]; then \
-		echo 'install.rdf: changing the Extension ID !' ; \
-		sed -i s/$(off_amo__extension_id)/$(amo__extension_id)/ $@ ; \
-		echo 'install.rdf: removing the updateURL !' ; \
-		sed -i '/<em:updateURL>.*<\/em:updateURL>/d' $@ ; \
-	fi ; \
-	if [[ "$(current_build__unique_version)" == "yes" ]]; then \
-		echo 'install.rdf: making the version unique !' ; \
-			unique_suffix=`./scripts/get_unique_version_suffix.sh` ; \
-		sed -i 's,\(</em:version>\),'$${unique_suffix}'\1,' $@ ; \
-	fi
+	$(call PREPROCESS,xml,$<,$@,$(current_build__preproc_context))
 
 #-------------------------------------------------------------------------------
 # [TARGETS] remove files/dirs no longer existant in the source
@@ -313,7 +325,7 @@ define make_other_xpi
 endef
 
 .PHONY: _other_xpi \
-	dev-helper-xpi dummy-xpi
+	dev-helper-xpi dummy-xpi webext-apply-css-xpi
 
 dev-helper-xpi:
 	$(call make_other_xpi,dev_helper)
@@ -379,7 +391,7 @@ endif
 # Development environment
 #===============================================================================
 
-PHONY: development-environment
+.PHONY: development-environment
 development-environment: python-venv node-packages firefox-all
 
 #-------------------------------------------------------------------------------
@@ -440,13 +452,13 @@ $(T_PYTHON_VIRTUALENV):
 #-------------------------------------------------------------------------------
 
 # timestamp/target files
-T_NODE_PACKAGES := $(node_env_dir)/.timestamp_packages
+T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
-$(T_NODE_PACKAGES): $(dev_env_dir)/node-packages.txt \
+$(T_NODE_PACKAGES): package.json \
 		$(call force_every,7 days,$(T_NODE_PACKAGES))
-	grep -Ev '^\#' $< | xargs $(NPM) install
+	$(NPM) install
 	touch $@
 
 #-------------------------------------------------------------------------------
@@ -533,33 +545,12 @@ clean-old-browser-tarballs: \
 		clean-old-firefox-tarballs
 
 #===============================================================================
-# Running and Testing RequestPolicy
+# Running a Browser + RequestPolicy
 #===============================================================================
-
-#-------------------------------------------------------------------------------
-# [VARIABLES] general variables
-#-------------------------------------------------------------------------------
-
-# select the default app. Can be overridden e.g. via `make run app='seamonkey'`
-app := firefox
-# default app branch
-ifeq ($(app),firefox)
-	app_branch := nightly
-else
-	app_branch := release
-endif
-binary_filename := $(app)
-app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
-
-mozrunner_prefs_ini := tests/mozrunner-prefs.ini
-
-#-------------------------------------------------------------------------------
-# run firefox
-#-------------------------------------------------------------------------------
 
 # arguments for mozrunner
 run_additional_xpis :=
-_run_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper) $(run_additional_xpis)
+_run_xpis := $(xpi_file__nightly) $(xpi_file__dev_helper) $(run_additional_xpis)
 run_additional_prefs := default
 _run_prefs  := common run $(run_additional_prefs)
 run_additional_args :=
@@ -570,28 +561,32 @@ _run_mozrunner_args := \
 	$(run_additional_args)
 
 .PHONY: run
-run: python-venv unit-testing-xpi dev-helper-xpi $(app_binary)
+run: python-venv nightly-xpi dev-helper-xpi $(app_binary)
 	$(call IN_PYTHON_ENV, \
 		mozrunner $(_run_mozrunner_args) \
 	)
 
-#-------------------------------------------------------------------------------
+
+#===============================================================================
 # Testing
-#-------------------------------------------------------------------------------
+#===============================================================================
 
 .PHONY: test-quick test
-test-quick: static-analysis marionette-quick
-test-non-quick: test-makefile marionette-non-quick
+test-quick: static-analysis ui-tests-quick
+test-non-quick: test-makefile ui-tests-non-quick
 test: test-quick test-non-quick
 
 #-------------------------------------------------------------------------------
-# unit testing: Marionette
+# UI tests
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
 # see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
 
-.PHONY: marionette
+.PHONY: ui-tests ui-tests-quick ui-tests-non-quick
+ui-tests: marionette
+ui-tests-quick: marionette-quick
+ui-tests-non-quick: marionette-non-quick
 
 logfile_prefix := $(shell date +%y%m%d-%H%M%S)-$(app_branch)-
 
@@ -608,8 +603,8 @@ marionette_logging += --log-tbpl=$(logs_dir)/$(logfile_prefix)marionette.tbpl.lo
 _marionette_port := 28$(shell printf "%03d" `printenv DISPLAY | cut -c 2-`)
 _marionette_address := localhost:$(_marionette_port)
 
-_marionette_xpis := $(xpi_file__unit_testing) $(xpi_file__dev_helper)
-_marionette_prefs := common marionette
+_marionette_xpis := $(xpi_file__ui_testing) $(xpi_file__dev_helper)
+_marionette_prefs := common ui_tests
 _marionette_mozprofile_args := \
 	$(addprefix --addon=,$(_marionette_xpis)) \
 	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_marionette_prefs))
@@ -628,7 +623,7 @@ marionette-non-quick: marionette_tests := tests/marionette/tests-non-quick.manif
 marionette-non-quick marionette-quick: \
 		python-venv \
 		$(logs_dir) \
-		unit-testing-xpi \
+		ui-testing-xpi \
 		dev-helper-xpi \
 		dummy-xpi \
 		webext-apply-css-xpi \
@@ -646,27 +641,38 @@ marionette-non-quick marionette-quick: \
 	@echo "Checking for undetected errors"
 	./scripts/check_gecko_log.py -p $(_marionette_gecko_log)
 
+#===============================================================================
+# static analysis
+#===============================================================================
+
+.PHONY: static-analysis
+static-analysis: lint check-locales
+
 #-------------------------------------------------------------------------------
-# static code analysis
+# linting
 #-------------------------------------------------------------------------------
 
-jshint_args :=
-jscs_args :=
+.PHONY: lint
+lint: addons-linter jscs jshint
 
-.PHONY: static-analysis jshint jscs addons-linter
-static-analysis: jshint jscs addons-linter check-locales
-jshint: node-packages
-	$(JSHINT) --exclude '**/jquery.min.js' $(jshint_args) src/
-	$(JSHINT) $(jshint_args) tests/xpcshell/
-	$(JSHINT) $(jshint_args) tests/helper-addons/
-jscs: node-packages
-	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
-	cd src/; $(JSCS) $(jscs_args) .
-	cd tests/xpcshell/; $(JSCS) $(jscs_args) .
-	cd tests/helper-addons/; $(JSCS) $(jscs_args) .
+.PHONY: addons-linter jscs jshint
 addons-linter: nightly-xpi node-packages
 	$(ADDONS_LINTER) $(xpi_file__nightly)
+jscs: node-packages
+	@echo '** NOTICE ** jscs is not run on "ruleset.jsm" because of its "yield" statement.'
+	cd src/;                 $(JSCS) .
+	cd tests/xpcshell/;      $(JSCS) .
+	cd tests/helper-addons/; $(JSCS) .
+jshint: node-packages
+	$(JSHINT) src/
+	$(JSHINT) tests/xpcshell/
+	$(JSHINT) tests/helper-addons/
+
+#-------------------------------------------------------------------------------
 # localization checks
+#-------------------------------------------------------------------------------
+
+.PHONY: check-locales
 include tests/l10n/Makefile
 
 #-------------------------------------------------------------------------------
@@ -691,7 +697,7 @@ mostlyclean: clean
 	@-$(call _remove_all_files_and_dirs_in,$(logs_dir))
 clean-dev-environment:
 	@-$(call _remove_all_files_and_dirs_in,$(python_env_dir))
-	@-$(call _remove_all_files_and_dirs_in,$(node_env_dir)/node_modules)
+	@-$(call _remove_all_files_and_dirs_in,$(node_modules_dir))
 	@rm -rf $(browsers_dir)/firefox
 	@# Do not remove the seamonkey "downloads" dir. Seamonkey tarballs
 	@# are put there manually.

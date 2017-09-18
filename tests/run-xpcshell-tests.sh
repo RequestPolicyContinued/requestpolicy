@@ -12,7 +12,7 @@ if [ "$1" = "--help" ]; then
   echo "      $0 test_file.js"
   echo
 else
-  (cd `dirname $0`/.. ; make unit-testing-files)
+  (cd `dirname $0`/.. ; make nightly-files)
 fi
 
 export PYTHONPATH=\

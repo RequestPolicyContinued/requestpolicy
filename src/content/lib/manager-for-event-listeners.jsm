@@ -63,11 +63,11 @@ function ManagerForEventListeners(aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
-          // #ifdef LOG_EVENT_LISTENERS
+          // @ifdef LOG_EVENT_LISTENERS
           Logger.dump("From now on new event listeners will be " +
                       "added immediately. Environment: \"" +
                       self.environment.name + "\"");
-          // #endif
+          // @endif
           self.addNewListenersImmediately = true;
           self.addAllListeners();
         });
@@ -111,11 +111,11 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     listening: false
   };
   if (self.addNewListenersImmediately) {
-    // #ifdef LOG_EVENT_LISTENERS
+    // @ifdef LOG_EVENT_LISTENERS
     Logger.dump("Immediately adding event listener for \"" +
                 listener.eventType + "\". Environment: \"" +
                 self.environment.name + "\"");
-    // #endif
+    // @endif
     addEvLis(listener);
   }
   self.listeners.push(listener);
@@ -128,11 +128,11 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   let self = this;
   for (let listener of self.listeners) {
     if (listener.listening === false) {
-      // #ifdef LOG_EVENT_LISTENERS
+      // @ifdef LOG_EVENT_LISTENERS
       Logger.dump("Lazily adding event listener for \"" +
                   listener.eventType + "\". Environment: \"" +
                   self.environment.name + "\"");
-      // #endif
+      // @endif
       addEvLis(listener);
     }
   }
@@ -145,10 +145,10 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    // #ifdef LOG_EVENT_LISTENERS
+    // @ifdef LOG_EVENT_LISTENERS
     Logger.dump("Removing event listener for \"" + listener.eventType +
                 "\". Environment: \"" + self.environment.name + "\"");
-    // #endif
+    // @endif
     listener.target.removeEventListener(listener.eventType, listener.callback,
                                         listener.useCapture);
   }

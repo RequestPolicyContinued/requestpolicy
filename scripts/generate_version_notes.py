@@ -65,7 +65,6 @@ def main():
         current=current,
         prev=prev,
         prev_version=prev_version,
-
     )
 
     uri_to_changes = (
@@ -78,6 +77,8 @@ def main():
     link_to_code = (
         """<a href="{base_uri}/tree/{current}">{current}</a>"""
     ).format(**print_kwargs)
+
+    print_str__diff = print_str__diff.format(**print_kwargs)
 
     print (
         textwrap.dedent("""\

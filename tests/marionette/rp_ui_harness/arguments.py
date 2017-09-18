@@ -41,7 +41,7 @@ class RequestPolicyUIBaseArguments(object):
       )),
       (["--logfile-stem"], dict()),
       (["--rp-addon"], dict(
-          action="store", default="RP.ui-testing"
+          action="store", default="RP.legacy.ui-testing"
       )),
     ]
 

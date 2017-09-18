@@ -149,12 +149,12 @@ amo-nightly-xpi: node-packages
 nightly-files: node-packages
 	$(call make_files,nightly)
 
-xpi_file__nightly      := $(dist_dir)/$(extension_name).xpi
-xpi_file__dev          := $(dist_dir)/$(extension_name)-dev.xpi
-xpi_file__beta         := $(dist_dir)/$(extension_name)-beta.xpi
-xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-amo-beta.xpi
-xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-amo-nightly.xpi
-xpi_file__ui_testing   := $(dist_dir)/$(extension_name)-ui-testing.xpi
+xpi_file__nightly      := $(dist_dir)/$(extension_name)-legacy-nightly.xpi
+xpi_file__dev          := $(dist_dir)/$(extension_name)-legacy-dev.xpi
+xpi_file__beta         := $(dist_dir)/$(extension_name)-legacy-beta.xpi
+xpi_file__amo_beta     := $(dist_dir)/$(extension_name)-legacy-amo-beta.xpi
+xpi_file__amo_nightly  := $(dist_dir)/$(extension_name)-legacy-amo-nightly.xpi
+xpi_file__ui_testing   := $(dist_dir)/$(extension_name)-legacy-ui-testing.xpi
 
 
 #===============================================================================
@@ -454,7 +454,7 @@ unit-tests: mocha
 
 .PHONY: mocha
 mocha: node-packages nightly-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/nightly/content/ \
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/nightly/content/ \
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \
 		tests/unit/

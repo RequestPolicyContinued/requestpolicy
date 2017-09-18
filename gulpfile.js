@@ -126,7 +126,8 @@ function _sanitizeArgsForAddTask(aFn) {
   };
 }
 
-// ensure that the function passed to "gulp.task" always returns something (e.g. a promise, a stream)
+// ensure that the function passed to "gulp.task" always returns something
+// (e.g. a promise, a stream)
 gulp.task = (function() {
   const origGulpTask = gulp.task;
   return _sanitizeArgsForAddTask(function(name, deps, fn) {
@@ -198,228 +199,229 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 const BUILDS = [
   { alias: "ui-testing",  isDev: true,  isAMO: false, version: "uniqueVersion" },
   { alias: "dev",         isDev: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",     isDev: false, isAMO: false, version: "uniqueVersion", xpiSuffix: "" },
+  { alias: "nightly",     isDev: false, isAMO: false, version: "uniqueVersion" },
   { alias: "beta",        isDev: false, isAMO: false, version: "nonUniqueVersion" },
   { alias: "amo-nightly", isDev: false, isAMO: true,  version: "uniqueVersion" },
   { alias: "amo-beta",    isDev: false, isAMO: true,  version: "nonUniqueVersion" },
 ];
 
+const EXTENSION_TYPES = [
+  "legacy",
+];
+const DEFAULT_EXTENSION_TYPE = "legacy";
+
 BUILDS.forEach(build => {
-  const buildDirRelative = `build/${build.alias}`;
-  const buildDir = `${__dirname}/${buildDirRelative}`;
+  gulp.task(`build:${build.alias}`, [`build:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
+  gulp.task(`xpi:${build.alias}`, [`xpi:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
 
-  const TASK_NAMES = {
-    ppContext: `buildData:${build.alias}:preprocessContext`,
-    version: `versionData:${build.version}`,
-  };
+  EXTENSION_TYPES.forEach(extensionType => {
+    const buildDirRelative = `build/${extensionType}/${build.alias}`;
+    const buildDir = `${__dirname}/${buildDirRelative}`;
 
-  //----------------------------------------------------------------------------
-  // clean, XPI
-  //----------------------------------------------------------------------------
+    const TASK_NAMES = {
+      ppContext: `buildData:${extensionType}:${build.alias}:preprocessContext`,
+      version: `versionData:${build.version}`,
+    };
 
-  gulp.task(`clean:${build.alias}`, () => {
-    return del([buildDir]);
-  });
+    //--------------------------------------------------------------------------
+    // clean, XPI
+    //--------------------------------------------------------------------------
 
-  gulp.task(`xpi:${build.alias}`, [`build:${build.alias}`], () => {
-    const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix : `-${build.alias}`;
-    let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
-        pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
-        pipe(gulp.dest("dist"));
-    return stream;
-  });
-
-  //----------------------------------------------------------------------------
-  // build data
-  //----------------------------------------------------------------------------
-
-  const buildData = {};
-
-  addGulpTasks(`buildData:${build.alias}`, addTask => {
-    addTask("preprocessContext", [TASK_NAMES.version], () => {
-      const context = buildData.ppContext = {
-        "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
-        "RP_HOMEPAGE_URL": config.homepage,
-        "RP_VERSION": versionData[build.version],
-      };
-
-      if (build.isAMO) { context.AMO = "TRUE"; }
-      if (build.alias === "ui-testing") { context.UI_TESTING = "TRUE"; }
-
-      return Promise.resolve();
+    gulp.task(`clean:${extensionType}:${build.alias}`, () => {
+      return del([buildDir]);
     });
-  });
 
-  //----------------------------------------------------------------------------
-  // build utilities
-  //----------------------------------------------------------------------------
-
-  const extensionType = "legacy";
-
-  const conditionalDirsRelative = [extensionType].
-      concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
-      map(name => `conditional/${name}`);
-  const conditionalDirsWithSrc = conditionalDirsRelative.
-      map(dir => `${srcDir}/${dir}`);
-
-  function mergeInConditional(path) {
-    conditionalDirsRelative.forEach(dir => {
-      path.dirname = path.dirname.replace(dir + "/", "");  // non-root files
-      path.dirname = path.dirname.replace(dir, "");  // root files, e.g. conditional/legacy/bootstrap.js
-    });
-  }
-
-  function inAnyRoot(aFilenames) {
-    const roots = [srcDir].concat(conditionalDirsWithSrc);
-    return aFilenames.reduce((accumulator, curFilename) => {
-      if (curFilename.startsWith("**")) {
-        throw new Error("paths passed must not start with '**'");
-      }
-      return accumulator.concat(roots.map(root => `${root}/${curFilename}`));
-    }, []);
-  }
-
-  //----------------------------------------------------------------------------
-  // main build tasks
-  //----------------------------------------------------------------------------
-
-  addGulpTasks(`build:${build.alias}`, [`clean:${build.alias}`], (addBuildTask, buildTaskPrefix) => {
-    addBuildTask("copiedFiles", () => {
-      let files = [
-        "README",
-        "LICENSE",
-        "content/**/*.css",
-        "content/**/*.html",
-        "content/lib/third-party/**/*.js",
-        "skin/*.css",
-        "skin/*.png",
-        "skin/*.svg",
-      ];
-      switch (extensionType) {
-        case "legacy":
-          files = files.concat([
-            "chrome.manifest",
-            "content/**/*.xul",
-            "locale/*/*.dtd",
-            "locale/*/*.properties",
-          ]);
-          break;
-      }
-      files = inAnyRoot(files);
-      let stream = gulp.src(files, { base: srcDir }).
-          pipe(rename(mergeInConditional)).
-          pipe(gulp.dest(buildDir));
+    gulp.task(`xpi:${extensionType}:${build.alias}`,
+              [`build:${extensionType}:${build.alias}`],
+              () => {
+      const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix :
+                        `-${extensionType}-${build.alias}`;
+      let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
+          pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
+          pipe(gulp.dest("dist"));
       return stream;
     });
 
-    addBuildTask("manifest-json", [TASK_NAMES.ppContext], () => {
-      let file;
-      switch (extensionType) {
-        case "webextension":
-          file = "manifest.json";
-          break;
-        case "legacy":
-          file = "content/bootstrap/data/manifest.json";
-          break;
-      }
-      file = inAnyRoot([file]);
-      let stream = gulp.src(file, { base: srcDir }).
-          pipe(rename(mergeInConditional)).
-          pipe(preprocess({ context: buildData.ppContext })).
-          pipe(gulp.dest(buildDir));
-      return stream;
+    //--------------------------------------------------------------------------
+    // build data
+    //--------------------------------------------------------------------------
+
+    const buildData = {};
+
+    addGulpTasks(`buildData:${extensionType}:${build.alias}`, addTask => {
+      addTask("preprocessContext", [TASK_NAMES.version], () => {
+        const context = buildData.ppContext = {
+          "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
+          "EXTENSION_TYPE": extensionType,
+          "RP_HOMEPAGE_URL": config.homepage,
+          "RP_VERSION": versionData[build.version],
+        };
+
+        if (build.isAMO) { context.AMO = "TRUE"; }
+        if (build.alias === "ui-testing") { context.UI_TESTING = "TRUE"; }
+
+        return Promise.resolve();
+      });
     });
 
-    // ---
+    //--------------------------------------------------------------------------
+    // build utilities
+    //--------------------------------------------------------------------------
 
-    function addPreprocessedFilesBuildTask(aFileType, aFiles) {
-      return addBuildTask(`${aFileType}TypePreprocessedFiles`, [TASK_NAMES.ppContext], () => {
-        let files = inAnyRoot(aFiles);
-        let stream = gulp.src(files, { base: srcDir }).
-            pipe(rename(mergeInConditional)).
-            pipe(preprocess({ context: buildData.ppContext, extension: aFileType })).
-            pipe(gulp.dest(buildDir));
-        return stream;
+    const conditionalDirsRelative = [extensionType].
+        concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
+        map(name => `conditional/${name}`);
+    const conditionalDirsWithSrc = conditionalDirsRelative.
+        map(dir => `${srcDir}/${dir}`);
+
+    function mergeInConditional(path) {
+      conditionalDirsRelative.forEach(dir => {
+        // non-root files
+        path.dirname = path.dirname.replace(dir + "/", "");
+        // root files, e.g. conditional/legacy/bootstrap.js
+        path.dirname = path.dirname.replace(dir, "");
       });
     }
 
-    addPreprocessedFilesBuildTask("xml", [
-    ].concat(
-      extensionType === "webextension" ? [
-      ] : extensionType === "legacy" ? [
-        "install.rdf",
-      ] : []
-    ));
+    function inAnyRoot(aFilenames) {
+      const roots = [srcDir].concat(conditionalDirsWithSrc);
+      return aFilenames.reduce((accumulator, curFilename) => {
+        if (curFilename.startsWith("**")) {
+          throw new Error("paths passed must not start with '**'");
+        }
+        return accumulator.concat(roots.map(root => `${root}/${curFilename}`));
+      }, []);
+    }
 
-    addPreprocessedFilesBuildTask("js", [
-    ].concat(
-      extensionType === "webextension" ? [
-        "manifest.json",
-      ] : extensionType === "legacy" ? [
-        "content/bootstrap/data/manifest.json",
-      ] : []
-    ));
+    //----------------------------------------------------------------------------
+    // main build tasks
+    //----------------------------------------------------------------------------
 
-    // ---
+    addGulpTasks(`build:${extensionType}:${build.alias}`,
+                 [`clean:${extensionType}:${build.alias}`],
+                 (addBuildTask, buildTaskPrefix) => {
+      addBuildTask("copiedFiles", () => {
+        let files = [
+          "README",
+          "LICENSE",
+          "content/**/*.css",
+          "content/lib/third-party/**/*.js",
+          "skin/*.css",
+          "skin/*.png",
+          "skin/*.svg",
+        ];
+        switch (extensionType) {
+          case "legacy":
+            files = files.concat([
+              "chrome.manifest",
+              "content/**/*.xul",
+              "locale/*/*.dtd",
+              "locale/*/*.properties",
+            ]);
+            break;
+        }
+        files = inAnyRoot(files);
+        let stream = gulp.src(files, { base: srcDir }).
+            pipe(rename(mergeInConditional)).
+            pipe(gulp.dest(buildDir));
+        return stream;
+      });
 
-    const tsProject = ts.createProject("tsconfig.json", {
-      rootDir: srcDir,
-      outDir: srcDir, // virtual (!) output directory
-      // <hack>
-      // For whatever inexplicable reason, "content/settings/common.js" and
-      // "content/ui/request-log/tree-view.js" are removed by tsProject() if
-      // `isolatedModules` is false. However, when the two files are renamed
-      // to "common_.js" and "tree-view_.js", respectively, the files are created
-      // correctly in the build directory. This is very likely a bug in the
-      // "gulp-typescript" module.
-      isolatedModules: true,
-      // </hack>
-    });
+      // ---
 
-    addBuildTask("js", [TASK_NAMES.ppContext], () => {
-      let files = [`content/**/*.*(js|jsm|ts)`];
-      switch (extensionType) {
-        case "legacy":
-          files.push(`bootstrap.js`);
-          break;
+      function addPreprocessedFilesBuildTask(aFileType, aFiles) {
+        return addBuildTask(`${aFileType}TypePreprocessedFiles`, [TASK_NAMES.ppContext], () => {
+          let files = inAnyRoot(aFiles);
+          let stream = gulp.src(files, { base: srcDir }).
+              pipe(rename(mergeInConditional)).
+              pipe(preprocess({ context: buildData.ppContext, extension: aFileType })).
+              pipe(gulp.dest(buildDir));
+          return stream;
+        });
       }
-      files = inAnyRoot(files);
-      files.push("!**/third-party/**/*");
 
-      let stream = gulp.src(files, { base: srcDir }).
-          pipe(replace(
-              /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
-              (match, fn, stringDelim) => {
-                let argsPrefix = stringDelim === "" ?
-                    `"[RequestPolicy] " + ` :
-                    `${stringDelim}[RequestPolicy] `;
-                return `console.${fn}(${argsPrefix}`;
-              }
-          )).
-          pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
-          pipe(gulpif(build.isDev, sourcemaps.init()));
+      addPreprocessedFilesBuildTask("xml", [
+        "content/**/*.html",
+      ].concat(
+        extensionType === "webextension" ? [
+        ] : extensionType === "legacy" ? [
+          "install.rdf",
+        ] : []
+      ));
 
-      stream = mergeStream(
-          // non-jsm files
-          stream.
-              pipe(fileFilter.include({isModule: true})).
-              pipe(tsProject()).js,
+      addPreprocessedFilesBuildTask("js", [
+      ].concat(
+        extensionType === "webextension" ? [
+          "manifest.json",
+        ] : extensionType === "legacy" ? [
+          "content/bootstrap/data/manifest.json",
+        ] : []
+      ));
 
-          // jsm files
-          stream.
-              pipe(fileFilter.include({isModule: false})));
+      // ---
 
-      stream = stream.
-          // WORKAROUND NOTICE:
-          // `mergeInConditional` is applied _after_ typescript because I had
-          // sourcemapping issues when it was the other way around.
-          // (gulp-typescript did not correctly respect the previously created
-          // sourcemap.)
-          pipe(rename(mergeInConditional)).
+      const tsProject = ts.createProject("tsconfig.json", {
+        rootDir: srcDir,
+        outDir: srcDir, // virtual (!) output directory
+        // <hack>
+        // For whatever inexplicable reason, "content/settings/common.js" and
+        // "content/ui/request-log/tree-view.js" are removed by tsProject() if
+        // `isolatedModules` is false. However, when the two files are renamed
+        // to "common_.js" and "tree-view_.js", respectively, the files are created
+        // correctly in the build directory. This is very likely a bug in the
+        // "gulp-typescript" module.
+        isolatedModules: true,
+        // </hack>
+      });
 
-          pipe(gulpif(build.isDev, sourcemaps.write({ destPath: buildDir, sourceRoot: `file://${srcDir}` }))).
-          pipe(gulp.dest(buildDir));
-      return stream;
+      addBuildTask("js", [TASK_NAMES.ppContext], () => {
+        let files = [`content/**/*.*(js|jsm|ts)`];
+        switch (extensionType) {
+          case "legacy":
+            files.push(`bootstrap.js`);
+            break;
+        }
+        files = inAnyRoot(files);
+        files.push("!**/third-party/**/*");
+
+        let stream = gulp.src(files, { base: srcDir }).
+            pipe(replace(
+                /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
+                (match, fn, stringDelim) => {
+                  let argsPrefix = stringDelim === "" ?
+                      `"[RequestPolicy] " + ` :
+                      `${stringDelim}[RequestPolicy] `;
+                  return `console.${fn}(${argsPrefix}`;
+                }
+            )).
+            pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
+            pipe(gulpif(build.isDev, sourcemaps.init()));
+
+        stream = mergeStream(
+            // non-jsm files
+            stream.
+                pipe(fileFilter.include({isModule: true})).
+                pipe(tsProject()).js,
+
+            // jsm files
+            stream.
+                pipe(fileFilter.include({isModule: false})));
+
+        stream = stream.
+            // WORKAROUND NOTICE:
+            // `mergeInConditional` is applied _after_ typescript because I had
+            // sourcemapping issues when it was the other way around.
+            // (gulp-typescript did not correctly respect the previously created
+            // sourcemap.)
+            pipe(rename(mergeInConditional)).
+
+            pipe(gulpif(build.isDev, sourcemaps.write({
+              destPath: buildDir,
+              sourceRoot: `file://${srcDir}`,
+            }))).
+            pipe(gulp.dest(buildDir));
+        return stream;
+      });
     });
   });
 });

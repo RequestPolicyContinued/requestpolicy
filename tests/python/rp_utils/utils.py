@@ -30,15 +30,13 @@ def create_profile(addons, pref_categories, profile=None):
 def xpi_filename(id):
     parts = id.split(".")
     xpi_type = parts[0]
-    xpi_id = parts[1]
+    other_parts = parts[1:]
 
     if xpi_type == "RP":
-        if xpi_id == "nightly":
-            xpi_id = ""
-        else:
-            xpi_id = "-" + xpi_id
+        xpi_id = "-" + "-".join(other_parts)
         return "{}/{}{}.xpi".format(C.DIST_DIR, C.EXTENSION_NAME, xpi_id)
     if xpi_type == "helper":
+        xpi_id = other_parts[0]
         return "{}/rpc-{}-helper.xpi".format(C.DIST_DIR, xpi_id)
     # other
     return "{}/{}.xpi".format(C.DIST_DIR, xpi_id)

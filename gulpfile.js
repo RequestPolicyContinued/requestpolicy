@@ -199,7 +199,7 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 const BUILDS = [
   { alias: "ui-testing",  isDev: true,  isAMO: false, version: "uniqueVersion" },
   { alias: "dev",         isDev: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",     isDev: false, isAMO: false, version: "uniqueVersion", xpiSuffix: "" },
+  { alias: "nightly",     isDev: false, isAMO: false, version: "uniqueVersion" },
   { alias: "beta",        isDev: false, isAMO: false, version: "nonUniqueVersion" },
   { alias: "amo-nightly", isDev: false, isAMO: true,  version: "uniqueVersion" },
   { alias: "amo-beta",    isDev: false, isAMO: true,  version: "nonUniqueVersion" },

@@ -126,7 +126,8 @@ function _sanitizeArgsForAddTask(aFn) {
   };
 }
 
-// ensure that the function passed to "gulp.task" always returns something (e.g. a promise, a stream)
+// ensure that the function passed to "gulp.task" always returns something
+// (e.g. a promise, a stream)
 gulp.task = (function() {
   const origGulpTask = gulp.task;
   return _sanitizeArgsForAddTask(function(name, deps, fn) {
@@ -221,8 +222,11 @@ BUILDS.forEach(build => {
     return del([buildDir]);
   });
 
-  gulp.task(`xpi:${build.alias}`, [`build:${build.alias}`], () => {
-    const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix : `-${build.alias}`;
+  gulp.task(`xpi:${build.alias}`,
+            [`build:${build.alias}`],
+            () => {
+    const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix :
+                      `-${build.alias}`;
     let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
         pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
         pipe(gulp.dest("dist"));
@@ -264,8 +268,10 @@ BUILDS.forEach(build => {
 
   function mergeInConditional(path) {
     conditionalDirsRelative.forEach(dir => {
-      path.dirname = path.dirname.replace(dir + "/", "");  // non-root files
-      path.dirname = path.dirname.replace(dir, "");  // root files, e.g. conditional/legacy/bootstrap.js
+      // non-root files
+      path.dirname = path.dirname.replace(dir + "/", "");
+      // root files, e.g. conditional/legacy/bootstrap.js
+      path.dirname = path.dirname.replace(dir, "");
     });
   }
 
@@ -283,7 +289,9 @@ BUILDS.forEach(build => {
   // main build tasks
   //----------------------------------------------------------------------------
 
-  addGulpTasks(`build:${build.alias}`, [`clean:${build.alias}`], (addBuildTask, buildTaskPrefix) => {
+  addGulpTasks(`build:${build.alias}`,
+               [`clean:${build.alias}`],
+               (addBuildTask, buildTaskPrefix) => {
     addBuildTask("copiedFiles", () => {
       let files = [
         "README",
@@ -417,7 +425,10 @@ BUILDS.forEach(build => {
           // sourcemap.)
           pipe(rename(mergeInConditional)).
 
-          pipe(gulpif(build.isDev, sourcemaps.write({ destPath: buildDir, sourceRoot: `file://${srcDir}` }))).
+          pipe(gulpif(build.isDev, sourcemaps.write({
+            destPath: buildDir,
+            sourceRoot: `file://${srcDir}`,
+          }))).
           pipe(gulp.dest(buildDir));
       return stream;
     });

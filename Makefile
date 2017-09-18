@@ -454,7 +454,7 @@ unit-tests: mocha
 
 .PHONY: mocha
 mocha: node-packages nightly-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/nightly/content/ \
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/nightly/content/ \
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \
 		tests/unit/

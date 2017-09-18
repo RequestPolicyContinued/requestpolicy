@@ -206,10 +206,10 @@ const BUILDS = [
 ];
 
 BUILDS.forEach(build => {
-  const buildDirRelative = `build/${build.alias}`;
-  const buildDir = `${__dirname}/${buildDirRelative}`;
-
   const extensionType = "legacy";
+
+  const buildDirRelative = `build/${extensionType}/${build.alias}`;
+  const buildDir = `${__dirname}/${buildDirRelative}`;
 
   const TASK_NAMES = {
     ppContext: `buildData:${build.alias}:preprocessContext`,

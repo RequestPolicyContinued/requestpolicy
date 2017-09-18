@@ -24,11 +24,11 @@
 import {RawRuleset} from "lib/ruleset";
 import {FileUtil} from "lib/utils/files";
 
-//==============================================================================
+// =============================================================================
 // RulesetStorage
-//==============================================================================
+// =============================================================================
 
-export var RulesetStorage = (function() {
+export const RulesetStorage = (function() {
   let self = {};
 
   /**
@@ -38,8 +38,9 @@ export var RulesetStorage = (function() {
    */
   self.loadRawRulesetFromFile = function(filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
-    // TODO: get a stream and use the mozilla json interface to decode from stream.
-    var policyFile = FileUtil.getRPUserDir("policies");
+    // TODO: get a stream and use the mozilla json interface to
+    //       decode from stream.
+    const policyFile = FileUtil.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {
@@ -53,10 +54,10 @@ export var RulesetStorage = (function() {
     // existed or not. This is a bad implementation.
     // TODO: solve this mess
     let str = FileUtil.fileToString(policyFile);
-    //let str;
-    //if (policyFile.exists()) {
-    //  str = FileUtil.fileToString(policyFile);
-    //}
+    // let str;
+    // if (policyFile.exists()) {
+    //   str = FileUtil.fileToString(policyFile);
+    // }
     return new RawRuleset(str);
   };
 
@@ -68,7 +69,8 @@ export var RulesetStorage = (function() {
   self.saveRawRulesetToFile = function(policy, filename,
                                         subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
-    // TODO: get a stream and use the mozilla json interface to encode to stream.
+    // TODO: get a stream and use the mozilla json interface to
+    //       encode to stream.
     let policyFile;
     if (subscriptionListName) {
       policyFile = FileUtil.getRPUserDir("policies",
@@ -81,4 +83,4 @@ export var RulesetStorage = (function() {
   };
 
   return self;
-}());
+})();

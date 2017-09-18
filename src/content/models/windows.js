@@ -22,9 +22,9 @@
 
 import {MapOfSets} from "lib/classes/map-of-sets";
 
-//==============================================================================
+// =============================================================================
 // LoadAndUnloadListener
-//==============================================================================
+// =============================================================================
 
 function LoadAndUnloadListener(callback) {
   let windows = new Set();
@@ -72,6 +72,7 @@ function LoadAndUnloadListener(callback) {
 
   this.listenTo = function(eventName, window) {
     if (eventName !== "load" && eventName !== "unload") {
+      // eslint-disable-next-line no-throw-literal
       throw "incorrect event type!";
     }
     windows.add(window);
@@ -88,28 +89,29 @@ function LoadAndUnloadListener(callback) {
   };
 }
 
-//==============================================================================
+// =============================================================================
 // Windows
-//==============================================================================
+// =============================================================================
 
-export var Windows = (function() {
+export const Windows = (function() {
   let self = {};
 
   self.forEachOpenWindow = function(aCallback, aThisArg=null) {
     // Apply a function to all open browser windows
     let windows = Services.wm.getEnumerator("navigator:browser");
     while (windows.hasMoreElements()) {
+      // eslint-disable-next-line new-cap
       let window = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
       aCallback.call(aThisArg, window);
     }
   };
 
   return self;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // Windows (listening functionality)
-//==============================================================================
+// =============================================================================
 
 (function(self) {
   let topicsToListeners = new MapOfSets();
@@ -131,20 +133,22 @@ export var Windows = (function() {
 
   let windowMediatorListener = {
     onOpenWindow: function(xulWindow) {
+      // eslint-disable-next-line new-cap
       let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
           .getInterface(Ci.nsIDOMWindow);
       loadAndUnloadListener.listenTo("load", window);
     },
     onCloseWindow: function(xulWindow) {},
-    onWindowTitleChange: function(xulWindow, newTitle) {}
+    onWindowTitleChange: function(xulWindow, newTitle) {},
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // exported functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.addListener = function(aEventType, aListener) {
     if (aEventType !== "load" && aEventType !== "unload") {
+      // eslint-disable-next-line no-throw-literal
       throw "incorrect event type!";
     }
     topicsToListeners.addToSet(aEventType, aListener);
@@ -154,9 +158,9 @@ export var Windows = (function() {
     topicsToListeners.deleteFromSet(aEventType, aListener);
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // bootstrap functions, called by the controller
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let listening = false;
 
@@ -180,4 +184,4 @@ export var Windows = (function() {
   };
 
   return self;
-}(Windows));
+})(Windows);

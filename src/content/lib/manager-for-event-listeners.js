@@ -26,14 +26,16 @@ import {C} from "lib/utils/constants";
 
 const {LOG_EVENT_LISTENERS} = C;
 
-//==============================================================================
+// =============================================================================
 // ManagerForEventListeners
-//==============================================================================
+// =============================================================================
 
 /**
  * This class provides an interface to multiple "Event Targets" which takes
  * care of adding/removing event listeners at startup/shutdown.
  * Every instance of this class is bound to an environment.
+ *
+ * @param {Environment} aEnv
  */
 export function ManagerForEventListeners(aEnv) {
   let self = this;
@@ -54,7 +56,7 @@ export function ManagerForEventListeners(aEnv) {
 
   // Note: the startup functions have to be defined *last*, as they might get
   //       called immediately.
-  if (!!aEnv) {
+  if (aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
@@ -74,7 +76,7 @@ export function ManagerForEventListeners(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (!!Logger) {
+    if (Logger) {
       console.error(
           "No Environment was specified for a new ManagerForEventListeners! " +
           "This means that the listeners won't be removed!");
@@ -103,7 +105,7 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
     eventType: aEventType,
     callback: aCallback,
     useCapture: !!aUseCapture,
-    listening: false
+    listening: false,
   };
   if (self.addNewListenersImmediately) {
     if (LOG_EVENT_LISTENERS) {

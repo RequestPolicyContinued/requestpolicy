@@ -31,7 +31,7 @@ import {common, WinEnv, elManager} from "./common";
     rpService,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "yourPolicy",
@@ -48,7 +48,7 @@ import {common, WinEnv, elManager} from "./common";
     "subscriptionAllowFunctionalityDescription",
     "subscriptionAllowEmbeddedDescription",
     "subscriptionAllowMozillaDescription",
-    "subscriptionAllowExtensionsDescription"
+    "subscriptionAllowExtensionsDescription",
   ];
 
   $(function() {
@@ -115,7 +115,7 @@ import {common, WinEnv, elManager} from "./common";
       "allow_functionality": {},
       "allow_mozilla": {},
       "allow_sameorg": {},
-      "deny_trackers": {}
+      "deny_trackers": {},
     };
     for (var subName in available) {
       var el = getInputElement(subName);
@@ -129,7 +129,7 @@ import {common, WinEnv, elManager} from "./common";
     // call updateDisplay() every time a subscription is added or removed
     WinEnv.obMan.observe([
       SUBSCRIPTION_ADDED_TOPIC,
-      SUBSCRIPTION_REMOVED_TOPIC
+      SUBSCRIPTION_REMOVED_TOPIC,
     ], updateDisplay);
   };
-}());
+})();

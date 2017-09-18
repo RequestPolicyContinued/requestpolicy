@@ -30,7 +30,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     Storage,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "basic",
@@ -50,7 +50,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "hint",
     "menuSortingHint",
     "menuIndicatedInformation",
-    "menuIndicateNumRequests"
+    "menuIndicateNumRequests",
   ];
 
   $(function() {
@@ -89,8 +89,9 @@ import {common, WinEnv, elManager, $id} from "./common";
     $id("pref-prefetch.preconnections.restoreDefaultOnUninstall").checked =
         Storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
-    // TODO: Create a class which acts as an API for preferences and which ensures
-    // that the returned value is always a valid value for "string" preferences.
+    // TODO: Create a class which acts as an API for preferences and which
+    // ensures that the returned value is always a valid value for "string"
+    // preferences.
     var sorting = Storage.get("menu.sorting");
 
     if (sorting === $id("sortByNumRequests").value) {
@@ -207,4 +208,4 @@ import {common, WinEnv, elManager, $id} from "./common";
       "root/ network.http.speculative-parallel-limit",
     ], updateDisplay);
   };
-}());
+})();

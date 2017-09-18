@@ -29,9 +29,9 @@ import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 
 const {LOG_REQUESTS} = C;
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 export const REQUEST_TYPE_NORMAL = 1;
 export const REQUEST_TYPE_REDIRECT = 2;
@@ -68,9 +68,9 @@ const WHITELISTED_RESOURCE_URIS = new Set([
   "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
-//==============================================================================
+// =============================================================================
 // Request
-//==============================================================================
+// =============================================================================
 
 export function Request(originURI, destURI, requestType) {
   // TODO: save a nsIURI objects here instead of strings
@@ -220,9 +220,9 @@ Request.prototype.isInternal = function() {
   return false;
 };
 
-//==============================================================================
+// =============================================================================
 // NormalRequest
-//==============================================================================
+// =============================================================================
 
 export function NormalRequest(aContentType, aContentLocation, aRequestOrigin,
     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
@@ -252,13 +252,13 @@ NormalRequest.prototype.constructor = Request;
 Object.defineProperty(NormalRequest.prototype, "originUriObj", {
   get: function() {
     return this.aRequestOrigin;
-  }
+  },
 });
 
 Object.defineProperty(NormalRequest.prototype, "destUriObj", {
   get: function() {
     return this.aContentLocation;
-  }
+  },
 });
 
 NormalRequest.prototype.setOriginURI = function(originURI) {
@@ -274,7 +274,7 @@ NormalRequest.prototype.setDestURI = function(destURI) {
 Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
   get: function() {
     return this.aContentLocation.spec;
-  }
+  },
 });
 
 NormalRequest.prototype.detailsToString = function() {
@@ -315,6 +315,8 @@ NormalRequest.prototype.isInternal = function() {
 
 /**
  * Get the content window (nsIDOMWindow) related to this request.
+ *
+ * @return {?Window}
  */
 NormalRequest.prototype.getContentWindow = function() {
   let context = this.aContext;
@@ -329,13 +331,16 @@ NormalRequest.prototype.getContentWindow = function() {
 
   let win;
   try {
+    // eslint-disable-next-line new-cap
     win = context.QueryInterface(Ci.nsIDOMWindow);
   } catch (e) {
     let doc;
     try {
+      // eslint-disable-next-line new-cap
       doc = context.QueryInterface(Ci.nsIDOMDocument);
     } catch (e) {
       try {
+        // eslint-disable-next-line new-cap
         doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
       } catch (e) {
         return null;
@@ -347,11 +352,13 @@ NormalRequest.prototype.getContentWindow = function() {
 };
 
 /**
- * Get the chrome window (nsIDOMWindow) related to this request.
+ * Get the chrome window related to this request.
+ *
+ * @return {?nsIDOMWindow}
  */
 NormalRequest.prototype.getChromeWindow = function() {
   let contentWindow = this.getContentWindow();
-  if (!!contentWindow) {
+  if (contentWindow) {
     return WindowUtils.getChromeWindow(contentWindow);
   } else {
     return null;
@@ -359,7 +366,9 @@ NormalRequest.prototype.getChromeWindow = function() {
 };
 
 /**
- * Get the <browser> (nsIDOMXULElement) related to this request.
+ * Get the <browser> related to this request.
+ *
+ * @return {nsIDOMXULElement}
  */
 NormalRequest.prototype.getBrowser = function() {
   let context = this.aContext;
@@ -371,9 +380,9 @@ NormalRequest.prototype.getBrowser = function() {
   }
 };
 
-//==============================================================================
+// =============================================================================
 // RedirectRequest
-//==============================================================================
+// =============================================================================
 
 export function RedirectRequest(aOldChannel, aNewChannel, aFlags) {
   let oldChannel = new HttpChannelWrapper(aOldChannel);
@@ -390,29 +399,29 @@ RedirectRequest.prototype.constructor = Request;
 Object.defineProperty(RedirectRequest.prototype, "browser", {
   get: function() {
     return this._oldChannel.browser;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "loadFlags", {
   get: function() {
     return this._oldChannel._httpChannel.loadFlags;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
   get: function() {
     return this._oldChannel.uri;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "destUriObj", {
   get: function() {
     return this._newChannel.uri;
-  }
+  },
 });
 
 Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
   get: function() {
     return this._newChannel.uri.spec;
-  }
+  },
 });

@@ -28,7 +28,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     MainEnvironment,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   // create a new Environment for this window
   var WinEnv = new Environment(MainEnvironment, "WinEnv");
@@ -46,7 +46,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     "about",
     "help",
     "basic",
-    "advanced"
+    "advanced",
   ];
 
   var $str = StringUtils.$str;
@@ -56,6 +56,7 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
   common.localize = function(stringNames) {
     stringNames.forEach(function(name) {
       $("[data-string=\"" + name + "\"]").each(function() {
+        // eslint-disable-next-line no-invalid-this
         $(this).text($str(name));
       });
     });
@@ -70,8 +71,8 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
     WinEnv: WinEnv,
     elManager: elManager,
     $id: $id,
-    $str: $str
+    $str: $str,
   };
-}());
+})();
 
 export {common, WinEnv, elManager, $id, $str};

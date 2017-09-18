@@ -24,7 +24,7 @@
 
 const env = str => str[0] !== "undefined";
 
-export var C = {
+export const C = {
   LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */`,
   LOG_EVENT_LISTENERS: env`/* @echo LOG_EVENT_LISTENERS */`,
   LOG_FLAG_STATE: env`/* @echo LOG_FLAG_STATE */`,

@@ -29,7 +29,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     Storage,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "yourPolicy",
@@ -41,7 +41,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "learnMore",
     "allowRequestsToTheSameDomain",
     "differentSubscriptionsAreAvailable",
-    "manageSubscriptions"
+    "manageSubscriptions",
   ];
 
   $(function() {
@@ -99,4 +99,4 @@ import {common, WinEnv, elManager, $id} from "./common";
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);
   };
-}());
+})();

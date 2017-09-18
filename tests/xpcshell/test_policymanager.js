@@ -3,20 +3,18 @@ Components.utils.import("chrome://rpcontinued/content/lib/utils/domains.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/policy-manager.jsm");
 
-// jscs:disable validateIndentation
-
-var config = {
+const config = {
   "subscriptions": {
     "foo": {
       "name": "The Foo RP whitelist and blacklist.",
       "updateUrls": {
-        "http://foo.com/rp.json": {}
+        "http://foo.com/rp.json": {},
       },
       "infoUrls": {
-        "About": "http://foo.com/about.html"
-      }
-    }
-  }
+        "About": "http://foo.com/about.html",
+      },
+    },
+  },
 };
 
 
@@ -32,7 +30,7 @@ function test_0() {
   copyRulesetFileToProfile("user_0.json", "user.json");
   copyRulesetFileToProfile("foo.json");
 
-  var manager = new PolicyManager();
+  const manager = new PolicyManager();
   manager.loadUserRules(config);
 
   for (let i in manager._rulesets) {
@@ -44,11 +42,11 @@ function test_0() {
   // "user", "temp", and "foo".
   do_check_eq(Object.keys(manager._rulesets).length, 3);
 
-  var result;
+  let result;
 
   // This is allowed because of https to http.
-  var origin = DomainUtil.getUriObject("https://example.com/");
-  var dest = DomainUtil.getUriObject("http://foo.com/");
+  let origin = DomainUtil.getUriObject("https://example.com/");
+  let dest = DomainUtil.getUriObject("http://foo.com/");
 
   result = manager.checkRequest(origin, dest);
   do_check_false(result.isDenied());
@@ -87,17 +85,17 @@ function test_0() {
  * Test only persistent (non-temporary) rules.
  */
 function test_1() {
-  var noStore = true;
-  var manager = new PolicyManager();
+  const noStore = true;
+  const manager = new PolicyManager();
   manager.loadUserRules();
 
-  var origin = DomainUtil.getUriObject("http://www.foo.com/");
-  var dest = DomainUtil.getUriObject("https://www.example.com/");
+  const origin = DomainUtil.getUriObject("http://www.foo.com/");
+  const dest = DomainUtil.getUriObject("https://www.example.com/");
 
-  var rules = {"origin":         {"o": {"h": "*.foo.com"}},
-               "dest":           {"d": {"h": "www.example.com"}},
-               "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                  "d": {"h": "www.example.com"}}};
+  const rules = {"origin":         {"o": {"h": "*.foo.com"}},
+                 "dest":           {"d": {"h": "www.example.com"}},
+                 "origin-to-dest": {"o": {"h": "*.foo.com"},
+                                    "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
@@ -105,7 +103,7 @@ function test_1() {
     // manager.loadUserRules();
 
     print("Starting: " + i);
-    var rawRule = rules[i];
+    const rawRule = rules[i];
     // Add a rule we just added.
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
@@ -202,17 +200,17 @@ function test_1() {
  * Test only temporary rules.
  */
 function test_2() {
-  var noStore = true;
-  var manager = new PolicyManager();
+  const noStore = true;
+  const manager = new PolicyManager();
   manager.loadUserRules();
 
-  var origin = DomainUtil.getUriObject("http://www.foo.com/");
-  var dest = DomainUtil.getUriObject("https://www.example.com/");
+  const origin = DomainUtil.getUriObject("http://www.foo.com/");
+  const dest = DomainUtil.getUriObject("https://www.example.com/");
 
-  var rules = {"origin":         {"o": {"h": "*.foo.com"}},
-               "dest":           {"d": {"h": "www.example.com"}},
-               "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                  "d": {"h": "www.example.com"}}};
+  const rules = {"origin":         {"o": {"h": "*.foo.com"}},
+                 "dest":           {"d": {"h": "www.example.com"}},
+                 "origin-to-dest": {"o": {"h": "*.foo.com"},
+                                    "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
@@ -220,7 +218,7 @@ function test_2() {
     // manager.loadUserRules();
 
     print("Starting: " + i);
-    var rawRule = rules[i];
+    const rawRule = rules[i];
     // Add a rule we just added.
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
@@ -319,17 +317,17 @@ function test_2() {
  * single remove should remove from both.
  */
 function test_3() {
-  var noStore = true;
-  var manager = new PolicyManager();
+  const noStore = true;
+  const manager = new PolicyManager();
   manager.loadUserRules();
 
-  var origin = DomainUtil.getUriObject("http://www.foo.com/");
-  var dest = DomainUtil.getUriObject("https://www.example.com/");
+  const origin = DomainUtil.getUriObject("http://www.foo.com/");
+  const dest = DomainUtil.getUriObject("https://www.example.com/");
 
-  var rules = {"origin":         {"o": {"h": "*.foo.com"}},
-               "dest":           {"d": {"h": "www.example.com"}},
-               "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                  "d": {"h": "www.example.com"}}};
+  const rules = {"origin":         {"o": {"h": "*.foo.com"}},
+                 "dest":           {"d": {"h": "www.example.com"}},
+                 "origin-to-dest": {"o": {"h": "*.foo.com"},
+                                    "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
@@ -337,7 +335,7 @@ function test_3() {
     // manager.loadUserRules();
 
     print("Starting: " + i);
-    var rawRule = rules[i];
+    const rawRule = rules[i];
     // Add a rule as both persistent and temporary.
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);

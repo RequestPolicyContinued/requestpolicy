@@ -26,14 +26,17 @@ import {C} from "lib/utils/constants";
 
 const {LOG_MESSAGE_LISTENERS} = C;
 
-//==============================================================================
+// =============================================================================
 // ManagerForMessageListeners
-//==============================================================================
+// =============================================================================
 
 /**
  * This class provides an interface to a "Message Manager" which takes
  * care of adding/removing message listeners at startup/shutdown.
  * Every instance of this class is bound to an environment and a MessageManager.
+ *
+ * @param {Environment} aEnv
+ * @param {nsIMessageListenerManager} aMM
  */
 export function ManagerForMessageListeners(aEnv, aMM) {
   let self = this;
@@ -54,7 +57,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
 
   // Note: the startup functions have to be defined *last*, as they might get
   //       called immediately.
-  if (!!aEnv) {
+  if (aEnv) {
     self.environment.addStartupFunction(
         Environment.LEVELS.INTERFACE,
         function() {
@@ -74,7 +77,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (!!Logger) {
+    if (Logger) {
       console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
@@ -85,7 +88,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   self.mm = aMM;
 
   if (!self.mm) {
-    if (!!Logger) {
+    if (Logger) {
       Logger.warning("No Message Manager was specified " +
                      "for a new ManagerForMessageListeners!");
     }
@@ -125,6 +128,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     messageID: C.MM_PREFIX + aMessageName,
     callback: function(aMessage) {
       if (self.environment.envState === Environment.ENV_STATES.SHUTTING_DOWN) {
+        // eslint-disable-next-line no-console
         console.debug("[RequestPolicy] Listener for " + aMessageName +
             " has been called, but RP is already shutting down.");
         if (typeof aCallbackOnShutdown === "function") {
@@ -134,7 +138,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
       }
       return aCallback(aMessage);
     },
-    listening: false
+    listening: false,
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {
@@ -175,23 +179,23 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
   let self = this;
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
-    //if (typeof listener.callback == 'undefined') {
-    //  console.error("Can't remove message listener '" +
-    //                 'for "' + listener.messageName + '", the callback ' +
-    //                 'is undefined!');
-    //  continue;
-    //}
+    // if (typeof listener.callback == 'undefined') {
+    //   console.error("Can't remove message listener '" +
+    //                  'for "' + listener.messageName + '", the callback ' +
+    //                  'is undefined!');
+    //   continue;
+    // }
     if (LOG_MESSAGE_LISTENERS) {
       Logger.debug(
           "Removing message listener for \"" + listener.messageName + "\".");
     }
-    //try {
+    // try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);
-    //} catch (e) {
-    //  console.error('Failed to remove message listener ' +
-    //                 'for "' + listener.messageName + '". ' +
-    //                 'Env "' + self.environment.uid + '" (' +
-    //                 self.environment.name + '). Error was: ' + e, e);
-    //}
+    // } catch (e) {
+    //   console.error('Failed to remove message listener ' +
+    //                  'for "' + listener.messageName + '". ' +
+    //                  'Env "' + self.environment.uid + '" (' +
+    //                  self.environment.name + '). Error was: ' + e, e);
+    // }
   }
 };

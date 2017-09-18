@@ -26,27 +26,24 @@ import {Logger} from "lib/logger";
 
 let CustomizableUI = null;
 if (Info.isAustralis) {
-  // FIXME: Re-enable (W126) when JSHint issue #2775 is fixed.
-  /* jshint -W126 */
   ({CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm",
                                 {}));
-  /* jshint +W126 */
 }
 
-//==============================================================================
+// =============================================================================
 // ToolbarButtonController
-//==============================================================================
+// =============================================================================
 
-export var ToolbarButtonController = (function() {
+export const ToolbarButtonController = (function() {
   let self = {};
 
   const toolbarButtonId = "rpcontinuedToolbarButton";
 
   let isAustralis = Info.isAustralis;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Case 1: Australis (Firefox >= 29)
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   (function() {
     if (!isAustralis) {
@@ -55,14 +52,14 @@ export var ToolbarButtonController = (function() {
 
     function removeToolbarButtonFromAustralis() {
       const {
-        attributes: {id}
+        attributes: {id},
       } = XULUtils.xulTrees.toolbarbutton[0];
       CustomizableUI.destroyWidget(id);
     }
 
     function addToolbarButtonToAustralis() {
       const {
-        attributes: {id, label, tooltiptext}
+        attributes: {id, label, tooltiptext},
       } = XULUtils.xulTrees.toolbarbutton[0];
 
       CustomizableUI.createWidget({
@@ -74,7 +71,7 @@ export var ToolbarButtonController = (function() {
           // Bad smell
           let win = aEvent.target.ownerDocument.defaultView;
           win.rpcontinued.overlay.toggleMenu();
-        }
+        },
       });
     }
 
@@ -85,14 +82,14 @@ export var ToolbarButtonController = (function() {
     self.shutdown = function() {
       removeToolbarButtonFromAustralis();
     };
-  }());
+  })();
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Case 2: non-Australis
   //   - Firefox < 29
   //   - SeaMonkey
   //   - Pale Moon
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   (function() {
     if (isAustralis) {
@@ -102,13 +99,13 @@ export var ToolbarButtonController = (function() {
     function addToolbarButtonToNavBar(win) {
       // SeaMonkey users have to use a toolbar button now. At the moment I can't
       // justify a bunch of special cases to support the statusbar when such a
-      // tiny number of users have seamonkey and I can't even be sure that many of
-      // those users want a statusbar icon.
-      //if (!Info.isFirefox) {
-      //  Logger.info(
-      //    "Not performing toolbar button check: not Firefox.");
-      //  return;
-      //}
+      // tiny number of users have seamonkey and I can't even be sure that many
+      // of those users want a statusbar icon.
+      // if (!Info.isFirefox) {
+      //   Logger.info(
+      //     "Not performing toolbar button check: not Firefox.");
+      //   return;
+      // }
       let doc = win.document;
 
       let isFirstRun = false;
@@ -163,7 +160,7 @@ export var ToolbarButtonController = (function() {
     self.unloadFromWindow = function(win) {
       XULUtils.removeTreeElementsFromWindow(win, "toolbarbutton");
     };
-  }());
+  })();
 
   return self;
-}());
+})();

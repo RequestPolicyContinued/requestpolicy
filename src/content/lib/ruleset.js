@@ -25,9 +25,9 @@ import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {C} from "lib/utils/constants";
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 function dprint(msg) {
   Logger.info("[POLICY] " + msg);
@@ -37,6 +37,7 @@ function dwarn(msg) {
   Logger.warning("[POLICY] " + msg);
 }
 
+/* eslint-disable max-len */
 /*
 // We expect JSON data to represent the following data structure.
 exampleRawDataObj = {
@@ -64,6 +65,7 @@ exampleRawDataObj = {
   }
 };
 */
+/* eslint-enable max-len */
 
 /*
 // currently unused.
@@ -94,9 +96,9 @@ function dump(arr, level=0) {
 }
 */
 
-//==============================================================================
+// =============================================================================
 // RawRuleset
-//==============================================================================
+// =============================================================================
 
 export function RawRuleset(jsonData) {
   this._metadata = {"version": 1};
@@ -149,42 +151,40 @@ RawRuleset.prototype = {
   _addEntryToRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry.o;
-    var d = entry.d;
-    var rules;
-    var r;
+    const o = entry.o;
+    const d = entry.d;
+    // eslint-disable-next-line no-unused-vars
+    let rules;
+    let r;
 
-    //dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
+    // dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
     if (o && d) {
       [rules, r] = this._addEntryHelper(o, policy);
       r.initDestinations();
       [rules, r] = this._addEntryHelper(d, r.destinations);
-      //r.destinationRuleAction = ruleAction;
+      // r.destinationRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
       }
-
     } else if (o && !d) {
       [rules, r] = this._addEntryHelper(o, policy);
-      //r.originRuleAction = ruleAction;
+      // r.originRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowOrigin = true;
       } else {
         r.denyOrigin = true;
       }
-
     } else if (!o && d) {
       [rules, r] = this._addEntryHelper(d, policy);
-      //r.destinationRuleAction = ruleAction;
+      // r.destinationRuleAction = ruleAction;
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = true;
       } else {
         r.denyDestination = true;
       }
-
     } else {
       // TODO: Issue warning about bad entry and return or throw error.
       return;
@@ -192,16 +192,17 @@ RawRuleset.prototype = {
   },
 
   ruleExists: function(ruleAction, ruleData) {
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
 
-    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[actionStr];
-    for (var i in entries) {
-      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
+    const ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
+    const entries = this._entries[actionStr];
+    for (let i in entries) {
+      const curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr === curRuleStr) {
         return true;
       }
@@ -214,13 +215,16 @@ RawRuleset.prototype = {
    * |Ruleset| optionally provided as the policy argument.
    *
    * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
+   * @param {RuleSpec} ruleData
+   * @param {Ruleset} policy
    */
   addRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
-    //dprint("addRule: adding entry");
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    // dprint("addRule: adding entry");
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
 
@@ -250,10 +254,10 @@ RawRuleset.prototype = {
   _removeEntryFromRuleset: function(entry, ruleAction, policy) {
     // TODO: add an "entryPart" format verifier/normalizer.
     //    notes: 'pathPre' => path prefix (must start with "/")
-    var o = entry.o;
-    var d = entry.d;
-    var rules;
-    var r;
+    const o = entry.o;
+    const d = entry.d;
+    let rules;
+    let r;
 
     // TODO: refactor like done with _addEntryToRuleset
 
@@ -289,15 +293,15 @@ RawRuleset.prototype = {
       // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      //dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
+      // dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
       if (ruleAction === C.RULE_ACTION_ALLOW) {
         r.allowDestination = null;
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else if (o && !d) {
       if (o.h) {
         let originEntry = policy.getHost(o.h);
@@ -321,9 +325,9 @@ RawRuleset.prototype = {
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyOrigin = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else if (!o && d) {
       if (d.h) {
         let destEntry = policy.getHost(d.h);
@@ -347,9 +351,9 @@ RawRuleset.prototype = {
       } else if (ruleAction === C.RULE_ACTION_DENY) {
         r.denyDestination = null;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw "Invalid rule type: " + ruleAction;
       }
-
     } else {
       // TODO: Issue warning about bad entry and return or throw error.
       return;
@@ -357,24 +361,28 @@ RawRuleset.prototype = {
   },
 
   /**
-   * Removes the rule from the entries of this |RawRuleset| instance as well as the
-   * |Ruleset| optionally provided as the policy argument.
+   * Removes the rule from the entries of this |RawRuleset|
+   * instance as well as the |Ruleset| optionally provided
+   * as the policy argument.
    *
    * @param {RULE_ACTION_ALLOW|RULE_ACTION_DENY} ruleAction
+   * @param {RuleSpec} ruleData
+   * @param {Ruleset} policy
    */
   removeRule: function(ruleAction, ruleData, policy) {
     // XXX: remove loggings
-    //dprint("removeRule: removing entry");
-    var actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
+    // dprint("removeRule: removing entry");
+    const actionStr = ruleAction === C.RULE_ACTION_ALLOW ? "allow" :
         ruleAction === C.RULE_ACTION_DENY ? "deny" : "";
     if (!actionStr) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid ruleAction: " + ruleAction;
     }
-    var ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
-    var entries = this._entries[actionStr];
-    var removeIndex = false;
-    for (var i in entries) {
-      var curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
+    const ruleStr = Ruleset.rawRuleToCanonicalString(ruleData);
+    const entries = this._entries[actionStr];
+    let removeIndex = false;
+    for (let i in entries) {
+      const curRuleStr = Ruleset.rawRuleToCanonicalString(entries[i]);
       if (ruleStr === curRuleStr) {
         // |i| is a string which will cause bugs when we use it in arithmetic
         // expressions below. Why does this form of iterator give us string
@@ -384,9 +392,10 @@ RawRuleset.prototype = {
       }
     }
     if (removeIndex !== false) {
-      var begin = entries.slice(0, removeIndex);
-      var end = entries.slice(Number(removeIndex) + 1);
+      const begin = entries.slice(0, removeIndex);
+      const end = entries.slice(Number(removeIndex) + 1);
       if (begin.length + end.length + 1 !== entries.length) {
+        // eslint-disable-next-line no-throw-literal
         throw "Bad slicing (Probably bad math or not reading the docs).";
       }
       this._entries[actionStr] = begin.concat(end);
@@ -400,21 +409,24 @@ RawRuleset.prototype = {
   /**
    * Returns a |Ruleset| object initialized to reflect the contents of this
    * |RawRuleset|.
+   *
+   * @param {string} name
+   * @return {Ruleset}
    */
   toRuleset: function(name) {
-    var policy = new Ruleset(name);
+    const policy = new Ruleset(name);
 
-    for (var actionStr in this._entries) {
-      //dprint("actionStr: " + actionStr);
+    for (let actionStr in this._entries) {
+      // dprint("actionStr: " + actionStr);
       if (actionStr !== "allow" && actionStr !== "deny") {
         dwarn("Invalid entry type: " + actionStr);
         continue;
       }
-      var ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
+      const ruleAction = actionStr === "allow" ? C.RULE_ACTION_ALLOW :
           C.RULE_ACTION_DENY;
-      var entryArray = this._entries[actionStr];
-      for (var i in entryArray) {
-        //dprint("toRuleset: adding entry");
+      const entryArray = this._entries[actionStr];
+      for (let i in entryArray) {
+        // dprint("toRuleset: adding entry");
         this._addEntryToRuleset(entryArray[i], ruleAction, policy);
       }
     }
@@ -424,31 +436,37 @@ RawRuleset.prototype = {
 
   _checkDataObj: function(dataObj) {
     if (!("metadata" in dataObj)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'metadata' key";
     }
     if (!("version" in dataObj.metadata)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'version' key";
     }
     if (dataObj.metadata.version !== 1) {
+      // eslint-disable-next-line no-throw-literal
       throw "Wrong metadata version. Expected 1, was " +
           dataObj.metadata.version;
     }
     if (!("entries" in dataObj)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Invalid policy data: no 'entries' key";
     }
   },
 
   /**
    * Initializes this |RawRuleset| from JSON data.
+   *
+   * @param {string} data
    */
   _fromJSON: function(data) {
     // TODO: sanity check imported data, decide whether to ignore unrecognized
     // keys.
     // TODO: wrap in try/catch block
-    var dataObj = JSON.parse(data);
+    const dataObj = JSON.parse(data);
 
-    //dprint(typeof dataObj);
-    //dprint(dump(dataObj));
+    // dprint(typeof dataObj);
+    // dprint(dump(dataObj));
     this._checkDataObj(dataObj);
     this._metadata = dataObj.metadata;
     this._entries = dataObj.entries;
@@ -458,17 +476,19 @@ RawRuleset.prototype = {
    * Returns a simple object representing this |RawRuleset|. This function
    * is automatically invoked when |JSON.stringify(rawRulesetObj)| is called and
    * the result is passed through stringify before being returned.
+   *
+   * @return {Object}
    */
   toJSON: function() {
     // Note: unrecognized keys in the metadata and entries are preserved.
-    var tempObj = {"metadata": this._metadata, "entries": this._entries};
+    const tempObj = {"metadata": this._metadata, "entries": this._entries};
     return tempObj;
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // Rules
-//==============================================================================
+// =============================================================================
 
 function Rules() {
   /**
@@ -494,7 +514,7 @@ Rules.prototype = {
     return this._rules.length === 0;
   },
 
-  [Symbol.iterator]: function*() {
+  [Symbol.iterator]: function* () {
     yield* this._rules;
   },
 
@@ -517,12 +537,12 @@ Rules.prototype = {
     }
     this._rules.push(newRule);
     return newRule;
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // Rule
-//==============================================================================
+// =============================================================================
 
 /*
  * Semantics of rules:
@@ -576,8 +596,8 @@ Rule.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
@@ -608,8 +628,8 @@ Rule.prototype = {
    */
   isMatch: function(uriObj, endpointSpecHasHost) {
     if (this.scheme && this.scheme !== "*" && this.scheme !== uriObj.scheme) {
-      //dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
-      //       this.scheme + "')");
+      // dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
+      //        this.scheme + "')");
       return false;
     }
 
@@ -629,7 +649,8 @@ Rule.prototype = {
           ) {
             // Port Match is OK, so continue
           } else {
-            //dprint("isMatch: wrong port (not the port specified by the rule)");
+            // dprint(
+            //     "isMatch: wrong port (not the port specified by the rule)");
             return false;
           }
         }
@@ -638,7 +659,8 @@ Rule.prototype = {
           // Both host and port are undefined, so skip the default-port-check.
         } else {
           if (!DomainUtil.hasStandardPort(uriObj)) {
-            //dprint("isMatch: wrong port (not the default port and the rule assumes default)");
+            // dprint("isMatch: wrong port (not the default port and the " +
+            //     "rule assumes default)");
             return false;
           }
         }
@@ -651,25 +673,27 @@ Rule.prototype = {
     if (this.path) {
       if (typeof this.path === "string") {
         if (uriObj.path.indexOf(this.path) !== 0) {
-          //dprint("isMatch: wrong path (string): " + this.path + " vs " + uriObj.path);
+          // dprint("isMatch: wrong path (string): " +
+          //     this.path + " vs " + uriObj.path);
           return false;
         }
       } else if (!this.path.test(uriObj.path)) {
-        //dprint("isMatch: wrong path (regex)");
+        // dprint("isMatch: wrong path (regex)");
         return false;
       }
     }
-    //dprint("isMatch: MATCH");
+    // dprint("isMatch: MATCH");
     return true;
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // DomainEntry
-//==============================================================================
+// =============================================================================
 
 function DomainEntry(name, fullName, higher) {
   if (typeof name !== "string" && name !== null) {
+    // eslint-disable-next-line no-throw-literal
     throw "Invalid type: DomainEntry name must be a string or null.";
   }
   this._name = name;
@@ -696,21 +720,22 @@ DomainEntry.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
     if (this.rules) {
       this.rules.print(depth + 1);
     }
-    for (var entryName in this._lower) {
+    for (let entryName in this._lower) {
       this._lower[entryName].print(depth + 1);
     }
   },
 
   addLowerLevel: function(name, entry) {
     if (this._lower.hasOwnProperty(name)) {
+      // eslint-disable-next-line no-throw-literal
       throw "ENTRY_ALREADY_EXISTS";
     }
     this._lower[name] = entry;
@@ -721,12 +746,12 @@ DomainEntry.prototype = {
       return this._lower[name];
     }
     return null;
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // IPAddressEntry
-//==============================================================================
+// =============================================================================
 
 function IPAddressEntry(address) {
   this.address = address;
@@ -740,8 +765,8 @@ IPAddressEntry.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
@@ -752,12 +777,12 @@ IPAddressEntry.prototype = {
 
   deleteAllRules: function() {
 
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // Ruleset
-//==============================================================================
+// =============================================================================
 
 export function Ruleset(name) {
   this._name = name || null;
@@ -769,9 +794,9 @@ export function Ruleset(name) {
 }
 
 // TODO: remove
-//if (!print) {
-//  var print;
-//}
+// if (!print) {
+//   var print;
+// }
 
 Ruleset.prototype = {
   /**
@@ -803,13 +828,13 @@ Ruleset.prototype = {
 
   print: function(depth) {
     depth = depth || 0;
-    var indent = "";
-    for (var i = 0; i < depth; i++) {
+    let indent = "";
+    for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
     dprint(indent + this.toString());
     this._domain.print(depth + 1);
-    //this._ipAddr.print(depth + 1);
+    // this._ipAddr.print(depth + 1);
     this.rules.print(depth + 1);
   },
 
@@ -827,12 +852,12 @@ Ruleset.prototype = {
   },
 
   _getDomain: function(domain) {
-    var parts = domain.split(".");
-    var curLevel = this._domain;
-    var nextLevel;
-    var fullName = "";
-    for (var i = parts.length - 1; i >= 0; i--) {
-      //dprint(parts[i]);
+    const parts = domain.split(".");
+    let curLevel = this._domain;
+    let nextLevel;
+    let fullName = "";
+    for (let i = parts.length - 1; i >= 0; i--) {
+      // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
@@ -844,17 +869,17 @@ Ruleset.prototype = {
   },
 
   _addDomain: function(domain) {
-    var parts = domain.split(".");
-    var curLevel = this._domain;
-    var nextLevel;
-    var fullName = "";
-    for (var i = parts.length - 1; i >= 0; i--) {
-      //dprint(parts[i]);
+    const parts = domain.split(".");
+    let curLevel = this._domain;
+    let nextLevel;
+    let fullName = "";
+    for (let i = parts.length - 1; i >= 0; i--) {
+      // dprint(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
         nextLevel = new DomainEntry(parts[i], fullName, curLevel);
-        //dprint(nextLevel);
+        // dprint(nextLevel);
         curLevel.addLowerLevel(parts[i], nextLevel);
       }
       curLevel = nextLevel;
@@ -864,6 +889,7 @@ Ruleset.prototype = {
 
   getHost: function(host) {
     if (!host) {
+      // eslint-disable-next-line no-throw-literal
       throw "INVALID_HOST";
     }
     if (DomainUtil.isIPAddress(host)) {
@@ -875,6 +901,7 @@ Ruleset.prototype = {
 
   addHost: function(host) {
     if (!host) {
+      // eslint-disable-next-line no-throw-literal
       throw "INVALID_HOST";
     }
     if (DomainUtil.isIPAddress(host)) {
@@ -884,17 +911,15 @@ Ruleset.prototype = {
     }
   },
 
-  // jscs:disable jsDoc // https://github.com/jsdoc3/jsdoc/issues/555
   /**
    * Yields all matching hosts, that is, DomainEntry or IPAddressEntry
    * objects. For domains, this is in top-down order. For
    * example, first "com", then "foo", then "www".
    *
    * @param {string} host The host to get matching entries for.
-   * @return {Generator<DomainEntry|IPAddressEntry>}
+   * @yield {Generator<DomainEntry|IPAddressEntry>}
    */
-  // jscs:enable jsDoc
-  getHostMatches: function*(host) {
+  getHostMatches: function* (host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -911,19 +936,19 @@ Ruleset.prototype = {
     }
 
     if (DomainUtil.isIPAddress(host)) {
-      var addrEntry = this._ipAddr[host];
+      const addrEntry = this._ipAddr[host];
       if (addrEntry) {
         yield [addrEntry, true];
       }
     } else {
-      var parts = host.split(".");
-      var curLevel = this._domain;
+      const parts = host.split(".");
+      let curLevel = this._domain;
       // Start by checking for a wildcard at the highest level.
-      var nextLevel = curLevel.getLowerLevel("*");
+      let nextLevel = curLevel.getLowerLevel("*");
       if (nextLevel) {
         yield [nextLevel, true];
       }
-      for (var i = parts.length - 1; i >= 0; i--) {
+      for (let i = parts.length - 1; i >= 0; i--) {
         nextLevel = curLevel.getLowerLevel(parts[i]);
         if (!nextLevel) {
           break;
@@ -947,10 +972,10 @@ Ruleset.prototype = {
    *     and "deny" rules, respectively.
    */
   check: function(origin, dest) {
-    var matchedAllowRules = [];
-    var matchedDenyRules = [];
-    var originHost;
-    var destHost;
+    const matchedAllowRules = [];
+    const matchedDenyRules = [];
+    let originHost;
+    let destHost;
     try {
       originHost = origin.host;
     } catch (e) {
@@ -962,84 +987,94 @@ Ruleset.prototype = {
       destHost = "";
     }
 
-    //dprint("Checking origin rules and origin-to-destination rules.");
+    // dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
     for (let [entry, originSpecHasHost] of this.getHostMatches(originHost)) {
-      //dprint(entry);
+      // dprint(entry);
       for (let rule of entry.rules) {
-        //dprint("Checking rule: " + rule);
+        // dprint("Checking rule: " + rule);
         let ruleMatchedOrigin = rule.isMatch(origin, originSpecHasHost);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
-          //dprint("ALLOW origin by rule " + entry + " " + rule);
+          // dprint("ALLOW origin by rule " + entry + " " + rule);
           matchedAllowRules.push(["origin", entry, rule]);
         }
         if (rule.denyOrigin && ruleMatchedOrigin) {
-          //dprint("DENY origin by rule " + entry + " " + rule);
+          // dprint("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
 
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
-          //dprint("There are origin-to-destination rules using this origin rule.");
+          // dprint("There are origin-to-destination " +
+          //     "rules using this origin rule.");
           for (let [destEntry, destSpecHasHost]
                of rule.destinations.getHostMatches(destHost)) {
-            //dprint(destEntry);
+            // dprint(destEntry);
             for (let destRule of destEntry.rules) {
-              //dprint("Checking rule: " + rule);
+              // dprint("Checking rule: " + rule);
               if (destRule.allowDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                //dprint("ALLOW origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("ALLOW origin-to-dest by rule origin " +
+                //     entry + " " + rule + " to dest " + destEntry +
+                //     " " + destRule);
                 matchedAllowRules.push([
                   "origin-to-dest",
                   entry,
                   rule,
                   destEntry,
-                  destRule
+                  destRule,
                 ]);
               }
               if (destRule.denyDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                //dprint("DENY origin-to-dest by rule origin " + entry + " " + rule + " to dest " + destEntry + " " + destRule);
+                // dprint("DENY origin-to-dest by rule origin " +
+                //     entry + " " + rule + " to dest " + destEntry +
+                //     " " + destRule);
                 matchedDenyRules.push([
                   "origin-to-dest",
                   entry,
                   rule,
                   destEntry,
-                  destRule
+                  destRule,
                 ]);
               }
             }
           }
-          //dprint("Done checking origin-to-destination rules using this origin rule.");
+          // dprint("Done checking origin-to-destination " +
+          //     "rules using this origin rule.");
         } // end: if (rule.destinations)
       }
     }
 
-    //dprint("Checking dest rules.");
+    // dprint("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
     for (let [entry, destSpecHasHost] of this.getHostMatches(destHost)) {
-      //dprint(entry);
+      // dprint(entry);
       for (let rule of entry.rules) {
-        //dprint("Checking rule: " + rule);
+        // dprint("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest, destSpecHasHost)) {
-          //dprint("ALLOW dest by rule " + entry + " " + rule);
+          // dprint("ALLOW dest by rule " + entry + " " + rule);
           matchedAllowRules.push(["dest", entry, rule]);
         }
         if (rule.denyDestination && rule.isMatch(dest, destSpecHasHost)) {
-          //dprint("DENY dest by rule " + entry + " " + rule);
+          // dprint("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
       }
     }
 
     return [matchedAllowRules, matchedDenyRules];
-  }
+  },
 };
 
 /**
  * @static
+ * @param {?} rawRule
+ * @param {("o"|"d")} originOrDest
+ * @param {?} entry
+ * @param {?} rule
  */
 Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
   rawRule[originOrDest] = {};
@@ -1059,6 +1094,8 @@ Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
 
 /**
  * @static
+ * @param {?} match
+ * @return {RawRule}
  */
 Ruleset.matchToRawRule = function(match) {
   // The matches are in the format
@@ -1066,12 +1103,12 @@ Ruleset.matchToRawRule = function(match) {
   // or
   //     [actionStr, originEntry, originRule, destEntry, destRule]
   // as returned by calls to |Ruleset.check()|.
-  var rawRule = {};
-  var entry;
-  var rule;
-  var destEntry;
-  var destRule;
-  var actionStr = match[0];
+  const rawRule = {};
+  let entry;
+  let rule;
+  let destEntry;
+  let destRule;
+  let actionStr = match[0];
 
   if (actionStr === "origin") {
     [actionStr, entry, rule] = match;
@@ -1084,6 +1121,7 @@ Ruleset.matchToRawRule = function(match) {
     Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
     Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
   } else {
+    // eslint-disable-next-line no-throw-literal
     throw "[matchToRawRule] Invalid match type: " + actionStr +
         " from match: " + match;
   }
@@ -1093,12 +1131,16 @@ Ruleset.matchToRawRule = function(match) {
 
 /**
  * @static
+ * @param {?} rawRule
+ * @param {("o"|"d")} originOrDest
+ * @param {Array} parts
+ * @return {string}
  */
 Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
     parts) {
   if (rawRule[originOrDest]) {
     parts.push("\"" + originOrDest + "\":{");
-    var needComma = false;
+    let needComma = false;
     if (rawRule[originOrDest].h) {
       parts.push("\"h\":\"" + rawRule[originOrDest].h + "\"");
       needComma = true;
@@ -1123,7 +1165,7 @@ Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
 };
 
 Ruleset.rawRuleToCanonicalString = function(rawRule) {
-  var parts = ["{"];
+  const parts = ["{"];
   if (rawRule.d) {
     Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
   }

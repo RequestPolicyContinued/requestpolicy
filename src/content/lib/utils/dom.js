@@ -21,16 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // DOMUtils
-//==============================================================================
+// =============================================================================
 
-export var DOMUtils = (function() {
+export const DOMUtils = (function() {
   let self = {};
 
   /**
    * Function that takes a DOM Element or an Array of DOM elements and removes
    * all their children.
+   *
+   * @param {(Element|Array<Element>)} aElements
    */
   self.removeChildren = function(aElements) {
     // If aElements is not an Array, put the element in an Array.
@@ -73,4 +75,4 @@ export var DOMUtils = (function() {
   };
 
   return self;
-}());
+})();

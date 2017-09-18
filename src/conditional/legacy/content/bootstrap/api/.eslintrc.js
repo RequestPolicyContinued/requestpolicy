@@ -1,9 +1,8 @@
-{
-  "extends": "../../src/.jshintrc",
+module.exports = {
+  "extends": "../../../../../../src/.eslintrc.js",
 
   "globals": {
-    "browser": true,
-    "LegacyApi": true,
+    "Bootstrap": true,
 
     "Cc": true,
     "Ci": true,
@@ -15,8 +14,10 @@
     "Services": true,
     "XPCOMUtils": true,
 
-    "console": true
+    "console": true,
   },
 
-  "strict": "implied"
-}
+  "parserOptions": {
+    "sourceType": "module",
+  },
+};

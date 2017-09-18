@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // RuleUtils
-//==============================================================================
+// =============================================================================
 
-export var RuleUtils = (function() {
+export const RuleUtils = (function() {
   let self = {};
 
   /**
@@ -33,6 +33,9 @@ export var RuleUtils = (function() {
    *
    * Example cases can be found in the unit test corresponding
    * to this function.
+   *
+   * @param {Object} aEndpointSpec
+   * @return {string}
    */
   self.endpointSpecToDisplayString = function(aEndpointSpec) {
     if (aEndpointSpec.port !== undefined &&
@@ -59,7 +62,7 @@ export var RuleUtils = (function() {
           break;
       }
     }
-    var str = "";
+    let str = "";
     if (scheme !== "*" || aEndpointSpec.port) {
       str += scheme + "://";
     }
@@ -72,4 +75,4 @@ export var RuleUtils = (function() {
   };
 
   return self;
-}());
+})();

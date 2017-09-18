@@ -25,20 +25,20 @@ import {Environment, MainEnvironment} from "lib/environment";
 import {Storage} from "models/storage";
 import {Logger} from "lib/logger";
 
-//==============================================================================
+// =============================================================================
 // PrefManager
-//==============================================================================
+// =============================================================================
 
-export var PrefManager = (function() {
+export const PrefManager = (function() {
   let self = {};
 
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
-    var resetLinkPrefetch =
+    const resetLinkPrefetch =
         Storage.get("prefetch.link.restoreDefaultOnUninstall");
-    var resetDNSPrefetch =
+    const resetDNSPrefetch =
         Storage.get("prefetch.dns.restoreDefaultOnUninstall");
-    var resetPreConnections =
+    const resetPreConnections =
         Storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
@@ -111,7 +111,7 @@ export var PrefManager = (function() {
     let deletePrefs = [
       "temporarilyAllowedOrigins",
       "temporarilyAllowedDestinations",
-      "temporarilyAllowedOriginsToDestinations"
+      "temporarilyAllowedOriginsToDestinations",
     ];
     for (let prefName of deletePrefs) {
       if (LegacyApi.prefs.isSet(prefName)) {
@@ -133,4 +133,4 @@ export var PrefManager = (function() {
                                       maybeHandleUninstallOrDisable);
 
   return self;
-}());
+})();

@@ -58,7 +58,7 @@ let controllers = [
   OldRulesController,
 ];
 
-//==============================================================================
+// =============================================================================
 
 /* global _setBackgroundPage */
 _setBackgroundPage({
@@ -81,7 +81,7 @@ _setBackgroundPage({
   WindowUtils,
 });
 
-//==============================================================================
+// =============================================================================
 
 function logSevereError(aMessage, aError) {
   console.error("[SEVERE] " + aMessage + " - Details:");
@@ -90,9 +90,9 @@ function logSevereError(aMessage, aError) {
 
 const shutdownMessage = C.MM_PREFIX + "shutdown";
 
-//==============================================================================
+// =============================================================================
 // shutdown
-//==============================================================================
+// =============================================================================
 
 function shutdown(aShutdownArgs) {
   controllers.reverse().forEach(function(controller) {
@@ -135,14 +135,14 @@ let observer = {
         logSevereError("shutdown() failed!", e);
       }
     }
-  }
+  },
 };
 
 observerService.addObserver(observer, "sdk:loader:destroy", false);
 
-//==============================================================================
+// =============================================================================
 // start up
-//==============================================================================
+// =============================================================================
 
 (function startup() {
   PrefManager.init();
@@ -162,4 +162,4 @@ observerService.addObserver(observer, "sdk:loader:destroy", false);
       controller.startup.apply(null);
     }
   });
-}());
+})();

@@ -26,9 +26,9 @@ import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
 import {Storage} from "models/storage";
 
-//==============================================================================
+// =============================================================================
 // HttpResponse
-//==============================================================================
+// =============================================================================
 
 export function HttpResponse(aHttpChannel) {
   this.httpChannel = aHttpChannel;
@@ -45,6 +45,7 @@ HttpResponse.prototype.removeResponseHeader = function() {
 /**
  * Get the value of a particular response header.
  *
+ * @param {string} aHeaderName
  * @return {String|undefined} The header's value, or `undefined`
  *     if the header does not exist.
  */
@@ -119,7 +120,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
       }
     }
     return this._rawDestString;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "destURI", {
@@ -129,7 +130,7 @@ Object.defineProperty(HttpResponse.prototype, "destURI", {
                                          this.originURI);
     }
     return this._destURI;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "originURI", {
@@ -138,7 +139,7 @@ Object.defineProperty(HttpResponse.prototype, "originURI", {
       this._originURI = Services.io.newURI(this.httpChannel.name, null, null);
     }
     return this._originURI;
-  }
+  },
 });
 
 Object.defineProperty(HttpResponse.prototype, "loadContext", {
@@ -149,9 +150,11 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
 
       /* start - be careful when editing here */
       try {
+        /* eslint-disable new-cap */
         this._loadContext = this.httpChannel.notificationCallbacks
                                .QueryInterface(Ci.nsIInterfaceRequestor)
                                .getInterface(Ci.nsILoadContext);
+        /* eslint-enable new-cap */
       } catch (ex) {
         try {
           this._loadContext = this.httpChannel.loadGroup
@@ -170,7 +173,7 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
       /* end - be careful when editing here */
     }
     return this._loadContext;
-  }
+  },
 });
 
 /**
@@ -204,7 +207,7 @@ Object.defineProperty(HttpResponse.prototype, "browser", {
       }
     }
     return this._browser;
-  }
+  },
 });
 
 /**
@@ -215,9 +218,11 @@ Object.defineProperty(HttpResponse.prototype, "docShell", {
   get: function() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
+        /* eslint-disable new-cap */
         this._docShell = this.httpChannel.notificationCallbacks.
                          QueryInterface(Ci.nsIInterfaceRequestor).
                          getInterface(Ci.nsIDocShell);
+        /* eslint-enable new-cap */
       } catch (e) {
         Logger.warning(
             "The redirection's DocShell couldn't be found!", e);
@@ -225,5 +230,5 @@ Object.defineProperty(HttpResponse.prototype, "docShell", {
       }
     }
     return this._docShell;
-  }
+  },
 });

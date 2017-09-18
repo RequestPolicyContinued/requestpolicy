@@ -30,9 +30,9 @@ var EXPORTED_SYMBOLS = ["CustomUri"];
 let {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 let {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
-//==============================================================================
+// =============================================================================
 // CustomUri
-//==============================================================================
+// =============================================================================
 
 var CustomUri = (function() {
   let self = {};
@@ -43,6 +43,7 @@ var CustomUri = (function() {
 
   self.classDescription = "RPC Protocol";
   self.contractID = "@mozilla.org/network/protocol;1?name=rpc";
+  // eslint-disable-next-line new-cap
   self.classID = Components.ID("{2d668f50-d8af-11e4-8830-0800200c9a66}");
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIProtocolHandler]);
 
@@ -61,19 +62,22 @@ var CustomUri = (function() {
   self.newChannel = function(aURI) {
     var path = aURI.path;
     var uri = Services.io.newURI(DESTINATION_URI + "?" + path, null, null);
+    /* eslint-disable new-cap */
     var channel = Services.io.newChannelFromURI(uri, null)
         .QueryInterface(Ci.nsIHttpChannel);
+    /* eslint-enable new-cap */
     return channel;
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
@@ -81,15 +85,17 @@ var CustomUri = (function() {
   self.shutdown = unregisterFactory;
 
   function registerFactory() {
+    // eslint-disable-next-line new-cap
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
         .registerFactory(self.classID, self.classDescription,
                          self.contractID, self);
   }
 
   function unregisterFactory() {
+    // eslint-disable-next-line new-cap
     Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
         .unregisterFactory(self.classID, self);
   }
 
   return self;
-}());
+})();

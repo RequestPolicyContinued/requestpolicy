@@ -22,11 +22,11 @@
 
 const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 
-//==============================================================================
+// =============================================================================
 // Manifest
-//==============================================================================
+// =============================================================================
 
-export var Manifest = (function() {
+export const Manifest = (function() {
   const uri = "chrome://rpcontinued/content/bootstrap/data/manifest.json";
   const charset = "UTF-8";
 
@@ -38,4 +38,4 @@ export var Manifest = (function() {
   inputStream.close();
 
   return Object.freeze(JSON.parse(data));
-}());
+})();

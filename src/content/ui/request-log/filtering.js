@@ -27,14 +27,14 @@ let {
 export function loadRLFilteringIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   let filterText = null;
 
   // TODO: use the Window Environment instead
   let elements = WindowUtils.getElementsByIdOnLoad(window, {
         filterTextbox: "rpcontinued-requestLog-requestFilter",
-        clearFilterButton: "rpcontinued-requestLog-clearFilter"
+        clearFilterButton: "rpcontinued-requestLog-clearFilter",
       });
 
   requestLog.filterChanged = function() {
@@ -60,6 +60,7 @@ export function loadRLFilteringIntoWindow(window) {
    * This function searches the first two columns for the filterText.
    *
    * @param {Array} aRow
+   * @return {boolean}
    */
   requestLog.isRowFilteredOut = function(aRow) {
     if (filterText === null) {

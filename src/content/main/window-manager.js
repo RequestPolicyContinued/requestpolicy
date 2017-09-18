@@ -27,9 +27,9 @@ import {ToolbarButtonController} from "controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "controllers/windows.style-sheets";
 import {FramescriptServices} from "main/framescript-services";
 
-//==============================================================================
+// =============================================================================
 // WindowSubControllers
-//==============================================================================
+// =============================================================================
 
 let WindowSubControllers = (function() {
   let self = {};
@@ -60,13 +60,13 @@ let WindowSubControllers = (function() {
                                                      true);
 
   return self;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // rpWindowManager
-//==============================================================================
+// =============================================================================
 
-export var rpWindowManager = (function() {
+export const rpWindowManager = (function() {
   let self = {};
 
   let frameScriptURI =
@@ -96,7 +96,7 @@ export var rpWindowManager = (function() {
         // Load the framescript into all existing tabs.
         // Also tell the globalMM to load it into each new
         // tab from now on.
-        var globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
+        const globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
             .getService(Ci.nsIMessageListenerManager);
         globalMM.loadFrameScript(frameScriptURI, true);
       });
@@ -113,7 +113,7 @@ export var rpWindowManager = (function() {
         // - In case the addon is being disabled or firefox gets quit,
         //   the ParentProcessEnvironment will send a message to all
         //   children.
-        var globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
+        const globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
             .getService(Ci.nsIMessageListenerManager);
         globalMM.removeDelayedFrameScript(frameScriptURI);
 
@@ -123,4 +123,4 @@ export var rpWindowManager = (function() {
       });
 
   return self;
-}());
+})();

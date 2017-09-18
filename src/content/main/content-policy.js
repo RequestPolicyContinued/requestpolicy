@@ -30,23 +30,24 @@ import {Environment, MainEnvironment} from "lib/environment";
 let catMan = Cc["@mozilla.org/categorymanager;1"].
     getService(Ci.nsICategoryManager);
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
 
-//==============================================================================
+// =============================================================================
 // RPContentPolicy
-//==============================================================================
+// =============================================================================
 
-export var RPContentPolicy = (function() {
+export const RPContentPolicy = (function() {
   let self = {};
 
   const XPCOM_CATEGORIES = ["content-policy"];
 
   self.classDescription = "RequestPolicy ContentPolicy Implementation";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{d734b30a-996c-4805-be24-25a0738249fe}");
   self.contractID = "@requestpolicy.org/content-policy;1";
 
@@ -54,6 +55,7 @@ export var RPContentPolicy = (function() {
    * Registers the content policy on startup.
    */
   function register() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
@@ -114,12 +116,13 @@ export var RPContentPolicy = (function() {
       //     Similarly like described above this is necessary
       //     because the `C` variable is not available anymore
       //     after RP has been shut down.
-      var finalReturnValue = CP_OK;
+      const finalReturnValue = CP_OK;
 
       // Actually create the final function, as it is described
       // above.
       self.shouldLoad = () => finalReturnValue;
 
+      // eslint-disable-next-line new-cap
       let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
       for (let category of XPCOM_CATEGORIES) {
@@ -131,29 +134,29 @@ export var RPContentPolicy = (function() {
         registrar.unregisterFactory(self.classID, self);
       });
     };
-  }());
+  })();
 
   MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
                                          unregister);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsISupports interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
                                                Ci.nsIObserver,
                                                Ci.nsIFactory,
                                                Ci.nsISupportsWeakReference]);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIContentPolicy interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   // https://developer.mozilla.org/en/nsIContentPolicy
 
   self.shouldLoad = function(aContentType, aContentLocation, aRequestOrigin,
       aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-    var request = new NormalRequest(
+    const request = new NormalRequest(
         aContentType, aContentLocation, aRequestOrigin, aContext,
         aMimeTypeGuess, aExtra, aRequestPrincipal);
     return RequestProcessor.process(request);
@@ -164,30 +167,33 @@ export var RPContentPolicy = (function() {
 
   self.shouldProcess = () => CP_OK;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
   return self;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // RPChannelEventSink
-//==============================================================================
+// =============================================================================
 
-export var RPChannelEventSink = (function() {
+export const RPChannelEventSink = (function() {
   let self = {};
 
   const XPCOM_CATEGORIES = ["net-channel-event-sinks"];
 
   self.classDescription = "RequestPolicy ChannelEventSink Implementation";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{dc6e2000-2ff0-11e6-bdf4-0800200c9a66}");
   self.contractID = "@requestpolicy.org/net-channel-event-sinks;1";
 
@@ -195,6 +201,7 @@ export var RPChannelEventSink = (function() {
    * Registers the channel event sink on startup.
    */
   function register() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
         registerFactory(self.classID, self.classDescription, self.contractID,
             self);
@@ -227,6 +234,7 @@ export var RPChannelEventSink = (function() {
 
       self.asyncOnChannelRedirect = () => {};
 
+      // eslint-disable-next-line new-cap
       let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
       for (let category of XPCOM_CATEGORIES) {
@@ -238,22 +246,22 @@ export var RPChannelEventSink = (function() {
         registrar.unregisterFactory(self.classID, self);
       });
     };
-  }());
+  })();
 
   MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE, unregister);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsISupports interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIChannelEventSink,
                                                Ci.nsIObserver,
                                                Ci.nsIFactory,
                                                Ci.nsISupportsWeakReference]);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIChannelEventSink interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const CES_ACCEPT = Cr.NS_OK;
   const CES_REJECT = Cr.NS_ERROR_FAILURE;
@@ -272,16 +280,18 @@ export var RPChannelEventSink = (function() {
     aCallback.onRedirectVerifyCallback(result);
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
   return self;
-}());
+})();

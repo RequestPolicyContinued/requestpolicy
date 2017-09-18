@@ -25,11 +25,11 @@ import {Info} from "lib/utils/info";
 import {OldRules} from "lib/old-rules";
 import {PolicyManager} from "lib/policy-manager";
 
-//==============================================================================
+// =============================================================================
 // OldRulesController
-//==============================================================================
+// =============================================================================
 
-export var OldRulesController = (function() {
+export const OldRulesController = (function() {
   let self = {};
 
   self.startup = function() {
@@ -73,4 +73,4 @@ export var OldRulesController = (function() {
   };
 
   return self;
-}());
+})();

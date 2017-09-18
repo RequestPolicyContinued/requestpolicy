@@ -25,23 +25,24 @@ import {Logger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {RequestResult} from "lib/request-result";
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 function getUriIdentifier(uri) {
   try {
     return DomainUtil.getIdentifier(uri, DomainUtil.LEVEL_SOP);
   } catch (e) {
-    var msg = "getUriIdentifier exception on uri <" + uri + "> " +
+    const msg = "getUriIdentifier exception on uri <" + uri + "> " +
         ". Exception was: " + e;
+    // eslint-disable-next-line no-throw-literal
     throw new Error(msg);
   }
 }
 
-//==============================================================================
+// =============================================================================
 // RequestSet
-//==============================================================================
+// =============================================================================
 
 export function RequestSet() {
   this._origins = {};
@@ -53,16 +54,16 @@ RequestSet.prototype = {
     printFn("-------------------------------------------------");
     printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
-    var origins = this._origins;
-    for (var oUri in origins) {
+    const origins = this._origins;
+    for (let oUri in origins) {
       printFn("      " + "Origin uri: <" + oUri + ">");
-      for (var dBase in origins[oUri]) {
-        var dests = origins[oUri];
+      for (let dBase in origins[oUri]) {
+        const dests = origins[oUri];
         printFn("        " + "Dest base domain: <" + dBase + ">");
-        for (var dIdent in dests[dBase]) {
+        for (let dIdent in dests[dBase]) {
           printFn("          " + "Dest identifier: <" + dIdent + ">");
-          for (var dUri in dests[dBase][dIdent]) {
-            var n = dests[dBase][dIdent][dUri].length;
+          for (let dUri in dests[dBase][dIdent]) {
+            const n = dests[dBase][dIdent][dUri].length;
             printFn("            " + "Dest uri: (" + n + " requests) <" +
                 dUri + ">");
           }
@@ -80,18 +81,18 @@ RequestSet.prototype = {
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
   getAllMergedOrigins: function() {
-    var result = {};
-    for (var originUri in this._origins) {
-      var dests = this._origins[originUri];
-      for (var destBase in dests) {
+    const result = {};
+    for (let originUri in this._origins) {
+      const dests = this._origins[originUri];
+      for (let destBase in dests) {
         if (!result[destBase]) {
           result[destBase] = {};
         }
-        for (var destIdent in dests[destBase]) {
+        for (let destIdent in dests[destBase]) {
           if (!result[destBase][destIdent]) {
             result[destBase][destIdent] = {};
           }
-          for (var destUri in dests[destBase][destIdent]) {
+          for (let destUri in dests[destBase][destIdent]) {
             if (!result[destBase][destIdent][destUri]) {
               result[destBase][destIdent][destUri] =
                   dests[destBase][destIdent][destUri];
@@ -128,14 +129,14 @@ RequestSet.prototype = {
     if (!this._origins[originUri]) {
       this._origins[originUri] = {};
     }
-    var dests = this._origins[originUri];
+    const dests = this._origins[originUri];
 
-    var destBase = DomainUtil.getBaseDomain(destUri);
+    const destBase = DomainUtil.getBaseDomain(destUri);
     if (!dests[destBase]) {
       dests[destBase] = {};
     }
 
-    var destIdent = getUriIdentifier(destUri);
+    const destIdent = getUriIdentifier(destUri);
     if (!dests[destBase][destIdent]) {
       dests[destBase][destIdent] = {};
     }
@@ -168,19 +169,21 @@ RequestSet.prototype = {
   },
 
   /**
+   * @param {string} originUri
+   * @param {string} destUri
    */
   removeRequest: function(originUri, destUri) {
     if (!this._origins[originUri]) {
       return;
     }
-    var dests = this._origins[originUri];
+    const dests = this._origins[originUri];
 
-    var destBase = DomainUtil.getBaseDomain(destUri);
+    const destBase = DomainUtil.getBaseDomain(destUri);
     if (!dests[destBase]) {
       return;
     }
 
-    var destIdent = getUriIdentifier(destUri);
+    const destIdent = getUriIdentifier(destUri);
     if (!dests[destBase][destIdent]) {
       return;
     }
@@ -207,6 +210,7 @@ RequestSet.prototype = {
   },
 
   /**
+   * @param {string} originUri
    */
   removeOriginUri: function(originUri) {
     delete this._origins[originUri];
@@ -232,5 +236,5 @@ RequestSet.prototype = {
       }
     }
     return false;
-  }
+  },
 };

@@ -11,7 +11,7 @@ describe("Utils", function() {
 
     let testObj = {
       testProp: "foo",
-      testFunction: wrappedFunction
+      testFunction: wrappedFunction,
     };
 
     it("Basic check", function() {
@@ -79,11 +79,11 @@ describe("Utils", function() {
      * multiple addons are wrapping the same function.
      */
     function manualWrap() {
-      var _orig = testObj.testFunction;
+      const _orig = testObj.testFunction;
 
-      testObj.testFunction = function() {
+      testObj.testFunction = function(...args) {
         functionCalls += "{";
-        var rv = _orig.apply(testObj, arguments);
+        const rv = _orig.apply(testObj, args);
         functionCalls += "}";
         return rv;
       };
@@ -94,7 +94,7 @@ describe("Utils", function() {
       functionCalls = "";
 
       // call the function, remember the return value
-      var rv = testObj.testFunction("foo", "bar");
+      const rv = testObj.testFunction("foo", "bar");
 
       // do checks
       strictEqual(rv, "baz");
@@ -102,12 +102,10 @@ describe("Utils", function() {
     }
 
     function wrappedFunction(param1, param2) {
-      /* jshint validthis: true */
-
       functionCalls += "_0";
 
       // check that "this" is correctly set
-      isTrue(this.testProp === "foo");
+      isTrue(this.testProp === "foo"); // eslint-disable-line no-invalid-this
 
       // check that the parameters have been passed correctly
       isTrue(param1 === "foo");
@@ -140,7 +138,7 @@ describe("Utils", function() {
       isTrue(param2 === "bar");
 
       // test that errors are catched
-      throw "test error";
+      throw "test error"; // eslint-disable-line no-throw-literal
     }
   });
 });

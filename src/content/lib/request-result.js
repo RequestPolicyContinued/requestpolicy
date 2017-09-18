@@ -21,10 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
+/* eslint-disable no-multi-spaces, max-len */
 export const REQUEST_REASON_USER_POLICY           = 1;
 export const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
 export const REQUEST_REASON_DEFAULT_POLICY        = 3;
@@ -41,10 +42,11 @@ export const REQUEST_REASON_NEW_WINDOW            = 12;
 export const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
 
 export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
+/* eslint-enable no-multi-spaces, max-len */
 
-//==============================================================================
+// =============================================================================
 // RequestResult
-//==============================================================================
+// =============================================================================
 
 // TODO: merge this Class with the "Request" class and/or some kind of
 // "RememberedRequest" or "RequestInfo" class.
@@ -52,6 +54,9 @@ export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user contr
  * RequestResult objects are used to hand over the result of a check
  * whether a request is allowed or not. Sometimes only the boolean value of
  * isAllowed is needed; in that case the other arguments may be unused.
+ *
+ * @param {boolean} isAllowed
+ * @param {number} resultReason
  */
 export function RequestResult(isAllowed, resultReason) {
   this.matchedAllowRules = [];
@@ -65,8 +70,8 @@ RequestResult.prototype = {
   matchedAllowRules: null,
   matchedDenyRules: null,
 
-  isAllowed: undefined,  // whether the request will be or has been allowed
-  resultReason: undefined
+  isAllowed: undefined, // whether the request will be or has been allowed
+  resultReason: undefined,
 };
 
 RequestResult.prototype.allowRulesExist = function() {
@@ -100,7 +105,8 @@ RequestResult.prototype.resolveConflict = function() {
 };
 
 RequestResult.prototype.isDefaultPolicyUsed = function() {
-  // returns whether the default policy has been or will be used for this request.
+  // returns whether the default policy has been or will be used
+  // for this request.
   return this.resultReason === REQUEST_REASON_DEFAULT_POLICY ||
       this.resultReason === REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
       this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;

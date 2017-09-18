@@ -26,9 +26,9 @@ import {Storage} from "models/storage";
 import {XULUtils} from "lib/utils/xul";
 import {MainEnvironment} from "lib/environment";
 
-//==============================================================================
+// =============================================================================
 // KeyboardShortcut
-//==============================================================================
+// =============================================================================
 
 /**
  * Overview of events:
@@ -49,9 +49,9 @@ import {MainEnvironment} from "lib/environment";
 
 export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
     aUserEnabledPrefName, aUserComboPrefName) {
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // initialize properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   this._id = aID;
   this._elementID = "rpKey_" + this._id;
@@ -63,19 +63,19 @@ export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
   this._elementAttributes = {
     disabled: null,
     modifiers: null,
-    key: null
+    key: null,
   };
 
   this._listeners = {
     onWindowLoad: this._loadIntoWindow.bind(this),
     onWindowUnload: this._unloadFromWindow.bind(this),
     onKeyCommand: this._onPress.bind(this),
-    onPrefChange: this._onPrefChange.bind(this)
+    onPrefChange: this._onPrefChange.bind(this),
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // initialize
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   this._determineElementAttributes();
   Windows.forEachOpenWindow(this._loadIntoWindow.bind(this));
@@ -84,13 +84,13 @@ export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
   Windows.addListener("unload", this._listeners.onWindowUnload);
   ManagerForPrefObservers.get(MainEnvironment).addListeners([
     this._userEnabledPrefName,
-    this._userComboPrefName
+    this._userComboPrefName,
   ], this._listeners.onPrefChange);
 }
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // main methods
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 KeyboardShortcut.prototype.destroy = function() {
   Windows.forEachOpenWindow(this._unloadFromWindow.bind(this));
@@ -98,7 +98,7 @@ KeyboardShortcut.prototype.destroy = function() {
   Windows.removeListener("unload", this._listeners.onWindowUnload);
   ManagerForPrefObservers.get(MainEnvironment).removeListeners([
     this._userEnabledPrefName,
-    this._userComboPrefName
+    this._userComboPrefName,
   ], this._listeners.onPrefChange);
 };
 
@@ -118,7 +118,7 @@ KeyboardShortcut.prototype._onPress = function(event) {
 
 KeyboardShortcut.prototype._onPrefChange = function() {
   this._determineElementAttributes();
-  Windows.forEachOpenWindow(function(window) {
+  Windows.forEachOpenWindow((window) => {
     this._setElementAttributes(window);
 
     // Each time one of the key's attributes changes it's necessary to
@@ -126,12 +126,12 @@ KeyboardShortcut.prototype._onPrefChange = function() {
     // keyboard shortcut doesn't get updated!
     let keyset = window.document.getElementById("rpcontinuedKeyset");
     keyset.parentNode.appendChild(keyset);
-  }, this);
+  });
 };
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // assisting methods
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 KeyboardShortcut.prototype._createElement = function(window) {
   let keyset = window.document.getElementById("rpcontinuedKeyset");
@@ -162,19 +162,19 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
     return Storage.get(this._userComboPrefName);
-  }
+  },
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
     return Storage.get(this._userEnabledPrefName);
-  }
+  },
 });
 
 const ELEMENT_ATTRIBUTES_WHEN_DISABLED = {
   disabled: "true",
   modifiers: "",
-  key: ""
+  key: "",
 };
 
 KeyboardShortcut.prototype._determineElementAttributes = function() {
@@ -202,6 +202,6 @@ KeyboardShortcut.prototype._determineElementAttributes = function() {
   this._elementAttributes = {
     disabled: "false",
     modifiers: rv.modifiers,
-    key: rv.key
+    key: rv.key,
   };
 };

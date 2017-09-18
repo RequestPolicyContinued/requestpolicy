@@ -23,11 +23,11 @@
 
 import {DomainUtil} from "lib/utils/domains";
 
-//==============================================================================
+// =============================================================================
 // OldRules
-//==============================================================================
+// =============================================================================
 
-export var OldRules = (function() {
+export const OldRules = (function() {
   function OldRules(aOrigins = "", aDestinations = "",
                     aOriginsToDestinations = "") {
     this._customPrefStrings = null;
@@ -35,7 +35,7 @@ export var OldRules = (function() {
       this._customPrefStrings = {
         origins: String(aOrigins),
         dests: String(aDestinations),
-        originsToDests: String(aOriginsToDestinations)
+        originsToDests: String(aOriginsToDestinations),
       };
     }
   }
@@ -50,11 +50,11 @@ export var OldRules = (function() {
           origins: OldRules._getPrefString("allowedOrigins"),
           dests: OldRules._getPrefString("allowedDestinations"),
           originsToDests: OldRules._getPrefString(
-              "allowedOriginsToDestinations")
+              "allowedOriginsToDestinations"),
         };
       }
       return this._prefStrings;
-    }
+    },
   });
 
   /**
@@ -63,7 +63,7 @@ export var OldRules = (function() {
   Object.defineProperty(OldRules.prototype, "prefStringSets", {
     get: function() {
       function splitString(aRulesString) {
-        var rules = new Set(aRulesString.split(" "));
+        const rules = new Set(aRulesString.split(" "));
 
         // The string might contain double spaces.
         rules.delete("");
@@ -76,29 +76,31 @@ export var OldRules = (function() {
         this._prefStringSets = {
           origins: splitString(origins),
           dests: splitString(dests),
-          originsToDests: splitString(originsToDests)
+          originsToDests: splitString(originsToDests),
         };
       }
       return this._prefStringSets;
-    }
+    },
   });
 
   /**
    * Convert the pref strings to rule objects.
+   *
+   * @return {Array<Object>}
    */
   OldRules.prototype.getAsNewRules = function() {
-    var rules = [];
-    var {origins, dests, originsToDests} = this.prefStringSets;
+    const rules = [];
+    const {origins, dests, originsToDests} = this.prefStringSets;
 
     for (let origin of origins) {
       rules.push({
-        o: OldRules.getEndpointSpecFromString(origin)
+        o: OldRules.getEndpointSpecFromString(origin),
       });
     }
 
     for (let dest of dests) {
       rules.push({
-        d: OldRules.getEndpointSpecFromString(dest)
+        d: OldRules.getEndpointSpecFromString(dest),
       });
     }
 
@@ -110,12 +112,13 @@ export var OldRules = (function() {
         if (origin !== "" && dest !== "") {
           rules.push({
             o: OldRules.getEndpointSpecFromString(origin),
-            d: OldRules.getEndpointSpecFromString(dest)
+            d: OldRules.getEndpointSpecFromString(dest),
           });
           continue;
         }
       }
 
+      // eslint-disable-next-line no-throw-literal
       throw new OldRulesParseError("Invalid old rule: \"" + originToDest +
           "\"");
     }
@@ -154,6 +157,7 @@ export var OldRules = (function() {
       } else if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
         return false;
       } else {
+        // eslint-disable-next-line no-throw-literal
         throw e;
       }
     }
@@ -165,7 +169,7 @@ export var OldRules = (function() {
    * @return {Object} The endpoints' specifications.
    */
   OldRules.getEndpointSpecFromString = function(aEndpointString) {
-    var spec = {};
+    const spec = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
       let uriObj = DomainUtil.getUriObject(aEndpointString);
       spec.s = uriObj.scheme;
@@ -210,14 +214,14 @@ export var OldRules = (function() {
   };
 
   return OldRules;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // OldRulesParseError
-//==============================================================================
+// =============================================================================
 
-export function OldRulesParseError() {
-  Error.apply(this, arguments);
+export function OldRulesParseError(...args) {
+  Error.apply(this, args);
   this.name = "OldRulesParseError";
 }
 

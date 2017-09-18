@@ -24,7 +24,7 @@
 export function loadRLTreeViewIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   requestLog.treebox = null;
 
@@ -32,7 +32,7 @@ export function loadRLTreeViewIntoWindow(window) {
     "rpcontinued-requestLog-origin": 0,
     "rpcontinued-requestLog-destination": 1,
     "rpcontinued-requestLog-blocked": 2,
-    "rpcontinued-requestLog-time": 3
+    "rpcontinued-requestLog-time": 3,
   };
 
   function getVisibleRowAtIndex(index) {
@@ -56,6 +56,8 @@ export function loadRLTreeViewIntoWindow(window) {
     /**
      * "This method should return the text contents at the specified row and
      * column."
+     *
+     * @param {nsITreeBoxObject} aTreebox
      */
     setTree: function(aTreebox) {
       requestLog.treebox = aTreebox;
@@ -63,16 +65,20 @@ export function loadRLTreeViewIntoWindow(window) {
 
     /**
      * This method is called once to set the tree element on the view.
+     *
+     * @param {number} aIndex
+     * @param {nsITreeColumn} aColumn
+     * @return {number}
      */
     getCellText: function(aIndex, aColumn) {
-      // Row 0 is actually the last element in the array so that we don't have to
-      // unshift() the array and can just push().
-      // TODO: Do an actual speed test with push vs. unshift to see if it matters
-      // with this javascript array implementation, though I'm assuming it does.
-      var columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
+      // Row 0 is actually the last element in the array so that we don't
+      // have to unshift() the array and can just push().
+      // TODO: Do an actual speed test with push vs. unshift to see if it
+      // matters with this javascript array implementation, though I'm
+      // assuming it does.
+      const columnIndex = requestLog.columnNameToIndexMap[aColumn.id];
       if (columnIndex !== 2) {
-        return getVisibleRowAtIndex(aIndex)
-            [requestLog.columnNameToIndexMap[aColumn.id]];
+        return getVisibleRowAtIndex(aIndex)[columnIndex];
       }
     },
 
@@ -145,6 +151,6 @@ export function loadRLTreeViewIntoWindow(window) {
 
     getColumnProperties: function(aColumn) {
       return "";
-    }
+    },
   };
 }

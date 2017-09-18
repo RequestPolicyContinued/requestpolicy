@@ -30,7 +30,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "yourPolicy",
@@ -49,7 +49,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     "ruleSet",
     "activeRules",
     "filterRules",
-    "policy"
+    "policy",
   ];
 
   $(function() {
@@ -143,8 +143,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
   }
 
   function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source,
-      readOnly) {
-
+                            readOnly) {
     if (ruleAction !== "allow") {
       ruleAction = "block";
     }
@@ -218,6 +217,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
     if (!originPart && !destPart) {
       // TODO: don't throw, instead show message in form.
+      // eslint-disable-next-line no-throw-literal
       throw "You must specify some rule information";
     }
     var ruleData = {};
@@ -263,4 +263,4 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
       populateRuleTable(search.value);
     });
   };
-}());
+})();

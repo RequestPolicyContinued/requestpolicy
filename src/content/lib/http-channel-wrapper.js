@@ -23,9 +23,9 @@
 import {Logger} from "lib/logger";
 import {WindowUtils} from "lib/utils/windows";
 
-//==============================================================================
+// =============================================================================
 // HttpChannelWrapper
-//==============================================================================
+// =============================================================================
 
 export function HttpChannelWrapper(aHttpChannel) {
   this._httpChannel = aHttpChannel;
@@ -37,7 +37,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "uri", {
       this._uri = Services.io.newURI(this._httpChannel.name, null, null);
     }
     return this._uri;
-  }
+  },
 });
 
 Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
@@ -48,9 +48,11 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
 
       /* start - be careful when editing here */
       try {
+        /* eslint-disable new-cap */
         this._loadContext = this._httpChannel.notificationCallbacks.
                             QueryInterface(Ci.nsIInterfaceRequestor).
                             getInterface(Ci.nsILoadContext);
+        /* eslint-enable new-cap */
       } catch (ex) {
         try {
           this._loadContext = this._httpChannel.loadGroup.
@@ -69,7 +71,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
       /* end - be careful when editing here */
     }
     return this._loadContext;
-  }
+  },
 });
 
 /**
@@ -103,7 +105,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "browser", {
       }
     }
     return this._browser;
-  }
+  },
 });
 
 /**
@@ -114,14 +116,16 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
   get: function() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
+        /* eslint-disable new-cap */
         this._docShell = this._httpChannel.notificationCallbacks.
                          QueryInterface(Ci.nsIInterfaceRequestor).
                          getInterface(Ci.nsIDocShell);
+        /* eslint-enable new-cap */
       } catch (e) {
         Logger.warning("The HTTPChannel's DocShell couldn't be found!", e);
         this._docShell = null;
       }
     }
     return this._docShell;
-  }
+  },
 });

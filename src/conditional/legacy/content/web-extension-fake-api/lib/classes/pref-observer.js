@@ -23,9 +23,9 @@
 import {MapOfSets} from "lib/classes/map-of-sets";
 import {Prefs} from "web-extension-fake-api/models/prefs";
 
-//==============================================================================
+// =============================================================================
 // PrefObserver
-//==============================================================================
+// =============================================================================
 
 export function PrefObserver() {
   this._maps = {
@@ -33,7 +33,7 @@ export function PrefObserver() {
     domainsToListeners: new MapOfSets(),
 
     // Storage for observers.
-    domainsToObservers: new Map()
+    domainsToObservers: new Map(),
   };
 }
 
@@ -45,7 +45,7 @@ PrefObserver.prototype.addListener = function(aDomain, aListener) {
   if (false === this._maps.domainsToObservers.has(aDomain)) {
     // start to observe this Pref Domain
     let observer = {
-      observe: this._onObserve.bind(this, aDomain)
+      observe: this._onObserve.bind(this, aDomain),
     };
     Prefs._addObserver(aDomain, observer);
     this._maps.domainsToObservers.set(aDomain, observer);

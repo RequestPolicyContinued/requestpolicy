@@ -28,32 +28,32 @@ import {JSUtils} from "lib/utils/javascript";
 
 const {LOG_ENVIRONMENT} = C;
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 const log = LOG_ENVIRONMENT ? {
   debug: function(message) {
+    // eslint-disable-next-line no-console
     console.debug(`[Environment] ${message}`);
-  }
+  },
 } : null;
 
-//==============================================================================
+// =============================================================================
 // Environment
-//==============================================================================
+// =============================================================================
 
-export var Environment = (function() {
-
-  //----------------------------------------------------------------------------
+export const Environment = (function() {
+  // ---------------------------------------------------------------------------
   // constants, metadata
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const ENV_STATES = {
     "NOT_STARTED": 0,
     "STARTING_UP": 1,
     "STARTUP_DONE": 2,
     "SHUTTING_DOWN": 3,
-    "SHUT_DOWN": 4
+    "SHUT_DOWN": 4,
   };
 
   const LEVELS = {
@@ -68,14 +68,14 @@ export var Environment = (function() {
     // Factories.
     "INTERFACE": 3,
     // UI functions will enable/disable UI elements such as the menu.
-    "UI": 4
+    "UI": 4,
   };
 
   // a level can be entered, being processed, or finished being processed.
   const LEVEL_STATES = {
     "NOT_ENTERED": 0,
     "PROCESSING": 1,
-    "FINISHED_PROCESSING": 2
+    "FINISHED_PROCESSING": 2,
   };
 
   let BOOTSTRAP = {
@@ -84,13 +84,13 @@ export var Environment = (function() {
         LEVELS.ESSENTIAL,
         LEVELS.BACKEND,
         LEVELS.INTERFACE,
-        LEVELS.UI
+        LEVELS.UI,
       ],
       lastLevel: LEVELS.UI,
       envStates: {
         "beforeProcessing": ENV_STATES.NOT_STARTED,
         "duringProcessing": ENV_STATES.STARTING_UP,
-        "afterProcessing": ENV_STATES.STARTUP_DONE
+        "afterProcessing": ENV_STATES.STARTUP_DONE,
       },
       functions: {
         /**
@@ -99,21 +99,21 @@ export var Environment = (function() {
         "beforeProcessing": function() {
           this.register();
         },
-        "afterProcessing": function() {}
-      }
+        "afterProcessing": function() {},
+      },
     },
     "shutdown": {
       levelSequence: [
         LEVELS.UI,
         LEVELS.INTERFACE,
         LEVELS.BACKEND,
-        LEVELS.ESSENTIAL
+        LEVELS.ESSENTIAL,
       ],
       lastLevel: LEVELS.ESSENTIAL,
       envStates: {
         "beforeProcessing": ENV_STATES.STARTUP_DONE,
         "duringProcessing": ENV_STATES.SHUTTING_DOWN,
-        "afterProcessing": ENV_STATES.SHUT_DOWN
+        "afterProcessing": ENV_STATES.SHUT_DOWN,
       },
       functions: {
         "beforeProcessing": function() {},
@@ -123,17 +123,17 @@ export var Environment = (function() {
         "afterProcessing": function() {
           this.innerEnvs.length = 0;
           this.unregister();
-        }
-      }
-    }
+        },
+      },
+    },
   };
   function getBootstrapMetadata(startupOrShutdown) {
     return BOOTSTRAP[startupOrShutdown];
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Environment
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * The `Environment` class can take care of the "startup" (=initialization)
@@ -165,7 +165,7 @@ export var Environment = (function() {
 
     self.levels = {
       "startup": generateLevelObjects(),
-      "shutdown": generateLevelObjects()
+      "shutdown": generateLevelObjects(),
     };
 
     // Define a Lazy Getter to get an ObserverManager for this Environment.
@@ -194,9 +194,6 @@ export var Environment = (function() {
   Environment.LEVELS = LEVELS;
   Environment.ENV_STATES = ENV_STATES;
 
-  /**
-   * Registers the environment to its outer environment.
-   */
   Environment.prototype.isShuttingDownOrShutDown = function() {
     let self = this;
     return self.envState >= ENV_STATES.SHUTTING_DOWN;
@@ -207,6 +204,8 @@ export var Environment = (function() {
    * mainly will hold the startup- or shutdown-functions of the corresponding
    * level. All of the Level Objects are put together in another object which
    * is then returned.
+   *
+   * @return {Object}
    */
   function generateLevelObjects() {
     let obj = {};
@@ -268,9 +267,6 @@ export var Environment = (function() {
     }
   };
 
-  /**
-   * Add a startup function to the environment.
-   */
   Environment.prototype.addStartupFunction = function(aLevel, f) {
     let self = this;
     if (self.isShuttingDownOrShutDown()) {
@@ -292,9 +288,6 @@ export var Environment = (function() {
     }
   };
 
-  /**
-   * Add a shutdown function to the environment.
-   */
   Environment.prototype.addShutdownFunction = function(aLevel, f) {
     let self = this;
     if (self.levels.shutdown[aLevel].levelState >= LEVEL_STATES.PROCESSING) {
@@ -355,7 +348,7 @@ export var Environment = (function() {
      * @param {Array.<function()>} aFunctions
      * @param {Array} aBootstrapArgs - the arguments to apply
      */
-    function callFunctions(aFunctions, aBootstrapArgs) {
+    function callFunctions(aFunctions, aBootstrapArgs=[]) {
       // process the Array as long as it contains elements
       while (aFunctions.length > 0) {
         // The following is either `fnArray.pop()` or `fnArray.shift()`
@@ -364,7 +357,7 @@ export var Environment = (function() {
 
         // call the function
         try {
-          f.apply(null, aBootstrapArgs);
+          f(...aBootstrapArgs);
         } catch (e) {
           console.error("Error in Bootstrap function! Details:");
           console.dir(e);
@@ -383,9 +376,9 @@ export var Environment = (function() {
      * @this {Environment}
      * @param {string} aStartupOrShutdown - either "startup" or "shutdown"
      * @param {integer} aLevel
+     * @param {Object} aBootstrapArgs
      */
     function processLevel(aStartupOrShutdown, aLevel, aBootstrapArgs) {
-      /* jshint validthis: true */
       let self = this;
 
       let levelObj = self.levels[aStartupOrShutdown][aLevel];
@@ -423,7 +416,6 @@ export var Environment = (function() {
      * @param {integer=} aUntilLevel
      */
     function processLevels(aStartupOrShutdown, aBootstrapArgs, aUntilLevel) {
-      /* jshint validthis: true */
       let self = this;
       iterateLevels(aStartupOrShutdown, function(level) {
         processLevel.call(self, aStartupOrShutdown, level, aBootstrapArgs);
@@ -447,7 +439,6 @@ export var Environment = (function() {
      * @param {string} aStartupOrShutdown
      */
     function logStartupOrShutdown(aStartupOrShutdown) {
-      /* jshint validthis: true */
       let self = this;
       if (LOG_ENVIRONMENT) {
         log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
@@ -469,13 +460,12 @@ export var Environment = (function() {
     function bootstrap(aStartupOrShutdown,
                        aBootstrapArgs,
                        aUntilLevel=BOOTSTRAP[aStartupOrShutdown].lastLevel) {
-      /* jshint validthis: true */
       let self = this;
 
       let {
         lastLevel,
         envStates,
-        functions
+        functions,
       } = getBootstrapMetadata(aStartupOrShutdown);
 
       if (self.envState === envStates.beforeProcessing) {
@@ -513,8 +503,7 @@ export var Environment = (function() {
       }
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
-
-  }(Environment));
+  })(Environment);
 
   /**
    * Tell the Environment to shut down when an EventTarget's
@@ -536,14 +525,14 @@ export var Environment = (function() {
   };
 
   return Environment;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // MainEnvironment
-//==============================================================================
+// =============================================================================
 
 // Main Environments are the outermost environments.
-export var MainEnvironment = new Environment(null, "Main Environment");
+export const MainEnvironment = new Environment(null, "Main Environment");
 
 MainEnvironment.isMainEnvironment =
     typeof browser.extension.getBackgroundPage === "function";

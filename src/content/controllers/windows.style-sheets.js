@@ -22,18 +22,18 @@
 
 import {Info} from "lib/utils/info";
 
-//==============================================================================
+// =============================================================================
 // StyleSheetsController
-//==============================================================================
+// =============================================================================
 
-export var StyleSheetsController = (function() {
+export const StyleSheetsController = (function() {
   let self = {};
 
   const STYLE_SHEETS = Object.freeze([
     "chrome://rpcontinued/skin/requestpolicy.css",
     Info.isSeamonkey ?
         "chrome://rpcontinued/skin/toolbarbutton-seamonkey.css" :
-        "chrome://rpcontinued/skin/toolbarbutton.css"
+        "chrome://rpcontinued/skin/toolbarbutton.css",
   ]);
 
   function loadStyleSheets() {
@@ -70,4 +70,4 @@ export var StyleSheetsController = (function() {
   };
 
   return self;
-}());
+})();

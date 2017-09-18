@@ -23,11 +23,11 @@
 
 import {PrefBranch} from "web-extension-fake-api/lib/classes/pref-branch";
 
-//==============================================================================
+// =============================================================================
 // Prefs
-//==============================================================================
+// =============================================================================
 
-export var Prefs = (function() {
+export const Prefs = (function() {
   let self = {};
 
   self.save = function() {
@@ -69,7 +69,7 @@ export var Prefs = (function() {
       "network.dns.disablePrefetchFromHTTPS": "BoolPref",
       "network.http.speculative-parallel-limit": "IntPref",
       "network.prefetch-next": "BoolPref",
-    })
+    }),
   };
 
   /**
@@ -78,17 +78,20 @@ export var Prefs = (function() {
    * Valid "fake pref names" are:
    *   - "root/ network.prefetch-next" (root pref branch)
    *   - "welcomeWindowShown" (RequestPolicy pref branch)
+   *
+   * @param {string} aFakePrefName
+   * @return {Object}
    */
   function getBranchAndRealName(aFakePrefName) {
     if (aFakePrefName.startsWith("root/ ")) {
       return {
         branch: self.branches.root,
-        name: aFakePrefName.slice(6)
+        name: aFakePrefName.slice(6),
       };
     }
     return {
       branch: self.branches.rp,
-      name: aFakePrefName
+      name: aFakePrefName,
     };
   }
 
@@ -112,9 +115,9 @@ export var Prefs = (function() {
     return branch.isSet(name);
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Observer functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Notes about addObserver and removeObserver:
@@ -143,16 +146,16 @@ export var Prefs = (function() {
   };
 
   return self;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // Prefs - Aliases
-//==============================================================================
+// =============================================================================
 
 (function(self) {
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Dynamically created aliases
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Define a list of pref aliases that will be available through
@@ -166,8 +169,8 @@ export var Prefs = (function() {
 
       // As an example, this will become `isBlockingDisabled()` and
       // `setBlockingDisabled()`:
-      ["startWithAllowAllEnabled", "BlockingDisabled"]
-    ]
+      ["startWithAllowAllEnabled", "BlockingDisabled"],
+    ],
   };
 
   // Dynamically create functions like `isDefaultAllow` or
@@ -180,9 +183,9 @@ export var Prefs = (function() {
     self["set" + prefAlias] = self.set.bind(null, prefName);
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Other aliases
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.isPrefetchEnabled = function() {
     return self.get("root/ network.prefetch-next") ||
@@ -204,4 +207,4 @@ export var Prefs = (function() {
              isOldRulePrefEmpty("allowedDestinations") &&
              isOldRulePrefEmpty("allowedOriginsToDestinations"));
   };
-}(Prefs));
+})(Prefs);

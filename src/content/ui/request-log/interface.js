@@ -29,10 +29,10 @@ let {
 export function loadRLInterfaceIntoWindow(window) {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   requestLog.clear = function() {
-    var count = requestLog.treeView.rowCount;
+    const count = requestLog.treeView.rowCount;
     if (count === 0) {
       return;
     }
@@ -47,9 +47,12 @@ export function loadRLInterfaceIntoWindow(window) {
   /**
    * Copy the content of a cell to the clipboard. The row used will be the one
    * selected when the context menu was opened.
+   *
+   * @param {string} columnName
    */
   requestLog.copyToClipboard = function(columnName) {
-    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+    const content = requestLog.treeView.getCellText(
+        requestLog.tree.currentIndex,
         requestLog.tree.columns.getNamedColumn(columnName));
 
     const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
@@ -60,24 +63,28 @@ export function loadRLInterfaceIntoWindow(window) {
   /**
    * Open the content of a cell in a new tab. The row used will be the one
    * selected when the context menu was opened.
+   *
+   * @param {string} columnName
    */
   requestLog.openInNewTab = function(columnName) {
-    var content = requestLog.treeView.getCellText(requestLog.tree.currentIndex,
+    const content = requestLog.treeView.getCellText(
+        requestLog.tree.currentIndex,
         requestLog.tree.columns.getNamedColumn(columnName));
 
-    var forbidden = true;
+    let forbidden = true;
     try {
-      var uri = DomainUtil.getUriObject(content);
+      const uri = DomainUtil.getUriObject(content);
       if (uri.scheme === "http" || uri.scheme === "https" ||
           uri.scheme === "ftp") {
         forbidden = false;
       }
     } catch (e) {
+      console.error(e);
     }
 
     if (forbidden) {
-      var alertTitle = StringUtils.$str("actionForbidden");
-      var alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
+      const alertTitle = StringUtils.$str("actionForbidden");
+      const alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

@@ -25,19 +25,19 @@ import {C} from "lib/utils/constants";
 
 const {UI_TESTING} = C;
 
-//==============================================================================
+// =============================================================================
 // Logger
-//==============================================================================
+// =============================================================================
 
 /**
  * Provides logging methods
  */
-export var Logger = (function() {
+export const Logger = (function() {
   let self = {};
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // constants
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const LevelEnum = Object.freeze({
     OFF: Number.MAX_VALUE, // no logging
@@ -50,9 +50,9 @@ export var Logger = (function() {
 
   const MINIMUM_LOGGING_LEVEL = LevelEnum.ERROR;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // settings
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let loggingLevel = LevelEnum.ALL;
   let loggingEnabled = true;
@@ -80,9 +80,9 @@ export var Logger = (function() {
 
   browser.storage.onChanged.addListener(onStorageChange);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // logging
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   function shouldLog(aLevel) {
     if (loggingEnabled && aLevel >= loggingLevel) {
@@ -112,9 +112,11 @@ export var Logger = (function() {
     }
   }
 
+  /* eslint-disable no-console */
   self.warning = log.bind(self, LevelEnum.WARNING, console.warn);
   self.info = log.bind(self, LevelEnum.INFO, console.info);
   self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
+  /* eslint-enable no-console */
 
   self.vardump = function(obj) {
     if (shouldLog(LevelEnum.DEBUG)) {
@@ -123,4 +125,4 @@ export var Logger = (function() {
   };
 
   return self;
-}());
+})();

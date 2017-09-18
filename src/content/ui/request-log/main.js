@@ -37,10 +37,10 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
 (function() {
   let {requestLog} = window.rpcontinued;
 
-  //============================================================================
+  // ===========================================================================
 
   // create a new Environment for this window
-  var WinEnv = new Environment(MainEnvironment, "WinEnv");
+  const WinEnv = new Environment(MainEnvironment, "WinEnv");
   // The Environment has to be shut down when the content window gets unloaded.
   WinEnv.shutdownOnUnload(window);
   // start up right now, as there won't be any startup functions
@@ -63,8 +63,8 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
     window.parent.rpcontinued.overlay.requestLog = requestLog;
   }
   function showLogIsEmptyMessage() {
-    var message = StringUtils.$str("requestLogIsEmpty");
-    var directions = StringUtils.$str("requestLogDirections");
+    const message = StringUtils.$str("requestLogIsEmpty");
+    const directions = StringUtils.$str("requestLogDirections");
     requestLog.visibleRows.push([message, directions, false, ""]);
     requestLog.treebox.rowCountChanged(0, 1);
   }
@@ -73,7 +73,7 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
   WinEnv.elManager.addListener(window, "load", init, false);
 
   return requestLog;
-}());
+})();
 
 loadRLInterfaceIntoWindow(window);
 loadRLTreeViewIntoWindow(window);

@@ -5,9 +5,9 @@ const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Initialize the profile.
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // This will create a Directory Service Provider for the
 // profile directory. See `head.js` in mozilla-central.
@@ -15,14 +15,14 @@ Cu.import("resource://gre/modules/Services.jsm");
 // simply ignored.
 do_get_profile();
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Register RequestPolicy's Chrome Manifest.
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 function getRPChromeManifest() {
-  var cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
+  const cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
-  var manifestFile = cwd.parent.parent.clone();
+  const manifestFile = cwd.parent.parent.clone();
   manifestFile.appendRelativePath("build/nightly/chrome.manifest");
   return manifestFile;
 }
@@ -34,16 +34,16 @@ function registerRPChromeManifest() {
 
 registerRPChromeManifest();
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Load the default preferences
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
                                     "main/default-pref-handler.js", {});
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Set up the Logger module
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 {
   let tmpScope = {};

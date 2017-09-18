@@ -26,11 +26,11 @@ import {Storage} from "models/storage";
 let {PrivateBrowsingUtils} = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {});
 
-//==============================================================================
+// =============================================================================
 // WindowUtils
-//==============================================================================
+// =============================================================================
 
-export var WindowUtils = (function() {
+export const WindowUtils = (function() {
   let self = {};
 
   self.getMostRecentWindow = function(aWindowType = null) {
@@ -43,12 +43,14 @@ export var WindowUtils = (function() {
                                     bind(self, "navigator:browser");
 
   self.getChromeWindow = function(aContentWindow) {
+    /* eslint-disable new-cap */
     return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIWebNavigation)
                              .QueryInterface(Ci.nsIDocShellTreeItem)
                              .rootTreeItem
                              .QueryInterface(Ci.nsIInterfaceRequestor)
                              .getInterface(Ci.nsIDOMWindow);
+    /* eslint-enable new-cap */
   };
 
   self.getBrowserForWindow = function(aContentWindow) {
@@ -63,10 +65,12 @@ export var WindowUtils = (function() {
   };
 
   self.getChromeWindowForDocShell = function(aDocShell) {
+    /* eslint-disable new-cap */
     return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
                     .rootTreeItem
                     .QueryInterface(Ci.nsIInterfaceRequestor)
                     .getInterface(Ci.nsIDOMWindow);
+    /* eslint-enable new-cap */
   };
 
   self.getTabBrowser = function(window) {
@@ -89,6 +93,7 @@ export var WindowUtils = (function() {
   /**
    * Should it be possible to add permanent rules in that window?
    *
+   * @param {Window} aWindow
    * @return {boolean}
    */
   self.mayPermanentRulesBeAdded = function(aWindow) {
@@ -104,6 +109,10 @@ export var WindowUtils = (function() {
    * Wait for a window to be loaded and then add a list of Elements „by ID“ to
    * a scope. The scope is optional, but in any case will be returned.
    *
+   * @param {Window} aWindow
+   * @param {Array<string>} aElementIDs
+   * @param {Object?} aScope
+   * @param {function?} aCallback
    * @return {Object} the scope of the elements
    */
   self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
@@ -125,4 +134,4 @@ export var WindowUtils = (function() {
   };
 
   return self;
-}());
+})();

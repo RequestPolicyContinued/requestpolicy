@@ -26,12 +26,12 @@ import {Storage} from "models/storage";
 
 const initFunctions = [];
 
-export var FramescriptServices = {
+export const FramescriptServices = {
   init: function() {
     for (let fn of initFunctions) {
       fn();
     }
-  }
+  },
 };
 
 // notifyDocumentLoaded
@@ -72,8 +72,8 @@ export var FramescriptServices = {
             // case 2a: all requests have been blocked because of a blacklist
             //          ==> do *not* indicate
             //
-            // case 2b: at least one of the blocked (identical) requests has been
-            //          blocked by a rule *other than* the blacklist
+            // case 2b: at least one of the blocked (identical) requests
+            //          has been blocked by a rule *other than* the blacklist
             //          ==> *do* indicate
             const requests = rejectedRequests[destBase][destIdent][destUri];
             if (indicateBlacklisted ||
@@ -104,4 +104,4 @@ export var FramescriptServices = {
   initFunctions.push(() => {
     browser.runtime.onMessage.addListener(onMessage);
   });
-}());
+})();

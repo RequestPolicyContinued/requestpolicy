@@ -27,9 +27,9 @@ import {FileUtil} from "lib/utils/files";
 import {RulesetStorage} from "lib/ruleset-storage";
 import {MainEnvironment} from "lib/environment";
 
-//==============================================================================
+// =============================================================================
 // Constants
-//==============================================================================
+// =============================================================================
 
 export const SUBSCRIPTION_UPDATED_TOPIC =
     "rpcontinued-subscription-policy-updated";
@@ -46,12 +46,12 @@ const SUBSCRIPTION_UPDATE_SUCCESS = "SUCCESS";
 const SUBSCRIPTION_UPDATE_NOT_NEEDED = "NOT_NEEDED";
 const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
 
-//==============================================================================
+// =============================================================================
 // utilities
-//==============================================================================
+// =============================================================================
 
 function maybeCallback(aCallback) {
-  return function() {
+  return function(...args) {
     let ok = true;
     try {
       ok = MainEnvironment.isShuttingDownOrShutDown() === false;
@@ -59,20 +59,22 @@ function maybeCallback(aCallback) {
       // Probably MainEnvironment is not available anymore, because RP already
       // being shut down.
       ok = false;
-      console.warn("[RequestPolicy] Catched error: ", e);
+      console.error("[RequestPolicy] Catched error: ");
+      console.dir(e);
     }
     if (!ok) {
+      // eslint-disable-next-line no-console
       console.debug("[RequestPolicy] Did not call callback function");
       return;
     }
-    aCallback.apply(null, arguments);
+    aCallback(...args);
   };
 }
 
 function setTimeout(func, delay) {
-  var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-  var event = {
-    notify: maybeCallback(func)
+  const timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  const event = {
+    notify: maybeCallback(func),
   };
   timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
   return timer;
@@ -82,9 +84,9 @@ function dprint(msg) {
   Logger.info(msg);
 }
 
-//==============================================================================
+// =============================================================================
 // UserSubscriptions
-//==============================================================================
+// =============================================================================
 
 /**
  * Represents all of the subscriptions a user has enabled. This is where user
@@ -92,7 +94,7 @@ function dprint(msg) {
  * subscriptions.
  */
 export function UserSubscriptions() {
-  var userSubsFile = FileUtil.getRPUserDir();
+  const userSubsFile = FileUtil.getRPUserDir();
   userSubsFile.appendRelativePath("subscriptions.json");
   let jsonData = "{}";
   if (userSubsFile.exists()) {
@@ -108,9 +110,9 @@ export function UserSubscriptions() {
           "allow_functionality": {},
           "allow_mozilla": {},
           "allow_sameorg": {},
-          "deny_trackers": {}
-        }
-      }
+          "deny_trackers": {},
+        },
+      },
     };
   }
   this._lists = this._data.lists;
@@ -122,15 +124,15 @@ UserSubscriptions.prototype = {
   },
 
   save: function() {
-    var userSubsFile = FileUtil.getRPUserDir();
+    const userSubsFile = FileUtil.getRPUserDir();
     userSubsFile.appendRelativePath("subscriptions.json");
     FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
   getSubscriptionInfo: function() {
-    var lists = this._data.lists;
-    var result = {};
-    for (var listName in lists) {
+    const lists = this._data.lists;
+    const result = {};
+    for (let listName in lists) {
       if (!lists[listName].subscriptions) {
         continue;
       }
@@ -143,7 +145,7 @@ UserSubscriptions.prototype = {
   },
 
   addSubscription: function(listName, subName) {
-    var lists = this._data.lists;
+    const lists = this._data.lists;
     if (!lists[listName]) {
       lists[listName] = {};
     }
@@ -155,7 +157,7 @@ UserSubscriptions.prototype = {
   },
 
   removeSubscription: function(listName, subName) {
-    var lists = this._data.lists;
+    const lists = this._data.lists;
     if (lists[listName] && lists[listName].subscriptions &&
         lists[listName].subscriptions[subName]) {
       delete lists[listName].subscriptions[subName];
@@ -169,8 +171,8 @@ UserSubscriptions.prototype = {
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
   update: function(callback, serials) {
-    var updatingLists = {};
-    var updateResults = {};
+    const updatingLists = {};
+    const updateResults = {};
 
     function recordDone(listName, subName, result) {
       dprint("Recording done: " + listName + " " + subName);
@@ -178,26 +180,25 @@ UserSubscriptions.prototype = {
         updateResults[listName][subName] = result;
         let list = updatingLists[listName];
         delete list[subName];
-        for (let i in list) { // jshint ignore:line
+        for (let i in list) {
           return; // What's that??
         }
       }
       delete updatingLists[listName];
-      for (let i in updatingLists) { // jshint ignore:line
+      for (let i in updatingLists) {
         return; // What's that??
       }
       setTimeout(() => callback(updateResults), 0);
     }
 
-    var listCount = 0;
-    /* jshint -W083 */ // Don't make functions within a loop.
-    for (var listName in serials) {
+    let listCount = 0;
+    for (let listName in serials) {
       if (!this._lists[listName] || !this._lists[listName].subscriptions) {
         dprint("Skipping update of unsubscribed list: " + listName);
         continue;
       }
       let updateSubs = {};
-      var subCount = 0;
+      let subCount = 0;
       for (let subName in serials[listName]) {
         if (!this._lists[listName].subscriptions[subName]) {
           dprint("Skipping update of unsubscribed subscription: " + listName +
@@ -211,7 +212,7 @@ UserSubscriptions.prototype = {
         dprint("Skipping list with no subscriptions: " + listName);
         continue;
       }
-      var url = this._lists[listName].url;
+      let url = this._lists[listName].url;
       if (!url) {
         url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + ".json";
       }
@@ -219,7 +220,7 @@ UserSubscriptions.prototype = {
         dprint("Skipping list without url: " + listName);
         continue;
       }
-      var list = new SubscriptionList(listName, url);
+      const list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
       for (let subName in updateSubs) {
         dprint("Will update subscription: " + listName + " " + subName);
@@ -253,18 +254,17 @@ UserSubscriptions.prototype = {
       dprint("Will update list: " + listName);
       list.updateMetadata(metadataSuccess, metadataError);
     }
-    /* jshint +W083 */ // Don't make functions within a loop.
 
     if (listCount === 0) {
       dprint("No lists to update.");
       setTimeout(() => callback(updateResults), 0);
     }
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // SubscriptionList
-//==============================================================================
+// =============================================================================
 
 /**
  * Represents a list of available subscriptions. Any actual subscription belongs
@@ -295,9 +295,9 @@ SubscriptionList.prototype = {
 
   updateMetadata: function(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
-    var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+    const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Ci.nsIXMLHttpRequest);
-    var self = this;
+    const self = this;
     req.onload = maybeCallback(function(event) {
       try {
         self._data = JSON.parse(req.responseText);
@@ -316,7 +316,6 @@ SubscriptionList.prototype = {
   },
 
   updateSubscriptions: function(userSubs, successCallback, errorCallback) {
-    /* jshint -W083 */ // Don't make functions within a loop.
     for (let subName in userSubs) {
       let serial = this.getSubscriptionSerial(subName);
       if (serial === null) {
@@ -346,7 +345,6 @@ SubscriptionList.prototype = {
         setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
-    /* jshint +W083 */ // Don't make functions within a loop.
   },
 
   // getSubscriptionNames : function () {
@@ -369,12 +367,12 @@ SubscriptionList.prototype = {
       return null;
     }
     return this._data.subscriptions[subName].url;
-  }
+  },
 };
 
-//==============================================================================
+// =============================================================================
 // Subscription
-//==============================================================================
+// =============================================================================
 
 /**
  * Represents a particular subscription policy available through a given
@@ -406,9 +404,9 @@ Subscription.prototype = {
   update: function(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
 
-    var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
+    const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
         createInstance(Ci.nsIXMLHttpRequest);
-    var self = this;
+    const self = this;
     req.onload = maybeCallback(function(event) {
       try {
         self._rawData = req.responseText;
@@ -436,14 +434,14 @@ Subscription.prototype = {
         }
         // The rest of the sanity checking is done by RawRuleset().
         try {
-          var rawRuleset = new RawRuleset(self._rawData);
+          const rawRuleset = new RawRuleset(self._rawData);
           RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + ".json",
                 self._list);
         } catch (e) {
           setTimeout(() => errorCallback(self, e.toString()), 0);
           return;
         }
-        var subInfo = {};
+        const subInfo = {};
         subInfo[self._list] = {};
         subInfo[self._list][self._name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
@@ -460,6 +458,6 @@ Subscription.prototype = {
     });
     req.open("GET", this._url);
     req.send(null);
-  }
+  },
 
 };

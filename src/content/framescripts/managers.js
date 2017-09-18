@@ -25,5 +25,6 @@ import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
 import {FramescriptToOverlayCommunication}
     from "framescripts/framescript-to-overlay-communication.js";
 
-export var mlManager = new ManagerForMessageListeners(MainEnvironment, cfmm);
-export var overlayComm = new FramescriptToOverlayCommunication(MainEnvironment);
+export const mlManager = new ManagerForMessageListeners(MainEnvironment, cfmm);
+export const overlayComm =
+    new FramescriptToOverlayCommunication(MainEnvironment);

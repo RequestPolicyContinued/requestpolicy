@@ -22,16 +22,18 @@
 
 import {Environment, MainEnvironment} from "lib/environment";
 
-//==============================================================================
+// =============================================================================
 // ErrorTriggeringService
-//==============================================================================
+// =============================================================================
 
-var ErrorTriggeringService = createErrorTriggeringService();
+const ErrorTriggeringService = createErrorTriggeringService();
 ErrorTriggeringService.bootstrap();
 
 /**
  * Triggers errors for a RequestPolicy UI test.
  * It's used to test Error Detection from the UI tests.
+ *
+ * @return {ErrorTriggeringService}
  */
 function createErrorTriggeringService() {
   let self = {};
@@ -74,23 +76,27 @@ function createErrorTriggeringService() {
    * to two strings:
    *   ["foo", "bar:baz"]
    * Only the first colon counts.
+   *
+   * @param {string} aString
+   * @return {[string, string]}
    */
   function splitColon(aString) {
-    var index = aString.indexOf(":");
+    const index = aString.indexOf(":");
     if (index === -1) {
       return [aString, ""];
     }
-    var part1 = aString.substr(0, index);
-    var part2 = aString.substr(index + 1);
+    const part1 = aString.substr(0, index);
+    const part2 = aString.substr(index + 1);
     return [part1, part2];
   }
 
   function produceReferenceError() {
-    var localVar = nonexistantVariable; // jshint ignore:line
+    // eslint-disable-next-line no-unused-vars, no-undef
+    const localVar = nonexistantVariable;
   }
 
   function runAsync(aFunction) {
-    var runnable = {run: aFunction};
+    const runnable = {run: aFunction};
     Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
   }

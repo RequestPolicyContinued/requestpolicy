@@ -23,7 +23,7 @@
 (function() {
   var {RequestProcessor} = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   function getNRequestResultObjects(aRequestSet) {
     var n = 0;
@@ -62,6 +62,8 @@
 
   /**
    * Delete all own properties of an object.
+   *
+   * @param {Object} obj
    */
   function deleteOwnProperties(obj) {
     for (var key in obj) {
@@ -89,7 +91,7 @@
     var list = $("<ul>");
     info.append(list);
 
-    var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests
+    var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests,
         } = getMemoryInfo();
     list.append("<li>RequestResult objects: " + nRRTotal +
         " (" + nRRAllowed + " allowed requests, " +
@@ -111,4 +113,4 @@
     list.append("<li>" + nClickedLinks + " clicked links</li>");
     list.append("<li>" + nFaviconRequests + " favicon requests</li>");
   };
-}());
+})();

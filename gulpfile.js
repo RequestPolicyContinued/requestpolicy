@@ -1,16 +1,16 @@
-"use strict"; /* jshint node: true */
+/* eslint-env node */
+"use strict";
 
-/* jscs:disable disallowSpacesInsideObjectBrackets */
-/* jscs:disable maximumLineLength */
+/* eslint max-len: [error, 100], no-multi-spaces: off, object-curly-spacing: off */
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // imports
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const exec = require("child_process").exec;
 const del = require("del");
 const gulp = require("gulp");
-const debug = require("gulp-debug"); /* jshint ignore:line */ /* (ignore if unused) */
+const debug = require("gulp-debug"); // eslint-disable-line no-unused-vars
 const gulpif = require("gulp-if");
 const gulpIgnore = require("gulp-ignore");
 const preprocess = require("gulp-preprocess");
@@ -24,19 +24,18 @@ const nodePath = require("path");
 
 const config = require("./config.json");
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // constants, utilities
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const srcDirRelative = `src`;
-const srcDir = `${__dirname}/${srcDirRelative}`; /* jshint ignore:line */ /* (ignore if unused) */
+const srcDir = `${__dirname}/${srcDirRelative}`; // eslint-disable-line no-unused-vars
 
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
 
-const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) */
-
+const fileFilter = (function() {
   function _array(aAny) {
     return Array.isArray(aAny) ? aAny : [aAny];
   }
@@ -45,20 +44,20 @@ const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) 
     return new Set(_array(aAny));
   }
 
+  // eslint-disable-next-line complexity
   function pathMatches(aPath, aFilter) {
-    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
     if (Array.isArray(aFilter)) {
       return aFilter.some(filter => pathMatches(aPath, filter));
     }
     let {name: stem, ext} = nodePath.parse(aPath);
     if ("pathRegex" in aFilter) {
-      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) { return false; }
+      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) return false;
     }
     if ("stem" in aFilter) {
-      if (!_set(aFilter.stem).has(stem)) { return false; }
+      if (!_set(aFilter.stem).has(stem)) return false;
     }
     if ("ext" in aFilter) {
-      if (!_set(aFilter.ext).has(ext)) { return false; }
+      if (!_set(aFilter.ext).has(ext)) return false;
     }
     return true;
   }
@@ -83,20 +82,20 @@ const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) 
     ]);
   }
 
+  // eslint-disable-next-line complexity
   function fileMatches(aFilter, aVinylFile) {
-    /* jshint -W074 */ // This function's cyclomatic complexity is too high.
     if (Array.isArray(aFilter)) {
       return aFilter.some(filter => fileMatches(filter, aVinylFile));
     }
-    if (!pathMatches(aVinylFile.path, aFilter)) { return false; }
+    if (!pathMatches(aVinylFile.path, aFilter)) return false;
     if ("originalPath" in aFilter) {
-      if (!pathMatches(originalPath(aVinylFile), aFilter.originalPath)) { return false; }
+      if (!pathMatches(originalPath(aVinylFile), aFilter.originalPath)) return false;
     }
     if ("isModule" in aFilter) {
-      if (isModule(aVinylFile) !== aFilter.isModule) { return false; }
+      if (isModule(aVinylFile) !== aFilter.isModule) return false;
     }
     if ("not" in aFilter) {
-      if (fileMatches(aFilter.not, aVinylFile)) { return false; }
+      if (fileMatches(aFilter.not, aVinylFile)) return false;
     }
     return true;
   }
@@ -114,7 +113,7 @@ const fileFilter = (function() { /* jshint ignore:line */ /* (ignore if unused) 
       return gulpif(conditionFactory(aFilter), aThen, aElse);
     },
   };
-}());
+})();
 
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
@@ -122,6 +121,7 @@ function _sanitizeArgsForAddTask(aFn) {
       fn = deps;
       deps = [];
     }
+    // eslint-disable-next-line no-invalid-this
     aFn.call(this, name, deps, fn);
   };
 }
@@ -141,9 +141,10 @@ gulp.task = (function() {
         return rv;
       };
     }
+    // eslint-disable-next-line no-invalid-this
     origGulpTask.call(this, name, deps, fn);
   });
-}());
+})();
 
 const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder) => {
   const tasks = [];
@@ -159,9 +160,9 @@ const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder)
   gulp.task(namePrefix, tasks);
 });
 
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // version strings
-//------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 const versionData = {};
 
@@ -192,9 +193,9 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
   return Promise.resolve();
 });
 
-//==============================================================================
+// =============================================================================
 // builds
-//==============================================================================
+// =============================================================================
 
 const BUILDS = [
   { alias: "ui-testing",  isDev: true,  isAMO: false, version: "uniqueVersion" },
@@ -223,9 +224,9 @@ BUILDS.forEach(build => {
       version: `versionData:${build.version}`,
     };
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // clean, XPI
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     gulp.task(`clean:${extensionType}:${build.alias}`, () => {
       return del([buildDir]);
@@ -242,9 +243,9 @@ BUILDS.forEach(build => {
       return stream;
     });
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // build data
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     const buildData = {};
 
@@ -257,16 +258,16 @@ BUILDS.forEach(build => {
           "RP_VERSION": versionData[build.version],
         };
 
-        if (build.isAMO) { context.AMO = "TRUE"; }
-        if (build.alias === "ui-testing") { context.UI_TESTING = "TRUE"; }
+        if (build.isAMO) context.AMO = "TRUE";
+        if (build.alias === "ui-testing") context.UI_TESTING = "TRUE";
 
         return Promise.resolve();
       });
     });
 
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // build utilities
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     const conditionalDirsRelative = [extensionType].
         concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
@@ -293,9 +294,9 @@ BUILDS.forEach(build => {
       }, []);
     }
 
-    //----------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
     // main build tasks
-    //----------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     addGulpTasks(`build:${extensionType}:${build.alias}`,
                  [`clean:${extensionType}:${build.alias}`],
@@ -426,8 +427,8 @@ BUILDS.forEach(build => {
   });
 });
 
-//==============================================================================
+// =============================================================================
 // default task
-//==============================================================================
+// =============================================================================
 
 gulp.task("default", ["xpi:nightly"]);

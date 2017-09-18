@@ -20,11 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // JSUtils
-//==============================================================================
+// =============================================================================
 
-export var JSUtils = (function() {
+export const JSUtils = (function() {
   let self = {};
 
   self.arrayIncludes = function(array, searchElement) {
@@ -45,12 +45,12 @@ export var JSUtils = (function() {
           value,
           writable: true,
           configurable: true,
-          enumerable: true
+          enumerable: true,
         });
         return value;
       },
       configurable: true,
-      enumerable: true
+      enumerable: true,
     });
   };
 
@@ -63,6 +63,9 @@ export var JSUtils = (function() {
 
   /**
    * Create an array containing the elements [0, ..., n-1].
+   *
+   * @param {number} n
+   * @return {Array<number>}
    */
   self.range = function(n) {
     let array = [];
@@ -73,4 +76,4 @@ export var JSUtils = (function() {
   };
 
   return self;
-}());
+})();

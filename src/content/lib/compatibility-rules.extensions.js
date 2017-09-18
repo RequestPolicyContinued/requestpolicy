@@ -27,7 +27,7 @@ export default [
     rules: [
       ["file://", "http://userscripts.org/"],
       ["file://", "http://static.userscripts.org/"],
-    ]
+    ],
   },
   {
     ids: [
@@ -37,7 +37,7 @@ export default [
     ],
     rules: [
       ["resource://brief-content/", null],
-    ]
+    ],
   },
   {
     ids: [
@@ -62,27 +62,27 @@ export default [
     rules: [
       [null, "symnst:"],
       [null, "symres:"],
-    ]
+    ],
   },
   {
     ids: ["{c45c406e-ab73-11d8-be73-000a95be3b12}"], // Web Developer
     rules: [
       ["about:blank", "http://jigsaw.w3.org/css-validator/validator"],
       ["about:blank", "http://validator.w3.org/check"],
-    ]
+    ],
   },
   {
     ids: ["{c07d1a49-9894-49ff-a594-38960ede8fb9}"], // Update Scanner
     topLevelDocTranslationRules: [
       ["chrome://updatescan/content/diffPage.xul", "data:text/html"],
-    ]
+    ],
   },
   {
     ids: ["FirefoxAddon@similarWeb.com"], // SimilarWeb
     rules: [
       ["http://api2.similarsites.com/", "http://images2.similargroup.com/"],
       ["http://www.similarweb.com/", "http://go.similarsites.com/"],
-    ]
+    ],
   },
   {
     ids: ["{6614d11d-d21d-b211-ae23-815234e1ebb5}"], // Dr. Web Link Checker
@@ -94,13 +94,13 @@ export default [
     ids: ["keefox@chris.tomlinson"], // KeeFox
     rules: [
       ["resource://", "ws://127.0.0.1"],
-    ]
+    ],
   },
   {
     ids: ["jid1-TPTs1Z1UvUn2fA@jetpack"], // Enpass
     rules: [
       ["resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/", "ws://localhost"],
-    ]
+    ],
   },
   // @ifdef UI_TESTING
   {

@@ -25,11 +25,11 @@ import {loadOverlayIntoWindow} from "ui/overlay.js";
 import {loadMenuIntoWindow} from "ui/menu.js";
 import {loadClassicmenuIntoWindow} from "ui/classicmenu.js";
 
-//==============================================================================
+// =============================================================================
 // OverlayController
-//==============================================================================
+// =============================================================================
 
-export var OverlayController = (function() {
+export const OverlayController = (function() {
   let self = {};
 
   self.loadIntoWindow = function(window) {
@@ -60,4 +60,4 @@ export var OverlayController = (function() {
   };
 
   return self;
-}());
+})();

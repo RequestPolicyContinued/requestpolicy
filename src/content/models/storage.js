@@ -23,11 +23,11 @@
 
 import {Storage as StorageClass} from "lib/classes/storage";
 
-//==============================================================================
+// =============================================================================
 // Storage
-//==============================================================================
+// =============================================================================
 
-export var Storage = new StorageClass({
+export const Storage = new StorageClass({
   cachedKeys: [
     "autoReload",
     "confirmSiteInfo",
@@ -63,6 +63,6 @@ export var Storage = new StorageClass({
   boolAliases: [
     ["defaultPolicy.allow", "DefaultAllow"],
     ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
-    ["startWithAllowAllEnabled", "BlockingDisabled"]
+    ["startWithAllowAllEnabled", "BlockingDisabled"],
   ],
 });

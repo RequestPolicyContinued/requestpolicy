@@ -24,9 +24,9 @@ import {Environment, MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
 import {Info} from "lib/utils/info";
 
-//==============================================================================
+// =============================================================================
 // utilities, constants
-//==============================================================================
+// =============================================================================
 
 const FILENAMES = {
   "basicprefs": "basicprefs.html",
@@ -52,15 +52,16 @@ function getURI(aURI) {
   return Services.io.newURI(spec, null, null);
 }
 
-//==============================================================================
+// =============================================================================
 // AboutRequestPolicy
-//==============================================================================
+// =============================================================================
 
-export var AboutRequestPolicy = (function() {
+export const AboutRequestPolicy = (function() {
   let self = {};
 
   self.classDescription = "about:requestpolicy";
   self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
+  // eslint-disable-next-line new-cap
   self.classID = ComponentsID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
 
@@ -71,6 +72,7 @@ export var AboutRequestPolicy = (function() {
   /**
    * @param {nsIURI} aURI
    * @param {nsILoadInfo} aLoadInfo Only available on Gecko 36+.
+   * @return {nsIChannel}
    */
   self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);
@@ -86,18 +88,21 @@ export var AboutRequestPolicy = (function() {
     return channel;
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIFactory interface implementation
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.createInstance = function(outer, iid) {
     if (outer) {
+      // eslint-disable-next-line no-throw-literal
       throw Cr.NS_ERROR_NO_AGGREGATION;
     }
+    // eslint-disable-next-line new-cap
     return self.QueryInterface(iid);
   };
 
   function registerFactory() {
+    // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar)
         .registerFactory(self.classID, self.classDescription,
                          self.contractID, self);
@@ -120,6 +125,7 @@ export var AboutRequestPolicy = (function() {
       });
 
   function unregisterFactory() {
+    // eslint-disable-next-line new-cap
     let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
 
     // This needs to run asynchronously, see Mozilla bug 753687
@@ -131,4 +137,4 @@ export var AboutRequestPolicy = (function() {
                                          unregisterFactory);
 
   return self;
-}());
+})();

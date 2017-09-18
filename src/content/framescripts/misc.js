@@ -28,7 +28,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
 (function() {
   let {content, sendSyncMessage} = cfmm;
 
-  //==============================================================================
+  // ===========================================================================
 
   function reloadDocument() {
     content.document.location.reload(false);
@@ -51,13 +51,14 @@ import {mlManager, overlayComm} from "framescripts/managers";
   // Listen for click events so that we can allow requests that result from
   // user-initiated link clicks and form submissions.
   function mouseClicked(event) {
-    // If mozInputSource is undefined or zero, then this was a javascript-generated event.
-    // If there is a way to forge mozInputSource from javascript, then that could be used
-    // to bypass RequestPolicy.
+    // If mozInputSource is undefined or zero, then this was a
+    // javascript-generated event. If there is a way to forge mozInputSource
+    // from javascript, then that could be used to bypass RequestPolicy.
     if (!event.mozInputSource) {
       return;
     }
-    // The following show up as button value 0 for links and form input submit buttons:
+    // The following show up as button value 0 for links and form input submit
+    // buttons:
     // * left-clicks
     // * enter key while focused
     // * space bar while focused (no event sent for links in this case)
@@ -72,7 +73,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
         sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
                         {
                           origin: event.target.ownerDocument.URL,
-                          dest: event.target.href
+                          dest: event.target.href,
                         });
       });
       return;
@@ -87,7 +88,7 @@ import {mlManager, overlayComm} from "framescripts/managers";
         sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
                         {
                           origin: event.target.ownerDocument.URL,
-                          dest: event.target.form.action
+                          dest: event.target.form.action,
                         });
       });
       return;
@@ -97,4 +98,4 @@ import {mlManager, overlayComm} from "framescripts/managers";
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
     MainEnvironment.elManager.addListener(cfmm, "click", mouseClicked, true);
   });
-}());
+})();

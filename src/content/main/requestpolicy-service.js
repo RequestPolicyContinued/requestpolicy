@@ -33,22 +33,22 @@ import {Info} from "lib/utils/info";
 
 const {AMO} = C;
 
-//==============================================================================
+// =============================================================================
 // rpService
-//==============================================================================
+// =============================================================================
 
-export var rpService = (function() {
+export const rpService = (function() {
   let self = {};
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Internal Data
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let subscriptions = null;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Utility
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   function loadConfigAndRules() {
     subscriptions = new UserSubscriptions();
@@ -67,7 +67,7 @@ export var rpService = (function() {
         serials[listName][subName] = -1;
       }
     }
-    var loadedSubs = PolicyManager.getSubscriptionRulesets();
+    const loadedSubs = PolicyManager.getSubscriptionRulesets();
     for (let listName in loadedSubs) {
       for (let subName in loadedSubs[listName]) {
         if (!serials[listName]) {
@@ -86,7 +86,7 @@ export var rpService = (function() {
   // TODO: move to window manager
   function maybeShowSetupTab() {
     if (!Storage.get("welcomeWindowShown")) {
-      var url = "about:requestpolicy?setup";
+      const url = "about:requestpolicy?setup";
 
       let win = WindowUtils.getMostRecentBrowserWindow();
       if (win === null) {
@@ -119,12 +119,12 @@ export var rpService = (function() {
    * Module for detecting installations of other RequestPolicy versions,
    * which have a different extension ID.
    */
-  var DetectorForOtherInstallations = (function() {
+  const DetectorForOtherInstallations = (function() {
     const NOTICE_URL = "chrome://rpcontinued/content/" +
         "multiple-installations.html";
 
     // The other extension IDs of RequestPolicy.
-    var addonIDs = Object.freeze(new Set([
+    const addonIDs = Object.freeze(new Set([
       // Detect the "original" add-on (v0.5; released on AMO).
       "requestpolicy@requestpolicy.com",
       // Detect "RPC Legacy" (v0.5; AMO version).
@@ -167,10 +167,10 @@ export var rpService = (function() {
     }
 
     // On startup, the tab should be opened only once.
-    var initialCheckDone = false;
+    let initialCheckDone = false;
 
     function addonListCallback(addons) {
-      var activeAddons = addons.
+      const activeAddons = addons.
           filter(addon => addonIDs.has(addon.id)).
           filter(addon => addon.enabled);
       if (activeAddons.length === 0) {
@@ -182,7 +182,7 @@ export var rpService = (function() {
         return;
       }
 
-      var rv = openTab();
+      const rv = openTab();
 
       if (rv === true) {
         initialCheckDone = true;
@@ -206,13 +206,13 @@ export var rpService = (function() {
 
     return {
       maybeShowMultipleInstallationsWarning:
-          maybeShowMultipleInstallationsWarning
+          maybeShowMultipleInstallationsWarning,
     };
-  }());
+  })();
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // startup and shutdown functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   // prepare back-end
   MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
@@ -228,7 +228,7 @@ export var rpService = (function() {
       // support for old browsers (Firefox <20)
       // TODO: support per-window temporary rules
       //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
-      "private-browsing"
+      "private-browsing",
     ], self.observe);
   }
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
@@ -248,13 +248,12 @@ export var rpService = (function() {
     return subscriptions;
   };
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // nsIObserver interface
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.observe = function(subject, topic, data) {
     switch (topic) {
-
       // FIXME: The subscription logic should reside in the
       // subscription module.
 
@@ -316,4 +315,4 @@ export var rpService = (function() {
   };
 
   return self;
-}());
+})();

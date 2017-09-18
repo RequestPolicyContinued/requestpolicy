@@ -29,7 +29,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     Storage,
   } = browser.extension.getBackgroundPage();
 
-  //============================================================================
+  // ===========================================================================
 
   var PAGE_STRINGS = [
     "basic",
@@ -39,7 +39,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "dontIndicateBlacklisted",
     "autoReload",
     "menu",
-    "allowAddingNonTemporaryRulesInPBM"
+    "allowAddingNonTemporaryRulesInPBM",
   ];
 
   $(function() {
@@ -106,4 +106,4 @@ import {common, WinEnv, elManager, $id} from "./common";
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);
   };
-}());
+})();

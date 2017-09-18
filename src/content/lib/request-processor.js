@@ -34,7 +34,7 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
         REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
         REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
-        REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL
+        REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL,
         } from "lib/request-result";
 import {RequestSet} from "lib/request-set";
 import {MainEnvironment} from "lib/environment";
@@ -45,9 +45,9 @@ import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 import RPContentPolicy from "main/content-policy";
 
-//==============================================================================
+// =============================================================================
 // constants
-//==============================================================================
+// =============================================================================
 
 const {LOG_REQUESTS, LOG_GETTING_SAVED_REQUESTS} = C;
 
@@ -60,18 +60,18 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 
 const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor
-//==============================================================================
+// =============================================================================
 
-export var RequestProcessor = (function() {
+export let RequestProcessor = (function() {
   let self = {};
 
   let internal = Utils.createModuleInternal(self);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // private properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Number of elapsed milliseconds from the time of the last shouldLoad() call
@@ -92,7 +92,7 @@ export var RequestProcessor = (function() {
     "origin": null,
     "destination": null,
     "time": 0,
-    "result": null
+    "result": null,
   };
 
   let historyRequests = {};
@@ -109,9 +109,9 @@ export var RequestProcessor = (function() {
 
   internal.requestObservers = new Set();
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // private functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   function notifyRequestObserversOfBlockedRequest(request) {
     for (let observer of internal.requestObservers) {
@@ -200,6 +200,7 @@ export var RequestProcessor = (function() {
    * @param {string} reason
    * @param {Request} request
    * @param {boolean} unforbidable
+   * @return {number}
    */
   function accept(reason, request, unforbidable) {
     if (LOG_REQUESTS) {
@@ -239,7 +240,7 @@ export var RequestProcessor = (function() {
   internal.recordAllowedRequest = recordAllowedRequest;
 
   function cacheShouldLoadResult(result, originUri, destUri) {
-    var date = new Date();
+    const date = new Date();
     lastShouldLoadCheck.time = date.getTime();
     lastShouldLoadCheck.destination = destUri;
     lastShouldLoadCheck.origin = originUri;
@@ -248,7 +249,7 @@ export var RequestProcessor = (function() {
 
   internal.checkByDefaultPolicy = function(aRequest) {
     if (Storage.isDefaultAllow()) {
-      var result = new RequestResult(true,
+      const result = new RequestResult(true,
           REQUEST_REASON_DEFAULT_POLICY);
       return result;
     }
@@ -257,8 +258,8 @@ export var RequestProcessor = (function() {
     let destUri = aRequest.destURI;
 
     if (Storage.isDefaultAllowSameDomain()) {
-      var originDomain = DomainUtil.getBaseDomain(originUri);
-      var destDomain = DomainUtil.getBaseDomain(destUri);
+      const originDomain = DomainUtil.getBaseDomain(originUri);
+      const destDomain = DomainUtil.getBaseDomain(destUri);
 
       if (originDomain !== null && destDomain !== null) {
         // apply this rule only if both origin and dest URIs
@@ -278,8 +279,9 @@ export var RequestProcessor = (function() {
       return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
     }
 
-    var originIdent = DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP);
-    var destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
+    const originIdent = DomainUtil.getIdentifier(
+        originUri, DomainUtil.LEVEL_SOP);
+    const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
         REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   };
@@ -299,7 +301,7 @@ export var RequestProcessor = (function() {
   function isDuplicateRequest(request) {
     if (lastShouldLoadCheck.origin === request.originURI &&
         lastShouldLoadCheck.destination === request.destURI) {
-      var date = new Date();
+      const date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
         if (LOG_REQUESTS) {
@@ -323,8 +325,8 @@ export var RequestProcessor = (function() {
 
   function _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
       isAllowed) {
-    var result = new RequestSet();
-    var requests = allRequestsOnDocument.getAll();
+    const result = new RequestSet();
+    const requests = allRequestsOnDocument.getAll();
 
     // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
     // domain and hostname levels.
@@ -368,6 +370,8 @@ export var RequestProcessor = (function() {
 
     return result;
   }
+
+  /* eslint-disable */
 
   // function _getOtherOriginsHelperFromDOM(document, reqSet) {
   //   var documentUri = DomainUtil
@@ -414,6 +418,8 @@ export var RequestProcessor = (function() {
   //   }
   // },
 
+  /* eslint-enable */
+
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
     if (LOG_GETTING_SAVED_REQUESTS) {
@@ -425,12 +431,12 @@ export var RequestProcessor = (function() {
       checkedOrigins[originURI] = true;
     }
     _addAllDeniedRequestsFromURI(originURI, reqSet);
-    var allowedRequests = RequestProcessor._allowedRequests
+    const allowedRequests = RequestProcessor._allowedRequests
         .getOriginUri(originURI);
     if (allowedRequests) {
-      for (var destBase in allowedRequests) {
-        for (var destIdent in allowedRequests[destBase]) {
-          for (var destURI in allowedRequests[destBase][destIdent]) {
+      for (let destBase in allowedRequests) {
+        for (let destIdent in allowedRequests[destBase]) {
+          for (let destURI in allowedRequests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
               Logger.debug("Found allowed request to <" + destURI + "> " +
                   "from <" + originURI + ">");
@@ -456,11 +462,11 @@ export var RequestProcessor = (function() {
       Logger.debug("Looking for other origins within denied requests from " +
           originURI);
     }
-    var requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
+    const requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
-      for (var destBase in requests) {
-        for (var destIdent in requests[destBase]) {
-          for (var destUri in requests[destBase][destIdent]) {
+      for (let destBase in requests) {
+        for (let destIdent in requests[destBase]) {
+          for (let destUri in requests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
               Logger.debug("Found denied request to <" + destUri + "> from <" +
                   originURI + ">");
@@ -473,9 +479,9 @@ export var RequestProcessor = (function() {
     }
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // public properties
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   // TODO: make them private
   self._rejectedRequests = new RequestSet();
@@ -486,23 +492,25 @@ export var RequestProcessor = (function() {
   self.clickedLinksReverse = internal.clickedLinksReverse;
   self.faviconRequests = internal.faviconRequests;
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // public functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   /**
    * Process a NormalRequest.
    *
    * @param {NormalRequest} request
+   * @return {number}
    */
+  // eslint-disable-next-line complexity
   self.process = function(request) {
     // uncomment for debugging:
-    //Logger.debug("request: " +
-    //            (request.aRequestOrigin ? request.aRequestOrigin.spec :
-    //             "<unknown>") +
-    //            " -->  "+request.aContentLocation.spec);
-    //Logger.vardump(request.aRequestOrigin);
-    //Logger.vardump(request.aContentLocation);
+    // Logger.debug("request: " +
+    //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
+    //               "<unknown>") +
+    //              " -->  "+request.aContentLocation.spec);
+    // Logger.vardump(request.aRequestOrigin);
+    // Logger.vardump(request.aContentLocation);
     try {
       if (request.isInternal()) {
         if (LOG_REQUESTS) {
@@ -513,8 +521,8 @@ export var RequestProcessor = (function() {
         return CP_OK;
       }
 
-      var originURI = request.originURI;
-      var destURI = request.destURI;
+      let originURI = request.originURI;
+      let destURI = request.destURI;
 
       if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
         // Before RP has been forked, there was a hack: in case of a request
@@ -566,7 +574,7 @@ export var RequestProcessor = (function() {
       }
 
       if (request.aContentLocation.scheme === "view-source") {
-        var newDestURI = destURI.split(":").slice(1).join(":");
+        const newDestURI = destURI.split(":").slice(1).join(":");
         if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
           if (LOG_REQUESTS) {
@@ -589,9 +597,11 @@ export var RequestProcessor = (function() {
       if (originURI === "about:blank" && request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -638,9 +648,11 @@ export var RequestProcessor = (function() {
       if (request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -677,7 +689,6 @@ export var RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_LINK_CLICK);
         return accept("User-initiated request by link click", request);
-
       } else if (internal.submittedForms[originURI] &&
           internal.submittedForms[originURI][destURI.split("?")[0]]) {
         // Note: we dropped the query string from the destURI because form GET
@@ -693,7 +704,6 @@ export var RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_FORM_SUBMISSION);
         return accept("User-initiated request by form submission", request);
-
       } else if (historyRequests[destURI]) {
         // When the user goes back and forward in their history, a request for
         // the url comes through but is not followed by requests for any of
@@ -748,9 +758,11 @@ export var RequestProcessor = (function() {
       if (request.aContext) {
         let domNode;
         try {
+          // eslint-disable-next-line new-cap
           domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
         } catch (e) {
           if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+            // eslint-disable-next-line no-throw-literal
             throw e;
           }
         }
@@ -764,19 +776,19 @@ export var RequestProcessor = (function() {
         }
       }
 
-      // XMLHttpRequests made within chrome's context have these origins.
-      // Greasemonkey uses such a method to provide their cross-site xhr.
-      if (originURI === "resource://gre/res/hiddenWindow.html" ||
-          originURI === "resource://gre-resources/hiddenWindow.html") {
-      }
+      // // XMLHttpRequests made within chrome's context have these origins.
+      // // Greasemonkey uses such a method to provide their cross-site xhr.
+      // if (originURI === "resource://gre/res/hiddenWindow.html" ||
+      //     originURI === "resource://gre-resources/hiddenWindow.html") {
+      // }
 
       // Now that we have blacklists, a user could prevent themselves from
       // being able to reload a page by blocking requests from * to the
       // destination page. As a simple hack around this, for now we'll always
       // allow request to the same origin. It would be nice to have a a better
       // solution but I'm not sure what that solution is.
-      var originIdent = DomainUtil.getIdentifier(originURI);
-      var destIdent = DomainUtil.getIdentifier(destURI);
+      const originIdent = DomainUtil.getIdentifier(originURI);
+      const destIdent = DomainUtil.getIdentifier(destURI);
       if (originIdent === destIdent &&
           originIdent !== null && destIdent !== null) {
         request.requestResult = new RequestResult(true,
@@ -806,7 +818,7 @@ export var RequestProcessor = (function() {
       // question.
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
-        let {conflictCanBeResolved, shouldAllow
+        let {conflictCanBeResolved, shouldAllow,
              } = request.requestResult.resolveConflict();
         if (conflictCanBeResolved) {
           request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
@@ -853,7 +865,7 @@ export var RequestProcessor = (function() {
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
-        let {conflictCanBeResolved, shouldAllow
+        let {conflictCanBeResolved, shouldAllow,
              } = request.requestResult.resolveConflict();
         if (conflictCanBeResolved) {
           request.requestResult.resultReason =
@@ -922,8 +934,8 @@ export var RequestProcessor = (function() {
       if (request.aExtra !== CP_MAPPEDDESTINATION &&
           internal.mappedDestinations[destURI]) {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
-          var mappedDestUriObj = internal.mappedDestinations
-                                 [destURI][mappedDest];
+          const mappedDestUriObj =
+              internal.mappedDestinations[destURI][mappedDest];
           if (LOG_REQUESTS) {
             Logger.debug("Checking mapped destination: " + mappedDest);
           }
@@ -946,7 +958,6 @@ export var RequestProcessor = (function() {
             CP_REJECT :
             reject("Denied by default policy", request);
       }
-
     } catch (e) {
       console.error("Fatal Error:");
       console.dir(e);
@@ -969,9 +980,12 @@ export var RequestProcessor = (function() {
    *
    * Currently this just looks for prefetch requests that are getting through
    * which we currently can't stop.
+   *
+   * @param {string} aSubject
    */
   let examineHttpRequest = function(aSubject) {
-    var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+    // eslint-disable-next-line new-cap
+    const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
     try {
       // Determine if prefetch requests are slipping through.
       if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
@@ -1089,6 +1103,7 @@ export var RequestProcessor = (function() {
    */
   self.addRequestObserver = function(observer) {
     if (!("observeBlockedRequest" in observer)) {
+      // eslint-disable-next-line no-throw-literal
       throw "Observer passed to addRequestObserver does " +
           "not have an observeBlockedRequest() method.";
     }
@@ -1148,28 +1163,29 @@ export var RequestProcessor = (function() {
    * cases where the user has multiple tabs/windows open to the same page.
    *
    * @param {Browser} browser
+   * @return {RequestSet}
    */
   self.getAllRequestsInBrowser = function(browser) {
-    //var origins = {};
-    var reqSet = new RequestSet();
+    // var origins = {};
+    const reqSet = new RequestSet();
 
     // If we get these from the DOM, then we won't know the relevant
     // rules that were involved with allowing/denying the request.
     // Maybe just look up the allowed/blocked requests in the
     // main allowed/denied request sets before adding them.
-    //_getOtherOriginsHelperFromDOM(document, reqSet);
+    // _getOtherOriginsHelperFromDOM(document, reqSet);
 
-    var uri = DomainUtil.stripFragment(browser.currentURI.spec);
+    const uri = DomainUtil.stripFragment(browser.currentURI.spec);
     _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
     return reqSet;
   };
 
   return self;
-}());
+})();
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor (redirections part)
-//==============================================================================
+// =============================================================================
 
 RequestProcessor = (function(self) {
   let internal = self.getInternal();
@@ -1208,6 +1224,7 @@ RequestProcessor = (function(self) {
    * @param {string} newSpec
    */
   function handleHttpsEverywhereUriRewrite(oldURI, newSpec) {
+    // eslint-disable-next-line new-cap
     oldURI = oldURI.QueryInterface(Ci.nsIURI);
     mapDestinations(oldURI.spec, newSpec);
   }
@@ -1222,11 +1239,11 @@ RequestProcessor = (function(self) {
     // This is not including link clicks, form submissions, and user-allowed
     // redirects.
 
-    var originURI = request.originURI;
-    var destURI = request.destURI;
+    const originURI = request.originURI;
+    const destURI = request.destURI;
 
-    var originURIObj = DomainUtil.getUriObject(originURI);
-    var destURIObj = DomainUtil.getUriObject(destURI);
+    const originURIObj = DomainUtil.getUriObject(originURI);
+    const destURIObj = DomainUtil.getUriObject(destURI);
 
     {
       let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
@@ -1286,7 +1303,7 @@ RequestProcessor = (function(self) {
   }
 
   self.isAllowedRedirect = function(originURI, destURI) {
-    var request = new Request(originURI, destURI);
+    const request = new Request(originURI, destURI);
     return true === checkRedirect(request).isAllowed;
   };
 
@@ -1382,7 +1399,6 @@ RequestProcessor = (function(self) {
                 "from <" + realOrigin + ">");
           }
           self.registerLinkClicked(realOrigin, destURI);
-
         } else if (internal.submittedForms[realOrigin] &&
             internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
           if (LOG_REQUESTS) {
@@ -1442,8 +1458,8 @@ RequestProcessor = (function(self) {
         }
 
         // TODO: implement for form submissions whose redirects are blocked
-        //if (internal.submittedFormsReverse[initialOrigin]) {
-        //}
+        // if (internal.submittedFormsReverse[initialOrigin]) {
+        // }
       }
 
       internal.recordRejectedRequest(request);
@@ -1472,10 +1488,10 @@ RequestProcessor = (function(self) {
       return false;
     }
 
-    var window = browser.ownerGlobal;
+    const window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(function() {
-      var showNotification = Utils.getObjectPath(window, "rpcontinued",
+      const showNotification = Utils.getObjectPath(window, "rpcontinued",
           "overlay", "_showRedirectNotification");
       if (!showNotification) {
         return false;
@@ -1515,10 +1531,11 @@ RequestProcessor = (function(self) {
 
   /**
    * @param {RedirectRequest} aRequest
+   * @return {string}
    */
   function getOriginOfInitialRedirect(aRequest) {
-    var initialOrigin = aRequest.originURI;
-    var initialDest = aRequest.destURI;
+    let initialOrigin = aRequest.originURI;
+    let initialDest = aRequest.destURI; // eslint-disable-line no-unused-vars
 
     // Prevent infinite loops, that is, bound the number of iterations.
     // Note: An apparent redirect loop doesn't mean a problem with a
@@ -1543,6 +1560,9 @@ RequestProcessor = (function(self) {
   /**
    * Checks whether a request is initiated by a content window. If it's from a
    * content window, then it's from unprivileged code.
+   *
+   * @param {RedirectRequest} request
+   * @return {boolean}
    */
   function isContentRequest(request) {
     let loadContext = request._oldChannel.loadContext;
@@ -1555,11 +1575,11 @@ RequestProcessor = (function(self) {
   }
 
   return self;
-}(RequestProcessor));
+})(RequestProcessor);
 
-//==============================================================================
+// =============================================================================
 // RequestProcessor (compatibility part)
-//==============================================================================
+// =============================================================================
 
 /**
  * Detect other installed extensions and the current application and do
@@ -1573,9 +1593,9 @@ RequestProcessor = (function(self) {
   browser.management.onEnabled.addListener(updateExtensionCompatibility);
   browser.management.onDisabled.addListener(updateExtensionCompatibility);
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Extensions compatibility
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let addonIdsToNames = new Map();
   let extRulesToIds = new MapOfSets();
@@ -1589,7 +1609,7 @@ RequestProcessor = (function(self) {
             addonIdsToNames,
             extRulesToIds,
             whitelistedBaseUrisToIds,
-            topLevelDocTranslationRules
+            topLevelDocTranslationRules,
           } = extensionInfosToCompatibilityRules(extensionInfos));
           return;
         }).
@@ -1619,7 +1639,6 @@ RequestProcessor = (function(self) {
     }
 
     EXT_COMPAT_RULES.forEach(spec => {
-      // jshint -W083
       const enabledAddonIds = spec.ids.filter(id => idsToExtInfos.has(id));
       if (enabledAddonIds.length === 0) {
         return;
@@ -1653,13 +1672,13 @@ RequestProcessor = (function(self) {
       addonIdsToNames,
       extRulesToIds,
       whitelistedBaseUrisToIds,
-      topLevelDocTranslationRules
+      topLevelDocTranslationRules,
     };
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Application compatibility
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   let appCompatRules = [];
   let appName;
@@ -1691,9 +1710,9 @@ RequestProcessor = (function(self) {
     return rules;
   }
 
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // exported functions
-  //----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   self.forEachCompatibilityRule = function(aCallback) {
     extRulesToIds.forEach((rule, addonIds) => {
@@ -1727,7 +1746,7 @@ RequestProcessor = (function(self) {
   };
 
   return self;
-}(RequestProcessor));
+})(RequestProcessor);
 
 RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

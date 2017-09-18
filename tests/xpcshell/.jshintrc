@@ -1,7 +1,0 @@
-{
-  "extends": "../../tests/.jshintrc",
-
-  "undef": false,
-  "forin": false,
-  "maxcomplexity": 10
-}

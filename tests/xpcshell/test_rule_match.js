@@ -21,7 +21,7 @@ add_test(function() {
     let destUri = Services.io.newURI(destUriSpec, null, null);
 
     // EXERCISE
-    let [matchedAllowRules, ] = ruleset.check(originUri, destUri);
+    let [matchedAllowRules ] = ruleset.check(originUri, destUri);
 
     // VERIFY
     strictEqual(shouldMatch ? 1 : 0, matchedAllowRules.length);

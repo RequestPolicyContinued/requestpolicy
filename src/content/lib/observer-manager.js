@@ -24,21 +24,23 @@ import {SingleTopicObserver} from "lib/utils/observers";
 import {Environment} from "lib/environment";
 import {Logger} from "lib/logger";
 
-//==============================================================================
+// =============================================================================
 // ObserverManager
-//==============================================================================
+// =============================================================================
 
 /**
  * An ObserverManager provides an interface to `nsIObserverService` which takes
  * care of unregistering the observed topics. Every ObserverManager is bound to
  * an environment.
+ *
+ * @param {Environment} aEnv
  */
 export function ObserverManager(aEnv) {
   let self = this;
 
   self.environment = aEnv;
 
-  if (!!aEnv) {
+  if (aEnv) {
     self.environment.addShutdownFunction(
         Environment.LEVELS.INTERFACE,
         function() {
@@ -47,7 +49,7 @@ export function ObserverManager(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (!!Logger) {
+    if (Logger) {
       Logger.warning("No Environment was specified for " +
                      "a new ObserverManager! This means that the observers " +
                      "won't be unregistered!");

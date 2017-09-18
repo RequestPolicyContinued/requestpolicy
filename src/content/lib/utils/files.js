@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // utilities and constants
-//==============================================================================
+// =============================================================================
 
 /**
  * creates an integer from the arguments
@@ -31,11 +31,13 @@
  * The reason for this function is that octal integer literals (integer with
  * leading zero like 0700) are deprecated. Using them would cause a JavaScript
  * strict warning. See http://www.ecma-international.org/ecma-262/5.1/#sec-B.1
+ *
+ * @return {number}
  */
-function getOctalInt() {
+function getOctalInt(...args) {
   let result = 0;
-  for (let i = 0, len = arguments.length; i < len; ++i) {
-    result += arguments[len - i - 1] * Math.pow(8, i);
+  for (let i = 0, len = args.length; i < len; ++i) {
+    result += args[len - i - 1] * Math.pow(8, i);
   }
   return result;
 }
@@ -45,25 +47,27 @@ const OCTAL_700 = getOctalInt(7, 0, 0); // octal: 0700
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
-//==============================================================================
+// =============================================================================
 // FileUtil
-//==============================================================================
+// =============================================================================
 
-export var FileUtil = {
+export const FileUtil = {
 
   /**
    * Returns the lines of the file in an array.
    *
    * @param {nsIFile} file
+   * @return {Array<string>}
    */
   fileToArray: function(file) {
-    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
+    // eslint-disable-next-line new-cap
     stream.QueryInterface(Ci.nsILineInputStream);
-    var line = {};
-    var lines = [];
-    var hasmore;
+    const line = {};
+    const lines = [];
+    let hasmore;
     do {
       hasmore = stream.readLine(line);
       lines.push(line.value);
@@ -76,6 +80,7 @@ export var FileUtil = {
    * Returns the contents of the file as a string.
    *
    * @param {nsIFile} file
+   * @return {string}
    */
   fileToString: function(file) {
     // FIXME: This function MUST NOT check for the file to exist,
@@ -89,21 +94,22 @@ export var FileUtil = {
     //
     //        The subscription system urgently needs to rewritten,
     //        see issue #597.
-    //if (file.exists() === false) {
-    //  // prevent NS_ERROR_FILE_NOT_FOUND
-    //  return "";
-    //}
-    var stream = Cc["@mozilla.org/network/file-input-stream;1"]
+    // if (file.exists() === false) {
+    //   // prevent NS_ERROR_FILE_NOT_FOUND
+    //   return "";
+    // }
+    const stream = Cc["@mozilla.org/network/file-input-stream;1"]
         .createInstance(Ci.nsIFileInputStream);
     stream.init(file, 0x01, OCTAL_444, 0);
+    // eslint-disable-next-line new-cap
     stream.QueryInterface(Ci.nsILineInputStream);
 
-    var cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
+    const cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
                   createInstance(Ci.nsIConverterInputStream);
     cstream.init(stream, "UTF-8", 0, 0);
 
-    var str = "";
-    var data = {};
+    let str = "";
+    const data = {};
     let read;
     do {
       // Read as much as we can and put it in |data.value|.
@@ -123,16 +129,16 @@ export var FileUtil = {
    * @param {nsIFile} file
    */
   arrayToFile: function(lines, file) {
-    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
+    const cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
 
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
       cos.writeString(lines[i] + "\n");
     }
     cos.close();
@@ -147,12 +153,12 @@ export var FileUtil = {
    * @param {nsIFile} file
    */
   stringToFile: function(str, file) {
-    var stream = Cc["@mozilla.org/network/file-output-stream;1"]
+    const stream = Cc["@mozilla.org/network/file-output-stream;1"]
         .createInstance(Ci.nsIFileOutputStream);
     // write, create, append on write, truncate
     stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-    var cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
+    const cos = Cc["@mozilla.org/intl/converter-output-stream;1"]
         .createInstance(Ci.nsIConverterOutputStream);
     cos.init(stream, "UTF-8", 4096, 0x0000);
     cos.writeString(str);
@@ -166,11 +172,14 @@ export var FileUtil = {
    * it doesn't already exist. Each subdir, if specified, is created if it does
    * not exist.
    *
+   * @param {string?} subdir1
+   * @param {string?} subdir2
+   * @param {string?} subdir3
    * @return {nsIFile}
    */
   getRPUserDir: function(subdir1, subdir2, subdir3) {
-    var profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
-    var file = profileDir.clone();
+    const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
+    const file = profileDir.clone();
     file.appendRelativePath(REQUESTPOLICY_DIR);
     if (!file.exists()) {
       file.create(Ci.nsIFile.DIRECTORY_TYPE, OCTAL_700);
@@ -198,5 +207,5 @@ export var FileUtil = {
     }
 
     return file;
-  }
+  },
 };

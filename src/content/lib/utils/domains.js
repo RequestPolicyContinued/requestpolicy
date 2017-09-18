@@ -23,11 +23,11 @@
 
 import {Logger} from "lib/logger";
 
-//==============================================================================
+// =============================================================================
 // DomainUtil
-//==============================================================================
+// =============================================================================
 
-export var DomainUtil = {};
+export const DomainUtil = {};
 
 /*
  * It's worth noting that many of the functions in this module will
@@ -50,8 +50,8 @@ DomainUtil.LEVEL_HOST = 2;
 DomainUtil.LEVEL_SOP = 3;
 
 DomainUtil.getIdentifier = function(uri, level) {
-  var identifier;
-  var identifierGettingFunctionName;
+  let identifier;
+  let identifierGettingFunctionName;
 
   // We only have one identifier that we're using now:
   //     the pre-path / LEVEL_SOP.
@@ -60,16 +60,17 @@ DomainUtil.getIdentifier = function(uri, level) {
   level = this.LEVEL_SOP;
 
   switch (level) {
-    case this.LEVEL_DOMAIN :
+    case this.LEVEL_DOMAIN:
       identifierGettingFunctionName = "getDomain";
       break;
-    case this.LEVEL_HOST :
+    case this.LEVEL_HOST:
       identifierGettingFunctionName = "getHost";
       break;
-    case this.LEVEL_SOP :
+    case this.LEVEL_SOP:
       identifierGettingFunctionName = "getPrePath";
       break;
-    default :
+    default:
+    // eslint-disable-next-line no-throw-literal
       throw "Invalid identifier level specified " +
           "in DomainUtil.getIdentifier(): " + level;
   }
@@ -122,7 +123,7 @@ DomainUtil.getHost = function(uri) {
 DomainUtil.uriObjHasHost = function(aUriObj) {
   try {
     // simply access the host.
-    aUriObj.host; // jshint ignore:line
+    aUriObj.host;
     return true;
   } catch (e) {
     // it's an URI without host
@@ -136,7 +137,7 @@ DomainUtil.uriObjHasHost = function(aUriObj) {
  */
 DomainUtil.uriObjHasPort = function(aUriObj) {
   try {
-    aUriObj.port; // jshint ignore:line
+    aUriObj.port;
     return true;
   } catch (e) {
     return false;
@@ -160,8 +161,9 @@ DomainUtil.getUriObject = function(uri) {
   try {
     return Services.io.newURI(uri, null, null);
   } catch (e) {
-    var msg = "DomainUtil.getUriObject exception on uri <" + uri + ">.";
+    const msg = "DomainUtil.getUriObject exception on uri <" + uri + ">.";
     Logger.debug(msg);
+    // eslint-disable-next-line no-throw-literal
     throw e;
   }
 };
@@ -188,13 +190,13 @@ DomainUtil.isValidUri = function(uri) {
  * @return {?string} The domain of the uri.
  */
 DomainUtil.getBaseDomain = function(uri) {
-  var host = this.getHost(uri);
+  const host = this.getHost(uri);
   if (host === null) {
     return null;
   }
   try {
     // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
-    var baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
+    const baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
     // Note: we use convertToDisplayIDN rather than convertACEtoUTF8() because
     // we want to only convert IDNs that that are in Mozilla's IDN whitelist.
     // The second argument will have the property named "value" set to true if
@@ -206,6 +208,7 @@ DomainUtil.getBaseDomain = function(uri) {
     } else if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
       return host;
     } else {
+      // eslint-disable-next-line no-throw-literal
       throw e;
     }
   }
@@ -267,19 +270,20 @@ DomainUtil.stripFragment = function(uri) {
  *     including if the seconds can't be parsed as a float.
  */
 DomainUtil.parseRefresh = function(refreshString) {
-  var parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
-  var delay = parseFloat(parts[1]);
+  const parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
+  const delay = parseFloat(parts[1]);
   if (isNaN(delay)) {
+    // eslint-disable-next-line no-throw-literal
     throw "Invalid delay value in refresh string: " + parts[1];
   }
-  var url = parts[3];
+  let url = parts[3];
   if (url === undefined) {
     url = "";
   }
   // Strip off enclosing quotes around the url.
   if (url) {
-    var first = url[0];
-    var last = url[url.length - 1];
+    const first = url[0];
+    const last = url[url.length - 1];
     if (first === last && (first === "'" || first === "\"")) {
       url = url.substring(1, url.length - 1);
     }
@@ -334,11 +338,12 @@ DomainUtil.formatIDNUri = function(uri) {
  * @return {String}
  */
 DomainUtil.determineRedirectUri = function(originUri, destPath) {
-  var baseUri = this.getUriObject(originUri);
-  var urlType = Ci.nsIStandardURL.URLTYPE_AUTHORITY;
-  var newUri = Cc[STANDARDURL_CONTRACTID].createInstance(Ci.nsIStandardURL);
+  const baseUri = this.getUriObject(originUri);
+  const urlType = Ci.nsIStandardURL.URLTYPE_AUTHORITY;
+  const newUri = Cc[STANDARDURL_CONTRACTID].createInstance(Ci.nsIStandardURL);
   newUri.init(urlType, 0, destPath, null, baseUri);
-  var resolvedUri = newUri.QueryInterface(Ci.nsIURI);
+  // eslint-disable-next-line new-cap
+  const resolvedUri = newUri.QueryInterface(Ci.nsIURI);
   return resolvedUri.spec;
 };
 

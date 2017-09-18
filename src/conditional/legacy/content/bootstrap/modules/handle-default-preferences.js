@@ -32,7 +32,7 @@
  * [1] https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
  */
 
-//==============================================================================
+// =============================================================================
 
 let prefInitFunctions = {
   getGenericPref: function(branch, prefName) {
@@ -72,28 +72,28 @@ let prefInitFunctions = {
   },
 
   setDefaultPref: function(prefName, prefValue) {
-    var defaultBranch = Services.prefs.getDefaultBranch(null);
+    const defaultBranch = Services.prefs.getDefaultBranch(null);
     this.setGenericPref(defaultBranch, prefName, prefValue);
   },
 
-  getUCharPref: function(prefName, branch) {  // Unicode getCharPref
+  getUCharPref: function(prefName, branch) { // Unicode getCharPref
     branch = branch || Services.prefs;
     return branch.getComplexValue(prefName, Ci.nsISupportsString).data;
   },
 
   setUCharPref: function(prefName, text, branch) { // Unicode setCharPref
-    var string = Cc["@mozilla.org/supports-string;1"]
+    const string = Cc["@mozilla.org/supports-string;1"]
         .createInstance(Ci.nsISupportsString);
     string.data = text;
     branch = branch || Services.prefs;
     branch.setComplexValue(prefName, Ci.nsISupportsString, string);
-  }
+  },
 };
 
 let defaultPrefScriptScope = {
   pref: prefInitFunctions.setDefaultPref,
   setGenericPref: prefInitFunctions.setGenericPref,
-  setUCharPref: prefInitFunctions.setUCharPref
+  setUCharPref: prefInitFunctions.setUCharPref,
 };
 
 //

@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-//==============================================================================
+// =============================================================================
 // Utils
-//==============================================================================
+// =============================================================================
 
-export var Utils = (function() {
+export const Utils = (function() {
   let self = {};
 
   /**
@@ -36,12 +36,11 @@ export var Utils = (function() {
    * @param {Function} callback
    * @param {Object} thisPtr
    */
-  self.runAsync = function(callback, thisPtr) {
-    let params = Array.prototype.slice.call(arguments, 2);
+  self.runAsync = function(callback, thisPtr, ...params) {
     let runnable = {
       run: function() {
         callback.apply(thisPtr, params);
-      }
+      },
     };
     Services.tm.currentThread.dispatch(runnable,
         Ci.nsIEventTarget.DISPATCH_NORMAL);
@@ -74,6 +73,7 @@ export var Utils = (function() {
    *
    * @param {Object} object
    * @param {...string} properties
+   * @return {any}
    */
   self.getObjectPath = function(object, ...properties) {
     return properties.reduce(self.getObjectProperty, object);
@@ -81,6 +81,9 @@ export var Utils = (function() {
 
   /**
    * @private
+   * @param {Object} object
+   * @param {string} property
+   * @return {any}
    */
   self.getObjectProperty = function(object, property) {
     if (!!object && object.hasOwnProperty(property)) {
@@ -94,7 +97,7 @@ export var Utils = (function() {
    * The `internal` can be accessed from all submodules of that module.
    *
    * @param {Object} aModuleScope
-   * @returns {Object} the module's `internal`
+   * @return {Object} the module's `internal`
    */
   self.createModuleInternal = function(aModuleScope) {
     let internal = {};
@@ -129,7 +132,7 @@ export var Utils = (function() {
                                aBeforeFunction = null, aAfterFunction = null) {
     initWrapperFunction(aOwnerObject, aFunctionName);
 
-    var fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
+    const fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
     fnMetadata.before = aBeforeFunction;
     fnMetadata.after = aAfterFunction;
   };
@@ -168,7 +171,7 @@ export var Utils = (function() {
       aOwnerObject.rpcontinuedWrappedFunctions = {};
     }
 
-    var metadata = aOwnerObject.rpcontinuedWrappedFunctions;
+    const metadata = aOwnerObject.rpcontinuedWrappedFunctions;
 
     if (metadata.hasOwnProperty(aFunctionName)) {
       // the function is already wrapped by RequestPolicy
@@ -179,29 +182,29 @@ export var Utils = (function() {
     metadata[aFunctionName] = {
       main: aOwnerObject[aFunctionName], // the original function
       before: null,
-      after: null
+      after: null,
     };
 
     // actually wrap the object
-    aOwnerObject[aFunctionName] = function() {
-      var {main, before, after} = metadata[aFunctionName];
+    aOwnerObject[aFunctionName] = function(...args) {
+      const {main, before, after} = metadata[aFunctionName];
 
       // Execute some action before the original function call.
       try {
         if (before) {
-          before.apply(aOwnerObject, arguments);
+          before.apply(aOwnerObject, args);
         }
       } catch (e) {
         onError(e, "before");
       }
 
       // Execute original function.
-      var rv = main.apply(aOwnerObject, arguments);
+      const rv = main.apply(aOwnerObject, args);
 
       // Execute some action afterwards.
       try {
         if (after) {
-          after.apply(aOwnerObject, arguments);
+          after.apply(aOwnerObject, args);
         }
       } catch (e) {
         onError(e, "after");
@@ -213,4 +216,4 @@ export var Utils = (function() {
   }
 
   return self;
-}());
+})();

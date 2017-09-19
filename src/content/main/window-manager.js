@@ -96,9 +96,7 @@ export const rpWindowManager = (function() {
         // Load the framescript into all existing tabs.
         // Also tell the globalMM to load it into each new
         // tab from now on.
-        const globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
-            .getService(Ci.nsIMessageListenerManager);
-        globalMM.loadFrameScript(frameScriptURI, true);
+        Services.mm.loadFrameScript(frameScriptURI, true);
       });
 
   MainEnvironment.addShutdownFunction(
@@ -113,9 +111,7 @@ export const rpWindowManager = (function() {
         // - In case the addon is being disabled or firefox gets quit,
         //   the ParentProcessEnvironment will send a message to all
         //   children.
-        const globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
-            .getService(Ci.nsIMessageListenerManager);
-        globalMM.removeDelayedFrameScript(frameScriptURI);
+        Services.mm.removeDelayedFrameScript(frameScriptURI);
 
         Windows._stopListening();
         Windows.forEachOpenWindow(unloadFromWindow);

@@ -105,9 +105,7 @@ function shutdown(aShutdownArgs) {
 }
 
 function broadcastShutdownMessage() {
-  let globalMM = Cc["@mozilla.org/globalmessagemanager;1"]
-      .getService(Ci.nsIMessageBroadcaster);
-  globalMM.broadcastAsyncMessage(shutdownMessage);
+  Services.mm.broadcastAsyncMessage(shutdownMessage);
 }
 
 // Very important: The shutdown message must be sent *after*

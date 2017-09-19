@@ -34,9 +34,7 @@ export const WindowUtils = (function() {
   let self = {};
 
   self.getMostRecentWindow = function(aWindowType = null) {
-    let wm = Cc["@mozilla.org/appshell/window-mediator;1"].
-        getService(Ci.nsIWindowMediator);
-    return wm.getMostRecentWindow(aWindowType);
+    return Services.wm.getMostRecentWindow(aWindowType);
   };
 
   self.getMostRecentBrowserWindow = self.getMostRecentWindow.

@@ -63,10 +63,11 @@ export class ApplicationCompatibilityRules {
     const addRules = (rule: Rule) => {
       rules.push(rule);
     };
-    this.spec.all.forEach(addRules);
-    if (this.spec.hasOwnProperty(appName)) {
-      this.spec[appName].forEach(addRules);
-    }
+    ["all", appName].forEach((prop) => {
+      if (this.spec.hasOwnProperty(prop)) {
+        this.spec[prop].forEach(addRules);
+      }
+    });
 
     return rules;
   }

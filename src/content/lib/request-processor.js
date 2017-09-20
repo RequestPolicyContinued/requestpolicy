@@ -39,7 +39,7 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
 import {RequestSet} from "lib/request-set";
 import {MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
-import {MapOfSets} from "lib/classes/map-of-sets";
+import {CompatibilityRules} from "models/compatibility-rules";
 import APP_COMPAT_RULES from "lib/compatibility-rules.apps";
 import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
@@ -903,7 +903,7 @@ export let RequestProcessor = (function() {
         return accept("Allowed by subscription policy", request);
       }
 
-      self.forEachCompatibilityRule(rule => {
+      CompatibilityRules.forEachCompatibilityRule(rule => {
         let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
                           true;
         let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
@@ -917,7 +917,8 @@ export let RequestProcessor = (function() {
       });
 
       if (request.aContext) {
-        let info = self.checkBaseUriWhitelist(request.aContext.baseURI);
+        let info = CompatibilityRules.checkBaseUriWhitelist(
+            request.aContext.baseURI);
         if (info.isWhitelisted) {
           request.requestResult = new RequestResult(true,
               REQUEST_REASON_COMPATIBILITY);
@@ -1290,7 +1291,7 @@ RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    self.forEachCompatibilityRule(rule => {
+    CompatibilityRules.forEachCompatibilityRule(rule => {
       let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
       let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
@@ -1586,167 +1587,10 @@ RequestProcessor = (function(self) {
  * what is needed to allow their requests.
  */
 
-RequestProcessor = (function(self) {
-  updateExtensionCompatibility();
-  initializeApplicationCompatibility();
-
-  browser.management.onEnabled.addListener(updateExtensionCompatibility);
-  browser.management.onDisabled.addListener(updateExtensionCompatibility);
-
-  // ---------------------------------------------------------------------------
-  // Extensions compatibility
-  // ---------------------------------------------------------------------------
-
-  let addonIdsToNames = new Map();
-  let extRulesToIds = new MapOfSets();
-  let whitelistedBaseUrisToIds = new MapOfSets();
-  let topLevelDocTranslationRules = new Map();
-
-  function updateExtensionCompatibility() {
-    browser.management.getAll().
-        then(extensionInfos => {
-          ({
-            addonIdsToNames,
-            extRulesToIds,
-            whitelistedBaseUrisToIds,
-            topLevelDocTranslationRules,
-          } = extensionInfosToCompatibilityRules(extensionInfos));
-          return;
-        }).
-        catch(e => {
-          console.error("Could not update extension compatibility. Details:");
-          console.dir(e);
-        });
-  }
-
-  function maybeForEach(aObj, aPropName, aCallback) {
-    if (aObj.hasOwnProperty(aPropName)) {
-      aObj[aPropName].forEach(aCallback);
-    }
-  }
-
-  function extensionInfosToCompatibilityRules(aExtensionInfos) {
-    let addonIdsToNames = new Map();
-    let extRulesToIds = new MapOfSets();
-    let whitelistedBaseUrisToIds = new MapOfSets();
-    let topLevelDocTranslationRules = new Map();
-
-    const enabledAddons = aExtensionInfos.map(addon => addon.enabled);
-    let idsToExtInfos = new Map();
-    for (let addon of enabledAddons) {
-      idsToExtInfos.set(addon.id, addon);
-      addonIdsToNames.set(addon.id, addon.name);
-    }
-
-    EXT_COMPAT_RULES.forEach(spec => {
-      const enabledAddonIds = spec.ids.filter(id => idsToExtInfos.has(id));
-      if (enabledAddonIds.length === 0) {
-        return;
-      }
-      maybeForEach(spec, "rules", rule => {
-        for (let id of enabledAddonIds) {
-          extRulesToIds.addToSet(rule, id);
-        }
-      });
-      maybeForEach(spec, "whitelistedBaseURIs", baseUri => {
-        for (let id of enabledAddonIds) {
-          whitelistedBaseUrisToIds.addToSet(baseUri, id);
-        }
-      });
-      maybeForEach(spec, "topLevelDocTranslationRules", rules => {
-        rules.forEach(rule => {
-          let [uriToBeTranslated, translatedUri] = rule;
-          if (topLevelDocTranslationRules.has(uriToBeTranslated)) {
-            console.error("Multiple definitions of traslation rule " +
-                `"${uriToBeTranslated}".`);
-          }
-          topLevelDocTranslationRules.set(uriToBeTranslated, {
-            extensionIds: enabledAddonIds,
-            translatedUri,
-          });
-        });
-      });
-    });
-
-    return {
-      addonIdsToNames,
-      extRulesToIds,
-      whitelistedBaseUrisToIds,
-      topLevelDocTranslationRules,
-    };
-  }
-
-  // ---------------------------------------------------------------------------
-  // Application compatibility
-  // ---------------------------------------------------------------------------
-
-  let appCompatRules = [];
-  let appName;
-
-  function initializeApplicationCompatibility() {
-    browser.runtime.getBrowserInfo().
-        then(appInfo => {
-          appName = appInfo.name;
-          appCompatRules = getAppCompatRules(appName);
-          return;
-        }).
-        catch(e => {
-          console.error("Could not init app compatibility.");
-          console.dir(e);
-        });
-  }
-
-  function getAppCompatRules(appName) {
-    let rules = [];
-
-    let addRules = rule => {
-      rules.push(rule);
-    };
-    APP_COMPAT_RULES.all.forEach(addRules);
-    if (APP_COMPAT_RULES.hasOwnProperty(appName)) {
-      APP_COMPAT_RULES[appName].forEach(addRules);
-    }
-
-    return rules;
-  }
-
-  // ---------------------------------------------------------------------------
-  // exported functions
-  // ---------------------------------------------------------------------------
-
-  self.forEachCompatibilityRule = function(aCallback) {
-    extRulesToIds.forEach((rule, addonIds) => {
-      const addonNames = addonIds.
-          map(id => addonIdsToNames.get(id)).
-          join(", ");
-      const [origin, dest] = rule;
-      aCallback.call(null, {origin, dest, info: addonNames});
-    });
-    appCompatRules.forEach(([origin, dest]) => {
-      aCallback.call(null, {origin, dest, info: appName});
-    });
-  };
-
-  self.checkBaseUriWhitelist = function(aBaseUri) {
-    if (!whitelistedBaseUrisToIds.has(aBaseUri)) {
-      return {isWhitelisted: false};
-    }
-    let addonId = whitelistedBaseUrisToIds.get(aBaseUri);
-    let addonName = addonIdsToNames.get(addonId);
-    return {isWhitelisted: true, addonName};
-  };
-
-  self.getTopLevelDocTranslation = function(uri) {
-    // We're not sure if the array will be fully populated during init. This
-    // is especially a concern given the async addon manager API in Firefox 4.
-    if (topLevelDocTranslationRules.has(uri)) {
-      return topLevelDocTranslationRules.get(uri).translatedUri;
-    }
-    return null;
-  };
-
-  return self;
-})(RequestProcessor);
+(function() {
+  CompatibilityRules.setApplicationCompatibilitySpec(APP_COMPAT_RULES);
+  CompatibilityRules.setExtensionCompatibilitySpec(EXT_COMPAT_RULES);
+})();
 
 RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

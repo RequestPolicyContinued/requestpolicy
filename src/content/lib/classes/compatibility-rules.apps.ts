@@ -31,11 +31,16 @@ export class ApplicationCompatibilityRules {
   private spec: any;
   private rules: any;
   private appName: string;
+  private pWhenReady: Promise<void>;
 
   constructor(aSpec: any) {
     this.rules = [];
     this.spec = aSpec;
     this.update();
+  }
+
+  public get whenReady() {
+    return this.pWhenReady;
   }
 
   public forEach(aCallback: ForEachCallback) {
@@ -45,12 +50,13 @@ export class ApplicationCompatibilityRules {
   }
 
   private update() {
-    browser.runtime.getBrowserInfo().
+    this.pWhenReady = browser.runtime.getBrowserInfo().
         then((appInfo: any) => {
           this.appName = appInfo.name;
           this.rules = this.getAppCompatRules(this.appName);
           return;
-        }).
+        });
+    this.pWhenReady.
         catch((e: any) => {
           console.error("Could not update app compatibility.");
           console.dir(e);

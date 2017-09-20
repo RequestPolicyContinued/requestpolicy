@@ -38,6 +38,13 @@ export class CompatibilityRules {
         aExtensionCompatibilitySpec);
   }
 
+  public get whenReady() {
+    return Promise.all([
+      this.app.whenReady,
+      this.extensions.whenReady,
+    ]);
+  }
+
   public forEach(aCallback: ForEachCallback) {
     this.app.forEach(aCallback);
     this.extensions.forEach(aCallback);

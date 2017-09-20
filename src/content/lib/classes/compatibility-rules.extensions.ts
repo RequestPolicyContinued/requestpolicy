@@ -57,6 +57,7 @@ export class ExtensionCompatibilityRules {
   private topLevelDocTranslationRules: TopLevelDocTranslationRules_Map;
 
   private listener: ManagementListener;
+  private pWhenReady: Promise<void>;
 
   constructor(aSpec: any) {
     this.spec = aSpec;
@@ -67,6 +68,10 @@ export class ExtensionCompatibilityRules {
     };
     browser.management.onEnabled.addListener(this.listener);
     browser.management.onDisabled.addListener(this.listener);
+  }
+
+  public get whenReady() {
+    return this.pWhenReady;
   }
 
   public forEach(aCallback: ForEachCallback) {
@@ -101,12 +106,13 @@ export class ExtensionCompatibilityRules {
   }
 
   private update() {
-    browser.management.getAll().
+    this.pWhenReady = browser.management.getAll().
         then((extensionInfos: any) => {
           Object.assign(this,
               this.extensionInfosToCompatibilityRules(extensionInfos));
           return;
-        }).
+        });
+    this.pWhenReady.
         catch((e: any) => {
           console.error("Could not update extension compatibility. Details:");
           console.dir(e);

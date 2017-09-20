@@ -15,7 +15,8 @@
     ],
     "no-console": [
       false
-    ]
+    ],
+    "no-reference": false
   },
   "rulesDirectory": []
 }

@@ -40,8 +40,6 @@ import {RequestSet} from "lib/request-set";
 import {MainEnvironment} from "lib/environment";
 import {Utils} from "lib/utils";
 import {CompatibilityRules} from "models/compatibility-rules";
-import APP_COMPAT_RULES from "lib/compatibility-rules.apps";
-import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 import RPContentPolicy from "main/content-policy";
 
@@ -903,7 +901,7 @@ export let RequestProcessor = (function() {
         return accept("Allowed by subscription policy", request);
       }
 
-      CompatibilityRules.forEachCompatibilityRule(rule => {
+      CompatibilityRules.forEach(rule => {
         let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
                           true;
         let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
@@ -1291,7 +1289,7 @@ RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    CompatibilityRules.forEachCompatibilityRule(rule => {
+    CompatibilityRules.forEach(rule => {
       let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
       let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
@@ -1577,20 +1575,6 @@ RequestProcessor = (function(self) {
 
   return self;
 })(RequestProcessor);
-
-// =============================================================================
-// RequestProcessor (compatibility part)
-// =============================================================================
-
-/**
- * Detect other installed extensions and the current application and do
- * what is needed to allow their requests.
- */
-
-(function() {
-  CompatibilityRules.setApplicationCompatibilitySpec(APP_COMPAT_RULES);
-  CompatibilityRules.setExtensionCompatibilitySpec(EXT_COMPAT_RULES);
-})();
 
 RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

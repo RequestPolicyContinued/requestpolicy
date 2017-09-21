@@ -10,6 +10,13 @@ SHELL := /bin/bash
 .SUFFIXES:
 
 #===============================================================================
+# GNU make HACKS
+#===============================================================================
+
+_SPACE :=
+_SPACE +=
+
+#===============================================================================
 # general variables and targets
 #===============================================================================
 
@@ -276,9 +283,7 @@ development-environment: python-venv node-packages firefox-all
 # timestamps for remakes every x hours/days
 #-------------------------------------------------------------------------------
 
-space :=
-space +=
-fn_timestamp_file = $(stamps_dir)/.timestamp_$(subst $(space),_,$1)_ago
+fn_timestamp_file = $(stamps_dir)/.timestamp_$(subst $(_SPACE),_,$1)_ago
 force_every = $(shell \
   mkdir -p $(dir $(call fn_timestamp_file,$1)); \
   touch -d '$1 ago' $(call fn_timestamp_file,$1); \

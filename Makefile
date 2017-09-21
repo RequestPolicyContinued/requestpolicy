@@ -136,7 +136,7 @@ endef
 
 .PHONY: all \
 	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
-	nightly-files
+	unit-testing-files
 
 all: xpi
 xpi: nightly-xpi
@@ -153,8 +153,8 @@ amo-beta-xpi: node-packages
 amo-nightly-xpi: node-packages
 	$(call make_xpi,amo-nightly)
 
-nightly-files: node-packages
-	$(call make_files,nightly)
+unit-testing-files: node-packages
+	$(call make_files,unit-testing)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name)-legacy-nightly.xpi
 xpi_file__dev          := $(dist_dir)/$(extension_name)-legacy-dev.xpi
@@ -458,10 +458,11 @@ test: test-quick test-non-quick
 unit-tests: mocha
 
 .PHONY: mocha
-mocha: node-packages nightly-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/nightly/content/ \
+mocha: node-packages unit-testing-files
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/unit-testing/content/ \
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \
+		--require source-map-support/register \
 		tests/unit/
 
 #-------------------------------------------------------------------------------

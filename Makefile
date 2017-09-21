@@ -554,6 +554,7 @@ test-makefile:
 # cleanup targets
 #===============================================================================
 
+.NOTPARALLEL:
 .PHONY: clean mostlyclean distclean clean-dev-environment
 clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi

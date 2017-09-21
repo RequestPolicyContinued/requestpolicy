@@ -16,6 +16,9 @@ SHELL := /bin/bash
 _SPACE :=
 _SPACE +=
 
+_make_invocation_cmd := $(wordlist 2,100000,$(shell ps -o cmd fp $$PPID))
+_make_invocation_program := $(firstword $(_make_invocation_cmd))
+
 #===============================================================================
 # general variables and targets
 #===============================================================================
@@ -556,11 +559,44 @@ test-makefile:
 
 
 #===============================================================================
-# cleanup targets
+# clean targets
 #===============================================================================
 
+_clean_targets := clean mostlyclean distclean clean-dev-environment
+
+# ---
+# check if ".NOTPARALLEL" is necessary (in case a clean target is part of the goals),
+# and perhaps warn the user (in case other, non-clean targets are part of the goals).
+# ---
+
+_clean_makecmdgoals := $(filter $(_clean_targets),$(MAKECMDGOALS))
+_nonclean_makecmdgoals = $(filter-out $(_clean_targets),$(MAKECMDGOALS))
+
+# NOTE: do not put spaces in the following variable:
+_jobs_in_cmdline = \
+$(findstring $(space)-j,$(_make_invocation_cmd))\
+$(findstring $(space)--jobs,$(_make_invocation_cmd))
+
+define _jobs_warning
+WARNING:
+    executing NON-parallel! To execute in parallel AND execute clean targets, run
+    "$(_make_invocation_program) $(_clean_makecmdgoals) && $(filter-out $(_clean_targets),$(_make_invocation_cmd))"
+endef
+
+ifneq '' '$(_clean_makecmdgoals)'
 .NOTPARALLEL:
-.PHONY: clean mostlyclean distclean clean-dev-environment
+ifneq '' '$(_nonclean_makecmdgoals)'
+ifneq '' '$(_jobs_in_cmdline)'
+$(info $(_jobs_warning))
+endif
+endif
+endif
+
+# ---
+# actual targets
+# ---
+
+.PHONY: $(_clean_targets)
 clean: clean-old-browser-tarballs
 	@rm -rf $(dist_dir)/*.xpi
 	@-$(call _remove_all_files_and_dirs_in,$(build_dir_root))

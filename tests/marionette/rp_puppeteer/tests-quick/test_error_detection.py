@@ -37,6 +37,18 @@ class ErrorDetectionTests(object):
             )
         )
 
+    def test_reference_error_in_promise_chain(self, n=1):
+        self.error_triggerer.trigger_error(
+            "ReferenceError:Promise", "backgroundscript")
+        self._do_checks(
+            n,
+            (
+                r"^JavaScript error: "
+                r"chrome://rpcontinued/content/ui-testing/services\.js, "
+                r"line [0-9]+: ReferenceError: "
+            )
+        )
+
     ##########################
     # Private Helper Methods #
     ##########################

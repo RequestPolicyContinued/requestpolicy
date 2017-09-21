@@ -51,6 +51,13 @@ function createErrorTriggeringService() {
         console.error(message);
       } else if (type === "ReferenceError") {
         runAsync(produceReferenceError);
+      } else if (type === "ReferenceError:Promise") {
+        Promise.resolve().then(() => {
+          produceReferenceError();
+          return;
+        }).catch(e => {
+          console.error(e);
+        });
       }
     },
   };

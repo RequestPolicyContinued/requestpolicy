@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import APP_COMPAT_RULES from "data/compatibility-rules.apps";
+import EXT_COMPAT_RULES from "data/compatibility-rules.extensions";
 import {CompatibilityRules as CRClass} from "lib/classes/compatibility-rules";
-import APP_COMPAT_RULES from "lib/compatibility-rules.apps";
-import EXT_COMPAT_RULES from "lib/compatibility-rules.extensions";
 
 const CRModel = new CRClass(APP_COMPAT_RULES, EXT_COMPAT_RULES);
 

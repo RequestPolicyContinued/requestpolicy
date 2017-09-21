@@ -132,7 +132,7 @@ export class ExtensionCompatibilityRules {
     const topLevelDocTranslationRules: TopLevelDocTranslationRules_Map =
         new Map();
 
-    const enabledAddons = aExtensionInfos.map((addon: any) => addon.enabled);
+    const enabledAddons = aExtensionInfos.filter((addon: any) => addon.enabled);
     const idsToExtInfos = new Map();
 
     // tslint:disable-next-line:prefer-const (see bug 1101653, fixed in Fx51)

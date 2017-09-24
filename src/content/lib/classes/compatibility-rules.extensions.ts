@@ -74,6 +74,20 @@ export class ExtensionCompatibilityRules {
     return this.pWhenReady;
   }
 
+  public get [Symbol.iterator]() {
+    const self: ExtensionCompatibilityRules = this;
+    return function*() {
+      // tslint:disable-next-line:prefer-const
+      for (let [rule, addonIds] of self.extRulesToIds.mapEntries()) {
+        const addonNames = Array.from(addonIds).
+            map((id: AddonID) => self.addonIdsToNames.get(id)).
+            join(", ");
+        const [origin, dest] = rule;
+        yield {origin, dest, info: addonNames};
+      }
+    };
+  }
+
   public forEach(aCallback: ForEachCallback) {
     this.extRulesToIds.forEachSet((addonIds: Set<AddonID>, rule: Rule) => {
       const addonNames = Array.from(addonIds).

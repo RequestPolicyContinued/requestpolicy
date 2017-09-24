@@ -43,6 +43,16 @@ export class ApplicationCompatibilityRules {
     return this.pWhenReady;
   }
 
+  public get [Symbol.iterator]() {
+    const self: ApplicationCompatibilityRules = this;
+    return function*() {
+      // tslint:disable-next-line:prefer-const
+      for (let [origin, dest] of self.rules) {
+        yield {origin, dest, info: self.appName};
+      }
+    };
+  }
+
   public forEach(aCallback: ForEachCallback) {
     this.rules.forEach(([origin, dest]: Rule) => {
       aCallback({origin, dest, info: this.appName});

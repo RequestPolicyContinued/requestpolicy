@@ -61,6 +61,10 @@ export class MapOfSets<K, V> {
     }
   }
 
+  public mapEntries() {
+    return this.map.entries();
+  }
+
   public forEachSet(
       aCallback: (set: Set<V>, key: K) => void,
   ) {

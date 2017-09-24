@@ -45,6 +45,14 @@ export class CompatibilityRules {
     ]);
   }
 
+  public get [Symbol.iterator]() {
+    const self: CompatibilityRules = this;
+    return function*() {
+      yield* self.app;
+      yield* self.extensions;
+    };
+  }
+
   public forEach(aCallback: ForEachCallback) {
     this.app.forEach(aCallback);
     this.extensions.forEach(aCallback);

@@ -83,6 +83,7 @@ TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 
 # python
 PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
+PY_MOZPROFILE  := $(abspath $(python_env_dir))/bin/mozprofile
 PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
 
 
@@ -352,6 +353,20 @@ _run_mozrunner_args := \
 .PHONY: run
 run: python-venv dev-xpi dev-helper-xpi
 	$(PY_MOZRUNNER) $(_run_mozrunner_args)
+
+_dev_profile_dir := .temp/dev_profile
+dev_profile_additional_args :=
+_dev_profile_mozprofile_args := \
+	--profile=$(_dev_profile_dir) \
+	$(addprefix --addon=,$(_run_xpis)) \
+	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_run_prefs)) \
+	$(temp_profile_additional_args)
+
+.PHONY: temp-dev-profile
+temp-dev-profile: python-venv dev-xpi dev-helper-xpi
+	@rm -rf $(_dev_profile_dir)
+	@mkdir -p $(_dev_profile_dir)
+	$(PY_MOZPROFILE) $(_dev_profile_mozprofile_args)
 
 
 #===============================================================================

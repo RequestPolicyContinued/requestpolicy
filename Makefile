@@ -88,7 +88,6 @@ TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 
 # python
 PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
-PY_MOZDOWNLOAD := $(abspath $(python_env_dir))/bin/mozdownload
 PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
 
 
@@ -339,87 +338,6 @@ $(T_NODE_PACKAGES): package.json \
 	$(NPM) install
 	touch $@
 
-#-------------------------------------------------------------------------------
-# browsers
-#-------------------------------------------------------------------------------
-
-# TODO: Automatically download seamonkey tarball.
-#         https://archive.mozilla.org/pub/seamonkey/
-#       However, mozdownload only supports 'b2g', 'firefox', 'fennec' and
-#       'thunderbird' as --application. So maybe use wget instead.
-
-# FIXME: Add support for fx-release and fx-beta (unbranded)
-#          https://github.com/mozilla/mozdownload/issues/407
-#        Maybe use "get-firefox" instead?
-#          https://www.npmjs.com/package/get-firefox
-#firefox_branches := esr release beta aurora nightly
-firefox_branches := esr aurora nightly
-seamonkey_branches := release
-
-mozdl_opts_firefox_esr             := --type release --version latest-esr
-# There is no option for "add-on-devel" (unbranded releases) yet; see above.
-#mozdl_opts_firefox_release         := --type tinderbox --branch mozilla-release --??? add-on-devel
-#mozdl_opts_firefox_beta            := --type tinderbox --branch mozilla-beta --??? add-on-devel
-mozdl_opts_firefox_aurora          := --type daily --branch mozilla-aurora
-mozdl_opts_firefox_nightly         := --type daily --branch mozilla-central
-
-mozdl_supported_browsers := firefox
-
-# timestamp of last mozdownload execution
-T_BROWSER = $(browsers_dir)/$1/downloads/$2/.timestamp
-
-define fn_create_browser_target
-.PHONY: $1-$2
-$1-$2: $(browsers_dir)/$1/extracted/$2/$1
-$(browsers_dir)/$1/extracted/$2/$1: \
-		$(browsers_dir)/$1/downloads/latest-$2.tar.bz2
-	rm -rf $(browsers_dir)/$1/extracted/$2/
-	mkdir -p $(browsers_dir)/$1/extracted/$2/
-	tar -xjf $$< -C $(browsers_dir)/$1/extracted/$2/ --strip-components=1
-	touch $$@
-ifneq "$(filter $(mozdl_supported_browsers),$1)" ""
-# The T_BROWSER timestamp file is decoupled from the tarball-target.
-# Make will check for the newest tarball in fixed intervals (force_every),
-# but the tarball will only be extracted iff a new tarball has been
-# downloaded (i.e., a new update has been available).
-$(browsers_dir)/$1/downloads/latest-$2.tar.bz2: \
-		$(call force_every,12 hours) \
-		| python-venv
-	mkdir -p $(browsers_dir)/$1/downloads/$2/
-	$(PY_MOZDOWNLOAD) \
-	    --destination $(browsers_dir)/$1/downloads/$2/ \
-	    --extension tar.bz2 --application $1 \
-	    $$(mozdl_opts_$1_$2)
-	ln -sf $$$$(cd $$(dir $$@); ls -t $2/*.tar.bz2 | head -n 1) $$@
-	touch --reference="$$$$(readlink -f $$@)" $$@
-	touch $(call T_BROWSER,$1,$2)
-else
-$(browsers_dir)/$1/downloads/latest-$2.tar.bz2:
-	$$(error \
-	  $1 cannot be downloaded automatically, yet. \
-	  Please put the $1 tarball at "$$@". \
-	  The tarball will then be extracted automatically. \
-	  Make sure to download the correct file (32 bit or 64 bit) \
-	  as the 32-bit version won't work on 64-bit systems. \
-	)
-endif
-.PHONY: clean-old-$1-tarballs-$2
-clean-old-$1-tarballs-$2:
-	@# Remove all but the latest tarball
-	@rm -rf $$$$(ls -t $(browsers_dir)/$1/downloads/$2/*.tar.bz2 2>/dev/null | tail -n +2)
-endef
-$(foreach b,$(firefox_branches),$(eval $(call fn_create_browser_target,firefox,$b)))
-$(foreach b,$(seamonkey_branches),$(eval $(call fn_create_browser_target,seamonkey,$b)))
-
-.PHONY: firefox-all
-firefox-all: $(addprefix firefox-,$(firefox_branches))
-.PHONY: clean-old-firefox-tarballs
-clean-old-firefox-tarballs: \
-		$(addprefix clean-old-firefox-tarballs-,$(firefox_branches))
-.PHONY: clean-old-browser-tarballs
-clean-old-browser-tarballs: \
-		clean-old-firefox-tarballs
-
 #===============================================================================
 # Running a Browser + RequestPolicy
 #===============================================================================
@@ -598,7 +516,7 @@ endif
 # ---
 
 .PHONY: $(_clean_targets)
-clean: clean-old-browser-tarballs
+clean:
 	@rm -rf $(dist_dir)/*.xpi
 	@-$(call _remove_all_files_and_dirs_in,$(build_dir_root))
 mostlyclean: clean

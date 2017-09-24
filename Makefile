@@ -35,14 +35,9 @@ extension_name        := requestpolicy
 
 # select the default app. Can be overridden e.g. via `make run app='seamonkey'`
 app := firefox
-# default app branch
-ifeq ($(app),firefox)
-	app_branch := nightly
-else
-	app_branch := release
-endif
+app_branch := default
 binary_filename := $(app)
-app_binary := dev_env/browsers/$(app)/extracted/$(app_branch)/$(binary_filename)
+app_binary = dev_env/browsers/$(app)/$(app_branch)/$(binary_filename)
 
 mozrunner_prefs_ini := tests/mozrunner-prefs.ini
 

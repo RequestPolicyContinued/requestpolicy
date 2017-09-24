@@ -18,7 +18,7 @@ describe "CompatibilityRules", ->
       cr = new CompatibilityRules({}, [])
       cr.whenReady
 
-  describe "forEach()", () ->
+  describe "rule iterator", () ->
     genTest = (aAppSpec, aExtSpec, aAddons, aNExpectedRules) ->
       () ->
         browser.management.getAll.resolves(aAddons)
@@ -26,9 +26,10 @@ describe "CompatibilityRules", ->
 
         cr.whenReady.then(() ->
           addedRules = []
-          cr.forEach((rule) ->
+          iterator = cr[Symbol.iterator]()
+          while (entry = iterator.next()) && !entry.done
+            rule = entry.value
             addedRules.push(rule)
-          )
           assert.lengthOf(addedRules, aNExpectedRules)
         )
 

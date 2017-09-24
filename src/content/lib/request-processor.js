@@ -901,7 +901,7 @@ export let RequestProcessor = (function() {
         return accept("Allowed by subscription policy", request);
       }
 
-      CompatibilityRules.forEach(rule => {
+      for (let rule of CompatibilityRules) {
         let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
                           true;
         let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
@@ -912,7 +912,7 @@ export let RequestProcessor = (function() {
               "Extension/application compatibility rule matched [" +
               rule.info + "]", request, true);
         }
-      });
+      }
 
       if (request.aContext) {
         let info = CompatibilityRules.checkBaseUriWhitelist(
@@ -1289,13 +1289,13 @@ RequestProcessor = (function(self) {
       return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
     }
 
-    CompatibilityRules.forEach(rule => {
+    for (let rule of CompatibilityRules) {
       let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
       let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
         return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
       }
-    });
+    }
 
     let result = internal.checkByDefaultPolicy(request);
     return result;

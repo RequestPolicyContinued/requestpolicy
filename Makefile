@@ -437,7 +437,7 @@ _run_mozrunner_args := \
 	$(run_additional_args)
 
 .PHONY: run
-run: python-venv dev-xpi dev-helper-xpi $(app_binary)
+run: python-venv dev-xpi dev-helper-xpi
 	$(PY_MOZRUNNER) $(_run_mozrunner_args)
 
 

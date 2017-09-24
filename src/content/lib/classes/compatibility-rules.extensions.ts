@@ -88,16 +88,6 @@ export class ExtensionCompatibilityRules {
     };
   }
 
-  public forEach(aCallback: ForEachCallback) {
-    this.extRulesToIds.forEachSet((addonIds: Set<AddonID>, rule: Rule) => {
-      const addonNames = Array.from(addonIds).
-          map((id: AddonID) => this.addonIdsToNames.get(id)).
-          join(", ");
-      const [origin, dest] = rule;
-      aCallback({origin, dest, info: addonNames});
-    });
-  }
-
   public checkBaseUriWhitelist(aBaseUri: BaseUri) {
     const addonIds = this.whitelistedBaseUrisToIds.get(aBaseUri);
     if (addonIds === undefined) {

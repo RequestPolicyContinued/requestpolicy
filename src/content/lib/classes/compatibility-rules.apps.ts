@@ -53,12 +53,6 @@ export class ApplicationCompatibilityRules {
     };
   }
 
-  public forEach(aCallback: ForEachCallback) {
-    this.rules.forEach(([origin, dest]: Rule) => {
-      aCallback({origin, dest, info: this.appName});
-    });
-  }
-
   private update() {
     this.pWhenReady = browser.runtime.getBrowserInfo().
         then((appInfo: any) => {

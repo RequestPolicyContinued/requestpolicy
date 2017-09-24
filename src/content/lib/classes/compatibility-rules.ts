@@ -53,11 +53,6 @@ export class CompatibilityRules {
     };
   }
 
-  public forEach(aCallback: ForEachCallback) {
-    this.app.forEach(aCallback);
-    this.extensions.forEach(aCallback);
-  }
-
   public checkBaseUriWhitelist(aBaseUri: BaseUri) {
     return this.extensions.checkBaseUriWhitelist(aBaseUri);
   }

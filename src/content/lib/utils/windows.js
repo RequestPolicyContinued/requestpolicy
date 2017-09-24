@@ -71,13 +71,13 @@ export const WindowUtils = (function() {
     /* eslint-enable new-cap */
   };
 
-  self.getTabBrowser = function(window) {
+  self.getTabBrowser = function(aChromeWindow) {
     // bug 1009938 - may be null in SeaMonkey
-    return window.gBrowser || window.getBrowser();
+    return aChromeWindow.gBrowser || aChromeWindow.getBrowser();
   };
 
-  self.getTabsForWindow = function(window) {
-    return self.getTabBrowser(window).tabContainer.children;
+  self.getTabsForWindow = function(aChromeWindow) {
+    return self.getTabBrowser(aChromeWindow).tabContainer.children;
   };
 
   //

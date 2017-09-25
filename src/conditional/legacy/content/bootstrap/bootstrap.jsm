@@ -106,7 +106,13 @@ function createCommonjsEnv() {
         },
         globals,
       });
-      main = Loader.main(loaderWrapper.loader, aMainFile);
+      try {
+        main = Loader.main(loaderWrapper.loader, aMainFile);
+      } catch (e) {
+        console.error("Loader.main() failed!");
+        console.dir(e);
+        throw e;
+      }
       return main;
     },
     unload: (function(Loader, loaderWrapper) {

@@ -35,6 +35,7 @@ import {JSUtils} from "lib/utils/javascript";
 import {Utils} from "lib/utils";
 import {DOMUtils} from "lib/utils/dom";
 import {C} from "lib/utils/constants";
+import {CompatibilityRules} from "models/compatibility-rules";
 
 const {LOG_FLAG_STATE} = C;
 
@@ -944,7 +945,7 @@ export function loadOverlayIntoWindow(window) {
    */
   self.getTopLevelDocumentUri = function() {
     let uri = gBrowser.selectedBrowser.currentURI.spec;
-    return RequestProcessor.getTopLevelDocTranslation(uri) ||
+    return CompatibilityRules.getTopLevelDocTranslation(uri) ||
         DomainUtil.stripFragment(uri);
   };
 

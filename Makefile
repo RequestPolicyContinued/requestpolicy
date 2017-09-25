@@ -16,6 +16,10 @@ SHELL := /bin/bash
 _SPACE :=
 _SPACE +=
 
+ifndef MAKECMDGOALS
+MAKECMDGOALS :=
+endif
+
 _make_invocation_cmd := $(wordlist 2,100000,$(shell ps -o cmd fp $$PPID))
 _make_invocation_program := $(firstword $(_make_invocation_cmd))
 
@@ -373,10 +377,14 @@ temp-dev-profile: python-venv dev-xpi dev-helper-xpi
 # Testing
 #===============================================================================
 
+_ui_subtests := ui-tests-quick ui-tests-non-quick
+_quick_tests := static-analysis unit-tests ui-tests-quick
+_non_quick_tests := test-makefile ui-tests-non-quick
+
 .PHONY: test-quick test
-test-quick: static-analysis unit-tests ui-tests-quick
-test-non-quick: test-makefile ui-tests-non-quick
-test: test-quick test-non-quick
+test-quick: $(_quick_tests)
+test-non-quick: $(_non_quick_tests)
+test: $(filter-out $(_ui_subtests),$(_quick_tests) $(_non_quick_tests)) ui-tests
 
 #-------------------------------------------------------------------------------
 # Testing: unit tests
@@ -405,16 +413,14 @@ ui-tests: marionette
 ui-tests-quick: marionette-quick
 ui-tests-non-quick: marionette-non-quick
 
-
-.PHONY: marionette marionette-quick marionette-non-quick
-marionette: marionette-quick marionette-non-quick
-
+_marionette_targets := marionette marionette-quick marionette-non-quick
+.PHONY: $(_marionette_targets)
+marionette: _args :=
 marionette-quick: _args := --quick
 marionette-non-quick: _args := --non-quick
 
-marionette-quick marionette-non-quick: _marionette_dependencies
+$(_marionette_targets): _marionette_dependencies
 	./scripts/run_marionette_tests.py --no-make-dependencies $(_args)
-
 
 .PHONY: _marionette_dependencies
 _marionette_dependencies: \

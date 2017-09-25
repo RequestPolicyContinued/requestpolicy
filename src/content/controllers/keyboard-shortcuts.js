@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
+import {KeyboardShortcut} from "content/lib/classes/keyboard-shortcut";
 
 // =============================================================================
 // KeyboardShortcuts

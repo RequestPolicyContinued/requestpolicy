@@ -20,8 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "lib/environment";
-import {PrefObserver} from "web-extension-fake-api/lib/classes/pref-observer";
+import {Environment} from "content/lib/environment";
+import {PrefObserver}
+    from "content/web-extension-fake-api/lib/classes/pref-observer";
 
 // =============================================================================
 // ManagerForPrefObservers

@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
-import {Storage} from "models/storage";
-import {Logger} from "lib/logger";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {Storage} from "content/models/storage";
+import {Logger} from "content/lib/logger";
 
 // =============================================================================
 // PrefManager

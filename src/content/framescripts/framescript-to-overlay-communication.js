@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "lib/environment";
-import {Logger} from "lib/logger";
-import {C} from "lib/utils/constants";
-import {mlManager} from "framescripts/managers";
+import {Environment} from "content/lib/environment";
+import {Logger} from "content/lib/logger";
+import {C} from "content/lib/utils/constants";
+import {mlManager} from "content/framescripts/managers";
 
 // =============================================================================
 // constants

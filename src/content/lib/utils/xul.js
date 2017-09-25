@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {StringUtils} from "lib/utils/strings";
-import {JSUtils} from "lib/utils/javascript";
-import {C} from "lib/utils/constants";
+import {StringUtils} from "content/lib/utils/strings";
+import {JSUtils} from "content/lib/utils/javascript";
+import {C} from "content/lib/utils/constants";
 
 // =============================================================================
 // XULUtils

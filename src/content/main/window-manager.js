@@ -20,12 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
-import {Windows} from "models/windows";
-import {OverlayController} from "controllers/windows.overlay";
-import {ToolbarButtonController} from "controllers/windows.toolbarbutton";
-import {StyleSheetsController} from "controllers/windows.style-sheets";
-import {FramescriptServices} from "main/framescript-services";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {Windows} from "content/models/windows";
+import {OverlayController} from "content/controllers/windows.overlay";
+import {ToolbarButtonController}
+    from "content/controllers/windows.toolbarbutton";
+import {StyleSheetsController} from "content/controllers/windows.style-sheets";
+import {FramescriptServices} from "content/main/framescript-services";
 
 // =============================================================================
 // WindowSubControllers

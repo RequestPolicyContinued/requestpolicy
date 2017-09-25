@@ -21,13 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {DomainUtil} from "lib/utils/domains";
-import {Environment, MainEnvironment} from "lib/environment";
-import {C} from "lib/utils/constants";
+import {Logger} from "content/lib/logger";
+import {DomainUtil} from "content/lib/utils/domains";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {C} from "content/lib/utils/constants";
 
-import {overlayComm} from "framescripts/managers";
-import {ManagerForBlockedContent} from "framescripts/blocked-content.js";
+import {overlayComm} from "content/framescripts/managers";
+import {ManagerForBlockedContent}
+    from "content/framescripts/blocked-content.js";
 
 export const ManagerForDOMContentLoaded = (function() {
   let self = {};

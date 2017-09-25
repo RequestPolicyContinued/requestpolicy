@@ -3,7 +3,7 @@
 let {assert} = require("chai");
 let {isTrue, strictEqual} = assert;
 
-let {Utils} = require("lib/utils");
+let {Utils} = require("content/lib/utils");
 
 describe("Utils", function() {
   describe("wrapFunction(), unwrapFunction()", function() {

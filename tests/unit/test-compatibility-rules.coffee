@@ -3,7 +3,7 @@
 
 browser = require "./lib/sinon-chrome"
 
-{CompatibilityRules} = require "lib/classes/compatibility-rules"
+{CompatibilityRules} = require "content/lib/classes/compatibility-rules"
 
 describe "CompatibilityRules", ->
   before () ->

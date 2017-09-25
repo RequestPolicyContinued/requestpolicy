@@ -20,11 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {ManagerForEventListeners} from "lib/manager-for-event-listeners";
-import {ObserverManager} from "lib/observer-manager";
-import {createExtendedLogger} from "lib/logger";
-import {C} from "lib/utils/constants";
-import {JSUtils} from "lib/utils/javascript";
+import {ManagerForEventListeners}
+    from "content/lib/manager-for-event-listeners";
+import {ObserverManager} from "content/lib/observer-manager";
+import {createExtendedLogger} from "content/lib/logger";
+import {C} from "content/lib/utils/constants";
+import {JSUtils} from "content/lib/utils/javascript";
 
 const {LOG_ENVIRONMENT} = C;
 

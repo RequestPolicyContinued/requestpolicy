@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {RawRuleset} from "lib/ruleset";
-import {FileUtil} from "lib/utils/files";
-import {RulesetStorage} from "lib/ruleset-storage";
-import {MainEnvironment} from "lib/environment";
+import {Logger} from "content/lib/logger";
+import {RawRuleset} from "content/lib/ruleset";
+import {FileUtil} from "content/lib/utils/files";
+import {RulesetStorage} from "content/lib/ruleset-storage";
+import {MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // Constants

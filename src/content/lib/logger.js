@@ -24,7 +24,7 @@
 import {
   LEVEL as LOG_LEVEL,
   Logger as LoggerCls,
-} from "lib/classes/logger";
+} from "content/lib/classes/logger";
 
 // =============================================================================
 // Logger

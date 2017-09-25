@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {DomainUtil} from "lib/utils/domains";
-import {WindowUtils} from "lib/utils/windows";
-import {Storage} from "models/storage";
+import {Logger} from "content/lib/logger";
+import {DomainUtil} from "content/lib/utils/domains";
+import {WindowUtils} from "content/lib/utils/windows";
+import {Storage} from "content/models/storage";
 
 // =============================================================================
 // HttpResponse

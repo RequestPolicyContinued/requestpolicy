@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {RequestProcessor} from "lib/request-processor";
-import {DomainUtil} from "lib/utils/domains";
-import {Storage} from "models/storage";
+import {RequestProcessor} from "content/lib/request-processor";
+import {DomainUtil} from "content/lib/utils/domains";
+import {Storage} from "content/models/storage";
 
 const initFunctions = [];
 

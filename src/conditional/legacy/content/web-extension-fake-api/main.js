@@ -23,7 +23,7 @@
 // Before anything else, handle default preferences. This is necessary because
 // bootsrapped addons have to handle their default preferences manually,
 // see Mozilla Bug 564675.
-import "bootstrap/modules/handle-default-preferences";
+import "content/bootstrap/modules/handle-default-preferences";
 
 export {Api, ContentScriptsApi} from "./models/api";
 export {Manifest} from "./models/manifest";

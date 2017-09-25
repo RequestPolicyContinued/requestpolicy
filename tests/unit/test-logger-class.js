@@ -1,8 +1,8 @@
 const {assert} = require("chai");
 const sinon = require("sinon");
 
-const {Logger} = require("lib/classes/logger");
-const {C} = require("lib/utils/constants");
+const {Logger} = require("content/lib/classes/logger");
+const {C} = require("content/lib/utils/constants");
 
 describe("Logger", () => {
   describe("basic functions, all levels", () => {

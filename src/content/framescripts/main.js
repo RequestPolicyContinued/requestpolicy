@@ -20,17 +20,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import "framescripts/misc.js";
-import "framescripts/blocked-content.js";
-import "framescripts/dom-content-loaded.js";
+import "content/framescripts/misc.js";
+import "content/framescripts/blocked-content.js";
+import "content/framescripts/dom-content-loaded.js";
 
-import {C} from "lib/utils/constants";
+import {C} from "content/lib/utils/constants";
 
 if (C.UI_TESTING) {
-  require("ui-testing/services");
+  require("content/ui-testing/services");
 }
 
-import {Environment, MainEnvironment} from "lib/environment";
+import {Environment, MainEnvironment} from "content/lib/environment";
 
 const unloadSubject = require("@loader/unload");
 

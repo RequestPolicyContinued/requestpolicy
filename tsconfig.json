@@ -26,13 +26,13 @@
     "strictNullChecks": true,
 
     "outDir": "build/ts",
-    "baseUrl": "src/content",
+    "baseUrl": "src",
     "paths": {
       "*": [
         "*",
-        "../conditional/legacy/content/*",
-        "../conditional/ui-testing/content/*",
-        "../conditional/webextension/content/*"
+        "conditional/legacy/*",
+        "conditional/ui-testing/*",
+        "conditional/webextension/*"
       ]
     }
   }

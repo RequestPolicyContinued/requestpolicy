@@ -1,7 +1,7 @@
 {assert} = require "chai"
 {strictEqual} = assert
 
-{MapOfSets} = require "lib/classes/map-of-sets"
+{MapOfSets} = require "content/lib/classes/map-of-sets"
 
 describe "MapOfSets", ->
   it "addToSet(), deleteFromSet(), has(), get()", ->

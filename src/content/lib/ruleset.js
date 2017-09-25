@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {DomainUtil} from "lib/utils/domains";
-import {C} from "lib/utils/constants";
+import {Logger} from "content/lib/logger";
+import {DomainUtil} from "content/lib/utils/domains";
+import {C} from "content/lib/utils/constants";
 
 // =============================================================================
 // utilities

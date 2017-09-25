@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Info} from "lib/utils/info";
+import {Info} from "content/lib/utils/info";
 
 // =============================================================================
 // StyleSheetsController

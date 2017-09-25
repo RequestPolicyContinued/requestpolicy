@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MapOfSets} from "lib/classes/map-of-sets";
-import {Prefs} from "web-extension-fake-api/models/prefs";
+import {MapOfSets} from "content/lib/classes/map-of-sets";
+import {Prefs} from "content/web-extension-fake-api/models/prefs";
 
 // =============================================================================
 // PrefObserver

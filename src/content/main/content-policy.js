@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {NormalRequest, RedirectRequest} from "lib/request";
-import {Utils} from "lib/utils";
-import {RequestProcessor} from "lib/request-processor";
-import {Environment, MainEnvironment} from "lib/environment";
+import {Logger} from "content/lib/logger";
+import {NormalRequest, RedirectRequest} from "content/lib/request";
+import {Utils} from "content/lib/utils";
+import {RequestProcessor} from "content/lib/request-processor";
+import {Environment, MainEnvironment} from "content/lib/environment";
 
 let catMan = Cc["@mozilla.org/categorymanager;1"].
     getService(Ci.nsICategoryManager);

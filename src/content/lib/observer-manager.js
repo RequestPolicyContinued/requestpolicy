@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {SingleTopicObserver} from "lib/utils/observers";
-import {Environment} from "lib/environment";
-import {Logger} from "lib/logger";
+import {SingleTopicObserver} from "content/lib/utils/observers";
+import {Environment} from "content/lib/environment";
+import {Logger} from "content/lib/logger";
 
 // =============================================================================
 // ObserverManager

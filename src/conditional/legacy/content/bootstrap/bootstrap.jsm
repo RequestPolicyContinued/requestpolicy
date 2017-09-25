@@ -101,8 +101,8 @@ function createCommonjsEnv() {
       // eslint-disable-next-line new-cap
       loaderWrapper.loader = Loader.Loader({
         paths: {
-          "toolkit/": "resource://gre/modules/commonjs/toolkit/",
-          "": "chrome://rpcontinued/content/",
+          "content/": "chrome://rpcontinued/content/",
+          "": "resource://gre/modules/commonjs/",
         },
         globals,
       });
@@ -179,12 +179,14 @@ var FakeWebExt = (function() {
 
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
-    fakeEnv.exports = fakeEnv.commonjsEnv.load("web-extension-fake-api/main", [
-      ["Bootstrap", {
-        onStartup: FakeWebExt.onStartup,
-        onShutdown: FakeWebExt.onShutdown,
-      }],
-    ]);
+    fakeEnv.exports = fakeEnv.commonjsEnv.load(
+        "content/web-extension-fake-api/main",
+        [
+          ["Bootstrap", {
+            onStartup: FakeWebExt.onStartup,
+            onShutdown: FakeWebExt.onShutdown,
+          }],
+        ]);
 
     // "export" fake environment Api (for usage by UI tests)
     FakeWebExt.Api = fakeEnv.exports.Api;
@@ -234,7 +236,7 @@ var FakeWebExt = (function() {
     const {ContentScriptsApi} = fakeEnv.exports;
 
     const commonjsEnv = createCommonjsEnv();
-    commonjsEnv.load("framescripts/main", [
+    commonjsEnv.load("content/framescripts/main", [
       ["cfmm", cfmm],
       ["browser", ContentScriptsApi.browser],
     ]);
@@ -267,7 +269,7 @@ var FakeWebExt = (function() {
     function onDOMContentLoaded() {
       document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
       const pageName = document.documentElement.id;
-      commonjsEnv.load("settings/" + pageName, [
+      commonjsEnv.load("content/settings/" + pageName, [
         ["$", $],
         ["window", window],
         ["document", document],
@@ -286,7 +288,7 @@ var FakeWebExt = (function() {
 
     const commonjsEnv = createCommonjsEnv();
 
-    commonjsEnv.load("ui/request-log/main", [
+    commonjsEnv.load("content/ui/request-log/main", [
       ["window", window],
       ["browser", Api.browser],
     ]);

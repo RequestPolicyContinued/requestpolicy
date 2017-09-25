@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/utils/constants";
-import {JSUtils} from "lib/utils/javascript";
+import {C} from "content/lib/utils/constants";
+import {JSUtils} from "content/lib/utils/javascript";
 
 // =============================================================================
 // Info

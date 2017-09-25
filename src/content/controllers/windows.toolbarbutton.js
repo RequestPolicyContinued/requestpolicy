@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XULUtils} from "lib/utils/xul";
-import {Info} from "lib/utils/info";
-import {Logger} from "lib/logger";
+import {XULUtils} from "content/lib/utils/xul";
+import {Info} from "content/lib/utils/info";
+import {Logger} from "content/lib/logger";
 
 let CustomizableUI = null;
 if (Info.isAustralis) {

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/utils/constants";
+import {C} from "content/lib/utils/constants";
 
 // =============================================================================
 // GUILocation

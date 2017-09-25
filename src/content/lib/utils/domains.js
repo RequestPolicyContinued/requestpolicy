@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
+import {Logger} from "content/lib/logger";
 
 // =============================================================================
 // DomainUtil

@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/utils/constants";
-import {Logger} from "lib/logger";
-import {RequestResult} from "lib/request-result";
-import {Ruleset, RawRuleset} from "lib/ruleset";
-import {RulesetStorage} from "lib/ruleset-storage";
+import {C} from "content/lib/utils/constants";
+import {Logger} from "content/lib/logger";
+import {RequestResult} from "content/lib/request-result";
+import {Ruleset, RawRuleset} from "content/lib/ruleset";
+import {RulesetStorage} from "content/lib/ruleset-storage";
 
 // =============================================================================
 // constants

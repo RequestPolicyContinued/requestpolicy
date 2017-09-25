@@ -1,7 +1,7 @@
 {assert} = require "chai"
 {strictEqual} = assert
 
-{RuleUtils} = require "lib/utils/rules"
+{RuleUtils} = require "content/lib/utils/rules"
 
 describe "RuleUtils", ->
   it "endpointSpecToDisplayString()", ->

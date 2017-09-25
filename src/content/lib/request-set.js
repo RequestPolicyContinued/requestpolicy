@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {DomainUtil} from "lib/utils/domains";
-import {RequestResult} from "lib/request-result";
+import {Logger} from "content/lib/logger";
+import {DomainUtil} from "content/lib/utils/domains";
+import {RequestResult} from "content/lib/request-result";
 
 // =============================================================================
 // utilities

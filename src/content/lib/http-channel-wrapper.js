@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {WindowUtils} from "lib/utils/windows";
+import {Logger} from "content/lib/logger";
+import {WindowUtils} from "content/lib/utils/windows";
 
 // =============================================================================
 // HttpChannelWrapper

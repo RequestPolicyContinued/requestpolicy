@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/utils/constants";
-import {Environment, MainEnvironment} from "lib/environment";
-import {mlManager, overlayComm} from "framescripts/managers";
+import {C} from "content/lib/utils/constants";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {mlManager, overlayComm} from "content/framescripts/managers";
 
 (function() {
   let {content, sendSyncMessage} = cfmm;

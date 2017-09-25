@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
-import {Utils} from "lib/utils";
-import {Info} from "lib/utils/info";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {Utils} from "content/lib/utils";
+import {Info} from "content/lib/utils/info";
 
 // =============================================================================
 // utilities, constants

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
+import {Environment, MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // ErrorTriggeringService

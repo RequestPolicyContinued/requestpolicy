@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Storage as StorageClass} from "lib/classes/storage";
+import {Storage as StorageClass} from "content/lib/classes/storage";
 
 // =============================================================================
 // Storage

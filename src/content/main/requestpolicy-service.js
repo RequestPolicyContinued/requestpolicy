@@ -21,15 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {Storage} from "models/storage";
-import {PolicyManager} from "lib/policy-manager";
+import {Logger} from "content/lib/logger";
+import {Storage} from "content/models/storage";
+import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
-     SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
-import {Environment, MainEnvironment} from "lib/environment";
-import {C} from "lib/utils/constants";
-import {WindowUtils} from "lib/utils/windows";
-import {Info} from "lib/utils/info";
+     SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {C} from "content/lib/utils/constants";
+import {WindowUtils} from "content/lib/utils/windows";
+import {Info} from "content/lib/utils/info";
 
 const {AMO} = C;
 

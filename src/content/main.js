@@ -21,36 +21,36 @@
  */
 
 // import the logger first! It needs to get logging prefs from storage (async).
-import {Logger} from "lib/logger";
+import {Logger} from "content/lib/logger";
 
-import {Environment, MainEnvironment} from "lib/environment";
-import {PrefManager} from "main/pref-manager";
-import {C} from "lib/utils/constants";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {PrefManager} from "content/main/pref-manager";
+import {C} from "content/lib/utils/constants";
 
-import "main/requestpolicy-service";
-import "main/content-policy";
-import "main/window-manager";
-import "main/about-uri";
+import "content/main/requestpolicy-service";
+import "content/main/content-policy";
+import "content/main/window-manager";
+import "content/main/about-uri";
 
-import {KeyboardShortcuts} from "controllers/keyboard-shortcuts";
-import {OldRulesController} from "controllers/old-rules";
+import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
+import {OldRulesController} from "content/controllers/old-rules";
 
-import {RequestProcessor} from "lib/request-processor";
-import {Storage} from "models/storage";
-import {PolicyManager} from "lib/policy-manager";
-import {OldRules} from "lib/old-rules";
-import {RuleUtils} from "lib/utils/rules";
-import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {DomainUtil} from "lib/utils/domains";
-import {StringUtils} from "lib/utils/strings";
-import {Info} from "lib/utils/info";
+import {RequestProcessor} from "content/lib/request-processor";
+import {Storage} from "content/models/storage";
+import {PolicyManager} from "content/lib/policy-manager";
+import {OldRules} from "content/lib/old-rules";
+import {RuleUtils} from "content/lib/utils/rules";
+import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
+import {DomainUtil} from "content/lib/utils/domains";
+import {StringUtils} from "content/lib/utils/strings";
+import {Info} from "content/lib/utils/info";
 import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
-    from "lib/subscription";
-import {rpService} from "main/requestpolicy-service";
-import {WindowUtils} from "lib/utils/windows";
+    from "content/lib/subscription";
+import {rpService} from "content/main/requestpolicy-service";
+import {WindowUtils} from "content/lib/utils/windows";
 
 // @if BUILD_ALIAS='ui-testing'
-import "ui-testing/services";
+import "content/ui-testing/services";
 // @endif
 
 let controllers = [

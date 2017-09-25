@@ -21,19 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "lib/environment";
-import {Logger} from "lib/logger";
-import {Storage} from "models/storage";
-import {RequestProcessor} from "lib/request-processor";
-import {PolicyManager} from "lib/policy-manager";
-import {DomainUtil} from "lib/utils/domains";
-import {Ruleset} from "lib/ruleset";
+import {Environment} from "content/lib/environment";
+import {Logger} from "content/lib/logger";
+import {Storage} from "content/models/storage";
+import {RequestProcessor} from "content/lib/request-processor";
+import {PolicyManager} from "content/lib/policy-manager";
+import {DomainUtil} from "content/lib/utils/domains";
+import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
-        } from "lib/classes/gui-location";
-import {StringUtils} from "lib/utils/strings";
-import {DOMUtils} from "lib/utils/dom";
-import {WindowUtils} from "lib/utils/windows";
-import {C} from "lib/utils/constants";
+        } from "content/lib/classes/gui-location";
+import {StringUtils} from "content/lib/utils/strings";
+import {DOMUtils} from "content/lib/utils/dom";
+import {WindowUtils} from "content/lib/utils/windows";
+import {C} from "content/lib/utils/constants";
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;

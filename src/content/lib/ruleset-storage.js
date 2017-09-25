@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {RawRuleset} from "lib/ruleset";
-import {FileUtil} from "lib/utils/files";
+import {RawRuleset} from "content/lib/ruleset";
+import {FileUtil} from "content/lib/utils/files";
 
 // =============================================================================
 // RulesetStorage

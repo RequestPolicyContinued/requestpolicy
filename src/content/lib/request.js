@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createExtendedLogger} from "lib/logger";
-import {DomainUtil} from "lib/utils/domains";
-import {WindowUtils} from "lib/utils/windows";
-import {HttpChannelWrapper} from "lib/http-channel-wrapper";
+import {createExtendedLogger} from "content/lib/logger";
+import {DomainUtil} from "content/lib/utils/domains";
+import {WindowUtils} from "content/lib/utils/windows";
+import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
 
 const logRequests = createExtendedLogger({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},

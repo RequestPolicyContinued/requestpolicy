@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "lib/environment";
-import {Logger} from "lib/logger";
-import {C} from "lib/utils/constants";
+import {Environment} from "content/lib/environment";
+import {Logger} from "content/lib/logger";
+import {C} from "content/lib/utils/constants";
 
 const {LOG_EVENT_LISTENERS} = C;
 

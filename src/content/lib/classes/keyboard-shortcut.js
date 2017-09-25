@@ -20,11 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Windows} from "models/windows";
-import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {Storage} from "models/storage";
-import {XULUtils} from "lib/utils/xul";
-import {MainEnvironment} from "lib/environment";
+import {Windows} from "content/models/windows";
+import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
+import {Storage} from "content/models/storage";
+import {XULUtils} from "content/lib/utils/xul";
+import {MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // KeyboardShortcut

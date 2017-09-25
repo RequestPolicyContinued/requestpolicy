@@ -11,11 +11,11 @@
   },
 
   "background": {
-    "scripts": ["main.js"]
+    "scripts": ["content/main.js"]
   },
 
   "options_ui": {
-    "page": "settings/basicprefs.html",
+    "page": "content/settings/basicprefs.html",
     "open_in_tab": true
   },
 

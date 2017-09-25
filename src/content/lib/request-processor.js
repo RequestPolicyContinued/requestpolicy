@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createExtendedLogger, Logger} from "lib/logger";
-import {Storage} from "models/storage";
-import {PolicyManager} from "lib/policy-manager";
-import {DomainUtil} from "lib/utils/domains";
-import {Request} from "lib/request";
+import {createExtendedLogger, Logger} from "content/lib/logger";
+import {Storage} from "content/models/storage";
+import {PolicyManager} from "content/lib/policy-manager";
+import {DomainUtil} from "content/lib/utils/domains";
+import {Request} from "content/lib/request";
 import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,
         REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
@@ -34,13 +34,13 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
         REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
         REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL,
-        } from "lib/request-result";
-import {RequestSet} from "lib/request-set";
-import {MainEnvironment} from "lib/environment";
-import {Utils} from "lib/utils";
-import {CompatibilityRules} from "models/compatibility-rules";
+        } from "content/lib/request-result";
+import {RequestSet} from "content/lib/request-set";
+import {MainEnvironment} from "content/lib/environment";
+import {Utils} from "content/lib/utils";
+import {CompatibilityRules} from "content/models/compatibility-rules";
 
-import RPContentPolicy from "main/content-policy";
+import RPContentPolicy from "content/main/content-policy";
 
 const logRequests = createExtendedLogger({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},

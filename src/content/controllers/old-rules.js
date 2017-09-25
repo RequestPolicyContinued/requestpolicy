@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {Info} from "lib/utils/info";
-import {OldRules} from "lib/old-rules";
-import {PolicyManager} from "lib/policy-manager";
+import {Logger} from "content/lib/logger";
+import {Info} from "content/lib/utils/info";
+import {OldRules} from "content/lib/old-rules";
+import {PolicyManager} from "content/lib/policy-manager";
 
 // =============================================================================
 // OldRulesController

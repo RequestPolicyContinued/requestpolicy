@@ -21,21 +21,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "lib/environment";
-import {ManagerForMessageListeners} from "lib/manager-for-message-listeners";
-import {Logger} from "lib/logger";
-import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {Storage} from "models/storage";
-import {RequestProcessor} from "lib/request-processor";
-import {PolicyManager} from "lib/policy-manager";
-import {DomainUtil} from "lib/utils/domains";
-import {StringUtils} from "lib/utils/strings";
-import {WindowUtils} from "lib/utils/windows";
-import {JSUtils} from "lib/utils/javascript";
-import {Utils} from "lib/utils";
-import {DOMUtils} from "lib/utils/dom";
-import {C} from "lib/utils/constants";
-import {CompatibilityRules} from "models/compatibility-rules";
+import {Environment, MainEnvironment} from "content/lib/environment";
+import {ManagerForMessageListeners}
+    from "content/lib/manager-for-message-listeners";
+import {Logger} from "content/lib/logger";
+import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
+import {Storage} from "content/models/storage";
+import {RequestProcessor} from "content/lib/request-processor";
+import {PolicyManager} from "content/lib/policy-manager";
+import {DomainUtil} from "content/lib/utils/domains";
+import {StringUtils} from "content/lib/utils/strings";
+import {WindowUtils} from "content/lib/utils/windows";
+import {JSUtils} from "content/lib/utils/javascript";
+import {Utils} from "content/lib/utils";
+import {DOMUtils} from "content/lib/utils/dom";
+import {C} from "content/lib/utils/constants";
+import {CompatibilityRules} from "content/models/compatibility-rules";
 
 const {LOG_FLAG_STATE} = C;
 

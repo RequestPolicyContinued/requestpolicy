@@ -73,10 +73,12 @@ const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
 
 /* eslint-disable new-cap */
 const profileUri = (function() {
+  /* eslint-disable new-cap */
   const fileHandler = Services.io.getProtocolHandler("file").
       QueryInterface(Ci.nsIFileProtocolHandler);
   const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
   return fileHandler.getURLSpecFromDir(profileDir);
+  /* eslint-enable new-cap */
 })();
 /* eslint-enable new-cap */
 

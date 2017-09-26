@@ -119,7 +119,7 @@ RequestSet.prototype = {
    */
   addRequest: function(originUri, destUri, requestResult) {
     if (requestResult === undefined) {
-      Logger.warning(
+      Logger.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
           "origin: <" + originUri + ">, destination: <" + destUri + ">");

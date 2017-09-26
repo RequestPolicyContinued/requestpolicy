@@ -202,7 +202,7 @@ export const ManagerForDOMContentLoaded = (function() {
           QueryInterface(Ci.nsIDocShell);
       /* eslint-enable new-cap */
       if (!docShell.allowMetaRedirects) {
-        Logger.warning(
+        Logger.warn(
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 

@@ -89,7 +89,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
 
   if (!self.mm) {
     if (Logger) {
-      Logger.warning("No Message Manager was specified " +
+      Logger.warn("No Message Manager was specified " +
                      "for a new ManagerForMessageListeners!");
     }
   }
@@ -117,7 +117,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
-    Logger.warning("The message name that has been passed to " +
+    Logger.warn("The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
     aMessageName = aMessageName.substr(C.MM_PREFIX.length);

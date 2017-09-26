@@ -171,7 +171,7 @@ export let RequestProcessor = (function() {
       let window = request.getChromeWindow();
 
       if (!browser || !window || typeof window.rpcontinued === "undefined") {
-        Logger.warning("The user could not be notified " +
+        Logger.warn("The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
         window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
@@ -961,10 +961,10 @@ export let RequestProcessor = (function() {
       console.error("Fatal Error:");
       console.dir(e);
       if (Storage.isBlockingDisabled()) {
-        Logger.warning("Allowing request due to internal error.");
+        Logger.warn("Allowing request due to internal error.");
         return CP_OK;
       }
-      Logger.warning("Rejecting request due to internal error.");
+      Logger.warn("Rejecting request due to internal error.");
       return CP_REJECT;
     }
   };
@@ -990,7 +990,7 @@ export let RequestProcessor = (function() {
       if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
         // Seems to be too late to block it at this point. Calling the
         // cancel(status) method didn't stop it.
-        Logger.warning(
+        Logger.warn(
             "Discovered prefetch request being sent to: " + httpChannel.name);
       }
     } catch (e) {
@@ -1121,7 +1121,7 @@ export let RequestProcessor = (function() {
       internal.requestObservers.delete(observer);
       return;
     }
-    Logger.warning(
+    Logger.warn(
         "Could not find observer to remove " + "in removeRequestObserver()");
   };
 
@@ -1353,7 +1353,7 @@ RequestProcessor = (function(self) {
             "This will be treated as a content request.");
       } else {
         if (LOG_REQUESTS) {
-          Logger.warning(
+          Logger.warn(
               "** ALLOWED ** redirection from <" + originURI + "> " +
               "to <" + destURI + ">. " +
               "Original request is from privileged code.");
@@ -1364,7 +1364,7 @@ RequestProcessor = (function(self) {
 
     // Ignore redirects to javascript. The browser will ignore them, as well.
     if (request.destUriObj.schemeIs("javascript")) {
-      Logger.warning(
+      Logger.warn(
           "Ignoring redirect to javascript URI <" + destURI + ">");
       return CP_OK;
     }
@@ -1372,7 +1372,7 @@ RequestProcessor = (function(self) {
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
       if (LOG_REQUESTS) {
-        Logger.warning(
+        Logger.warn(
             "** ALLOWED ** redirection from <" + originURI + "> " +
             "to <" + destURI + ">. " +
             "Same hosts or allowed origin/destination.");
@@ -1464,7 +1464,7 @@ RequestProcessor = (function(self) {
       internal.recordRejectedRequest(request);
 
       if (LOG_REQUESTS) {
-        Logger.warning(
+        Logger.warn(
             "** BLOCKED ** redirection from <" + originURI + "> " +
             "to <" + destURI + ">.");
       }
@@ -1473,10 +1473,10 @@ RequestProcessor = (function(self) {
       console.error("Fatal Error:");
       console.dir(e);
       if (Storage.isBlockingDisabled()) {
-        Logger.warning("Allowing request due to internal error.");
+        Logger.warn("Allowing request due to internal error.");
         return CP_OK;
       }
-      Logger.warning("Rejecting request due to internal error.");
+      Logger.warn("Rejecting request due to internal error.");
       return CP_REJECT;
     }
   };
@@ -1520,7 +1520,7 @@ RequestProcessor = (function(self) {
 
     let rv = showRedirectNotification(aRequest);
     if (true !== rv) {
-      Logger.warning(
+      Logger.warn(
           "A redirection of a top-level document has been observed, " +
           "but it was not possible to notify the user! The redirection " +
           "was from page <" + aRequest.originURI + "> " +

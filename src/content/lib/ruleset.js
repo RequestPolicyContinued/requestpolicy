@@ -34,7 +34,7 @@ function dprint(msg) {
 }
 
 function dwarn(msg) {
-  Logger.warning("[POLICY] " + msg);
+  Logger.warn("[POLICY] " + msg);
 }
 
 /* eslint-disable max-len */

@@ -381,7 +381,7 @@ export function loadMenuIntoWindow(window) {
           // destsWithAllowedRequests, but not in destsMixed.
           // This should never happen, the destsMixed destination should have
           // been added in the destsWithBlockedRequests-loop.
-          Logger.warning("mixed dest was" +
+          Logger.warn("mixed dest was" +
               " not added to `destsMixed` list: <" + allowedGUIDest + ">");
           destsMixed.push(allowedGUIDest);
         }

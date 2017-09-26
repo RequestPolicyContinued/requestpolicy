@@ -309,7 +309,7 @@ export function loadOverlayIntoWindow(window) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
-          Logger.warning(
+          Logger.warn(
               "Ignoring redirect to javascript URI <" + destURI + ">");
           continue;
         }

@@ -113,7 +113,7 @@ export const Logger = (function() {
   }
 
   /* eslint-disable no-console */
-  self.warning = log.bind(self, LevelEnum.WARNING, console.warn);
+  self.warn = log.bind(self, LevelEnum.WARNING, console.warn);
   self.info = log.bind(self, LevelEnum.INFO, console.info);
   self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
   /* eslint-enable no-console */

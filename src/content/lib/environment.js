@@ -242,7 +242,7 @@ export const Environment = (function() {
   Environment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
     if (self.envState === ENV_STATES.NOT_STARTED) {
-      Logger.warning("registerInnerEnvironment() has been called but " +
+      Logger.warn("registerInnerEnvironment() has been called but " +
           "the outer environment hasn't started up yet. " +
           "Starting up now.");
       self.startup();

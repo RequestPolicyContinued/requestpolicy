@@ -368,7 +368,7 @@ DomainUtil.getDefaultPortForScheme = function(scheme) {
     case "https":
       return 443;
     default:
-      Logger.warning("Unknown default port for scheme " + scheme + ".");
+      Logger.warn("Unknown default port for scheme " + scheme + ".");
       return null;
   }
 };

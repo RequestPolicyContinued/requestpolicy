@@ -50,7 +50,7 @@ export function ObserverManager(aEnv) {
   } else {
     // aEnv is not defined! Try to report an error.
     if (Logger) {
-      Logger.warning("No Environment was specified for " +
+      Logger.warn("No Environment was specified for " +
                      "a new ObserverManager! This means that the observers " +
                      "won't be unregistered!");
     }

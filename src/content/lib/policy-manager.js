@@ -42,7 +42,7 @@ function dprint(msg) {
 }
 
 function warn(msg) {
-  Logger.warning("[POLICY] " + msg);
+  Logger.warn("[POLICY] " + msg);
 }
 
 function notifyRulesChanged() {

@@ -507,8 +507,8 @@ export let RequestProcessor = (function() {
     //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
     //               "<unknown>") +
     //              " -->  "+request.aContentLocation.spec);
-    // Logger.vardump(request.aRequestOrigin);
-    // Logger.vardump(request.aContentLocation);
+    // Logger.dir(request.aRequestOrigin);
+    // Logger.dir(request.aContentLocation);
     try {
       if (request.isInternal()) {
         if (LOG_REQUESTS) {
@@ -800,11 +800,11 @@ export let RequestProcessor = (function() {
           request.aRequestOrigin, request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
         Logger.debug("Matched deny rules");
-        Logger.vardump(matchedDenyRule);
+        Logger.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
         Logger.debug("Matched allow rules");
-        Logger.vardump(matchedAllowRule);
+        Logger.dir(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
       // policy. I believe this is effectively the same as giving precedence
@@ -855,11 +855,11 @@ export let RequestProcessor = (function() {
               request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
         Logger.debug("Matched deny rules");
-        Logger.vardump(matchedDenyRule);
+        Logger.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
         Logger.debug("Matched allow rules");
-        Logger.vardump(matchedAllowRule);
+        Logger.dir(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {

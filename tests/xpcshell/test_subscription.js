@@ -29,7 +29,7 @@ function test_1_completed(updateResults) {
   if (!updateResults.official) {
     do_throw("No \"official\" key in updateResults.");
   }
-  Logger.vardump(updateResults.official);
+  Logger.dir(updateResults.official);
   do_check_true(updateResults.official.embedded);
   do_check_true(false);
   do_test_finished();

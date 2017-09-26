@@ -118,7 +118,7 @@ export const Logger = (function() {
   self.debug = log.bind(self, LevelEnum.DEBUG, console.debug);
   /* eslint-enable no-console */
 
-  self.vardump = function(obj) {
+  self.dir = function(obj) {
     if (shouldLog(LevelEnum.DEBUG)) {
       console.dir(obj);
     }

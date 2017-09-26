@@ -362,7 +362,7 @@ BUILDS.forEach(build => {
 
       // ---
 
-      const tsProject = ts.createProject("tsconfig.json", {
+      const tsConfigOverride = {
         rootDir: srcDir,
         outDir: srcDir, // virtual (!) output directory
         // <hack>
@@ -374,7 +374,9 @@ BUILDS.forEach(build => {
         // "gulp-typescript" module.
         isolatedModules: true,
         // </hack>
-      });
+      };
+      const tsProject = ts.createProject("tsconfig.json", tsConfigOverride);
+
 
       addBuildTask("js", [TASK_NAMES.ppContext], () => {
         let files = [`content/**/*.*(js|jsm|ts)`];

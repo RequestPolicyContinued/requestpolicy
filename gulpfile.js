@@ -375,6 +375,7 @@ BUILDS.forEach(build => {
         isolatedModules: true,
         // </hack>
       };
+      if (build.isDev) tsConfigOverride.removeComments = false;
       const tsProject = ts.createProject("tsconfig.json", tsConfigOverride);
 
 

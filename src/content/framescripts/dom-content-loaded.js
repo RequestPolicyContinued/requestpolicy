@@ -88,7 +88,7 @@ export const ManagerForDOMContentLoaded = (function() {
       }
 
       const {blockedURIs} = aResponse;
-      // Logger.debug("Received " +
+      // Logger.log("Received " +
       //              Object.getOwnPropertyNames(blockedURIs).length +
       //              " blocked URIs.");
 

@@ -61,7 +61,7 @@ export function ManagerForEventListeners(aEnv) {
         Environment.LEVELS.INTERFACE,
         function() {
           if (LOG_EVENT_LISTENERS) {
-            Logger.debug("From now on new event listeners will be " +
+            Logger.log("From now on new event listeners will be " +
                 "added immediately. Environment: \"" +
                 self.environment.name + "\"");
           }
@@ -109,7 +109,7 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
   };
   if (self.addNewListenersImmediately) {
     if (LOG_EVENT_LISTENERS) {
-      Logger.debug("Immediately adding event listener for \"" +
+      Logger.log("Immediately adding event listener for \"" +
           listener.eventType + "\". Environment: \"" +
           self.environment.name + "\"");
     }
@@ -126,7 +126,7 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   for (let listener of self.listeners) {
     if (listener.listening === false) {
       if (LOG_EVENT_LISTENERS) {
-        Logger.debug("Lazily adding event listener for \"" +
+        Logger.log("Lazily adding event listener for \"" +
             listener.eventType + "\". Environment: \"" +
             self.environment.name + "\"");
       }
@@ -143,7 +143,7 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
     if (LOG_EVENT_LISTENERS) {
-      Logger.debug("Removing event listener for \"" + listener.eventType +
+      Logger.log("Removing event listener for \"" + listener.eventType +
           "\". Environment: \"" + self.environment.name + "\"");
     }
     listener.target.removeEventListener(listener.eventType, listener.callback,

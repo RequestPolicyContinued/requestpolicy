@@ -89,7 +89,7 @@ export function FramescriptToOverlayCommunication(aEnv) {
 
 FramescriptToOverlayCommunication.prototype._dump = function(msg) {
   let self = this;
-  Logger.debug(self.env.uid + ": " + msg);
+  Logger.log(self.env.uid + ": " + msg);
 };
 
 /**

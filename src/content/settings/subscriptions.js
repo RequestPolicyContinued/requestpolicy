@@ -120,7 +120,7 @@ import {common, WinEnv, elManager} from "./common";
     for (var subName in available) {
       var el = getInputElement(subName);
       if (!el) {
-        Logger.debug("Skipping unexpected official subName: " + subName);
+        Logger.log("Skipping unexpected official subName: " + subName);
         continue;
       }
       elManager.addListener(el, "change", handleSubscriptionCheckboxChange);

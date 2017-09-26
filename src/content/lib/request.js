@@ -118,7 +118,7 @@ Request.prototype.isInternal = function() {
 
   if (origin === undefined || origin === null) {
     if (LOG_REQUESTS) {
-      Logger.debug("Allowing request without an origin.");
+      Logger.log("Allowing request without an origin.");
     }
     return true;
   }
@@ -128,7 +128,7 @@ Request.prototype.isInternal = function() {
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
     if (LOG_REQUESTS) {
-      Logger.debug("Allowing request with empty origin spec!");
+      Logger.log("Allowing request with empty origin spec!");
     }
     return true;
   }
@@ -143,7 +143,7 @@ Request.prototype.isInternal = function() {
         origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
       )) {
     if (LOG_REQUESTS) {
-      Logger.debug("Allowing internal request.");
+      Logger.log("Allowing internal request.");
     }
     return true;
   }
@@ -151,7 +151,7 @@ Request.prototype.isInternal = function() {
   // Whitelisted internal request.
   if (WHITELISTED_INTERNAL_SCHEMES.has(dest.scheme)) {
     if (LOG_REQUESTS) {
-      Logger.debug("Allowing request with a semi-internal destination.");
+      Logger.log("Allowing request with a semi-internal destination.");
     }
     return true;
   }
@@ -161,7 +161,7 @@ Request.prototype.isInternal = function() {
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
     if (LOG_REQUESTS) {
-      Logger.debug(
+      Logger.log(
           "Allowing request with no asciiHost on either origin " +
           "<" + origin.spec + "> or dest <" + dest.spec + ">");
     }

@@ -84,7 +84,7 @@ export const RPContentPolicy = (function() {
 
   let unregister = (function() {
     return function() {
-      Logger.debug("shutting down RPContentPolicy...");
+      Logger.log("shutting down RPContentPolicy...");
 
       // Below the shouldLoad function is replaced by a new one
       // which always allows *all* requests.
@@ -230,7 +230,7 @@ export const RPChannelEventSink = (function() {
 
   let unregister = (function() {
     return function unregister() {
-      Logger.debug("shutting down RPChannelEventSink...");
+      Logger.log("shutting down RPChannelEventSink...");
 
       self.asyncOnChannelRedirect = () => {};
 

@@ -122,7 +122,7 @@ export function loadOverlayIntoWindow(window) {
 
         browser.runtime.getBrowserInfo().then((appInfo) => {
           if (appInfo.name === "Fennec") {
-            Logger.debug("Detected Fennec.");
+            Logger.log("Detected Fennec.");
             // Set an attribute for CSS usage.
             popupElement.setAttribute("fennec", "true");
             popupElement.setAttribute("position", "after_end");
@@ -282,7 +282,7 @@ export function loadOverlayIntoWindow(window) {
   });
 
   self.handleMetaRefreshes = function(message) {
-    Logger.debug("Handling meta refreshes...");
+    Logger.log("Handling meta refreshes...");
 
     let {documentURI, metaRefreshes} = message.data;
     let browser = message.target;
@@ -290,12 +290,12 @@ export function loadOverlayIntoWindow(window) {
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       let {delay, destURI, originalDestURI} = metaRefreshes[i];
 
-      Logger.debug("meta refresh to <" +
+      Logger.log("meta refresh to <" +
           destURI + "> (" + delay + " second delay) found in document at <" +
           documentURI + ">");
 
       if (originalDestURI) {
-        Logger.debug(
+        Logger.log(
             "meta refresh destination <" + originalDestURI + "> " +
             "appeared to be relative to <" + documentURI + ">, so " +
             "it has been resolved to <" + destURI + ">");
@@ -551,7 +551,7 @@ export function loadOverlayIntoWindow(window) {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
-        Logger.debug(
+        Logger.log(
             "Checking for blocked requests from page <" + uri + ">");
       }
 
@@ -565,7 +565,7 @@ export function loadOverlayIntoWindow(window) {
         let logText = documentContainsBlockedContent ?
                       "Requests have been blocked." :
                       "No requests have been blocked.";
-        Logger.debug(logText);
+        Logger.log(logText);
       }
 
       return Promise.resolve();
@@ -986,7 +986,7 @@ export function loadOverlayIntoWindow(window) {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    // Logger.debug('popup width: ' + popup.clientWidth);
+    // Logger.log('popup width: ' + popup.clientWidth);
     const popupWidth = popupElement.clientWidth === 0 ? 730 :
         popupElement.clientWidth;
     const anchor = $id("content");

@@ -258,7 +258,7 @@ export const rpService = (function() {
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        Logger.debug("XXX updated: " + data);
+        Logger.log("XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -268,7 +268,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        Logger.debug("XXX added: " + data);
+        Logger.log("XXX added: " + data);
         let subInfo = JSON.parse(data);
         let failures = PolicyManager.loadSubscriptionRules(subInfo);
         let failed = Object.getOwnPropertyNames(failures).length > 0;
@@ -291,7 +291,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        Logger.debug("YYY: " + data);
+        Logger.log("YYY: " + data);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;

@@ -146,7 +146,7 @@ export let RequestProcessor = (function() {
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
     if (LOG_REQUESTS) {
-      Logger.debug("** BLOCKED ** reason: " + reason +
+      Logger.log("** BLOCKED ** reason: " + reason +
           ". " + request.detailsToString());
     }
 
@@ -202,7 +202,7 @@ export let RequestProcessor = (function() {
    */
   function accept(reason, request, unforbidable) {
     if (LOG_REQUESTS) {
-      Logger.debug("** ALLOWED ** reason: " +
+      Logger.log("** ALLOWED ** reason: " +
           reason + ". " + request.detailsToString());
     }
 
@@ -303,7 +303,7 @@ export let RequestProcessor = (function() {
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
         if (LOG_REQUESTS) {
-          Logger.debug(
+          Logger.log(
               "Using cached shouldLoad() result of " +
               lastShouldLoadCheck.result + " for request to <" +
               request.destURI + "> from <" + request.originURI + ">.");
@@ -311,7 +311,7 @@ export let RequestProcessor = (function() {
         return true;
       } else {
         if (LOG_REQUESTS) {
-          Logger.debug(
+          Logger.log(
               "shouldLoad() cache expired for result of " +
               lastShouldLoadCheck.result + " for request to <" +
               request.destURI + "> from <" + request.originURI + ">.");
@@ -334,22 +334,22 @@ export let RequestProcessor = (function() {
         continue;
       }
       if (LOG_GETTING_SAVED_REQUESTS) {
-        Logger.debug("test originUri: " + originUri);
+        Logger.log("test originUri: " + originUri);
       }
       let originUriRequests = requests[originUri];
       for (let destBase in originUriRequests) {
         if (LOG_GETTING_SAVED_REQUESTS) {
-          Logger.debug("test destBase: " + destBase);
+          Logger.log("test destBase: " + destBase);
         }
         let destBaseRequests = originUriRequests[destBase];
         for (let destIdent in destBaseRequests) {
           if (LOG_GETTING_SAVED_REQUESTS) {
-            Logger.debug("test destIdent: " + destIdent);
+            Logger.log("test destIdent: " + destIdent);
           }
           let destIdentRequests = destBaseRequests[destIdent];
           for (let destUri in destIdentRequests) {
             if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.debug("test destUri: " + destUri);
+              Logger.log("test destUri: " + destUri);
             }
             let dest = destIdentRequests[destUri];
             for (let i in dest) {
@@ -374,7 +374,7 @@ export let RequestProcessor = (function() {
   // function _getOtherOriginsHelperFromDOM(document, reqSet) {
   //   var documentUri = DomainUtil
   //       .stripFragment(document.documentURI);
-  //   Logger.debug("Looking for other origins within DOM of "
+  //   Logger.log("Looking for other origins within DOM of "
   //       + documentUri);
   //   // TODO: Check other elements besides iframes and frames?
   //   var frameTagTypes = {
@@ -402,7 +402,7 @@ export let RequestProcessor = (function() {
   //         // yet.
   //         continue;
   //       }
-  //       Logger.debug("Found DOM child " + tagType
+  //       Logger.log("Found DOM child " + tagType
   //           + " with src <" + childUri + "> in document <" + documentUri + ">");
   //       //var childUriIdent = DomainUtil.getIdentifier(childUri,
   //       //    DomainUtil.LEVEL_SOP);
@@ -421,7 +421,7 @@ export let RequestProcessor = (function() {
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
     if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.debug("Looking for other origins within allowed requests from " +
+      Logger.log("Looking for other origins within allowed requests from " +
           originURI);
     }
     if (!checkedOrigins[originURI]) {
@@ -436,7 +436,7 @@ export let RequestProcessor = (function() {
         for (let destIdent in allowedRequests[destBase]) {
           for (let destURI in allowedRequests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.debug("Found allowed request to <" + destURI + "> " +
+              Logger.log("Found allowed request to <" + destURI + "> " +
                   "from <" + originURI + ">");
             }
             reqSet.addRequest(originURI, destURI,
@@ -457,7 +457,7 @@ export let RequestProcessor = (function() {
 
   function _addAllDeniedRequestsFromURI(originURI, reqSet) {
     if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.debug("Looking for other origins within denied requests from " +
+      Logger.log("Looking for other origins within denied requests from " +
           originURI);
     }
     const requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
@@ -466,7 +466,7 @@ export let RequestProcessor = (function() {
         for (let destIdent in requests[destBase]) {
           for (let destUri in requests[destBase][destIdent]) {
             if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.debug("Found denied request to <" + destUri + "> from <" +
+              Logger.log("Found denied request to <" + destUri + "> from <" +
                   originURI + ">");
             }
             reqSet.addRequest(originURI, destUri,
@@ -503,7 +503,7 @@ export let RequestProcessor = (function() {
   // eslint-disable-next-line complexity
   self.process = function(request) {
     // uncomment for debugging:
-    // Logger.debug("request: " +
+    // Logger.log("request: " +
     //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
     //               "<unknown>") +
     //              " -->  "+request.aContentLocation.spec);
@@ -512,7 +512,7 @@ export let RequestProcessor = (function() {
     try {
       if (request.isInternal()) {
         if (LOG_REQUESTS) {
-          Logger.debug("Allowing a request that seems to be internal. " +
+          Logger.log("Allowing a request that seems to be internal. " +
                       "Origin: " + request.originURI + ", Dest: " +
                       request.destURI);
         }
@@ -551,7 +551,7 @@ export let RequestProcessor = (function() {
         //   -> https://bugzilla.mozilla.org/show_bug.cgi?id=767134#c15
         if (request.aRequestPrincipal) {
           if (LOG_REQUESTS) {
-            Logger.debug(
+            Logger.log(
                 "Allowing request that appears to be a URL entered in the " +
                 "location bar or some other good explanation: " + destURI);
           }
@@ -563,7 +563,7 @@ export let RequestProcessor = (function() {
       if (request.aRequestOrigin.scheme === "view-source") {
         let newOriginURI = originURI.split(":").slice(1).join(":");
         if (LOG_REQUESTS) {
-          Logger.debug(
+          Logger.log(
               "Considering view-source origin <" + originURI + "> " +
               "to be origin <" + newOriginURI + ">");
         }
@@ -576,14 +576,14 @@ export let RequestProcessor = (function() {
         if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
           if (LOG_REQUESTS) {
-            Logger.debug(
+            Logger.log(
                 "Allowing \"data:text/html\" view-source destination" +
                 " (Selection Source)");
           }
           return CP_OK;
         } else {
           if (LOG_REQUESTS) {
-            Logger.debug(
+            Logger.log(
                 "Considering view-source destination <" + destURI + "> " +
                 "to be destination <" + newDestURI + ">");
           }
@@ -615,7 +615,7 @@ export let RequestProcessor = (function() {
           }
           if (newOriginURI) {
             newOriginURI = DomainUtil.stripFragment(newOriginURI);
-            Logger.debug("Considering origin <" +
+            Logger.log("Considering origin <" +
                          originURI + "> to be origin <" + newOriginURI + ">");
             originURI = newOriginURI;
             request.setOriginURI(originURI);
@@ -636,7 +636,7 @@ export let RequestProcessor = (function() {
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
       if (originURI === destURI) {
         if (LOG_REQUESTS) {
-          Logger.debug(
+          Logger.log(
               "Allowing (but not recording) request " +
               "where origin is the same as the destination: " + originURI);
         }
@@ -799,11 +799,11 @@ export let RequestProcessor = (function() {
       request.requestResult = PolicyManager.checkRequestAgainstUserRules(
           request.aRequestOrigin, request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.debug("Matched deny rules");
+        Logger.log("Matched deny rules");
         Logger.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.debug("Matched allow rules");
+        Logger.log("Matched allow rules");
         Logger.dir(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
@@ -854,11 +854,11 @@ export let RequestProcessor = (function() {
           .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
               request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.debug("Matched deny rules");
+        Logger.log("Matched deny rules");
         Logger.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.debug("Matched allow rules");
+        Logger.log("Matched allow rules");
         Logger.dir(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
@@ -936,7 +936,7 @@ export let RequestProcessor = (function() {
           const mappedDestUriObj =
               internal.mappedDestinations[destURI][mappedDest];
           if (LOG_REQUESTS) {
-            Logger.debug("Checking mapped destination: " + mappedDest);
+            Logger.log("Checking mapped destination: " + mappedDest);
           }
           let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
@@ -1106,7 +1106,7 @@ export let RequestProcessor = (function() {
       throw "Observer passed to addRequestObserver does " +
           "not have an observeBlockedRequest() method.";
     }
-    Logger.debug("Adding request observer: " + observer.toString());
+    Logger.log("Adding request observer: " + observer.toString());
     internal.requestObservers.add(observer);
   };
 
@@ -1117,7 +1117,7 @@ export let RequestProcessor = (function() {
    */
   self.removeRequestObserver = function(observer) {
     if (internal.requestObservers.has(observer)) {
-      Logger.debug("Removing request observer: " + observer.toString());
+      Logger.log("Removing request observer: " + observer.toString());
       internal.requestObservers.delete(observer);
       return;
     }
@@ -1128,7 +1128,7 @@ export let RequestProcessor = (function() {
   self.getDeniedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
     if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.debug("## getDeniedRequests");
+      Logger.log("## getDeniedRequests");
     }
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
@@ -1137,7 +1137,7 @@ export let RequestProcessor = (function() {
   self.getAllowedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
     if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.debug("## getAllowedRequests");
+      Logger.log("## getAllowedRequests");
     }
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);
@@ -1323,7 +1323,7 @@ RequestProcessor = (function(self) {
     // to a "data" URI.
     if (request.isInternal()) {
       if (LOG_REQUESTS) {
-        Logger.debug(
+        Logger.log(
             "Allowing a redirection that seems to be internal. " +
             "Origin: " + request.originURI + ", Dest: " +
             request.destURI);
@@ -1392,7 +1392,7 @@ RequestProcessor = (function(self) {
         if (internal.clickedLinks[realOrigin] &&
             internal.clickedLinks[realOrigin][originURI]) {
           if (LOG_REQUESTS) {
-            Logger.debug(
+            Logger.log(
                 "This redirect was from a link click." +
                 " Registering an additional click to <" + destURI + "> " +
                 "from <" + realOrigin + ">");
@@ -1401,7 +1401,7 @@ RequestProcessor = (function(self) {
         } else if (internal.submittedForms[realOrigin] &&
             internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
           if (LOG_REQUESTS) {
-            Logger.debug(
+            Logger.log(
                 "This redirect was from a form submission." +
                 " Registering an additional form submission to <" + destURI +
                 "> " + "from <" + realOrigin + ">");

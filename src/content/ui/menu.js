@@ -694,9 +694,9 @@ export function loadMenuIntoWindow(window) {
     }
 
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    Logger.debug("ruleData: " + canonicalRule);
-    Logger.debug("ruleAction: " + ruleAction);
-    Logger.debug("undo: " + undo);
+    Logger.log("ruleData: " + canonicalRule);
+    Logger.log("ruleAction: " + ruleAction);
+    Logger.log("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the
@@ -1128,7 +1128,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            Logger.debug("destinations[destUri] is null or undefined for " +
+            Logger.log("destinations[destUri] is null or undefined for " +
                 "destUri: " + destUri);
             continue;
           }
@@ -1205,7 +1205,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            Logger.debug("destinations[destUri] is null or undefined " +
+            Logger.log("destinations[destUri] is null or undefined " +
                 "for destUri: " + destUri);
             continue;
           }

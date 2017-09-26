@@ -162,7 +162,7 @@ DomainUtil.getUriObject = function(uri) {
     return Services.io.newURI(uri, null, null);
   } catch (e) {
     const msg = "DomainUtil.getUriObject exception on uri <" + uri + ">.";
-    Logger.debug(msg);
+    Logger.log(msg);
     // eslint-disable-next-line no-throw-literal
     throw e;
   }

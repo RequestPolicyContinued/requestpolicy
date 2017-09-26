@@ -36,6 +36,8 @@ export const C = {
   UI_TESTING: env`/* @echo UI_TESTING */`,
 };
 
+C.LOG_PREFIX = "[RequestPolicy] ";
+
 C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
 
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";

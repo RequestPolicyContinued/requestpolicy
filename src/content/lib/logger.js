@@ -104,7 +104,7 @@ export const Logger = (function() {
 
   function log(aLevel, aFn, aMessage, aError) {
     if (shouldLog(aLevel)) {
-      let msg = `[RequestPolicy] ${aMessage}`;
+      let msg = C.LOG_PREFIX + aMessage;
       aFn(msg);
       if (aError) {
         console.dir(aError);

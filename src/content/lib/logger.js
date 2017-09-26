@@ -21,108 +21,43 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/utils/constants";
-
-const {UI_TESTING} = C;
+import {
+  LEVEL as LOG_LEVEL,
+  Logger as LoggerCls,
+} from "lib/classes/logger";
 
 // =============================================================================
 // Logger
 // =============================================================================
 
-/**
- * Provides logging methods
- */
-export const Logger = (function() {
-  let self = {};
+export const Logger = new LoggerCls({
+  enabled: true,
+  level: LOG_LEVEL.ALL,
+});
 
-  // ---------------------------------------------------------------------------
-  // constants
-  // ---------------------------------------------------------------------------
+browser.storage.local.get([
+  "log",
+  "log.level",
+]).then(result => {
+  Logger.setEnabled(result.log);
+  Logger.setLevel(result["log.level"]);
+  return;
+}).catch(error => {
+  console.error("Error initializing the Logger! Details:");
+  console.dir(error);
+});
 
-  const LevelEnum = Object.freeze({
-    OFF: Number.MAX_VALUE, // no logging
-    ERROR: 1000,
-    WARNING: 900,
-    INFO: 800,
-    DEBUG: 700,
-    ALL: Number.MIN_VALUE, // log everything
-  });
-
-  const MINIMUM_LOGGING_LEVEL = LevelEnum.ERROR;
-
-  // ---------------------------------------------------------------------------
-  // settings
-  // ---------------------------------------------------------------------------
-
-  let loggingLevel = LevelEnum.ALL;
-  let loggingEnabled = true;
-
-  browser.storage.local.get([
-    "log",
-    "log.level",
-  ]).then(result => {
-    loggingEnabled = result.log;
-    loggingLevel = result["log.level"];
-    return;
-  }).catch(error => {
-    console.error("Error initializing the Logger! Details:");
-    console.dir(error);
-  });
-
-  function onStorageChange(aChanges, aAreaName) {
-    if (aChanges.hasOwnProperty("log")) {
-      loggingEnabled = aChanges.log.newValue;
-    }
-    if (aChanges.hasOwnProperty("log.level")) {
-      loggingLevel = aChanges["log.level"].newValue;
-    }
+function onStorageChange(aChanges, aAreaName) {
+  if (aChanges.hasOwnProperty("log")) {
+    Logger.setEnabled(aChanges.log.newValue);
   }
-
-  browser.storage.onChanged.addListener(onStorageChange);
-
-  // ---------------------------------------------------------------------------
-  // logging
-  // ---------------------------------------------------------------------------
-
-  function shouldLog(aLevel) {
-    if (loggingEnabled && aLevel >= loggingLevel) {
-      return true;
-    }
-
-    if (UI_TESTING && aLevel >= LevelEnum.WARNING) {
-      // log even if logging is disabled
-      return true;
-    }
-
-    if (aLevel >= MINIMUM_LOGGING_LEVEL) {
-      // log even if logging is disabled
-      return true;
-    }
-
-    return false;
+  if (aChanges.hasOwnProperty("log.level")) {
+    Logger.setLevel(aChanges["log.level"].newValue);
   }
+}
 
-  function log(aLevel, aFn, aMessage, aError) {
-    if (shouldLog(aLevel)) {
-      let msg = C.LOG_PREFIX + aMessage;
-      aFn(msg);
-      if (aError) {
-        console.dir(aError);
-      }
-    }
-  }
+browser.storage.onChanged.addListener(onStorageChange);
 
-  /* eslint-disable no-console */
-  self.warn = log.bind(self, LevelEnum.WARNING, console.warn);
-  self.info = log.bind(self, LevelEnum.INFO, console.info);
-  self.log = log.bind(self, LevelEnum.DEBUG, console.log);
-  /* eslint-enable no-console */
-
-  self.dir = function(obj) {
-    if (shouldLog(LevelEnum.DEBUG)) {
-      console.dir(obj);
-    }
-  };
-
-  return self;
-})();
+export function createExtendedLogger(...args) {
+  return Logger.extend(...args);
+}

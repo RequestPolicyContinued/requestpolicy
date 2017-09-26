@@ -50,7 +50,7 @@ export function RequestSet() {
 RequestSet.prototype = {
   _origins: null,
 
-  print: function(name, printFn=Logger.log) {
+  print: function(name, printFn=Logger.log.bind(Logger)) {
     printFn("-------------------------------------------------");
     printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"

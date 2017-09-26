@@ -20,6 +20,7 @@
     "gulp-zip": "^4.0.0",
     "merge-stream": "^1.0.1",
     "mocha": "^3.4.2",
+    "sinon": "^4.0.0",
     "sinon-chrome": "^2.2.1",
     "source-map-support": "^0.4.18",
     "tslint": "^5.5.0",

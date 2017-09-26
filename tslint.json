@@ -10,6 +10,7 @@
       "parameters",
       "statements"
     ],
+    "curly": [true, "ignore-same-line"],
     "indent": [
       true, "spaces", 2
     ],

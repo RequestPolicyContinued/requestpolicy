@@ -33,7 +33,7 @@ const {LOG_ENVIRONMENT} = C;
 // =============================================================================
 
 const log = LOG_ENVIRONMENT ? {
-  debug: function(message) {
+  log: function(message) {
     // eslint-disable-next-line no-console
     console.log(`[Environment] ${message}`);
   },
@@ -187,7 +187,7 @@ export const Environment = (function() {
     });
 
     if (LOG_ENVIRONMENT) {
-      log.debug("created new Environment \"" + self.name + "\"");
+      log.log("created new Environment \"" + self.name + "\"");
     }
   }
 
@@ -248,7 +248,7 @@ export const Environment = (function() {
       self.startup();
     }
     if (LOG_ENVIRONMENT) {
-      log.debug("registering inner environment");
+      log.log("registering inner environment");
     }
     self.innerEnvs.add(aEnv);
   };
@@ -299,7 +299,7 @@ export const Environment = (function() {
       f();
       if (LOG_ENVIRONMENT) {
         let fName = f.name || "anonymous";
-        log.debug("calling shutdown function immediately: " +
+        log.log("calling shutdown function immediately: " +
             "\"" + fName + "\" (" + self.name + ")");
       }
     } else {
@@ -363,7 +363,7 @@ export const Environment = (function() {
           console.dir(e);
         }
         if (LOG_ENVIRONMENT) {
-          log.debug("function called! (" + aFunctions.length +
+          log.log("function called! (" + aFunctions.length +
               " functions left)");
         }
       }
@@ -386,7 +386,7 @@ export const Environment = (function() {
       if (levelObj.levelState === LEVEL_STATES.NOT_ENTERED) {
         levelObj.levelState = LEVEL_STATES.PROCESSING;
         if (LOG_ENVIRONMENT) {
-          log.debug("processing level " + aLevel + " of startup (" +
+          log.log("processing level " + aLevel + " of startup (" +
               self.uid + ")");
         }
 
@@ -401,7 +401,7 @@ export const Environment = (function() {
 
         levelObj.levelState = LEVEL_STATES.FINISHED_PROCESSING;
         if (LOG_ENVIRONMENT) {
-          log.debug("processing level " + aLevel + " of startup " +
+          log.log("processing level " + aLevel + " of startup " +
               "(" + self.uid + ") finished");
         }
       }
@@ -441,7 +441,7 @@ export const Environment = (function() {
     function logStartupOrShutdown(aStartupOrShutdown) {
       let self = this;
       if (LOG_ENVIRONMENT) {
-        log.debug(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
+        log.log(aStartupOrShutdown + ": " + getEnvInfo(self) + "." +
                   (self.outerEnv ?
                   " OuterEnv is " + getEnvInfo(self.outerEnv) + "." :
                   " No OuterEnv."));
@@ -491,7 +491,7 @@ export const Environment = (function() {
     Environment.prototype.startup = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
       if (LOG_ENVIRONMENT) {
-        log.debug("starting up: " + self.name);
+        log.log("starting up: " + self.name);
       }
       bootstrap.call(self, "startup", aBootstrapArgs, aUntilLevel);
     };
@@ -499,7 +499,7 @@ export const Environment = (function() {
     Environment.prototype.shutdown = function(aBootstrapArgs, aUntilLevel) {
       let self = this;
       if (LOG_ENVIRONMENT) {
-        log.debug("shutting down: " + self.name);
+        log.log("shutting down: " + self.name);
       }
       bootstrap.call(self, "shutdown", aBootstrapArgs, aUntilLevel);
     };
@@ -516,7 +516,7 @@ export const Environment = (function() {
     let self = this;
     self.elManager.addListener(aEventTarget, "unload", function() {
       if (LOG_ENVIRONMENT) {
-        log.debug("an EventTarget's `unload` function " +
+        log.log("an EventTarget's `unload` function " +
             "has been called. Going to shut down Environment \"" +
             self.name + "\"");
       }

@@ -35,7 +35,7 @@ const {LOG_ENVIRONMENT} = C;
 const log = LOG_ENVIRONMENT ? {
   debug: function(message) {
     // eslint-disable-next-line no-console
-    console.debug(`[Environment] ${message}`);
+    console.log(`[Environment] ${message}`);
   },
 } : null;
 

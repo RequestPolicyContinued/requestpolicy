@@ -129,7 +129,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     callback: function(aMessage) {
       if (self.environment.envState === Environment.ENV_STATES.SHUTTING_DOWN) {
         // eslint-disable-next-line no-console
-        console.debug("[RequestPolicy] Listener for " + aMessageName +
+        console.log("[RequestPolicy] Listener for " + aMessageName +
             " has been called, but RP is already shutting down.");
         if (typeof aCallbackOnShutdown === "function") {
           return aCallbackOnShutdown(aMessage);

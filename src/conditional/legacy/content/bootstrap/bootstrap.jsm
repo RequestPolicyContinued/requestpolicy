@@ -175,7 +175,7 @@ var FakeWebExt = (function() {
 
   FakeWebExt.startup = function() {
     // eslint-disable-next-line no-console
-    console.debug("starting up");
+    console.log("starting up");
 
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
@@ -208,7 +208,7 @@ var FakeWebExt = (function() {
 
   FakeWebExt.shutdown = function(aReason) {
     // eslint-disable-next-line no-console
-    console.debug("shutting down");
+    console.log("shutting down");
 
     // shut down the add-on
     addon.commonjsEnv.unload(aReason);

@@ -64,7 +64,7 @@ export function loadOverlayIntoWindow(window) {
     return window.setTimeout(function() {
       if (OverlayEnvironment.isShuttingDownOrShutDown()) {
         // eslint-disable-next-line no-console
-        console.debug("[RequestPolicy] Not calling delayed function " +
+        console.log("[RequestPolicy] Not calling delayed function " +
             "because of add-on shutdown.");
         return;
       }

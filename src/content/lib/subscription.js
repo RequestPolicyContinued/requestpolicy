@@ -64,7 +64,7 @@ function maybeCallback(aCallback) {
     }
     if (!ok) {
       // eslint-disable-next-line no-console
-      console.debug("[RequestPolicy] Did not call callback function");
+      console.log("[RequestPolicy] Did not call callback function");
       return;
     }
     aCallback(...args);

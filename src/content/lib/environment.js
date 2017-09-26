@@ -22,7 +22,7 @@
 
 import {ManagerForEventListeners} from "lib/manager-for-event-listeners";
 import {ObserverManager} from "lib/observer-manager";
-import {Logger} from "lib/logger";
+import {createExtendedLogger} from "lib/logger";
 import {C} from "lib/utils/constants";
 import {JSUtils} from "lib/utils/javascript";
 
@@ -32,12 +32,10 @@ const {LOG_ENVIRONMENT} = C;
 // utilities
 // =============================================================================
 
-const log = LOG_ENVIRONMENT ? {
-  log: function(message) {
-    // eslint-disable-next-line no-console
-    console.log(`[Environment] ${message}`);
-  },
-} : null;
+const log = createExtendedLogger({
+  enabledCondition: {type: "C", C: "LOG_ENVIRONMENT"},
+  name: "Environment",
+});
 
 // =============================================================================
 // Environment
@@ -242,7 +240,7 @@ export const Environment = (function() {
   Environment.prototype.registerInnerEnvironment = function(aEnv) {
     let self = this;
     if (self.envState === ENV_STATES.NOT_STARTED) {
-      Logger.warn("registerInnerEnvironment() has been called but " +
+      log.warn("registerInnerEnvironment() has been called but " +
           "the outer environment hasn't started up yet. " +
           "Starting up now.");
       self.startup();

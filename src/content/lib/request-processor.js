@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
+import {createExtendedLogger, Logger} from "lib/logger";
 import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
 import {C} from "lib/utils/constants";
@@ -43,11 +43,17 @@ import {CompatibilityRules} from "models/compatibility-rules";
 
 import RPContentPolicy from "main/content-policy";
 
+const logRequests = createExtendedLogger({
+  enabledCondition: {type: "C", C: "LOG_REQUESTS"},
+  level: "all",
+  name: "Requests",
+});
+
 // =============================================================================
 // constants
 // =============================================================================
 
-const {LOG_REQUESTS, LOG_GETTING_SAVED_REQUESTS} = C;
+const {LOG_GETTING_SAVED_REQUESTS} = C;
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
@@ -145,10 +151,8 @@ export let RequestProcessor = (function() {
 
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
-    if (LOG_REQUESTS) {
-      Logger.log("** BLOCKED ** reason: " + reason +
-          ". " + request.detailsToString());
-    }
+    logRequests.log("** BLOCKED ** reason: " + reason +
+        ". " + request.detailsToString());
 
     if (Storage.isBlockingDisabled()) {
       return CP_OK;
@@ -201,10 +205,8 @@ export let RequestProcessor = (function() {
    * @return {number}
    */
   function accept(reason, request, unforbidable) {
-    if (LOG_REQUESTS) {
-      Logger.log("** ALLOWED ** reason: " +
-          reason + ". " + request.detailsToString());
-    }
+    logRequests.log("** ALLOWED ** reason: " +
+        reason + ". " + request.detailsToString());
 
     cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
     // We aren't recording the request so it doesn't show up in the menu, but we
@@ -302,20 +304,16 @@ export let RequestProcessor = (function() {
       const date = new Date();
       if (date.getTime() - lastShouldLoadCheck.time <
           lastShouldLoadCheckTimeout) {
-        if (LOG_REQUESTS) {
-          Logger.log(
-              "Using cached shouldLoad() result of " +
-              lastShouldLoadCheck.result + " for request to <" +
-              request.destURI + "> from <" + request.originURI + ">.");
-        }
+        logRequests.log(
+            "Using cached shouldLoad() result of " +
+            lastShouldLoadCheck.result + " for request to <" +
+            request.destURI + "> from <" + request.originURI + ">.");
         return true;
       } else {
-        if (LOG_REQUESTS) {
-          Logger.log(
-              "shouldLoad() cache expired for result of " +
-              lastShouldLoadCheck.result + " for request to <" +
-              request.destURI + "> from <" + request.originURI + ">.");
-        }
+        logRequests.log(
+            "shouldLoad() cache expired for result of " +
+            lastShouldLoadCheck.result + " for request to <" +
+            request.destURI + "> from <" + request.originURI + ">.");
       }
     }
     return false;
@@ -511,11 +509,9 @@ export let RequestProcessor = (function() {
     // Logger.dir(request.aContentLocation);
     try {
       if (request.isInternal()) {
-        if (LOG_REQUESTS) {
-          Logger.log("Allowing a request that seems to be internal. " +
-                      "Origin: " + request.originURI + ", Dest: " +
-                      request.destURI);
-        }
+        logRequests.log("Allowing a request that seems to be internal. " +
+                    "Origin: " + request.originURI + ", Dest: " +
+                    request.destURI);
         return CP_OK;
       }
 
@@ -550,11 +546,9 @@ export let RequestProcessor = (function() {
         //   milestone was Firefox 16.
         //   -> https://bugzilla.mozilla.org/show_bug.cgi?id=767134#c15
         if (request.aRequestPrincipal) {
-          if (LOG_REQUESTS) {
-            Logger.log(
-                "Allowing request that appears to be a URL entered in the " +
-                "location bar or some other good explanation: " + destURI);
-          }
+          logRequests.log(
+              "Allowing request that appears to be a URL entered in the " +
+              "location bar or some other good explanation: " + destURI);
           removeSavedRequestsByOriginURI(destURI);
           return CP_OK;
         }
@@ -562,11 +556,9 @@ export let RequestProcessor = (function() {
 
       if (request.aRequestOrigin.scheme === "view-source") {
         let newOriginURI = originURI.split(":").slice(1).join(":");
-        if (LOG_REQUESTS) {
-          Logger.log(
-              "Considering view-source origin <" + originURI + "> " +
-              "to be origin <" + newOriginURI + ">");
-        }
+        logRequests.log(
+            "Considering view-source origin <" + originURI + "> " +
+            "to be origin <" + newOriginURI + ">");
         originURI = newOriginURI;
         request.setOriginURI(originURI);
       }
@@ -575,18 +567,14 @@ export let RequestProcessor = (function() {
         const newDestURI = destURI.split(":").slice(1).join(":");
         if (newDestURI.indexOf("data:text/html") === 0) {
           // "View Selection Source" has been clicked
-          if (LOG_REQUESTS) {
-            Logger.log(
-                "Allowing \"data:text/html\" view-source destination" +
-                " (Selection Source)");
-          }
+          logRequests.log(
+              "Allowing \"data:text/html\" view-source destination" +
+              " (Selection Source)");
           return CP_OK;
         } else {
-          if (LOG_REQUESTS) {
-            Logger.log(
-                "Considering view-source destination <" + destURI + "> " +
-                "to be destination <" + newDestURI + ">");
-          }
+          logRequests.log(
+              "Considering view-source destination <" + destURI + "> " +
+              "to be destination <" + newDestURI + ">");
           destURI = newDestURI;
           request.setDestURI(destURI);
         }
@@ -635,11 +623,9 @@ export let RequestProcessor = (function() {
       // Example to test with: Click on "expand all" at
       // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
       if (originURI === destURI) {
-        if (LOG_REQUESTS) {
-          Logger.log(
-              "Allowing (but not recording) request " +
-              "where origin is the same as the destination: " + originURI);
-        }
+        logRequests.log(
+            "Allowing (but not recording) request " +
+            "where origin is the same as the destination: " + originURI);
         return CP_OK;
       }
 
@@ -935,9 +921,7 @@ export let RequestProcessor = (function() {
         for (let mappedDest in internal.mappedDestinations[destURI]) {
           const mappedDestUriObj =
               internal.mappedDestinations[destURI][mappedDest];
-          if (LOG_REQUESTS) {
-            Logger.log("Checking mapped destination: " + mappedDest);
-          }
+          logRequests.log("Checking mapped destination: " + mappedDest);
           let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
               request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION);
@@ -1322,12 +1306,10 @@ RequestProcessor = (function(self) {
     // "Decentraleyes" redirects external resources like jQuery
     // to a "data" URI.
     if (request.isInternal()) {
-      if (LOG_REQUESTS) {
-        Logger.log(
-            "Allowing a redirection that seems to be internal. " +
-            "Origin: " + request.originURI + ", Dest: " +
-            request.destURI);
-      }
+      logRequests.log(
+          "Allowing a redirection that seems to be internal. " +
+          "Origin: " + request.originURI + ", Dest: " +
+          request.destURI);
       return CP_OK;
     }
 
@@ -1352,12 +1334,10 @@ RequestProcessor = (function(self) {
             "appears to be a redirected favicon request. " +
             "This will be treated as a content request.");
       } else {
-        if (LOG_REQUESTS) {
-          Logger.warn(
-              "** ALLOWED ** redirection from <" + originURI + "> " +
-              "to <" + destURI + ">. " +
-              "Original request is from privileged code.");
-        }
+        logRequests.warn(
+            "** ALLOWED ** redirection from <" + originURI + "> " +
+            "to <" + destURI + ">. " +
+            "Original request is from privileged code.");
         return CP_OK;
       }
     }
@@ -1371,12 +1351,10 @@ RequestProcessor = (function(self) {
 
     request.requestResult = checkRedirect(request);
     if (true === request.requestResult.isAllowed) {
-      if (LOG_REQUESTS) {
-        Logger.warn(
-            "** ALLOWED ** redirection from <" + originURI + "> " +
-            "to <" + destURI + ">. " +
-            "Same hosts or allowed origin/destination.");
-      }
+      logRequests.warn(
+          "** ALLOWED ** redirection from <" + originURI + "> " +
+          "to <" + destURI + ">. " +
+          "Same hosts or allowed origin/destination.");
       internal.recordAllowedRequest(originURI, destURI, false,
                                     request.requestResult);
       internal.allowedRedirectsReverse[destURI] = originURI;
@@ -1391,21 +1369,17 @@ RequestProcessor = (function(self) {
 
         if (internal.clickedLinks[realOrigin] &&
             internal.clickedLinks[realOrigin][originURI]) {
-          if (LOG_REQUESTS) {
-            Logger.log(
-                "This redirect was from a link click." +
-                " Registering an additional click to <" + destURI + "> " +
-                "from <" + realOrigin + ">");
-          }
+          logRequests.log(
+              "This redirect was from a link click." +
+              " Registering an additional click to <" + destURI + "> " +
+              "from <" + realOrigin + ">");
           self.registerLinkClicked(realOrigin, destURI);
         } else if (internal.submittedForms[realOrigin] &&
             internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
-          if (LOG_REQUESTS) {
-            Logger.log(
-                "This redirect was from a form submission." +
-                " Registering an additional form submission to <" + destURI +
-                "> " + "from <" + realOrigin + ">");
-          }
+          logRequests.log(
+              "This redirect was from a form submission." +
+              " Registering an additional form submission to <" + destURI +
+              "> " + "from <" + realOrigin + ">");
           self.registerFormSubmitted(realOrigin, destURI);
         }
       }
@@ -1463,11 +1437,9 @@ RequestProcessor = (function(self) {
 
       internal.recordRejectedRequest(request);
 
-      if (LOG_REQUESTS) {
-        Logger.warn(
-            "** BLOCKED ** redirection from <" + originURI + "> " +
-            "to <" + destURI + ">.");
-      }
+      logRequests.warn(
+          "** BLOCKED ** redirection from <" + originURI + "> " +
+          "to <" + destURI + ">.");
       return CP_REJECT;
     } catch (e) {
       console.error("Fatal Error:");

@@ -24,7 +24,6 @@
 import {createExtendedLogger, Logger} from "lib/logger";
 import {Storage} from "models/storage";
 import {PolicyManager} from "lib/policy-manager";
-import {C} from "lib/utils/constants";
 import {DomainUtil} from "lib/utils/domains";
 import {Request} from "lib/request";
 import {RequestResult, REQUEST_REASON_USER_POLICY,
@@ -49,11 +48,15 @@ const logRequests = createExtendedLogger({
   name: "Requests",
 });
 
+const logGettingSavedRequests = createExtendedLogger({
+  enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},
+  level: "all",
+  name: "getting saved requests",
+});
+
 // =============================================================================
 // constants
 // =============================================================================
-
-const {LOG_GETTING_SAVED_REQUESTS} = C;
 
 const CP_OK = Ci.nsIContentPolicy.ACCEPT;
 const CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
@@ -331,24 +334,20 @@ export let RequestProcessor = (function() {
         // only return requests from the given base domain
         continue;
       }
-      if (LOG_GETTING_SAVED_REQUESTS) {
-        Logger.log("test originUri: " + originUri);
-      }
+      logGettingSavedRequests.log("test originUri: " + originUri);
+
       let originUriRequests = requests[originUri];
       for (let destBase in originUriRequests) {
-        if (LOG_GETTING_SAVED_REQUESTS) {
-          Logger.log("test destBase: " + destBase);
-        }
+        logGettingSavedRequests.log("test destBase: " + destBase);
+
         let destBaseRequests = originUriRequests[destBase];
         for (let destIdent in destBaseRequests) {
-          if (LOG_GETTING_SAVED_REQUESTS) {
-            Logger.log("test destIdent: " + destIdent);
-          }
+          logGettingSavedRequests.log("test destIdent: " + destIdent);
+
           let destIdentRequests = destBaseRequests[destIdent];
           for (let destUri in destIdentRequests) {
-            if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.log("test destUri: " + destUri);
-            }
+            logGettingSavedRequests.log("test destUri: " + destUri);
+
             let dest = destIdentRequests[destUri];
             for (let i in dest) {
               // TODO: This variable could have been created easily already in
@@ -418,10 +417,10 @@ export let RequestProcessor = (function() {
 
   function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
       checkedOrigins) {
-    if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.log("Looking for other origins within allowed requests from " +
-          originURI);
-    }
+    logGettingSavedRequests.log(
+        "Looking for other origins within allowed requests from " +
+        originURI);
+
     if (!checkedOrigins[originURI]) {
       // this "if" is needed for the first call of this function.
       checkedOrigins[originURI] = true;
@@ -433,10 +432,9 @@ export let RequestProcessor = (function() {
       for (let destBase in allowedRequests) {
         for (let destIdent in allowedRequests[destBase]) {
           for (let destURI in allowedRequests[destBase][destIdent]) {
-            if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.log("Found allowed request to <" + destURI + "> " +
-                  "from <" + originURI + ">");
-            }
+            logGettingSavedRequests.log(
+                "Found allowed request to <" + destURI + "> " +
+                "from <" + originURI + ">");
             reqSet.addRequest(originURI, destURI,
                               allowedRequests[destBase][destIdent][destURI]);
 
@@ -454,19 +452,18 @@ export let RequestProcessor = (function() {
   }
 
   function _addAllDeniedRequestsFromURI(originURI, reqSet) {
-    if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.log("Looking for other origins within denied requests from " +
-          originURI);
-    }
+    logGettingSavedRequests.log(
+        "Looking for other origins within denied requests from " + originURI);
+
     const requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
     if (requests) {
       for (let destBase in requests) {
         for (let destIdent in requests[destBase]) {
           for (let destUri in requests[destBase][destIdent]) {
-            if (LOG_GETTING_SAVED_REQUESTS) {
-              Logger.log("Found denied request to <" + destUri + "> from <" +
-                  originURI + ">");
-            }
+            logGettingSavedRequests.log(
+                "Found denied request to <" + destUri + "> " +
+                `from <${originURI}>`);
+
             reqSet.addRequest(originURI, destUri,
                 requests[destBase][destIdent][destUri]);
           }
@@ -1111,18 +1108,14 @@ export let RequestProcessor = (function() {
 
   self.getDeniedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
-    if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.log("## getDeniedRequests");
-    }
+    logGettingSavedRequests.log("## getDeniedRequests");
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         false);
   };
 
   self.getAllowedRequests = function(currentlySelectedOrigin,
       allRequestsOnDocument) {
-    if (LOG_GETTING_SAVED_REQUESTS) {
-      Logger.log("## getAllowedRequests");
-    }
+    logGettingSavedRequests.log("## getAllowedRequests");
     return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
         true);
   };

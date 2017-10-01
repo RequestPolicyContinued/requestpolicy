@@ -43,8 +43,6 @@ var {
   utils: Cu,
 } = Components;
 
-var RUN_ID = Math.random();
-
 // ===========================================================================
 // modules
 // ===========================================================================
@@ -78,7 +76,6 @@ function getGlobals() {
     Cc, Ci, Cm, Cr, Cu,
     ComponentsID: Components.ID,
     console,
-    RUN_ID,
     Services,
     XPCOMUtils,
   };

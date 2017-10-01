@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global RUN_ID */ // see bootstrap.jsm
-
 const env = str => str[0] !== "undefined";
 
 export const C = {
@@ -40,10 +38,12 @@ C.LOG_PREFIX = "[RequestPolicy] ";
 
 C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
 
+C.RUN_ID = Math.random();
+
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";
 // We need a random RUN_ID because of https://bugzilla.mozilla.org/show_bug.cgi?id=1202125
-C.MMID = C.EXTENSION_ID + "_" + RUN_ID; // message manager ID
+C.MMID = C.EXTENSION_ID + "_" + C.RUN_ID; // message manager ID
 C.MM_PREFIX = C.MMID + ":";
 
 // content policy

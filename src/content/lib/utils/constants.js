@@ -46,9 +46,5 @@ C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";
 C.MMID = C.EXTENSION_ID + "_" + C.RUN_ID; // message manager ID
 C.MM_PREFIX = C.MMID + ":";
 
-// content policy
-C.CP_OK = Ci.nsIContentPolicy.ACCEPT;
-C.CP_REJECT = Ci.nsIContentPolicy.REJECT_SERVER;
-
 C.RULE_ACTION_ALLOW = 1;
 C.RULE_ACTION_DENY = 2;

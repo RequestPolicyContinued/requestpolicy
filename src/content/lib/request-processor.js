@@ -928,6 +928,12 @@ export let RequestProcessor = (function() {
         }
       }
 
+      if (request.aRequestOrigin &&
+          request.aRequestOrigin.scheme === "moz-extension") {
+        request.requestResult = REQUEST_REASON_DEFAULT_POLICY;
+        return accept("Allowing WebExtension request by default", request);
+      }
+
       request.requestResult = internal.checkByDefaultPolicy(request);
       if (request.requestResult.isAllowed) {
         return accept("Allowed by default policy", request);

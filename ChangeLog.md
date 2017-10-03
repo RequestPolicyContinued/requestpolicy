@@ -3,6 +3,11 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta13.1
+* bugfixes
+  * By default, allow WebExtensions to make any request, as long as
+    there is no other rule blocking the request.
+
 #### Version 1.0.beta13.0
 * improvements
   * When the "allow same domain" setting is set to `false`, allow

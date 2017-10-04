@@ -40,6 +40,7 @@ const INTERNAL_SCHEMES = new Set([
   "resource",
   "about",
   "chrome",
+  "moz-extension",
   "moz-icon",
   "moz-filedata",
 ]);

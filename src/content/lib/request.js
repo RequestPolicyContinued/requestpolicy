@@ -193,6 +193,12 @@ Request.prototype.isInternal = function() {
 };
 
 Request.prototype.isAllowedByDefault = function() {
+  if (
+      this.aExtra &&
+      this.aExtra instanceof Ci.nsISupportsString &&
+      this.aExtra.data === "conPolCheckFromDocShell"
+  ) return true;
+
   let origin = this.originUriObj;
   let dest = this.destUriObj;
 

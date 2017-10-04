@@ -199,6 +199,12 @@ Request.prototype.isAllowedByDefault = function() {
       this.aExtra.data === "conPolCheckFromDocShell"
   ) return true;
 
+  if (
+      this.aRequestPrincipal &&
+      Services.scriptSecurityManager.isSystemPrincipal(
+          this.aRequestPrincipal)
+  ) return true;
+
   let origin = this.originUriObj;
   let dest = this.destUriObj;
 

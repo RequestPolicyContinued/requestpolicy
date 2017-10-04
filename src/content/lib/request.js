@@ -150,13 +150,20 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  if (!DomainUtil.uriObjHasHost(origin) || !DomainUtil.uriObjHasHost(dest)) {
+  const originHasHost = DomainUtil.uriObjHasHost(origin);
+  const destHasHost = DomainUtil.uriObjHasHost(dest);
+
+  if (!originHasHost || !destHasHost) {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
+
+    let list = [];
+    if (!originHasHost) list.push(`origin <${origin.spec}>`);
+    if (!destHasHost) list.push(`dest <${dest.spec}>`);
     logRequests.log(
-        "Allowing request with no asciiHost on either origin " +
-        "<" + origin.spec + "> or dest <" + dest.spec + ">");
+        "Allowing request with no host on " +
+        list.join(" and "));
     return true;
   }
 

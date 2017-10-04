@@ -45,7 +45,7 @@ const INTERNAL_SCHEMES = new Set([
   "moz-filedata",
 ]);
 
-const WHITELISTED_INTERNAL_SCHEMES = new Set([
+const WHITELISTED_DESTINATION_SCHEMES = new Set([
   "data",
   "blob",
   "wyciwyg",
@@ -57,7 +57,7 @@ const WHITELISTED_INTERNAL_SCHEMES = new Set([
   "moz-extension",
 ]);
 
-const WHITELISTED_RESOURCE_URIS = new Set([
+const WHITELISTED_DESTINATION_RESOURCE_URIS = new Set([
   // Viewing resources (text files, images, etc.) directly in a tab
 
   // images (png, jpg, etc.)
@@ -149,8 +149,7 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  // Whitelisted internal request.
-  if (WHITELISTED_INTERNAL_SCHEMES.has(dest.scheme)) {
+  if (WHITELISTED_DESTINATION_SCHEMES.has(dest.scheme)) {
     if (LOG_REQUESTS) {
       Logger.log("Allowing request with a semi-internal destination.");
     }
@@ -198,7 +197,7 @@ Request.prototype.isInternal = function() {
 
   if (dest.scheme === "resource" && (
         dest.host.startsWith("noscript_") || // RP issue #788
-        WHITELISTED_RESOURCE_URIS.has(dest.spec)
+        WHITELISTED_DESTINATION_RESOURCE_URIS.has(dest.spec)
       )) {
     return true;
   }

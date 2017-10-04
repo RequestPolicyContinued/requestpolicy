@@ -156,7 +156,7 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  if (origin.asciiHost === undefined || dest.asciiHost === undefined) {
+  if (!DomainUtil.uriObjHasHost(origin) || !DomainUtil.uriObjHasHost(dest)) {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.

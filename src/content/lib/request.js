@@ -196,30 +196,27 @@ Request.prototype.isAllowedByDefault = function() {
   let origin = this.originUriObj;
   let dest = this.destUriObj;
 
-  if (DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
-      DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)) {
-    return true;
-  }
+  if (
+      DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+      DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
+  ) return true;
 
   if (dest.scheme === "chrome") {
     // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
     // References:
     // - RP issue #784
-    if (dest.path.startsWith("/skin/")) {
-      return true;
-    }
+    if (dest.path.startsWith("/skin/")) return true;
     // See RP issue #797
     if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
       return true;
     }
   }
 
-  if (dest.scheme === "resource" && (
-        dest.host.startsWith("noscript_") || // RP issue #788
-        DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
-      )) {
-    return true;
-  }
+  if (
+      dest.scheme === "resource" && (
+          dest.host.startsWith("noscript_") || // RP issue #788
+          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec))
+  ) return true;
 
   return false;
 };

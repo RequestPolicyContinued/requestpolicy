@@ -53,10 +53,9 @@ const WHITELISTED_DESTINATION_SCHEMES = new Set([
   "blob",
   "wyciwyg",
   "javascript",
-  // "moz-extension" -- scheme for WebExtensions.
-  // * Necessary to whitelist for installation of WebExtensions.
-  //   See https://bugzil.la/1298856.
-  // * Necessary to whitelist for web_accessible_resources.
+]);
+
+const DEFAULT_ALLOWED_SCHEMES = new Set([
   "moz-extension",
 ]);
 
@@ -194,7 +193,13 @@ Request.prototype.isInternal = function() {
 };
 
 Request.prototype.isAllowedByDefault = function() {
+  let origin = this.originUriObj;
   let dest = this.destUriObj;
+
+  if (DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+      DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)) {
+    return true;
+  }
 
   if (dest.scheme === "chrome") {
     // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"

@@ -169,29 +169,9 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  if (dest.scheme === "chrome") {
-    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
-    // References:
-    // - RP issue #784
-    if (dest.path.startsWith("/skin/")) {
-      return true;
-    }
-    // See RP issue #797
-    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
-      return true;
-    }
-  }
-
   // See RP issue #788
   if (origin.scheme === "view-source" &&
       dest.spec === "resource://gre-resources/viewsource.css") {
-    return true;
-  }
-
-  if (dest.scheme === "resource" && (
-        dest.host.startsWith("noscript_") || // RP issue #788
-        WHITELISTED_DESTINATION_RESOURCE_URIS.has(dest.spec)
-      )) {
     return true;
   }
 
@@ -207,6 +187,26 @@ Request.prototype.isInternal = function() {
   // see issue #180
   if (origin.scheme === "about" &&
       origin.spec.indexOf("about:neterror?") === 0) {
+    return true;
+  }
+
+  if (dest.scheme === "chrome") {
+    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
+    // References:
+    // - RP issue #784
+    if (dest.path.startsWith("/skin/")) {
+      return true;
+    }
+    // See RP issue #797
+    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
+      return true;
+    }
+  }
+
+  if (dest.scheme === "resource" && (
+        dest.host.startsWith("noscript_") || // RP issue #788
+        WHITELISTED_DESTINATION_RESOURCE_URIS.has(dest.spec)
+      )) {
     return true;
   }
 

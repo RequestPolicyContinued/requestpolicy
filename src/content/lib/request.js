@@ -60,7 +60,7 @@ const WHITELISTED_DESTINATION_SCHEMES = new Set([
   "moz-extension",
 ]);
 
-const WHITELISTED_DESTINATION_RESOURCE_URIS = new Set([
+const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
   // Viewing resources (text files, images, etc.) directly in a tab
 
   // images (png, jpg, etc.)
@@ -190,6 +190,12 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
+  return false;
+};
+
+Request.prototype.isAllowedByDefault = function() {
+  let dest = this.destUriObj;
+
   if (dest.scheme === "chrome") {
     // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
     // References:
@@ -205,7 +211,7 @@ Request.prototype.isInternal = function() {
 
   if (dest.scheme === "resource" && (
         dest.host.startsWith("noscript_") || // RP issue #788
-        WHITELISTED_DESTINATION_RESOURCE_URIS.has(dest.spec)
+        DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
       )) {
     return true;
   }

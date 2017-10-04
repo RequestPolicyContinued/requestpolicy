@@ -251,10 +251,8 @@ export let RequestProcessor = (function() {
   }
 
   internal.checkByDefaultPolicy = function(aRequest) {
-    if (Storage.isDefaultAllow()) {
-      const result = new RequestResult(true,
-          REQUEST_REASON_DEFAULT_POLICY);
-      return result;
+    if (aRequest.isAllowedByDefault() || Storage.isDefaultAllow()) {
+      return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
     }
 
     let originUri = aRequest.originURI;

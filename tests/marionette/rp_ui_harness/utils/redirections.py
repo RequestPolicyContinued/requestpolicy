@@ -247,6 +247,16 @@ def for_each_possible_redirection_scenario(callback, uri_type):
         expected_dest_pre_path="http://www.maindomain.test/")
 
 
+def assert_redir_is_shown(self, test_url, dest_url, is_shown,
+                          additional_info=None):
+    self.assertEqual(
+        self.redir.is_shown(), is_shown,
+        msg=("redirection from {} to {}: the notification should {}show up{}"
+             ).format(test_url, dest_url,
+                      "NOT " if not is_shown else "",
+                      " (" + additional_info + ")" if additional_info else ""))
+
+
 def assert_url_does_not_load(testcase, url, expected_delay):
     timeout = expected_delay + 0.25
     testcase.assertRaises(TimeoutException, wait_until_url_load, testcase, url,

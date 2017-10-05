@@ -38,20 +38,20 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
             # Select the new tab
             tabbar.tabs[1].select()
 
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification in the "
-                             "destination tab.")
+            redirections.assert_redir_is_shown(
+                self, test_url, dest_url, is_shown=False,
+                additional_info="destination tab")
             redirections.wait_until_url_load(self, dest_url)
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification in the "
-                             "destination tab.")
+            redirections.assert_redir_is_shown(
+                self, test_url, dest_url, is_shown=False,
+                additional_info="destination tab")
 
             # Close the new tab.
             tabbar.close_tab()
 
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification in the "
-                             "origin tab.")
+            redirections.assert_redir_is_shown(
+                self, test_url, dest_url, is_shown=False,
+                additional_info="origin tab")
 
         def test_appear(test_url, dest_url, info, *args):
             open_page_and_open_first_link_in_new_tab(test_url, *args)
@@ -59,9 +59,9 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
             # Select the new tab
             tabbar.tabs[1].select()
 
-            self.assertTrue(self.redir.is_shown(),
-                            "The redirect notification has been displayed "
-                            "in the destination tab.")
+            redirections.assert_redir_is_shown(
+                self, test_url, dest_url, is_shown=True,
+                additional_info="destination tab")
             redirections.assert_url_does_not_load(
                 self, dest_url,
                 expected_delay=info["delay"])
@@ -69,9 +69,9 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
             # Close the new tab.
             tabbar.close_tab()
 
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification in the "
-                             "origin tab.")
+            redirections.assert_redir_is_shown(
+                self, test_url, dest_url, is_shown=False,
+                additional_info="origin tab")
 
         def open_page_and_open_first_link_in_new_tab(
             test_url, open_tab_method

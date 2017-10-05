@@ -31,6 +31,7 @@ export const C = {
   LOG_REQUESTS: env`/* @echo LOG_REQUESTS */`,
 
   AMO: env`/* @echo AMO */`,
+  BUILD_ALIAS: `/* @echo BUILD_ALIAS */`,
   UI_TESTING: env`/* @echo UI_TESTING */`,
 };
 

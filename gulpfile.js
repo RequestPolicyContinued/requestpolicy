@@ -253,6 +253,7 @@ BUILDS.forEach(build => {
     addGulpTasks(`buildData:${extensionType}:${build.alias}`, addTask => {
       addTask("preprocessContext", [TASK_NAMES.version], () => {
         const context = buildData.ppContext = {
+          "BUILD_ALIAS": build.alias,
           "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
           "EXTENSION_TYPE": extensionType,
           "RP_HOMEPAGE_URL": config.homepage,

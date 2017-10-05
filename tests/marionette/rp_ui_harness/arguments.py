@@ -66,7 +66,8 @@ class RequestPolicyUIBaseArguments(object):
                       args.tests)
 
         if args.binary is None:
-            args.binary = ".mozilla/software/firefox/default/firefox"
+            args.binary = (".mozilla/software/firefox/"
+                           "default-marionette-testing/firefox")
         if args.addon is None:
             args.addon = []
         args.addon += [

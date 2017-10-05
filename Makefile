@@ -39,7 +39,7 @@ extension_name        := requestpolicy
 
 # select the default app. Can be overridden e.g. via `make run app='seamonkey'`
 app := firefox
-app_branch := default
+app_branch := default-rp-dev
 binary_filename := $(app)
 app_binary = dev_env/browsers/$(app)/$(app_branch)/$(binary_filename)
 

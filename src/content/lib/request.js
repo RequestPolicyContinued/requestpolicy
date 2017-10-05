@@ -85,6 +85,19 @@ export function Request(originURI, destURI, requestType) {
   this.requestResult = undefined;
 }
 
+Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
+  get: function() {
+    if (!this.originURI) return null;
+    return Services.io.newURI(this.originURI, null, null);
+  },
+});
+
+Object.defineProperty(Request.prototype, "destUriObj", {
+  get: function() {
+    return Services.io.newURI(this.destURI, null, null);
+  },
+});
+
 Request.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
 };

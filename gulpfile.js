@@ -261,7 +261,6 @@ BUILDS.forEach(build => {
         };
 
         if (build.isAMO) context.AMO = "TRUE";
-        if (build.alias === "ui-testing") context.UI_TESTING = "TRUE";
 
         return Promise.resolve();
       });

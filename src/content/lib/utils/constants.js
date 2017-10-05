@@ -32,8 +32,9 @@ export const C = {
 
   AMO: env`/* @echo AMO */`,
   BUILD_ALIAS: `/* @echo BUILD_ALIAS */`,
-  UI_TESTING: env`/* @echo UI_TESTING */`,
 };
+
+C.UI_TESTING = C.BUILD_ALIAS === "ui-testing";
 
 C.LOG_PREFIX = "[RequestPolicy] ";
 

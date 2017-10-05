@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+/* global RUN_ID */ // see bootstrap.jsm
+
 const env = str => str[0] !== "undefined";
 
 export const C = {
@@ -35,12 +37,16 @@ export const C = {
 };
 
 C.UI_TESTING = C.BUILD_ALIAS === "ui-testing";
+C.UNIT_TESTING = C.BUILD_ALIAS === "unit-testing";
 
 C.LOG_PREFIX = "[RequestPolicy] ";
 
 C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
 
-C.RUN_ID = Math.random();
+// NOTE: do not generate the run ID here (except for unit tests),
+//   because "constants.js" gets loaded multiple times, i.e.,
+//   in multiple environments.
+C.RUN_ID = C.UNIT_TESTING ? Math.random() : RUN_ID;
 
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";

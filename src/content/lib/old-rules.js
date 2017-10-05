@@ -173,8 +173,9 @@ export const OldRules = (function() {
     if (DomainUtil.isValidUri(aEndpointString)) {
       let uriObj = DomainUtil.getUriObject(aEndpointString);
       spec.s = uriObj.scheme;
-      if (DomainUtil.uriObjHasHost(uriObj)) {
-        spec.h = uriObj.host;
+      let host = DomainUtil.getHostByUriObj(uriObj);
+      if (host !== null) {
+        spec.h = host;
         if (OldRules.shouldWildcardBeAddedToEndpoint(uriObj)) {
           spec.h = "*." + spec.h;
         }

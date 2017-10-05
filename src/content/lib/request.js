@@ -163,8 +163,9 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  const originHasHost = DomainUtil.uriObjHasHost(origin);
-  const destHasHost = DomainUtil.uriObjHasHost(dest);
+  // NOTE: Sometimes asciiHost !== host
+  const originHasHost = DomainUtil.getAsciiHostByUriObj(origin) !== undefined;
+  const destHasHost = DomainUtil.getAsciiHostByUriObj(dest) !== undefined;
 
   if (!originHasHost || !destHasHost) {
     // The asciiHost values will exist but be empty strings for the "file"

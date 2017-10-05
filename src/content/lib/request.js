@@ -21,13 +21,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "lib/logger";
-import {C} from "lib/utils/constants";
+import {createExtendedLogger} from "lib/logger";
 import {DomainUtil} from "lib/utils/domains";
 import {WindowUtils} from "lib/utils/windows";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 
-const {LOG_REQUESTS} = C;
+const logRequests = createExtendedLogger({
+  enabledCondition: {type: "C", C: "LOG_REQUESTS"},
+  level: "all",
+  name: "Requests",
+});
 
 // =============================================================================
 // constants
@@ -40,23 +43,23 @@ const INTERNAL_SCHEMES = new Set([
   "resource",
   "about",
   "chrome",
+  "moz-extension",
   "moz-icon",
   "moz-filedata",
 ]);
 
-const WHITELISTED_INTERNAL_SCHEMES = new Set([
+const WHITELISTED_DESTINATION_SCHEMES = new Set([
   "data",
   "blob",
   "wyciwyg",
   "javascript",
-  // "moz-extension" -- scheme for WebExtensions.
-  // * Necessary to whitelist for installation of WebExtensions.
-  //   See https://bugzil.la/1298856.
-  // * Necessary to whitelist for web_accessible_resources.
+]);
+
+const DEFAULT_ALLOWED_SCHEMES = new Set([
   "moz-extension",
 ]);
 
-const WHITELISTED_RESOURCE_URIS = new Set([
+const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
   // Viewing resources (text files, images, etc.) directly in a tab
 
   // images (png, jpg, etc.)
@@ -117,9 +120,7 @@ Request.prototype.isInternal = function() {
   let dest = this.destUriObj;
 
   if (origin === undefined || origin === null) {
-    if (LOG_REQUESTS) {
-      Logger.log("Allowing request without an origin.");
-    }
+    logRequests.log("Allowing request without an origin.");
     return true;
   }
 
@@ -127,9 +128,7 @@ Request.prototype.isInternal = function() {
     // The spec can be empty if odd things are going on, like the Refcontrol
     // extension causing back/forward button-initiated requests to have
     // aRequestOrigin be a virtually empty nsIURL object.
-    if (LOG_REQUESTS) {
-      Logger.log("Allowing request with empty origin spec!");
-    }
+    logRequests.log("Allowing request with empty origin spec!");
     return true;
   }
 
@@ -142,29 +141,29 @@ Request.prototype.isInternal = function() {
         // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
         origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
       )) {
-    if (LOG_REQUESTS) {
-      Logger.log("Allowing internal request.");
-    }
+    logRequests.log("Allowing internal request.");
     return true;
   }
 
-  // Whitelisted internal request.
-  if (WHITELISTED_INTERNAL_SCHEMES.has(dest.scheme)) {
-    if (LOG_REQUESTS) {
-      Logger.log("Allowing request with a semi-internal destination.");
-    }
+  if (WHITELISTED_DESTINATION_SCHEMES.has(dest.scheme)) {
+    logRequests.log("Allowing request with a semi-internal destination.");
     return true;
   }
 
-  if (!DomainUtil.uriObjHasHost(origin) || !DomainUtil.uriObjHasHost(dest)) {
+  const originHasHost = DomainUtil.uriObjHasHost(origin);
+  const destHasHost = DomainUtil.uriObjHasHost(dest);
+
+  if (!originHasHost || !destHasHost) {
     // The asciiHost values will exist but be empty strings for the "file"
     // scheme, so we don't want to allow just because they are empty strings,
     // only if not set at all.
-    if (LOG_REQUESTS) {
-      Logger.log(
-          "Allowing request with no asciiHost on either origin " +
-          "<" + origin.spec + "> or dest <" + dest.spec + ">");
-    }
+
+    let list = [];
+    if (!originHasHost) list.push(`origin <${origin.spec}>`);
+    if (!destHasHost) list.push(`dest <${dest.spec}>`);
+    logRequests.log(
+        "Allowing request with no host on " +
+        list.join(" and "));
     return true;
   }
 
@@ -176,29 +175,9 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  if (dest.scheme === "chrome") {
-    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
-    // References:
-    // - RP issue #784
-    if (dest.path.startsWith("/skin/")) {
-      return true;
-    }
-    // See RP issue #797
-    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
-      return true;
-    }
-  }
-
   // See RP issue #788
   if (origin.scheme === "view-source" &&
       dest.spec === "resource://gre-resources/viewsource.css") {
-    return true;
-  }
-
-  if (dest.scheme === "resource" && (
-        dest.host.startsWith("noscript_") || // RP issue #788
-        WHITELISTED_RESOURCE_URIS.has(dest.spec)
-      )) {
     return true;
   }
 
@@ -216,6 +195,47 @@ Request.prototype.isInternal = function() {
       origin.spec.indexOf("about:neterror?") === 0) {
     return true;
   }
+
+  return false;
+};
+
+Request.prototype.isAllowedByDefault = function() {
+  if (
+      this.aExtra &&
+      this.aExtra instanceof Ci.nsISupportsString &&
+      this.aExtra.data === "conPolCheckFromDocShell"
+  ) return true;
+
+  if (
+      this.aRequestPrincipal &&
+      Services.scriptSecurityManager.isSystemPrincipal(
+          this.aRequestPrincipal)
+  ) return true;
+
+  let origin = this.originUriObj;
+  let dest = this.destUriObj;
+
+  if (
+      DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+      DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
+  ) return true;
+
+  if (dest.scheme === "chrome") {
+    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
+    // References:
+    // - RP issue #784
+    if (dest.path.startsWith("/skin/")) return true;
+    // See RP issue #797
+    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
+      return true;
+    }
+  }
+
+  if (
+      dest.scheme === "resource" && (
+          dest.host.startsWith("noscript_") || // RP issue #788
+          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec))
+  ) return true;
 
   return false;
 };

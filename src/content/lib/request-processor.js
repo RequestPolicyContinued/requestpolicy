@@ -251,10 +251,8 @@ export let RequestProcessor = (function() {
   }
 
   internal.checkByDefaultPolicy = function(aRequest) {
-    if (Storage.isDefaultAllow()) {
-      const result = new RequestResult(true,
-          REQUEST_REASON_DEFAULT_POLICY);
-      return result;
+    if (aRequest.isAllowedByDefault() || Storage.isDefaultAllow()) {
+      return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
     }
 
     let originUri = aRequest.originURI;
@@ -926,12 +924,6 @@ export let RequestProcessor = (function() {
             return CP_OK;
           }
         }
-      }
-
-      if (request.aRequestOrigin &&
-          request.aRequestOrigin.scheme === "moz-extension") {
-        request.requestResult = REQUEST_REASON_DEFAULT_POLICY;
-        return accept("Allowing WebExtension request by default", request);
       }
 
       request.requestResult = internal.checkByDefaultPolicy(request);

@@ -125,8 +125,11 @@ DomainUtil.getHost = function(aUri) {
  */
 DomainUtil.uriObjHasHost = function(aUriObj) {
   try {
-    return typeof aUriObj.host === "string";
+    // simply access the host.
+    aUriObj.host;
+    return true;
   } catch (e) {
+    // it's an URI without host
     return false;
   }
 };

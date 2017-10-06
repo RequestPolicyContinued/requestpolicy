@@ -106,7 +106,11 @@ DomainUtil.getIdentifier = function(uri, level) {
  * @return {?string} The hostname of the uri.
  */
 DomainUtil.getHostByUriObj = function(aUriObj) {
-  return DomainUtil.uriObjHasHost(aUriObj) ? aUriObj.host : null;
+  try {
+    return aUriObj.host;
+  } catch (e) {
+    return null;
+  }
 };
 
 /**

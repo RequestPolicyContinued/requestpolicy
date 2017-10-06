@@ -102,7 +102,7 @@ export default [
       ["resource://jid1-tpts1z1uvun2fa-at-jetpack/enpass/", "ws://localhost"],
     ],
   },
-  // @ifdef UI_TESTING
+  // @if BUILD_ALIAS='ui-testing'
   {
     ids: ["dummy-ext@requestpolicy.org"],
     rules: [

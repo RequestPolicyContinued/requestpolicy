@@ -85,6 +85,19 @@ export function Request(originURI, destURI, requestType) {
   this.requestResult = undefined;
 }
 
+Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
+  get: function() {
+    if (!this.originURI) return null;
+    return Services.io.newURI(this.originURI, null, null);
+  },
+});
+
+Object.defineProperty(Request.prototype, "destUriObj", {
+  get: function() {
+    return Services.io.newURI(this.destURI, null, null);
+  },
+});
+
 Request.prototype.setOriginURI = function(originURI) {
   this.originURI = originURI;
 };
@@ -150,24 +163,7 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  const originHasHost = DomainUtil.uriObjHasHost(origin);
-  const destHasHost = DomainUtil.uriObjHasHost(dest);
-
-  if (!originHasHost || !destHasHost) {
-    // The asciiHost values will exist but be empty strings for the "file"
-    // scheme, so we don't want to allow just because they are empty strings,
-    // only if not set at all.
-
-    let list = [];
-    if (!originHasHost) list.push(`origin <${origin.spec}>`);
-    if (!destHasHost) list.push(`dest <${dest.spec}>`);
-    logRequests.log(
-        "Allowing request with no host on " +
-        list.join(" and "));
-    return true;
-  }
-
-  let destHost = dest.asciiHost;
+  let destHost = DomainUtil.getHostByUriObj(dest);
 
   // "global" dest are [some sort of interal requests]
   // "browser" dest are [???]
@@ -216,7 +212,7 @@ Request.prototype.isAllowedByDefault = function() {
   let dest = this.destUriObj;
 
   if (
-      DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+      origin && DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
       DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
   ) return true;
 
@@ -231,10 +227,13 @@ Request.prototype.isAllowedByDefault = function() {
     }
   }
 
+  let destHost = DomainUtil.getHostByUriObj(dest);
+
   if (
       dest.scheme === "resource" && (
-          dest.host.startsWith("noscript_") || // RP issue #788
-          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec))
+          destHost && destHost.startsWith("noscript_") || // RP issue #788
+          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
+      )
   ) return true;
 
   return false;

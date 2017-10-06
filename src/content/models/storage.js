@@ -55,7 +55,7 @@ export const Storage = new StorageClass({
     "privateBrowsingPermanentWhitelisting",
     "startWithAllowAllEnabled",
     "welcomeWindowShown",
-    // @ifdef UI_TESTING
+    // @if BUILD_ALIAS='ui-testing'
     "unitTesting.consoleErrors.counter",
     "unitTesting.loggingErrors.counter",
     // @endif

@@ -49,7 +49,7 @@ import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
 import {rpService} from "main/requestpolicy-service";
 import {WindowUtils} from "lib/utils/windows";
 
-// @ifdef UI_TESTING
+// @if BUILD_ALIAS='ui-testing'
 import "ui-testing/services";
 // @endif
 

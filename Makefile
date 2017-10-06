@@ -364,7 +364,7 @@ _dev_profile_mozprofile_args := \
 	--profile=$(_dev_profile_dir) \
 	$(addprefix --addon=,$(_run_xpis)) \
 	$(addprefix  --preferences=$(mozrunner_prefs_ini):,$(_run_prefs)) \
-	$(temp_profile_additional_args)
+	$(dev_profile_additional_args)
 
 .PHONY: temp-dev-profile
 temp-dev-profile: python-venv dev-xpi dev-helper-xpi

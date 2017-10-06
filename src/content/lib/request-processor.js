@@ -701,8 +701,10 @@ export let RequestProcessor = (function() {
         return accept("User-allowed redirect", request, true);
       }
 
+      let originHost = DomainUtil.getHostByUriObj(request.aRequestOrigin);
+
       if (request.aRequestOrigin.scheme === "chrome") {
-        if (request.aRequestOrigin.asciiHost === "browser") {
+        if (originHost === "browser") {
           // "browser" origin shows up for favicon.ico and an address entered
           // in address bar.
           request.requestResult = new RequestResult(true,

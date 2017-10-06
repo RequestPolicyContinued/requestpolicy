@@ -106,7 +106,11 @@ DomainUtil.getIdentifier = function(uri, level) {
  * @return {?string} The hostname of the uri.
  */
 DomainUtil.getHostByUriObj = function(aUriObj) {
-  return DomainUtil.uriObjHasHost(aUriObj) ? aUriObj.host : null;
+  try {
+    return aUriObj.host;
+  } catch (e) {
+    return null;
+  }
 };
 
 /**
@@ -117,18 +121,6 @@ DomainUtil.getHostByUriObj = function(aUriObj) {
  */
 DomainUtil.getHost = function(aUri) {
   return DomainUtil.getHostByUriObj(DomainUtil.getUriObject(aUri));
-};
-
-/**
- * @param {nsIURI} aUriObj
- * @return {boolean} whether the uri object has a host
- */
-DomainUtil.uriObjHasHost = function(aUriObj) {
-  try {
-    return typeof aUriObj.host === "string";
-  } catch (e) {
-    return false;
-  }
 };
 
 /**
@@ -223,12 +215,20 @@ DomainUtil.getBaseDomain = function(uri) {
 DomainUtil.isIPAddress = function(host) {
   try {
     Services.eTLD.getBaseDomainFromHost(host, 0);
+    return false;
   } catch (e) {
-    if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
-      return true;
+    switch (e.name) {
+      case "NS_ERROR_HOST_IS_IP_ADDRESS":
+        return true;
+
+      case "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS":
+        return false;
+
+      default:
+        console.error("Unexpected error:", e);
+        return false;
     }
   }
-  return false;
 };
 
 /**

@@ -229,7 +229,7 @@ Request.prototype.isAllowedByDefault = function() {
   let dest = this.destUriObj;
 
   if (
-      DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+      origin && DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
       DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
   ) return true;
 

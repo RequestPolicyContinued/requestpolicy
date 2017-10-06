@@ -227,10 +227,13 @@ Request.prototype.isAllowedByDefault = function() {
     }
   }
 
+  let destHost = DomainUtil.getHostByUriObj(dest);
+
   if (
       dest.scheme === "resource" && (
-          dest.host.startsWith("noscript_") || // RP issue #788
-          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec))
+          destHost && destHost.startsWith("noscript_") || // RP issue #788
+          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
+      )
   ) return true;
 
   return false;

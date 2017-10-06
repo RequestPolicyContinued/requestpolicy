@@ -140,7 +140,7 @@ export const OldRules = (function() {
     let getBaseDomain;
     if (aEndpoint instanceof Ci.nsIURI) {
       let uri = aEndpoint;
-      host = uri.host;
+      host = DomainUtil.getHostByUriObj(uri);
       getBaseDomain = () => Services.eTLD.getBaseDomain(uri, 0);
     } else {
       host = aEndpoint;

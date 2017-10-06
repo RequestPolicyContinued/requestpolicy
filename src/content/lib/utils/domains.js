@@ -100,18 +100,6 @@ DomainUtil.getIdentifier = function(uri, level) {
 };
 
 /**
- * @param {nsIURI} aUriObj
- * @return {?string}
- */
-DomainUtil.getAsciiHostByUriObj = function(aUriObj) {
-  try {
-    return aUriObj.asciiHost;
-  } catch (e) {
-    return null;
-  }
-};
-
-/**
  * Returns the hostname from a uri string.
  *
  * @param {nsIURI} aUriObj

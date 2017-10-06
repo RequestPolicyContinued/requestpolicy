@@ -163,24 +163,6 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  // NOTE: Sometimes asciiHost !== host
-  const originHasHost = DomainUtil.getAsciiHostByUriObj(origin) !== undefined;
-  const destHasHost = DomainUtil.getAsciiHostByUriObj(dest) !== undefined;
-
-  if (!originHasHost || !destHasHost) {
-    // The asciiHost values will exist but be empty strings for the "file"
-    // scheme, so we don't want to allow just because they are empty strings,
-    // only if not set at all.
-
-    let list = [];
-    if (!originHasHost) list.push(`origin <${origin.spec}>`);
-    if (!destHasHost) list.push(`dest <${dest.spec}>`);
-    logRequests.log(
-        "Allowing request with no host on " +
-        list.join(" and "));
-    return true;
-  }
-
   let destHost = dest.asciiHost;
 
   // "global" dest are [some sort of interal requests]

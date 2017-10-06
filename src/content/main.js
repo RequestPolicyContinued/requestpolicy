@@ -62,6 +62,7 @@ let controllers = [
 
 /* global _setBackgroundPage */
 _setBackgroundPage({
+  C,
   DomainUtil,
   Environment,
   Info,

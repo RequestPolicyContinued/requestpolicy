@@ -25,6 +25,7 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
 
 (function() {
   var {
+    C,
     LegacyApi,
     PolicyManager,
     RuleUtils,
@@ -69,6 +70,8 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
   var searchTimeoutId = null;
 
   function populateRuleTable(filter) {
+    // FIXME: populating the rules table is very slow
+
     searchTimeoutId = null;
 
     var table = $id("rules");
@@ -87,13 +90,16 @@ import {common, WinEnv, elManager, $id, $str} from "settings/common";
     entries = temp.rawRuleset.toJSON().entries;
     addRules(entries, "Temporary", filter, false);
 
-    // Get and display subscription rules
-    var subscriptionLists = PolicyManager.getSubscriptionRulesets();
-    for (var subscriptionList in subscriptionLists) {
-      for (var subscription in subscriptionLists[subscriptionList]) {
-        entries = subscriptionLists[subscriptionList][subscription].rawRuleset.
-            toJSON().entries;
-        addRules(entries, subscription, filter, true);
+    if (!C.UI_TESTING) {
+      // Get and display subscription rules
+      // (Ignore subscription rules when UI testing.)
+      var subscriptionLists = PolicyManager.getSubscriptionRulesets();
+      for (var subscriptionList in subscriptionLists) {
+        for (var subscription in subscriptionLists[subscriptionList]) {
+          entries = subscriptionLists[subscriptionList][subscription].
+              rawRuleset.toJSON().entries;
+          addRules(entries, subscription, filter, true);
+        }
       }
     }
   }

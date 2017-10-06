@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import unittest
+
 from rp_ui_harness import RequestPolicyTestCase
 
 
@@ -21,6 +23,7 @@ class TestSubscriptionsSettings(RequestPolicyTestCase):
     # Test Methods #
     ################
 
+    @unittest.skip("subscriptions have been disabled on YourPolicy page")
     def test_subscription_contains_rules(self):
         def count_rules():
             return self.settings.your_policy.rules_table.count_rules()

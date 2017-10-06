@@ -17,6 +17,4 @@ interface ITopLevelDocTranslationInfo {
   translatedUri: Dest;
 }
 
-type ForEachCallback = (info: any) => void;
-
 declare const browser: any;

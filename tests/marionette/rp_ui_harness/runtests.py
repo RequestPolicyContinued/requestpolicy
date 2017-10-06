@@ -42,9 +42,12 @@ class RequestPolicyUIHarness(MarionetteHarness):
     def _check_gecko_log(self):
         from rp_utils.utils import get_gecko_log_error_lines
         error_lines = get_gecko_log_error_lines(self.args.get("gecko_log"))
-        if len(error_lines) == 0:
+        n_errors = len(error_lines)
+        if n_errors == 0:
             return
-        print "Error have been detected after running '{}' tests:"
+        print (
+            "1 error has been detected:" if n_errors == 1
+            else str(n_errors) + " errors have been detected:")
         for line in error_lines:
             print line
 

@@ -36,8 +36,7 @@ class RequestPolicyUIHarness(MarionetteHarness):
             failed = super(RequestPolicyUIHarness, self).run()
         finally:
             self._profile_rpc.cleanup()
-        if not failed:
-            self._check_gecko_log()
+        self._check_gecko_log()
         return failed
 
     def _check_gecko_log(self):

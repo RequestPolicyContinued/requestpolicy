@@ -125,21 +125,6 @@ DomainUtil.getHost = function(aUri) {
 
 /**
  * @param {nsIURI} aUriObj
- * @return {boolean} whether the uri object has a host
- */
-DomainUtil.uriObjHasHost = function(aUriObj) {
-  try {
-    // simply access the host.
-    aUriObj.host;
-    return true;
-  } catch (e) {
-    // it's an URI without host
-    return false;
-  }
-};
-
-/**
- * @param {nsIURI} aUriObj
  * @return {boolean}
  */
 DomainUtil.uriObjHasPort = function(aUriObj) {

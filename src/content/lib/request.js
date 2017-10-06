@@ -163,7 +163,7 @@ Request.prototype.isInternal = function() {
     return true;
   }
 
-  let destHost = dest.asciiHost;
+  let destHost = DomainUtil.getHostByUriObj(dest);
 
   // "global" dest are [some sort of interal requests]
   // "browser" dest are [???]

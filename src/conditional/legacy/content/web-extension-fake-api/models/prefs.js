@@ -154,36 +154,6 @@ export const Prefs = (function() {
 
 (function(self) {
   // ---------------------------------------------------------------------------
-  // Dynamically created aliases
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Define a list of pref aliases that will be available through
-   * `Prefs.getter_function_name()` and `Prefs.setter_function_name()`.
-   * Those functions will be added to `self` subsequently.
-   */
-  const RP_PREF_ALIASES = {
-    "bool": [
-      ["defaultPolicy.allow", "DefaultAllow"],
-      ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
-
-      // As an example, this will become `isBlockingDisabled()` and
-      // `setBlockingDisabled()`:
-      ["startWithAllowAllEnabled", "BlockingDisabled"],
-    ],
-  };
-
-  // Dynamically create functions like `isDefaultAllow` or
-  // `setBlockingDisabled`.
-  for (let [prefName, prefAlias] of RP_PREF_ALIASES.bool) {
-    // define the pref's getter function to `self`
-    self["is" + prefAlias] = self.get.bind(null, prefName);
-
-    // define the pref's getter function to `self`
-    self["set" + prefAlias] = self.set.bind(null, prefName);
-  }
-
-  // ---------------------------------------------------------------------------
   // Other aliases
   // ---------------------------------------------------------------------------
 

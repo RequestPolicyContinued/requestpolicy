@@ -112,6 +112,10 @@ Request.prototype.detailsToString = function() {
   return "destination: " + this.destURI + ", origin: " + this.originURI;
 };
 
+Request.prototype.isTopLevel = function() {
+  return this.getContentPolicyType() === Ci.nsIContentPolicy.TYPE_DOCUMENT;
+};
+
 /**
   * Determines if a request is only related to internal resources.
   *
@@ -296,6 +300,10 @@ Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
   },
 });
 
+NormalRequest.prototype.getContentPolicyType = function() {
+  return this.aContentType;
+};
+
 NormalRequest.prototype.detailsToString = function() {
   // Note: try not to cause side effects of toString() during load, so "<HTML
   // Element>" is hard-coded.
@@ -444,3 +452,13 @@ Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
     return this._newChannel.uri.spec;
   },
 });
+
+RedirectRequest.prototype.getContentPolicyType = function() {
+  let {loadInfo} = this._oldChannel._httpChannel;
+  if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
+  if (typeof loadInfo.contentPolicyType !== "undefined") {
+    // FF < 44.0
+    return loadInfo.contentPolicyType;
+  }
+  return loadInfo.externalContentPolicyType;
+};

@@ -10,6 +10,7 @@ pref("extensions.requestpolicy.autoReload", true);
 
 pref("extensions.requestpolicy.defaultPolicy.allow", false);
 pref("extensions.requestpolicy.defaultPolicy.allowSameDomain", true);
+pref("extensions.requestpolicy.defaultPolicy.allowTopLevel", false);
 
 pref("extensions.requestpolicy.welcomeWindowShown", false);
 

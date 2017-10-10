@@ -41,6 +41,7 @@ export const Prefs = (function() {
       "contextMenu": "BoolPref",
       "defaultPolicy.allow": "BoolPref",
       "defaultPolicy.allowSameDomain": "BoolPref",
+      "defaultPolicy.allowTopLevel": "BoolPref",
       "indicateBlacklistedObjects": "BoolPref",
       "indicateBlockedObjects": "BoolPref",
       "keyboardShortcuts.openMenu.enabled": "BoolPref",

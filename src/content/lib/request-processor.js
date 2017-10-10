@@ -251,7 +251,11 @@ export let RequestProcessor = (function() {
   }
 
   internal.checkByDefaultPolicy = function(aRequest) {
-    if (aRequest.isAllowedByDefault() || Storage.isDefaultAllow()) {
+    if (
+        aRequest.isAllowedByDefault() ||
+        Storage.isDefaultAllow() ||
+        Storage.isDefaultAllowTopLevel() && aRequest.isTopLevel()
+    ) {
       return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
     }
 

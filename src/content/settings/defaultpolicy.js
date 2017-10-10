@@ -40,6 +40,7 @@ import {common, WinEnv, elManager, $id} from "./common";
     "defaultPolicyDefinition",
     "learnMore",
     "allowRequestsToTheSameDomain",
+    "allowTopLevelRequests",
     "differentSubscriptionsAreAvailable",
     "manageSubscriptions",
   ];
@@ -60,6 +61,9 @@ import {common, WinEnv, elManager, $id} from "./common";
 
     var allowsamedomain = Storage.get("defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
+
+    let allowTopLevel = Storage.get("defaultPolicy.allowTopLevel");
+    $id("allowtoplevel").checked = allowTopLevel;
   }
 
   function showManageSubscriptionsLink() {
@@ -93,6 +97,15 @@ import {common, WinEnv, elManager, $id} from "./common";
           var allowSameDomain = event.target.checked;
           Storage.set({
             "defaultPolicy.allowSameDomain": allowSameDomain,
+          });
+        });
+
+    elManager.addListener(
+        $id("allowtoplevel"), "change",
+        function(event) {
+          let allowTopLevel = event.target.checked;
+          Storage.set({
+            "defaultPolicy.allowTopLevel": allowTopLevel,
           });
         });
 

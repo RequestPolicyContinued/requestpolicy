@@ -451,6 +451,15 @@ export function loadOverlayIntoWindow(window) {
       classicmenu.addMenuSeparator(addRulePopup);
     }
 
+    {
+      // allow ALL
+      let label = StringUtils.$str("allowAllRedirections");
+      classicmenu.addCustomMenuItem(addRulePopup, label, () => {
+        maybeOpenLinkInNewTab("about:requestpolicy?defaultpolicy", [], true);
+      });
+      addMenuSeparator();
+    }
+
     if (destBaseDomain !== null) {
       addMenuItem({dest});
       if (mayPermRulesBeAdded) {

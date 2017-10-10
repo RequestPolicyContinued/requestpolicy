@@ -34,6 +34,7 @@ export const Storage = new StorageClass({
     "contextMenu",
     "defaultPolicy.allow",
     "defaultPolicy.allowSameDomain",
+    "defaultPolicy.allowTopLevel",
     "indicateBlacklistedObjects",
     "indicateBlockedObjects",
     "keyboardShortcuts.openMenu.enabled",
@@ -63,6 +64,7 @@ export const Storage = new StorageClass({
   boolAliases: [
     ["defaultPolicy.allow", "DefaultAllow"],
     ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
+    ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
     ["startWithAllowAllEnabled", "BlockingDisabled"],
   ],
 });

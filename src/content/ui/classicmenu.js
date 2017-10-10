@@ -57,7 +57,7 @@ export function loadClassicmenuIntoWindow(window) {
     return separator;
   };
 
-  self._addMenuItem = function(menu, label, aCallback) {
+  self.addCustomMenuItem = function(menu, label, aCallback) {
     const menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     menuItem.addEventListener("command", aCallback, false);
@@ -131,7 +131,7 @@ export function loadClassicmenuIntoWindow(window) {
     };
     const label = StringUtils.$str(labelName, originAndOrDestArray);
 
-    const item = self._addMenuItem(aMenu, label, callbackFn);
+    const item = self.addCustomMenuItem(aMenu, label, callbackFn);
     if (isTemp) {
       item.setAttribute("class", "rpcontinuedTemporary");
     }

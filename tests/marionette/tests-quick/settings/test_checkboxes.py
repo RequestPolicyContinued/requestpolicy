@@ -79,6 +79,9 @@ class TestCheckboxes(RequestPolicyTestCase):
             self._test("allowsamedomain",
                        RP_BRANCH + "defaultPolicy.allowSameDomain")
 
+        self._test("allowtoplevel",
+                   RP_BRANCH + "defaultPolicy.allowTopLevel")
+
     ##########################
     # Private Helper Methods #
     ##########################

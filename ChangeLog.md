@@ -4,7 +4,9 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
 #### next version
-no changes yet
+* improvements
+  * Add an option to allow all website redirections (top-level requests).
+    (#53)
 
 
 #### Version 1.0.beta13.1

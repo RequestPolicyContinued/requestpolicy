@@ -9,7 +9,9 @@
 
 const exec = require("child_process").exec;
 const del = require("del");
+const fs = require("fs");
 const gulp = require("gulp");
+const changed = require("gulp-changed");
 const debug = require("gulp-debug"); // eslint-disable-line no-unused-vars
 const gulpif = require("gulp-if");
 const gulpIgnore = require("gulp-ignore");
@@ -21,15 +23,19 @@ const ts = require("gulp-typescript");
 const zip = require("gulp-zip");
 const mergeStream = require("merge-stream");
 const nodePath = require("path");
+const pify = require("pify");
 
 const config = require("./config.json");
+
+const promiseStat = pify(fs.stat);
 
 // -----------------------------------------------------------------------------
 // constants, utilities
 // -----------------------------------------------------------------------------
 
+const rootDir = `${__dirname}`;
 const srcDirRelative = `src`;
-const srcDir = `${__dirname}/${srcDirRelative}`; // eslint-disable-line no-unused-vars
+const srcDir = `${rootDir}/${srcDirRelative}`; // eslint-disable-line no-unused-vars
 
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
@@ -115,6 +121,57 @@ const fileFilter = (function() {
   };
 })();
 
+function maxDate(dates) {
+  return dates.reduce(
+      (max, current) => current > max ? current : max,
+      new Date(0));
+}
+
+function promiseMaxDate(datePromises) {
+  const pMaxDate = Promise.
+      all(datePromises).
+      then(dates => maxDate(dates));
+  pMaxDate.catch(e => {
+    console.error(e);
+  });
+  return pMaxDate;
+}
+
+function promiseMtime(path) {
+  return promiseStat(path).then(({mtime}) => mtime);
+}
+
+const getDependenciesMaxMtime = (function() {
+  let pMaxMtime;
+
+  let dependencies = [
+    "config.json",
+    "gulpfile.js",
+    "package.json",
+  ].map(filename => rootDir + "/" + filename);
+
+  return function getDependenciesMtime() {
+    if (!pMaxMtime) {
+      let pMtimes = dependencies.map(promiseMtime);
+      pMaxMtime = Promise.all(pMtimes).then(promiseMaxDate);
+    }
+    return pMaxMtime;
+  };
+})();
+
+function compareLastModifiedTime(stream, sourceFile, targetPath) {
+  return Promise.all([
+    getDependenciesMaxMtime().
+        then(maxMtime => maxDate([maxMtime, sourceFile.stat.mtime])),
+    promiseMtime(targetPath),
+  ]).then(([depsMaxMtime, targetMtime]) => {
+    if (depsMaxMtime > targetMtime) {
+      stream.push(sourceFile);
+    }
+    return;
+  });
+}
+
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
     if (fn === undefined && typeof deps === "function") {
@@ -197,15 +254,17 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 // builds
 // =============================================================================
 
+/* eslint-disable max-len */
 const BUILDS = [
-  { alias: "ui-testing",   isDev: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "unit-testing", isDev: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "dev",          isDev: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",      isDev: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "beta",         isDev: false, isAMO: false, version: "nonUniqueVersion" },
-  { alias: "amo-nightly",  isDev: false, isAMO: true,  version: "uniqueVersion" },
-  { alias: "amo-beta",     isDev: false, isAMO: true,  version: "nonUniqueVersion" },
+  { alias: "ui-testing",   isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "unit-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "dev",          isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "nightly",      isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
+  { alias: "beta",         isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
+  { alias: "amo-nightly",  isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
+  { alias: "amo-beta",     isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
 ];
+/* eslint-enable max-len */
 
 const EXTENSION_TYPES = [
   "legacy",
@@ -218,7 +277,7 @@ BUILDS.forEach(build => {
 
   EXTENSION_TYPES.forEach(extensionType => {
     const buildDirRelative = `build/${extensionType}/${build.alias}`;
-    const buildDir = `${__dirname}/${buildDirRelative}`;
+    const buildDir = `${rootDir}/${buildDirRelative}`;
 
     const TASK_NAMES = {
       ppContext: `buildData:${extensionType}:${build.alias}:preprocessContext`,
@@ -276,13 +335,19 @@ BUILDS.forEach(build => {
     const conditionalDirsWithSrc = conditionalDirsRelative.
         map(dir => `${srcDir}/${dir}`);
 
-    function mergeInConditional(path) {
+    // eslint-disable-next-line camelcase
+    function mergeInConditional_mapDirname(dirname) {
       conditionalDirsRelative.forEach(dir => {
         // non-root files
-        path.dirname = path.dirname.replace(dir + "/", "");
+        dirname = dirname.replace(dir + "/", "");
         // root files, e.g. conditional/legacy/bootstrap.js
-        path.dirname = path.dirname.replace(dir, "");
+        dirname = dirname.replace(dir, "");
       });
+      return dirname;
+    }
+
+    function mergeInConditional(path) {
+      path.dirname = mergeInConditional_mapDirname(path.dirname);
     }
 
     function inAnyRoot(aFilenames) {
@@ -299,8 +364,9 @@ BUILDS.forEach(build => {
     // main build tasks
     // ---------------------------------------------------------------------------
 
-    addGulpTasks(`build:${extensionType}:${build.alias}`,
-                 [`clean:${extensionType}:${build.alias}`],
+    const buildDeps = [];
+    if (build.forceCleanBuild) buildDeps.push(`clean:${extensionType}:${build.alias}`);
+    addGulpTasks(`build:${extensionType}:${build.alias}`, buildDeps,
                  (addBuildTask, buildTaskPrefix) => {
       addBuildTask("copiedFiles", () => {
         let files = [
@@ -390,6 +456,14 @@ BUILDS.forEach(build => {
         files.push("!**/third-party/**/*");
 
         let stream = gulp.src(files, { base: srcDir }).
+            pipe(gulpif(!build.forceCleanBuild, changed(buildDir, {
+              hasChanged: compareLastModifiedTime,
+              transformPath(aPath) {
+                let path = mergeInConditional_mapDirname(aPath);
+                path = path.replace(/\.(ts)$/, ".js");
+                return path;
+              },
+            }))).
             pipe(replace(
                 /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
                 (match, fn, stringDelim) => {

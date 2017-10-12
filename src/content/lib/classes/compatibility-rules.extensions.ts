@@ -146,7 +146,8 @@ export class ExtensionCompatibilityRules {
     }
 
     this.spec.forEach((spec: any) => {
-      const enabledAddonIds = spec.ids.filter((id: string) => idsToExtInfos.has(id));
+      const enabledAddonIds = spec.ids.
+          filter((id: string) => idsToExtInfos.has(id));
       if (enabledAddonIds.length === 0) {
         return;
       }

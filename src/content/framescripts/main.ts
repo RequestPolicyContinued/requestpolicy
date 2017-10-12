@@ -20,27 +20,32 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import "content/framescripts/misc.js";
-import "content/framescripts/blocked-content.js";
-import "content/framescripts/dom-content-loaded.js";
+import "content/framescripts/blocked-content";
+import "content/framescripts/dom-content-loaded";
+import "content/framescripts/misc";
 
 import {C} from "content/lib/utils/constants";
 
+declare const require: (path: string) => void;
+
 if (C.UI_TESTING) {
+  // tslint:disable-next-line:no-var-requires
   require("content/ui-testing/services");
 }
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 
+// tslint:disable-next-line:no-var-requires
 const unloadSubject = require("@loader/unload");
 
 // =============================================================================
 
-MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
+MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, () => {
   // shut down the framescript on the message manager"s
   // `unload`. That event will occur when the browsing context
   // (e.g. the tab) has been closed.
-  MainEnvironment.obMan.observeSingleTopic("sdk:loader:destroy", (subject) => {
+  MainEnvironment.obMan.observeSingleTopic("sdk:loader:destroy",
+                                           (subject: any) => {
     if (subject.wrappedJSObject === unloadSubject) {
       MainEnvironment.shutdown();
     }

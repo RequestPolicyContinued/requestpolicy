@@ -148,6 +148,7 @@ const getDependenciesMaxMtime = (function() {
     "config.json",
     "gulpfile.js",
     "package.json",
+    "tsconfig.json",
   ].map(filename => rootDir + "/" + filename);
 
   return function getDependenciesMtime() {

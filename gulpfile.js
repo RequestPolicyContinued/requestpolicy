@@ -257,13 +257,13 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 
 /* eslint-disable max-len */
 const BUILDS = [
-  { alias: "ui-testing",   isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "unit-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "dev",          isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",      isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "beta",         isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
-  { alias: "amo-nightly",  isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
-  { alias: "amo-beta",     isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
+  { alias: "ui-testing",     isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "non-ui-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "dev",            isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "nightly",        isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
+  { alias: "beta",           isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
+  { alias: "amo-nightly",    isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
+  { alias: "amo-beta",       isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
 ];
 /* eslint-enable max-len */
 
@@ -497,7 +497,7 @@ BUILDS.forEach(build => {
 
             pipe(gulpif(build.isDev,
                 gulpif(
-                    build.alias === "unit-testing",
+                    build.alias === "non-ui-testing",
                     sourcemaps.write({
                       destPath: buildDir,
                       sourceRoot: srcDir,

@@ -37,16 +37,16 @@ export const C = {
 };
 
 C.UI_TESTING = C.BUILD_ALIAS === "ui-testing";
-C.UNIT_TESTING = C.BUILD_ALIAS === "unit-testing";
+C.NON_UI_TESTING = C.BUILD_ALIAS === "non-ui-testing";
 
 C.LOG_PREFIX = "[RequestPolicy] ";
 
 C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
 
-// NOTE: do not generate the run ID here (except for unit tests),
+// NOTE: do not generate the run ID here (except for non-UI tests),
 //   because "constants.js" gets loaded multiple times, i.e.,
 //   in multiple environments.
-C.RUN_ID = C.UNIT_TESTING ? Math.random() : RUN_ID;
+C.RUN_ID = C.NON_UI_TESTING ? Math.random() : RUN_ID;
 
 C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
 C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";

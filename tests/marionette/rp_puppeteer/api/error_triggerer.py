@@ -13,6 +13,6 @@ class ErrorTriggerer(BaseLib):
           Services.obs.notifyObservers(null, "{}", "{}");
         """.format(topic, data))
 
-    def trigger_error(self, error_type, where, msg="[Marionette unit test]"):
+    def trigger_error(self, error_type, where, msg="[Marionette UI test]"):
         self._notify_observers("requestpolicy-trigger-error-" + where,
                                "{}:{}".format(error_type, msg))

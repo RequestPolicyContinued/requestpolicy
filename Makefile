@@ -399,8 +399,8 @@ mocha-tests: node-packages unit-testing-files
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
-		tests/unit/lib/helper \
-		tests/unit/
+		tests/mocha/lib/helper \
+		tests/mocha/unit/
 
 #-------------------------------------------------------------------------------
 # UI tests
@@ -458,11 +458,11 @@ addons-linter: nightly-xpi node-packages
 	@$(ADDONS_LINTER) $(xpi_file__nightly)
 coffeelint: node-packages
 	@echo $@
-	@$(COFFEELINT) $(wildcard tests/unit/*.coffee)
+	@$(COFFEELINT) $(shell find tests/mocha/ -name '*.coffee')
 eslint: node-packages
 	@echo $@
 	@$(ESLINT) src/
-	@$(ESLINT) tests/unit/
+	@$(ESLINT) tests/mocha/
 	@$(ESLINT) tests/xpcshell/
 	@$(ESLINT) tests/helper-addons/
 	@$(ESLINT) gulpfile.js

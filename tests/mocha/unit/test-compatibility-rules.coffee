@@ -1,7 +1,7 @@
 {assert} = require "chai"
 {strictEqual} = assert
 
-createBrowserApi = require "./lib/sinon-chrome"
+createBrowserApi = require "../lib/sinon-chrome"
 browser = createBrowserApi()
 
 {CompatibilityRules} = require "content/lib/classes/compatibility-rules"

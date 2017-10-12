@@ -406,7 +406,7 @@ mocha: node-packages unit-testing-files
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
-# see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
+# see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#marionette-ui-tests
 
 .PHONY: ui-tests ui-tests-quick ui-tests-non-quick
 ui-tests: marionette

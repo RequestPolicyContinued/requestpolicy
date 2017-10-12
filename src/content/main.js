@@ -116,6 +116,7 @@ MainEnvironment.addShutdownFunction(
     Environment.LEVELS.BACKEND,
     broadcastShutdownMessage);
 
+// eslint-disable-next-line no-undef
 let unloadSubject = require("@loader/unload");
 let observerService = Cc["@mozilla.org/observer-service;1"].
                       getService(Ci.nsIObserverService);

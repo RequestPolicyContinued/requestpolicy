@@ -11,7 +11,6 @@ module.exports = {
     "Cr": true,
     "Cu": true,
     "ComponentsID": true,
-    "require": true,
     "Services": true,
     "XPCOMUtils": true,
 

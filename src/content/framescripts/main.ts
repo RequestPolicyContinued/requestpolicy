@@ -29,8 +29,7 @@ import {C} from "content/lib/utils/constants";
 declare const require: (path: string) => void;
 
 if (C.UI_TESTING) {
-  // tslint:disable-next-line:no-var-requires
-  require("content/ui-testing/services");
+  import("content/ui-testing/services");
 }
 
 import {Environment, MainEnvironment} from "content/lib/environment";

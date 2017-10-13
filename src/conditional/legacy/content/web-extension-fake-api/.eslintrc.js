@@ -3,7 +3,6 @@ module.exports = {
 
   "globals": {
     "Bootstrap": true,
-    "Manifest": true,
 
     "Cc": true,
     "Ci": true,

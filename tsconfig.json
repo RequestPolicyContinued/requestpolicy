@@ -20,6 +20,10 @@
       "es2016.array.include"
       // "es2017.object" // support since Fx47
     ],
+    "typeRoots": [
+      "@types",
+      "node_modules/web-ext-types"
+    ],
 
     "noImplicitAny": true,
     "noImplicitThis": true,

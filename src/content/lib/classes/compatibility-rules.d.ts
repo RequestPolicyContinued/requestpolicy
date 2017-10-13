@@ -16,5 +16,3 @@ interface ITopLevelDocTranslationInfo {
   extensionIds: AddonID[];
   translatedUri: Dest;
 }
-
-declare const browser: any;

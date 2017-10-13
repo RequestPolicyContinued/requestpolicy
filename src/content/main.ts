@@ -39,13 +39,15 @@ import "content/main/window-manager";
 import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {OldRulesController} from "content/controllers/old-rules";
 
+import {Controllers} from "content/lib/classes/controllers";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
 import {RequestProcessor} from "content/lib/request-processor";
-// tslint:disable-next-line import-spacing
-import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
-    from "content/lib/subscription";
+import {
+  SUBSCRIPTION_ADDED_TOPIC,
+  SUBSCRIPTION_REMOVED_TOPIC,
+} from "content/lib/subscription";
 import {DomainUtil} from "content/lib/utils/domains";
 import {Info} from "content/lib/utils/info";
 import {RuleUtils} from "content/lib/utils/rules";
@@ -58,10 +60,10 @@ import {Storage} from "content/models/storage";
 import "content/ui-testing/services";
 // @endif
 
-const controllers = [
+const controllers = new Controllers([
   KeyboardShortcuts,
   OldRulesController,
-];
+]);
 
 // =============================================================================
 
@@ -104,12 +106,7 @@ const shutdownMessage = C.MM_PREFIX + "shutdown";
 // =============================================================================
 
 function shutdown(aShutdownArgs: any) {
-  controllers.reverse().forEach((controller) => {
-    if (typeof controller.shutdown === "function") {
-      controller.shutdown.apply(null);
-    }
-  });
-
+  controllers.shutdown();
   MainEnvironment.shutdown(aShutdownArgs);
 }
 
@@ -162,9 +159,5 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
     logSevereError("startup() failed!", e);
   }
 
-  controllers.forEach((controller) => {
-    if (typeof controller.startup === "function") {
-      controller.startup.apply(null);
-    }
-  });
+  controllers.startup();
 })();

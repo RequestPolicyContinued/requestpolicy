@@ -133,32 +133,6 @@ var FakeWebExt = (function() {
     getGlobals,
   };
 
-  let bootstrapFunctions = {
-    onStartup: [],
-    onShutdown: [],
-  };
-
-  const FIFO_ADD = "push";
-  const LIFO_ADD = "unshift";
-
-  /**
-   * @param {String} aEvent "onStartup" or "onShutdown"
-   * @param {String} aArrayAddFn "push" or "unshift"
-   * @param {Function} aFn
-   */
-  function addBootstrapFn(aEvent, aArrayAddFn, aFn) {
-    bootstrapFunctions[aEvent][aArrayAddFn](aFn);
-  }
-
-  FakeWebExt.onStartup = addBootstrapFn.bind(null, "onStartup", FIFO_ADD);
-  FakeWebExt.onShutdown = addBootstrapFn.bind(null, "onShutdown", LIFO_ADD);
-
-  function runBootstrapFunctions(aEvent) {
-    bootstrapFunctions[aEvent].forEach(fn => {
-      fn.call(null);
-    });
-  }
-
   let fakeEnv = {
     commonjsEnv: null,
     exports: null,
@@ -181,12 +155,7 @@ var FakeWebExt = (function() {
     fakeEnv.commonjsEnv = createCommonjsEnv();
     fakeEnv.exports = fakeEnv.commonjsEnv.load(
         "content/web-extension-fake-api/main",
-        [
-          ["Bootstrap", {
-            onStartup: FakeWebExt.onStartup,
-            onShutdown: FakeWebExt.onShutdown,
-          }],
-        ]);
+        []);
 
     // eslint-disable-next-line no-constant-condition
     if ("/* @echo BUILD_ALIAS */" === "ui-testing") {
@@ -195,7 +164,7 @@ var FakeWebExt = (function() {
     }
 
     // initialize the fake environment
-    runBootstrapFunctions("onStartup");
+    fakeEnv.exports.Bootstrap._startup();
 
     // start up the add-on
     const {Api, Manifest} = fakeEnv.exports;
@@ -220,7 +189,7 @@ var FakeWebExt = (function() {
     addon.commonjsEnv = null;
 
     // shut down the fake environment
-    runBootstrapFunctions("onShutdown");
+    fakeEnv.exports.Bootstrap._shutdown();
     fakeEnv.commonjsEnv.unload();
 
     // clean up

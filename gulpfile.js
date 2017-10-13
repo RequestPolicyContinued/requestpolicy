@@ -69,11 +69,11 @@ const fileFilter = (function() {
   }
 
   const nonModulePaths = [
+    "conditional/legacy/bootstrap",
     "content/bootstrap/data/",
     "content/bootstrap/environments/",
   ];
   const nonModuleStems = [
-    "bootstrap",
   ];
 
   function originalPath(aVinylFile) {

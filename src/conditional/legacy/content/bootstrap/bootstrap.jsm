@@ -188,8 +188,11 @@ var FakeWebExt = (function() {
           }],
         ]);
 
-    // "export" fake environment Api (for usage by UI tests)
-    FakeWebExt.Api = fakeEnv.exports.Api;
+    // eslint-disable-next-line no-constant-condition
+    if ("/* @echo BUILD_ALIAS */" === "ui-testing") {
+      // "export" fake environment Api
+      FakeWebExt.Api = fakeEnv.exports.Api;
+    }
 
     // initialize the fake environment
     runBootstrapFunctions("onStartup");

@@ -26,4 +26,5 @@
 import "content/bootstrap/modules/handle-default-preferences";
 
 export {Api, ContentScriptsApi} from "./models/api";
+export {Bootstrap} from "./models/bootstrap";
 export {Manifest} from "./models/manifest";

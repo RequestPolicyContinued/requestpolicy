@@ -29,6 +29,6 @@ for (let ns of stableApiFx) {
   }
 }
 
-const browser = new Api(stableApiFx).create();
-
-module.exports = browser;
+module.exports = function createBrowserApi() {
+  return new Api(stableApiFx).create();
+};

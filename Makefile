@@ -399,6 +399,7 @@ mocha-tests: node-packages unit-testing-files
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
+		tests/unit/lib/helper \
 		tests/unit/
 
 #-------------------------------------------------------------------------------

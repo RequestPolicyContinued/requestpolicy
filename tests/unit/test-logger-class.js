@@ -5,12 +5,19 @@ const {Logger} = require("content/lib/classes/logger");
 const {C} = require("content/lib/utils/constants");
 
 describe("Logger", () => {
+  function stubConsoleFn(aFnName) {
+    if (typeof console[aFnName].restore === "function") {
+      console[aFnName].restore();
+    }
+    sinon.stub(console, aFnName);
+  }
+
   describe("basic functions, all levels", () => {
     let spiedFn = null;
 
     function _it(fnName) {
       it(fnName, () => {
-        sinon.stub(console, fnName);
+        stubConsoleFn(fnName);
         spiedFn = console[fnName];
 
         const logger = new Logger({enabled: true, level: "all"});
@@ -43,7 +50,7 @@ describe("Logger", () => {
 
     function _it(fnName) {
       it(fnName, () => {
-        sinon.stub(console, fnName);
+        stubConsoleFn(fnName);
         spiedFn = console[fnName];
 
         const baseLogger = new Logger();
@@ -81,7 +88,7 @@ describe("Logger", () => {
 
     function _it(fnName, {isCalled}) {
       it(fnName, () => {
-        sinon.stub(console, fnName);
+        stubConsoleFn(fnName);
         spiedFn = console[fnName];
 
         const logger = new Logger({enabled: true});

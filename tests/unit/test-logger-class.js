@@ -1,10 +1,12 @@
 const {assert} = require("chai");
-const sinon = require("sinon");
 
 const {Logger} = require("content/lib/classes/logger");
 const {C} = require("content/lib/utils/constants");
 
 describe("Logger", () => {
+  const sinon = require("sinon").sandbox.create();
+  afterEach(() => sinon.restore());
+
   function stubConsoleFn(aFnName) {
     if (typeof console[aFnName].restore === "function") {
       console[aFnName].restore();
@@ -13,12 +15,10 @@ describe("Logger", () => {
   }
 
   describe("basic functions, all levels", () => {
-    let spiedFn = null;
-
     function _it(fnName) {
       it(fnName, () => {
         stubConsoleFn(fnName);
-        spiedFn = console[fnName];
+        const spiedFn = console[fnName];
 
         const logger = new Logger({enabled: true, level: "all"});
         logger[fnName]("test");
@@ -39,19 +39,13 @@ describe("Logger", () => {
     _it("info");
     _it("warn");
     _it("error");
-
-    afterEach(() => {
-      spiedFn.restore();
-    });
   });
 
   describe("extended logger", () => {
-    let spiedFn = null;
-
     function _it(fnName) {
       it(fnName, () => {
         stubConsoleFn(fnName);
-        spiedFn = console[fnName];
+        const spiedFn = console[fnName];
 
         const baseLogger = new Logger();
         const extendedLogger = baseLogger.extend({
@@ -77,19 +71,13 @@ describe("Logger", () => {
     _it("info");
     _it("warn");
     _it("error");
-
-    afterEach(() => {
-      spiedFn.restore();
-    });
   });
 
   describe("default level", () => {
-    let spiedFn = null;
-
     function _it(fnName, {isCalled}) {
       it(fnName, () => {
         stubConsoleFn(fnName);
-        spiedFn = console[fnName];
+        const spiedFn = console[fnName];
 
         const logger = new Logger({enabled: true});
         logger[fnName]("test");
@@ -114,9 +102,5 @@ describe("Logger", () => {
     _it("info", {isCalled: false});
     _it("warn", {isCalled: false});
     _it("error", {isCalled: true});
-
-    afterEach(() => {
-      spiedFn.restore();
-    });
   });
 });

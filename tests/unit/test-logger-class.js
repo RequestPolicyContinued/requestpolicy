@@ -1,3 +1,5 @@
+"use strict";
+
 const {assert} = require("chai");
 
 const {Logger} = require("content/lib/classes/logger");

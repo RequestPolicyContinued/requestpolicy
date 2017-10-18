@@ -23,9 +23,13 @@
 // import the logger first! It needs to get logging prefs from storage (async).
 import {Logger} from "content/lib/logger";
 
+import {
+  COMMONJS_UNLOAD_SUBJECT,
+} from "content/legacy/lib/commonjs-unload-subject";
+import {C} from "content/lib/utils/constants";
+
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {PrefManager} from "content/main/pref-manager";
-import {C} from "content/lib/utils/constants";
 
 import "content/main/requestpolicy-service";
 import "content/main/content-policy";
@@ -117,13 +121,12 @@ MainEnvironment.addShutdownFunction(
     broadcastShutdownMessage);
 
 // eslint-disable-next-line no-undef
-let unloadSubject = require("@loader/unload");
 let observerService = Cc["@mozilla.org/observer-service;1"].
                       getService(Ci.nsIObserverService);
 
 let observer = {
   observe: function(subject, topic, reason) {
-    if (subject.wrappedJSObject === unloadSubject) {
+    if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
       try {
         // Remark: shutdown() takes the arguments as an array!
         //

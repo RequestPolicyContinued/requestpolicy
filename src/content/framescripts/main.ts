@@ -24,18 +24,16 @@ import "content/framescripts/blocked-content";
 import "content/framescripts/dom-content-loaded";
 import "content/framescripts/misc";
 
+import {
+  COMMONJS_UNLOAD_SUBJECT,
+} from "content/legacy/lib/commonjs-unload-subject";
 import {C} from "content/lib/utils/constants";
-
-declare const require: (path: string) => void;
 
 if (C.UI_TESTING) {
   import("content/ui-testing/services");
 }
 
 import {Environment, MainEnvironment} from "content/lib/environment";
-
-// tslint:disable-next-line:no-var-requires
-const unloadSubject = require("@loader/unload");
 
 // =============================================================================
 
@@ -45,7 +43,7 @@ MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, () => {
   // (e.g. the tab) has been closed.
   MainEnvironment.obMan.observeSingleTopic("sdk:loader:destroy",
                                            (subject: any) => {
-    if (subject.wrappedJSObject === unloadSubject) {
+    if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
       MainEnvironment.shutdown();
     }
   });

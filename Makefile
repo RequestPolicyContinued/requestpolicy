@@ -391,10 +391,10 @@ test: $(filter-out $(_ui_subtests),$(_quick_tests) $(_non_quick_tests)) ui-tests
 #-------------------------------------------------------------------------------
 
 .PHONY: unit-tests
-unit-tests: mocha
+unit-tests: mocha-tests
 
-.PHONY: mocha
-mocha: node-packages unit-testing-files
+.PHONY: mocha-tests
+mocha-tests: node-packages unit-testing-files
 	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/unit-testing/ \
 	$(MOCHA) \
 		--compilers coffee:coffeescript/register \

@@ -31,64 +31,68 @@ import {C} from "content/lib/utils/constants";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {PrefManager} from "content/main/pref-manager";
 
-import "content/main/requestpolicy-service";
-import "content/main/content-policy";
-import "content/main/window-manager";
 import "content/main/about-uri";
+import "content/main/content-policy";
+import "content/main/requestpolicy-service";
+import "content/main/window-manager";
 
 import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {OldRulesController} from "content/controllers/old-rules";
 
-import {RequestProcessor} from "content/lib/request-processor";
-import {Storage} from "content/models/storage";
-import {PolicyManager} from "content/lib/policy-manager";
-import {OldRules} from "content/lib/old-rules";
-import {RuleUtils} from "content/lib/utils/rules";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {DomainUtil} from "content/lib/utils/domains";
-import {StringUtils} from "content/lib/utils/strings";
-import {Info} from "content/lib/utils/info";
+import {OldRules} from "content/lib/old-rules";
+import {PolicyManager} from "content/lib/policy-manager";
+import {RequestProcessor} from "content/lib/request-processor";
+// tslint:disable-next-line import-spacing
 import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
     from "content/lib/subscription";
-import {rpService} from "content/main/requestpolicy-service";
+import {DomainUtil} from "content/lib/utils/domains";
+import {Info} from "content/lib/utils/info";
+import {RuleUtils} from "content/lib/utils/rules";
+import {StringUtils} from "content/lib/utils/strings";
 import {WindowUtils} from "content/lib/utils/windows";
+import {rpService} from "content/main/requestpolicy-service";
+import {Storage} from "content/models/storage";
 
 // @if BUILD_ALIAS='ui-testing'
 import "content/ui-testing/services";
 // @endif
 
-let controllers = [
+const controllers = [
   KeyboardShortcuts,
   OldRulesController,
 ];
 
 // =============================================================================
 
-/* global _setBackgroundPage */
+declare const LegacyApi: any;
+declare const _setBackgroundPage:
+    (backgroundPage: {[name: string]: any}) => void;
+
 _setBackgroundPage({
   C,
   DomainUtil,
   Environment,
   Info,
+  LegacyApi,
   Logger,
   MainEnvironment,
   ManagerForPrefObservers,
   OldRules,
   PolicyManager,
-  LegacyApi,
-  Storage,
   RequestProcessor,
-  rpService,
   RuleUtils,
-  StringUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
+  Storage,
+  StringUtils,
   WindowUtils,
+  rpService,
 });
 
 // =============================================================================
 
-function logSevereError(aMessage, aError) {
+function logSevereError(aMessage: string, aError: any) {
   console.error("[SEVERE] " + aMessage + " - Details:");
   console.dir(aError);
 }
@@ -99,8 +103,8 @@ const shutdownMessage = C.MM_PREFIX + "shutdown";
 // shutdown
 // =============================================================================
 
-function shutdown(aShutdownArgs) {
-  controllers.reverse().forEach(function(controller) {
+function shutdown(aShutdownArgs: any) {
+  controllers.reverse().forEach((controller) => {
     if (typeof controller.shutdown === "function") {
       controller.shutdown.apply(null);
     }
@@ -108,6 +112,8 @@ function shutdown(aShutdownArgs) {
 
   MainEnvironment.shutdown(aShutdownArgs);
 }
+
+declare const Services: any;
 
 function broadcastShutdownMessage() {
   Services.mm.broadcastAsyncMessage(shutdownMessage);
@@ -120,12 +126,8 @@ MainEnvironment.addShutdownFunction(
     Environment.LEVELS.BACKEND,
     broadcastShutdownMessage);
 
-// eslint-disable-next-line no-undef
-let observerService = Cc["@mozilla.org/observer-service;1"].
-                      getService(Ci.nsIObserverService);
-
-let observer = {
-  observe: function(subject, topic, reason) {
+const observer = {
+  observe(subject: any, topic: any, reason: any) {
     if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
       try {
         // Remark: shutdown() takes the arguments as an array!
@@ -141,7 +143,7 @@ let observer = {
   },
 };
 
-observerService.addObserver(observer, "sdk:loader:destroy", false);
+Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 
 // =============================================================================
 // start up
@@ -160,7 +162,7 @@ observerService.addObserver(observer, "sdk:loader:destroy", false);
     logSevereError("startup() failed!", e);
   }
 
-  controllers.forEach(function(controller) {
+  controllers.forEach((controller) => {
     if (typeof controller.startup === "function") {
       controller.startup.apply(null);
     }

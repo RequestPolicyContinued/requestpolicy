@@ -93,7 +93,10 @@ function createCommonjsEnv() {
   let main;
 
   return {
-    load: function load(aMainFile, aAdditionalGlobals=[]) {
+    load: function load({
+        mainFile: aMainFile,
+        additionalGlobals: aAdditionalGlobals=[],
+    }) {
       let globals = getGlobals();
       aAdditionalGlobals.forEach(([key, val]) => {
         globals[key] = val;
@@ -153,9 +156,10 @@ var FakeWebExt = (function() {
 
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
-    fakeEnv.exports = fakeEnv.commonjsEnv.load(
-        "content/web-extension-fake-api/main",
-        []);
+    fakeEnv.exports = fakeEnv.commonjsEnv.load({
+      mainFile: "content/web-extension-fake-api/main",
+      additionalGlobals: [],
+    });
 
     // eslint-disable-next-line no-constant-condition
     if ("/* @echo BUILD_ALIAS */" === "ui-testing") {
@@ -169,11 +173,14 @@ var FakeWebExt = (function() {
     // start up the add-on
     const {Api, Manifest} = fakeEnv.exports;
     addon.commonjsEnv = createCommonjsEnv();
-    addon.commonjsEnv.load(Manifest.background.scripts[0], [
-      ["browser", Api.browser],
-      ["LegacyApi", Api.LegacyApi],
-      ["_setBackgroundPage", Api._setBackgroundPage],
-    ]);
+    addon.commonjsEnv.load({
+      mainFile: Manifest.background.scripts[0],
+      additionalGlobals: [
+        ["browser", Api.browser],
+        ["LegacyApi", Api.LegacyApi],
+        ["_setBackgroundPage", Api._setBackgroundPage],
+      ],
+    });
   };
 
   // ---------------------------------------------------------------------------
@@ -208,10 +215,13 @@ var FakeWebExt = (function() {
     const {ContentScriptsApi} = fakeEnv.exports;
 
     const commonjsEnv = createCommonjsEnv();
-    commonjsEnv.load("content/framescripts/main", [
-      ["cfmm", cfmm],
-      ["browser", ContentScriptsApi.browser],
-    ]);
+    commonjsEnv.load({
+      mainFile: "content/framescripts/main",
+      additionalGlobals: [
+        ["cfmm", cfmm],
+        ["browser", ContentScriptsApi.browser],
+      ],
+    });
 
     function unload() {
       commonjsEnv.unload();
@@ -241,12 +251,15 @@ var FakeWebExt = (function() {
     function onDOMContentLoaded() {
       document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
       const pageName = document.documentElement.id;
-      commonjsEnv.load("content/settings/" + pageName, [
-        ["$", $],
-        ["window", window],
-        ["document", document],
-        ["browser", Api.browser],
-      ]);
+      commonjsEnv.load({
+        mainFile: "content/settings/" + pageName,
+        additionalGlobals: [
+          ["$", $],
+          ["window", window],
+          ["document", document],
+          ["browser", Api.browser],
+        ],
+      });
     }
     document.addEventListener("DOMContentLoaded", onDOMContentLoaded);
   };
@@ -260,10 +273,13 @@ var FakeWebExt = (function() {
 
     const commonjsEnv = createCommonjsEnv();
 
-    commonjsEnv.load("content/ui/request-log/main", [
-      ["window", window],
-      ["browser", Api.browser],
-    ]);
+    commonjsEnv.load({
+      mainFile: "content/ui/request-log/main",
+      additionalGlobals: [
+        ["window", window],
+        ["browser", Api.browser],
+      ],
+    });
   };
 
   return FakeWebExt;

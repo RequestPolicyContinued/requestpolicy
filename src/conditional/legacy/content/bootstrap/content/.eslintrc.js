@@ -1,5 +1,5 @@
 module.exports = {
-  "extends": "../../../../../src/.eslintrc.js",
+  "extends": "../../../../../../src/.eslintrc.js",
 
   "globals": {
     "Cc": true,

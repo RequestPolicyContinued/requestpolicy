@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as Utils from "content/web-extension-fake-api/lib/utils/webext-utils";
-import {Bootstrap} from "content/web-extension-fake-api/models/bootstrap";
-import {Manifest} from "content/web-extension-fake-api/models/manifest";
-import {Prefs} from "content/web-extension-fake-api/models/prefs";
+import * as Utils from "bootstrap/lib/utils/webext-utils";
+import {Bootstrap} from "bootstrap/models/bootstrap";
+import {Manifest} from "bootstrap/models/manifest";
+import {Prefs} from "bootstrap/models/prefs";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 

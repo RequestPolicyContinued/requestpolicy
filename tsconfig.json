@@ -33,6 +33,9 @@
     "outDir": "build/ts",
     "baseUrl": "src",
     "paths": {
+      "bootstrap/*": [
+        "conditional/legacy/content/bootstrap/content/*"
+      ],
       "*": [
         "*",
         "conditional/legacy/*",

@@ -100,14 +100,18 @@ let defaultPrefScriptScope = {
 // Load default preferences (if necessary)
 //
 
-try {
-  // This is necessary for restartless extensions.
-  // https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/bootstrap/data/default-preferences.js",
-      defaultPrefScriptScope);
-  Services.prefs.savePrefFile(null);
-} catch (e) {
-  console.error("Error handling default preferences!");
-  console.dir(e);
-}
+export const DefaultPreferencesController = {
+  startup() {
+    try {
+      // This is necessary for restartless extensions.
+      // https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
+      Services.scriptloader.loadSubScript(
+          "chrome://rpcontinued/content/bootstrap/data/default-preferences.js",
+          defaultPrefScriptScope);
+      Services.prefs.savePrefFile(null);
+    } catch (e) {
+      console.error("Error handling default preferences!");
+      console.dir(e);
+    }
+  },
+};

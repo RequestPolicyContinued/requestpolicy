@@ -93,24 +93,28 @@ function createCommonjsEnv() {
   let main;
 
   return {
-    load: function load({
-        mainFile: aMainFile,
-        additionalGlobals: aAdditionalGlobals=[],
-    }) {
+    load: function load(aOptions) {
+      const {
+        mainFile, additionalGlobals, additionalPaths,
+      } = Object.assign({
+        additionalGlobals: [],
+        additionalPaths: {},
+      }, aOptions);
+
       let globals = getGlobals();
-      aAdditionalGlobals.forEach(([key, val]) => {
+      additionalGlobals.forEach(([key, val]) => {
         globals[key] = val;
       });
       // eslint-disable-next-line new-cap
       loaderWrapper.loader = Loader.Loader({
-        paths: {
+        paths: Object.assign({
           "content/": "chrome://rpcontinued/content/",
           "": "resource://gre/modules/commonjs/",
-        },
+        }, additionalPaths),
         globals,
       });
       try {
-        main = Loader.main(loaderWrapper.loader, aMainFile);
+        main = Loader.main(loaderWrapper.loader, mainFile);
       } catch (e) {
         console.error("Loader.main() failed!");
         console.dir(e);
@@ -157,8 +161,11 @@ var FakeWebExt = (function() {
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
     fakeEnv.exports = fakeEnv.commonjsEnv.load({
-      mainFile: "content/web-extension-fake-api/main",
+      mainFile: "bootstrap/main",
       additionalGlobals: [],
+      additionalPaths: {
+        "bootstrap/": "chrome://rpcontinued/content/bootstrap/content/",
+      },
     });
 
     // eslint-disable-next-line no-constant-condition

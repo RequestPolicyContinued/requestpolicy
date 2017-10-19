@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as JSUtils from "lib/utils/js-utils";
+import {arrayIncludes} from "lib/utils/js-utils";
 import {C} from "data/constants";
 
 // =============================================================================
@@ -335,7 +335,7 @@ export const keyboardShortcuts = (function() {
   }
 
   function isValidModifier(aModifier) {
-    return JSUtils.arrayIncludes(VALID_MODIFIERS, aModifier);
+    return arrayIncludes(VALID_MODIFIERS, aModifier);
   }
 
   let keyRegEx = /^[a-z]$/;

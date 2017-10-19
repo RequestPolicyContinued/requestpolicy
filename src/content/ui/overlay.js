@@ -32,7 +32,11 @@ import {
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as RequestProcessor from "lib/request-processor";
 import * as WindowUtils from "lib/utils/window-utils";
-import * as JSUtils from "lib/utils/js-utils";
+import {
+  arrayIncludes,
+  leftRotateArray,
+  range,
+} from "lib/utils/js-utils";
 import * as Utils from "lib/utils/misc-utils";
 import * as DOMUtils from "lib/utils/dom-utils";
 import {C} from "data/constants";
@@ -1126,14 +1130,14 @@ export function loadOverlayIntoWindow(window) {
     let numTabs = tabbrowser.tabs.length;
 
     // Start iterating at the currently selected tab.
-    let indexes = JSUtils.leftRotateArray(
-        JSUtils.range(numTabs),
+    let indexes = leftRotateArray(
+        range(numTabs),
         selectedTabIndex
     );
     for (let index of indexes) {
       let currentBrowser = tabbrowser.getBrowserAtIndex(index);
       let currentURI = currentBrowser.currentURI.spec;
-      if (JSUtils.arrayIncludes(possibleURLs, currentURI)) {
+      if (arrayIncludes(possibleURLs, currentURI)) {
         // The URL is already opened. Select this tab.
         tabbrowser.selectedTab = tabbrowser.tabContainer.childNodes[index];
         popupElement.hidePopup();

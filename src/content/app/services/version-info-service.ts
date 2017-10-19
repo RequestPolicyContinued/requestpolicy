@@ -24,7 +24,7 @@
 import { App, IVersionComparator } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import * as JSUtils from "lib/utils/js-utils";
+import {objectValues} from "lib/utils/js-utils";
 
 interface IInfos {
   curAppVersion: string;
@@ -137,7 +137,7 @@ export class VersionInfoService extends Module {
     // store last*Version
     // -------------------------------------------------------------------------
 
-    return Promise.all(JSUtils.objectValues(promises)).then(() => {
+    return Promise.all(objectValues(promises)).then(() => {
       this.infos = infos as IInfos;
       const {curAppVersion, curRPVersion} = infos;
       return this.cachedSettings.set({

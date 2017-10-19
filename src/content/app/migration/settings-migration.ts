@@ -30,11 +30,13 @@ export class SettingsMigration extends Module
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
+      private waitFor: Promise<void>,
   ) {
     super("app.migration.settings", log);
   }
 
-  protected startupSelf() {
+  protected async startupSelf() {
+    await this.waitFor;
     return Promise.all([
       this.performMergeActions(),
       this.performRemoveActions(),

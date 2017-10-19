@@ -46,6 +46,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "**/third-party/static"
+    "**/third-party/static",
+    "src/conditional/legacy/webextension/"
   ]
 }

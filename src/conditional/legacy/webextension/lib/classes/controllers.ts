@@ -1,0 +1,1 @@
+../../../../../content/lib/classes/controllers.ts

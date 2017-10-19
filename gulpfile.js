@@ -155,6 +155,7 @@ const getDependenciesMaxMtime = (function() {
     "gulpfile.js",
     "package.json",
     "tsconfig.json",
+    "src/conditional/legacy/webextension/tsconfig.json",
   ].map((filename) => `${rootDir}/${filename}`);
 
   return function getDependenciesMtime() {
@@ -451,6 +452,8 @@ BUILDS.forEach((build) => {
               "content/**/*.xul",
               "locale/*/*.dtd",
               "locale/*/*.properties",
+              "webextension/background.html",
+              "webextension/lib/third-party/**/*.js",
             ]);
             break;
         }
@@ -495,6 +498,7 @@ BUILDS.forEach((build) => {
             "content/bootstrap-data/manifest.json",
             "content/_locales/**/messages.json",
             "skin/*.css",
+            "webextension/manifest.json",
           ] : []
       ));
 
@@ -523,6 +527,11 @@ BUILDS.forEach((build) => {
           additionalFiles: extensionType === "legacy" ? [
             "bootstrap.js",
           ] : [],
+        },
+        "embedded-we": {
+          moduleRoot: "webextension",
+          tsConfigPath: "src/conditional/legacy/webextension/tsconfig.json",
+          additionalFiles: [],
         },
       };
 
@@ -604,6 +613,9 @@ BUILDS.forEach((build) => {
       }
 
       addJsBuildTask("main");
+      if (extensionType === "legacy") {
+        addJsBuildTask("embedded-we");
+      }
     });
   });
 });

@@ -161,9 +161,21 @@ var FakeWebExt = (function() {
   // startup
   // ---------------------------------------------------------------------------
 
-  FakeWebExt.startup = function() {
+  FakeWebExt.startup = function(aEmbeddedWebExtensionPromise = null) {
     // eslint-disable-next-line no-console
     console.log("starting up");
+
+    let pEmbeddedWebExtension = aEmbeddedWebExtensionPromise;
+
+    if (!pEmbeddedWebExtension) {
+      pEmbeddedWebExtension =
+          Promise.reject("embedded webextension not available");
+    } else {
+      pEmbeddedWebExtension = pEmbeddedWebExtension.catch((e) => {
+        console.error("[Bootstrap] Failed to load the embedded WebExtension:");
+        console.dir(e);
+      });
+    }
 
     // create the fake environment
     fakeEnv.commonjsEnv = createCommonjsEnv();
@@ -194,6 +206,7 @@ var FakeWebExt = (function() {
           additionalGlobals: [
             ["browser", api.backgroundApi],
             ["LegacyApi", api.legacyApi],
+            ["_pEmbeddedWebExtension", pEmbeddedWebExtension],
             ["_setBackgroundPage", api.bootstrap.setBackgroundPage],
           ],
         });

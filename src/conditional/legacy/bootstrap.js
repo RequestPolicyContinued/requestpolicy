@@ -51,8 +51,12 @@ function reasonConstantToString(c) {
 // =============================================================================
 
 function startup(data, reason) {
+  let pEmbeddedWebExtension = null;
+  if ("webExtension" in data && data.webExtension) {
+    pEmbeddedWebExtension = data.webExtension.startup();
+  }
   const {FakeWebExt} = Cu.import(BOOTSTRAP, {});
-  FakeWebExt.startup();
+  FakeWebExt.startup(pEmbeddedWebExtension);
 }
 
 function shutdown(data, reason) {

@@ -38,6 +38,9 @@ import { CachedSettings } from "app/storage/cached-settings";
 import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
+import {
+  LegacySideSettingsMigrationController,
+} from "legacy/controllers/legacy-side-settings-migration-controller";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
@@ -64,7 +67,12 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
-const settingsMigration = new SettingsMigration(log, browser.storage.local);
+const settingsMigration = new SettingsMigration(
+    log,
+    browser.storage.local,
+    LegacySideSettingsMigrationController._controller.
+        pStorageReadyForAccess, // FIXME
+);
 const storageReadyPromise = settingsMigration.whenReady;
 
 const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;

@@ -97,20 +97,25 @@ export class CachedSettings extends Module {
     throw new Error(`Invalid key "${aKeys}"`);
   }
 
-  public set(aKeys: {[key: string]: any}) {
-    this.assertReady();
-    try {
+  public set(aKeys: {[key: string]: any}): Promise<void> {
+    const p = this.set_(aKeys);
+    p.catch((e) => {
+      console.error("Error when saving to storage:");
+      console.dir({error: e, keys: aKeys});
+    });
+    return p;
+  }
+
+  public set_(aKeys: {[key: string]: any}): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.assertReady();
+      this.rpPrefBranch.set("lastStorageChange", (new Date()).toISOString());
       Object.keys(aKeys).forEach((key) => {
         this.rpPrefBranch.set(key, aKeys[key]);
       });
       this.prefsService.savePrefFile(null);
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error when saving to storage! Details:");
-      console.dir(aKeys);
-      console.dir(error);
-      return Promise.reject(error);
-    }
+      resolve();
+    });
   }
 
   private getRaw(aKey: string): any {

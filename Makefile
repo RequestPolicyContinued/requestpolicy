@@ -417,8 +417,9 @@ integration-tests: mocha-integration-tests
 
 _mocha_test_targets = mocha-tests mocha-unit-tests mocha-integration-tests
 .PHONY: $(_mocha_test_targets)
-mocha-tests: ALIASES := unit
+mocha-tests: ALIASES := unit legacy-integration
 mocha-unit-tests: ALIASES := unit
+mocha-integration-tests: ALIASES := legacy-integration
 $(_mocha_test_targets): node-packages
 	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/ \
 	$(MOCHA) \
@@ -501,6 +502,7 @@ pycodestyle: python-packages
 ts: node-packages
 	@echo $@
 	@$(TSC) --noEmit
+	@$(TSC) --noEmit -p src/conditional/legacy/webextension/tsconfig.json
 	@#$(TSC) --noEmit -p tests/mocha     # failing
 	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
@@ -508,7 +510,12 @@ tslint: node-packages
 	@$(TSLINT) --project tsconfig.json \
 		--exclude '**/third-party/**/*' \
 		--exclude '**/*.d.ts' \
+		--exclude 'src/conditional/legacy/webextension/**/*' \
 		'src/**/*.ts' \
+		| $(_remove_leading_empty_lines)
+	@$(TSLINT) --project src/conditional/legacy/webextension/tsconfig.json \
+		--exclude '**/third-party/**/*' \
+		'src/conditional/legacy/webextension/**/*.ts' \
 		| $(_remove_leading_empty_lines)
 
 #-------------------------------------------------------------------------------

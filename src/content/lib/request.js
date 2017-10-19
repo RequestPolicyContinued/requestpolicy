@@ -71,6 +71,17 @@ const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
   "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
+const profileUri = (function() {
+  const fileHandler = Services.io.getProtocolHandler("file").
+      QueryInterface(Ci.nsIFileProtocolHandler);
+  const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
+  return fileHandler.getURLSpecFromDir(profileDir);
+})();
+
+const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
+  profileUri + "extensions/", // issue #860
+];
+
 // =============================================================================
 // Request
 // =============================================================================
@@ -179,6 +190,13 @@ Request.prototype.isInternal = function() {
   if (origin.scheme === "view-source" &&
       dest.spec === "resource://gre-resources/viewsource.css") {
     return true;
+  }
+
+  if (dest.scheme === "jar") {
+    const {path} = dest;
+    for (let pathStart of WHITELISTED_DESTINATION_JAR_PATH_STARTS) {
+      if (path.startsWith(pathStart)) return true;
+    }
   }
 
   // Empty iframes will have the "about:blank" URI. Sometimes websites

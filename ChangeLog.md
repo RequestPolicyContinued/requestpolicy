@@ -3,6 +3,11 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta13.2
+* bugfixes
+  * Redirections to WebExtensions' internal resources shouldn't be blocked.
+    (#860)
+
 #### Version 1.0.beta13.1
 * bugfixes
   * By default, allow WebExtensions to make any request, as long as

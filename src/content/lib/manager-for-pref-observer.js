@@ -21,8 +21,8 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {PrefObserver}
-    from "content/web-extension-fake-api/lib/classes/pref-observer";
+
+const {PrefObserver} = LegacyApi;
 
 // =============================================================================
 // ManagerForPrefObservers

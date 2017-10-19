@@ -24,6 +24,7 @@ import * as Utils from "bootstrap/lib/utils/webext-utils";
 import {Bootstrap} from "bootstrap/models/bootstrap";
 import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
+import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -360,3 +361,9 @@ export const ContentScriptsApi = {
 
   Api.LegacyApi.prefs = Prefs;
 })();
+
+// =============================================================================
+// LegacyApi
+// =============================================================================
+
+Api.LegacyApi.PrefObserver = PrefObserver;

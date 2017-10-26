@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {DomainUtil} from "content/lib/utils/domains";
 import {RequestResult} from "content/lib/request-result";
 
@@ -50,7 +50,7 @@ export function RequestSet() {
 RequestSet.prototype = {
   _origins: null,
 
-  print: function(name, printFn=Logger.log.bind(Logger)) {
+  print: function(name, printFn=Log.log.bind(Log)) {
     printFn("-------------------------------------------------");
     printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
@@ -119,7 +119,7 @@ RequestSet.prototype = {
    */
   addRequest: function(originUri, destUri, requestResult) {
     if (requestResult === undefined) {
-      Logger.warn(
+      Log.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
           "origin: <" + originUri + ">, destination: <" + destUri + ">");

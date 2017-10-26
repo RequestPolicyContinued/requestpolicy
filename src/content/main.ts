@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// import the logger first! It needs to get logging prefs from storage (async).
-import {Logger} from "content/lib/logger";
+// import the Log first! It needs to get logging prefs from storage (async).
+import {Log} from "content/lib/logger";
 
 import {
   COMMONJS_UNLOAD_SUBJECT,
@@ -77,7 +77,7 @@ _setBackgroundPage({
   Environment,
   Info,
   LegacyApi,
-  Logger,
+  Log,
   MainEnvironment,
   ManagerForPrefObservers,
   OldRules,

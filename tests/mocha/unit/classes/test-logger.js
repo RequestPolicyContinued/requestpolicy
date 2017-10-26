@@ -2,10 +2,10 @@
 
 const {assert} = require("chai");
 
-const {Logger} = require("content/lib/classes/logger");
+const {Log} = require("content/lib/classes/logger");
 const {C} = require("content/lib/utils/constants");
 
-describe("Logger", () => {
+describe("Log", () => {
   const sinon = require("sinon").sandbox.create();
   afterEach(() => sinon.restore());
 
@@ -22,8 +22,8 @@ describe("Logger", () => {
         stubConsoleFn(fnName);
         const spiedFn = console[fnName];
 
-        const logger = new Logger({enabled: true, level: "all"});
-        logger[fnName]("test");
+        const log = new Log({enabled: true, level: "all"});
+        log[fnName]("test");
 
         const expectedArgs = [
           C.LOG_PREFIX + "test",
@@ -43,13 +43,13 @@ describe("Logger", () => {
     _it("error");
   });
 
-  describe("extended logger", () => {
+  describe("extended Log", () => {
     function _it(fnName) {
       it(fnName, () => {
         stubConsoleFn(fnName);
         const spiedFn = console[fnName];
 
-        const baseLogger = new Logger();
+        const baseLogger = new Log();
         const extendedLogger = baseLogger.extend({
           enabled: true,
           level: "all",
@@ -81,8 +81,8 @@ describe("Logger", () => {
         stubConsoleFn(fnName);
         const spiedFn = console[fnName];
 
-        const logger = new Logger({enabled: true});
-        logger[fnName]("test");
+        const log = new Log({enabled: true});
+        log[fnName]("test");
 
         const expectedCallCount = isCalled ? 1 : 0;
 

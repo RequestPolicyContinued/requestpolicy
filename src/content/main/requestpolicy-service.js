@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
@@ -78,7 +78,7 @@ export const rpService = (function() {
       }
     }
     function updateCompleted(result) {
-      Logger.info("Subscription updates completed: " + result);
+      Log.info("Subscription updates completed: " + result);
     }
     subscriptions.update(updateCompleted, serials);
   }
@@ -258,7 +258,7 @@ export const rpService = (function() {
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        Logger.log("XXX updated: " + data);
+        Log.log("XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -268,7 +268,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        Logger.log("XXX added: " + data);
+        Log.log("XXX added: " + data);
         let subInfo = JSON.parse(data);
         let failures = PolicyManager.loadSubscriptionRules(subInfo);
         let failed = Object.getOwnPropertyNames(failures).length > 0;
@@ -283,7 +283,7 @@ export const rpService = (function() {
             }
           }
           let updateCompleted = function(result) {
-            Logger.info("Subscription update completed: " + result);
+            Log.info("Subscription update completed: " + result);
           };
           subscriptions.update(updateCompleted, serials);
         }
@@ -291,7 +291,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        Logger.log("YYY: " + data);
+        Log.log("YYY: " + data);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;

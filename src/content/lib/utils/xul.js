@@ -64,7 +64,7 @@ const xulTrees = XULUtils.xulTrees = {};
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
       aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
-      // Logger.log(
+      // Log.log(
       //     "Automatically created ID '" + aElementSpec.attributes.id +
       //     "' for element <" + aElementSpec.tag + ">");
     }

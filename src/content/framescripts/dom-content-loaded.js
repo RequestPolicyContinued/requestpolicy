@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {DomainUtil} from "content/lib/utils/domains";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {C} from "content/lib/utils/constants";
@@ -89,7 +89,7 @@ export const ManagerForDOMContentLoaded = (function() {
       }
 
       const {blockedURIs} = aResponse;
-      // Logger.log("Received " +
+      // Log.log("Received " +
       //              Object.getOwnPropertyNames(blockedURIs).length +
       //              " blocked URIs.");
 
@@ -194,7 +194,7 @@ export const ManagerForDOMContentLoaded = (function() {
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      Logger.info("Number of meta refreshes found: " + metaRefreshes.length);
+      Log.info("Number of meta refreshes found: " + metaRefreshes.length);
 
       /* eslint-disable new-cap */
       const docShell = doc.defaultView.
@@ -203,7 +203,7 @@ export const ManagerForDOMContentLoaded = (function() {
           QueryInterface(Ci.nsIDocShell);
       /* eslint-enable new-cap */
       if (!docShell.allowMetaRedirects) {
-        Logger.warn(
+        Log.warn(
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 

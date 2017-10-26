@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {RawRuleset} from "content/lib/ruleset";
 import {FileUtil} from "content/lib/utils/files";
 import {RulesetStorage} from "content/lib/ruleset-storage";
@@ -59,10 +59,10 @@ function maybeCallback(aCallback) {
       // Probably MainEnvironment is not available anymore, because RP already
       // being shut down.
       ok = false;
-      Logger.error("Catched error:", e);
+      Log.error("Catched error:", e);
     }
     if (!ok) {
-      Logger.log("Did not call callback function");
+      Log.log("Did not call callback function");
       return;
     }
     aCallback(...args);
@@ -79,7 +79,7 @@ function setTimeout(func, delay) {
 }
 
 function dprint(msg) {
-  Logger.info(msg);
+  Log.info(msg);
 }
 
 // =============================================================================

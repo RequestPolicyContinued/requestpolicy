@@ -22,7 +22,7 @@
 
 import {SingleTopicObserver} from "content/lib/utils/observers";
 import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 
 // =============================================================================
 // ObserverManager
@@ -49,8 +49,8 @@ export function ObserverManager(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (Logger) {
-      Logger.warn("No Environment was specified for " +
+    if (Log) {
+      Log.warn("No Environment was specified for " +
                      "a new ObserverManager! This means that the observers " +
                      "won't be unregistered!");
     }

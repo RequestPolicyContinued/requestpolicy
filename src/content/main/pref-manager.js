@@ -23,7 +23,7 @@
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {Storage} from "content/models/storage";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 
 // =============================================================================
 // PrefManager
@@ -71,7 +71,7 @@ export const PrefManager = (function() {
     if (LegacyApi.prefs.get("prefetch.link.disableOnStartup")) {
       if (LegacyApi.prefs.get("root/ network.prefetch-next") === true) {
         LegacyApi.prefs.set("root/ network.prefetch-next", false);
-        Logger.info("Disabled link prefetch.");
+        Log.info("Disabled link prefetch.");
       }
     }
     // Disable DNS prefetch.
@@ -83,7 +83,7 @@ export const PrefManager = (function() {
       if (!LegacyApi.prefs.isSet(prefName) ||
           LegacyApi.prefs.get(prefName) === false) {
         LegacyApi.prefs.set(prefName, true);
-        Logger.info("Disabled DNS prefetch.");
+        Log.info("Disabled DNS prefetch.");
       }
 
       prefName = "root/ network.dns.disablePrefetchFromHTTPS";
@@ -92,7 +92,7 @@ export const PrefManager = (function() {
       if (LegacyApi.prefs.isSet(prefName) &&
           LegacyApi.prefs.get(prefName) === false) {
         LegacyApi.prefs.set(prefName, true);
-        Logger.info("Disabled DNS prefetch from HTTPS.");
+        Log.info("Disabled DNS prefetch from HTTPS.");
       }
     }
     // Disable Speculative pre-connections.
@@ -101,7 +101,7 @@ export const PrefManager = (function() {
       if (!LegacyApi.prefs.isSet(prefName) ||
           LegacyApi.prefs.get(prefName) !== 0) {
         LegacyApi.prefs.set(prefName, 0);
-        Logger.info("Disabled Speculative pre-connections.");
+        Log.info("Disabled Speculative pre-connections.");
       }
     }
 

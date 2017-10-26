@@ -38,10 +38,10 @@ export const LEVEL = Object.freeze({
 const MINIMUM_LOGGING_LEVEL = LEVEL.ERROR;
 
 // =============================================================================
-// Logger
+// Log
 // =============================================================================
 
-export function Logger(options) {
+export function Log(options) {
   this._setAll(options);
 }
 
@@ -52,7 +52,7 @@ const defaultOptions = Object.freeze({
   name: null,
 });
 
-Logger.prototype = {
+Log.prototype = {
   _enabled: true,
   _level: MINIMUM_LOGGING_LEVEL,
   _prefix: C.LOG_PREFIX,
@@ -146,7 +146,7 @@ Logger.prototype = {
             break;
 
           default:
-            console.error("Logger: Invalid condition type");
+            console.error("Log: Invalid condition type");
             return;
         }
         break;

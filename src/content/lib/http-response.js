@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {DomainUtil} from "content/lib/utils/domains";
 import {WindowUtils} from "content/lib/utils/windows";
 import {Storage} from "content/models/storage";
@@ -105,7 +105,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
             this._rawDestString = DomainUtil.
                                   parseRefresh(this.redirHeaderValue).destURI;
           } catch (e) {
-            Logger.warn(
+            Log.warn(
                 "Invalid refresh header: <" + this.redirHeaderValue + ">");
             if (!Storage.isBlockingDisabled()) {
               this.removeResponseHeader();
@@ -165,7 +165,7 @@ Object.defineProperty(HttpResponse.prototype, "loadContext", {
           //        request is redirected, that is, the server responds
           //        with a 'Location' header when the server's
           //        `favicon.ico` is requested.
-          Logger.warn("The redirection's Load Context couldn't be found!",
+          Log.warn("The redirection's Load Context couldn't be found!",
               ex2);
           this._loadContext = null;
         }
@@ -199,7 +199,7 @@ Object.defineProperty(HttpResponse.prototype, "browser", {
                             getBrowserForWindow(loadContext.topWindow);
           }
         } catch (e) {
-          Logger.warn(
+          Log.warn(
               "The browser for the redirection's Load Context couldn't be " +
               "found!", e);
           this._browser = null;
@@ -224,7 +224,7 @@ Object.defineProperty(HttpResponse.prototype, "docShell", {
                          getInterface(Ci.nsIDocShell);
         /* eslint-enable new-cap */
       } catch (e) {
-        Logger.warn(
+        Log.warn(
             "The redirection's DocShell couldn't be found!", e);
         this._docShell = null;
       }

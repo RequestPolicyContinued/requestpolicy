@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createExtendedLogger, Logger} from "content/lib/logger";
+import {createExtendedLogger, Log} from "content/lib/logger";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domains";
@@ -178,7 +178,7 @@ export let RequestProcessor = (function() {
       let window = request.getChromeWindow();
 
       if (!browser || !window || typeof window.rpcontinued === "undefined") {
-        Logger.warn("The user could not be notified " +
+        Log.warn("The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
         window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
@@ -373,7 +373,7 @@ export let RequestProcessor = (function() {
   // function _getOtherOriginsHelperFromDOM(document, reqSet) {
   //   var documentUri = DomainUtil
   //       .stripFragment(document.documentURI);
-  //   Logger.log("Looking for other origins within DOM of "
+  //   Log.log("Looking for other origins within DOM of "
   //       + documentUri);
   //   // TODO: Check other elements besides iframes and frames?
   //   var frameTagTypes = {
@@ -401,7 +401,7 @@ export let RequestProcessor = (function() {
   //         // yet.
   //         continue;
   //       }
-  //       Logger.log("Found DOM child " + tagType
+  //       Log.log("Found DOM child " + tagType
   //           + " with src <" + childUri + "> in document <" + documentUri + ">");
   //       //var childUriIdent = DomainUtil.getIdentifier(childUri,
   //       //    DomainUtil.LEVEL_SOP);
@@ -500,12 +500,12 @@ export let RequestProcessor = (function() {
   // eslint-disable-next-line complexity
   self.process = function(request) {
     // uncomment for debugging:
-    // Logger.log("request: " +
+    // Log.log("request: " +
     //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
     //               "<unknown>") +
     //              " -->  "+request.aContentLocation.spec);
-    // Logger.dir(request.aRequestOrigin);
-    // Logger.dir(request.aContentLocation);
+    // Log.dir(request.aRequestOrigin);
+    // Log.dir(request.aContentLocation);
     try {
       if (request.isInternal()) {
         logRequests.log("Allowing a request that seems to be internal. " +
@@ -602,7 +602,7 @@ export let RequestProcessor = (function() {
           }
           if (newOriginURI) {
             newOriginURI = DomainUtil.stripFragment(newOriginURI);
-            Logger.log("Considering origin <" +
+            Log.log("Considering origin <" +
                          originURI + "> to be origin <" + newOriginURI + ">");
             originURI = newOriginURI;
             request.setOriginURI(originURI);
@@ -786,12 +786,12 @@ export let RequestProcessor = (function() {
       request.requestResult = PolicyManager.checkRequestAgainstUserRules(
           request.aRequestOrigin, request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.log("Matched deny rules");
-        Logger.dir(matchedDenyRule);
+        Log.log("Matched deny rules");
+        Log.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.log("Matched allow rules");
-        Logger.dir(matchedAllowRule);
+        Log.log("Matched allow rules");
+        Log.dir(matchedAllowRule);
       }
       // If there are both allow and deny rules, then fall back on the default
       // policy. I believe this is effectively the same as giving precedence
@@ -841,12 +841,12 @@ export let RequestProcessor = (function() {
           .checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
               request.aContentLocation);
       for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-        Logger.log("Matched deny rules");
-        Logger.dir(matchedDenyRule);
+        Log.log("Matched deny rules");
+        Log.dir(matchedDenyRule);
       }
       for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-        Logger.log("Matched allow rules");
-        Logger.dir(matchedAllowRule);
+        Log.log("Matched allow rules");
+        Log.dir(matchedAllowRule);
       }
       if (request.requestResult.allowRulesExist() &&
           request.requestResult.denyRulesExist()) {
@@ -946,10 +946,10 @@ export let RequestProcessor = (function() {
       console.error("Fatal Error:");
       console.dir(e);
       if (Storage.isBlockingDisabled()) {
-        Logger.warn("Allowing request due to internal error.");
+        Log.warn("Allowing request due to internal error.");
         return CP_OK;
       }
-      Logger.warn("Rejecting request due to internal error.");
+      Log.warn("Rejecting request due to internal error.");
       return CP_REJECT;
     }
   };
@@ -975,7 +975,7 @@ export let RequestProcessor = (function() {
       if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
         // Seems to be too late to block it at this point. Calling the
         // cancel(status) method didn't stop it.
-        Logger.warn(
+        Log.warn(
             "Discovered prefetch request being sent to: " + httpChannel.name);
       }
     } catch (e) {
@@ -990,7 +990,7 @@ export let RequestProcessor = (function() {
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
     historyRequests[destinationUrl] = true;
-    Logger.info("History item requested: <" + destinationUrl + ">.");
+    Log.info("History item requested: <" + destinationUrl + ">.");
   };
 
   self.registerFormSubmitted = function(originUrl, destinationUrl) {
@@ -999,7 +999,7 @@ export let RequestProcessor = (function() {
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
-    Logger.info(
+    Log.info(
         "Form submitted from <" + originUrl + "> to <" + destinationUrl + ">.");
 
     // Drop the query string from the destination url because form GET requests
@@ -1032,7 +1032,7 @@ export let RequestProcessor = (function() {
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
-    Logger.info(
+    Log.info(
         "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
 
     if (internal.clickedLinks[originUrl] === undefined) {
@@ -1067,7 +1067,7 @@ export let RequestProcessor = (function() {
     destinationUrl = DomainUtil.ensureUriHasPath(
         DomainUtil.stripFragment(destinationUrl));
 
-    Logger.info("User-allowed redirect from <" +
+    Log.info("User-allowed redirect from <" +
         originUrl + "> to <" + destinationUrl + ">.");
 
     if (internal.userAllowedRedirects[originUrl] === undefined) {
@@ -1091,7 +1091,7 @@ export let RequestProcessor = (function() {
       throw "Observer passed to addRequestObserver does " +
           "not have an observeBlockedRequest() method.";
     }
-    Logger.log("Adding request observer: " + observer.toString());
+    Log.log("Adding request observer: " + observer.toString());
     internal.requestObservers.add(observer);
   };
 
@@ -1102,11 +1102,11 @@ export let RequestProcessor = (function() {
    */
   self.removeRequestObserver = function(observer) {
     if (internal.requestObservers.has(observer)) {
-      Logger.log("Removing request observer: " + observer.toString());
+      Log.log("Removing request observer: " + observer.toString());
       internal.requestObservers.delete(observer);
       return;
     }
-    Logger.warn(
+    Log.warn(
         "Could not find observer to remove " + "in removeRequestObserver()");
   };
 
@@ -1187,7 +1187,7 @@ RequestProcessor = (function(self) {
   function mapDestinations(origDestUri, newDestUri) {
     origDestUri = DomainUtil.stripFragment(origDestUri);
     newDestUri = DomainUtil.stripFragment(newDestUri);
-    Logger.info(
+    Log.info(
         "Mapping destination <" + origDestUri + "> to <" + newDestUri + ">.");
     if (!internal.mappedDestinations[newDestUri]) {
       internal.mappedDestinations[newDestUri] = {};
@@ -1326,7 +1326,7 @@ RequestProcessor = (function(self) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
         internal.faviconRequests[destURI] = true;
-        Logger.info(
+        Log.info(
             "Redirection from <" + originURI + "> to <" + destURI + "> " +
             "appears to be a redirected favicon request. " +
             "This will be treated as a content request.");
@@ -1341,7 +1341,7 @@ RequestProcessor = (function(self) {
 
     // Ignore redirects to javascript. The browser will ignore them, as well.
     if (request.destUriObj.schemeIs("javascript")) {
-      Logger.warn(
+      Log.warn(
           "Ignoring redirect to javascript URI <" + destURI + ">");
       return CP_OK;
     }
@@ -1442,10 +1442,10 @@ RequestProcessor = (function(self) {
       console.error("Fatal Error:");
       console.dir(e);
       if (Storage.isBlockingDisabled()) {
-        Logger.warn("Allowing request due to internal error.");
+        Log.warn("Allowing request due to internal error.");
         return CP_OK;
       }
-      Logger.warn("Rejecting request due to internal error.");
+      Log.warn("Rejecting request due to internal error.");
       return CP_REJECT;
     }
   };
@@ -1489,7 +1489,7 @@ RequestProcessor = (function(self) {
 
     let rv = showRedirectNotification(aRequest);
     if (true !== rv) {
-      Logger.warn(
+      Log.warn(
           "A redirection of a top-level document has been observed, " +
           "but it was not possible to notify the user! The redirection " +
           "was from page <" + aRequest.originURI + "> " +

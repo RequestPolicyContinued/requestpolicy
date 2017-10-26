@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 
 // =============================================================================
 // DomainUtil
@@ -93,7 +93,7 @@ DomainUtil.getIdentifier = function(uri, level) {
       identifier = uri.split(",")[0];
       return identifier.split(";")[0];
     }
-    Logger.info("Unable to getIdentifier from uri " +
+    Log.info("Unable to getIdentifier from uri " +
         uri + " using identifier level " + level + ".");
     return uri;
   }
@@ -154,7 +154,7 @@ DomainUtil.getUriObject = function(uri) {
     return Services.io.newURI(uri, null, null);
   } catch (e) {
     const msg = "DomainUtil.getUriObject exception on uri <" + uri + ">.";
-    Logger.log(msg);
+    Log.log(msg);
     // eslint-disable-next-line no-throw-literal
     throw e;
   }
@@ -368,7 +368,7 @@ DomainUtil.getDefaultPortForScheme = function(scheme) {
     case "https":
       return 443;
     default:
-      Logger.warn("Unknown default port for scheme " + scheme + ".");
+      Log.warn("Unknown default port for scheme " + scheme + ".");
       return null;
   }
 };

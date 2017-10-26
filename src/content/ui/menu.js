@@ -22,7 +22,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -177,13 +177,13 @@ export function loadMenuIntoWindow(window) {
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
         if (self._currentBaseDomain === null) {
-          Logger.info("Unable to prepare menu because " +
+          Log.info("Unable to prepare menu because " +
               "the current uri has no host: " + self._currentUri);
           self._populateMenuForUncontrollableOrigin();
           return;
         }
       } catch (e) {
-        Logger.info("Unable to prepare menu because " +
+        Log.info("Unable to prepare menu because " +
             "base domain can't be determined: " + self._currentUri);
         self._populateMenuForUncontrollableOrigin();
         return;
@@ -192,13 +192,13 @@ export function loadMenuIntoWindow(window) {
       self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
-      // Logger.info("self._currentUri: " + self._currentUri);
+      // Log.info("self._currentUri: " + self._currentUri);
       self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
 
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
       // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
 
-      Logger.info("self._currentUri: " + self._currentUri);
+      Log.info("self._currentUri: " + self._currentUri);
 
       if (self._isChromeUri) {
         self._populateMenuForUncontrollableOrigin();
@@ -373,7 +373,7 @@ export function loadMenuIntoWindow(window) {
         destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
         if (destsMixedIndex !== -1) {
-          Logger.info("Merging dest: <" + allowedGUIDest + ">");
+          Log.info("Merging dest: <" + allowedGUIDest + ">");
           destsMixed[destsMixedIndex] = GUIDestination.merge(
               allowedGUIDest, destsMixed[destsMixedIndex]);
         } else {
@@ -381,7 +381,7 @@ export function loadMenuIntoWindow(window) {
           // destsWithAllowedRequests, but not in destsMixed.
           // This should never happen, the destsMixed destination should have
           // been added in the destsWithBlockedRequests-loop.
-          Logger.warn("mixed dest was" +
+          Log.warn("mixed dest was" +
               " not added to `destsMixed` list: <" + allowedGUIDest + ">");
           destsMixed.push(allowedGUIDest);
         }
@@ -694,9 +694,9 @@ export function loadMenuIntoWindow(window) {
     }
 
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    Logger.log("ruleData: " + canonicalRule);
-    Logger.log("ruleAction: " + ruleAction);
-    Logger.log("undo: " + undo);
+    Log.log("ruleData: " + canonicalRule);
+    Log.log("ruleAction: " + ruleAction);
+    Log.log("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the
@@ -1128,7 +1128,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            Logger.log("destinations[destUri] is null or undefined for " +
+            Log.log("destinations[destUri] is null or undefined for " +
                 "destUri: " + destUri);
             continue;
           }
@@ -1148,7 +1148,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            // Logger.info("matched allow rule: " + rawRuleStr);
+            // Log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1205,7 +1205,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            Logger.log("destinations[destUri] is null or undefined " +
+            Log.log("destinations[destUri] is null or undefined " +
                 "for destUri: " + destUri);
             continue;
           }
@@ -1225,7 +1225,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            // Logger.info("matched allow rule: " + rawRuleStr);
+            // Log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {

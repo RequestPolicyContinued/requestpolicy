@@ -42,7 +42,7 @@ Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
                                     "main/default-pref-handler.js", {});
 
 // -----------------------------------------------------------------------------
-// Set up the Logger module
+// Set up the Log module
 // -----------------------------------------------------------------------------
 
 {
@@ -51,7 +51,7 @@ Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
 
   // Use |do_print| instead of |dump| because that's what's
   // available for xpcshell tests.
-  tmpScope.Logger.printFunc = function(msg) {
+  tmpScope.Log.printFunc = function(msg) {
     do_print(msg.trimRight());
   };
 }

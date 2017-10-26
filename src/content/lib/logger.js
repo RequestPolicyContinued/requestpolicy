@@ -23,14 +23,14 @@
 
 import {
   LEVEL as LOG_LEVEL,
-  Logger as LoggerCls,
+  Log as LogClass,
 } from "content/lib/classes/logger";
 
 // =============================================================================
-// Logger
+// Log
 // =============================================================================
 
-export const Logger = new LoggerCls({
+export const Log = new LogClass({
   enabled: true,
   level: LOG_LEVEL.ALL,
 });
@@ -39,25 +39,25 @@ browser.storage.local.get([
   "log",
   "log.level",
 ]).then(result => {
-  Logger.setEnabled(result.log);
-  Logger.setLevel(result["log.level"]);
+  Log.setEnabled(result.log);
+  Log.setLevel(result["log.level"]);
   return;
 }).catch(error => {
-  console.error("Error initializing the Logger! Details:");
+  console.error("Error initializing the Log! Details:");
   console.dir(error);
 });
 
 function onStorageChange(aChanges, aAreaName) {
   if (aChanges.hasOwnProperty("log")) {
-    Logger.setEnabled(aChanges.log.newValue);
+    Log.setEnabled(aChanges.log.newValue);
   }
   if (aChanges.hasOwnProperty("log.level")) {
-    Logger.setLevel(aChanges["log.level"].newValue);
+    Log.setLevel(aChanges["log.level"].newValue);
   }
 }
 
 browser.storage.onChanged.addListener(onStorageChange);
 
 export function createExtendedLogger(...args) {
-  return Logger.extend(...args);
+  return Log.extend(...args);
 }

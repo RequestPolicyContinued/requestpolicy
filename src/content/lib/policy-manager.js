@@ -22,7 +22,7 @@
  */
 
 import {C} from "content/lib/utils/constants";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {RequestResult} from "content/lib/request-result";
 import {Ruleset, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
@@ -38,11 +38,11 @@ export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 // =============================================================================
 
 function dprint(msg) {
-  Logger.info("[POLICY] " + msg);
+  Log.info("[POLICY] " + msg);
 }
 
 function warn(msg) {
-  Logger.warn("[POLICY] " + msg);
+  Log.warn("[POLICY] " + msg);
 }
 
 function notifyRulesChanged() {

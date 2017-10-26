@@ -21,7 +21,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {C} from "content/lib/utils/constants";
 
 const {LOG_EVENT_LISTENERS} = C;
@@ -61,7 +61,7 @@ export function ManagerForEventListeners(aEnv) {
         Environment.LEVELS.INTERFACE,
         function() {
           if (LOG_EVENT_LISTENERS) {
-            Logger.log("From now on new event listeners will be " +
+            Log.log("From now on new event listeners will be " +
                 "added immediately. Environment: \"" +
                 self.environment.name + "\"");
           }
@@ -76,7 +76,7 @@ export function ManagerForEventListeners(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (Logger) {
+    if (Log) {
       console.error(
           "No Environment was specified for a new ManagerForEventListeners! " +
           "This means that the listeners won't be removed!");
@@ -109,7 +109,7 @@ ManagerForEventListeners.prototype.addListener = function(aEventTarget,
   };
   if (self.addNewListenersImmediately) {
     if (LOG_EVENT_LISTENERS) {
-      Logger.log("Immediately adding event listener for \"" +
+      Log.log("Immediately adding event listener for \"" +
           listener.eventType + "\". Environment: \"" +
           self.environment.name + "\"");
     }
@@ -126,7 +126,7 @@ ManagerForEventListeners.prototype.addAllListeners = function() {
   for (let listener of self.listeners) {
     if (listener.listening === false) {
       if (LOG_EVENT_LISTENERS) {
-        Logger.log("Lazily adding event listener for \"" +
+        Log.log("Lazily adding event listener for \"" +
             listener.eventType + "\". Environment: \"" +
             self.environment.name + "\"");
       }
@@ -143,7 +143,7 @@ ManagerForEventListeners.prototype.removeAllListeners = function() {
   while (self.listeners.length > 0) {
     let listener = self.listeners.pop();
     if (LOG_EVENT_LISTENERS) {
-      Logger.log("Removing event listener for \"" + listener.eventType +
+      Log.log("Removing event listener for \"" + listener.eventType +
           "\". Environment: \"" + self.environment.name + "\"");
     }
     listener.target.removeEventListener(listener.eventType, listener.callback,

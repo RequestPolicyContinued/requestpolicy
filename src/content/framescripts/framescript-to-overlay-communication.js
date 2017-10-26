@@ -21,7 +21,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {C} from "content/lib/utils/constants";
 import {mlManager} from "content/framescripts/managers";
 
@@ -89,7 +89,7 @@ export function FramescriptToOverlayCommunication(aEnv) {
 
 FramescriptToOverlayCommunication.prototype._dump = function(msg) {
   let self = this;
-  Logger.log(self.env.uid + ": " + msg);
+  Log.log(self.env.uid + ": " + msg);
 };
 
 /**

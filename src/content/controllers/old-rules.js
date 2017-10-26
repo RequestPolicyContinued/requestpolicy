@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {Info} from "content/lib/utils/info";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -49,7 +49,7 @@ export const OldRulesController = (function() {
   };
 
   function importOldRulesAutomatically() {
-    Logger.info("Performing automatic rule import.");
+    Log.info("Performing automatic rule import.");
     let rv = self.importOldRules();
     if (false === rv) {
       console.error("Failed to automatically import old rules.");

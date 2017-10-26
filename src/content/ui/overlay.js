@@ -24,7 +24,7 @@
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";

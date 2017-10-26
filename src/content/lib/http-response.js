@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 import {DomainUtil} from "content/lib/utils/domains";
 import {WindowUtils} from "content/lib/utils/windows";
 import {Storage} from "content/models/storage";

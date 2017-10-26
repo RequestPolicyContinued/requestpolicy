@@ -22,7 +22,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";

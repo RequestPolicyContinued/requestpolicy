@@ -21,7 +21,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 import {C} from "content/lib/utils/constants";
 import {mlManager} from "content/framescripts/managers";
 

@@ -22,7 +22,7 @@
 
 import {SingleTopicObserver} from "content/lib/utils/observers";
 import {Environment} from "content/lib/environment";
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 
 // =============================================================================
 // ObserverManager

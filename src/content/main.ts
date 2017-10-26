@@ -21,7 +21,7 @@
  */
 
 // import the Log first! It needs to get logging prefs from storage (async).
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 
 import {
   COMMONJS_UNLOAD_SUBJECT,

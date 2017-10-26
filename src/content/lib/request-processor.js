@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/logger";
+import {Log} from "content/lib/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domains";

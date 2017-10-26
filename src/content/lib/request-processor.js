@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createExtendedLogger, Log} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domains";
@@ -42,13 +42,13 @@ import {CompatibilityRules} from "content/models/compatibility-rules";
 
 import RPContentPolicy from "content/main/content-policy";
 
-const logRequests = createExtendedLogger({
+const logRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",
 });
 
-const logGettingSavedRequests = createExtendedLogger({
+const logGettingSavedRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},
   level: "all",
   name: "getting saved requests",

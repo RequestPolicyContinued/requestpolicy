@@ -57,7 +57,3 @@ function onStorageChange(aChanges, aAreaName) {
 }
 
 browser.storage.onChanged.addListener(onStorageChange);
-
-export function createExtendedLogger(...args) {
-  return Log.extend(...args);
-}

@@ -21,12 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createExtendedLogger} from "content/lib/logger";
+import {Log} from "content/lib/logger";
 import {DomainUtil} from "content/lib/utils/domains";
 import {WindowUtils} from "content/lib/utils/windows";
 import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
 
-const logRequests = createExtendedLogger({
+const logRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",

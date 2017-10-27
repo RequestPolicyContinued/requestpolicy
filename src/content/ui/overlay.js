@@ -33,7 +33,7 @@ import {DomainUtil} from "content/lib/utils/domains";
 import {StringUtils} from "content/lib/utils/strings";
 import {WindowUtils} from "content/lib/utils/windows";
 import {JSUtils} from "content/lib/utils/javascript";
-import {Utils} from "content/lib/utils/misc-utils";
+import * as Utils from "content/lib/utils/misc-utils";
 import {DOMUtils} from "content/lib/utils/dom";
 import {C} from "content/lib/utils/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";

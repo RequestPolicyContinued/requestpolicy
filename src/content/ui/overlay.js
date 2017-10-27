@@ -35,7 +35,7 @@ import {WindowUtils} from "content/lib/utils/windows";
 import {JSUtils} from "content/lib/utils/javascript";
 import * as Utils from "content/lib/utils/misc-utils";
 import {DOMUtils} from "content/lib/utils/dom";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";
 
 const {LOG_FLAG_STATE} = C;

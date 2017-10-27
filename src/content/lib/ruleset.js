@@ -23,7 +23,7 @@
 
 import {Log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domains";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 
 // =============================================================================
 // utilities

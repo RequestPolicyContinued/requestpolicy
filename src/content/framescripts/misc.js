@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {mlManager, overlayComm} from "content/framescripts/managers";
 

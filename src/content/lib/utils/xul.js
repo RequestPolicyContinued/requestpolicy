@@ -22,7 +22,7 @@
 
 import {StringUtils} from "content/lib/utils/strings";
 import {JSUtils} from "content/lib/utils/javascript";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 
 // =============================================================================
 // XULUtils

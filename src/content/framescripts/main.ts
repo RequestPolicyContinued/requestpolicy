@@ -24,10 +24,10 @@ import "content/framescripts/blocked-content";
 import "content/framescripts/dom-content-loaded";
 import "content/framescripts/misc";
 
+import {C} from "content/data/constants";
 import {
   COMMONJS_UNLOAD_SUBJECT,
 } from "content/legacy/lib/commonjs-unload-subject";
-import {C} from "content/lib/utils/constants";
 
 if (C.UI_TESTING) {
   import("content/ui-testing/services");

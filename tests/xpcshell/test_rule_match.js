@@ -1,7 +1,7 @@
 /* exported run_test */
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
-Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
+Components.utils.import("chrome://rpcontinued/content/data/constants.jsm");
 
 function run_test() {
   run_next_test();

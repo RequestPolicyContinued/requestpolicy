@@ -24,7 +24,7 @@
 import {Log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domains";
 import {Environment, MainEnvironment} from "content/lib/environment";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 
 import {overlayComm} from "content/framescripts/managers";
 import {ManagerForBlockedContent}

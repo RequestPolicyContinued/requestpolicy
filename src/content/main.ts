@@ -31,10 +31,10 @@ import {Controllers} from "content/lib/classes/controllers";
   allControllers = allControllers.concat(controllers);
 }
 
+import {C} from "content/data/constants";
 import {
   COMMONJS_UNLOAD_SUBJECT,
 } from "content/legacy/lib/commonjs-unload-subject";
-import {C} from "content/lib/utils/constants";
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {PrefManager} from "content/main/pref-manager";

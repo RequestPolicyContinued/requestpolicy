@@ -33,7 +33,7 @@ import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
 import {StringUtils} from "content/lib/utils/strings";
 import {DOMUtils} from "content/lib/utils/dom";
 import {WindowUtils} from "content/lib/utils/windows";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;

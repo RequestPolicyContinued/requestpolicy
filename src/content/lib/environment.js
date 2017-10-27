@@ -24,7 +24,7 @@ import {ManagerForEventListeners}
     from "content/lib/manager-for-event-listeners";
 import {ObserverManager} from "content/lib/observer-manager";
 import {Log} from "content/models/log";
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 import {JSUtils} from "content/lib/utils/javascript";
 
 const {LOG_ENVIRONMENT} = C;

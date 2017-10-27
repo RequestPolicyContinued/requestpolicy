@@ -1,7 +1,7 @@
 /* exported run_test */
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset-storage.jsm");
-Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
+Components.utils.import("chrome://rpcontinued/content/data/constants.jsm");
 
 // We expect JSON data to represent the following data structure.
 const exampleJsonObj = {

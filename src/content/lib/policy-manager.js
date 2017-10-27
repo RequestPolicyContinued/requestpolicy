@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/lib/utils/constants";
+import {C} from "content/data/constants";
 import {Log} from "content/models/log";
 import {RequestResult} from "content/lib/request-result";
 import {Ruleset, RawRuleset} from "content/lib/ruleset";

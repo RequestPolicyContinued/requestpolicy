@@ -22,7 +22,7 @@
  */
 
 import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
+import {Storage} from "content/models/storage-model";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domain-utils";
 import {Request} from "content/lib/request";

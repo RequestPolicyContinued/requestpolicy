@@ -24,7 +24,7 @@
 import {Log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domain-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
-import {Storage} from "content/models/storage";
+import {Storage} from "content/models/storage-model";
 
 // =============================================================================
 // HttpResponse

@@ -22,7 +22,7 @@
  */
 
 import {Environment, MainEnvironment} from "content/lib/environment";
-import {Storage} from "content/models/storage";
+import {Storage} from "content/models/storage-model";
 import {Log} from "content/models/log";
 
 // =============================================================================

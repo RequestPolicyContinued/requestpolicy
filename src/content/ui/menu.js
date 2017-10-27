@@ -23,7 +23,7 @@
 
 import {Environment} from "content/lib/environment";
 import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
+import {Storage} from "content/models/storage-model";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domain-utils";

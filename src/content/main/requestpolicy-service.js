@@ -22,7 +22,7 @@
  */
 
 import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
+import {Storage} from "content/models/storage-model";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";

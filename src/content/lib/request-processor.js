@@ -37,7 +37,7 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         } from "content/lib/request-result";
 import {RequestSet} from "content/lib/request-set";
 import {MainEnvironment} from "content/lib/environment";
-import {Utils} from "content/lib/utils";
+import {Utils} from "content/lib/utils/misc-utils";
 import {CompatibilityRules} from "content/models/compatibility-rules";
 
 import RPContentPolicy from "content/main/content-policy";

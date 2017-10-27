@@ -23,7 +23,7 @@
 
 import {Log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
-import {Utils} from "content/lib/utils";
+import {Utils} from "content/lib/utils/misc-utils";
 import {RequestProcessor} from "content/lib/request-processor";
 import {Environment, MainEnvironment} from "content/lib/environment";
 

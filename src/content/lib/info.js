@@ -22,7 +22,7 @@
  */
 
 import {C} from "content/data/constants";
-import {JSUtils} from "content/lib/utils/js-utils";
+import * as JSUtils from "content/lib/utils/js-utils";
 
 // =============================================================================
 // Info

@@ -21,13 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// =============================================================================
-// RuleUtils
-// =============================================================================
-
-export const RuleUtils = (function() {
-  let self = {};
-
 /**
  * Get a string representation of an endpoint (origin or dest) specification.
  *
@@ -37,7 +30,7 @@ export const RuleUtils = (function() {
  * @param {Object} aEndpointSpec
  * @return {string}
  */
-self.endpointSpecToDisplayString = function(aEndpointSpec) {
+export function endpointSpecToDisplayString(aEndpointSpec) {
   if (aEndpointSpec.port !== undefined &&
       (aEndpointSpec.h === null || aEndpointSpec.h === "")) {
     return "[invalid endpoint specification]";
@@ -72,7 +65,4 @@ self.endpointSpecToDisplayString = function(aEndpointSpec) {
   }
   // TODO: path
   return str;
-};
-
-  return self;
-})();
+}

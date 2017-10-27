@@ -20,23 +20,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// =============================================================================
-// JSUtils
-// =============================================================================
-
-export const JSUtils = (function() {
-  let self = {};
-
-self.arrayIncludes = function(array, searchElement) {
+export function arrayIncludes(array, searchElement) {
   for (let element of array) {
     if (element === searchElement) {
       return true;
     }
   }
   return false;
-};
+}
 
-self.defineLazyGetter = function(aOnObj, aKey, aValueFn) {
+export function defineLazyGetter(aOnObj, aKey, aValueFn) {
   Object.defineProperty(aOnObj, aKey, {
     get: function() {
       delete aOnObj[aKey];
@@ -52,14 +45,14 @@ self.defineLazyGetter = function(aOnObj, aKey, aValueFn) {
     configurable: true,
     enumerable: true,
   });
-};
+}
 
-self.leftRotateArray = function(array, n) {
+export function leftRotateArray(array, n) {
   n = n % array.length;
   let firstPart = array.slice(0, n);
   let secondPart = array.slice(n);
   return [].concat(secondPart, firstPart);
-};
+}
 
 /**
  * Create an array containing the elements [0, ..., n-1].
@@ -67,13 +60,10 @@ self.leftRotateArray = function(array, n) {
  * @param {number} n
  * @return {Array<number>}
  */
-self.range = function(n) {
+export function range(n) {
   let array = [];
   for (let i = 0; i < n; i++) {
     array.push(i);
   }
   return array;
-};
-
-  return self;
-})();
+}

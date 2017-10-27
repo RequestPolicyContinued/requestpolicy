@@ -57,9 +57,9 @@ import {
   SUBSCRIPTION_REMOVED_TOPIC,
 } from "content/lib/subscription";
 import {DomainUtil} from "content/lib/utils/domain-utils";
-import {RuleUtils} from "content/lib/utils/rule-utils";
-import {StringUtils} from "content/lib/utils/string-utils";
-import {WindowUtils} from "content/lib/utils/window-utils";
+import * as RuleUtils from "content/lib/utils/rule-utils";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";

@@ -48,10 +48,8 @@ const OCTAL_700 = getOctalInt(7, 0, 0); // octal: 0700
 const REQUESTPOLICY_DIR = "requestpolicy";
 
 // =============================================================================
-// FileUtil
+// FileUtils
 // =============================================================================
-
-export const FileUtil = {
 
 /**
  * Returns the lines of the file in an array.
@@ -59,7 +57,7 @@ export const FileUtil = {
  * @param {nsIFile} file
  * @return {Array<string>}
  */
-fileToArray: function(file) {
+export function fileToArray(file) {
   const stream = Cc["@mozilla.org/network/file-input-stream;1"]
       .createInstance(Ci.nsIFileInputStream);
   stream.init(file, 0x01, OCTAL_444, 0);
@@ -74,7 +72,7 @@ fileToArray: function(file) {
   } while (hasmore);
   stream.close();
   return lines;
-},
+}
 
 /**
  * Returns the contents of the file as a string.
@@ -82,7 +80,7 @@ fileToArray: function(file) {
  * @param {nsIFile} file
  * @return {string}
  */
-fileToString: function(file) {
+export function fileToString(file) {
   // FIXME: This function MUST NOT check for the file to exist,
   //        otherwise the subscriptions are not fetched at all,
   //        for whatever reason.
@@ -119,7 +117,7 @@ fileToString: function(file) {
   cstream.close(); // This closes |fstream|.
 
   return str;
-},
+}
 
 /**
  * Writes each element of an array to a line of a file (truncates the file if
@@ -128,7 +126,7 @@ fileToString: function(file) {
  * @param {Array} lines
  * @param {nsIFile} file
  */
-arrayToFile: function(lines, file) {
+export function arrayToFile(lines, file) {
   const stream = Cc["@mozilla.org/network/file-output-stream;1"]
       .createInstance(Ci.nsIFileOutputStream);
   // write, create, append on write, truncate
@@ -143,7 +141,7 @@ arrayToFile: function(lines, file) {
   }
   cos.close();
   stream.close();
-},
+}
 
 /**
  * Writes a string to a file (truncates the file if it exists, creates it if
@@ -152,7 +150,7 @@ arrayToFile: function(lines, file) {
  * @param {string} str
  * @param {nsIFile} file
  */
-stringToFile: function(str, file) {
+export function stringToFile(str, file) {
   const stream = Cc["@mozilla.org/network/file-output-stream;1"]
       .createInstance(Ci.nsIFileOutputStream);
   // write, create, append on write, truncate
@@ -164,7 +162,7 @@ stringToFile: function(str, file) {
   cos.writeString(str);
   cos.close();
   stream.close();
-},
+}
 
 /**
  * Returns a file object for a path relative to the user's "requestpolicy"
@@ -177,7 +175,7 @@ stringToFile: function(str, file) {
  * @param {string?} subdir3
  * @return {nsIFile}
  */
-getRPUserDir: function(subdir1, subdir2, subdir3) {
+export function getRPUserDir(subdir1, subdir2, subdir3) {
   const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
   const file = profileDir.clone();
   file.appendRelativePath(REQUESTPOLICY_DIR);
@@ -207,5 +205,4 @@ getRPUserDir: function(subdir1, subdir2, subdir3) {
   }
 
   return file;
-},
-};
+}

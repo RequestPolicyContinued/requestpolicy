@@ -23,7 +23,7 @@
 
 import {Log} from "content/models/log";
 import {RawRuleset} from "content/lib/ruleset";
-import {FileUtil} from "content/lib/utils/file-utils";
+import * as FileUtils from "content/lib/utils/file-utils";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {MainEnvironment} from "content/lib/environment";
 
@@ -92,11 +92,11 @@ function dprint(msg) {
  * subscriptions.
  */
 export function UserSubscriptions() {
-  const userSubsFile = FileUtil.getRPUserDir();
+  const userSubsFile = FileUtils.getRPUserDir();
   userSubsFile.appendRelativePath("subscriptions.json");
   let jsonData = "{}";
   if (userSubsFile.exists()) {
-    jsonData = FileUtil.fileToString(userSubsFile);
+    jsonData = FileUtils.fileToString(userSubsFile);
   }
   this._data = JSON.parse(jsonData);
   if (!this._data.lists) {
@@ -122,9 +122,9 @@ UserSubscriptions.prototype = {
   },
 
   save: function() {
-    const userSubsFile = FileUtil.getRPUserDir();
+    const userSubsFile = FileUtils.getRPUserDir();
     userSubsFile.appendRelativePath("subscriptions.json");
-    FileUtil.stringToFile(JSON.stringify(this._data), userSubsFile);
+    FileUtils.stringToFile(JSON.stringify(this._data), userSubsFile);
   },
 
   getSubscriptionInfo: function() {

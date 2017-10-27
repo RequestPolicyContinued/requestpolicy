@@ -22,8 +22,8 @@
  */
 
 import {PolicyManager} from "content/lib/policy-manager";
-import {StringUtils} from "content/lib/utils/string-utils";
-import {DOMUtils} from "content/lib/utils/dom-utils";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as DOMUtils from "content/lib/utils/dom-utils";
 
 export function loadClassicmenuIntoWindow(window) {
   let self = {};

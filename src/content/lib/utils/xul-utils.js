@@ -20,17 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {StringUtils} from "content/lib/utils/string-utils";
-import {JSUtils} from "content/lib/utils/js-utils";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as JSUtils from "content/lib/utils/js-utils";
 import {C} from "content/data/constants";
 
 // =============================================================================
 // XULUtils
 // =============================================================================
 
-export const XULUtils = {};
-
-const xulTrees = XULUtils.xulTrees = {};
+export const xulTrees = {};
 
 /**
  * IIFE: Import the XUL trees and ensure their integrity.
@@ -276,11 +274,11 @@ function recursivelyAddXULElements(aDocument, aElementSpecList,
   }
 }
 
-XULUtils.addTreeElementsToWindow = function(aWin, aTreeName) {
+export function addTreeElementsToWindow(aWin, aTreeName) {
   if (xulTrees.hasOwnProperty(aTreeName)) {
     recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
-};
+}
 
 /**
  * Return a list of the IDs of the specified tree's root elements.
@@ -295,7 +293,7 @@ function getRootElementIDs(aTreeName) {
   return ids;
 }
 
-XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
+export function removeTreeElementsFromWindow(aWin, aTreeName) {
   if (!xulTrees.hasOwnProperty(aTreeName)) {
     console.error("There's no tree with name '" + aTreeName + "'.");
     return;
@@ -321,9 +319,9 @@ XULUtils.removeTreeElementsFromWindow = function(aWin, aTreeName) {
       node.parentNode.removeChild(node);
     }
   }
-};
+}
 
-XULUtils.keyboardShortcuts = (function() {
+export const keyboardShortcuts = (function() {
   let self = {};
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Attribute/modifiers

@@ -21,20 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// =============================================================================
-// DOMUtils
-// =============================================================================
-
-export const DOMUtils = (function() {
-  let self = {};
-
 /**
  * Function that takes a DOM Element or an Array of DOM elements and removes
  * all their children.
  *
  * @param {(Element|Array<Element>)} aElements
  */
-self.removeChildren = function(aElements) {
+export function removeChildren(aElements) {
   // If aElements is not an Array, put the element in an Array.
   let elements = Array.isArray(aElements) ? aElements : [aElements];
   // Note on `isArray` (above):
@@ -46,7 +39,7 @@ self.removeChildren = function(aElements) {
       el.removeChild(el.firstChild);
     }
   }
-};
+}
 
 function isThisElementVisible(aElement) {
   if (!aElement || !aElement.getClientRects) {
@@ -66,13 +59,10 @@ function isThisElementVisible(aElement) {
  * @param  {Element} aElement
  * @return {boolean}
  */
-self.isElementVisible = function(aElement) {
+export function isElementVisible(aElement) {
   if (!isThisElementVisible(aElement)) {
     return false;
   }
   let parent = aElement.parentElement;
-  return parent !== null ? self.isElementVisible(parent) : true;
-};
-
-  return self;
-})();
+  return parent !== null ? isElementVisible(parent) : true;
+}

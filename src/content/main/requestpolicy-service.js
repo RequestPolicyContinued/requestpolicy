@@ -28,7 +28,7 @@ import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {C} from "content/data/constants";
-import {WindowUtils} from "content/lib/utils/window-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
 import {Info} from "content/lib/info";
 
 const {AMO} = C;

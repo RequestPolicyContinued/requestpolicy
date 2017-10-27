@@ -21,16 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {JSUtils} from "content/lib/utils/js-utils";
+import * as JSUtils from "content/lib/utils/js-utils";
 
-// =============================================================================
-// StringUtils
-// =============================================================================
+const lazy = {};
 
-export const StringUtils = (function() {
-  let self = {};
-
-JSUtils.defineLazyGetter(self, "strbundle", function() {
+JSUtils.defineLazyGetter(lazy, "strbundle", function() {
   return loadPropertiesFile(
       "chrome://rpcontinued/locale/requestpolicy.properties");
 });
@@ -53,15 +48,12 @@ function loadPropertiesFile(path) {
   return Services.strings.createBundle(path + "?" + Math.random());
 }
 
-self.$str = function(aName, aParams) {
+export function $str(aName, aParams) {
   if (aParams) {
-    return self.strbundle.formatStringFromName(aName, aParams,
+    return lazy.strbundle.formatStringFromName(aName, aParams,
                                                 aParams.length);
   } else {
     // eslint-disable-next-line new-cap
-    return self.strbundle.GetStringFromName(aName);
+    return lazy.strbundle.GetStringFromName(aName);
   }
-};
-
-  return self;
-})();
+}

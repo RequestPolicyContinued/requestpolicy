@@ -21,7 +21,7 @@
  */
 
 import {Log} from "content/models/log";
-import {WindowUtils} from "content/lib/utils/window-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
 
 // =============================================================================
 // HttpChannelWrapper

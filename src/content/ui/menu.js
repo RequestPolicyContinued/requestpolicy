@@ -30,9 +30,9 @@ import {DomainUtil} from "content/lib/utils/domain-utils";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";
-import {StringUtils} from "content/lib/utils/string-utils";
-import {DOMUtils} from "content/lib/utils/dom-utils";
-import {WindowUtils} from "content/lib/utils/window-utils";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as DOMUtils from "content/lib/utils/dom-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
 import {C} from "content/data/constants";
 
 export function loadMenuIntoWindow(window) {

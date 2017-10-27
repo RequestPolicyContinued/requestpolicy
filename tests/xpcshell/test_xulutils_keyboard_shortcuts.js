@@ -1,5 +1,5 @@
 /* exported run_test */
-Cu.import("chrome://rpcontinued/content/lib/utils/xul.jsm");
+Cu.import("chrome://rpcontinued/content/lib/utils/xul.jsm-utils");
 
 function run_test() {
   "use strict";

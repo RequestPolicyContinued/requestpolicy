@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {JSUtils} from "content/lib/utils/javascript";
+import {JSUtils} from "content/lib/utils/js-utils";
 
 // =============================================================================
 // StringUtils

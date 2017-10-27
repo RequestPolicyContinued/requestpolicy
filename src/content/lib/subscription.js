@@ -23,7 +23,7 @@
 
 import {Log} from "content/models/log";
 import {RawRuleset} from "content/lib/ruleset";
-import {FileUtil} from "content/lib/utils/files";
+import {FileUtil} from "content/lib/utils/file-utils";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {MainEnvironment} from "content/lib/environment";
 

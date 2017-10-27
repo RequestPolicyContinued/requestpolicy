@@ -29,12 +29,12 @@ import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domains";
-import {StringUtils} from "content/lib/utils/strings";
-import {WindowUtils} from "content/lib/utils/windows";
-import {JSUtils} from "content/lib/utils/javascript";
+import {DomainUtil} from "content/lib/utils/domain-utils";
+import {StringUtils} from "content/lib/utils/string-utils";
+import {WindowUtils} from "content/lib/utils/window-utils";
+import {JSUtils} from "content/lib/utils/js-utils";
 import * as Utils from "content/lib/utils/misc-utils";
-import {DOMUtils} from "content/lib/utils/dom";
+import {DOMUtils} from "content/lib/utils/dom-utils";
 import {C} from "content/data/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";
 

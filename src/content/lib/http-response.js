@@ -22,8 +22,8 @@
  */
 
 import {Log} from "content/models/log";
-import {DomainUtil} from "content/lib/utils/domains";
-import {WindowUtils} from "content/lib/utils/windows";
+import {DomainUtil} from "content/lib/utils/domain-utils";
+import {WindowUtils} from "content/lib/utils/window-utils";
 import {Storage} from "content/models/storage";
 
 // =============================================================================

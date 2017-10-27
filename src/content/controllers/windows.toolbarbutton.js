@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XULUtils} from "content/lib/utils/xul";
+import {XULUtils} from "content/lib/utils/xul-utils";
 import {Info} from "content/lib/info";
 import {Log} from "content/models/log";
 

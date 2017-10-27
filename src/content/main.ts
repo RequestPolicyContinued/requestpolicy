@@ -56,10 +56,10 @@ import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
 } from "content/lib/subscription";
-import {DomainUtil} from "content/lib/utils/domains";
-import {RuleUtils} from "content/lib/utils/rules";
-import {StringUtils} from "content/lib/utils/strings";
-import {WindowUtils} from "content/lib/utils/windows";
+import {DomainUtil} from "content/lib/utils/domain-utils";
+import {RuleUtils} from "content/lib/utils/rule-utils";
+import {StringUtils} from "content/lib/utils/string-utils";
+import {WindowUtils} from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";

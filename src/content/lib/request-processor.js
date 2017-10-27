@@ -24,7 +24,7 @@
 import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domains";
+import {DomainUtil} from "content/lib/utils/domain-utils";
 import {Request} from "content/lib/request";
 import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,

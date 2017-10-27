@@ -22,7 +22,7 @@
  */
 
 import {RawRuleset} from "content/lib/ruleset";
-import {FileUtil} from "content/lib/utils/files";
+import {FileUtil} from "content/lib/utils/file-utils";
 
 // =============================================================================
 // RulesetStorage

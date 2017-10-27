@@ -26,13 +26,13 @@ import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domains";
+import {DomainUtil} from "content/lib/utils/domain-utils";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";
-import {StringUtils} from "content/lib/utils/strings";
-import {DOMUtils} from "content/lib/utils/dom";
-import {WindowUtils} from "content/lib/utils/windows";
+import {StringUtils} from "content/lib/utils/string-utils";
+import {DOMUtils} from "content/lib/utils/dom-utils";
+import {WindowUtils} from "content/lib/utils/window-utils";
 import {C} from "content/data/constants";
 
 export function loadMenuIntoWindow(window) {

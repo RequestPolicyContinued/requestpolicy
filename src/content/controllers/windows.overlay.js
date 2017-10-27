@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XULUtils} from "content/lib/utils/xul";
+import {XULUtils} from "content/lib/utils/xul-utils";
 import {loadOverlayIntoWindow} from "content/ui/overlay.js";
 import {loadMenuIntoWindow} from "content/ui/menu.js";
 import {loadClassicmenuIntoWindow} from "content/ui/classicmenu.js";

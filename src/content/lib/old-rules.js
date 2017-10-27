@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {DomainUtil} from "content/lib/utils/domains";
+import {DomainUtil} from "content/lib/utils/domain-utils";
 
 // =============================================================================
 // OldRules

@@ -22,7 +22,7 @@
  */
 
 import {Log} from "content/models/log";
-import {DomainUtil} from "content/lib/utils/domains";
+import {DomainUtil} from "content/lib/utils/domain-utils";
 import {RequestResult} from "content/lib/request-result";
 
 // =============================================================================

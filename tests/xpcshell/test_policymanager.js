@@ -1,5 +1,5 @@
 /* exported run_test */
-Components.utils.import("chrome://rpcontinued/content/lib/utils/domains.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/domains.jsm-utils");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/policy-manager.jsm");
 

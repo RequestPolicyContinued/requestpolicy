@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {StringUtils} from "content/lib/utils/strings";
-import {JSUtils} from "content/lib/utils/javascript";
+import {StringUtils} from "content/lib/utils/string-utils";
+import {JSUtils} from "content/lib/utils/js-utils";
 import {C} from "content/data/constants";
 
 // =============================================================================

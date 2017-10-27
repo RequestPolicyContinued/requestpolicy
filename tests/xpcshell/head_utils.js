@@ -3,7 +3,7 @@
     deleteFileFromProfile,
 */
 
-Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm");
+Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm-utils");
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {

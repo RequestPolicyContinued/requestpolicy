@@ -22,7 +22,7 @@
  */
 
 import {Log} from "content/models/log";
-import {DomainUtil} from "content/lib/utils/domains";
+import {DomainUtil} from "content/lib/utils/domain-utils";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {C} from "content/data/constants";
 

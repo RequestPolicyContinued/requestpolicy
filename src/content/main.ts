@@ -62,7 +62,7 @@ import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
-import {Storage} from "content/models/storage-model";
+import {Storage} from "content/models/storage";
 
 // @if BUILD_ALIAS='ui-testing'
 import "content/ui-testing/services";

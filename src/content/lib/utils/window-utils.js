@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Storage} from "content/models/storage-model";
+import {Storage} from "content/models/storage";
 
 let {PrivateBrowsingUtils} = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {});

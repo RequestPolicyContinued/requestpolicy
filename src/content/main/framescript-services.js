@@ -22,7 +22,7 @@
 
 import {RequestProcessor} from "content/lib/request-processor";
 import {DomainUtil} from "content/lib/utils/domain-utils";
-import {Storage} from "content/models/storage-model";
+import {Storage} from "content/models/storage";
 
 const initFunctions = [];
 

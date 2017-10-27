@@ -2,7 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2008 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +22,10 @@
  */
 
 // =============================================================================
-// Storage
+// Storage class
 // =============================================================================
 
-export function Storage({cachedKeys, boolAliases}) {
+export function StorageClass({cachedKeys, boolAliases}) {
   this._cachedKeys = Object.freeze(cachedKeys);
   this._cachedKeysSet = Object.freeze(new Set(cachedKeys));
 
@@ -34,11 +35,11 @@ export function Storage({cachedKeys, boolAliases}) {
   });
 }
 
-Storage.prototype.isKeyCached = function(aKey) {
+StorageClass.prototype.isKeyCached = function(aKey) {
   return this._cachedKeysSet.has(aKey);
 };
 
-Storage.prototype.get = function(aKeys) {
+StorageClass.prototype.get = function(aKeys) {
   if (typeof aKeys === "string") {
     let key = aKeys;
     if (!this.isKeyCached(key)) {
@@ -56,7 +57,7 @@ Storage.prototype.get = function(aKeys) {
   return this.get(this._cachedKeys);
 };
 
-Storage.prototype.set = function(aKeys) {
+StorageClass.prototype.set = function(aKeys) {
   try {
     Object.keys(aKeys).forEach(key => {
       LegacyApi.prefs.set(key, aKeys[key]);
@@ -70,3 +71,49 @@ Storage.prototype.set = function(aKeys) {
     return Promise.reject(error);
   }
 };
+
+// =============================================================================
+// Storage
+// =============================================================================
+
+export const Storage = new StorageClass({
+  cachedKeys: [
+    "autoReload",
+    "confirmSiteInfo",
+    "contextMenu",
+    "defaultPolicy.allow",
+    "defaultPolicy.allowSameDomain",
+    "defaultPolicy.allowTopLevel",
+    "indicateBlacklistedObjects",
+    "indicateBlockedObjects",
+    "keyboardShortcuts.openMenu.enabled",
+    "keyboardShortcuts.openMenu.combo",
+    "keyboardShortcuts.openRequestLog.enabled",
+    "keyboardShortcuts.openRequestLog.combo",
+    "lastAppVersion",
+    "lastVersion",
+    "log",
+    "log.level",
+    "menu.info.showNumRequests",
+    "menu.sorting",
+    "prefetch.dns.disableOnStartup",
+    "prefetch.dns.restoreDefaultOnUninstall",
+    "prefetch.link.disableOnStartup",
+    "prefetch.link.restoreDefaultOnUninstall",
+    "prefetch.preconnections.disableOnStartup",
+    "prefetch.preconnections.restoreDefaultOnUninstall",
+    "privateBrowsingPermanentWhitelisting",
+    "startWithAllowAllEnabled",
+    "welcomeWindowShown",
+    // @if BUILD_ALIAS='ui-testing'
+    "unitTesting.consoleErrors.counter",
+    "unitTesting.loggingErrors.counter",
+    // @endif
+  ],
+  boolAliases: [
+    ["defaultPolicy.allow", "DefaultAllow"],
+    ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
+    ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
+    ["startWithAllowAllEnabled", "BlockingDisabled"],
+  ],
+});

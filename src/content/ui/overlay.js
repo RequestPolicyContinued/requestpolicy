@@ -26,7 +26,7 @@ import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
 import {Log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {Storage} from "content/models/storage-model";
+import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domain-utils";

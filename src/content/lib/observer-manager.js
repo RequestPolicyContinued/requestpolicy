@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {SingleTopicObserver} from "content/lib/utils/observers";
+import {SingleTopicObserver} from "content/lib/classes/observer";
 import {Environment} from "content/lib/environment";
 import {Log} from "content/models/log";
 

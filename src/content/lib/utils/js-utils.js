@@ -27,53 +27,53 @@
 export const JSUtils = (function() {
   let self = {};
 
-  self.arrayIncludes = function(array, searchElement) {
-    for (let element of array) {
-      if (element === searchElement) {
-        return true;
-      }
+self.arrayIncludes = function(array, searchElement) {
+  for (let element of array) {
+    if (element === searchElement) {
+      return true;
     }
-    return false;
-  };
+  }
+  return false;
+};
 
-  self.defineLazyGetter = function(aOnObj, aKey, aValueFn) {
-    Object.defineProperty(aOnObj, aKey, {
-      get: function() {
-        delete aOnObj[aKey];
-        let value = aValueFn.call(aOnObj);
-        Object.defineProperty(aOnObj, aKey, {
-          value,
-          writable: true,
-          configurable: true,
-          enumerable: true,
-        });
-        return value;
-      },
-      configurable: true,
-      enumerable: true,
-    });
-  };
+self.defineLazyGetter = function(aOnObj, aKey, aValueFn) {
+  Object.defineProperty(aOnObj, aKey, {
+    get: function() {
+      delete aOnObj[aKey];
+      let value = aValueFn.call(aOnObj);
+      Object.defineProperty(aOnObj, aKey, {
+        value,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+      return value;
+    },
+    configurable: true,
+    enumerable: true,
+  });
+};
 
-  self.leftRotateArray = function(array, n) {
-    n = n % array.length;
-    let firstPart = array.slice(0, n);
-    let secondPart = array.slice(n);
-    return [].concat(secondPart, firstPart);
-  };
+self.leftRotateArray = function(array, n) {
+  n = n % array.length;
+  let firstPart = array.slice(0, n);
+  let secondPart = array.slice(n);
+  return [].concat(secondPart, firstPart);
+};
 
-  /**
-   * Create an array containing the elements [0, ..., n-1].
-   *
-   * @param {number} n
-   * @return {Array<number>}
-   */
-  self.range = function(n) {
-    let array = [];
-    for (let i = 0; i < n; i++) {
-      array.push(i);
-    }
-    return array;
-  };
+/**
+ * Create an array containing the elements [0, ..., n-1].
+ *
+ * @param {number} n
+ * @return {Array<number>}
+ */
+self.range = function(n) {
+  let array = [];
+  for (let i = 0; i < n; i++) {
+    array.push(i);
+  }
+  return array;
+};
 
   return self;
 })();

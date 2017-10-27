@@ -33,103 +33,103 @@ let {PrivateBrowsingUtils} = Cu.import(
 export const WindowUtils = (function() {
   let self = {};
 
-  self.getMostRecentWindow = function(aWindowType = null) {
-    return Services.wm.getMostRecentWindow(aWindowType);
-  };
+self.getMostRecentWindow = function(aWindowType = null) {
+  return Services.wm.getMostRecentWindow(aWindowType);
+};
 
-  self.getMostRecentBrowserWindow = self.getMostRecentWindow.
-                                    bind(self, "navigator:browser");
+self.getMostRecentBrowserWindow = self.getMostRecentWindow.
+                                  bind(self, "navigator:browser");
 
-  self.getChromeWindow = function(aContentWindow) {
-    /* eslint-disable new-cap */
-    return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
-                             .getInterface(Ci.nsIWebNavigation)
-                             .QueryInterface(Ci.nsIDocShellTreeItem)
-                             .rootTreeItem
-                             .QueryInterface(Ci.nsIInterfaceRequestor)
-                             .getInterface(Ci.nsIDOMWindow);
-    /* eslint-enable new-cap */
-  };
+self.getChromeWindow = function(aContentWindow) {
+  /* eslint-disable new-cap */
+  return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
+                            .getInterface(Ci.nsIWebNavigation)
+                            .QueryInterface(Ci.nsIDocShellTreeItem)
+                            .rootTreeItem
+                            .QueryInterface(Ci.nsIInterfaceRequestor)
+                            .getInterface(Ci.nsIDOMWindow);
+  /* eslint-enable new-cap */
+};
 
-  self.getBrowserForWindow = function(aContentWindow) {
-    let win = self.getChromeWindow(aContentWindow);
-    let tabs = self.getTabsForWindow(win);
-    for (let tab of tabs) {
-      if (tab.linkedBrowser.contentWindow === aContentWindow.top) {
-        return tab.linkedBrowser;
-      }
+self.getBrowserForWindow = function(aContentWindow) {
+  let win = self.getChromeWindow(aContentWindow);
+  let tabs = self.getTabsForWindow(win);
+  for (let tab of tabs) {
+    if (tab.linkedBrowser.contentWindow === aContentWindow.top) {
+      return tab.linkedBrowser;
     }
-    return null;
+  }
+  return null;
+};
+
+self.getChromeWindowForDocShell = function(aDocShell) {
+  /* eslint-disable new-cap */
+  return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
+                  .rootTreeItem
+                  .QueryInterface(Ci.nsIInterfaceRequestor)
+                  .getInterface(Ci.nsIDOMWindow);
+  /* eslint-enable new-cap */
+};
+
+self.getTabBrowser = function(aChromeWindow) {
+  // bug 1009938 - may be null in SeaMonkey
+  return aChromeWindow.gBrowser || aChromeWindow.getBrowser();
+};
+
+self.getTabsForWindow = function(aChromeWindow) {
+  return self.getTabBrowser(aChromeWindow).tabContainer.children;
+};
+
+//
+// Private Browsing
+//
+
+self.isWindowPrivate = function(aWindow) {
+  return PrivateBrowsingUtils.isWindowPrivate(aWindow);
+};
+
+/**
+ * Should it be possible to add permanent rules in that window?
+ *
+ * @param {Window} aWindow
+ * @return {boolean}
+ */
+self.mayPermanentRulesBeAdded = function(aWindow) {
+  return self.isWindowPrivate(aWindow) === false ||
+      Storage.get("privateBrowsingPermanentWhitelisting");
+};
+
+//
+// Window & DOM utilities
+//
+
+/**
+ * Wait for a window to be loaded and then add a list of Elements „by ID“ to
+ * a scope. The scope is optional, but in any case will be returned.
+ *
+ * @param {Window} aWindow
+ * @param {Array<string>} aElementIDs
+ * @param {Object?} aScope
+ * @param {function?} aCallback
+ * @return {Object} the scope of the elements
+ */
+self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
+                                      aCallback) {
+  let scope = aScope || {};
+  let document = aWindow.document;
+  let callback = function() {
+    aWindow.removeEventListener("load", callback);
+
+    for (let elementName in aElementIDs) {
+      scope[elementName] = document.getElementById(aElementIDs[elementName]);
+    }
+    if (aCallback) {
+      aCallback();
+    }
   };
-
-  self.getChromeWindowForDocShell = function(aDocShell) {
-    /* eslint-disable new-cap */
-    return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
-                    .rootTreeItem
-                    .QueryInterface(Ci.nsIInterfaceRequestor)
-                    .getInterface(Ci.nsIDOMWindow);
-    /* eslint-enable new-cap */
-  };
-
-  self.getTabBrowser = function(aChromeWindow) {
-    // bug 1009938 - may be null in SeaMonkey
-    return aChromeWindow.gBrowser || aChromeWindow.getBrowser();
-  };
-
-  self.getTabsForWindow = function(aChromeWindow) {
-    return self.getTabBrowser(aChromeWindow).tabContainer.children;
-  };
-
-  //
-  // Private Browsing
-  //
-
-  self.isWindowPrivate = function(aWindow) {
-    return PrivateBrowsingUtils.isWindowPrivate(aWindow);
-  };
-
-  /**
-   * Should it be possible to add permanent rules in that window?
-   *
-   * @param {Window} aWindow
-   * @return {boolean}
-   */
-  self.mayPermanentRulesBeAdded = function(aWindow) {
-    return self.isWindowPrivate(aWindow) === false ||
-        Storage.get("privateBrowsingPermanentWhitelisting");
-  };
-
-  //
-  // Window & DOM utilities
-  //
-
-  /**
-   * Wait for a window to be loaded and then add a list of Elements „by ID“ to
-   * a scope. The scope is optional, but in any case will be returned.
-   *
-   * @param {Window} aWindow
-   * @param {Array<string>} aElementIDs
-   * @param {Object?} aScope
-   * @param {function?} aCallback
-   * @return {Object} the scope of the elements
-   */
-  self.getElementsByIdOnLoad = function(aWindow, aElementIDs, aScope,
-                                        aCallback) {
-    let scope = aScope || {};
-    let document = aWindow.document;
-    let callback = function() {
-      aWindow.removeEventListener("load", callback);
-
-      for (let elementName in aElementIDs) {
-        scope[elementName] = document.getElementById(aElementIDs[elementName]);
-      }
-      if (aCallback) {
-        aCallback();
-      }
-    };
-    aWindow.addEventListener("load", callback);
-    return scope;
-  };
+  aWindow.addEventListener("load", callback);
+  return scope;
+};
 
   return self;
 })();

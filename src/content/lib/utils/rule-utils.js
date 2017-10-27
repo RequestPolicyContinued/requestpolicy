@@ -28,51 +28,51 @@
 export const RuleUtils = (function() {
   let self = {};
 
-  /**
-   * Get a string representation of an endpoint (origin or dest) specification.
-   *
-   * Example cases can be found in the unit test corresponding
-   * to this function.
-   *
-   * @param {Object} aEndpointSpec
-   * @return {string}
-   */
-  self.endpointSpecToDisplayString = function(aEndpointSpec) {
-    if (aEndpointSpec.port !== undefined &&
-        (aEndpointSpec.h === null || aEndpointSpec.h === "")) {
-      return "[invalid endpoint specification]";
-    }
-    let scheme = aEndpointSpec.s ? String(aEndpointSpec.s) : "*";
-    if (aEndpointSpec.port === undefined) {
-      // Special cases.
-      switch (aEndpointSpec.h) {
-        case undefined:
-          if (aEndpointSpec.s === undefined) {
-            return "";
-          }
-          return scheme + ":<path> (host optional)";
+/**
+ * Get a string representation of an endpoint (origin or dest) specification.
+ *
+ * Example cases can be found in the unit test corresponding
+ * to this function.
+ *
+ * @param {Object} aEndpointSpec
+ * @return {string}
+ */
+self.endpointSpecToDisplayString = function(aEndpointSpec) {
+  if (aEndpointSpec.port !== undefined &&
+      (aEndpointSpec.h === null || aEndpointSpec.h === "")) {
+    return "[invalid endpoint specification]";
+  }
+  let scheme = aEndpointSpec.s ? String(aEndpointSpec.s) : "*";
+  if (aEndpointSpec.port === undefined) {
+    // Special cases.
+    switch (aEndpointSpec.h) {
+      case undefined:
+        if (aEndpointSpec.s === undefined) {
+          return "";
+        }
+        return scheme + ":<path> (host optional)";
 
-        case null:
-          return scheme + ":<path> (no host)";
+      case null:
+        return scheme + ":<path> (no host)";
 
-        case "":
-          return scheme + "://<path> (empty host)";
+      case "":
+        return scheme + "://<path> (empty host)";
 
-        default:
-          break;
-      }
+      default:
+        break;
     }
-    let str = "";
-    if (scheme !== "*" || aEndpointSpec.port) {
-      str += scheme + "://";
-    }
-    str += aEndpointSpec.h || "*";
-    if (aEndpointSpec.port) {
-      str += ":" + aEndpointSpec.port;
-    }
-    // TODO: path
-    return str;
-  };
+  }
+  let str = "";
+  if (scheme !== "*" || aEndpointSpec.port) {
+    str += scheme + "://";
+  }
+  str += aEndpointSpec.h || "*";
+  if (aEndpointSpec.port) {
+    str += ":" + aEndpointSpec.port;
+  }
+  // TODO: path
+  return str;
+};
 
   return self;
 })();

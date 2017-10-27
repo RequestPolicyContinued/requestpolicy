@@ -21,7 +21,7 @@
  */
 
 import {XULUtils} from "content/lib/utils/xul";
-import {Info} from "content/lib/utils/info";
+import {Info} from "content/lib/info";
 import {Log} from "content/models/log";
 
 let CustomizableUI = null;

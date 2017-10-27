@@ -29,7 +29,7 @@ import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {C} from "content/data/constants";
 import {WindowUtils} from "content/lib/utils/windows";
-import {Info} from "content/lib/utils/info";
+import {Info} from "content/lib/info";
 
 const {AMO} = C;
 

@@ -22,7 +22,7 @@
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
-import {Info} from "content/lib/utils/info";
+import {Info} from "content/lib/info";
 
 // =============================================================================
 // utilities, constants

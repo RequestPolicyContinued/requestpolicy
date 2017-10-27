@@ -21,7 +21,7 @@
  */
 
 import {Log} from "content/models/log";
-import {Info} from "content/lib/utils/info";
+import {Info} from "content/lib/info";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
 

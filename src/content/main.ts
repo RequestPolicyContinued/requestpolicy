@@ -47,6 +47,7 @@ import "content/main/window-manager";
 import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {OldRulesController} from "content/controllers/old-rules";
 
+import {Info} from "content/lib/info";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -56,7 +57,6 @@ import {
   SUBSCRIPTION_REMOVED_TOPIC,
 } from "content/lib/subscription";
 import {DomainUtil} from "content/lib/utils/domains";
-import {Info} from "content/lib/utils/info";
 import {RuleUtils} from "content/lib/utils/rules";
 import {StringUtils} from "content/lib/utils/strings";
 import {WindowUtils} from "content/lib/utils/windows";

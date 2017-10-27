@@ -20,11 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as Utils from "bootstrap/lib/utils/webext-utils";
 import {Bootstrap} from "bootstrap/models/bootstrap";
 import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
+import {Event} from "content/lib/classes/event";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -161,8 +161,11 @@ export const ContentScriptsApi = {
     "onUninstalled",
   ]);
 
-  const managementListeners = Utils.
-      createWebextOnEventApi(Api.browser.management, MANAGEMENT_EVENTS);
+  const managementEvents = {};
+  Event.createMultiple(MANAGEMENT_EVENTS, {
+    assignEventsTo: managementEvents,
+    assignEventTargetsTo: Api.browser.management,
+  });
 
   function mapAddonListenerCallbackToManagementEventName(aCallbackName) {
     switch (aCallbackName) {
@@ -179,9 +182,7 @@ export const ContentScriptsApi = {
     let webextEventName =
         mapAddonListenerCallbackToManagementEventName(aALCallbackName);
     let extensionInfo = mapAddonInfoToWebextExtensionInfo(aAddon);
-    managementListeners[webextEventName].forEach(listener => {
-      listener.call(null, extensionInfo);
-    });
+    managementEvents[webextEventName].emit(extensionInfo);
   }
 
   let addonListener = {};
@@ -286,10 +287,11 @@ export const ContentScriptsApi = {
     return legacyPath;
   };
 
-  const listeners = {
-    backgroundPage: Utils.createWebextOnEventApi(
-        Api.browser.runtime, ["onMessage"]),
-  };
+  const events = {backgroundPage: {}};
+  Event.createMultiple(["onMessage"], {
+    assignEventsTo: events.backgroundPage,
+    assignEventTargetsTo: Api.browser.runtime,
+  });
 
   ContentScriptsApi.browser.runtime.sendMessage = function(aMessage) {
     return genNewPromise((resolve, reject) => {
@@ -297,7 +299,7 @@ export const ContentScriptsApi = {
       const callback = (aResponse) => {
         response = aResponse;
       };
-      for (let listener of listeners.backgroundPage.onMessage) {
+      for (let listener of events.backgroundPage.onMessage) {
         const rv = listener(aMessage, null, callback);
         if (response !== undefined) {
           resolve(response);
@@ -320,8 +322,11 @@ export const ContentScriptsApi = {
     return;
   }
 
-  /* let onStorageChangedListener = */ Utils.
-      createWebextOnEventApi(Api.browser.storage, ["onChanged"]);
+  const events = {};
+  Event.createMultiple(["onChanged"], {
+    assignEventsTo: events,
+    assignEventTargetsTo: Api.browser.storage,
+  });
 
   // ---------------------------------------------------------------------------
   // get(), set()

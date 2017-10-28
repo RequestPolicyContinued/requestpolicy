@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {SingleTopicObserver} from "content/lib/classes/observer";
+import {XPCOMObserver} from "content/lib/classes/observer";
 import {Environment} from "content/lib/environment";
 import {Log} from "content/models/log";
 
@@ -81,7 +81,7 @@ export function ObserverManager(aEnv) {
    */
   ObserverManager.prototype.observeSingleTopic = function(aTopic, aCallback) {
     let self = this;
-    self.observers.push(new SingleTopicObserver(aTopic, aCallback));
+    self.observers.push(new XPCOMObserver(aTopic, aCallback));
   };
 
   /**

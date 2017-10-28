@@ -20,7 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export function arrayIncludes(array, searchElement) {
+export function arrayIncludes<T = any>(array: T[], searchElement: T) {
+  // tslint:disable-next-line prefer-const
   for (let element of array) {
     if (element === searchElement) {
       return true;
@@ -29,16 +30,20 @@ export function arrayIncludes(array, searchElement) {
   return false;
 }
 
-export function defineLazyGetter(aOnObj, aKey, aValueFn) {
+export function defineLazyGetter<V = any>(
+    aOnObj: {[key: string]: any},
+    aKey: string,
+    aValueFn: () => V,
+) {
   Object.defineProperty(aOnObj, aKey, {
-    get: function() {
+    get() {
       delete aOnObj[aKey];
-      let value = aValueFn.call(aOnObj);
+      const value = aValueFn.call(aOnObj);
       Object.defineProperty(aOnObj, aKey, {
-        value,
-        writable: true,
         configurable: true,
         enumerable: true,
+        value,
+        writable: true,
       });
       return value;
     },
@@ -47,11 +52,11 @@ export function defineLazyGetter(aOnObj, aKey, aValueFn) {
   });
 }
 
-export function leftRotateArray(array, n) {
+export function leftRotateArray<T = any>(array: T[], n: number): T[] {
   n = n % array.length;
-  let firstPart = array.slice(0, n);
-  let secondPart = array.slice(n);
-  return [].concat(secondPart, firstPart);
+  const firstPart = array.slice(0, n);
+  const secondPart = array.slice(n);
+  return secondPart.concat(firstPart);
 }
 
 /**
@@ -60,8 +65,8 @@ export function leftRotateArray(array, n) {
  * @param {number} n
  * @return {Array<number>}
  */
-export function range(n) {
-  let array = [];
+export function range(n: number): number[] {
+  const array = [];
   for (let i = 0; i < n; i++) {
     array.push(i);
   }

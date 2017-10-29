@@ -30,6 +30,46 @@ export function arrayIncludes<T = any>(array: T[], searchElement: T) {
   return false;
 }
 
+enum PromiseState {
+  pending = "pending",
+  fulfilled = "fulfilled",
+  rejected = "rejected",
+}
+
+export interface IDeferred<T> {
+  promise: Promise<T>;
+  promiseState: PromiseState;
+  reject: (arg: any) => void;
+  resolve: (arg: any) => void;
+}
+
+/**
+ * Defer some task.
+ */
+export function defer<T = void>(): IDeferred<T> {
+  let promiseState: PromiseState = PromiseState.pending;
+  let rejectFn: (value: T) => void;
+  let resolveFn: (value: T) => void;
+
+  const promise = new Promise<T>((resolve, reject) => {
+    rejectFn = reject;
+    resolveFn = resolve;
+  });
+
+  return {
+    promise,
+    promiseState,
+    reject(arg: T) {
+      promiseState = PromiseState.rejected;
+      rejectFn(arg);
+    },
+    resolve(arg: T) {
+      promiseState = PromiseState.fulfilled;
+      resolveFn(arg);
+    },
+  };
+}
+
 export function defineLazyGetter<V = any>(
     aOnObj: {[key: string]: any},
     aKey: string,
@@ -57,6 +97,26 @@ export function leftRotateArray<T = any>(array: T[], n: number): T[] {
   const firstPart = array.slice(0, n);
   const secondPart = array.slice(n);
   return secondPart.concat(firstPart);
+}
+
+// Object.values() polyfill
+export function objectEntries<T = any>(
+    obj: {[k: string]: T},
+): Array<[string, T]> {
+  const keys = Object.keys(obj);
+  let i = keys.length;
+  const resArray = new Array(i);
+  while (i--) resArray[i] = [keys[i], obj[keys[i]]];
+  return resArray;
+}
+
+// Object.values() polyfill
+export function objectValues(obj: any): any[] {
+  const keys = Object.keys(obj);
+  let i = keys.length;
+  const resArray = new Array(i);
+  while (i--) resArray[i] = keys[i];
+  return resArray;
 }
 
 /**

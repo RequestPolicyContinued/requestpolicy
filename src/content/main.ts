@@ -53,23 +53,6 @@ import {
   OtherRPInstallationsController,
 } from "content/controllers/other-rp-installations-controller";
 
-import {Info} from "content/lib/info";
-import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {OldRules} from "content/lib/old-rules";
-import {PolicyManager} from "content/lib/policy-manager";
-import {RequestProcessor} from "content/lib/request-processor";
-import {
-  SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC,
-} from "content/lib/subscription";
-import {DomainUtil} from "content/lib/utils/domain-utils";
-import * as RuleUtils from "content/lib/utils/rule-utils";
-import * as StringUtils from "content/lib/utils/string-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {rpService} from "content/main/requestpolicy-service";
-import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
-
 // @if BUILD_ALIAS='ui-testing'
 import "content/ui-testing/services";
 // @endif
@@ -84,30 +67,12 @@ allControllers = allControllers.concat(controllersToBeStartedUp);
 
 // =============================================================================
 
-declare const LegacyApi: any;
-declare const _setBackgroundPage:
-    (backgroundPage: {[name: string]: any}) => void;
+import {BackgroundPage} from "content/models/background-page";
 
-_setBackgroundPage({
-  C,
-  DomainUtil,
-  Environment,
-  Info,
-  LegacyApi,
-  Log,
-  MainEnvironment,
-  ManagerForPrefObservers,
-  OldRules,
-  PolicyManager,
-  RequestProcessor,
-  RuleUtils,
-  SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC,
-  Storage,
-  StringUtils,
-  WindowUtils,
-  rpService,
-});
+declare const _setBackgroundPage: (
+  backgroundPage: {[name: string]: any},
+) => void;
+_setBackgroundPage(BackgroundPage);
 
 // =============================================================================
 

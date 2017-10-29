@@ -44,6 +44,9 @@ import "content/main/content-policy";
 import "content/main/requestpolicy-service";
 import "content/main/window-manager";
 
+import {
+  InitialSetupController,
+} from "content/controllers/initial-setup-controller";
 import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {
   NotificationsController,
@@ -60,7 +63,10 @@ import "content/ui-testing/services";
 const controllersToBeStartedUp = [
   KeyboardShortcuts,
   OldRulesController,
+
   OtherRPInstallationsController,
+  InitialSetupController,
+
   NotificationsController,
 ];
 allControllers = allControllers.concat(controllersToBeStartedUp);

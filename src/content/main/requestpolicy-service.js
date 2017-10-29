@@ -22,13 +22,10 @@
  */
 
 import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
 import {Environment, MainEnvironment} from "content/lib/environment";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {Info} from "content/lib/info";
 
 // =============================================================================
 // rpService
@@ -80,38 +77,6 @@ export const rpService = (function() {
     subscriptions.update(updateCompleted, serials);
   }
 
-  // TODO: move to window manager
-  function maybeShowSetupTab() {
-    if (!Storage.get("welcomeWindowShown")) {
-      const url = "about:requestpolicy?setup";
-
-      let win = WindowUtils.getMostRecentBrowserWindow();
-      if (win === null) {
-        return;
-      }
-      let tabbrowser = win.getBrowser();
-      if (typeof tabbrowser.addTab !== "function") {
-        return;
-      }
-
-      if (Info.isRPUpgrade) {
-        // If the use has just upgraded from an 0.x version, set the
-        // default-policy preferences based on the old preferences.
-        Storage.set({"defaultPolicy.allow": false});
-        if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
-          let identLevel = Storage.get("uriIdentificationLevel");
-          Storage.set({
-            "defaultPolicy.allowSameDomain": identLevel === 1,
-          });
-        }
-      }
-
-      tabbrowser.selectedTab = tabbrowser.addTab(url);
-
-      Storage.set({"welcomeWindowShown": true});
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // startup and shutdown functions
   // ---------------------------------------------------------------------------
@@ -122,7 +87,6 @@ export const rpService = (function() {
 
   function registerObservers() {
     MainEnvironment.obMan.observe([
-      "sessionstore-windows-restored",
       SUBSCRIPTION_UPDATED_TOPIC,
       SUBSCRIPTION_ADDED_TOPIC,
       SUBSCRIPTION_REMOVED_TOPIC,
@@ -135,15 +99,6 @@ export const rpService = (function() {
   }
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
                                         registerObservers);
-
-  MainEnvironment.addStartupFunction(
-      Environment.LEVELS.UI,
-      function() {
-        // In case of the app's startup and if they fail now, they
-        // will be successful when they are called by the
-        // "sessionstore-windows-restored" observer.
-        maybeShowSetupTab();
-      });
 
   self.getSubscriptions = function() {
     return subscriptions;
@@ -197,10 +152,6 @@ export const rpService = (function() {
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;
       }
-
-      case "sessionstore-windows-restored":
-        maybeShowSetupTab();
-        break;
 
       // support for old browsers (Firefox <20)
       case "private-browsing":

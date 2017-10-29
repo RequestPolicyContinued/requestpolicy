@@ -25,10 +25,15 @@ import {Event} from "content/lib/classes/event";
 import * as WindowUtils from "content/lib/utils/window-utils";
 
 export enum NotificationID {
+  InitialSetup,
   MultipleRPInstallations,
 }
 
 const URI_MAP = new Map([
+  [
+    NotificationID.InitialSetup,
+    "about:requestpolicy?setup",
+  ],
   [
     NotificationID.MultipleRPInstallations,
     "chrome://rpcontinued/content/multiple-installations.html",
@@ -38,15 +43,18 @@ const URI_MAP = new Map([
 class NotificationsClass extends Set {
   public onAdded: IEventTarget;
   public onDeleted: IEventTarget;
+  public onTabOpened: IEventTarget;
   private events = Event.createMultiple([
     "onAdded",
     "onDeleted",
+    "onTabOpened",
   ]).events;
 
   constructor() {
     super();
     this.onAdded = this.events.onAdded.eventTarget;
     this.onDeleted = this.events.onDeleted.eventTarget;
+    this.onTabOpened = this.events.onTabOpened.eventTarget;
   }
 
   public add(aID: NotificationID): this {
@@ -66,6 +74,7 @@ class NotificationsClass extends Set {
     const win = WindowUtils.getMostRecentBrowserWindow();
     const tabbrowser = win.getBrowser();
     tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID));
+    this.events.onTabOpened.emit(aID);
   }
 }
 

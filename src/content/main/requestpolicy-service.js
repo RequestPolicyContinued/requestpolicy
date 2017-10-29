@@ -27,11 +27,8 @@ import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
 import {Environment, MainEnvironment} from "content/lib/environment";
-import {C} from "content/data/constants";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {Info} from "content/lib/info";
-
-const {AMO} = C;
 
 // =============================================================================
 // rpService
@@ -115,101 +112,6 @@ export const rpService = (function() {
     }
   }
 
-  /**
-   * Module for detecting installations of other RequestPolicy versions,
-   * which have a different extension ID.
-   */
-  const DetectorForOtherInstallations = (function() {
-    const NOTICE_URL = "chrome://rpcontinued/content/" +
-        "multiple-installations.html";
-
-    // The other extension IDs of RequestPolicy.
-    const addonIDs = Object.freeze(new Set([
-      // Detect the "original" add-on (v0.5; released on AMO).
-      "requestpolicy@requestpolicy.com",
-      // Detect "RPC Legacy" (v0.5; AMO version).
-      "rpcontinued@requestpolicy.org",
-      AMO ? // In the AMO version the non-AMO version needs to be detected.
-            "rpcontinued@non-amo.requestpolicy.org" :
-            // In the non-AMO version the AMO version needs to be detected.
-            "rpcontinued@amo.requestpolicy.org",
-    ]));
-
-    function checkAddon(addon) {
-      if (addonIDs.has(addon.id)) {
-        openTab();
-      }
-    }
-
-    MainEnvironment.addStartupFunction(Environment.LEVELS.UI, function() {
-      browser.management.onEnabled.addListener(checkAddon);
-      browser.management.onInstalled.addListener(checkAddon);
-    });
-
-    /**
-     * Open the tab with the 'multiple installations' notice.
-     *
-     * @return {Boolean} whether opening the tab was successful
-     */
-    function openTab() {
-      let win = WindowUtils.getMostRecentBrowserWindow();
-      if (win === null) {
-        return;
-      }
-      let tabbrowser = win.getBrowser();
-      if (typeof tabbrowser.addTab !== "function") {
-        return;
-      }
-
-      tabbrowser.selectedTab = tabbrowser.addTab(NOTICE_URL);
-
-      return true;
-    }
-
-    // On startup, the tab should be opened only once.
-    let initialCheckDone = false;
-
-    function addonListCallback(addons) {
-      const activeAddons = addons.
-          filter(addon => addonIDs.has(addon.id)).
-          filter(addon => addon.enabled);
-      if (activeAddons.length === 0) {
-        // no other RequestPolicy version is active
-        return;
-      }
-
-      if (initialCheckDone === true) {
-        return;
-      }
-
-      const rv = openTab();
-
-      if (rv === true) {
-        initialCheckDone = true;
-      }
-    }
-
-    /**
-     * Check if other RequestPolicy versions (with other extension IDs)
-     * are installed. If so, a tab with a notice will be opened.
-     */
-    function maybeShowMultipleInstallationsWarning() {
-      if (initialCheckDone === true) {
-        return;
-      }
-
-      browser.management.getAll().then(addonListCallback).catch(e => {
-        console.error("Error getting the list of addons! Details:");
-        console.dir(e);
-      });
-    }
-
-    return {
-      maybeShowMultipleInstallationsWarning:
-          maybeShowMultipleInstallationsWarning,
-    };
-  })();
-
   // ---------------------------------------------------------------------------
   // startup and shutdown functions
   // ---------------------------------------------------------------------------
@@ -241,7 +143,6 @@ export const rpService = (function() {
         // will be successful when they are called by the
         // "sessionstore-windows-restored" observer.
         maybeShowSetupTab();
-        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
       });
 
   self.getSubscriptions = function() {
@@ -299,7 +200,6 @@ export const rpService = (function() {
 
       case "sessionstore-windows-restored":
         maybeShowSetupTab();
-        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
         break;
 
       // support for old browsers (Firefox <20)

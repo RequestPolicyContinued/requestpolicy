@@ -62,13 +62,10 @@ class NotificationsClass extends Set {
     return true;
   }
 
-  public open(aID: NotificationID): boolean {
+  public openTab(aID: NotificationID): void {
     const win = WindowUtils.getMostRecentBrowserWindow();
-    if (win === null) return false;
     const tabbrowser = win.getBrowser();
-    if (typeof tabbrowser.addTab !== "function") return false;
     tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID));
-    return true;
   }
 }
 

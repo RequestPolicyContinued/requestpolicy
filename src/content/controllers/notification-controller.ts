@@ -20,36 +20,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export interface IController {
-  startupPrecondition?: Promise<void>;
-  startup?: () => void;
-  shutdown?: () => void;
+import {IController} from "content/lib/classes/controllers";
+import {NotificationID, Notifications} from "content/models/notifications";
+import {pWindowsAvailable} from "content/models/ui-startup";
+
+function showNotification(id: NotificationID) {
+  Notifications.openTab(id);
 }
 
-export class Controllers {
-  private controllers: IController[];
-
-  constructor(aControllers: IController[]) {
-    this.controllers = aControllers;
-  }
-
-  public shutdown() {
-    this.controllers.reverse().forEach((controller) => {
-      if (typeof controller.shutdown === "function") {
-        controller.shutdown();
-      }
-    });
-  }
-
-  public startup() {
-    this.controllers.forEach((controller) => {
-      if (typeof controller.startup === "function") {
-        if (typeof controller.startupPrecondition !== "undefined") {
-          controller.startupPrecondition.then(controller.startup);
-        } else {
-          controller.startup();
-        }
-      }
-    });
-  }
-}
+export const NotificationsController: IController = {
+  startupPrecondition: pWindowsAvailable,
+  startup() {
+    Notifications.forEach(showNotification);
+    Notifications.onAdded.addListener(showNotification);
+  },
+};

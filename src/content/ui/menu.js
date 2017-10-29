@@ -165,7 +165,7 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
-      const disabled = Storage.isBlockingDisabled();
+      const disabled = Storage.alias.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
@@ -421,7 +421,7 @@ export function loadMenuIntoWindow(window) {
     // rule. We won't be able to use just "allow temporarily".
 
     if (!self._currentlySelectedDest) {
-      if (Storage.isDefaultAllow()) {
+      if (Storage.alias.isDefaultAllow()) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemDenyOrigin(lists.addRules, ruleData);
         }
@@ -443,7 +443,7 @@ export function loadMenuIntoWindow(window) {
           "h": self._addWildcard(dest),
         },
       };
-      // if (Storage.isDefaultAllow()) {
+      // if (Storage.alias.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
@@ -492,8 +492,8 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (self._currentlySelectedDest) {
-      if (!Storage.isDefaultAllow() &&
-          !Storage.isDefaultAllowSameDomain()) {
+      if (!Storage.alias.isDefaultAllow() &&
+          !Storage.alias.isDefaultAllowSameDomain()) {
         self._populateDetailsAddSubdomainAllowRules(lists.addRules);
       }
     }
@@ -793,7 +793,10 @@ export function loadMenuIntoWindow(window) {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
-      if (Storage.isDefaultAllow() || Storage.isDefaultAllowSameDomain()) {
+      if (
+          Storage.alias.isDefaultAllow() ||
+          Storage.alias.isDefaultAllowSameDomain()
+      ) {
         if (destBase === self._currentlySelectedOrigin) {
           continue;
         }
@@ -834,8 +837,8 @@ export function loadMenuIntoWindow(window) {
   self._getOtherOriginsAsGUILocations = function() {
     const allRequests = self._allRequestsOnDocument.getAll();
 
-    const allowSameDomain = Storage.isDefaultAllow() ||
-        Storage.isDefaultAllowSameDomain();
+    const allowSameDomain = Storage.alias.isDefaultAllow() ||
+        Storage.alias.isDefaultAllowSameDomain();
 
     const guiOrigins = [];
     for (let originUri in allRequests) {

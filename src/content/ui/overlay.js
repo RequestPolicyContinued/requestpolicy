@@ -305,7 +305,7 @@ export function loadOverlayIntoWindow(window) {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!Storage.isBlockingDisabled() &&
+      if (!Storage.alias.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
@@ -609,7 +609,7 @@ export function loadOverlayIntoWindow(window) {
     const button = $id(toolbarButtonId);
     let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
-      let isPermissive = Storage.isBlockingDisabled();
+      let isPermissive = Storage.alias.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
@@ -967,8 +967,8 @@ export function loadOverlayIntoWindow(window) {
    * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
-    const disabled = !Storage.isBlockingDisabled();
-    Storage.setBlockingDisabled(disabled);
+    const disabled = !Storage.alias.isBlockingDisabled();
+    Storage.alias.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
     $id("rpc-link-enable-blocking").hidden = !disabled;

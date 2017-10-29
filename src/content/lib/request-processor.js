@@ -157,7 +157,7 @@ export let RequestProcessor = (function() {
     logRequests.log("** BLOCKED ** reason: " + reason +
         ". " + request.detailsToString());
 
-    if (Storage.isBlockingDisabled()) {
+    if (Storage.alias.isBlockingDisabled()) {
       return CP_OK;
     }
 
@@ -253,8 +253,8 @@ export let RequestProcessor = (function() {
   internal.checkByDefaultPolicy = function(aRequest) {
     if (
         aRequest.isAllowedByDefault() ||
-        Storage.isDefaultAllow() ||
-        Storage.isDefaultAllowTopLevel() && aRequest.isTopLevel()
+        Storage.alias.isDefaultAllow() ||
+        Storage.alias.isDefaultAllowTopLevel() && aRequest.isTopLevel()
     ) {
       return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
     }
@@ -262,7 +262,7 @@ export let RequestProcessor = (function() {
     let originUri = aRequest.originURI;
     let destUri = aRequest.destURI;
 
-    if (Storage.isDefaultAllowSameDomain()) {
+    if (Storage.alias.isDefaultAllowSameDomain()) {
       const originDomain = DomainUtil.getBaseDomain(originUri);
       const destDomain = DomainUtil.getBaseDomain(destUri);
 
@@ -816,7 +816,7 @@ export let RequestProcessor = (function() {
         }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-        if (Storage.isDefaultAllow()) {
+        if (Storage.alias.isDefaultAllow()) {
           request.requestResult.isAllowed = true;
           return accept("User policy indicates both allow and block. " +
               "Using default allow policy", request);
@@ -864,7 +864,7 @@ export let RequestProcessor = (function() {
         }
         request.requestResult.resultReason =
             REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
-        if (Storage.isDefaultAllow()) {
+        if (Storage.alias.isDefaultAllow()) {
           request.requestResult.isAllowed = true;
           return accept(
               "Subscription rules indicate both allow and block. " +
@@ -945,7 +945,7 @@ export let RequestProcessor = (function() {
     } catch (e) {
       console.error("Fatal Error:");
       console.dir(e);
-      if (Storage.isBlockingDisabled()) {
+      if (Storage.alias.isBlockingDisabled()) {
         Log.warn("Allowing request due to internal error.");
         return CP_OK;
       }
@@ -1231,7 +1231,7 @@ RequestProcessor = (function(self) {
       if (result.denyRulesExist() && result.allowRulesExist()) {
         let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
         result.isAllowed = conflictCanBeResolved ? shouldAllow :
-                           Storage.isDefaultAllow();
+                           Storage.alias.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {
@@ -1250,7 +1250,7 @@ RequestProcessor = (function(self) {
       if (result.denyRulesExist() && result.allowRulesExist()) {
         let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
         result.isAllowed = conflictCanBeResolved ? shouldAllow :
-                           Storage.isDefaultAllow();
+                           Storage.alias.isDefaultAllow();
         return result;
       }
       if (result.denyRulesExist()) {
@@ -1386,7 +1386,7 @@ RequestProcessor = (function(self) {
 
     // The header isn't allowed, so remove it.
     try {
-      if (Storage.isBlockingDisabled()) {
+      if (Storage.alias.isBlockingDisabled()) {
         return CP_OK;
       }
 
@@ -1441,7 +1441,7 @@ RequestProcessor = (function(self) {
     } catch (e) {
       console.error("Fatal Error:");
       console.dir(e);
-      if (Storage.isBlockingDisabled()) {
+      if (Storage.alias.isBlockingDisabled()) {
         Log.warn("Allowing request due to internal error.");
         return CP_OK;
       }

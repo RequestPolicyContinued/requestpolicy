@@ -107,7 +107,7 @@ Object.defineProperty(HttpResponse.prototype, "rawDestString", {
           } catch (e) {
             Log.warn(
                 "Invalid refresh header: <" + this.redirHeaderValue + ">");
-            if (!Storage.isBlockingDisabled()) {
+            if (!Storage.alias.isBlockingDisabled()) {
               this.removeResponseHeader();
             }
             this._rawDestString = null;

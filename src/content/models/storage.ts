@@ -21,62 +21,90 @@
  * ***** END LICENSE BLOCK *****
  */
 
+declare const LegacyApi: any;
+
 // =============================================================================
 // Storage class
 // =============================================================================
 
-export function StorageClass({cachedKeys, boolAliases}) {
-  this._cachedKeys = Object.freeze(cachedKeys);
-  this._cachedKeysSet = Object.freeze(new Set(cachedKeys));
+export class StorageClass {
+  public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
+  public pReady: Promise<void>;
+  private cachedKeys: string[];
+  private cachedKeysSet: Set<string>;
 
-  boolAliases.forEach(([storageKey, alias]) => {
-    this[`is${alias}`] = () => this.get(storageKey);
-    this[`set${alias}`] = (value) => this.set({[storageKey]: value});
-  });
-}
+  constructor({
+      cachedKeys,
+      boolAliases,
+  }: {
+      cachedKeys: string[],
+      boolAliases: Array<[string, string]>,
+  }) {
+    this.cachedKeys = cachedKeys;
+    this.cachedKeysSet = new Set(cachedKeys);
 
-StorageClass.prototype.isKeyCached = function(aKey) {
-  return this._cachedKeysSet.has(aKey);
-};
-
-StorageClass.prototype.get = function(aKeys) {
-  if (typeof aKeys === "string") {
-    let key = aKeys;
-    if (!this.isKeyCached(key)) {
-      console.error(`Key "${key} is not cached in Storage!`);
-      return;
-    }
-    return LegacyApi.prefs.get(key);
-  }
-  if (!Array.isArray(aKeys)) {
-    return aKeys.reduce((rv, key) => {
-      rv[key] = LegacyApi.prefs.get(key);
-      return rv;
-    }, {});
-  }
-  return this.get(this._cachedKeys);
-};
-
-StorageClass.prototype.set = function(aKeys) {
-  try {
-    Object.keys(aKeys).forEach(key => {
-      LegacyApi.prefs.set(key, aKeys[key]);
+    boolAliases.forEach(([storageKey, alias]) => {
+      this.alias[`is${alias}`] = () => this.get(storageKey);
+      this.alias[`set${alias}`] = (value) => this.set({[storageKey]: value});
     });
-    LegacyApi.prefs.save();
-    return Promise.resolve();
-  } catch (error) {
-    console.error("Error when saving to storage! Details:");
-    console.dir(aKeys);
-    console.dir(error);
-    return Promise.reject(error);
+
+    this.pReady = Promise.resolve();
   }
-};
+
+  public isKeyCached(aKey: string) {
+    return this.cachedKeysSet.has(aKey);
+  }
+
+  public get(aKeys: "" | string | string[] | null | undefined): any {
+    if (aKeys === "") return {};
+    if (aKeys === null || aKeys === undefined) {
+      return this.get(this.cachedKeys);
+    }
+    if (typeof aKeys === "string") {
+      const key = aKeys;
+      if (!this.isKeyCached(key)) {
+        console.error(`Key "${key} is not cached in Storage!`);
+        return;
+      }
+      return LegacyApi.prefs.get(key);
+    }
+    if (Array.isArray(aKeys)) {
+      const result: {[key: string]: any} = {};
+      aKeys.forEach((key) => {
+        result[key] = LegacyApi.prefs.get(key);
+      });
+      return result;
+    }
+    console.error();
+  }
+
+  public set(aKeys: {[key: string]: any}) {
+    try {
+      Object.keys(aKeys).forEach((key) => {
+        LegacyApi.prefs.set(key, aKeys[key]);
+      });
+      LegacyApi.prefs.save();
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error when saving to storage! Details:");
+      console.dir(aKeys);
+      console.dir(error);
+      return Promise.reject(error);
+    }
+  }
+}
 
 // =============================================================================
 // Storage
 // =============================================================================
 
 export const Storage = new StorageClass({
+  boolAliases: [
+    ["defaultPolicy.allow", "DefaultAllow"],
+    ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
+    ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
+    ["startWithAllowAllEnabled", "BlockingDisabled"],
+  ],
   cachedKeys: [
     "autoReload",
     "confirmSiteInfo",
@@ -109,11 +137,5 @@ export const Storage = new StorageClass({
     "unitTesting.consoleErrors.counter",
     "unitTesting.loggingErrors.counter",
     // @endif
-  ],
-  boolAliases: [
-    ["defaultPolicy.allow", "DefaultAllow"],
-    ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
-    ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
-    ["startWithAllowAllEnabled", "BlockingDisabled"],
   ],
 });

@@ -90,11 +90,6 @@ export const rpService = (function() {
       SUBSCRIPTION_UPDATED_TOPIC,
       SUBSCRIPTION_ADDED_TOPIC,
       SUBSCRIPTION_REMOVED_TOPIC,
-
-      // support for old browsers (Firefox <20)
-      // TODO: support per-window temporary rules
-      //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
-      "private-browsing",
     ], self.observe);
   }
   MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
@@ -152,13 +147,6 @@ export const rpService = (function() {
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;
       }
-
-      // support for old browsers (Firefox <20)
-      case "private-browsing":
-        if (data === "exit") {
-          PolicyManager.revokeTemporaryRules();
-        }
-        break;
 
       default:
         console.error("unknown topic observed: " + topic);

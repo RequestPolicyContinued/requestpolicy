@@ -27,6 +27,10 @@ import {RequestResult} from "content/lib/request-result";
 import {Ruleset, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 
+const log = Log.extend({
+  name: "PolicyManager",
+});
+
 // =============================================================================
 // constants
 // =============================================================================
@@ -36,14 +40,6 @@ export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 // =============================================================================
 // utilities
 // =============================================================================
-
-function dprint(msg) {
-  Log.info("[POLICY] " + msg);
-}
-
-function warn(msg) {
-  Log.warn("[POLICY] " + msg);
-}
 
 function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
@@ -81,7 +77,7 @@ export let PolicyManager = (function() {
     let rawRuleset;
     // Read the user rules from a file.
     try {
-      dprint("PolicyManager::loadUserRules loading user rules");
+      log.info("loadUserRules loading user rules");
       rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
       self.userRulesetExistedOnStartup = true;
     } catch (e) {
@@ -112,12 +108,12 @@ export let PolicyManager = (function() {
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
         try {
-          dprint("PolicyManager::loadSubscriptionRules: " +
+          log.info("loadSubscriptionRules: " +
                  listName + " / " + subName);
           rawRuleset = RulesetStorage
               .loadRawRulesetFromFile(subName + ".json", listName);
         } catch (e) {
-          warn("Unable to load ruleset from file: " + e);
+          log.warn("Unable to load ruleset from file: " + e);
           if (!failures[listName]) {
             failures[listName] = {};
           }
@@ -147,7 +143,7 @@ export let PolicyManager = (function() {
 
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
-        dprint("PolicyManager::unloadSubscriptionRules: " +
+        log.info("unloadSubscriptionRules: " +
                  listName + " / " + subName);
         if (!subscriptionRulesets[listName] ||
             !subscriptionRulesets[listName][subName]) {
@@ -194,7 +190,7 @@ export let PolicyManager = (function() {
   };
 
   self.addRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::addRule " + ruleAction + " " +
+    log.info("addRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.user.ruleset.print();
 
@@ -233,7 +229,7 @@ export let PolicyManager = (function() {
   };
 
   self.addTemporaryRule = function(ruleAction, ruleData) {
-    dprint("PolicyManager::addTemporaryRule " + ruleAction + " " +
+    log.info("addTemporaryRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.temp.ruleset.print();
 
@@ -248,7 +244,7 @@ export let PolicyManager = (function() {
   };
 
   self.removeRule = function(ruleAction, ruleData, noStore) {
-    dprint("PolicyManager::removeRule " + ruleAction + " " +
+    log.info("removeRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.user.ruleset.print();
     // userRulesets.temp.ruleset.print();

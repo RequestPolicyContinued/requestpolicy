@@ -22,14 +22,21 @@
 
 declare const Services: any;
 
-type XPCOMObserverCallback = (subject: any, topic: string, data: any) => void;
+// "known" observer topics
+export type XPCOMObserverTopic = "sessionstore-windows-restored";
+
+type XPCOMObserverCallback =
+    (subject: any, topic: XPCOMObserverTopic, data: any) => void;
 
 export class XPCOMObserver {
   private observer: {observe: XPCOMObserverCallback};
   private isRegistered: boolean = false;
-  private topics: string[] = [];
+  private topics: XPCOMObserverTopic[] = [];
 
-  constructor(aTopics: string[] | string, aCallback: XPCOMObserverCallback) {
+  constructor(
+      aTopics: XPCOMObserverTopic[] | XPCOMObserverTopic,
+      aCallback: XPCOMObserverCallback,
+  ) {
     this.topics = Array.isArray(aTopics) ? aTopics : [aTopics];
     this.observer.observe = aCallback;
     this.register();

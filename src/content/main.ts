@@ -47,7 +47,9 @@ import "content/main/window-manager";
 import {
   InitialSetupController,
 } from "content/controllers/initial-setup-controller";
-import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
+import {
+  KeyboardShortcutController,
+} from "content/controllers/keyboard-shortcut-controller";
 import {
   NotificationsController,
 } from "content/controllers/notification-controller";
@@ -61,7 +63,7 @@ import "content/ui-testing/services";
 // @endif
 
 const controllersToBeStartedUp = [
-  KeyboardShortcuts,
+  KeyboardShortcutController,
   OldRulesController,
 
   OtherRPInstallationsController,

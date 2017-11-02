@@ -21,17 +21,19 @@
  */
 
 import {KeyboardShortcut} from "content/lib/classes/keyboard-shortcut";
+import {Storage} from "content/models/storage";
 
 // =============================================================================
-// KeyboardShortcuts
+// KeyboardShortcutController
 // =============================================================================
 
-export const KeyboardShortcuts = (function() {
-  let self = {};
+const keyboardShortcuts = [];
 
-  let keyboardShortcuts = [];
-
-  self.startup = function() {
+export const KeyboardShortcutController = {
+  startupPreconditions: [
+    Storage.pReady,
+  ],
+  startup() {
     keyboardShortcuts.push(new KeyboardShortcut("openMenu", "alt shift r",
         function(window) {
           window.rpcontinued.overlay.toggleMenu();
@@ -44,14 +46,11 @@ export const KeyboardShortcuts = (function() {
         },
         "keyboardShortcuts.openRequestLog.enabled",
         "keyboardShortcuts.openRequestLog.combo"));
-  };
-
-  self.shutdown = function() {
+  },
+  shutdown() {
     keyboardShortcuts.forEach(ks => {
       ks.destroy();
     });
     keyboardShortcuts.length = 0;
-  };
-
-  return self;
-})();
+  },
+};

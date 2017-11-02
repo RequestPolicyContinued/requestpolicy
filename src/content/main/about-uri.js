@@ -22,7 +22,7 @@
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
-import {Info} from "content/lib/info";
+import {MiscInfos} from "content/models/misc-infos";
 
 // =============================================================================
 // utilities, constants
@@ -77,7 +77,7 @@ export const AboutRequestPolicy = (function() {
   self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);
     let channel;
-    if (Info.isGeckoVersionAtLeast("48.0a1")) {
+    if (MiscInfos.isGeckoVersionAtLeast("48.0a1")) {
       // newChannelFromURIWithLoadInfo is available since Gecko 48.
       channel = Services.io.newChannelFromURIWithLoadInfo(uri, aLoadInfo);
     } else {

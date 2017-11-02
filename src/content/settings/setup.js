@@ -25,7 +25,7 @@ import {$id, common} from "./common";
 
 (function() {
   var {
-    Info,
+    MiscInfos,
     Storage,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
@@ -127,7 +127,7 @@ import {$id, common} from "./common";
   }*/
 
   window.onload = function() {
-    if (Info.isRPUpgrade) {
+    if (MiscInfos.isRPUpgrade) {
       // Skip the welcome screen.
       showConfigure();
     }

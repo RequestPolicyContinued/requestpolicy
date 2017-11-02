@@ -24,7 +24,6 @@ declare const LegacyApi: any;
 
 import {C} from "content/data/constants";
 import {Environment, MainEnvironment} from "content/lib/environment";
-import {Info} from "content/lib/info";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -39,17 +38,18 @@ import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
+import {MiscInfos} from "content/models/misc-infos";
 import {Storage} from "content/models/storage";
 
 export const BackgroundPage = {
   C,
   DomainUtil,
   Environment,
-  Info,
   LegacyApi,
   Log,
   MainEnvironment,
   ManagerForPrefObservers,
+  MiscInfos,
   OldRules,
   PolicyManager,
   RequestProcessor,

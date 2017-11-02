@@ -25,10 +25,10 @@ import {C} from "content/data/constants";
 import * as JSUtils from "content/lib/utils/js-utils";
 
 // =============================================================================
-// Info
+// MiscInfos
 // =============================================================================
 
-export const Info = (function() {
+export const MiscInfos = (function() {
   let self = {};
 
   // bad smell...

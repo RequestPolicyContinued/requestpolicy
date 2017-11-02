@@ -21,7 +21,7 @@
  */
 
 import {Log} from "content/models/log";
-import {Info} from "content/lib/info";
+import {MiscInfos} from "content/models/misc-infos";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
 
@@ -38,7 +38,7 @@ export const OldRulesController = (function() {
     //   * downgrades back to 0.5
     //   * and upgrades again
     // the user ruleset (user.json) already exists after the first step.
-    let isFirstRPUpgrade = true === Info.isRPUpgrade &&
+    let isFirstRPUpgrade = true === MiscInfos.isRPUpgrade &&
         false === PolicyManager.userRulesetExistedOnStartup;
 
     if (isFirstRPUpgrade) {

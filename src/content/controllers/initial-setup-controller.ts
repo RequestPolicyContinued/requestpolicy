@@ -24,7 +24,7 @@
 declare const LegacyApi: any;
 
 import {IController} from "content/lib/classes/controllers";
-import {Info} from "content/lib/info";
+import {MiscInfos} from "content/models/misc-infos";
 import {NotificationID, Notifications} from "content/models/notifications";
 import {Storage} from "content/models/storage";
 
@@ -37,7 +37,7 @@ function onNotificationsTabOpened(aId: NotificationID) {
 function maybeShowSetupTab() {
   if (Storage.get("welcomeWindowShown")) return;
 
-  if (Info.isRPUpgrade) {
+  if (MiscInfos.isRPUpgrade) {
     // If the use has just upgraded from an 0.x version, set the
     // default-policy preferences based on the old preferences.
     Storage.set({"defaultPolicy.allow": false});

@@ -24,10 +24,7 @@
 import * as JSUtils from "content/lib/utils/js-utils";
 import {Log as log} from "content/models/log";
 
-declare const LegacyApi: any;
 declare const Services: any;
-
-const dReady = JSUtils.defer();
 
 interface IInfos {
   curAppVersion: string;
@@ -36,12 +33,12 @@ interface IInfos {
   lastAppVersion: string;
   lastRPVersion: string;
 }
-interface IInfosOrNull {
-  curAppVersion?: IInfos["curAppVersion"] | null;
-  curRPVersion?: IInfos["curRPVersion"] | null;
-  isRPUpgrade?: IInfos["isRPUpgrade"] | null;
-  lastAppVersion?: IInfos["lastAppVersion"] | null;
-  lastRPVersion?: IInfos["lastRPVersion"] | null;
+interface IOptionalInfos {
+  curAppVersion?: IInfos["curAppVersion"];
+  curRPVersion?: IInfos["curRPVersion"];
+  isRPUpgrade?: IInfos["isRPUpgrade"];
+  lastAppVersion?: IInfos["lastAppVersion"];
+  lastRPVersion?: IInfos["lastRPVersion"];
 }
 interface IInfoPromises {
   curAppVersion?: Promise<IInfos["curAppVersion"]>;
@@ -51,41 +48,72 @@ interface IInfoPromises {
   lastRPVersion?: Promise<IInfos["lastRPVersion"]>;
 }
 
-export const VersionInfos: IInfosOrNull & {
+// =============================================================================
+// VersionInfos
+// =============================================================================
+
+const dReady = JSUtils.defer();
+
+export const VersionInfos: IOptionalInfos & {
   pReady: Promise<any>,
 } = {
-  curAppVersion: Services.appinfo.version,
-  curRPVersion: null,
-  isRPUpgrade: null,
-  lastAppVersion: LegacyApi.prefs.get("lastAppVersion"),
-  lastRPVersion: LegacyApi.prefs.get("lastVersion"),
   pReady: dReady.promise,
 };
 
 const promises: IInfoPromises = {};
 
-promises.curRPVersion = browser.management.getSelf().then((addon) => {
-  const curRPVersion = addon.version;
-  VersionInfos.curRPVersion = curRPVersion;
-  return curRPVersion;
-});
-promises.curRPVersion.catch((e) => {
-  console.error("Error setting lastRPVersion. Details:");
-  console.dir(e);
-});
+function checkPromise(aPropName: keyof IInfoPromises) {
+  (promises[aPropName] as Promise<any>).catch((e) => {
+    log.error(`Error initializing "${aPropName}":`, e);
+  });
+}
 
-promises.lastRPVersion = Promise.resolve(
-    VersionInfos.lastRPVersion as string);
-promises.isRPUpgrade = promises.lastRPVersion.then((lastRPVersion) => {
-  // Compare with version 1.0.0a8 since that version introduced
-  // the "welcome window".
-  VersionInfos.isRPUpgrade = !!lastRPVersion &&
-      Services.vc.compare(lastRPVersion, "1.0.0a8") <= 0;
-  return VersionInfos.isRPUpgrade;
-});
-promises.isRPUpgrade.catch((e) => {
-  log.error("Failed to set 'isRPUpgrade':", e);
-});
+// -----------------------------------------------------------------------------
+// RP version info
+// -----------------------------------------------------------------------------
+
+promises.lastRPVersion =
+    browser.storage.local.get("lastVersion").
+    then(({lastVersion}) => {
+      VersionInfos.lastRPVersion = lastVersion;
+      return lastVersion;
+    });
+checkPromise("lastRPVersion");
+
+promises.isRPUpgrade =
+    promises.lastRPVersion.
+    then((lastRPVersion) => {
+      // Compare with version 1.0.0a8 since that version introduced
+      // the "welcome window".
+      VersionInfos.isRPUpgrade = !!lastRPVersion &&
+          Services.vc.compare(lastRPVersion, "1.0.0a8") <= 0;
+      return VersionInfos.isRPUpgrade;
+    });
+checkPromise("isRPUpgrade");
+
+promises.curRPVersion =
+    browser.management.getSelf().
+    then((addon) => {
+      VersionInfos.curRPVersion = addon.version;
+      return VersionInfos.curRPVersion;
+    });
+checkPromise("curRPVersion");
+
+// -----------------------------------------------------------------------------
+// app version info
+// -----------------------------------------------------------------------------
+
+promises.lastAppVersion =
+    browser.storage.local.get("lastAppVersion").
+    then(({lastAppVersion}) => {
+      VersionInfos.lastAppVersion = lastAppVersion;
+      return lastAppVersion;
+    });
+checkPromise("lastAppVersion");
+
+// -----------------------------------------------------------------------------
+// deferred "ready"
+// -----------------------------------------------------------------------------
 
 Promise.all(JSUtils.objectValues(promises)).then(() => {
   dReady.resolve(null);

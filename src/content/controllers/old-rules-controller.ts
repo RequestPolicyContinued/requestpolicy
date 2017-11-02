@@ -20,25 +20,44 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
-import {MiscInfos} from "content/models/misc-infos";
-import {OldRules} from "content/lib/old-rules";
+import {IController} from "content/lib/classes/controllers";
+import {OldRules} from "content/lib/classes/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
+import {Log as log} from "content/models/log";
+import {MiscInfos} from "content/models/misc-infos";
 
-// =============================================================================
-// OldRulesController
-// =============================================================================
+/**
+ * @return {boolean} If the import was successful.
+ */
+function importOldRules() {
+  try {
+    const oldRules = new OldRules();
+    const rules = oldRules.getAsNewRules();
+    PolicyManager.addAllowRules(rules);
+    return true;
+  } catch (e) {
+    console.error("Failed to import old rules. Details:");
+    console.dir(e);
+    return false;
+  }
+}
 
-export const OldRulesController = (function() {
-  let self = {};
+function importOldRulesAutomatically() {
+  log.info("Performing automatic rule import.");
+  const rv = importOldRules();
+  if (false === rv) {
+    console.error("Failed to automatically import old rules.");
+  }
+}
 
-  self.startup = function() {
+export const OldRulesController: IController = {
+  startup() {
     // If the user ...
     //   * upgrades to 1.0,
     //   * downgrades back to 0.5
     //   * and upgrades again
     // the user ruleset (user.json) already exists after the first step.
-    let isFirstRPUpgrade = true === MiscInfos.isRPUpgrade &&
+    const isFirstRPUpgrade = true === MiscInfos.isRPUpgrade &&
         false === PolicyManager.userRulesetExistedOnStartup;
 
     if (isFirstRPUpgrade) {
@@ -46,31 +65,5 @@ export const OldRulesController = (function() {
     } else {
       // TODO inform the user about old rules
     }
-  };
-
-  function importOldRulesAutomatically() {
-    Log.info("Performing automatic rule import.");
-    let rv = self.importOldRules();
-    if (false === rv) {
-      console.error("Failed to automatically import old rules.");
-    }
-  }
-
-  /**
-   * @return {boolean} If the import was successful.
-   */
-  self.importOldRules = function() {
-    try {
-      let oldRules = new OldRules();
-      let rules = oldRules.getAsNewRules();
-      PolicyManager.addAllowRules(rules);
-      return true;
-    } catch (e) {
-      console.error("Failed to import old rules. Details:");
-      console.dir(e);
-      return false;
-    }
-  };
-
-  return self;
-})();
+  },
+};

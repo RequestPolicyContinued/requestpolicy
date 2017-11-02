@@ -51,7 +51,7 @@ import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {
   NotificationsController,
 } from "content/controllers/notification-controller";
-import {OldRulesController} from "content/controllers/old-rules";
+import {OldRulesController} from "content/controllers/old-rules-controller";
 import {
   OtherRPInstallationsController,
 } from "content/controllers/other-rp-installations-controller";

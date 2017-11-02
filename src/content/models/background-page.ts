@@ -23,9 +23,9 @@
 declare const LegacyApi: any;
 
 import {C} from "content/data/constants";
+import {OldRules} from "content/lib/classes/old-rules";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
 import {RequestProcessor} from "content/lib/request-processor";
 import {

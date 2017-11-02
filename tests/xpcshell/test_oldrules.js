@@ -1,5 +1,5 @@
 /* exported run_test */
-Cu.import("chrome://rpcontinued/content/lib/old-rules.jsm");
+Cu.import("chrome://rpcontinued/content/lib/classes/old-rules.jsm");
 Cu.import("chrome://rpcontinued/content/models/prefs.jsm");
 
 

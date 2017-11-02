@@ -21,6 +21,7 @@
  */
 
 import {Bootstrap} from "bootstrap/models/bootstrap";
+import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
 import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
@@ -372,3 +373,4 @@ export const ContentScriptsApi = {
 // =============================================================================
 
 Api.LegacyApi.PrefObserver = PrefObserver;
+Api.LegacyApi.miscInfos = LegacyMiscInfos;

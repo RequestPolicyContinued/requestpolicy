@@ -24,7 +24,7 @@ import {IController} from "content/lib/classes/controllers";
 import {OldRules} from "content/lib/classes/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
 import {Log as log} from "content/models/log";
-import {MiscInfos} from "content/models/misc-infos";
+import {VersionInfos} from "content/models/version-infos";
 
 /**
  * @return {boolean} If the import was successful.
@@ -51,13 +51,16 @@ function importOldRulesAutomatically() {
 }
 
 export const OldRulesController: IController = {
+  startupPreconditions: [
+    VersionInfos.pReady,
+  ],
   startup() {
     // If the user ...
     //   * upgrades to 1.0,
     //   * downgrades back to 0.5
     //   * and upgrades again
     // the user ruleset (user.json) already exists after the first step.
-    const isFirstRPUpgrade = true === MiscInfos.isRPUpgrade &&
+    const isFirstRPUpgrade = true === VersionInfos.isRPUpgrade &&
         false === PolicyManager.userRulesetExistedOnStartup;
 
     if (isFirstRPUpgrade) {

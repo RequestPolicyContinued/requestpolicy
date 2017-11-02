@@ -21,11 +21,10 @@
  */
 
 import * as XULUtils from "content/lib/utils/xul-utils";
-import {MiscInfos} from "content/models/misc-infos";
 import {Log} from "content/models/log";
 
 let CustomizableUI = null;
-if (MiscInfos.isAustralis) {
+if (LegacyApi.miscInfos.isAustralis) {
   ({CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm",
                                 {}));
 }
@@ -39,7 +38,7 @@ export const ToolbarButtonController = (function() {
 
   const toolbarButtonId = "rpcontinuedToolbarButton";
 
-  let isAustralis = MiscInfos.isAustralis;
+  let isAustralis = LegacyApi.miscInfos.isAustralis;
 
   // ---------------------------------------------------------------------------
   // Case 1: Australis (Firefox >= 29)
@@ -101,7 +100,7 @@ export const ToolbarButtonController = (function() {
       // justify a bunch of special cases to support the statusbar when such a
       // tiny number of users have seamonkey and I can't even be sure that many
       // of those users want a statusbar icon.
-      // if (!MiscInfos.isFirefox) {
+      // if (!LegacyApi.miscInfos.isFirefox) {
       //   Log.info(
       //     "Not performing toolbar button check: not Firefox.");
       //   return;
@@ -109,7 +108,7 @@ export const ToolbarButtonController = (function() {
       let doc = win.document;
 
       let isFirstRun = false;
-      if (Services.vc.compare(MiscInfos.lastAppVersion, "0.0") <= 0) {
+      if (Services.vc.compare(LegacyApi.miscInfos.lastAppVersion, "0.0") <= 0) {
         Log.info("This is the first run.");
         isFirstRun = true;
       }

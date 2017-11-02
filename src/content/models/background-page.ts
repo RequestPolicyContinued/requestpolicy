@@ -38,8 +38,8 @@ import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
-import {MiscInfos} from "content/models/misc-infos";
 import {Storage} from "content/models/storage";
+import {VersionInfos} from "content/models/version-infos";
 
 export const BackgroundPage = {
   C,
@@ -49,7 +49,6 @@ export const BackgroundPage = {
   Log,
   MainEnvironment,
   ManagerForPrefObservers,
-  MiscInfos,
   OldRules,
   PolicyManager,
   RequestProcessor,
@@ -58,6 +57,7 @@ export const BackgroundPage = {
   SUBSCRIPTION_REMOVED_TOPIC,
   Storage,
   StringUtils,
+  VersionInfos,
   WindowUtils,
   rpService,
 };

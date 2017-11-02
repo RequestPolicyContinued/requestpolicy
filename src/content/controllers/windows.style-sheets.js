@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MiscInfos} from "content/models/misc-infos";
-
 // =============================================================================
 // StyleSheetsController
 // =============================================================================
@@ -31,7 +29,7 @@ export const StyleSheetsController = (function() {
 
   const STYLE_SHEETS = Object.freeze([
     "chrome://rpcontinued/skin/requestpolicy.css",
-    MiscInfos.isSeamonkey ?
+    LegacyApi.miscInfos.isSeamonkey ?
         "chrome://rpcontinued/skin/toolbarbutton-seamonkey.css" :
         "chrome://rpcontinued/skin/toolbarbutton.css",
   ]);

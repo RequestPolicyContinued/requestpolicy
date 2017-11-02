@@ -2,7 +2,8 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2011 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,20 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IController} from "content/lib/classes/controllers";
-import {NotificationID, Notifications} from "content/models/notifications";
-import {pWindowsAvailable} from "content/models/ui-startup";
+import {Prefs} from "bootstrap/models/prefs";
+import {C} from "content/data/constants";
 
-function showNotification(id: NotificationID) {
-  Notifications.openTab(id);
+declare const Services: any;
+
+export const lastAppVersion: string = Prefs.get("lastAppVersion");
+
+const {ID: appID, name: appName, platformVersion} = Services.appinfo;
+export const isFirefox: boolean = appID === C.FIREFOX_ID;
+export const isSeamonkey: boolean = appID === C.SEAMONKEY_ID;
+export const isGecko: boolean = appName !== "Pale Moon";
+export const isAustralis: boolean = isFirefox &&
+    Services.vc.compare(platformVersion, "29") >= 0;
+
+export function isGeckoVersionAtLeast(aMinVersion: string): boolean {
+  return isGecko &&
+      Services.vc.compare(platformVersion, aMinVersion) >= 0;
 }
-
-export const NotificationsController: IController = {
-  startupPreconditions: [
-    pWindowsAvailable,
-  ],
-  startup() {
-    Notifications.forEach(showNotification);
-    Notifications.onAdded.addListener(showNotification);
-  },
-};

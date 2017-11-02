@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008-2009 Justin Samuel
+ * Copyright (c) 2011 Justin Samuel
  * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
@@ -21,44 +21,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-declare const LegacyApi: any;
-
 import {IController} from "content/lib/classes/controllers";
-import {NotificationID, Notifications} from "content/models/notifications";
+import {Log as log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {VersionInfos} from "content/models/version-infos";
 
-function onNotificationsTabOpened(aId: NotificationID) {
-  if (aId !== NotificationID.InitialSetup) return;
-  Notifications.onTabOpened.removeListener(onNotificationsTabOpened);
-  Storage.set({welcomeWindowShown: true});
+function updateLastVersions() {
+  const {curAppVersion, curRPVersion} = VersionInfos;
+  browser.storage.local.set({
+    lastAppVersion: curAppVersion,
+    lastVersion: curRPVersion,
+  }).catch((e) => {
+    log.error(`Failed to update last app and RP version:`, e);
+  });
 }
 
-function maybeShowSetupTab() {
-  if (Storage.get("welcomeWindowShown")) return;
-
-  if (VersionInfos.isRPUpgrade) {
-    // If the use has just upgraded from an 0.x version, set the
-    // default-policy preferences based on the old preferences.
-    Storage.set({"defaultPolicy.allow": false});
-    if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
-      const identLevel = Storage.get("uriIdentificationLevel");
-      Storage.set({
-        "defaultPolicy.allowSameDomain": identLevel === 1,
-      });
-    }
-  }
-
-  Notifications.add(NotificationID.InitialSetup);
-  Notifications.onTabOpened.addListener(onNotificationsTabOpened);
-}
-
-export const InitialSetupController: IController = {
+export const VersionInfosController: IController = {
   startupPreconditions: [
     Storage.pReady,
     VersionInfos.pReady,
   ],
   startup() {
-    maybeShowSetupTab();
+    updateLastVersions();
   },
 };

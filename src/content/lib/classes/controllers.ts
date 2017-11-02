@@ -21,7 +21,7 @@
  */
 
 export interface IController {
-  startupPrecondition?: Promise<void>;
+  startupPreconditions?: Array<Promise<void>>;
   startup?: () => void;
   shutdown?: () => void;
 }
@@ -44,8 +44,9 @@ export class Controllers {
   public startup() {
     this.controllers.forEach((controller) => {
       if (typeof controller.startup === "function") {
-        if (typeof controller.startupPrecondition !== "undefined") {
-          controller.startupPrecondition.then(controller.startup);
+        if (typeof controller.startupPreconditions !== "undefined") {
+          Promise.all(controller.startupPreconditions).
+              then(controller.startup);
         } else {
           controller.startup();
         }

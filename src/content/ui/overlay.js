@@ -37,6 +37,7 @@ import * as Utils from "content/lib/utils/misc-utils";
 import * as DOMUtils from "content/lib/utils/dom-utils";
 import {C} from "content/data/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";
+import {Requests} from "content/models/requests";
 
 const {LOG_FLAG_STATE} = C;
 
@@ -137,7 +138,7 @@ export function loadOverlayIntoWindow(window) {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        RequestProcessor.addRequestObserver(self);
+        Requests.onRequest.addListener(self.observeRequest);
 
         setContextMenuEntryEnabled(Storage.get("contextMenu"));
 
@@ -171,7 +172,7 @@ export function loadOverlayIntoWindow(window) {
   OverlayEnvironment.addShutdownFunction(
       Environment.LEVELS.INTERFACE,
       function() {
-        RequestProcessor.removeRequestObserver(self);
+        Requests.onRequest.removeListener(self.observeRequest);
         unwrapAddTab();
         self._removeHistoryObserver();
         self._removeLocationObserver();
@@ -259,7 +260,7 @@ export function loadOverlayIntoWindow(window) {
 
   mlManager.addListener("notifyDOMFrameContentLoaded", function(message) {
     // This has an advantage over just relying on the
-    // observeBlockedRequest() call in that this will clear a blocked
+    // observeRequest() call in that this will clear a blocked
     // content notification if there no longer blocked content. Another way
     // to solve this would be to observe allowed requests as well as blocked
     // requests.
@@ -569,7 +570,7 @@ export function loadOverlayIntoWindow(window) {
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
-      let documentContainsBlockedContent = RequestProcessor
+      let documentContainsBlockedContent = Requests
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
@@ -628,31 +629,24 @@ export function loadOverlayIntoWindow(window) {
                                         updatePermissiveStatus);
 
   /**
-   * This function is called when any allowed requests happen. This must be as
+   * This function is called when any requests happen. This must be as
    * fast as possible because request processing blocks until this function
    * returns.
    *
+   * @param {boolean} isAllowed
    * @param {string} originUri
    * @param {string} destUri
    */
-  self.observeAllowedRequest = function(originUri, destUri) {
-    if (self.requestLog) {
-      self.requestLog.addAllowedRequest(originUri, destUri);
-    }
-  };
-
-  /**
-   * This function is called when any blocked requests happen. This must be as
-   * fast as possible because request processing blocks until this function
-   * returns.
-   *
-   * @param {string} originUri
-   * @param {string} destUri
-   */
-  self.observeBlockedRequest = function(originUri, destUri) {
-    self._updateNotificationDueToBlockedContent();
-    if (self.requestLog) {
-      self.requestLog.addBlockedRequest(originUri, destUri);
+  self.observeRequest = function({isAllowed, originUri, destUri}) {
+    if (isAllowed) {
+      if (self.requestLog) {
+        self.requestLog.addAllowedRequest(originUri, destUri);
+      }
+    } else {
+      self._updateNotificationDueToBlockedContent();
+      if (self.requestLog) {
+        self.requestLog.addBlockedRequest(originUri, destUri);
+      }
     }
   };
 

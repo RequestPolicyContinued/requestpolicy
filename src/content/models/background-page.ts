@@ -38,6 +38,7 @@ import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
+import {Requests} from "content/models/requests";
 import {Storage} from "content/models/storage";
 import {VersionInfos} from "content/models/version-infos";
 
@@ -52,6 +53,7 @@ export const BackgroundPage = {
   OldRules,
   PolicyManager,
   RequestProcessor,
+  Requests,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,

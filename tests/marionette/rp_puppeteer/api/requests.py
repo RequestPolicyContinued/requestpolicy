@@ -64,24 +64,27 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {RequestProcessor} = """ + GET_BACKGROUND_PAGE + """;
+          const {Requests} = """ + GET_BACKGROUND_PAGE + """;
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];
-            self.pushRequest = function (aIsAllowed, aOriginUri, aDestUri,
-                                         aRequestResult) {
+            self.pushRequest = function({
+                isAllowed: aIsAllowed,
+                originUri: aOriginUri,
+                destUri: aDestUri,
+                requestResult: aRequestResult,
+            }) {
               self.requests.push({
                 origin: aOriginUri,
                 dest: aDestUri,
                 isAllowed: aIsAllowed
               });
             };
-            self.observeBlockedRequest = self.pushRequest.bind(self, false);
-            self.observeAllowedRequest = self.pushRequest.bind(self, true);
+            self.observeRequest = self.pushRequest;
             return self;
           })(this.requestObserver || {});
 
-          RequestProcessor.addRequestObserver(requestObserver);
+          Requests.onRequest.addListener(this.requestObserver.observeRequest);
           this.listening = true;
         """, sandbox=self._sandbox, new_sandbox=False)
 
@@ -92,8 +95,8 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {RequestProcessor} = """ + GET_BACKGROUND_PAGE + """;
-          RequestProcessor.removeRequestObserver(this.requestObserver);
+          const {Requests} = """ + GET_BACKGROUND_PAGE + """;
+          Requests.onRequest.removeListener(this.requestObserver.observeRequest);
           this.listening = false;
         """, sandbox=self._sandbox, new_sandbox=False)
 

@@ -21,7 +21,7 @@
  */
 
 (function() {
-  var {RequestProcessor} = browser.extension.getBackgroundPage();
+  var {RequestProcessor, Requests} = browser.extension.getBackgroundPage();
 
   // ===========================================================================
 
@@ -46,9 +46,9 @@
 
   function getMemoryInfo() {
     var nRRAllowed = getNRequestResultObjects(
-        RequestProcessor._allowedRequests);
+        Requests._requestSets.allowedRequests);
     var nRRDenied = getNRequestResultObjects(
-        RequestProcessor._rejectedRequests);
+        Requests._requestSets.rejectedRequests);
     return {
       nRRAllowed: nRRAllowed,
       nRRDenied: nRRDenied,
@@ -76,8 +76,8 @@
   function freeMemory() {
     var memoryInfo = getMemoryInfo();
 
-    deleteOwnProperties(RequestProcessor._allowedRequests._origins);
-    deleteOwnProperties(RequestProcessor._rejectedRequests._origins);
+    deleteOwnProperties(Requests._requestSets.allowedRequests._origins);
+    deleteOwnProperties(Requests._requestSets.rejectedRequests._origins);
     deleteOwnProperties(RequestProcessor.clickedLinks);
     deleteOwnProperties(RequestProcessor.clickedLinksReverse);
     deleteOwnProperties(RequestProcessor.faviconRequests);

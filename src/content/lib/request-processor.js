@@ -35,10 +35,10 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
         REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
         REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL,
         } from "content/lib/request-result";
-import {RequestSet} from "content/lib/request-set";
 import {MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
 import {CompatibilityRules} from "content/models/compatibility-rules";
+import {Requests} from "content/models/requests";
 
 import RPContentPolicy from "content/main/content-policy";
 
@@ -46,12 +46,6 @@ const logRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",
-});
-
-const logGettingSavedRequests = Log.extend({
-  enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},
-  level: "all",
-  name: "getting saved requests",
 });
 
 // =============================================================================
@@ -114,43 +108,9 @@ export let RequestProcessor = (function() {
 
   internal.mappedDestinations = {};
 
-  internal.requestObservers = new Set();
-
   // ---------------------------------------------------------------------------
   // private functions
   // ---------------------------------------------------------------------------
-
-  function notifyRequestObserversOfBlockedRequest(request) {
-    for (let observer of internal.requestObservers) {
-      if (!observer) {
-        continue;
-      }
-      observer.observeBlockedRequest(request.originURI,
-          request.destURI, request.requestResult);
-    }
-  }
-
-  function notifyRequestObserversOfAllowedRequest(originUri,
-      destUri, requestResult) {
-    for (let observer of internal.requestObservers) {
-      if (!observer) {
-        continue;
-      }
-      observer.observeAllowedRequest(originUri, destUri,
-          requestResult);
-    }
-  }
-
-  /**
-   * Remove all saved requests from a specific origin URI. Remove both
-   * accepted and rejected requests.
-   *
-   * @param {string} uri The origin URI.
-   */
-  function removeSavedRequestsByOriginURI(uri) {
-    self._allowedRequests.removeOriginUri(uri);
-    self._rejectedRequests.removeOriginUri(uri);
-  }
 
   // We always call this from shouldLoad to reject a request.
   function reject(reason, request) {
@@ -168,7 +128,13 @@ export let RequestProcessor = (function() {
     }
 
     cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
-    internal.recordRejectedRequest(request);
+    Requests.notifyNewRequest({
+      isAllowed: false,
+      isInsert: false,
+      requestResult: request.requestResult,
+      originUri: request.originURI,
+      destUri: request.destURI,
+    });
 
     if (Ci.nsIContentPolicy.TYPE_DOCUMENT === request.aContentType) {
       // This was a blocked top-level document request. This may be due to
@@ -189,13 +155,6 @@ export let RequestProcessor = (function() {
     return CP_REJECT;
   }
 
-  internal.recordRejectedRequest = function(request) {
-    self._rejectedRequests.addRequest(request.originURI, request.destURI,
-        request.requestResult);
-    self._allowedRequests.removeRequest(request.originURI, request.destURI);
-    notifyRequestObserversOfBlockedRequest(request);
-  };
-
   // We only call this from shouldLoad when the request was a remote request
   // initiated by the content of a page. this is partly for efficiency. in other
   // cases we just return CP_OK rather than return this function which
@@ -212,35 +171,17 @@ export let RequestProcessor = (function() {
         reason + ". " + request.detailsToString());
 
     cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
-    // We aren't recording the request so it doesn't show up in the menu, but we
-    // want it to still show up in the request log.
-    if (unforbidable) {
-      notifyRequestObserversOfAllowedRequest(request.originURI, request.destURI,
-          request.requestResult);
-    } else {
-      internal.recordAllowedRequest(request.originURI, request.destURI, false,
-                                    request.requestResult);
-    }
+    Requests.notifyNewRequest({
+      isAllowed: true,
+      isInsert: false,
+      requestResult: request.requestResult,
+      originUri: request.originURI,
+      destUri: request.destURI,
+      unforbidable,
+    });
 
     return CP_OK;
   }
-
-  /**
-   * @param {string} originUri
-   * @param {string} destUri
-   * @param {Boolean} isInsert
-   * @param {RequestResult} requestResult
-   */
-  function recordAllowedRequest(originUri, destUri, isInsert, requestResult) {
-    if (!isInsert) {
-      // The destination URI may itself originate further requests.
-      removeSavedRequestsByOriginURI(destUri);
-    }
-    self._rejectedRequests.removeRequest(originUri, destUri);
-    self._allowedRequests.addRequest(originUri, destUri, requestResult);
-    notifyRequestObserversOfAllowedRequest(originUri, destUri, requestResult);
-  }
-  internal.recordAllowedRequest = recordAllowedRequest;
 
   function cacheShouldLoadResult(result, originUri, destUri) {
     const date = new Date();
@@ -324,163 +265,9 @@ export let RequestProcessor = (function() {
     return false;
   }
 
-  function _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
-      isAllowed) {
-    const result = new RequestSet();
-    const requests = allRequestsOnDocument.getAll();
-
-    // We're assuming ident is fullIdent (LEVEL_SOP). We plan to remove base
-    // domain and hostname levels.
-    for (let originUri in requests) {
-      if (DomainUtil.getBaseDomain(originUri) !== currentlySelectedOrigin) {
-        // only return requests from the given base domain
-        continue;
-      }
-      logGettingSavedRequests.log("test originUri: " + originUri);
-
-      let originUriRequests = requests[originUri];
-      for (let destBase in originUriRequests) {
-        logGettingSavedRequests.log("test destBase: " + destBase);
-
-        let destBaseRequests = originUriRequests[destBase];
-        for (let destIdent in destBaseRequests) {
-          logGettingSavedRequests.log("test destIdent: " + destIdent);
-
-          let destIdentRequests = destBaseRequests[destIdent];
-          for (let destUri in destIdentRequests) {
-            logGettingSavedRequests.log("test destUri: " + destUri);
-
-            let dest = destIdentRequests[destUri];
-            for (let i in dest) {
-              // TODO: This variable could have been created easily already in
-              //       getAllRequestsInBrowser(). ==> rewrite RequestSet to
-              //       contain a blocked list, an allowed list (and maybe a list
-              //       of all requests).
-              if (isAllowed === dest[i].isAllowed) {
-                result.addRequest(originUri, destUri, dest[i]);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /* eslint-disable */
-
-  // function _getOtherOriginsHelperFromDOM(document, reqSet) {
-  //   var documentUri = DomainUtil
-  //       .stripFragment(document.documentURI);
-  //   Log.log("Looking for other origins within DOM of "
-  //       + documentUri);
-  //   // TODO: Check other elements besides iframes and frames?
-  //   var frameTagTypes = {
-  //     "iframe" : null,
-  //     "frame" : null
-  //   };
-  //   for (var tagType in frameTagTypes) {
-  //     var iframes = document.getElementsByTagName(tagType);
-  //     for (var i = 0; i < iframes.length; i++) {
-  //       var child = iframes[i];
-  //       var childDocument = child.contentDocument;
-  //       // Flock's special home page is about:myworld. It has (i)frames in it
-  //       // that have no contentDocument. It's probably related to the fact that
-  //       // that is an xul page, but I have no reason to fully understand the
-  //       // problem in order to fix it.
-  //       if (!childDocument) {
-  //         continue;
-  //       }
-  //       var childUri = DomainUtil
-  //           .stripFragment(childDocument.documentURI);
-  //       if (childUri == "about:blank") {
-  //         // iframe empty or not loaded yet, or maybe blocked.
-  //         // childUri = child.src;
-  //         // If it's not loaded or blocked, it's not the origin for anything
-  //         // yet.
-  //         continue;
-  //       }
-  //       Log.log("Found DOM child " + tagType
-  //           + " with src <" + childUri + "> in document <" + documentUri + ">");
-  //       //var childUriIdent = DomainUtil.getIdentifier(childUri,
-  //       //    DomainUtil.LEVEL_SOP);
-  //       // if (!origins[childUriIdent]) {
-  //       //   origins[childUriIdent] = {};
-  //       // }
-  //       // origins[childUriIdent][childUri] = true;
-  //       reqSet.addRequest(documentUri, childUri);
-  //       _getOtherOriginsHelperFromDOM(childDocument, reqSet);
-  //     }
-  //   }
-  // },
-
-  /* eslint-enable */
-
-  function _addRecursivelyAllRequestsFromURI(originURI, reqSet,
-      checkedOrigins) {
-    logGettingSavedRequests.log(
-        "Looking for other origins within allowed requests from " +
-        originURI);
-
-    if (!checkedOrigins[originURI]) {
-      // this "if" is needed for the first call of this function.
-      checkedOrigins[originURI] = true;
-    }
-    _addAllDeniedRequestsFromURI(originURI, reqSet);
-    const allowedRequests = RequestProcessor._allowedRequests
-        .getOriginUri(originURI);
-    if (allowedRequests) {
-      for (let destBase in allowedRequests) {
-        for (let destIdent in allowedRequests[destBase]) {
-          for (let destURI in allowedRequests[destBase][destIdent]) {
-            logGettingSavedRequests.log(
-                "Found allowed request to <" + destURI + "> " +
-                "from <" + originURI + ">");
-            reqSet.addRequest(originURI, destURI,
-                              allowedRequests[destBase][destIdent][destURI]);
-
-            if (!checkedOrigins[destURI]) {
-              // only check the destination URI if it hasn't been checked yet.
-              checkedOrigins[destURI] = true;
-
-              _addRecursivelyAllRequestsFromURI(destURI, reqSet,
-                  checkedOrigins);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  function _addAllDeniedRequestsFromURI(originURI, reqSet) {
-    logGettingSavedRequests.log(
-        "Looking for other origins within denied requests from " + originURI);
-
-    const requests = RequestProcessor._rejectedRequests.getOriginUri(originURI);
-    if (requests) {
-      for (let destBase in requests) {
-        for (let destIdent in requests[destBase]) {
-          for (let destUri in requests[destBase][destIdent]) {
-            logGettingSavedRequests.log(
-                "Found denied request to <" + destUri + "> " +
-                `from <${originURI}>`);
-
-            reqSet.addRequest(originURI, destUri,
-                requests[destBase][destIdent][destUri]);
-          }
-        }
-      }
-    }
-  }
-
   // ---------------------------------------------------------------------------
   // public properties
   // ---------------------------------------------------------------------------
-
-  // TODO: make them private
-  self._rejectedRequests = new RequestSet();
-  self._allowedRequests = new RequestSet();
 
   // needed to collect some memory usage information
   self.clickedLinks = internal.clickedLinks;
@@ -548,7 +335,7 @@ export let RequestProcessor = (function() {
           logRequests.log(
               "Allowing request that appears to be a URL entered in the " +
               "location bar or some other good explanation: " + destURI);
-          removeSavedRequestsByOriginURI(destURI);
+          Requests._removeSavedRequestsByOriginURI(destURI);
           return CP_OK;
         }
       }
@@ -1079,87 +866,6 @@ export let RequestProcessor = (function() {
     }
   };
 
-  /**
-   * Add an observer to be notified of all blocked and allowed requests. TODO:
-   * This should be made to accept instances of a defined interface.
-   *
-   * @param {Object} observer
-   */
-  self.addRequestObserver = function(observer) {
-    if (!("observeBlockedRequest" in observer)) {
-      // eslint-disable-next-line no-throw-literal
-      throw "Observer passed to addRequestObserver does " +
-          "not have an observeBlockedRequest() method.";
-    }
-    Log.log("Adding request observer: " + observer.toString());
-    internal.requestObservers.add(observer);
-  };
-
-  /**
-   * Remove an observer added through addRequestObserver().
-   *
-   * @param {Object} observer
-   */
-  self.removeRequestObserver = function(observer) {
-    if (internal.requestObservers.has(observer)) {
-      Log.log("Removing request observer: " + observer.toString());
-      internal.requestObservers.delete(observer);
-      return;
-    }
-    Log.warn(
-        "Could not find observer to remove " + "in removeRequestObserver()");
-  };
-
-  self.getDeniedRequests = function(currentlySelectedOrigin,
-      allRequestsOnDocument) {
-    logGettingSavedRequests.log("## getDeniedRequests");
-    return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
-        false);
-  };
-
-  self.getAllowedRequests = function(currentlySelectedOrigin,
-      allRequestsOnDocument) {
-    logGettingSavedRequests.log("## getAllowedRequests");
-    return _getRequestsHelper(currentlySelectedOrigin, allRequestsOnDocument,
-        true);
-  };
-
-  /**
-   * TODO: This comment is quite old. It might not be necessary anymore to
-   *       check the DOM since all requests are recorded, like:
-   *       RequestSet._origins[originURI][destBase][destIdent][destURI][i]
-   * Info: As soon as requests are saved per Tab, this function isn't needed
-   *       anymore.
-   *
-   * This will look both at the DOM as well as the recorded allowed requests to
-   * determine which other origins exist within the document. This includes
-   * other origins that have the same domain.
-   *
-   * The reason for also
-   * needing to check the DOM is that some sites (like gmail) will make multiple
-   * requests to the same uri for different iframes and this will cause us to
-   * only have in the recorded requests from a source uri the destinations from
-   * the most recent iframe that loaded that source uri. It may also help in
-   * cases where the user has multiple tabs/windows open to the same page.
-   *
-   * @param {Browser} browser
-   * @return {RequestSet}
-   */
-  self.getAllRequestsInBrowser = function(browser) {
-    // var origins = {};
-    const reqSet = new RequestSet();
-
-    // If we get these from the DOM, then we won't know the relevant
-    // rules that were involved with allowing/denying the request.
-    // Maybe just look up the allowed/blocked requests in the
-    // main allowed/denied request sets before adding them.
-    // _getOtherOriginsHelperFromDOM(document, reqSet);
-
-    const uri = DomainUtil.stripFragment(browser.currentURI.spec);
-    _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
-    return reqSet;
-  };
-
   return self;
 })();
 
@@ -1352,8 +1058,13 @@ RequestProcessor = (function(self) {
           "** ALLOWED ** redirection from <" + originURI + "> " +
           "to <" + destURI + ">. " +
           "Same hosts or allowed origin/destination.");
-      internal.recordAllowedRequest(originURI, destURI, false,
-                                    request.requestResult);
+      Requests.notifyNewRequest({
+        isAllowed: true,
+        isInsert: false,
+        requestResult: request.requestResult,
+        originUri: originURI,
+        destUri: destURI,
+      });
       internal.allowedRedirectsReverse[destURI] = originURI;
 
       // If this was a link click or a form submission, we register an
@@ -1423,8 +1134,13 @@ RequestProcessor = (function(self) {
           // else.
           // We set the "isInsert" parameter so we don't clobber the existing
           // info about allowed and deleted requests.
-          internal.recordAllowedRequest(linkClickOrigin, linkClickDest, true,
-                                        request.requestResult);
+          Requests.notifyNewRequest({
+            isAllowed: true,
+            isInsert: true,
+            originUri: linkClickOrigin,
+            destUri: linkClickDest,
+            requestResult: request.requestResult,
+          });
         }
 
         // TODO: implement for form submissions whose redirects are blocked

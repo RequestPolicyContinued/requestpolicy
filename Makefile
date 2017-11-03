@@ -397,6 +397,7 @@ unit-tests: mocha-tests
 mocha-tests: node-packages unit-testing-files
 	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/unit-testing/ \
 	$(MOCHA) \
+		--recursive \
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
 		tests/mocha/lib/helper \

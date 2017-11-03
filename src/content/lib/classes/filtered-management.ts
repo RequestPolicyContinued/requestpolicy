@@ -46,6 +46,7 @@ export class FilteredManagement {
   public get onUninstalled() { return this.events.onUninstalled.eventTarget; }
 
   constructor(filter: AddonFilter) {
+    this.filter = filter;
     MANAGEMENT_EVENT_NAMES.forEach((eventName) => {
       browser.management[eventName].
           addListener(this.onManagementEvent.bind(this, eventName));

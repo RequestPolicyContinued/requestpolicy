@@ -42,6 +42,9 @@ export function PrefBranch(aBranchRoot, aPrefNameToTypeMap) {
 }
 
 PrefBranch.prototype._type = function(aPrefName) {
+  if (!(aPrefName in this._namesToTypesMap)) {
+    throw new Error(`Unknown pref "${aPrefName}"`);
+  }
   return this._namesToTypesMap[aPrefName];
 };
 

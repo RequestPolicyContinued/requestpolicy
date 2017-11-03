@@ -295,22 +295,17 @@ export const ContentScriptsApi = {
   });
 
   ContentScriptsApi.browser.runtime.sendMessage = function(aMessage) {
-    return genNewPromise((resolve, reject) => {
-      let response;
-      const callback = (aResponse) => {
-        response = aResponse;
-      };
-      for (let listener of events.backgroundPage.onMessage) {
-        const rv = listener(aMessage, null, callback);
-        if (response !== undefined) {
-          resolve(response);
-          return;
-        }
-        if (rv !== undefined) {
-          // ...
-        }
-      }
-    }, "browser.runtime.sendMessage");
+    const responses = [];
+    const callback = (aResponse) => {
+      responses.push(aResponse);
+    };
+    return events.backgroundPage.onMessage.
+        emit(aMessage, null, callback).
+        then(() => {
+          if (responses.length === 0) return;
+          if (responses.length === 1) return responses[0];
+          throw new Error("Got multiple responses!");
+        });
   };
 })();
 

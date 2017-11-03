@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {WindowUtils} from "content/lib/utils/windows";
 
 // =============================================================================

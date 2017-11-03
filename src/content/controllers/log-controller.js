@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2017 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,31 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {
-  LEVEL as LOG_LEVEL,
-  Log as LogClass,
-} from "content/lib/classes/log";
-
-// =============================================================================
-// Log
-// =============================================================================
-
-export const Log = new LogClass({
-  enabled: true,
-  level: LOG_LEVEL.ALL,
-});
-
-browser.storage.local.get([
-  "log",
-  "log.level",
-]).then(result => {
-  Log.setEnabled(result.log);
-  Log.setLevel(result["log.level"]);
-  return;
-}).catch(error => {
-  console.error("Error initializing the Log! Details:");
-  console.dir(error);
-});
+import {Log} from "content/models/log";
 
 function onStorageChange(aChanges, aAreaName) {
   if (aChanges.hasOwnProperty("log")) {
@@ -56,4 +31,19 @@ function onStorageChange(aChanges, aAreaName) {
   }
 }
 
-browser.storage.onChanged.addListener(onStorageChange);
+export const LogController = {
+  startup() {
+    browser.storage.local.get([
+      "log",
+      "log.level",
+    ]).then(result => {
+      Log.setEnabled(result.log);
+      Log.setLevel(result["log.level"]);
+      return;
+    }).catch(e => {
+      Log.error("Error initializing the Log:", e);
+    });
+
+    browser.storage.onChanged.addListener(onStorageChange);
+  },
+};

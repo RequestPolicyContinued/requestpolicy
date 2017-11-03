@@ -23,7 +23,7 @@
 
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {Storage} from "content/models/storage";
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 
 // =============================================================================
 // PrefManager

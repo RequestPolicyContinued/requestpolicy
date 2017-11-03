@@ -23,7 +23,7 @@
 import {ManagerForEventListeners}
     from "content/lib/manager-for-event-listeners";
 import {ObserverManager} from "content/lib/observer-manager";
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {C} from "content/lib/utils/constants";
 import {JSUtils} from "content/lib/utils/javascript";
 

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {RawRuleset} from "content/lib/ruleset";
 import {FileUtil} from "content/lib/utils/files";
 import {RulesetStorage} from "content/lib/ruleset-storage";

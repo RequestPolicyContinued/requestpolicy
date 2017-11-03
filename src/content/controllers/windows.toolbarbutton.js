@@ -22,7 +22,7 @@
 
 import {XULUtils} from "content/lib/utils/xul";
 import {Info} from "content/lib/utils/info";
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 
 let CustomizableUI = null;
 if (Info.isAustralis) {

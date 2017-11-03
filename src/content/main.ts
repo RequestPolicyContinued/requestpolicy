@@ -20,8 +20,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
+let allControllers: Array<{[key: string]: any}> = [];
+
 // import the Log first! It needs to get logging prefs from storage (async).
-import {Log} from "content/lib/log";
+import {LogController} from "content/controllers/log-controller";
+import {Controllers} from "content/lib/classes/controllers";
+{
+  const controllers = [LogController];
+  (new Controllers(controllers)).startup();
+  allControllers = allControllers.concat(controllers);
+}
 
 import {
   COMMONJS_UNLOAD_SUBJECT,
@@ -39,7 +47,6 @@ import "content/main/window-manager";
 import {KeyboardShortcuts} from "content/controllers/keyboard-shortcuts";
 import {OldRulesController} from "content/controllers/old-rules";
 
-import {Controllers} from "content/lib/classes/controllers";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {OldRules} from "content/lib/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -54,16 +61,18 @@ import {RuleUtils} from "content/lib/utils/rules";
 import {StringUtils} from "content/lib/utils/strings";
 import {WindowUtils} from "content/lib/utils/windows";
 import {rpService} from "content/main/requestpolicy-service";
+import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 
 // @if BUILD_ALIAS='ui-testing'
 import "content/ui-testing/services";
 // @endif
 
-const controllers = new Controllers([
+const controllersToBeStartedUp = [
   KeyboardShortcuts,
   OldRulesController,
-]);
+];
+allControllers = allControllers.concat(controllersToBeStartedUp);
 
 // =============================================================================
 
@@ -106,7 +115,7 @@ const shutdownMessage = C.MM_PREFIX + "shutdown";
 // =============================================================================
 
 function shutdown(aShutdownArgs: any) {
-  controllers.shutdown();
+  (new Controllers(allControllers)).shutdown();
   MainEnvironment.shutdown(aShutdownArgs);
 }
 
@@ -159,5 +168,5 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
     logSevereError("startup() failed!", e);
   }
 
-  controllers.startup();
+  (new Controllers(controllersToBeStartedUp)).startup();
 })();

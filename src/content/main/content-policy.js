@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
 import {Utils} from "content/lib/utils";
 import {RequestProcessor} from "content/lib/request-processor";

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domains";
 import {WindowUtils} from "content/lib/utils/windows";
 import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";

@@ -22,7 +22,7 @@
  */
 
 import {C} from "content/lib/utils/constants";
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {RequestResult} from "content/lib/request-result";
 import {Ruleset, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";

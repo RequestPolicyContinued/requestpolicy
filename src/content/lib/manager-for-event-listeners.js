@@ -21,7 +21,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Log} from "content/lib/log";
+import {Log} from "content/models/log";
 import {C} from "content/lib/utils/constants";
 
 const {LOG_EVENT_LISTENERS} = C;

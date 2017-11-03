@@ -47,7 +47,7 @@ Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
 
 {
   let tmpScope = {};
-  Cu.import("chrome://rpcontinued/content/lib/log.jsm", tmpScope);
+  Cu.import("chrome://rpcontinued/content/models/log.jsm", tmpScope);
 
   // Use |do_print| instead of |dump| because that's what's
   // available for xpcshell tests.

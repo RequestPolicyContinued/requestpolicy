@@ -38,10 +38,10 @@ export const LEVEL = Object.freeze({
 const MINIMUM_LOGGING_LEVEL = LEVEL.ERROR;
 
 // =============================================================================
-// Log
+// LogClass
 // =============================================================================
 
-export function Log(options) {
+export function LogClass(options) {
   this._setAll(options);
 }
 
@@ -52,7 +52,7 @@ const defaultOptions = Object.freeze({
   name: null,
 });
 
-Log.prototype = {
+LogClass.prototype = {
   _enabled: true,
   _level: MINIMUM_LOGGING_LEVEL,
   _prefix: C.LOG_PREFIX,
@@ -189,3 +189,12 @@ Log.prototype = {
     return child;
   },
 };
+
+// =============================================================================
+// Log
+// =============================================================================
+
+export const Log = new LogClass({
+  enabled: true,
+  level: LEVEL.ALL,
+});

@@ -2,7 +2,7 @@
 
 const {assert} = require("chai");
 
-const {Log} = require("content/models/log");
+const {LogClass: Log} = require("content/models/log");
 const {C} = require("content/data/constants");
 
 describe("Log", () => {

@@ -48,29 +48,29 @@ interface IEnabledCondition {
   C?: string;
 }
 
-interface IAllLogOptions {
-  enabled: boolean | null;
-  enabledCondition: IEnabledCondition | null;
-  level: LogLevel | null;
-  name: string | null;
-  prefix: string | null;
+interface IAllLogOptions<TAdditional = never> {
+  enabled: boolean | TAdditional;
+  enabledCondition: IEnabledCondition | TAdditional;
+  level: LogLevel | TAdditional;
+  name: string | TAdditional;
+  prefix: string | TAdditional;
 }
 
 interface ILogOptions {
-  enabled?: IAllLogOptions["enabled"];
-  enabledCondition?: IAllLogOptions["enabledCondition"];
-  level?: IAllLogOptions["level"] | "all";
-  name?: IAllLogOptions["name"];
-  prefix?: IAllLogOptions["prefix"];
+  enabled?: IAllLogOptions<null>["enabled"];
+  enabledCondition?: IAllLogOptions<null>["enabledCondition"];
+  level?: IAllLogOptions<null>["level"] | "all";
+  name?: IAllLogOptions<null>["name"];
+  prefix?: IAllLogOptions<null>["prefix"];
 }
 
-interface IInternalLogOptions {
-  enabled: IAllLogOptions["enabled"];
-  level: IAllLogOptions["level"];
+interface IInternalLogOptions<TAdditional = never> {
+  enabled: IAllLogOptions<TAdditional>["enabled"];
+  level: IAllLogOptions<TAdditional>["level"];
   prefix: string;
 }
 
-const DEFAULT_OPTIONS: Readonly<IAllLogOptions> = Object.freeze({
+const DEFAULT_OPTIONS: Readonly<IAllLogOptions<null>> = Object.freeze({
   enabled: null,
   enabledCondition: null,
   level: null,
@@ -78,16 +78,22 @@ const DEFAULT_OPTIONS: Readonly<IAllLogOptions> = Object.freeze({
   prefix: null,
 });
 
+const ROOT_OPTIONS: IInternalLogOptions = {
+  enabled: true,
+  level: MINIMUM_LOGGING_LEVEL,
+  prefix: C.LOG_PREFIX,
+};
+
 export class LogClass {
-  private ownInternalOptions: IInternalLogOptions = {
-    enabled: true,
-    level: MINIMUM_LOGGING_LEVEL,
+  private ownInternalOptions: IInternalLogOptions<null> = {
+    enabled: null,
+    level: null,
     prefix: "",
   };
   private parent: LogClass | null = null;
 
   constructor(aOptions: ILogOptions, aParent?: LogClass) {
-    const options: IAllLogOptions =
+    const options: IAllLogOptions<null> =
         Object.assign({}, DEFAULT_OPTIONS, aOptions);
     let {enabled, name} = options;
     const {enabledCondition, level, prefix} = options;
@@ -117,29 +123,15 @@ export class LogClass {
   // getter methods
 
   public get enabled(): boolean {
-    if (this.ownInternalOptions.enabled !== null) {
-      return this.ownInternalOptions.enabled;
-    }
-    if (this.parent !== null) {
-      return this.parent.enabled;
-    }
-    console.error("root Log does not have 'enabled' set.");
-    return true;
+    return this.getInternalOption("enabled");
   }
 
   public get level(): LogLevel {
-    if (this.ownInternalOptions.level !== null) {
-      return this.ownInternalOptions.level;
-    }
-    if (this.parent !== null) {
-      return this.parent.level;
-    }
-    console.error("root Log does not have 'enabled' set.");
-    return LogLevel.ALL;
+    return this.getInternalOption("level");
   }
 
   public get prefix(): string {
-    const parentPrefix = this.parent ? this.parent.prefix : "";
+    const parentPrefix = this.parent ? this.parent.prefix : ROOT_OPTIONS.prefix;
     return parentPrefix + this.ownInternalOptions.prefix;
   }
 
@@ -152,7 +144,10 @@ export class LogClass {
 
   public error(message: string, error: any) {
     if (!this.shouldLog(LogLevel.ERROR)) return;
-    console.error(this.prefix + message);
+    // NOTE: Use `console["error"]` instead of `console.error` in
+    //       order to prevent insertion of `"[RequestPolicy] " + `.
+    // tslint:disable-next-line no-string-literal
+    console["error"](this.prefix + message);
     if (error) {
       console.dir(error);
     }
@@ -226,6 +221,18 @@ export class LogClass {
     return new LogClass(options, this);
   }
 
+  private getInternalOption<T extends "level" | "enabled">(
+      aOption: T,
+  ): IAllLogOptions[T] {
+    if (this.ownInternalOptions[aOption] !== null) {
+      return this.ownInternalOptions[aOption] as IAllLogOptions[T];
+    }
+    if (this.parent !== null) {
+      return this.parent[aOption];
+    }
+    return ROOT_OPTIONS[aOption];
+  }
+
   private shouldLog(aLevel: LogLevel) {
     if (this.enabled && aLevel >= this.level) {
       return true;
@@ -262,5 +269,5 @@ export class LogClass {
 export const Log = new LogClass({
   enabled: true,
   level: LogLevel.ALL,
-  prefix: C.LOG_PREFIX,
+  prefix: "",
 });

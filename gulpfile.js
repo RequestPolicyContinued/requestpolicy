@@ -492,11 +492,12 @@ BUILDS.forEach(build => {
                 },
               }))).
               pipe(replace(
-                  /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
-                  (match, fn, stringDelim) => {
-                    let argsPrefix = stringDelim === "" ?
-                        `"[RequestPolicy] " + ` :
-                        `${stringDelim}[RequestPolicy] `;
+                  /console\.(error|warn|info|log|debug)\(\s*(["'`)]?)/g,
+                  (match, fn, nextChar) => {
+                    let argsPrefix =
+                        nextChar === ")" ? `"[RequestPolicy]")` :
+                        nextChar === "" ? `"[RequestPolicy] " + ` :
+                        `${nextChar}[RequestPolicy] `;
                     return `console.${fn}(${argsPrefix}`;
                   }
               )).

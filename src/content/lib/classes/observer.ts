@@ -38,7 +38,7 @@ export class XPCOMObserver {
       aCallback: XPCOMObserverCallback,
   ) {
     this.topics = Array.isArray(aTopics) ? aTopics : [aTopics];
-    this.observer.observe = aCallback;
+    this.observer = {observe: aCallback};
     this.register();
   }
 

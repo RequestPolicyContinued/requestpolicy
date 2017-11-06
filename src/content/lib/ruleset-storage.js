@@ -28,15 +28,13 @@ import * as FileUtils from "content/lib/utils/file-utils";
 // RulesetStorage
 // =============================================================================
 
-export const RulesetStorage = (function() {
-  let self = {};
-
+export const RulesetStorage = {
   /**
    * @param {String} filename
    * @param {String} subscriptionListName
    * @return {RawRuleset}
    */
-  self.loadRawRulesetFromFile = function(filename, subscriptionListName) {
+  loadRawRulesetFromFile(filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to
     //       decode from stream.
@@ -59,15 +57,14 @@ export const RulesetStorage = (function() {
     //   str = FileUtils.fileToString(policyFile);
     // }
     return new RawRuleset(str);
-  };
+  },
 
   /**
    * @param {RawRuleset} policy
    * @param {String} filename
    * @param {String} subscriptionListName
    */
-  self.saveRawRulesetToFile = function(policy, filename,
-                                        subscriptionListName) {
+  saveRawRulesetToFile(policy, filename, subscriptionListName) {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to
     //       encode to stream.
@@ -80,7 +77,5 @@ export const RulesetStorage = (function() {
     }
     policyFile.appendRelativePath(filename);
     FileUtils.stringToFile(JSON.stringify(policy), policyFile);
-  };
-
-  return self;
-})();
+  },
+};

@@ -26,6 +26,7 @@ import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import {Event} from "content/lib/classes/event";
+import {MaybePromise} from "content/lib/classes/maybe-promise";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -299,13 +300,13 @@ export const ContentScriptsApi = {
     const callback = (aResponse) => {
       responses.push(aResponse);
     };
-    return events.backgroundPage.onMessage.
-        emit(aMessage, null, callback).
-        then(() => {
-          if (responses.length === 0) return;
-          if (responses.length === 1) return responses[0];
-          throw new Error("Got multiple responses!");
-        });
+    return MaybePromise.resolve(
+        events.backgroundPage.onMessage.emit(aMessage, null, callback)
+    ).then(() => {
+      if (responses.length === 0) return;
+      if (responses.length === 1) return responses[0];
+      throw new Error("Got multiple responses!");
+    }).toPromise();
   };
 })();
 

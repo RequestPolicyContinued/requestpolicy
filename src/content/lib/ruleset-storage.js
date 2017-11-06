@@ -22,7 +22,7 @@
  */
 
 import {RawRuleset} from "content/lib/ruleset";
-import {FileUtil} from "content/lib/utils/file-utils";
+import * as FileUtils from "content/lib/utils/file-utils";
 
 // =============================================================================
 // RulesetStorage
@@ -40,7 +40,7 @@ export const RulesetStorage = (function() {
     // TODO: change filename argument to policyname and we'll append the '.json'
     // TODO: get a stream and use the mozilla json interface to
     //       decode from stream.
-    const policyFile = FileUtil.getRPUserDir("policies");
+    const policyFile = FileUtils.getRPUserDir("policies");
     // TODO: maybe exercise additional paranoia and sanitize the filename
     // even though we're already useing "appendRelativePath".
     if (subscriptionListName) {
@@ -53,10 +53,10 @@ export const RulesetStorage = (function() {
     // loadSubscriptionRules catches errors and then knows if a file
     // existed or not. This is a bad implementation.
     // TODO: solve this mess
-    let str = FileUtil.fileToString(policyFile);
+    let str = FileUtils.fileToString(policyFile);
     // let str;
     // if (policyFile.exists()) {
-    //   str = FileUtil.fileToString(policyFile);
+    //   str = FileUtils.fileToString(policyFile);
     // }
     return new RawRuleset(str);
   };
@@ -73,13 +73,13 @@ export const RulesetStorage = (function() {
     //       encode to stream.
     let policyFile;
     if (subscriptionListName) {
-      policyFile = FileUtil.getRPUserDir("policies",
+      policyFile = FileUtils.getRPUserDir("policies",
             "subscriptions", subscriptionListName);
     } else {
-      policyFile = FileUtil.getRPUserDir("policies");
+      policyFile = FileUtils.getRPUserDir("policies");
     }
     policyFile.appendRelativePath(filename);
-    FileUtil.stringToFile(JSON.stringify(policy), policyFile);
+    FileUtils.stringToFile(JSON.stringify(policy), policyFile);
   };
 
   return self;

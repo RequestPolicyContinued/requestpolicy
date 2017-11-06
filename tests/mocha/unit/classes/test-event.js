@@ -3,12 +3,8 @@
 const {assert} = require("chai");
 
 const {Event} = require("content/lib/classes/event");
-const {C} = require("content/data/constants");
 
 describe("Event", () => {
-  const sinon = require("sinon").sandbox.create();
-  afterEach(() => sinon.restore());
-
   describe("emit()", () => {
     function _it(aDescription, {
       rvSpecs: aRVSpecs,

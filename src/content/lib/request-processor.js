@@ -1148,7 +1148,13 @@ RequestProcessor = (function(self) {
         // }
       }
 
-      internal.recordRejectedRequest(request);
+      Requests.notifyNewRequest({
+        isAllowed: false,
+        isInsert: false,
+        requestResult: request.requestResult,
+        originUri: request.originURI,
+        destUri: request.destURI,
+      });
 
       logRequests.warn(
           "** BLOCKED ** redirection from <" + originURI + "> " +

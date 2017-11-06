@@ -27,6 +27,7 @@ import {Prefs} from "bootstrap/models/prefs";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import {Event} from "content/lib/classes/event";
 import {MaybePromise} from "content/lib/classes/maybe-promise";
+import {Log} from "content/models/log";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -34,14 +35,7 @@ let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 // utilities
 // =============================================================================
 
-const log = {
-  error: function(message, error) {
-    console.error("[API] " + message);
-    if (error) {
-      console.dir(error);
-    }
-  },
-};
+const log = Log.extend({name: "API"});
 
 function genErrorCallback(message) {
   return log.error.bind(null, message);
@@ -323,9 +317,17 @@ export const ContentScriptsApi = {
   // get(), set()
   // ---------------------------------------------------------------------------
 
+  function isPolicyPref(aKey) {
+    return aKey.startsWith("policy.");
+  }
+
+  function getPref(aKey) {
+    return isPolicyPref(aKey) ? PolicyStorage.get(aKey) : Prefs.get(aKey);
+  }
+
   Api.browser.storage.local.get = function(aKeys) {
     if (typeof aKeys === "string") {
-      return Promise.resolve(Prefs.get(aKeys));
+      return Promise.resolve(getPref(aKeys));
     }
     let keys;
     if (Array.isArray(aKeys)) {
@@ -337,7 +339,7 @@ export const ContentScriptsApi = {
     }
     let results = {};
     keys.forEach(key => {
-      results[key] = Prefs.get(key);
+      results[key] = getPref(key);
     });
     return Promise.resolve(results);
   };

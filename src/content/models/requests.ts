@@ -71,7 +71,7 @@ function notifyNewRequest({
     unforbidable?: boolean,
     isInsert: boolean,
 }) {
-  if (!isAllowed) {
+  if (isAllowed) {
     // We aren't recording the request so it doesn't show up in the menu, but we
     // want it to still show up in the request log.
     if (!unforbidable) {

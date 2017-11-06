@@ -92,6 +92,12 @@ export function defineLazyGetter<V = any>(
   });
 }
 
+export function isPromise<T>(aObj: T | Promise<T>): aObj is Promise<T> {
+  if (!aObj) return false;
+  if (typeof aObj !== "object") return false;
+  return typeof (aObj as Promise<T>).then === "function";
+}
+
 export function leftRotateArray<T = any>(array: T[], n: number): T[] {
   n = n % array.length;
   const firstPart = array.slice(0, n);

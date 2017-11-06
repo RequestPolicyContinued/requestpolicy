@@ -28,6 +28,7 @@ import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
 import {Log} from "content/models/log";
 import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
+import {StorageApi} from "bootstrap/models/storage-api";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -58,11 +59,12 @@ export const Api = {
     extension: {},
     management: {},
     runtime: {},
-    storage: {
-      local: {},
-    },
+    storage: StorageApi,
   },
   LegacyApi: {
+    miscInfos: LegacyMiscInfos,
+    PrefObserver: PrefObserver,
+    prefs: Prefs,
     storage: {},
   },
 };
@@ -297,72 +299,3 @@ export const ContentScriptsApi = {
     }).toPromise();
   };
 })();
-
-// =============================================================================
-// browser.storage
-// =============================================================================
-
-(function() {
-  if (!manifestHasPermission("storage")) {
-    return;
-  }
-
-  const events = {};
-  Event.createMultiple(["onChanged"], {
-    assignEventsTo: events,
-    assignEventTargetsTo: Api.browser.storage,
-  });
-
-  // ---------------------------------------------------------------------------
-  // get(), set()
-  // ---------------------------------------------------------------------------
-
-  function isPolicyPref(aKey) {
-    return aKey.startsWith("policy.");
-  }
-
-  function getPref(aKey) {
-    return isPolicyPref(aKey) ? PolicyStorage.get(aKey) : Prefs.get(aKey);
-  }
-
-  Api.browser.storage.local.get = function(aKeys) {
-    if (typeof aKeys === "string") {
-      return Promise.resolve(getPref(aKeys));
-    }
-    let keys;
-    if (Array.isArray(aKeys)) {
-      keys = aKeys;
-    } else if (typeof aKeys === "object") {
-      keys = Object.keys(aKeys);
-    } else {
-      keys = Prefs.ALL_KEYS;
-    }
-    let results = {};
-    keys.forEach(key => {
-      results[key] = getPref(key);
-    });
-    return Promise.resolve(results);
-  };
-
-  Api.browser.storage.local.set = function(aKeys) {
-    if (typeof aKeys !== "object") {
-      let msg = "browser.storage.local.set(): aKeys must be an object!";
-      log.error(msg, aKeys);
-      return Promise.reject(new Error(msg));
-    }
-    Object.keys(aKeys).forEach(key => {
-      Prefs.set(key, aKeys[key]);
-    });
-    Prefs.save();
-    return Promise.resolve();
-  };
-
-  Api.LegacyApi.prefs = Prefs;
-})();
-
-// =============================================================================
-// LegacyApi
-// =============================================================================
-
-Api.LegacyApi.PrefObserver = PrefObserver;
-Api.LegacyApi.miscInfos = LegacyMiscInfos;

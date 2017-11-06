@@ -20,14 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Bootstrap} from "bootstrap/models/bootstrap";
-import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
-import {Manifest} from "bootstrap/models/manifest";
-import {Prefs} from "bootstrap/models/prefs";
-import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import {Event} from "content/lib/classes/event";
 import {MaybePromise} from "content/lib/classes/maybe-promise";
+import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
+import {Bootstrap} from "bootstrap/models/bootstrap";
+import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
 import {Log} from "content/models/log";
+import {Manifest} from "bootstrap/models/manifest";
+import {Prefs} from "bootstrap/models/prefs";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 

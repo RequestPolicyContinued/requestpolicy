@@ -26,49 +26,47 @@ import {Log} from "content/models/log";
 
 const log = Log.extend({name: "Storage API"});
 
-function getPref(aKey) {
+function getPref(aKey: string) {
   return Prefs.get(aKey);
 }
 
-const events = {};
+const {eventTargets} = Event.createMultiple([
+  "onChanged",
+]);
 
 export const StorageApi = {
   local: {
-    get(aKeys) {
+    get(aKeys: string | string[] | {[k: string]: any} | null | undefined) {
       if (typeof aKeys === "string") {
         return Promise.resolve(getPref(aKeys));
       }
-      let keys;
+      let keys: string[];
       if (Array.isArray(aKeys)) {
         keys = aKeys;
       } else if (typeof aKeys === "object") {
-        keys = Object.keys(aKeys);
+        keys = Object.keys(aKeys as {[k: string]: any});
       } else {
         keys = Prefs.ALL_KEYS;
       }
-      let results = {};
-      keys.forEach(key => {
+      const results: {[k: string]: any} = {};
+      keys.forEach((key) => {
         results[key] = getPref(key);
       });
       return Promise.resolve(results);
     },
 
-    set(aKeys) {
+    set(aKeys: {[k: string]: any}) {
       if (typeof aKeys !== "object") {
-        let msg = "browser.storage.local.set(): aKeys must be an object!";
+        const msg = "browser.storage.local.set(): aKeys must be an object!";
         log.error(msg, aKeys);
         return Promise.reject(new Error(msg));
       }
-      Object.keys(aKeys).forEach(key => {
+      Object.keys(aKeys).forEach((key) => {
         Prefs.set(key, aKeys[key]);
       });
       Prefs.save();
       return Promise.resolve();
     },
   },
+  onChanged: eventTargets.onChanged,
 };
-
-Event.createMultiple(["onChanged"], {
-  assignEventsTo: events,
-  assignEventTargetsTo: StorageApi,
-});

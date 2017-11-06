@@ -27,86 +27,88 @@ import {Prefs} from "bootstrap/models/prefs";
 // PrefObserver
 // =============================================================================
 
-export function PrefObserver() {
-  this._maps = {
-    // Storage for listeners.
-    domainsToListeners: new MapOfSets(),
+export class PrefObserver {
+  constructor() {
+    this._maps = {
+      // Storage for listeners.
+      domainsToListeners: new MapOfSets(),
 
-    // Storage for observers.
-    domainsToObservers: new Map(),
-  };
-}
-
-/**
- * @param {string} aDomain The preference on which to listen for changes.
- * @param {Function} aListener The callback.
- */
-PrefObserver.prototype.addListener = function(aDomain, aListener) {
-  if (false === this._maps.domainsToObservers.has(aDomain)) {
-    // start to observe this Pref Domain
-    let observer = {
-      observe: this._onObserve.bind(this, aDomain),
+      // Storage for observers.
+      domainsToObservers: new Map(),
     };
-    Prefs._addObserver(aDomain, observer);
-    this._maps.domainsToObservers.set(aDomain, observer);
   }
 
-  this._maps.domainsToListeners.addToSet(aDomain, aListener);
-};
+  /**
+   * @param {string} aDomain The preference on which to listen for changes.
+   * @param {Function} aListener The callback.
+   */
+  addListener(aDomain, aListener) {
+    if (false === this._maps.domainsToObservers.has(aDomain)) {
+      // start to observe this Pref Domain
+      let observer = {
+        observe: this._onObserve.bind(this, aDomain),
+      };
+      Prefs._addObserver(aDomain, observer);
+      this._maps.domainsToObservers.set(aDomain, observer);
+    }
 
-PrefObserver.prototype.addListeners = function(aDomains, aListener) {
-  for (let domain of aDomains) {
-    this.addListener(domain, aListener);
+    this._maps.domainsToListeners.addToSet(aDomain, aListener);
   }
-};
 
-/**
- * @param {string} aDomain The preference which is being observed for changes.
- * @param {Function} aListener The callback.
- */
-PrefObserver.prototype.removeListener = function(aDomain, aListener) {
-  this._maps.domainsToListeners.deleteFromSet(aDomain, aListener);
-
-  // no more listeners?
-  if (false === this._maps.domainsToListeners.has(aDomain)) {
-    // stop to observe this Pref Domain
-    let observer = this._maps.domainsToObservers.get(aDomain);
-    Prefs._removeObserver(aDomain, observer);
-    this._maps.domainsToObservers.delete(aDomain);
-  }
-};
-
-PrefObserver.prototype.removeListeners = function(aDomains, aListener) {
-  for (let domain of aDomains) {
-    this.removeListener(domain, aListener);
-  }
-};
-
-/**
- * Remove all listeners in this Pref Observer.
- */
-PrefObserver.prototype.removeAllListeners = function() {
-  for (let domain of this._maps.domainsToListeners.keys()) {
-    let listeners = this._maps.domainsToListeners.get(domain);
-    for (let listener of listeners.values()) {
-      this.removeListener(domain, listener);
+  addListeners(aDomains, aListener) {
+    for (let domain of aDomains) {
+      this.addListener(domain, aListener);
     }
   }
-};
 
-/**
- * Callback for nsIObserver.observe(). Call (notify) all listeners.
- *
- * @param {string} aDomain The Pref Domain of the corresponding observer.
- * @param {nsIPrefBranch} aSubject The pref branch.
- * @param {string} aTopic Always "nsPref:changed".
- * @param {string} aData The name of the preference which has changed,
- *     relative to the "root" of the aSubject branch.
- */
-PrefObserver.prototype._onObserve = function(aDomain, aSubject, aTopic, aData) {
-  let prefName = aData;
-  let listeners = this._maps.domainsToListeners.get(aDomain);
-  for (let listener of listeners.values()) {
-    listener.call(null, prefName);
+  /**
+   * @param {string} aDomain The preference which is being observed for changes.
+   * @param {Function} aListener The callback.
+   */
+  removeListener(aDomain, aListener) {
+    this._maps.domainsToListeners.deleteFromSet(aDomain, aListener);
+
+    // no more listeners?
+    if (false === this._maps.domainsToListeners.has(aDomain)) {
+      // stop to observe this Pref Domain
+      let observer = this._maps.domainsToObservers.get(aDomain);
+      Prefs._removeObserver(aDomain, observer);
+      this._maps.domainsToObservers.delete(aDomain);
+    }
   }
-};
+
+  removeListeners(aDomains, aListener) {
+    for (let domain of aDomains) {
+      this.removeListener(domain, aListener);
+    }
+  }
+
+  /**
+   * Remove all listeners in this Pref Observer.
+   */
+  removeAllListeners() {
+    for (let domain of this._maps.domainsToListeners.keys()) {
+      let listeners = this._maps.domainsToListeners.get(domain);
+      for (let listener of listeners.values()) {
+        this.removeListener(domain, listener);
+      }
+    }
+  }
+
+  /**
+   * Callback for nsIObserver.observe(). Call (notify) all listeners.
+   *
+   * @param {string} aDomain The Pref Domain of the corresponding observer.
+   * @param {nsIPrefBranch} aSubject The pref branch.
+   * @param {string} aTopic Always "nsPref:changed".
+   * @param {string} aData The name of the preference which has changed,
+   *     relative to the "root" of the aSubject branch.
+   */
+  _onObserve(aDomain, aSubject, aTopic, aData) {
+    let prefName = aData;
+    let listeners = this._maps.domainsToListeners.get(aDomain);
+    for (let listener of listeners.values()) {
+      listener.call(null, prefName);
+    }
+  }
+}

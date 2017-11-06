@@ -51,12 +51,6 @@ function promiseCatch(promise, message) {
   return promise.catch(genErrorCallback(message));
 }
 
-function genNewPromise(promiseExecutor, onErrorMessage) {
-  let p = new Promise(promiseExecutor);
-  promiseCatch(p, onErrorMessage);
-  return p;
-}
-
 function manifestHasPermission(perm) {
   return Manifest.permissions.includes(perm);
 }

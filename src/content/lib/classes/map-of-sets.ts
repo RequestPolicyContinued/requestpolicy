@@ -22,4 +22,8 @@
 
 import {MapOfCustomSets} from "./map-of-custom-sets";
 
-export class MapOfSets<K, V> extends MapOfCustomSets<K, Set<V>> {}
+export class MapOfSets<K, V> extends MapOfCustomSets<K, Set<V>> {
+  constructor() {
+    super(() => new Set<V>());
+  }
+}

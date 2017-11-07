@@ -135,6 +135,38 @@ export class LogClass {
     return parentPrefix + this.ownInternalOptions.prefix;
   }
 
+  // callback log methods
+
+  public cbDir(cb: () => [string, any]) {
+    if (!this.shouldLog(LogLevel.DEBUG)) return;
+    const [msg, ...args] = cb();
+    this.dir(msg, ...args);
+  }
+
+  public cbError(cb: () => ([string, any])) {
+    if (!this.shouldLog(LogLevel.ERROR)) return;
+    const [msg, error] = cb();
+    this.error(msg, error);
+  }
+
+  public cbLog(cb: () => [string]) {
+    if (this.shouldLog(LogLevel.DEBUG)) return;
+    const [msg, ...args] = cb();
+    this.dir(msg, ...args);
+  }
+
+  public cbInfo(cb: () => [string]) {
+    if (this.shouldLog(LogLevel.INFO)) return;
+    const [msg, ...args] = cb();
+    this.dir(msg, ...args);
+  }
+
+  public cbWarn(cb: () => [string]) {
+    if (this.shouldLog(LogLevel.WARNING)) return;
+    const [msg, ...args] = cb();
+    this.dir(msg, ...args);
+  }
+
   // log methods
 
   public dir(...args: any[]) {

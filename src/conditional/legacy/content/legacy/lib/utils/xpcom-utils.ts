@@ -20,7 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XPCOMObserver, XPCOMObserverTopic} from "content/lib/classes/observer";
+import {
+  XPCOMObserver,
+  XPCOMObserverTopic,
+} from "content/lib/classes/xpcom-observer";
 import {defer} from "content/lib/utils/js-utils";
 
 export function promiseObserverTopic(aTopic: XPCOMObserverTopic) {

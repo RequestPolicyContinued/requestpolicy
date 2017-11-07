@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XPCOMObserver} from "content/lib/classes/observer";
+import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
 import {Environment} from "content/lib/environment";
 import {Log} from "content/models/log";
 

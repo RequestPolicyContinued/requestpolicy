@@ -45,14 +45,14 @@ export class XPCOMObserver {
   public register() {
     if (this.isRegistered) return;
     this.topics.forEach((topic) => {
-      Services.obs.addObserver(this, topic, false);
+      Services.obs.addObserver(this.observer, topic, false);
     });
     this.isRegistered = true;
   }
   public unregister() {
     if (!this.isRegistered) return;
     this.topics.forEach((topic) => {
-      Services.obs.removeObserver(this, topic);
+      Services.obs.removeObserver(this.observer, topic);
     });
     this.isRegistered = false;
   }

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
+import {Level as EnvLevel} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
@@ -87,7 +87,7 @@ export function loadMenuIntoWindow(window) {
       lists.removeRules = $id("rpc-rules-remove");
 
       rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           // empty _all_ lists
           for (let listName in lists) {

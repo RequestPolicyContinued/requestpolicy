@@ -36,7 +36,7 @@ import {
   COMMONJS_UNLOAD_SUBJECT,
 } from "content/legacy/lib/commonjs-unload-subject";
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {PrefManager} from "content/main/pref-manager";
 
 import "content/main/about-uri";
@@ -110,7 +110,7 @@ function broadcastShutdownMessage() {
 //     calling `removeDelayedFrameScript`, which is done in
 //     the LEVELS.INTERFACE level.
 MainEnvironment.addShutdownFunction(
-    Environment.LEVELS.BACKEND,
+    EnvLevel.BACKEND,
     broadcastShutdownMessage);
 
 const observer = {

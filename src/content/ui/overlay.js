@@ -21,7 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {
+  Environment,
+  Level as EnvLevel,
+  MainEnvironment,
+} from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
 import {Log as log} from "content/models/log";
@@ -170,7 +174,7 @@ export function loadOverlayIntoWindow(window) {
   }
 
   OverlayEnvironment.addShutdownFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         Requests.onRequest.removeListener(self.observeRequest);
         unwrapAddTab();
@@ -179,7 +183,7 @@ export function loadOverlayIntoWindow(window) {
       });
 
   OverlayEnvironment.addShutdownFunction(
-    Environment.LEVELS.UI,
+    EnvLevel.UI,
     function() {
       let requestLog = $id("rpcontinued-requestLog");
 
@@ -202,7 +206,7 @@ export function loadOverlayIntoWindow(window) {
       }
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addAppcontentTabSelectListener);
 
   /**
@@ -217,7 +221,7 @@ export function loadOverlayIntoWindow(window) {
                                                false);
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addContextMenuListener);
 
   function addTabContainerTabSelectListener() {
@@ -238,7 +242,7 @@ export function loadOverlayIntoWindow(window) {
       self._addHistoryObserver();
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addTabContainerTabSelectListener);
 
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
@@ -622,10 +626,10 @@ export function loadOverlayIntoWindow(window) {
     ManagerForPrefObservers.get(OverlayEnvironment).
         addListener("startWithAllowAllEnabled", updatePermissiveStatus);
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);
   // initially set the Permissive Status
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.UI,
+  OverlayEnvironment.addStartupFunction(EnvLevel.UI,
                                         updatePermissiveStatus);
 
   /**

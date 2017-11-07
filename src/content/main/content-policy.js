@@ -25,7 +25,7 @@ import {Log as log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
 import * as Utils from "content/lib/utils/misc-utils";
 import {RequestProcessor} from "content/lib/request-processor";
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 let catMan = Cc["@mozilla.org/categorymanager;1"].
     getService(Ci.nsICategoryManager);
@@ -67,7 +67,7 @@ export const RPContentPolicy = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           register();
@@ -136,7 +136,7 @@ export const RPContentPolicy = (function() {
     };
   })();
 
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
                                          unregister);
 
   // ---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ export const RPChannelEventSink = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           register();
@@ -248,7 +248,7 @@ export const RPChannelEventSink = (function() {
     };
   })();
 
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE, unregister);
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE, unregister);
 
   // ---------------------------------------------------------------------------
   // nsISupports interface implementation

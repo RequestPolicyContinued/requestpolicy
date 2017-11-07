@@ -22,7 +22,7 @@
  */
 
 import {C} from "content/data/constants";
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {mlManager, overlayComm} from "content/framescripts/managers";
 
 (function() {
@@ -95,7 +95,7 @@ import {mlManager, overlayComm} from "content/framescripts/managers";
     }
   }
 
-  MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, function() {
+  MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, function() {
     MainEnvironment.elManager.addListener(cfmm, "click", mouseClicked, true);
   });
 })();

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
+import {Level as EnvLevel} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 import {C} from "content/data/constants";
 import {mlManager} from "content/framescripts/managers";
@@ -81,9 +81,9 @@ export function FramescriptToOverlayCommunication(aEnv) {
    */
   self.env = aEnv;
 
-  self.env.addStartupFunction(Environment.LEVELS.INTERFACE,
+  self.env.addStartupFunction(EnvLevel.INTERFACE,
                               startCommNowOrLater.bind(null, self));
-  self.env.addShutdownFunction(Environment.LEVELS.INTERFACE,
+  self.env.addShutdownFunction(EnvLevel.INTERFACE,
                                stopCommunication.bind(null, self));
 }
 

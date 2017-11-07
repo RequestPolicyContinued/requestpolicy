@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
+import {Level as EnvLevel, State as EnvState} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 import {C} from "content/data/constants";
 
@@ -59,7 +59,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   //       called immediately.
   if (aEnv) {
     self.environment.addStartupFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           if (LOG_MESSAGE_LISTENERS) {
             log.log(
@@ -70,7 +70,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
           self.addAllListeners();
         });
     self.environment.addShutdownFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           // clean up when the environment shuts down
           self.removeAllListeners();
@@ -127,7 +127,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     messageName: aMessageName,
     messageID: C.MM_PREFIX + aMessageName,
     callback: function(aMessage) {
-      if (self.environment.envState === Environment.ENV_STATES.SHUTTING_DOWN) {
+      if (self.environment.envState === EnvState.SHUTTING_DOWN) {
         // eslint-disable-next-line no-console
         console.log("[RequestPolicy] Listener for " + aMessageName +
             " has been called, but RP is already shutting down.");

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
 
 // =============================================================================
@@ -108,7 +108,7 @@ export const AboutRequestPolicy = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           registerFactory();
@@ -132,7 +132,7 @@ export const AboutRequestPolicy = (function() {
       registrar.unregisterFactory(self.classID, self);
     });
   }
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
                                          unregisterFactory);
 
   return self;

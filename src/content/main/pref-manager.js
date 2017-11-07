@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {Storage} from "content/models/storage";
 import {Log as log} from "content/models/log";
 
@@ -129,7 +129,7 @@ export const PrefManager = (function() {
       handleUninstallOrDisable();
     }
   }
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
+  MainEnvironment.addShutdownFunction(EnvLevel.BACKEND,
                                       maybeHandleUninstallOrDisable);
 
   return self;

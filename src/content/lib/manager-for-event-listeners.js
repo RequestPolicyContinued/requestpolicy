@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
+import {Level as EnvLevel} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 import {C} from "content/data/constants";
 
@@ -63,7 +63,7 @@ export class ManagerForEventListeners {
     //       called immediately.
     if (aEnv) {
       this.environment.addStartupFunction(
-          Environment.LEVELS.INTERFACE,
+          EnvLevel.INTERFACE,
           () => {
             if (LOG_EVENT_LISTENERS) {
               log.log("From now on new event listeners will be " +
@@ -74,7 +74,7 @@ export class ManagerForEventListeners {
             this.addAllListeners();
           });
       this.environment.addShutdownFunction(
-          Environment.LEVELS.INTERFACE,
+          EnvLevel.INTERFACE,
           () => {
             // clean up when the environment shuts down
             this.removeAllListeners();

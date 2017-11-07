@@ -21,7 +21,7 @@
  */
 
 import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
-import {Environment} from "content/lib/environment";
+import {Level as EnvLevel} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 
 // =============================================================================
@@ -41,7 +41,7 @@ export class ObserverManager {
 
     if (aEnv) {
       this.environment.addShutdownFunction(
-          Environment.LEVELS.INTERFACE,
+          EnvLevel.INTERFACE,
           () => {
             // unregister when the environment shuts down
             this.unregisterAllObservers();

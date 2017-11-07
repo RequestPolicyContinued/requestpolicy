@@ -25,7 +25,7 @@ import {Log as log} from "content/models/log";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // rpService
@@ -82,7 +82,7 @@ export const rpService = (function() {
   // ---------------------------------------------------------------------------
 
   // prepare back-end
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
+  MainEnvironment.addStartupFunction(EnvLevel.BACKEND,
                                         loadConfigAndRules);
 
   function registerObservers() {
@@ -92,7 +92,7 @@ export const rpService = (function() {
       SUBSCRIPTION_REMOVED_TOPIC,
     ], self.observe);
   }
-  MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  MainEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         registerObservers);
 
   self.getSubscriptions = function() {

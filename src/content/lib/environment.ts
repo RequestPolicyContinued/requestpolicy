@@ -477,8 +477,6 @@ class BaseEnvironment {
 
 // tslint:disable-next-line max-classes-per-file
 export class Environment extends BaseEnvironment {
-  public static LEVELS = Level;
-
   private lazyElManager: ManagerForEventListeners;
   private lazyObMan: ObserverManager;
 

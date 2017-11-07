@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // ErrorTriggeringService
@@ -63,9 +63,9 @@ function createErrorTriggeringService() {
   };
 
   self.bootstrap = function() {
-    MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
+    MainEnvironment.addStartupFunction(EnvLevel.BACKEND,
         self.startup);
-    MainEnvironment.addShutdownFunction(Environment.LEVELS.BACKEND,
+    MainEnvironment.addShutdownFunction(EnvLevel.BACKEND,
         self.shutdown);
   };
 

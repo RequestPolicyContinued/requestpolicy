@@ -33,11 +33,11 @@ if (C.UI_TESTING) {
   import("content/ui-testing/services");
 }
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 
-MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE, () => {
+MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, () => {
   // shut down the framescript on the message manager"s
   // `unload`. That event will occur when the browsing context
   // (e.g. the tab) has been closed.

@@ -20,11 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export class MapOfSets<K, V> {
-  private map: Map<K, Set<V>>;
+export class MapOfCustomSets<K, S extends Set<any>> {
+  private map: Map<K, S>;
+  private setConstructor: S;
 
-  constructor() {
+  constructor(aSetConstructor: S) {
     this.map = new Map();
+    this.setConstructor = aSetConstructor;
   }
 
   public has(aMapKey: K): boolean {
@@ -39,17 +41,20 @@ export class MapOfSets<K, V> {
     return this.map.keys();
   }
 
-  public addToSet(aMapKey: K, aValue: V) {
-    let set = this.map.get(aMapKey);
-    if (set === undefined) {
+  public addToSet(aMapKey: K, aValue: keyof S) {
+    let set: S;
+    if (!this.map.has(aMapKey)) {
       // automatically add a Set object to the Map
-      set = new Set();
+      const MySet: any = this.setConstructor;
+      set = new MySet();
       this.map.set(aMapKey, set);
+    } else {
+      set = this.map.get(aMapKey) as S;
     }
     set.add(aValue);
   }
 
-  public deleteFromSet(aMapKey: K, aValue: V) {
+  public deleteFromSet(aMapKey: K, aValue: S) {
     const set = this.map.get(aMapKey);
     if (set === undefined) {
       return;
@@ -66,13 +71,13 @@ export class MapOfSets<K, V> {
   }
 
   public forEachSet(
-      aCallback: (set: Set<V>, key: K) => void,
+      aCallback: (set: Set<S>, key: K) => void,
   ) {
     this.map.forEach(aCallback);
   }
 
   public forEach(
-      aCallback: (value: V, key: K) => void,
+      aCallback: (value: S, key: K) => void,
   ) {
     this.map.forEach((set, mapKey) => {
       set.forEach((setValue) => {

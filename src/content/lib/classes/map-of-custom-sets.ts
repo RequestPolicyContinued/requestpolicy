@@ -22,11 +22,11 @@
 
 export class MapOfCustomSets<K, S extends Set<any>> {
   private map: Map<K, S>;
-  private setConstructor: S;
+  private getNewSet: () => S;
 
-  constructor(aSetConstructor: S) {
+  constructor(aSetFactory: () => S) {
     this.map = new Map();
-    this.setConstructor = aSetConstructor;
+    this.getNewSet = aSetFactory;
   }
 
   public has(aMapKey: K): boolean {
@@ -45,8 +45,7 @@ export class MapOfCustomSets<K, S extends Set<any>> {
     let set: S;
     if (!this.map.has(aMapKey)) {
       // automatically add a Set object to the Map
-      const MySet: any = this.setConstructor;
-      set = new MySet();
+      set = this.getNewSet();
       this.map.set(aMapKey, set);
     } else {
       set = this.map.get(aMapKey) as S;

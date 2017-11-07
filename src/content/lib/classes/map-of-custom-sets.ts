@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export class MapOfCustomSets<K, S extends Set<any>> {
+export class MapOfCustomSets<K, V, S extends Set<V>> {
   private map: Map<K, S>;
   private getNewSet: () => S;
 
@@ -41,7 +41,7 @@ export class MapOfCustomSets<K, S extends Set<any>> {
     return this.map.keys();
   }
 
-  public addToSet(aMapKey: K, aValue: keyof S) {
+  public addToSet(aMapKey: K, aValue: V) {
     let set: S;
     if (!this.map.has(aMapKey)) {
       // automatically add a Set object to the Map
@@ -53,7 +53,7 @@ export class MapOfCustomSets<K, S extends Set<any>> {
     set.add(aValue);
   }
 
-  public deleteFromSet(aMapKey: K, aValue: S) {
+  public deleteFromSet(aMapKey: K, aValue: V) {
     const set = this.map.get(aMapKey);
     if (set === undefined) {
       return;
@@ -70,13 +70,13 @@ export class MapOfCustomSets<K, S extends Set<any>> {
   }
 
   public forEachSet(
-      aCallback: (set: Set<S>, key: K) => void,
+      aCallback: (set: Set<V>, key: K) => void,
   ) {
     this.map.forEach(aCallback);
   }
 
   public forEach(
-      aCallback: (value: S, key: K) => void,
+      aCallback: (value: V, key: K) => void,
   ) {
     this.map.forEach((set, mapKey) => {
       set.forEach((setValue) => {

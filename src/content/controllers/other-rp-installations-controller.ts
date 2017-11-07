@@ -23,7 +23,7 @@
 
 import {C} from "content/data/constants";
 import {FilteredManagement} from "content/lib/classes/filtered-management";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {NotificationID, Notifications} from "content/models/notifications";
 
 const {AMO} = C;
@@ -62,7 +62,7 @@ export const OtherRPInstallationsController = {
       if (enabledAddons.length === 0) return;
       addNotification();
     }).catch((e) => {
-      Log.error("Error getting the list of addons! Details:", e);
+      log.error("Error getting the list of addons! Details:", e);
     });
     browser.management.onEnabled.addListener(maybeAddNotification);
     browser.management.onInstalled.addListener(maybeAddNotification);

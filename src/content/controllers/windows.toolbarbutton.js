@@ -21,7 +21,7 @@
  */
 
 import * as XULUtils from "content/lib/utils/xul-utils";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 
 let CustomizableUI = null;
 if (LegacyApi.miscInfos.isAustralis) {
@@ -101,7 +101,7 @@ export const ToolbarButtonController = (function() {
       // tiny number of users have seamonkey and I can't even be sure that many
       // of those users want a statusbar icon.
       // if (!LegacyApi.miscInfos.isFirefox) {
-      //   Log.info(
+      //   log.info(
       //     "Not performing toolbar button check: not Firefox.");
       //   return;
       // }
@@ -109,7 +109,7 @@ export const ToolbarButtonController = (function() {
 
       let isFirstRun = false;
       if (Services.vc.compare(LegacyApi.miscInfos.lastAppVersion, "0.0") <= 0) {
-        Log.info("This is the first run.");
+        log.info("This is the first run.");
         isFirstRun = true;
       }
 

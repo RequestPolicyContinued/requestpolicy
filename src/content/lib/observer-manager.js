@@ -22,7 +22,7 @@
 
 import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
 import {Environment} from "content/lib/environment";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 
 // =============================================================================
 // ObserverManager
@@ -49,10 +49,11 @@ export function ObserverManager(aEnv) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (Log) {
-      Log.warn("No Environment was specified for " +
-                     "a new ObserverManager! This means that the observers " +
-                     "won't be unregistered!");
+    if (log) {
+      log.warn(
+          "No Environment was specified for " +
+          "a new ObserverManager! This means that the observers " +
+          "won't be unregistered!");
     }
   }
 

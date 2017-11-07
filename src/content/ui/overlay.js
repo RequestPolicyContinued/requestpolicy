@@ -24,7 +24,7 @@
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
@@ -124,7 +124,7 @@ export function loadOverlayIntoWindow(window) {
 
         browser.runtime.getBrowserInfo().then((appInfo) => {
           if (appInfo.name === "Fennec") {
-            Log.log("Detected Fennec.");
+            log.log("Detected Fennec.");
             // Set an attribute for CSS usage.
             popupElement.setAttribute("fennec", "true");
             popupElement.setAttribute("position", "after_end");
@@ -284,7 +284,7 @@ export function loadOverlayIntoWindow(window) {
   });
 
   self.handleMetaRefreshes = function(message) {
-    Log.log("Handling meta refreshes...");
+    log.log("Handling meta refreshes...");
 
     let {documentURI, metaRefreshes} = message.data;
     let browser = message.target;
@@ -292,12 +292,12 @@ export function loadOverlayIntoWindow(window) {
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       let {delay, destURI, originalDestURI} = metaRefreshes[i];
 
-      Log.log("meta refresh to <" +
+      log.log("meta refresh to <" +
           destURI + "> (" + delay + " second delay) found in document at <" +
           documentURI + ">");
 
       if (originalDestURI) {
-        Log.log(
+        log.log(
             "meta refresh destination <" + originalDestURI + "> " +
             "appeared to be relative to <" + documentURI + ">, so " +
             "it has been resolved to <" + destURI + ">");
@@ -311,7 +311,7 @@ export function loadOverlayIntoWindow(window) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
-          Log.warn(
+          log.warn(
               "Ignoring redirect to javascript URI <" + destURI + ">");
           continue;
         }
@@ -380,7 +380,7 @@ export function loadOverlayIntoWindow(window) {
     redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {
-      Log.warning(
+      log.warning(
           "Should have shown redirect notification to <" + redirectTargetUri +
           ">, but it's not implemented yet on Fennec.");
       return false;
@@ -564,7 +564,7 @@ export function loadOverlayIntoWindow(window) {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
-        Log.log(
+        log.log(
             "Checking for blocked requests from page <" + uri + ">");
       }
 
@@ -578,7 +578,7 @@ export function loadOverlayIntoWindow(window) {
         let logText = documentContainsBlockedContent ?
                       "Requests have been blocked." :
                       "No requests have been blocked.";
-        Log.log(logText);
+        log.log(logText);
       }
 
       return Promise.resolve();
@@ -992,7 +992,7 @@ export function loadOverlayIntoWindow(window) {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    // Log.log('popup width: ' + popup.clientWidth);
+    // log.log('popup width: ' + popup.clientWidth);
     const popupWidth = popupElement.clientWidth === 0 ? 730 :
         popupElement.clientWidth;
     const anchor = $id("content");

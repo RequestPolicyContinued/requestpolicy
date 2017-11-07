@@ -21,7 +21,7 @@
  */
 
 import {Environment} from "content/lib/environment";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {C} from "content/data/constants";
 
 const {LOG_MESSAGE_LISTENERS} = C;
@@ -62,7 +62,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         Environment.LEVELS.INTERFACE,
         function() {
           if (LOG_MESSAGE_LISTENERS) {
-            Log.log(
+            log.log(
                 "From now on new message listeners will be added " +
                 "immediately. Environment: \"" + self.environment.name + "\"");
           }
@@ -77,7 +77,7 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (Log) {
+    if (log) {
       console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
@@ -88,8 +88,8 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   self.mm = aMM;
 
   if (!self.mm) {
-    if (Log) {
-      Log.warn("No Message Manager was specified " +
+    if (log) {
+      log.warn("No Message Manager was specified " +
                      "for a new ManagerForMessageListeners!");
     }
   }
@@ -117,7 +117,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
-    Log.warn("The message name that has been passed to " +
+    log.warn("The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
     aMessageName = aMessageName.substr(C.MM_PREFIX.length);
@@ -142,7 +142,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {
-      Log.log(
+      log.log(
           "Immediately adding message listener for \"" +
           listener.messageName + "\". Environment: \"" +
           self.environment.name + "\"");
@@ -161,7 +161,7 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   for (let listener of self.listeners) {
     if (listener.listening === false) {
       if (LOG_MESSAGE_LISTENERS) {
-        Log.log(
+        log.log(
             "Lazily adding message listener for \"" +
             listener.messageName + "\". Environment: \"" +
             self.environment.name + "\"");
@@ -186,7 +186,7 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //   continue;
     // }
     if (LOG_MESSAGE_LISTENERS) {
-      Log.log(
+      log.log(
           "Removing message listener for \"" + listener.messageName + "\".");
     }
     // try {

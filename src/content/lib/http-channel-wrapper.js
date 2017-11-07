@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import * as WindowUtils from "content/lib/utils/window-utils";
 
 // =============================================================================
@@ -63,7 +63,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
           //        request is redirected, that is, the server responds
           //        with a 'Location' header when the server's
           //        `favicon.ico` is requested.
-          Log.warn("The HTTPChannel's " +
+          log.warn("The HTTPChannel's " +
                          "Load Context couldn't be found! " + ex2);
           this._loadContext = null;
         }
@@ -97,7 +97,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "browser", {
                             getBrowserForWindow(loadContext.topWindow);
           }
         } catch (e) {
-          Log.warn("The browser for " +
+          log.warn("The browser for " +
                          "the HTTPChannel's Load Context couldn't be " +
                          "found! " + e);
           this._browser = null;
@@ -122,7 +122,7 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
                          getInterface(Ci.nsIDocShell);
         /* eslint-enable new-cap */
       } catch (e) {
-        Log.warn("The HTTPChannel's DocShell couldn't be found!", e);
+        log.warn("The HTTPChannel's DocShell couldn't be found!", e);
         this._docShell = null;
       }
     }

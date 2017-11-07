@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domain-utils";
 import {C} from "content/data/constants";
 
@@ -30,11 +30,11 @@ import {C} from "content/data/constants";
 // =============================================================================
 
 function dprint(msg) {
-  Log.info("[POLICY] " + msg);
+  log.info("[POLICY] " + msg);
 }
 
 function dwarn(msg) {
-  Log.warn("[POLICY] " + msg);
+  log.warn("[POLICY] " + msg);
 }
 
 /* eslint-disable max-len */

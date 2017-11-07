@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
@@ -72,7 +72,7 @@ export const rpService = (function() {
       }
     }
     function updateCompleted(result) {
-      Log.info("Subscription updates completed: " + result);
+      log.info("Subscription updates completed: " + result);
     }
     subscriptions.update(updateCompleted, serials);
   }
@@ -109,7 +109,7 @@ export const rpService = (function() {
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        Log.log("XXX updated: " + data);
+        log.log("XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -119,7 +119,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        Log.log("XXX added: " + data);
+        log.log("XXX added: " + data);
         let subInfo = JSON.parse(data);
         let failures = PolicyManager.loadSubscriptionRules(subInfo);
         let failed = Object.getOwnPropertyNames(failures).length > 0;
@@ -134,7 +134,7 @@ export const rpService = (function() {
             }
           }
           let updateCompleted = function(result) {
-            Log.info("Subscription update completed: " + result);
+            log.info("Subscription update completed: " + result);
           };
           subscriptions.update(updateCompleted, serials);
         }
@@ -142,7 +142,7 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        Log.log("YYY: " + data);
+        log.log("YYY: " + data);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;

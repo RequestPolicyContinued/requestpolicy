@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
 import * as Utils from "content/lib/utils/misc-utils";
 import {RequestProcessor} from "content/lib/request-processor";
@@ -84,7 +84,7 @@ export const RPContentPolicy = (function() {
 
   let unregister = (function() {
     return function() {
-      Log.log("shutting down RPContentPolicy...");
+      log.log("shutting down RPContentPolicy...");
 
       // Below the shouldLoad function is replaced by a new one
       // which always allows *all* requests.
@@ -230,7 +230,7 @@ export const RPChannelEventSink = (function() {
 
   let unregister = (function() {
     return function unregister() {
-      Log.log("shutting down RPChannelEventSink...");
+      log.log("shutting down RPChannelEventSink...");
 
       self.asyncOnChannelRedirect = () => {};
 

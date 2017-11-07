@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 import {DomainUtil} from "content/lib/utils/domain-utils";
 import {RequestResult} from "content/lib/request-result";
 
@@ -49,7 +49,7 @@ export class RequestSet {
     this._origins = {};
   }
 
-  print(name, printFn = Log.log.bind(Log)) {
+  print(name, printFn = log.log.bind(log)) {
     printFn("-------------------------------------------------");
     printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
@@ -118,7 +118,7 @@ export class RequestSet {
    */
   addRequest(originUri, destUri, requestResult) {
     if (requestResult === undefined) {
-      Log.warn(
+      log.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
           "origin: <" + originUri + ">, destination: <" + destUri + ">");

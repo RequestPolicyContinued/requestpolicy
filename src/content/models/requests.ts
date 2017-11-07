@@ -24,9 +24,9 @@
 import {Event} from "content/lib/classes/event";
 import {RequestSet} from "content/lib/request-set";
 import {DomainUtil} from "content/lib/utils/domain-utils";
-import {Log} from "content/models/log";
+import {Log as log} from "content/models/log";
 
-const logGettingSavedRequests = Log.extend({
+const logGettingSavedRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},
   level: "all",
   name: "getting saved requests",
@@ -151,7 +151,7 @@ function getRequestsHelper(
 // function _getOtherOriginsHelperFromDOM(document, reqSet) {
 //   var documentUri = DomainUtil
 //       .stripFragment(document.documentURI);
-//   Log.log("Looking for other origins within DOM of "
+//   log.log("Looking for other origins within DOM of "
 //       + documentUri);
 //   // TODO: Check other elements besides iframes and frames?
 //   var frameTagTypes = {
@@ -179,7 +179,7 @@ function getRequestsHelper(
 //         // yet.
 //         continue;
 //       }
-//       Log.log("Found DOM child " + tagType
+//       log.log("Found DOM child " + tagType
 //           + " with src <" + childUri + "> in document <" +
 //           documentUri + ">");
 //       //var childUriIdent = DomainUtil.getIdentifier(childUri,

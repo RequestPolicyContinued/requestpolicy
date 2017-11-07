@@ -2,29 +2,29 @@
 
 const {assert} = require("chai");
 
-const {Event} = require("content/lib/classes/event");
+const {Listeners} = require("content/lib/classes/listeners");
 
-describe("Event", () => {
+describe("Listeners", () => {
   describe("emit()", () => {
     function _it(aDescription, {
       rvSpecs: aRVSpecs,
       withPromises: aWithPromises,
     }) {
       it(aDescription, function() {
-        const event = new Event();
+        const listeners = new Listeners();
         const expectedRVs = [];
         aRVSpecs.forEach((rvSpec) => {
           if (!("value" in rvSpec)) {
-            event.addListener(() => {});
+            listeners.add(() => {});
             return;
           }
           const {value} = rvSpec;
           expectedRVs.push(value);
           const rv = rvSpec.promise ? Promise.resolve(value) : value;
-          event.addListener(() => rv);
+          listeners.add(() => rv);
         });
 
-        const emitRV = event.emit();
+        const emitRV = listeners.emit();
         const checkReturnValues = (returnValues) => {
           assert.sameDeepMembers(returnValues, expectedRVs);
         };

@@ -21,7 +21,7 @@
  */
 
 import {Prefs} from "bootstrap/models/prefs";
-import {Event} from "content/lib/classes/event";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 import {Log} from "content/models/log";
 
 const log = Log.extend({name: "Storage API"});
@@ -30,7 +30,9 @@ function getPref(aKey: string) {
   return Prefs.get(aKey);
 }
 
-const {eventTargets} = Event.createMultiple([
+const {
+  interfaces: eventTargets,
+} = createListenersMap([
   "onChanged",
 ]);
 

@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IEventTarget} from "content/lib/classes/event";
-import {Event} from "content/lib/classes/event";
+import {IListenInterface} from "content/lib/classes/listeners";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 import * as WindowUtils from "content/lib/utils/window-utils";
 
 export enum NotificationID {
@@ -41,32 +41,32 @@ const URI_MAP = new Map([
 ]);
 
 class NotificationsClass extends Set {
-  public onAdded: IEventTarget;
-  public onDeleted: IEventTarget;
-  public onTabOpened: IEventTarget;
-  private events = Event.createMultiple([
+  public onAdded: IListenInterface;
+  public onDeleted: IListenInterface;
+  public onTabOpened: IListenInterface;
+  private eventListenersMap = createListenersMap([
     "onAdded",
     "onDeleted",
     "onTabOpened",
-  ]).events;
+  ]).listenersMap;
 
   constructor() {
     super();
-    this.onAdded = this.events.onAdded.eventTarget;
-    this.onDeleted = this.events.onDeleted.eventTarget;
-    this.onTabOpened = this.events.onTabOpened.eventTarget;
+    this.onAdded = this.eventListenersMap.onAdded.interface;
+    this.onDeleted = this.eventListenersMap.onDeleted.interface;
+    this.onTabOpened = this.eventListenersMap.onTabOpened.interface;
   }
 
   public add(aID: NotificationID): this {
     if (this.has(aID)) return this;
     super.add(aID);
-    this.events.onAdded.emit(aID);
+    this.eventListenersMap.onAdded.emit(aID);
     return this;
   }
   public delete(aID: NotificationID): boolean {
     if (!this.has(aID)) return false;
     this.delete(aID);
-    this.events.onDeleted.emit(aID);
+    this.eventListenersMap.onDeleted.emit(aID);
     return true;
   }
 
@@ -74,7 +74,7 @@ class NotificationsClass extends Set {
     const win = WindowUtils.getMostRecentBrowserWindow();
     const tabbrowser = win.getBrowser();
     tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID));
-    this.events.onTabOpened.emit(aID);
+    this.eventListenersMap.onTabOpened.emit(aID);
   }
 }
 

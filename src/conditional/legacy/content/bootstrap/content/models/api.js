@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Event} from "content/lib/classes/event";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 import {MaybePromise} from "content/lib/classes/maybe-promise";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import {Bootstrap} from "bootstrap/models/bootstrap";
@@ -153,10 +153,10 @@ export const ContentScriptsApi = {
     "onUninstalled",
   ]);
 
-  const managementEvents = {};
-  Event.createMultiple(MANAGEMENT_EVENTS, {
-    assignEventsTo: managementEvents,
-    assignEventTargetsTo: Api.browser.management,
+  const managementEventListenersMap = {};
+  createListenersMap(MANAGEMENT_EVENTS, {
+    assignListenersTo: managementEventListenersMap,
+    assignInterfacesTo: Api.browser.management,
   });
 
   function mapAddonListenerCallbackToManagementEventName(aCallbackName) {
@@ -174,7 +174,7 @@ export const ContentScriptsApi = {
     let webextEventName =
         mapAddonListenerCallbackToManagementEventName(aALCallbackName);
     let extensionInfo = mapAddonInfoToWebextExtensionInfo(aAddon);
-    managementEvents[webextEventName].emit(extensionInfo);
+    managementEventListenersMap[webextEventName].emit(extensionInfo);
   }
 
   let addonListener = {};
@@ -279,10 +279,10 @@ export const ContentScriptsApi = {
     return legacyPath;
   };
 
-  const events = {backgroundPage: {}};
-  Event.createMultiple(["onMessage"], {
-    assignEventsTo: events.backgroundPage,
-    assignEventTargetsTo: Api.browser.runtime,
+  const listenersMaps = {backgroundPage: {}};
+  createListenersMap(["onMessage"], {
+    assignListenersTo: listenersMaps.backgroundPage,
+    assignInterfacesTo: Api.browser.runtime,
   });
 
   ContentScriptsApi.browser.runtime.sendMessage = function(aMessage) {
@@ -291,7 +291,8 @@ export const ContentScriptsApi = {
       responses.push(aResponse);
     };
     return MaybePromise.resolve(
-        events.backgroundPage.onMessage.emit(aMessage, null, callback)
+        listenersMaps.backgroundPage.
+            onMessage.emit(aMessage, null, callback)
     ).then(() => {
       if (responses.length === 0) return;
       if (responses.length === 1) return responses[0];

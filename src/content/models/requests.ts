@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Event} from "content/lib/classes/event";
 import {RequestSet} from "content/lib/request-set";
 import {DomainUtil} from "content/lib/utils/domain-utils";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 import {Log as log} from "content/models/log";
 
 const logGettingSavedRequests = log.extend({
@@ -39,7 +39,10 @@ const requestSets = {
   rejectedRequests: new RequestSet(),
 };
 
-const {events, eventTargets} = Event.createMultiple([
+const {
+  interfaces: eventTargets,
+  listenersMap: eventListenersMap,
+} = createListenersMap([
   "onRequest",
 ]);
 
@@ -86,7 +89,7 @@ function notifyNewRequest({
     requestSets.rejectedRequests.addRequest(originUri, destUri, requestResult);
     requestSets.allowedRequests.removeRequest(originUri, destUri);
   }
-  events.onRequest.emit({
+  eventListenersMap.onRequest.emit({
     destUri,
     isAllowed,
     originUri,

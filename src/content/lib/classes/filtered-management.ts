@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Event} from "./event";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 
 type ManagementEventName =
     "onDisabled" |
@@ -38,12 +38,15 @@ type AddonFilter = (addon: browser.management.ExtensionInfo) => boolean;
 
 export class FilteredManagement {
   private filter: AddonFilter;
-  private events = Event.createMultiple(MANAGEMENT_EVENT_NAMES).events;
+  private evntLsnrsMap =
+      createListenersMap(MANAGEMENT_EVENT_NAMES).listenersMap;
 
-  public get onDisabled() { return this.events.onDisabled.eventTarget; }
-  public get onEnabled() { return this.events.onEnabled.eventTarget; }
-  public get onInstalled() { return this.events.onInstalled.eventTarget; }
-  public get onUninstalled() { return this.events.onUninstalled.eventTarget; }
+  public get onDisabled() { return this.evntLsnrsMap.onDisabled.interface; }
+  public get onEnabled() { return this.evntLsnrsMap.onEnabled.interface; }
+  public get onInstalled() { return this.evntLsnrsMap.onInstalled.interface; }
+  public get onUninstalled() {
+    return this.evntLsnrsMap.onUninstalled.interface;
+  }
 
   constructor(filter: AddonFilter) {
     this.filter = filter;
@@ -63,6 +66,6 @@ export class FilteredManagement {
       aExtensionInfo: browser.management.ExtensionInfo,
   ) {
     if (!this.filter(aExtensionInfo)) return;
-    this.events[aEventName].emit(aExtensionInfo);
+    this.evntLsnrsMap[aEventName].emit(aExtensionInfo);
   }
 }

@@ -28,7 +28,7 @@ describe("Log", () => {
         const expectedArgs = [
           C.LOG_PREFIX + "test",
         ];
-        assert(spiedFn.calledOnce,
+        assert.strictEqual(spiedFn.callCount, 1,
             `console.${fnName} called once`);
         assert.deepEqual(
             spiedFn.getCall(0).args,

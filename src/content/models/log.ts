@@ -174,26 +174,19 @@ export class LogClass {
     console.dir(...args);
   }
 
-  public error(message: string, error: any) {
-    if (!this.shouldLog(LogLevel.ERROR)) return;
-    // NOTE: Use `console["error"]` instead of `console.error` in
-    //       order to prevent insertion of `"[RequestPolicy] " + `.
-    // tslint:disable-next-line no-string-literal
-    console["error"](this.prefix + message);
-    if (error) {
-      console.dir(error);
-    }
+  public error(msg: string | string[], ...errorsAndOtherDirArgs: any[]) {
+    this.logInternal(LogLevel.ERROR, "error", msg, ...errorsAndOtherDirArgs);
   }
 
-  public log(msg: string, ...args: any[]) {
+  public log(msg: string | string[], ...args: any[]) {
     this.logInternal(LogLevel.DEBUG, "log", msg, ...args);
   }
 
-  public info(msg: string, ...args: any[]) {
+  public info(msg: string | string[], ...args: any[]) {
     this.logInternal(LogLevel.INFO, "info", msg, ...args);
   }
 
-  public warn(msg: string, ...args: any[]) {
+  public warn(msg: string | string[], ...args: any[]) {
     this.logInternal(LogLevel.WARNING, "warn", msg, ...args);
   }
 
@@ -286,11 +279,14 @@ export class LogClass {
   private logInternal(
       aLevel: LogLevel,
       aFnName: LogFnName,
-      aMsg: string,
-      ...args: any[],
+      aMsg: string | string[],
+      ...aDirArgs: any[],
   ) {
     if (!this.shouldLog(aLevel)) return;
-    console[aFnName](this.prefix + aMsg, ...args);
+    if (typeof aMsg !== "object") aMsg = [aMsg];
+    const [firstMsg, ...otherMsgs] = aMsg;
+    console[aFnName](this.prefix + firstMsg, ...otherMsgs);
+    console.dir(...aDirArgs);
   }
 }
 

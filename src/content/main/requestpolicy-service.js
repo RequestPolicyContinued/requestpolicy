@@ -48,33 +48,40 @@ export const rpService = (function() {
     subscriptions = new UserSubscriptions();
     PolicyManager.loadUserRules();
 
-    let failures = PolicyManager.loadSubscriptionRules(
+    const pLoadSubscriptionRules = PolicyManager.loadSubscriptionRules(
         subscriptions.getSubscriptionInfo());
-    // TODO: check a preference that indicates the last time we checked for
-    // updates. Don't do it if we've done it too recently.
-    // TODO: Maybe we should probably ship snapshot versions of the official
-    // rulesets so that they can be available immediately after installation.
-    let serials = {};
-    for (let listName in failures) {
-      serials[listName] = {};
-      for (let subName in failures[listName]) {
-        serials[listName][subName] = -1;
-      }
-    }
-    const loadedSubs = PolicyManager.getSubscriptionRulesets();
-    for (let listName in loadedSubs) {
-      for (let subName in loadedSubs[listName]) {
-        if (!serials[listName]) {
-          serials[listName] = {};
+    const pDone = pLoadSubscriptionRules.then(({failures}) => {
+      // TODO: check a preference that indicates the last time we checked for
+      // updates. Don't do it if we've done it too recently.
+      // TODO: Maybe we should probably ship snapshot versions of the official
+      // rulesets so that they can be available immediately after installation.
+      let serials = {};
+      for (let listName in failures) {
+        serials[listName] = {};
+        for (let subName in failures[listName]) {
+          serials[listName][subName] = -1;
         }
-        let rawRuleset = loadedSubs[listName][subName].rawRuleset;
-        serials[listName][subName] = rawRuleset._metadata.serial;
       }
-    }
-    function updateCompleted(result) {
-      log.info("Subscription updates completed: " + result);
-    }
-    subscriptions.update(updateCompleted, serials);
+      const loadedSubs = PolicyManager.getSubscriptionRulesets();
+      for (let listName in loadedSubs) {
+        for (let subName in loadedSubs[listName]) {
+          if (!serials[listName]) {
+            serials[listName] = {};
+          }
+          let rawRuleset = loadedSubs[listName][subName].rawRuleset;
+          serials[listName][subName] = rawRuleset._metadata.serial;
+        }
+      }
+      function updateCompleted(result) {
+        log.info("Subscription updates completed: " + result);
+      }
+      subscriptions.update(updateCompleted, serials);
+      return;
+    });
+    pDone.catch((e) => {
+      log.error("loadConfigAndRules():", e);
+    });
+    return pDone;
   }
 
   // ---------------------------------------------------------------------------
@@ -121,23 +128,29 @@ export const rpService = (function() {
       case SUBSCRIPTION_ADDED_TOPIC: {
         log.log("XXX added: " + data);
         let subInfo = JSON.parse(data);
-        let failures = PolicyManager.loadSubscriptionRules(subInfo);
-        let failed = Object.getOwnPropertyNames(failures).length > 0;
-        if (failed) {
-          let serials = {};
-          for (let listName in subInfo) {
-            if (!serials[listName]) {
-              serials[listName] = {};
+        const pLoadSubscriptionRules = PolicyManager.
+            loadSubscriptionRules(subInfo);
+        pLoadSubscriptionRules.then(({failures}) => {
+          let failed = Object.getOwnPropertyNames(failures).length > 0;
+          if (failed) {
+            let serials = {};
+            for (let listName in subInfo) {
+              if (!serials[listName]) {
+                serials[listName] = {};
+              }
+              for (let subName in subInfo[listName]) {
+                serials[listName][subName] = -1;
+              }
             }
-            for (let subName in subInfo[listName]) {
-              serials[listName][subName] = -1;
-            }
+            let updateCompleted = function(result) {
+              log.info("Subscription update completed: " + result);
+            };
+            subscriptions.update(updateCompleted, serials);
           }
-          let updateCompleted = function(result) {
-            log.info("Subscription update completed: " + result);
-          };
-          subscriptions.update(updateCompleted, serials);
-        }
+          return;
+        }).catch((e) => {
+          log.error("SUBSCRIPTION_ADDED_TOPIC", e);
+        });
         break;
       }
 

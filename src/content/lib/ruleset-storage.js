@@ -32,7 +32,7 @@ export const RulesetStorage = {
   /**
    * @param {String} policyName
    * @param {String?} subscriptionListName
-   * @return {RawRuleset?}
+   * @return {Promise<RawRuleset?>}
    */
   loadRawRulesetFromFile(policyName, subscriptionListName) {
     const filename = policyName + ".json";
@@ -46,9 +46,9 @@ export const RulesetStorage = {
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
-    if (!policyFile.exists()) return null;
+    if (!policyFile.exists()) return Promise.resolve(null);
     let str = FileUtils.fileToString(policyFile);
-    return new RawRuleset(str);
+    return Promise.resolve(new RawRuleset(str));
   },
 
   /**

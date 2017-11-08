@@ -37,6 +37,8 @@ const log = Log.extend({
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
+const RULESET_NOT_EXISTING = {};
+
 // =============================================================================
 // utilities
 // =============================================================================
@@ -71,61 +73,68 @@ export const PolicyManager = {
 
   loadUserRules() {
     log.info("loadUserRules loading user rules");
-    let rawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
-    this.userRulesetExistedOnStartup = !!rawRuleset;
-    if (!rawRuleset) rawRuleset = new RawRuleset();
-    userRulesets.user = {
-      "rawRuleset": rawRuleset,
-      "ruleset": rawRuleset.toRuleset("user"),
-    },
-    userRulesets.user.ruleset.userRuleset = true;
-    // userRulesets.user.ruleset.print();
-    // Temporary rules. These are never stored.
-    this.revokeTemporaryRules();
+    const pRawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
+    pRawRuleset.then((rawRuleset) => {
+      this.userRulesetExistedOnStartup = !!rawRuleset;
+      if (!rawRuleset) rawRuleset = new RawRuleset();
+      userRulesets.user = {
+        "rawRuleset": rawRuleset,
+        "ruleset": rawRuleset.toRuleset("user"),
+      },
+      userRulesets.user.ruleset.userRuleset = true;
+      // userRulesets.user.ruleset.print();
+      // Temporary rules. These are never stored.
+      this.revokeTemporaryRules();
 
-    notifyRulesChanged();
+      notifyRulesChanged();
+      return;
+    }).catch((e) => {
+      log.error("PolicyManager.loadUserRules():", e);
+    });
   },
 
   loadSubscriptionRules(subscriptionInfo) {
     let failures = {};
+    const promises = [];
 
     // Read each subscription from a file.
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
         log.info(`loadSubscriptionRules: ${listName} / ${subName}`);
-        let rawRuleset;
-        try {
-          rawRuleset = RulesetStorage
-              .loadRawRulesetFromFile(subName, listName);
-          if (rawRuleset === null) {
-            log.warn("Ruleset does not exist (yet).");
+        const pRawRuleset = RulesetStorage.
+            loadRawRulesetFromFile(subName, listName);
+        const pDone = pRawRuleset.then((rawRuleset) => {
+          if (!rawRuleset) throw RULESET_NOT_EXISTING;
+          if (!subscriptionRulesets[listName]) {
+            subscriptionRulesets[listName] = {};
           }
-        } catch (e) {
-          log.error("Error when loading ruleset from file: ", e);
-        }
-        if (!rawRuleset) {
+          let list = subscriptionRulesets[listName];
+          list[subName] = {
+            rawRuleset,
+            ruleset: rawRuleset.toRuleset(subName),
+          };
+          list[subName].ruleset.userRuleset = false;
+          // list[subName].ruleset.print();
+          return;
+        }).catch((e) => {
+          if (e === RULESET_NOT_EXISTING) {
+            log.warn("Ruleset does not exist (yet).");
+          } else {
+            log.error("Error when loading ruleset from file: ", e);
+          }
           if (!failures[listName]) {
             failures[listName] = {};
           }
           failures[listName][subName] = null;
-          continue;
-        }
-        if (!subscriptionRulesets[listName]) {
-          subscriptionRulesets[listName] = {};
-        }
-        let list = subscriptionRulesets[listName];
-        list[subName] = {
-          "rawRuleset": rawRuleset,
-          "ruleset": rawRuleset.toRuleset(subName),
-        };
-        list[subName].ruleset.userRuleset = false;
-        // list[subName].ruleset.print();
+        });
+        promises.push(pDone);
       }
     }
 
-    notifyRulesChanged();
-
-    return failures;
+    return Promise.all(promises).then(() => {
+      notifyRulesChanged();
+      return {failures};
+    });
   },
 
   unloadSubscriptionRules(subscriptionInfo) {

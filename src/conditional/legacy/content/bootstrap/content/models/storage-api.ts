@@ -30,6 +30,10 @@ function getPref(aKey: string) {
   return Prefs.get(aKey);
 }
 
+function setPref(aKey: string, aValue: any) {
+  Prefs.set(aKey, aValue);
+}
+
 const {
   interfaces: eventTargets,
 } = createListenersMap([
@@ -64,7 +68,7 @@ export const StorageApi = {
         return Promise.reject(new Error(msg));
       }
       Object.keys(aKeys).forEach((key) => {
-        Prefs.set(key, aKeys[key]);
+        setPref(key, aKeys[key]);
       });
       Prefs.save();
       return Promise.resolve();

@@ -22,8 +22,10 @@
 
 import {
   IListenInterface,
+  Listener,
   Listeners,
 } from "content/lib/classes/listeners";
+import {MapOfCustomSets} from "content/lib/classes/map-of-custom-sets";
 
 interface IObject<T> {
   [key: string]: T;
@@ -47,4 +49,9 @@ export function createListenersMap(aEventNames: string[], aOptions: {
   });
 
   return {listenersMap, interfaces};
+}
+
+export function createMapOfListeners() {
+  return new MapOfCustomSets<string, Listener, Listeners>(
+      () => new Listeners());
 }

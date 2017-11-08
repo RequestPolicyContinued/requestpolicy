@@ -41,6 +41,12 @@ export class MapOfCustomSets<K, V, S extends Set<V>> {
     return this.map.keys();
   }
 
+  public hasInSet(aMapKey: K, aValue: V): boolean {
+    const set = this.map.get(aMapKey);
+    if (!set) return false;
+    return set.has(aValue);
+  }
+
   public addToSet(aMapKey: K, aValue: V) {
     let set: S;
     if (!this.map.has(aMapKey)) {

@@ -70,25 +70,32 @@ export function defer<T = void>(): IDeferred<T> {
   };
 }
 
+export function createLazyGetter<V = any>(
+    aKey: string,
+    aValueFn: () => V,
+): () => V {
+  return function(this: any) {
+    delete this[aKey];
+    const value = aValueFn.call(this);
+    Object.defineProperty(this, aKey, {
+      configurable: true,
+      enumerable: true,
+      value,
+      writable: true,
+    });
+    return value;
+  };
+}
+
 export function defineLazyGetter<V = any>(
     aOnObj: {[key: string]: any},
     aKey: string,
     aValueFn: () => V,
 ) {
   Object.defineProperty(aOnObj, aKey, {
-    get() {
-      delete aOnObj[aKey];
-      const value = aValueFn.call(aOnObj);
-      Object.defineProperty(aOnObj, aKey, {
-        configurable: true,
-        enumerable: true,
-        value,
-        writable: true,
-      });
-      return value;
-    },
     configurable: true,
     enumerable: true,
+    get: createLazyGetter(aKey, aValueFn),
   });
 }
 

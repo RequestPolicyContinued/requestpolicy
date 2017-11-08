@@ -49,48 +49,44 @@ function notifyRulesChanged() {
 // PolicyManager
 // =============================================================================
 
+let userRulesets = {};
+let subscriptionRulesets = {};
+
 /**
  * Provides a simplified interface to handling multiple
  * rulesets, checking requests against multiple rulesets, etc.
  */
-export let PolicyManager = (function() {
-  let self = {};
-
-  let userRulesets = {};
-  let subscriptionRulesets = {};
-
-  self.getUserRulesets = function() {
+export const PolicyManager = {
+  getUserRulesets() {
     return userRulesets;
-  };
-  self.getSubscriptionRulesets = function() {
+  },
+  getSubscriptionRulesets() {
     return subscriptionRulesets;
-  };
+  },
 
-  // self._rulesets = null;
-
-  self.getUserRuleCount = function() {
+  getUserRuleCount() {
     let rawRuleset = userRulesets.user.rawRuleset;
     return rawRuleset.getAllowRuleCount() + rawRuleset.getDenyRuleCount();
-  };
+  },
 
-  self.loadUserRules = function() {
+  loadUserRules() {
     log.info("loadUserRules loading user rules");
     let rawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
-    self.userRulesetExistedOnStartup = !!rawRuleset;
+    this.userRulesetExistedOnStartup = !!rawRuleset;
     if (!rawRuleset) rawRuleset = new RawRuleset();
     userRulesets.user = {
       "rawRuleset": rawRuleset,
       "ruleset": rawRuleset.toRuleset("user"),
-    };
+    },
     userRulesets.user.ruleset.userRuleset = true;
     // userRulesets.user.ruleset.print();
     // Temporary rules. These are never stored.
-    self.revokeTemporaryRules();
+    this.revokeTemporaryRules();
 
     notifyRulesChanged();
-  };
+  },
 
-  self.loadSubscriptionRules = function(subscriptionInfo) {
+  loadSubscriptionRules(subscriptionInfo) {
     let failures = {};
 
     // Read each subscription from a file.
@@ -130,9 +126,9 @@ export let PolicyManager = (function() {
     notifyRulesChanged();
 
     return failures;
-  };
+  },
 
-  self.unloadSubscriptionRules = function(subscriptionInfo) {
+  unloadSubscriptionRules(subscriptionInfo) {
     const failures = {};
 
     for (let listName in subscriptionInfo) {
@@ -155,18 +151,18 @@ export let PolicyManager = (function() {
     notifyRulesChanged();
 
     return failures;
-  };
+  },
 
-  function assertRuleAction(ruleAction) {
+  assertRuleAction(ruleAction) {
     if (ruleAction !== C.RULE_ACTION_ALLOW &&
         ruleAction !== C.RULE_ACTION_DENY) {
       // eslint-disable-next-line no-throw-literal
       throw "Invalid rule type: " + ruleAction;
     }
-  }
+  },
 
-  self.ruleExists = function(ruleAction, ruleData) {
-    assertRuleAction(ruleAction);
+  ruleExists(ruleAction, ruleData) {
+    this.assertRuleAction(ruleAction);
     for (let name in userRulesets) {
       if (userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
@@ -181,14 +177,14 @@ export let PolicyManager = (function() {
       }
     }
     return false;
-  };
+  },
 
-  self.addRule = function(ruleAction, ruleData, noStore) {
+  addRule(ruleAction, ruleData, noStore) {
     log.info("addRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.user.ruleset.print();
 
-    assertRuleAction(ruleAction);
+    this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
     userRulesets.user.rawRuleset.addRule(ruleAction, ruleData,
           userRulesets.user.ruleset);
@@ -206,28 +202,28 @@ export let PolicyManager = (function() {
     // userRulesets.user.ruleset.print();
 
     notifyRulesChanged();
-  };
+  },
 
-  self.addRules = function(aRuleAction, aRuleDataList, aNoStore=false) {
+  addRules(aRuleAction, aRuleDataList, aNoStore=false) {
     for (let ruleData of aRuleDataList) {
       PolicyManager.addRule(aRuleAction, ruleData, true);
     }
     if (false === aNoStore) {
       PolicyManager.storeRules();
     }
-  };
+  },
 
-  self.storeRules = function() {
+  storeRules() {
     RulesetStorage.saveRawRulesetToFile(
         userRulesets.user.rawRuleset, "user.json");
-  };
+  },
 
-  self.addTemporaryRule = function(ruleAction, ruleData) {
+  addTemporaryRule(ruleAction, ruleData) {
     log.info("addTemporaryRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.temp.ruleset.print();
 
-    assertRuleAction(ruleAction);
+    this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
     userRulesets.temp.rawRuleset.addRule(ruleAction, ruleData,
           userRulesets.temp.ruleset);
@@ -235,15 +231,15 @@ export let PolicyManager = (function() {
     // userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
-  };
+  },
 
-  self.removeRule = function(ruleAction, ruleData, noStore) {
+  removeRule(ruleAction, ruleData, noStore) {
     log.info("removeRule " + ruleAction + " " +
         Ruleset.rawRuleToCanonicalString(ruleData));
     // userRulesets.user.ruleset.print();
     // userRulesets.temp.ruleset.print();
 
-    assertRuleAction(ruleAction);
+    this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
     userRulesets.user.rawRuleset.removeRule(ruleAction, ruleData,
@@ -265,14 +261,14 @@ export let PolicyManager = (function() {
     // userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
-  };
+  },
 
-  self.temporaryRulesExist = function() {
+  temporaryRulesExist() {
     return userRulesets.temp.rawRuleset.getAllowRuleCount() ||
            userRulesets.temp.rawRuleset.getDenyRuleCount();
-  };
+  },
 
-  self.revokeTemporaryRules = function() {
+  revokeTemporaryRules() {
     const rawRuleset = new RawRuleset();
     userRulesets.temp = {
       "rawRuleset": rawRuleset,
@@ -281,22 +277,22 @@ export let PolicyManager = (function() {
     userRulesets.temp.ruleset.userRuleset = true;
 
     notifyRulesChanged();
-  };
+  },
 
-  self.checkRequestAgainstUserRules = function(origin, dest) {
-    return checkRequest(origin, dest, userRulesets);
-  };
+  checkRequestAgainstUserRules(origin, dest) {
+    return this.checkRequest(origin, dest, userRulesets);
+  },
 
-  self.checkRequestAgainstSubscriptionRules = function(origin, dest) {
+  checkRequestAgainstSubscriptionRules(origin, dest) {
     const result = new RequestResult();
     for (let listName in subscriptionRulesets) {
       let ruleset = subscriptionRulesets[listName];
-      checkRequest(origin, dest, ruleset, result);
+      this.checkRequest(origin, dest, ruleset, result);
     }
     return result;
-  };
+  },
 
-  function checkRequest(origin, dest, aRuleset, result) {
+  checkRequest(origin, dest, aRuleset, result) {
     if (!(origin instanceof Ci.nsIURI)) {
       // eslint-disable-next-line no-throw-literal
       throw "Origin must be an nsIURI.";
@@ -325,29 +321,27 @@ export let PolicyManager = (function() {
       }
     }
     return result;
-  }
-
-  return self;
-})();
+  },
+};
 
 // =============================================================================
 // PolicyManager (alias functions)
 // =============================================================================
 
-PolicyManager = (function(self) {
-  self.addAllowRule = self.addRule.bind(null, C.RULE_ACTION_ALLOW);
-  self.addTemporaryAllowRule = self.addTemporaryRule.bind(null,
-                                                          C.RULE_ACTION_ALLOW);
-  self.removeAllowRule = self.removeRule.bind(null, C.RULE_ACTION_ALLOW);
-  self.addDenyRule = self.addRule.bind(null, C.RULE_ACTION_DENY);
-  self.addTemporaryDenyRule = self.addTemporaryRule.bind(null,
-                                                         C.RULE_ACTION_DENY);
-  self.removeDenyRule = self.removeRule.bind(null, C.RULE_ACTION_DENY);
+const PM = PolicyManager;
 
-  self.addAllowRules = self.addRules.bind(null, C.RULE_ACTION_ALLOW);
-  self.addDenyRules = self.addRules.bind(null, C.RULE_ACTION_DENY);
+Object.assign(PolicyManager, {
+  addAllowRule: PM.addRule.bind(null, C.RULE_ACTION_ALLOW),
+  addTemporaryAllowRule: PM.addTemporaryRule.bind(null, C.RULE_ACTION_ALLOW),
+  removeAllowRule: PM.removeRule.bind(null, C.RULE_ACTION_ALLOW),
+  addDenyRule: PM.addRule.bind(null, C.RULE_ACTION_DENY),
+  addTemporaryDenyRule: PM.addTemporaryRule.bind(null, C.RULE_ACTION_DENY),
+  removeDenyRule: PM.removeRule.bind(null, C.RULE_ACTION_DENY),
 
-  function getRuleData(aOrigin, aDest) {
+  addAllowRules: PM.addRules.bind(null, C.RULE_ACTION_ALLOW),
+  addDenyRules: PM.addRules.bind(null, C.RULE_ACTION_DENY),
+
+  getRuleData(aOrigin, aDest) {
     let ruleData = {};
     if (aOrigin !== undefined) {
       ruleData.o = {"h": aOrigin};
@@ -356,15 +350,13 @@ PolicyManager = (function(self) {
       ruleData.d = {"h": aDest};
     }
     return ruleData;
-  }
+  },
 
-  self.addRuleBySpec = function(aSpec, noStore) {
-    const fn = aSpec.temp ? self.addTemporaryRule : self.addRule;
+  addRuleBySpec(aSpec, noStore) {
+    const fn = aSpec.temp ? PM.addTemporaryRule : PM.addRule;
     const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
-    const ruleData = getRuleData(aSpec.origin, aSpec.dest);
+    const ruleData = this.getRuleData(aSpec.origin, aSpec.dest);
 
     fn(ruleAction, ruleData, noStore);
-  };
-
-  return self;
-})(PolicyManager);
+  },
+});

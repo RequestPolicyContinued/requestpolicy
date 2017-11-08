@@ -34,25 +34,36 @@ export const C = {
 
   AMO: env`/* @echo AMO */`,
   BUILD_ALIAS: `/* @echo BUILD_ALIAS */`,
+
+  get UI_TESTING() {
+    return this.BUILD_ALIAS === "ui-testing";
+  },
+  get NON_UI_TESTING() {
+    return this.BUILD_ALIAS === "non-ui-testing";
+  },
+
+  LOG_PREFIX: "[RequestPolicy] ",
+
+  EXTENSION_ID: "/* @echo EXTENSION_ID */",
+
+  // NOTE: do not generate the run ID here (except for non-UI tests),
+  //   because "constants.js" gets loaded multiple times, i.e.,
+  //   in multiple environments.
+  CONTEXT_ID: Math.random(),
+  get RUN_ID() {
+    return this.NON_UI_TESTING ? this.CONTEXT_ID : RUN_ID;
+  },
+
+  FIREFOX_ID: "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",
+  SEAMONKEY_ID: "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}",
+  // We need a random RUN_ID because of https://bugzilla.mozilla.org/show_bug.cgi?id=1202125
+  get MMID() { // message manager ID
+    return `${this.EXTENSION_ID}_${this.RUN_ID}`;
+  },
+  get MM_PREFIX() {
+    return `${this.MMID}:`;
+  },
+
+  RULE_ACTION_ALLOW: 1,
+  RULE_ACTION_DENY: 2,
 };
-
-C.UI_TESTING = C.BUILD_ALIAS === "ui-testing";
-C.NON_UI_TESTING = C.BUILD_ALIAS === "non-ui-testing";
-
-C.LOG_PREFIX = "[RequestPolicy] ";
-
-C.EXTENSION_ID = "/* @echo EXTENSION_ID */";
-
-// NOTE: do not generate the run ID here (except for non-UI tests),
-//   because "constants.js" gets loaded multiple times, i.e.,
-//   in multiple environments.
-C.RUN_ID = C.NON_UI_TESTING ? Math.random() : RUN_ID;
-
-C.FIREFOX_ID = "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
-C.SEAMONKEY_ID = "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}";
-// We need a random RUN_ID because of https://bugzilla.mozilla.org/show_bug.cgi?id=1202125
-C.MMID = C.EXTENSION_ID + "_" + C.RUN_ID; // message manager ID
-C.MM_PREFIX = C.MMID + ":";
-
-C.RULE_ACTION_ALLOW = 1;
-C.RULE_ACTION_DENY = 2;

@@ -78,7 +78,7 @@ export let PolicyManager = (function() {
     // Read the user rules from a file.
     try {
       log.info("loadUserRules loading user rules");
-      rawRuleset = RulesetStorage.loadRawRulesetFromFile("user.json");
+      rawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
       self.userRulesetExistedOnStartup = true;
     } catch (e) {
       // TODO: log a message about missing user.json ruleset file.
@@ -111,7 +111,7 @@ export let PolicyManager = (function() {
           log.info("loadSubscriptionRules: " +
                  listName + " / " + subName);
           rawRuleset = RulesetStorage
-              .loadRawRulesetFromFile(subName + ".json", listName);
+              .loadRawRulesetFromFile(subName, listName);
         } catch (e) {
           log.warn("Unable to load ruleset from file: " + e);
           if (!failures[listName]) {

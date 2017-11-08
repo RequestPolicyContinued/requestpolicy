@@ -30,12 +30,12 @@ import * as FileUtils from "content/lib/utils/file-utils";
 
 export const RulesetStorage = {
   /**
-   * @param {String} filename
-   * @param {String} subscriptionListName
+   * @param {String} policyName
+   * @param {String?} subscriptionListName
    * @return {RawRuleset}
    */
-  loadRawRulesetFromFile(filename, subscriptionListName) {
-    // TODO: change filename argument to policyname and we'll append the '.json'
+  loadRawRulesetFromFile(policyName, subscriptionListName) {
+    const filename = policyName + ".json";
     // TODO: get a stream and use the mozilla json interface to
     //       decode from stream.
     const policyFile = FileUtils.getRPUserDir("policies");
@@ -61,11 +61,11 @@ export const RulesetStorage = {
 
   /**
    * @param {RawRuleset} policy
-   * @param {String} filename
-   * @param {String} subscriptionListName
+   * @param {String} policyName
+   * @param {String?} subscriptionListName
    */
-  saveRawRulesetToFile(policy, filename, subscriptionListName) {
-    // TODO: change filename argument to policyname and we'll append the '.json'
+  saveRawRulesetToFile(policy, policyName, subscriptionListName) {
+    const filename = policyName + ".json";
     // TODO: get a stream and use the mozilla json interface to
     //       encode to stream.
     let policyFile;

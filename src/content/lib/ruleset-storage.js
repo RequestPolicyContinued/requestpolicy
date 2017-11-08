@@ -32,7 +32,7 @@ export const RulesetStorage = {
   /**
    * @param {String} policyName
    * @param {String?} subscriptionListName
-   * @return {RawRuleset}
+   * @return {RawRuleset?}
    */
   loadRawRulesetFromFile(policyName, subscriptionListName) {
     const filename = policyName + ".json";
@@ -46,16 +46,8 @@ export const RulesetStorage = {
       policyFile.appendRelativePath(subscriptionListName);
     }
     policyFile.appendRelativePath(filename);
-    // Important note: Do not catch the error thrown by the fileToString!
-    // There is no check for the existence of the file, because
-    // loadSubscriptionRules catches errors and then knows if a file
-    // existed or not. This is a bad implementation.
-    // TODO: solve this mess
+    if (!policyFile.exists()) return null;
     let str = FileUtils.fileToString(policyFile);
-    // let str;
-    // if (policyFile.exists()) {
-    //   str = FileUtils.fileToString(policyFile);
-    // }
     return new RawRuleset(str);
   },
 

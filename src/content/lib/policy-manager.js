@@ -74,20 +74,10 @@ export let PolicyManager = (function() {
   };
 
   self.loadUserRules = function() {
-    let rawRuleset;
-    // Read the user rules from a file.
-    try {
-      log.info("loadUserRules loading user rules");
-      rawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
-      self.userRulesetExistedOnStartup = true;
-    } catch (e) {
-      // TODO: log a message about missing user.json ruleset file.
-      // There's no user ruleset. This is either because RP has just been
-      // installed, the file has been deleted, or something is wrong. For now,
-      // we'll assume this is a new install.
-      self.userRulesetExistedOnStartup = false;
-      rawRuleset = new RawRuleset();
-    }
+    log.info("loadUserRules loading user rules");
+    let rawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
+    self.userRulesetExistedOnStartup = !!rawRuleset;
+    if (!rawRuleset) rawRuleset = new RawRuleset();
     userRulesets.user = {
       "rawRuleset": rawRuleset,
       "ruleset": rawRuleset.toRuleset("user"),
@@ -104,16 +94,20 @@ export let PolicyManager = (function() {
     let failures = {};
 
     // Read each subscription from a file.
-    let rawRuleset;
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
+        log.info(`loadSubscriptionRules: ${listName} / ${subName}`);
+        let rawRuleset;
         try {
-          log.info("loadSubscriptionRules: " +
-                 listName + " / " + subName);
           rawRuleset = RulesetStorage
               .loadRawRulesetFromFile(subName, listName);
+          if (rawRuleset === null) {
+            log.warn("Ruleset does not exist (yet).");
+          }
         } catch (e) {
-          log.warn("Unable to load ruleset from file: " + e);
+          log.error("Error when loading ruleset from file: ", e);
+        }
+        if (!rawRuleset) {
           if (!failures[listName]) {
             failures[listName] = {};
           }

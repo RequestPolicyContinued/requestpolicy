@@ -91,43 +91,43 @@ function dprint(msg) {
  * subscription information is stored and provides the mechanism for updating
  * subscriptions.
  */
-export function UserSubscriptions() {
-  const userSubsFile = FileUtils.getRPUserDir();
-  userSubsFile.appendRelativePath("subscriptions.json");
-  let jsonData = "{}";
-  if (userSubsFile.exists()) {
-    jsonData = FileUtils.fileToString(userSubsFile);
-  }
-  this._data = JSON.parse(jsonData);
-  if (!this._data.lists) {
-    this._data.lists = {
-      "official": {
-        "subscriptions": {
-          "allow_embedded": {},
-          "allow_extensions": {},
-          "allow_functionality": {},
-          "allow_mozilla": {},
-          "allow_sameorg": {},
-          "deny_trackers": {},
+export class UserSubscriptions {
+  constructor() {
+    const userSubsFile = FileUtils.getRPUserDir();
+    userSubsFile.appendRelativePath("subscriptions.json");
+    let jsonData = "{}";
+    if (userSubsFile.exists()) {
+      jsonData = FileUtils.fileToString(userSubsFile);
+    }
+    this._data = JSON.parse(jsonData);
+    if (!this._data.lists) {
+      this._data.lists = {
+        "official": {
+          "subscriptions": {
+            "allow_embedded": {},
+            "allow_extensions": {},
+            "allow_functionality": {},
+            "allow_mozilla": {},
+            "allow_sameorg": {},
+            "deny_trackers": {},
+          },
         },
-      },
-    };
+      };
+    }
+    this._lists = this._data.lists;
   }
-  this._lists = this._data.lists;
-}
 
-UserSubscriptions.prototype = {
-  toString: function() {
+  toString() {
     return "[UserSubscriptions]";
-  },
+  }
 
-  save: function() {
+  save() {
     const userSubsFile = FileUtils.getRPUserDir();
     userSubsFile.appendRelativePath("subscriptions.json");
     FileUtils.stringToFile(JSON.stringify(this._data), userSubsFile);
-  },
+  }
 
-  getSubscriptionInfo: function() {
+  getSubscriptionInfo() {
     const lists = this._data.lists;
     const result = {};
     for (let listName in lists) {
@@ -140,9 +140,9 @@ UserSubscriptions.prototype = {
       }
     }
     return result;
-  },
+  }
 
-  addSubscription: function(listName, subName) {
+  addSubscription(listName, subName) {
     const lists = this._data.lists;
     if (!lists[listName]) {
       lists[listName] = {};
@@ -152,23 +152,23 @@ UserSubscriptions.prototype = {
     }
     lists[listName].subscriptions[subName] = {};
     this.save();
-  },
+  }
 
-  removeSubscription: function(listName, subName) {
+  removeSubscription(listName, subName) {
     const lists = this._data.lists;
     if (lists[listName] && lists[listName].subscriptions &&
         lists[listName].subscriptions[subName]) {
       delete lists[listName].subscriptions[subName];
     }
     this.save();
-  },
+  }
 
   // This method kinda sucks. Maybe move this to a worker and write this
   // procedurally instead of event-driven. That is, the async requests really
   // make a big fat mess of the code, or more likely I'm just not good at
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
-  update: function(callback, serials) {
+  update(callback, serials) {
     const updatingLists = {};
     const updateResults = {};
 
@@ -257,8 +257,8 @@ UserSubscriptions.prototype = {
       dprint("No lists to update.");
       setTimeout(() => callback(updateResults), 0);
     }
-  },
-};
+  }
+}
 
 // =============================================================================
 // SubscriptionList
@@ -276,22 +276,19 @@ UserSubscriptions.prototype = {
  * @param {string} name
  * @param {string} url
  */
-export function SubscriptionList(name, url) {
-  // TODO: allow only ascii lower letters, digits, and hyphens in name.
-  this._name = name;
-  this._url = url;
-}
+export class SubscriptionList {
+  constructor(name, url) {
+    // TODO: allow only ascii lower letters, digits, and hyphens in name.
+    this._name = name;
+    this._url = url;
+    this._data = null;
+  }
 
-SubscriptionList.prototype = {
-  _name: null,
-  _url: null,
-  _data: null,
-
-  toString: function() {
+  toString() {
     return "[SubscriptionList " + this._name + " " + this._url + "]";
-  },
+  }
 
-  updateMetadata: function(successCallback, errorCallback) {
+  updateMetadata(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Ci.nsIXMLHttpRequest);
@@ -311,9 +308,9 @@ SubscriptionList.prototype = {
     });
     req.open("GET", this._url);
     req.send(null);
-  },
+  }
 
-  updateSubscriptions: function(userSubs, successCallback, errorCallback) {
+  updateSubscriptions(userSubs, successCallback, errorCallback) {
     for (let subName in userSubs) {
       let serial = this.getSubscriptionSerial(subName);
       if (serial === null) {
@@ -343,9 +340,9 @@ SubscriptionList.prototype = {
         setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
-  },
+  }
 
-  // getSubscriptionNames : function () {
+  // getSubscriptionNames  () {
   //   var names = [];
   //   for (var subName in this._data.subscriptions) {
   //     names.push(subName);
@@ -353,20 +350,20 @@ SubscriptionList.prototype = {
   //   return names;
   // },
 
-  getSubscriptionSerial: function(subName) {
+  getSubscriptionSerial(subName) {
     if (!(subName in this._data.subscriptions)) {
       return null;
     }
     return this._data.subscriptions[subName].serial;
-  },
+  }
 
-  getSubscriptionUrl: function(subName) {
+  getSubscriptionUrl(subName) {
     if (!(subName in this._data.subscriptions)) {
       return null;
     }
     return this._data.subscriptions[subName].url;
-  },
-};
+  }
+}
 
 // =============================================================================
 // Subscription
@@ -380,26 +377,22 @@ SubscriptionList.prototype = {
  * @param {string} subName
  * @param {string} subUrl
  */
-export function Subscription(listName, subName, subUrl) {
-  // TODO: allow only ascii lower letters, digits, and hyphens in listName.
-  this._list = listName;
-  // TODO: allow only ascii lower letters, digits, and hyphens in subName.
-  this._name = subName;
-  this._url = subUrl;
-}
+export class Subscription {
+  constructor(listName, subName, subUrl) {
+    // TODO: allow only ascii lower letters, digits, and hyphens in listName.
+    this._list = listName;
+    // TODO: allow only ascii lower letters, digits, and hyphens in subName.
+    this._name = subName;
+    this._url = subUrl;
+    this._data = null;
+  }
 
-Subscription.prototype = {
-  _list: null,
-  _name: null,
-  _url: null,
-  _data: null,
-
-  toString: function() {
+  toString() {
     return "[Subscription " + this._list + " " + this._name + " " +
         this._url + "]";
-  },
+  }
 
-  update: function(successCallback, errorCallback) {
+  update(successCallback, errorCallback) {
     dprint("Updating " + this.toString());
 
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
@@ -456,6 +449,5 @@ Subscription.prototype = {
     });
     req.open("GET", this._url);
     req.send(null);
-  },
-
-};
+  }
+}

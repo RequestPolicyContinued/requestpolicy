@@ -35,6 +35,10 @@ export class Listeners extends Set<Listener> {
     removeListener: this.delete.bind(this),
   };
 
+  constructor() {
+    super();
+  }
+
   public emit(...args: any[]) {
     const returnValues = [];
     let withPromises = false;

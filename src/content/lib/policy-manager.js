@@ -340,15 +340,15 @@ export const PolicyManager = {
 const PM = PolicyManager;
 
 Object.assign(PolicyManager, {
-  addAllowRule: PM.addRule.bind(null, C.RULE_ACTION_ALLOW),
-  addTemporaryAllowRule: PM.addTemporaryRule.bind(null, C.RULE_ACTION_ALLOW),
-  removeAllowRule: PM.removeRule.bind(null, C.RULE_ACTION_ALLOW),
-  addDenyRule: PM.addRule.bind(null, C.RULE_ACTION_DENY),
-  addTemporaryDenyRule: PM.addTemporaryRule.bind(null, C.RULE_ACTION_DENY),
-  removeDenyRule: PM.removeRule.bind(null, C.RULE_ACTION_DENY),
+  addAllowRule: PM.addRule.bind(PM, C.RULE_ACTION_ALLOW),
+  addTemporaryAllowRule: PM.addTemporaryRule.bind(PM, C.RULE_ACTION_ALLOW),
+  removeAllowRule: PM.removeRule.bind(PM, C.RULE_ACTION_ALLOW),
+  addDenyRule: PM.addRule.bind(PM, C.RULE_ACTION_DENY),
+  addTemporaryDenyRule: PM.addTemporaryRule.bind(PM, C.RULE_ACTION_DENY),
+  removeDenyRule: PM.removeRule.bind(PM, C.RULE_ACTION_DENY),
 
-  addAllowRules: PM.addRules.bind(null, C.RULE_ACTION_ALLOW),
-  addDenyRules: PM.addRules.bind(null, C.RULE_ACTION_DENY),
+  addAllowRules: PM.addRules.bind(PM, C.RULE_ACTION_ALLOW),
+  addDenyRules: PM.addRules.bind(PM, C.RULE_ACTION_DENY),
 
   getRuleData(aOrigin, aDest) {
     let ruleData = {};

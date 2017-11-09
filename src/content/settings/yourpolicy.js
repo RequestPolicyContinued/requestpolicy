@@ -182,6 +182,8 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
     try {
       addRuleHelper();
     } catch (e) {
+      console.error("yourpolicy: addRule():");
+      console.dir(e);
       window.alert("Unable to add rule: " + e.toString());
       return;
     }

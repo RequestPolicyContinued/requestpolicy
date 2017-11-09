@@ -23,7 +23,7 @@
 import {C} from "content/data/constants";
 
 // ===========================================================================
-// constants
+// constants & utilities
 // ===========================================================================
 
 export enum LogLevel {
@@ -38,6 +38,10 @@ export enum LogLevel {
 type LogFnName = "dir" | "log" | "info" | "warn" | "error";
 
 const MINIMUM_LOGGING_LEVEL = LogLevel.ERROR;
+
+function dir(...args: any[]) {
+  args.forEach((arg) => console.dir(arg));
+}
 
 // =============================================================================
 // LogClass
@@ -171,7 +175,7 @@ export class LogClass {
 
   public dir(...args: any[]) {
     if (!this.shouldLog(LogLevel.DEBUG)) return;
-    console.dir(...args);
+    dir(...args);
   }
 
   public error(msg: string | string[], ...errorsAndOtherDirArgs: any[]) {
@@ -286,7 +290,7 @@ export class LogClass {
     if (typeof aMsg !== "object") aMsg = [aMsg];
     const [firstMsg, ...otherMsgs] = aMsg;
     console[aFnName](this.prefix + firstMsg, ...otherMsgs);
-    console.dir(...aDirArgs);
+    dir(...aDirArgs);
   }
 }
 

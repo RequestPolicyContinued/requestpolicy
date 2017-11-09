@@ -92,14 +92,8 @@ function dprint(msg) {
  * subscriptions.
  */
 export class UserSubscriptions {
-  constructor() {
-    const userSubsFile = FileUtils.getRPUserDir();
-    userSubsFile.appendRelativePath("subscriptions.json");
-    let jsonData = "{}";
-    if (userSubsFile.exists()) {
-      jsonData = FileUtils.fileToString(userSubsFile);
-    }
-    this._data = JSON.parse(jsonData);
+  constructor(aRawData = {}) {
+    this._data = aRawData;
     if (!this._data.lists) {
       this._data.lists = {
         "official": {
@@ -123,7 +117,7 @@ export class UserSubscriptions {
 
   save() {
     const userSubsFile = FileUtils.getRPUserDir();
-    userSubsFile.appendRelativePath("subscriptions.json");
+    userSubsFile.appendRelativePath("subscriptions");
     FileUtils.stringToFile(JSON.stringify(this._data), userSubsFile);
   }
 
@@ -276,7 +270,7 @@ export class UserSubscriptions {
  * @param {string} name
  * @param {string} url
  */
-export class SubscriptionList {
+class SubscriptionList {
   constructor(name, url) {
     // TODO: allow only ascii lower letters, digits, and hyphens in name.
     this._name = name;
@@ -377,7 +371,7 @@ export class SubscriptionList {
  * @param {string} subName
  * @param {string} subUrl
  */
-export class Subscription {
+class Subscription {
   constructor(listName, subName, subUrl) {
     // TODO: allow only ascii lower letters, digits, and hyphens in listName.
     this._list = listName;
@@ -426,7 +420,7 @@ export class Subscription {
         // The rest of the sanity checking is done by RawRuleset().
         try {
           const rawRuleset = new RawRuleset(self._rawData);
-          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name + ".json",
+          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name,
                 self._list);
         } catch (e) {
           setTimeout(() => errorCallback(self, e.toString()), 0);

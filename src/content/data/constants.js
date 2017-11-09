@@ -66,4 +66,6 @@ export const C = {
 
   RULE_ACTION_ALLOW: 1,
   RULE_ACTION_DENY: 2,
+
+  UNDEFINED: Symbol("UNDEFINED"),
 };

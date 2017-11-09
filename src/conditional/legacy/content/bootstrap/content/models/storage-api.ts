@@ -20,18 +20,93 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {isJsonPref, JsonPrefs} from "bootstrap/models/json-prefs";
 import {Prefs} from "bootstrap/models/prefs";
+import {C} from "content/data/constants";
 import {createListenersMap} from "content/lib/utils/listener-factories";
-import {Log} from "content/models/log";
 
-const log = Log.extend({name: "Storage API"});
+// =============================================================================
+
+interface IKeysWithDefaults {
+  [k: string]: any;
+}
+
+// =============================================================================
+
+function getPrefsModel(aKey: string) {
+  return isJsonPref(aKey) ? JsonPrefs : Prefs;
+}
 
 function getPref(aKey: string) {
-  return Prefs.get(aKey);
+  return getPrefsModel(aKey).get(aKey);
 }
 
 function setPref(aKey: string, aValue: any) {
-  Prefs.set(aKey, aValue);
+  getPrefsModel(aKey).set(aKey, aValue);
+}
+
+function getAllPrefs() {
+  return Prefs.branches.rp.getAll().concat(JsonPrefs.getAll());
+}
+
+function getNothing() {
+  return {};
+}
+
+function getPrefs(aKeys: string[]) {
+  const results: {[k: string]: any} = {};
+  aKeys.forEach((key) => {
+    const result = getPref(key);
+    if (result !== C.UNDEFINED) {
+      results[key] = result;
+    }
+  });
+  return results;
+}
+
+// =============================================================================
+
+function get(aKeys: string | string[] | IKeysWithDefaults | null | undefined) {
+  if (aKeys === "") return getNothing();
+  let keys: string[];
+  let isObjectWithDefaults = false;
+
+  if (typeof aKeys === "string") {
+    keys = [aKeys];
+  } else if (typeof aKeys === "object") {
+    if (Array.isArray(aKeys)) {
+      keys = aKeys as string[];
+    } else {
+      isObjectWithDefaults = true;
+      keys = Object.keys(aKeys as IKeysWithDefaults);
+    }
+    if (keys.length === 0) {
+      return getNothing();
+    }
+  } else {
+    return getAllPrefs();
+  }
+  const results = getPrefs(keys);
+  if (isObjectWithDefaults) {
+    const defaults = aKeys as IKeysWithDefaults;
+    // tslint:disable-next-line prefer-const
+    for (let key in keys) {
+      if (!(results.hasOwnProperty(key))) {
+        results[key] = defaults[key];
+      }
+    }
+  }
+  return results;
+}
+
+function set(aKeys: {[k: string]: any}) {
+  if (typeof aKeys !== "object") {
+    throw new Error("browser.storage.local.set(): aKeys must be an object!");
+  }
+  Object.keys(aKeys).forEach((key) => {
+    setPref(key, aKeys[key]);
+  });
+  Prefs.save();
 }
 
 const {
@@ -42,36 +117,15 @@ const {
 
 export const StorageApi = {
   local: {
-    get(aKeys: string | string[] | {[k: string]: any} | null | undefined) {
-      if (typeof aKeys === "string") {
-        return Promise.resolve(getPref(aKeys));
-      }
-      let keys: string[];
-      if (Array.isArray(aKeys)) {
-        keys = aKeys;
-      } else if (typeof aKeys === "object") {
-        keys = Object.keys(aKeys as {[k: string]: any});
-      } else {
-        keys = Prefs.ALL_KEYS;
-      }
-      const results: {[k: string]: any} = {};
-      keys.forEach((key) => {
-        results[key] = getPref(key);
-      });
-      return Promise.resolve(results);
+    get(aKeys: string | string[] | IKeysWithDefaults | null | undefined) {
+      return Promise.resolve(get(aKeys));
     },
-
     set(aKeys: {[k: string]: any}) {
-      if (typeof aKeys !== "object") {
-        const msg = "browser.storage.local.set(): aKeys must be an object!";
-        log.error(msg, aKeys);
-        return Promise.reject(new Error(msg));
+      try {
+        return Promise.resolve(set(aKeys));
+      } catch (e) {
+        return Promise.reject(e);
       }
-      Object.keys(aKeys).forEach((key) => {
-        setPref(key, aKeys[key]);
-      });
-      Prefs.save();
-      return Promise.resolve();
     },
   },
   onChanged: eventTargets.onChanged,

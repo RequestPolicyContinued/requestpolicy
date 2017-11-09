@@ -48,6 +48,11 @@ PrefBranch.prototype._type = function(aPrefName) {
   return this._namesToTypesMap[aPrefName];
 };
 
+PrefBranch.prototype.getAll = function() {
+  return Object.keys(this._namesToTypesMap).
+      map((prefName) => this.get(prefName));
+};
+
 PrefBranch.prototype.get = function(aPrefName) {
   let getterFnName = "get" + this._type(aPrefName);
   return this.branch[getterFnName](aPrefName);

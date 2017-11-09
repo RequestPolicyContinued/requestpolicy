@@ -205,7 +205,7 @@ export const PolicyManager = {
     // become annoying when there is a large file to write.
     if (!noStore) {
       RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user.json");
+          userRulesets.user.rawRuleset, "user");
     }
 
     // userRulesets.user.ruleset.print();
@@ -224,7 +224,7 @@ export const PolicyManager = {
 
   storeRules() {
     RulesetStorage.saveRawRulesetToFile(
-        userRulesets.user.rawRuleset, "user.json");
+        userRulesets.user.rawRuleset, "user");
   },
 
   addTemporaryRule(ruleAction, ruleData) {
@@ -263,7 +263,7 @@ export const PolicyManager = {
     // become annoying when there is a large file to write.
     if (!noStore) {
       RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user.json");
+          userRulesets.user.rawRuleset, "user");
     }
 
     // userRulesets.user.ruleset.print();

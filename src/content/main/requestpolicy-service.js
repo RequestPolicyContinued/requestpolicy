@@ -44,13 +44,20 @@ export const rpService = (function() {
   // Utility
   // ---------------------------------------------------------------------------
 
-  function loadConfigAndRules() {
-    subscriptions = new UserSubscriptions();
+  function loadUserRules() {
     PolicyManager.loadUserRules();
+  }
 
-    const pLoadSubscriptionRules = PolicyManager.loadSubscriptionRules(
-        subscriptions.getSubscriptionInfo());
-    const pDone = pLoadSubscriptionRules.then(({failures}) => {
+  function loadSubscriptionRules() {
+    const pDone = browser.storage.local.get(
+        "subscriptions"
+    ).then((result) => {
+      const rawData = result.hasOwnProperty("subscriptions") ?
+          result.subscriptions : undefined;
+      subscriptions = new UserSubscriptions(rawData);
+      return PolicyManager.loadSubscriptionRules(
+          subscriptions.getSubscriptionInfo());
+    }).then(({failures}) => {
       // TODO: check a preference that indicates the last time we checked for
       // updates. Don't do it if we've done it too recently.
       // TODO: Maybe we should probably ship snapshot versions of the official
@@ -81,7 +88,11 @@ export const rpService = (function() {
     pDone.catch((e) => {
       log.error("loadConfigAndRules():", e);
     });
-    return pDone;
+  }
+
+  function loadRules() {
+    loadUserRules();
+    loadSubscriptionRules();
   }
 
   // ---------------------------------------------------------------------------
@@ -89,8 +100,7 @@ export const rpService = (function() {
   // ---------------------------------------------------------------------------
 
   // prepare back-end
-  MainEnvironment.addStartupFunction(EnvLevel.BACKEND,
-                                        loadConfigAndRules);
+  MainEnvironment.addStartupFunction(EnvLevel.BACKEND, loadRules);
 
   function registerObservers() {
     MainEnvironment.obMan.observe([

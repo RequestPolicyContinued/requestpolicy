@@ -59,7 +59,7 @@ export const OldRulesController: IController = {
     //   * upgrades to 1.0,
     //   * downgrades back to 0.5
     //   * and upgrades again
-    // the user ruleset (user.json) already exists after the first step.
+    // the user ruleset already exists after the first step.
     const isFirstRPUpgrade = true === VersionInfos.isRPUpgrade &&
         false === PolicyManager.userRulesetExistedOnStartup;
 

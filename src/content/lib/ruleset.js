@@ -39,7 +39,7 @@ function dwarn(msg) {
 
 /* eslint-disable max-len */
 /*
-// We expect JSON data to represent the following data structure.
+// We expect the following data structure:
 exampleRawDataObj = {
   "metadata" : {
     "version" : 1,
@@ -101,11 +101,19 @@ function dump(arr, level=0) {
 // =============================================================================
 
 export class RawRuleset {
-  constructor(jsonData) {
+  constructor(data) {
     this._metadata = {"version": 1};
     this._entries = {};
-    if (jsonData) {
-      this._fromJSON(jsonData);
+    if (data) {
+      // TODO: sanity check imported data, decide whether to ignore unrecognized
+      // keys.
+      // TODO: wrap in try/catch block
+
+      // dprint(typeof data);
+      // dprint(dump(data));
+      RawRuleset._checkDataObj(data);
+      this._metadata = data.metadata;
+      this._entries = data.entries;
     }
     if (!this._entries.allow) {
       this._entries.allow = [];
@@ -452,34 +460,13 @@ export class RawRuleset {
   }
 
   /**
-   * Initializes this |RawRuleset| from JSON data.
-   *
-   * @param {string} data
-   */
-  _fromJSON(data) {
-    // TODO: sanity check imported data, decide whether to ignore unrecognized
-    // keys.
-    // TODO: wrap in try/catch block
-    const dataObj = JSON.parse(data);
-
-    // dprint(typeof dataObj);
-    // dprint(dump(dataObj));
-    this._checkDataObj(dataObj);
-    this._metadata = dataObj.metadata;
-    this._entries = dataObj.entries;
-  }
-
-  /**
-   * Returns a simple object representing this |RawRuleset|. This function
-   * is automatically invoked when |JSON.stringify(rawRulesetObj)| is called and
-   * the result is passed through stringify before being returned.
+   * Returns a simple object representing this |RawRuleset|.
    *
    * @return {Object}
    */
-  toJSON() {
+  get raw() {
     // Note: unrecognized keys in the metadata and entries are preserved.
-    const tempObj = {"metadata": this._metadata, "entries": this._entries};
-    return tempObj;
+    return {"metadata": this._metadata, "entries": this._entries};
   }
 }
 

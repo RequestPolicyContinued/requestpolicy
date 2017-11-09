@@ -21,11 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log as log} from "content/models/log";
 import {RawRuleset} from "content/lib/ruleset";
 import * as FileUtils from "content/lib/utils/file-utils";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {MainEnvironment} from "content/lib/environment";
+import {Log} from "content/models/log";
+
+const log = Log.extend({
+  name: "Subscriptions",
+});
 
 // =============================================================================
 // Constants
@@ -169,7 +173,7 @@ export class UserSubscriptions {
     const updateResults = {};
 
     function recordDone(listName, subName, result) {
-      dprint("Recording done: " + listName + " " + subName);
+      log.info("Recording done: " + listName + " " + subName);
       if (subName) {
         updateResults[listName][subName] = result;
         let list = updatingLists[listName];
@@ -188,14 +192,14 @@ export class UserSubscriptions {
     let listCount = 0;
     for (let listName in serials) {
       if (!this._lists[listName] || !this._lists[listName].subscriptions) {
-        dprint("Skipping update of unsubscribed list: " + listName);
+        log.info("Skipping update of unsubscribed list: " + listName);
         continue;
       }
       let updateSubs = {};
       let subCount = 0;
       for (let subName in serials[listName]) {
         if (!this._lists[listName].subscriptions[subName]) {
-          dprint("Skipping update of unsubscribed subscription: " + listName +
+          log.info("Skipping update of unsubscribed subscription: " + listName +
               " " + subName);
           continue;
         }
@@ -203,7 +207,7 @@ export class UserSubscriptions {
         subCount++;
       }
       if (subCount === 0) {
-        dprint("Skipping list with no subscriptions: " + listName);
+        log.info("Skipping list with no subscriptions: " + listName);
         continue;
       }
       let url = this._lists[listName].url;
@@ -211,46 +215,46 @@ export class UserSubscriptions {
         url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + ".json";
       }
       if (!url) {
-        dprint("Skipping list without url: " + listName);
+        log.info("Skipping list without url: " + listName);
         continue;
       }
       const list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
       for (let subName in updateSubs) {
-        dprint("Will update subscription: " + listName + " " + subName);
+        log.info("Will update subscription: " + listName + " " + subName);
         updatingLists[listName][subName] = true;
       }
       updateResults[listName] = {};
 
       let metadataSuccess = function(list) {
         function subSuccess(sub, status) {
-          dprint("Successfully updated subscription " + sub.toString());
+          log.info("Successfully updated subscription " + sub.toString());
           recordDone(list._name, sub._name, status);
         }
 
         function subError(sub, error) {
-          dprint("Failed to update subscription " + sub.toString() + ": " +
-                error);
+          log.info("Failed to update subscription " + sub.toString() + ": " +
+              error);
           recordDone(list._name, sub._name, SUBSCRIPTION_UPDATE_FAILURE);
         }
 
-        dprint("Successfully updated list " + list.toString());
+        log.info("Successfully updated list " + list.toString());
         list.updateSubscriptions(updateSubs, subSuccess, subError);
       };
 
       let metadataError = function(list, error) {
-        dprint("Failed to update list: " + list.toString() + ": " + error);
+        log.info("Failed to update list: " + list.toString() + ": " + error);
         updateResults[listName] = false;
         recordDone(list._name);
       };
 
       listCount++;
-      dprint("Will update list: " + listName);
+      log.info("Will update list: " + listName);
       list.updateMetadata(metadataSuccess, metadataError);
     }
 
     if (listCount === 0) {
-      dprint("No lists to update.");
+      log.info("No lists to update.");
       setTimeout(() => callback(updateResults), 0);
     }
   }
@@ -285,7 +289,7 @@ class SubscriptionList {
   }
 
   updateMetadata(successCallback, errorCallback) {
-    dprint("Updating " + this.toString());
+    log.info("Updating " + this.toString());
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Ci.nsIXMLHttpRequest);
     const self = this;
@@ -312,10 +316,10 @@ class SubscriptionList {
       if (serial === null) {
         continue;
       }
-      dprint("Current serial for " + this._name + " " + subName + ": " +
-             userSubs[subName].serial);
-      dprint("Available serial for " + this._name + " " + subName + ": " +
-             serial);
+      log.info("Current serial for " + this._name + " " + subName + ": " +
+          userSubs[subName].serial);
+      log.info("Available serial for " + this._name + " " + subName + ": " +
+          serial);
       let subUrl = this.getSubscriptionUrl(subName);
       if (subUrl === null) {
         continue;
@@ -325,7 +329,7 @@ class SubscriptionList {
         if (serial > userSubs[subName].serial) {
           sub.update(successCallback, errorCallback);
         } else {
-          dprint("No update needed for " + this._name + " " + subName);
+          log.info("No update needed for " + this._name + " " + subName);
           let curSub = sub;
           setTimeout(() => {
             successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
@@ -389,7 +393,7 @@ class Subscription {
   }
 
   update(successCallback, errorCallback) {
-    dprint("Updating " + this.toString());
+    log.info("Updating " + this.toString());
 
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
         createInstance(Ci.nsIXMLHttpRequest);

@@ -116,9 +116,11 @@ export class UserSubscriptions {
   }
 
   save() {
-    const userSubsFile = FileUtils.getRPUserDir();
-    userSubsFile.appendRelativePath("subscriptions");
-    FileUtils.stringToFile(JSON.stringify(this._data), userSubsFile);
+    browser.storage.local.set({
+      subscriptions: this._data,
+    }).catch((e) => {
+      log.error("UserSubscriptions.save():", e);
+    });
   }
 
   getSubscriptionInfo() {

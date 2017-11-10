@@ -535,15 +535,8 @@ class Rules {
  */
 class Rule {
   constructor(scheme, port) {
-    this.scheme = scheme || null;
+    this.scheme = scheme || null; // string
     this.port = port || null; // string
-
-    this.scheme = null;
-
-    /**
-     * @type {?string}
-     */
-    this.port = null;
 
     this.path = null;
 
@@ -669,32 +662,28 @@ class Rule {
 // DomainEntry
 // =============================================================================
 
-function DomainEntry(name, fullName, higher) {
-  if (typeof name !== "string" && name !== null) {
-    // eslint-disable-next-line no-throw-literal
-    throw "Invalid type: DomainEntry name must be a string or null.";
-  }
-  this._name = name;
-  this.fullName = fullName;
-  this._higher = higher;
-  this._lower = {};
-  this.rules = new Rules();
-}
+class DomainEntry {
+  constructor(name, fullName, higher) {
+    if (typeof name !== "string" && name !== null) {
+      // eslint-disable-next-line no-throw-literal
+      throw "Invalid type: DomainEntry name must be a string or null.";
+    }
+    this._name = name;
+    this.fullName = fullName;
 
-DomainEntry.prototype = {
-  _name: null,
-  fullName: null,
-  /**
-   * A dictionary whose keys are strings of domain part names and values are
-   * further DomainEntry objects.
-   */
-  _lower: null,
-  _higher: null,
-  rules: null,
+    /**
+     * A dictionary whose keys are strings of domain part names and values are
+     * further DomainEntry objects.
+     */
+    this._lower = {};
+    this._higher = higher;
+
+    this.rules = new Rules();
+  }
 
   toString() {
     return "[DomainEntry '" + this._name + " (" + this.fullName + ")']";
-  },
+  }
 
   print(depth) {
     depth = depth || 0;
@@ -709,7 +698,7 @@ DomainEntry.prototype = {
     for (let entryName in this._lower) {
       this._lower[entryName].print(depth + 1);
     }
-  },
+  }
 
   addLowerLevel(name, entry) {
     if (this._lower.hasOwnProperty(name)) {
@@ -717,29 +706,29 @@ DomainEntry.prototype = {
       throw "ENTRY_ALREADY_EXISTS";
     }
     this._lower[name] = entry;
-  },
+  }
 
   getLowerLevel(name) {
     if (this._lower.hasOwnProperty(name)) {
       return this._lower[name];
     }
     return null;
-  },
-};
+  }
+}
 
 // =============================================================================
 // IPAddressEntry
 // =============================================================================
 
-function IPAddressEntry(address) {
-  this.address = address;
-  this.rules = new Rules();
-}
+class IPAddressEntry {
+  constructor(address) {
+    this.address = address;
+    this.rules = new Rules();
+  }
 
-IPAddressEntry.prototype = {
   toString() {
     return "[IPAddressEntry '" + this.address + "']";
-  },
+  }
 
   print(depth) {
     depth = depth || 0;
@@ -751,58 +740,158 @@ IPAddressEntry.prototype = {
     if (this.rules) {
       this.rules.print(depth + 1);
     }
-  },
+  }
 
   deleteAllRules() {
-
-  },
-};
+  }
+}
 
 // =============================================================================
 // Ruleset
 // =============================================================================
 
-export function Ruleset(name) {
-  this._name = name || null;
-  // Start off with an "empty" top-level domain entry. This will never have
-  // its own rules. Non-host-specific rules go in |this.rules|.
-  this._domain = new DomainEntry(null, null, null);
-  this._ipAddr = {};
-  this.rules = new Rules();
-}
-
-// TODO: remove
-// if (!print) {
-//   var print;
-// }
-
-Ruleset.prototype = {
+export class Ruleset {
   /**
-   * @type {?string}
+   * @static
+   * @param {?} rawRule
+   * @param {("o"|"d")} originOrDest
+   * @param {?} entry
+   * @param {?} rule
    */
-  _name: null,
-
-  /**
-   * Represents the root domain entry, that is, the domain ".".
-   * Its "lower levels" are domain entries like "com", "info", "org".
-   * @type {DomainEntry}
-   */
-  _domain: null,
+  static _matchToRawRuleHelper(rawRule, originOrDest, entry, rule) {
+    rawRule[originOrDest] = {};
+    if (entry instanceof DomainEntry && entry.fullName) {
+      rawRule[originOrDest].h = entry.fullName;
+    } else if (entry instanceof IPAddressEntry) {
+      rawRule[originOrDest].h = entry.address;
+    }
+    if (rule.scheme) {
+      rawRule[originOrDest].s = rule.scheme;
+    }
+    if (rule.port) {
+      rawRule[originOrDest].port = rule.port;
+    }
+    // TODO: path
+  }
 
   /**
-   * @type {Object<string, IPAddressEntry>}
+   * @static
+   * @param {?} match
+   * @return {RawRule}
    */
-  _ipAddr: null,
+  static matchToRawRule(match) {
+    // The matches are in the format
+    //     [actionStr, entry, rule]
+    // or
+    //     [actionStr, originEntry, originRule, destEntry, destRule]
+    // as returned by calls to |Ruleset.check()|.
+    const rawRule = {};
+    let entry;
+    let rule;
+    let destEntry;
+    let destRule;
+    let actionStr = match[0];
+
+    if (actionStr === "origin") {
+      [actionStr, entry, rule] = match;
+      Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
+    } else if (actionStr === "dest") {
+      [actionStr, entry, rule] = match;
+      Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
+    } else if (actionStr === "origin-to-dest") {
+      [actionStr, entry, rule, destEntry, destRule] = match;
+      Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
+      Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
+    } else {
+      // eslint-disable-next-line no-throw-literal
+      throw "[matchToRawRule] Invalid match type: " + actionStr +
+          " from match: " + match;
+    }
+
+    return rawRule;
+  }
 
   /**
-   * Contains rules that don't specify a host.
-   * @type {Rules}
+   * @static
+   * @param {?} rawRule
+   * @param {("o"|"d")} originOrDest
+   * @param {Array} parts
+   * @return {string}
    */
-  rules: null,
+  static _rawRuleToCanonicalStringHelper(rawRule, originOrDest,
+      parts) {
+    if (rawRule[originOrDest]) {
+      parts.push("\"" + originOrDest + "\":{");
+      let needComma = false;
+      if (rawRule[originOrDest].h) {
+        parts.push("\"h\":\"" + rawRule[originOrDest].h + "\"");
+        needComma = true;
+      }
+      if (rawRule[originOrDest].port) {
+        if (needComma) {
+          parts.push(",");
+        }
+        parts.push("\"port\":\"" + rawRule[originOrDest].port + "\"");
+      }
+      if (rawRule[originOrDest].s) {
+        if (needComma) {
+          parts.push(",");
+        }
+        parts.push("\"s\":\"" + rawRule[originOrDest].s + "\"");
+      }
+      parts.push("}");
+    }
+    // TODO: pathPre and pathRegex (will need to escape strings)
+    parts.push("}");
+    return parts.join("");
+  }
+
+  static rawRuleToCanonicalString(rawRule) {
+    const parts = ["{"];
+    if (rawRule.d) {
+      Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
+    }
+    if (rawRule.d && rawRule.o) {
+      parts.push(",");
+    }
+    if (rawRule.o) {
+      Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
+    }
+    parts.push("}");
+    return parts.join("");
+  }
+
+  /**
+   * @static
+   */
+  // Ruleset.rawRulesAreEqual = function(first, second) {
+  //   var firstStr = Ruleset.rawRuleToCanonicalString(first);
+  //   var secondStr = Ruleset.rawRuleToCanonicalString(second);
+  //   return firstStr === secondStr;
+  // }
+
+  constructor(name) {
+    this._name = name || null; // string
+    // Start off with an "empty" top-level domain entry. This will never have
+    // its own rules. Non-host-specific rules go in |this.rules|.
+    /**
+     * Represents the root domain entry, that is, the domain ".".
+     * Its "lower levels" are domain entries like "com", "info", "org".
+     */
+    this._domain = new DomainEntry(null, null, null);
+    /**
+     * @type {Object<string, IPAddressEntry>}
+     */
+    this._ipAddr = {};
+    /**
+     * Contains rules that don't specify a host.
+     */
+    this.rules = new Rules();
+  }
 
   toString() {
     return "[Ruleset " + this._name + "]";
-  },
+  }
 
   print(depth) {
     depth = depth || 0;
@@ -814,12 +903,12 @@ Ruleset.prototype = {
     this._domain.print(depth + 1);
     // this._ipAddr.print(depth + 1);
     this.rules.print(depth + 1);
-  },
+  }
 
   _getIPAddress(address) {
     // TODO: Canonicalize IPv6 addresses.
     return this._ipAddr[address];
-  },
+  }
 
   _addIPAddress(address) {
     // TODO: Canonicalize IPv6 addresses.
@@ -827,7 +916,7 @@ Ruleset.prototype = {
       this._ipAddr[address] = new IPAddressEntry(address);
     }
     return this._ipAddr[address];
-  },
+  }
 
   _getDomain(domain) {
     const parts = domain.split(".");
@@ -844,7 +933,7 @@ Ruleset.prototype = {
       curLevel = nextLevel;
     }
     return curLevel;
-  },
+  }
 
   _addDomain(domain) {
     const parts = domain.split(".");
@@ -863,7 +952,7 @@ Ruleset.prototype = {
       curLevel = nextLevel;
     }
     return curLevel;
-  },
+  }
 
   getHost(host) {
     if (!host) {
@@ -875,7 +964,7 @@ Ruleset.prototype = {
     } else {
       return this._getDomain(host);
     }
-  },
+  }
 
   addHost(host) {
     if (!host) {
@@ -887,7 +976,7 @@ Ruleset.prototype = {
     } else {
       return this._addDomain(host);
     }
-  },
+  }
 
   /**
    * Yields all matching hosts, that is, DomainEntry or IPAddressEntry
@@ -897,7 +986,7 @@ Ruleset.prototype = {
    * @param {string} host The host to get matching entries for.
    * @yield {Generator<DomainEntry|IPAddressEntry>}
    */
-  getHostMatches: function* (host) {
+  * getHostMatches(host) {
     if (!this.rules.isEmpty()) {
       // If `this.rules` is not empty, it contains any rules which do
       // not specify a host (host = undefined).
@@ -941,7 +1030,7 @@ Ruleset.prototype = {
         }
       }
     }
-  },
+  }
 
   /**
    * @param {nsIURI} origin
@@ -1044,124 +1133,5 @@ Ruleset.prototype = {
     }
 
     return [matchedAllowRules, matchedDenyRules];
-  },
-};
-
-/**
- * @static
- * @param {?} rawRule
- * @param {("o"|"d")} originOrDest
- * @param {?} entry
- * @param {?} rule
- */
-Ruleset._matchToRawRuleHelper = function(rawRule, originOrDest, entry, rule) {
-  rawRule[originOrDest] = {};
-  if (entry instanceof DomainEntry && entry.fullName) {
-    rawRule[originOrDest].h = entry.fullName;
-  } else if (entry instanceof IPAddressEntry) {
-    rawRule[originOrDest].h = entry.address;
   }
-  if (rule.scheme) {
-    rawRule[originOrDest].s = rule.scheme;
-  }
-  if (rule.port) {
-    rawRule[originOrDest].port = rule.port;
-  }
-  // TODO: path
-};
-
-/**
- * @static
- * @param {?} match
- * @return {RawRule}
- */
-Ruleset.matchToRawRule = function(match) {
-  // The matches are in the format
-  //     [actionStr, entry, rule]
-  // or
-  //     [actionStr, originEntry, originRule, destEntry, destRule]
-  // as returned by calls to |Ruleset.check()|.
-  const rawRule = {};
-  let entry;
-  let rule;
-  let destEntry;
-  let destRule;
-  let actionStr = match[0];
-
-  if (actionStr === "origin") {
-    [actionStr, entry, rule] = match;
-    Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
-  } else if (actionStr === "dest") {
-    [actionStr, entry, rule] = match;
-    Ruleset._matchToRawRuleHelper(rawRule, "d", entry, rule);
-  } else if (actionStr === "origin-to-dest") {
-    [actionStr, entry, rule, destEntry, destRule] = match;
-    Ruleset._matchToRawRuleHelper(rawRule, "o", entry, rule);
-    Ruleset._matchToRawRuleHelper(rawRule, "d", destEntry, destRule);
-  } else {
-    // eslint-disable-next-line no-throw-literal
-    throw "[matchToRawRule] Invalid match type: " + actionStr +
-        " from match: " + match;
-  }
-
-  return rawRule;
-};
-
-/**
- * @static
- * @param {?} rawRule
- * @param {("o"|"d")} originOrDest
- * @param {Array} parts
- * @return {string}
- */
-Ruleset._rawRuleToCanonicalStringHelper = function(rawRule, originOrDest,
-    parts) {
-  if (rawRule[originOrDest]) {
-    parts.push("\"" + originOrDest + "\":{");
-    let needComma = false;
-    if (rawRule[originOrDest].h) {
-      parts.push("\"h\":\"" + rawRule[originOrDest].h + "\"");
-      needComma = true;
-    }
-    if (rawRule[originOrDest].port) {
-      if (needComma) {
-        parts.push(",");
-      }
-      parts.push("\"port\":\"" + rawRule[originOrDest].port + "\"");
-    }
-    if (rawRule[originOrDest].s) {
-      if (needComma) {
-        parts.push(",");
-      }
-      parts.push("\"s\":\"" + rawRule[originOrDest].s + "\"");
-    }
-    parts.push("}");
-  }
-  // TODO: pathPre and pathRegex (will need to escape strings)
-  parts.push("}");
-  return parts.join("");
-};
-
-Ruleset.rawRuleToCanonicalString = function(rawRule) {
-  const parts = ["{"];
-  if (rawRule.d) {
-    Ruleset._rawRuleToCanonicalStringHelper(rawRule, "d", parts);
-  }
-  if (rawRule.d && rawRule.o) {
-    parts.push(",");
-  }
-  if (rawRule.o) {
-    Ruleset._rawRuleToCanonicalStringHelper(rawRule, "o", parts);
-  }
-  parts.push("}");
-  return parts.join("");
-};
-
-/**
- * @static
- */
-// Ruleset.rawRulesAreEqual = function(first, second) {
-//   var firstStr = Ruleset.rawRuleToCanonicalString(first);
-//   var secondStr = Ruleset.rawRuleToCanonicalString(second);
-//   return firstStr === secondStr;
-// }
+}

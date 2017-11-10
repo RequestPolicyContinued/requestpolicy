@@ -31,96 +31,69 @@ import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 // rpService
 // =============================================================================
 
-export const rpService = (function() {
-  let self = {};
+let subscriptions = null;
 
-  // ---------------------------------------------------------------------------
-  // Internal Data
-  // ---------------------------------------------------------------------------
+function loadUserRules() {
+  PolicyManager.loadUserRules();
+}
 
-  let subscriptions = null;
-
-  // ---------------------------------------------------------------------------
-  // Utility
-  // ---------------------------------------------------------------------------
-
-  function loadUserRules() {
-    PolicyManager.loadUserRules();
-  }
-
-  function loadSubscriptionRules() {
-    const pDone = browser.storage.local.get(
-        "subscriptions"
-    ).then((result) => {
-      const rawData = result.hasOwnProperty("subscriptions") ?
-          result.subscriptions : undefined;
-      subscriptions = new UserSubscriptions(rawData);
-      return PolicyManager.loadSubscriptionRules(
-          subscriptions.getSubscriptionInfo());
-    }).then(({failures}) => {
-      // TODO: check a preference that indicates the last time we checked for
-      // updates. Don't do it if we've done it too recently.
-      // TODO: Maybe we should probably ship snapshot versions of the official
-      // rulesets so that they can be available immediately after installation.
-      let serials = {};
-      for (let listName in failures) {
-        serials[listName] = {};
-        for (let subName in failures[listName]) {
-          serials[listName][subName] = -1;
+function loadSubscriptionRules() {
+  const pDone = browser.storage.local.get(
+      "subscriptions"
+  ).then((result) => {
+    const rawData = result.hasOwnProperty("subscriptions") ?
+        result.subscriptions : undefined;
+    subscriptions = new UserSubscriptions(rawData);
+    return PolicyManager.loadSubscriptionRules(
+        subscriptions.getSubscriptionInfo());
+  }).then(({failures}) => {
+    // TODO: check a preference that indicates the last time we checked for
+    // updates. Don't do it if we've done it too recently.
+    // TODO: Maybe we should probably ship snapshot versions of the official
+    // rulesets so that they can be available immediately after installation.
+    let serials = {};
+    for (let listName in failures) {
+      serials[listName] = {};
+      for (let subName in failures[listName]) {
+        serials[listName][subName] = -1;
+      }
+    }
+    const loadedSubs = PolicyManager.getSubscriptionRulesets();
+    for (let listName in loadedSubs) {
+      for (let subName in loadedSubs[listName]) {
+        if (!serials[listName]) {
+          serials[listName] = {};
         }
+        let rawRuleset = loadedSubs[listName][subName].rawRuleset;
+        serials[listName][subName] = rawRuleset._metadata.serial;
       }
-      const loadedSubs = PolicyManager.getSubscriptionRulesets();
-      for (let listName in loadedSubs) {
-        for (let subName in loadedSubs[listName]) {
-          if (!serials[listName]) {
-            serials[listName] = {};
-          }
-          let rawRuleset = loadedSubs[listName][subName].rawRuleset;
-          serials[listName][subName] = rawRuleset._metadata.serial;
-        }
-      }
-      function updateCompleted(result) {
-        log.info("Subscription updates completed: " + result);
-      }
-      subscriptions.update(updateCompleted, serials);
-      return;
-    });
-    pDone.catch((e) => {
-      log.error("loadConfigAndRules():", e);
-    });
-  }
+    }
+    function updateCompleted(result) {
+      log.info("Subscription updates completed: " + result);
+    }
+    subscriptions.update(updateCompleted, serials);
+    return;
+  });
+  pDone.catch((e) => {
+    log.error("loadConfigAndRules():", e);
+  });
+}
 
-  function loadRules() {
-    loadUserRules();
-    loadSubscriptionRules();
-  }
+function loadRules() {
+  loadUserRules();
+  loadSubscriptionRules();
+}
 
-  // ---------------------------------------------------------------------------
-  // startup and shutdown functions
-  // ---------------------------------------------------------------------------
-
-  // prepare back-end
-  MainEnvironment.addStartupFunction(EnvLevel.BACKEND, loadRules);
-
-  function registerObservers() {
-    MainEnvironment.obMan.observe([
-      SUBSCRIPTION_UPDATED_TOPIC,
-      SUBSCRIPTION_ADDED_TOPIC,
-      SUBSCRIPTION_REMOVED_TOPIC,
-    ], self.observe);
-  }
-  MainEnvironment.addStartupFunction(EnvLevel.INTERFACE,
-                                        registerObservers);
-
-  self.getSubscriptions = function() {
+export const rpService = {
+  getSubscriptions() {
     return subscriptions;
-  };
+  },
 
   // ---------------------------------------------------------------------------
   // nsIObserver interface
   // ---------------------------------------------------------------------------
 
-  self.observe = function(subject, topic, data) {
+  observe(subject, topic, data) {
     switch (topic) {
       // FIXME: The subscription logic should reside in the
       // subscription module.
@@ -174,7 +147,21 @@ export const rpService = (function() {
       default:
         console.error("unknown topic observed: " + topic);
     }
-  };
+  },
+};
 
-  return self;
-})();
+// ---------------------------------------------------------------------------
+// startup and shutdown functions
+// ---------------------------------------------------------------------------
+
+// prepare back-end
+MainEnvironment.addStartupFunction(EnvLevel.BACKEND, loadRules);
+
+function registerObservers() {
+  MainEnvironment.obMan.observe([
+    SUBSCRIPTION_UPDATED_TOPIC,
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC,
+  ], rpService.observe);
+}
+MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, registerObservers);

@@ -22,7 +22,7 @@
  */
 
 import {Log as log} from "content/models/log";
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import {
   Environment,
   Level as EnvLevel,

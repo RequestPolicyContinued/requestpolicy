@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Requests} from "content/models/requests";
 import {Storage} from "content/models/storage";
 

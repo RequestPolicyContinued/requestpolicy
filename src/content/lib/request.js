@@ -22,7 +22,7 @@
  */
 
 import {Log} from "content/models/log";
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
 

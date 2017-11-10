@@ -32,7 +32,7 @@ import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
 } from "content/lib/subscription";
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as RuleUtils from "content/lib/utils/rule-utils";
 import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";

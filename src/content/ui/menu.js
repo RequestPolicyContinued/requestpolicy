@@ -25,7 +25,7 @@ import {Level as EnvLevel} from "content/lib/environment";
 import {Log as log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";

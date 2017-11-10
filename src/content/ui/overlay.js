@@ -33,7 +33,7 @@ import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import * as JSUtils from "content/lib/utils/js-utils";

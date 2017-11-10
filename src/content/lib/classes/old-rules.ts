@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {DomainUtil} from "content/lib/utils/domain-utils";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 
 declare const Cc: any;
 declare const Ci: any;

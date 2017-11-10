@@ -111,7 +111,7 @@ export class RawRuleset {
 
       // dprint(typeof data);
       // dprint(dump(data));
-      RawRuleset._checkDataObj(data);
+      this._checkDataObj(data);
       this._metadata = data.metadata;
       this._entries = data.entries;
     }

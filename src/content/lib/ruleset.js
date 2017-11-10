@@ -493,11 +493,8 @@ class Rules {
     return this._rules.length === 0;
   }
 
-  get [Symbol.iterator]() {
-    const self = this;
-    return function* () {
-      yield* self._rules;
-    };
+  * [Symbol.iterator]() {
+    yield* this._rules;
   }
 
   get(scheme, port) {

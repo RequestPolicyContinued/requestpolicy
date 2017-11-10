@@ -45,12 +45,9 @@ export class CompatibilityRules {
     ]);
   }
 
-  public get [Symbol.iterator]() {
-    const self: CompatibilityRules = this;
-    return function*() {
-      yield* self.app;
-      yield* self.extensions;
-    };
+  public * [Symbol.iterator]() {
+    yield* this.app;
+    yield* this.extensions;
   }
 
   public checkBaseUriWhitelist(aBaseUri: BaseUri) {

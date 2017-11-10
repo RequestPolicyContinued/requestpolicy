@@ -21,15 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {RawRuleset} from "content/lib/ruleset";
-import * as FileUtils from "content/lib/utils/file-utils";
-import {RulesetStorage} from "content/lib/ruleset-storage";
 import {MainEnvironment} from "content/lib/environment";
+import {RawRuleset} from "content/lib/ruleset";
+import {RulesetStorage} from "content/lib/ruleset-storage";
 import {Log} from "content/models/log";
 
 const log = Log.extend({
   name: "Subscriptions",
 });
+
+declare const Cc: any;
+declare const Ci: any;
+declare const Services: any;
 
 // =============================================================================
 // Constants
@@ -46,16 +49,26 @@ const DEFAULT_SUBSCRIPTION_LIST_URL_BASE =
     "https://raw.githubusercontent.com/" +
     "RequestPolicyContinued/subscriptions/master/";
 
-const SUBSCRIPTION_UPDATE_SUCCESS = "SUCCESS";
-const SUBSCRIPTION_UPDATE_NOT_NEEDED = "NOT_NEEDED";
-const SUBSCRIPTION_UPDATE_FAILURE = "FAILURE";
+enum SubscriptionUpdateResult {
+  SUBSCRIPTION_UPDATE_SUCCESS = "SUCCESS",
+  SUBSCRIPTION_UPDATE_NOT_NEEDED = "NOT_NEEDED",
+  SUBSCRIPTION_UPDATE_FAILURE = "FAILURE",
+}
+
+export const {
+  SUBSCRIPTION_UPDATE_SUCCESS,
+  SUBSCRIPTION_UPDATE_NOT_NEEDED,
+  SUBSCRIPTION_UPDATE_FAILURE,
+} = SubscriptionUpdateResult;
 
 // =============================================================================
 // utilities
 // =============================================================================
 
-function maybeCallback(aCallback) {
-  return function(...args) {
+function maybeCallback<T>(
+    aCallback: (...args: T[]) => void,
+): (...args: T[]) => void {
+  return (...args: T[]) => {
     let ok = true;
     try {
       ok = MainEnvironment.isShuttingDownOrShutDown() === false;
@@ -73,18 +86,54 @@ function maybeCallback(aCallback) {
   };
 }
 
-function setTimeout(func, delay) {
-  const timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-  const event = {
-    notify: maybeCallback(func),
-  };
-  timer.initWithCallback(event, delay, Ci.nsITimer.TYPE_ONE_SHOT);
-  return timer;
+// =============================================================================
+// types
+// =============================================================================
+
+interface IObject<T> {
+  [k: string]: T;
 }
 
-function dprint(msg) {
-  log.info(msg);
+interface ISubscriptionData {
+  metadata?: {
+    serial: any;
+  };
+  serial?: any;
+  url?: any;
 }
+
+interface IListData {
+  subscriptions: {
+    [subName: string]: ISubscriptionData,
+  };
+  url?: string;
+}
+
+interface IDataPerList {
+  [listName: string]: IListData;
+}
+
+interface IUserSubscriptionsData {
+  lists: IDataPerList;
+}
+interface IMaybeIncompleteUserSubscriptionsData {
+  lists?: IUserSubscriptionsData["lists"];
+}
+
+interface ISubsObject<T, TListAdditional = never> {
+  [listName: string]: TListAdditional | {
+    [subName: string]: T,
+  };
+}
+
+type UpdateResults = ISubsObject<SubscriptionUpdateResult, false>;
+export type Serial = -1 | number;
+
+interface IMetadata {
+  serial: Serial;
+}
+
+type Serials = IObject<IMetadata>;
 
 // =============================================================================
 // UserSubscriptions
@@ -96,45 +145,57 @@ function dprint(msg) {
  * subscriptions.
  */
 export class UserSubscriptions {
-  constructor(aRawData = {}) {
-    this._data = aRawData;
-    if (!this._data.lists) {
-      this._data.lists = {
-        "official": {
-          "subscriptions": {
-            "allow_embedded": {},
-            "allow_extensions": {},
-            "allow_functionality": {},
-            "allow_mozilla": {},
-            "allow_sameorg": {},
-            "deny_trackers": {},
+  public static create(
+      data: IMaybeIncompleteUserSubscriptionsData = {},
+  ): UserSubscriptions {
+    if (!data.lists) {
+      data.lists = {
+        official: {
+          subscriptions: {
+            allow_embedded: {},
+            allow_extensions: {},
+            allow_functionality: {},
+            allow_mozilla: {},
+            allow_sameorg: {},
+            deny_trackers: {},
           },
         },
       };
     }
-    this._lists = this._data.lists;
+    return new UserSubscriptions(data as IUserSubscriptionsData);
   }
 
-  toString() {
+  private data: IUserSubscriptionsData;
+  private get lists(): IDataPerList {
+    return this.data.lists;
+  }
+
+  constructor(data: IUserSubscriptionsData) {
+    this.data = data;
+  }
+
+  public toString() {
     return "[UserSubscriptions]";
   }
 
-  save() {
+  public save() {
     browser.storage.local.set({
-      subscriptions: this._data,
+      subscriptions: this.data,
     }).catch((e) => {
       log.error("UserSubscriptions.save():", e);
     });
   }
 
-  getSubscriptionInfo() {
-    const lists = this._data.lists;
-    const result = {};
+  public getSubscriptionInfo(): ISubsObject<null> {
+    const lists = this.data.lists;
+    const result: ISubsObject<null> = {};
+    // tslint:disable-next-line prefer-const forin
     for (let listName in lists) {
       if (!lists[listName].subscriptions) {
         continue;
       }
       result[listName] = {};
+      // tslint:disable-next-line prefer-const forin
       for (let subName in lists[listName].subscriptions) {
         result[listName][subName] = null;
       }
@@ -142,10 +203,10 @@ export class UserSubscriptions {
     return result;
   }
 
-  addSubscription(listName, subName) {
-    const lists = this._data.lists;
+  public addSubscription(listName: string, subName: string) {
+    const lists = this.data.lists;
     if (!lists[listName]) {
-      lists[listName] = {};
+      lists[listName] = {subscriptions: {}};
     }
     if (!lists[listName].subscriptions) {
       lists[listName].subscriptions = {};
@@ -154,8 +215,8 @@ export class UserSubscriptions {
     this.save();
   }
 
-  removeSubscription(listName, subName) {
-    const lists = this._data.lists;
+  public removeSubscription(listName: string, subName: string) {
+    const lists = this.data.lists;
     if (lists[listName] && lists[listName].subscriptions &&
         lists[listName].subscriptions[subName]) {
       delete lists[listName].subscriptions[subName];
@@ -168,49 +229,64 @@ export class UserSubscriptions {
   // make a big fat mess of the code, or more likely I'm just not good at
   // making it not a mess. On the other hand, this parallelizes the update
   // requests, though that may not be a great thing in this case.
-  update(callback, serials) {
-    const updatingLists = {};
-    const updateResults = {};
+  public update(
+      callback: (results: UpdateResults) => void,
+      serials: ISubsObject<Serial>,
+  ) {
+    const updatingLists: ISubsObject<true> = {};
+    const updateResults: UpdateResults = {};
 
-    function recordDone(listName, subName, result) {
+    const recordDone = (
+        listName: string,
+        subName?: string,
+        result?: SubscriptionUpdateResult,
+    ) => {
       log.info("Recording done: " + listName + " " + subName);
       if (subName) {
-        updateResults[listName][subName] = result;
-        let list = updatingLists[listName];
+        const updateResultsList =
+            updateResults[listName] as IObject<SubscriptionUpdateResult>;
+        updateResultsList[subName] = result as SubscriptionUpdateResult;
+        const list = updatingLists[listName];
         delete list[subName];
+        // tslint:disable-next-line prefer-const forin
         for (let i in list) {
+          i; // tslint:disable-line
           return; // What's that??
         }
       }
       delete updatingLists[listName];
+      // tslint:disable-next-line prefer-const forin
       for (let i in updatingLists) {
+        i; // tslint:disable-line
         return; // What's that??
       }
       setTimeout(() => callback(updateResults), 0);
-    }
+    };
 
     let listCount = 0;
+    // tslint:disable-next-line prefer-const forin
     for (let listName in serials) {
-      if (!this._lists[listName] || !this._lists[listName].subscriptions) {
+      if (!this.lists[listName] || !this.lists[listName].subscriptions) {
         log.info("Skipping update of unsubscribed list: " + listName);
         continue;
       }
-      let updateSubs = {};
+      const updateSubs: Serials = {};
       let subCount = 0;
+      // tslint:disable-next-line prefer-const forin
       for (let subName in serials[listName]) {
-        if (!this._lists[listName].subscriptions[subName]) {
+        if (!this.lists[listName].subscriptions[subName]) {
           log.info("Skipping update of unsubscribed subscription: " + listName +
               " " + subName);
           continue;
         }
-        updateSubs[subName] = {"serial": serials[listName][subName]};
+        updateSubs[subName] = {serial: serials[listName][subName]};
         subCount++;
       }
       if (subCount === 0) {
         log.info("Skipping list with no subscriptions: " + listName);
         continue;
       }
-      let url = this._lists[listName].url;
+      let url = this.lists[listName].url;
       if (!url) {
         url = DEFAULT_SUBSCRIPTION_LIST_URL_BASE + listName + ".json";
       }
@@ -220,32 +296,36 @@ export class UserSubscriptions {
       }
       const list = new SubscriptionList(listName, url);
       updatingLists[listName] = {};
+      // tslint:disable-next-line prefer-const forin
       for (let subName in updateSubs) {
         log.info("Will update subscription: " + listName + " " + subName);
         updatingLists[listName][subName] = true;
       }
       updateResults[listName] = {};
 
-      let metadataSuccess = function(list) {
-        function subSuccess(sub, status) {
+      const metadataSuccess = () => {
+        const subSuccess = (
+            sub: Subscription,
+            status: SubscriptionUpdateResult,
+        ) => {
           log.info("Successfully updated subscription " + sub.toString());
-          recordDone(list._name, sub._name, status);
-        }
+          recordDone(list.name, sub.name, status);
+        };
 
-        function subError(sub, error) {
+        const subError = (sub: Subscription, error: string) => {
           log.info("Failed to update subscription " + sub.toString() + ": " +
               error);
-          recordDone(list._name, sub._name, SUBSCRIPTION_UPDATE_FAILURE);
-        }
+          recordDone(list.name, sub.name, SUBSCRIPTION_UPDATE_FAILURE);
+        };
 
         log.info("Successfully updated list " + list.toString());
         list.updateSubscriptions(updateSubs, subSuccess, subError);
       };
 
-      let metadataError = function(list, error) {
+      const metadataError = (error: string) => {
         log.info("Failed to update list: " + list.toString() + ": " + error);
         updateResults[listName] = false;
-        recordDone(list._name);
+        recordDone(list.name);
       };
 
       listCount++;
@@ -276,67 +356,81 @@ export class UserSubscriptions {
  * @param {string} name
  * @param {string} url
  */
+// tslint:disable-next-line max-classes-per-file
 class SubscriptionList {
-  constructor(name, url) {
+  public readonly name: string;
+  private url: string;
+  private data: IListData;
+
+  constructor(name: string, url: string) {
     // TODO: allow only ascii lower letters, digits, and hyphens in name.
-    this._name = name;
-    this._url = url;
-    this._data = null;
+    this.name = name;
+    this.url = url;
   }
 
-  toString() {
-    return "[SubscriptionList " + this._name + " " + this._url + "]";
+  public toString() {
+    return "[SubscriptionList " + this.name + " " + this.url + "]";
   }
 
-  updateMetadata(successCallback, errorCallback) {
+  public updateMetadata(
+      successCallback: () => void,
+      errorCallback: (e: string) => void,
+  ) {
     log.info("Updating " + this.toString());
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
       .createInstance(Ci.nsIXMLHttpRequest);
-    const self = this;
-    req.onload = maybeCallback(function(event) {
+    req.onload = maybeCallback((event) => {
       try {
-        self._data = JSON.parse(req.responseText);
+        this.data = JSON.parse(req.responseText);
         // Maybe we don't need to write this to a file since we never read it
         // back again (we always grab new metadata when updating).
-        setTimeout(() => successCallback(self), 0);
+        setTimeout(() => successCallback(), 0);
       } catch (e) {
-        setTimeout(() => errorCallback(self, e.toString()), 0);
+        setTimeout(() => errorCallback(e.toString()), 0);
       }
     });
-    req.onerror = maybeCallback(function(event) {
-      setTimeout(() => errorCallback(self, req.statusText), 0);
+    req.onerror = maybeCallback((event) => {
+      setTimeout(() => errorCallback(req.statusText), 0);
     });
-    req.open("GET", this._url);
+    req.open("GET", this.url);
     req.send(null);
   }
 
-  updateSubscriptions(userSubs, successCallback, errorCallback) {
+  public updateSubscriptions(
+      userSubs: Serials,
+      successCallback: (
+          sub: Subscription,
+          result: SubscriptionUpdateResult,
+      ) => void,
+      errorCallback: (sub: Subscription, error: string) => void,
+  ) {
+    // tslint:disable-next-line prefer-const forin
     for (let subName in userSubs) {
-      let serial = this.getSubscriptionSerial(subName);
+      const serial = this.getSubscriptionSerial(subName);
       if (serial === null) {
         continue;
       }
-      log.info("Current serial for " + this._name + " " + subName + ": " +
+      log.info("Current serial for " + this.name + " " + subName + ": " +
           userSubs[subName].serial);
-      log.info("Available serial for " + this._name + " " + subName + ": " +
+      log.info("Available serial for " + this.name + " " + subName + ": " +
           serial);
-      let subUrl = this.getSubscriptionUrl(subName);
+      const subUrl = this.getSubscriptionUrl(subName);
       if (subUrl === null) {
         continue;
       }
-      let sub = new Subscription(this._name, subName, subUrl);
+      const sub = new Subscription(this.name, subName, subUrl);
       try {
         if (serial > userSubs[subName].serial) {
           sub.update(successCallback, errorCallback);
         } else {
-          log.info("No update needed for " + this._name + " " + subName);
-          let curSub = sub;
+          log.info("No update needed for " + this.name + " " + subName);
+          const curSub = sub;
           setTimeout(() => {
             successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
           }, 0);
         }
       } catch (e) {
-        let curSub = sub;
+        const curSub = sub;
         setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
@@ -350,18 +444,18 @@ class SubscriptionList {
   //   return names;
   // },
 
-  getSubscriptionSerial(subName) {
-    if (!(subName in this._data.subscriptions)) {
+  public getSubscriptionSerial(subName: string) {
+    if (!(subName in this.data.subscriptions)) {
       return null;
     }
-    return this._data.subscriptions[subName].serial;
+    return this.data.subscriptions[subName].serial;
   }
 
-  getSubscriptionUrl(subName) {
-    if (!(subName in this._data.subscriptions)) {
+  public getSubscriptionUrl(subName: string) {
+    if (!(subName in this.data.subscriptions)) {
       return null;
     }
-    return this._data.subscriptions[subName].url;
+    return this.data.subscriptions[subName].url;
   }
 }
 
@@ -377,77 +471,88 @@ class SubscriptionList {
  * @param {string} subName
  * @param {string} subUrl
  */
+// tslint:disable-next-line max-classes-per-file
 class Subscription {
-  constructor(listName, subName, subUrl) {
+  public readonly name: string;
+  private list: string;
+  private url: string;
+  private data: ISubscriptionData;
+  private rawData: any;
+
+  constructor(listName: string, subName: string, subUrl: string) {
     // TODO: allow only ascii lower letters, digits, and hyphens in listName.
-    this._list = listName;
+    this.list = listName;
     // TODO: allow only ascii lower letters, digits, and hyphens in subName.
-    this._name = subName;
-    this._url = subUrl;
-    this._data = null;
+    this.name = subName;
+    this.url = subUrl;
   }
 
-  toString() {
-    return "[Subscription " + this._list + " " + this._name + " " +
-        this._url + "]";
+  public toString() {
+    return "[Subscription " + this.list + " " + this.name + " " +
+        this.url + "]";
   }
 
-  update(successCallback, errorCallback) {
+  public update(
+      successCallback: (
+          sub: Subscription,
+          result: SubscriptionUpdateResult,
+      ) => void,
+      errorCallback: (sub: Subscription, error: string) => void,
+  ) {
     log.info("Updating " + this.toString());
 
     const req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].
         createInstance(Ci.nsIXMLHttpRequest);
-    const self = this;
-    req.onload = maybeCallback(function(event) {
+    req.onload = maybeCallback((event) => {
       try {
-        self._rawData = req.responseText;
-        if (!self._rawData) {
-          let error = "Empty response when requesting subscription file";
-          setTimeout(() => errorCallback(self, error), 0);
+        this.rawData = req.responseText;
+        if (!this.rawData) {
+          const error = "Empty response when requesting subscription file";
+          setTimeout(() => errorCallback(this, error), 0);
           return;
         }
-        self._data = JSON.parse(req.responseText);
+        this.data = JSON.parse(req.responseText);
         // Make sure there's a ['metadata']['serial'] key as a way of sanity
         // checking the parsed JSON as well as enforcing the use of serial
         // numbers in subscription rulesets.
         let serial;
-        try {
-          serial = self._data.metadata.serial;
-        } catch (e) {
-          let error = "Ruleset has no serial number";
-          setTimeout(() => errorCallback(self, error), 0);
+        if (this.data && this.data.metadata && this.data.metadata.serial) {
+          serial = this.data.metadata.serial;
+        } else {
+          const error = "Ruleset has no serial number";
+          setTimeout(() => errorCallback(this, error), 0);
           return;
         }
         if (typeof serial !== "number" || serial % 1 !== 0) {
-          let error = "Ruleset has invalid serial number: " + serial;
-          setTimeout(() => errorCallback(self, error), 0);
+          const error = "Ruleset has invalid serial number: " + serial;
+          setTimeout(() => errorCallback(this, error), 0);
           return;
         }
-        // The rest of the sanity checking is done by RawRuleset().
+        // The rest of the sanity checking is done by RawRuleset.
         try {
-          const rawRuleset = new RawRuleset(self._rawData);
-          RulesetStorage.saveRawRulesetToFile(rawRuleset, self._name,
-                self._list);
+          const rawRuleset = RawRuleset.create(this.rawData);
+          RulesetStorage.saveRawRulesetToFile(rawRuleset, this.name,
+                this.list);
         } catch (e) {
-          setTimeout(() => errorCallback(self, e.toString()), 0);
+          setTimeout(() => errorCallback(this, e.toString()), 0);
           return;
         }
-        const subInfo = {};
-        subInfo[self._list] = {};
-        subInfo[self._list][self._name] = true;
+        const subInfo: ISubsObject<true> = {};
+        subInfo[this.list] = {};
+        subInfo[this.list][this.name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
             JSON.stringify(subInfo));
         setTimeout(() => {
-          successCallback(self, SUBSCRIPTION_UPDATE_SUCCESS);
+          successCallback(this, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);
       } catch (e) {
-        setTimeout(() => errorCallback(self, e.toString()), 0);
+        setTimeout(() => errorCallback(this, e.toString()), 0);
       }
     });
-    req.onerror = maybeCallback(function(event) {
-      setTimeout(() => errorCallback(self, req.statusText), 0);
+    req.onerror = maybeCallback((event) => {
+      setTimeout(() => errorCallback(this, req.statusText), 0);
     });
-    req.open("GET", this._url);
+    req.open("GET", this.url);
     req.send(null);
   }
 }

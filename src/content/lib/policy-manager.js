@@ -76,7 +76,7 @@ export const PolicyManager = {
     const pRawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
     pRawRuleset.then((rawRuleset) => {
       this.userRulesetExistedOnStartup = !!rawRuleset;
-      if (!rawRuleset) rawRuleset = new RawRuleset();
+      if (!rawRuleset) rawRuleset = RawRuleset.create();
       userRulesets.user = {
         "rawRuleset": rawRuleset,
         "ruleset": rawRuleset.toRuleset("user"),
@@ -278,7 +278,7 @@ export const PolicyManager = {
   },
 
   revokeTemporaryRules() {
-    const rawRuleset = new RawRuleset();
+    const rawRuleset = RawRuleset.create();
     userRulesets.temp = {
       "rawRuleset": rawRuleset,
       "ruleset": rawRuleset.toRuleset("temp"),

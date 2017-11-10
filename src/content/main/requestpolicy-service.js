@@ -65,7 +65,7 @@ function loadSubscriptionRules() {
           serials[listName] = {};
         }
         let rawRuleset = loadedSubs[listName][subName].rawRuleset;
-        serials[listName][subName] = rawRuleset._metadata.serial;
+        serials[listName][subName] = rawRuleset.metadata.serial;
       }
     }
     function updateCompleted(result) {

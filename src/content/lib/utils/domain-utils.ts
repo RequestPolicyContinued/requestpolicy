@@ -27,7 +27,7 @@ declare const Cc: any;
 declare const Ci: any;
 declare const Services: any;
 
-interface IUri {
+export interface IUri {
   spec: string;
   scheme: string;
   host: string;

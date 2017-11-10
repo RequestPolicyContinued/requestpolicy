@@ -68,19 +68,19 @@ function test_2() {
 
   let rawRuleset = new RawRuleset();
 
-  do_check_eq(Object.keys(rawRuleset._metadata).length, 1);
-  do_check_eq(rawRuleset._metadata.version, 1);
-  do_check_eq(rawRuleset._entries.allow.length, 0);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(Object.keys(rawRuleset.metadata).length, 1);
+  do_check_eq(rawRuleset.metadata.version, 1);
+  do_check_eq(rawRuleset.entries.allow.length, 0);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   // Write it to a file and read it back.
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(Object.keys(rawRuleset._metadata).length, 1);
-  do_check_eq(rawRuleset._metadata.version, 1);
-  do_check_eq(rawRuleset._entries.allow.length, 0);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(Object.keys(rawRuleset.metadata).length, 1);
+  do_check_eq(rawRuleset.metadata.version, 1);
+  do_check_eq(rawRuleset.entries.allow.length, 0);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   // Add all of the rules as allow rules.
   for (let name in Iterator(rules, true)) {
@@ -93,8 +93,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 3);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(rawRuleset.entries.allow.length, 3);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   // Add all of the rules as deny rules.
   for (let name in Iterator(rules, true)) {
@@ -107,8 +107,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 3);
-  do_check_eq(rawRuleset._entries.deny.length, 3);
+  do_check_eq(rawRuleset.entries.allow.length, 3);
+  do_check_eq(rawRuleset.entries.deny.length, 3);
 
   // Remove one of the deny rules.
   rawRuleset.removeRule(C.RULE_ACTION_DENY, rules.origin);
@@ -117,8 +117,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 3);
-  do_check_eq(rawRuleset._entries.deny.length, 2);
+  do_check_eq(rawRuleset.entries.allow.length, 3);
+  do_check_eq(rawRuleset.entries.deny.length, 2);
 
   // Remove all of the deny rules.
   for (let name in Iterator(rules, true)) {
@@ -131,8 +131,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 3);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(rawRuleset.entries.allow.length, 3);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   // Remove one of the allow rules.
   rawRuleset.removeRule(C.RULE_ACTION_ALLOW, rules.dest);
@@ -141,8 +141,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 2);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(rawRuleset.entries.allow.length, 2);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   // Remove all of the allow rules.
   for (let name in Iterator(rules, true)) {
@@ -155,8 +155,8 @@ function test_2() {
   RulesetStorage.saveRawRulesetToFile(rawRuleset, filename);
   rawRuleset = RulesetStorage.loadRawRulesetFromFile(filename);
 
-  do_check_eq(rawRuleset._entries.allow.length, 0);
-  do_check_eq(rawRuleset._entries.deny.length, 0);
+  do_check_eq(rawRuleset.entries.allow.length, 0);
+  do_check_eq(rawRuleset.entries.deny.length, 0);
 
   deleteFileFromProfile(filename);
 }

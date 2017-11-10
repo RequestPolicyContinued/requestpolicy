@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {RawRuleset} from "content/lib/ruleset";
+import {IMaybeIncompleteRawRuleset, RawRuleset} from "content/lib/ruleset";
 import {Log as log} from "content/models/log";
 
 // =============================================================================
@@ -45,7 +45,7 @@ export const RulesetStorage = {
     const pResult = browser.storage.local.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
-      return new RawRuleset(aResult);
+      return RawRuleset.create(aResult as IMaybeIncompleteRawRuleset);
     });
     pRawRuleset.catch((e) => {
       log.error("RulesetStorage.loadRawRulesetFromFile():", e);

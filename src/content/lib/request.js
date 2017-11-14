@@ -90,397 +90,382 @@ const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
 // Request
 // =============================================================================
 
-export function Request(originURI, destURI, requestType) {
-  // TODO: save a nsIURI objects here instead of strings
-  this.originURI = originURI;
-  this.destURI = destURI;
-  this.requestType = requestType;
+export class Request {
+  constructor(originURI, destURI, requestType) {
+    // TODO: save a nsIURI objects here instead of strings
+    this.originURI = originURI;
+    this.destURI = destURI;
+    this.requestType = requestType;
 
-  // TODO: Merge "RequestResult" into this class.
-  this.requestResult = undefined;
-}
+    // TODO: Merge "RequestResult" into this class.
+    this.requestResult = undefined;
+  }
 
-Object.defineProperty(Request.prototype, "originUriObj", {
-  get: function() {
+  get originUriObj() {
     if (!this.originURI) return null;
     return Services.io.newURI(this.originURI, null, null);
-  },
-});
+  }
 
-Object.defineProperty(Request.prototype, "destUriObj", {
-  get: function() {
+  get destUriObj() {
     return Services.io.newURI(this.destURI, null, null);
-  },
-});
-
-Request.prototype.setOriginURI = function(originURI) {
-  this.originURI = originURI;
-};
-
-Request.prototype.setDestURI = function(destURI) {
-  this.destURI = destURI;
-};
-
-Request.prototype.detailsToString = function() {
-  // Note: try not to cause side effects of toString() during load, so "<HTML
-  // Element>" is hard-coded.
-  return "destination: " + this.destURI + ", origin: " + this.originURI;
-};
-
-Request.prototype.isTopLevel = function() {
-  return this.getContentPolicyType() === Ci.nsIContentPolicy.TYPE_DOCUMENT;
-};
-
-/**
-  * Determines if a request is only related to internal resources.
-  *
-  * @return {Boolean} true if the request is only related to internal
-  *         resources.
-  */
-Request.prototype.isInternal = function() {
-  // TODO: investigate "moz-nullprincipal". The following comment has been
-  //       created by @jsamuel in 2008, commit 46a04bb. More information about
-  //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
-  //
-  // Note: Don't OK the origin scheme "moz-nullprincipal" without further
-  // understanding. It appears to be the source when the `js_1.html` test is
-  // used. That is, javascript redirect to a "javascript:" url that creates the
-  // entire page's content which includes a form that it submits. Maybe
-  // "moz-nullprincipal" always shows up when using "document.location"?
-
-  let origin = this.originUriObj;
-  let dest = this.destUriObj;
-
-  if (origin === undefined || origin === null) {
-    logRequests.log("Allowing request without an origin.");
-    return true;
   }
 
-  if (origin.spec === "") {
-    // The spec can be empty if odd things are going on, like the Refcontrol
-    // extension causing back/forward button-initiated requests to have
-    // aRequestOrigin be a virtually empty nsIURL object.
-    logRequests.log("Allowing request with empty origin spec!");
-    return true;
+  setOriginURI(originURI) {
+    this.originURI = originURI;
   }
 
-  // Fully internal requests.
-  if (INTERNAL_SCHEMES.has(dest.scheme) &&
-      (
-        INTERNAL_SCHEMES.has(origin.scheme) ||
-        // e.g.
-        // data:application/vnd.mozilla.xul+xml;charset=utf-8,<window/>
-        // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
-        origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
-      )) {
-    logRequests.log("Allowing internal request.");
-    return true;
+  setDestURI(destURI) {
+    this.destURI = destURI;
   }
 
-  if (WHITELISTED_DESTINATION_SCHEMES.has(dest.scheme)) {
-    logRequests.log("Allowing request with a semi-internal destination.");
-    return true;
+  detailsToString() {
+    // Note: try not to cause side effects of toString() during load, so "<HTML
+    // Element>" is hard-coded.
+    return "destination: " + this.destURI + ", origin: " + this.originURI;
   }
 
-  let destHost = DomainUtil.getHostByUriObj(dest);
-
-  // "global" dest are [some sort of interal requests]
-  // "browser" dest are [???]
-  if (destHost === "global" || destHost === "browser") {
-    return true;
+  isTopLevel() {
+    return this.getContentPolicyType() === Ci.nsIContentPolicy.TYPE_DOCUMENT;
   }
 
-  // See RP issue #788
-  if (origin.scheme === "view-source" &&
-      dest.spec === "resource://gre-resources/viewsource.css") {
-    return true;
-  }
+  /**
+    * Determines if a request is only related to internal resources.
+    *
+    * @return {Boolean} true if the request is only related to internal
+    *         resources.
+    */
+  isInternal() {
+    // TODO: investigate "moz-nullprincipal". The following comment has been
+    //       created by @jsamuel in 2008, commit 46a04bb. More information about
+    //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
+    //
+    // Note: Don't OK the origin scheme "moz-nullprincipal" without further
+    // understanding. It appears to be the source when the `js_1.html` test is
+    // used. That is, javascript redirect to a "javascript:" url that creates
+    // the entire page's content which includes a form that it submits. Maybe
+    // "moz-nullprincipal" always shows up when using "document.location"?
 
-  if (dest.scheme === "jar") {
-    const {path} = dest;
-    for (let pathStart of WHITELISTED_DESTINATION_JAR_PATH_STARTS) {
-      if (path.startsWith(pathStart)) return true;
-    }
-  }
+    let origin = this.originUriObj;
+    let dest = this.destUriObj;
 
-  // Empty iframes will have the "about:blank" URI. Sometimes websites
-  // create an empty iframe and then manipulate it.
-  // References:
-  // - NoScript FAQ: https://noscript.net/faq#qa1_9
-  // - RP issue #784
-  if (dest.spec === "about:blank") {
-    return true;
-  }
-
-  // see issue #180
-  if (origin.scheme === "about" &&
-      origin.spec.indexOf("about:neterror?") === 0) {
-    return true;
-  }
-
-  return false;
-};
-
-Request.prototype.isAllowedByDefault = function() {
-  if (
-      this.aExtra &&
-      this.aExtra instanceof Ci.nsISupportsString &&
-      this.aExtra.data === "conPolCheckFromDocShell"
-  ) return true;
-
-  if (
-      this.aRequestPrincipal &&
-      Services.scriptSecurityManager.isSystemPrincipal(
-          this.aRequestPrincipal)
-  ) return true;
-
-  let origin = this.originUriObj;
-  let dest = this.destUriObj;
-
-  if (
-      origin && DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
-      DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
-  ) return true;
-
-  if (dest.scheme === "chrome") {
-    // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
-    // References:
-    // - RP issue #784
-    if (dest.path.startsWith("/skin/")) return true;
-    // See RP issue #797
-    if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
+    if (origin === undefined || origin === null) {
+      logRequests.log("Allowing request without an origin.");
       return true;
     }
+
+    if (origin.spec === "") {
+      // The spec can be empty if odd things are going on, like the Refcontrol
+      // extension causing back/forward button-initiated requests to have
+      // aRequestOrigin be a virtually empty nsIURL object.
+      logRequests.log("Allowing request with empty origin spec!");
+      return true;
+    }
+
+    // Fully internal requests.
+    if (INTERNAL_SCHEMES.has(dest.scheme) &&
+        (
+          INTERNAL_SCHEMES.has(origin.scheme) ||
+          // e.g.
+          // data:application/vnd.mozilla.xul+xml;charset=utf-8,<window/>
+          // resource://b9db16a4-6edc-47ec-a1f4-b86292ed211d/data/mainPanel.html
+          origin.spec.startsWith("data:application/vnd.mozilla.xul+xml")
+        )) {
+      logRequests.log("Allowing internal request.");
+      return true;
+    }
+
+    if (WHITELISTED_DESTINATION_SCHEMES.has(dest.scheme)) {
+      logRequests.log("Allowing request with a semi-internal destination.");
+      return true;
+    }
+
+    let destHost = DomainUtil.getHostByUriObj(dest);
+
+    // "global" dest are [some sort of interal requests]
+    // "browser" dest are [???]
+    if (destHost === "global" || destHost === "browser") {
+      return true;
+    }
+
+    // See RP issue #788
+    if (origin.scheme === "view-source" &&
+        dest.spec === "resource://gre-resources/viewsource.css") {
+      return true;
+    }
+
+    if (dest.scheme === "jar") {
+      const {path} = dest;
+      for (let pathStart of WHITELISTED_DESTINATION_JAR_PATH_STARTS) {
+        if (path.startsWith(pathStart)) return true;
+      }
+    }
+
+    // Empty iframes will have the "about:blank" URI. Sometimes websites
+    // create an empty iframe and then manipulate it.
+    // References:
+    // - NoScript FAQ: https://noscript.net/faq#qa1_9
+    // - RP issue #784
+    if (dest.spec === "about:blank") {
+      return true;
+    }
+
+    // see issue #180
+    if (origin.scheme === "about" &&
+        origin.spec.indexOf("about:neterror?") === 0) {
+      return true;
+    }
+
+    return false;
   }
 
-  let destHost = DomainUtil.getHostByUriObj(dest);
+  isAllowedByDefault() {
+    if (
+        this.aExtra &&
+        this.aExtra instanceof Ci.nsISupportsString &&
+        this.aExtra.data === "conPolCheckFromDocShell"
+    ) return true;
 
-  if (
-      dest.scheme === "resource" && (
-          destHost && destHost.startsWith("noscript_") || // RP issue #788
-          DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
-      )
-  ) return true;
+    if (
+        this.aRequestPrincipal &&
+        Services.scriptSecurityManager.isSystemPrincipal(
+            this.aRequestPrincipal)
+    ) return true;
 
-  return false;
-};
+    let origin = this.originUriObj;
+    let dest = this.destUriObj;
+
+    if (
+        origin && DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
+        DEFAULT_ALLOWED_SCHEMES.has(dest.scheme)
+    ) return true;
+
+    if (dest.scheme === "chrome") {
+      // Necessary for some Add-ons, e.g. "rikaichan" or "Grab and Drag"
+      // References:
+      // - RP issue #784
+      if (dest.path.startsWith("/skin/")) return true;
+      // See RP issue #797
+      if (dest.spec === "chrome://pluginproblem/content/pluginProblem.xml") {
+        return true;
+      }
+    }
+
+    let destHost = DomainUtil.getHostByUriObj(dest);
+
+    if (
+        dest.scheme === "resource" && (
+            destHost && destHost.startsWith("noscript_") || // RP issue #788
+            DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS.has(dest.spec)
+        )
+    ) return true;
+
+    return false;
+  }
+}
 
 // =============================================================================
 // NormalRequest
 // =============================================================================
 
-export function NormalRequest(aContentType, aContentLocation, aRequestOrigin,
-    aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
-  Request.call(this,
-      // About originURI and destURI:
-      // We don't need to worry about ACE formatted IDNs because it seems
-      // that they'll automatically be converted to UTF8 format before we
-      // even get here, as long as they're valid and Mozilla allows the TLD
-      // to have UTF8 formatted IDNs.
-      aRequestOrigin ? aRequestOrigin.specIgnoringRef : undefined, // originURI
-      aContentLocation.specIgnoringRef, // destURI
-      REQUEST_TYPE_NORMAL);
+export class NormalRequest extends Request {
+  constructor(
+      aContentType, aContentLocation, aRequestOrigin,
+      aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
+    super(
+        // About originURI and destURI:
+        // We don't need to worry about ACE formatted IDNs because it seems
+        // that they'll automatically be converted to UTF8 format before we
+        // even get here, as long as they're valid and Mozilla allows the TLD
+        // to have UTF8 formatted IDNs.
+        aRequestOrigin ? aRequestOrigin.specIgnoringRef : undefined,
+            // originURI
+        aContentLocation.specIgnoringRef, // destURI
+        REQUEST_TYPE_NORMAL);
 
-  this.aContentType = aContentType;
-  this.aContentLocation = aContentLocation;
-  this.aRequestOrigin = aRequestOrigin;
-  this.aContext = aContext;
-  this.aMimeTypeGuess = aMimeTypeGuess;
-  this.aExtra = aExtra;
-  this.aRequestPrincipal = aRequestPrincipal;
+    this.aContentType = aContentType;
+    this.aContentLocation = aContentLocation;
+    this.aRequestOrigin = aRequestOrigin;
+    this.aContext = aContext;
+    this.aMimeTypeGuess = aMimeTypeGuess;
+    this.aExtra = aExtra;
+    this.aRequestPrincipal = aRequestPrincipal;
 
-  this.shouldLoadResult = undefined;
-}
-NormalRequest.prototype = Object.create(Request.prototype);
-NormalRequest.prototype.constructor = Request;
+    this.shouldLoadResult = undefined;
+  }
 
-Object.defineProperty(NormalRequest.prototype, "originUriObj", {
-  get: function() {
+  get originUriObj() {
     return this.aRequestOrigin;
-  },
-});
+  }
 
-Object.defineProperty(NormalRequest.prototype, "destUriObj", {
-  get: function() {
+  get destUriObj() {
     return this.aContentLocation;
-  },
-});
+  }
 
-NormalRequest.prototype.setOriginURI = function(originURI) {
-  this.originURI = originURI;
-  this.aRequestOrigin = DomainUtil.getUriObject(originURI);
-};
+  setOriginURI(originURI) {
+    this.originURI = originURI;
+    this.aRequestOrigin = DomainUtil.getUriObject(originURI);
+  }
 
-NormalRequest.prototype.setDestURI = function(destURI) {
-  this.destURI = destURI;
-  this.aContentLocation = DomainUtil.getUriObject(destURI);
-};
+  setDestURI(destURI) {
+    this.destURI = destURI;
+    this.aContentLocation = DomainUtil.getUriObject(destURI);
+  }
 
-Object.defineProperty(NormalRequest.prototype, "destURIWithRef", {
-  get: function() {
+  get destURIWithRef() {
     return this.aContentLocation.spec;
-  },
-});
-
-NormalRequest.prototype.getContentPolicyType = function() {
-  return this.aContentType;
-};
-
-NormalRequest.prototype.detailsToString = function() {
-  // Note: try not to cause side effects of toString() during load, so "<HTML
-  // Element>" is hard-coded.
-  let context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
-      "<HTML Element>" : this.aContext;
-  return "type: " + this.aContentType +
-      ", destination: " + this.destURI +
-      ", origin: " + this.originURI +
-      ", context: " + context +
-      ", mime: " + this.aMimeTypeGuess +
-      ", " + this.aExtra;
-};
-
-/**
-  * Determines if a request is only related to internal resources.
-  *
-  * @return {Boolean} true if the request is only related to internal
-  *         resources.
-  */
-NormalRequest.prototype.isInternal = function() {
-  let rv = Request.prototype.isInternal.call(this);
-  if (rv === true) {
-    return true;
   }
 
-  // If there are entities in the document, they may trigger a local file
-  // request. We'll only allow requests to .dtd files, though, so we don't
-  // open up all file:// destinations.
-  if (this.aContentLocation.scheme === "file" &&
-      this.aContentType === Ci.nsIContentPolicy.TYPE_DTD) {
-    return true;
+  getContentPolicyType() {
+    return this.aContentType;
   }
 
-  return false;
-};
-
-/**
- * Get the content window (nsIDOMWindow) related to this request.
- *
- * @return {?Window}
- */
-NormalRequest.prototype.getContentWindow = function() {
-  let context = this.aContext;
-  if (!context) {
-    return null;
+  detailsToString() {
+    // Note: try not to cause side effects of toString() during load, so "<HTML
+    // Element>" is hard-coded.
+    let context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
+        "<HTML Element>" : this.aContext;
+    return "type: " + this.aContentType +
+        ", destination: " + this.destURI +
+        ", origin: " + this.originURI +
+        ", context: " + context +
+        ", mime: " + this.aMimeTypeGuess +
+        ", " + this.aExtra;
   }
 
-  if (context instanceof Ci.nsIDOMXULElement &&
-      context.localName === "browser") {
-    return context.contentWindow;
+  /**
+    * Determines if a request is only related to internal resources.
+    *
+    * @return {Boolean} true if the request is only related to internal
+    *         resources.
+    */
+  isInternal() {
+    let rv = Request.prototype.isInternal.call(this);
+    if (rv === true) {
+      return true;
+    }
+
+    // If there are entities in the document, they may trigger a local file
+    // request. We'll only allow requests to .dtd files, though, so we don't
+    // open up all file:// destinations.
+    if (this.aContentLocation.scheme === "file" &&
+        this.aContentType === Ci.nsIContentPolicy.TYPE_DTD) {
+      return true;
+    }
+
+    return false;
   }
 
-  let win;
-  try {
-    // eslint-disable-next-line new-cap
-    win = context.QueryInterface(Ci.nsIDOMWindow);
-  } catch (e) {
-    let doc;
+  /**
+   * Get the content window (nsIDOMWindow) related to this request.
+   *
+   * @return {?Window}
+   */
+  getContentWindow() {
+    let context = this.aContext;
+    if (!context) {
+      return null;
+    }
+
+    if (context instanceof Ci.nsIDOMXULElement &&
+        context.localName === "browser") {
+      return context.contentWindow;
+    }
+
+    let win;
     try {
       // eslint-disable-next-line new-cap
-      doc = context.QueryInterface(Ci.nsIDOMDocument);
+      win = context.QueryInterface(Ci.nsIDOMWindow);
     } catch (e) {
+      let doc;
       try {
         // eslint-disable-next-line new-cap
-        doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
+        doc = context.QueryInterface(Ci.nsIDOMDocument);
       } catch (e) {
-        return null;
+        try {
+          // eslint-disable-next-line new-cap
+          doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
+        } catch (e) {
+          return null;
+        }
       }
+      win = doc.defaultView;
     }
-    win = doc.defaultView;
+    return win;
   }
-  return win;
-};
 
-/**
- * Get the chrome window related to this request.
- *
- * @return {?nsIDOMWindow}
- */
-NormalRequest.prototype.getChromeWindow = function() {
-  let contentWindow = this.getContentWindow();
-  if (contentWindow) {
-    return WindowUtils.getChromeWindow(contentWindow);
-  } else {
-    return null;
+  /**
+   * Get the chrome window related to this request.
+   *
+   * @return {?nsIDOMWindow}
+   */
+  getChromeWindow() {
+    let contentWindow = this.getContentWindow();
+    if (contentWindow) {
+      return WindowUtils.getChromeWindow(contentWindow);
+    } else {
+      return null;
+    }
   }
-};
 
-/**
- * Get the <browser> related to this request.
- *
- * @return {nsIDOMXULElement}
- */
-NormalRequest.prototype.getBrowser = function() {
-  let context = this.aContext;
-  if (context instanceof Ci.nsIDOMXULElement &&
-      context.localName === "browser") {
-    return context;
-  } else {
-    return WindowUtils.getBrowserForWindow(this.getContentWindow());
+  /**
+   * Get the <browser> related to this request.
+   *
+   * @return {nsIDOMXULElement}
+   */
+  getBrowser() {
+    let context = this.aContext;
+    if (context instanceof Ci.nsIDOMXULElement &&
+        context.localName === "browser") {
+      return context;
+    } else {
+      return WindowUtils.getBrowserForWindow(this.getContentWindow());
+    }
   }
-};
+}
 
 // =============================================================================
 // RedirectRequest
 // =============================================================================
 
-export function RedirectRequest(aOldChannel, aNewChannel, aFlags) {
-  let oldChannel = new HttpChannelWrapper(aOldChannel);
-  let newChannel = new HttpChannelWrapper(aNewChannel);
-  Request.call(this, oldChannel.uri.specIgnoringRef,
-               newChannel.uri.specIgnoringRef, REQUEST_TYPE_REDIRECT);
-  this._oldChannel = oldChannel;
-  this._newChannel = newChannel;
-  this._redirectFlags = aFlags;
-}
-RedirectRequest.prototype = Object.create(Request.prototype);
-RedirectRequest.prototype.constructor = Request;
-
-Object.defineProperty(RedirectRequest.prototype, "browser", {
-  get: function() {
-    return this._oldChannel.browser;
-  },
-});
-
-Object.defineProperty(RedirectRequest.prototype, "loadFlags", {
-  get: function() {
-    return this._oldChannel._httpChannel.loadFlags;
-  },
-});
-
-Object.defineProperty(RedirectRequest.prototype, "originUriObj", {
-  get: function() {
-    return this._oldChannel.uri;
-  },
-});
-
-Object.defineProperty(RedirectRequest.prototype, "destUriObj", {
-  get: function() {
-    return this._newChannel.uri;
-  },
-});
-
-Object.defineProperty(RedirectRequest.prototype, "destURIWithRef", {
-  get: function() {
-    return this._newChannel.uri.spec;
-  },
-});
-
-RedirectRequest.prototype.getContentPolicyType = function() {
-  let {loadInfo} = this._oldChannel._httpChannel;
-  if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
-  if (typeof loadInfo.contentPolicyType !== "undefined") {
-    // FF < 44.0
-    return loadInfo.contentPolicyType;
+export class RedirectRequest extends Request {
+  constructor(aOldChannel, aNewChannel, aFlags) {
+    let oldChannel = new HttpChannelWrapper(aOldChannel);
+    let newChannel = new HttpChannelWrapper(aNewChannel);
+    super(
+        oldChannel.uri.specIgnoringRef,
+        newChannel.uri.specIgnoringRef, REQUEST_TYPE_REDIRECT);
+    this._oldChannel = oldChannel;
+    this._newChannel = newChannel;
+    this._redirectFlags = aFlags;
   }
-  return loadInfo.externalContentPolicyType;
-};
+
+  get browser() {
+    return this._oldChannel.browser;
+  }
+
+  get loadFlags() {
+    return this._oldChannel._httpChannel.loadFlags;
+  }
+
+  get originUriObj() {
+    return this._oldChannel.uri;
+  }
+
+  get destUriObj() {
+    return this._newChannel.uri;
+  }
+
+  get destURIWithRef() {
+    return this._newChannel.uri.spec;
+  }
+
+  getContentPolicyType() {
+    let {loadInfo} = this._oldChannel._httpChannel;
+    if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
+    if (typeof loadInfo.contentPolicyType !== "undefined") {
+      // FF < 44.0
+      return loadInfo.contentPolicyType;
+    }
+    return loadInfo.externalContentPolicyType;
+  }
+}

@@ -27,21 +27,19 @@ import * as WindowUtils from "content/lib/utils/window-utils";
 // HttpChannelWrapper
 // =============================================================================
 
-export function HttpChannelWrapper(aHttpChannel) {
-  this._httpChannel = aHttpChannel;
-}
+export class HttpChannelWrapper {
+  constructor(aHttpChannel) {
+    this._httpChannel = aHttpChannel;
+  }
 
-Object.defineProperty(HttpChannelWrapper.prototype, "uri", {
-  get: function() {
+  get uri() {
     if (!this.hasOwnProperty("_uri")) {
       this._uri = Services.io.newURI(this._httpChannel.name, null, null);
     }
     return this._uri;
-  },
-});
+  }
 
-Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
-  get: function() {
+  get loadContext() {
     if (!this.hasOwnProperty("_loadContext")) {
       // more info on the load context:
       // https://developer.mozilla.org/en-US/Firefox/Releases/3.5/Updating_extensions
@@ -71,15 +69,13 @@ Object.defineProperty(HttpChannelWrapper.prototype, "loadContext", {
       /* end - be careful when editing here */
     }
     return this._loadContext;
-  },
-});
+  }
 
-/**
- * Get the <browser> related to this request.
- * @return {?nsIDOMXULElement}
- */
-Object.defineProperty(HttpChannelWrapper.prototype, "browser", {
-  get: function() {
+  /**
+   * Get the <browser> related to this request.
+   * @return {?nsIDOMXULElement}
+   */
+  get browser() {
     if (!this.hasOwnProperty("_browser")) {
       let loadContext = this.loadContext;
 
@@ -105,15 +101,13 @@ Object.defineProperty(HttpChannelWrapper.prototype, "browser", {
       }
     }
     return this._browser;
-  },
-});
+  }
 
-/**
- * Get the DocShell related to this request.
- * @return {?nsIDocShell}
- */
-Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
-  get: function() {
+  /**
+   * Get the DocShell related to this request.
+   * @return {?nsIDocShell}
+   */
+  get docShell() {
     if (!this.hasOwnProperty("_docShell")) {
       try {
         /* eslint-disable new-cap */
@@ -127,5 +121,5 @@ Object.defineProperty(HttpChannelWrapper.prototype, "docShell", {
       }
     }
     return this._docShell;
-  },
-});
+  }
+}

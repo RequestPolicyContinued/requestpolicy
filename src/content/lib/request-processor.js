@@ -1074,8 +1074,8 @@ RequestProcessor = (function(self) {
       // destination of the target of the redirect. This is because future
       // requests (such as using back/forward) might show up as directly from
       // the initial origin to the ultimate redirected destination.
-      if (request._oldChannel.referrer) {
-        let realOrigin = request._oldChannel.referrer.spec;
+      if (request.oldChannel.referrer) {
+        let realOrigin = request.oldChannel.referrer.spec;
 
         if (internal.clickedLinks[realOrigin] &&
             internal.clickedLinks[realOrigin][originURI]) {
@@ -1257,7 +1257,7 @@ RequestProcessor = (function(self) {
    * @return {boolean}
    */
   function isContentRequest(request) {
-    let loadContext = request._oldChannel.loadContext;
+    let loadContext = request.oldChannel.loadContext;
 
     if (loadContext === null) {
       return false;

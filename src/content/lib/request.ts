@@ -21,10 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
+import {RequestResult} from "content/lib/request-result";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
-import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
+import {Log} from "content/models/log";
 
 const logRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -32,12 +33,12 @@ const logRequests = Log.extend({
   name: "Requests",
 });
 
+declare const Ci: any;
+declare const Services: any;
+
 // =============================================================================
 // constants
 // =============================================================================
-
-export const REQUEST_TYPE_NORMAL = 1;
-export const REQUEST_TYPE_REDIRECT = 2;
 
 const INTERNAL_SCHEMES = new Set([
   "resource",
@@ -71,16 +72,12 @@ const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
   "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
-/* eslint-disable new-cap */
-const profileUri = (function() {
-  /* eslint-disable new-cap */
+const profileUri = (() => {
   const fileHandler = Services.io.getProtocolHandler("file").
       QueryInterface(Ci.nsIFileProtocolHandler);
   const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
   return fileHandler.getURLSpecFromDir(profileDir);
-  /* eslint-enable new-cap */
 })();
-/* eslint-enable new-cap */
 
 const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
   profileUri + "extensions/", // issue #860
@@ -91,14 +88,19 @@ const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
 // =============================================================================
 
 export class Request {
-  constructor(originURI, destURI, requestType) {
-    // TODO: save a nsIURI objects here instead of strings
+  // TODO: save a nsIURI objects here instead of strings
+  public originURI?: string;
+  public destURI: string;
+
+  // TODO: Merge "RequestResult" into this class.
+  public requestResult: RequestResult;
+
+  constructor(
+      originURI: string | undefined,
+      destURI: string,
+  ) {
     this.originURI = originURI;
     this.destURI = destURI;
-    this.requestType = requestType;
-
-    // TODO: Merge "RequestResult" into this class.
-    this.requestResult = undefined;
   }
 
   get originUriObj() {
@@ -110,34 +112,35 @@ export class Request {
     return Services.io.newURI(this.destURI, null, null);
   }
 
-  setOriginURI(originURI) {
+  public setOriginURI(originURI: string) {
     this.originURI = originURI;
   }
 
-  setDestURI(destURI) {
+  public setDestURI(destURI: string) {
     this.destURI = destURI;
   }
 
-  detailsToString() {
+  public detailsToString() {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
     return "destination: " + this.destURI + ", origin: " + this.originURI;
   }
 
-  isTopLevel() {
+  public isTopLevel() {
     return this.getContentPolicyType() === Ci.nsIContentPolicy.TYPE_DOCUMENT;
   }
 
   /**
-    * Determines if a request is only related to internal resources.
-    *
-    * @return {Boolean} true if the request is only related to internal
-    *         resources.
-    */
-  isInternal() {
+   * Determines if a request is only related to internal resources.
+   *
+   * @return {Boolean} true if the request is only related to internal
+   *         resources.
+   */
+  public isInternal() {
     // TODO: investigate "moz-nullprincipal". The following comment has been
     //       created by @jsamuel in 2008, commit 46a04bb. More information about
-    //       principals at https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
+    //       principals at
+    //   https://developer.mozilla.org/en-US/docs/Mozilla/Gecko/Script_security
     //
     // Note: Don't OK the origin scheme "moz-nullprincipal" without further
     // understanding. It appears to be the source when the `js_1.html` test is
@@ -145,8 +148,8 @@ export class Request {
     // the entire page's content which includes a form that it submits. Maybe
     // "moz-nullprincipal" always shows up when using "document.location"?
 
-    let origin = this.originUriObj;
-    let dest = this.destUriObj;
+    const origin = this.originUriObj;
+    const dest = this.destUriObj;
 
     if (origin === undefined || origin === null) {
       logRequests.log("Allowing request without an origin.");
@@ -179,7 +182,7 @@ export class Request {
       return true;
     }
 
-    let destHost = DomainUtil.getHostByUriObj(dest);
+    const destHost = DomainUtil.getHostByUriObj(dest);
 
     // "global" dest are [some sort of interal requests]
     // "browser" dest are [???]
@@ -195,6 +198,7 @@ export class Request {
 
     if (dest.scheme === "jar") {
       const {path} = dest;
+      // tslint:disable-next-line prefer-const
       for (let pathStart of WHITELISTED_DESTINATION_JAR_PATH_STARTS) {
         if (path.startsWith(pathStart)) return true;
       }
@@ -218,21 +222,9 @@ export class Request {
     return false;
   }
 
-  isAllowedByDefault() {
-    if (
-        this.aExtra &&
-        this.aExtra instanceof Ci.nsISupportsString &&
-        this.aExtra.data === "conPolCheckFromDocShell"
-    ) return true;
-
-    if (
-        this.aRequestPrincipal &&
-        Services.scriptSecurityManager.isSystemPrincipal(
-            this.aRequestPrincipal)
-    ) return true;
-
-    let origin = this.originUriObj;
-    let dest = this.destUriObj;
+  public isAllowedByDefault() {
+    const origin = this.originUriObj;
+    const dest = this.destUriObj;
 
     if (
         origin && DEFAULT_ALLOWED_SCHEMES.has(origin.scheme) ||
@@ -250,7 +242,7 @@ export class Request {
       }
     }
 
-    let destHost = DomainUtil.getHostByUriObj(dest);
+    const destHost = DomainUtil.getHostByUriObj(dest);
 
     if (
         dest.scheme === "resource" && (
@@ -261,16 +253,37 @@ export class Request {
 
     return false;
   }
+
+  public getContentPolicyType() {
+    throw new Error("Request.getContentPolicyType() not implemented");
+  }
 }
 
 // =============================================================================
 // NormalRequest
 // =============================================================================
 
+// tslint:disable-next-line max-classes-per-file
 export class NormalRequest extends Request {
+  public aContentType: any;
+  public aContentLocation: any;
+  public aRequestOrigin: any;
+  public aContext: any;
+  public aMimeTypeGuess: any;
+  public aExtra: any;
+  public aRequestPrincipal: any;
+
+  public shouldLoadResult: any;
+
   constructor(
-      aContentType, aContentLocation, aRequestOrigin,
-      aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
+      aContentType: any,
+      aContentLocation: any,
+      aRequestOrigin: any,
+      aContext: any,
+      aMimeTypeGuess: any,
+      aExtra: any,
+      aRequestPrincipal: any,
+  ) {
     super(
         // About originURI and destURI:
         // We don't need to worry about ACE formatted IDNs because it seems
@@ -280,8 +293,7 @@ export class NormalRequest extends Request {
         aRequestOrigin ? aRequestOrigin.specIgnoringRef : undefined,
             // originURI
         aContentLocation.specIgnoringRef, // destURI
-        REQUEST_TYPE_NORMAL);
-
+    );
     this.aContentType = aContentType;
     this.aContentLocation = aContentLocation;
     this.aRequestOrigin = aRequestOrigin;
@@ -289,8 +301,6 @@ export class NormalRequest extends Request {
     this.aMimeTypeGuess = aMimeTypeGuess;
     this.aExtra = aExtra;
     this.aRequestPrincipal = aRequestPrincipal;
-
-    this.shouldLoadResult = undefined;
   }
 
   get originUriObj() {
@@ -301,12 +311,12 @@ export class NormalRequest extends Request {
     return this.aContentLocation;
   }
 
-  setOriginURI(originURI) {
+  public setOriginURI(originURI: string) {
     this.originURI = originURI;
     this.aRequestOrigin = DomainUtil.getUriObject(originURI);
   }
 
-  setDestURI(destURI) {
+  public setDestURI(destURI: string) {
     this.destURI = destURI;
     this.aContentLocation = DomainUtil.getUriObject(destURI);
   }
@@ -315,14 +325,14 @@ export class NormalRequest extends Request {
     return this.aContentLocation.spec;
   }
 
-  getContentPolicyType() {
+  public getContentPolicyType() {
     return this.aContentType;
   }
 
-  detailsToString() {
+  public detailsToString() {
     // Note: try not to cause side effects of toString() during load, so "<HTML
     // Element>" is hard-coded.
-    let context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
+    const context = this.aContext instanceof Ci.nsIDOMHTMLElement ?
         "<HTML Element>" : this.aContext;
     return "type: " + this.aContentType +
         ", destination: " + this.destURI +
@@ -332,14 +342,30 @@ export class NormalRequest extends Request {
         ", " + this.aExtra;
   }
 
+  public isAllowedByDefault() {
+    if (
+        this.aExtra &&
+        this.aExtra instanceof Ci.nsISupportsString &&
+        this.aExtra.data === "conPolCheckFromDocShell"
+    ) return true;
+
+    if (
+        this.aRequestPrincipal &&
+        Services.scriptSecurityManager.isSystemPrincipal(
+            this.aRequestPrincipal)
+    ) return true;
+
+    return super.isAllowedByDefault();
+  }
+
   /**
-    * Determines if a request is only related to internal resources.
-    *
-    * @return {Boolean} true if the request is only related to internal
-    *         resources.
-    */
-  isInternal() {
-    let rv = Request.prototype.isInternal.call(this);
+   * Determines if a request is only related to internal resources.
+   *
+   * @return {Boolean} true if the request is only related to internal
+   *         resources.
+   */
+  public isInternal() {
+    const rv = super.isInternal();
     if (rv === true) {
       return true;
     }
@@ -360,8 +386,8 @@ export class NormalRequest extends Request {
    *
    * @return {?Window}
    */
-  getContentWindow() {
-    let context = this.aContext;
+  public getContentWindow() {
+    const context = this.aContext;
     if (!context) {
       return null;
     }
@@ -373,16 +399,13 @@ export class NormalRequest extends Request {
 
     let win;
     try {
-      // eslint-disable-next-line new-cap
       win = context.QueryInterface(Ci.nsIDOMWindow);
     } catch (e) {
       let doc;
       try {
-        // eslint-disable-next-line new-cap
         doc = context.QueryInterface(Ci.nsIDOMDocument);
       } catch (e) {
         try {
-          // eslint-disable-next-line new-cap
           doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
         } catch (e) {
           return null;
@@ -398,8 +421,8 @@ export class NormalRequest extends Request {
    *
    * @return {?nsIDOMWindow}
    */
-  getChromeWindow() {
-    let contentWindow = this.getContentWindow();
+  public getChromeWindow() {
+    const contentWindow = this.getContentWindow();
     if (contentWindow) {
       return WindowUtils.getChromeWindow(contentWindow);
     } else {
@@ -412,8 +435,8 @@ export class NormalRequest extends Request {
    *
    * @return {nsIDOMXULElement}
    */
-  getBrowser() {
-    let context = this.aContext;
+  public getBrowser() {
+    const context = this.aContext;
     if (context instanceof Ci.nsIDOMXULElement &&
         context.localName === "browser") {
       return context;
@@ -427,40 +450,43 @@ export class NormalRequest extends Request {
 // RedirectRequest
 // =============================================================================
 
+// tslint:disable-next-line max-classes-per-file
 export class RedirectRequest extends Request {
-  constructor(aOldChannel, aNewChannel, aFlags) {
-    let oldChannel = new HttpChannelWrapper(aOldChannel);
-    let newChannel = new HttpChannelWrapper(aNewChannel);
+  private oldChannel: HttpChannelWrapper;
+  private newChannel: HttpChannelWrapper;
+
+  constructor(aOldChannel: any, aNewChannel: any, aFlags: any) {
+    const oldChannel = new HttpChannelWrapper(aOldChannel);
+    const newChannel = new HttpChannelWrapper(aNewChannel);
     super(
         oldChannel.uri.specIgnoringRef,
-        newChannel.uri.specIgnoringRef, REQUEST_TYPE_REDIRECT);
-    this._oldChannel = oldChannel;
-    this._newChannel = newChannel;
-    this._redirectFlags = aFlags;
+        newChannel.uri.specIgnoringRef);
+    this.oldChannel = oldChannel;
+    this.newChannel = newChannel;
   }
 
   get browser() {
-    return this._oldChannel.browser;
+    return this.oldChannel.browser;
   }
 
   get loadFlags() {
-    return this._oldChannel._httpChannel.loadFlags;
+    return this.oldChannel._httpChannel.loadFlags;
   }
 
   get originUriObj() {
-    return this._oldChannel.uri;
+    return this.oldChannel.uri;
   }
 
   get destUriObj() {
-    return this._newChannel.uri;
+    return this.newChannel.uri;
   }
 
   get destURIWithRef() {
-    return this._newChannel.uri.spec;
+    return this.newChannel.uri.spec;
   }
 
-  getContentPolicyType() {
-    let {loadInfo} = this._oldChannel._httpChannel;
+  public getContentPolicyType() {
+    const {loadInfo} = this.oldChannel._httpChannel;
     if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
     if (typeof loadInfo.contentPolicyType !== "undefined") {
       // FF < 44.0

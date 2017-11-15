@@ -58,62 +58,58 @@ export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user contr
  * @param {boolean} isAllowed
  * @param {number} resultReason
  */
-export function RequestResult(isAllowed, resultReason) {
-  this.matchedAllowRules = [];
-  this.matchedDenyRules = [];
-
-  this.isAllowed = isAllowed;
-  this.resultReason = resultReason;
-}
-
-RequestResult.prototype = {
-  matchedAllowRules: null,
-  matchedDenyRules: null,
-
-  isAllowed: undefined, // whether the request will be or has been allowed
-  resultReason: undefined,
-};
-
-RequestResult.prototype.allowRulesExist = function() {
-  return this.matchedAllowRules.length > 0;
-};
-
-RequestResult.prototype.denyRulesExist = function() {
-  return this.matchedDenyRules.length > 0;
-};
-
-function countOriginToDestRules(aMatchedRules) {
-  let n = 0;
-  for (let [, [type]] of aMatchedRules) {
-    if (type === "origin-to-dest") {
-      ++n;
+export class RequestResult {
+  static countOriginToDestRules(aMatchedRules) {
+    let n = 0;
+    for (let [, [type]] of aMatchedRules) {
+      if (type === "origin-to-dest") ++n;
     }
+    return n;
   }
-  return n;
+
+  constructor(isAllowed, resultReason) {
+    this.matchedAllowRules = [];
+    this.matchedDenyRules = [];
+
+    this.isAllowed = isAllowed;
+    this.resultReason = resultReason;
+  }
+
+  allowRulesExist() {
+    return this.matchedAllowRules.length > 0;
+  }
+
+  denyRulesExist() {
+    return this.matchedDenyRules.length > 0;
+  }
+
+  resolveConflict() {
+    let nODAllowRules = RequestResult.
+        countOriginToDestRules(this.matchedAllowRules);
+    let nODDenyRules = RequestResult.
+        countOriginToDestRules(this.matchedDenyRules);
+    if (nODAllowRules === 0 && nODDenyRules > 0) {
+      return {conflictCanBeResolved: true, shouldAllow: false};
+    }
+    if (nODAllowRules > 0 && nODDenyRules === 0) {
+      return {conflictCanBeResolved: true, shouldAllow: true};
+    }
+    return {conflictCanBeResolved: false, shouldAllow: undefined};
+  }
+
+  isDefaultPolicyUsed() {
+    // returns whether the default policy has been or will be used
+    // for this request.
+    return this.resultReason ===
+        REQUEST_REASON_DEFAULT_POLICY ||
+        this.resultReason ===
+            REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
+        this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;
+  }
+
+  isOnBlacklist() {
+    // TODO: implement a real blacklist. currently, if a request is blocked
+    // *not* by the default policy it's by a blacklist
+    return this.isAllowed ? false : !this.isDefaultPolicyUsed();
+  }
 }
-
-RequestResult.prototype.resolveConflict = function() {
-  let nODAllowRules = countOriginToDestRules(this.matchedAllowRules);
-  let nODDenyRules = countOriginToDestRules(this.matchedDenyRules);
-  if (nODAllowRules === 0 && nODDenyRules > 0) {
-    return {conflictCanBeResolved: true, shouldAllow: false};
-  }
-  if (nODAllowRules > 0 && nODDenyRules === 0) {
-    return {conflictCanBeResolved: true, shouldAllow: true};
-  }
-  return {conflictCanBeResolved: false, shouldAllow: undefined};
-};
-
-RequestResult.prototype.isDefaultPolicyUsed = function() {
-  // returns whether the default policy has been or will be used
-  // for this request.
-  return this.resultReason === REQUEST_REASON_DEFAULT_POLICY ||
-      this.resultReason === REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
-      this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;
-};
-
-RequestResult.prototype.isOnBlacklist = function() {
-  // TODO: implement a real blacklist. currently, if a request is blocked
-  // *not* by the default policy it's by a blacklist
-  return this.isAllowed ? false : !this.isDefaultPolicyUsed();
-};

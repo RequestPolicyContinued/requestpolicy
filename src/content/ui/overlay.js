@@ -31,7 +31,7 @@ import {ManagerForMessageListeners}
 import {Log as log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
-import {RequestProcessor} from "content/lib/request-processor";
+import * as RequestProcessor from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as StringUtils from "content/lib/utils/string-utils";

@@ -27,7 +27,7 @@ import {OldRules} from "content/lib/classes/old-rules";
 import {Environment, MainEnvironment} from "content/lib/environment";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {PolicyManager} from "content/lib/policy-manager";
-import {RequestProcessor} from "content/lib/request-processor";
+import * as RequestProcessor from "content/lib/request-processor";
 import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,

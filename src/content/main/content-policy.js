@@ -24,7 +24,7 @@
 import {Log as log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
 import * as Utils from "content/lib/utils/misc-utils";
-import {RequestProcessor} from "content/lib/request-processor";
+import * as RequestProcessor from "content/lib/request-processor";
 import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 let catMan = Cc["@mozilla.org/categorymanager;1"].

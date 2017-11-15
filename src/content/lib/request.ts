@@ -23,8 +23,7 @@
 
 import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
 import {
-  REQUEST_REASON_DEFAULT_POLICY,
-  REQUEST_REASON_DEFAULT_SAME_DOMAIN,
+  RequestReason,
   RequestResult,
 } from "content/lib/request-result";
 import * as DomainUtil from "content/lib/utils/domain-utils";
@@ -265,7 +264,7 @@ export class Request {
         this.isAllowedByDefault() ||
         Storage.alias.isDefaultAllow() ||
         Storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
-    ) return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
+    ) return new RequestResult(true, RequestReason.DefaultPolicy);
 
     const originUri = this.originURI;
     const destUri = this.destURI;
@@ -279,7 +278,7 @@ export class Request {
         // apply this rule only if both origin and dest URIs
         // do have a host.
         return new RequestResult(originDomain === destDomain,
-            REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+            RequestReason.DefaultSameDomain);
       }
     }
 
@@ -290,14 +289,14 @@ export class Request {
     if (originObj.scheme === "http" && destObj.scheme === "https" &&
         originObj.port === -1 && destObj.port === -1 &&
         originObj.host === destObj.host) {
-      return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+      return new RequestResult(true, RequestReason.DefaultSameDomain);
     }
 
     const originIdent = originUri ?
         DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP) : null;
     const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
-        REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+        RequestReason.DefaultSameDomain);
   }
 
   public getContentPolicyType() {

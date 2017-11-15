@@ -25,24 +25,26 @@
 // constants
 // =============================================================================
 
-/* eslint-disable no-multi-spaces, max-len */
-export const REQUEST_REASON_USER_POLICY           = 1;
-export const REQUEST_REASON_SUBSCRIPTION_POLICY   = 2;
-export const REQUEST_REASON_DEFAULT_POLICY        = 3;
-export const REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES = 4; // if there are allow _and_ deny rules for the same request
-export const REQUEST_REASON_DEFAULT_SAME_DOMAIN   = 5;
-export const REQUEST_REASON_COMPATIBILITY         = 6;
+export const RequestReason = {
+  UserPolicy: 1,
+  SubscriptionPolicy: 2,
+  DefaultPolicy: 3,
+  DefaultPolicyInconsistentRules: 4,
+      // if there are allow _and_ deny rules for the same request
+  DefaultSameDomain: 5,
+  Compatibility: 6,
 
-export const REQUEST_REASON_LINK_CLICK            = 7;
-export const REQUEST_REASON_FORM_SUBMISSION       = 8;
-export const REQUEST_REASON_HISTORY_REQUEST       = 9;
-export const REQUEST_REASON_USER_ALLOWED_REDIRECT = 10;
-export const REQUEST_REASON_USER_ACTION           = 11;
-export const REQUEST_REASON_NEW_WINDOW            = 12;
-export const REQUEST_REASON_IDENTICAL_IDENTIFIER  = 13;
+  LinkClick: 7,
+  FormSubmission: 8,
+  HistoryRequest: 9,
+  UserAllowedRedirect: 10,
+  UserAction: 11,
+  NewWindow: 12,
+  IdenticalIdentifier: 13,
 
-export const REQUEST_REASON_RELATIVE_URL          = 14; // TODO: give user control about relative urls on the page
-/* eslint-enable no-multi-spaces, max-len */
+  RelativeUrl: 14,
+      // TODO: give user control about relative urls on the page
+};
 
 // =============================================================================
 // RequestResult
@@ -101,10 +103,10 @@ export class RequestResult {
     // returns whether the default policy has been or will be used
     // for this request.
     return this.resultReason ===
-        REQUEST_REASON_DEFAULT_POLICY ||
+        RequestReason.DefaultPolicy ||
         this.resultReason ===
-            REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES ||
-        this.resultReason === REQUEST_REASON_DEFAULT_SAME_DOMAIN;
+            RequestReason.DefaultPolicyInconsistentRules ||
+        this.resultReason === RequestReason.DefaultSameDomain;
   }
 
   isOnBlacklist() {

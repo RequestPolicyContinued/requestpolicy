@@ -26,15 +26,10 @@ import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Request} from "content/lib/request";
-import {RequestResult, REQUEST_REASON_USER_POLICY,
-        REQUEST_REASON_SUBSCRIPTION_POLICY,
-        REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
-        REQUEST_REASON_COMPATIBILITY,
-        REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
-        REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
-        REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
-        REQUEST_REASON_IDENTICAL_IDENTIFIER, REQUEST_REASON_RELATIVE_URL,
-        } from "content/lib/request-result";
+import {
+  RequestReason,
+  RequestResult,
+} from "content/lib/request-result";
 import {MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
 import {CompatibilityRules} from "content/models/compatibility-rules";
@@ -404,7 +399,7 @@ export function process(request) {
       // requests, the menu becomes inaccurate. Now the question is: what
       // are we breaking by clearing the blocked/allowed requests here?
       request.requestResult = new RequestResult(true,
-          REQUEST_REASON_LINK_CLICK);
+          RequestReason.LinkClick);
       return accept("User-initiated request by link click", request);
     } else if (SubmittedForms[originURI] &&
         SubmittedForms[originURI][destURI.split("?")[0]]) {
@@ -419,7 +414,7 @@ export function process(request) {
       // requests on refresh. I haven't tested if it's the same for forms
       // but it should be so we're making the same change here.
       request.requestResult = new RequestResult(true,
-          REQUEST_REASON_FORM_SUBMISSION);
+          RequestReason.FormSubmission);
       return accept("User-initiated request by form submission", request);
     } else if (historyRequests[destURI]) {
       // When the user goes back and forward in their history, a request for
@@ -428,14 +423,14 @@ export function process(request) {
       // blocked requests isn't removed in this case.
       delete historyRequests[destURI];
       request.requestResult = new RequestResult(true,
-          REQUEST_REASON_HISTORY_REQUEST);
+          RequestReason.HistoryRequest);
       return accept("History request", request, true);
     } else if (UserAllowedRedirects[originURI] &&
         UserAllowedRedirects[originURI][destURI]) {
       // shouldLoad is called by location.href in overlay.js as of Fx
       // 3.7a5pre and SeaMonkey 2.1a.
       request.requestResult = new RequestResult(true,
-          REQUEST_REASON_USER_ALLOWED_REDIRECT);
+          RequestReason.UserAllowedRedirect);
       return accept("User-allowed redirect", request, true);
     }
 
@@ -446,7 +441,7 @@ export function process(request) {
         // "browser" origin shows up for favicon.ico and an address entered
         // in address bar.
         request.requestResult = new RequestResult(true,
-            REQUEST_REASON_USER_ACTION);
+            RequestReason.UserAction);
         return accept(
             "User action (e.g. address entered in address bar) " +
             "or other good explanation (e.g. new window/tab opened)",
@@ -460,7 +455,7 @@ export function process(request) {
         // you know of a way to use this to evade RequestPolicy, please let
         // me know, I will be very grateful.
         request.requestResult = new RequestResult(true,
-            REQUEST_REASON_USER_ACTION);
+            RequestReason.UserAction);
         return accept(
             "User action (e.g. address entered in address bar) " +
             "or other good explanation (e.g. new window/tab opened)",
@@ -489,7 +484,7 @@ export function process(request) {
       if (domNode && domNode.nodeName === "xul:browser" &&
           domNode.currentURI && domNode.currentURI.spec === "about:blank") {
         request.requestResult = new RequestResult(true,
-            REQUEST_REASON_NEW_WINDOW);
+            RequestReason.NewWindow);
         return accept("New window (should probably only be an allowed " +
             "popup's initial request)", request, true);
       }
@@ -511,7 +506,7 @@ export function process(request) {
     if (originIdent === destIdent &&
         originIdent !== null && destIdent !== null) {
       request.requestResult = new RequestResult(true,
-          REQUEST_REASON_IDENTICAL_IDENTIFIER);
+          RequestReason.IdenticalIdentifier);
       return accept(
           "Allowing request where origin protocol, host, and port are the" +
           " same as the destination: " + originIdent, request);
@@ -540,7 +535,7 @@ export function process(request) {
       let {conflictCanBeResolved, shouldAllow,
             } = request.requestResult.resolveConflict();
       if (conflictCanBeResolved) {
-        request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+        request.requestResult.resultReason = RequestReason.UserPolicy;
         request.requestResult.isAllowed = shouldAllow;
         if (shouldAllow) {
           return accept("Allowed by user policy", request);
@@ -549,7 +544,7 @@ export function process(request) {
         }
       }
       request.requestResult.resultReason =
-          REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+          RequestReason.DefaultPolicyInconsistentRules;
       if (Storage.alias.isDefaultAllow()) {
         request.requestResult.isAllowed = true;
         return accept("User policy indicates both allow and block. " +
@@ -561,12 +556,12 @@ export function process(request) {
       }
     }
     if (request.requestResult.allowRulesExist()) {
-      request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+      request.requestResult.resultReason = RequestReason.UserPolicy;
       request.requestResult.isAllowed = true;
       return accept("Allowed by user policy", request);
     }
     if (request.requestResult.denyRulesExist()) {
-      request.requestResult.resultReason = REQUEST_REASON_USER_POLICY;
+      request.requestResult.resultReason = RequestReason.UserPolicy;
       request.requestResult.isAllowed = false;
       return reject("Blocked by user policy", request);
     }
@@ -588,7 +583,7 @@ export function process(request) {
             } = request.requestResult.resolveConflict();
       if (conflictCanBeResolved) {
         request.requestResult.resultReason =
-            REQUEST_REASON_SUBSCRIPTION_POLICY;
+            RequestReason.SubscriptionPolicy;
         request.requestResult.isAllowed = shouldAllow;
         if (shouldAllow) {
           return accept("Allowed by subscription policy", request);
@@ -597,7 +592,7 @@ export function process(request) {
         }
       }
       request.requestResult.resultReason =
-          REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES;
+          RequestReason.DefaultPolicyInconsistentRules;
       if (Storage.alias.isDefaultAllow()) {
         request.requestResult.isAllowed = true;
         return accept(
@@ -611,13 +606,13 @@ export function process(request) {
     }
     if (request.requestResult.denyRulesExist()) {
       request.requestResult.resultReason =
-          REQUEST_REASON_SUBSCRIPTION_POLICY;
+          RequestReason.SubscriptionPolicy;
       request.requestResult.isAllowed = false;
       return reject("Blocked by subscription policy", request);
     }
     if (request.requestResult.allowRulesExist()) {
       request.requestResult.resultReason =
-          REQUEST_REASON_SUBSCRIPTION_POLICY;
+          RequestReason.SubscriptionPolicy;
       request.requestResult.isAllowed = true;
       return accept("Allowed by subscription policy", request);
     }
@@ -628,7 +623,7 @@ export function process(request) {
       let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
         request.requestResult = new RequestResult(true,
-            REQUEST_REASON_COMPATIBILITY);
+            RequestReason.Compatibility);
         return accept(
             "Extension/application compatibility rule matched [" +
             rule.info + "]", request, true);
@@ -640,7 +635,7 @@ export function process(request) {
           request.aContext.baseURI);
       if (info.isWhitelisted) {
         request.requestResult = new RequestResult(true,
-            REQUEST_REASON_COMPATIBILITY);
+            RequestReason.Compatibility);
         return accept(
             "Extension/application compatibility rule matched [" +
             info.addonName + "]", request, true);
@@ -904,14 +899,14 @@ function checkRedirect(request) {
   if (destURI[0] && destURI[0] === "/" || destURI.indexOf(":") === -1) {
     // Redirect is to a relative url.
     // ==> allow.
-    return new RequestResult(true, REQUEST_REASON_RELATIVE_URL);
+    return new RequestResult(true, RequestReason.RelativeUrl);
   }
 
   for (let rule of CompatibilityRules) {
     let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
     let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
     if (allowOrigin && allowDest) {
-      return new RequestResult(true, REQUEST_REASON_COMPATIBILITY);
+      return new RequestResult(true, RequestReason.Compatibility);
     }
   }
 

@@ -38,6 +38,7 @@ import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
+import * as Metadata from "content/models/metadata";
 import {Requests} from "content/models/requests";
 import {Storage} from "content/models/storage";
 import {VersionInfos} from "content/models/version-infos";
@@ -50,6 +51,7 @@ export const BackgroundPage = {
   Log,
   MainEnvironment,
   ManagerForPrefObservers,
+  Metadata,
   OldRules,
   PolicyManager,
   RequestProcessor,

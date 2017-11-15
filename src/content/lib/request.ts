@@ -22,10 +22,16 @@
  */
 
 import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
-import {RequestResult} from "content/lib/request-result";
+import {
+  REQUEST_REASON_DEFAULT_POLICY,
+  REQUEST_REASON_DEFAULT_SAME_DOMAIN,
+  RequestResult,
+} from "content/lib/request-result";
 import * as DomainUtil from "content/lib/utils/domain-utils";
+import {IUri} from "content/lib/utils/domain-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {Log} from "content/models/log";
+import {Storage} from "content/models/storage";
 
 const logRequests = Log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -252,6 +258,46 @@ export class Request {
     ) return true;
 
     return false;
+  }
+
+  public checkByDefaultPolicy() {
+    if (
+        this.isAllowedByDefault() ||
+        Storage.alias.isDefaultAllow() ||
+        Storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
+    ) return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
+
+    const originUri = this.originURI;
+    const destUri = this.destURI;
+
+    if (Storage.alias.isDefaultAllowSameDomain()) {
+      const originDomain = originUri ?
+          DomainUtil.getBaseDomain(originUri) : null;
+      const destDomain = DomainUtil.getBaseDomain(destUri);
+
+      if (originDomain !== null && destDomain !== null) {
+        // apply this rule only if both origin and dest URIs
+        // do have a host.
+        return new RequestResult(originDomain === destDomain,
+            REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+      }
+    }
+
+    const originObj: IUri = this.originUriObj;
+    const destObj: IUri = this.destUriObj;
+
+    // Allow requests from http:80 to https:443 of the same host.
+    if (originObj.scheme === "http" && destObj.scheme === "https" &&
+        originObj.port === -1 && destObj.port === -1 &&
+        originObj.host === destObj.host) {
+      return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
+    }
+
+    const originIdent = originUri ?
+        DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP) : null;
+    const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
+    return new RequestResult(originIdent === destIdent,
+        REQUEST_REASON_DEFAULT_SAME_DOMAIN);
   }
 
   public getContentPolicyType() {

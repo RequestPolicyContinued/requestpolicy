@@ -27,9 +27,9 @@ import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Request} from "content/lib/request";
 import {RequestResult, REQUEST_REASON_USER_POLICY,
-        REQUEST_REASON_SUBSCRIPTION_POLICY, REQUEST_REASON_DEFAULT_POLICY,
+        REQUEST_REASON_SUBSCRIPTION_POLICY,
         REQUEST_REASON_DEFAULT_POLICY_INCONSISTENT_RULES,
-        REQUEST_REASON_DEFAULT_SAME_DOMAIN, REQUEST_REASON_COMPATIBILITY,
+        REQUEST_REASON_COMPATIBILITY,
         REQUEST_REASON_LINK_CLICK, REQUEST_REASON_FORM_SUBMISSION,
         REQUEST_REASON_HISTORY_REQUEST, REQUEST_REASON_USER_ALLOWED_REDIRECT,
         REQUEST_REASON_USER_ACTION, REQUEST_REASON_NEW_WINDOW,
@@ -38,6 +38,16 @@ import {RequestResult, REQUEST_REASON_USER_POLICY,
 import {MainEnvironment} from "content/lib/environment";
 import * as Utils from "content/lib/utils/misc-utils";
 import {CompatibilityRules} from "content/models/compatibility-rules";
+import {
+  AllowedRedirectsReverse,
+  ClickedLinks,
+  ClickedLinksReverse,
+  FaviconRequests,
+  MappedDestinations,
+  SubmittedForms,
+  SubmittedFormsReverse,
+  UserAllowedRedirects,
+} from "content/models/metadata";
 import {Requests} from "content/models/requests";
 
 import RPContentPolicy from "content/main/content-policy";
@@ -70,8 +80,6 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
 export let RequestProcessor = (function() {
   let self = {};
 
-  let internal = Utils.createModuleInternal(self);
-
   // ---------------------------------------------------------------------------
   // private properties
   // ---------------------------------------------------------------------------
@@ -99,16 +107,6 @@ export let RequestProcessor = (function() {
   };
 
   let historyRequests = {};
-
-  internal.submittedForms = {};
-  internal.submittedFormsReverse = {};
-
-  internal.clickedLinks = {};
-  internal.clickedLinksReverse = {};
-
-  internal.faviconRequests = {};
-
-  internal.mappedDestinations = {};
 
   // ---------------------------------------------------------------------------
   // private functions
@@ -193,47 +191,6 @@ export let RequestProcessor = (function() {
     lastShouldLoadCheck.result = result;
   }
 
-  internal.checkByDefaultPolicy = function(aRequest) {
-    if (
-        aRequest.isAllowedByDefault() ||
-        Storage.alias.isDefaultAllow() ||
-        Storage.alias.isDefaultAllowTopLevel() && aRequest.isTopLevel()
-    ) {
-      return new RequestResult(true, REQUEST_REASON_DEFAULT_POLICY);
-    }
-
-    let originUri = aRequest.originURI;
-    let destUri = aRequest.destURI;
-
-    if (Storage.alias.isDefaultAllowSameDomain()) {
-      const originDomain = DomainUtil.getBaseDomain(originUri);
-      const destDomain = DomainUtil.getBaseDomain(destUri);
-
-      if (originDomain !== null && destDomain !== null) {
-        // apply this rule only if both origin and dest URIs
-        // do have a host.
-        return new RequestResult(originDomain === destDomain,
-            REQUEST_REASON_DEFAULT_SAME_DOMAIN);
-      }
-    }
-
-    let originObj = aRequest.originUriObj;
-    let destObj = aRequest.destUriObj;
-
-    // Allow requests from http:80 to https:443 of the same host.
-    if (originObj.scheme === "http" && destObj.scheme === "https" &&
-        originObj.port === -1 && destObj.port === -1 &&
-        originObj.host === destObj.host) {
-      return new RequestResult(true, REQUEST_REASON_DEFAULT_SAME_DOMAIN);
-    }
-
-    const originIdent = DomainUtil.getIdentifier(
-        originUri, DomainUtil.LEVEL_SOP);
-    const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
-    return new RequestResult(originIdent === destIdent,
-        REQUEST_REASON_DEFAULT_SAME_DOMAIN);
-  };
-
   /**
    * Determines if a request is a duplicate of the last call to shouldLoad().
    * If it is, the cached result in lastShouldLoadCheck.result can be used.
@@ -266,15 +223,6 @@ export let RequestProcessor = (function() {
     }
     return false;
   }
-
-  // ---------------------------------------------------------------------------
-  // public properties
-  // ---------------------------------------------------------------------------
-
-  // needed to collect some memory usage information
-  self.clickedLinks = internal.clickedLinks;
-  self.clickedLinksReverse = internal.clickedLinksReverse;
-  self.faviconRequests = internal.faviconRequests;
 
   // ---------------------------------------------------------------------------
   // public functions
@@ -431,7 +379,7 @@ export let RequestProcessor = (function() {
 
         if (domNode && domNode.nodeName === "LINK" &&
             (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
-          internal.faviconRequests[destURI] = true;
+          FaviconRequests[destURI] = true;
         }
       }
 
@@ -446,11 +394,11 @@ export let RequestProcessor = (function() {
       // was opened in a new tab but that link would have been allowed
       // regardless of the link click. The original tab would then show it
       // in its menu.
-      if (internal.clickedLinks[originURI] &&
-          internal.clickedLinks[originURI][destURI]) {
+      if (ClickedLinks[originURI] &&
+          ClickedLinks[originURI][destURI]) {
         // Don't delete the clickedLinks item. We need it for if the user
         // goes back/forward through their history.
-        // delete internal.clickedLinks[originURI][destURI];
+        // delete ClickedLinks[originURI][destURI];
 
         // We used to have this not be recorded so that it wouldn't cause us
         // to forget blocked/allowed requests. However, when a policy change
@@ -461,14 +409,14 @@ export let RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_LINK_CLICK);
         return accept("User-initiated request by link click", request);
-      } else if (internal.submittedForms[originURI] &&
-          internal.submittedForms[originURI][destURI.split("?")[0]]) {
+      } else if (SubmittedForms[originURI] &&
+          SubmittedForms[originURI][destURI.split("?")[0]]) {
         // Note: we dropped the query string from the destURI because form GET
         // requests will have that added on here but the original action of
         // the form may not have had it.
         // Don't delete the clickedLinks item. We need it for if the user
         // goes back/forward through their history.
-        // delete internal.submittedForms[originURI][destURI.split("?")[0]];
+        // delete SubmittedForms[originURI][destURI.split("?")[0]];
 
         // See the note above for link clicks and forgetting blocked/allowed
         // requests on refresh. I haven't tested if it's the same for forms
@@ -485,8 +433,8 @@ export let RequestProcessor = (function() {
         request.requestResult = new RequestResult(true,
             REQUEST_REASON_HISTORY_REQUEST);
         return accept("History request", request, true);
-      } else if (internal.userAllowedRedirects[originURI] &&
-          internal.userAllowedRedirects[originURI][destURI]) {
+      } else if (UserAllowedRedirects[originURI] &&
+          UserAllowedRedirects[originURI][destURI]) {
         // shouldLoad is called by location.href in overlay.js as of Fx
         // 3.7a5pre and SeaMonkey 2.1a.
         request.requestResult = new RequestResult(true,
@@ -707,10 +655,10 @@ export let RequestProcessor = (function() {
       // request if the original destination would have been accepted.
       // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
       if (request.aExtra !== CP_MAPPEDDESTINATION &&
-          internal.mappedDestinations[destURI]) {
-        for (let mappedDest in internal.mappedDestinations[destURI]) {
+          MappedDestinations[destURI]) {
+        for (let mappedDest in MappedDestinations[destURI]) {
           const mappedDestUriObj =
-              internal.mappedDestinations[destURI][mappedDest];
+              MappedDestinations[destURI][mappedDest];
           logRequests.log("Checking mapped destination: " + mappedDest);
           let mappedResult = RPContentPolicy.shouldLoad(
               request.aContentType, mappedDestUriObj, request.aRequestOrigin,
@@ -721,7 +669,7 @@ export let RequestProcessor = (function() {
         }
       }
 
-      request.requestResult = internal.checkByDefaultPolicy(request);
+      request.requestResult = request.checkByDefaultPolicy();
       if (request.requestResult.isAllowed) {
         return accept("Allowed by default policy", request);
       } else {
@@ -796,22 +744,21 @@ export let RequestProcessor = (function() {
     // we'll need to be dropping the query string there.
     destinationUrl = destinationUrl.split("?")[0];
 
-    if (internal.submittedForms[originUrl] === undefined) {
-      internal.submittedForms[originUrl] = {};
+    if (SubmittedForms[originUrl] === undefined) {
+      SubmittedForms[originUrl] = {};
     }
-    if (internal.submittedForms[originUrl][destinationUrl] === undefined) {
+    if (SubmittedForms[originUrl][destinationUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
-      internal.submittedForms[originUrl][destinationUrl] = true;
+      SubmittedForms[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.submittedFormsReverse[destinationUrl] === undefined) {
-      internal.submittedFormsReverse[destinationUrl] = {};
+    if (SubmittedFormsReverse[destinationUrl] === undefined) {
+      SubmittedFormsReverse[destinationUrl] = {};
     }
-    if (internal.
-        submittedFormsReverse[destinationUrl][originUrl] === undefined) {
+    if (SubmittedFormsReverse[destinationUrl][originUrl] === undefined) {
       // TODO: See timestamp note for registerLinkClicked.
-      internal.submittedFormsReverse[destinationUrl][originUrl] = true;
+      SubmittedFormsReverse[destinationUrl][originUrl] = true;
     }
   };
 
@@ -824,10 +771,10 @@ export let RequestProcessor = (function() {
     log.info(
         "Link clicked from <" + originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.clickedLinks[originUrl] === undefined) {
-      internal.clickedLinks[originUrl] = {};
+    if (ClickedLinks[originUrl] === undefined) {
+      ClickedLinks[originUrl] = {};
     }
-    if (internal.clickedLinks[originUrl][destinationUrl] === undefined) {
+    if (ClickedLinks[originUrl][destinationUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp that can be used elsewhere
       // to determine if this is a recent click. This is probably necessary as
       // multiple calls to shouldLoad get made and we need a way to allow
@@ -837,16 +784,16 @@ export let RequestProcessor = (function() {
       // of time). This would have the advantage that we could delete items from
       // the clickedLinks object. One of these approaches would also reduce log
       // clutter, which would be good.
-      internal.clickedLinks[originUrl][destinationUrl] = true;
+      ClickedLinks[originUrl][destinationUrl] = true;
     }
 
     // Keep track of a destination-indexed map, as well.
-    if (internal.clickedLinksReverse[destinationUrl] === undefined) {
-      internal.clickedLinksReverse[destinationUrl] = {};
+    if (ClickedLinksReverse[destinationUrl] === undefined) {
+      ClickedLinksReverse[destinationUrl] = {};
     }
-    if (internal.clickedLinksReverse[destinationUrl][originUrl] === undefined) {
+    if (ClickedLinksReverse[destinationUrl][originUrl] === undefined) {
       // TODO: Possibly set the value to a timestamp, as described above.
-      internal.clickedLinksReverse[destinationUrl][originUrl] = true;
+      ClickedLinksReverse[destinationUrl][originUrl] = true;
     }
   };
 
@@ -859,12 +806,11 @@ export let RequestProcessor = (function() {
     log.info("User-allowed redirect from <" +
         originUrl + "> to <" + destinationUrl + ">.");
 
-    if (internal.userAllowedRedirects[originUrl] === undefined) {
-      internal.userAllowedRedirects[originUrl] = {};
+    if (UserAllowedRedirects[originUrl] === undefined) {
+      UserAllowedRedirects[originUrl] = {};
     }
-    if (internal.
-        userAllowedRedirects[originUrl][destinationUrl] === undefined) {
-      internal.userAllowedRedirects[originUrl][destinationUrl] = true;
+    if (UserAllowedRedirects[originUrl][destinationUrl] === undefined) {
+      UserAllowedRedirects[originUrl][destinationUrl] = true;
     }
   };
 
@@ -876,16 +822,6 @@ export let RequestProcessor = (function() {
 // =============================================================================
 
 RequestProcessor = (function(self) {
-  let internal = self.getInternal();
-
-  /**
-   * These are redirects that the user allowed when presented with a redirect
-   * notification.
-   */
-  internal.userAllowedRedirects = {};
-
-  internal.allowedRedirectsReverse = {};
-
   MainEnvironment.obMan.observe(
       [HTTPS_EVERYWHERE_REWRITE_TOPIC],
       function(subject, topic, data) {
@@ -897,10 +833,10 @@ RequestProcessor = (function(self) {
     newDestUri = DomainUtil.stripFragment(newDestUri);
     log.info(
         "Mapping destination <" + origDestUri + "> to <" + newDestUri + ">.");
-    if (!internal.mappedDestinations[newDestUri]) {
-      internal.mappedDestinations[newDestUri] = {};
+    if (!MappedDestinations[newDestUri]) {
+      MappedDestinations[newDestUri] = {};
     }
-    internal.mappedDestinations[newDestUri][origDestUri] =
+    MappedDestinations[newDestUri][origDestUri] =
         DomainUtil.getUriObject(origDestUri);
   }
 
@@ -986,7 +922,7 @@ RequestProcessor = (function(self) {
       }
     }
 
-    let result = internal.checkByDefaultPolicy(request);
+    let result = request.checkByDefaultPolicy();
     return result;
   }
 
@@ -1030,10 +966,10 @@ RequestProcessor = (function(self) {
       // We always have to check "/favicon.ico" because Firefox will use this
       // as a default path and that request won't pass through shouldLoad().
       if (originPath === "/favicon.ico" ||
-          internal.faviconRequests[originURI]) {
+          FaviconRequests[originURI]) {
         // If the redirected request is allowed, we need to know that was a
         // favicon request in case it is further redirected.
-        internal.faviconRequests[destURI] = true;
+        FaviconRequests[destURI] = true;
         log.info(
             "Redirection from <" + originURI + "> to <" + destURI + "> " +
             "appears to be a redirected favicon request. " +
@@ -1067,7 +1003,7 @@ RequestProcessor = (function(self) {
         originUri: originURI,
         destUri: destURI,
       });
-      internal.allowedRedirectsReverse[destURI] = originURI;
+      AllowedRedirectsReverse[destURI] = originURI;
 
       // If this was a link click or a form submission, we register an
       // additional click/submit with the original source but with a new
@@ -1077,15 +1013,15 @@ RequestProcessor = (function(self) {
       if (request.oldChannel.referrer) {
         let realOrigin = request.oldChannel.referrer.spec;
 
-        if (internal.clickedLinks[realOrigin] &&
-            internal.clickedLinks[realOrigin][originURI]) {
+        if (ClickedLinks[realOrigin] &&
+            ClickedLinks[realOrigin][originURI]) {
           logRequests.log(
               "This redirect was from a link click." +
               " Registering an additional click to <" + destURI + "> " +
               "from <" + realOrigin + ">");
           self.registerLinkClicked(realOrigin, destURI);
-        } else if (internal.submittedForms[realOrigin] &&
-            internal.submittedForms[realOrigin][originURI.split("?")[0]]) {
+        } else if (SubmittedForms[realOrigin] &&
+            SubmittedForms[realOrigin][originURI.split("?")[0]]) {
           logRequests.log(
               "This redirect was from a form submission." +
               " Registering an additional form submission to <" + destURI +
@@ -1113,14 +1049,14 @@ RequestProcessor = (function(self) {
       {
         let initialOrigin = getOriginOfInitialRedirect(request);
 
-        if (internal.clickedLinksReverse.hasOwnProperty(initialOrigin)) {
+        if (ClickedLinksReverse.hasOwnProperty(initialOrigin)) {
           let linkClickDest = initialOrigin;
           let linkClickOrigin;
 
           // fixme: bad smell! the same link (linkClickDest) could have
           //        been clicked from different origins!
-          for (let i in internal.clickedLinksReverse[linkClickDest]) {
-            if (internal.clickedLinksReverse[linkClickDest].
+          for (let i in ClickedLinksReverse[linkClickDest]) {
+            if (ClickedLinksReverse[linkClickDest].
                     hasOwnProperty(i)) {
               // We hope there's only one possibility of a source page
               // (that is,ideally there will be one iteration of this loop).
@@ -1146,7 +1082,7 @@ RequestProcessor = (function(self) {
         }
 
         // TODO: implement for form submissions whose redirects are blocked
-        // if (internal.submittedFormsReverse[initialOrigin]) {
+        // if (SubmittedFormsReverse[initialOrigin]) {
         // }
       }
 
@@ -1237,13 +1173,13 @@ RequestProcessor = (function(self) {
     const ASSUME_REDIRECT_LOOP = 100; // Chosen arbitrarily.
 
     for (let i = 0; i < ASSUME_REDIRECT_LOOP; ++i) {
-      if (!internal.allowedRedirectsReverse.hasOwnProperty(initialOrigin)) {
+      if (!AllowedRedirectsReverse.hasOwnProperty(initialOrigin)) {
         // break the loop
         break;
       }
 
       initialDest = initialOrigin;
-      initialOrigin = internal.allowedRedirectsReverse[initialOrigin];
+      initialOrigin = AllowedRedirectsReverse[initialOrigin];
     }
 
     return initialOrigin;
@@ -1269,5 +1205,4 @@ RequestProcessor = (function(self) {
   return self;
 })(RequestProcessor);
 
-RequestProcessor.sealInternal();
 RequestProcessor.whenReady = Promise.resolve();

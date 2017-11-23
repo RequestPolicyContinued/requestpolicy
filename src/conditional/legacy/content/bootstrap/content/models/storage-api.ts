@@ -23,13 +23,12 @@
 import {isJsonPref, JsonPrefs} from "bootstrap/models/json-prefs";
 import {Prefs} from "bootstrap/models/prefs";
 import {C} from "content/data/constants";
+import {
+  AbstractObjectInterface,
+  IKeysObject,
+  IKeysWithDefaults,
+} from "content/lib/classes/object-interface";
 import {createListenersMap} from "content/lib/utils/listener-factories";
-
-// =============================================================================
-
-interface IKeysWithDefaults {
-  [k: string]: any;
-}
 
 // =============================================================================
 
@@ -37,77 +36,34 @@ function getPrefsModel(aKey: string) {
   return isJsonPref(aKey) ? JsonPrefs : Prefs;
 }
 
-function getPref(aKey: string) {
-  return getPrefsModel(aKey).get(aKey);
-}
-
-function setPref(aKey: string, aValue: any) {
-  getPrefsModel(aKey).set(aKey, aValue);
-}
-
-function getAllPrefs() {
-  return Prefs.branches.rp.getAll().concat(JsonPrefs.getAll());
-}
-
-function getNothing() {
-  return {};
-}
-
-function getPrefs(aKeys: string[]) {
-  const results: {[k: string]: any} = {};
-  aKeys.forEach((key) => {
-    const result = getPref(key);
-    if (result !== C.UNDEFINED) {
-      results[key] = result;
-    }
-  });
-  return results;
-}
-
-// =============================================================================
-
-function get(aKeys: string | string[] | IKeysWithDefaults | null | undefined) {
-  if (aKeys === "") return getNothing();
-  let keys: string[];
-  let isObjectWithDefaults = false;
-
-  if (typeof aKeys === "string") {
-    keys = [aKeys];
-  } else if (typeof aKeys === "object") {
-    if (Array.isArray(aKeys)) {
-      keys = aKeys as string[];
-    } else {
-      isObjectWithDefaults = true;
-      keys = Object.keys(aKeys as IKeysWithDefaults);
-    }
-    if (keys.length === 0) {
-      return getNothing();
-    }
-  } else {
-    return getAllPrefs();
+class SyncLocalStorageArea extends AbstractObjectInterface<any> {
+  protected getAll() {
+    return Prefs.branches.rp.getAll().concat(JsonPrefs.getAll());
   }
-  const results = getPrefs(keys);
-  if (isObjectWithDefaults) {
-    const defaults = aKeys as IKeysWithDefaults;
-    // tslint:disable-next-line prefer-const
-    for (let key in keys) {
-      if (!(results.hasOwnProperty(key))) {
-        results[key] = defaults[key];
+  protected getNothing() {
+    return {};
+  }
+  protected getByKeys(aKeys: string[]) {
+    const results: IKeysObject = {};
+    aKeys.forEach((key) => {
+      const result = getPrefsModel(key).get(key);
+      if (result !== C.UNDEFINED) {
+        results[key] = result;
       }
+    });
+    return results;
+  }
+  protected setByKey(aKey: string, aValue: any) {
+    getPrefsModel(aKey).set(aKey, aValue);
+  }
+  protected removeByKeys(aKeys: string[]) {
+    if (aKeys.length !== 0) {
+      throw new Error("Not implemented!");
     }
   }
-  return results;
 }
 
-function set(aKeys: {[k: string]: any}) {
-  if (typeof aKeys !== "object") {
-    throw new Error("browser.storage.local.set(): aKeys must be an object!");
-  }
-  Object.keys(aKeys).forEach((key) => {
-    setPref(key, aKeys[key]);
-  });
-  Prefs.save();
-}
+const slsa = new SyncLocalStorageArea();
 
 const {
   interfaces: eventTargets,
@@ -118,11 +74,11 @@ const {
 export const StorageApi = {
   local: {
     get(aKeys: string | string[] | IKeysWithDefaults | null | undefined) {
-      return Promise.resolve(get(aKeys));
+      return Promise.resolve(slsa.get(aKeys));
     },
     set(aKeys: {[k: string]: any}) {
       try {
-        return Promise.resolve(set(aKeys));
+        return Promise.resolve(slsa.set(aKeys));
       } catch (e) {
         return Promise.reject(e);
       }

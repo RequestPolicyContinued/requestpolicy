@@ -1,7 +1,6 @@
 // Some mocks for /gre/modules/NetUtil.jsm
 // Warning : those mock must be only used for unit testing purpose
-// Those are partial mocks to successly load
-// src/conditional/legacy/content/web-extension-fake-api/models/api.js
+// Warning : Those mocks are partial, add functions if needed
 
 // =============================================================================
 // Partial mock of nsIInputStream XPCOM Class
@@ -42,7 +41,7 @@ NetUtil.prototype.newChannel = function(uriObj) {
 };
 
 NetUtil.prototype.readInputStreamToString = function(inputStream, count, charset) {
-  return "{\"permissions\" : []}";
+  return "";
 };
 
 module.exports = NetUtil;

@@ -246,6 +246,41 @@ export const ContentScriptsApi = {
     return Promise.resolve({name, vendor, version, buildID});
   };
 
+  /**
+   * Map a relative path to manifest.json to a legacy path (XUL/XPCOM).
+   * All paths pointing to a html file in /content/settings/ are mapped into about:requestpolicy?,
+   * other paths are mapped into chrome://rpcontinued/ :
+   *  - /content/settings/filename.html will become about:requestpolicy?filename
+   *  - /foo/bar.file.css will become chrome://rpcontinued/foo/bar.file.css
+   * Leading / or ./ are ignored and the path is case sensitive.
+   *
+   * @param {string} path
+   * @return {string}
+   */
+  Api.browser.runtime.getURL = function(path) {
+
+    // Pattern to match mapping into about:requestpolicy?file
+    // 1) ^(?:\.\/|\/)? : matches even if path starts with "content/" or "./content"
+    // 2) content\/settings\/ : checks path (case sensitive)
+    // 3) ([^\/]+) : capturing group for the filename (everything not containing /)
+    // 4) \.[hH][tT][mM][lL]$ : matches html extension (case insensitive)
+    let patternAbout = /^(?:\.\/|\/)?content\/settings\/([^\/]+)\.[hH][tT][mM][lL]$/mg;
+
+    // Pattern to match prepending with chrome://rpcontinued/
+    // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"
+    let patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
+
+    let legacyPath = null;
+    
+    if (patternAbout.test(path)) {
+      legacyPath = path.replace(patternAbout, "about:requestpolicy?$1");
+    } else {
+      legacyPath = path.replace(patternChrome, "chrome://rpcontinued/$1");
+    }
+
+    return legacyPath;
+  };
+
   const listeners = {
     backgroundPage: Utils.createWebextOnEventApi(
         Api.browser.runtime, ["onMessage"]),

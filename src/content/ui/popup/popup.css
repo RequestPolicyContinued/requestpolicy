@@ -1,0 +1,306 @@
+
+/*********************************************
+ * Menu contents
+ *********************************************/
+#rpc-popup {
+  padding: 0;
+  margin: 0;
+  font-family: Helvetica, sans-serif;
+}
+#rpc-contents {
+  background-color: #ffffff;
+}
+#rpc-main {
+  padding: 10px 10px 10px 10px;
+  font-size: 13px;
+}
+
+#rpc-origins-destinations {
+  width : 200px;
+  margin-right: 10px;
+}
+
+/*
+#rpc-origins-destinations .rpc-od-item {
+  border: 1px solid #ffffff;
+  border-right: 0;
+  padding: 2px 0 2px 8px;
+  margin: 0;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+*/
+.rpc-od-item {
+  border: 1px solid #ffffff;
+  padding: 0 12px 0 12px;
+  margin: 0px 4px 0px 4px;
+  border-radius: 3px;
+}
+
+#rpc-origins-destinations [selected-origin="true"] {
+  border-color: #ddd !important;
+  background-color: #eaeaea;
+}
+#rpc-origins-destinations [selected-origin="false"]:hover {
+  border-color: #eee !important;
+  background-color: #f1f1f1;
+}
+
+
+#rpc-blocked-destinations [default-policy="true"],
+#rpc-allowed-destinations [default-policy="true"] {
+  background-image: url(chrome://rpcontinued/skin/menu-default.svg);
+}
+#rpc-blocked-destinations [default-policy="false"] {
+  background-image: url(chrome://rpcontinued/skin/menu-blocked.svg);
+}
+#rpc-allowed-destinations [default-policy="false"] {
+  background-image: url(chrome://rpcontinued/skin/menu-allowed.svg);
+}
+#rpc-blocked-destinations [default-policy],
+#rpc-allowed-destinations [default-policy] {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  padding-left: 20px;
+}
+
+#rpc-blocked-destinations [selected-dest="true"] {
+  border-color: #edd !important;
+  background-color: #ffe1e1;
+}
+#rpc-blocked-destinations [selected-dest="false"]:hover {
+  border-color: #fee !important;
+  background-color: #fff1f1;
+}
+
+#rpc-mixed-destinations [selected-dest="true"] {
+  border-color: #F2E2C7 !important;
+  background-color: #FFF3DE;
+}
+#rpc-mixed-destinations [selected-dest="false"]:hover {
+  border-color: #FFF3DE !important;
+  background-color: #FFFAF2;
+}
+
+#rpc-allowed-destinations [selected-dest="true"] {
+  border-color: #ded !important;
+  background-color: #e1ffe1;
+}
+#rpc-allowed-destinations [selected-dest="false"]:hover {
+  border-color: #efe !important;
+  background-color: #f1fff1;
+}
+
+#rpc-details .rpc-od-item:hover {
+  border-color: #eee !important;
+  background-color: #f1f1f1;
+}
+#rpc-details .rpc-allow {
+  /* This should probably stay the same color as the allowed destinations. */
+  color: #484;
+}
+#rpc-details .rpc-deny {
+  /* This should probably stay the same color as the blocked destinations. */
+  color: #844;
+}
+#rpc-details .rpc-temporary {
+  font-style: italic;
+  font-size: 0.9em;
+  color: #999;
+}
+/* When in private browsing mode, the user only has the option of adding
+   temporary rules. So, don't show them only small, grey text. */
+#rpc-details.privatebrowsing .rpc-allow {
+  font-size: 1em;
+  color: #484;
+}
+#rpc-details.privatebrowsing .rpc-deny {
+  font-size: 1em;
+  color: #844;
+}
+
+
+
+#rpc-details .rpc-stop-rule[selected-rule="true"] {
+  text-decoration: underline;
+}
+
+#rpc-details .rpc-start-rule[selected-rule="true"] {
+  text-decoration: underline;
+}
+
+#rpc-rules-remove label:last-child {
+  margin-bottom: 14px;
+}
+
+#rpc-origin #rpc-origin-domainname {
+  font-size: 1.2em;
+  color : #555;
+  padding-right: 10px;
+  flex: 2;
+}
+#rpc-origin #rpc-origin-num-requests {
+  font-size: 1.2em;
+  color: #777;
+}
+#rpc-origin[requests-blocked="true"] {
+  background-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+}
+#rpc-origin[requests-blocked="false"] {
+  background-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+}
+#rpc-origin[requests-blocked] {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  padding-left: 20px;
+}
+
+.rpc-label-list {
+  /*margin-left : 10px;*/
+}
+#rpc-other-origins {
+  color: #444;
+  margin-top: 1em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid #eee;
+}
+#rpc-other-origins [requests-blocked="true"] {
+  background-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+}
+#rpc-other-origins [requests-blocked="false"] {
+  background-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+}
+#rpc-other-origins [requests-blocked] {
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 14px 14px;
+  padding-left: 20px;
+}
+
+#rpc-other-origins-title {
+  color: #aaa;
+}
+
+#rpc-blocked-destinations {
+  color: #844;
+  margin-top: 1em;
+}
+#rpc-blocked-destinations-title {
+  color: #caa;
+}
+
+#rpc-mixed-destinations {
+  color: #AA7215;
+  margin-top: 1em;
+}
+#rpc-mixed-destinations-title {
+  color: #CCAF7D;
+}
+
+#rpc-allowed-destinations {
+  color: #484;
+  margin-top: 1em;
+}
+#rpc-allowed-destinations-title {
+  color: #aca;
+}
+
+#rpc-details {
+  padding: 0 1em 0 1em;
+  border-left: 1px solid #eee;
+  width: 500px !important;
+}
+
+#rpc-revoke-temporary-permissions {
+  border-top: 1px solid #ddd;
+  padding: 7px 5px 9px 5px;
+  -moz-box-pack: center;
+}
+#rpc-revoke-temporary-permissions label {
+  color: #2550ba;
+  font-size: 14px;
+  margin: 0 10px 0 10px;
+}
+#rpc-revoke-temporary-permissions label:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#rpc-footer {
+  border-top: 1px solid #ddd;
+  padding: 0 5px 2px 5px;
+  -moz-box-pack: end;
+}
+#rpc-footer-links {
+  margin-top: 4px;
+}
+.rpc-footer-link {
+  color: #888;
+  font-size: 11px;
+  margin: 0 10px 0 10px;
+}
+.rpc-footer-link:hover {
+  color: #555;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#rpc-link-disable-blocking {
+  color: #000;
+}
+#rpc-link-enable-blocking {
+  color: #966803;
+}
+
+/*********************************************
+* ClassicMenu contents
+*********************************************/
+.rpcontinuedTemporary {
+  font-style: italic;
+}
+
+.rpcontinuedAllowOriginToDest {
+  font-weight: bold;
+}
+
+/*********************************************
+ * Context menu entry
+ *********************************************/
+
+#rpcontinuedContextMenuEntry {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+}
+
+#rpcontinuedContextMenuEntry[rpcontinuedBlocked="true"] {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+}
+
+#rpcontinuedContextMenuEntry[rpcontinuedPermissive="true"] {
+  list-style-image:
+    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+}
+
+/*********************************************
+ * Request Log
+ *********************************************/
+#rpcontinued-requestLog-close {
+  -moz-appearance: none;
+  padding: 0 !important;
+  margin-right: 4px;
+  border: none !important;
+  background: transparent !important;
+  list-style-image: url(chrome://rpcontinued/skin/close.png);
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+  -moz-box-align: end;
+}
+
+#rpcontinued-requestLog-close :hover {
+  -moz-image-region: rect(0px, 32px, 16px, 16px);
+}

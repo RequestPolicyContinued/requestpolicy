@@ -2,16 +2,24 @@
 
 <html>
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <link href="chrome://rpcontinued/content/ui/popup/popup.css"
+  rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="popup.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+</head>
+<!-- If legacy extension, this page is included in a frame.
+     An special CSS class is used to removed margins for seamless integration
+-->
 <!-- @if EXTENSION_TYPE='legacy' -->
-<link href="chrome://rpcontinued/content/ui/popup/popup.css"
-      rel="stylesheet" type="text/css"/>
+<body class="body-frame-inc">
 <!-- @endif -->
 <!-- @if EXTENSION_TYPE!='legacy' -->
-<link href="popup.css" rel="stylesheet" type="text/css"/>
-<!-- @endif -->
-</head>
 <body>
+<!-- @endif -->
   <div id="rpc-contents">
     <div id="rpc-main">
       <!-- [BEGIN] LEFT MENU COLUMN -->
@@ -69,5 +77,6 @@
       </div>
     </div>
     <!-- [END] MENU FOOTER -->
+  </div>
 </body>
 </html>

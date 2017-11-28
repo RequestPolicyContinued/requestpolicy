@@ -2,13 +2,19 @@
 /*********************************************
  * Menu contents
  *********************************************/
-#rpc-popup {
+
+/* Class to use on the body if included in a frame.
+ * Removes margins for seamless integration.
+ */
+.body-frame-inc {
+  margin: 0;
+}
+
+#rpc-contents {
+  background-color: #ffffff;
   padding: 0;
   margin: 0;
   font-family: Helvetica, sans-serif;
-}
-#rpc-contents {
-  background-color: #ffffff;
 }
 #rpc-main {
   padding: 10px 10px 10px 10px;

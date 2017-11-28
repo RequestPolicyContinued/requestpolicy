@@ -296,6 +296,13 @@ exports.mainTree = [
               // [END] MENU FOOTER
             ],
           },
+          {
+            tag: "iframe",
+            attributes: {id: "rpc-popup-frame",
+                         type: "chrome",
+                         src: "chrome://rpcontinued/content/ui/popup/popup.html",
+                       },
+          },
         ],
       },
     ],

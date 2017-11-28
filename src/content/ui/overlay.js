@@ -920,6 +920,7 @@ export function loadOverlayIntoWindow(window) {
     //   return;
     // }
     rpcontinued.menu.prepareMenu();
+    self.updatePopupFrameSize();
   };
 
   /**
@@ -982,6 +983,43 @@ export function loadOverlayIntoWindow(window) {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
+  };
+
+  /**
+   * Updates the size of the frame containing the popup.
+   */
+  self.updatePopupFrameSize = function() {
+    try {
+      var popupframe = $id("rpc-popup-frame");
+      if (popupframe) {
+        var doc = null;
+        if (popupframe.contentDocument) {
+          doc = popupframe.contentDocument;
+        } else if (popupframe.contentWindow
+            && popupframe.contentWindow.document) {
+          doc = popupframe.contentWindow.document;
+        }
+
+        if (doc) {
+          var contentBody = doc.body, contentHtml = doc.documentElement;
+          var contentHeight = Math.max( contentBody.scrollHeight,
+                contentBody.offsetHeight, contentHtml.clientHeight,
+                contentHtml.scrollHeight, contentHtml.offsetHeight );
+          var contentWidth = Math.max( contentBody.scrollWidth,
+                contentBody.offsetWidth, contentHtml.clientWidth,
+                contentHtml.scrollWidth, contentHtml.offsetWidth );
+
+          if (contentHeight && contentHeight != 0) {
+            popupframe.style.height = contentHeight + "px";
+          }
+          if (contentWidth && contentWidth != 0) {
+            popupframe.style.width = contentWidth + "px";
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   /**

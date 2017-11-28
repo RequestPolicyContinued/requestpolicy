@@ -2,6 +2,13 @@
 /*********************************************
  * Menu contents
  *********************************************/
+#rpc-popup-frame {
+  background-color: #ffffff;
+  border: 0;
+  min-width: 100px;
+  min-height: 100px;
+}
+
 #rpc-popup {
   padding: 0;
   margin: 0;

@@ -229,71 +229,7 @@ exports.mainTree = [
                   },
                   // [END] RIGHT MENU COLUMN
                 ],
-              }, {
-                tag: "hbox",
-                attributes: {id: "rpc-revoke-temporary-permissions",
-                             hidden: "true"},
-                children: [
-                  {
-                    tag: "label",
-                    attributes: {value: "__MSG_rp_menu_revokeTemporaryPermissions__"},
-                    events: {click: ["overlay", "revokeTemporaryPermissions"]},
-                  },
-                ],
               },
-              // [BEGIN] MENU FOOTER
-              {
-                tag: "hbox",
-                attributes: {id: "rpc-footer"},
-                children: [
-                  {
-                    tag: "hbox",
-                    attributes: {id: "rpc-footer-links"},
-                    children: [
-                      {
-                        tag: "label",
-                        attributes: {id: "rpc-link-enable-blocking",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_rp_menu_enableBlocking__"},
-                        events: {click: ["overlay",
-                                         "toggleTemporarilyAllowAll"]},
-                      }, {
-                        tag: "label",
-                        attributes: {id: "rpc-link-disable-blocking",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_rp_menu_disableBlocking__"},
-                        events: {click: ["overlay",
-                                         "toggleTemporarilyAllowAll"]},
-                      }, {
-                        tag: "label",
-                        attributes: {id: "rpc-link-help",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_rp_menu_help__"},
-                        events: {click: ["overlay", "openHelp"]},
-                      }, {
-                        tag: "label",
-                        attributes: {id: "rpc-link-prefs",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_rp_menu_preferences__"},
-                        events: {click: ["overlay", "openPrefs"]},
-                      }, {
-                        tag: "label",
-                        attributes: {id: "rpc-link-policies",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_managePolicies@menu__"},
-                        events: {click: ["overlay", "openPolicyManager"]},
-                      }, {
-                        tag: "label",
-                        attributes: {id: "rpc-link-request-log",
-                                     class: "rpc-footer-link",
-                                     value: "__MSG_rp_requestLog_title__"},
-                        events: {click: ["overlay", "toggleRequestLog"]},
-                      },
-                    ],
-                  },
-                ],
-              },
-              // [END] MENU FOOTER
             ],
           },
           {

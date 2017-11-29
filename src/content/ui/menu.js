@@ -187,8 +187,12 @@ export function loadMenuIntoWindow(window) {
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
-      $id("rpc-revoke-temporary-permissions").hidden =
-          !PolicyManager.temporaryRulesExist();
+      let tempPermLink = $id("rpc-revoke-temporary-permissions");
+      if(PolicyManager.temporaryRulesExist()) {
+        tempPermLink.className = "rpc-revoke-temporary-permissions-enable";
+      } else {
+        tempPermLink.className = "rpc-revoke-temporary-permissions-disable";
+      }
 
       self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
 

@@ -226,8 +226,15 @@
 #rpc-revoke-temporary-permissions {
   border-top: 1px solid #ddd;
   padding: 7px 5px 9px 5px;
-  -moz-box-pack: center;
 }
+.rpc-revoke-temporary-permissions-disable {
+  display: none;
+}
+.rpc-revoke-temporary-permissions-enable {
+  display: flex;
+  justify-content: center;
+}
+
 #rpc-revoke-temporary-permissions label {
   color: #2550ba;
   font-size: 14px;
@@ -241,10 +248,11 @@
 #rpc-footer {
   border-top: 1px solid #ddd;
   padding: 0 5px 2px 5px;
-  -moz-box-pack: end;
 }
 #rpc-footer-links {
   margin-top: 4px;
+  display: flex;
+  justify-content: flex-end;
 }
 .rpc-footer-link {
   color: #888;

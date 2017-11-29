@@ -58,13 +58,12 @@ const {LOG_FLAG_STATE} = C;
  * @param {Window} window
  */
 export function loadOverlayIntoWindow(window) {
-  let {document, rpcontinued} = window;
+  let {rpcontinued} = window;
 
   // ===========================================================================
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
-  let $id = document.getElementById.bind(document);
   const $str = browser.i18n.getMessage.bind(browser.i18n);
 
   // create an environment for this overlay.
@@ -109,6 +108,26 @@ export function loadOverlayIntoWindow(window) {
     // We don't need to worry about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment,
+  };
+
+  let $id = function(id) {
+    let element = window.top.document.getElementById(id);
+    if (!element) {
+      let popupframe = window.top.document.getElementById("rpc-popup-frame");
+      if (popupframe) {
+        let frameDoc = null;
+        if (popupframe.contentDocument) {
+          frameDoc = popupframe.contentDocument;
+        } else if (popupframe.contentWindow
+            && popupframe.contentWindow.document) {
+          frameDoc = popupframe.contentWindow.document;
+        }
+        if (frameDoc) {
+          element = frameDoc.getElementById(id);
+        }
+      }
+    }
+    return element;
   };
 
   self.toString = function() {

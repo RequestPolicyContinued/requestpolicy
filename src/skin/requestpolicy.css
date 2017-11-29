@@ -5,8 +5,10 @@
 #rpc-popup-frame {
   background-color: #ffffff;
   border: 0;
-  min-width: 100px;
-  min-height: 100px;
+  min-width: 1px;
+  min-height: 1px;
+  width: 1px;
+  height: 1px;
 }
 
 #rpc-popup {

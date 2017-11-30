@@ -95,17 +95,6 @@ export function loadMenuIntoWindow(window) {
     if (initialized === false) {
       initialized = true;
 
-      self._originItem = document.getElementById("rpc-origin");
-      self._originDomainnameItem = $id("rpc-origin-domainname");
-      self._originNumRequestsItem = $id("rpc-origin-num-requests");
-
-      lists.otherOrigins = $id("rpc-other-origins-list");
-      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
-      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
-      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
-      lists.addRules = $id("rpc-rules-add");
-      lists.removeRules = $id("rpc-rules-remove");
-
       rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
           EnvLevel.INTERFACE,
           function() {
@@ -188,6 +177,17 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
+      self._originItem = $id("rpc-origin");
+      self._originDomainnameItem = $id("rpc-origin-domainname");
+      self._originNumRequestsItem = $id("rpc-origin-num-requests");
+
+      lists.otherOrigins = $id("rpc-other-origins-list");
+      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
+      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
+      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
+      lists.addRules = $id("rpc-rules-add");
+      lists.removeRules = $id("rpc-rules-remove");
+
       const disabled = Storage.alias.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;

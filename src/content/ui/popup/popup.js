@@ -25,4 +25,13 @@
   $id("rpc-link-request-log").addEventListener("click",
     overlay.toggleRequestLog, false);
 
+  // If the popup is embedded in a frame, we add a mutation observer
+  // to resize the frame when DOM changes
+  if (window !== window.top) {
+    let mutationTarget = $id("rpc-contents");
+    let observer = new MutationObserver(overlay.updatePopupFrameSize);
+    let confObserver = { attributes: true, childList: true,
+      characterData: true, subtree: true };
+    observer.observe(mutationTarget, confObserver);
+  }
 })();

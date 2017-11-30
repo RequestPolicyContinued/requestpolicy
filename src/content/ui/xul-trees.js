@@ -148,85 +148,9 @@ exports.mainTree = [
                           },
                         ],
                       },
-                      {
-                        tag: "vbox",
-                        attributes: {id: "rpc-other-origins"},
-                        children: [
-                          {
-                            tag: "label",
-                            attributes: {id: "rpc-other-origins-title",
-                                         value: "&rp.menu.otherOrigins;"},
-                          }, {
-                            tag: "vbox",
-                            attributes: {id: "rpc-other-origins-list",
-                                         class: "rpc-label-list"},
-                          },
-                        ],
-                      },
-                      {
-                        tag: "vbox",
-                        attributes: {id: "rpc-blocked-destinations"},
-                        children: [
-                          {
-                            tag: "label",
-                            attributes: {id: "rpc-blocked-destinations-title",
-                                         value: "&rp.menu.blockedDestinations;"},
-                          }, {
-                            tag: "vbox",
-                            attributes: {id: "rpc-blocked-destinations-list",
-                                         class: "rpc-label-list"},
-                          },
-                        ],
-                      }, {
-                        tag: "vbox",
-                        attributes: {id: "rpc-mixed-destinations"},
-                        children: [
-                          {
-                            tag: "label",
-                            attributes: {id: "rpc-mixed-destinations-title",
-                                         value: "&rp.menu.mixedDestinations;"},
-                          }, {
-                            tag: "vbox",
-                            attributes: {id: "rpc-mixed-destinations-list",
-                                         class: "rpc-label-list"},
-                          },
-                        ],
-                      }, {
-                        tag: "vbox",
-                        attributes: {id: "rpc-allowed-destinations"},
-                        children: [
-                          {
-                            tag: "label",
-                            attributes: {id: "rpc-allowed-destinations-title",
-                                         value: "&rp.menu.allowedDestinations;"},
-                          }, {
-                            tag: "vbox",
-                            attributes: {id: "rpc-allowed-destinations-list",
-                                         class: "rpc-label-list"},
-                          },
-                        ],
-                      },
                     ],
                   },
                   // [END] LEFT MENU COLUMN
-                  // [BEGIN] RIGHT MENU COLUMN
-                  {
-                    tag: "vbox",
-                    attributes: {id: "rpc-details"},
-                    children: [
-                      {
-                        tag: "vbox",
-                        attributes: {id: "rpc-rules-remove"},
-                      }, {
-                        tag: "vbox",
-                        attributes: {id: "rpc-rules-add"},
-                      }, {
-                        tag: "vbox",
-                        attributes: {id: "rpc-rules-info"},
-                      },
-                    ],
-                  },
-                  // [END] RIGHT MENU COLUMN
                 ],
               },
             ],

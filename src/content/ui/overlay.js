@@ -981,7 +981,6 @@ export function loadOverlayIntoWindow(window) {
     //   return;
     // }
     rpcontinued.menu.prepareMenu();
-    self.updatePopupFrameSize();
   };
 
   /**
@@ -1062,6 +1061,12 @@ export function loadOverlayIntoWindow(window) {
         }
 
         if (doc) {
+          // Reinit the frame size so the content will take less
+          // room as possible when calculating content size. Otherwise
+          // the frame size is never made smaller
+          popupframe.style.height = "1px";
+          popupframe.style.width = "1px";
+
           let contentBody = doc.body;
           let contentHtml = doc.documentElement;
           let contentHeight = Math.max(

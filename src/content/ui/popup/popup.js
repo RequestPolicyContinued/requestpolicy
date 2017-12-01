@@ -1,8 +1,14 @@
 (function() {
   // We use window.top because the popup can be embedded in a frame
   let overlay = window.top.rpcontinued.overlay;
+  let menu = window.top.window.rpcontinued.menu;
   let $id = document.getElementById.bind(document);
 
+  // Listener for origin domain selection
+  $id("rpc-origin").addEventListener("click",
+      menu.itemSelected, false);
+
+  // Listener for revoke temporary permission link
   $id("rpc-revoke-temporary-permissions").addEventListener("click",
       overlay.revokeTemporaryPermissions, false);
 

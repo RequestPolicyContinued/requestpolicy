@@ -674,14 +674,12 @@ export function loadMenuIntoWindow(window) {
   }
 
   self.itemSelected = function(event) {
-    let item = event.target;
+    // We retrieve the element on which the listener was added to always
+    // get the div (and not one span or textnode children)
+    let item = event.currentTarget;
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
-    if (item.nodeName === "span" && item.parentNode.nodeName === "div") {
-      // item should be the <div>
-      item = item.parentNode;
-    }
     if (item.id === "rpc-origin" ||
         item.parentNode.id === "rpc-other-origins-list") {
       if (event.button === 1) {

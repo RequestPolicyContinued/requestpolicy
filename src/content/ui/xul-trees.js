@@ -118,44 +118,6 @@ exports.mainTree = [
                  popuphidden: ["overlay", "onPopupHidden"]},
         children: [
           {
-            tag: "vbox",
-            attributes: {id: "rpc-contents"},
-            children: [
-              {
-                tag: "hbox",
-                attributes: {id: "rpc-main"},
-                children: [
-                  // [BEGIN] LEFT MENU COLUMN
-                  {
-                    tag: "vbox",
-                    attributes: {id: "rpc-origins-destinations"},
-                    children: [
-                      {
-                        tag: "hbox",
-                        attributes: {id: "rpc-origin",
-                                     class: "rpc-od-item"},
-                        events: {click: ["menu", "itemSelected"]},
-                        children: [
-                          {
-                            tag: "label",
-                            attributes: {id: "rpc-origin-domainname",
-                                         class: "domainname",
-                                         flex: "2"},
-                          }, {
-                            tag: "label",
-                            attributes: {id: "rpc-origin-num-requests",
-                                         class: "numRequests"},
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  // [END] LEFT MENU COLUMN
-                ],
-              },
-            ],
-          },
-          {
             tag: "iframe",
             attributes: {id: "rpc-popup-frame",
                          type: "chrome",

@@ -19,28 +19,24 @@
 #rpc-main {
   padding: 10px 10px 10px 10px;
   font-size: 13px;
+  display: flex;
 }
 
 #rpc-origins-destinations {
-  width : 200px;
   margin-right: 10px;
 }
 
-/*
-#rpc-origins-destinations .rpc-od-item {
-  border: 1px solid #ffffff;
-  border-right: 0;
-  padding: 2px 0 2px 8px;
-  margin: 0;
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-*/
 .rpc-od-item {
   border: 1px solid #ffffff;
   padding: 0 12px 0 12px;
   margin: 0px 4px 0px 4px;
   border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rpc-od-item:hover {
+  cursor: pointer;
 }
 
 #rpc-origins-destinations [selected-origin="true"] {
@@ -235,14 +231,14 @@
   justify-content: center;
 }
 
-#rpc-revoke-temporary-permissions label {
+#rpc-revoke-temporary-permissions>a {
   color: #2550ba;
   font-size: 14px;
   margin: 0 10px 0 10px;
+  text-decoration: none;
 }
-#rpc-revoke-temporary-permissions label:hover {
+#rpc-revoke-temporary-permissions>a:hover {
   text-decoration: underline;
-  cursor: pointer;
 }
 
 #rpc-footer {
@@ -258,11 +254,11 @@
   color: #888;
   font-size: 11px;
   margin: 0 10px 0 10px;
+  text-decoration: none;
 }
 .rpc-footer-link:hover {
   color: #555;
   text-decoration: underline;
-  cursor: pointer;
 }
 #rpc-link-disable-blocking {
   color: #000;

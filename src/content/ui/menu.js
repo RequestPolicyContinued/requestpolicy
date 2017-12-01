@@ -260,10 +260,10 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._populateMenuForUncontrollableOrigin = function() {
-    self._originDomainnameItem.setAttribute("value",
-        browser.i18n.getMessage("noOrigin"));
+    self._originDomainnameItem.textContent =
+        browser.i18n.getMessage("noOrigin");
     self._isUncontrollableOrigin = true;
-    self._originNumRequestsItem.setAttribute("value", "");
+    self._originNumRequestsItem.textContent = "";
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
 
@@ -332,7 +332,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._populateOrigin = function() {
-    self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
+    self._originDomainnameItem.textContent = self._currentBaseDomain;
     self._isUncontrollableOrigin = false;
 
     let showNumRequests = Storage.get("menu.info.showNumRequests");
@@ -348,7 +348,7 @@ export function loadMenuIntoWindow(window) {
         numRequests = props.numRequests;
       }
     }
-    self._originNumRequestsItem.setAttribute("value", numRequests);
+    self._originNumRequestsItem.textContent = numRequests;
 
     self._originItem.setAttribute(
         "default-policy",
@@ -537,25 +537,24 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._addListItem = function(list, cssClass, value, numRequests) {
-    const hbox = document.createElement("hbox");
-    hbox.setAttribute("class", `${cssClass} listen-click`);
-    hbox.addEventListener("click", self.itemSelected, false);
-    list.insertBefore(hbox, null);
+    const box = document.createElement("div");
+    box.setAttribute("class", `${cssClass} listen-click`);
+    box.addEventListener("click", self.itemSelected, false);
+    list.insertBefore(box, null);
 
-    const destLabel = document.createElement("label");
-    destLabel.setAttribute("value", value);
+    const destLabel = document.createElement("span");
+    destLabel.textContent = value;
     destLabel.setAttribute("class", "domainname");
-    destLabel.setAttribute("flex", "2");
-    hbox.insertBefore(destLabel, null);
+    box.insertBefore(destLabel, null);
 
     if (numRequests) {
-      const numReqLabel = document.createElement("label");
-      numReqLabel.setAttribute("value", numRequests);
+      const numReqLabel = document.createElement("span");
+      numReqLabel.textContent = numRequests;
       numReqLabel.setAttribute("class", "numRequests");
-      hbox.insertBefore(numReqLabel, null);
+      box.insertBefore(numReqLabel, null);
     }
 
-    return hbox;
+    return box;
   };
 
   self._disableIfNoChildren = function(el) {
@@ -599,11 +598,11 @@ export function loadMenuIntoWindow(window) {
       if (self._isUncontrollableOrigin) {
         return;
       }
-      self._currentlySelectedOrigin = self._originDomainnameItem.value;
+      self._currentlySelectedOrigin = self._originDomainnameItem.textContent;
     } else if (item.parentNode.id === "rpc-other-origins-list") {
       // it's an otherOrigin
       self._currentlySelectedOrigin =
-          item.getElementsByClassName("domainname")[0].value;
+          item.getElementsByClassName("domainname")[0].textContent;
     }
     self._currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
@@ -617,7 +616,7 @@ export function loadMenuIntoWindow(window) {
 
   self._activateDestinationItem = function(item) {
     self._currentlySelectedDest =
-        item.getElementsByClassName("domainname")[0].value;
+        item.getElementsByClassName("domainname")[0].textContent;
 
     if (item.parentNode.id === "rpc-blocked-destinations-list") {
       self._isCurrentlySelectedDestBlocked = true;
@@ -652,7 +651,7 @@ export function loadMenuIntoWindow(window) {
       let domainLabel = item.querySelector(".domainname");
 
       if (domainLabel !== null) {
-        domain = domainLabel.value;
+        domain = domainLabel.textContent;
       }
     }
 
@@ -679,8 +678,8 @@ export function loadMenuIntoWindow(window) {
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
-    if (item.nodeName === "label" && item.parentNode.nodeName === "hbox") {
-      // item should be the <hbox>
+    if (item.nodeName === "span" && item.parentNode.nodeName === "div") {
+      // item should be the <div>
       item = item.parentNode;
     }
     if (item.id === "rpc-origin" ||

@@ -344,7 +344,7 @@ export function loadMenuIntoWindow(window) {
     let numRequests = "";
     if (true === showNumRequests) {
       if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
-        numRequests = props.numRequests + " (" +
+        numRequests = props.numRequests + "\u00a0(" +
             props.numBlockedRequests + "+" + props.numAllowedRequests + ")";
       } else {
         numRequests = props.numRequests;

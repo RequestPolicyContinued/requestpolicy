@@ -71,22 +71,21 @@ export function loadMenuIntoWindow(window) {
     _ruleChangeQueues: {},
   };
 
+  /**
+   * Return a DOM element by its id. First search in the document included
+   * in the frame, and if not found search in the main document.
+   *
+   * @param {string} id the DOM element's id
+   * @return {Element} the DOM element or null if not found
+   */
   let $id = function(id) {
-    let element = window.top.document.getElementById(id);
+    let element = null;
+    let popupframe = window.top.document.getElementById("rpc-popup-frame");
+    if (popupframe && popupframe.contentDocument) {
+      element = popupframe.contentDocument.getElementById(id);
+    }
     if (!element) {
-      let popupframe = window.top.document.getElementById("rpc-popup-frame");
-      if (popupframe) {
-        let frameDoc = null;
-        if (popupframe.contentDocument) {
-          frameDoc = popupframe.contentDocument;
-        } else if (popupframe.contentWindow
-            && popupframe.contentWindow.document) {
-          frameDoc = popupframe.contentWindow.document;
-        }
-        if (frameDoc) {
-          element = frameDoc.getElementById(id);
-        }
-      }
+      element = window.top.document.getElementById(id);
     }
     return element;
   };
@@ -246,7 +245,7 @@ export function loadMenuIntoWindow(window) {
 
       self._populateOrigin();
       self._populateOtherOrigins();
-      self._activateOriginItem($id("rpc-origin"));
+      self._activateOriginItem(self._originItem);
     } catch (e) {
       console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);

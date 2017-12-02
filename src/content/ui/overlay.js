@@ -47,7 +47,7 @@ const {LOG_FLAG_STATE} = C;
  * @param {Window} window
  */
 export function loadOverlayIntoWindow(window) {
-  let {document, rpcontinued} = window;
+  let {rpcontinued} = window;
 
   // ===========================================================================
 
@@ -95,25 +95,23 @@ export function loadOverlayIntoWindow(window) {
     OverlayEnvironment: OverlayEnvironment,
   };
 
+  /**
+   * Return a DOM element by its id. First search in the main document,
+   * and if not found search in the document included in the frame.
+   *
+   * @param {string} id the DOM element's id
+   * @return {Element} the DOM element or null if not found
+   */
   let $id = function(id) {
     let element = window.top.document.getElementById(id);
     if (!element) {
       let popupframe = window.top.document.getElementById("rpc-popup-frame");
-      if (popupframe) {
-        let frameDoc = null;
-        if (popupframe.contentDocument) {
-          frameDoc = popupframe.contentDocument;
-        } else if (popupframe.contentWindow
-            && popupframe.contentWindow.document) {
-          frameDoc = popupframe.contentWindow.document;
-        }
-        if (frameDoc) {
-          element = frameDoc.getElementById(id);
-        }
+      if (popupframe && popupframe.contentDocument) {
+        element = popupframe.contentDocument.getElementById(id);
       }
     }
     return element;
-  }
+  };
 
   self.toString = function() {
     return "[rpcontinued.overlay " + overlayId + "]";
@@ -980,15 +978,14 @@ export function loadOverlayIntoWindow(window) {
   /**
    * Toggles disabling of all blocking for the current session.
    *
-   * @param {Event} event
+   * @return {boolean} True if the blocking is temporary disabled,
+   * false otherise
    */
-  self.toggleTemporarilyAllowAll = function(event) {
+  self.toggleTemporarilyAllowAll = function() {
     const disabled = !Storage.isBlockingDisabled();
     Storage.setBlockingDisabled(disabled);
 
-    // Change the link displayed in the menu.
-    $id("rpc-link-enable-blocking").hidden = !disabled;
-    $id("rpc-link-disable-blocking").hidden = disabled;
+    return disabled;
   };
 
   /**
@@ -1000,30 +997,6 @@ export function loadOverlayIntoWindow(window) {
     PolicyManager.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
-  };
-
-  /**
-   * Updates the size of the frame containing the popup.
-   */
-  self.updatePopupFrameSize = function() {
-    let popupframe = $id("rpc-popup-frame");
-    if (popupframe) {
-      // If the popup is embedded in a frame, it's size must be set
-      // according to the content actual size (otherwise scrollbars would
-      // appear). This is done by setting the body's display property to flex
-      // so rpc-content's size will be the content's size, and not its
-      // parent size (i.e the frame).
-      let frameContentDiv = $id("rpc-contents");
-      let contentHeight = frameContentDiv.scrollHeight;
-      let contentWidth = frameContentDiv.scrollWidth;
-
-      if (contentWidth && contentWidth != 0) {
-        popupframe.style.width = contentWidth + "px";
-      }
-      if (contentHeight && contentHeight != 0) {
-        popupframe.style.height = contentHeight + "px";
-      }
-    }
   };
 
   /**

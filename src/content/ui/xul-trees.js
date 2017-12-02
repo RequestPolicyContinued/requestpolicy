@@ -121,8 +121,7 @@ exports.mainTree = [
             tag: "iframe",
             attributes: {id: "rpc-popup-frame",
                          type: "chrome",
-                         src: "chrome://rpcontinued/content/ui/popup/popup.html"
-                       },
+                         src: "chrome://rpcontinued/content/ui/popup/popup.html"},
           },
         ],
       },

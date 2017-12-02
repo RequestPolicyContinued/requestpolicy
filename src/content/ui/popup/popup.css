@@ -3,11 +3,14 @@
  * Menu contents
  *********************************************/
 
-/* Class to use on the body if included in a frame.
- * Removes margins for seamless integration.
+/* Class used on the body if included in a frame.
+ * Removes margins for seamless integration. The flex value hack allows to
+ * retrieve the actual size of the content regardless of the frame size by
+ * getting the size on rpc-contents.
  */
 .body-frame-inc {
   margin: 0;
+  display: flex;
 }
 
 #rpc-contents {

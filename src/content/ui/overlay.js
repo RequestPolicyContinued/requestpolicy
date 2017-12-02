@@ -1006,42 +1006,23 @@ export function loadOverlayIntoWindow(window) {
    * Updates the size of the frame containing the popup.
    */
   self.updatePopupFrameSize = function() {
-    try {
-      var popupframe = $id("rpc-popup-frame");
-      if (popupframe) {
-        var doc = null;
-        if (popupframe.contentDocument) {
-          doc = popupframe.contentDocument;
-        } else if (popupframe.contentWindow
-            && popupframe.contentWindow.document) {
-          doc = popupframe.contentWindow.document;
-        }
+    let popupframe = $id("rpc-popup-frame");
+    if (popupframe) {
+      // If the popup is embedded in a frame, it's size must be set
+      // according to the content actual size (otherwise scrollbars would
+      // appear). This is done by setting the body's display property to flex
+      // so rpc-content's size will be the content's size, and not its
+      // parent size (i.e the frame).
+      let frameContentDiv = $id("rpc-contents");
+      let contentHeight = frameContentDiv.scrollHeight;
+      let contentWidth = frameContentDiv.scrollWidth;
 
-        if (doc) {
-          // Reinit the frame size so the content will take less
-          // room as possible when calculating content size. Otherwise
-          // the frame size is never made smaller
-          popupframe.style.height = "1px";
-          popupframe.style.width = "1px";
-
-          var contentBody = doc.body, contentHtml = doc.documentElement;
-          var contentHeight = Math.max( contentBody.scrollHeight,
-                contentBody.offsetHeight, contentHtml.clientHeight,
-                contentHtml.scrollHeight, contentHtml.offsetHeight );
-          var contentWidth = Math.max( contentBody.scrollWidth,
-                contentBody.offsetWidth, contentHtml.clientWidth,
-                contentHtml.scrollWidth, contentHtml.offsetWidth );
-
-          if (contentHeight && contentHeight != 0) {
-            popupframe.style.height = contentHeight + "px";
-          }
-          if (contentWidth && contentWidth != 0) {
-            popupframe.style.width = contentWidth + "px";
-          }
-        }
+      if (contentWidth && contentWidth != 0) {
+        popupframe.style.width = contentWidth + "px";
       }
-    } catch (e) {
-      console.error(e);
+      if (contentHeight && contentHeight != 0) {
+        popupframe.style.height = contentHeight + "px";
+      }
     }
   };
 

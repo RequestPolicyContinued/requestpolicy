@@ -6,7 +6,7 @@
 // Partial mock of Components.utils XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.utils
 // =============================================================================
-function Utils() {};
+function Utils() {}
 Utils.prototype.import = function(mod) {};
 
 // =============================================================================
@@ -15,7 +15,7 @@ Utils.prototype.import = function(mod) {};
 // =============================================================================
 function Interfaces() {
   this.nsIPrefBranch2 = null;
-};
+}
 
 // =============================================================================
 // Partial mock of Components XPCOM Class

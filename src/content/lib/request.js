@@ -71,12 +71,14 @@ const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
   "resource://gre/res/TopLevelVideoDocument.css",
 ]);
 
+/* eslint-disable new-cap */
 const profileUri = (function() {
   const fileHandler = Services.io.getProtocolHandler("file").
       QueryInterface(Ci.nsIFileProtocolHandler);
   const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
   return fileHandler.getURLSpecFromDir(profileDir);
 })();
+/* eslint-enable new-cap */
 
 const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
   profileUri + "extensions/", // issue #860

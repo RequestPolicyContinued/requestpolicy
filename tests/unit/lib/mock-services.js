@@ -7,7 +7,7 @@
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefBranch
 // =============================================================================
 
-function nsIPrefBranch() {};
+function nsIPrefBranch() {}
 
 nsIPrefBranch.prototype.QueryInterface = function() {
   return null;
@@ -17,7 +17,7 @@ nsIPrefBranch.prototype.QueryInterface = function() {
 // Partial mock of nsIPrefService XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefService
 // =============================================================================
-function nsIPrefService() {};
+function nsIPrefService() {}
 
 nsIPrefService.prototype.getBranch = function(aPrefRoot) {
   return new nsIPrefBranch();
@@ -32,6 +32,6 @@ nsIPrefService.prototype.savePrefFile = function(aFile) {};
 
 function Services() {
   this.prefs = new nsIPrefService();
-};
+}
 
 module.exports = Services;

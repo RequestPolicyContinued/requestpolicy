@@ -2,15 +2,25 @@
 <html id="oldrules">
 <head>
   <title>RequestPolicy - Old Rules</title>
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
   <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/bootstrap/environments/settings.js"></script>
   <!-- @endif -->
   <!-- @if EXTENSION_TYPE!='legacy' -->
-  <script src="chrome://rpcontinued/content/settings/main.js"></script>
+  <script data-main="oldrules.js" src="../lib/third-party/require.min.js"></script>
   <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -117,7 +127,12 @@
             </div>
             <div id="importdone">
               Done! Your old rules have been imported into
+              <!-- @if EXTENSION_TYPE='legacy' -->
               <a href="about:requestpolicy?yourpolicy">your policy</a>.
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">your policy</a>.
+              <!-- @endif -->
             </div>
 
           </div>

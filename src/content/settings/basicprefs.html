@@ -2,15 +2,25 @@
 <html id="basicprefs">
 <head>
   <title>RequestPolicy - Preferences</title>
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
   <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/bootstrap/environments/settings.js"></script>
   <!-- @endif -->
   <!-- @if EXTENSION_TYPE!='legacy' -->
-  <script src="chrome://rpcontinued/content/settings/main.js"></script>
+  <script data-main="basicprefs.js" src="../lib/third-party/require.min.js"></script>
   <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -24,10 +34,22 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" selected="true"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" selected="true" data-string="preferences"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" selected="true" data-string="preferences"></a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy" data-string="managePolicies"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html" data-string="managePolicies"></a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
                    data-string="help" target="_blank"></a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
@@ -36,10 +58,22 @@
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" selected="true"
-                   data-string="basic"></a></li>
-            <li><a href="about:requestpolicy?advancedprefs"
-                   data-string="advanced"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" selected="true" data-string="basic"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" selected="true" data-string="basic"></a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?advancedprefs" data-string="advanced"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./advancedprefs.html" data-string="advanced"></a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>

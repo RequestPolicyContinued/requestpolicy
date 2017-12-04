@@ -2,12 +2,17 @@
 <html id="setup">
 <head>
   <title>RequestPolicy - Setup</title>
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
   <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/bootstrap/environments/settings.js"></script>
   <!-- @endif -->
   <!-- @if EXTENSION_TYPE!='legacy' -->
-  <script src="chrome://rpcontinued/content/settings/main.js"></script>
+  <script data-main="setup.js" src="../lib/third-party/require.min.js"></script>
   <!-- @endif -->
   <!--<link href="chrome://rpcontinued/content/settings/setup.css"
       rel="stylesheet" type="text/css"/>-->

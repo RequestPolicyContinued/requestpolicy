@@ -2,15 +2,25 @@
 <html id="yourpolicy">
 <head>
   <title>RequestPolicy - Your Policy</title>
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/jquery.min.js"></script>
+  <!-- @endif -->
   <!-- @if EXTENSION_TYPE='legacy' -->
   <script src="chrome://rpcontinued/content/bootstrap/environments/settings.js"></script>
   <!-- @endif -->
   <!-- @if EXTENSION_TYPE!='legacy' -->
-  <script src="chrome://rpcontinued/content/settings/main.js"></script>
+  <script data-main="yourpolicy.js" src="../lib/third-party/require.min.js"></script>
   <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -24,10 +34,22 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy" selected="true"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" data-string="preferences"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" data-string="preferences"></a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy" selected="true" data-string="managePolicies"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html" selected="true" data-string="managePolicies"></a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
                    data-string="help" target="_blank"></a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
@@ -36,12 +58,30 @@
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="about:requestpolicy?yourpolicy" selected="true"
-                   data-string="yourPolicy"></a></li>
-            <li><a href="about:requestpolicy?defaultpolicy"
-                   data-string="defaultPolicy"></a></li>
-            <li><a href="about:requestpolicy?subscriptions"
-                   data-string="subscriptions"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy" selected="true" data-string="yourPolicy"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html" selected="true" data-string="yourPolicy"></a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?defaultpolicy" data-string="defaultPolicy"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./defaultpolicy.html" data-string="defaultPolicy"></a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?subscriptions" data-string="subscriptions"></a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./subscriptions.html" data-string="subscriptions"></a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>
@@ -144,7 +184,12 @@
       </style>
 
       <div id="oldrulesexist">
+        <!-- @if EXTENSION_TYPE='legacy' -->
         <a href="about:requestpolicy?oldrules" data-string="removeOldRules"></a>
+        <!-- @endif -->
+        <!-- @if EXTENSION_TYPE!='legacy' -->
+        <a href="./oldrules.html" data-string="removeOldRules"></a>
+        <!-- @endif -->
       </div>
 
     </td>

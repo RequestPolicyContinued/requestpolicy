@@ -456,7 +456,9 @@ export function loadOverlayIntoWindow(window) {
       // allow ALL
       let label = StringUtils.$str("allowAllRedirections");
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
-        maybeOpenLinkInNewTab("about:requestpolicy?defaultpolicy", [], true);
+        maybeOpenLinkInNewTab(
+            browser.runtime.getURL("content/settings/defaultpolicy.html"),
+            [], true);
       });
       addMenuSeparator();
     }
@@ -1081,10 +1083,11 @@ export function loadOverlayIntoWindow(window) {
     openLinkInNewTab(url, relatedToCurrent);
   }
 
-  self.openPrefs = maybeOpenLinkInNewTab.bind(null, "about:requestpolicy",
-      ["about:requestpolicy?basicprefs"], true);
+  self.openPrefs = maybeOpenLinkInNewTab.bind(null,
+      browser.runtime.getURL("content/settings/basicprefs.html"),
+      [], true);
   self.openPolicyManager = maybeOpenLinkInNewTab.bind(null,
-      "about:requestpolicy?yourpolicy", [], true);
+      browser.runtime.getURL("content/settings/yourpolicy.html"), [], true);
   self.openHelp = maybeOpenLinkInNewTab.bind(null, "https://github.com/" +
       "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support", []);
 

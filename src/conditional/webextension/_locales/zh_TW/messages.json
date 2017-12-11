@@ -1,0 +1,156 @@
+{
+  "extensionConflictWarning": {
+    "message": "有衝突的擴充套件: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "allowOrigin": {
+    "message": "允許來自於 $1 的請求",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "允許到 $1 的請求",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "允許由 $1 至 $2 的請求",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "暫時允許來自於 $1 的請求",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "暫時允許所有到 $1 的請求",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "暫時允許從 $1 到 $2 的請求",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "禁止所有來自於 $1 的請求",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "禁止所有到 $1 的請求",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "禁止由 $1 到 $2 的請求",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "無法阻擋來自於 $1 的請求",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "本網站請求重新導向至 $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "允許",
+    "description": "Allow"
+  },
+
+  "deny": {
+    "message": "拒絕",
+    "description": "Deny"
+  },
+
+  "more": {
+    "message": "More...",
+    "description": "More…"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "請求記錄一開始是空白的。",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "在您瀏覽網頁時會產生記錄。",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "preferences": {
+    "message": "偏好設定",
+    "description": "Preferences"
+  },
+
+  "advanced": {
+    "message": "進階",
+    "description": "Advanced"
+  },
+
+  "autoReload": {
+    "message": "更改白名單後重新載入目前頁面",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "網頁",
+    "description": "Web Pages"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "私密瀏覽時允許永久性的白名單",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "origin": {
+    "message": "來源",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "目標",
+    "description": "Destination"
+  },
+
+  "rp.menu.revokeTemporaryPermissions": {
+    "message": "撤銷所有暫時性的允許",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp.menu.blockedDestinations": {
+    "message": "已阻擋的目標",
+    "description": "Blocked destinations"
+  },
+
+  "rp.menu.allowedDestinations": {
+    "message": "已允許的目標",
+    "description": "Allowed destinations"
+  },
+
+  "rp.menu.preferences": {
+    "message": "偏好設定",
+    "description": "Preferences"
+  },
+
+  "rp.requestLog.title": {
+    "message": "請求記錄",
+    "description": "Request Log"
+  },
+
+  "alwaysAsk": {
+    "message": "總是要求確認",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfo.confirm": {
+    "message": "您可能透過一個查詢給 $2 來索取關於 $1 網站的資訊，是否要繼續？",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

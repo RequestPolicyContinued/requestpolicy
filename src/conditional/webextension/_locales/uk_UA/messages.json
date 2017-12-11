@@ -1,0 +1,86 @@
+{
+  "allowOrigin": {
+    "message": "Дозволити запити від $1",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "Дозволити запити до $1",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "Дозволити запити від $1 до $2",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "Тимчасово дозволити запити від $1",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "Тимчасово дозволити запити до $1",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "Тимчасово дозволити запити від $1 до $2",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "Заборонити усі запити від $1",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "Заборонити усі запити до $1",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "Заборонити запити від $1 до $2",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "redirectNotification": {
+    "message": "Ця сторінка намагається переадресуватися на $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "Дозволити",
+    "description": "Allow"
+  },
+
+  "deny": {
+    "message": "Заборонити",
+    "description": "Deny"
+  },
+
+  "more": {
+    "message": "More...",
+    "description": "More…"
+  },
+
+  "preferences": {
+    "message": "Вподобання",
+    "description": "Preferences"
+  },
+
+  "advanced": {
+    "message": "Додатково",
+    "description": "Advanced"
+  },
+
+  "webPages": {
+    "message": "Веб-сторінки",
+    "description": "Web Pages"
+  },
+
+  "rp.menu.preferences": {
+    "message": "Вподобання",
+    "description": "Preferences"
+  }
+}

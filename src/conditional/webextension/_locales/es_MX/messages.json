@@ -1,651 +1,581 @@
 {
   "extensionConflictWarning": {
-    "message": "Conflicting extensions: $1",
+    "message": "Extensiones incompatibles: $1",
     "description": "Conflicting extensions: $1"
   },
 
   "noOrigin": {
-    "message": "[no origin]",
+    "message": "[sin origen]",
     "description": "[no origin]"
   },
 
   "allowOrigin": {
-    "message": "Allow requests from $1",
+    "message": "Permitir peticiones desde $1",
     "description": "Allow requests from $1"
   },
 
   "allowDestination": {
-    "message": "Allow requests to $1",
+    "message": "Permitir peticiones hacia $1",
     "description": "Allow requests to $1"
   },
 
   "allowOriginToDestination": {
-    "message": "Allow requests from $1 to $2",
+    "message": "Permitir peticiones desde $1 hacia $2",
     "description": "Allow requests from $1 to $2"
   },
 
   "allowOriginTemporarily": {
-    "message": "Temporarily allow requests from $1",
+    "message": "Permitir temporalmente peticiones desde $1",
     "description": "Temporarily allow requests from $1"
   },
 
   "allowDestinationTemporarily": {
-    "message": "Temporarily allow requests to $1",
+    "message": "Permitir temporalmente peticiones hacia $1",
     "description": "Temporarily allow requests to $1"
   },
 
   "allowOriginToDestinationTemporarily": {
-    "message": "Temporarily allow requests from $1 to $2",
+    "message": "Permitir temporalmente peticiones desde $1 hacia $2",
     "description": "Temporarily allow requests from $1 to $2"
   },
 
   "stopAllowingOrigin": {
-    "message": "Stop allowing requests from $1",
+    "message": "Dejar de permitir peticiones de $1",
     "description": "Stop allowing requests from $1"
   },
 
   "stopAllowingDestination": {
-    "message": "Stop allowing requests to $1",
+    "message": "Dejar de permitir peticiones a $1",
     "description": "Stop allowing requests to $1"
   },
 
   "stopAllowingOriginToDestination": {
-    "message": "Stop allowing requests from $1 to $2",
+    "message": "Dejar de permitir peticiones de $1 a $2",
     "description": "Stop allowing requests from $1 to $2"
   },
 
   "denyOrigin": {
-    "message": "Block all requests from $1",
+    "message": "Prohibir todas las peticiones desde $1",
     "description": "Block all requests from $1"
   },
 
   "denyDestination": {
-    "message": "Block all requests to $1",
+    "message": "Prohibir todas las peticiones hacia $1",
     "description": "Block all requests to $1"
   },
 
   "denyOriginToDestination": {
-    "message": "Block requests from $1 to $2",
+    "message": "Prohibir peticiones desde  $1 hacia $2",
     "description": "Block requests from $1 to $2"
   },
 
   "denyOriginTemporarily": {
-    "message": "Temporarily block all requests from $1",
+    "message": "Bloquear temporalmente todas las peticiones de $1",
     "description": "Temporarily block all requests from $1"
   },
 
   "denyDestinationTemporarily": {
-    "message": "Temporarily block all requests to $1",
+    "message": "Bloquear temporalmente todas las peticiones a $1",
     "description": "Temporarily block all requests to $1"
   },
 
   "denyOriginToDestinationTemporarily": {
-    "message": "Temporarily block requests from $1 to $2",
+    "message": "Bloquear temporalmente todas las peticiones de $1 a $2",
     "description": "Temporarily block requests from $1 to $2"
   },
 
   "stopDenyingOrigin": {
-    "message": "Stop blocking requests from $1",
+    "message": "Dejar de bloquear las peticiones de $1",
     "description": "Stop blocking requests from $1"
   },
 
   "stopDenyingDestination": {
-    "message": "Stop blocking requests to $1",
+    "message": "Dejar de bloquear las peticiones a $1",
     "description": "Stop blocking requests to $1"
   },
 
   "stopDenyingOriginToDestination": {
-    "message": "Stop blocking requests from $1 to $2",
+    "message": "Dejar de bloquear las peticiones de $1 a $2",
     "description": "Stop blocking requests from $1 to $2"
   },
 
   "unrestrictedOrigin": {
-    "message": "Requests from $1 cannot be blocked",
+    "message": "Las peticiones desde $1 no pueden ser bloqueadas",
     "description": "Requests from $1 cannot be blocked"
   },
 
   "redirectNotification": {
-    "message": "This webpage has asked to redirect to $1",
+    "message": "Esta pagina ha pedido ser redirigida a $1",
     "description": "This webpage has asked to redirect to $1"
   },
 
-  "redirectNotificationWithOrigin": {
-    "message": "The URL $1 has asked to redirect to $2",
-    "description": "The URL $1 has asked to redirect to $2"
-  },
-
   "allow": {
-    "message": "Allow",
+    "message": "Permitir",
     "description": "Allow"
   },
 
-  "allow.accesskey": {
-    "message": "A",
-    "description": "A"
-  },
-
   "deny": {
-    "message": "Deny",
+    "message": "Denegar",
     "description": "Deny"
   },
 
-  "deny.accesskey": {
-    "message": "D",
-    "description": "D"
-  },
-
   "more": {
-    "message": "More…",
+    "message": "Más…",
     "description": "More…"
   },
 
-  "more.accesskey": {
-    "message": "M",
-    "description": "M"
-  },
-
-  "indentedText": {
-    "message": "$1 $2",
-    "description": "$1 $2"
-  },
-
   "requestLogIsEmpty": {
-    "message": "The Request Log is initially empty.",
+    "message": "El registro de peticiones esta vacío.",
     "description": "The Request Log is initially empty."
   },
 
   "requestLogDirections": {
-    "message": "Log entries will appear when you visit web pages.",
+    "message": "El registro de navegación aparecerá cuando visite paginas web.",
     "description": "Log entries will appear when you visit web pages."
   },
 
   "actionForbidden": {
-    "message": "Action forbidden",
+    "message": "Acción no permitida",
     "description": "Action forbidden"
   },
 
   "urlCanOnlyBeCopiedToClipboard": {
-    "message": "This URL can only be copied to the clipboard.",
+    "message": "Esta URL solo puede ser copiada al portapapeles",
     "description": "This URL can only be copied to the clipboard."
   },
 
   "preferences": {
-    "message": "Preferences",
+    "message": "Preferencias",
     "description": "Preferences"
   },
 
   "managePolicies": {
-    "message": "Manage Policies",
+    "message": "Gestionar políticas",
     "description": "Manage Policies"
   },
 
   "about": {
-    "message": "About",
+    "message": "Acerca de",
     "description": "About"
   },
 
   "help": {
-    "message": "Help",
+    "message": "Ayuda",
     "description": "Help"
   },
 
   "basic": {
-    "message": "Basic",
+    "message": "Básico",
     "description": "Basic"
   },
 
   "advanced": {
-    "message": "Advanced",
+    "message": "Avanzado",
     "description": "Advanced"
   },
 
   "indicateBlockedImages": {
-    "message": "Indicate blocked images",
+    "message": "Indicar imágenes bloqueadas",
     "description": "Indicate blocked images"
   },
 
   "dontIndicateBlacklisted": {
-    "message": "Exception: images blocked by a blacklist",
+    "message": "Excepción: imágenes bloqueadas por una lista negra",
     "description": "Exception: images blocked by a blacklist"
   },
 
   "autoReload": {
-    "message": "Reload current page when whitelist is changed",
+    "message": "Recargar la pagina actual cuando cambie la lista de sitios permitidos",
     "description": "Reload current page when whitelist is changed"
   },
 
   "webPages": {
-    "message": "Web Pages",
+    "message": "Paginas web",
     "description": "Web Pages"
   },
 
-  "menu": {
-    "message": "Menu",
-    "description": "Menu"
-  },
-
   "allowAddingNonTemporaryRulesInPBM": {
-    "message": "Allow adding non-temporary rules when using Private Browsing Mode",
+    "message": "Al usar navegación privada permitir poner sitios en la lista de modo permanente",
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "advancedPreferences": {
-    "message": "Advanced Preferences",
-    "description": "Advanced Preferences"
-  },
-
   "linkPrefetching": {
-    "message": "Link Prefetching",
+    "message": "Descarga anticipada de enlaces",
     "description": "Link Prefetching"
   },
 
   "dnsPrefetching": {
-    "message": "DNS Prefetching",
+    "message": "Descarga anticipada de DNS",
     "description": "DNS Prefetching"
   },
 
   "speculativePreConnections": {
-    "message": "Speculative pre-connections",
+    "message": "Pre-conexiones especuladas",
     "description": "Speculative pre-connections"
   },
 
   "enabled": {
-    "message": "Enabled",
+    "message": "Activado",
     "description": "Enabled"
   },
 
   "disableOnStartup": {
-    "message": "Disable on startup",
+    "message": "Deshabilitar al inicio",
     "description": "Disable on startup"
   },
 
   "restoreDefaultOnUninstall": {
-    "message": "Restore default when RequestPolicy is uninstalled",
+    "message": "Restaurar predeterminados cuando RequestPolicy es desinstalado",
     "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {
-    "message": "Menu Preferences",
+    "message": "Menú de preferencias",
     "description": "Menu Preferences"
   },
 
   "menuSorting": {
-    "message": "sorting of destinations",
+    "message": "orden de los destinos",
     "description": "sorting of destinations"
   },
 
   "sortByNumRequests": {
-    "message": "by the number of requests",
+    "message": "por número de peticiones",
     "description": "by the number of requests"
   },
 
   "sortByDestName": {
-    "message": "by the domain name only",
+    "message": "por el nombre del dominio solamente",
     "description": "by the domain name only"
   },
 
   "noSorting": {
-    "message": "do not sort",
+    "message": "no ordenar",
     "description": "do not sort"
   },
 
   "hint": {
-    "message": "Hint:",
+    "message": "Pista:",
     "description": "Hint:"
   },
 
   "menuSortingHint": {
-    "message": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential.",
+    "message": "Cuando se desactiva la ordenación, los dominios se listan por orden de peticiones por el sitio web. Esto puede ser útil en el modo de bloqueo predeterminado cuando se buscan peticiones que han sido permitidas, ya que las primeras peticiones de la página pueden ser esenciales.",
     "description": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential."
   },
 
   "menuIndicatedInformation": {
-    "message": "indicated information",
+    "message": "información indicada",
     "description": "indicated information"
   },
 
   "menuIndicateNumRequests": {
-    "message": "show the number of requests for every destination",
+    "message": "muestra el número de peticiones para cada destino",
     "description": "show the number of requests for every destination"
   },
 
   "yourPolicy": {
-    "message": "Your Policy",
+    "message": "tu política",
     "description": "Your Policy"
   },
 
   "defaultPolicy": {
-    "message": "Default Policy",
+    "message": "Política predeterminada",
     "description": "Default Policy"
   },
 
   "subscriptions": {
-    "message": "Subscriptions",
+    "message": "Suscripciones",
     "description": "Subscriptions"
   },
 
   "search": {
-    "message": "Search",
+    "message": "Buscar",
     "description": "Search"
   },
 
   "scheme": {
-    "message": "scheme",
+    "message": "esquema",
     "description": "scheme"
   },
 
   "host": {
-    "message": "host",
+    "message": "servidor",
     "description": "host"
   },
 
   "port": {
-    "message": "port",
+    "message": "puerto",
     "description": "port"
   },
 
   "type": {
-    "message": "Type",
+    "message": "Tipo",
     "description": "Type"
   },
 
   "origin": {
-    "message": "Origin",
+    "message": "Origen",
     "description": "Origin"
   },
 
   "destination": {
-    "message": "Destination",
+    "message": "Destino",
     "description": "Destination"
   },
 
-  "block": {
-    "message": "Block",
-    "description": "Block"
-  },
-
   "temporary": {
-    "message": "Temporary",
+    "message": "Temporalmente",
     "description": "Temporary"
   },
 
   "addRule": {
-    "message": "Add rule",
+    "message": "Añadir regla",
     "description": "Add rule"
   },
 
-  "addRule.accesskey": {
-    "message": "R",
-    "description": "R"
-  },
-
-  "createRule": {
-    "message": "Create Rule",
-    "description": "Create Rule"
-  },
-
   "learnMoreAboutRules": {
-    "message": "Learn more about rules.",
+    "message": "Aprender más sobre las reglas.",
     "description": "Learn more about rules."
   },
 
   "learnMore": {
-    "message": "Learn more.",
+    "message": "Aprender más.",
     "description": "Learn more."
   },
 
   "defaultPolicyDefinition": {
-    "message": "When you don't have any \"allow\" or \"block\" rules that match a request, this is what RequestPolicy will do.",
+    "message": "Cuando no tienes nada reglas para «permitir» o «bloquear» esa petición, RequestPolicy las hará.",
     "description": "When you don't have any \"allow\" or \"block\" rules that match a request, this is what RequestPolicy will do."
   },
 
   "allowRequestsByDefault": {
-    "message": "Allow requests by default.",
+    "message": "Permitir peticiones por defecto.",
     "description": "Allow requests by default."
   },
 
   "blockRequestsByDefault": {
-    "message": "Block requests by default. (For advanced users. Breaks many websites.)",
+    "message": "Bloquear peticiones por defecto. (Para usuarios avanzados. «Rompe» muchos sitios web.)",
     "description": "Block requests by default. (For advanced users. Breaks many websites.)"
   },
 
   "allowRequestsToTheSameDomain": {
-    "message": "Allow requests to the same domain (www.example.com -> static.example.com).",
+    "message": "Permitir peticiones con el mismo dominio (www.example.com -> static.example.com).",
     "description": "Allow requests to the same domain (www.example.com -> static.example.com)."
   },
 
-  "allowTopLevelRequests": {
-    "message": "Allow all website redirections (top-level requests).",
-    "description": "Allow all website redirections (top-level requests)."
-  },
-
-  "allowAllRedirections": {
-    "message": "Allow ALL redirections.",
-    "description": "Allow ALL redirections."
-  },
-
   "differentSubscriptionsAreAvailable": {
-    "message": "Changing your default rule means different subscriptions are available.",
+    "message": "Cambiar las reglas predeterminadas implica diferentes suscripciones disponibles.",
     "description": "Changing your default rule means different subscriptions are available."
   },
 
   "manageSubscriptions": {
-    "message": "Manage subscriptions.",
+    "message": "Gestionar suscripciones.",
     "description": "Manage subscriptions."
   },
 
   "subscriptionPolicies": {
-    "message": "Subscription Policies",
+    "message": "Políticas de suscripciones",
     "description": "Subscription Policies"
   },
 
   "subscriptionPoliciesDefinition": {
-    "message": "Subscription policies are preset rules maintained by the community. These rules are updated automatically and can fulfil different needs, such as blocking known web browsing tracking sites, or allowing requests to allow certain sites to display/work properly. Subscription rules act as a supplement to user defined rules, that is, if no user defined rule applies, RequestPolicy will check if a subscription rule does.",
+    "message": "Las políticas de suscripciones son reglas presentes mantenidas por la comunidad. Estas reglas se actualizan automáticamente y pueden satisfacer diferentes necesidades, como bloquear conocidos sitios web que rastrean o permitir peticiones a determinados sitios para ser mostrados y que funcionen correctamente. Las suscripciones actúan como un suplemento para las reglas establecidas por el usuario, es decir, si una regla establecida no se aplica, RequestPolicy comprobará si lo hace una regla de la suscripción.",
     "description": "Subscription policies are preset rules maintained by the community. These rules are updated automatically and can fulfil different needs, such as blocking known web browsing tracking sites, or allowing requests to allow certain sites to display/work properly. Subscription rules act as a supplement to user defined rules, that is, if no user defined rule applies, RequestPolicy will check if a subscription rule does."
   },
 
   "learnMoreAboutSubscriptions": {
-    "message": "Learn more about subscriptions.",
+    "message": "Aprender más sobre las suscripciones.",
     "description": "Learn more about subscriptions."
   },
 
   "privacy": {
-    "message": "Privacy",
+    "message": "Privacidad",
     "description": "Privacy"
   },
 
   "usability": {
-    "message": "Usability",
+    "message": "Usabilidad",
     "description": "Usability"
   },
 
   "browser": {
-    "message": "Browser",
+    "message": "Navegador",
     "description": "Browser"
   },
 
   "subscriptionDenyTrackersDescription": {
-    "message": "Block destinations that can track you as you browse the web",
+    "message": "Bloquear destinos que pueden rastrearte tanto a ti como a tu navegador mientras navegas por la web",
     "description": "Block destinations that can track you as you browse the web"
   },
 
   "subscriptionAllowSameOrgDescription": {
-    "message": "Allow destinations that belong to the same organization as the origin webpage",
+    "message": "Permitir destinos que pertenecen a la misma organización que la página web principal",
     "description": "Allow destinations that belong to the same organization as the origin webpage"
   },
 
   "subscriptionAllowFunctionalityDescription": {
-    "message": "Allow requests that are needed for websites to work properly",
+    "message": "Permitir peticiones necesarias para el correcto funcionamiento de páginas web",
     "description": "Allow requests that are needed for websites to work properly"
   },
 
   "subscriptionAllowEmbeddedDescription": {
-    "message": "Allow requests for embedded content such as images and videos",
+    "message": "Permitir peticiones para contenido incrustado como imágenes y vídeos",
     "description": "Allow requests for embedded content such as images and videos"
   },
 
   "subscriptionAllowMozillaDescription": {
-    "message": "Allow requests related to Mozilla and Firefox websites",
+    "message": "Permitir peticiones relacionadas con las páginas web de Mozilla y Firefox",
     "description": "Allow requests related to Mozilla and Firefox websites"
   },
 
   "subscriptionAllowExtensionsDescription": {
-    "message": "Allow requests that are needed for other extensions to work properly",
+    "message": "Permitir peticiones que se necesitan para el correcto funcionamiento de complementos",
     "description": "Allow requests that are needed for other extensions to work properly"
   },
 
   "welcomeToRequestPolicy": {
-    "message": "Welcome to RequestPolicy",
+    "message": "Bienvenid@ a RequestPolicy",
     "description": "Welcome to RequestPolicy"
   },
 
   "forMostUsersDefaultsAreIdeal": {
-    "message": "For most users, RequestPolicy's default settings are ideal.",
+    "message": "Para la mayoría de usuarios, la configuración predeterminada de RequestPolicy es ideal.",
     "description": "For most users, RequestPolicy's default settings are ideal."
   },
 
   "youCanConfigureRequestPolicyToBeMoreStrict": {
-    "message": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users).",
+    "message": "Sin embargo, puedes configurar RequestPolicy para hacerla mucho más estricta (recomendado únicamente para usuarios avanzados).",
     "description": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users)."
   },
 
   "teachMeHowToUseRequestPolicy": {
-    "message": "Teach me how to use RequestPolicy",
+    "message": "Enséñame cómo usar RequestPolicy",
     "description": "Teach me how to use RequestPolicy"
   },
 
   "returnToBrowsing": {
-    "message": "Return to browsing",
+    "message": "Volver a navegar",
     "description": "Return to browsing"
   },
 
   "configureRequestPolicy": {
-    "message": "Configure RequestPolicy",
+    "message": "Configurar RequestPolicy",
     "description": "Configure RequestPolicy"
   },
 
   "yesUseSubscriptions": {
-    "message": "Yes, use subscription policies. (Recommended.)",
+    "message": "Sí, usar suscripciones de políticas. (Recomendado.)",
     "description": "Yes, use subscription policies. (Recommended.)"
   },
 
   "noDoNotUseSubscriptions": {
-    "message": "No, don't use subscription policies.",
+    "message": "No, no usar suscripciones de políticas.",
     "description": "No, don't use subscription policies."
   },
 
   "removeOldRules": {
-    "message": "Remove unused rules left over from the old version of RequestPolicy.",
+    "message": "Eliminar reglas sin usar importadas de la versión antigua de RequestPolicy.",
     "description": "Remove unused rules left over from the old version of RequestPolicy."
   },
 
   "importOldRules": {
-    "message": "Import Old Rules",
+    "message": "Importar reglas antiguas",
     "description": "Import Old Rules"
   },
 
   "deleteOldRules": {
-    "message": "Delete old rules",
+    "message": "Eliminar reglas antiguas",
     "description": "Delete old rules"
   },
 
   "showOldRuleReimportOptions": {
-    "message": "Show re-import options.",
+    "message": "Mostrar opciones de re-importación.",
     "description": "Show re-import options."
   },
 
   "yourOldRulesHaveBeenDeleted": {
-    "message": "Done! Your old rules have been deleted.",
+    "message": "¡Hecho! Tus reglas antiguas han sido eliminadas.",
     "description": "Done! Your old rules have been deleted."
   },
 
   "ruleSet": {
-    "message": "Rule Set",
+    "message": "Establecer regla",
     "description": "Rule Set"
   },
 
-  "activeRules": {
-    "message": "Active Rules",
-    "description": "Active Rules"
-  },
-
   "filterRules": {
-    "message": "Filter Rules",
+    "message": "Filtrar reglas",
     "description": "Filter Rules"
   },
 
   "policy": {
-    "message": "Policy",
+    "message": "Política",
     "description": "Policy"
   },
 
   "rp.menu.revokeTemporaryPermissions": {
-    "message": "Revoke all temporary permissions",
+    "message": "Cancelar los permisos temporales",
     "description": "Revoke all temporary permissions"
   },
 
   "rp.menu.blockedDestinations": {
-    "message": "Blocked destinations",
+    "message": "Destinos bloqueados",
     "description": "Blocked destinations"
   },
 
   "rp.menu.allowedDestinations": {
-    "message": "Allowed destinations",
+    "message": "Destinos permitidos",
     "description": "Allowed destinations"
   },
 
   "rp.menu.mixedDestinations": {
-    "message": "Mixed destinations",
+    "message": "Destinos mezclados",
     "description": "Mixed destinations"
   },
 
   "rp.menu.otherOrigins": {
-    "message": "Other origins",
+    "message": "Otros orígenes",
     "description": "Other origins"
   },
 
   "rp.menu.enableBlocking": {
-    "message": "Enable blocking",
+    "message": "Activar bloqueo",
     "description": "Enable blocking"
   },
 
   "rp.menu.disableBlocking": {
-    "message": "Disable blocking",
+    "message": "Desactivar bloqueo",
     "description": "Disable blocking"
   },
 
   "rp.menu.help": {
-    "message": "Help",
+    "message": "Ayuda",
     "description": "Help"
   },
 
   "rp.menu.preferences": {
-    "message": "Preferences",
+    "message": "Preferencias",
     "description": "Preferences"
   },
 
-  "rp.menu.managePolicies": {
-    "message": "Manage Policies",
-    "description": "Manage Policies"
-  },
-
   "rp.requestLog.title": {
-    "message": "Request Log",
+    "message": "Registro de peticiones",
     "description": "Request Log"
   },
 
   "rp.requestLog.clear": {
-    "message": "Clear",
+    "message": "Limpiar",
     "description": "Clear"
   },
 
   "alwaysAsk": {
-    "message": "Always ask for confirmation",
+    "message": "Siempre pedir confirmación",
     "description": "Always ask for confirmation"
   },
 
   "siteInfo.confirm": {
-    "message": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?",
+    "message": "Vas a preguntar por información del sitio \"$1\"\nenviando una consulta a $2.\n¿Quieres continuar?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }
 }

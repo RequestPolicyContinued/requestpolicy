@@ -1,0 +1,507 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Konfliktējošie papildinājumi: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Atļaut pieprasījumus no %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Atļaut pieprasījumus uz %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Atļaut pieprasījumus no %1$S uz %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Īslaicīgi atļaut pieprasījumus no %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Īslaicīgi atļaut pieprasījumus uz %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Īslaicīgi atļaut pieprasījumus no %1$S uz %2$S"
+	},
+
+	"stopAllowingOrigin": {
+		"message": "Stop allowing requests from %S",
+		"description": "Anulēt atļauju veikt pieprasījumus no %S"
+	},
+
+	"stopAllowingDestination": {
+		"message": "Stop allowing requests to %S",
+		"description": "Anulēt atļauju veikt pieprasījumus uz %S"
+	},
+
+	"stopAllowingOriginToDestination": {
+		"message": "Stop allowing requests from %1$S to %2$S",
+		"description": "Anulēt atļauju veikt pieprasījumus no %1$S uz %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Bloķēt visus pieprasījumus no %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Bloķēt visus pierasījumus uz %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Bloķēt pieprasījumus no %1$S uz %2$S"
+	},
+
+	"denyOriginTemporarily": {
+		"message": "Temporarily block all requests from %S",
+		"description": "Īslaicīgi bloķēt visus pieprasījumus no %S"
+	},
+
+	"denyDestinationTemporarily": {
+		"message": "Temporarily block all requests to %S",
+		"description": "Īslaicīgi bloķēt visus pieprasījumus uz %S"
+	},
+
+	"denyOriginToDestinationTemporarily": {
+		"message": "Temporarily block requests from %1$S to %2$S",
+		"description": "Īslaicīgi bloķēt pieprasījumus no %1$S uz %2$S"
+	},
+
+	"stopDenyingOrigin": {
+		"message": "Stop blocking requests from %S",
+		"description": "Izbeigt pieprasījumu bloķēšānu no %S"
+	},
+
+	"stopDenyingDestination": {
+		"message": "Stop blocking requests to %S",
+		"description": "Izbeigt pieprasījumu bloķēšanu uz %S"
+	},
+
+	"stopDenyingOriginToDestination": {
+		"message": "Stop blocking requests from %1$S to %2$S",
+		"description": "Izbeigt pieprasījumu bloķēšanu no %1$S uz %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Pieprasījumi no %S nevar tikt aizliegti"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Šī vietne vēlas pārvirzīt uz %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Atļaut"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Aizliegt"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Detalizētāk…"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Sākotnēji pieprasījumu žurnāls ir tukšs."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Žurnāla ieraksti parādīsies apmeklējot vietnes."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Darbība aizliegta"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Šī adrese var tikt kopēta vienīgi starpliktuvē."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Iestatījumi"
+	},
+
+	"managePolicies": {
+		"message": "Manage Policies",
+		"description": "Pārvaldīt politikas"
+	},
+
+	"about": {
+		"message": "About",
+		"description": "Par"
+	},
+
+	"help": {
+		"message": "Help",
+		"description": "Palīdzība"
+	},
+
+	"basic": {
+		"message": "Basic",
+		"description": "Bāzes"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Papildus"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Atzīmēt bloķetus attēlus"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Atjaunināt pašreizējo lapu, kad izmaina balto sarakstu"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Tīmekļa lapas"
+	},
+
+	"menu": {
+		"message": "Menu",
+		"description": "Izvēlne"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Atļaut paliekošas izmaiņas baltajā sarakstā, kad izmanto privāto pārlūkošanu"
+	},
+
+	"advancedPreferences": {
+		"message": "Advanced Preferences",
+		"description": "Papildus iestatījumi"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Saišu priekšnese"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "Domēna vārdu (DNS) priekšnese"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Aktivizēts"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Atspējot pēc pārlūka iedarbināšanas"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Atjaunot noklusētās vērtības pēc RequestPolicy atinstalēšanas"
+	},
+
+	"yourPolicy": {
+		"message": "Your Policy",
+		"description": "Jūsu politika"
+	},
+
+	"defaultPolicy": {
+		"message": "Default Policy",
+		"description": "Noklusējuma politika"
+	},
+
+	"subscriptions": {
+		"message": "Subscriptions",
+		"description": "Abonēšana"
+	},
+
+	"search": {
+		"message": "Search",
+		"description": "Meklēt"
+	},
+
+	"scheme": {
+		"message": "scheme",
+		"description": "shēma"
+	},
+
+	"host": {
+		"message": "host",
+		"description": "hosts"
+	},
+
+	"port": {
+		"message": "port",
+		"description": "ports"
+	},
+
+	"type": {
+		"message": "Type",
+		"description": "Tips"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Pirmavots"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Mērķis"
+	},
+
+	"block": {
+		"message": "Block",
+		"description": "Bloķēt"
+	},
+
+	"temporary": {
+		"message": "Temporary",
+		"description": "Īslaicīgi"
+	},
+
+	"addRule": {
+		"message": "Add rule",
+		"description": "Pievienot noteikumus"
+	},
+
+	"learnMoreAboutRules": {
+		"message": "Learn more about rules.",
+		"description": "Uzziniet vairāk par noteikumiem."
+	},
+
+	"learnMore": {
+		"message": "Learn more.",
+		"description": "Uzziniet vairāk."
+	},
+
+	"defaultPolicyDefinition": {
+		"message": "When you don't have any "allow" or "block" rules that match a request, this is what RequestPolicy will do.",
+		"description": "Gadījumā, ja vietnei nav definēti noteikumi, RequestPolicy pēc noklusejuma darbosies šādi."
+	},
+
+	"allowRequestsByDefault": {
+		"message": "Allow requests by default.",
+		"description": "Atļaut pieprasījumus pēc noklusējuma."
+	},
+
+	"blockRequestsByDefault": {
+		"message": "Block requests by default. (For advanced users. Breaks many websites.)",
+		"description": "Bloķēt pieprasījumus pēc noklusējuma. (Ekspertiem. Izkropļo daudzas vietnes.)"
+	},
+
+	"allowRequestsToTheSameDomain": {
+		"message": "Allow requests to the same domain (www.example.com -> static.example.com).",
+		"description": "Atļaut pieprasījumus domēna ietvaros (www.example.com -> static.example.com)."
+	},
+
+	"differentSubscriptionsAreAvailable": {
+		"message": "Changing your default rule means different subscriptions are available.",
+		"description": "Katram noklusējuma noteikumam ir pieejami atšķirīgi abonementi."
+	},
+
+	"manageSubscriptions": {
+		"message": "Manage subscriptions.",
+		"description": "Pārvaldīt abonementus."
+	},
+
+	"subscriptionPolicies": {
+		"message": "Subscription Policies",
+		"description": "Politiku abonementi."
+	},
+
+	"privacy": {
+		"message": "Privacy",
+		"description": "Privātums"
+	},
+
+	"usability": {
+		"message": "Usability",
+		"description": "Lietojamība"
+	},
+
+	"browser": {
+		"message": "Browser",
+		"description": "Pārlūks"
+	},
+
+	"subscriptionDenyTrackersDescription": {
+		"message": "Block destinations that can track you as you browse the web",
+		"description": "Bloķēt mērķus, kas var sekot jūsu tīmekļa parlūkošanai"
+	},
+
+	"subscriptionAllowSameOrgDescription": {
+		"message": "Allow destinations that belong to the same organization as the origin webpage",
+		"description": "Atļaut mērķus, kas pieder tai pašai organizācijai kā pirmavots"
+	},
+
+	"subscriptionAllowFunctionalityDescription": {
+		"message": "Allow requests that are needed for websites to work properly",
+		"description": "Atļaut pieprasījumus, kas nepieciešami tīmekļa vietņu korektai darbībai"
+	},
+
+	"subscriptionAllowEmbeddedDescription": {
+		"message": "Allow requests for embedded content such as images and videos",
+		"description": "Atļaut pieprasījumus iegultam saturam (attēli un video)"
+	},
+
+	"subscriptionAllowMozillaDescription": {
+		"message": "Allow requests related to Mozilla and Firefox websites",
+		"description": "Atļaut pieprasījumus saistītus ar Mozilla un Firefox tīmekļa vietnēm"
+	},
+
+	"subscriptionAllowExtensionsDescription": {
+		"message": "Allow requests that are needed for other extensions to work properly",
+		"description": "Atļaut pieprasījumus, kas nepieciešami citu papildinājumu korektai darbībai"
+	},
+
+	"welcomeToRequestPolicy": {
+		"message": "Welcome to RequestPolicy",
+		"description": "Esiet sveicināti RequestPolicy"
+	},
+
+	"forMostUsersDefaultsAreIdeal": {
+		"message": "For most users, RequestPolicy's default settings are ideal.",
+		"description": "Vairumam lietotāju RequestPolicy noklusētie iestatījumi ir ideāli piemēroti."
+	},
+
+	"youCanConfigureRequestPolicyToBeMoreStrict": {
+		"message": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users).",
+		"description": "Tomēr, ja vēlaties, varat nokonfigurēt RequestPolicy iestatījumus un noteikumus pašrocīgi (ieteicams tikai ekspertiem)."
+	},
+
+	"teachMeHowToUseRequestPolicy": {
+		"message": "Teach me how to use RequestPolicy",
+		"description": "Iemāciet man, kā izmantot RequestPolicy"
+	},
+
+	"returnToBrowsing": {
+		"message": "Return to browsing",
+		"description": "Atgriezties pie pārlūkošanas"
+	},
+
+	"configureRequestPolicy": {
+		"message": "Configure RequestPolicy",
+		"description": "Konfigurējiet RequestPolicy"
+	},
+
+	"yesUseSubscriptions": {
+		"message": "Yes, use subscription policies. (Recommended.)",
+		"description": "Ja, izmantot politiku abonēšanu. (Rekomendējams)"
+	},
+
+	"noDoNotUseSubscriptions": {
+		"message": "No, don't use subscription policies.",
+		"description": "Nē, neizmantot politiku abonēšanu."
+	},
+
+	"removeOldRules": {
+		"message": "Remove unused rules left over from the old version of RequestPolicy.",
+		"description": "Izņemt neizmantotus noteikumus, kas palika no RequestPolicy iepriekšējās versijas."
+	},
+
+	"importOldRules": {
+		"message": "Import Old Rules",
+		"description": "Importēt vecus noteikumus"
+	},
+
+	"deleteOldRules": {
+		"message": "Delete old rules",
+		"description": "Dzēst vecus noteikumus"
+	},
+
+	"showOldRuleReimportOptions": {
+		"message": "Show re-import options.",
+		"description": "Parādīt importēšanas iespējas."
+	},
+
+	"yourOldRulesHaveBeenDeleted": {
+		"message": "Done! Your old rules have been deleted.",
+		"description": "Gatavs! Jūsu vecie noteikumi tika dzēsti."
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Atsaukt visas īslaicīgās atļaujas"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Bloķētie mērķi"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Atļautie mērķi"
+	},
+
+	"rp.menu.mixedDestinations": {
+		"message": "Mixed destinations",
+		"description": "Jauktie mērķi"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "Citi mērķi"
+	},
+
+	"rp.menu.enableBlocking": {
+		"message": "Enable blocking",
+		"description": "Aktivizēt bloķēšanu"
+	},
+
+	"rp.menu.disableBlocking": {
+		"message": "Disable blocking",
+		"description": "Deaktivizēt bloķēšanu"
+	},
+
+	"rp.menu.help": {
+		"message": "Help",
+		"description": "Palīdzība"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Iestatījumi"
+	},
+
+	"rp.menu.managePolicies": {
+		"message": "Manage Policies",
+		"description": "Pārvaldīt politikas"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Pieprasījumu žurnāls"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Notīrīt"
+	},
+
+}

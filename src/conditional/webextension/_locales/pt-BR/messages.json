@@ -1,0 +1,217 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Extensões incompatíveis: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Permitir pedidos de %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Permitir pedidos para %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Permitir pedidos de %1$S para %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Temporariamente permitir pedidos de %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Temporariamente permitir pedidos para %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Temporariamente permitir pedidos de %1$S para %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Bloquear todos os pedidos de %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Bloquear todos os pedidos para %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Bloquear pedidos de %1$S para %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Pedidos de %S não puderam ser bloqueados"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "A página atual quer redirecionar o navegador para %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Permitir"
+	},
+
+	"allow.accesskey": {
+		"message": "A",
+		"description": "P"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Bloquear"
+	},
+
+	"deny.accesskey": {
+		"message": "D",
+		"description": "B"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Mais…"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "A lista de pedidos começa vazia."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Novos pedidos detectados serão listados conforme você visitar outras páginas."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Ação não permitida"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Este endereço apenas pode ser copiado para a área de transferência."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Preferências"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Avançado"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Indicar imagens bloqueadas"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Recarregar a página logo após modificar a lista de permissões"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Exibição da página"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Adicionar permissões às listas também durante navegação privativa"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Pré-carregamento de links"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "Pré-busca de nomes de domínio (DNS)"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Ativo"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Desativado ao iniciar o navegador"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Restaurar padrão quando RequestPolicy for desinstalado"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Origem"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Destino"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Revogar todas as permissões temporárias"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Destinos bloqueados"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Destinos permitidos"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "Outras origens"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Preferências…"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Pedidos nesta página"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Limpar"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Sempre pedir confirmação"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Você está prestes a pedir informações sobre o site "%1$S"\nao fazer uma consulta ao %2$S.\nDeseja continuar?"
+	}
+
+}

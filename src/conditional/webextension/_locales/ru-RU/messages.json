@@ -1,0 +1,202 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Конфликтующие расширения: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Разрешить запросы от %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Разрешить запросы к %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Разрешить запросы от %1$S к %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Временно разрешить запросы с %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Временно разрешить запросы к %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Временно разрешить запросы от %1$S к %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Запретить все запросы от %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Запретить все запросы к %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Запретить все запросы от %1$S к %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Запросы от %S не могут быть заблокированы"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Эта страница запросила перенаправление на %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Разрешить"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Отклонить"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Подробнее..."
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Журнал запросов пуст"
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Записи журнала будут показаны при посещении веб страниц"
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Действие запрещено"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Данный URL можно скопировать только в буфер обмена"
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Настройки"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Дополнительно"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Помечать заблокированные изображения"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Перегружать текущую страницу при изменении белого списка"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Веб-страницы"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Всегда использовать белый список в режиме приватного просмотра"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Предварительная загрузка ссылок"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "Упреждающее чтение DNS"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Включено"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Отключать при запуске"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Восстанавливать по умолчанию при удалении RequestPolicy"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Источник"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Цель"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Отменить все временные разрешения"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Блокированные цели"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Разрешенные цели"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Настройки"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Журнал Запросов"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Очистить"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Всегда спрашивать подтверждение"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Вы собираетесь узнать информацию о сайте «%1$S»,\nотправив запрос к %2$S.\nПродолжить?"
+	}
+
+}

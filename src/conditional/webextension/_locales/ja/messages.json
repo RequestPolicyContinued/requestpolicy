@@ -1,0 +1,547 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "競合するアドオンがあります: %S"
+	},
+
+	"noOrigin": {
+		"message": "[no origin]",
+		"description": "[オリジンなし]"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "%S からのリクエストを許可する"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "%S へのリクエストを許可する"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストを許可する"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "%S からのリクエストを一時的に許可する"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "%S へのリクエストを一時的に許可する"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストを一時的に許可する"
+	},
+
+	"stopAllowingOrigin": {
+		"message": "Stop allowing requests from %S",
+		"description": "%S からのリクエストの許可を停止する"
+	},
+
+	"stopAllowingDestination": {
+		"message": "Stop allowing requests to %S",
+		"description": "%S へのリクエストの許可を停止する"
+	},
+
+	"stopAllowingOriginToDestination": {
+		"message": "Stop allowing requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストの許可を停止する"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "%S からのすべてのリクエストを禁止する"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "%S へのすべてのリクエストを禁止する"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストを禁止する"
+	},
+
+	"denyOriginTemporarily": {
+		"message": "Temporarily block all requests from %S",
+		"description": "%S からのすべてのリクエストを一時的に禁止する"
+	},
+
+	"denyDestinationTemporarily": {
+		"message": "Temporarily block all requests to %S",
+		"description": "%S へのすべてのリクエストを一時的に禁止する"
+	},
+
+	"denyOriginToDestinationTemporarily": {
+		"message": "Temporarily block requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストを一時的に禁止する"
+	},
+
+	"stopDenyingOrigin": {
+		"message": "Stop blocking requests from %S",
+		"description": "%S からのリクエストの禁止を解除する"
+	},
+
+	"stopDenyingDestination": {
+		"message": "Stop blocking requests to %S",
+		"description": "%S へのリクエストの禁止を解除する"
+	},
+
+	"stopDenyingOriginToDestination": {
+		"message": "Stop blocking requests from %1$S to %2$S",
+		"description": "%1$S から %2$S へのリクエストの禁止を解除する"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "%S からのリクエストは禁止されません"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "この Web ページは %S へリダイレクトしようとしています"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "許可"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "禁止"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "詳細..."
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "リクエスト ログは初期状態では空です。"
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "ログエントリは Web ページを訪問した際に表示されます。"
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "操作禁止"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "この URL はクリップボードにのみコピーすることができます。"
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "設定"
+	},
+
+	"managePolicies": {
+		"message": "Manage Policies",
+		"description": "ポリシーの管理"
+	},
+
+	"about": {
+		"message": "About",
+		"description": "RequestPolicy について"
+	},
+
+	"help": {
+		"message": "Help",
+		"description": "ヘルプ"
+	},
+
+	"basic": {
+		"message": "Basic",
+		"description": "基本設定"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "上級者向け設定"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "ブロックされたことを示す画像を表示する"
+	},
+
+	"dontIndicateBlacklisted": {
+		"message": "Exception: images blocked by a blacklist",
+		"description": "例外: ブラックリストに該当する画像"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "ホワイトリストが変更されたとき、現在のページを再読み込みする"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Web ページ"
+	},
+
+	"menu": {
+		"message": "Menu",
+		"description": "メニュー"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "プライベートブラウジング中に恒久的なルールの追加を許可する"
+	},
+
+	"advancedPreferences": {
+		"message": "Advanced Preferences",
+		"description": "上級者向け設定"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "リンクの先読み"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "DNS の先読み"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "有効にする"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "起動時に無効にする"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "RequestPolicy が削除されたとき、既定の設定に戻す"
+	},
+
+	"menuPreferences": {
+		"message": "Menu Preferences",
+		"description": "メニュー設定"
+	},
+
+	"menuSorting": {
+		"message": "sorting of destinations",
+		"description": "送信先の並べ替え"
+	},
+
+	"sortByNumRequests": {
+		"message": "by the number of requests",
+		"description": "リクエストの数で並べ替える"
+	},
+
+	"sortByDestName": {
+		"message": "by the domain name only",
+		"description": "ドメイン名で並べ替える"
+	},
+
+	"noSorting": {
+		"message": "do not sort",
+		"description": "並べ替えをしない"
+	},
+
+	"hint": {
+		"message": "Hint:",
+		"description": "ヒント:"
+	},
+
+	"menuSortingHint": {
+		"message": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential.",
+		"description": "並べ替えを無効にしたとき、Web サイトからリクエストされた順にドメインが表示されます。Web ページからの最初のリクエストは必須かもしれないので、この仕様は、デフォルトでリクエストを禁止にしているときに、許可すべきリクエストを探すのに役立つでしょう。"
+	},
+
+	"menuIndicatedInformation": {
+		"message": "indicated information",
+		"description": "情報の表示"
+	},
+
+	"menuIndicateNumRequests": {
+		"message": "show the number of requests for every destination",
+		"description": "各送信先ごとにリクエスト数を表示する"
+	},
+
+	"yourPolicy": {
+		"message": "Your Policy",
+		"description": "あなたのポリシー"
+	},
+
+	"defaultPolicy": {
+		"message": "Default Policy",
+		"description": "既定のポリシー"
+	},
+
+	"subscriptions": {
+		"message": "Subscriptions",
+		"description": "サブスクリプション"
+	},
+
+	"search": {
+		"message": "Search",
+		"description": "検索"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "オリジン"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "送信先"
+	},
+
+	"block": {
+		"message": "Block",
+		"description": "禁止"
+	},
+
+	"temporary": {
+		"message": "Temporary",
+		"description": "一時的"
+	},
+
+	"addRule": {
+		"message": "Add rule",
+		"description": "ルールを追加"
+	},
+
+	"learnMoreAboutRules": {
+		"message": "Learn more about rules.",
+		"description": "ルールについてさらに学ぶ。"
+	},
+
+	"learnMore": {
+		"message": "Learn more.",
+		"description": "もっと学ぶ。"
+	},
+
+	"defaultPolicyDefinition": {
+		"message": "When you don't have any "allow" or "block" rules that match a request, this is what RequestPolicy will do.",
+		"description": "リクエストに当てはまるルール（許可または禁止）がない場合、RequestPolicy はここで設定したルールを適用します。"
+	},
+
+	"allowRequestsByDefault": {
+		"message": "Allow requests by default.",
+		"description": "デフォルトでリクエストを許可する"
+	},
+
+	"blockRequestsByDefault": {
+		"message": "Block requests by default. (For advanced users. Breaks many websites.)",
+		"description": "デフォルトでリクエストを禁止する(上級者向けです。多くのWeb サイトの表示がくずれます。)"
+	},
+
+	"allowRequestsToTheSameDomain": {
+		"message": "Allow requests to the same domain (www.example.com -> static.example.com).",
+		"description": "同じドメインへのリクエストを許可する(www.example.com -> static.example.com)。"
+	},
+
+	"differentSubscriptionsAreAvailable": {
+		"message": "Changing your default rule means different subscriptions are available.",
+		"description": "既定のルールを変更すると別のサブスクリプションが利用可能になります。"
+	},
+
+	"manageSubscriptions": {
+		"message": "Manage subscriptions.",
+		"description": "サブスクリプションの管理"
+	},
+
+	"subscriptionPolicies": {
+		"message": "Subscription Policies",
+		"description": "サブスクリプション ポリシー"
+	},
+
+	"privacy": {
+		"message": "Privacy",
+		"description": "プライバシー"
+	},
+
+	"usability": {
+		"message": "Usability",
+		"description": "ユーザビリティ"
+	},
+
+	"browser": {
+		"message": "Browser",
+		"description": "ブラウザー"
+	},
+
+	"subscriptionDenyTrackersDescription": {
+		"message": "Block destinations that can track you as you browse the web",
+		"description": "あなたの Web ブラウズを追跡する送信先をブロックする"
+	},
+
+	"subscriptionAllowSameOrgDescription": {
+		"message": "Allow destinations that belong to the same organization as the origin webpage",
+		"description": "オリジンの Web ページと同じ組織に属している送信先を許可する"
+	},
+
+	"subscriptionAllowFunctionalityDescription": {
+		"message": "Allow requests that are needed for websites to work properly",
+		"description": "Web サイトが正しく機能するために必要なリクエストを許可する"
+	},
+
+	"subscriptionAllowEmbeddedDescription": {
+		"message": "Allow requests for embedded content such as images and videos",
+		"description": "画像や動画などの埋め込みコンテンツのリクエストを許可する"
+	},
+
+	"subscriptionAllowMozillaDescription": {
+		"message": "Allow requests related to Mozilla and Firefox websites",
+		"description": "Mozilla や Firefox の Web サイトに関連するリクエストを許可する"
+	},
+
+	"subscriptionAllowExtensionsDescription": {
+		"message": "Allow requests that are needed for other extensions to work properly",
+		"description": "他の拡張機能が正しく機能するために必要なリクエストを許可する"
+	},
+
+	"welcomeToRequestPolicy": {
+		"message": "Welcome to RequestPolicy",
+		"description": "RequestPolicy にようこそ"
+	},
+
+	"forMostUsersDefaultsAreIdeal": {
+		"message": "For most users, RequestPolicy's default settings are ideal.",
+		"description": "ほとんどのユーザーにとって、RequestPolicy の既定の設定が理想的な設定になります。"
+	},
+
+	"youCanConfigureRequestPolicyToBeMoreStrict": {
+		"message": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users).",
+		"description": "しかしながら、より厳格に RequestPolicy を設定することができます（上級者にのみ推奨されます）。"
+	},
+
+	"teachMeHowToUseRequestPolicy": {
+		"message": "Teach me how to use RequestPolicy",
+		"description": "RequestPolicy の使い方を学ぶ"
+	},
+
+	"returnToBrowsing": {
+		"message": "Return to browsing",
+		"description": "ブラウジングに戻る"
+	},
+
+	"configureRequestPolicy": {
+		"message": "Configure RequestPolicy",
+		"description": "RequestPolicy の設定"
+	},
+
+	"yesUseSubscriptions": {
+		"message": "Yes, use subscription policies. (Recommended.)",
+		"description": "はい、サブスクリプション ポリシーを利用します（推奨）。"
+	},
+
+	"noDoNotUseSubscriptions": {
+		"message": "No, don't use subscription policies.",
+		"description": "いいえ、サブスクリプション ポリシーを利用しません。"
+	},
+
+	"removeOldRules": {
+		"message": "Remove unused rules left over from the old version of RequestPolicy.",
+		"description": "旧バージョンの RequestPolicy で残された使われていないルールを削除する"
+	},
+
+	"importOldRules": {
+		"message": "Import Old Rules",
+		"description": "古いルールをインポート"
+	},
+
+	"deleteOldRules": {
+		"message": "Delete old rules",
+		"description": "古いルールを削除"
+	},
+
+	"showOldRuleReimportOptions": {
+		"message": "Show re-import options.",
+		"description": "再インポート オプションを表示する。"
+	},
+
+	"yourOldRulesHaveBeenDeleted": {
+		"message": "Done! Your old rules have been deleted.",
+		"description": "完了！ 古いルールは削除されました。"
+	},
+
+	"policy": {
+		"message": "Policy",
+		"description": "ポリシー"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "すべての一時的な許可を取り消す"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "禁止されている送信先"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "許可されている送信先"
+	},
+
+	"rp.menu.mixedDestinations": {
+		"message": "Mixed destinations",
+		"description": "混合している送信先"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "その他のオリジン"
+	},
+
+	"rp.menu.enableBlocking": {
+		"message": "Enable blocking",
+		"description": "ブロックを有効にする"
+	},
+
+	"rp.menu.disableBlocking": {
+		"message": "Disable blocking",
+		"description": "ブロックを無効にする"
+	},
+
+	"rp.menu.help": {
+		"message": "Help",
+		"description": "ヘルプ"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "設定"
+	},
+
+	"rp.menu.managePolicies": {
+		"message": "Manage Policies",
+		"description": "ポリシーの管理"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "リクエストログ"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "消去"
+	},
+
+}

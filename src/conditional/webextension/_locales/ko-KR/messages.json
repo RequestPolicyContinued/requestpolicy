@@ -1,0 +1,117 @@
+{
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "%S 로부터의 요청을 허용합니다."
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "%S 로의 요청을 허용합니다."
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "%1$S에서 %2$S(으)로의 요청을 허용합니다."
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "%S(으)로부터의 요청을 임시적으로 허용합니다."
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "%S(으)로의 요청을 임시적으로 허용합니다."
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "%1$S에서 %2$S(으)로의 요청을 임시적으로 허용합니다."
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "%S(으)로부터의 모든 요청을 거절합니다."
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "%S(으)로의 모든 요청을 거절합니다."
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "%1$S에서 %2$S(으)로의 요청을 거절합니다."
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "이 웹페이지가 %S(으)로 리다이렉트 됩니다."
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "허용"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "거부"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "More..."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "환경 설정"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "거부된 사이트 표시"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "출발지 주소"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "목적지 주소"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "임시로 설정된 모든 권한을 취소합니다."
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "차단된 목적지 주소"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "허용된 목적지 주소"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "환경 설정"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "요청 기록"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "항상 확인"
+	},
+
+}

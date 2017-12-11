@@ -1,0 +1,207 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Tillägg med konflikter: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Tillåt förfrågningar från %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Tillåt förfrågningar till %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Tillåt förfrågningar från %1$S till %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Tillåt tillfälligt förfrågningar från %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Tillåt tillfälligt förfrågningar till %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Tillåt tillfälligt förfrågningar från %1$S till %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Förbjud alla förfrågningar från %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Förbjud alla förfrågningar till %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Förbjud förfrågningar från %1$S till %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Förfrågningar från %S kan inte blockeras"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Den här webbsidan har bett om omdirigering till %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Tillåt"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Neka"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Mer…"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Förfrågningsloggen är inledningsvis tom."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Loggposter kommer att dyka upp när du besöker hemsidor."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Förbjuden handling"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Denna URL kan bara kopieras till urklipp."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Alternativ"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Avancerat"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Indikera blockerade bilder"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Ladda om nuvarande sida när vitlistan ändras"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Webbsidor"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Tillåt permanent vitlistning när privat surfning används"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Länkförhämtning"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "DNS-förhämtning"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Aktiverad"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Inaktivera vid start"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Återställ standard när RequestPolicy avinstalleras"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Källa"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Mål"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Återkalla alla tillfälliga tillstånd"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Blockerade destinationer"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Tillåtna mål"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "Andra källor"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Alternativ"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Förfrågningslogg"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Rensa"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Fråga alltid"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Du är på väg att be om information om platsen \"%1$S\"\n genom att skicka en förfrågan till %2$S.\nVill du fortsätta?"
+	}
+
+}

@@ -1,0 +1,217 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Conflicterende extensies: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Verzoeken van %S toestaan"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Verzoeken aan %S toestaan"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Verzoeken van %1$S aan %2$S toestaan"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Verzoeken van %S tijdelijk toestaan"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Verzoeken aan %S tijdelijk toestaan"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Verzoeken van %1$S aan %2$S tijdelijk toestaan"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Alle verzoeken van %S verbieden"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Alle verzoeken aan %S verbieden"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Verzoeken van %1$S aan %2$S verbieden"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Verzoeken van %S kunnen niet worden geblokkeerd"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Deze webpagina wil doorverwijzen naar %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Toestaan"
+	},
+
+	"allow.accesskey": {
+		"message": "A",
+		"description": "T"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Weigeren"
+	},
+
+	"deny.accesskey": {
+		"message": "D",
+		"description": "W"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Meer…"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Het verzoekenlogbestand is in eerste instantie leeg."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Logingaven verschijnen wanneer u webpagina’s bezoekt."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Actie verboden"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Deze URL kan alleen maar worden gekopieerd naar het Klembord."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Voorkeuren"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Geavanceerd"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Geblokkeerde afbeeldingen aanduiden"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Huidige pagina opnieuw laden wanneer witte lijst wijzigt"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Webpagina’s"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Permanente witte lijst toestaan bij gebruik Privénavigatie"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Vooraf ophalen koppelingen"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "Vooraf ophalen DNS"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Ingeschakeld"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Uitschakelen bij opstarten"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Standaard herstellen wanneer RequestPolicy is gedeïnstalleerd"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Oorsprong"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Bestemming"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Alle tijdelijke permissies intrekken"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Geblokkeerde bestemmingen"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Toegestane bestemmingen"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "Andere oorsprongen"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Voorkeuren"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Logbestand verzoeken"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Wissen"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Altijd om een bevestiging vragen"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Je staat op het punt informatie te vragen over de "%1$S" site\ndoor een verzoek te sturen naar %2$S.\nWil je hiermee doorgaan?"
+	}
+
+}

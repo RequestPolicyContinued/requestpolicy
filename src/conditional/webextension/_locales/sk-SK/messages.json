@@ -1,0 +1,207 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Konfliktné rozšírenia: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Povoliť požiadavky z %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Povoliť požiadavky na %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Povoliť požiadavky z %1$S na %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Dočasne umožniť požiadavky z %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Dočasne umožniť požiadavky na %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Dočasne umožniť požiadavky z %1$S na %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Zakázať všetky požiadavky z %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Zakázať všetky požiadavky od %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Zakázať všetky požiadavky z %1$S na %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Požiadavky z %S nemôžu byť blokované"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Táto stránka požaduje presmerovanie na %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Povoliť"
+	},
+
+	"allow.accesskey": {
+		"message": "A",
+		"description": "P"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Zakázať"
+	},
+
+	"deny.accesskey": {
+		"message": "D",
+		"description": "Z"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Viac…"
+	},
+
+	"more.accesskey": {
+		"message": "M",
+		"description": "V"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Protokol požiadaviek je na začiatku prázdny."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Položky protokolu sa zobrazia pri návšteve webovej stránky."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Úloha zakázaná"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Táto adresa URL môže byť skopírovaná len do schránky."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Nastavenia"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Pokročilé"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Uviesť blokované obrázky"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Znovu načítať aktuálnu stránku pri zmene whitelist"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Webové stránky"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Povoliť trvalé whitelisting pri používaní Súkromného ​​prehliadania"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Zapnuté"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Vypnúť pri spustení"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Obnoviť pôvodné pri odinštalovaní RequestPolicy"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Zdroj"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Ciele"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Odvolať všetky dočasné oprávnenie"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Blokované ciele"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Povolené ciele"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Nastavenia"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Protokol požiadaviek"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Vyčistiť"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Vždy sa opýtať na potvrdenie"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Chystáte sa požiadať o informácie o stránke "%1$S"\nodoslaním požiadavky na %2$S.\nChcete pokračovať?"
+	}
+
+}

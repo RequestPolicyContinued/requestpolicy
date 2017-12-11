@@ -1,0 +1,222 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Konfliktantaj etendoprogramoj: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Permesi petojn fare de %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Permesi petojn al %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Permesi petojn de %1$S al %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Provizore permesi petojn fare de %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Provizore permesi petojn al %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Provizore permesi petojn de %1$S al %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Malpermesi ĉiujn petojn fare de %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Malpermesi ĉiujn petojn al %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Malpermesi petojn de %1$S al %2$S"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Petojn de %S malpermesi ne eblas"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Tiu ĉi retpaĝo petis pri alidirekto al %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Permesi"
+	},
+
+	"allow.accesskey": {
+		"message": "A",
+		"description": "P"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Ne permesi"
+	},
+
+	"deny.accesskey": {
+		"message": "D",
+		"description": "N"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Pli…"
+	},
+
+	"more.accesskey": {
+		"message": "M",
+		"description": "P"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Komence la petprotokolo malplenas."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "La protokoleroj aperados dum retesplorado."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "La ago estis malpermesita"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Adreson kun tiu protokol-skemo eblas nur kopii en la tondujon."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Preferoj"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Spertulaj"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Indiki blokitajn bildojn"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Reŝargi la montratan paĝon ĉe ŝanĝo de permesoj."
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Retpaĝoj"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Ebligi neprovizoran permesadon dum Privata retesplorado"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Laŭligila antaŭakirado"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "DNSa antaŭakirado"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Ŝaltita"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Malŝalti ĉe starto de la programo"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "Restarigi la defaŭltan agordon ĉe malinstalo de RequestPolicy"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Fonto"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Celo"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Malvalidigi ĉiujn provizorajn permesojn."
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Malpermesitaj celoj"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "Permesitaj celoj"
+	},
+
+	"rp.menu.otherOrigins": {
+		"message": "Other origins",
+		"description": "Aliaj petfontoj"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Preferoj"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Protokolo de petoj"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Forviŝi"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Ĉiam peti konfirmon"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "Vi estas petonta informojn pri la retejo «%1$S»\nper sendo de peto al %2$S.\nĈu vi volas fari tion?"
+	}
+
+}

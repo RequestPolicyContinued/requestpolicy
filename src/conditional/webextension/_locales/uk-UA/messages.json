@@ -1,0 +1,87 @@
+{
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "Дозволити запити від %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "Дозволити запити до %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "Дозволити запити від %1$S до %2$S"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Тимчасово дозволити запити від %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Тимчасово дозволити запити до %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Тимчасово дозволити запити від %1$S до %2$S"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "Заборонити усі запити від %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "Заборонити усі запити до %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "Заборонити запити від %1$S до %2$S"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Ця сторінка намагається переадресуватися на %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "Дозволити"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Заборонити"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "More..."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Вподобання"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Додатково"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Веб-сторінки"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Вподобання"
+	},
+
+}

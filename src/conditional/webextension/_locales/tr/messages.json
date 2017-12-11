@@ -1,0 +1,207 @@
+{
+	"extensionConflictWarning": {
+		"message": "Conflicting extensions: %S",
+		"description": "Uyumsuz eklentiler: %S"
+	},
+
+	"allowOrigin": {
+		"message": "Allow requests from %S",
+		"description": "İzin ver %S"
+	},
+
+	"allowDestination": {
+		"message": "Allow requests to %S",
+		"description": "İzin ver %S"
+	},
+
+	"allowOriginToDestination": {
+		"message": "Allow requests from %1$S to %2$S",
+		"description": "İzin ver %1$S dan %2$S a"
+	},
+
+	"allowOriginTemporarily": {
+		"message": "Temporarily allow requests from %S",
+		"description": "Geçici olarak izin ver %S"
+	},
+
+	"allowDestinationTemporarily": {
+		"message": "Temporarily allow requests to %S",
+		"description": "Geçici olarak izin ver %S"
+	},
+
+	"allowOriginToDestinationTemporarily": {
+		"message": "Temporarily allow requests from %1$S to %2$S",
+		"description": "Geçici olarak izin %1$S dan %2$S a"
+	},
+
+	"denyOrigin": {
+		"message": "Block all requests from %S",
+		"description": "İzinleri kaldır %S"
+	},
+
+	"denyDestination": {
+		"message": "Block all requests to %S",
+		"description": "İzinleri kaldır %S"
+	},
+
+	"denyOriginToDestination": {
+		"message": "Block requests from %1$S to %2$S",
+		"description": "İzini kaldır %1$S dan %2$S a"
+	},
+
+	"unrestrictedOrigin": {
+		"message": "Requests from %S cannot be blocked",
+		"description": "Bu istek %S engellenemez"
+	},
+
+	"redirectNotification": {
+		"message": "This webpage has asked to redirect to %S",
+		"description": "Yönlendirme istiyor %S"
+	},
+
+	"allow": {
+		"message": "Allow",
+		"description": "İzin ver"
+	},
+
+	"deny": {
+		"message": "Deny",
+		"description": "Yasakla"
+	},
+
+	"more": {
+		"message": "More…",
+		"description": "Daha fazla..."
+	},
+
+	"more.accesskey": {
+		"message": "M",
+		"description": "F"
+	},
+
+	"requestLogIsEmpty": {
+		"message": "The Request Log is initially empty.",
+		"description": "Kayıt dosyası boş."
+	},
+
+	"requestLogDirections": {
+		"message": "Log entries will appear when you visit web pages.",
+		"description": "Sayfalar gezdiğinizde kayıtlar gözükür."
+	},
+
+	"actionForbidden": {
+		"message": "Action forbidden",
+		"description": "Yasaklı hareket"
+	},
+
+	"urlCanOnlyBeCopiedToClipboard": {
+		"message": "This URL can only be copied to the clipboard.",
+		"description": "Bu adres sadece hafızaya kopyalanabilir."
+	},
+
+	"preferences": {
+		"message": "Preferences",
+		"description": "Seçenekler"
+	},
+
+	"advanced": {
+		"message": "Advanced",
+		"description": "Gelişmiş"
+	},
+
+	"indicateBlockedImages": {
+		"message": "Indicate blocked images",
+		"description": "Bloklanan resimi işaretle"
+	},
+
+	"autoReload": {
+		"message": "Reload current page when whitelist is changed",
+		"description": "Beyaz liste değiştiğinde sayfayı yenile"
+	},
+
+	"webPages": {
+		"message": "Web Pages",
+		"description": "Web sayfaları"
+	},
+
+	"allowAddingNonTemporaryRulesInPBM": {
+		"message": "Allow adding non-temporary rules when using Private Browsing Mode",
+		"description": "Özel Gezinti yaparken kalıcı beyazlistelemeye izin ver"
+	},
+
+	"linkPrefetching": {
+		"message": "Link Prefetching",
+		"description": "Link Hafızalama"
+	},
+
+	"dnsPrefetching": {
+		"message": "DNS Prefetching",
+		"description": "DNS Hafızalama"
+	},
+
+	"enabled": {
+		"message": "Enabled",
+		"description": "Aktifleştirildi"
+	},
+
+	"disableOnStartup": {
+		"message": "Disable on startup",
+		"description": "Başlangıçta etkisizleştir"
+	},
+
+	"restoreDefaultOnUninstall": {
+		"message": "Restore default when RequestPolicy is uninstalled",
+		"description": "RequestPolicy silindiğinde herşeyi eski haline getir"
+	},
+
+	"origin": {
+		"message": "Origin",
+		"description": "Ana"
+	},
+
+	"destination": {
+		"message": "Destination",
+		"description": "Hedef"
+	},
+
+	"rp.menu.revokeTemporaryPermissions": {
+		"message": "Revoke all temporary permissions",
+		"description": "Bütün izinleri geri al"
+	},
+
+	"rp.menu.blockedDestinations": {
+		"message": "Blocked destinations",
+		"description": "Yasaklı sayfalar"
+	},
+
+	"rp.menu.allowedDestinations": {
+		"message": "Allowed destinations",
+		"description": "İzinli sayfalar"
+	},
+
+	"rp.menu.preferences": {
+		"message": "Preferences",
+		"description": "Seçenekler"
+	},
+
+	"rp.requestLog.title": {
+		"message": "Request Log",
+		"description": "Kayıtlar"
+	},
+
+	"rp.requestLog.clear": {
+		"message": "Clear",
+		"description": "Temizle"
+	},
+
+	"alwaysAsk": {
+		"message": "Always ask for confirmation",
+		"description": "Herzaman onay iste"
+	},
+
+	"siteInfo.confirm": {
+		"message": "You're about to ask for information about the "%1$S" site\nby submitting a query to %2$S.\nDo you want to continue?",
+		"description": "%2$S sorgusunu yaparak \n"%1$S" sitesi hakkında bilgi istemek üzeresiniz.\nDevam etmek istiyor musunuz?"
+	}
+
+}

@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Určiť, ktoré požiadavky externých stránok sú povolené. Zlepšiť súkromie vášho prehliadania. Zabezpečte sa od Cross-Site Request Forgery (CSRF) a ďalších útokov.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Konfliktné rozšírenia: $1",
     "description": "Conflicting extensions: $1"

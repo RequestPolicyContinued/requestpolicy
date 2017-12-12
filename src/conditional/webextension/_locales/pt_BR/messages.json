@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Controle pedidos entre domínios. Navegue com mais privacidade. Proteja-se contra ataques de referência cruzada e outros.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Extensões incompatíveis: $1",
     "description": "Conflicting extensions: $1"

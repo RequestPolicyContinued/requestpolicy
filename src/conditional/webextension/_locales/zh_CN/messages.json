@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "控制允许哪些跨站点的请求。改进您浏览时的隐私保护。确保自己不被跨站点请求伪造（CSRF）攻击和其他攻击。",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "冲突的扩展：$1",
     "description": "Conflicting extensions: $1"

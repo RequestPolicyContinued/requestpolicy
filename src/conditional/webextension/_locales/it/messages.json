@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Controlla quali richieste cross-site sono permesse. Migliora la tua privacy di navigazione. Difenditi dal Cross-Site Request Forgery (CSRF) e altri attacchi.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Estensioni in conflitto: $1",
     "description": "Conflicting extensions: $1"

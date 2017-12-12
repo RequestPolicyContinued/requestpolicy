@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Mit diesem Addon können Sie domainübergreifende Anfragen kontrollieren und sich vor Cross-Site-Forgery-Requests (CSFR) und anderen Angriffen schützen.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Konflikt mit folgenden Erweiterungen: $1",
     "description": "Conflicting extensions: $1"

@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "クロスサイトリクエストを制御し，ブラウジングのプライバシーを改善します．クロスサイトリクエストフォージェリ(CSRF)などの攻撃から保護します．",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "競合するアドオンがあります: $1",
     "description": "Conflicting extensions: $1"

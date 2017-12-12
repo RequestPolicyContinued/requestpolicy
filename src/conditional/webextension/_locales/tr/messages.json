@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Çapraz-site bağlantılarını yönetin.Tarayıcı güvenliğinizi artırın.Çapraz Site Bağlantı Sahtekarlığı (CSRF) ve benzeri saldırılardan korunun.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Uyumsuz eklentiler: $1",
     "description": "Conflicting extensions: $1"

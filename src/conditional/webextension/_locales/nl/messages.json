@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Beheers welke cross-site verzoeken worden toegelaten. Verbeter de privacy van uw surfen. Beveilig uzelf tegen Cross-Site Request Forgery (CSRF) en andere aanvallen.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Conflicterende extensies: $1",
     "description": "Conflicting extensions: $1"

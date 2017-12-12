@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Осуществляет контроль разрешенных межсайтовых запросов. Повышает конфиденциальность веб-серфинга. Защищает вас от подделки межсайтовых запросов (CSRF) и других атак.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Конфликтующие расширения: $1",
     "description": "Conflicting extensions: $1"

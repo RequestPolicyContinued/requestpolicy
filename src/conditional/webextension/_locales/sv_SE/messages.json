@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Kontrollera vilka förfrågningar mellan webbsidor som är tillåtna. Förbättra din integritet. Skydda dig mot falska förfrågningar mellan webbsidor (CSRF) och andra attacker.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Tillägg med konflikter: $1",
     "description": "Conflicting extensions: $1"

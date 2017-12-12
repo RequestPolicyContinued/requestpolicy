@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Kontrola itzazu zein gune-arteko eskaerak baimentzen diren. Hobetu zure nabigazioaren pribatutasuna. Babes zaitez Cross-Site Request Forgery (CSRF) eta beste erasoen aurrean.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Hedapenen gatazka: $1",
     "description": "Conflicting extensions: $1"

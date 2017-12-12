@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Pārvalda atļautos starpvietņu pieprasījumus. Uzlabo pārlūkošanas privātumu. Pasargājiet sevi no starpvietņu pieprasījumu viltošanas (CSRF) un citiem tīmekļa uzbrukumiem.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Konfliktējošie papildinājumi: $1",
     "description": "Conflicting extensions: $1"

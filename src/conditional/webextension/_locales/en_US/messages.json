@@ -1,4 +1,14 @@
 {
+  "extensionName": {
+    "message": "RequestPolicy Continued",
+    "description": "RequestPolicy Continued"
+  },
+
+  "extensionDescription": {
+    "message": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Conflicting extensions: $1",
     "description": "Conflicting extensions: $1"

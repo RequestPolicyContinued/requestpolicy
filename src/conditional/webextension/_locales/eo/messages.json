@@ -1,4 +1,9 @@
 {
+  "extensionDescription": {
+    "message": "Administru la rajtojn de retejoj fari inter-retejajn petojn. Plibonigu la privatecon de via retumado. Sekurigu vin kontraŭ Falsado de inter-retejaj petoj (Cross-Site Request Forgery, CSRF) kaj aliaj atakoj.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
   "extensionConflictWarning": {
     "message": "Konfliktantaj etendoprogramoj: $1",
     "description": "Conflicting extensions: $1"

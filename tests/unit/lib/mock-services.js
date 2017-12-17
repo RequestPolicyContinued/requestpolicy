@@ -26,12 +26,21 @@ nsIPrefService.prototype.getBranch = function(aPrefRoot) {
 nsIPrefService.prototype.savePrefFile = function(aFile) {};
 
 // =============================================================================
+// Partial mock of nsILocaleService XPCOM Class
+// See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsILocaleService
+// =============================================================================
+function nsILocaleService() {}
+
+nsILocaleService.prototype.getAppLocaleAsBCP47 = function() {};
+
+// =============================================================================
 // Partial mock of Services.jsm
 // See : https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.jsm
 // =============================================================================
 
 function Services() {
   this.prefs = new nsIPrefService();
+  this.locale = new nsILocaleService();
 }
 
 module.exports = Services;

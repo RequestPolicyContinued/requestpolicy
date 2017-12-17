@@ -86,7 +86,7 @@ TSC            := $(abspath $(node_modules_dir))/.bin/tsc
 TSLINT         := $(abspath $(node_modules_dir))/.bin/tslint
 
 # python
-PY_PEP8        := $(abspath $(python_env_dir))/bin/pep8
+PY_PYCODESTYLE := $(abspath $(python_env_dir))/bin/pycodestyle
 PY_MOZPROFILE  := $(abspath $(python_env_dir))/bin/mozprofile
 PY_MOZRUNNER   := $(abspath $(python_env_dir))/bin/mozrunner
 
@@ -447,11 +447,11 @@ lint: lint-coffee lint-js lint-python lint-ts lint-xpi
 .PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
 lint-coffee: coffeelint
 lint-js: eslint
-lint-python: pep8
+lint-python: pycodestyle
 lint-ts: ts tslint
 lint-xpi: addons-linter
 
-.PHONY: addons-linter coffeelint eslint pep8 ts tslint
+.PHONY: addons-linter coffeelint eslint pycodestyle ts tslint
 addons-linter: nightly-xpi node-packages
 	@echo $@
 	@$(ADDONS_LINTER) $(xpi_file__nightly)
@@ -465,10 +465,10 @@ eslint: node-packages
 	@$(ESLINT) tests/xpcshell/
 	@$(ESLINT) tests/helper-addons/
 	@$(ESLINT) gulpfile.js
-pep8: python-packages
+pycodestyle: python-packages
 	@echo $@
-	@$(PY_PEP8) scripts/
-	@$(PY_PEP8) tests/marionette/
+	@$(PY_PYCODESTYLE) scripts/
+	@$(PY_PYCODESTYLE) tests/marionette/
 ts: node-packages
 	@echo $@
 	@$(TSC)

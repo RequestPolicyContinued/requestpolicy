@@ -1,4 +1,4 @@
-pep8
+pycodestyle
 
 firefox-puppeteer == 50
 firefox-ui-harness == 1.3

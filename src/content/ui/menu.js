@@ -42,8 +42,6 @@ export function loadMenuIntoWindow(window) {
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
-  let $id = document.getElementById.bind(document);
-
   let initialized = false;
 
   // TODO: Create a "List" class which also contains functions like
@@ -71,20 +69,28 @@ export function loadMenuIntoWindow(window) {
     _ruleChangeQueues: {},
   };
 
+  /**
+   * Return a DOM element by its id. First search in the document included
+   * in the frame, and if not found search in the main document.
+   *
+   * @param {string} id the DOM element's id
+   * @return {Element} the DOM element or null if not found
+   */
+  let $id = function(id) {
+    let element = null;
+    let popupframe = window.top.document.getElementById("rpc-popup-frame");
+    if (popupframe && popupframe.contentDocument) {
+      element = popupframe.contentDocument.getElementById(id);
+    }
+    if (!element) {
+      element = window.top.document.getElementById(id);
+    }
+    return element;
+  };
+
   self.init = function() {
     if (initialized === false) {
       initialized = true;
-
-      self._originItem = document.getElementById("rpc-origin");
-      self._originDomainnameItem = $id("rpc-origin-domainname");
-      self._originNumRequestsItem = $id("rpc-origin-num-requests");
-
-      lists.otherOrigins = $id("rpc-other-origins-list");
-      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
-      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
-      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
-      lists.addRules = $id("rpc-rules-add");
-      lists.removeRules = $id("rpc-rules-remove");
 
       rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
         Environment.LEVELS.INTERFACE,
@@ -165,12 +171,27 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
+      self._originItem = $id("rpc-origin");
+      self._originDomainnameItem = $id("rpc-origin-domainname");
+      self._originNumRequestsItem = $id("rpc-origin-num-requests");
+
+      lists.otherOrigins = $id("rpc-other-origins-list");
+      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
+      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
+      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
+      lists.addRules = $id("rpc-rules-add");
+      lists.removeRules = $id("rpc-rules-remove");
+
       const disabled = Storage.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
-      $id("rpc-revoke-temporary-permissions").hidden =
-          !PolicyManager.temporaryRulesExist();
+      let tempPermLink = $id("rpc-revoke-temporary-permissions");
+      if (PolicyManager.temporaryRulesExist()) {
+        tempPermLink.className = "rpc-revoke-temporary-permissions-enable";
+      } else {
+        tempPermLink.className = "rpc-revoke-temporary-permissions-disable";
+      }
 
       self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
 
@@ -230,7 +251,7 @@ export function loadMenuIntoWindow(window) {
 
       self._populateOrigin();
       self._populateOtherOrigins();
-      self._activateOriginItem($id("rpc-origin"));
+      self._activateOriginItem(self._originItem);
     } catch (e) {
       console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);
@@ -244,10 +265,9 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._populateMenuForUncontrollableOrigin = function() {
-    self._originDomainnameItem.setAttribute("value",
-        StringUtils.$str("noOrigin"));
+    self._originDomainnameItem.textContent = StringUtils.$str("noOrigin");
     self._isUncontrollableOrigin = true;
-    self._originNumRequestsItem.setAttribute("value", "");
+    self._originNumRequestsItem.textContent = "";
     self._originItem.removeAttribute("default-policy");
     self._originItem.removeAttribute("requests-blocked");
 
@@ -312,7 +332,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._populateOrigin = function() {
-    self._originDomainnameItem.setAttribute("value", self._currentBaseDomain);
+    self._originDomainnameItem.textContent = self._currentBaseDomain;
     self._isUncontrollableOrigin = false;
 
     let showNumRequests = Storage.get("menu.info.showNumRequests");
@@ -322,13 +342,13 @@ export function loadMenuIntoWindow(window) {
     let numRequests = "";
     if (true === showNumRequests) {
       if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
-        numRequests = props.numRequests + " (" +
+        numRequests = props.numRequests + "\u00a0(" +
             props.numBlockedRequests + "+" + props.numAllowedRequests + ")";
       } else {
         numRequests = props.numRequests;
       }
     }
-    self._originNumRequestsItem.setAttribute("value", numRequests);
+    self._originNumRequestsItem.textContent = numRequests;
 
     self._originItem.setAttribute("default-policy",
         props.numDefaultPolicyRequests > 0 ? "true" : "false");
@@ -503,25 +523,24 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._addListItem = function(list, cssClass, value, numRequests) {
-    const hbox = document.createElement("hbox");
-    hbox.setAttribute("class", cssClass + " listen-click");
-    hbox.addEventListener("click", self.itemSelected, false);
-    list.insertBefore(hbox, null);
+    const box = document.createElement("div");
+    box.setAttribute("class", cssClass + " listen-click");
+    box.addEventListener("click", self.itemSelected, false);
+    list.insertBefore(box, null);
 
-    const destLabel = document.createElement("label");
-    destLabel.setAttribute("value", value);
+    const destLabel = document.createElement("span");
+    destLabel.textContent = value;
     destLabel.setAttribute("class", "domainname");
-    destLabel.setAttribute("flex", "2");
-    hbox.insertBefore(destLabel, null);
+    box.insertBefore(destLabel, null);
 
     if (numRequests) {
-      const numReqLabel = document.createElement("label");
-      numReqLabel.setAttribute("value", numRequests);
+      const numReqLabel = document.createElement("span");
+      numReqLabel.textContent = numRequests;
       numReqLabel.setAttribute("class", "numRequests");
-      hbox.insertBefore(numReqLabel, null);
+      box.insertBefore(numReqLabel, null);
     }
 
-    return hbox;
+    return box;
   };
 
   self._disableIfNoChildren = function(el) {
@@ -564,11 +583,11 @@ export function loadMenuIntoWindow(window) {
       if (self._isUncontrollableOrigin) {
         return;
       }
-      self._currentlySelectedOrigin = self._originDomainnameItem.value;
+      self._currentlySelectedOrigin = self._originDomainnameItem.textContent;
     } else if (item.parentNode.id === "rpc-other-origins-list") {
       // it's an otherOrigin
       self._currentlySelectedOrigin =
-          item.getElementsByClassName("domainname")[0].value;
+          item.getElementsByClassName("domainname")[0].textContent;
     }
     self._currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
@@ -582,7 +601,7 @@ export function loadMenuIntoWindow(window) {
 
   self._activateDestinationItem = function(item) {
     self._currentlySelectedDest =
-        item.getElementsByClassName("domainname")[0].value;
+        item.getElementsByClassName("domainname")[0].textContent;
 
     if (item.parentNode.id === "rpc-blocked-destinations-list") {
       self._isCurrentlySelectedDestBlocked = true;
@@ -617,7 +636,7 @@ export function loadMenuIntoWindow(window) {
       let domainLabel = item.querySelector(".domainname");
 
       if (domainLabel !== null) {
-        domain = domainLabel.value;
+        domain = domainLabel.textContent;
       }
     }
 
@@ -640,14 +659,12 @@ export function loadMenuIntoWindow(window) {
   }
 
   self.itemSelected = function(event) {
-    let item = event.target;
+    // We retrieve the element on which the listener was added to always
+    // get the div (and not one span or textnode children)
+    let item = event.currentTarget;
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
-    if (item.nodeName === "label" && item.parentNode.nodeName === "hbox") {
-      // item should be the <hbox>
-      item = item.parentNode;
-    }
     if (item.id === "rpc-origin" ||
         item.parentNode.id === "rpc-other-origins-list") {
       if (event.button === 1) {

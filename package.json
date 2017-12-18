@@ -2,6 +2,7 @@
   "devDependencies": {
     "addons-linter": "^0.22.2",
     "chai": "^4.0.2",
+    "chai-as-promised": "^7.1.1",
     "coffeelint": "^1.16.0",
     "coffeescript": "^1.12.6",
     "del": "^3.0.0",

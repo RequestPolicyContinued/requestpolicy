@@ -242,7 +242,7 @@ function getInstallRdfLocalizedSection() {
       line(`    <em:name>${name}</em:name>`),
       line(`    <em:description>${description}</em:description>`),
       line(`  </Description>`),
-      line(`</em:localize>`),
+      line(`</em:localized>`),
     ]);
   }
 

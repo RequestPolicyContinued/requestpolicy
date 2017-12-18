@@ -217,13 +217,26 @@ const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder)
   gulp.task(namePrefix, tasks);
 });
 
+const localesPath = "./src/conditional/webextension/_locales";
+const locales = (function() {
+  let $locales = null;
+
+  return {
+    get() {
+      if ($locales === null) {
+        $locales = fs.readdirSync(localesPath);
+      }
+      return $locales;
+    },
+  };
+})();
+
 function getInstallRdfLocalizedSection() {
   let lines = [];
   const line = (str) => `    ${str}`;
-  const path = "./src/conditional/webextension/_locales";
 
   function getValues(localeDirname, defaultValues=null) {
-    const filepath = `${path}/${localeDirname}/messages.json`;
+    const filepath = `${localesPath}/${localeDirname}/messages.json`;
     const fileContents = require(filepath);
     const get = (key, fileKey) => fileKey in fileContents ?
         fileContents[fileKey].message : defaultValues[key];
@@ -250,7 +263,7 @@ function getInstallRdfLocalizedSection() {
   const defaultValues = getValues(defaultLocaleDirname);
   addValues(defaultValues);
 
-  fs.readdirSync(path).forEach((localeDirname) => {
+  locales.get().forEach((localeDirname) => {
     if (localeDirname === defaultLocaleDirname) return;
     const values = getValues(localeDirname, defaultValues);
     addValues(values);
@@ -358,6 +371,7 @@ BUILDS.forEach(build => {
           "EXTENSION_TYPE": extensionType,
           "RP_HOMEPAGE_URL": config.homepage,
           "RP_VERSION": versionData[build.version],
+          "LOCALES": JSON.stringify(locales.get()),
           "INSTALL_RDF_LOCALIZED_SECTION": getInstallRdfLocalizedSection(),
         };
 
@@ -464,6 +478,7 @@ BUILDS.forEach(build => {
         extensionType === "webextension" ? [
           "manifest.json",
         ] : extensionType === "legacy" ? [
+          "content/bootstrap/data/locales.json",
           "content/bootstrap/data/manifest.json",
         ] : []
       ));

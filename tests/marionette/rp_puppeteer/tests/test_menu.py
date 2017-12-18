@@ -32,7 +32,7 @@ class MenuTests:
                 else:
                     self.menu.close()
                 self.assertFalse(self.menu.is_open())
-            except:
+            except:  # noqa
                 print "trigger: " + self.trigger
                 raise
 

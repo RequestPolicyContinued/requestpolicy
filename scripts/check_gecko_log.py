@@ -26,5 +26,6 @@ def main():
                 print line
         exit(code=1)
 
+
 if __name__ == "__main__":
     main()

@@ -155,7 +155,7 @@ class TestLinkClickRedirectInNewTab(RequestPolicyTestCase):
             try:
                 redirections.for_each_possible_redirection_scenario(maybe_test,
                                                                     "link")
-            except:
+            except:  # noqa
                 print "test variant: " + str(args[0])
                 raise
 

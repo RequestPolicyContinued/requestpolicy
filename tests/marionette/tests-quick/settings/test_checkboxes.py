@@ -125,7 +125,7 @@ class TestCheckboxes(RequestPolicyTestCase):
                 self.assertEqual(cb_value, pref_value)
             else:
                 self.assertNotEqual(cb_value, pref_value)
-        except:
+        except:  # noqa
             print ("pref name: {}, checkbox: {}, pref: {}"
                    .format(pref["name"], str(cb_value), str(pref_value)))
             raise

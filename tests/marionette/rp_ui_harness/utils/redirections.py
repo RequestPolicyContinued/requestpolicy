@@ -166,7 +166,7 @@ def for_each_possible_redirection_scenario(callback, uri_type):
     def callback_wrapper(uris, info):
         try:
             callback(uris, info=info)
-        except:
+        except:  # noqa
             print "info: " + str(info)
             print "uris: " + str(uris)
             raise

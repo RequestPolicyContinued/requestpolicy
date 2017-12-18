@@ -37,7 +37,6 @@ LocaleData.prototype = {
       defaultLocale: this.defaultLocale,
       selectedLocale: this.selectedLocale,
       messages: this.messages,
-      locales: this.locales,
     };
   },
 

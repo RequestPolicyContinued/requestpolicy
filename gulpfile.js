@@ -480,6 +480,7 @@ BUILDS.forEach(build => {
         ] : extensionType === "legacy" ? [
           "content/bootstrap/data/locales.json",
           "content/bootstrap/data/manifest.json",
+          "content/_locales/**/messages.json",
         ] : []
       ));
 

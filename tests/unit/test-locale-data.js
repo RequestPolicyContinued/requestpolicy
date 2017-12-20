@@ -1,6 +1,4 @@
 const {assert} = require("chai");
-const sinon = require("sinon");
-
 const {LocaleData} = require("content/lib/i18n/locale-data");
 
 
@@ -8,13 +6,13 @@ describe("LocaleData", function() {
   describe("has(locale)", function() {
     it("Should return true with loaded locale", function() {
       let data = new LocaleData();
-      data.messages = new Map([["en-US", {}]]);;
+      data.messages = new Map([["en-US", {}]]);
       assert.isTrue(data.has("en-US"));
     });
 
     it("Should return false with unknown locale", function() {
       let data = new LocaleData();
-      data.messages = new Map([["en-US", {}]]);;
+      data.messages = new Map([["en-US", {}]]);
       assert.isFalse(data.has("fr"));
     });
   });

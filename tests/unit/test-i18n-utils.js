@@ -1,6 +1,4 @@
 const {expect} = require("chai");
-const sinon = require("sinon");
-
 const {I18nUtils} = require("content/lib/i18n/i18n-utils");
 
 describe("I18nUtils", function() {
@@ -26,7 +24,9 @@ describe("I18nUtils", function() {
     it("Error cases", function() {
       let cases = ["", "en_US_", "_en_US"];
       for (let i=0; i < cases.length; i++) {
-        let fn = function() { return I18nUtils.normalizeToBCP47(cases[i]); };
+        let fn = function() {
+          return I18nUtils.normalizeToBCP47(cases[i]);
+        };
         expect(fn).to.throw(RangeError);
       }
     });

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
+import {common, WinEnv, elManager, $id} from "content/settings/common";
 
 (function() {
   var {
@@ -56,13 +56,15 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
   $(function() {
     common.localize(PAGE_STRINGS);
     // l10n for input placeholders.
-    $id("rulesearch").placeholder = $str("search");
-    $("[name=originscheme]").prop("placeholder", $str("scheme"));
-    $("[name=destscheme]").prop("placeholder", $str("scheme"));
-    $("[name=originhost]").prop("placeholder", $str("host"));
-    $("[name=desthost]").prop("placeholder", $str("host"));
-    $("[name=originport]").prop("placeholder", $str("port"));
-    $("[name=destport]").prop("placeholder", $str("port"));
+    $id("rulesearch").placeholder = browser.i18n.getMessage("search");
+    $("[name=originscheme]").prop("placeholder",
+      browser.i18n.getMessage("scheme"));
+    $("[name=destscheme]").prop("placeholder",
+      browser.i18n.getMessage("scheme"));
+    $("[name=originhost]").prop("placeholder", browser.i18n.getMessage("host"));
+    $("[name=desthost]").prop("placeholder", browser.i18n.getMessage("host"));
+    $("[name=originport]").prop("placeholder", browser.i18n.getMessage("port"));
+    $("[name=destport]").prop("placeholder", browser.i18n.getMessage("port"));
   });
 
   const SEARCH_DELAY = 100;
@@ -153,9 +155,7 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
     if (ruleAction !== "allow") {
       ruleAction = "block";
     }
-    ruleAction = ruleAction === "allow" ? "allow" : "block";
-    var ruleActionString = ruleAction === "allow" ? $str("allow") :
-        $str("block");
+    var ruleActionString = browser.i18n.getMessage(ruleAction);
 
     var row = $("<tr>").addClass(ruleAction).appendTo(table);
 

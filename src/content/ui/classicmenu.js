@@ -129,7 +129,7 @@ export function loadClassicmenuIntoWindow(window) {
       PolicyManager.addRuleBySpec(aRuleSpec);
       aAllowRedirectFn();
     };
-    const label = StringUtils.$str(labelName, originAndOrDestArray);
+    const label = browser.i18n.getMessage(labelName, originAndOrDestArray);
 
     const item = self.addCustomMenuItem(aMenu, label, callbackFn);
     if (isTemp) {

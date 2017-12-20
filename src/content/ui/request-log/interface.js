@@ -83,8 +83,8 @@ export function loadRLInterfaceIntoWindow(window) {
     }
 
     if (forbidden) {
-      const alertTitle = StringUtils.$str("actionForbidden");
-      const alertText = StringUtils.$str("urlCanOnlyBeCopiedToClipboard");
+      const alertTitle = browser.i18n.getMessage("actionForbidden");
+      const alertText = browser.i18n.getMessage("urlCanOnlyBeCopiedToClipboard");
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

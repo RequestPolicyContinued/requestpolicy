@@ -391,10 +391,10 @@ export function loadOverlayIntoWindow(window) {
     // prepare the notification's label
     let notificationLabel;
     if (isOriginUndefined) {
-      notificationLabel = StringUtils.$str("redirectNotification",
+      notificationLabel = browser.i18n.getMessage("redirectNotification",
           [cropUri(redirectTargetUri, 50)]);
     } else {
-      notificationLabel = StringUtils.$str("redirectNotificationWithOrigin",
+      notificationLabel = browser.i18n.getMessage("redirectNotificationWithOrigin",
           [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
@@ -454,7 +454,7 @@ export function loadOverlayIntoWindow(window) {
 
     {
       // allow ALL
-      let label = StringUtils.$str("allowAllRedirections");
+      let label = browser.i18n.getMessage("allowAllRedirections");
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
         maybeOpenLinkInNewTab(
             browser.runtime.getURL("content/settings/defaultpolicy.html"),
@@ -497,22 +497,22 @@ export function loadOverlayIntoWindow(window) {
     } else {
       const buttons = [
         {
-          label: StringUtils.$str("allow"),
-          accessKey: StringUtils.$str("allow.accesskey"),
+          label: browser.i18n.getMessage("allow"),
+          accessKey: browser.i18n.getMessage("allow.accesskey"),
           popup: null,
           callback: allowRedirection,
         },
         {
-          label: StringUtils.$str("deny"),
-          accessKey: StringUtils.$str("deny.accesskey"),
+          label: browser.i18n.getMessage("deny"),
+          accessKey: browser.i18n.getMessage("deny.accesskey"),
           popup: null,
           callback: function() {
             // Do nothing. The notification closes when this is called.
           },
         },
         {
-          label: StringUtils.$str("addRule"),
-          accessKey: StringUtils.$str("addRule.accesskey"),
+          label: browser.i18n.getMessage("addRule"),
+          accessKey: browser.i18n.getMessage("addRule.accesskey"),
           popup: addRuleMenuName,
           callback: null,
         },

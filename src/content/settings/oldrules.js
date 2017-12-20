@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, $id, $str} from "./common";
+import {common, $id} from "./common";
 
 (function() {
   var {
@@ -76,8 +76,14 @@ import {common, $id, $str} from "./common";
   }
 
   function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
-    var actionClass = ruleAction === "allow" ? "allow" : "block";
-    var action = ruleAction === "allow" ? $str("allow") : $str("block");
+    var actionClass, action;
+    if (ruleAction === "allow") {
+      actionClass = "allow";
+      action = browser.i18n.getMessage("allow");
+    } else {
+      actionClass = "block";
+      action = browser.i18n.getMessage("block");
+    }
 
     var row = $("<tr>").addClass(actionClass).appendTo(table);
 

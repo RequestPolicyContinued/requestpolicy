@@ -45,9 +45,7 @@ describe("LocaleManager", function() {
 
   afterEach(function() {
     sandbox.restore();
-    if (global.Service) {
-      global.Service.locale = {};
-    }
+    global.Services.locale = {};
     LocaleManager.localeData = new LocaleData();
   });
 

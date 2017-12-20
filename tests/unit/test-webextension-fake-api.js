@@ -31,6 +31,8 @@ describe("Api.browser.runtime", function() {
     global.Ci = mockComp.interfaces;
     global.Services = new MockServices();
 
+    let {LocaleManager} = require("content/lib/i18n/locale-manager");
+    sinon.stub(LocaleManager, "init").resolves();
     // eslint-disable-next-line no-unused-vars
     let {Api, ContentScriptsApi} = require("content/web-extension-fake-api/models/api");
     runtime = Api.browser.runtime;

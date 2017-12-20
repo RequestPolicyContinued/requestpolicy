@@ -158,12 +158,33 @@ export const LocaleManager = (function() {
       .then(bestMatches => this.loadLocalesMessages(bestMatches))
       .then(localesMessages => Promise.all(localesMessages.map(
         obj => this.localeData.addLocale(obj.locale, obj.messages)))
-      ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale))
-      .catch(e => {
-        console.error("[Fatal] Unable to prepare locales! Details:");
-        console.dir(e);
-        return Promise.reject(e);
-      });
+      ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale));
+  };
+
+  /**
+   * Gets the localized string for the specified message. If the message
+   * can't be found in messages.json, returns "" and log an error.
+   *
+   * @param {string} messageName The name of the message, as specified in
+   * the messages.json file.
+   * @param {any} substitutions string or array of string. A single
+   * substitution string, or an array of substitution strings.
+   * @return {string} Message localized for current locale.
+   */
+  self.localizeMessage = function(messageName, substitutions) {
+    return this.localeData.localizeMessage(messageName, substitutions);
+  };
+
+  /**
+   * Localize a string, replacing all |__MSG_(.*)__| tokens with the
+   * matching string from the current local. Should be only used for
+   * substitution in HTML files.
+   *
+   * @param {string} str __MSG_(<message_name>)__
+   * @return {string} String localized for current locale.
+   */
+  self.localize = function(str) {
+    return this.localeData.localize(str);
   };
 
   return self;

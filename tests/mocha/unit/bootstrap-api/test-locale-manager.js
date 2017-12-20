@@ -64,7 +64,7 @@ describe("LocaleManager", function() {
         },
         getApplicationLocale: function() {
           return "en";
-        }
+        },
       };
 
       let result = LocaleManager.getAppLocale();
@@ -74,13 +74,12 @@ describe("LocaleManager", function() {
     it("Should use getApplicationLocale as fallback", function() {
       global.Services.locale = {
         getApplicationLocale: function() {
-          return { getCategory: () => "fr" };
-        }
+          return {getCategory: () => "fr"};
+        },
       };
 
       let result = LocaleManager.getAppLocale();
       expect(result).to.equal("fr");
-
     });
 
     it("Should return normalized BCP 47 tag", function() {
@@ -101,7 +100,9 @@ describe("LocaleManager", function() {
         },
       };
 
-      let fn = function() { return LocaleManager.getAppLocale(); };
+      let fn = function() {
+        return LocaleManager.getAppLocale();
+      };
       expect(fn).to.throws(RangeError);
     });
   });
@@ -163,12 +164,12 @@ describe("LocaleManager", function() {
 
     it("Shouldn't return duplicates", function() {
       let result = LocaleManager.getBestMatches(["fr-FR", "fr"], localesMap);
-      return expect(result).to.be.a("map").which.have.property('size', 1);
+      return expect(result).to.be.a("map").which.have.property("size", 1);
     });
 
     it("Shouldn't empty map if no match", function() {
       let result = LocaleManager.getBestMatches(["zn"], localesMap);
-      return expect(result).to.be.a("map").which.have.property('size', 0);
+      return expect(result).to.be.a("map").which.have.property("size", 0);
     });
   });
 

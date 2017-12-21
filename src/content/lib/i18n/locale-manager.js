@@ -1,20 +1,23 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * RequestPolicy - A Firefox extension for control over cross-site requests.
+ * Copyright (c) 2014-2017 Martin Kimmerle
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * ***** END LICENSE BLOCK *****
- */
-
-/**
- * This object is used to manage localization for i18n support.
- * Original source code is from Mozilla's Gecko Extension.jsm module,
- * and was modified to suite RequestPolicy needs.
- * See https://github.com/mozilla/gecko,
- * gecko/toolkit/components/extensions/Extension.jsm
- * revision 6991a6334725aabee674e17a2f4f01dc508e4d52.
  */
 
  /* global Services */
@@ -23,7 +26,9 @@ import {LocaleData} from "content/lib/i18n/locale-data";
 import * as ChromeFilesUtils from "content/lib/utils/chrome-files";
 import * as I18nUtils from "content/lib/i18n/i18n-utils";
 
-
+/**
+ * This object manages loading locales for i18n support.
+ */
 export const LocaleManager = (function() {
   let self = {
     localeData: new LocaleData(),

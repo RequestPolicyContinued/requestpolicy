@@ -39,7 +39,13 @@ export const Utils = (function() {
   self.runAsync = function(callback, thisPtr, ...params) {
     let runnable = {
       run: function() {
-        callback.apply(thisPtr, params);
+        try {
+          callback.apply(thisPtr, params);
+        } catch (e) {
+          console.error("Asynchronous callback failed unexpectly. Details:")
+          console.dir(e);
+          throw e;
+        }
       },
     };
     Services.tm.currentThread.dispatch(runnable,

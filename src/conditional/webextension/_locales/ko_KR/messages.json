@@ -89,27 +89,27 @@
     "description": "Destination"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "임시로 설정된 모든 권한을 취소합니다.",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "차단된 목적지 주소",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "허용된 목적지 주소",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "환경 설정",
     "description": "Preferences"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "요청 기록",
     "description": "Request Log"
   },

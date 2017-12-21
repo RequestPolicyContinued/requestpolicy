@@ -164,32 +164,32 @@
     "description": "Destination"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Отменить все временные разрешения",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Блокированные цели",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Разрешенные цели",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Настройки",
     "description": "Preferences"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Журнал Запросов",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Очистить",
     "description": "Clear"
   },
@@ -199,7 +199,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "Вы собираетесь узнать информацию о сайте «$1»,\nотправив запрос к $2.\nПродолжить?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

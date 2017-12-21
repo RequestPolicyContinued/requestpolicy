@@ -79,7 +79,7 @@
     "description": "Web Pages"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Вподобання",
     "description": "Preferences"
   }

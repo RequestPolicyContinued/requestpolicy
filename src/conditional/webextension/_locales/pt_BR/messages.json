@@ -174,37 +174,37 @@
     "description": "Destination"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Revogar todas as permissões temporárias",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Destinos bloqueados",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Destinos permitidos",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "Outras origens",
     "description": "Other origins"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Preferências…",
     "description": "Preferences"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Pedidos nesta página",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Limpar",
     "description": "Clear"
   },
@@ -214,7 +214,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "Você está prestes a pedir informações sobre o site \"$1\"\nao fazer uma consulta ao $2.\nDeseja continuar?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

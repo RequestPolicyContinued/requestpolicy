@@ -12,10 +12,20 @@ http://github.com/piroor/webextensions-lib-l10n
 * Aimed to be used with HTML page.
 */
 export const l10n = (function() {
+  const regexp = /__MSG_([A-Za-z0-9@_]+?)__/g;
+
   let l10n = {
+    matchKeyPattern(aString) {
+      // eslint-disable-next-line no-extra-parens
+      if (!aString || (typeof aString !== "string"
+        && !(aString instanceof String))) {
+        return false;
+      }
+      return regexp.test(aString);
+    },
+
     updateString(aString) {
-      return aString.replace(/__MSG_([A-Za-z0-9@_]+?)__/g,
-      (matched, message) => {
+      return aString.replace(regexp, (matched, message) => {
         return browser.i18n.getMessage(message, [], {defaultValue: matched});
       });
     },

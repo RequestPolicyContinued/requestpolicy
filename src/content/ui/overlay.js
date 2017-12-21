@@ -358,7 +358,7 @@ export function loadOverlayIntoWindow(window) {
   // TODO, bad smell: Instead of the <browser> etc. hand over a `Request`
   //                  object that contains everything. This requires
   //                  e.g. a `MetaRedirectRequest` class.
-  self._showRedirectNotification = function(browser, redirectTargetUri, delay,
+  self._showRedirectNotification = function(vBrowser, redirectTargetUri, delay,
       redirectOriginUri, replaceIfPossible) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
@@ -385,7 +385,7 @@ export function loadOverlayIntoWindow(window) {
       return false;
     }
 
-    const notificationBox = gBrowser.getNotificationBox(browser);
+    const notificationBox = gBrowser.getNotificationBox(vBrowser);
     const notificationValue = "request-policy-meta-redirect";
 
     // prepare the notification's label
@@ -436,7 +436,7 @@ export function loadOverlayIntoWindow(window) {
       if (replaceIfPossible) {
         data.replaceUri = redirectOriginUri;
       }
-      browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
+      vBrowser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
           data);
     };
 

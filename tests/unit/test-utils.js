@@ -7,7 +7,7 @@
  *
  * ***** END LICENSE BLOCK *****
  */
- 
+
 "use strict";
 
 let {assert} = require("chai");

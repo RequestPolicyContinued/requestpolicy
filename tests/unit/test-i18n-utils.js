@@ -7,7 +7,7 @@
  *
  * ***** END LICENSE BLOCK *****
  */
- 
+
 const {expect} = require("chai");
 const {I18nUtils} = require("content/lib/i18n/i18n-utils");
 

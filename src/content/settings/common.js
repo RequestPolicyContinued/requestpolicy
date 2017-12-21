@@ -21,9 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var {common, WinEnv, elManager, $id, $str} = (function() {
+var {WinEnv, elManager, $id} = (function() {
   var {
-    StringUtils,
     Environment,
     MainEnvironment,
   } = browser.extension.getBackgroundPage();
@@ -40,39 +39,11 @@ var {common, WinEnv, elManager, $id, $str} = (function() {
 
   var $id = window.document.getElementById.bind(window.document);
 
-  var COMMON_STRINGS = [
-    "preferences",
-    "managePolicies",
-    "about",
-    "help",
-    "basic",
-    "advanced",
-  ];
-
-  var $str = StringUtils.$str;
-
-  var common = {};
-
-  common.localize = function(stringNames) {
-    stringNames.forEach(function(name) {
-      $("[data-string=\"" + name + "\"]").each(function() {
-        // eslint-disable-next-line no-invalid-this
-        $(this).text($str(name));
-      });
-    });
-  };
-
-  $(function() {
-    common.localize(COMMON_STRINGS);
-  });
-
   return {
-    common: common,
     WinEnv: WinEnv,
     elManager: elManager,
     $id: $id,
-    $str: $str,
   };
 })();
 
-export {common, WinEnv, elManager, $id, $str};
+export {WinEnv, elManager, $id};

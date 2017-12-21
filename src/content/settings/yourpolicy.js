@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "content/settings/common";
+import {WinEnv, elManager, $id} from "content/settings/common";
+import {l10n} from "../lib/i18n/l10n";
 
 (function() {
   var {
@@ -33,28 +34,8 @@ import {common, WinEnv, elManager, $id} from "content/settings/common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "yourPolicy",
-    "defaultPolicy",
-    "subscriptions",
-    "type",
-    "origin",
-    "destination",
-    "allow",
-    "block",
-    "temporary",
-    "createRule",
-    "addRule",
-    "learnMoreAboutRules",
-    "removeOldRules",
-    "ruleSet",
-    "activeRules",
-    "filterRules",
-    "policy",
-  ];
-
   $(function() {
-    common.localize(PAGE_STRINGS);
+    l10n.updateDocument();
     // l10n for input placeholders.
     $id("rulesearch").placeholder = browser.i18n.getMessage("search");
     $("[name=originscheme]").prop("placeholder",

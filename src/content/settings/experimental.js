@@ -20,10 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+ import {l10n} from "../lib/i18n/l10n";
+
 (function() {
   var {Metadata, Requests} = browser.extension.getBackgroundPage();
 
   // ===========================================================================
+
+  l10n.updateDocument();
 
   function getNRequestResultObjects(aRequestSet) {
     var n = 0;

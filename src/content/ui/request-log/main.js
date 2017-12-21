@@ -26,7 +26,6 @@ import {loadRLTreeViewIntoWindow} from "./tree-view";
 import {loadRLFilteringIntoWindow} from "./filtering";
 
 let {
-  StringUtils,
   Environment,
   MainEnvironment,
 } = browser.extension.getBackgroundPage();

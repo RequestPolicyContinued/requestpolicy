@@ -22,7 +22,6 @@
  */
 
 import {PolicyManager} from "content/lib/policy-manager";
-import {StringUtils} from "content/lib/utils/strings";
 import {DOMUtils} from "content/lib/utils/dom";
 
 export function loadClassicmenuIntoWindow(window) {

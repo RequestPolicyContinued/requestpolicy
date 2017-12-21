@@ -30,7 +30,6 @@ import {DomainUtil} from "content/lib/utils/domains";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";
-import {StringUtils} from "content/lib/utils/strings";
 import {DOMUtils} from "content/lib/utils/dom";
 import {WindowUtils} from "content/lib/utils/windows";
 import {C} from "content/lib/utils/constants";

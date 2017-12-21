@@ -30,7 +30,6 @@ import {Storage} from "content/models/storage";
 import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
 import {DomainUtil} from "content/lib/utils/domains";
-import {StringUtils} from "content/lib/utils/strings";
 import {WindowUtils} from "content/lib/utils/windows";
 import {JSUtils} from "content/lib/utils/javascript";
 import {Utils} from "content/lib/utils";
@@ -394,8 +393,9 @@ export function loadOverlayIntoWindow(window) {
       notificationLabel = browser.i18n.getMessage("redirectNotification",
           [cropUri(redirectTargetUri, 50)]);
     } else {
-      notificationLabel = browser.i18n.getMessage("redirectNotificationWithOrigin",
-          [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
+      notificationLabel = browser.i18n.getMessage(
+        "redirectNotificationWithOrigin",
+        [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
     const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";

@@ -42,7 +42,7 @@ export const Utils = (function() {
         try {
           callback.apply(thisPtr, params);
         } catch (e) {
-          console.error("Asynchronous callback failed unexpectly. Details:")
+          console.error("Asynchronous callback failed unexpectly. Details:");
           console.dir(e);
           throw e;
         }

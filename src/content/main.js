@@ -42,7 +42,6 @@ import {OldRules} from "content/lib/old-rules";
 import {RuleUtils} from "content/lib/utils/rules";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {DomainUtil} from "content/lib/utils/domains";
-import {StringUtils} from "content/lib/utils/strings";
 import {Info} from "content/lib/utils/info";
 import {SUBSCRIPTION_ADDED_TOPIC, SUBSCRIPTION_REMOVED_TOPIC}
     from "content/lib/subscription";
@@ -76,7 +75,6 @@ _setBackgroundPage({
   RequestProcessor,
   rpService,
   RuleUtils,
-  StringUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
   WindowUtils,

@@ -23,7 +23,6 @@
 
 let {
   DomainUtil,
-  StringUtils,
 } = browser.extension.getBackgroundPage();
 
 export function loadRLInterfaceIntoWindow(window) {
@@ -84,7 +83,8 @@ export function loadRLInterfaceIntoWindow(window) {
 
     if (forbidden) {
       const alertTitle = browser.i18n.getMessage("actionForbidden");
-      const alertText = browser.i18n.getMessage("urlCanOnlyBeCopiedToClipboard");
+      const alertText = browser.i18n.getMessage(
+        "urlCanOnlyBeCopiedToClipboard");
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

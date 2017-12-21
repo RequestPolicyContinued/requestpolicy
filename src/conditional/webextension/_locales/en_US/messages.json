@@ -589,62 +589,62 @@
     "description": "Policy"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Revoke all temporary permissions",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Blocked destinations",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Allowed destinations",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.mixedDestinations": {
+  "rp_menu_mixedDestinations": {
     "message": "Mixed destinations",
     "description": "Mixed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "Other origins",
     "description": "Other origins"
   },
 
-  "rp.menu.enableBlocking": {
+  "rp_menu_enableBlocking": {
     "message": "Enable blocking",
     "description": "Enable blocking"
   },
 
-  "rp.menu.disableBlocking": {
+  "rp_menu_disableBlocking": {
     "message": "Disable blocking",
     "description": "Disable blocking"
   },
 
-  "rp.menu.help": {
+  "rp_menu_help": {
     "message": "Help",
     "description": "Help"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Preferences",
     "description": "Preferences"
   },
 
-  "rp.menu.managePolicies": {
+  "rp_menu_managePolicies": {
     "message": "Manage Policies",
     "description": "Manage Policies"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Request Log",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Clear",
     "description": "Clear"
   },
@@ -654,7 +654,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

@@ -174,37 +174,37 @@
     "description": "Destination"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Alle tijdelijke permissies intrekken",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Geblokkeerde bestemmingen",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Toegestane bestemmingen",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "Andere oorsprongen",
     "description": "Other origins"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Voorkeuren",
     "description": "Preferences"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Logbestand verzoeken",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Wissen",
     "description": "Clear"
   },
@@ -214,7 +214,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "Je staat op het punt informatie te vragen over de \"$1\" site\ndoor een verzoek te sturen naar $2.\nWil je hiermee doorgaan?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

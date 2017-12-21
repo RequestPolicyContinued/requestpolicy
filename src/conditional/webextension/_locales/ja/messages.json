@@ -489,62 +489,62 @@
     "description": "Policy"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "すべての一時的な許可を取り消す",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "禁止されている送信先",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "許可されている送信先",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.mixedDestinations": {
+  "rp_menu_mixedDestinations": {
     "message": "混合している送信先",
     "description": "Mixed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "その他のオリジン",
     "description": "Other origins"
   },
 
-  "rp.menu.enableBlocking": {
+  "rp_menu_enableBlocking": {
     "message": "ブロックを有効にする",
     "description": "Enable blocking"
   },
 
-  "rp.menu.disableBlocking": {
+  "rp_menu_disableBlocking": {
     "message": "ブロックを無効にする",
     "description": "Disable blocking"
   },
 
-  "rp.menu.help": {
+  "rp_menu_help": {
     "message": "ヘルプ",
     "description": "Help"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "設定",
     "description": "Preferences"
   },
 
-  "rp.menu.managePolicies": {
+  "rp_menu_managePolicies": {
     "message": "ポリシーの管理",
     "description": "Manage Policies"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "リクエストログ",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "消去",
     "description": "Clear"
   }

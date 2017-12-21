@@ -549,62 +549,62 @@
     "description": "Policy"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Aldi baterako baimen guztiak baliogabetu",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Blokeatutako helmugak",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Baimendutako helmugak",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.mixedDestinations": {
+  "rp_menu_mixedDestinations": {
     "message": "Helmuga nahasiak",
     "description": "Mixed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "Beste jatorri batzuk",
     "description": "Other origins"
   },
 
-  "rp.menu.enableBlocking": {
+  "rp_menu_enableBlocking": {
     "message": "Debekatzea gaitu",
     "description": "Enable blocking"
   },
 
-  "rp.menu.disableBlocking": {
+  "rp_menu_disableBlocking": {
     "message": "Debekatzea ezgaitu",
     "description": "Disable blocking"
   },
 
-  "rp.menu.help": {
+  "rp_menu_help": {
     "message": "Laguntza",
     "description": "Help"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Hobespenak",
     "description": "Preferences"
   },
 
-  "rp.menu.managePolicies": {
+  "rp_menu_managePolicies": {
     "message": "Politikak kudeatu",
     "description": "Manage Policies"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Eskaeren erregistroa",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Garbitu",
     "description": "Clear"
   },
@@ -614,7 +614,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "\"$1\" guneari buruzko informazioa eskatzera zoaz\n$2(e)ra kontsulta bat bidaliz.\nJarraitu nahi al duzu?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

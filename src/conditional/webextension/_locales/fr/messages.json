@@ -514,62 +514,62 @@
     "description": "Policy"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Révoquer tous les droits d'accès temporaires",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Cibles bloquées",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Cibles autorisées",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.mixedDestinations": {
+  "rp_menu_mixedDestinations": {
     "message": "Destinations mixtes",
     "description": "Mixed destinations"
   },
 
-  "rp.menu.otherOrigins": {
+  "rp_menu_otherOrigins": {
     "message": "Autres origines",
     "description": "Other origins"
   },
 
-  "rp.menu.enableBlocking": {
+  "rp_menu_enableBlocking": {
     "message": "Activer le blocage",
     "description": "Enable blocking"
   },
 
-  "rp.menu.disableBlocking": {
+  "rp_menu_disableBlocking": {
     "message": "Désactiver le blocage",
     "description": "Disable blocking"
   },
 
-  "rp.menu.help": {
+  "rp_menu_help": {
     "message": "Aide",
     "description": "Help"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Préférences",
     "description": "Preferences"
   },
 
-  "rp.menu.managePolicies": {
+  "rp_menu_managePolicies": {
     "message": "Gérer les politiques",
     "description": "Manage Policies"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Journal des requêtes",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Effacer",
     "description": "Clear"
   },
@@ -579,7 +579,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "Vous allez demander des informations à propos du site \"$1\" en soumettant un requête à $2.\nVoulez-vous continuer ?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

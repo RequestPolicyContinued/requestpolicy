@@ -169,32 +169,32 @@
     "description": "Destination"
   },
 
-  "rp.menu.revokeTemporaryPermissions": {
+  "rp_menu_revokeTemporaryPermissions": {
     "message": "Odvolať všetky dočasné oprávnenie",
     "description": "Revoke all temporary permissions"
   },
 
-  "rp.menu.blockedDestinations": {
+  "rp_menu_blockedDestinations": {
     "message": "Blokované ciele",
     "description": "Blocked destinations"
   },
 
-  "rp.menu.allowedDestinations": {
+  "rp_menu_allowedDestinations": {
     "message": "Povolené ciele",
     "description": "Allowed destinations"
   },
 
-  "rp.menu.preferences": {
+  "rp_menu_preferences": {
     "message": "Nastavenia",
     "description": "Preferences"
   },
 
-  "rp.requestLog.title": {
+  "rp_requestLog_title": {
     "message": "Protokol požiadaviek",
     "description": "Request Log"
   },
 
-  "rp.requestLog.clear": {
+  "rp_requestLog_clear": {
     "message": "Vyčistiť",
     "description": "Clear"
   },
@@ -204,7 +204,7 @@
     "description": "Always ask for confirmation"
   },
 
-  "siteInfo.confirm": {
+  "siteInfoConfirm": {
     "message": "Chystáte sa požiadať o informácie o stránke \"$1\"\nodoslaním požiadavky na $2.\nChcete pokračovať?",
     "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
   }

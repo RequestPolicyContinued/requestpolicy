@@ -615,7 +615,7 @@ export function loadMenuIntoWindow(window) {
       return;
     }
 
-    let dialogMessage = browser.i18n.getMessage("siteInfo.confirm",
+    let dialogMessage = browser.i18n.getMessage("siteInfoConfirm",
         [domain, "https://www.mywot.com"]);
     let alwaysAskPrefName = "confirmSiteInfo";
     let confirmed = confirm(dialogMessage, alwaysAskPrefName, {

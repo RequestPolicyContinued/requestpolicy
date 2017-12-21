@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "./common";
+import {WinEnv, elManager, $id} from "./common";
+import {l10n} from "../lib/i18n/l10n";
 
 (function() {
   var {
@@ -32,30 +33,7 @@ import {common, WinEnv, elManager, $id} from "./common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "basic",
-    "advanced",
-    "advancedPreferences",
-    "linkPrefetching",
-    "dnsPrefetching",
-    "speculativePreConnections",
-    "enabled",
-    "disableOnStartup",
-    "restoreDefaultOnUninstall",
-    "menuPreferences",
-    "menuSorting",
-    "sortByNumRequests",
-    "sortByDestName",
-    "noSorting",
-    "hint",
-    "menuSortingHint",
-    "menuIndicatedInformation",
-    "menuIndicateNumRequests",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
+  l10n.updateDocument();
 
   function updateDisplay() {
     // Link prefetch.

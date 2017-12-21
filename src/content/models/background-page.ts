@@ -34,7 +34,6 @@ import {
 } from "content/lib/subscription";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import * as RuleUtils from "content/lib/utils/rule-utils";
-import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {rpService} from "content/main/requestpolicy-service";
 import {Log} from "content/models/log";
@@ -60,7 +59,6 @@ export const BackgroundPage = {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
   Storage,
-  StringUtils,
   VersionInfos,
   WindowUtils,
   rpService,

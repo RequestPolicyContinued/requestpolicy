@@ -7,7 +7,7 @@
  *
  * ***** END LICENSE BLOCK *****
  */
- 
+
 const {assert} = require("chai");
 const {LocaleData} = require("content/lib/i18n/locale-data");
 

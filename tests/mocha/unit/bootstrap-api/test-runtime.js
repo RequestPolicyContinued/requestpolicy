@@ -7,7 +7,7 @@
  *
  * ***** END LICENSE BLOCK *****
  */
- 
+
 const {assert} = require("chai");
 const sinon = require("sinon");
 

@@ -115,6 +115,46 @@ describe("LocaleManager", function() {
     });
   });
 
+  describe("getDefaultLocale()", function() {
+    it("Should return value from manifest.json", function() {
+      ChromeFilesUtils.parseJSON
+        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
+        .resolves({default_locale: "zh"});
+
+      let promise = LocaleManager.getDefaultLocale();
+      return expect(promise).to.be.eventually.fulfilled
+        .with.a("string").which.equal("zh");
+    });
+
+    it("Should return a normalized BCP 47 tag", function() {
+      ChromeFilesUtils.parseJSON
+        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
+        .resolves({default_locale: "fr_CA"});
+
+      let promise = LocaleManager.getDefaultLocale();
+      return expect(promise).to.be.eventually.fulfilled
+        .with.a("string").which.equal("fr-ca");
+    });
+
+    it("Should reject if default_locale isn't present", function() {
+      ChromeFilesUtils.parseJSON
+        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
+        .resolves({name: "RPC"});
+
+      let promise = LocaleManager.getDefaultLocale();
+      return expect(promise).to.be.eventually.rejectedWith(Error);
+    });
+
+    it("Should reject if can't parse manifest.json", function() {
+      ChromeFilesUtils.parseJSON
+        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
+        .rejects();
+
+      let promise = LocaleManager.getDefaultLocale();
+      return expect(promise).to.be.eventually.rejectedWith(Error);
+    });
+  });
+
   describe("getAvailableLocales()", function() {
     it("Should return a map of available locales", function() {
       ChromeFilesUtils.parseJSON.resolves(["fr", "en"]);

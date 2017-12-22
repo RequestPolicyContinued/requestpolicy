@@ -10,6 +10,8 @@
     }
   },
 
+  "default_locale": "en_US",
+
   "background": {
     "scripts": ["content/main.js"]
   },

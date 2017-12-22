@@ -53,6 +53,27 @@ export const LocaleManager = (function() {
   },
 
   /**
+   * Return a promise which is fullfilled with the value of default_locale
+   * indicated in manifest.json as a normalized BCP 47 tag.
+   *
+   * @return {Promise}
+   */
+  self.getDefaultLocale = function() {
+    const manifestUrl = ChromeFilesUtils.getChromeUrl(
+      "content/bootstrap/data/manifest.json");
+
+    return ChromeFilesUtils.parseJSON(manifestUrl).then(manifest => {
+      if (manifest && manifest.default_locale) {
+        let bcp47tag = I18nUtils.normalizeToBCP47(manifest.default_locale);
+        return Promise.resolve(bcp47tag);
+      } else {
+        return Promise.reject(
+          new Error("'default_locale' key not found in manifest.json"));
+      }
+    });
+  },
+
+  /**
    * Return Promise which is fullfilled with a Map(bcp-47-tag -> locale-dir)
    * of available locales in the _locales dir of the extension.
    *
@@ -154,12 +175,15 @@ export const LocaleManager = (function() {
   };
 
   self.init = function() {
-    const defaultLocale = I18nUtils.normalizeToBCP47("en-US");
-    const uiLocale = this.getAppLocale();
-    const requestedLocales = [defaultLocale, uiLocale];
+    let defaultLocale;
+    let uiLocale;
 
-    return this.getAvailableLocales()
-      .then(AllLocales => this.getBestMatches(requestedLocales, AllLocales))
+    return this.getDefaultLocale()
+      .then(result => defaultLocale = result)
+      .then(() => uiLocale = this.getAppLocale())
+      .then(() => this.getAvailableLocales())
+      .then(AllLocales => this.getBestMatches([defaultLocale, uiLocale],
+        AllLocales))
       .then(bestMatches => this.loadLocalesMessages(bestMatches))
       .then(localesMessages => Promise.all(localesMessages.map(
         obj => this.localeData.addLocale(obj.locale, obj.messages)))

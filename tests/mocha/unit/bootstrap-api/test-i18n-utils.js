@@ -1,5 +1,5 @@
 const {expect} = require("chai");
-const {I18nUtils} = require("content/lib/i18n/i18n-utils");
+const I18nUtils = require("content/lib/i18n/i18n-utils");
 
 describe("I18nUtils", function() {
   describe("normalizeToBCP47(tag)", function() {

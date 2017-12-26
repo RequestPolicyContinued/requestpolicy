@@ -36,7 +36,7 @@ describe("LocaleManager", function() {
     global.Cu = mockComp.utils;
     global.Services = mockServices;
 
-    ChromeFilesUtils = require("content/lib/utils/chrome-files").ChromeFilesUtils;
+    ChromeFilesUtils = require("content/lib/utils/chrome-files");
     LocaleManager = require("content/lib/i18n/locale-manager").LocaleManager;
 
     // Create stubs

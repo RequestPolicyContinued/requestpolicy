@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {l10n} from "content/lib/i18n/l10n";
+import * as l10n from "content/lib/i18n/l10n";
 import * as JSUtils from "content/lib/utils/js-utils";
 import {C} from "content/data/constants";
 

@@ -22,7 +22,7 @@
  */
 
 import {WinEnv, elManager, $id} from "./common";
-import {l10n} from "../lib/i18n/l10n";
+import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {

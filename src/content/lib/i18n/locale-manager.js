@@ -23,7 +23,7 @@
  /* global Services */
 
 import {LocaleData} from "content/lib/i18n/locale-data";
-import {ChromeFilesUtils} from "content/lib/utils/chrome-files";
+import {ChromeFilesUtils} from "content/lib/utils/chrome-files-utils";
 import {I18nUtils} from "content/lib/i18n/i18n-utils";
 
 /**

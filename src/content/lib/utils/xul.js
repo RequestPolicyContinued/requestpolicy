@@ -22,7 +22,7 @@
 
 import {JSUtils} from "content/lib/utils/javascript";
 import {C} from "content/lib/utils/constants";
-import {l10n} from "content/lib/i18n/l10n";
+import * as l10n from "content/lib/i18n/l10n";
 
 // =============================================================================
 // XULUtils

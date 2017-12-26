@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
- import {l10n} from "../lib/i18n/l10n";
+ import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {RequestProcessor} = browser.extension.getBackgroundPage();

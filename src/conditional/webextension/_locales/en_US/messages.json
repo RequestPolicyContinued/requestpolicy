@@ -154,11 +154,6 @@
     "description": "M"
   },
 
-  "indentedText": {
-    "message": "$1 $2",
-    "description": "$1 $2"
-  },
-
   "requestLogIsEmpty": {
     "message": "The Request Log is initially empty.",
     "description": "The Request Log is initially empty."

@@ -509,6 +509,9 @@ tslint: node-packages
 #-------------------------------------------------------------------------------
 
 .PHONY: check-locales
+check-locales: python-packages
+	@echo $@
+	@./tests/l10n/check-we-locales.py
 include tests/l10n/Makefile
 
 #-------------------------------------------------------------------------------

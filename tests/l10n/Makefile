@@ -23,9 +23,6 @@ check-locale-$(1):
 else
 check-locale-$(1): check-locale-$(reference_locale)
 endif
-	@$(BASE_DIR)/tests/l10n/check-property-file.sh \
-	  "$(L10N_DIR)/$(1)/requestpolicy.properties" \
-	  "$(L10N_DIR)/$(reference_locale)/requestpolicy.properties"
 	@$(BASE_DIR)/tests/l10n/check-dtd-file.sh \
 	  "$(L10N_DIR)/$(1)/requestpolicy.dtd" \
 	  "$(L10N_DIR)/$(reference_locale)/requestpolicy.dtd"

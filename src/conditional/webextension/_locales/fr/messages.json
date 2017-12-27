@@ -124,14 +124,29 @@
     "description": "Allow"
   },
 
+  "allow_accesskey": {
+    "message": "A",
+    "description": "A"
+  },
+
   "deny": {
     "message": "Refuser",
     "description": "Deny"
   },
 
+  "deny_accesskey": {
+    "message": "D",
+    "description": "D"
+  },
+
   "more": {
     "message": "Plus...",
     "description": "More…"
+  },
+
+  "more_accesskey": {
+    "message": "M",
+    "description": "M"
   },
 
   "requestLogIsEmpty": {
@@ -204,6 +219,11 @@
     "description": "Web Pages"
   },
 
+  "menu": {
+    "message": "Menu",
+    "description": "Menu"
+  },
+
   "allowAddingNonTemporaryRulesInPBM": {
     "message": "Autoriser la mise permanente en liste blanche lors de la navigation privée",
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
@@ -222,6 +242,11 @@
   "dnsPrefetching": {
     "message": "Préchargement DNS",
     "description": "DNS Prefetching"
+  },
+
+  "speculativePreConnections": {
+    "message": "Pré-connexions spéculatives",
+    "description": "Speculative pre-connections"
   },
 
   "enabled": {
@@ -314,9 +339,24 @@
     "description": "host"
   },
 
+  "port": {
+    "message": "port",
+    "description": "port"
+  },
+
+  "type": {
+    "message": "Type",
+    "description": "Type"
+  },
+
   "origin": {
     "message": "Origine",
     "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Destination",
+    "description": "Destination"
   },
 
   "block": {
@@ -332,6 +372,16 @@
   "addRule": {
     "message": "Ajouter une règle",
     "description": "Add rule"
+  },
+
+  "addRule_accesskey": {
+    "message": "R",
+    "description": "R"
+  },
+
+  "createRule": {
+    "message": "Créer une règle",
+    "description": "Create Rule"
   },
 
   "learnMoreAboutRules": {
@@ -362,6 +412,16 @@
   "allowRequestsToTheSameDomain": {
     "message": "Autoriser les requêtes vers le même domaine (www.exemple.com -> static.exemple.com).",
     "description": "Allow requests to the same domain (www.example.com -> static.example.com)."
+  },
+
+  "allowTopLevelRequests": {
+    "message": "Autoriser toutes les redirections de sites web (requêtes de premier niveau).",
+    "description": "Allow all website redirections (top-level requests)."
+  },
+
+  "allowAllRedirections": {
+    "message": "Autoriser TOUTES les redirections.",
+    "description": "Allow ALL redirections."
   },
 
   "differentSubscriptionsAreAvailable": {
@@ -502,6 +562,11 @@
   "ruleSet": {
     "message": "Règle ajoutée",
     "description": "Rule Set"
+  },
+
+  "activeRules": {
+    "message": "Règles actives",
+    "description": "Active Rules"
   },
 
   "filterRules": {

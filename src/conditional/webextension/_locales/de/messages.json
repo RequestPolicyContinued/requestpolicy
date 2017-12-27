@@ -119,7 +119,7 @@
     "description": "Allow"
   },
 
-  "allow.accesskey": {
+  "allow_accesskey": {
     "message": "E",
     "description": "A"
   },
@@ -129,7 +129,7 @@
     "description": "Deny"
   },
 
-  "deny.accesskey": {
+  "deny_accesskey": {
     "message": "L",
     "description": "D"
   },

@@ -507,13 +507,13 @@ export function loadOverlayIntoWindow(window) {
       const buttons = [
         {
           label: browser.i18n.getMessage("allow"),
-          accessKey: browser.i18n.getMessage("allow.accesskey"),
+          accessKey: browser.i18n.getMessage("allow_accesskey"),
           popup: null,
           callback: allowRedirection,
         },
         {
           label: browser.i18n.getMessage("deny"),
-          accessKey: browser.i18n.getMessage("deny.accesskey"),
+          accessKey: browser.i18n.getMessage("deny_accesskey"),
           popup: null,
           callback: function() {
             // Do nothing. The notification closes when this is called.
@@ -521,7 +521,7 @@ export function loadOverlayIntoWindow(window) {
         },
         {
           label: browser.i18n.getMessage("addRule"),
-          accessKey: browser.i18n.getMessage("addRule.accesskey"),
+          accessKey: browser.i18n.getMessage("addRule_accesskey"),
           popup: addRuleMenuName,
           callback: null,
         },

@@ -119,7 +119,7 @@
     "description": "Allow"
   },
 
-  "allow.accesskey": {
+  "allow_accesskey": {
     "message": "T",
     "description": "A"
   },
@@ -129,7 +129,7 @@
     "description": "Deny"
   },
 
-  "deny.accesskey": {
+  "deny_accesskey": {
     "message": "N",
     "description": "D"
   },
@@ -139,7 +139,7 @@
     "description": "More…"
   },
 
-  "more.accesskey": {
+  "more_accesskey": {
     "message": "W",
     "description": "M"
   },
@@ -339,7 +339,7 @@
     "description": "Add rule"
   },
 
-  "addRule.accesskey": {
+  "addRule_accesskey": {
     "message": "D",
     "description": "R"
   },

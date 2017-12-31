@@ -44,7 +44,7 @@ function dir(...args: any[]) {
 }
 
 // =============================================================================
-// LogClass
+// Log
 // =============================================================================
 
 interface IEnabledCondition {
@@ -88,15 +88,27 @@ const ROOT_OPTIONS: IInternalLogOptions = {
   prefix: C.LOG_PREFIX,
 };
 
-export class LogClass {
+class Log {
+  private static lInstance: Log;
+  public static get instance(): Log {
+    if (!Log.lInstance) {
+      Log.lInstance = new Log({
+        enabled: true,
+        level: LogLevel.ALL,
+        prefix: "",
+      });
+    }
+    return Log.lInstance;
+  }
+
   private ownInternalOptions: IInternalLogOptions<null> = {
     enabled: null,
     level: null,
     prefix: "",
   };
-  private parent: LogClass | null = null;
+  private parent: Log | null = null;
 
-  constructor(aOptions: ILogOptions, aParent?: LogClass) {
+  private constructor(aOptions: ILogOptions, aParent?: Log) {
     const options: IAllLogOptions<null> =
         Object.assign({}, DEFAULT_OPTIONS, aOptions);
     let {enabled, name} = options;
@@ -247,7 +259,7 @@ export class LogClass {
   }
 
   public extend(options: ILogOptions) {
-    return new LogClass(options, this);
+    return new Log(options, this);
   }
 
   private getInternalOption<T extends "level" | "enabled">(
@@ -294,12 +306,5 @@ export class LogClass {
   }
 }
 
-// =============================================================================
-// Log
-// =============================================================================
-
-export const Log = new LogClass({
-  enabled: true,
-  level: LogLevel.ALL,
-  prefix: "",
-});
+const LogInstance = Log.instance;
+export { LogInstance as Log };

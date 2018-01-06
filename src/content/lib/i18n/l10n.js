@@ -33,10 +33,10 @@
 /* global document */
 
 /**
-* Replace all |__MSG_(.*)__| tokens with the matching string from
-* the current locale.
-* Aimed to be used with HTML page.
-*/
+ * Replace all |__MSG_(.*)__| tokens with the matching string from
+ * the current locale.
+ * Aimed to be used with HTML page.
+ */
 const MSG_REGEXP = /__MSG_([A-Za-z0-9@_]+?)__/g;
 
 export function matchKeyPattern(aString) {

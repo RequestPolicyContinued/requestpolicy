@@ -13,12 +13,12 @@ const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 const {httpRequest} = Cu.import("resource://gre/modules/Http.jsm");
 
 /**
-* Return the complete chrome url based on a relative path to
-* RequestPolicy main dir (i.e chrome://rpcontinued/<path>).
-*
-* @param {string} path Relative path from RequestPolicy main dir
-* @return {string} Chrome URL
-*/
+ * Return the complete chrome url based on a relative path to
+ * RequestPolicy main dir (i.e chrome://rpcontinued/<path>).
+ *
+ * @param {string} path Relative path from RequestPolicy main dir
+ * @return {string} Chrome URL
+ */
 export function getChromeUrl(path) {
  // Removes leading ./ or / and append to chrome://rpcontinued/
  const replacer = /^(?:\.\/|\/)?(.+)$/mg;
@@ -90,12 +90,12 @@ export function parseJSON(chromeUrl) {
 }
 
 /**
-* Return a promise which is fulfilled with the response text
-* of the HTTP GET request. The promise is rejected with an Error if the
-* status code isn't 200 or upon any other errors.
-* @param {string} url
-* @return {Promise}
-*/
+ * Return a promise which is fulfilled with the response text
+ * of the HTTP GET request. The promise is rejected with an Error if the
+ * status code isn't 200 or upon any other errors.
+ * @param {string} url
+ * @return {Promise}
+ */
 function sendHttpGet(url) {
   return new Promise((resolve, reject) => {
     try {

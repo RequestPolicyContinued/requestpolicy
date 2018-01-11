@@ -43,7 +43,7 @@ function loadSubscriptionRules() {
   ).then((result) => {
     const rawData = result.hasOwnProperty("subscriptions") ?
         result.subscriptions : undefined;
-    subscriptions = new UserSubscriptions(rawData);
+    subscriptions = UserSubscriptions.create(rawData);
     return PolicyManager.loadSubscriptionRules(
         subscriptions.getSubscriptionInfo());
   }).then(({failures}) => {

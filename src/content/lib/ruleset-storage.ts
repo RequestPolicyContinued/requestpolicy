@@ -45,7 +45,7 @@ export const RulesetStorage = {
     const pResult = browser.storage.local.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
-      return RawRuleset.create(aResult as IMaybeIncompleteRawRuleset);
+      return RawRuleset.create(aResult[key] as IMaybeIncompleteRawRuleset);
     });
     pRawRuleset.catch((e) => {
       log.error("RulesetStorage.loadRawRulesetFromFile():", e);

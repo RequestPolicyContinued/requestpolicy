@@ -22,7 +22,7 @@
  */
 
 import {MainEnvironment} from "content/lib/environment";
-import {RawRuleset} from "content/lib/ruleset";
+import {IRuleSpecs, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {Log} from "content/models/log";
 
@@ -94,17 +94,25 @@ interface IObject<T> {
   [k: string]: T;
 }
 
+// see also RawRuleset's IMetadata
+interface ISubscriptionMetadata {
+  version: 1;
+  serial: Serial;
+}
+
 interface ISubscriptionData {
-  metadata?: {
-    serial: any;
-  };
-  serial?: any;
-  url?: any;
+  metadata: ISubscriptionMetadata;
+  entries: IRuleSpecs;
 }
 
 interface IListData {
   subscriptions: {
-    [subName: string]: ISubscriptionData,
+    [subName: string]: {
+      serial?: Serial;
+      url?: string;
+      title?: string;
+      description?: string;
+    },
   };
   url?: string;
 }
@@ -129,11 +137,11 @@ interface ISubsObject<T, TListAdditional = never> {
 type UpdateResults = ISubsObject<SubscriptionUpdateResult, false>;
 export type Serial = -1 | number;
 
-interface IMetadata {
+interface ISerialObj {
   serial: Serial;
 }
 
-type Serials = IObject<IMetadata>;
+type Serials = IObject<ISerialObj>;
 
 // =============================================================================
 // UserSubscriptions
@@ -407,7 +415,7 @@ class SubscriptionList {
     // tslint:disable-next-line prefer-const forin
     for (let subName in userSubs) {
       const serial = this.getSubscriptionSerial(subName);
-      if (serial === null) {
+      if (!serial) {
         continue;
       }
       log.info("Current serial for " + this.name + " " + subName + ": " +
@@ -415,7 +423,7 @@ class SubscriptionList {
       log.info("Available serial for " + this.name + " " + subName + ": " +
           serial);
       const subUrl = this.getSubscriptionUrl(subName);
-      if (subUrl === null) {
+      if (!subUrl) {
         continue;
       }
       const sub = new Subscription(this.name, subName, subUrl);
@@ -477,7 +485,7 @@ class Subscription {
   private list: string;
   private url: string;
   private data: ISubscriptionData;
-  private rawData: any;
+  private rawData: string;
 
   constructor(listName: string, subName: string, subUrl: string) {
     // TODO: allow only ascii lower letters, digits, and hyphens in listName.
@@ -505,13 +513,14 @@ class Subscription {
         createInstance(Ci.nsIXMLHttpRequest);
     req.onload = maybeCallback((event) => {
       try {
-        this.rawData = req.responseText;
-        if (!this.rawData) {
+        const rawData = req.responseText;
+        this.rawData = rawData;
+        if (!rawData) {
           const error = "Empty response when requesting subscription file";
           setTimeout(() => errorCallback(this, error), 0);
           return;
         }
-        this.data = JSON.parse(req.responseText);
+        this.data = JSON.parse(rawData);
         // Make sure there's a ['metadata']['serial'] key as a way of sanity
         // checking the parsed JSON as well as enforcing the use of serial
         // numbers in subscription rulesets.
@@ -530,7 +539,7 @@ class Subscription {
         }
         // The rest of the sanity checking is done by RawRuleset.
         try {
-          const rawRuleset = RawRuleset.create(this.rawData);
+          const rawRuleset = RawRuleset.create(this.data);
           RulesetStorage.saveRawRulesetToFile(rawRuleset, this.name,
                 this.list);
         } catch (e) {

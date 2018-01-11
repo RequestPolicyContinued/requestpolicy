@@ -81,7 +81,7 @@ interface IMetadata {
   source?: "user" | "subscription";
 }
 
-interface IRuleSpecs {
+export interface IRuleSpecs {
   allow: IRuleSpec[];
   deny: IRuleSpec[];
 }

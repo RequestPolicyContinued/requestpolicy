@@ -476,6 +476,7 @@ BUILDS.forEach(build => {
       addPreprocessedFilesBuildTask("js", [
       ].concat(
         extensionType === "webextension" ? [
+          "_locales/**/messages.json",
           "manifest.json",
         ] : extensionType === "legacy" ? [
           "content/bootstrap/data/locales.json",

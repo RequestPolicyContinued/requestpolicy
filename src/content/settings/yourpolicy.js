@@ -22,7 +22,6 @@
  */
 
 import {WinEnv, elManager, $id} from "content/settings/common";
-import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -37,7 +36,6 @@ import * as l10n from "content/lib/i18n/l10n";
   // ===========================================================================
 
   $(function() {
-    l10n.updateDocument();
     // l10n for input placeholders.
     $id("rulesearch").placeholder = $str("search");
     $("[name=originscheme]").prop("placeholder", $str("scheme"));

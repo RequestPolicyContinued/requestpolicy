@@ -20,7 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as l10n from "content/lib/i18n/l10n";
 import * as JSUtils from "content/lib/utils/js-utils";
 import {C} from "content/data/constants";
 
@@ -138,10 +137,11 @@ function getParentElement(aDocument, aElementSpec) {
  * @return {string}
  */
 function getLocalizedValue(aRawValue) {
-  if (!l10n.matchKeyPattern(aRawValue)) {
+  const {L10nUtils} = LegacyApi;
+  if (!L10nUtils.matchKeyPattern(aRawValue)) {
     return aRawValue;
   }
-  return l10n.updateString(aRawValue);
+  return L10nUtils.updateString(aRawValue);
 }
 
 /**

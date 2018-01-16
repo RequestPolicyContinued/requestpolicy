@@ -20,11 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
- /* global Services */
-
-import {LocaleData} from "content/lib/i18n/locale-data";
+import {LocaleData} from "./locale-data";
 import * as ChromeFilesUtils from "content/lib/utils/chrome-files-utils";
-import * as I18nUtils from "content/lib/i18n/i18n-utils";
+import * as I18nUtils from "./i18n-utils";
 
 /**
  * This object manages loading locales for i18n support.
@@ -39,7 +37,6 @@ export class LocaleManager {
 
   constructor() {
     this.localeData = new LocaleData();
-    this.init = null;
   }
 
   /**

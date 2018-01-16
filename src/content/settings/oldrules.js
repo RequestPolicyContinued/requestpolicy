@@ -22,7 +22,6 @@
  */
 
 import {$id} from "./common";
-import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -33,8 +32,6 @@ import * as l10n from "content/lib/i18n/l10n";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  l10n.updateDocument();
 
   var rules = null;
 

@@ -9,7 +9,7 @@
  */
 
 const {assert} = require("chai");
-const {LocaleData} = require("content/lib/i18n/locale-data");
+const {LocaleData} = require("bootstrap/models/browser/i18n/locale-data");
 
 
 function resetConsoleErrors() {

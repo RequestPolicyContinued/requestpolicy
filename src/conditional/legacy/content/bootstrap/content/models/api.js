@@ -29,7 +29,8 @@ import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {StorageApi} from "bootstrap/models/storage-api";
 import {Runtime, ContentRuntime} from "bootstrap/models/browser/runtime";
-import {LocaleManager} from "content/lib/i18n/locale-manager";
+import {ContentI18n, I18n} from "bootstrap/models/browser/i18n";
+import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -58,12 +59,13 @@ function manifestHasPermission(perm) {
 export const Api = {
   browser: {
     extension: {},
-    i18n: {},
+    i18n: I18n,
     management: {},
     runtime: Runtime.instance,
     storage: StorageApi,
   },
   LegacyApi: {
+    L10nUtils,
     miscInfos: LegacyMiscInfos,
     PrefObserver: PrefObserver,
     prefs: Prefs,
@@ -78,12 +80,7 @@ export const ContentScriptsApi = {
       inIncognitoContext: null,
     },
     runtime: ContentRuntime.instance,
-    i18n: {
-      getMessage: null,
-      getAcceptLanguages: null,
-      getUILanguage: null,
-      detectLanguage: null,
-    },
+    i18n: ContentI18n,
     storage: Api.browser.storage,
   },
 };
@@ -101,40 +98,6 @@ export const ContentScriptsApi = {
 
   Api.browser.extension.getBackgroundPage = function() {
     return backgroundPage;
-  };
-})();
-
-// =============================================================================
-// browser.i18n
-// =============================================================================
-
-(function() {
-  LocaleManager.instance.init().catch(e => {
-    console.error("[Fatal] Unable to prepare locales manager! Details:");
-    console.dir(e);
-  });
-
-  /**
-   * Gets the localized string for the specified message. If the message
-   * can't be found in messages.json, returns "" and log an error.
-   *
-   * @param {string} messageName The name of the message, as specified in
-   * the messages.json file.
-   * @param {any} substitutions string or array of string. A single
-   * substitution string, or an array of substitution strings.
-   * @return {string} Message localized for current locale.
-   */
-  Api.browser.i18n.getMessage = function(messageName, substitutions) {
-    return LocaleManager.instance.localizeMessage(messageName, substitutions);
-  };
-
-  /**
-   * Gets the UI language of the browser.
-   *
-   * @return {string} The browser UI language code as a BCP 47 tag.
-   */
-  Api.browser.i18n.getUILanguage = function() {
-    return LocaleManager.instance.getAppLocale();
   };
 })();
 

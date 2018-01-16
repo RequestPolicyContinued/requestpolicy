@@ -56,13 +56,14 @@ You can obtain a copy of the MPL at http://mozilla.org/MPL/2.0/.
 
 ===============================================================================
 The following files are distributed under the Mozilla Public License, v. 2.0:
- * src/content/lib/i18n/locale-data.js
+ * src/conditional/legacy/content/bootstrap/content/models/browser/i18n/locale-data.js
  * src/content/lib/utils/chrome-files-utils.js
 You can obtain a copy of the MPL at http://mozilla.org/MPL/2.0/.
 
 ===============================================================================
-The l10n librairy available under src/content/lib/i18n/l10n.js is based on
-YUKI "Piro" Hiroshi's l10n librairy.
+The l10n librairy available under
+src/conditional/legacy/content/bootstrap/content/lib/utils/l10n-utils.js
+is based on YUKI "Piro" Hiroshi's l10n librairy.
 Original code can be obtain at https://github.com/piroor/webextensions-lib-l10n
 
 YUKI "Piro" Hiroshi's l10n librairy is distributed under this license:

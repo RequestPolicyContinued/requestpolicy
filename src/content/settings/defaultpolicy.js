@@ -22,7 +22,6 @@
  */
 
 import {WinEnv, elManager, $id} from "./common";
-import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -31,8 +30,6 @@ import * as l10n from "content/lib/i18n/l10n";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  l10n.updateDocument();
 
   function updateDisplay() {
     var defaultallow = Storage.get("defaultPolicy.allow");

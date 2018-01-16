@@ -30,7 +30,7 @@
   * Original file from https://github.com/piroor/webextensions-lib-l10n
   */
 
-/* global document */
+import {I18n} from "content/bootstrap/content/models/browser/i18n";
 
 /**
  * Replace all |__MSG_(.*)__| tokens with the matching string from
@@ -50,11 +50,11 @@ export function matchKeyPattern(aString) {
 
 export function updateString(aString) {
   return aString.replace(MSG_REGEXP, (matched, message) => {
-    return browser.i18n.getMessage(message, [], {defaultValue: matched});
+    return I18n.instance.getMessage(message, [], {defaultValue: matched});
   });
 }
 
-export function updateDocument() {
+export function updateDocument(document) {
   let texts = document.evaluate(
     "descendant::text()[contains(self::text(), \"__MSG_\")]",
     document,

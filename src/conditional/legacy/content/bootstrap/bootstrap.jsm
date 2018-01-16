@@ -263,6 +263,7 @@ var FakeWebExt = (function() {
     function onDOMContentLoaded() {
       document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
       const pageName = document.documentElement.id;
+      Api.LegacyApi.L10nUtils.updateDocument(document);
       commonjsEnv.load({
         mainFile: "content/settings/" + pageName,
         additionalGlobals: [

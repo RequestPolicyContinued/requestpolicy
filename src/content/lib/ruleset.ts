@@ -23,6 +23,7 @@
 
 import {C} from "content/data/constants";
 import * as DomainUtils from "content/lib/utils/domain-utils";
+import { getHostByUriObj } from "content/lib/utils/domain-utils";
 import {Log as log} from "content/models/log";
 
 // =============================================================================
@@ -1069,18 +1070,8 @@ export class Ruleset {
   public check(origin: IUri, dest: IUri): [Match[], Match[]] {
     const matchedAllowRules: Match[] = [];
     const matchedDenyRules: Match[] = [];
-    let originHost;
-    let destHost;
-    try {
-      originHost = origin.host;
-    } catch (e) {
-      originHost = "";
-    }
-    try {
-      destHost = dest.host;
-    } catch (e) {
-      destHost = "";
-    }
+    const originHost = getHostByUriObj(origin) || "";
+    const destHost = getHostByUriObj(dest) || "";
 
     // dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.

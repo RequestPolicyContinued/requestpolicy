@@ -22,6 +22,9 @@
  */
 
 import {PrefBranch} from "bootstrap/lib/classes/pref-branch";
+import {
+  getComplexValueFromPrefBranch,
+} from "content/lib/utils/try-catch-utils";
 
 // =============================================================================
 // Prefs
@@ -164,13 +167,9 @@ export const Prefs = (function() {
   };
 
   function isOldRulePrefEmpty(pref) {
-    try {
-      let value = self.branches.rp.branch.
-          getComplexValue(pref, Ci.nsISupportsString).data;
-      return value === "";
-    } catch (e) {
-      return true;
-    }
+    const result = getComplexValueFromPrefBranch(self.branches.rp.branch,
+        pref, Ci.nsISupportsString);
+    return result.value === "";
   }
 
   self.oldRulesExist = function() {

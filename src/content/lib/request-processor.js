@@ -46,6 +46,10 @@ import {
 import {Requests} from "content/models/requests";
 
 import RPContentPolicy from "content/main/content-policy";
+import {
+  getRequestHeaderFromHttpChannel,
+  queryInterface,
+} from "content/lib/utils/try-catch-utils";
 
 const log = Log;
 
@@ -216,6 +220,17 @@ function isDuplicateRequest(request) {
   return false;
 }
 
+function getDomNodeFromRequestContext(context) {
+  const result = queryInterface(context, Ci.nsIDOMNode);
+  if (!result.error) {
+    return result.value;
+  }
+  const e = result.error;
+  if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
+    throw e;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // public functions
 // ---------------------------------------------------------------------------
@@ -309,16 +324,7 @@ export function process(request) {
     }
 
     if (originURI === "about:blank" && request.aContext) {
-      let domNode;
-      try {
-        // eslint-disable-next-line new-cap
-        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-      } catch (e) {
-        if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
-          // eslint-disable-next-line no-throw-literal
-          throw e;
-        }
-      }
+      const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeType === Ci.nsIDOMNode.DOCUMENT_NODE) {
         let newOriginURI;
         if (request.aContext.documentURI &&
@@ -358,17 +364,7 @@ export function process(request) {
     }
 
     if (request.aContext) {
-      let domNode;
-      try {
-        // eslint-disable-next-line new-cap
-        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-      } catch (e) {
-        if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
-          // eslint-disable-next-line no-throw-literal
-          throw e;
-        }
-      }
-
+      const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeName === "LINK" &&
           (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
         FaviconRequests[destURI] = true;
@@ -470,17 +466,7 @@ export function process(request) {
     // and destination before the request is made. This should be able to be
     // removed if we can find a better solution for the allowed popup case.
     if (request.aContext) {
-      let domNode;
-      try {
-        // eslint-disable-next-line new-cap
-        domNode = request.aContext.QueryInterface(Ci.nsIDOMNode);
-      } catch (e) {
-        if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
-          // eslint-disable-next-line no-throw-literal
-          throw e;
-        }
-      }
-
+      const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeName === "xul:browser" &&
           domNode.currentURI && domNode.currentURI.spec === "about:blank") {
         request.requestResult = new RequestResult(true,
@@ -699,16 +685,13 @@ export function process(request) {
 let examineHttpRequest = function(aSubject) {
   // eslint-disable-next-line new-cap
   const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-  try {
-    // Determine if prefetch requests are slipping through.
-    if (httpChannel.getRequestHeader("X-moz") === "prefetch") {
-      // Seems to be too late to block it at this point. Calling the
-      // cancel(status) method didn't stop it.
-      log.warn(
-          "Discovered prefetch request being sent to: " + httpChannel.name);
-    }
-  } catch (e) {
-    // No X-moz header.
+  const result = getRequestHeaderFromHttpChannel(httpChannel, "X-moz");
+  // Determine if prefetch requests are slipping through.
+  if (result.value === "prefetch") {
+    // Seems to be too late to block it at this point. Calling the
+    // cancel(status) method didn't stop it.
+    log.warn(
+        "Discovered prefetch request being sent to: " + httpChannel.name);
   }
 };
 

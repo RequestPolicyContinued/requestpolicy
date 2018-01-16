@@ -42,6 +42,10 @@ import * as DOMUtils from "content/lib/utils/dom-utils";
 import {C} from "content/data/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";
 import {Requests} from "content/models/requests";
+import {
+  addSessionHistoryListener,
+  removeSessionHistoryListener,
+} from "content/lib/utils/try-catch-utils";
 
 const {LOG_FLAG_STATE} = C;
 
@@ -877,19 +881,17 @@ export function loadOverlayIntoWindow(window) {
     let maxTries = 10;
     let tryAddingSHistoryListener = function() {
       ++tries;
-      try {
-        // FIXME: [e10s] The DocShell (and webNavigation) lives in the
-        //               content process.
-        let sHistory = gBrowser.webNavigation.sessionHistory;
-        sHistory.addSHistoryListener(self.historyListener);
-        return;
-      } catch (e) {
-        if (tries >= maxTries) {
-          console.error("[SEVERE] Can't add session history listener, even " +
-              "after " + tries + " tries. Details:");
-          console.dir(e);
-          return;
-        }
+      // FIXME: [e10s] The DocShell (and webNavigation) lives in the
+      //               content process.
+      const result = addSessionHistoryListener(gBrowser, self.historyListener);
+      if (!result.error) return;
+
+      const e = result.error;
+      if (tries >= maxTries) {
+        console.error("[SEVERE] Can't add session history listener, even " +
+            "after " + tries + " tries. Details:");
+        console.dir(e);
+      } else {
         // call this function again in a few miliseconds.
         setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
@@ -901,10 +903,8 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self._removeHistoryObserver = function() {
-    const sHistory = gBrowser.webNavigation.sessionHistory;
-    try {
-      sHistory.removeSHistoryListener(self.historyListener);
-    } catch (e) {
+    const result = removeSessionHistoryListener(gBrowser, self.historyListener);
+    if (result.error) {
       // When closing the last window in a session where additional windows
       // have been opened and closed, this will sometimes fail (bug #175).
     }

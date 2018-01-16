@@ -22,6 +22,9 @@
  */
 
 import * as DomainUtil from "content/lib/utils/domain-utils";
+import {
+  getComplexValueFromPrefBranch,
+} from "content/lib/utils/try-catch-utils";
 
 declare const Cc: any;
 declare const Ci: any;
@@ -119,15 +122,14 @@ export class OldRules {
    *     the pref does not exist.
    */
   private static getPrefString(aPrefName: string): string {
-    try {
-      return LegacyApi.prefs.branches.rp.branch.
-          getComplexValue(aPrefName, Ci.nsISupportsString).data;
-    } catch (e) {
-      if (e.name !== "NS_ERROR_UNEXPECTED") {
-        console.dir(e);
-      }
-      return "";
+    const result = getComplexValueFromPrefBranch(
+        LegacyApi.prefs.branches.rp.branch, aPrefName, Ci.nsISupportsString);
+    if (!result.error) return result.value;
+    const e = result.error;
+    if (e.name !== "NS_ERROR_UNEXPECTED") {
+      console.dir(e);
     }
+    return "";
   }
 
   private customPrefStrings: IPrefStrings | null = null;

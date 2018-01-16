@@ -28,6 +28,7 @@ import {
 } from "content/lib/request-result";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {IUri} from "content/lib/utils/domain-utils";
+import {queryInterface } from "content/lib/utils/try-catch-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
@@ -442,23 +443,24 @@ export class NormalRequest extends Request {
       return context.contentWindow;
     }
 
-    let win;
-    try {
-      win = context.QueryInterface(Ci.nsIDOMWindow);
-    } catch (e) {
-      let doc;
-      try {
-        doc = context.QueryInterface(Ci.nsIDOMDocument);
-      } catch (e) {
-        try {
-          doc = context.QueryInterface(Ci.nsIDOMNode).ownerDocument;
-        } catch (e) {
-          return null;
-        }
-      }
-      win = doc.defaultView;
+    {
+      const result = queryInterface(context, Ci.nsIDOMWindow);
+      if (!result.error) return result.value;
     }
-    return win;
+    let doc;
+    {
+      const result = queryInterface(context, Ci.nsIDOMDocument);
+      if (!result.error) doc = result.value;
+    }
+    if (!doc) {
+      const result = queryInterface(context, Ci.nsIDOMNode);
+      if (!result.error) {
+        const node = result.value;
+        doc = node.ownerDocument;
+      }
+    }
+    if (!doc) return null;
+    return doc.defaultView;
   }
 
   /**

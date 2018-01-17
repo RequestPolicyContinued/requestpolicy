@@ -1,0 +1,571 @@
+{
+  "extensionDescription": {
+    "message": "Mit diesem Addon können Sie domainübergreifende Anfragen kontrollieren und sich vor Cross-Site-Forgery-Requests (CSFR) und anderen Angriffen schützen.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "Konflikt mit folgenden Erweiterungen: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "noOrigin": {
+    "message": "[keine Website geladen]",
+    "description": "[no origin]"
+  },
+
+  "allowOrigin": {
+    "message": "Anfragen durch $1 erlauben",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "Anfragen nach $1 erlauben",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "Anfragen durch $1 nach $2 erlauben",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "kurzzeitig alle Anfragen durch $1 erlauben",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "kurzzeitig alle Anfragen nach $1 erlauben",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "kurzzeitig alle Anfragen durch $1 nach $2 erlauben",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "stopAllowingOrigin": {
+    "message": "Anfragen durch $1 nicht mehr zulassen",
+    "description": "Stop allowing requests from $1"
+  },
+
+  "stopAllowingDestination": {
+    "message": "Anfragen nach $1 nicht mehr zulassen",
+    "description": "Stop allowing requests to $1"
+  },
+
+  "stopAllowingOriginToDestination": {
+    "message": "Anfragen durch $1 nach $2 nicht mehr zulassen",
+    "description": "Stop allowing requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "Anfragen durch $1 verbieten",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "Anfragen nach $1 verbieten",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "Anfragen durch $1 nach $2 verbieten",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "denyOriginTemporarily": {
+    "message": "kurzzeitig alle Anfragen durch $1 blockieren",
+    "description": "Temporarily block all requests from $1"
+  },
+
+  "denyDestinationTemporarily": {
+    "message": "kurzzeitig alle Anfragen nach $1 blockieren",
+    "description": "Temporarily block all requests to $1"
+  },
+
+  "denyOriginToDestinationTemporarily": {
+    "message": "kurzzeitig alle Anfragen durch $1 nach $2 blockieren",
+    "description": "Temporarily block requests from $1 to $2"
+  },
+
+  "stopDenyingOrigin": {
+    "message": "Anfragen durch $1 nicht mehr blockieren",
+    "description": "Stop blocking requests from $1"
+  },
+
+  "stopDenyingDestination": {
+    "message": "Anfragen nach $1 nicht mehr blockieren",
+    "description": "Stop blocking requests to $1"
+  },
+
+  "stopDenyingOriginToDestination": {
+    "message": "Anfragen durch $1 nach $2 nicht mehr blockieren",
+    "description": "Stop blocking requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "Anfragen durch $1 können nicht verboten werden",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "Diese Webseite möchte nach $1 weiterleiten",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "Erlauben",
+    "description": "Allow"
+  },
+
+  "allow_accesskey": {
+    "message": "E",
+    "description": "A"
+  },
+
+  "deny": {
+    "message": "Ablehnen",
+    "description": "Deny"
+  },
+
+  "deny_accesskey": {
+    "message": "L",
+    "description": "D"
+  },
+
+  "more": {
+    "message": "Mehr...",
+    "description": "More…"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "Das Anfragenprotokoll ist anfangs leer.",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "Beim Besuchen von Webseiten werden Protokolleinträge erstellt.",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "Unzulässige Aktion",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "Diese Adresse kann nur in die Zwischenablage kopiert werden.",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "Einstellungen",
+    "description": "Preferences"
+  },
+
+  "managePolicies": {
+    "message": "Regeln verwalten",
+    "description": "Manage Policies"
+  },
+
+  "about": {
+    "message": "Über RequestPolicy",
+    "description": "About"
+  },
+
+  "help": {
+    "message": "Hilfe",
+    "description": "Help"
+  },
+
+  "basic": {
+    "message": "wichtig",
+    "description": "Basic"
+  },
+
+  "advanced": {
+    "message": "erweitert",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "Blockierte Grafiken durch Platzhalter ersetzen",
+    "description": "Indicate blocked images"
+  },
+
+  "autoReload": {
+    "message": "Aktuelle Seite beim Ändern der Liste erlaubter Anfragen neu laden",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "Webseiten",
+    "description": "Web Pages"
+  },
+
+  "menu": {
+    "message": "Menü",
+    "description": "Menu"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "Dauerhaftes Erlauben im Privaten Modus ermöglichen",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "advancedPreferences": {
+    "message": "Erweiterte Einstellungen",
+    "description": "Advanced Preferences"
+  },
+
+  "enabled": {
+    "message": "Aktivieren",
+    "description": "Enabled"
+  },
+
+  "disableOnStartup": {
+    "message": "Beim Start von Firefox deaktivieren",
+    "description": "Disable on startup"
+  },
+
+  "restoreDefaultOnUninstall": {
+    "message": "Bei der Deinstallation von RequestPolicy Standardeinstellung wiederherstellen",
+    "description": "Restore default when RequestPolicy is uninstalled"
+  },
+
+  "menuPreferences": {
+    "message": "Menü-Einstellungen",
+    "description": "Menu Preferences"
+  },
+
+  "menuSorting": {
+    "message": "Sortierung der Ziele",
+    "description": "sorting of destinations"
+  },
+
+  "sortByNumRequests": {
+    "message": "nach der Anzahl an Anfragen",
+    "description": "by the number of requests"
+  },
+
+  "sortByDestName": {
+    "message": "nur nach dem Domainnamen",
+    "description": "by the domain name only"
+  },
+
+  "noSorting": {
+    "message": "nicht sortieren",
+    "description": "do not sort"
+  },
+
+  "hint": {
+    "message": "Hinweis:",
+    "description": "Hint:"
+  },
+
+  "menuSortingHint": {
+    "message": "Wenn Sie die Sortierung deaktivieren, werden die Domains in der Reihenfolge aufgeführt, in der Sie von der Website geladen wurden. Diese Einstellung ist sinnvoll, wenn Anfragen standardmäßig abgelehnt werden. Falls Sie in diesem Fall nach Anfragen suchen, die Sie erlauben möchten, stehen die wichtigsten Anfragen zuerst in der Liste.",
+    "description": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential."
+  },
+
+  "menuIndicatedInformation": {
+    "message": "angezeigte Informationen",
+    "description": "indicated information"
+  },
+
+  "menuIndicateNumRequests": {
+    "message": "die Anzahl der Anfragen für jedes Ziel anzeigen",
+    "description": "show the number of requests for every destination"
+  },
+
+  "yourPolicy": {
+    "message": "Ihre Regeln",
+    "description": "Your Policy"
+  },
+
+  "defaultPolicy": {
+    "message": "Voreingestellte Regeln",
+    "description": "Default Policy"
+  },
+
+  "subscriptions": {
+    "message": "Abonnements",
+    "description": "Subscriptions"
+  },
+
+  "search": {
+    "message": "Suche",
+    "description": "Search"
+  },
+
+  "scheme": {
+    "message": "Schema",
+    "description": "scheme"
+  },
+
+  "type": {
+    "message": "Typ",
+    "description": "Type"
+  },
+
+  "origin": {
+    "message": "Quelle",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Ziel",
+    "description": "Destination"
+  },
+
+  "block": {
+    "message": "Blockieren",
+    "description": "Block"
+  },
+
+  "temporary": {
+    "message": "kurzzeitig",
+    "description": "Temporary"
+  },
+
+  "addRule": {
+    "message": "Regel hinzufügen",
+    "description": "Add rule"
+  },
+
+  "learnMoreAboutRules": {
+    "message": "Weitere Informationen über Regeln lesen",
+    "description": "Learn more about rules."
+  },
+
+  "learnMore": {
+    "message": "Mehr lernen",
+    "description": "Learn more."
+  },
+
+  "defaultPolicyDefinition": {
+    "message": "Wenn keine ihrer Regeln eine Anfrage explizit erlauben oder blockieren, wird RequestPolicy folgendes tun:",
+    "description": "When you don't have any \"allow\" or \"block\" rules that match a request, this is what RequestPolicy will do."
+  },
+
+  "allowRequestsByDefault": {
+    "message": "Anfragen generell erlauben.",
+    "description": "Allow requests by default."
+  },
+
+  "blockRequestsByDefault": {
+    "message": "Anfragen generell blockieren. (Achtung, durch diese Einstellung werden viele Websiten unbenutzbar.)",
+    "description": "Block requests by default. (For advanced users. Breaks many websites.)"
+  },
+
+  "allowRequestsToTheSameDomain": {
+    "message": "Anfragen an die gleiche Domain erlauben (www.example.com -> static.example.com).",
+    "description": "Allow requests to the same domain (www.example.com -> static.example.com)."
+  },
+
+  "differentSubscriptionsAreAvailable": {
+    "message": "Wenn Sie diese Einstellung aktivieren werden verschiedene Listen vorgefertigter Regeln zur Verfügung stehen.",
+    "description": "Changing your default rule means different subscriptions are available."
+  },
+
+  "manageSubscriptions": {
+    "message": "Abonnierte Regellisten verwalten.",
+    "description": "Manage subscriptions."
+  },
+
+  "subscriptionPolicies": {
+    "message": "Abonnierte Regellisten",
+    "description": "Subscription Policies"
+  },
+
+  "privacy": {
+    "message": "Privatsphäre",
+    "description": "Privacy"
+  },
+
+  "usability": {
+    "message": "Nutzerfreundlichkeit",
+    "description": "Usability"
+  },
+
+  "subscriptionDenyTrackersDescription": {
+    "message": "Anfragen blockieren, die versuchen, ihr Surfverhalten auszuspionieren",
+    "description": "Block destinations that can track you as you browse the web"
+  },
+
+  "subscriptionAllowSameOrgDescription": {
+    "message": "Anfragen erlauben, die Inhalte vom gleichen Anbieter nachladen möchten",
+    "description": "Allow destinations that belong to the same organization as the origin webpage"
+  },
+
+  "subscriptionAllowFunctionalityDescription": {
+    "message": "Anfragen erlauben, die benötigt werden, damit Websiten korrekt funktionieren",
+    "description": "Allow requests that are needed for websites to work properly"
+  },
+
+  "subscriptionAllowEmbeddedDescription": {
+    "message": "Anfragen erlauben, mit denen Inhalte (z.B. Bilder und Videos) in Websiten eingebettet werden",
+    "description": "Allow requests for embedded content such as images and videos"
+  },
+
+  "subscriptionAllowMozillaDescription": {
+    "message": "Anfragen von Websiten von Mozilla und Firefox zulassen",
+    "description": "Allow requests related to Mozilla and Firefox websites"
+  },
+
+  "subscriptionAllowExtensionsDescription": {
+    "message": "Anfragen erlauben, die benötigt werden, damit andere Firefox-Addons korrekt funktionieren",
+    "description": "Allow requests that are needed for other extensions to work properly"
+  },
+
+  "welcomeToRequestPolicy": {
+    "message": "Willkommen zu RequestPolicy",
+    "description": "Welcome to RequestPolicy"
+  },
+
+  "forMostUsersDefaultsAreIdeal": {
+    "message": "Für die meisten Benutzer sind die vorbereiteten Einstellungen von RequestPolicy ideal.",
+    "description": "For most users, RequestPolicy's default settings are ideal."
+  },
+
+  "youCanConfigureRequestPolicyToBeMoreStrict": {
+    "message": "Sie können RequestPolicy aber auch so konfigurieren, dass es mehr Anfragen blockiert. Diese Einstellung ist nur für erfahrene Benutzer empfehlenswert.",
+    "description": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users)."
+  },
+
+  "teachMeHowToUseRequestPolicy": {
+    "message": "Zeige mir, wie RequestPolicy verwendet werden kann",
+    "description": "Teach me how to use RequestPolicy"
+  },
+
+  "returnToBrowsing": {
+    "message": "Zurück zum Surfen",
+    "description": "Return to browsing"
+  },
+
+  "configureRequestPolicy": {
+    "message": "RequestPolicy konfigurieren",
+    "description": "Configure RequestPolicy"
+  },
+
+  "yesUseSubscriptions": {
+    "message": "Ja, Listen vorgefertigter Regeln abonnieren. (Empfohlene Einstellung)",
+    "description": "Yes, use subscription policies. (Recommended.)"
+  },
+
+  "noDoNotUseSubscriptions": {
+    "message": "Nein, keine Listen vorgefertigter Regeln abonnieren.",
+    "description": "No, don't use subscription policies."
+  },
+
+  "removeOldRules": {
+    "message": "Alte Regeln von früheren Versionen von RequestPolicy entfernen.",
+    "description": "Remove unused rules left over from the old version of RequestPolicy."
+  },
+
+  "importOldRules": {
+    "message": "Alte Regeln importieren",
+    "description": "Import Old Rules"
+  },
+
+  "deleteOldRules": {
+    "message": "Alte Regeln löschen",
+    "description": "Delete old rules"
+  },
+
+  "showOldRuleReimportOptions": {
+    "message": "Optionen anzeigen, wie die alten Regeln importiert werden können",
+    "description": "Show re-import options."
+  },
+
+  "yourOldRulesHaveBeenDeleted": {
+    "message": "Ihre alten Regeln wurden gelöscht.",
+    "description": "Done! Your old rules have been deleted."
+  },
+
+  "ruleSet": {
+    "message": "Regelsatz",
+    "description": "Rule Set"
+  },
+
+  "filterRules": {
+    "message": "Regeln filtern",
+    "description": "Filter Rules"
+  },
+
+  "policy": {
+    "message": "Regel",
+    "description": "Policy"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "Temporäre Berechtigungen aufheben",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "Blockierte Anfragen",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "Erlaubte Anfragen",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_mixedDestinations": {
+    "message": "Gemischte Anfragen",
+    "description": "Mixed destinations"
+  },
+
+  "rp_menu_otherOrigins": {
+    "message": "Weitere Quellen",
+    "description": "Other origins"
+  },
+
+  "rp_menu_enableBlocking": {
+    "message": "Anfragen blockieren",
+    "description": "Enable blocking"
+  },
+
+  "rp_menu_disableBlocking": {
+    "message": "Anfragen zulassen",
+    "description": "Disable blocking"
+  },
+
+  "rp_menu_help": {
+    "message": "Hilfe",
+    "description": "Help"
+  },
+
+  "rp_menu_preferences": {
+    "message": "Einstellungen",
+    "description": "Preferences"
+  },
+
+  "rp_menu_managePolicies": {
+    "message": "Regeln verwalten",
+    "description": "Manage Policies"
+  },
+
+  "rp_requestLog_title": {
+    "message": "Anfragenchronik",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "Löschen",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "Diese Meldung immer anzeigen",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "Sie haben Informationen über die Site \"$1\"\ndurch Stellen einer Anfrage bei $2 angefordert.\nSoll dieser Vorgang wirklich fortgesetzt werden?",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

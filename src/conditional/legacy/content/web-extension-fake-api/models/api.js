@@ -23,6 +23,7 @@
 import * as Utils from "content/web-extension-fake-api/lib/utils/webext-utils";
 import {Manifest} from "content/web-extension-fake-api/models/manifest";
 import {Prefs} from "content/web-extension-fake-api/models/prefs";
+import {LocaleManager} from "content/lib/i18n/locale-manager";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -64,6 +65,7 @@ function manifestHasPermission(perm) {
 export const Api = {
   browser: {
     extension: {},
+    i18n: {},
     management: {},
     runtime: {},
     storage: {
@@ -112,6 +114,40 @@ export const ContentScriptsApi = {
 
   Api.browser.extension.getBackgroundPage = function() {
     return backgroundPage;
+  };
+})();
+
+// =============================================================================
+// browser.i18n
+// =============================================================================
+
+(function() {
+  LocaleManager.init().catch(e => {
+    console.error("[Fatal] Unable to prepare locales manager! Details:");
+    console.dir(e);
+  });
+
+  /**
+   * Gets the localized string for the specified message. If the message
+   * can't be found in messages.json, returns "" and log an error.
+   *
+   * @param {string} messageName The name of the message, as specified in
+   * the messages.json file.
+   * @param {any} substitutions string or array of string. A single
+   * substitution string, or an array of substitution strings.
+   * @return {string} Message localized for current locale.
+   */
+  Api.browser.i18n.getMessage = function(messageName, substitutions) {
+    return LocaleManager.localizeMessage(messageName, substitutions);
+  };
+
+  /**
+   * Gets the UI language of the browser.
+   *
+   * @return {string} The browser UI language code as a BCP 47 tag.
+   */
+  Api.browser.i18n.getUILanguage = function() {
+    return LocaleManager.getAppLocale();
   };
 })();
 

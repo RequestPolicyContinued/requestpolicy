@@ -20,10 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+ import * as l10n from "content/lib/i18n/l10n";
+
 (function() {
   var {RequestProcessor} = browser.extension.getBackgroundPage();
 
   // ===========================================================================
+
+  l10n.updateDocument();
 
   function getNRequestResultObjects(aRequestSet) {
     var n = 0;

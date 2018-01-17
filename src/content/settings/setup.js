@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {$id, common} from "./common";
+import {$id} from "./common";
+import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -34,27 +35,7 @@ import {$id, common} from "./common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "welcomeToRequestPolicy",
-    "forMostUsersDefaultsAreIdeal",
-    "youCanConfigureRequestPolicyToBeMoreStrict",
-    "teachMeHowToUseRequestPolicy",
-    "returnToBrowsing",
-    "configureRequestPolicy",
-    "defaultPolicy",
-    "defaultPolicyDefinition",
-    "allowRequestsByDefault",
-    "blockRequestsByDefault",
-    "allowRequestsToTheSameDomain",
-    "subscriptionPolicies",
-    "subscriptionPoliciesDefinition",
-    "yesUseSubscriptions",
-    "noDoNotUseSubscriptions",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
+  l10n.updateDocument();
 
   function showConfigure() {
     $("#welcome").css("display", "none");

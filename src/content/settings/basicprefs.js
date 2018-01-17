@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "./common";
+import {WinEnv, elManager, $id} from "./common";
+import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -31,20 +32,7 @@ import {common, WinEnv, elManager, $id} from "./common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "basic",
-    "advanced",
-    "webPages",
-    "indicateBlockedImages",
-    "dontIndicateBlacklisted",
-    "autoReload",
-    "menu",
-    "allowAddingNonTemporaryRulesInPBM",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
+  l10n.updateDocument();
 
   function updateDisplay() {
     var indicate = Storage.get("indicateBlockedObjects");

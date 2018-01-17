@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, $id, $str} from "./common";
+import {$id} from "./common";
+import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -33,19 +34,7 @@ import {common, $id, $str} from "./common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "importOldRules",
-    "deleteOldRules",
-    "showOldRuleReimportOptions",
-    "yourOldRulesHaveBeenDeleted",
-    "type",
-    "origin",
-    "destination",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
+  l10n.updateDocument();
 
   var rules = null;
 
@@ -76,8 +65,15 @@ import {common, $id, $str} from "./common";
   }
 
   function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
-    var actionClass = ruleAction === "allow" ? "allow" : "block";
-    var action = ruleAction === "allow" ? $str("allow") : $str("block");
+    let actionClass;
+    let action;
+    if (ruleAction === "allow") {
+      actionClass = "allow";
+      action = browser.i18n.getMessage("allow");
+    } else {
+      actionClass = "block";
+      action = browser.i18n.getMessage("block");
+    }
 
     var row = $("<tr>").addClass(actionClass).appendTo(table);
 

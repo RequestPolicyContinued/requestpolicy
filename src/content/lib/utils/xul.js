@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {StringUtils} from "content/lib/utils/strings";
 import {JSUtils} from "content/lib/utils/javascript";
 import {C} from "content/lib/utils/constants";
+import * as l10n from "content/lib/i18n/l10n";
 
 // =============================================================================
 // XULUtils
@@ -140,23 +140,10 @@ function getParentElement(aDocument, aElementSpec) {
  * @return {string}
  */
 function getLocalizedValue(aRawValue) {
-  if (typeof aRawValue !== "string") {
+  if (!l10n.matchKeyPattern(aRawValue)) {
     return aRawValue;
   }
-
-  if (aRawValue.charAt(0) !== "&" ||
-      aRawValue.slice(-1) !== ";") {
-    return aRawValue;
-  }
-
-  try {
-    let name = aRawValue.slice(1, -1);
-    return StringUtils.$str(name);
-  } catch (e) {
-    console.error(
-        `It was not possible to get the localized value for "${aRawValue}".`);
-    return aRawValue;
-  }
+  return l10n.updateString(aRawValue);
 }
 
 /**

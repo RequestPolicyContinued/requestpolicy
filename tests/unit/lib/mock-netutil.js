@@ -44,4 +44,8 @@ NetUtil.prototype.readInputStreamToString = function(inputStream, count, charset
   return "";
 };
 
+NetUtil.prototype.asyncFetch = function(source, callback) {
+  return "";
+};
+
 module.exports = NetUtil;

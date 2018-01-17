@@ -1,0 +1,226 @@
+{
+  "extensionDescription": {
+    "message": "Administru la rajtojn de retejoj fari inter-retejajn petojn. Plibonigu la privatecon de via retumado. Sekurigu vin kontraŭ Falsado de inter-retejaj petoj (Cross-Site Request Forgery, CSRF) kaj aliaj atakoj.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "Konfliktantaj etendoprogramoj: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "allowOrigin": {
+    "message": "Permesi petojn fare de $1",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "Permesi petojn al $1",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "Permesi petojn de $1 al $2",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "Provizore permesi petojn fare de $1",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "Provizore permesi petojn al $1",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "Provizore permesi petojn de $1 al $2",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "Malpermesi ĉiujn petojn fare de $1",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "Malpermesi ĉiujn petojn al $1",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "Malpermesi petojn de $1 al $2",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "Petojn de $1 malpermesi ne eblas",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "Tiu ĉi retpaĝo petis pri alidirekto al $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "Permesi",
+    "description": "Allow"
+  },
+
+  "allow_accesskey": {
+    "message": "P",
+    "description": "A"
+  },
+
+  "deny": {
+    "message": "Ne permesi",
+    "description": "Deny"
+  },
+
+  "deny_accesskey": {
+    "message": "N",
+    "description": "D"
+  },
+
+  "more": {
+    "message": "Pli…",
+    "description": "More…"
+  },
+
+  "more_accesskey": {
+    "message": "P",
+    "description": "M"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "Komence la petprotokolo malplenas.",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "La protokoleroj aperados dum retesplorado.",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "La ago estis malpermesita",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "Adreson kun tiu protokol-skemo eblas nur kopii en la tondujon.",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "Preferoj",
+    "description": "Preferences"
+  },
+
+  "advanced": {
+    "message": "Spertulaj",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "Indiki blokitajn bildojn",
+    "description": "Indicate blocked images"
+  },
+
+  "autoReload": {
+    "message": "Reŝargi la montratan paĝon ĉe ŝanĝo de permesoj.",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "Retpaĝoj",
+    "description": "Web Pages"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "Ebligi neprovizoran permesadon dum Privata retesplorado",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "linkPrefetching": {
+    "message": "Laŭligila antaŭakirado",
+    "description": "Link Prefetching"
+  },
+
+  "dnsPrefetching": {
+    "message": "DNSa antaŭakirado",
+    "description": "DNS Prefetching"
+  },
+
+  "enabled": {
+    "message": "Ŝaltita",
+    "description": "Enabled"
+  },
+
+  "disableOnStartup": {
+    "message": "Malŝalti ĉe starto de la programo",
+    "description": "Disable on startup"
+  },
+
+  "restoreDefaultOnUninstall": {
+    "message": "Restarigi la defaŭltan agordon ĉe malinstalo de RequestPolicy",
+    "description": "Restore default when RequestPolicy is uninstalled"
+  },
+
+  "origin": {
+    "message": "Fonto",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Celo",
+    "description": "Destination"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "Malvalidigi ĉiujn provizorajn permesojn.",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "Malpermesitaj celoj",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "Permesitaj celoj",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_otherOrigins": {
+    "message": "Aliaj petfontoj",
+    "description": "Other origins"
+  },
+
+  "rp_menu_preferences": {
+    "message": "Preferoj",
+    "description": "Preferences"
+  },
+
+  "rp_requestLog_title": {
+    "message": "Protokolo de petoj",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "Forviŝi",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "Ĉiam peti konfirmon",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "Vi estas petonta informojn pri la retejo «$1»\nper sendo de peto al $2.\nĈu vi volas fari tion?",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

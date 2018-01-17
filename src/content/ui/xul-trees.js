@@ -63,19 +63,19 @@ exports.mainTree = [
         children: [
           {
             tag: "menuitem",
-            attributes: {label: "&rp.menu.managePolicies;",
+            attributes: {label: "__MSG_rp_menu_managePolicies__",
                          accesskey: "m"},
             events: {command: ["overlay", "openPolicyManager"]},
           },
           {
             tag: "menuitem",
-            attributes: {label: "&rp.requestLog.title;",
+            attributes: {label: "__MSG_rp_requestLog_title__",
                          accesskey: "l"},
             events: {command: ["overlay", "toggleRequestLog"]},
           },
           {
             tag: "menuitem",
-            attributes: {label: "&rp.menu.preferences;",
+            attributes: {label: "__MSG_rp_menu_preferences__",
                          accesskey: "p"},
             events: {command: ["overlay", "openPrefs"]},
           },
@@ -155,7 +155,7 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-other-origins-title",
-                                         value: "&rp.menu.otherOrigins;"},
+                                         value: "__MSG_rp_menu_otherOrigins__"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-other-origins-list",
@@ -170,7 +170,7 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-blocked-destinations-title",
-                                         value: "&rp.menu.blockedDestinations;"},
+                                         value: "__MSG_rp_menu_blockedDestinations__"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-blocked-destinations-list",
@@ -184,7 +184,7 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-mixed-destinations-title",
-                                         value: "&rp.menu.mixedDestinations;"},
+                                         value: "__MSG_rp_menu_mixedDestinations__"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-mixed-destinations-list",
@@ -198,7 +198,7 @@ exports.mainTree = [
                           {
                             tag: "label",
                             attributes: {id: "rpc-allowed-destinations-title",
-                                         value: "&rp.menu.allowedDestinations;"},
+                                         value: "__MSG_rp_menu_allowedDestinations__"},
                           }, {
                             tag: "vbox",
                             attributes: {id: "rpc-allowed-destinations-list",
@@ -235,7 +235,7 @@ exports.mainTree = [
                 children: [
                   {
                     tag: "label",
-                    attributes: {value: "&rp.menu.revokeTemporaryPermissions;"},
+                    attributes: {value: "__MSG_rp_menu_revokeTemporaryPermissions__"},
                     events: {click: ["overlay", "revokeTemporaryPermissions"]},
                   },
                 ],
@@ -253,39 +253,39 @@ exports.mainTree = [
                         tag: "label",
                         attributes: {id: "rpc-link-enable-blocking",
                                      class: "rpc-footer-link",
-                                     value: "&rp.menu.enableBlocking;"},
+                                     value: "__MSG_rp_menu_enableBlocking__"},
                         events: {click: ["overlay",
                                          "toggleTemporarilyAllowAll"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-disable-blocking",
                                      class: "rpc-footer-link",
-                                     value: "&rp.menu.disableBlocking;"},
+                                     value: "__MSG_rp_menu_disableBlocking__"},
                         events: {click: ["overlay",
                                          "toggleTemporarilyAllowAll"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-help",
                                      class: "rpc-footer-link",
-                                     value: "&rp.menu.help;"},
+                                     value: "__MSG_rp_menu_help__"},
                         events: {click: ["overlay", "openHelp"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-prefs",
                                      class: "rpc-footer-link",
-                                     value: "&rp.menu.preferences;"},
+                                     value: "__MSG_rp_menu_preferences__"},
                         events: {click: ["overlay", "openPrefs"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-policies",
                                      class: "rpc-footer-link",
-                                     value: "&rp.menu.managePolicies;"},
+                                     value: "__MSG_rp_menu_managePolicies__"},
                         events: {click: ["overlay", "openPolicyManager"]},
                       }, {
                         tag: "label",
                         attributes: {id: "rpc-link-request-log",
                                      class: "rpc-footer-link",
-                                     value: "&rp.requestLog.title;"},
+                                     value: "__MSG_rp_requestLog_title__"},
                         events: {click: ["overlay", "toggleRequestLog"]},
                       },
                     ],
@@ -327,12 +327,12 @@ exports.mainTree = [
                 tag: "label",
                 attributes: {id: "rpcontinued-requestLog-title",
                              control: "rpcontinued-requestLog-frame",
-                             value: "&rp.requestLog.title;",
+                             value: "__MSG_rp_requestLog_title__",
                              crop: "end"},
               }, {
                 tag: "button",
                 attributes: {id: "rpcontinued-requestLog-clear",
-                             label: "&rp.requestLog.clear;"},
+                             label: "__MSG_rp_requestLog_clear__"},
                 events: {command: ["overlay", "clearRequestLog"]},
               }, {
                 tag: "vbox",

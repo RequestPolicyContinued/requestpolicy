@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "./common";
+import {WinEnv, elManager, $id} from "./common";
+import * as l10n from "content/lib/i18n/l10n";
 
 (function() {
   var {
@@ -31,23 +32,7 @@ import {common, WinEnv, elManager, $id} from "./common";
 
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "yourPolicy",
-    "defaultPolicy",
-    "subscriptions",
-    "allowRequestsByDefault",
-    "blockRequestsByDefault",
-    "defaultPolicyDefinition",
-    "learnMore",
-    "allowRequestsToTheSameDomain",
-    "allowTopLevelRequests",
-    "differentSubscriptionsAreAvailable",
-    "manageSubscriptions",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
+  l10n.updateDocument();
 
   function updateDisplay() {
     var defaultallow = Storage.get("defaultPolicy.allow");

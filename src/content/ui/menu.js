@@ -30,7 +30,6 @@ import {DomainUtil} from "content/lib/utils/domains";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";
-import {StringUtils} from "content/lib/utils/strings";
 import {DOMUtils} from "content/lib/utils/dom";
 import {WindowUtils} from "content/lib/utils/windows";
 import {C} from "content/lib/utils/constants";
@@ -119,7 +118,7 @@ export function loadMenuIntoWindow(window) {
 
     let dialogTitle = params.dialogTitle || "RequestPolicy";
     let checkboxObj = {value: shouldAsk};
-    let checkboxText = StringUtils.$str("alwaysAsk");
+    let checkboxText = browser.i18n.getMessage("alwaysAsk");
 
     if (typeof params.onBeforeDialog === "function") {
       params.onBeforeDialog.call();
@@ -217,17 +216,6 @@ export function loadMenuIntoWindow(window) {
 
       self._setPrivateBrowsingStyles();
 
-      // const hidePrefetchInfo = !LegacyApi.prefs.isPrefetchEnabled();
-      // self._itemPrefetchWarning.hidden = hidePrefetchInfo;
-      // self._itemPrefetchWarningSeparator.hidden = hidePrefetchInfo;
-      //
-      // if (isChromeUri) {
-      //   self._itemUnrestrictedOrigin.setAttribute("label",
-      //       StringUtils.$str("unrestrictedOrigin", ["chrome://"]));
-      //   self._itemUnrestrictedOrigin.hidden = false;
-      //   return;
-      // }
-
       self._populateOrigin();
       self._populateOtherOrigins();
       self._activateOriginItem($id("rpc-origin"));
@@ -245,7 +233,7 @@ export function loadMenuIntoWindow(window) {
 
   self._populateMenuForUncontrollableOrigin = function() {
     self._originDomainnameItem.setAttribute("value",
-        StringUtils.$str("noOrigin"));
+      browser.i18n.getMessage("noOrigin"));
     self._isUncontrollableOrigin = true;
     self._originNumRequestsItem.setAttribute("value", "");
     self._originItem.removeAttribute("default-policy");
@@ -627,7 +615,7 @@ export function loadMenuIntoWindow(window) {
       return;
     }
 
-    let dialogMessage = StringUtils.$str("siteInfo.confirm",
+    let dialogMessage = browser.i18n.getMessage("siteInfoConfirm",
         [domain, "https://www.mywot.com"]);
     let alwaysAskPrefName = "confirmSiteInfo";
     let confirmed = confirm(dialogMessage, alwaysAskPrefName, {
@@ -1046,7 +1034,7 @@ export function loadMenuIntoWindow(window) {
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
       ruleAction, cssClass) {
-    const label = StringUtils.$str(fmtStrName, fmtStrArgs);
+    const label = browser.i18n.getMessage(fmtStrName, fmtStrArgs);
     const item = self._addListItem(list, "rpc-od-item", label);
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;

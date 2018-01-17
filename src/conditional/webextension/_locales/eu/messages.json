@@ -1,0 +1,621 @@
+{
+  "extensionDescription": {
+    "message": "Kontrola itzazu zein gune-arteko eskaerak baimentzen diren. Hobetu zure nabigazioaren pribatutasuna. Babes zaitez Cross-Site Request Forgery (CSRF) eta beste erasoen aurrean.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "Hedapenen gatazka: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "noOrigin": {
+    "message": "[jatorririk ez]",
+    "description": "[no origin]"
+  },
+
+  "allowOrigin": {
+    "message": "$1(e)tik datozen eskaerak baimendu",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "$1(e)ra doazen eskaerak baimendu",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak baimendu",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "$1(e)tik datozen eskaerak aldi baterako baimendu",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "$1(e)ra doazen eskaerak aldi baterako baimendu",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak aldi baterako baimendu",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "stopAllowingOrigin": {
+    "message": "$1(e)tik datozen eskaerak baimentzeari utzi",
+    "description": "Stop allowing requests from $1"
+  },
+
+  "stopAllowingDestination": {
+    "message": "$1(e)ra doazen eskaerak baimentzeari utzi",
+    "description": "Stop allowing requests to $1"
+  },
+
+  "stopAllowingOriginToDestination": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak baimentzeari utzi",
+    "description": "Stop allowing requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "$1(e)tik datozen eskaera guztiak debekatu",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "$1(e)ra doazen eskaera guztiak debekatu",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak debekatu",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "denyOriginTemporarily": {
+    "message": "$1(e)tik datozen eskaera guztiak aldi baterako debekatu",
+    "description": "Temporarily block all requests from $1"
+  },
+
+  "denyDestinationTemporarily": {
+    "message": "$1(e)ra doazen eskaera guztiak aldi baterako debekatu",
+    "description": "Temporarily block all requests to $1"
+  },
+
+  "denyOriginToDestinationTemporarily": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak aldi baterako debekatu",
+    "description": "Temporarily block requests from $1 to $2"
+  },
+
+  "stopDenyingOrigin": {
+    "message": "$1(e)tik datozen eskaerak debekatzeari utzi",
+    "description": "Stop blocking requests from $1"
+  },
+
+  "stopDenyingDestination": {
+    "message": "$1(e)ra doazen eskaerak debekatzeari utzi",
+    "description": "Stop blocking requests to $1"
+  },
+
+  "stopDenyingOriginToDestination": {
+    "message": "$1(e)tik $2(e)ra doazen eskaerak debekatzeari utzi",
+    "description": "Stop blocking requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "$1(e)tik datozen eskaerak ezin dira blokeatu",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "Webgune honek $1(e)ra berbideratzeko eskatu du",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "redirectNotificationWithOrigin": {
+    "message": "$1 URLak $2(e)ra berbideratzeko eskatu du",
+    "description": "The URL $1 has asked to redirect to $2"
+  },
+
+  "allow": {
+    "message": "Baimendu",
+    "description": "Allow"
+  },
+
+  "deny": {
+    "message": "Ukatu",
+    "description": "Deny"
+  },
+
+  "more": {
+    "message": "Gehiago...",
+    "description": "More…"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "Eskaera erregistroa hutsik dago hasieran.",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "Erregistroko sarrerak webguneak bisitatzerakoan agertuko dira.",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "Debekatutako ekintza",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "URL hau soilik arbelera kopiatu daiteke.",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "Hobespenak",
+    "description": "Preferences"
+  },
+
+  "managePolicies": {
+    "message": "Politikak kudeatu",
+    "description": "Manage Policies"
+  },
+
+  "about": {
+    "message": "Honi buruz",
+    "description": "About"
+  },
+
+  "help": {
+    "message": "Laguntza",
+    "description": "Help"
+  },
+
+  "basic": {
+    "message": "Oinarrizkoa",
+    "description": "Basic"
+  },
+
+  "advanced": {
+    "message": "Aurreratua",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "Blokeatutako irudiak markatu",
+    "description": "Indicate blocked images"
+  },
+
+  "dontIndicateBlacklisted": {
+    "message": "Salbuespena: zerrenda beltz batek blokeatutako irudiak",
+    "description": "Exception: images blocked by a blacklist"
+  },
+
+  "autoReload": {
+    "message": "Berritu uneko orria zerrenda zuria aldatzen denean",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "Web orriak",
+    "description": "Web Pages"
+  },
+
+  "menu": {
+    "message": "Menua",
+    "description": "Menu"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "Baimendu behin-betiko arauak gehitzea nabigatze pribatua erabiltzerakoan",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "advancedPreferences": {
+    "message": "Hobespen aurreratuak",
+    "description": "Advanced Preferences"
+  },
+
+  "linkPrefetching": {
+    "message": "Loturen aurre-erakarpena",
+    "description": "Link Prefetching"
+  },
+
+  "dnsPrefetching": {
+    "message": "DNSaren aurre-erakarpena",
+    "description": "DNS Prefetching"
+  },
+
+  "speculativePreConnections": {
+    "message": "Aurre-konexio espekulatiboak",
+    "description": "Speculative pre-connections"
+  },
+
+  "enabled": {
+    "message": "Gaituta",
+    "description": "Enabled"
+  },
+
+  "disableOnStartup": {
+    "message": "Ezgaitu abioan",
+    "description": "Disable on startup"
+  },
+
+  "restoreDefaultOnUninstall": {
+    "message": "Berrezarri lehenetsia RequestPolicy desinstalatzerakoan",
+    "description": "Restore default when RequestPolicy is uninstalled"
+  },
+
+  "menuPreferences": {
+    "message": "Hobespenen menua",
+    "description": "Menu Preferences"
+  },
+
+  "menuSorting": {
+    "message": "Helmugen sailkapena",
+    "description": "sorting of destinations"
+  },
+
+  "sortByNumRequests": {
+    "message": "eskaera kopuruaren arabera",
+    "description": "by the number of requests"
+  },
+
+  "sortByDestName": {
+    "message": "domeinu izenaren arabera soilik",
+    "description": "by the domain name only"
+  },
+
+  "noSorting": {
+    "message": "ez sailkatu",
+    "description": "do not sort"
+  },
+
+  "hint": {
+    "message": "Iradokizuna:",
+    "description": "Hint:"
+  },
+
+  "menuSortingHint": {
+    "message": "Sailkapena ezgaitzerakoan, webguneak domeinuak eskatu ahala zerrendatuko dira. Hau lagungarria izan daiteke lehenetsi-debekatze moduan baimendu diren eskaerak bilatzerakoan, webgunearen lehenengo eskaerak ezinbestekoak izan bai daitezke.",
+    "description": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential."
+  },
+
+  "menuIndicatedInformation": {
+    "message": "Adierazitako informazioa",
+    "description": "indicated information"
+  },
+
+  "menuIndicateNumRequests": {
+    "message": "helmuga bakoitzeko eskaera kopurua erakutsi",
+    "description": "show the number of requests for every destination"
+  },
+
+  "yourPolicy": {
+    "message": "Zure politika",
+    "description": "Your Policy"
+  },
+
+  "defaultPolicy": {
+    "message": "Lehenetsitako politika",
+    "description": "Default Policy"
+  },
+
+  "subscriptions": {
+    "message": "Harpidetzak",
+    "description": "Subscriptions"
+  },
+
+  "search": {
+    "message": "Bilatu",
+    "description": "Search"
+  },
+
+  "scheme": {
+    "message": "eskema",
+    "description": "scheme"
+  },
+
+  "host": {
+    "message": "ostalaria",
+    "description": "host"
+  },
+
+  "port": {
+    "message": "ataka",
+    "description": "port"
+  },
+
+  "type": {
+    "message": "Mota",
+    "description": "Type"
+  },
+
+  "origin": {
+    "message": "Jatorria",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Helmuga",
+    "description": "Destination"
+  },
+
+  "block": {
+    "message": "Debekatu",
+    "description": "Block"
+  },
+
+  "temporary": {
+    "message": "Aldi baterako",
+    "description": "Temporary"
+  },
+
+  "addRule": {
+    "message": "Araua gehitu",
+    "description": "Add rule"
+  },
+
+  "createRule": {
+    "message": "Araua sortu",
+    "description": "Create Rule"
+  },
+
+  "learnMoreAboutRules": {
+    "message": "Arauei buruz gehiago ikasi.",
+    "description": "Learn more about rules."
+  },
+
+  "learnMore": {
+    "message": "Gehiago ikasi.",
+    "description": "Learn more."
+  },
+
+  "defaultPolicyDefinition": {
+    "message": "Eskaerarekin bat egiten duen \"baimendu\" edo \"debekatu\" araurik ez daukazunean, hau da RequestPolicyk egingo duena.",
+    "description": "When you don't have any \"allow\" or \"block\" rules that match a request, this is what RequestPolicy will do."
+  },
+
+  "allowRequestsByDefault": {
+    "message": "Eskaerak baimendu berez.",
+    "description": "Allow requests by default."
+  },
+
+  "blockRequestsByDefault": {
+    "message": "Eskaerak debekatu berez. (Erabiltzaile aurreratuentzat. Webgune asko hausten ditu.)",
+    "description": "Block requests by default. (For advanced users. Breaks many websites.)"
+  },
+
+  "allowRequestsToTheSameDomain": {
+    "message": "Domeinu berera eskaerak baimendu (www.adibidea.com -> static.adibidea.com).",
+    "description": "Allow requests to the same domain (www.example.com -> static.example.com)."
+  },
+
+  "differentSubscriptionsAreAvailable": {
+    "message": "Zure arau lehenetsia aldatzeak harpidetza ezberdinak eskuragarri daudela esan nahi du.",
+    "description": "Changing your default rule means different subscriptions are available."
+  },
+
+  "manageSubscriptions": {
+    "message": "Harpidetzak kudeatu.",
+    "description": "Manage subscriptions."
+  },
+
+  "subscriptionPolicies": {
+    "message": "Harpidetza politikak",
+    "description": "Subscription Policies"
+  },
+
+  "subscriptionPoliciesDefinition": {
+    "message": "Harpidetza politikak komunitateak mantendutako aurre-ezarritako arauak dira. Arau hauek automatikoki eguneratzen dira eta behar ezberdinak bete ditzakete, nabigazio jarraipena egiten duten gune ezagunak blokeatu, edo gune ezagunak zuzen ikusi/funtziona dezaten eskaerak baimentzea bezala. Harpidetza arauak erabiltzaileak zehaztutako arauen gehigarri gisa lan egiten dute, hau da, erabiltzaileak zehaztutako araurik ez balego, RequestPolicy harpidetza arauren bat bilatuko du.",
+    "description": "Subscription policies are preset rules maintained by the community. These rules are updated automatically and can fulfil different needs, such as blocking known web browsing tracking sites, or allowing requests to allow certain sites to display/work properly. Subscription rules act as a supplement to user defined rules, that is, if no user defined rule applies, RequestPolicy will check if a subscription rule does."
+  },
+
+  "learnMoreAboutSubscriptions": {
+    "message": "Harpidetzei buruz gehiago ikasi.",
+    "description": "Learn more about subscriptions."
+  },
+
+  "privacy": {
+    "message": "Pribatutasuna",
+    "description": "Privacy"
+  },
+
+  "usability": {
+    "message": "Erabilgarritasuna",
+    "description": "Usability"
+  },
+
+  "browser": {
+    "message": "Nabigatzailea",
+    "description": "Browser"
+  },
+
+  "subscriptionDenyTrackersDescription": {
+    "message": "Nabigatzen duzun bitartean jarrai zaitzaketen helmugak blokeatu",
+    "description": "Block destinations that can track you as you browse the web"
+  },
+
+  "subscriptionAllowSameOrgDescription": {
+    "message": "Jatorrizko webgunearen organizazio berdinarenak diren helmugak baimendu",
+    "description": "Allow destinations that belong to the same organization as the origin webpage"
+  },
+
+  "subscriptionAllowFunctionalityDescription": {
+    "message": "Webguneak ondo funtziona dezaten beharrezkoak diren eskaerak baimendu",
+    "description": "Allow requests that are needed for websites to work properly"
+  },
+
+  "subscriptionAllowEmbeddedDescription": {
+    "message": "Irudiak eta bideoak bezalako txertatutako edukientzako eskaerak baimendu",
+    "description": "Allow requests for embedded content such as images and videos"
+  },
+
+  "subscriptionAllowMozillaDescription": {
+    "message": "Mozilla eta Firefoxekin zerikusia duten webguneen eskaerak baimendu",
+    "description": "Allow requests related to Mozilla and Firefox websites"
+  },
+
+  "subscriptionAllowExtensionsDescription": {
+    "message": "Beste hedapen batzuk ondo funtziona dezaten beharrezkoak diren eskaerak baimendu",
+    "description": "Allow requests that are needed for other extensions to work properly"
+  },
+
+  "welcomeToRequestPolicy": {
+    "message": "Ongi etorri RequestPolicyra",
+    "description": "Welcome to RequestPolicy"
+  },
+
+  "forMostUsersDefaultsAreIdeal": {
+    "message": "Erabiltzaile gehienentzat, RequestPolicyren ezarpen lehenetsiak egokiak dira.",
+    "description": "For most users, RequestPolicy's default settings are ideal."
+  },
+
+  "youCanConfigureRequestPolicyToBeMoreStrict": {
+    "message": "Hala ere, RequestPolicy konfigura dezakezu zorrotzagoa izan dadin (erabiltzaile aurreratuentzat soilik gomendatuta).",
+    "description": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users)."
+  },
+
+  "teachMeHowToUseRequestPolicy": {
+    "message": "RequestPolicy nola erabili irakatsi ezadazu",
+    "description": "Teach me how to use RequestPolicy"
+  },
+
+  "returnToBrowsing": {
+    "message": "Nabigaziora itzuli",
+    "description": "Return to browsing"
+  },
+
+  "configureRequestPolicy": {
+    "message": "RequestPolicy konfiguratu",
+    "description": "Configure RequestPolicy"
+  },
+
+  "yesUseSubscriptions": {
+    "message": "Bai, harpidetza politikak erabili. (Gomendatuta.)",
+    "description": "Yes, use subscription policies. (Recommended.)"
+  },
+
+  "noDoNotUseSubscriptions": {
+    "message": "Ez, ez erabili harpidetza politikak.",
+    "description": "No, don't use subscription policies."
+  },
+
+  "removeOldRules": {
+    "message": "Erabili gabeko eta RequestPolicyren bertsio zaharrak utzitako arauak kendu.",
+    "description": "Remove unused rules left over from the old version of RequestPolicy."
+  },
+
+  "importOldRules": {
+    "message": "Arau zaharrak inportatu",
+    "description": "Import Old Rules"
+  },
+
+  "deleteOldRules": {
+    "message": "Arau zaharrak ezabatu",
+    "description": "Delete old rules"
+  },
+
+  "showOldRuleReimportOptions": {
+    "message": "Erakutsi ber-inportazio aukerak.",
+    "description": "Show re-import options."
+  },
+
+  "yourOldRulesHaveBeenDeleted": {
+    "message": "Eginda! Zure arau zaharrak ezabatu egin dira.",
+    "description": "Done! Your old rules have been deleted."
+  },
+
+  "ruleSet": {
+    "message": "Arau taldea",
+    "description": "Rule Set"
+  },
+
+  "activeRules": {
+    "message": "Arau aktiboak",
+    "description": "Active Rules"
+  },
+
+  "filterRules": {
+    "message": "Iragazki arauak",
+    "description": "Filter Rules"
+  },
+
+  "policy": {
+    "message": "Politika",
+    "description": "Policy"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "Aldi baterako baimen guztiak baliogabetu",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "Blokeatutako helmugak",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "Baimendutako helmugak",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_mixedDestinations": {
+    "message": "Helmuga nahasiak",
+    "description": "Mixed destinations"
+  },
+
+  "rp_menu_otherOrigins": {
+    "message": "Beste jatorri batzuk",
+    "description": "Other origins"
+  },
+
+  "rp_menu_enableBlocking": {
+    "message": "Debekatzea gaitu",
+    "description": "Enable blocking"
+  },
+
+  "rp_menu_disableBlocking": {
+    "message": "Debekatzea ezgaitu",
+    "description": "Disable blocking"
+  },
+
+  "rp_menu_help": {
+    "message": "Laguntza",
+    "description": "Help"
+  },
+
+  "rp_menu_preferences": {
+    "message": "Hobespenak",
+    "description": "Preferences"
+  },
+
+  "rp_menu_managePolicies": {
+    "message": "Politikak kudeatu",
+    "description": "Manage Policies"
+  },
+
+  "rp_requestLog_title": {
+    "message": "Eskaeren erregistroa",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "Garbitu",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "Beti eskatu berrespena",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "\"$1\" guneari buruzko informazioa eskatzera zoaz\n$2(e)ra kontsulta bat bidaliz.\nJarraitu nahi al duzu?",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

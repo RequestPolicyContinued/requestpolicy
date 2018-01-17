@@ -62,6 +62,7 @@ export function loadOverlayIntoWindow(window) {
   let gBrowser = WindowUtils.getTabBrowser(window);
 
   let $id = document.getElementById.bind(document);
+  const $str = browser.i18n.getMessage.bind(browser.i18n);
 
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(MainEnvironment, "OverlayEnv");
@@ -399,10 +400,10 @@ export function loadOverlayIntoWindow(window) {
     // prepare the notification's label
     let notificationLabel;
     if (isOriginUndefined) {
-      notificationLabel = browser.i18n.getMessage("redirectNotification",
+      notificationLabel = $str("redirectNotification",
           [cropUri(redirectTargetUri, 50)]);
     } else {
-      notificationLabel = browser.i18n.getMessage(
+      notificationLabel = $str(
         "redirectNotificationWithOrigin",
         [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
@@ -463,7 +464,7 @@ export function loadOverlayIntoWindow(window) {
 
     {
       // allow ALL
-      let label = browser.i18n.getMessage("allowAllRedirections");
+      let label = $str("allowAllRedirections");
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
         maybeOpenLinkInNewTab(
             browser.runtime.getURL("content/settings/defaultpolicy.html"),
@@ -506,22 +507,22 @@ export function loadOverlayIntoWindow(window) {
     } else {
       const buttons = [
         {
-          label: browser.i18n.getMessage("allow"),
-          accessKey: browser.i18n.getMessage("allow_accesskey"),
+          label: $str("allow"),
+          accessKey: $str("allow_accesskey"),
           popup: null,
           callback: allowRedirection,
         },
         {
-          label: browser.i18n.getMessage("deny"),
-          accessKey: browser.i18n.getMessage("deny_accesskey"),
+          label: $str("deny"),
+          accessKey: $str("deny_accesskey"),
           popup: null,
           callback: function() {
             // Do nothing. The notification closes when this is called.
           },
         },
         {
-          label: browser.i18n.getMessage("addRule"),
-          accessKey: browser.i18n.getMessage("addRule_accesskey"),
+          label: $str("addRule"),
+          accessKey: $str("addRule_accesskey"),
           popup: addRuleMenuName,
           callback: null,
         },

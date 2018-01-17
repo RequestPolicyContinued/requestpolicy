@@ -32,20 +32,20 @@ import * as l10n from "content/lib/i18n/l10n";
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
+  const $str = browser.i18n.getMessage.bind(browser.i18n);
+
   // ===========================================================================
 
   $(function() {
     l10n.updateDocument();
     // l10n for input placeholders.
-    $id("rulesearch").placeholder = browser.i18n.getMessage("search");
-    $("[name=originscheme]").prop("placeholder",
-      browser.i18n.getMessage("scheme"));
-    $("[name=destscheme]").prop("placeholder",
-      browser.i18n.getMessage("scheme"));
-    $("[name=originhost]").prop("placeholder", browser.i18n.getMessage("host"));
-    $("[name=desthost]").prop("placeholder", browser.i18n.getMessage("host"));
-    $("[name=originport]").prop("placeholder", browser.i18n.getMessage("port"));
-    $("[name=destport]").prop("placeholder", browser.i18n.getMessage("port"));
+    $id("rulesearch").placeholder = $str("search");
+    $("[name=originscheme]").prop("placeholder", $str("scheme"));
+    $("[name=destscheme]").prop("placeholder", $str("scheme"));
+    $("[name=originhost]").prop("placeholder", $str("host"));
+    $("[name=desthost]").prop("placeholder", $str("host"));
+    $("[name=originport]").prop("placeholder", $str("port"));
+    $("[name=destport]").prop("placeholder", $str("port"));
   });
 
   const SEARCH_DELAY = 100;
@@ -136,7 +136,7 @@ import * as l10n from "content/lib/i18n/l10n";
     if (ruleAction !== "allow") {
       ruleAction = "block";
     }
-    var ruleActionString = browser.i18n.getMessage(ruleAction);
+    var ruleActionString = $str(ruleAction);
 
     var row = $("<tr>").addClass(ruleAction).appendTo(table);
 

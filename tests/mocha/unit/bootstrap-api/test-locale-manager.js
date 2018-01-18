@@ -47,7 +47,7 @@ describe("LocaleManager", function() {
     global.Services = mockServices;
 
     ChromeFilesUtils = require("content/lib/utils/chrome-files");
-    LocaleManager = require("content/lib/i18n/locale-manager").LocaleManager;
+    LocaleManager = require("content/lib/i18n/locale-manager").LocaleManager.instance;
 
     // Create stubs
     sinon.stub(ChromeFilesUtils, "parseJSON");

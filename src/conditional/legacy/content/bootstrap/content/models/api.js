@@ -109,7 +109,7 @@ export const ContentScriptsApi = {
 // =============================================================================
 
 (function() {
-  LocaleManager.init().catch(e => {
+  LocaleManager.instance.init().catch(e => {
     console.error("[Fatal] Unable to prepare locales manager! Details:");
     console.dir(e);
   });
@@ -125,7 +125,7 @@ export const ContentScriptsApi = {
    * @return {string} Message localized for current locale.
    */
   Api.browser.i18n.getMessage = function(messageName, substitutions) {
-    return LocaleManager.localizeMessage(messageName, substitutions);
+    return LocaleManager.instance.localizeMessage(messageName, substitutions);
   };
 
   /**
@@ -134,7 +134,7 @@ export const ContentScriptsApi = {
    * @return {string} The browser UI language code as a BCP 47 tag.
    */
   Api.browser.i18n.getUILanguage = function() {
-    return LocaleManager.getAppLocale();
+    return LocaleManager.instance.getAppLocale();
   };
 })();
 

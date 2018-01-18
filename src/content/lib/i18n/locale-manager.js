@@ -29,18 +29,25 @@ import * as I18nUtils from "content/lib/i18n/i18n-utils";
 /**
  * This object manages loading locales for i18n support.
  */
-export const LocaleManager = (function() {
-  let self = {
-    localeData: new LocaleData(),
-    init: null,
-  };
+export class LocaleManager {
+  static get instance() {
+    if (!LocaleManager.lInstance) {
+      LocaleManager.lInstance = new LocaleManager();
+    }
+    return LocaleManager.lInstance;
+  }
+
+  constructor() {
+    this.localeData = new LocaleData();
+    this.init = null;
+  }
 
   /**
    * Return the application locale as a normalized BCP 47 tag.
    *
    * @return {String}
    */
-  self.getAppLocale = function() {
+  getAppLocale() {
     let appLocale;
     if (Services.locale.getAppLocaleAsBCP47) {
       appLocale = Services.locale.getAppLocaleAsBCP47();
@@ -50,7 +57,7 @@ export const LocaleManager = (function() {
       appLocale = nsILocale.getCategory("NSILOCALE_MESSAGES");
     }
     return I18nUtils.normalizeToBCP47(appLocale);
-  },
+  }
 
   /**
    * Return a promise which is fullfilled with the value of default_locale
@@ -58,7 +65,7 @@ export const LocaleManager = (function() {
    *
    * @return {Promise}
    */
-  self.getDefaultLocale = function() {
+  getDefaultLocale() {
     const manifestUrl = ChromeFilesUtils.getChromeUrl(
       "content/bootstrap/data/manifest.json");
 
@@ -71,7 +78,7 @@ export const LocaleManager = (function() {
           new Error("'default_locale' key not found in manifest.json"));
       }
     });
-  },
+  }
 
   /**
    * Return Promise which is fullfilled with a Map(bcp-47-tag -> locale-dir)
@@ -79,7 +86,7 @@ export const LocaleManager = (function() {
    *
    * @return {Promise}
    */
-  self.getAvailableLocales = function() {
+  getAvailableLocales() {
     // During build, a JSON file containing all available locales should be
     // generated.
     const localesListJSON = ChromeFilesUtils.getChromeUrl(
@@ -90,7 +97,7 @@ export const LocaleManager = (function() {
         return Promise.all(localesDirNames.map(dirName =>
           [I18nUtils.normalizeToBCP47(dirName), dirName]));
       }).then(mapAsArray => new Map(mapAsArray));
-  };
+  }
 
   /**
    * Return a Map(bcp-47-tag -> locale-dir) which are the best matches
@@ -101,7 +108,7 @@ export const LocaleManager = (function() {
    * @param {Map} localesMap a (locale-tag -> locale-dir) map
    * @return {Map}
    */
-  self.getBestMatches = function(requestedLocales, localesMap) {
+  getBestMatches(requestedLocales, localesMap) {
     let matchesSet = new Set();
     let localesTag = Array.from(localesMap.keys());
     for (let locale of requestedLocales) {
@@ -116,7 +123,7 @@ export const LocaleManager = (function() {
       result.set(key, localesMap.get(key));
     }
     return result;
-  };
+  }
 
   /**
    * Return a promise which is fullfilled with an array of
@@ -125,7 +132,7 @@ export const LocaleManager = (function() {
    * @param {Map} localesMap a (bcp-47-tag -> locale-dir) Map
    * @return {Promise}
    */
-  self.loadLocalesMessages = function(localesMap) {
+  loadLocalesMessages(localesMap) {
     return Promise.all(Array.from(localesMap.keys()).map(key => {
       let dir = localesMap.get(key);
       let file = `content/_locales/${dir}/messages.json`;
@@ -135,7 +142,7 @@ export const LocaleManager = (function() {
         return Promise.resolve({"locale": key, "messages": messages});
       });
     }));
-  };
+  }
 
   /**
    * Set the locale to used primarly and its fallback according to
@@ -145,7 +152,7 @@ export const LocaleManager = (function() {
    * @param {String} uiLocale requested UI locale tag
    * @return {Object} An object containing the best matches
    */
-  self.updateLocalesPrefs = function(defaultLocale, uiLocale) {
+  updateLocalesPrefs(defaultLocale, uiLocale) {
     let normDefault = I18nUtils.normalizeToBCP47(defaultLocale);
     let normUi = I18nUtils.normalizeToBCP47(uiLocale);
 
@@ -172,9 +179,9 @@ export const LocaleManager = (function() {
       selected: bestUi,
       default: bestDefault,
     };
-  };
+  }
 
-  self.init = function() {
+  init() {
     let defaultLocale;
     let uiLocale;
 
@@ -188,7 +195,7 @@ export const LocaleManager = (function() {
       .then(localesMessages => Promise.all(localesMessages.map(
         obj => this.localeData.addLocale(obj.locale, obj.messages)))
       ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale));
-  };
+  }
 
   /**
    * Gets the localized string for the specified message. If the message
@@ -200,9 +207,9 @@ export const LocaleManager = (function() {
    * substitution string, or an array of substitution strings.
    * @return {string} Message localized for current locale.
    */
-  self.localizeMessage = function(messageName, substitutions) {
+  localizeMessage(messageName, substitutions) {
     return this.localeData.localizeMessage(messageName, substitutions);
-  };
+  }
 
   /**
    * Localize a string, replacing all |__MSG_(.*)__| tokens with the
@@ -212,9 +219,7 @@ export const LocaleManager = (function() {
    * @param {string} str __MSG_(<message_name>)__
    * @return {string} String localized for current locale.
    */
-  self.localize = function(str) {
+  localize(str) {
     return this.localeData.localize(str);
-  };
-
-  return self;
-})();
+  }
+}

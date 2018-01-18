@@ -46,7 +46,7 @@ describe("Api.browser.runtime", function() {
     pathAliasProxy = Utils.createPathAliasProxy();
 
     let {LocaleManager} = require("content/lib/i18n/locale-manager");
-    sinon.stub(LocaleManager, "init").resolves();
+    sinon.stub(LocaleManager.prototype, "init").resolves();
     // eslint-disable-next-line no-unused-vars
     let {Runtime} = require("bootstrap/models/browser/runtime");
     runtime = Runtime.instance;

@@ -21,7 +21,7 @@
  */
 
 import {LocaleData} from "./locale-data";
-import * as ChromeFilesUtils from "content/lib/utils/chrome-files-utils";
+import * as ChromeFilesUtils from "bootstrap/lib/utils/chrome-files-utils";
 import * as I18nUtils from "./i18n-utils";
 
 /**

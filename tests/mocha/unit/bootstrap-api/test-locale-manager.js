@@ -46,7 +46,7 @@ describe("LocaleManager", function() {
     global.Cu = mockComp.utils;
     global.Services = mockServices;
 
-    ChromeFilesUtils = require("content/lib/utils/chrome-files");
+    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files");
     LocaleManager = require("bootstrap/models/browser/i18n/locale-manager").
         LocaleManager.instance;
 

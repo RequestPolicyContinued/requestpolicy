@@ -41,7 +41,7 @@ describe("ChromeFilesUtils", function() {
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
 
-    ChromeFilesUtils = require("content/lib/utils/chrome-files-utils");
+    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
   });
 
   afterEach(function() {

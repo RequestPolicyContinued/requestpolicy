@@ -57,7 +57,7 @@ You can obtain a copy of the MPL at http://mozilla.org/MPL/2.0/.
 ===============================================================================
 The following files are distributed under the Mozilla Public License, v. 2.0:
  * src/conditional/legacy/content/bootstrap/content/models/browser/i18n/locale-data.js
- * src/content/lib/utils/chrome-files-utils.js
+ * src/conditional/legacy/content/bootstrap/content/lib/utils/chrome-files-utils.js
 You can obtain a copy of the MPL at http://mozilla.org/MPL/2.0/.
 
 ===============================================================================

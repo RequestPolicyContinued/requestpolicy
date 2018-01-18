@@ -594,7 +594,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Politikak kudeatu",
     "description": "Manage Policies"
   },

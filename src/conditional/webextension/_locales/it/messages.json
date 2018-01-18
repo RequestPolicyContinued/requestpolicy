@@ -554,7 +554,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Gestisci Regole",
     "description": "Manage Policies"
   },

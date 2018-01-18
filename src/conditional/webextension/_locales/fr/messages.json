@@ -624,7 +624,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Gérer les politiques",
     "description": "Manage Policies"
   },

@@ -534,7 +534,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "ポリシーの管理",
     "description": "Manage Policies"
   },

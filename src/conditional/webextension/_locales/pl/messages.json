@@ -569,7 +569,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Zarządzaj regułkami",
     "description": "Manage Policies"
   },

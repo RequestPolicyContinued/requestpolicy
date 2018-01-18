@@ -494,7 +494,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Pārvaldīt politikas",
     "description": "Manage Policies"
   },

@@ -63,7 +63,7 @@ exports.mainTree = [
         children: [
           {
             tag: "menuitem",
-            attributes: {label: "__MSG_rp_menu_managePolicies__",
+            attributes: {label: "__MSG_managePolicies@menu__",
                          accesskey: "m"},
             events: {command: ["overlay", "openPolicyManager"]},
           },
@@ -279,7 +279,7 @@ exports.mainTree = [
                         tag: "label",
                         attributes: {id: "rpc-link-policies",
                                      class: "rpc-footer-link",
-                                     value: "__MSG_rp_menu_managePolicies__"},
+                                     value: "__MSG_managePolicies@menu__"},
                         events: {click: ["overlay", "openPolicyManager"]},
                       }, {
                         tag: "label",

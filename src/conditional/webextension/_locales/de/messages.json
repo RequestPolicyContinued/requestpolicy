@@ -544,7 +544,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Regeln verwalten",
     "description": "Manage Policies"
   },

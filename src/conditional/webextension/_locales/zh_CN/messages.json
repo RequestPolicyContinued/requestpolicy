@@ -574,7 +574,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "管理策略",
     "description": "Manage Policies"
   },

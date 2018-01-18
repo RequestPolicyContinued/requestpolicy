@@ -629,7 +629,7 @@
     "description": "Preferences"
   },
 
-  "rp_menu_managePolicies": {
+  "managePolicies@menu": {
     "message": "Manage Policies",
     "description": "Manage Policies"
   },

@@ -224,9 +224,7 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
         originPort);
     var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
     if (!originPart && !destPart) {
-      // TODO: don't throw, instead show message in form.
-      // eslint-disable-next-line no-throw-literal
-      throw "You must specify some rule information";
+      return;
     }
     var ruleData = {};
     if (originPart) {

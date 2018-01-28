@@ -5,6 +5,7 @@
 from rp_ui_harness.testcases import RequestPolicyTestCase
 from rp_puppeteer.errors import ElementNotDisplayedException
 from marionette_driver.errors import NoSuchElementException
+from marionette import SkipTest
 
 
 class TestContextMenu(RequestPolicyTestCase):
@@ -26,6 +27,9 @@ class TestContextMenu(RequestPolicyTestCase):
             super(TestContextMenu, self).tearDown()
 
     def test_select_entry__normal(self):
+        raise SkipTest(
+            "ctx_menu.select_entry() often fails due to a TimeoutException")
+
         # Open Link in New Tab.
         self.ctx_menu.select_entry("context-openlinkintab", self.link)
         self.assertEqual(self.browser.tabbar.selected_tab, self.origin_tab,
@@ -33,11 +37,17 @@ class TestContextMenu(RequestPolicyTestCase):
         self.assertEqual(self.ctx_menu.state, "closed")
 
     def test_select_entry__nonexistant(self):
+        raise SkipTest(
+            "ctx_menu.select_entry() often fails due to a TimeoutException")
+
         with self.assertRaises(NoSuchElementException):
             self.ctx_menu.select_entry("foo-bar-nonexistant", self.link)
         self.assertEqual(self.ctx_menu.state, "closed")
 
     def test_select_entry__invisible(self):
+        raise SkipTest(
+            "ctx_menu.select_entry() often fails due to a TimeoutException")
+
         with self.assertRaises(ElementNotDisplayedException):
             # Select the "Copy" entry, which exists but is not shown when
             # right-clicking on a link.

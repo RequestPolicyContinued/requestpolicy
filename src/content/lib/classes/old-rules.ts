@@ -124,7 +124,7 @@ export class OldRules {
   private static getPrefString(aPrefName: string): string {
     const result = getComplexValueFromPrefBranch(
         LegacyApi.prefs.branches.rp.branch, aPrefName, Ci.nsISupportsString);
-    if (!result.error) return result.value;
+    if (!result.error) return result.value!;
     const e = result.error;
     if (e.name !== "NS_ERROR_UNEXPECTED") {
       console.dir(e);

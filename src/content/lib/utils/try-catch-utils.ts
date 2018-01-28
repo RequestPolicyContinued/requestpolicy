@@ -37,8 +37,8 @@ const value = <T = any>(val: T) => ({value: val});
 const error = <T = any>(err: T) => ({error: err, value: null});
 
 // tslint:disable-next-line:interface-name
-interface RV {
-  value: any;
+interface RV<T = any> {
+  value: T | null;
   error?: any;
 }
 
@@ -114,9 +114,9 @@ export function getComplexValueFromPrefBranch(
     prefBranch: any,
     prefName: string,
     type: any,
-) {
+): RV<string> {
   try {
-    return prefBranch.getComplexValue(prefName, type).data;
+    return value(prefBranch.getComplexValue(prefName, type).data as string);
   } catch (e) {
     return error(e);
   }

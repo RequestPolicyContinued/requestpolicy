@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from firefox_puppeteer.api.keys import Keys
 from rp_ui_harness.testcases import RequestPolicyTestCase
 
 
@@ -21,8 +22,8 @@ class TestWebUtils(RequestPolicyTestCase):
             # Select the element's text.
             self.web_utils.select_element_text(element)
 
-        # Copy the selection to the clipboard.
-        self.ctx_menu.select_entry("context-copy", element)
+            # Copy the selection to the clipboard.
+            element.send_keys(Keys.CONTROL, "c")
 
         # Get the clipboard content.
         text_in_clipboard = self.marionette.execute_script("""

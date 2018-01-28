@@ -49,8 +49,8 @@ function maybeShowSetupTab() {
     }
   }
 
-  Notifications.add(NotificationID.InitialSetup);
   Notifications.onTabOpened.addListener(onNotificationsTabOpened);
+  Notifications.add(NotificationID.InitialSetup);
 }
 
 export const InitialSetupController: IController = {

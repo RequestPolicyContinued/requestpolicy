@@ -169,7 +169,7 @@ export const Prefs = (function() {
   function isOldRulePrefEmpty(pref) {
     const result = getComplexValueFromPrefBranch(self.branches.rp.branch,
         pref, Ci.nsISupportsString);
-    return result.value === "";
+    return !!result.error || !result.value;
   }
 
   self.oldRulesExist = function() {

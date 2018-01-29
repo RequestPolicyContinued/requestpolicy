@@ -1081,9 +1081,18 @@ export function loadOverlayIntoWindow(window) {
     openLinkInNewTab(url, relatedToCurrent);
   }
 
+  // @if EXTENSION_TYPE='legacy'
+  self.openPrefs = maybeOpenLinkInNewTab.bind(null,
+      "about:requestpolicy",
+      [
+        browser.runtime.getURL("content/settings/basicprefs.html"),
+      ], true);
+  // @endif
+  // @if EXTENSION_TYPE!='legacy'
   self.openPrefs = maybeOpenLinkInNewTab.bind(null,
       browser.runtime.getURL("content/settings/basicprefs.html"),
       [], true);
+  // @endif
   self.openPolicyManager = maybeOpenLinkInNewTab.bind(null,
       browser.runtime.getURL("content/settings/yourpolicy.html"), [], true);
   self.openHelp = maybeOpenLinkInNewTab.bind(null, "https://github.com/" +

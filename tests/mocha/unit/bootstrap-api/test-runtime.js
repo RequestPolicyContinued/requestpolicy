@@ -7,10 +7,11 @@ const sinon = require("sinon");
 const MockNetUtil = require("./lib/mock-netutil");
 const MockServices = require("./lib/mock-services");
 const MockComponents = require("./lib/mock-components");
-
+const Utils = require("./lib/utils");
 
 describe("Api.browser.runtime", function() {
   let runtime = null;
+  let pathAliasProxy;
 
   before(function() {
     let mockComp = new MockComponents();
@@ -24,16 +25,19 @@ describe("Api.browser.runtime", function() {
     // Stubbing in order to perform imports in api.js and required scripts
     sinon.stub(mockComp.utils, "import")
       .withArgs("resource://gre/modules/NetUtil.jsm").returns({NetUtil: mockNu})
-      .withArgs("resource://gre/modules/AddonManager.jsm", {}).returns({});
+      .withArgs("resource://gre/modules/AddonManager.jsm", {}).returns({})
+      .withArgs("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).returns({});
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
     global.Ci = mockComp.interfaces;
     global.Services = new MockServices();
 
+    pathAliasProxy = Utils.createPathAliasProxy();
+
     // eslint-disable-next-line no-unused-vars
-    let {Api, ContentScriptsApi} = require("content/web-extension-fake-api/models/api");
-    runtime = Api.browser.runtime;
+    let {Runtime} = require("bootstrap/models/browser/runtime");
+    runtime = Runtime.instance;
   });
 
   describe("getURL(path)", function() {
@@ -144,5 +148,7 @@ describe("Api.browser.runtime", function() {
     global.Cu = null;
     global.Ci = null;
     global.Services = null;
+
+    pathAliasProxy.revoke();
   });
 });

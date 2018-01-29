@@ -21,7 +21,6 @@
  */
 
 import {createListenersMap} from "content/lib/utils/listener-factories";
-import {MaybePromise} from "content/lib/classes/maybe-promise";
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import {Bootstrap} from "bootstrap/models/bootstrap";
 import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
@@ -29,6 +28,7 @@ import {Log} from "content/models/log";
 import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {StorageApi} from "bootstrap/models/storage-api";
+import {Runtime, ContentRuntime} from "bootstrap/models/browser/runtime";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -58,7 +58,7 @@ export const Api = {
   browser: {
     extension: {},
     management: {},
-    runtime: {},
+    runtime: Runtime.instance,
     storage: StorageApi,
   },
   LegacyApi: {
@@ -75,14 +75,7 @@ export const ContentScriptsApi = {
       getURL: null,
       inIncognitoContext: null,
     },
-    runtime: {
-      connect: null,
-      getManifest: null,
-      getURL: null,
-      onConnect: null,
-      onMessage: null,
-      sendMessage: null,
-    },
+    runtime: ContentRuntime.instance,
     i18n: {
       getMessage: null,
       getAcceptLanguages: null,
@@ -229,74 +222,4 @@ export const ContentScriptsApi = {
 
   Api.browser.management.getSelf =
       Api.browser.management.get.bind(null, "/* @echo EXTENSION_ID */");
-})();
-
-// =============================================================================
-// browser.runtime
-// =============================================================================
-
-(function() {
-  Api.browser.runtime.getBrowserInfo = function() {
-    let {name, vendor, version, appBuildID: buildID} = Services.appinfo;
-    return Promise.resolve({name, vendor, version, buildID});
-  };
-
-  /**
-   * Map a relative path to manifest.json to a legacy path (XUL/XPCOM).
-   * All paths pointing to a html file in /content/settings/ are mapped into
-   * about:requestpolicy?, other paths are mapped into chrome://rpcontinued/ :
-   *  - /content/settings/filename.html will become about:requestpolicy?filename
-   *  - /foo/bar.file.css will become chrome://rpcontinued/foo/bar.file.css
-   * Leading / or ./ are ignored and the path is case sensitive.
-   *
-   * @param {string} path
-   * @return {string}
-   */
-  Api.browser.runtime.getURL = function(path) {
-    // Pattern to match mapping into about:requestpolicy?file
-    // 1) ^(?:\.\/|\/)? : matches even if path starts with "content/"
-    // or "./content"
-    // 2) content\/settings\/ : checks path (case sensitive)
-    // 3) ([^\/]+) : capturing group for the filename
-    // 4) \.[hH][tT][mM][lL]$ : matches html extension (case insensitive)
-    // Disable max-length line lint on this one because using new RegExp
-    // to split it isn't recommended if the pattern doesn't change
-    // eslint-disable-next-line max-len
-    let patternAbout = /^(?:\.\/|\/)?content\/settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
-
-    // Pattern to match prepending with chrome://rpcontinued/
-    // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"
-    let patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
-
-    let legacyPath = null;
-
-    if (patternAbout.test(path)) {
-      legacyPath = path.replace(patternAbout, "about:requestpolicy?$1");
-    } else {
-      legacyPath = path.replace(patternChrome, "chrome://rpcontinued/$1");
-    }
-
-    return legacyPath;
-  };
-
-  const listenersMaps = {backgroundPage: {}};
-  createListenersMap(["onMessage"], {
-    assignListenersTo: listenersMaps.backgroundPage,
-    assignInterfacesTo: Api.browser.runtime,
-  });
-
-  ContentScriptsApi.browser.runtime.sendMessage = function(aMessage) {
-    const responses = [];
-    const callback = (aResponse) => {
-      responses.push(aResponse);
-    };
-    return MaybePromise.resolve(
-        listenersMaps.backgroundPage.
-            onMessage.emit(aMessage, null, callback)
-    ).then(() => {
-      if (responses.length === 0) return;
-      if (responses.length === 1) return responses[0];
-      throw new Error("Got multiple responses!");
-    }).toPromise();
-  };
 })();

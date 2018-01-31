@@ -66,7 +66,7 @@ export function FramescriptToOverlayCommunication(aEnv) {
    * A queue of runnables that wait for the overlay to be ready.
    * As it's a queue, the functions `pop` and `shift` have to be
    * used.
-   * @type  {Array.<function>}
+   * @type  {Array<Function>}
    */
   self.waitingRunnables = [];
 

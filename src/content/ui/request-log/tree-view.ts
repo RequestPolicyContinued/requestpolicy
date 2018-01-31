@@ -21,27 +21,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export function loadRLTreeViewIntoWindow(window) {
-  let {requestLog} = window.rpcontinued;
+interface IWindow extends Window {
+  rpcontinued: any;
+}
+
+export function loadRLTreeViewIntoWindow(window: IWindow) {
+  const {requestLog} = window.rpcontinued;
 
   // ===========================================================================
 
   requestLog.treebox = null;
 
+  /* tslint:disable object-literal-sort-keys */
   requestLog.columnNameToIndexMap = {
     "rpcontinued-requestLog-origin": 0,
     "rpcontinued-requestLog-destination": 1,
     "rpcontinued-requestLog-blocked": 2,
     "rpcontinued-requestLog-time": 3,
   };
+  /* tslint:enable object-literal-sort-keys */
 
-  function getVisibleRowAtIndex(index) {
+  function getVisibleRowAtIndex(index: number) {
     return requestLog.visibleRows[requestLog.visibleRows.length - index - 1];
   }
 
   //
   // the interface.
-  // see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
+  // see https://developer.mozilla.org/en-US/docs/
+  //     Mozilla/Tech/XUL/Tutorial/Custom_Tree_Views
   //
 
   requestLog.treeView = {
@@ -59,7 +66,7 @@ export function loadRLTreeViewIntoWindow(window) {
      *
      * @param {nsITreeBoxObject} aTreebox
      */
-    setTree: function(aTreebox) {
+    setTree(aTreebox: any) {
       requestLog.treebox = aTreebox;
     },
 
@@ -70,7 +77,7 @@ export function loadRLTreeViewIntoWindow(window) {
      * @param {nsITreeColumn} aColumn
      * @return {number}
      */
-    getCellText: function(aIndex, aColumn) {
+    getCellText(aIndex: number, aColumn: any): number | undefined {
       // Row 0 is actually the last element in the array so that we don't
       // have to unshift() the array and can just push().
       // TODO: Do an actual speed test with push vs. unshift to see if it
@@ -82,45 +89,47 @@ export function loadRLTreeViewIntoWindow(window) {
       }
     },
 
-    isContainer: function(aIndex) {
+    isContainer(aIndex: number) {
       return false;
     },
 
-    isContainerOpen: function(aIndex) {
+    isContainerOpen(aIndex: number) {
       return false;
     },
 
-    isContainerEmpty: function(aIndex) {
+    isContainerEmpty(aIndex: number) {
       return false;
     },
 
-    isSeparator: function(aIndex) {
+    isSeparator(aIndex: number) {
       return false;
     },
 
-    isSorted: function() {
+    isSorted() {
       return false;
     },
 
-    isEditable: function(aIndex, aColumn) {
+    isEditable(aIndex: number, aColumn: any) {
       return false;
     },
 
-    getParentIndex: function(aIndex) {
+    getParentIndex(aIndex: number) {
       return -1;
     },
 
-    getLevel: function(aIndex) {
+    getLevel(aIndex: number) {
       return 0;
     },
 
-    hasNextSibling: function(aIndex, aAfter) {
+    hasNextSibling(aIndex: number, aAfter: any) {
       return false;
     },
 
-    toggleOpenState: function(aIndex) {},
+    toggleOpenState(aIndex: number) {
+      return;
+    },
 
-    getImageSrc: function(aIndex, aColumn) {
+    getImageSrc(aIndex: number, aColumn: any) {
       if (requestLog.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "chrome://rpcontinued/skin/dot.png";
@@ -128,19 +137,19 @@ export function loadRLTreeViewIntoWindow(window) {
       }
     },
 
-    getProgressMode: function(aIndex, aColumn) {},
-    getCellValue: function(aIndex, aColumn) {},
-    cycleHeader: function(col, elem) {},
-    selectionChanged: function() {},
-    cycleCell: function(aIndex, aColumn) {},
-    performAction: function(action) {},
-    performActionOnCell: function(action, aIndex, aColumn) {},
+    getProgressMode(aIndex: number, aColumn: any) { return; },
+    getCellValue(aIndex: number, aColumn: any) { return; },
+    cycleHeader(col: any, elem: any) { return; },
+    selectionChanged() { return; },
+    cycleCell(aIndex: number, aColumn: any) { return; },
+    performAction(action: any) { return; },
+    performActionOnCell(action: any, aIndex: number, aColumn: any) { return; },
 
-    getRowProperties: function(aIndex) {
+    getRowProperties(aIndex: number) {
       return getVisibleRowAtIndex(aIndex)[2] ? "blocked" : "allowed";
     },
 
-    getCellProperties: function(aIndex, aColumn) {
+    getCellProperties(aIndex: number, aColumn: any) {
       if (requestLog.columnNameToIndexMap[aColumn.id] === 2) {
         if (getVisibleRowAtIndex(aIndex)[2]) {
           return "blocked";
@@ -149,7 +158,7 @@ export function loadRLTreeViewIntoWindow(window) {
       return "";
     },
 
-    getColumnProperties: function(aColumn) {
+    getColumnProperties(aColumn: any) {
       return "";
     },
   };

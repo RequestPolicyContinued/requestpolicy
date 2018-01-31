@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness.testcases import RequestPolicyTestCase
-from marionette.marionette_test import SkipTest
 from rp_ui_harness.test_data.rules import ExemplaryOldRules
 
 

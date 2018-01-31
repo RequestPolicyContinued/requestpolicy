@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
-import {C} from "content/lib/utils/constants";
+import {Level as EnvLevel, State as EnvState} from "content/lib/environment";
+import {Log as log} from "content/models/log";
+import {C} from "content/data/constants";
 
 const {LOG_MESSAGE_LISTENERS} = C;
 
@@ -59,10 +59,10 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   //       called immediately.
   if (aEnv) {
     self.environment.addStartupFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           if (LOG_MESSAGE_LISTENERS) {
-            Logger.log(
+            log.log(
                 "From now on new message listeners will be added " +
                 "immediately. Environment: \"" + self.environment.name + "\"");
           }
@@ -70,14 +70,14 @@ export function ManagerForMessageListeners(aEnv, aMM) {
           self.addAllListeners();
         });
     self.environment.addShutdownFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           // clean up when the environment shuts down
           self.removeAllListeners();
         });
   } else {
     // aEnv is not defined! Try to report an error.
-    if (Logger) {
+    if (log) {
       console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
@@ -88,8 +88,8 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   self.mm = aMM;
 
   if (!self.mm) {
-    if (Logger) {
-      Logger.warn("No Message Manager was specified " +
+    if (log) {
+      log.warn("No Message Manager was specified " +
                      "for a new ManagerForMessageListeners!");
     }
   }
@@ -117,7 +117,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
-    Logger.warn("The message name that has been passed to " +
+    log.warn("The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
     aMessageName = aMessageName.substr(C.MM_PREFIX.length);
@@ -127,7 +127,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     messageName: aMessageName,
     messageID: C.MM_PREFIX + aMessageName,
     callback: function(aMessage) {
-      if (self.environment.envState === Environment.ENV_STATES.SHUTTING_DOWN) {
+      if (self.environment.envState === EnvState.SHUTTING_DOWN) {
         // eslint-disable-next-line no-console
         console.log("[RequestPolicy] Listener for " + aMessageName +
             " has been called, but RP is already shutting down.");
@@ -142,7 +142,7 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {
-      Logger.log(
+      log.log(
           "Immediately adding message listener for \"" +
           listener.messageName + "\". Environment: \"" +
           self.environment.name + "\"");
@@ -161,7 +161,7 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   for (let listener of self.listeners) {
     if (listener.listening === false) {
       if (LOG_MESSAGE_LISTENERS) {
-        Logger.log(
+        log.log(
             "Lazily adding message listener for \"" +
             listener.messageName + "\". Environment: \"" +
             self.environment.name + "\"");
@@ -186,7 +186,7 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //   continue;
     // }
     if (LOG_MESSAGE_LISTENERS) {
-      Logger.log(
+      log.log(
           "Removing message listener for \"" + listener.messageName + "\".");
     }
     // try {

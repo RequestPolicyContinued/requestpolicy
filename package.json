@@ -27,6 +27,7 @@
     "sinon-chrome": "^2.2.1",
     "source-map-support": "^0.4.18",
     "tslint": "^5.5.0",
-    "typescript": "^2.4.2"
+    "typescript": "^2.4.2",
+    "web-ext-types": "github:myrdd/web-ext-types"
   }
 }

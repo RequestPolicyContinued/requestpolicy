@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {Windows} from "content/models/windows";
 import {OverlayController} from "content/controllers/windows.overlay";
 import {ToolbarButtonController}
@@ -83,7 +83,7 @@ export const rpWindowManager = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         WindowSubControllers.startup();
         Windows.forEachOpenWindow(loadIntoWindow);
@@ -101,7 +101,7 @@ export const rpWindowManager = (function() {
       });
 
   MainEnvironment.addShutdownFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         // Stop loading framescripts into new tabs.
         // --------------------------

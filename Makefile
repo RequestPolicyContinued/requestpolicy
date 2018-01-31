@@ -135,7 +135,7 @@ endef
 
 .PHONY: all \
 	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
-	unit-testing-files
+	non-ui-testing-files
 
 all: xpi
 xpi: nightly-xpi
@@ -152,8 +152,8 @@ amo-beta-xpi: node-packages
 amo-nightly-xpi: node-packages
 	$(call make_xpi,amo-nightly)
 
-unit-testing-files: node-packages
-	$(call make_files,unit-testing)
+non-ui-testing-files: node-packages
+	$(call make_files,non-ui-testing)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name)-legacy-nightly.xpi
 xpi_file__dev          := $(dist_dir)/$(extension_name)-legacy-dev.xpi
@@ -378,7 +378,7 @@ temp-dev-profile: python-venv dev-xpi dev-helper-xpi
 #===============================================================================
 
 _ui_subtests := ui-tests-quick ui-tests-non-quick
-_quick_tests := static-analysis unit-tests ui-tests-quick
+_quick_tests := static-analysis non-ui-tests ui-tests-quick
 _non_quick_tests := test-makefile ui-tests-non-quick
 
 .PHONY: test-quick test
@@ -387,26 +387,36 @@ test-non-quick: $(_non_quick_tests)
 test: $(filter-out $(_ui_subtests),$(_quick_tests) $(_non_quick_tests)) ui-tests
 
 #-------------------------------------------------------------------------------
-# Testing: unit tests
+# Testing: non-UI tests
 #-------------------------------------------------------------------------------
 
-.PHONY: unit-tests
-unit-tests: mocha
+.PHONY: non-ui-tests
+non-ui-tests: mocha-tests
 
-.PHONY: mocha
-mocha: node-packages unit-testing-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/unit-testing/ \
+_non_ui_subtests := unit-tests integration-tests
+.PHONY: $(_non_ui_subtests)
+unit-tests: mocha-unit-tests
+integration-tests: mocha-integration-tests
+
+_mocha_test_targets = mocha-tests mocha-unit-tests mocha-integration-tests
+.PHONY: $(_mocha_test_targets)
+mocha-tests: ALIASES := unit
+mocha-unit-tests: ALIASES := unit
+$(_mocha_test_targets): node-packages non-ui-testing-files
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/non-ui-testing/ \
 	$(MOCHA) \
+		--recursive \
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
-		tests/unit/
+		tests/mocha/lib/helper \
+		$(patsubst %,tests/mocha/%/,$(ALIASES))
 
 #-------------------------------------------------------------------------------
 # UI tests
 #-------------------------------------------------------------------------------
 
 # Note: currently you have to do some setup before this will work.
-# see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#unit-tests-for-requestpolicy
+# see https://github.com/RequestPolicyContinued/requestpolicy/wiki/Setting-up-a-development-environment#marionette-ui-tests
 
 .PHONY: ui-tests ui-tests-quick ui-tests-non-quick
 ui-tests: marionette
@@ -457,11 +467,11 @@ addons-linter: nightly-xpi node-packages
 	@$(ADDONS_LINTER) $(xpi_file__nightly)
 coffeelint: node-packages
 	@echo $@
-	@$(COFFEELINT) $(wildcard tests/unit/*.coffee)
+	@$(COFFEELINT) $(shell find tests/mocha/ -name '*.coffee')
 eslint: node-packages
 	@echo $@
 	@$(ESLINT) src/
-	@$(ESLINT) tests/unit/
+	@$(ESLINT) tests/mocha/
 	@$(ESLINT) tests/xpcshell/
 	@$(ESLINT) tests/helper-addons/
 	@$(ESLINT) gulpfile.js

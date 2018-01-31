@@ -20,14 +20,22 @@
       "es2016.array.include"
       // "es2017.object" // support since Fx47
     ],
+    "typeRoots": [
+      "@types",
+      "node_modules/web-ext-types"
+    ],
 
     "noImplicitAny": true,
     "noImplicitThis": true,
+    "noUnusedLocals": true,
     "strictNullChecks": true,
 
     "outDir": "build/ts",
     "baseUrl": "src",
     "paths": {
+      "bootstrap/*": [
+        "conditional/legacy/content/bootstrap/content/*"
+      ],
       "*": [
         "*",
         "conditional/legacy/*",

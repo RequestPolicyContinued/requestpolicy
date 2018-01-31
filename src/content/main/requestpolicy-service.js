@@ -21,41 +21,32 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
-import {Storage} from "content/models/storage";
+import {Log as log} from "content/models/log";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
      SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
-import {Environment, MainEnvironment} from "content/lib/environment";
-import {C} from "content/lib/utils/constants";
-import {WindowUtils} from "content/lib/utils/windows";
-import {Info} from "content/lib/utils/info";
-
-const {AMO} = C;
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 // =============================================================================
 // rpService
 // =============================================================================
 
-export const rpService = (function() {
-  let self = {};
+let subscriptions = null;
 
-  // ---------------------------------------------------------------------------
-  // Internal Data
-  // ---------------------------------------------------------------------------
+function loadUserRules() {
+  PolicyManager.loadUserRules();
+}
 
-  let subscriptions = null;
-
-  // ---------------------------------------------------------------------------
-  // Utility
-  // ---------------------------------------------------------------------------
-
-  function loadConfigAndRules() {
-    subscriptions = new UserSubscriptions();
-    PolicyManager.loadUserRules();
-
-    let failures = PolicyManager.loadSubscriptionRules(
+function loadSubscriptionRules() {
+  const pDone = browser.storage.local.get(
+      "subscriptions"
+  ).then((result) => {
+    const rawData = result.hasOwnProperty("subscriptions") ?
+        result.subscriptions : undefined;
+    subscriptions = UserSubscriptions.create(rawData);
+    return PolicyManager.loadSubscriptionRules(
         subscriptions.getSubscriptionInfo());
+  }).then(({failures}) => {
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
     // TODO: Maybe we should probably ship snapshot versions of the official
@@ -74,191 +65,41 @@ export const rpService = (function() {
           serials[listName] = {};
         }
         let rawRuleset = loadedSubs[listName][subName].rawRuleset;
-        serials[listName][subName] = rawRuleset._metadata.serial;
+        serials[listName][subName] = rawRuleset.metadata.serial;
       }
     }
     function updateCompleted(result) {
-      Logger.info("Subscription updates completed: " + result);
+      log.info("Subscription updates completed: " + result);
     }
     subscriptions.update(updateCompleted, serials);
-  }
+    return;
+  });
+  pDone.catch((e) => {
+    log.error("loadConfigAndRules():", e);
+  });
+}
 
-  // TODO: move to window manager
-  function maybeShowSetupTab() {
-    if (!Storage.get("welcomeWindowShown")) {
-      const url = "about:requestpolicy?setup";
+function loadRules() {
+  loadUserRules();
+  loadSubscriptionRules();
+}
 
-      let win = WindowUtils.getMostRecentBrowserWindow();
-      if (win === null) {
-        return;
-      }
-      let tabbrowser = win.getBrowser();
-      if (typeof tabbrowser.addTab !== "function") {
-        return;
-      }
-
-      if (Info.isRPUpgrade) {
-        // If the use has just upgraded from an 0.x version, set the
-        // default-policy preferences based on the old preferences.
-        Storage.set({"defaultPolicy.allow": false});
-        if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
-          let identLevel = Storage.get("uriIdentificationLevel");
-          Storage.set({
-            "defaultPolicy.allowSameDomain": identLevel === 1,
-          });
-        }
-      }
-
-      tabbrowser.selectedTab = tabbrowser.addTab(url);
-
-      Storage.set({"welcomeWindowShown": true});
-    }
-  }
-
-  /**
-   * Module for detecting installations of other RequestPolicy versions,
-   * which have a different extension ID.
-   */
-  const DetectorForOtherInstallations = (function() {
-    const NOTICE_URL = "chrome://rpcontinued/content/" +
-        "multiple-installations.html";
-
-    // The other extension IDs of RequestPolicy.
-    const addonIDs = Object.freeze(new Set([
-      // Detect the "original" add-on (v0.5; released on AMO).
-      "requestpolicy@requestpolicy.com",
-      // Detect "RPC Legacy" (v0.5; AMO version).
-      "rpcontinued@requestpolicy.org",
-      AMO ? // In the AMO version the non-AMO version needs to be detected.
-            "rpcontinued@non-amo.requestpolicy.org" :
-            // In the non-AMO version the AMO version needs to be detected.
-            "rpcontinued@amo.requestpolicy.org",
-    ]));
-
-    function checkAddon(addon) {
-      if (addonIDs.has(addon.id)) {
-        openTab();
-      }
-    }
-
-    MainEnvironment.addStartupFunction(Environment.LEVELS.UI, function() {
-      browser.management.onEnabled.addListener(checkAddon);
-      browser.management.onInstalled.addListener(checkAddon);
-    });
-
-    /**
-     * Open the tab with the 'multiple installations' notice.
-     *
-     * @return {Boolean} whether opening the tab was successful
-     */
-    function openTab() {
-      let win = WindowUtils.getMostRecentBrowserWindow();
-      if (win === null) {
-        return;
-      }
-      let tabbrowser = win.getBrowser();
-      if (typeof tabbrowser.addTab !== "function") {
-        return;
-      }
-
-      tabbrowser.selectedTab = tabbrowser.addTab(NOTICE_URL);
-
-      return true;
-    }
-
-    // On startup, the tab should be opened only once.
-    let initialCheckDone = false;
-
-    function addonListCallback(addons) {
-      const activeAddons = addons.
-          filter(addon => addonIDs.has(addon.id)).
-          filter(addon => addon.enabled);
-      if (activeAddons.length === 0) {
-        // no other RequestPolicy version is active
-        return;
-      }
-
-      if (initialCheckDone === true) {
-        return;
-      }
-
-      const rv = openTab();
-
-      if (rv === true) {
-        initialCheckDone = true;
-      }
-    }
-
-    /**
-     * Check if other RequestPolicy versions (with other extension IDs)
-     * are installed. If so, a tab with a notice will be opened.
-     */
-    function maybeShowMultipleInstallationsWarning() {
-      if (initialCheckDone === true) {
-        return;
-      }
-
-      browser.management.getAll().then(addonListCallback).catch(e => {
-        console.error("Error getting the list of addons! Details:");
-        console.dir(e);
-      });
-    }
-
-    return {
-      maybeShowMultipleInstallationsWarning:
-          maybeShowMultipleInstallationsWarning,
-    };
-  })();
-
-  // ---------------------------------------------------------------------------
-  // startup and shutdown functions
-  // ---------------------------------------------------------------------------
-
-  // prepare back-end
-  MainEnvironment.addStartupFunction(Environment.LEVELS.BACKEND,
-                                        loadConfigAndRules);
-
-  function registerObservers() {
-    MainEnvironment.obMan.observe([
-      "sessionstore-windows-restored",
-      SUBSCRIPTION_UPDATED_TOPIC,
-      SUBSCRIPTION_ADDED_TOPIC,
-      SUBSCRIPTION_REMOVED_TOPIC,
-
-      // support for old browsers (Firefox <20)
-      // TODO: support per-window temporary rules
-      //       see https://github.com/RequestPolicyContinued/requestpolicy/issues/533#issuecomment-68851396
-      "private-browsing",
-    ], self.observe);
-  }
-  MainEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
-                                        registerObservers);
-
-  MainEnvironment.addStartupFunction(
-      Environment.LEVELS.UI,
-      function() {
-        // In case of the app's startup and if they fail now, they
-        // will be successful when they are called by the
-        // "sessionstore-windows-restored" observer.
-        maybeShowSetupTab();
-        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
-      });
-
-  self.getSubscriptions = function() {
+export const rpService = {
+  getSubscriptions() {
     return subscriptions;
-  };
+  },
 
   // ---------------------------------------------------------------------------
   // nsIObserver interface
   // ---------------------------------------------------------------------------
 
-  self.observe = function(subject, topic, data) {
+  observe(subject, topic, data) {
     switch (topic) {
       // FIXME: The subscription logic should reside in the
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        Logger.log("XXX updated: " + data);
+        log.log("XXX updated: " + data);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -268,51 +109,59 @@ export const rpService = (function() {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        Logger.log("XXX added: " + data);
+        log.log("XXX added: " + data);
         let subInfo = JSON.parse(data);
-        let failures = PolicyManager.loadSubscriptionRules(subInfo);
-        let failed = Object.getOwnPropertyNames(failures).length > 0;
-        if (failed) {
-          let serials = {};
-          for (let listName in subInfo) {
-            if (!serials[listName]) {
-              serials[listName] = {};
+        const pLoadSubscriptionRules = PolicyManager.
+            loadSubscriptionRules(subInfo);
+        pLoadSubscriptionRules.then(({failures}) => {
+          let failed = Object.getOwnPropertyNames(failures).length > 0;
+          if (failed) {
+            let serials = {};
+            for (let listName in subInfo) {
+              if (!serials[listName]) {
+                serials[listName] = {};
+              }
+              for (let subName in subInfo[listName]) {
+                serials[listName][subName] = -1;
+              }
             }
-            for (let subName in subInfo[listName]) {
-              serials[listName][subName] = -1;
-            }
+            let updateCompleted = function(result) {
+              log.info("Subscription update completed: " + result);
+            };
+            subscriptions.update(updateCompleted, serials);
           }
-          let updateCompleted = function(result) {
-            Logger.info("Subscription update completed: " + result);
-          };
-          subscriptions.update(updateCompleted, serials);
-        }
+          return;
+        }).catch((e) => {
+          log.error("SUBSCRIPTION_ADDED_TOPIC", e);
+        });
         break;
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        Logger.log("YYY: " + data);
+        log.log("YYY: " + data);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;
       }
 
-      case "sessionstore-windows-restored":
-        maybeShowSetupTab();
-        DetectorForOtherInstallations.maybeShowMultipleInstallationsWarning();
-        break;
-
-      // support for old browsers (Firefox <20)
-      case "private-browsing":
-        if (data === "exit") {
-          PolicyManager.revokeTemporaryRules();
-        }
-        break;
-
       default:
         console.error("unknown topic observed: " + topic);
     }
-  };
+  },
+};
 
-  return self;
-})();
+// ---------------------------------------------------------------------------
+// startup and shutdown functions
+// ---------------------------------------------------------------------------
+
+// prepare back-end
+MainEnvironment.addStartupFunction(EnvLevel.BACKEND, loadRules);
+
+function registerObservers() {
+  MainEnvironment.obMan.observe([
+    SUBSCRIPTION_UPDATED_TOPIC,
+    SUBSCRIPTION_ADDED_TOPIC,
+    SUBSCRIPTION_REMOVED_TOPIC,
+  ], rpService.observe);
+}
+MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, registerObservers);

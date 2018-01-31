@@ -8,8 +8,8 @@ from marionette_driver import Wait
 import re
 
 
-msg = "[Marionette] test_logging_error_detection"
-msg_regexp = "\[Marionette\] test_logging_error_detection"
+msg = ("Marionette -- test_logging_error_detection -- "
+       "this test is expected to fail")
 
 
 class ErrorDetectionTests(object):
@@ -23,7 +23,7 @@ class ErrorDetectionTests(object):
             "error", "backgroundscript", msg=msg)
         self._do_checks(
             n,
-            "^console.error:\s+\[RequestPolicy\] " + msg_regexp + "$")
+            "^console.error:\s+\[RequestPolicy\] " + msg + "$")
 
     def test_reference_error(self, n=1):
         self.error_triggerer.trigger_error(

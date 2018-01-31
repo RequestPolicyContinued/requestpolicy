@@ -21,19 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {Level as EnvLevel} from "content/lib/environment";
+import {Log as log} from "content/models/log";
 import {Storage} from "content/models/storage";
-import {RequestProcessor} from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domains";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Ruleset} from "content/lib/ruleset";
 import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
         } from "content/lib/classes/gui-location";
-import {StringUtils} from "content/lib/utils/strings";
-import {DOMUtils} from "content/lib/utils/dom";
-import {WindowUtils} from "content/lib/utils/windows";
-import {C} from "content/lib/utils/constants";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as DOMUtils from "content/lib/utils/dom-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
+import {C} from "content/data/constants";
+import {Requests} from "content/models/requests";
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -87,7 +87,7 @@ export function loadMenuIntoWindow(window) {
       lists.removeRules = $id("rpc-rules-remove");
 
       rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
-        Environment.LEVELS.INTERFACE,
+        EnvLevel.INTERFACE,
         function() {
           // empty _all_ lists
           for (let listName in lists) {
@@ -165,7 +165,7 @@ export function loadMenuIntoWindow(window) {
 
   self.prepareMenu = function() {
     try {
-      const disabled = Storage.isBlockingDisabled();
+      const disabled = Storage.alias.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
@@ -177,13 +177,13 @@ export function loadMenuIntoWindow(window) {
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
         if (self._currentBaseDomain === null) {
-          Logger.info("Unable to prepare menu because " +
+          log.info("Unable to prepare menu because " +
               "the current uri has no host: " + self._currentUri);
           self._populateMenuForUncontrollableOrigin();
           return;
         }
       } catch (e) {
-        Logger.info("Unable to prepare menu because " +
+        log.info("Unable to prepare menu because " +
             "base domain can't be determined: " + self._currentUri);
         self._populateMenuForUncontrollableOrigin();
         return;
@@ -192,13 +192,13 @@ export function loadMenuIntoWindow(window) {
       self._currentIdentifier = rpcontinued.overlay
           .getTopLevelDocumentUriIdentifier();
 
-      // Logger.info("self._currentUri: " + self._currentUri);
+      // log.info("self._currentUri: " + self._currentUri);
       self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
 
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
       // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
 
-      Logger.info("self._currentUri: " + self._currentUri);
+      log.info("self._currentUri: " + self._currentUri);
 
       if (self._isChromeUri) {
         self._populateMenuForUncontrollableOrigin();
@@ -211,7 +211,7 @@ export function loadMenuIntoWindow(window) {
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      self._allRequestsOnDocument = RequestProcessor
+      self._allRequestsOnDocument = Requests
             .getAllRequestsInBrowser(gBrowser.selectedBrowser);
       self._allRequestsOnDocument.print("_allRequestsOnDocument");
 
@@ -373,7 +373,7 @@ export function loadMenuIntoWindow(window) {
         destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
         if (destsMixedIndex !== -1) {
-          Logger.info("Merging dest: <" + allowedGUIDest + ">");
+          log.info("Merging dest: <" + allowedGUIDest + ">");
           destsMixed[destsMixedIndex] = GUIDestination.merge(
               allowedGUIDest, destsMixed[destsMixedIndex]);
         } else {
@@ -381,7 +381,7 @@ export function loadMenuIntoWindow(window) {
           // destsWithAllowedRequests, but not in destsMixed.
           // This should never happen, the destsMixed destination should have
           // been added in the destsWithBlockedRequests-loop.
-          Logger.warn("mixed dest was" +
+          log.warn("mixed dest was" +
               " not added to `destsMixed` list: <" + allowedGUIDest + ">");
           destsMixed.push(allowedGUIDest);
         }
@@ -421,7 +421,7 @@ export function loadMenuIntoWindow(window) {
     // rule. We won't be able to use just "allow temporarily".
 
     if (!self._currentlySelectedDest) {
-      if (Storage.isDefaultAllow()) {
+      if (Storage.alias.isDefaultAllow()) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemDenyOrigin(lists.addRules, ruleData);
         }
@@ -443,7 +443,7 @@ export function loadMenuIntoWindow(window) {
           "h": self._addWildcard(dest),
         },
       };
-      // if (Storage.isDefaultAllow()) {
+      // if (Storage.alias.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
           !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
@@ -492,8 +492,8 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (self._currentlySelectedDest) {
-      if (!Storage.isDefaultAllow() &&
-          !Storage.isDefaultAllowSameDomain()) {
+      if (!Storage.alias.isDefaultAllow() &&
+          !Storage.alias.isDefaultAllowSameDomain()) {
         self._populateDetailsAddSubdomainAllowRules(lists.addRules);
       }
     }
@@ -694,9 +694,9 @@ export function loadMenuIntoWindow(window) {
     }
 
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    Logger.log("ruleData: " + canonicalRule);
-    Logger.log("ruleAction: " + ruleAction);
-    Logger.log("undo: " + undo);
+    log.log("ruleData: " + canonicalRule);
+    log.log("ruleAction: " + ruleAction);
+    log.log("undo: " + undo);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the
@@ -770,7 +770,7 @@ export function loadMenuIntoWindow(window) {
   //  else there will be errors from within getDeniedRequests().“
 
   self._getBlockedDestinationsAsGUILocations = function() {
-    const reqSet = RequestProcessor.getDeniedRequests(
+    const reqSet = Requests.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     const requests = reqSet.getAllMergedOrigins();
 
@@ -784,7 +784,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._getAllowedDestinationsAsGUILocations = function() {
-    const reqSet = RequestProcessor.getAllowedRequests(
+    const reqSet = Requests.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     const requests = reqSet.getAllMergedOrigins();
 
@@ -793,7 +793,10 @@ export function loadMenuIntoWindow(window) {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
-      if (Storage.isDefaultAllow() || Storage.isDefaultAllowSameDomain()) {
+      if (
+          Storage.alias.isDefaultAllow() ||
+          Storage.alias.isDefaultAllowSameDomain()
+      ) {
         if (destBase === self._currentlySelectedOrigin) {
           continue;
         }
@@ -834,8 +837,8 @@ export function loadMenuIntoWindow(window) {
   self._getOtherOriginsAsGUILocations = function() {
     const allRequests = self._allRequestsOnDocument.getAll();
 
-    const allowSameDomain = Storage.isDefaultAllow() ||
-        Storage.isDefaultAllowSameDomain();
+    const allowSameDomain = Storage.alias.isDefaultAllow() ||
+        Storage.alias.isDefaultAllowSameDomain();
 
     const guiOrigins = [];
     for (let originUri in allRequests) {
@@ -1099,7 +1102,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = RequestProcessor.getAllowedRequests(
+    let reqSet = Requests.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     let requests = reqSet.getAllMergedOrigins();
 
@@ -1128,7 +1131,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            Logger.log("destinations[destUri] is null or undefined for " +
+            log.log("destinations[destUri] is null or undefined for " +
                 "destUri: " + destUri);
             continue;
           }
@@ -1148,7 +1151,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            // Logger.info("matched allow rule: " + rawRuleStr);
+            // log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1176,7 +1179,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = RequestProcessor.getDeniedRequests(
+    let reqSet = Requests.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     let requests = reqSet.getAllMergedOrigins();
 
@@ -1205,7 +1208,7 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            Logger.log("destinations[destUri] is null or undefined " +
+            log.log("destinations[destUri] is null or undefined " +
                 "for destUri: " + destUri);
             continue;
           }
@@ -1225,7 +1228,7 @@ export function loadMenuIntoWindow(window) {
             }
 
             let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
-            // Logger.info("matched allow rule: " + rawRuleStr);
+            // log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
             if (ruleset.userRuleset) {
@@ -1255,7 +1258,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = RequestProcessor.getDeniedRequests(
+    let reqSet = Requests.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument);
     let requests = reqSet.getAllMergedOrigins();
 

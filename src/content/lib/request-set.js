@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
-import {DomainUtil} from "content/lib/utils/domains";
+import {Log as log} from "content/models/log";
+import * as DomainUtil from "content/lib/utils/domain-utils";
 import {RequestResult} from "content/lib/request-result";
 
 // =============================================================================
@@ -44,13 +44,12 @@ function getUriIdentifier(uri) {
 // RequestSet
 // =============================================================================
 
-export function RequestSet() {
-  this._origins = {};
-}
-RequestSet.prototype = {
-  _origins: null,
+export class RequestSet {
+  constructor() {
+    this._origins = {};
+  }
 
-  print: function(name, printFn=Logger.log.bind(Logger)) {
+  print(name, printFn = log.log.bind(log)) {
     printFn("-------------------------------------------------");
     printFn("== Request Set <" + name + "> ==");
     // "Take that, Big-O!"
@@ -71,16 +70,16 @@ RequestSet.prototype = {
       }
     }
     printFn("-------------------------------------------------");
-  },
+  }
 
-  getAll: function() {
+  getAll() {
     return this._origins;
-  },
+  }
 
   // TODO: the name of this method, getAllMergedOrigins, is confusing. Is it
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
-  getAllMergedOrigins: function() {
+  getAllMergedOrigins() {
     const result = {};
     for (let originUri in this._origins) {
       const dests = this._origins[originUri];
@@ -106,20 +105,20 @@ RequestSet.prototype = {
       }
     }
     return result;
-  },
+  }
 
-  getOriginUri: function(originUri) {
+  getOriginUri(originUri) {
     return this._origins[originUri] || {};
-  },
+  }
 
   /**
    * @param {string} originUri
    * @param {string} destUri
    * @param {RequestResult} requestResult
    */
-  addRequest: function(originUri, destUri, requestResult) {
+  addRequest(originUri, destUri, requestResult) {
     if (requestResult === undefined) {
-      Logger.warn(
+      log.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
           "origin: <" + originUri + ">, destination: <" + destUri + ">");
@@ -166,13 +165,13 @@ RequestSet.prototype = {
     } else {
       dests[destBase][destIdent][destUri].push(requestResult);
     }
-  },
+  }
 
   /**
    * @param {string} originUri
    * @param {string} destUri
    */
-  removeRequest: function(originUri, destUri) {
+  removeRequest(originUri, destUri) {
     if (!this._origins[originUri]) {
       return;
     }
@@ -207,16 +206,16 @@ RequestSet.prototype = {
       return;
     }
     delete this._origins[originUri];
-  },
+  }
 
   /**
    * @param {string} originUri
    */
-  removeOriginUri: function(originUri) {
+  removeOriginUri(originUri) {
     delete this._origins[originUri];
-  },
+  }
 
-  containsBlockedRequests: function() {
+  containsBlockedRequests() {
     let origins = this._origins;
     for (let originURI in origins) {
       let originUriRequests = origins[originURI];
@@ -236,5 +235,5 @@ RequestSet.prototype = {
       }
     }
     return false;
-  },
-};
+  }
+}

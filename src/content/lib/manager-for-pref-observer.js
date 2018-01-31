@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment} from "content/lib/environment";
-import {PrefObserver}
-    from "content/web-extension-fake-api/lib/classes/pref-observer";
+import {Level as EnvLevel, Environment} from "content/lib/environment";
+
+const {PrefObserver} = LegacyApi;
 
 // =============================================================================
 // ManagerForPrefObservers
@@ -41,7 +41,7 @@ export const ManagerForPrefObservers = (function() {
       return observers.get(aEnv);
     }
     let prefObserver = new PrefObserver();
-    aEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, () => {
+    aEnv.addShutdownFunction(EnvLevel.INTERFACE, () => {
       prefObserver.removeAllListeners();
     });
     observers.set(aEnv, prefObserver);

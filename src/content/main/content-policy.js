@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
+import {Log as log} from "content/models/log";
 import {NormalRequest, RedirectRequest} from "content/lib/request";
-import {Utils} from "content/lib/utils";
-import {RequestProcessor} from "content/lib/request-processor";
-import {Environment, MainEnvironment} from "content/lib/environment";
+import * as Utils from "content/lib/utils/misc-utils";
+import * as RequestProcessor from "content/lib/request-processor";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 let catMan = Cc["@mozilla.org/categorymanager;1"].
     getService(Ci.nsICategoryManager);
@@ -67,7 +67,7 @@ export const RPContentPolicy = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           register();
@@ -84,7 +84,7 @@ export const RPContentPolicy = (function() {
 
   let unregister = (function() {
     return function() {
-      Logger.log("shutting down RPContentPolicy...");
+      log.log("shutting down RPContentPolicy...");
 
       // Below the shouldLoad function is replaced by a new one
       // which always allows *all* requests.
@@ -136,7 +136,7 @@ export const RPContentPolicy = (function() {
     };
   })();
 
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
                                          unregister);
 
   // ---------------------------------------------------------------------------
@@ -213,7 +213,7 @@ export const RPChannelEventSink = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           register();
@@ -230,7 +230,7 @@ export const RPChannelEventSink = (function() {
 
   let unregister = (function() {
     return function unregister() {
-      Logger.log("shutting down RPChannelEventSink...");
+      log.log("shutting down RPChannelEventSink...");
 
       self.asyncOnChannelRedirect = () => {};
 
@@ -248,7 +248,7 @@ export const RPChannelEventSink = (function() {
     };
   })();
 
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE, unregister);
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE, unregister);
 
   // ---------------------------------------------------------------------------
   // nsISupports interface implementation

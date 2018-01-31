@@ -21,10 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Logger} from "content/lib/logger";
-import {DomainUtil} from "content/lib/utils/domains";
-import {Environment, MainEnvironment} from "content/lib/environment";
-import {C} from "content/lib/utils/constants";
+import {Log as log} from "content/models/log";
+import * as DomainUtil from "content/lib/utils/domain-utils";
+import {
+  Environment,
+  Level as EnvLevel,
+  MainEnvironment,
+} from "content/lib/environment";
+import {C} from "content/data/constants";
 
 import {overlayComm} from "content/framescripts/managers";
 import {ManagerForBlockedContent}
@@ -89,7 +93,7 @@ export const ManagerForDOMContentLoaded = (function() {
       }
 
       const {blockedURIs} = aResponse;
-      // Logger.log("Received " +
+      // log.log("Received " +
       //              Object.getOwnPropertyNames(blockedURIs).length +
       //              " blocked URIs.");
 
@@ -151,11 +155,11 @@ export const ManagerForDOMContentLoaded = (function() {
    * @param {Document} doc
    */
   function onDocumentLoaded(doc) {
-    // Create a new Environment for this Document and shut it down when
+    // Create a new environment for this Document and shut it down when
     // the document is unloaded.
     let DocEnv = new Environment(MainEnvironment, "DocEnv");
     DocEnv.shutdownOnUnload(doc.defaultView);
-    // start up the Environment immediately, as it won't have any startup
+    // start up the environment immediately, as it won't have any startup
     // functions.
     DocEnv.startup();
 
@@ -194,7 +198,7 @@ export const ManagerForDOMContentLoaded = (function() {
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      Logger.info("Number of meta refreshes found: " + metaRefreshes.length);
+      log.info("Number of meta refreshes found: " + metaRefreshes.length);
 
       /* eslint-disable new-cap */
       const docShell = doc.defaultView.
@@ -203,7 +207,7 @@ export const ManagerForDOMContentLoaded = (function() {
           QueryInterface(Ci.nsIDocShell);
       /* eslint-enable new-cap */
       if (!docShell.allowMetaRedirects) {
-        Logger.warn(
+        log.warn(
             "Another extension disabled docShell.allowMetaRedirects.");
       }
 
@@ -230,7 +234,7 @@ export const ManagerForDOMContentLoaded = (function() {
     for (let anchorTag of anchorTags) {
       anchorTag.addEventListener("click", htmlAnchorTagClicked, false);
     }
-    DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+    DocEnv.addShutdownFunction(EnvLevel.INTERFACE, function() {
       for (let anchorTag of anchorTags) {
         anchorTag.removeEventListener("click", htmlAnchorTagClicked, false);
       }
@@ -240,7 +244,7 @@ export const ManagerForDOMContentLoaded = (function() {
     //       openDialog() methods?
 
     // wrapWindowFunctions(doc.defaultView);
-    // DocEnv.addShutdownFunction(Environment.LEVELS.INTERFACE, function() {
+    // DocEnv.addShutdownFunction(EnvLevel.INTERFACE, function() {
     //   unwrapWindowFunctions(doc.defaultView);
     // });
   }

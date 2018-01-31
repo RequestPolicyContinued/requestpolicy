@@ -69,11 +69,11 @@ const fileFilter = (function() {
   }
 
   const nonModulePaths = [
+    "conditional/legacy/bootstrap",
     "content/bootstrap/data/",
     "content/bootstrap/environments/",
   ];
   const nonModuleStems = [
-    "bootstrap",
   ];
 
   function originalPath(aVinylFile) {
@@ -148,6 +148,7 @@ const getDependenciesMaxMtime = (function() {
     "config.json",
     "gulpfile.js",
     "package.json",
+    "tsconfig.json",
   ].map(filename => rootDir + "/" + filename);
 
   return function getDependenciesMtime() {
@@ -256,13 +257,13 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 
 /* eslint-disable max-len */
 const BUILDS = [
-  { alias: "ui-testing",   isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "unit-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "dev",          isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",      isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "beta",         isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
-  { alias: "amo-nightly",  isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
-  { alias: "amo-beta",     isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
+  { alias: "ui-testing",     isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "non-ui-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "dev",            isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
+  { alias: "nightly",        isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
+  { alias: "beta",           isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
+  { alias: "amo-nightly",    isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
+  { alias: "amo-beta",       isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
 ];
 /* eslint-enable max-len */
 
@@ -367,6 +368,7 @@ BUILDS.forEach(build => {
     const buildDeps = [];
     if (build.forceCleanBuild) buildDeps.push(`clean:${extensionType}:${build.alias}`);
     addGulpTasks(`build:${extensionType}:${build.alias}`, buildDeps,
+                 // eslint-disable-next-line complexity
                  (addBuildTask, buildTaskPrefix) => {
       addBuildTask("copiedFiles", () => {
         let files = [
@@ -442,74 +444,103 @@ BUILDS.forEach(build => {
         // </hack>
       };
       if (build.isDev) tsConfigOverride.removeComments = false;
-      const tsProject = ts.createProject("tsconfig.json", tsConfigOverride);
+      Object.freeze(tsConfigOverride);
 
+      const moduleRootInfos = {
+        "main": {
+          moduleRoot: "content",
+          tsConfigPath: "tsconfig.json",
+          additionalFiles: extensionType === "legacy" ? [
+            "bootstrap.js",
+          ] : [],
+        },
+      };
 
-      addBuildTask("js", [TASK_NAMES.ppContext], () => {
-        let files = [`content/**/*.*(js|jsm|ts)`];
-        switch (extensionType) {
-          case "legacy":
-            files.push(`bootstrap.js`);
-            break;
-        }
-        files = inAnyRoot(files);
-        files.push("!**/third-party/**/*");
+      function addJsBuildTask(aModuleRootAlias) {
+        const {
+          moduleRoot,
+          additionalFiles,
+          tsConfigPath,
+        } = moduleRootInfos[aModuleRootAlias];
+        const otherModuleRoots = Object.keys(moduleRootInfos).
+            filter(alias => alias !== aModuleRootAlias).
+            map(alias => moduleRootInfos[alias].moduleRoot);
+        const subRoots = otherModuleRoots.
+            filter(otherRoot => otherRoot.startsWith(`${moduleRoot}/`));
+        const tsProject = ts.createProject(tsConfigPath, tsConfigOverride);
 
-        let stream = gulp.src(files, { base: srcDir }).
-            pipe(gulpif(!build.forceCleanBuild, changed(buildDir, {
-              hasChanged: compareLastModifiedTime,
-              transformPath(aPath) {
-                let path = mergeInConditional_mapDirname(aPath);
-                path = path.replace(/\.(ts)$/, ".js");
-                return path;
-              },
-            }))).
-            pipe(replace(
-                /console\.(error|warn|info|log|debug)\(\s*(["'`]?)/g,
-                (match, fn, stringDelim) => {
-                  let argsPrefix = stringDelim === "" ?
-                      `"[RequestPolicy] " + ` :
-                      `${stringDelim}[RequestPolicy] `;
-                  return `console.${fn}(${argsPrefix}`;
-                }
-            )).
-            pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
-            pipe(gulpif(build.isDev, sourcemaps.init()));
+        return addBuildTask(`js:${aModuleRootAlias}`, [TASK_NAMES.ppContext], () => {
+          let files = [`${moduleRoot}/**/*.*(js|jsm|ts)`].concat(additionalFiles);
+          files = inAnyRoot(files);
+          files.push("!**/third-party/**/*");
 
-        stream = mergeStream(
-            // non-jsm files
-            stream.
-                pipe(fileFilter.include({isModule: true})).
-                pipe(tsProject()).js,
+          let subRootFiles = [];
+          for (let subRoot of subRoots) {
+            subRootFiles.push(`${subRoot}/**/*`);
+            subRootFiles.push(`${subRoot}/*`);
+          }
+          subRootFiles = inAnyRoot(subRootFiles);
+          files = files.concat(subRootFiles.map(file => "!" + file));
 
-            // jsm files
-            stream.
-                pipe(fileFilter.include({isModule: false})));
+          let stream = gulp.src(files, { base: srcDir }).
+              pipe(gulpif(!build.forceCleanBuild, changed(buildDir, {
+                hasChanged: compareLastModifiedTime,
+                transformPath(aPath) {
+                  let path = mergeInConditional_mapDirname(aPath);
+                  path = path.replace(/\.(ts)$/, ".js");
+                  return path;
+                },
+              }))).
+              pipe(replace(
+                  /console\.(error|warn|info|log|debug)\(\s*(["'`)]?)/g,
+                  (match, fn, nextChar) => {
+                    let argsPrefix =
+                        nextChar === ")" ? `"[RequestPolicy]")` :
+                        nextChar === "" ? `"[RequestPolicy] " + ` :
+                        `${nextChar}[RequestPolicy] `;
+                    return `console.${fn}(${argsPrefix}`;
+                  }
+              )).
+              pipe(preprocess({ context: buildData.ppContext, extension: "js" })).
+              pipe(gulpif(build.isDev, sourcemaps.init()));
 
-        stream = stream.
-            // WORKAROUND NOTICE:
-            // `mergeInConditional` is applied _after_ typescript because I had
-            // sourcemapping issues when it was the other way around.
-            // (gulp-typescript did not correctly respect the previously created
-            // sourcemap.)
-            pipe(rename(mergeInConditional)).
+          stream = mergeStream(
+              // non-jsm files
+              stream.
+                  pipe(fileFilter.include({isModule: true})).
+                  pipe(tsProject()).js,
 
-            pipe(gulpif(build.isDev,
-                gulpif(
-                    build.alias === "unit-testing",
-                    sourcemaps.write({
-                      destPath: buildDir,
-                      sourceRoot: srcDir,
-                    }),
-                    sourcemaps.write({
-                      destPath: buildDir,
-                      sourceRoot: `file://${srcDir}`,
-                    })
-                )
-            )).
-            pipe(gulp.dest(buildDir));
-        return stream;
-      });
+              // jsm files
+              stream.
+                  pipe(fileFilter.include({isModule: false})));
+
+          stream = stream.
+              // WORKAROUND NOTICE:
+              // `mergeInConditional` is applied _after_ typescript because I had
+              // sourcemapping issues when it was the other way around.
+              // (gulp-typescript did not correctly respect the previously created
+              // sourcemap.)
+              pipe(rename(mergeInConditional)).
+
+              pipe(gulpif(build.isDev,
+                  gulpif(
+                      build.alias === "non-ui-testing",
+                      sourcemaps.write({
+                        destPath: buildDir,
+                        sourceRoot: srcDir,
+                      }),
+                      sourcemaps.write({
+                        destPath: buildDir,
+                        sourceRoot: `file://${srcDir}`,
+                      })
+                  )
+              )).
+              pipe(gulp.dest(buildDir));
+          return stream;
+        });
+      }
+
+      addJsBuildTask("main");
     });
   });
 });

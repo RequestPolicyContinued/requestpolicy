@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from marionette_driver.marionette import Actions
 from rp_ui_harness import RequestPolicyTestCase
 
 
@@ -18,7 +19,11 @@ class TestTabs(RequestPolicyTestCase):
             link = self.marionette.find_element("tag name", "a")
 
         # Open Link in New Tab (background).
-        self.ctx_menu.select_entry("context-openlinkintab", link)
+        # Use middle click because the context menu does not always work.
+        # (TimeoutException)
+        with self.marionette.using_context("content"):
+            Actions(self.marionette).click(link, 1).perform()
+        # self.ctx_menu.select_entry("context-openlinkintab", link)
 
         tabbar = self.browser.tabbar
         new_tab = tabbar.tabs[1]

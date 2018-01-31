@@ -82,12 +82,12 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
 
     // Get and display user rules
     var user = PolicyManager.getUserRulesets().user;
-    entries = user.rawRuleset.toJSON().entries;
+    entries = user.rawRuleset.raw.entries;
     addRules(entries, "User", filter, false);
 
     // Get and display temorary rules
     var temp = PolicyManager.getUserRulesets().temp;
-    entries = temp.rawRuleset.toJSON().entries;
+    entries = temp.rawRuleset.raw.entries;
     addRules(entries, "Temporary", filter, false);
 
     if (!C.UI_TESTING) {
@@ -97,7 +97,7 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
       for (var subscriptionList in subscriptionLists) {
         for (var subscription in subscriptionLists[subscriptionList]) {
           entries = subscriptionLists[subscriptionList][subscription].
-              rawRuleset.toJSON().entries;
+              rawRuleset.raw.entries;
           addRules(entries, subscription, filter, true);
         }
       }
@@ -182,6 +182,8 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
     try {
       addRuleHelper();
     } catch (e) {
+      console.error("yourpolicy: addRule():");
+      console.dir(e);
       window.alert("Unable to add rule: " + e.toString());
       return;
     }
@@ -222,9 +224,7 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
         originPort);
     var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
     if (!originPart && !destPart) {
-      // TODO: don't throw, instead show message in form.
-      // eslint-disable-next-line no-throw-literal
-      throw "You must specify some rule information";
+      return;
     }
     var ruleData = {};
     if (originPart) {

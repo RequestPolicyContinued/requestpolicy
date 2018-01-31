@@ -25,7 +25,7 @@ import {common, WinEnv, elManager} from "./common";
 
 (function() {
   var {
-    Logger,
+    Log: log,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rpService,
@@ -120,7 +120,7 @@ import {common, WinEnv, elManager} from "./common";
     for (var subName in available) {
       var el = getInputElement(subName);
       if (!el) {
-        Logger.log("Skipping unexpected official subName: " + subName);
+        log.log("Skipping unexpected official subName: " + subName);
         continue;
       }
       elManager.addListener(el, "change", handleSubscriptionCheckboxChange);

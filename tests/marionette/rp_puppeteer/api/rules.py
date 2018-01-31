@@ -124,7 +124,7 @@ class Rules(BaseLib):
           var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
           var rawRuleset = PolicyManager.getUserRulesets()[rulesetName]
                                         .rawRuleset;
-          return rawRuleset._entries[ruleActionString];
+          return rawRuleset.entries[ruleActionString];
         """, script_args=[ruleset_name, rule_action_string])
 
         return [self.create_rule(rule_data, allow, temp)

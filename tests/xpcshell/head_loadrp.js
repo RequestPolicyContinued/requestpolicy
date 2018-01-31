@@ -42,16 +42,16 @@ Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
                                     "main/default-pref-handler.js", {});
 
 // -----------------------------------------------------------------------------
-// Set up the Logger module
+// Set up the Log module
 // -----------------------------------------------------------------------------
 
 {
   let tmpScope = {};
-  Cu.import("chrome://rpcontinued/content/lib/logger.jsm", tmpScope);
+  Cu.import("chrome://rpcontinued/content/models/log.jsm", tmpScope);
 
   // Use |do_print| instead of |dump| because that's what's
   // available for xpcshell tests.
-  tmpScope.Logger.printFunc = function(msg) {
+  tmpScope.Log.printFunc = function(msg) {
     do_print(msg.trimRight());
   };
 }

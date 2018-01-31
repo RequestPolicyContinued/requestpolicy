@@ -21,22 +21,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
+import {
+  Environment,
+  Level as EnvLevel,
+  MainEnvironment,
+} from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
-import {Logger} from "content/lib/logger";
+import {Log as log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
-import {RequestProcessor} from "content/lib/request-processor";
+import * as RequestProcessor from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
-import {DomainUtil} from "content/lib/utils/domains";
-import {StringUtils} from "content/lib/utils/strings";
-import {WindowUtils} from "content/lib/utils/windows";
-import {JSUtils} from "content/lib/utils/javascript";
-import {Utils} from "content/lib/utils";
-import {DOMUtils} from "content/lib/utils/dom";
-import {C} from "content/lib/utils/constants";
+import * as DomainUtil from "content/lib/utils/domain-utils";
+import * as StringUtils from "content/lib/utils/string-utils";
+import * as WindowUtils from "content/lib/utils/window-utils";
+import * as JSUtils from "content/lib/utils/js-utils";
+import * as Utils from "content/lib/utils/misc-utils";
+import * as DOMUtils from "content/lib/utils/dom-utils";
+import {C} from "content/data/constants";
 import {CompatibilityRules} from "content/models/compatibility-rules";
+import {Requests} from "content/models/requests";
+import {
+  addSessionHistoryListener,
+  removeSessionHistoryListener,
+} from "content/lib/utils/try-catch-utils";
 
 const {LOG_FLAG_STATE} = C;
 
@@ -123,7 +132,7 @@ export function loadOverlayIntoWindow(window) {
 
         browser.runtime.getBrowserInfo().then((appInfo) => {
           if (appInfo.name === "Fennec") {
-            Logger.log("Detected Fennec.");
+            log.log("Detected Fennec.");
             // Set an attribute for CSS usage.
             popupElement.setAttribute("fennec", "true");
             popupElement.setAttribute("position", "after_end");
@@ -137,7 +146,7 @@ export function loadOverlayIntoWindow(window) {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        RequestProcessor.addRequestObserver(self);
+        Requests.onRequest.addListener(self.observeRequest);
 
         setContextMenuEntryEnabled(Storage.get("contextMenu"));
 
@@ -169,16 +178,16 @@ export function loadOverlayIntoWindow(window) {
   }
 
   OverlayEnvironment.addShutdownFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
-        RequestProcessor.removeRequestObserver(self);
+        Requests.onRequest.removeListener(self.observeRequest);
         unwrapAddTab();
         self._removeHistoryObserver();
         self._removeLocationObserver();
       });
 
   OverlayEnvironment.addShutdownFunction(
-    Environment.LEVELS.UI,
+    EnvLevel.UI,
     function() {
       let requestLog = $id("rpcontinued-requestLog");
 
@@ -201,7 +210,7 @@ export function loadOverlayIntoWindow(window) {
       }
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addAppcontentTabSelectListener);
 
   /**
@@ -216,7 +225,7 @@ export function loadOverlayIntoWindow(window) {
                                                false);
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addContextMenuListener);
 
   function addTabContainerTabSelectListener() {
@@ -237,7 +246,7 @@ export function loadOverlayIntoWindow(window) {
       self._addHistoryObserver();
     }
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         addTabContainerTabSelectListener);
 
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
@@ -259,7 +268,7 @@ export function loadOverlayIntoWindow(window) {
 
   mlManager.addListener("notifyDOMFrameContentLoaded", function(message) {
     // This has an advantage over just relying on the
-    // observeBlockedRequest() call in that this will clear a blocked
+    // observeRequest() call in that this will clear a blocked
     // content notification if there no longer blocked content. Another way
     // to solve this would be to observe allowed requests as well as blocked
     // requests.
@@ -283,7 +292,7 @@ export function loadOverlayIntoWindow(window) {
   });
 
   self.handleMetaRefreshes = function(message) {
-    Logger.log("Handling meta refreshes...");
+    log.log("Handling meta refreshes...");
 
     let {documentURI, metaRefreshes} = message.data;
     let browser = message.target;
@@ -291,12 +300,12 @@ export function loadOverlayIntoWindow(window) {
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       let {delay, destURI, originalDestURI} = metaRefreshes[i];
 
-      Logger.log("meta refresh to <" +
+      log.log("meta refresh to <" +
           destURI + "> (" + delay + " second delay) found in document at <" +
           documentURI + ">");
 
       if (originalDestURI) {
-        Logger.log(
+        log.log(
             "meta refresh destination <" + originalDestURI + "> " +
             "appeared to be relative to <" + documentURI + ">, so " +
             "it has been resolved to <" + destURI + ">");
@@ -305,12 +314,12 @@ export function loadOverlayIntoWindow(window) {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!Storage.isBlockingDisabled() &&
+      if (!Storage.alias.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
-          Logger.warn(
+          log.warn(
               "Ignoring redirect to javascript URI <" + destURI + ">");
           continue;
         }
@@ -379,7 +388,7 @@ export function loadOverlayIntoWindow(window) {
     redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {
-      Logger.warning(
+      log.warning(
           "Should have shown redirect notification to <" + redirectTargetUri +
           ">, but it's not implemented yet on Fennec.");
       return false;
@@ -563,13 +572,13 @@ export function loadOverlayIntoWindow(window) {
       let browser = gBrowser.selectedBrowser;
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
-        Logger.log(
+        log.log(
             "Checking for blocked requests from page <" + uri + ">");
       }
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
-      let documentContainsBlockedContent = RequestProcessor
+      let documentContainsBlockedContent = Requests
           .getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
@@ -577,7 +586,7 @@ export function loadOverlayIntoWindow(window) {
         let logText = documentContainsBlockedContent ?
                       "Requests have been blocked." :
                       "No requests have been blocked.";
-        Logger.log(logText);
+        log.log(logText);
       }
 
       return Promise.resolve();
@@ -609,7 +618,7 @@ export function loadOverlayIntoWindow(window) {
     const button = $id(toolbarButtonId);
     let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
-      let isPermissive = Storage.isBlockingDisabled();
+      let isPermissive = Storage.alias.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
@@ -621,38 +630,31 @@ export function loadOverlayIntoWindow(window) {
     ManagerForPrefObservers.get(OverlayEnvironment).
         addListener("startWithAllowAllEnabled", updatePermissiveStatus);
   }
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.INTERFACE,
+  OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
                                         updatePermissiveStatusOnPrefChanges);
   // initially set the Permissive Status
-  OverlayEnvironment.addStartupFunction(Environment.LEVELS.UI,
+  OverlayEnvironment.addStartupFunction(EnvLevel.UI,
                                         updatePermissiveStatus);
 
   /**
-   * This function is called when any allowed requests happen. This must be as
+   * This function is called when any requests happen. This must be as
    * fast as possible because request processing blocks until this function
    * returns.
    *
+   * @param {boolean} isAllowed
    * @param {string} originUri
    * @param {string} destUri
    */
-  self.observeAllowedRequest = function(originUri, destUri) {
-    if (self.requestLog) {
-      self.requestLog.addAllowedRequest(originUri, destUri);
-    }
-  };
-
-  /**
-   * This function is called when any blocked requests happen. This must be as
-   * fast as possible because request processing blocks until this function
-   * returns.
-   *
-   * @param {string} originUri
-   * @param {string} destUri
-   */
-  self.observeBlockedRequest = function(originUri, destUri) {
-    self._updateNotificationDueToBlockedContent();
-    if (self.requestLog) {
-      self.requestLog.addBlockedRequest(originUri, destUri);
+  self.observeRequest = function({isAllowed, originUri, destUri}) {
+    if (isAllowed) {
+      if (self.requestLog) {
+        self.requestLog.addAllowedRequest(originUri, destUri);
+      }
+    } else {
+      self._updateNotificationDueToBlockedContent();
+      if (self.requestLog) {
+        self.requestLog.addBlockedRequest(originUri, destUri);
+      }
     }
   };
 
@@ -879,19 +881,17 @@ export function loadOverlayIntoWindow(window) {
     let maxTries = 10;
     let tryAddingSHistoryListener = function() {
       ++tries;
-      try {
-        // FIXME: [e10s] The DocShell (and webNavigation) lives in the
-        //               content process.
-        let sHistory = gBrowser.webNavigation.sessionHistory;
-        sHistory.addSHistoryListener(self.historyListener);
-        return;
-      } catch (e) {
-        if (tries >= maxTries) {
-          console.error("[SEVERE] Can't add session history listener, even " +
-              "after " + tries + " tries. Details:");
-          console.dir(e);
-          return;
-        }
+      // FIXME: [e10s] The DocShell (and webNavigation) lives in the
+      //               content process.
+      const result = addSessionHistoryListener(gBrowser, self.historyListener);
+      if (!result.error) return;
+
+      const e = result.error;
+      if (tries >= maxTries) {
+        console.error("[SEVERE] Can't add session history listener, even " +
+            "after " + tries + " tries. Details:");
+        console.dir(e);
+      } else {
         // call this function again in a few miliseconds.
         setTimeout(function() {
           // Prevent the `setTimeout` warning of the AMO Validator.
@@ -903,10 +903,8 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self._removeHistoryObserver = function() {
-    const sHistory = gBrowser.webNavigation.sessionHistory;
-    try {
-      sHistory.removeSHistoryListener(self.historyListener);
-    } catch (e) {
+    const result = removeSessionHistoryListener(gBrowser, self.historyListener);
+    if (result.error) {
       // When closing the last window in a session where additional windows
       // have been opened and closed, this will sometimes fail (bug #175).
     }
@@ -967,8 +965,8 @@ export function loadOverlayIntoWindow(window) {
    * @param {Event} event
    */
   self.toggleTemporarilyAllowAll = function(event) {
-    const disabled = !Storage.isBlockingDisabled();
-    Storage.setBlockingDisabled(disabled);
+    const disabled = !Storage.alias.isBlockingDisabled();
+    Storage.alias.setBlockingDisabled(disabled);
 
     // Change the link displayed in the menu.
     $id("rpc-link-enable-blocking").hidden = !disabled;
@@ -998,7 +996,7 @@ export function loadOverlayIntoWindow(window) {
     // The first time the width will be 0. The default value is determined by
     // logging it or you can probably figure it out from the CSS which doesn't
     // directly specify the width of the entire popup.
-    // Logger.log('popup width: ' + popup.clientWidth);
+    // log.log('popup width: ' + popup.clientWidth);
     const popupWidth = popupElement.clientWidth === 0 ? 730 :
         popupElement.clientWidth;
     const anchor = $id("content");
@@ -1083,9 +1081,18 @@ export function loadOverlayIntoWindow(window) {
     openLinkInNewTab(url, relatedToCurrent);
   }
 
+  // @if EXTENSION_TYPE='legacy'
+  self.openPrefs = maybeOpenLinkInNewTab.bind(null,
+      "about:requestpolicy",
+      [
+        browser.runtime.getURL("content/settings/basicprefs.html"),
+      ], true);
+  // @endif
+  // @if EXTENSION_TYPE!='legacy'
   self.openPrefs = maybeOpenLinkInNewTab.bind(null,
       browser.runtime.getURL("content/settings/basicprefs.html"),
       [], true);
+  // @endif
   self.openPolicyManager = maybeOpenLinkInNewTab.bind(null,
       browser.runtime.getURL("content/settings/yourpolicy.html"), [], true);
   self.openHelp = maybeOpenLinkInNewTab.bind(null, "https://github.com/" +

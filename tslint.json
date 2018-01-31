@@ -14,6 +14,7 @@
     "indent": [
       true, "spaces", 2
     ],
+    "max-line-length": [true, 80],
     "no-console": [
       false
     ],

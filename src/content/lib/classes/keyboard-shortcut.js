@@ -23,7 +23,7 @@
 import {Windows} from "content/models/windows";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
-import {XULUtils} from "content/lib/utils/xul";
+import * as XULUtils from "content/lib/utils/xul-utils";
 import {MainEnvironment} from "content/lib/environment";
 
 // =============================================================================

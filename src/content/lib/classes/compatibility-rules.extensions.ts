@@ -74,18 +74,15 @@ export class ExtensionCompatibilityRules {
     return this.pWhenReady;
   }
 
-  public get [Symbol.iterator]() {
-    const self: ExtensionCompatibilityRules = this;
-    return function*() {
-      // tslint:disable-next-line:prefer-const
-      for (let [rule, addonIds] of self.extRulesToIds.mapEntries()) {
-        const addonNames = Array.from(addonIds).
-            map((id: AddonID) => self.addonIdsToNames.get(id)).
-            join(", ");
-        const [origin, dest] = rule;
-        yield {origin, dest, info: addonNames};
-      }
-    };
+  public * [Symbol.iterator]() {
+    // tslint:disable-next-line:prefer-const
+    for (let [rule, addonIds] of this.extRulesToIds.mapEntries()) {
+      const addonNames = Array.from(addonIds).
+          map((id: AddonID) => this.addonIdsToNames.get(id)).
+          join(", ");
+      const [origin, dest] = rule;
+      yield {origin, dest, info: addonNames};
+    }
   }
 
   public checkBaseUriWhitelist(aBaseUri: BaseUri) {
@@ -146,7 +143,8 @@ export class ExtensionCompatibilityRules {
     }
 
     this.spec.forEach((spec: any) => {
-      const enabledAddonIds = spec.ids.filter((id: string) => idsToExtInfos.has(id));
+      const enabledAddonIds = spec.ids.
+          filter((id: string) => idsToExtInfos.has(id));
       if (enabledAddonIds.length === 0) {
         return;
       }

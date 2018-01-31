@@ -1,0 +1,59 @@
+/*
+ * ***** BEGIN LICENSE BLOCK *****
+ *
+ * RequestPolicy - A Firefox extension for control over cross-site requests.
+ * Copyright (c) 2008-2009 Justin Samuel
+ * Copyright (c) 2014 Martin Kimmerle
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * ***** END LICENSE BLOCK *****
+ */
+
+import * as JSUtils from "content/lib/utils/js-utils";
+
+const lazy = {};
+
+JSUtils.defineLazyGetter(lazy, "strbundle", function() {
+  return loadPropertiesFile(
+      "chrome://rpcontinued/locale/requestpolicy.properties");
+});
+
+// from https://developer.mozilla.org/en-US/Add-ons/
+// How_to_convert_an_overlay_extension_to_restartless
+// #Step_10.3A_Bypass_cache_when_loading_properties_files
+function loadPropertiesFile(path) {
+  /* HACK: The string bundle cache is cleared on addon shutdown, however it
+    * doesn't appear to do so reliably. Errors can erratically happen on next
+    * load of the same file in certain instances. (at minimum, when strings are
+    * added/removed) The apparently accepted solution to reliably load new
+    * versions is to always create bundles with a unique URL so as to bypass
+    * the cache. This is accomplished by passing a random number in a parameter
+    * after a '?'. (this random ID is otherwise ignored) The loaded string
+    * bundle is still cached on startup and should still be cleared out of the
+    * cache on addon shutdown. This just bypasses the built-in cache for
+    * repeated loads of the same path so that a newly installed update loads
+    * cleanly. */
+  return Services.strings.createBundle(path + "?" + Math.random());
+}
+
+export function $str(aName, aParams) {
+  if (aParams) {
+    return lazy.strbundle.formatStringFromName(aName, aParams,
+                                                aParams.length);
+  } else {
+    // eslint-disable-next-line new-cap
+    return lazy.strbundle.GetStringFromName(aName);
+  }
+}

@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {SingleTopicObserver} from "content/lib/utils/observers";
-import {Environment} from "content/lib/environment";
-import {Logger} from "content/lib/logger";
+import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
+import {Level as EnvLevel} from "content/lib/environment";
+import {Log as log} from "content/models/log";
 
 // =============================================================================
 // ObserverManager
@@ -35,39 +35,39 @@ import {Logger} from "content/lib/logger";
  *
  * @param {Environment} aEnv
  */
-export function ObserverManager(aEnv) {
-  let self = this;
+export class ObserverManager {
+  constructor(aEnv) {
+    this.environment = aEnv;
 
-  self.environment = aEnv;
-
-  if (aEnv) {
-    self.environment.addShutdownFunction(
-        Environment.LEVELS.INTERFACE,
-        function() {
-          // unregister when the environment shuts down
-          self.unregisterAllObservers();
-        });
-  } else {
-    // aEnv is not defined! Try to report an error.
-    if (Logger) {
-      Logger.warn("No Environment was specified for " +
-                     "a new ObserverManager! This means that the observers " +
-                     "won't be unregistered!");
+    if (aEnv) {
+      this.environment.addShutdownFunction(
+          EnvLevel.INTERFACE,
+          () => {
+            // unregister when the environment shuts down
+            this.unregisterAllObservers();
+          });
+    } else {
+      // aEnv is not defined! Try to report an error.
+      if (log) {
+        log.warn(
+            "No Environment was specified for " +
+            "a new ObserverManager! This means that the observers " +
+            "won't be unregistered!");
+      }
     }
+
+    // an object holding all observers for unregistering when unloading the page
+    this.observers = [];
   }
 
-  // an object holding all observers for unregistering when unloading the page
-  self.observers = [];
-}
+  /**
+   * Define 'observe' functions. Those function can be called from anywhere;
+   * the caller hands over an object with the keys being the "IDs" and the
+   * values being the function that should be called when the "ID" is observed.
+   *
+   * The "ID" for each function might be something different.
+   */
 
-/**
- * Define 'observe' functions. Those function can be called from anywhere;
- * the caller hands over an object with the keys being the "IDs" and the values
- * being the function that should be called when the "ID" is observed.
- *
- * The "ID" for each function might be something different.
- */
-{
   //
   // functions using nsIObserverService
   //
@@ -79,10 +79,10 @@ export function ObserverManager(aEnv) {
    * @param {string} aTopic - The topic to be observed.
    * @param {Function} aCallback - The observer's callback function.
    */
-  ObserverManager.prototype.observeSingleTopic = function(aTopic, aCallback) {
+  observeSingleTopic(aTopic, aCallback) {
     let self = this;
-    self.observers.push(new SingleTopicObserver(aTopic, aCallback));
-  };
+    self.observers.push(new XPCOMObserver(aTopic, aCallback));
+  }
 
   /**
    * Observe multiple topics.
@@ -91,21 +91,21 @@ export function ObserverManager(aEnv) {
    * @param {function} aCallback - the function to be called when one of the
    *     the topics is observed.
    */
-  ObserverManager.prototype.observe = function(aTopics, aCallback) {
+  observe(aTopics, aCallback) {
     let self = this;
     aTopics.forEach(function(topic) {
       self.observeSingleTopic(topic, aCallback);
     });
-  };
-}
-
-/**
- * The function will unregister all registered observers.
- */
-ObserverManager.prototype.unregisterAllObservers = function() {
-  let self = this;
-  while (self.observers.length > 0) {
-    let observer = self.observers.pop();
-    observer.unregister();
   }
-};
+
+  /**
+   * The function will unregister all registered observers.
+   */
+  unregisterAllObservers() {
+    let self = this;
+    while (self.observers.length > 0) {
+      let observer = self.observers.pop();
+      observer.unregister();
+    }
+  }
+}

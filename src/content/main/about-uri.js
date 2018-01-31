@@ -20,9 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Environment, MainEnvironment} from "content/lib/environment";
-import {Utils} from "content/lib/utils";
-import {Info} from "content/lib/utils/info";
+import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
+import * as Utils from "content/lib/utils/misc-utils";
 
 // =============================================================================
 // utilities, constants
@@ -77,7 +76,7 @@ export const AboutRequestPolicy = (function() {
   self.newChannel = function(aURI, aLoadInfo) {
     let uri = getURI(aURI);
     let channel;
-    if (Info.isGeckoVersionAtLeast("48.0a1")) {
+    if (LegacyApi.miscInfos.isGeckoVersionAtLeast("48.0a1")) {
       // newChannelFromURIWithLoadInfo is available since Gecko 48.
       channel = Services.io.newChannelFromURIWithLoadInfo(uri, aLoadInfo);
     } else {
@@ -109,7 +108,7 @@ export const AboutRequestPolicy = (function() {
   }
 
   MainEnvironment.addStartupFunction(
-      Environment.LEVELS.INTERFACE,
+      EnvLevel.INTERFACE,
       function() {
         try {
           registerFactory();
@@ -133,7 +132,7 @@ export const AboutRequestPolicy = (function() {
       registrar.unregisterFactory(self.classID, self);
     });
   }
-  MainEnvironment.addShutdownFunction(Environment.LEVELS.INTERFACE,
+  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
                                          unregisterFactory);
 
   return self;

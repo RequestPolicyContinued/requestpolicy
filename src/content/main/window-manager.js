@@ -27,6 +27,7 @@ import {ToolbarButtonController}
     from "content/controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "content/controllers/windows.style-sheets";
 import {FramescriptServices} from "content/main/framescript-services";
+import { pWindowsAvailable } from "content/models/ui-startup";
 
 // =============================================================================
 // WindowSubControllers
@@ -85,19 +86,25 @@ export const rpWindowManager = (function() {
   MainEnvironment.addStartupFunction(
       EnvLevel.INTERFACE,
       function() {
-        WindowSubControllers.startup();
-        Windows.forEachOpenWindow(loadIntoWindow);
-        Windows.addListener("load", loadIntoWindow);
-        Windows.addListener("unload", unloadFromWindow);
-        Windows._startListening();
+        pWindowsAvailable.then(() => {
+          WindowSubControllers.startup();
+          Windows.forEachOpenWindow(loadIntoWindow);
+          Windows.addListener("load", loadIntoWindow);
+          Windows.addListener("unload", unloadFromWindow);
+          Windows._startListening();
 
-        // init the FramescriptServices _before_ loading the framescripts
-        FramescriptServices.init();
+          // init the FramescriptServices _before_ loading the framescripts
+          FramescriptServices.init();
 
-        // Load the framescript into all existing tabs.
-        // Also tell the globalMM to load it into each new
-        // tab from now on.
-        Services.mm.loadFrameScript(frameScriptURI, true);
+          // Load the framescript into all existing tabs.
+          // Also tell the globalMM to load it into each new
+          // tab from now on.
+          Services.mm.loadFrameScript(frameScriptURI, true);
+          return;
+        }).catch((e) => {
+          console.error("rpWindowManager startup error:");
+          console.dir(e);
+        });
       });
 
   MainEnvironment.addShutdownFunction(

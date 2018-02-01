@@ -22,6 +22,7 @@
 
 import {KeyboardShortcut} from "content/lib/classes/keyboard-shortcut";
 import {Storage} from "content/models/storage";
+import {pWindowsAvailable} from "content/models/ui-startup";
 
 // =============================================================================
 // KeyboardShortcutController
@@ -32,6 +33,7 @@ const keyboardShortcuts = [];
 export const KeyboardShortcutController = {
   startupPreconditions: [
     Storage.pReady,
+    pWindowsAvailable,
   ],
   startup() {
     keyboardShortcuts.push(new KeyboardShortcut("openMenu", "alt shift r",

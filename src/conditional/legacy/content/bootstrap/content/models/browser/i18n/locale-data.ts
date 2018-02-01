@@ -47,9 +47,20 @@ export class LocaleData {
     return this.messages.has(locale);
   }
 
-  // https://developer.chrome.com/extensions/i18n
-  // Note: Special messages starting with @@ (e.g @@bidi, @@ui_locale)
-  // are not supported
+  /**
+   * Gets the localized string for the specified message. If the message
+   * can't be found in messages.json, returns "" and log an error.
+   *
+   * https://developer.chrome.com/extensions/i18n
+   * Note: Special messages starting with @@ (e.g @@bidi, @@ui_locale)
+   * are not supported
+   *
+   * @param {string} messageName The name of the message, as specified in
+   * the messages.json file.
+   * @param {any} substitutions string or array of string. A single
+   * substitution string, or an array of substitution strings.
+   * @return {string} Message localized for current locale.
+   */
   public localizeMessage(
       message: string,
       substitutions = [],
@@ -111,12 +122,11 @@ export class LocaleData {
     return options.defaultValue;
   }
 
-  // Localize a string, replacing all |__MSG_(.*)__| tokens with the
-  // matching string from the current locale, as determined by
-  // |this.selectedLocale|.
-  //
-  // This may not be called before calling either |initLocale| or
-  // |initAllLocales|.
+  /**
+   * Localize a string, replacing all |__MSG_(.*)__| tokens with the
+   * matching string from the current local. Should be only used for
+   * substitution in HTML files.
+   */
   public localize(str?: string, locale = this.selectedLocale) {
     if (!str) {
       return str;

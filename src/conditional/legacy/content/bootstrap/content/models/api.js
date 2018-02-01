@@ -59,17 +59,41 @@ function manifestHasPermission(perm) {
 export const Api = {
   browser: {
     extension: {},
-    i18n: I18n,
+    i18n: new I18n(),
     management: {},
     runtime: Runtime.instance,
     storage: StorageApi,
   },
+
   LegacyApi: {
     L10nUtils,
     miscInfos: LegacyMiscInfos,
     PrefObserver: PrefObserver,
     prefs: Prefs,
     storage: {},
+  },
+
+  get subModels() {
+    return [
+      Api.browser.i18n,
+    ];
+  },
+
+  get whenReady() {
+    return Promise.all(this.subModels.map(
+        (model) => model.whenReady)
+    );
+  },
+
+  init() {
+    const p = Promise.all(this.subModels.map(
+        (model) => model.init()
+    ));
+    p.catch((e) => {
+      console.error("Api init() error:");
+      console.dir(e);
+    });
+    return p;
   },
 };
 
@@ -80,7 +104,7 @@ export const ContentScriptsApi = {
       inIncognitoContext: null,
     },
     runtime: ContentRuntime.instance,
-    i18n: ContentI18n,
+    i18n: new ContentI18n(Api.browser.i18n),
     storage: Api.browser.storage,
   },
 };

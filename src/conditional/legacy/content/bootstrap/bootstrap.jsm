@@ -179,20 +179,30 @@ var FakeWebExt = (function() {
       FakeWebExt.Api = fakeEnv.exports.Api;
     }
 
-    // initialize the fake environment
-    fakeEnv.exports.Bootstrap._startup();
+    const {Api} = fakeEnv.exports;
 
-    // start up the add-on
-    const {Api, Manifest} = fakeEnv.exports;
-    addon.commonjsEnv = createCommonjsEnv();
-    addon.commonjsEnv.load({
-      mainFile: Manifest.background.scripts[0],
-      additionalGlobals: [
-        ["browser", Api.browser],
-        ["LegacyApi", Api.LegacyApi],
-        ["_setBackgroundPage", Api._setBackgroundPage],
-      ],
+    // initialize the fake environment
+    const p = Api.init().then(() => {
+      fakeEnv.exports.Bootstrap._startup();
+
+      // start up the add-on
+      const {Manifest} = fakeEnv.exports;
+      addon.commonjsEnv = createCommonjsEnv();
+      addon.commonjsEnv.load({
+        mainFile: Manifest.background.scripts[0],
+        additionalGlobals: [
+          ["browser", Api.browser],
+          ["LegacyApi", Api.LegacyApi],
+          ["_setBackgroundPage", Api._setBackgroundPage],
+        ],
+      });
+      return;
     });
+    p.catch((e) => {
+      console.error("Error starting up!");
+      console.dir(e);
+    });
+    return p;
   };
 
   // ---------------------------------------------------------------------------

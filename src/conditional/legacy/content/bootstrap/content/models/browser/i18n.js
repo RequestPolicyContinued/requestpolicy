@@ -20,21 +20,41 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {LocaleManager} from "./i18n/locale-manager";
+import {AsyncLocaleData} from "bootstrap/models/browser/i18n/async-locale-data";
 
 export class I18n {
-  static get instance() {
-    if (!I18n._instance) {
-      I18n._instance = new I18n();
-    }
-    return I18n._instance;
+  constructor() {
+    this.lLocaleData = new AsyncLocaleData();
   }
 
-  constructor() {
-    LocaleManager.instance.init().catch(e => {
-      console.error("[Fatal] Unable to prepare locales manager! Details:");
+  get subModels() {
+    return [
+      this.lLocaleData,
+    ];
+  }
+
+  get whenReady() {
+    return Promise.all(this.subModels.map(
+        (model) => model.whenReady)
+    );
+  }
+
+  init() {
+    const p = Promise.all(this.subModels.map(
+        (model) => model.init()
+    ));
+    p.catch((e) => {
+      console.error("I18n init() error:");
       console.dir(e);
     });
+    return p;
+  }
+
+  get localeData() {
+    if (!this.lLocaleData.ready) {
+      throw new Error("I18n: localeData is not ready yet!");
+    }
+    return this.lLocaleData;
   }
 
   /**
@@ -48,7 +68,7 @@ export class I18n {
    * @return {string} Message localized for current locale.
    */
   getMessage(messageName, substitutions) {
-    return LocaleManager.instance.localizeMessage(messageName, substitutions);
+    return this.localeData.localizeMessage(messageName, substitutions);
   }
 
   /**
@@ -57,26 +77,23 @@ export class I18n {
    * @return {string} The browser UI language code as a BCP 47 tag.
    */
   getUILanguage() {
-    return LocaleManager.instance.getAppLocale();
+    return this.localeData.getAppLocale();
   }
 }
 
 export class ContentI18n {
-  static get instance() {
-    if (!this._instance) {
-      this._instance = new ContentI18n();
-    }
-    return this._instance;
+  constructor(i18n) {
+    this.i18n = i18n;
   }
 
   getMessage(...args) {
-    return I18n.instance.getMessage(...args);
+    return this.i18n.getMessage(...args);
   }
   getAcceptLanguages() {
     return null;
   }
   getUILanguage(...args) {
-    return I18n.instance.getUILanguage(...args);
+    return this.i18n.getUILanguage(...args);
   }
   detectLanguage() {
     return null;

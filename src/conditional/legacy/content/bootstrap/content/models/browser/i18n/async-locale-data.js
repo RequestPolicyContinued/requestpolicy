@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {defer} from "content/lib/utils/js-utils";
 import {LocaleData} from "./locale-data";
 import * as ChromeFilesUtils from "bootstrap/lib/utils/chrome-files-utils";
 import * as I18nUtils from "./i18n-utils";
@@ -27,16 +28,15 @@ import * as I18nUtils from "./i18n-utils";
 /**
  * This object manages loading locales for i18n support.
  */
-export class LocaleManager {
-  static get instance() {
-    if (!LocaleManager.lInstance) {
-      LocaleManager.lInstance = new LocaleManager();
-    }
-    return LocaleManager.lInstance;
+export class AsyncLocaleData extends LocaleData {
+  constructor() {
+    super();
+    this.dReady = defer();
+    this.ready = false;
   }
 
-  constructor() {
-    this.localeData = new LocaleData();
+  get whenReady() {
+    return this.dReady.promise;
   }
 
   /**
@@ -153,8 +153,8 @@ export class LocaleManager {
     let normDefault = I18nUtils.normalizeToBCP47(defaultLocale);
     let normUi = I18nUtils.normalizeToBCP47(uiLocale);
 
-    let loadedTags = Array.from(this.localeData.messages.keys()).filter(tag =>
-      tag.toLowerCase() !== this.localeData.BUILTIN.toLowerCase()).map(tag =>
+    let loadedTags = Array.from(this.messages.keys()).filter(tag =>
+      tag.toLowerCase() !== this.BUILTIN.toLowerCase()).map(tag =>
       I18nUtils.normalizeToBCP47(tag));
 
     let bestDefault = I18nUtils.getBestAvailableLocale(loadedTags, normDefault);
@@ -169,8 +169,8 @@ export class LocaleManager {
       // doesn't matter which value we set because defaultLocale will be used
       bestUi = normUi;
     }
-    this.localeData.defaultLocale = bestDefault;
-    this.localeData.selectedLocale = bestUi;
+    this.defaultLocale = bestDefault;
+    this.selectedLocale = bestUi;
 
     return {
       selected: bestUi,
@@ -182,7 +182,7 @@ export class LocaleManager {
     let defaultLocale;
     let uiLocale;
 
-    return this.getDefaultLocale()
+    const p = this.getDefaultLocale()
       .then(result => defaultLocale = result)
       .then(() => uiLocale = this.getAppLocale())
       .then(() => this.getAvailableLocales())
@@ -190,33 +190,18 @@ export class LocaleManager {
         AllLocales))
       .then(bestMatches => this.loadLocalesMessages(bestMatches))
       .then(localesMessages => Promise.all(localesMessages.map(
-        obj => this.localeData.addLocale(obj.locale, obj.messages)))
-      ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale));
-  }
-
-  /**
-   * Gets the localized string for the specified message. If the message
-   * can't be found in messages.json, returns "" and log an error.
-   *
-   * @param {string} messageName The name of the message, as specified in
-   * the messages.json file.
-   * @param {any} substitutions string or array of string. A single
-   * substitution string, or an array of substitution strings.
-   * @return {string} Message localized for current locale.
-   */
-  localizeMessage(messageName, substitutions) {
-    return this.localeData.localizeMessage(messageName, substitutions);
-  }
-
-  /**
-   * Localize a string, replacing all |__MSG_(.*)__| tokens with the
-   * matching string from the current local. Should be only used for
-   * substitution in HTML files.
-   *
-   * @param {string} str __MSG_(<message_name>)__
-   * @return {string} String localized for current locale.
-   */
-  localize(str) {
-    return this.localeData.localize(str);
+        obj => this.addLocale(obj.locale, obj.messages)))
+      ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale))
+      .then(() => {
+        this.dReady.resolve();
+        this.ready = true;
+        return;
+      });
+    p.catch((e) => {
+      console.error("LazyLocaleData.init()");
+      console.dir(e);
+      this.dReady.reject(e);
+    });
+    return p;
   }
 }

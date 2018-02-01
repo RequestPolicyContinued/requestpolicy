@@ -17,13 +17,14 @@
  * revision bc6315c22e6950b7022f6caf8929428399a1499f.
  */
 
+import {CIMap} from "content/lib/classes/case-insensitive-map";
 
 export function LocaleData() {
   this.defaultLocale = "";
   this.selectedLocale = "";
   this.warnedMissingKeys = new Set();
 
-  // Map(locale-name -> Map(message-key -> localized-string))
+  // Map(locale-name -> CIMap(message-key -> localized-string))
   // Contains a key for each loaded locale, each of which is a
   // Map of message keys to their localized strings.
   this.messages = new Map();
@@ -64,7 +65,6 @@ LocaleData.prototype = {
     options = Object.assign(defaultOptions, options);
 
     // Message names are case-insensitive, so normalize them to lower-case.
-    message = message.toLowerCase();
     for (let locale of locales) {
       let messages = this.messages.get(locale);
       if (messages.has(message)) {
@@ -119,9 +119,9 @@ LocaleData.prototype = {
   },
 
   // Validates the contents of a locale JSON file, normalizes the
-  // messages into a Map of message key -> localized string pairs.
+  // messages into a CIMap of message key -> localized string pairs.
   addLocale(locale, messages) {
-    let result = new Map();
+    let result = new CIMap();
 
     // eslint-disable-next-line no-extra-parens
     let isPlainObject = obj => (obj && typeof obj === "object");
@@ -154,15 +154,15 @@ LocaleData.prototype = {
 
       // Substitutions are case-insensitive, so normalize all of their names
       // to lower-case.
-      let placeholders = new Map();
+      let placeholders = new CIMap();
       if (isPlainObject(msg.placeholders)) {
         for (let key of Object.keys(msg.placeholders)) {
-          placeholders.set(key.toLowerCase(), msg.placeholders[key]);
+          placeholders.set(key, msg.placeholders[key]);
         }
       }
 
       let replacer = (match, name) => {
-        let replacement = placeholders.get(name.toLowerCase());
+        let replacement = placeholders.get(name);
         if (isPlainObject(replacement) && "content" in replacement) {
           return replacement.content;
         }
@@ -172,7 +172,7 @@ LocaleData.prototype = {
       let value = msg.message.replace(/\$([A-Za-z0-9@_]+)\$/g, replacer);
 
       // Message names are also case-insensitive
-      result.set(key.toLowerCase(), value);
+      result.set(key, value);
     }
 
     this.messages.set(locale, result);

@@ -13,13 +13,13 @@ describe("LocaleData", function() {
   describe("has(locale)", function() {
     it("Should return true with loaded locale", function() {
       let data = new LocaleData();
-      data.messages = new Map([["en-US", {}]]);
+      data.addLocale("en-US", {});
       assert.isTrue(data.has("en-US"));
     });
 
     it("Should return false with unknown locale", function() {
       let data = new LocaleData();
-      data.messages = new Map([["en-US", {}]]);
+      data.addLocale("en-US", {});
       assert.isFalse(data.has("fr"));
     });
   });
@@ -27,7 +27,8 @@ describe("LocaleData", function() {
   describe("availableLocales getter", function() {
     function initLocaleData(selectedLocale, defaultLocale) {
       let result = new LocaleData();
-      result.messages = new Map([["en-US", {}], ["fr", {}]]);
+      result.addLocale("en-US", {});
+      result.addLocale("fr", {});
       result.selectedLocale = selectedLocale;
       result.defaultLocale = defaultLocale;
       return result;
@@ -54,22 +55,20 @@ describe("LocaleData", function() {
 
   describe("localizeMessage(message, substitutions, options)", function() {
     function initLocaleData() {
-      let localeFr = new Map();
-      localeFr.set("msg_1", "Message remplacé");
-      localeFr.set("msg_2", "Message avec substitution : $1");
-      localeFr.set("msg_builtin", "Un message");
-      let localeEn = new Map();
-      localeEn.set("msg_1", "Replaced message");
-      localeEn.set("msg_3", "Message fallback");
-      localeEn.set("msg_builtin", "Some message");
-      let localeBuiltIn = new Map();
-      localeBuiltIn.set("msg_builtin", "Built-in message");
-
-
       let data = new LocaleData();
-      let msg = new Map([["fr", localeFr], ["en", localeEn],
-        [data.BUILTIN, localeBuiltIn]]);
-      data.messages = msg;
+      data.addLocale("fr", {
+        "msg_1": {message: "Message remplacé"},
+        "msg_2": {message: "Message avec substitution : $1"},
+        "msg_builtin": {message: "Un message"},
+      });
+      data.addLocale("en", {
+        "msg_1": {message: "Replaced message"},
+        "msg_3": {message: "Message fallback"},
+        "msg_builtin": {message: "Some message"},
+      });
+      data.addLocale(data.BUILTIN, {
+        "msg_builtin": {message: "Built-in message"},
+      });
       data.selectedLocale = "fr";
       data.defaultLocale = "en";
       return data;
@@ -128,13 +127,13 @@ describe("LocaleData", function() {
 
   describe("localize(str, locale)", function() {
     function initLocaleData() {
-      let localeFr = new Map([["msg_1", "Message remplacé"]]);
-      let localeEn = new Map([["msg_1", "Replaced message"]]);
-
-
       let data = new LocaleData();
-      let msg = new Map([["fr", localeFr], ["en", localeEn]]);
-      data.messages = msg;
+      data.addLocale("fr", {
+        "msg_1": {message: "Message remplacé"},
+      });
+      data.addLocale("en", {
+        "msg_1": {message: "Replaced message"},
+      });
       data.selectedLocale = "fr";
       data.defaultLocale = "en";
       return data;
@@ -211,6 +210,27 @@ describe("LocaleData", function() {
       assert.strictEqual(locale.size, 2);
       assert.strictEqual(locale.get("msg_ph"), "Place holder: $1");
       assert.strictEqual(locale.get("msg_direct_ph"), "Direct place holder: $1");
+    });
+  });
+
+  describe("messages.get(key)", function() {
+    it("should ignore the case", function() {
+      let json = {
+          "msg_1": {
+            "message": "My message 1",
+          },
+          "MSG_2": {
+            "message": "My message 2",
+          },
+      };
+
+      let data = new LocaleData();
+      data.addLocale("en", json);
+      assert.isTrue(data.messages.has("en"));
+      let locale = data.messages.get("en");
+      assert.strictEqual(locale.size, 2);
+      assert.strictEqual(locale.get("MsG_1"), "My message 1");
+      assert.strictEqual(locale.get("mSg_2"), "My message 2");
     });
   });
 });

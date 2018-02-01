@@ -57,7 +57,11 @@ export const ChromeFilesUtils = (function() {
       // We capture the filename and file-type
       const extractor = /^201:\s(\S+)\s+\d+\s+\S+\s+(\S+)\s*$/gm;
       let entry;
-      while (entry = extractor.exec(responseText)) {
+      const nextEntry = () => {
+        entry = extractor.exec(responseText);
+        return entry;
+      };
+      while (nextEntry()) {
         fileList.push({
           name: entry[1],
           isDir: entry[2].toLowerCase() === "directory",

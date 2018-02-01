@@ -30,7 +30,7 @@
   * Original file from https://github.com/piroor/webextensions-lib-l10n
   */
 
-import {I18n} from "content/bootstrap/content/models/browser/i18n";
+import * as ApiScope from "bootstrap/models/api";
 
 /**
  * Replace all |__MSG_(.*)__| tokens with the matching string from
@@ -50,7 +50,8 @@ export function matchKeyPattern(aString) {
 
 export function updateString(aString) {
   return aString.replace(MSG_REGEXP, (matched, message) => {
-    return I18n.instance.getMessage(message, [], {defaultValue: matched});
+    return ApiScope.Api.browser.i18n.
+        getMessage(message, [], {defaultValue: matched});
   });
 }
 

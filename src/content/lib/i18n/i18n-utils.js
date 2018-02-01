@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
- /* global Intl */
+import {Intl as IntlPolyfill} from "content/lib/polyfills/intl/8.intl";
 
 /**
  * Provides some i18n utilities and some implementation of ECMA-402 specs.
@@ -42,7 +42,7 @@
     */
    self.normalizeToBCP47 = function(tag) {
      let bcpTag = tag.replace(/_/g, "-");
-     let canonicalList = Intl.getCanonicalLocales(bcpTag);
+     let canonicalList = IntlPolyfill.getCanonicalLocales(bcpTag);
      let result = canonicalList[0];
      return result.toLowerCase();
    };

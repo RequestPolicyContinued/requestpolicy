@@ -2,6 +2,13 @@ const {assert} = require("chai");
 const {LocaleData} = require("content/lib/i18n/locale-data");
 
 
+function resetConsoleErrors() {
+  if ("reset" in console.error) {
+    console.error.reset();
+  }
+}
+
+
 describe("LocaleData", function() {
   describe("has(locale)", function() {
     it("Should return true with loaded locale", function() {
@@ -108,12 +115,14 @@ describe("LocaleData", function() {
       let data = initLocaleData();
       let result = data.localizeMessage("randomKey");
       assert.strictEqual(result, "");
+      resetConsoleErrors();
     });
 
     it("Should return options.defaultValue if key not found", function() {
       let data = initLocaleData();
       let result = data.localizeMessage("randomKey", [], {defaultValue: "message"});
       assert.strictEqual(result, "message");
+      resetConsoleErrors();
     });
   });
 

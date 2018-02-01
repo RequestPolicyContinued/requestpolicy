@@ -116,6 +116,13 @@ _remove_leading_empty_lines := sed '/./,$$!d'
 # $1: command(s) to be wrapped
 _remove_all_files_and_dirs_in = find '$1/' '!' -path '$1/' -delete
 
+#-------------------------------------------------------------------------------
+# error and warning messages
+#-------------------------------------------------------------------------------
+
+_warning_offline = [$1] WARNING: in offline mode, make targets may fail \
+due to missing software packages.
+
 
 #===============================================================================
 # Building RequestPolicy
@@ -311,8 +318,13 @@ python-venv python-packages: $(T_PYTHON_PACKAGES)
 $(T_PYTHON_PACKAGES): $(dev_env_dir)/python-requirements.txt \
 		$(call force_every,7 days) \
 		$(T_PYTHON_VIRTUALENV)
+ifndef OFFLINE
 	$(PYTHON) -m pip install --upgrade -r $<
 	touch $@
+endif
+ifdef OFFLINE
+	@echo '$(call _warning_offline,python)'
+endif
 $(T_PYTHON_VIRTUALENV): \
 		$(call _VAR_STAMP_,__python_venv__) \
 		$(call _VAR_STAMP_,CURDIR) \
@@ -335,8 +347,13 @@ T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 node-packages: $(T_NODE_PACKAGES)
 $(T_NODE_PACKAGES): package.json \
 		$(call force_every,7 days)
+ifndef OFFLINE
 	$(NPM) install
 	touch $@
+endif
+ifdef OFFLINE
+	@echo '$(call _warning_offline,npm)'
+endif
 
 #===============================================================================
 # Running a Browser + RequestPolicy

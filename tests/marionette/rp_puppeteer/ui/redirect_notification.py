@@ -67,9 +67,7 @@ class RedirectNotification(BaseLib):
 
     @property
     def _allow_button(self):
-        label = L10n(lambda: self.marionette).get_rp_property("allow")
-        return self._panel.find_element("css selector",
-                                        "[label='{}']".format(label))
+        return self._panel.find_element("tag name", "button")
 
     @property
     def _close_button(self):

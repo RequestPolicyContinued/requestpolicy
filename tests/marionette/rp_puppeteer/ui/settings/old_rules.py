@@ -35,17 +35,12 @@ class OldRulesPage(BaseLib):
     @property
     def _show_rules_button(self):
         return self.marionette.find_element(
-            "css selector",
-            "button[data-string=showOldRuleReimportOptions]")
+            "id", "showOldRuleReimportOptionsButton")
 
     @property
     def _import_button(self):
-        return self.marionette.find_element(
-            "css selector",
-            "button[data-string=importOldRules]")
+        return self.marionette.find_element("id", "importOldRulesButton")
 
     @property
     def _delete_button(self):
-        return self.marionette.find_element(
-            "css selector",
-            "button[data-string=deleteOldRules]")
+        return self.marionette.find_element("id", "deleteOldRulesButton")

@@ -86,12 +86,13 @@
               imported, you can delete your old rules.</p>
 
             <p id="deleteOldRules">
-              <button type="submit" onclick="deleteOldRules()"
+              <button type="submit" onclick="deleteOldRules()" id="deleteOldRulesButton"
                      >__MSG_deleteOldRules__</button>
             </p>
 
             <p id="showReimportOptions">
               <button type="submit" onclick="showReimportOptions()"
+                id="showOldRuleReimportOptionsButton"
                 >__MSG_showOldRuleReimportOptions__</button>
             </p>
 
@@ -123,7 +124,7 @@
             </div>
 
             <div id="doimport">
-              <button onclick="importOldRules()"
+              <button onclick="importOldRules()" id="importOldRulesButton"
                  >__MSG_importOldRules__</button>
             </div>
             <div id="importdone">

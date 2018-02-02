@@ -32,6 +32,7 @@ nsIPrefService.prototype.savePrefFile = function(aFile) {};
 
 function Services() {
   this.prefs = new nsIPrefService();
+  this.locale = {};
 }
 
 module.exports = Services;

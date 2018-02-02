@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {$id, common} from "./common";
+import {$id} from "./common";
 
 (function() {
   var {
@@ -33,28 +33,6 @@ import {$id, common} from "./common";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  var PAGE_STRINGS = [
-    "welcomeToRequestPolicy",
-    "forMostUsersDefaultsAreIdeal",
-    "youCanConfigureRequestPolicyToBeMoreStrict",
-    "teachMeHowToUseRequestPolicy",
-    "returnToBrowsing",
-    "configureRequestPolicy",
-    "defaultPolicy",
-    "defaultPolicyDefinition",
-    "allowRequestsByDefault",
-    "blockRequestsByDefault",
-    "allowRequestsToTheSameDomain",
-    "subscriptionPolicies",
-    "subscriptionPoliciesDefinition",
-    "yesUseSubscriptions",
-    "noDoNotUseSubscriptions",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
 
   function showConfigure() {
     $("#welcome").css("display", "none");

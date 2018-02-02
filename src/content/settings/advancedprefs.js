@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "./common";
+import {WinEnv, elManager, $id} from "./common";
 
 (function() {
   var {
@@ -31,31 +31,6 @@ import {common, WinEnv, elManager, $id} from "./common";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  var PAGE_STRINGS = [
-    "basic",
-    "advanced",
-    "advancedPreferences",
-    "linkPrefetching",
-    "dnsPrefetching",
-    "speculativePreConnections",
-    "enabled",
-    "disableOnStartup",
-    "restoreDefaultOnUninstall",
-    "menuPreferences",
-    "menuSorting",
-    "sortByNumRequests",
-    "sortByDestName",
-    "noSorting",
-    "hint",
-    "menuSortingHint",
-    "menuIndicatedInformation",
-    "menuIndicateNumRequests",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
 
   function updateDisplay() {
     // Link prefetch.

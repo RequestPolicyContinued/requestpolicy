@@ -22,9 +22,18 @@
 
 import {promiseObserverTopic} from "content/legacy/lib/utils/xpcom-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
+import {Windows} from "content/models/windows";
 
 function areWindowsAvailable() {
-  return WindowUtils.getMostRecentBrowserWindow() !== null;
+  if (WindowUtils.getMostRecentBrowserWindow() === null) {
+    return false;
+  }
+  try {
+    Windows.forEachOpenWindow((win) => WindowUtils.getTabBrowser(win));
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 function promiseSessionstoreWindowsRestored() {

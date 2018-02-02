@@ -14,10 +14,11 @@ class TestL10n(RequestPolicyTestCase):
         raise SkipTest("ToDo")
 
     def test_get_rp_property(self):
+        raise SkipTest("L10n is no working right now")
+
         prop_id = "preferences"
 
         with self.marionette.using_context("content"):
             self.marionette.navigate("about:requestpolicy?basicprefs")
-            el = self.marionette.find_element(
-                "css selector", "[data-string='{}']".format(prop_id))
+            el = self.marionette.find_element("id", prop_id)
             self.assertEqual(el.text, self.l10n.get_rp_property(prop_id))

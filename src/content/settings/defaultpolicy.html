@@ -36,50 +36,50 @@
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?basicprefs" data-string="preferences"></a>
+              <a href="about:requestpolicy?basicprefs">__MSG_preferences__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./basicprefs.html" data-string="preferences"></a>
+              <a href="./basicprefs.html">__MSG_preferences__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?yourpolicy" selected="true" data-string="managePolicies"></a>
+              <a href="about:requestpolicy?yourpolicy" selected="true">__MSG_managePolicies__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./yourpolicy.html" selected="true" data-string="managePolicies"></a>
+              <a href="./yourpolicy.html" selected="true">__MSG_managePolicies__</a>
               <!-- @endif -->
             </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                   target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                   target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?yourpolicy" data-string="yourPolicy"></a>
+              <a href="about:requestpolicy?yourpolicy">__MSG_yourPolicy__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./yourpolicy.html" data-string="yourPolicy"></a>
+              <a href="./yourpolicy.html">__MSG_yourPolicy__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?defaultpolicy" selected="true" data-string="defaultPolicy"></a>
+              <a href="about:requestpolicy?defaultpolicy" selected="true">__MSG_defaultPolicy__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./defaultpolicy.html" selected="true" data-string="defaultPolicy"></a>
+              <a href="./defaultpolicy.html" selected="true">__MSG_defaultPolicy__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?subscriptions" data-string="subscriptions"></a>
+              <a href="about:requestpolicy?subscriptions">__MSG_subscriptions__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./subscriptions.html" data-string="subscriptions"></a>
+              <a href="./subscriptions.html">__MSG_subscriptions__</a>
               <!-- @endif -->
             </li>
           </ul>
@@ -89,21 +89,21 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="defaultpolicy">
-        <div id="pagetitle" data-string="defaultPolicy"></div>
+        <div id="pagetitle">__MSG_defaultPolicy__</div>
 
         <p class="learnmore">
-          <span data-string="defaultPolicyDefinition"></span>
+          <span>__MSG_defaultPolicyDefinition__</span>
           <a href="https://requestpolicycontinued.github.io/Quickstart.html#setting-up---default-policy"
-             target="_blank" data-string="learnMore"></a></p>
+             target="_blank">__MSG_learnMore__</a></p>
 
           <label><input type="radio" name="defaultrule" id="defaultallow"
                         value="allow" />
-            <span data-string="allowRequestsByDefault"></span>
+            <span>__MSG_allowRequestsByDefault__</span>
           </label><br/>
           <label>
             <input type="radio" name="defaultrule" id="defaultdeny"
                    value="deny" />
-            <span data-string="blockRequestsByDefault"></span>
+            <span>__MSG_blockRequestsByDefault__</span>
           </label>
 
           <div id="defaultdenysetting">
@@ -111,7 +111,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;
               <input type="checkbox" name="allowsamedomain"
                      id="allowsamedomain" value="true" />
-              <span data-string="allowRequestsToTheSameDomain"></span>
+              <span>__MSG_allowRequestsToTheSameDomain__</span>
             </label>
           </div>
 
@@ -119,7 +119,7 @@
             <label>
               <input type="checkbox" name="allowtoplevel"
                       id="allowtoplevel" value="false" />
-              <span data-string="allowTopLevelRequests"></span>
+              <span>__MSG_allowTopLevelRequests__</span>
             </label>
           </div>
           <!--
@@ -135,12 +135,12 @@
           -->
 
         <div id="subscriptionschanged" style="display: none">
-          <span data-string="differentSubscriptionsAreAvailable"></span>
+          <span>__MSG_differentSubscriptionsAreAvailable__</span>
           <!-- @if EXTENSION_TYPE='legacy' -->
-          <a href="about:requestpolicy?subscriptions" data-string="manageSubscriptions"></a>
+          <a href="about:requestpolicy?subscriptions">__MSG_manageSubscriptions__</a>
           <!-- @endif -->
           <!-- @if EXTENSION_TYPE!='legacy' -->
-          <a href="./subscriptions.html" data-string="manageSubscriptions"></a>
+          <a href="./subscriptions.html">__MSG_manageSubscriptions__</a>
           <!-- @endif -->
         </div>
       </div>

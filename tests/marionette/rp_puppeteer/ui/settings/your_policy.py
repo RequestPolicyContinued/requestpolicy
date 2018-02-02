@@ -121,5 +121,4 @@ class AddRuleForm(HTMLFormBaseLib):
 
     @property
     def _submit_button(self):
-        return self.element.find_element("css selector",
-                                         "button[data-string=addRule]")
+        return self.element.find_element("id", "addRuleButton")

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
+import {WinEnv, elManager, $id} from "content/settings/common";
 
 (function() {
   var {
@@ -31,30 +31,11 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
+  const $str = browser.i18n.getMessage.bind(browser.i18n);
+
   // ===========================================================================
 
-  var PAGE_STRINGS = [
-    "yourPolicy",
-    "defaultPolicy",
-    "subscriptions",
-    "type",
-    "origin",
-    "destination",
-    "allow",
-    "block",
-    "temporary",
-    "createRule",
-    "addRule",
-    "learnMoreAboutRules",
-    "removeOldRules",
-    "ruleSet",
-    "activeRules",
-    "filterRules",
-    "policy",
-  ];
-
   $(function() {
-    common.localize(PAGE_STRINGS);
     // l10n for input placeholders.
     $id("rulesearch").placeholder = $str("search");
     $("[name=originscheme]").prop("placeholder", $str("scheme"));
@@ -153,9 +134,7 @@ import {common, WinEnv, elManager, $id, $str} from "content/settings/common";
     if (ruleAction !== "allow") {
       ruleAction = "block";
     }
-    ruleAction = ruleAction === "allow" ? "allow" : "block";
-    var ruleActionString = ruleAction === "allow" ? $str("allow") :
-        $str("block");
+    var ruleActionString = $str(ruleAction);
 
     var row = $("<tr>").addClass(ruleAction).appendTo(table);
 

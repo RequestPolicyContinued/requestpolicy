@@ -104,7 +104,7 @@ export const PolicyManager = {
         const pRawRuleset = RulesetStorage.
             loadRawRulesetFromFile(subName, listName);
         const pDone = pRawRuleset.then((rawRuleset) => {
-          if (!rawRuleset) throw RULESET_NOT_EXISTING;
+          if (!rawRuleset) return Promise.reject(RULESET_NOT_EXISTING);
           if (!subscriptionRulesets[listName]) {
             subscriptionRulesets[listName] = {};
           }

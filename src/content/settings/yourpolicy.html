@@ -36,50 +36,50 @@
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?basicprefs" data-string="preferences"></a>
+              <a href="about:requestpolicy?basicprefs">__MSG_preferences__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./basicprefs.html" data-string="preferences"></a>
+              <a href="./basicprefs.html">__MSG_preferences__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?yourpolicy" selected="true" data-string="managePolicies"></a>
+              <a href="about:requestpolicy?yourpolicy" selected="true">__MSG_managePolicies__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./yourpolicy.html" selected="true" data-string="managePolicies"></a>
+              <a href="./yourpolicy.html" selected="true">__MSG_managePolicies__</a>
               <!-- @endif -->
             </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                   target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                   target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?yourpolicy" selected="true" data-string="yourPolicy"></a>
+              <a href="about:requestpolicy?yourpolicy" selected="true">__MSG_yourPolicy__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./yourpolicy.html" selected="true" data-string="yourPolicy"></a>
+              <a href="./yourpolicy.html" selected="true">__MSG_yourPolicy__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?defaultpolicy" data-string="defaultPolicy"></a>
+              <a href="about:requestpolicy?defaultpolicy">__MSG_defaultPolicy__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./defaultpolicy.html" data-string="defaultPolicy"></a>
+              <a href="./defaultpolicy.html">__MSG_defaultPolicy__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?subscriptions" data-string="subscriptions"></a>
+              <a href="about:requestpolicy?subscriptions">__MSG_subscriptions__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./subscriptions.html" data-string="subscriptions"></a>
+              <a href="./subscriptions.html">__MSG_subscriptions__</a>
               <!-- @endif -->
             </li>
           </ul>
@@ -89,33 +89,33 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="yourpolicy">
-        <div id="pagetitle" data-string="yourPolicy"></div>
+        <div id="pagetitle">__MSG_yourPolicy__</div>
 
-        <h2 data-string="createRule"></h2>
+        <h2>__MSG_createRule__</h2>
           <div id="addrule">
             <p>
               <a href="https://requestpolicycontinued.github.io/Rules.html"
-                 target="_blank" data-string="learnMoreAboutRules"></a>
+                 target="_blank">__MSG_learnMoreAboutRules__</a>
             </p>
             <form id="addruleform" onsubmit="return false;">
               <ul>
                 <li class="input-label">
-                  <label data-string="policy"></label>
+                  <label>__MSG_policy__</label>
                 </li>
                 <li class="rule-action">
                   <label class="allow">
-                    <span data-string="allow"></span>
+                    <span>__MSG_allow__</span>
                     <input type="radio" name="allowdeny" id="allowrule"
                            value="allow" checked="checked"/>
                   </label>
                   <label class="block">
-                    <span data-string="block"></span>
+                    <span>__MSG_block__</span>
                     <input type="radio" name="allowdeny" id="denyrule"
                            value="deny"/>
                   </label>
                 </li>
                 <li class="input-label">
-                  <label data-string="origin"></label>
+                  <label>__MSG_origin__</label>
                 </li>
                 <li>
                   <input type="text" name="originscheme"/>
@@ -123,7 +123,7 @@
                   <input type="text" name="originport"/>
                 </li>
                 <li class="input-label">
-                  <label data-string="destination"></label>
+                  <label>__MSG_destination__</label>
                 </li>
                 <li>
                   <input type="text" name="destscheme"/>
@@ -131,23 +131,24 @@
                   <input type="text" name="destport"/>
                 </li>
                 <li class="input-label">
-                  <label for="temporary" data-string="temporary"></label>
+                  <label for="temporary">__MSG_temporary__</label>
                   <input type="checkbox" name="temporary" id="temporary" />
                 </li>
                 <li class="input-label">
-                  <button onclick="addRule();" data-string="addRule"></button>
+                  <button onclick="addRule();" id="addRuleButton"
+                    >__MSG_addRule__</button>
                 </li>
               </ul>
             </form>
 
           </div>
 
-        <h2 data-string="activeRules"></h2>
+        <h2>__MSG_activeRules__</h2>
 
         <div>
           <div class="policyheader">
             <div id="policysearch">
-              <label for="rulesearch" data-string="filterRules"></label>
+              <label for="rulesearch">__MSG_filterRules__</label>
               <input type="search" id="rulesearch"/>
             </div>
           </div>
@@ -162,11 +163,11 @@
               </colgroup>
               <thead>
                 <tr>
-                  <th data-string="policy"></th>
-                  <th data-string="origin"></th>
-                  <th data-string="destination"></th>
-                  <th data-string="ruleSet"></th>
-                  <th data-string="remove"></th>
+                  <th>__MSG_policy__</th>
+                  <th>__MSG_origin__</th>
+                  <th>__MSG_destination__</th>
+                  <th>__MSG_ruleSet__</th>
+                  <th>remove</th>
                 </tr>
               </thead>
               <tbody id="rules"></tbody>
@@ -185,10 +186,10 @@
 
       <div id="oldrulesexist">
         <!-- @if EXTENSION_TYPE='legacy' -->
-        <a href="about:requestpolicy?oldrules" data-string="removeOldRules"></a>
+        <a href="about:requestpolicy?oldrules">__MSG_removeOldRules__</a>
         <!-- @endif -->
         <!-- @if EXTENSION_TYPE!='legacy' -->
-        <a href="./oldrules.html" data-string="removeOldRules"></a>
+        <a href="./oldrules.html">__MSG_removeOldRules__</a>
         <!-- @endif -->
       </div>
 

@@ -1,0 +1,211 @@
+{
+  "extensionDescription": {
+    "message": "Çapraz-site bağlantılarını yönetin.Tarayıcı güvenliğinizi artırın.Çapraz Site Bağlantı Sahtekarlığı (CSRF) ve benzeri saldırılardan korunun.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "Uyumsuz eklentiler: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "allowOrigin": {
+    "message": "İzin ver $1",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "İzin ver $1",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "İzin ver $1 dan $2 a",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "Geçici olarak izin ver $1",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "Geçici olarak izin ver $1",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "Geçici olarak izin $1 dan $2 a",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "İzinleri kaldır $1",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "İzinleri kaldır $1",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "İzini kaldır $1 dan $2 a",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "Bu istek $1 engellenemez",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "Yönlendirme istiyor $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "İzin ver",
+    "description": "Allow"
+  },
+
+  "deny": {
+    "message": "Yasakla",
+    "description": "Deny"
+  },
+
+  "more": {
+    "message": "Daha fazla...",
+    "description": "More…"
+  },
+
+  "more_accesskey": {
+    "message": "F",
+    "description": "M"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "Kayıt dosyası boş.",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "Sayfalar gezdiğinizde kayıtlar gözükür.",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "Yasaklı hareket",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "Bu adres sadece hafızaya kopyalanabilir.",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "Seçenekler",
+    "description": "Preferences"
+  },
+
+  "advanced": {
+    "message": "Gelişmiş",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "Bloklanan resimi işaretle",
+    "description": "Indicate blocked images"
+  },
+
+  "autoReload": {
+    "message": "Beyaz liste değiştiğinde sayfayı yenile",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "Web sayfaları",
+    "description": "Web Pages"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "Özel Gezinti yaparken kalıcı beyazlistelemeye izin ver",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "linkPrefetching": {
+    "message": "Link Hafızalama",
+    "description": "Link Prefetching"
+  },
+
+  "dnsPrefetching": {
+    "message": "DNS Hafızalama",
+    "description": "DNS Prefetching"
+  },
+
+  "enabled": {
+    "message": "Aktifleştirildi",
+    "description": "Enabled"
+  },
+
+  "disableOnStartup": {
+    "message": "Başlangıçta etkisizleştir",
+    "description": "Disable on startup"
+  },
+
+  "restoreDefaultOnUninstall": {
+    "message": "RequestPolicy silindiğinde herşeyi eski haline getir",
+    "description": "Restore default when RequestPolicy is uninstalled"
+  },
+
+  "origin": {
+    "message": "Ana",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Hedef",
+    "description": "Destination"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "Bütün izinleri geri al",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "Yasaklı sayfalar",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "İzinli sayfalar",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_preferences": {
+    "message": "Seçenekler",
+    "description": "Preferences"
+  },
+
+  "rp_requestLog_title": {
+    "message": "Kayıtlar",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "Temizle",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "Herzaman onay iste",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "$2 sorgusunu yaparak \n\"$1\" sitesi hakkında bilgi istemek üzeresiniz.\nDevam etmek istiyor musunuz?",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

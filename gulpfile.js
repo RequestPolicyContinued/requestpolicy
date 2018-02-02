@@ -218,6 +218,60 @@ const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder)
   gulp.task(namePrefix, tasks);
 });
 
+const localesPath = "./src/conditional/webextension/_locales";
+const locales = (function() {
+  let $locales = null;
+
+  return {
+    get() {
+      if ($locales === null) {
+        $locales = fs.readdirSync(localesPath);
+      }
+      return $locales;
+    },
+  };
+})();
+
+function getInstallRdfLocalizedSection() {
+  let lines = [];
+  const line = (str) => `    ${str}`;
+
+  function getValues(localeDirname, defaultValues=null) {
+    const filepath = `${localesPath}/${localeDirname}/messages.json`;
+    const fileContents = require(filepath);
+    const get = (key, fileKey) => fileKey in fileContents ?
+        fileContents[fileKey].message : defaultValues[key];
+    return {
+      locale: localeDirname.replace("_", "-"),
+      name: get("name", "extensionName"),
+      description: get("description", "extensionDescription"),
+    };
+  }
+
+  function addValues({locale, name, description}) {
+    lines = lines.concat([
+      line(`<em:localized>`),
+      line(`  <Description>`),
+      line(`    <em:locale>${locale}</em:locale>`),
+      line(`    <em:name>${name}</em:name>`),
+      line(`    <em:description>${description}</em:description>`),
+      line(`  </Description>`),
+      line(`</em:localized>`),
+    ]);
+  }
+
+  const defaultLocaleDirname = "en_US";
+  const defaultValues = getValues(defaultLocaleDirname);
+  addValues(defaultValues);
+
+  locales.get().forEach((localeDirname) => {
+    if (localeDirname === defaultLocaleDirname) return;
+    const values = getValues(localeDirname, defaultValues);
+    addValues(values);
+  });
+  return lines.join("\n");
+}
+
 // -----------------------------------------------------------------------------
 // version strings
 // -----------------------------------------------------------------------------
@@ -318,6 +372,8 @@ BUILDS.forEach(build => {
           "EXTENSION_TYPE": extensionType,
           "RP_HOMEPAGE_URL": config.homepage,
           "RP_VERSION": versionData[build.version],
+          "LOCALES": JSON.stringify(locales.get()),
+          "INSTALL_RDF_LOCALIZED_SECTION": getInstallRdfLocalizedSection(),
         };
 
         if (build.isAMO) context.AMO = "TRUE";
@@ -422,9 +478,12 @@ BUILDS.forEach(build => {
       addPreprocessedFilesBuildTask("js", [
       ].concat(
         extensionType === "webextension" ? [
+          "_locales/**/messages.json",
           "manifest.json",
         ] : extensionType === "legacy" ? [
+          "content/bootstrap/data/locales.json",
           "content/bootstrap/data/manifest.json",
+          "content/_locales/**/messages.json",
         ] : []
       ));
 

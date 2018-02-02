@@ -34,7 +34,6 @@ import {Storage} from "content/models/storage";
 import * as RequestProcessor from "content/lib/request-processor";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
-import * as StringUtils from "content/lib/utils/string-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import * as JSUtils from "content/lib/utils/js-utils";
 import * as Utils from "content/lib/utils/misc-utils";
@@ -63,6 +62,7 @@ export function loadOverlayIntoWindow(window) {
   let gBrowser = WindowUtils.getTabBrowser(window);
 
   let $id = document.getElementById.bind(document);
+  const $str = browser.i18n.getMessage.bind(browser.i18n);
 
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(MainEnvironment, "OverlayEnv");
@@ -367,7 +367,7 @@ export function loadOverlayIntoWindow(window) {
   // TODO, bad smell: Instead of the <browser> etc. hand over a `Request`
   //                  object that contains everything. This requires
   //                  e.g. a `MetaRedirectRequest` class.
-  self._showRedirectNotification = function(browser, redirectTargetUri, delay,
+  self._showRedirectNotification = function(vBrowser, redirectTargetUri, delay,
       redirectOriginUri, replaceIfPossible) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
@@ -394,17 +394,18 @@ export function loadOverlayIntoWindow(window) {
       return false;
     }
 
-    const notificationBox = gBrowser.getNotificationBox(browser);
+    const notificationBox = gBrowser.getNotificationBox(vBrowser);
     const notificationValue = "request-policy-meta-redirect";
 
     // prepare the notification's label
     let notificationLabel;
     if (isOriginUndefined) {
-      notificationLabel = StringUtils.$str("redirectNotification",
+      notificationLabel = $str("redirectNotification",
           [cropUri(redirectTargetUri, 50)]);
     } else {
-      notificationLabel = StringUtils.$str("redirectNotificationWithOrigin",
-          [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
+      notificationLabel = $str(
+        "redirectNotificationWithOrigin",
+        [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
     }
 
     const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
@@ -445,7 +446,7 @@ export function loadOverlayIntoWindow(window) {
       if (replaceIfPossible) {
         data.replaceUri = redirectOriginUri;
       }
-      browser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
+      vBrowser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
           data);
     };
 
@@ -463,7 +464,7 @@ export function loadOverlayIntoWindow(window) {
 
     {
       // allow ALL
-      let label = StringUtils.$str("allowAllRedirections");
+      let label = $str("allowAllRedirections");
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
         maybeOpenLinkInNewTab(
             browser.runtime.getURL("content/settings/defaultpolicy.html"),
@@ -506,22 +507,22 @@ export function loadOverlayIntoWindow(window) {
     } else {
       const buttons = [
         {
-          label: StringUtils.$str("allow"),
-          accessKey: StringUtils.$str("allow.accesskey"),
+          label: $str("allow"),
+          accessKey: $str("allow_accesskey"),
           popup: null,
           callback: allowRedirection,
         },
         {
-          label: StringUtils.$str("deny"),
-          accessKey: StringUtils.$str("deny.accesskey"),
+          label: $str("deny"),
+          accessKey: $str("deny_accesskey"),
           popup: null,
           callback: function() {
             // Do nothing. The notification closes when this is called.
           },
         },
         {
-          label: StringUtils.$str("addRule"),
-          accessKey: StringUtils.$str("addRule.accesskey"),
+          label: $str("addRule"),
+          accessKey: $str("addRule_accesskey"),
           popup: addRuleMenuName,
           callback: null,
         },

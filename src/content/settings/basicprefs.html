@@ -36,42 +36,42 @@
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?basicprefs" selected="true" data-string="preferences"></a>
+              <a href="about:requestpolicy?basicprefs" selected="true">__MSG_preferences__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./basicprefs.html" selected="true" data-string="preferences"></a>
+              <a href="./basicprefs.html" selected="true">__MSG_preferences__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?yourpolicy" data-string="managePolicies"></a>
+              <a href="about:requestpolicy?yourpolicy">__MSG_managePolicies__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./yourpolicy.html" data-string="managePolicies"></a>
+              <a href="./yourpolicy.html">__MSG_managePolicies__</a>
               <!-- @endif -->
             </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                  target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                  target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?basicprefs" selected="true" data-string="basic"></a>
+              <a href="about:requestpolicy?basicprefs" selected="true">__MSG_basic__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./basicprefs.html" selected="true" data-string="basic"></a>
+              <a href="./basicprefs.html" selected="true">__MSG_basic__</a>
               <!-- @endif -->
             </li>
             <li>
               <!-- @if EXTENSION_TYPE='legacy' -->
-              <a href="about:requestpolicy?advancedprefs" data-string="advanced"></a>
+              <a href="about:requestpolicy?advancedprefs">__MSG_advanced__</a>
               <!-- @endif -->
               <!-- @if EXTENSION_TYPE!='legacy' -->
-              <a href="./advancedprefs.html" data-string="advanced"></a>
+              <a href="./advancedprefs.html">__MSG_advanced__</a>
               <!-- @endif -->
             </li>
           </ul>
@@ -81,16 +81,16 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="basicprefs">
-        <div id="pagetitle" data-string="preferences"></div>
+        <div id="pagetitle">__MSG_preferences__</div>
 
         <table class="settings">
           <tr>
-            <td data-string="webPages"></td>
+            <td>__MSG_webPages__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox" id="pref-indicateBlockedObjects"/>
-                  <span data-string="indicateBlockedImages"></span>
+                  <span>__MSG_indicateBlockedImages__</span>
                 </label>
               </div>
               <div id="indicateBlockedImages-details">
@@ -98,25 +98,25 @@
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   <input type="checkbox"
                          id="pref-dontIndicateBlacklistedObjects"/>
-                  <span data-string="dontIndicateBlacklisted"></span>
+                  <span>__MSG_dontIndicateBlacklisted__</span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox" id="pref-autoReload"/>
-                  <span data-string="autoReload"></span>
+                  <span>__MSG_autoReload__</span>
                 </label>
               </div>
             </td>
           </tr>
           <tr>
-            <td data-string="menu"></td>
+            <td>__MSG_menu__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-privateBrowsingPermanentWhitelisting"/>
-                  <span data-string="allowAddingNonTemporaryRulesInPBM"></span>
+                  <span>__MSG_allowAddingNonTemporaryRulesInPBM__</span>
                 </label>
               </div>
             </td>

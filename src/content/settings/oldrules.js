@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, $id, $str} from "./common";
+import {$id} from "./common";
 
 (function() {
   var {
@@ -32,20 +32,6 @@ import {common, $id, $str} from "./common";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  var PAGE_STRINGS = [
-    "importOldRules",
-    "deleteOldRules",
-    "showOldRuleReimportOptions",
-    "yourOldRulesHaveBeenDeleted",
-    "type",
-    "origin",
-    "destination",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
 
   var rules = null;
 
@@ -76,8 +62,15 @@ import {common, $id, $str} from "./common";
   }
 
   function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
-    var actionClass = ruleAction === "allow" ? "allow" : "block";
-    var action = ruleAction === "allow" ? $str("allow") : $str("block");
+    let actionClass;
+    let action;
+    if (ruleAction === "allow") {
+      actionClass = "allow";
+      action = browser.i18n.getMessage("allow");
+    } else {
+      actionClass = "block";
+      action = browser.i18n.getMessage("block");
+    }
 
     var row = $("<tr>").addClass(actionClass).appendTo(table);
 

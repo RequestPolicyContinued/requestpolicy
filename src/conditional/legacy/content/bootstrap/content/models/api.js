@@ -29,6 +29,8 @@ import {Manifest} from "bootstrap/models/manifest";
 import {Prefs} from "bootstrap/models/prefs";
 import {StorageApi} from "bootstrap/models/storage-api";
 import {Runtime, ContentRuntime} from "bootstrap/models/browser/runtime";
+import {ContentI18n, I18n} from "bootstrap/models/browser/i18n";
+import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
 
 let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -57,15 +59,41 @@ function manifestHasPermission(perm) {
 export const Api = {
   browser: {
     extension: {},
+    i18n: new I18n(),
     management: {},
     runtime: Runtime.instance,
     storage: StorageApi,
   },
+
   LegacyApi: {
+    L10nUtils,
     miscInfos: LegacyMiscInfos,
     PrefObserver: PrefObserver,
     prefs: Prefs,
     storage: {},
+  },
+
+  get subModels() {
+    return [
+      Api.browser.i18n,
+    ];
+  },
+
+  get whenReady() {
+    return Promise.all(this.subModels.map(
+        (model) => model.whenReady)
+    );
+  },
+
+  init() {
+    const p = Promise.all(this.subModels.map(
+        (model) => model.init()
+    ));
+    p.catch((e) => {
+      console.error("Api init() error:");
+      console.dir(e);
+    });
+    return p;
   },
 };
 
@@ -76,12 +104,7 @@ export const ContentScriptsApi = {
       inIncognitoContext: null,
     },
     runtime: ContentRuntime.instance,
-    i18n: {
-      getMessage: null,
-      getAcceptLanguages: null,
-      getUILanguage: null,
-      detectLanguage: null,
-    },
+    i18n: new ContentI18n(Api.browser.i18n),
     storage: Api.browser.storage,
   },
 };

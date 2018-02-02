@@ -26,7 +26,6 @@ import {loadRLTreeViewIntoWindow} from "./tree-view";
 import {loadRLFilteringIntoWindow} from "./filtering";
 
 let {
-  StringUtils,
   Environment,
   MainEnvironment,
 } = browser.extension.getBackgroundPage();
@@ -63,8 +62,8 @@ window.rpcontinued.requestLog = window.rpcontinued.requestLog || {};
     window.parent.rpcontinued.overlay.requestLog = requestLog;
   }
   function showLogIsEmptyMessage() {
-    const message = StringUtils.$str("requestLogIsEmpty");
-    const directions = StringUtils.$str("requestLogDirections");
+    const message = browser.i18n.getMessage("requestLogIsEmpty");
+    const directions = browser.i18n.getMessage("requestLogDirections");
     requestLog.visibleRows.push([message, directions, false, ""]);
     requestLog.treebox.rowCountChanged(0, 1);
   }

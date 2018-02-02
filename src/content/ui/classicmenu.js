@@ -22,7 +22,6 @@
  */
 
 import {PolicyManager} from "content/lib/policy-manager";
-import * as StringUtils from "content/lib/utils/string-utils";
 import * as DOMUtils from "content/lib/utils/dom-utils";
 
 export function loadClassicmenuIntoWindow(window) {
@@ -129,7 +128,7 @@ export function loadClassicmenuIntoWindow(window) {
       PolicyManager.addRuleBySpec(aRuleSpec);
       aAllowRedirectFn();
     };
-    const label = StringUtils.$str(labelName, originAndOrDestArray);
+    const label = browser.i18n.getMessage(labelName, originAndOrDestArray);
 
     const item = self.addCustomMenuItem(aMenu, label, callbackFn);
     if (isTemp) {

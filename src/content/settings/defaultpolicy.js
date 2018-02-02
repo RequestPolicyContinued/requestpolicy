@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {common, WinEnv, elManager, $id} from "./common";
+import {WinEnv, elManager, $id} from "./common";
 
 (function() {
   var {
@@ -30,24 +30,6 @@ import {common, WinEnv, elManager, $id} from "./common";
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
-
-  var PAGE_STRINGS = [
-    "yourPolicy",
-    "defaultPolicy",
-    "subscriptions",
-    "allowRequestsByDefault",
-    "blockRequestsByDefault",
-    "defaultPolicyDefinition",
-    "learnMore",
-    "allowRequestsToTheSameDomain",
-    "allowTopLevelRequests",
-    "differentSubscriptionsAreAvailable",
-    "manageSubscriptions",
-  ];
-
-  $(function() {
-    common.localize(PAGE_STRINGS);
-  });
 
   function updateDisplay() {
     var defaultallow = Storage.get("defaultPolicy.allow");

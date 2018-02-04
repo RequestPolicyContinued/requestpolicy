@@ -25,7 +25,7 @@ import {WinEnv, elManager} from "./common";
 
 (function() {
   var {
-    Log: log,
+    Log: {instance: log},
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rpService,

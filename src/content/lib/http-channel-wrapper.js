@@ -25,7 +25,9 @@ import {
   getBrowserFromLoadContext,
   getDocShellFromHttpChannel,
 } from "content/lib/utils/try-catch-utils";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 // =============================================================================
 // HttpChannelWrapper

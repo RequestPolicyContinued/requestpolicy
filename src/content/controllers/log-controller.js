@@ -22,12 +22,14 @@
 
 import {Log} from "content/models/log";
 
+const log = Log.instance;
+
 function onStorageChange(aChanges, aAreaName) {
   if (aChanges.hasOwnProperty("log")) {
-    Log.setEnabled(aChanges.log.newValue);
+    log.setEnabled(aChanges.log.newValue);
   }
   if (aChanges.hasOwnProperty("log.level")) {
-    Log.setLevel(aChanges["log.level"].newValue);
+    log.setLevel(aChanges["log.level"].newValue);
   }
 }
 
@@ -37,11 +39,11 @@ export const LogController = {
       "log",
       "log.level",
     ]).then(result => {
-      Log.setEnabled(result.log);
-      Log.setLevel(result["log.level"]);
+      log.setEnabled(result.log);
+      log.setLevel(result["log.level"]);
       return;
     }).catch(e => {
-      Log.error("Error initializing the Log:", e);
+      log.error("Error initializing the Log:", e);
     });
 
     browser.storage.onChanged.addListener(onStorageChange);

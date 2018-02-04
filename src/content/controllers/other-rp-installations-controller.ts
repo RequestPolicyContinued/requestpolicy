@@ -23,8 +23,10 @@
 
 import {C} from "content/data/constants";
 import {FilteredManagement} from "content/lib/classes/filtered-management";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {NotificationID, Notifications} from "content/models/notifications";
+
+const log = Log.instance;
 
 const {AMO} = C;
 

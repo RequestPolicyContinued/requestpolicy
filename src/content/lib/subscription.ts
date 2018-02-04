@@ -26,7 +26,7 @@ import {IRuleSpecs, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {Log} from "content/models/log";
 
-const log = Log.extend({
+const log = Log.instance.extend({
   name: "Subscriptions",
 });
 

@@ -22,7 +22,9 @@
 
 import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
 import {Level as EnvLevel} from "content/lib/environment";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 // =============================================================================
 // ObserverManager

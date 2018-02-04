@@ -21,9 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {RequestResult} from "content/lib/request-result";
+
+const log = Log.instance;
 
 // =============================================================================
 // utilities

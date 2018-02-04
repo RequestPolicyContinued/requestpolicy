@@ -21,9 +21,11 @@
  */
 
 import {Level as EnvLevel} from "content/lib/environment";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {C} from "content/data/constants";
 import {mlManager} from "content/framescripts/managers";
+
+const log = Log.instance;
 
 // =============================================================================
 // constants

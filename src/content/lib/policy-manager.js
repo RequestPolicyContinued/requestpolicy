@@ -27,7 +27,7 @@ import {RequestResult} from "content/lib/request-result";
 import {Ruleset, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 
-const log = Log.extend({
+const log = Log.instance.extend({
   name: "PolicyManager",
 });
 

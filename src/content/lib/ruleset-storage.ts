@@ -22,7 +22,9 @@
  */
 
 import {IMaybeIncompleteRawRuleset, RawRuleset} from "content/lib/ruleset";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 // =============================================================================
 

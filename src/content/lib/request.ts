@@ -33,7 +33,7 @@ import * as WindowUtils from "content/lib/utils/window-utils";
 import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 
-const logRequests = Log.extend({
+const logRequests = Log.instance.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",

@@ -28,7 +28,7 @@ import {
 } from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import * as RequestProcessor from "content/lib/request-processor";
@@ -45,6 +45,8 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "content/lib/utils/try-catch-utils";
+
+const log = Log.instance;
 
 const {LOG_FLAG_STATE} = C;
 

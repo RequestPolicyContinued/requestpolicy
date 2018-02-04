@@ -21,8 +21,10 @@
  */
 
 import {Level as EnvLevel} from "content/lib/environment";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {C} from "content/data/constants";
+
+const log = Log.instance;
 
 const {LOG_EVENT_LISTENERS} = C;
 

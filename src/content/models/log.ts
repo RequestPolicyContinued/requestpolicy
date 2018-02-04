@@ -88,7 +88,7 @@ const ROOT_OPTIONS: IInternalLogOptions = {
   prefix: C.LOG_PREFIX,
 };
 
-class Log {
+export class Log {
   private static lInstance: Log;
   public static get instance(): Log {
     if (!Log.lInstance) {
@@ -306,5 +306,4 @@ class Log {
   }
 }
 
-const LogInstance = Log.instance;
-export { LogInstance as Log };
+export const log = Log.instance;

@@ -30,7 +30,7 @@ import {Log} from "content/models/log";
 // utilities
 // =============================================================================
 
-const log = Log.extend({
+const log = Log.instance.extend({
   enabledCondition: {type: "C", C: "LOG_ENVIRONMENT"},
   name: "Environment",
 });

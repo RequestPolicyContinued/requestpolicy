@@ -38,7 +38,7 @@ let {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 // utilities
 // =============================================================================
 
-const log = Log.extend({name: "API"});
+const log = Log.instance.extend({name: "API"});
 
 function genErrorCallback(message) {
   return log.error.bind(null, message);

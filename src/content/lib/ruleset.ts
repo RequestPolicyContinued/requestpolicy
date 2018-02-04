@@ -740,7 +740,6 @@ class DomainEntry {
    * further DomainEntry objects.
    */
   private lower: IObject<DomainEntry> = {};
-  private higher: DomainEntry | null = null;
 
   constructor(
       name: string | null,
@@ -754,7 +753,6 @@ class DomainEntry {
     }
     if (name) this.name = name;
     if (fullName) this.fullName = fullName;
-    if (higher) this.higher = higher;
   }
 
   public toString() {

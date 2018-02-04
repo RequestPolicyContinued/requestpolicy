@@ -27,7 +27,7 @@ import {ToolbarButtonController}
     from "content/controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "content/controllers/windows.style-sheets";
 import {FramescriptServices} from "content/main/framescript-services";
-import { pWindowsAvailable } from "content/models/ui-startup";
+import {pWindowsAvailable} from "content/models/ui-startup";
 
 // =============================================================================
 // WindowSubControllers

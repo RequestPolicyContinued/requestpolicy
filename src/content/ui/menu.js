@@ -392,6 +392,7 @@ export function loadMenuIntoWindow(window) {
         destsWithSolelyAllowedRequests.length === 0;
   };
 
+  // eslint-disable-next-line complexity
   self._populateDetails = function() {
     let origin = self._currentlySelectedOrigin;
     let dest = self._currentlySelectedDest;

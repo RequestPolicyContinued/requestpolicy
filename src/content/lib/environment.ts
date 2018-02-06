@@ -30,7 +30,7 @@ import {Log} from "content/models/log";
 // utilities
 // =============================================================================
 
-const log = Log.extend({
+const log = Log.instance.extend({
   enabledCondition: {type: "C", C: "LOG_ENVIRONMENT"},
   name: "Environment",
 });
@@ -345,7 +345,7 @@ class BaseEnvironment {
       try {
         f(...aBootstrapArgs);
       } catch (e) {
-        console.error("Error in Bootstrap function! Details:");
+        console.error("Error in bootstrap function! Details:");
         console.dir(e);
       }
       log.log("function called! (" + aFunctions.length +

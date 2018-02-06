@@ -28,7 +28,7 @@ import {
 } from "content/lib/environment";
 import {ManagerForMessageListeners}
     from "content/lib/manager-for-message-listeners";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
 import * as RequestProcessor from "content/lib/request-processor";
@@ -45,6 +45,8 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "content/lib/utils/try-catch-utils";
+
+const log = Log.instance;
 
 const {LOG_FLAG_STATE} = C;
 
@@ -738,7 +740,7 @@ export function loadOverlayIntoWindow(window) {
    * so that RequestPolicy can register a link-click.
    *
    * The original methods are defined in Firefox' nsContextMenu.js:
-   * http://mxr.mozilla.org/mozilla-central/source/browser/base/content/nsContextMenu.js
+   * http://mxr.mozilla.org/mozilla-central/source/api/base/content/nsContextMenu.js
    *
    * The openLinkInTab() method doesn't need to be wrapped because new tabs
    * are already recognized by tabAdded(), which is wrapped elsewhere.

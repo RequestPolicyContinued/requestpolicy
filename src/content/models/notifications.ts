@@ -21,6 +21,7 @@
  */
 
 import {IListenInterface} from "content/lib/classes/listeners";
+import {OverridableSet} from "content/lib/classes/set";
 import {createListenersMap} from "content/lib/utils/listener-factories";
 import * as WindowUtils from "content/lib/utils/window-utils";
 
@@ -40,7 +41,7 @@ const URI_MAP = new Map([
   ],
 ]);
 
-class NotificationsClass extends Set {
+class NotificationsClass extends OverridableSet<NotificationID> {
   public onAdded: IListenInterface;
   public onDeleted: IListenInterface;
   public onTabOpened: IListenInterface;

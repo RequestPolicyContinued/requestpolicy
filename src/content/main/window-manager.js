@@ -27,7 +27,8 @@ import {ToolbarButtonController}
     from "content/controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "content/controllers/windows.style-sheets";
 import {FramescriptServices} from "content/main/framescript-services";
-import { pWindowsAvailable } from "content/models/ui-startup";
+import {pWindowsAvailable} from "content/models/ui-startup";
+import {defer} from "content/lib/utils/js-utils";
 
 // =============================================================================
 // WindowSubControllers
@@ -71,6 +72,9 @@ let WindowSubControllers = (function() {
 export const rpWindowManager = (function() {
   let self = {};
 
+  const dStartup = defer();
+  self.pStartup = dStartup.promise;
+
   let frameScriptURI =
       "chrome://rpcontinued/content/bootstrap/environments/framescript.js?" +
       Math.random();
@@ -100,6 +104,8 @@ export const rpWindowManager = (function() {
           // Also tell the globalMM to load it into each new
           // tab from now on.
           Services.mm.loadFrameScript(frameScriptURI, true);
+
+          dStartup.resolve();
           return;
         }).catch((e) => {
           console.error("rpWindowManager startup error:");

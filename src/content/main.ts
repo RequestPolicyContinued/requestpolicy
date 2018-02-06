@@ -82,6 +82,8 @@ declare const _setBackgroundPage: (
 ) => void;
 _setBackgroundPage(BackgroundPage);
 
+export {BackgroundPage};
+
 // =============================================================================
 
 function logSevereError(aMessage: string, aError: any) {

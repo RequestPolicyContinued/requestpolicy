@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {
   Environment,
@@ -33,6 +33,8 @@ import {C} from "content/data/constants";
 import {overlayComm} from "content/framescripts/managers";
 import {ManagerForBlockedContent}
     from "content/framescripts/blocked-content.js";
+
+const log = Log.instance;
 
 export const ManagerForDOMContentLoaded = (function() {
   let self = {};

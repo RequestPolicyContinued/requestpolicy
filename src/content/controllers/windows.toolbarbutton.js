@@ -21,7 +21,9 @@
  */
 
 import * as XULUtils from "content/lib/utils/xul-utils";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 let CustomizableUI = null;
 if (LegacyApi.miscInfos.isAustralis) {

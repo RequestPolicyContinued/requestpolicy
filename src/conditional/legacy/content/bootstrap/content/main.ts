@@ -28,6 +28,7 @@ import {DefaultPreferencesController}
     from "bootstrap/controllers/default-preferences-controller";
 DefaultPreferencesController.startup();
 
-export {Api, ContentScriptsApi} from "bootstrap/models/api";
-export {Bootstrap} from "bootstrap/models/bootstrap";
+import {Api} from "bootstrap/models/api";
+
+export const api = Api.instance;
 export {Manifest} from "bootstrap/models/manifest";

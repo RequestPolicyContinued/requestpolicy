@@ -2,6 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
+ * Copyright (c) 2017 Martin Kimmerle
  * Copyright (c) 2017 Jérard Devarulrajah
  *
  * This program is free software: you can redistribute it and/or modify it under
@@ -20,27 +21,38 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createListenersMap} from "content/lib/utils/listener-factories";
 import {MaybePromise} from "content/lib/classes/maybe-promise";
+import {Module} from "content/lib/classes/module";
+import {createListenersMap} from "content/lib/utils/listener-factories";
 
-export class Runtime {
-  static get instance() {
-    if (!Runtime._instance) {
-      Runtime._instance = new Runtime();
-    }
-    return Runtime._instance;
+declare const Services: any;
+
+export class Runtime extends Module {
+  protected moduleName = "runtime";
+
+  private events = createListenersMap(["onMessage"]);
+
+  get backgroundApi() {
+    return {
+      getBrowserInfo: this.getBrowserInfo.bind(this),
+      getURL: this.getURL.bind(this),
+      onMessage: this.events.interfaces.onMessage,
+    };
   }
 
-  constructor() {
-    this.listenersMaps = {};
-    createListenersMap(["onMessage"], {
-      assignListenersTo: this.listenersMaps,
-      assignInterfacesTo: this,
-    });
+  get contentApi() {
+    return {
+      connect: null,
+      getManifest: null,
+      getURL: null,
+      onConnect: null,
+      onMessage: null,
+      sendMessage: this.sendMessageFromContent.bind(this),
+    };
   }
 
-  getBrowserInfo() {
-    let {name, vendor, version, appBuildID: buildID} = Services.appinfo;
+  private getBrowserInfo() {
+    const {name, vendor, version, appBuildID: buildID} = Services.appinfo;
     return Promise.resolve({name, vendor, version, buildID});
   }
 
@@ -55,7 +67,7 @@ export class Runtime {
    * @param {string} path
    * @return {string}
    */
-  getURL(path) {
+  private getURL(path: string) {
     // Pattern to match mapping into about:requestpolicy?file
     // 1) ^(?:\.\/|\/)? : matches even if path starts with "content/"
     // or "./content"
@@ -65,11 +77,12 @@ export class Runtime {
     // Disable max-length line lint on this one because using new RegExp
     // to split it isn't recommended if the pattern doesn't change
     // eslint-disable-next-line max-len
-    let patternAbout = /^(?:\.\/|\/)?content\/settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
+    const patternAbout =
+        /^(?:\.\/|\/)?content\/settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
 
     // Pattern to match prepending with chrome://rpcontinued/
     // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"
-    let patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
+    const patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
 
     let legacyPath = null;
 
@@ -81,29 +94,14 @@ export class Runtime {
 
     return legacyPath;
   }
-}
 
-export class ContentRuntime {
-  static get instance() {
-    if (!this._instance) {
-      this._instance = new ContentRuntime();
-    }
-    return this._instance;
-  }
-
-  connect() {}
-  getManifest() {}
-  getURL() {}
-  onConnect() {}
-  onMessage() {}
-
-  sendMessage(aMessage) {
-    const responses = [];
-    const callback = (aResponse) => {
+  private sendMessageFromContent(aMessage: any) {
+    const responses: any[] = [];
+    const callback = (aResponse: any) => {
       responses.push(aResponse);
     };
     return MaybePromise.resolve(
-        Runtime.instance.listenersMaps.onMessage.emit(aMessage, null, callback)
+        this.events.listenersMap.onMessage.emit(aMessage, null, callback),
     ).then(() => {
       if (responses.length === 0) return;
       if (responses.length === 1) return responses[0];

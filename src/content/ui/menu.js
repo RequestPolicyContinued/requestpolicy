@@ -22,7 +22,7 @@
  */
 
 import {Level as EnvLevel} from "content/lib/environment";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
@@ -33,6 +33,8 @@ import * as DOMUtils from "content/lib/utils/dom-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {C} from "content/data/constants";
 import {Requests} from "content/models/requests";
+
+const log = Log.instance;
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -390,6 +392,7 @@ export function loadMenuIntoWindow(window) {
         destsWithSolelyAllowedRequests.length === 0;
   };
 
+  // eslint-disable-next-line complexity
   self._populateDetails = function() {
     let origin = self._currentlySelectedOrigin;
     let dest = self._currentlySelectedDest;

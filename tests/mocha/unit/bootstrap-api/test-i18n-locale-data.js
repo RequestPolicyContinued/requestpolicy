@@ -9,8 +9,7 @@
  */
 
 const {assert} = require("chai");
-const {LocaleData} = require("bootstrap/models/browser/i18n/locale-data");
-
+const Utils = require("./lib/utils");
 
 function resetConsoleErrors() {
   if ("reset" in console.error) {
@@ -18,8 +17,16 @@ function resetConsoleErrors() {
   }
 }
 
-
 describe("LocaleData", function() {
+  let LocaleData;
+  let pathAliasProxy;
+
+  before(function() {
+    pathAliasProxy = Utils.createPathAliasProxy();
+
+    ({LocaleData} = require("bootstrap/models/api/i18n/locale-data"));
+  });
+
   describe("has(locale)", function() {
     it("Should return true with loaded locale", function() {
       let data = new LocaleData();
@@ -242,5 +249,9 @@ describe("LocaleData", function() {
       assert.strictEqual(locale.get("MsG_1"), "My message 1");
       assert.strictEqual(locale.get("mSg_2"), "My message 2");
     });
+  });
+
+  after(function() {
+    pathAliasProxy.revoke();
   });
 });

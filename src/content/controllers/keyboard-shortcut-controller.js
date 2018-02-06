@@ -23,6 +23,7 @@
 import {KeyboardShortcut} from "content/lib/classes/keyboard-shortcut";
 import {Storage} from "content/models/storage";
 import {pWindowsAvailable} from "content/models/ui-startup";
+import {rpWindowManager} from "content/main/window-manager";
 
 // =============================================================================
 // KeyboardShortcutController
@@ -34,7 +35,9 @@ export const KeyboardShortcutController = {
   startupPreconditions: [
     Storage.pReady,
     pWindowsAvailable,
+    rpWindowManager.pStartup,
   ],
+
   startup() {
     keyboardShortcuts.push(new KeyboardShortcut("openMenu", "alt shift r",
         function(window) {
@@ -49,6 +52,7 @@ export const KeyboardShortcutController = {
         "keyboardShortcuts.openRequestLog.enabled",
         "keyboardShortcuts.openRequestLog.combo"));
   },
+
   shutdown() {
     keyboardShortcuts.forEach(ks => {
       ks.destroy();

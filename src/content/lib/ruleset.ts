@@ -24,7 +24,9 @@
 import {C} from "content/data/constants";
 import * as DomainUtils from "content/lib/utils/domain-utils";
 import { getHostByUriObj } from "content/lib/utils/domain-utils";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 // =============================================================================
 // utilities
@@ -738,7 +740,6 @@ class DomainEntry {
    * further DomainEntry objects.
    */
   private lower: IObject<DomainEntry> = {};
-  private higher: DomainEntry | null = null;
 
   constructor(
       name: string | null,
@@ -752,7 +753,6 @@ class DomainEntry {
     }
     if (name) this.name = name;
     if (fullName) this.fullName = fullName;
-    if (higher) this.higher = higher;
   }
 
   public toString() {

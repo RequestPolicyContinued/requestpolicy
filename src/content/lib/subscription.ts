@@ -26,7 +26,7 @@ import {IRuleSpecs, RawRuleset} from "content/lib/ruleset";
 import {RulesetStorage} from "content/lib/ruleset-storage";
 import {Log} from "content/models/log";
 
-const log = Log.extend({
+const log = Log.instance.extend({
   name: "Subscriptions",
 });
 
@@ -485,7 +485,6 @@ class Subscription {
   private list: string;
   private url: string;
   private data: ISubscriptionData;
-  private rawData: string;
 
   constructor(listName: string, subName: string, subUrl: string) {
     // TODO: allow only ascii lower letters, digits, and hyphens in listName.
@@ -514,7 +513,6 @@ class Subscription {
     req.onload = maybeCallback((event) => {
       try {
         const rawData = req.responseText;
-        this.rawData = rawData;
         if (!rawData) {
           const error = "Empty response when requesting subscription file";
           setTimeout(() => errorCallback(this, error), 0);

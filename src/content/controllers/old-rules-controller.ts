@@ -23,8 +23,10 @@
 import {IController} from "content/lib/classes/controllers";
 import {OldRules} from "content/lib/classes/old-rules";
 import {PolicyManager} from "content/lib/policy-manager";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {VersionInfos} from "content/models/version-infos";
+
+const log = Log.instance;
 
 /**
  * @return {boolean} If the import was successful.

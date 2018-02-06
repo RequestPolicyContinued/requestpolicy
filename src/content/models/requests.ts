@@ -24,7 +24,9 @@
 import {RequestSet} from "content/lib/request-set";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {createListenersMap} from "content/lib/utils/listener-factories";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 const logGettingSavedRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},

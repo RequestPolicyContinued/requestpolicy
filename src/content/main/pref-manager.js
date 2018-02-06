@@ -23,7 +23,9 @@
 
 import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {Storage} from "content/models/storage";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 // =============================================================================
 // PrefManager

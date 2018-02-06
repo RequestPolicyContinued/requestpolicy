@@ -20,41 +20,37 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {AsyncLocaleData} from "bootstrap/models/browser/i18n/async-locale-data";
+import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
+import {Module} from "content/lib/classes/module";
+import {AsyncLocaleData} from "./i18n/async-locale-data";
 
-export class I18n {
-  constructor() {
-    this.lLocaleData = new AsyncLocaleData();
+export class I18n extends Module {
+  protected moduleName = "i18n";
+  protected subModules = {
+    localeData: new AsyncLocaleData(),
+  };
+
+  public get backgroundApi() {
+    return {
+      getMessage: this.getMessage.bind(this),
+      getUILanguage: this.getUILanguage.bind(this),
+    };
   }
 
-  get subModels() {
-    return [
-      this.lLocaleData,
-    ];
+  public get contentApi() {
+    const api = this.backgroundApi;
+    return {
+      getMessage: api.getMessage,
+      getUILanguage: api.getUILanguage,
+    };
   }
 
-  get whenReady() {
-    return Promise.all(this.subModels.map(
-        (model) => model.whenReady)
-    );
-  }
-
-  init() {
-    const p = Promise.all(this.subModels.map(
-        (model) => model.init()
-    ));
-    p.catch((e) => {
-      console.error("I18n init() error:");
-      console.dir(e);
-    });
-    return p;
-  }
-
-  get localeData() {
-    if (!this.lLocaleData.ready) {
-      throw new Error("I18n: localeData is not ready yet!");
-    }
-    return this.lLocaleData;
+  get legacyApi() {
+    return {
+      matchKeyPattern: L10nUtils.matchKeyPattern.bind(this),
+      updateDocument: L10nUtils.updateDocument.bind(null, this),
+      updateString: L10nUtils.updateString.bind(null, this),
+    };
   }
 
   /**
@@ -67,8 +63,9 @@ export class I18n {
    * substitution string, or an array of substitution strings.
    * @return {string} Message localized for current locale.
    */
-  getMessage(messageName, substitutions) {
-    return this.localeData.localizeMessage(messageName, substitutions);
+  public getMessage(messageName: string, substitutions: any) {
+    return this.subModules.localeData.
+        localizeMessage(messageName, substitutions);
   }
 
   /**
@@ -76,26 +73,7 @@ export class I18n {
    *
    * @return {string} The browser UI language code as a BCP 47 tag.
    */
-  getUILanguage() {
-    return this.localeData.getAppLocale();
-  }
-}
-
-export class ContentI18n {
-  constructor(i18n) {
-    this.i18n = i18n;
-  }
-
-  getMessage(...args) {
-    return this.i18n.getMessage(...args);
-  }
-  getAcceptLanguages() {
-    return null;
-  }
-  getUILanguage(...args) {
-    return this.i18n.getUILanguage(...args);
-  }
-  detectLanguage() {
-    return null;
+  public getUILanguage() {
+    return this.subModules.localeData.getAppLocale();
   }
 }

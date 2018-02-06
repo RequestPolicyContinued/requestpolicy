@@ -20,32 +20,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Module} from "content/lib/classes/module";
 
-const log = Log.instance;
+export class Extension extends Module {
+  protected moduleName = "extension";
 
-function onStorageChange(aChanges, aAreaName) {
-  if (aChanges.hasOwnProperty("log")) {
-    log.setEnabled(aChanges.log.newValue);
+  private backgroundPage: any;
+
+  public get backgroundApi() {
+    return {
+      getBackgroundPage: this.getBackgroundPage.bind(this),
+    };
   }
-  if (aChanges.hasOwnProperty("log.level")) {
-    log.setLevel(aChanges["log.level"].newValue);
+
+  public get contentApi() {
+    return {
+      getURL: null,
+      inIncognitoContext: null,
+    };
+  }
+
+  public setBackgroundPage(aObject: any) {
+    this.backgroundPage = aObject;
+  }
+
+  public getBackgroundPage() {
+    return this.backgroundPage;
   }
 }
-
-export const LogController = {
-  startup() {
-    browser.storage.local.get([
-      "log",
-      "log.level",
-    ]).then(result => {
-      log.setEnabled(result.log);
-      log.setLevel(result["log.level"]);
-      return;
-    }).catch(e => {
-      log.error("Error initializing the Log:", e);
-    });
-
-    browser.storage.onChanged.addListener(onStorageChange);
-  },
-};

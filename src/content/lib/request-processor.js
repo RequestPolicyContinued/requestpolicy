@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log as Log} from "content/models/log";
+import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
@@ -51,9 +51,9 @@ import {
   queryInterface,
 } from "content/lib/utils/try-catch-utils";
 
-const log = Log;
+const log = Log.instance;
 
-const logRequests = Log.extend({
+const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",

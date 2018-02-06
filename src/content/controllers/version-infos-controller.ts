@@ -22,9 +22,11 @@
  */
 
 import {IController} from "content/lib/classes/controllers";
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
 import {Storage} from "content/models/storage";
 import {VersionInfos} from "content/models/version-infos";
+
+const log = Log.instance;
 
 function updateLastVersions() {
   const {curAppVersion, curRPVersion} = VersionInfos;

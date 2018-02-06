@@ -21,7 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log as log} from "content/models/log";
+import {Log} from "content/models/log";
+
+const log = Log.instance;
 
 declare const Cc: any;
 declare const Ci: any;

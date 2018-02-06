@@ -70,11 +70,13 @@ import {mlManager, overlayComm} from "content/framescripts/managers";
     // it will never actually be empty. However, I don't know this for certain.
     if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
       overlayComm.run(function() {
-        sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                        {
-                          origin: event.target.ownerDocument.URL,
-                          dest: event.target.href,
-                        });
+        sendSyncMessage(
+            `${C.MM_PREFIX}notifyLinkClicked`,
+            {
+              origin: event.target.ownerDocument.URL,
+              dest: event.target.href,
+            }
+        );
       });
       return;
     }
@@ -85,11 +87,13 @@ import {mlManager, overlayComm} from "content/framescripts/managers";
         event.target.type.toLowerCase() === "submit" &&
         event.target.form && event.target.form.action) {
       overlayComm.run(function() {
-        sendSyncMessage(C.MM_PREFIX + "registerFormSubmitted",
-                        {
-                          origin: event.target.ownerDocument.URL,
-                          dest: event.target.form.action,
-                        });
+        sendSyncMessage(
+            `${C.MM_PREFIX}registerFormSubmitted`,
+            {
+              origin: event.target.ownerDocument.URL,
+              dest: event.target.form.action,
+            }
+        );
       });
       return;
     }

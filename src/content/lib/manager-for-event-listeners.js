@@ -30,7 +30,9 @@ const {LOG_EVENT_LISTENERS} = C;
 
 function addEvLis(listener) {
   listener.target.addEventListener(
-      listener.eventType, listener.callback, listener.useCapture);
+      listener.eventType, listener.callback, listener.useCapture
+  );
+  // eslint-disable-next-line no-param-reassign
   listener.listening = true;
 }
 
@@ -68,26 +70,29 @@ export class ManagerForEventListeners {
           EnvLevel.INTERFACE,
           () => {
             if (LOG_EVENT_LISTENERS) {
-              log.log("From now on new event listeners will be " +
-                  "added immediately. Environment: \"" +
-                  this.environment.name + "\"");
+              log.log(`${"From now on new event listeners will be " +
+                  "added immediately. Environment: \""}${
+                this.environment.name}"`);
             }
             this.addNewListenersImmediately = true;
             this.addAllListeners();
-          });
+          }
+      );
       this.environment.addShutdownFunction(
           EnvLevel.INTERFACE,
           () => {
             // clean up when the environment shuts down
             this.removeAllListeners();
-          });
+          }
+      );
     } else {
       // aEnv is not defined! Try to report an error.
       if (log) {
         console.error(
             "No Environment was specified for a new " +
             "ManagerForEventListeners! " +
-            "This means that the listeners won't be removed!");
+            "This means that the listeners won't be removed!"
+        );
       }
     }
   }
@@ -108,9 +113,9 @@ export class ManagerForEventListeners {
     };
     if (self.addNewListenersImmediately) {
       if (LOG_EVENT_LISTENERS) {
-        log.log("Immediately adding event listener for \"" +
-            listener.eventType + "\". Environment: \"" +
-            self.environment.name + "\"");
+        log.log(`Immediately adding event listener for "${
+          listener.eventType}". Environment: "${
+          self.environment.name}"`);
       }
       addEvLis(listener);
     }
@@ -125,9 +130,9 @@ export class ManagerForEventListeners {
     for (let listener of self.listeners) {
       if (listener.listening === false) {
         if (LOG_EVENT_LISTENERS) {
-          log.log("Lazily adding event listener for \"" +
-              listener.eventType + "\". Environment: \"" +
-              self.environment.name + "\"");
+          log.log(`Lazily adding event listener for "${
+            listener.eventType}". Environment: "${
+            self.environment.name}"`);
         }
         addEvLis(listener);
       }
@@ -142,11 +147,11 @@ export class ManagerForEventListeners {
     while (self.listeners.length > 0) {
       let listener = self.listeners.pop();
       if (LOG_EVENT_LISTENERS) {
-        log.log("Removing event listener for \"" + listener.eventType +
-            "\". Environment: \"" + self.environment.name + "\"");
+        log.log(`Removing event listener for "${listener.eventType
+        }". Environment: "${self.environment.name}"`);
       }
       listener.target.removeEventListener(listener.eventType, listener.callback,
-                                          listener.useCapture);
+          listener.useCapture);
     }
   }
 }

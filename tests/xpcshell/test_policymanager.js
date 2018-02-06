@@ -34,7 +34,7 @@ function test_0() {
   manager.loadUserRules(config);
 
   for (let i in manager._rulesets) {
-    print("print ruleset: " + i);
+    print(`print ruleset: ${i}`);
     manager._rulesets[i].ruleset.print(0, print);
     print(JSON.stringify(manager._rulesets[i].rawRuleset));
   }
@@ -93,16 +93,16 @@ function test_1() {
   const dest = DomainUtil.getUriObject("https://www.example.com/");
 
   const rules = {"origin":         {"o": {"h": "*.foo.com"}},
-                 "dest":           {"d": {"h": "www.example.com"}},
-                 "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                    "d": {"h": "www.example.com"}}};
+    "dest":           {"d": {"h": "www.example.com"}},
+    "origin-to-dest": {"o": {"h": "*.foo.com"},
+      "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
     // manager.loadUserRules();
 
-    print("Starting: " + i);
+    print(`Starting: ${i}`);
     const rawRule = rules[i];
     // Add a rule we just added.
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
@@ -116,7 +116,7 @@ function test_1() {
     manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -132,7 +132,7 @@ function test_1() {
     do_check_false(result.isAllowed());
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -140,7 +140,7 @@ function test_1() {
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -152,7 +152,7 @@ function test_1() {
     manager.addRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -172,7 +172,7 @@ function test_1() {
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -208,16 +208,16 @@ function test_2() {
   const dest = DomainUtil.getUriObject("https://www.example.com/");
 
   const rules = {"origin":         {"o": {"h": "*.foo.com"}},
-                 "dest":           {"d": {"h": "www.example.com"}},
-                 "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                    "d": {"h": "www.example.com"}}};
+    "dest":           {"d": {"h": "www.example.com"}},
+    "origin-to-dest": {"o": {"h": "*.foo.com"},
+      "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
     // manager.loadUserRules();
 
-    print("Starting: " + i);
+    print(`Starting: ${i}`);
     const rawRule = rules[i];
     // Add a rule we just added.
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
@@ -231,7 +231,7 @@ function test_2() {
     manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -247,7 +247,7 @@ function test_2() {
     do_check_false(result.isAllowed());
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -255,7 +255,7 @@ function test_2() {
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -267,7 +267,7 @@ function test_2() {
     manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -287,7 +287,7 @@ function test_2() {
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -325,16 +325,16 @@ function test_3() {
   const dest = DomainUtil.getUriObject("https://www.example.com/");
 
   const rules = {"origin":         {"o": {"h": "*.foo.com"}},
-                 "dest":           {"d": {"h": "www.example.com"}},
-                 "origin-to-dest": {"o": {"h": "*.foo.com"},
-                                    "d": {"h": "www.example.com"}}};
+    "dest":           {"d": {"h": "www.example.com"}},
+    "origin-to-dest": {"o": {"h": "*.foo.com"},
+      "d": {"h": "www.example.com"}}};
 
   for (let i in rules) {
     // Resetting the policy manager is useful for debugging failures.
     // var manager = new PolicyManager();
     // manager.loadUserRules();
 
-    print("Starting: " + i);
+    print(`Starting: ${i}`);
     const rawRule = rules[i];
     // Add a rule as both persistent and temporary.
     manager.addRule(RULE_ACTION_ALLOW, rawRule, noStore);
@@ -349,7 +349,7 @@ function test_3() {
     manager.removeRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -365,7 +365,7 @@ function test_3() {
     do_check_false(result.isAllowed());
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -374,7 +374,7 @@ function test_3() {
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -387,7 +387,7 @@ function test_3() {
     manager.addTemporaryRule(RULE_ACTION_DENY, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 
@@ -409,7 +409,7 @@ function test_3() {
     manager.addTemporaryRule(RULE_ACTION_ALLOW, rawRule, noStore);
 
     for (let j in manager._rulesets) {
-      print("print ruleset: " + j);
+      print(`print ruleset: ${j}`);
       manager._rulesets[j].ruleset.print(0, print);
     }
 

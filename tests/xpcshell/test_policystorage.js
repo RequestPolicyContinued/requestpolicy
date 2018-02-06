@@ -4,6 +4,7 @@ Components.utils.import("chrome://rpcontinued/content/lib/ruleset-storage.jsm");
 Components.utils.import("chrome://rpcontinued/content/data/constants.jsm");
 
 // We expect JSON data to represent the following data structure.
+/* eslint-disable indent */
 const exampleJsonObj = {
   "metadata": {
     "version": 1,
@@ -32,6 +33,7 @@ const exampleJsonObj = {
     ],
   },
 };
+/* eslint-enable indent */
 
 function run_test() {
   test_1();
@@ -61,11 +63,12 @@ function test_1() {
 
 function test_2() {
   const filename = "foo.json";
+  /* eslint-disable indent */
   const rules = {"origin":         {"o": {"h": "*.foo.com"}},
                  "dest":           {"d": {"h": "www.example.com"}},
                  "origin-to-dest": {"o": {"h": "*.foo.com"},
                                     "d": {"h": "www.example.com"}}};
-
+  /* eslint-enable indent */
   let rawRuleset = new RawRuleset();
 
   do_check_eq(Object.keys(rawRuleset.metadata).length, 1);

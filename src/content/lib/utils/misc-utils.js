@@ -99,6 +99,7 @@ export function getObjectProperty(object, property) {
  * @return {Object} the module's `internal`
  */
 export function createModuleInternal(aModuleScope) {
+  /* eslint-disable no-param-reassign */
   let internal = {};
   let sealed = false;
   aModuleScope.getInternal = function() {
@@ -128,7 +129,7 @@ export function createModuleInternal(aModuleScope) {
  *     original function.
  */
 export function wrapFunction(aOwnerObject, aFunctionName, aErrorCallback,
-                              aBeforeFunction = null, aAfterFunction = null) {
+    aBeforeFunction = null, aAfterFunction = null) {
   initWrapperFunction(aOwnerObject, aFunctionName);
 
   const fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
@@ -161,7 +162,8 @@ function initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback) {
     if (typeof aErrorCallback === "function") {
       aErrorCallback(
           `The "${aWhen}" function of the \`${aFunctionName}()\` wrapper ` +
-          `has thrown an error.`, aError);
+          `has thrown an error.`, aError
+      );
     }
   }
 

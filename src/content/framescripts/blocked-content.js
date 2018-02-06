@@ -78,16 +78,16 @@ export const ManagerForBlockedContent = (function() {
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";
         img.style.backgroundPosition = "center center";
-        img.style.backgroundImage = "url('" + MISSING_IMAGE_DATA_URI + "')";
+        img.style.backgroundImage = `url('${MISSING_IMAGE_DATA_URI}')`;
         if (!img.width) {
           img.width = 50;
         }
         if (!img.height) {
           img.height = 50;
         }
-        img.title = "[" + blockedURIs[img.src].identifier + "]" +
-            (img.title ? " " + img.title : "") +
-            (img.alt ? " " + img.alt : "");
+        img.title = `[${blockedURIs[img.src].identifier}]${
+          img.title ? ` ${img.title}` : ""
+        }${img.alt ? ` ${img.alt}` : ""}`;
         img.src = TRANSPARENT_IMAGE_DATA_URI;
       }
     }

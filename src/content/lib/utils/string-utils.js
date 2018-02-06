@@ -27,7 +27,8 @@ const lazy = {};
 
 JSUtils.defineLazyGetter(lazy, "strbundle", function() {
   return loadPropertiesFile(
-      "chrome://rpcontinued/locale/requestpolicy.properties");
+      "chrome://rpcontinued/locale/requestpolicy.properties"
+  );
 });
 
 // from https://developer.mozilla.org/en-US/Add-ons/
@@ -45,13 +46,13 @@ function loadPropertiesFile(path) {
     * cache on addon shutdown. This just bypasses the built-in cache for
     * repeated loads of the same path so that a newly installed update loads
     * cleanly. */
-  return Services.strings.createBundle(path + "?" + Math.random());
+  return Services.strings.createBundle(`${path}?${Math.random()}`);
 }
 
 export function $str(aName, aParams) {
   if (aParams) {
     return lazy.strbundle.formatStringFromName(aName, aParams,
-                                                aParams.length);
+        aParams.length);
   } else {
     // eslint-disable-next-line new-cap
     return lazy.strbundle.GetStringFromName(aName);

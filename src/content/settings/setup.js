@@ -78,12 +78,16 @@ import {$id} from "./common";
       // FIXME: Add a pref to disable subscriptions globally (#713)
       if (enableSubs) {
         userSubs.addSubscription("official", subName);
-        Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
-            JSON.stringify(subInfo));
+        Services.obs.notifyObservers(
+            null, SUBSCRIPTION_ADDED_TOPIC,
+            JSON.stringify(subInfo)
+        );
       } else {
         userSubs.removeSubscription("official", subName);
-        Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
-            JSON.stringify(subInfo));
+        Services.obs.notifyObservers(
+            null, SUBSCRIPTION_REMOVED_TOPIC,
+            JSON.stringify(subInfo)
+        );
       }
     }
   }

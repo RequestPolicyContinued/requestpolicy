@@ -45,8 +45,9 @@ GUILocation.prototype.toString = function() {
  */
 GUILocation.merge = function(SubclassOfGUILocation, location1, location2) {
   return new SubclassOfGUILocation(
-    location1.value, // we assume: location1.value == location2.value
-    GUILocationProperties.merge(location1.properties, location2.properties));
+      location1.value, // we assume: location1.value == location2.value
+      GUILocationProperties.merge(location1.properties, location2.properties)
+  );
 };
 
 /**
@@ -61,15 +62,15 @@ GUILocation.existsInArray = function(locationString, locations) {
 
 /**
  * @static
- * @param {String} locationString The location saved in GUILocation.value
+ * @param {String} aLocationString The location saved in GUILocation.value
  * @param {String} locations Array of GUILocation objects
  * @return {int} The index of the first GUILocation object which contains the
  *     specified locationString. If it doesn't exist, it returns -1.
  */
-GUILocation.indexOfLocationInArray = function(locationString, locations) {
-  if (locationString instanceof GUILocation) {
-    locationString = locationString.value;
-  }
+GUILocation.indexOfLocationInArray = function(aLocationString, locations) {
+  const locationString =
+      aLocationString instanceof GUILocation ? aLocationString.value :
+        aLocationString;
   for (let i in locations) {
     if (locations[i].value === locationString) {
       return i;

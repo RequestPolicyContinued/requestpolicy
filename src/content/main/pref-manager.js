@@ -132,7 +132,7 @@ export const PrefManager = (function() {
     }
   }
   MainEnvironment.addShutdownFunction(EnvLevel.BACKEND,
-                                      maybeHandleUninstallOrDisable);
+      maybeHandleUninstallOrDisable);
 
   return self;
 })();

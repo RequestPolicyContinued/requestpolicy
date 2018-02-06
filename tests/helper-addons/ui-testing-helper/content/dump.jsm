@@ -46,7 +46,7 @@ var Dump = (function() {
   };
 
   self.observe = function(aSubject, aTopic, aData) {
-    dump(aData + "\n");
+    dump(`${aData}\n`);
   };
 
   return self;

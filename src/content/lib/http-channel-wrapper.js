@@ -50,8 +50,8 @@ export class HttpChannelWrapper {
       const result = getLoadContextFromHttpChannel(this._httpChannel);
       this._loadContext = result.value;
       if (this._loadContext === null) {
-        log.warn("The HTTPChannel's " +
-            "Load Context couldn't be found! " + result.error);
+        log.warn(`${"The HTTPChannel's " +
+            "Load Context couldn't be found! "}${result.error}`);
       }
     }
     return this._loadContext;
@@ -71,9 +71,9 @@ export class HttpChannelWrapper {
         const result = getBrowserFromLoadContext(loadContext);
         this._browser = result.value;
         if (this._browser === null) {
-          log.warn("The browser for " +
+          log.warn(`${"The browser for " +
               "the HTTPChannel's Load Context couldn't be " +
-              "found! " + result.error);
+              "found! "}${result.error}`);
         }
       }
     }

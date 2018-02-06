@@ -32,7 +32,7 @@ import {C} from "content/data/constants";
 
 import {overlayComm} from "content/framescripts/managers";
 import {ManagerForBlockedContent}
-    from "content/framescripts/blocked-content.js";
+  from "content/framescripts/blocked-content.js";
 
 const log = Log.instance;
 
@@ -48,9 +48,11 @@ export const ManagerForDOMContentLoaded = (function() {
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
     overlayComm.run(function() {
-      cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
-                           {origin: event.currentTarget.ownerDocument.URL,
-                            dest: event.currentTarget.href});
+      cfmm.sendSyncMessage(
+          `${C.MM_PREFIX}notifyLinkClicked`,
+          {origin: event.currentTarget.ownerDocument.URL,
+            dest: event.currentTarget.href}
+      );
     });
   }
 
@@ -104,20 +106,22 @@ export const ManagerForDOMContentLoaded = (function() {
 
     pBlockedURIs.then((blockedURIs) => {
       if (blockedURIs !== null) {
-        ManagerForBlockedContent.indicateBlockedVisibleObjects(doc,
-            blockedURIs);
+        ManagerForBlockedContent.indicateBlockedVisibleObjects(
+            doc,
+            blockedURIs
+        );
       }
       return;
-    }).catch(e => {
+    }).catch((e) => {
       console.error(e);
     });
 
     pBlockedURIs.then((blockedURIs) => {
       if (blockedURIs !== null && isActiveTopLevelDocument(doc)) {
-        cfmm.sendAsyncMessage(C.MM_PREFIX + "notifyTopLevelDocumentLoaded");
+        cfmm.sendAsyncMessage(`${C.MM_PREFIX}notifyTopLevelDocumentLoaded`);
       }
       return;
-    }).catch(e => {
+    }).catch((e) => {
       console.error(e);
     });
   }
@@ -145,7 +149,7 @@ export const ManagerForDOMContentLoaded = (function() {
     // use a timeout like observerBlockedRequests does.
     if (isActiveTopLevelDocument(iframe.ownerDocument)) {
       overlayComm.run(function() {
-        cfmm.sendAsyncMessage(C.MM_PREFIX + "notifyDOMFrameContentLoaded");
+        cfmm.sendAsyncMessage(`${C.MM_PREFIX}notifyDOMFrameContentLoaded`);
       });
     }
   }
@@ -194,13 +198,13 @@ export const ManagerForDOMContentLoaded = (function() {
       }
 
       metaRefreshes.push({delay: delay, destURI: destURI,
-                          originalDestURI: originalDestURI});
+        originalDestURI: originalDestURI});
     }
 
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      log.info("Number of meta refreshes found: " + metaRefreshes.length);
+      log.info(`Number of meta refreshes found: ${metaRefreshes.length}`);
 
       /* eslint-disable new-cap */
       const docShell = doc.defaultView.
@@ -210,12 +214,15 @@ export const ManagerForDOMContentLoaded = (function() {
       /* eslint-enable new-cap */
       if (!docShell.allowMetaRedirects) {
         log.warn(
-            "Another extension disabled docShell.allowMetaRedirects.");
+            "Another extension disabled docShell.allowMetaRedirects."
+        );
       }
 
       overlayComm.run(function() {
-        cfmm.sendAsyncMessage(C.MM_PREFIX + "handleMetaRefreshes",
-            {documentURI: documentURI, metaRefreshes: metaRefreshes});
+        cfmm.sendAsyncMessage(
+            `${C.MM_PREFIX}handleMetaRefreshes`,
+            {documentURI: documentURI, metaRefreshes: metaRefreshes}
+        );
       });
     }
 
@@ -330,13 +337,17 @@ export const ManagerForDOMContentLoaded = (function() {
   //}
   /* eslint-enable */
 
-  MainEnvironment.elManager.addListener(cfmm, "DOMContentLoaded",
-                                        onDOMContentLoaded, true);
+  MainEnvironment.elManager.addListener(
+      cfmm, "DOMContentLoaded",
+      onDOMContentLoaded, true
+  );
 
   // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
   // enclosed frames.
-  MainEnvironment.elManager.addListener(cfmm, "DOMFrameContentLoaded",
-                                        onDOMFrameContentLoaded, true);
+  MainEnvironment.elManager.addListener(
+      cfmm, "DOMFrameContentLoaded",
+      onDOMFrameContentLoaded, true
+  );
 
   return self;
 })();

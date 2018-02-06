@@ -91,16 +91,18 @@ import {WinEnv, elManager, $id} from "content/settings/common";
       for (var i = 0; i < entries[entryType].length; i++) {
         var entry = entries[entryType][i];
         var origin = entry.o ?
-                     RuleUtils.endpointSpecToDisplayString(entry.o) : "";
+          RuleUtils.endpointSpecToDisplayString(entry.o) : "";
         var dest = entry.d ?
-                   RuleUtils.endpointSpecToDisplayString(entry.d) : "";
+          RuleUtils.endpointSpecToDisplayString(entry.d) : "";
         if (filter) {
           if (origin.indexOf(filter) === -1 && dest.indexOf(filter) === -1) {
             continue;
           }
         }
-        addRulesTableRow(table, entryType, origin, dest, entry, source,
-            readOnly);
+        addRulesTableRow(
+            table, entryType, origin, dest, entry, source,
+            readOnly
+        );
       }
     }
   }
@@ -129,20 +131,19 @@ import {WinEnv, elManager, $id} from "content/settings/common";
     }
   }
 
-  function addRulesTableRow(table, ruleAction, origin, dest, ruleData, source,
-                            readOnly) {
-    if (ruleAction !== "allow") {
-      ruleAction = "block";
-    }
+  function addRulesTableRow(
+      table, aRuleAction, origin, dest, ruleData, source, readOnly
+  ) {
+    const ruleAction = aRuleAction === "allow" ? "allow" : "block";
     var ruleActionString = $str(ruleAction);
 
     var row = $("<tr>").addClass(ruleAction).appendTo(table);
 
     row.append(
-      $("<td>").text(ruleActionString),
-      $("<td>").text(origin),
-      $("<td>").text(dest),
-      $("<td>").text(source)
+        $("<td>").text(ruleActionString),
+        $("<td>").text(origin),
+        $("<td>").text(dest),
+        $("<td>").text(source)
     );
 
     if (!readOnly) {
@@ -163,7 +164,7 @@ import {WinEnv, elManager, $id} from "content/settings/common";
     } catch (e) {
       console.error("yourpolicy: addRule():");
       console.dir(e);
-      window.alert("Unable to add rule: " + e.toString());
+      window.alert(`Unable to add rule: ${e.toString()}`);
       return;
     }
 
@@ -199,8 +200,10 @@ import {WinEnv, elManager, $id} from "content/settings/common";
       }
       return part;
     }
-    var originPart = ruleInfoToRuleDataPart(originScheme, originHost,
-        originPort);
+    var originPart = ruleInfoToRuleDataPart(
+        originScheme, originHost,
+        originPort
+    );
     var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
     if (!originPart && !destPart) {
       return;

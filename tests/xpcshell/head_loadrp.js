@@ -28,8 +28,8 @@ function getRPChromeManifest() {
 }
 
 function registerRPChromeManifest() {
-  Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-                    .autoRegister(getRPChromeManifest());
+  Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+      autoRegister(getRPChromeManifest());
 }
 
 registerRPChromeManifest();

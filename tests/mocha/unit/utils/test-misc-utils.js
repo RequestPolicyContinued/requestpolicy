@@ -36,8 +36,7 @@ describe("Utils", function() {
     });
 
     it("Check that a second call to the uut_wrap function overwrites the " +
-        "old 'before' and 'after' functions. It should not wrap again.",
-        function() {
+        "old 'before' and 'after' functions. It should not wrap again.", function() {
       uutWrap(wrapperFunction2, wrapperFunction1);
       callAndCheck("{_2_0_1}");
     });
@@ -49,8 +48,7 @@ describe("Utils", function() {
       callAndCheck("{_3_0_3}");
     });
 
-    it("Check that 'before' and 'after' function can be `null` and `undefined`.",
-        function() {
+    it("Check that 'before' and 'after' function can be `null` and `undefined`.", function() {
       uutWrap(null, null);
       callAndCheck("{_0}");
       uutWrap(undefined, undefined);
@@ -64,8 +62,7 @@ describe("Utils", function() {
 
     it("Again calling Utils.wrapFunction() should work without again " +
         "wrapping the outermost function. Reason: disable-enabling and " +
-        "update actions should not increase the number of wrapper functions.",
-        function() {
+        "update actions should not increase the number of wrapper functions.", function() {
       uutWrap(wrapperFunction1, wrapperFunction3);
       callAndCheck("{_1_0_3}");
       uutWrap(wrapperFunction1, wrapperFunction2);

@@ -41,7 +41,8 @@ export const xulTrees = {};
 
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/ui/xul-trees.js",
-      xulTreesScope);
+      xulTreesScope
+  );
 
   // For ensuring that each Element Spec has an ID.
   let nextID = 1;
@@ -53,6 +54,8 @@ export const xulTrees = {};
   }
 
   function ensureIntegrity(aElementSpec) {
+    /* eslint-disable no-param-reassign */
+
     // Ensure "attributes" exists.
     if (!aElementSpec.hasOwnProperty("attributes")) {
       aElementSpec.attributes = {};
@@ -60,7 +63,7 @@ export const xulTrees = {};
 
     // Ensure the Element Spec has an ID attribute.
     if (!aElementSpec.attributes.hasOwnProperty("id")) {
-      aElementSpec.attributes.id = "rpc-autoid-" + nextID++;
+      aElementSpec.attributes.id = `rpc-autoid-${nextID++}`;
       // log.log(
       //     "Automatically created ID '" + aElementSpec.attributes.id +
       //     "' for element <" + aElementSpec.tag + ">");
@@ -89,7 +92,8 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
     // Add all children recursively.
     if (elementSpec.hasOwnProperty("children")) {
       let allChildrenSpecs = recursivelyGetAllElementSpecs(
-          elementSpec.children);
+          elementSpec.children
+      );
       allElementSpecs = allElementSpecs.concat(allChildrenSpecs);
     }
   }
@@ -99,8 +103,7 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
 
 function getParentElementOfSubobject(aDocument, aElementSpec) {
   let subobjectTree = aElementSpec.parent.special.tree;
-  let parentElement = aDocument.getElementById(
-      aElementSpec.parent.special.id);
+  let parentElement = aDocument.getElementById(aElementSpec.parent.special.id);
   for (let i = 0, len = subobjectTree.length; i < len; ++i) {
     parentElement = parentElement[subobjectTree[i]];
   }
@@ -222,24 +225,25 @@ const {addEventListeners, removeEventListeners} = (function() {
   };
 })();
 
-function recursivelyAddXULElements(aDocument, aElementSpecList,
-                                   aParentElement = null) {
+function recursivelyAddXULElements(
+    aDocument, aElementSpecList,
+    aParentElement = null
+) {
   for (let elementSpec of aElementSpecList) {
     if (!elementSpec || !elementSpec.tag) {
       console.error("Element spec incomplete!");
       continue;
     }
     let parentElement = aParentElement ? aParentElement :
-        getParentElement(aDocument, elementSpec);
+      getParentElement(aDocument, elementSpec);
     if (false === parentElement) {
-      console.error("The parent element could not " +
-          "be determined. Tag: " + elementSpec.tag + "; " +
-          "ID: " + elementSpec.attributes.id);
+      console.error(`${"The parent element could not " +
+          "be determined. Tag: "}${elementSpec.tag}; ` +
+          `ID: ${elementSpec.attributes.id}`);
       continue;
     }
     if (parentElement === null) {
-      console.error(
-          "parentElement of '" + elementSpec.attributes.id + "' is null!");
+      console.error(`parentElement of '${elementSpec.attributes.id}' is null!`);
       continue;
     }
 
@@ -281,7 +285,7 @@ function getRootElementIDs(aTreeName) {
 
 export function removeTreeElementsFromWindow(aWin, aTreeName) {
   if (!xulTrees.hasOwnProperty(aTreeName)) {
-    console.error("There's no tree with name '" + aTreeName + "'.");
+    console.error(`There's no tree with name '${aTreeName}'.`);
     return;
   }
 
@@ -354,12 +358,12 @@ export const keyboardShortcuts = (function() {
 
     for (let modifier of modifiers) {
       if (false === isValidModifier(modifier)) {
-        return error("Invalid modifier: \"" + modifier + "\"");
+        return error(`Invalid modifier: "${modifier}"`);
       }
     }
 
     if (!keyRegEx.test(key)) {
-      return error("Invalid key: \"" + key + "\"");
+      return error(`Invalid key: "${key}"`);
     }
 
     return success({

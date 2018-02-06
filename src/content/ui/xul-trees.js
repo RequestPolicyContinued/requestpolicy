@@ -28,6 +28,7 @@
 let isSeamonkey = appID === C.SEAMONKEY_ID;
 
 /* eslint-disable max-len */
+/* eslint-disable indent */
 
 exports.toolbarbutton = [
   {

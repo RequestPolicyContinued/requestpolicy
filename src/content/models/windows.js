@@ -134,13 +134,15 @@ export const Windows = (function() {
   let windowMediatorListener = {
     onOpenWindow: function(xulWindow) {
       // eslint-disable-next-line new-cap
-      let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-          .getInterface(Ci.nsIDOMWindow);
+      let window = xulWindow.QueryInterface(Ci.nsIInterfaceRequestor).
+          getInterface(Ci.nsIDOMWindow);
       loadAndUnloadListener.listenTo("load", window);
     },
     onCloseWindow: function(xulWindow) {},
     onWindowTitleChange: function(xulWindow, newTitle) {},
   };
+
+  /* eslint-disable no-param-reassign */
 
   // ---------------------------------------------------------------------------
   // exported functions

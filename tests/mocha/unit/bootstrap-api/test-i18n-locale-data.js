@@ -98,9 +98,9 @@ describe("LocaleData", function() {
     });
 
     it("Message with substitutions", function() {
-        let data = initLocaleData();
-        let result = data.localizeMessage("msg_2", ["test"]);
-        assert.strictEqual(result, "Message avec substitution : test");
+      let data = initLocaleData();
+      let result = data.localizeMessage("msg_2", ["test"]);
+      assert.strictEqual(result, "Message avec substitution : test");
     });
 
     it("Message key search should be case insensitive", function() {
@@ -172,12 +172,12 @@ describe("LocaleData", function() {
   describe("addLocale(locale, messages)", function() {
     it("JSON with only message entries", function() {
       let json = {
-          "msg_1": {
-            "message": "My message 1",
-          },
-          "msg_2": {
-            "message": "My message 2",
-          },
+        "msg_1": {
+          "message": "My message 1",
+        },
+        "msg_2": {
+          "message": "My message 2",
+        },
       };
 
       let data = new LocaleData();
@@ -191,10 +191,10 @@ describe("LocaleData", function() {
 
     it("JSON with description entries", function() {
       let json = {
-          "msg_1": {
-            "message": "My message",
-            "description": "A message.",
-          },
+        "msg_1": {
+          "message": "My message",
+          "description": "A message.",
+        },
       };
 
       let data = new LocaleData();
@@ -207,17 +207,17 @@ describe("LocaleData", function() {
 
     it("JSON with placeholders", function() {
       let json = {
-          "msg_ph": {
-            "message": "Place holder: $HOLDER$",
-            "placeholders": {
-              "holder": {
-                "content": "$1",
-              },
+        "msg_ph": {
+          "message": "Place holder: $HOLDER$",
+          "placeholders": {
+            "holder": {
+              "content": "$1",
             },
           },
-          "msg_direct_ph": {
-            "message": "Direct place holder: $1",
-          },
+        },
+        "msg_direct_ph": {
+          "message": "Direct place holder: $1",
+        },
       };
 
       let data = new LocaleData();
@@ -233,12 +233,12 @@ describe("LocaleData", function() {
   describe("messages.get(key)", function() {
     it("should ignore the case", function() {
       let json = {
-          "msg_1": {
-            "message": "My message 1",
-          },
-          "MSG_2": {
-            "message": "My message 2",
-          },
+        "msg_1": {
+          "message": "My message 1",
+        },
+        "MSG_2": {
+          "message": "My message 2",
+        },
       };
 
       let data = new LocaleData();

@@ -21,10 +21,12 @@
  */
 
 import {MainEnvironment} from "content/lib/environment";
-import {ManagerForMessageListeners}
-    from "content/lib/manager-for-message-listeners";
-import {FramescriptToOverlayCommunication}
-    from "content/framescripts/framescript-to-overlay-communication.js";
+import {
+  ManagerForMessageListeners,
+} from "content/lib/manager-for-message-listeners";
+import {
+  FramescriptToOverlayCommunication,
+} from "content/framescripts/framescript-to-overlay-communication.js";
 
 export const mlManager = new ManagerForMessageListeners(MainEnvironment, cfmm);
 export const overlayComm =

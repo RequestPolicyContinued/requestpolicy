@@ -28,7 +28,8 @@ function test_0() {
         {o: {h: "*.mozilla.org"}},
         {d: {h: "*.mozilla.net"}},
         {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}},
-      ]);
+      ]
+  );
 
   testGetOldRulesAsNewRules(
       [
@@ -63,7 +64,8 @@ function test_0() {
           o: {h: "*.mozilla.org"},
           d: {h: "*.mozilla.net"},
         },
-      ]);
+      ]
+  );
 
   // localhost IP address
   testGetOldRulesAsNewRules(
@@ -82,7 +84,8 @@ function test_0() {
         {o: {s: "http", h: "127.0.0.1", port: 8080}},
         {o: {h: "::1"}},
         {o: {s: "http", h: "::1", port: 8080}},
-      ]);
+      ]
+  );
 
   // Get the old rules from the prefs.
   // The prefs don't exist.
@@ -130,7 +133,8 @@ function test_1() {
 
         {o: {s: "foo5o"}, d: {s: "foo5d"}},
         {o: {s: "foo6o"}, d: {s: "foo6d"}},
-      ]);
+      ]
+  );
 }
 
 
@@ -168,7 +172,8 @@ function test_2() {
         {d: {h: "c"}}, {d: {h: "d"}},
         {o: {h: "e"}, d: {h: "f"}},
         {o: {h: "g"}, d: {h: "h"}},
-      ]);
+      ]
+  );
 
   // UTF8 domain names
 
@@ -177,7 +182,8 @@ function test_2() {
       [
         {o: {h: "*.müller.de"}},
         {o: {s: "http", h: "foo.bar.الاردن"}},
-      ]);
+      ]
+  );
 }
 
 
@@ -208,8 +214,8 @@ function setOldRulePref(aPrefName, aValue) {
 
   // Not using just setCharPref because these values may contain Unicode
   // strings (e.g. for IDNs).
-  const str = Cc["@mozilla.org/supports-string;1"]
-      .createInstance(Ci.nsISupportsString);
+  const str = Cc["@mozilla.org/supports-string;1"].
+      createInstance(Ci.nsISupportsString);
   str.data = aValue;
   Prefs.branches.rp.branch.
       setComplexValue(aPrefName, Ci.nsISupportsString, str);
@@ -229,9 +235,11 @@ function assertRuleSpecsEqual(actual, expected) {
   "use strict";
 
   if (false === Array.isArray(actual)) {
+    // eslint-disable-next-line no-param-reassign
     actual = [actual];
   }
   if (false === Array.isArray(expected)) {
+    // eslint-disable-next-line no-param-reassign
     expected = [expected];
   }
 

@@ -42,4 +42,4 @@ function promiseSessionstoreWindowsRestored() {
 }
 
 export const pWindowsAvailable = areWindowsAvailable() ? Promise.resolve() :
-    promiseSessionstoreWindowsRestored();
+  promiseSessionstoreWindowsRestored();

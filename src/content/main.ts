@@ -91,7 +91,7 @@ function logSevereError(aMessage: string, aError: any) {
   console.dir(aError);
 }
 
-const shutdownMessage = C.MM_PREFIX + "shutdown";
+const shutdownMessage = `${C.MM_PREFIX}shutdown`;
 
 // =============================================================================
 // shutdown

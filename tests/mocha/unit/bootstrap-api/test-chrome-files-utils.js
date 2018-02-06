@@ -35,11 +35,11 @@ describe("ChromeFilesUtils", function() {
     let mockHttp = {httpRequest: function(url, option) {}};
     stubHttpRequest = sinon.stub(mockHttp, "httpRequest");
 
-    sinon.stub(mockComp.utils, "import")
-      .withArgs("resource://gre/modules/NetUtil.jsm")
-      .returns({NetUtil: mockNu})
-      .withArgs("resource://gre/modules/Http.jsm")
-      .returns(mockHttp);
+    sinon.stub(mockComp.utils, "import").
+        withArgs("resource://gre/modules/NetUtil.jsm").
+        returns({NetUtil: mockNu}).
+        withArgs("resource://gre/modules/Http.jsm").
+        returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
@@ -91,8 +91,9 @@ describe("ChromeFilesUtils", function() {
       });
 
       let promise = ChromeFilesUtils.readDirectory("bar/");
-      return expect(promise).to.be.eventually.fulfilled
-        .with.an("array").that.is.empty;
+      return expect(promise).
+          to.be.eventually.fulfilled.with.an("array").
+          that.is.empty;
     });
 
     it("Should be fullfilled with empty list if response is null", function() {
@@ -101,8 +102,9 @@ describe("ChromeFilesUtils", function() {
       });
 
       let promise = ChromeFilesUtils.readDirectory("bar/");
-      return expect(promise).to.be.eventually.fulfilled
-        .with.an("array").that.is.empty;
+      return expect(promise).
+          to.be.eventually.fulfilled.with.an("array").
+          that.is.empty;
     });
 
     it("Should be rejected if status code isn't 200", function() {
@@ -137,9 +139,10 @@ describe("ChromeFilesUtils", function() {
       });
 
       let promise = ChromeFilesUtils.readDirectory("bar/");
-      return expect(promise).to.be.eventually.fulfilled
-        .with.an("array").that.deep.include({name: "foo.ext", isDir: false})
-        .and.deep.include({name: "barDir", isDir: true});
+      return expect(promise).
+          to.be.eventually.fulfilled.with.an("array").
+          that.deep.include({name: "foo.ext", isDir: false}).
+          and.deep.include({name: "barDir", isDir: true});
     });
   });
 

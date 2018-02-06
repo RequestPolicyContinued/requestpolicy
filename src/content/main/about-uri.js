@@ -47,7 +47,7 @@ function getURI(aURI) {
   if (!id || !(id in FILENAMES)) {
     id = "basicprefs";
   }
-  let spec = "chrome://rpcontinued/content/settings/" + FILENAMES[id];
+  let spec = `chrome://rpcontinued/content/settings/${FILENAMES[id]}`;
   return Services.io.newURI(spec, null, null);
 }
 
@@ -102,9 +102,11 @@ export const AboutRequestPolicy = (function() {
 
   function registerFactory() {
     // eslint-disable-next-line new-cap
-    Cm.QueryInterface(Ci.nsIComponentRegistrar)
-        .registerFactory(self.classID, self.classDescription,
-                         self.contractID, self);
+    Cm.QueryInterface(Ci.nsIComponentRegistrar).
+        registerFactory(
+            self.classID, self.classDescription,
+            self.contractID, self
+        );
   }
 
   MainEnvironment.addStartupFunction(
@@ -121,7 +123,8 @@ export const AboutRequestPolicy = (function() {
             console.dir(e);
           }
         }
-      });
+      }
+  );
 
   function unregisterFactory() {
     // eslint-disable-next-line new-cap
@@ -133,7 +136,7 @@ export const AboutRequestPolicy = (function() {
     });
   }
   MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
-                                         unregisterFactory);
+      unregisterFactory);
 
   return self;
 })();

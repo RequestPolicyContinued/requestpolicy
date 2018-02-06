@@ -84,14 +84,14 @@ export function FramescriptToOverlayCommunication(aEnv) {
   self.env = aEnv;
 
   self.env.addStartupFunction(EnvLevel.INTERFACE,
-                              startCommNowOrLater.bind(null, self));
+      startCommNowOrLater.bind(null, self));
   self.env.addShutdownFunction(EnvLevel.INTERFACE,
-                               stopCommunication.bind(null, self));
+      stopCommunication.bind(null, self));
 }
 
 FramescriptToOverlayCommunication.prototype._dump = function(msg) {
   let self = this;
-  log.log(self.env.uid + ": " + msg);
+  log.log(`${self.env.uid}: ${msg}`);
 };
 
 /**
@@ -101,14 +101,16 @@ FramescriptToOverlayCommunication.prototype._dump = function(msg) {
  * @param {FramescriptToOverlayCommunication} self
  */
 function startCommNowOrLater(self) {
-  let answers = cfmm.sendSyncMessage(C.MM_PREFIX + "isOverlayReady");
+  let answers = cfmm.sendSyncMessage(`${C.MM_PREFIX}isOverlayReady`);
   if (answers.length > 0 && answers[0] === true) {
     startCommunication(self);
   } else {
     // The Overlay is not ready yet, so listen for the message.
     // Add the listener immediately.
-    mlManager.addListener("overlayIsReady",
-        startCommunication.bind(null, self), undefined, true);
+    mlManager.addListener(
+        "overlayIsReady",
+        startCommunication.bind(null, self), undefined, true
+    );
   }
 }
 
@@ -118,6 +120,8 @@ function startCommNowOrLater(self) {
  * @param {FramescriptToOverlayCommunication} self
  */
 function startCommunication(self) {
+  /* eslint-disable no-param-reassign */
+
   if (self.state === States.WAITING) {
     // self._dump("The Overlay is ready!");
     self.state = States.RUNNING;

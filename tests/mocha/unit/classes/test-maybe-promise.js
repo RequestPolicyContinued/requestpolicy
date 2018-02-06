@@ -52,7 +52,7 @@ function callFor_fulfilledAndRejected_fakeAndRealPromise(aDescribe, aFn, aDescri
 describe("MaybePromise", () => {
   describe("isFulfilled(), isRejected(), isPromiseWrapper()", function() {
     callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-        isFulfilled, isPromiseWrapper,
+      isFulfilled, isPromiseWrapper,
     }) {
       it("test", function() {
         const mp = genMaybePromise({isFulfilled, isPromiseWrapper});
@@ -71,7 +71,7 @@ describe("MaybePromise", () => {
 
   describe("toPromise() returns a Promise", function() {
     callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-        isFulfilled, isPromiseWrapper,
+      isFulfilled, isPromiseWrapper,
     }) {
       it("test", function() {
         const mp = genMaybePromise({isFulfilled, isPromiseWrapper});
@@ -91,7 +91,7 @@ describe("MaybePromise", () => {
   describe("then(), catch()", function() {
     describe("then-fn/catch-fn is called (or not)", function() {
       callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-          isFulfilled, isPromiseWrapper,
+        isFulfilled, isPromiseWrapper,
       }) {
         it("test", function() {
           let thenFnCalled = false;
@@ -116,7 +116,7 @@ describe("MaybePromise", () => {
 
     describe("then-fn/catch-fn is passed a value", function() {
       callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-          isFulfilled, isPromiseWrapper,
+        isFulfilled, isPromiseWrapper,
       }) {
         it("test", function() {
           const value = {};
@@ -132,11 +132,11 @@ describe("MaybePromise", () => {
 
     describe("then-fn/catch-fn may return a Promise", function() {
       callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-          isFulfilled: originalMPIsFulfilled,
-          isPromiseWrapper: originalMPIsPromiseWrapper,
+        isFulfilled: originalMPIsFulfilled,
+        isPromiseWrapper: originalMPIsPromiseWrapper,
       }) {
         callForFulfilledAndRejected(describe, function({
-            isFulfilled: returnedPromiseIsFulfilled,
+          isFulfilled: returnedPromiseIsFulfilled,
         }) {
           it("test", function() {
             const value = {};
@@ -150,7 +150,7 @@ describe("MaybePromise", () => {
             }).then(returnPromise, returnPromise);
 
             assert.isTrue(mp.isPromiseWrapper());
-            return mp.catch(v => v).then((aValue) => {
+            return mp.catch((v) => v).then((aValue) => {
               assert.strictEqual(aValue, value);
               return;
             }).toPromise();
@@ -161,12 +161,12 @@ describe("MaybePromise", () => {
 
     describe("then-fn/catch-fn may return a MaybePromise", function() {
       callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-          isFulfilled: originalMPIsFulfilled,
-          isPromiseWrapper: originalMPIsPromiseWrapper,
+        isFulfilled: originalMPIsFulfilled,
+        isPromiseWrapper: originalMPIsPromiseWrapper,
       }) {
         callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-            isFulfilled: returnedMaybePromiseIsFulfilled,
-            isPromiseWrapper: returnedMaybePromiseIsPromiseWrapper,
+          isFulfilled: returnedMaybePromiseIsFulfilled,
+          isPromiseWrapper: returnedMaybePromiseIsPromiseWrapper,
         }) {
           it("test", function() {
             const value = {};
@@ -181,7 +181,7 @@ describe("MaybePromise", () => {
               isPromiseWrapper: originalMPIsPromiseWrapper,
             }).then(returnMaybePromise, returnMaybePromise);
 
-            return mp.catch(v => v).then((aValue) => {
+            return mp.catch((v) => v).then((aValue) => {
               assert.strictEqual(aValue, value);
               return;
             }).toPromise();
@@ -193,7 +193,7 @@ describe("MaybePromise", () => {
     describe("errors thrown from then-fn/catch-fn cause the MaybePromise " +
         "to be rejected", function() {
       callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
-          isFulfilled, isPromiseWrapper,
+        isFulfilled, isPromiseWrapper,
       }) {
         it("test", function() {
           const error = new Error("foo");

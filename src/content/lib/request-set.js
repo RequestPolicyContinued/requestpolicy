@@ -35,8 +35,8 @@ function getUriIdentifier(uri) {
   try {
     return DomainUtil.getIdentifier(uri, DomainUtil.LEVEL_SOP);
   } catch (e) {
-    const msg = "getUriIdentifier exception on uri <" + uri + "> " +
-        ". Exception was: " + e;
+    const msg = `getUriIdentifier exception on uri <${uri}> ` +
+        `. Exception was: ${e}`;
     // eslint-disable-next-line no-throw-literal
     throw new Error(msg);
   }
@@ -53,20 +53,20 @@ export class RequestSet {
 
   print(name, printFn = log.log.bind(log)) {
     printFn("-------------------------------------------------");
-    printFn("== Request Set <" + name + "> ==");
+    printFn(`== Request Set <${name}> ==`);
     // "Take that, Big-O!"
     const origins = this._origins;
     for (let oUri in origins) {
-      printFn("      " + "Origin uri: <" + oUri + ">");
+      printFn(`${"      " + "Origin uri: <"}${oUri}>`);
       for (let dBase in origins[oUri]) {
         const dests = origins[oUri];
-        printFn("        " + "Dest base domain: <" + dBase + ">");
+        printFn(`${"        " + "Dest base domain: <"}${dBase}>`);
         for (let dIdent in dests[dBase]) {
-          printFn("          " + "Dest identifier: <" + dIdent + ">");
+          printFn(`${"          " + "Dest identifier: <"}${dIdent}>`);
           for (let dUri in dests[dBase][dIdent]) {
             const n = dests[dBase][dIdent][dUri].length;
-            printFn("            " + "Dest uri: (" + n + " requests) <" +
-                dUri + ">");
+            printFn(`${"            " + "Dest uri: ("}${n} requests) <${
+              dUri}>`);
           }
         }
       }
@@ -116,14 +116,16 @@ export class RequestSet {
   /**
    * @param {string} originUri
    * @param {string} destUri
-   * @param {RequestResult} requestResult
+   * @param {RequestResult} aRequestResult
    */
-  addRequest(originUri, destUri, requestResult) {
+  addRequest(originUri, destUri, aRequestResult) {
+    let requestResult = aRequestResult;
     if (requestResult === undefined) {
       log.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
-          "origin: <" + originUri + ">, destination: <" + destUri + ">");
+          `"origin: <${originUri}>, destination: <${destUri}>`
+      );
       requestResult = new RequestResult();
     }
 
@@ -162,8 +164,8 @@ export class RequestSet {
     }
     if (requestResult instanceof Array) {
       dests[destBase][destIdent][destUri] =
-            dests[destBase][destIdent][destUri]
-            .concat(requestResult);
+            dests[destBase][destIdent][destUri].
+                concat(requestResult);
     } else {
       dests[destBase][destIdent][destUri].push(requestResult);
     }

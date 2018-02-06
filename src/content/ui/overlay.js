@@ -26,8 +26,9 @@ import {
   Level as EnvLevel,
   MainEnvironment,
 } from "content/lib/environment";
-import {ManagerForMessageListeners}
-    from "content/lib/manager-for-message-listeners";
+import {
+  ManagerForMessageListeners,
+} from "content/lib/manager-for-message-listeners";
 import {Log} from "content/models/log";
 import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
 import {Storage} from "content/models/storage";
@@ -69,8 +70,10 @@ export function loadOverlayIntoWindow(window) {
   // create an environment for this overlay.
   let OverlayEnvironment = new Environment(MainEnvironment, "OverlayEnv");
   // manage this overlay's message listeners:
-  let mlManager = new ManagerForMessageListeners(OverlayEnvironment,
-                                                 window.messageManager);
+  let mlManager = new ManagerForMessageListeners(
+      OverlayEnvironment,
+      window.messageManager
+  );
 
   function setTimeout(aFn, aDelay) {
     return window.setTimeout(function() {
@@ -109,7 +112,7 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self.toString = function() {
-    return "[rpcontinued.overlay " + overlayId + "]";
+    return `[rpcontinued.overlay ${overlayId}]`;
   };
 
   /**
@@ -140,7 +143,7 @@ export function loadOverlayIntoWindow(window) {
             popupElement.setAttribute("position", "after_end");
           }
           return;
-        }).catch(e => {
+        }).catch((e) => {
           console.error("Error on Fennec detection. Details:");
           console.dir(e);
         });
@@ -162,12 +165,12 @@ export function loadOverlayIntoWindow(window) {
         }, function() {
           return false;
         });
-        window.messageManager.broadcastAsyncMessage(C.MM_PREFIX +
-                                                    "overlayIsReady", true);
+        window.messageManager.broadcastAsyncMessage(`${C.MM_PREFIX
+        }overlayIsReady`, true);
       }
     } catch (e) {
-      console.error(
-          "[FATAL] Unable to initialize rpcontinued.overlay. Details:");
+      console.error("[FATAL] Unable to initialize rpcontinued.overlay. " +
+          "Details:");
       console.dir(e);
       // eslint-disable-next-line no-throw-literal
       throw e;
@@ -186,20 +189,22 @@ export function loadOverlayIntoWindow(window) {
         unwrapAddTab();
         self._removeHistoryObserver();
         self._removeLocationObserver();
-      });
+      }
+  );
 
   OverlayEnvironment.addShutdownFunction(
-    EnvLevel.UI,
-    function() {
-      let requestLog = $id("rpcontinued-requestLog");
+      EnvLevel.UI,
+      function() {
+        let requestLog = $id("rpcontinued-requestLog");
 
-      // If the request log is found and is opened.
-      // The XUL elements of the request log might have already
-      // been removed.
-      if (!!requestLog && requestLog.hidden === false) {
-        self.toggleRequestLog();
+        // If the request log is found and is opened.
+        // The XUL elements of the request log might have already
+        // been removed.
+        if (!!requestLog && requestLog.hidden === false) {
+          self.toggleRequestLog();
+        }
       }
-    });
+  );
 
   function addAppcontentTabSelectListener() {
     // Info on detecting page load at:
@@ -207,13 +212,15 @@ export function loadOverlayIntoWindow(window) {
     const appcontent = $id("appcontent"); // browser
     if (appcontent) {
       if (isFennec) {
-        OverlayEnvironment.elManager.addListener(appcontent, "TabSelect",
-                                                 self.tabChanged, false);
+        OverlayEnvironment.elManager.addListener(
+            appcontent, "TabSelect",
+            self.tabChanged, false
+        );
       }
     }
   }
   OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
-                                        addAppcontentTabSelectListener);
+      addAppcontentTabSelectListener);
 
   /**
    * Add an event listener for when the contentAreaContextMenu (generally
@@ -222,13 +229,15 @@ export function loadOverlayIntoWindow(window) {
   function addContextMenuListener() {
     const contextMenu = $id("contentAreaContextMenu");
     if (contextMenu) {
-      OverlayEnvironment.elManager.addListener(contextMenu, "popupshowing",
-                                               self._contextMenuOnPopupShowing,
-                                               false);
+      OverlayEnvironment.elManager.addListener(
+          contextMenu, "popupshowing",
+          self._contextMenuOnPopupShowing,
+          false
+      );
     }
   }
   OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
-                                        addContextMenuListener);
+      addContextMenuListener);
 
   function addTabContainerTabSelectListener() {
     // Listen for the user changing tab so we can update any notification or
@@ -240,8 +249,10 @@ export function loadOverlayIntoWindow(window) {
         self.tabChanged();
       };
 
-      OverlayEnvironment.elManager.addListener(container, "TabSelect",
-                                               tabSelectCallback, false);
+      OverlayEnvironment.elManager.addListener(
+          container, "TabSelect",
+          tabSelectCallback, false
+      );
 
       wrapAddTab();
       self._addLocationObserver();
@@ -249,7 +260,7 @@ export function loadOverlayIntoWindow(window) {
     }
   }
   OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
-                                        addTabContainerTabSelectListener);
+      addTabContainerTabSelectListener);
 
   mlManager.addListener("notifyTopLevelDocumentLoaded", function(message) {
     // Clear any notifications that may have been present.
@@ -284,13 +295,17 @@ export function loadOverlayIntoWindow(window) {
   });
 
   mlManager.addListener("notifyLinkClicked", function(message) {
-    RequestProcessor.registerLinkClicked(message.data.origin,
-                                         message.data.dest);
+    RequestProcessor.registerLinkClicked(
+        message.data.origin,
+        message.data.dest
+    );
   });
 
   mlManager.addListener("notifyFormSubmitted", function(message) {
-    RequestProcessor.registerFormSubmitted(message.data.origin,
-                                           message.data.dest);
+    RequestProcessor.registerFormSubmitted(
+        message.data.origin,
+        message.data.dest
+    );
   });
 
   self.handleMetaRefreshes = function(message) {
@@ -302,15 +317,17 @@ export function loadOverlayIntoWindow(window) {
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       let {delay, destURI, originalDestURI} = metaRefreshes[i];
 
-      log.log("meta refresh to <" +
-          destURI + "> (" + delay + " second delay) found in document at <" +
-          documentURI + ">");
+      log.log(
+          `meta refresh to <${destURI}> (${delay} second delay) ` +
+          ` found in document at <${documentURI}>`
+      );
 
       if (originalDestURI) {
         log.log(
-            "meta refresh destination <" + originalDestURI + "> " +
-            "appeared to be relative to <" + documentURI + ">, so " +
-            "it has been resolved to <" + destURI + ">");
+            `meta refresh destination <${originalDestURI}> ` +
+            `appeared to be relative to <${documentURI}>, so ` +
+            `it has been resolved to <${destURI}>`
+        );
       }
 
       // We don't automatically perform any allowed redirects. Instead, we
@@ -322,7 +339,8 @@ export function loadOverlayIntoWindow(window) {
         // as well.
         if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
           log.warn(
-              "Ignoring redirect to javascript URI <" + destURI + ">");
+              `Ignoring redirect to javascript URI <${destURI}>`
+          );
           continue;
         }
         // The request will be blocked by shouldLoad.
@@ -352,7 +370,7 @@ export function loadOverlayIntoWindow(window) {
     } else {
       let prePathLength = DomainUtil.getPrePath(aUri).length + 1;
       let len = Math.max(prePathLength, aMaxLength);
-      return aUri.substring(0, len) + "...";
+      return `${aUri.substring(0, len)}...`;
     }
   }
 
@@ -370,7 +388,7 @@ export function loadOverlayIntoWindow(window) {
   //                  object that contains everything. This requires
   //                  e.g. a `MetaRedirectRequest` class.
   self._showRedirectNotification = function(vBrowser, redirectTargetUri, delay,
-      redirectOriginUri, replaceIfPossible) {
+      aRedirectOriginUri, replaceIfPossible) {
     // TODO: Do something with the delay. Not sure what the best thing to do is
     // without complicating the UI.
 
@@ -386,13 +404,15 @@ export function loadOverlayIntoWindow(window) {
     // Line: 260
 
     // redirectOriginUri is optional and is not necessary for <meta> redirects.
-    let isOriginUndefined = redirectOriginUri === undefined;
-    redirectOriginUri = redirectOriginUri || self.getTopLevelDocumentUri();
+    let isOriginUndefined = aRedirectOriginUri === undefined;
+    const redirectOriginUri =
+        aRedirectOriginUri || self.getTopLevelDocumentUri();
 
     if (isFennec) {
       log.warning(
-          "Should have shown redirect notification to <" + redirectTargetUri +
-          ">, but it's not implemented yet on Fennec.");
+          `Should have shown redirect notification to <${redirectTargetUri
+          }>, but it's not implemented yet on Fennec.`
+      );
       return false;
     }
 
@@ -406,8 +426,12 @@ export function loadOverlayIntoWindow(window) {
           [cropUri(redirectTargetUri, 50)]);
     } else {
       notificationLabel = $str(
-        "redirectNotificationWithOrigin",
-        [cropUri(redirectOriginUri, 50), cropUri(redirectTargetUri, 50)]);
+          "redirectNotificationWithOrigin",
+          [
+            cropUri(redirectOriginUri, 50),
+            cropUri(redirectTargetUri, 50),
+          ]
+      );
     }
 
     const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
@@ -439,8 +463,10 @@ export function loadOverlayIntoWindow(window) {
       //       this is not necessary at all.
       // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
 
-      RequestProcessor.registerAllowedRedirect(redirectOriginUri,
-                                               redirectTargetUri);
+      RequestProcessor.registerAllowedRedirect(
+          redirectOriginUri,
+          redirectTargetUri
+      );
 
       let data = {
         uri: redirectTargetUri,
@@ -448,11 +474,14 @@ export function loadOverlayIntoWindow(window) {
       if (replaceIfPossible) {
         data.replaceUri = redirectOriginUri;
       }
-      vBrowser.messageManager.sendAsyncMessage(C.MM_PREFIX + "setLocation",
-          data);
+      vBrowser.messageManager.sendAsyncMessage(
+          `${C.MM_PREFIX}setLocation`,
+          data
+      );
     };
 
     function addMenuItem(aRuleSpec) {
+      // eslint-disable-next-line no-param-reassign
       aRuleSpec.allow = true;
       classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
         if (Storage.get("autoReload")) {
@@ -470,7 +499,8 @@ export function loadOverlayIntoWindow(window) {
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
         maybeOpenLinkInNewTab(
             browser.runtime.getURL("content/settings/defaultpolicy.html"),
-            [], true);
+            [], true
+        );
       });
       addMenuSeparator();
     }
@@ -502,8 +532,8 @@ export function loadOverlayIntoWindow(window) {
       }
     }
 
-    const notification = notificationBox
-        .getNotificationWithValue(notificationValue);
+    const notification = notificationBox.
+        getNotificationWithValue(notificationValue);
     if (notification) {
       notification.label = notificationLabel;
     } else {
@@ -536,7 +566,8 @@ export function loadOverlayIntoWindow(window) {
       let notificationElem = notificationBox.appendNotification(
           notificationLabel, notificationValue,
           "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
-          priority, buttons);
+          priority, buttons
+      );
 
       // Let the notification persist at least 300ms. This is needed in the
       // following scenario:
@@ -576,24 +607,25 @@ export function loadOverlayIntoWindow(window) {
       let uri = DomainUtil.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
         log.log(
-            "Checking for blocked requests from page <" + uri + ">");
+            `Checking for blocked requests from page <${uri}>`
+        );
       }
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
-      let documentContainsBlockedContent = Requests
-          .getAllRequestsInBrowser(browser).containsBlockedRequests();
+      let documentContainsBlockedContent = Requests.
+          getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 
       if (LOG_FLAG_STATE) {
         let logText = documentContainsBlockedContent ?
-                      "Requests have been blocked." :
-                      "No requests have been blocked.";
+          "Requests have been blocked." :
+          "No requests have been blocked.";
         log.log(logText);
       }
 
       return Promise.resolve();
-    }).catch(e => {
+    }).catch((e) => {
       console.error("[SEVERE] " +
           "Unable to complete _updateBlockedContentState actions. Details:");
       console.dir(e);
@@ -634,10 +666,10 @@ export function loadOverlayIntoWindow(window) {
         addListener("startWithAllowAllEnabled", updatePermissiveStatus);
   }
   OverlayEnvironment.addStartupFunction(EnvLevel.INTERFACE,
-                                        updatePermissiveStatusOnPrefChanges);
+      updatePermissiveStatusOnPrefChanges);
   // initially set the Permissive Status
   OverlayEnvironment.addStartupFunction(EnvLevel.UI,
-                                        updatePermissiveStatus);
+      updatePermissiveStatus);
 
   /**
    * This function is called when any requests happen. This must be as
@@ -671,13 +703,17 @@ export function loadOverlayIntoWindow(window) {
    * @param {string} originUri
    * @param {string} destUri
    */
-  self.observeBlockedTopLevelDocRequest = function(browser, originUri,
-                                                   destUri) {
+  self.observeBlockedTopLevelDocRequest = function(
+      browser, originUri,
+      destUri
+  ) {
     // This function is called during shouldLoad() so set a timeout to
     // avoid blocking shouldLoad.
     setTimeout(function() {
-      rpcontinued.overlay._showRedirectNotification(browser, destUri, 0,
-          originUri);
+      rpcontinued.overlay._showRedirectNotification(
+          browser, destUri, 0,
+          originUri
+      );
     }, 0);
   };
 
@@ -721,8 +757,8 @@ export function loadOverlayIntoWindow(window) {
    */
   function onOpenLinkViaContextMenu() {
     let origin = window.gContextMenuContentData ?
-        window.gContextMenuContentData.docLocation :
-        this.target.ownerDocument.URL;
+      window.gContextMenuContentData.docLocation :
+      this.target.ownerDocument.URL;
     let dest = this.linkURL;
     RequestProcessor.registerLinkClicked(origin, dest);
   }
@@ -755,13 +791,16 @@ export function loadOverlayIntoWindow(window) {
   self._wrapOpenLink = function() {
     Utils.wrapFunction(
         window.gContextMenu, "openLink", wrapFunctionErrorCallback,
-        onOpenLinkViaContextMenu);
+        onOpenLinkViaContextMenu
+    );
     Utils.wrapFunction(
         window.gContextMenu, "openLinkInPrivateWindow",
-        wrapFunctionErrorCallback, onOpenLinkViaContextMenu);
+        wrapFunctionErrorCallback, onOpenLinkViaContextMenu
+    );
     Utils.wrapFunction(
         window.gContextMenu, "openLinkInCurrent", wrapFunctionErrorCallback,
-        onOpenLinkViaContextMenu);
+        onOpenLinkViaContextMenu
+    );
   };
 
   /**
@@ -816,12 +855,12 @@ export function loadOverlayIntoWindow(window) {
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
         rpcontinued.overlay._stopBlockedContentCheckTimeout();
-        rpcontinued.overlay
-            ._updateBlockedContentState(gBrowser.selectedBrowser);
+        rpcontinued.overlay.
+            _updateBlockedContentState(gBrowser.selectedBrowser);
       },
 
       QueryInterface: XPCOMUtils.generateQI(["nsIWebProgressListener",
-                                             "nsISupportsWeakReference"]),
+        "nsISupportsWeakReference"]),
     };
 
     // https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
@@ -872,8 +911,8 @@ export function loadOverlayIntoWindow(window) {
       },
 
       GetWeakReference: function() {
-        return Cc["@mozilla.org/appshell/appShellService;1"]
-            .createInstance(Ci.nsIWeakReference);
+        return Cc["@mozilla.org/appshell/appShellService;1"].
+            createInstance(Ci.nsIWeakReference);
       },
     };
 
@@ -891,8 +930,8 @@ export function loadOverlayIntoWindow(window) {
 
       const e = result.error;
       if (tries >= maxTries) {
-        console.error("[SEVERE] Can't add session history listener, even " +
-            "after " + tries + " tries. Details:");
+        console.error(`${"[SEVERE] Can't add session history listener, even " +
+            "after "}${tries} tries. Details:`);
         console.dir(e);
       } else {
         // call this function again in a few miliseconds.
@@ -935,7 +974,7 @@ export function loadOverlayIntoWindow(window) {
     if (rulesChanged || self._needsReloadOnMenuClose) {
       if (Storage.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
-        mm.sendAsyncMessage(C.MM_PREFIX + "reload");
+        mm.sendAsyncMessage(`${C.MM_PREFIX}reload`);
       }
     }
     self._needsReloadOnMenuClose = false;
@@ -1001,7 +1040,7 @@ export function loadOverlayIntoWindow(window) {
     // directly specify the width of the entire popup.
     // log.log('popup width: ' + popup.clientWidth);
     const popupWidth = popupElement.clientWidth === 0 ? 730 :
-        popupElement.clientWidth;
+      popupElement.clientWidth;
     const anchor = $id("content");
     const contentWidth = anchor.clientWidth;
     // Take a few pixels off so it doesn't cover the browser chrome's border.
@@ -1068,8 +1107,10 @@ export function loadOverlayIntoWindow(window) {
     let numTabs = tabbrowser.tabs.length;
 
     // Start iterating at the currently selected tab.
-    let indexes = JSUtils.leftRotateArray(JSUtils.range(numTabs),
-        selectedTabIndex);
+    let indexes = JSUtils.leftRotateArray(
+        JSUtils.range(numTabs),
+        selectedTabIndex
+    );
     for (let index of indexes) {
       let currentBrowser = tabbrowser.getBrowserAtIndex(index);
       let currentURI = currentBrowser.currentURI.spec;
@@ -1116,8 +1157,10 @@ export function loadOverlayIntoWindow(window) {
     const closeRequestLog = {};
 
     if (requestLog.hidden) {
-      requestLogFrame.setAttribute("src",
-          "chrome://rpcontinued/content/ui/request-log/request-log.xul");
+      requestLogFrame.setAttribute(
+          "src",
+          "chrome://rpcontinued/content/ui/request-log/request-log.xul"
+      );
       requestLog.hidden = false;
       requestLogSplitter.hidden = false;
       closeRequestLog.hidden = false;
@@ -1132,5 +1175,6 @@ export function loadOverlayIntoWindow(window) {
     }
   };
 
+  // eslint-disable-next-line no-param-reassign
   window.rpcontinued.overlay = self;
 }

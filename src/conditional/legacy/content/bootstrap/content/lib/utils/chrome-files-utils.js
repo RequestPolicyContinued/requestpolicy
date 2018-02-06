@@ -20,9 +20,9 @@ const {httpRequest} = Cu.import("resource://gre/modules/Http.jsm");
  * @return {string} Chrome URL
  */
 export function getChromeUrl(path) {
- // Removes leading ./ or / and append to chrome://rpcontinued/
- const replacer = /^(?:\.\/|\/)?(.+)$/mg;
- return path.replace(replacer, "chrome://rpcontinued/$1");
+  // Removes leading ./ or / and append to chrome://rpcontinued/
+  const replacer = /^(?:\.\/|\/)?(.+)$/mg;
+  return path.replace(replacer, "chrome://rpcontinued/$1");
 }
 
 /**
@@ -30,17 +30,18 @@ export function getChromeUrl(path) {
  * the content of the chrome directory. A file or directory is
  * represented as on object with name and isDir properties.
  *
- * @param {string} chromeUrl
+ * @param {string} aChromeUrl
  * @return {Promise}
  */
-export function readDirectory(chromeUrl) {
+export function readDirectory(aChromeUrl) {
+  let chromeUrl = aChromeUrl;
   if (!chromeUrl) {
     return Promise.reject(new Error("Invalid null argument"));
   } else if (!chromeUrl.endsWith("/")) {
-    chromeUrl = chromeUrl + "/";
+    chromeUrl = `${chromeUrl}/`;
   }
 
-  return sendHttpGet(chromeUrl).then(responseText => {
+  return sendHttpGet(chromeUrl).then((responseText) => {
     let fileList = [];
     // The http response contains in each line:
     // 201: filename content-length last-modified file-type
@@ -80,7 +81,7 @@ export function parseJSON(chromeUrl) {
             return;
           }
           let text = NetUtil.readInputStreamToString(inputStream,
-            inputStream.available(), {charset: "utf-8"});
+              inputStream.available(), {charset: "utf-8"});
           inputStream.close();
           resolve(JSON.parse(text));
         } catch (e) {

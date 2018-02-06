@@ -32,11 +32,14 @@ describe("Api.browser.runtime", function() {
     sinon.stub(mockNu, "readInputStreamToString")
       .returns(`{"permissions" : []}`);
 
+    let mockHttp = {httpRequest: function(url, option) {}};
+
     // Stubbing in order to perform imports in api.js and required scripts
     sinon.stub(mockComp.utils, "import")
       .withArgs("resource://gre/modules/NetUtil.jsm").returns({NetUtil: mockNu})
       .withArgs("resource://gre/modules/AddonManager.jsm", {}).returns({})
-      .withArgs("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).returns({});
+      .withArgs("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).returns({})
+      .withArgs("resource://gre/modules/Http.jsm").returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
@@ -45,11 +48,12 @@ describe("Api.browser.runtime", function() {
 
     pathAliasProxy = Utils.createPathAliasProxy();
 
-    let {LocaleManager} = require("bootstrap/models/api/i18n/locale-manager");
-    sinon.stub(LocaleManager.prototype, "init").resolves();
+    const {Log} = require("content/models/log");
+    const {AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data");
+    sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
     // eslint-disable-next-line no-unused-vars
     let {Runtime} = require("bootstrap/models/api/runtime");
-    runtime = Runtime.instance;
+    runtime = new Runtime({log: Log.instance});
   });
 
   describe("getURL(path)", function() {

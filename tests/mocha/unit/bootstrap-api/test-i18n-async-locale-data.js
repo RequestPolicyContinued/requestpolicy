@@ -15,20 +15,21 @@ const sinon = require("sinon");
 chai.use(chaiAsPromised);
 const {expect} = chai;
 
-const {LocaleData} = require("bootstrap/models/api/i18n/locale-data");
-
 // Loads mocking classes
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 const MockNetUtil = require("./lib/mock-netutil");
 const MockComponents = require("./lib/mock-components");
 const MockServices = require("./lib/mock-services");
+const Utils = require("./lib/utils");
 
 let sandbox = sinon.createSandbox();
 
-describe("LocaleManager", function() {
+describe("AsyncLocaleData", function() {
   let ChromeFilesUtils = null;
-  let LocaleManager = null;
+  let asyncLocaleData = null;
+  let pathAliasProxy;
+  let AsyncLocaleData;
 
   before(function() {
     let mockComp = new MockComponents();
@@ -46,21 +47,27 @@ describe("LocaleManager", function() {
     global.Cu = mockComp.utils;
     global.Services = mockServices;
 
-    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files");
-    LocaleManager = require("bootstrap/models/api/i18n/locale-manager").
-        LocaleManager.instance;
+    pathAliasProxy = Utils.createPathAliasProxy();
+
+    ({AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data"));
+    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
 
     // Create stubs
     sinon.stub(ChromeFilesUtils, "parseJSON");
   });
 
+  beforeEach(function() {
+    asyncLocaleData = new AsyncLocaleData();
+  });
+
   afterEach(function() {
     sandbox.restore();
     global.Services.locale = {};
-    LocaleManager.localeData = new LocaleData();
   });
 
   after(function() {
+    pathAliasProxy.revoke();
+
     global.Cu = null;
     global.Services = null;
   });
@@ -76,7 +83,7 @@ describe("LocaleManager", function() {
         },
       };
 
-      let result = LocaleManager.getAppLocale();
+      let result = asyncLocaleData.getAppLocale();
       expect(result).to.equal("fr");
     });
 
@@ -87,7 +94,7 @@ describe("LocaleManager", function() {
         },
       };
 
-      let result = LocaleManager.getAppLocale();
+      let result = asyncLocaleData.getAppLocale();
       expect(result).to.equal("fr");
     });
 
@@ -98,7 +105,7 @@ describe("LocaleManager", function() {
         },
       };
 
-      let result = LocaleManager.getAppLocale();
+      let result = asyncLocaleData.getAppLocale();
       expect(result).to.equal("fr-fr");
     });
 
@@ -110,7 +117,7 @@ describe("LocaleManager", function() {
       };
 
       let fn = function() {
-        return LocaleManager.getAppLocale();
+        return asyncLocaleData.getAppLocale();
       };
       expect(fn).to.throws(RangeError);
     });
@@ -122,7 +129,7 @@ describe("LocaleManager", function() {
         .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
         .resolves({default_locale: "zh"});
 
-      let promise = LocaleManager.getDefaultLocale();
+      let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.fulfilled
         .with.a("string").which.equal("zh");
     });
@@ -132,7 +139,7 @@ describe("LocaleManager", function() {
         .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
         .resolves({default_locale: "fr_CA"});
 
-      let promise = LocaleManager.getDefaultLocale();
+      let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.fulfilled
         .with.a("string").which.equal("fr-ca");
     });
@@ -142,7 +149,7 @@ describe("LocaleManager", function() {
         .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
         .resolves({name: "RPC"});
 
-      let promise = LocaleManager.getDefaultLocale();
+      let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.rejectedWith(Error);
     });
 
@@ -151,7 +158,7 @@ describe("LocaleManager", function() {
         .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
         .rejects();
 
-      let promise = LocaleManager.getDefaultLocale();
+      let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.rejectedWith(Error);
     });
   });
@@ -159,7 +166,7 @@ describe("LocaleManager", function() {
   describe("getAvailableLocales()", function() {
     it("Should return a map of available locales", function() {
       ChromeFilesUtils.parseJSON.resolves(["fr", "en"]);
-      let promise = LocaleManager.getAvailableLocales();
+      let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.eventually.fulfilled
         .with.a("map").which.have.all.keys("fr", "en")
         .and.include("fr")
@@ -168,7 +175,7 @@ describe("LocaleManager", function() {
 
     it("Should normalize tag", function() {
       ChromeFilesUtils.parseJSON.resolves(["Fr_fR", "eN_Us"]);
-      let promise = LocaleManager.getAvailableLocales();
+      let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.eventually.fulfilled
         .with.a("map").which.have.all.keys("fr-fr", "en-us")
         .and.include("Fr_fR")
@@ -177,7 +184,7 @@ describe("LocaleManager", function() {
 
     it("Should be rejected on parseJSON rejection", function() {
       ChromeFilesUtils.parseJSON.rejects();
-      let promise = LocaleManager.getAvailableLocales();
+      let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.rejectedWith(Error);
     });
 
@@ -185,7 +192,7 @@ describe("LocaleManager", function() {
       ChromeFilesUtils.parseJSON.returns(new Promise((resolve, reject) => {
         throw new Error();
       }));
-      let promise = LocaleManager.getAvailableLocales();
+      let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.rejectedWith(Error);
     });
   });
@@ -194,7 +201,7 @@ describe("LocaleManager", function() {
     let localesMap = new Map([["fr", "fr"], ["en-us", "en_US"], ["de", "de"]]);
 
     it("Should return only requested locales", function() {
-      let result = LocaleManager.getBestMatches(["fr", "en-us"], localesMap);
+      let result = asyncLocaleData.getBestMatches(["fr", "en-us"], localesMap);
       return expect(result).to.be.a("map")
         .which.have.all.keys("fr", "en-us")
         .and.include("fr")
@@ -203,7 +210,7 @@ describe("LocaleManager", function() {
     });
 
     it("Should return best match", function() {
-      let result = LocaleManager.getBestMatches(["fr-FR", "en-us"], localesMap);
+      let result = asyncLocaleData.getBestMatches(["fr-FR", "en-us"], localesMap);
       return expect(result).to.be.a("map")
         .which.have.all.keys("fr", "en-us")
         .and.include("fr")
@@ -212,12 +219,12 @@ describe("LocaleManager", function() {
     });
 
     it("Shouldn't return duplicates", function() {
-      let result = LocaleManager.getBestMatches(["fr-FR", "fr"], localesMap);
+      let result = asyncLocaleData.getBestMatches(["fr-FR", "fr"], localesMap);
       return expect(result).to.be.a("map").which.have.property("size", 1);
     });
 
     it("Shouldn't empty map if no match", function() {
-      let result = LocaleManager.getBestMatches(["zn"], localesMap);
+      let result = asyncLocaleData.getBestMatches(["zn"], localesMap);
       return expect(result).to.be.a("map").which.have.property("size", 0);
     });
   });
@@ -230,7 +237,7 @@ describe("LocaleManager", function() {
         .resolves("des messages")
         .withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json")
         .resolves("some messages");
-      let promise = LocaleManager.loadLocalesMessages(localesMap);
+      let promise = asyncLocaleData.loadLocalesMessages(localesMap);
       return expect(promise).to.be.eventually.fulfilled
         .with.an("array")
         .which.deep.include({locale: "fr", messages: "des messages"})
@@ -245,46 +252,46 @@ describe("LocaleManager", function() {
         .withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json")
         .rejects();
 
-      let promise = LocaleManager.loadLocalesMessages(localesMap);
+      let promise = asyncLocaleData.loadLocalesMessages(localesMap);
       return expect(promise).to.be.eventually.rejectedWith(Error);
     });
   });
 
   describe("updateLocalesPrefs(defaultLocale, uiLocale)", function() {
     it("Should find best match for default locale", function() {
-      LocaleManager.localeData.messages = new Map([["en", {}], ["fr", {}]]);
-      let result = LocaleManager.updateLocalesPrefs("en-US", "de");
+      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      let result = asyncLocaleData.updateLocalesPrefs("en-US", "de");
       expect(result.default).to.equal("en");
-      expect(LocaleManager.localeData.defaultLocale).to.equal("en");
+      expect(asyncLocaleData.defaultLocale).to.equal("en");
     });
 
     it("Should find best match for ui locale", function() {
-      LocaleManager.localeData.messages = new Map([["en", {}], ["fr", {}]]);
-      let result = LocaleManager.updateLocalesPrefs("en", "fr-FR");
+      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      let result = asyncLocaleData.updateLocalesPrefs("en", "fr-FR");
       expect(result.selected).to.equal("fr");
-      expect(LocaleManager.localeData.selectedLocale).to.equal("fr");
+      expect(asyncLocaleData.selectedLocale).to.equal("fr");
     });
 
     it("Should throw error if no match for default locale", function() {
-      LocaleManager.localeData.messages = new Map([["en", {}], ["fr", {}]]);
-      let fn = () => LocaleManager.updateLocalesPrefs("de", "fr");
+      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      let fn = () => asyncLocaleData.updateLocalesPrefs("de", "fr");
       expect(fn).to.throw(Error);
     });
 
     it("Should use fallback if no match for ui locale", function() {
-      LocaleManager.localeData.messages = new Map([["en", {}], ["fr", {}]]);
-      let result = LocaleManager.updateLocalesPrefs("en", "de");
+      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      let result = asyncLocaleData.updateLocalesPrefs("en", "de");
       expect(result.selected).to.equal("de");
-      expect(LocaleManager.localeData.selectedLocale).to.equal("de");
+      expect(asyncLocaleData.selectedLocale).to.equal("de");
     });
 
     it("Should normalized locales tag during search", function() {
-      LocaleManager.localeData.messages = new Map([["en", {}], ["fr", {}]]);
-      let result = LocaleManager.updateLocalesPrefs("En-uS", "fR-fR");
+      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      let result = asyncLocaleData.updateLocalesPrefs("En-uS", "fR-fR");
       expect(result.default).to.equal("en");
       expect(result.selected).to.equal("fr");
-      expect(LocaleManager.localeData.defaultLocale).to.equal("en");
-      expect(LocaleManager.localeData.selectedLocale).to.equal("fr");
+      expect(asyncLocaleData.defaultLocale).to.equal("en");
+      expect(asyncLocaleData.selectedLocale).to.equal("fr");
     });
   });
 });

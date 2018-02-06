@@ -2,10 +2,11 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": false,
+    "downlevelIteration": true, // for es5 support
     "module": "commonjs",
     "removeComments": true,
     "sourceMap": true,
-    "target": "es2015",
+    "target": "es5",
     "lib": [
       "dom",
       "es5",

@@ -19,7 +19,7 @@ const MockServices = require("./lib/mock-services");
 const MockComponents = require("./lib/mock-components");
 const Utils = require("./lib/utils");
 
-describe("Api.browser.runtime", function() {
+describe("browser.runtime", function() {
   let runtime = null;
   let pathAliasProxy;
 

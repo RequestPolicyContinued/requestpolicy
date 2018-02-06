@@ -189,7 +189,8 @@ var FakeWebExt = (function() {
         // start up the add-on
         const {Manifest} = fakeEnv.exports;
         addon.commonjsEnv = createCommonjsEnv();
-        addon.commonjsEnv.load({
+        // eslint-disable-next-line no-unused-vars
+        const background = addon.commonjsEnv.load({
           mainFile: Manifest.background.scripts[0],
           additionalGlobals: [
             ["browser", api.backgroundApi],
@@ -197,6 +198,8 @@ var FakeWebExt = (function() {
             ["_setBackgroundPage", api.bootstrap.setBackgroundPage],
           ],
         });
+        // TODO: uncomment
+        // api.bootstrap.setBackgroundPage(background.BackgroundPage);
         return;
       }),
     ]);

@@ -9,7 +9,7 @@ from contextlib import contextmanager
 GET_BACKGROUND_PAGE = """
     Components.utils.
         import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).
-        FakeWebExt.Api.browser.extension.getBackgroundPage()
+        FakeWebExt.api.backgroundApi.extension.getBackgroundPage()
 """
 
 

@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { OverridableSet } from "content/lib/classes/set";
+
 export type Listener = (...args: any[]) => void;
 
 export interface IListenInterface {
@@ -28,16 +30,12 @@ export interface IListenInterface {
   hasListener: (listener: Listener) => boolean;
 }
 
-export class Listeners extends Set<Listener> {
+export class Listeners extends OverridableSet<Listener> {
   public readonly interface: IListenInterface = {
     addListener: this.add.bind(this),
     hasListener: this.has.bind(this),
     removeListener: this.delete.bind(this),
   };
-
-  constructor() {
-    super();
-  }
 
   public emit(...args: any[]) {
     const returnValues = [];

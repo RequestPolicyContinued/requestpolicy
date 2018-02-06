@@ -26,6 +26,23 @@ WHITELIST = [
       r"""ReferenceError: reference to undefined property entryPart\.s"""
   ),
 
+  # es5 targeting issues
+
+  re.compile(
+      # see https://github.com/Microsoft/TypeScript/issues/14868
+      r"""JavaScript warning: """
+      r"""chrome://rpcontinued/content/[^ ]+, line [0-9]+: """
+      r"""mutating the \[\[Prototype\]\] of an object will cause your code """
+      r"""to run very slowly; instead create the object with the correct """
+      r"""initial \[\[Prototype\]\] value using Object\.create"""
+  ),
+  re.compile(
+      # es6 generators
+      r"""JavaScript strict warning: """
+      r"""chrome://rpcontinued/content/[^ ]+, line [0-9]+: """
+      r"""ReferenceError: reference to undefined property op\[1\]"""
+  ),
+
   # other
 
   "[RequestPolicy] Warning:",

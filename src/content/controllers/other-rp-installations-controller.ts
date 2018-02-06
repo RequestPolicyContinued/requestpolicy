@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/data/constants";
-import {FilteredManagement} from "content/lib/classes/filtered-management";
-import {Log} from "content/models/log";
-import {NotificationID, Notifications} from "content/models/notifications";
+import {C} from "data/constants";
+import {FilteredManagement} from "lib/classes/filtered-management";
+import {Log} from "models/log";
+import {NotificationID, Notifications} from "models/notifications";
 
 const log = Log.instance;
 

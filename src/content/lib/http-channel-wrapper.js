@@ -24,8 +24,8 @@ import {
   getLoadContextFromHttpChannel,
   getBrowserFromLoadContext,
   getDocShellFromHttpChannel,
-} from "content/lib/utils/try-catch-utils";
-import {Log} from "content/models/log";
+} from "lib/utils/try-catch-utils";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as XULUtils from "content/lib/utils/xul-utils";
-import {loadOverlayIntoWindow} from "content/ui/overlay.js";
-import {loadMenuIntoWindow} from "content/ui/menu.js";
-import {loadClassicmenuIntoWindow} from "content/ui/classicmenu.js";
+import * as XULUtils from "lib/utils/xul-utils";
+import {loadOverlayIntoWindow} from "ui/overlay.js";
+import {loadMenuIntoWindow} from "ui/menu.js";
+import {loadClassicmenuIntoWindow} from "ui/classicmenu.js";
 
 // =============================================================================
 // OverlayController

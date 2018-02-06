@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MainEnvironment} from "content/lib/environment";
+import {MainEnvironment} from "lib/environment";
 import {
   ManagerForMessageListeners,
-} from "content/lib/manager-for-message-listeners";
+} from "lib/manager-for-message-listeners";
 import {
   FramescriptToOverlayCommunication,
-} from "content/framescripts/framescript-to-overlay-communication.js";
+} from "framescripts/framescript-to-overlay-communication.js";
 
 export const mlManager = new ManagerForMessageListeners(MainEnvironment, cfmm);
 export const overlayComm =

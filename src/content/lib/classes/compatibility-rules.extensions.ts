@@ -23,7 +23,7 @@
 
 /// <reference path="./compatibility-rules.d.ts" />
 
-import {MapOfSets} from "content/lib/classes/map-of-sets";
+import {MapOfSets} from "lib/classes/map-of-sets";
 
 type AddonIdsToNames_Map = Map<AddonID, AddonName>;
 type ExtRulesToIds_MapOfSets = MapOfSets<Rule, AddonID>;

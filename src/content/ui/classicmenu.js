@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {PolicyManager} from "content/lib/policy-manager";
-import * as DOMUtils from "content/lib/utils/dom-utils";
+import {PolicyManager} from "lib/policy-manager";
+import * as DOMUtils from "lib/utils/dom-utils";
 
 export function loadClassicmenuIntoWindow(window) {
   let self = {};

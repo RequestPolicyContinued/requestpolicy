@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, Environment} from "content/lib/environment";
+import {Level as EnvLevel, Environment} from "lib/environment";
 
 const {PrefObserver} = LegacyApi;
 

@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/data/constants";
-import * as DomainUtils from "content/lib/utils/domain-utils";
-import { getHostByUriObj } from "content/lib/utils/domain-utils";
-import {Log} from "content/models/log";
+import {C} from "data/constants";
+import * as DomainUtils from "lib/utils/domain-utils";
+import { getHostByUriObj } from "lib/utils/domain-utils";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

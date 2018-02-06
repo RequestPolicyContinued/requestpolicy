@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as XULUtils from "content/lib/utils/xul-utils";
-import {Log} from "content/models/log";
+import * as XULUtils from "lib/utils/xul-utils";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

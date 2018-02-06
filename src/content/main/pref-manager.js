@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
-import {Storage} from "content/models/storage";
-import {Log} from "content/models/log";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
+import {Storage} from "models/storage";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

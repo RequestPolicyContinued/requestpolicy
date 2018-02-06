@@ -24,8 +24,8 @@ import {
   IListenInterface,
   Listener,
   Listeners,
-} from "content/lib/classes/listeners";
-import {MapOfCustomSets} from "content/lib/classes/map-of-custom-sets";
+} from "lib/classes/listeners";
+import {MapOfCustomSets} from "lib/classes/map-of-custom-sets";
 
 interface IObject<T> {
   [key: string]: T;

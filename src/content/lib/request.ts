@@ -21,17 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {HttpChannelWrapper} from "content/lib/http-channel-wrapper";
+import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
   RequestResult,
-} from "content/lib/request-result";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import {IUri} from "content/lib/utils/domain-utils";
-import {queryInterface } from "content/lib/utils/try-catch-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
+} from "lib/request-result";
+import * as DomainUtil from "lib/utils/domain-utils";
+import {IUri} from "lib/utils/domain-utils";
+import {queryInterface } from "lib/utils/try-catch-utils";
+import * as WindowUtils from "lib/utils/window-utils";
+import {Log} from "models/log";
+import {Storage} from "models/storage";
 
 const logRequests = Log.instance.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},

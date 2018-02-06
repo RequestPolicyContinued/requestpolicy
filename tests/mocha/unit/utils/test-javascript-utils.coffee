@@ -7,7 +7,7 @@
 {assert} = require "chai"
 {deepEqual, range, strictEqual} = assert
 
-JSUtils = require "content/lib/utils/js-utils"
+JSUtils = require "lib/utils/js-utils"
 
 describe "JSUtils", ->
   it "arrayIncludes()", ->

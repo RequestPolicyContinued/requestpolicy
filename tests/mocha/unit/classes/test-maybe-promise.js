@@ -2,7 +2,7 @@
 
 const {assert} = require("chai");
 
-const {MaybePromise} = require("content/lib/classes/maybe-promise");
+const {MaybePromise} = require("lib/classes/maybe-promise");
 
 function genPromise({isFulfilled, value = {}}) {
   return isFulfilled ? Promise.resolve(value) : Promise.reject(value);

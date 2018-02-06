@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/data/constants";
-import {Log} from "content/models/log";
-import {RequestResult} from "content/lib/request-result";
-import {Ruleset, RawRuleset} from "content/lib/ruleset";
-import {RulesetStorage} from "content/lib/ruleset-storage";
+import {C} from "data/constants";
+import {Log} from "models/log";
+import {RequestResult} from "lib/request-result";
+import {Ruleset, RawRuleset} from "lib/ruleset";
+import {RulesetStorage} from "lib/ruleset-storage";
 
 const log = Log.instance.extend({
   name: "PolicyManager",

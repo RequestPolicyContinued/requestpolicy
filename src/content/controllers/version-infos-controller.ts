@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IController} from "content/lib/classes/controllers";
-import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
-import {VersionInfos} from "content/models/version-infos";
+import {IController} from "lib/classes/controllers";
+import {Log} from "models/log";
+import {Storage} from "models/storage";
+import {VersionInfos} from "models/version-infos";
 
 const log = Log.instance;
 

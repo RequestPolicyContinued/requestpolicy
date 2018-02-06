@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {isPromise} from "content/lib/utils/js-utils";
+import {isPromise} from "lib/utils/js-utils";
 
 export class MaybePromise<T> {
   public static resolve<U>(aVal: U | Promise<U> | MaybePromise<U>) {

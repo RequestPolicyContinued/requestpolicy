@@ -12,8 +12,8 @@
 
 const {assert} = require("chai");
 
-const {Log} = require("content/models/log");
-const {C} = require("content/data/constants");
+const {Log} = require("models/log");
+const {C} = require("data/constants");
 
 describe("Log", () => {
   const sinon = require("sinon").sandbox.create();

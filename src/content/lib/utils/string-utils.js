@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as JSUtils from "content/lib/utils/js-utils";
+import * as JSUtils from "lib/utils/js-utils";
 
 const lazy = {};
 

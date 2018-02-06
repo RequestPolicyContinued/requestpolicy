@@ -23,8 +23,8 @@
 import {
   XPCOMObserver,
   XPCOMObserverTopic,
-} from "content/lib/classes/xpcom-observer";
-import {defer} from "content/lib/utils/js-utils";
+} from "lib/classes/xpcom-observer";
+import {defer} from "lib/utils/js-utils";
 
 export function promiseObserverTopic(aTopic: XPCOMObserverTopic) {
   const deferred = defer<[any, string, any]>();

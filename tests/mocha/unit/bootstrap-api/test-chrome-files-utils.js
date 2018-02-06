@@ -20,13 +20,10 @@ const {assert, expect} = chai;
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 const MockNetUtil = require("./lib/mock-netutil");
 const MockComponents = require("./lib/mock-components");
-const Utils = require("./lib/utils");
 
 describe("ChromeFilesUtils", function() {
   let ChromeFilesUtils = null;
   let stubHttpRequest = null;
-
-  let pathAliasProxy;
 
   before(function() {
     let mockComp = new MockComponents();
@@ -43,8 +40,6 @@ describe("ChromeFilesUtils", function() {
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
-
-    pathAliasProxy = Utils.createPathAliasProxy();
 
     ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
   });
@@ -147,8 +142,6 @@ describe("ChromeFilesUtils", function() {
   });
 
   after(function() {
-    pathAliasProxy.revoke();
-
     global.Cu = null;
   });
 });

@@ -21,14 +21,12 @@ const {expect} = chai;
 const MockNetUtil = require("./lib/mock-netutil");
 const MockComponents = require("./lib/mock-components");
 const MockServices = require("./lib/mock-services");
-const Utils = require("./lib/utils");
 
 let sandbox = sinon.createSandbox();
 
 describe("AsyncLocaleData", function() {
   let ChromeFilesUtils = null;
   let asyncLocaleData = null;
-  let pathAliasProxy;
   let AsyncLocaleData;
 
   before(function() {
@@ -47,8 +45,6 @@ describe("AsyncLocaleData", function() {
     global.Cu = mockComp.utils;
     global.Services = mockServices;
 
-    pathAliasProxy = Utils.createPathAliasProxy();
-
     ({AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data"));
     ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
 
@@ -66,8 +62,6 @@ describe("AsyncLocaleData", function() {
   });
 
   after(function() {
-    pathAliasProxy.revoke();
-
     global.Cu = null;
     global.Services = null;
   });
@@ -126,7 +120,7 @@ describe("AsyncLocaleData", function() {
   describe("getDefaultLocale()", function() {
     it("Should return value from manifest.json", function() {
       ChromeFilesUtils.parseJSON.
-          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({default_locale: "zh"});
 
       let promise = asyncLocaleData.getDefaultLocale();
@@ -136,7 +130,7 @@ describe("AsyncLocaleData", function() {
 
     it("Should return a normalized BCP 47 tag", function() {
       ChromeFilesUtils.parseJSON.
-          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({default_locale: "fr_CA"});
 
       let promise = asyncLocaleData.getDefaultLocale();
@@ -146,7 +140,7 @@ describe("AsyncLocaleData", function() {
 
     it("Should reject if default_locale isn't present", function() {
       ChromeFilesUtils.parseJSON.
-          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({name: "RPC"});
 
       let promise = asyncLocaleData.getDefaultLocale();
@@ -155,7 +149,7 @@ describe("AsyncLocaleData", function() {
 
     it("Should reject if can't parse manifest.json", function() {
       ChromeFilesUtils.parseJSON.
-          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           rejects();
 
       let promise = asyncLocaleData.getDefaultLocale();

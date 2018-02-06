@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as JSUtils from "content/lib/utils/js-utils";
-import {Log} from "content/models/log";
+import * as JSUtils from "lib/utils/js-utils";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

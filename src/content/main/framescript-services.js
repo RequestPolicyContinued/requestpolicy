@@ -49,8 +49,10 @@ export const FramescriptServices = {
     return false;
   }
 
-  messageListeners.notifyDocumentLoaded = function(aMessage, aSender,
-      aSendResponse) {
+  messageListeners.notifyDocumentLoaded = function(
+      aMessage, aSender,
+      aSendResponse
+  ) {
     const {documentURI} = aMessage;
     // The document URI could contain a "fragment" part.
     const originURI = DomainUtil.getUriObject(documentURI).specIgnoringRef;

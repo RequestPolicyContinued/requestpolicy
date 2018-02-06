@@ -33,9 +33,9 @@ export function loadRLFilteringIntoWindow(window) {
 
   // TODO: use the Window Environment instead
   let elements = WindowUtils.getElementsByIdOnLoad(window, {
-        filterTextbox: "rpcontinued-requestLog-requestFilter",
-        clearFilterButton: "rpcontinued-requestLog-clearFilter",
-      });
+    filterTextbox: "rpcontinued-requestLog-requestFilter",
+    clearFilterButton: "rpcontinued-requestLog-clearFilter",
+  });
 
   requestLog.filterChanged = function() {
     let filterValue = elements.filterTextbox.value;

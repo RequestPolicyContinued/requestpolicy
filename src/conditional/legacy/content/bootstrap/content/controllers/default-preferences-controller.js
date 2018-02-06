@@ -76,16 +76,16 @@ let prefInitFunctions = {
     this.setGenericPref(defaultBranch, prefName, prefValue);
   },
 
-  getUCharPref: function(prefName, branch) { // Unicode getCharPref
-    branch = branch || Services.prefs;
+  getUCharPref: function(prefName, aBranch) { // Unicode getCharPref
+    const branch = aBranch || Services.prefs;
     return branch.getComplexValue(prefName, Ci.nsISupportsString).data;
   },
 
-  setUCharPref: function(prefName, text, branch) { // Unicode setCharPref
-    const string = Cc["@mozilla.org/supports-string;1"]
-        .createInstance(Ci.nsISupportsString);
+  setUCharPref: function(prefName, text, aBranch) { // Unicode setCharPref
+    const string = Cc["@mozilla.org/supports-string;1"].
+        createInstance(Ci.nsISupportsString);
     string.data = text;
-    branch = branch || Services.prefs;
+    const branch = aBranch || Services.prefs;
     branch.setComplexValue(prefName, Ci.nsISupportsString, string);
   },
 };
@@ -107,7 +107,8 @@ export const DefaultPreferencesController = {
       // https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_4.3A_Manually_handle_default_preferences
       Services.scriptloader.loadSubScript(
           "chrome://rpcontinued/content/bootstrap/data/default-preferences.js",
-          defaultPrefScriptScope);
+          defaultPrefScriptScope
+      );
       Services.prefs.savePrefFile(null);
     } catch (e) {
       console.error("Error handling default preferences!");

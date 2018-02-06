@@ -53,18 +53,18 @@ var CustomUri = (function() {
                        Ci.nsIProtocolHandler.URI_LOADABLE_BY_ANYONE;
 
   self.newURI = function(aSpec, aOriginCharset, aBaseURI) {
-    var uri = Cc["@mozilla.org/network/simple-uri;1"]
-        .createInstance(Ci.nsIURI);
+    var uri = Cc["@mozilla.org/network/simple-uri;1"].
+        createInstance(Ci.nsIURI);
     uri.spec = aSpec;
     return uri;
   };
 
   self.newChannel = function(aURI) {
     var path = aURI.path;
-    var uri = Services.io.newURI(DESTINATION_URI + "?" + path, null, null);
+    var uri = Services.io.newURI(`${DESTINATION_URI}?${path}`, null, null);
     /* eslint-disable new-cap */
-    var channel = Services.io.newChannelFromURI(uri, null)
-        .QueryInterface(Ci.nsIHttpChannel);
+    var channel = Services.io.newChannelFromURI(uri, null).
+        QueryInterface(Ci.nsIHttpChannel);
     /* eslint-enable new-cap */
     return channel;
   };
@@ -86,15 +86,19 @@ var CustomUri = (function() {
 
   function registerFactory() {
     // eslint-disable-next-line new-cap
-    Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-        .registerFactory(self.classID, self.classDescription,
-                         self.contractID, self);
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+        registerFactory(
+            self.classID,
+            self.classDescription,
+            self.contractID,
+            self
+        );
   }
 
   function unregisterFactory() {
     // eslint-disable-next-line new-cap
-    Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-        .unregisterFactory(self.classID, self);
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+        unregisterFactory(self.classID, self);
   }
 
   return self;

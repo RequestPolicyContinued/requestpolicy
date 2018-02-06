@@ -27,8 +27,9 @@ import {Storage} from "content/models/storage";
 import {PolicyManager} from "content/lib/policy-manager";
 import * as DomainUtil from "content/lib/utils/domain-utils";
 import {Ruleset} from "content/lib/ruleset";
-import {GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
-        } from "content/lib/classes/gui-location";
+import {
+  GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
+} from "content/lib/classes/gui-location";
 import * as DOMUtils from "content/lib/utils/dom-utils";
 import * as WindowUtils from "content/lib/utils/window-utils";
 import {C} from "content/data/constants";
@@ -88,13 +89,14 @@ export function loadMenuIntoWindow(window) {
       lists.removeRules = $id("rpc-rules-remove");
 
       rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
-        EnvLevel.INTERFACE,
-        function() {
+          EnvLevel.INTERFACE,
+          function() {
           // empty _all_ lists
-          for (let listName in lists) {
-            emptyList(lists[listName]);
+            for (let listName in lists) {
+              emptyList(lists[listName]);
+            }
           }
-        });
+      );
     }
   };
 
@@ -126,8 +128,10 @@ export function loadMenuIntoWindow(window) {
       params.onBeforeDialog.call();
     }
 
-    let confirmed = Services.prompt.confirmCheck(window, dialogTitle,
-        dialogMessage, checkboxText, checkboxObj);
+    let confirmed = Services.prompt.confirmCheck(
+        window, dialogTitle,
+        dialogMessage, checkboxText, checkboxObj
+    );
 
     if (confirmed) {
       // "OK" has been pressed
@@ -178,20 +182,20 @@ export function loadMenuIntoWindow(window) {
       try {
         self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
         if (self._currentBaseDomain === null) {
-          log.info("Unable to prepare menu because " +
-              "the current uri has no host: " + self._currentUri);
+          log.info(`${"Unable to prepare menu because " +
+              "the current uri has no host: "}${self._currentUri}`);
           self._populateMenuForUncontrollableOrigin();
           return;
         }
       } catch (e) {
-        log.info("Unable to prepare menu because " +
-            "base domain can't be determined: " + self._currentUri);
+        log.info(`${"Unable to prepare menu because " +
+            "base domain can't be determined: "}${self._currentUri}`);
         self._populateMenuForUncontrollableOrigin();
         return;
       }
 
-      self._currentIdentifier = rpcontinued.overlay
-          .getTopLevelDocumentUriIdentifier();
+      self._currentIdentifier = rpcontinued.overlay.
+          getTopLevelDocumentUriIdentifier();
 
       // log.info("self._currentUri: " + self._currentUri);
       self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
@@ -199,7 +203,7 @@ export function loadMenuIntoWindow(window) {
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
       // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
 
-      log.info("self._currentUri: " + self._currentUri);
+      log.info(`self._currentUri: ${self._currentUri}`);
 
       if (self._isChromeUri) {
         self._populateMenuForUncontrollableOrigin();
@@ -212,8 +216,8 @@ export function loadMenuIntoWindow(window) {
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      self._allRequestsOnDocument = Requests
-            .getAllRequestsInBrowser(gBrowser.selectedBrowser);
+      self._allRequestsOnDocument = Requests.
+          getAllRequestsInBrowser(gBrowser.selectedBrowser);
       self._allRequestsOnDocument.print("_allRequestsOnDocument");
 
       self._setPrivateBrowsingStyles();
@@ -235,7 +239,7 @@ export function loadMenuIntoWindow(window) {
 
   self._populateMenuForUncontrollableOrigin = function() {
     self._originDomainnameItem.setAttribute("value",
-      browser.i18n.getMessage("noOrigin"));
+        browser.i18n.getMessage("noOrigin"));
     self._isUncontrollableOrigin = true;
     self._originNumRequestsItem.setAttribute("value", "");
     self._originItem.removeAttribute("default-policy");
@@ -282,16 +286,20 @@ export function loadMenuIntoWindow(window) {
         if (true === showNumRequests) {
           num = props.numRequests;
           if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
-            num += " (" + props.numBlockedRequests +
-                "+" + props.numAllowedRequests + ")";
+            num += ` (${props.numBlockedRequests
+            }+${props.numAllowedRequests})`;
           }
         }
         let newitem = self._addListItem(list, "rpc-od-item", guiLocation, num);
 
-        newitem.setAttribute("default-policy",
-            props.numDefaultPolicyRequests > 0 ? "true" : "false");
-        newitem.setAttribute("requests-blocked",
-            props.numBlockedRequests > 0 ? "true" : "false");
+        newitem.setAttribute(
+            "default-policy",
+            props.numDefaultPolicyRequests > 0 ? "true" : "false"
+        );
+        newitem.setAttribute(
+            "requests-blocked",
+            props.numBlockedRequests > 0 ? "true" : "false"
+        );
       }
     } else {
       values.sort();
@@ -312,18 +320,22 @@ export function loadMenuIntoWindow(window) {
     let numRequests = "";
     if (true === showNumRequests) {
       if (props.numAllowedRequests > 0 && props.numBlockedRequests > 0) {
-        numRequests = props.numRequests + " (" +
-            props.numBlockedRequests + "+" + props.numAllowedRequests + ")";
+        numRequests = `${props.numRequests} (${
+          props.numBlockedRequests}+${props.numAllowedRequests})`;
       } else {
         numRequests = props.numRequests;
       }
     }
     self._originNumRequestsItem.setAttribute("value", numRequests);
 
-    self._originItem.setAttribute("default-policy",
-        props.numDefaultPolicyRequests > 0 ? "true" : "false");
-    self._originItem.setAttribute("requests-blocked",
-        props.numBlockedRequests > 0 ? "true" : "false");
+    self._originItem.setAttribute(
+        "default-policy",
+        props.numDefaultPolicyRequests > 0 ? "true" : "false"
+    );
+    self._originItem.setAttribute(
+        "requests-blocked",
+        props.numBlockedRequests > 0 ? "true" : "false"
+    );
   };
 
   self._populateOtherOrigins = function() {
@@ -344,8 +356,10 @@ export function loadMenuIntoWindow(window) {
     for (let i = 0; i < destsWithBlockedRequests.length; i++) {
       let blockedGUIDest = destsWithBlockedRequests[i];
 
-      if (false === GUILocation.existsInArray(blockedGUIDest,
-          destsWithAllowedRequests)) {
+      if (false === GUILocation.existsInArray(
+          blockedGUIDest,
+          destsWithAllowedRequests
+      )) {
         destsWithSolelyBlockedRequests.push(blockedGUIDest);
       } else {
         destsMixed.push(blockedGUIDest);
@@ -363,31 +377,36 @@ export function loadMenuIntoWindow(window) {
         destsWithSolelyAllowedRequests.push(allowedGUIDest);
       } else {
         if (destsMixedIndex !== -1) {
-          log.info("Merging dest: <" + allowedGUIDest + ">");
+          log.info(`Merging dest: <${allowedGUIDest}>`);
           destsMixed[destsMixedIndex] = GUIDestination.merge(
-              allowedGUIDest, destsMixed[destsMixedIndex]);
+              allowedGUIDest, destsMixed[destsMixedIndex]
+          );
         } else {
           // If the allowedGUIDest is in destsWithBlockedRequests and
           // destsWithAllowedRequests, but not in destsMixed.
           // This should never happen, the destsMixed destination should have
           // been added in the destsWithBlockedRequests-loop.
-          log.warn("mixed dest was" +
-              " not added to `destsMixed` list: <" + allowedGUIDest + ">");
+          log.warn(`${"mixed dest was" +
+              " not added to `destsMixed` list: <"}${allowedGUIDest}>`);
           destsMixed.push(allowedGUIDest);
         }
       }
     }
 
-    self._populateList(lists.blockedDestinations,
-        destsWithSolelyBlockedRequests);
+    self._populateList(
+        lists.blockedDestinations,
+        destsWithSolelyBlockedRequests
+    );
     $id("rpc-blocked-destinations").hidden =
         destsWithSolelyBlockedRequests.length === 0;
 
     self._populateList(lists.mixedDestinations, destsMixed);
     $id("rpc-mixed-destinations").hidden = destsMixed.length === 0;
 
-    self._populateList(lists.allowedDestinations,
-        destsWithSolelyAllowedRequests);
+    self._populateList(
+        lists.allowedDestinations,
+        destsWithSolelyAllowedRequests
+    );
     $id("rpc-allowed-destinations").hidden =
         destsWithSolelyAllowedRequests.length === 0;
   };
@@ -459,8 +478,10 @@ export function loadMenuIntoWindow(window) {
       }
       if (self._isCurrentlySelectedDestBlocked ||
           !PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-              !PolicyManager.ruleExists(C.RULE_ACTION_ALLOW,
-                                        destOnlyRuleData)) {
+              !PolicyManager.ruleExists(
+                  C.RULE_ACTION_ALLOW,
+                  destOnlyRuleData
+              )) {
         // show "Allow requests" if the destination was blocked
         // OR if there's no allow-rule (i.e. the request was allowed
         // "by default") -- this enables support for whitelisting.
@@ -495,7 +516,7 @@ export function loadMenuIntoWindow(window) {
 
   self._addListItem = function(list, cssClass, value, numRequests) {
     const hbox = document.createElement("hbox");
-    hbox.setAttribute("class", cssClass + " listen-click");
+    hbox.setAttribute("class", `${cssClass} listen-click`);
     hbox.addEventListener("click", self.itemSelected, false);
     list.insertBefore(hbox, null);
 
@@ -517,6 +538,7 @@ export function loadMenuIntoWindow(window) {
 
   self._disableIfNoChildren = function(el) {
     // TODO: this isn't working.
+    // eslint-disable-next-line no-param-reassign
     el.hidden = el.firstChild ? false : true;
   };
 
@@ -592,7 +614,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   function openSiteInfoTab(domain) {
-    let url = "https://www.mywot.com/en/scorecard/" + domain;
+    let url = `https://www.mywot.com/en/scorecard/${domain}`;
     window.openUILinkIn(url, "tab", {
       relatedToCurrent: true,
       inBackground: true,
@@ -685,9 +707,9 @@ export function loadMenuIntoWindow(window) {
     }
 
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    log.log("ruleData: " + canonicalRule);
-    log.log("ruleAction: " + ruleAction);
-    log.log("undo: " + undo);
+    log.log(`ruleData: ${canonicalRule}`);
+    log.log(`ruleAction: ${ruleAction}`);
+    log.log(`undo: ${undo}`);
 
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the
@@ -750,7 +772,7 @@ export function loadMenuIntoWindow(window) {
         break;
       default:
         // eslint-disable-next-line no-throw-literal
-        throw "action not implemented: " + ruleAction;
+        throw `action not implemented: ${ruleAction}`;
     }
   };
 
@@ -762,7 +784,8 @@ export function loadMenuIntoWindow(window) {
 
   self._getBlockedDestinationsAsGUILocations = function() {
     const reqSet = Requests.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument);
+        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    );
     const requests = reqSet.getAllMergedOrigins();
 
     const result = [];
@@ -776,7 +799,8 @@ export function loadMenuIntoWindow(window) {
 
   self._getAllowedDestinationsAsGUILocations = function() {
     const reqSet = Requests.getAllowedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument);
+        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    );
     const requests = reqSet.getAllMergedOrigins();
 
     const result = [];
@@ -785,7 +809,7 @@ export function loadMenuIntoWindow(window) {
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
       if (
-          Storage.alias.isDefaultAllow() ||
+        Storage.alias.isDefaultAllow() ||
           Storage.alias.isDefaultAllowSameDomain()
       ) {
         if (destBase === self._currentlySelectedOrigin) {
@@ -846,8 +870,10 @@ export function loadMenuIntoWindow(window) {
       //   continue;
       // }
 
-      const guiOriginsIndex = GUIOrigin.indexOfOriginInArray(originBase,
-          guiOrigins);
+      const guiOriginsIndex = GUIOrigin.indexOfOriginInArray(
+          originBase,
+          guiOrigins
+      );
       let properties;
       if (guiOriginsIndex === -1) {
         properties = new GUILocationProperties();
@@ -889,7 +915,7 @@ export function loadMenuIntoWindow(window) {
     if (self._isIPAddressOrSingleName(hostname)) {
       return hostname;
     } else {
-      return "*." + hostname;
+      return `*.${hostname}`;
     }
   };
 
@@ -897,145 +923,193 @@ export function loadMenuIntoWindow(window) {
 
   // Stop allowing
 
-  self._addMenuItemStopAllowingOrigin = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopAllowingOrigin = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const originHost = ruleData.o.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData, "stopAllowingOrigin",
-        [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
+    return self._addMenuItemHelper(
+        list, ruleData, "stopAllowingOrigin",
+        [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow"
+    );
   };
 
-  self._addMenuItemStopAllowingDest = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopAllowingDest = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const destHost = ruleData.d.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData, "stopAllowingDestination",
-        [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow");
+    return self._addMenuItemHelper(
+        list, ruleData, "stopAllowingDestination",
+        [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow"
+    );
   };
 
-  self._addMenuItemStopAllowingOriginToDest = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopAllowingOriginToDest = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(list, ruleData,
+    return self._addMenuItemHelper(
+        list, ruleData,
         "stopAllowingOriginToDestination", [originHost, destHost], ruleAction,
-        "rpc-stop-rule rpc-stop-allow");
+        "rpc-stop-rule rpc-stop-allow"
+    );
   };
 
   // Allow
 
   self._addMenuItemAllowOrigin = function(list, ruleData) {
     const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOrigin",
-        [originHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(
+        list, ruleData, "allowOrigin",
+        [originHost], "allow", "rpc-start-rule rpc-allow"
+    );
   };
 
   self._addMenuItemAllowDest = function(list, ruleData) {
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowDestination",
-        [destHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(
+        list, ruleData, "allowDestination",
+        [destHost], "allow", "rpc-start-rule rpc-allow"
+    );
   };
 
   self._addMenuItemAllowOriginToDest = function(list, ruleData) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOriginToDestination",
-        [originHost, destHost], "allow", "rpc-start-rule rpc-allow");
+    return self._addMenuItemHelper(
+        list, ruleData, "allowOriginToDestination",
+        [originHost, destHost], "allow", "rpc-start-rule rpc-allow"
+    );
   };
 
   // Allow temp
 
   self._addMenuItemTempAllowOrigin = function(list, ruleData) {
     const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "allowOriginTemporarily",
-        [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
+    return self._addMenuItemHelper(
+        list, ruleData, "allowOriginTemporarily",
+        [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary"
+    );
   };
 
   self._addMenuItemTempAllowDest = function(list, ruleData) {
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData,
+    return self._addMenuItemHelper(
+        list, ruleData,
         "allowDestinationTemporarily", [destHost], "allow-temp",
-        "rpc-start-rule rpc-allow rpc-temporary");
+        "rpc-start-rule rpc-allow rpc-temporary"
+    );
   };
 
   self._addMenuItemTempAllowOriginToDest = function(list, ruleData) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData,
+    return self._addMenuItemHelper(
+        list, ruleData,
         "allowOriginToDestinationTemporarily", [originHost, destHost],
-        "allow-temp", "rpc-start-rule rpc-allow rpc-temporary");
+        "allow-temp", "rpc-start-rule rpc-allow rpc-temporary"
+    );
   };
 
   // Stop denying
 
-  self._addMenuItemStopDenyingOrigin = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopDenyingOrigin = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const originHost = ruleData.o.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData, "stopDenyingOrigin",
-        [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
+    return self._addMenuItemHelper(
+        list, ruleData, "stopDenyingOrigin",
+        [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny"
+    );
   };
 
-  self._addMenuItemStopDenyingDest = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopDenyingDest = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const destHost = ruleData.d.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData, "stopDenyingDestination",
-        [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny");
+    return self._addMenuItemHelper(
+        list, ruleData, "stopDenyingDestination",
+        [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny"
+    );
   };
 
-  self._addMenuItemStopDenyingOriginToDest = function(list, ruleData,
-      subscriptionOverride) {
+  self._addMenuItemStopDenyingOriginToDest = function(
+      list, ruleData,
+      subscriptionOverride
+  ) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(list, ruleData,
+    return self._addMenuItemHelper(
+        list, ruleData,
         "stopDenyingOriginToDestination", [originHost, destHost], ruleAction,
-        "rpc-stop-rule rpc-stop-deny");
+        "rpc-stop-rule rpc-stop-deny"
+    );
   };
 
   // Deny
 
   self._addMenuItemDenyOrigin = function(list, ruleData) {
     const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOrigin",
-        [originHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(
+        list, ruleData, "denyOrigin",
+        [originHost], "deny", "rpc-start-rule rpc-deny"
+    );
   };
 
   self._addMenuItemDenyDest = function(list, ruleData) {
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyDestination",
-        [destHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(
+        list, ruleData, "denyDestination",
+        [destHost], "deny", "rpc-start-rule rpc-deny"
+    );
   };
 
   self._addMenuItemDenyOriginToDest = function(list, ruleData) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOriginToDestination",
-        [originHost, destHost], "deny", "rpc-start-rule rpc-deny");
+    return self._addMenuItemHelper(
+        list, ruleData, "denyOriginToDestination",
+        [originHost, destHost], "deny", "rpc-start-rule rpc-deny"
+    );
   };
 
   // Deny temp
 
   self._addMenuItemTempDenyOrigin = function(list, ruleData) {
     const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(list, ruleData, "denyOriginTemporarily",
-        [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
+    return self._addMenuItemHelper(
+        list, ruleData, "denyOriginTemporarily",
+        [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+    );
   };
 
   self._addMenuItemTempDenyDest = function(list, ruleData) {
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData, "denyDestinationTemporarily",
-        [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
+    return self._addMenuItemHelper(
+        list, ruleData, "denyDestinationTemporarily",
+        [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+    );
   };
 
   self._addMenuItemTempDenyOriginToDest = function(list, ruleData) {
     const originHost = ruleData.o.h;
     const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(list, ruleData,
+    return self._addMenuItemHelper(
+        list, ruleData,
         "denyOriginToDestinationTemporarily", [originHost, destHost],
-        "deny-temp", "rpc-start-rule rpc-deny rpc-temporary");
+        "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+    );
   };
 
   self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
@@ -1045,7 +1119,7 @@ export function loadMenuIntoWindow(window) {
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;
     // var statustext = ''; // TODO
-    item.setAttribute("class", "rpc-od-item " + cssClass);
+    item.setAttribute("class", `rpc-od-item ${cssClass}`);
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
     if (self._ruleChangeQueues[ruleAction]) {
       if (self._ruleChangeQueues[ruleAction][canonicalRule]) {
@@ -1055,34 +1129,50 @@ export function loadMenuIntoWindow(window) {
     return item;
   };
 
-  self._addMenuItemRemoveAllowRule = function(list, rawRule,
-      subscriptionOverride) {
+  self._addMenuItemRemoveAllowRule = function(
+      list, rawRule,
+      subscriptionOverride
+  ) {
     if (rawRule.o && rawRule.d) {
-      return self._addMenuItemStopAllowingOriginToDest(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopAllowingOriginToDest(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else if (rawRule.o) {
-      return self._addMenuItemStopAllowingOrigin(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopAllowingOrigin(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else if (rawRule.d) {
-      return self._addMenuItemStopAllowingDest(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopAllowingDest(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else {
       // eslint-disable-next-line no-throw-literal
       throw "Invalid rule data: no origin or destination parts.";
     }
   };
 
-  self._addMenuItemRemoveDenyRule = function(list, rawRule,
-      subscriptionOverride) {
+  self._addMenuItemRemoveDenyRule = function(
+      list, rawRule,
+      subscriptionOverride
+  ) {
     if (rawRule.o && rawRule.d) {
-      return self._addMenuItemStopDenyingOriginToDest(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopDenyingOriginToDest(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else if (rawRule.o) {
-      return self._addMenuItemStopDenyingOrigin(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopDenyingOrigin(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else if (rawRule.d) {
-      return self._addMenuItemStopDenyingDest(list, rawRule,
-          subscriptionOverride);
+      return self._addMenuItemStopDenyingDest(
+          list, rawRule,
+          subscriptionOverride
+      );
     } else {
       // eslint-disable-next-line no-throw-literal
       throw "Invalid rule data: no origin or destination parts.";
@@ -1094,7 +1184,8 @@ export function loadMenuIntoWindow(window) {
     // from calling it earlier?
 
     let reqSet = Requests.getAllowedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument);
+        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    );
     let requests = reqSet.getAllMergedOrigins();
 
     // var rules = {};
@@ -1122,8 +1213,8 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default allow mode, we need to give an option
           // to add a deny rule for these requests.
           if (!destinations[destUri]) {
-            log.log("destinations[destUri] is null or undefined for " +
-                "destUri: " + destUri);
+            log.log(`${"destinations[destUri] is null or undefined for " +
+                "destUri: "}${destUri}`);
             continue;
           }
 
@@ -1171,7 +1262,8 @@ export function loadMenuIntoWindow(window) {
     // from calling it earlier?
 
     let reqSet = Requests.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument);
+        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    );
     let requests = reqSet.getAllMergedOrigins();
 
     // var rules = {};
@@ -1199,8 +1291,8 @@ export function loadMenuIntoWindow(window) {
           // TODO: we at least in default deny mode, we need to give an option
           // to add a allow rule for these requests.
           if (!destinations[destUri]) {
-            log.log("destinations[destUri] is null or undefined " +
-                "for destUri: " + destUri);
+            log.log(`${"destinations[destUri] is null or undefined " +
+                "for destUri: "}${destUri}`);
             continue;
           }
 
@@ -1250,7 +1342,8 @@ export function loadMenuIntoWindow(window) {
     // from calling it earlier?
 
     let reqSet = Requests.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument);
+        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    );
     let requests = reqSet.getAllMergedOrigins();
 
     let destHosts = {};
@@ -1302,5 +1395,6 @@ export function loadMenuIntoWindow(window) {
     }
   };
 
+  // eslint-disable-next-line no-param-reassign
   window.rpcontinued.menu = self;
 }

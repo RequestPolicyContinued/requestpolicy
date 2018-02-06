@@ -24,7 +24,8 @@
 import {Storage} from "content/models/storage";
 
 let {PrivateBrowsingUtils} = Cu.import(
-    "resource://gre/modules/PrivateBrowsingUtils.jsm", {});
+    "resource://gre/modules/PrivateBrowsingUtils.jsm", {}
+);
 
 export function getMostRecentWindow(aWindowType = null) {
   return Services.wm.getMostRecentWindow(aWindowType);
@@ -35,12 +36,12 @@ export const getMostRecentBrowserWindow =
 
 export function getChromeWindow(aContentWindow) {
   /* eslint-disable new-cap */
-  return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor)
-                            .getInterface(Ci.nsIWebNavigation)
-                            .QueryInterface(Ci.nsIDocShellTreeItem)
-                            .rootTreeItem
-                            .QueryInterface(Ci.nsIInterfaceRequestor)
-                            .getInterface(Ci.nsIDOMWindow);
+  return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor).
+      getInterface(Ci.nsIWebNavigation).
+      QueryInterface(Ci.nsIDocShellTreeItem).
+      rootTreeItem.
+      QueryInterface(Ci.nsIInterfaceRequestor).
+      getInterface(Ci.nsIDOMWindow);
   /* eslint-enable new-cap */
 }
 
@@ -57,10 +58,10 @@ export function getBrowserForWindow(aContentWindow) {
 
 export function getChromeWindowForDocShell(aDocShell) {
   /* eslint-disable new-cap */
-  return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem)
-                  .rootTreeItem
-                  .QueryInterface(Ci.nsIInterfaceRequestor)
-                  .getInterface(Ci.nsIDOMWindow);
+  return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem).
+      rootTreeItem.
+      QueryInterface(Ci.nsIInterfaceRequestor).
+      getInterface(Ci.nsIDOMWindow);
   /* eslint-enable new-cap */
 }
 
@@ -107,7 +108,7 @@ export function mayPermanentRulesBeAdded(aWindow) {
  * @return {Object} the scope of the elements
  */
 export function getElementsByIdOnLoad(aWindow, aElementIDs, aScope,
-                                      aCallback) {
+    aCallback) {
   let scope = aScope || {};
   let document = aWindow.document;
   let callback = function() {

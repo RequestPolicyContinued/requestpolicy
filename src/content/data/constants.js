@@ -22,7 +22,7 @@
 
 /* global RUN_ID */ // see bootstrap.jsm
 
-const env = str => str[0] !== "undefined";
+const env = (str) => str[0] !== "undefined";
 
 export const C = {
   LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */`,

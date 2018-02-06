@@ -47,14 +47,16 @@ import {MainEnvironment} from "content/lib/environment";
  * - set element attributes (all windows)
  */
 
-export function KeyboardShortcut(aID, aDefaultCombo, aCallback,
-    aUserEnabledPrefName, aUserComboPrefName) {
+export function KeyboardShortcut(
+    aID, aDefaultCombo, aCallback,
+    aUserEnabledPrefName, aUserComboPrefName
+) {
   // ---------------------------------------------------------------------------
   // initialize properties
   // ---------------------------------------------------------------------------
 
   this._id = aID;
-  this._elementID = "rpKey_" + this._id;
+  this._elementID = `rpKey_${this._id}`;
   this._defaultCombo = aDefaultCombo;
   this._callback = aCallback;
   this._userEnabledPrefName = aUserEnabledPrefName;

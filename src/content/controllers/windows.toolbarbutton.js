@@ -28,7 +28,7 @@ const log = Log.instance;
 let CustomizableUI = null;
 if (LegacyApi.miscInfos.isAustralis) {
   ({CustomizableUI} = Cu.import("resource:///modules/CustomizableUI.jsm",
-                                {}));
+      {}));
 }
 
 // =============================================================================
@@ -118,8 +118,8 @@ export const ToolbarButtonController = (function() {
       let id = toolbarButtonId;
 
       // find the toolbar in which the button has been placed by the user
-      let toolbarSelector = "[currentset^='" + id + ",'],[currentset*='," + id +
-          ",'],[currentset$='," + id + "']";
+      let toolbarSelector = `[currentset^='${id},'],[currentset*=',${id
+      },'],[currentset$=',${id}']`;
       let toolbar = doc.querySelector(toolbarSelector);
 
       if (!toolbar) {

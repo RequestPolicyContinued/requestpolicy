@@ -26,7 +26,9 @@
 
 (function() {
   let {FakeWebExt} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
+      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm",
+      {}
+  );
 
   FakeWebExt.startupSettingsPage(window);
 })();

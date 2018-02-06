@@ -43,13 +43,13 @@ export function endpointSpecToDisplayString(aEndpointSpec) {
         if (aEndpointSpec.s === undefined) {
           return "";
         }
-        return scheme + ":<path> (host optional)";
+        return `${scheme}:<path> (host optional)`;
 
       case null:
-        return scheme + ":<path> (no host)";
+        return `${scheme}:<path> (no host)`;
 
       case "":
-        return scheme + "://<path> (empty host)";
+        return `${scheme}://<path> (empty host)`;
 
       default:
         break;
@@ -57,11 +57,11 @@ export function endpointSpecToDisplayString(aEndpointSpec) {
   }
   let str = "";
   if (scheme !== "*" || aEndpointSpec.port) {
-    str += scheme + "://";
+    str += `${scheme}://`;
   }
   str += aEndpointSpec.h || "*";
   if (aEndpointSpec.port) {
-    str += ":" + aEndpointSpec.port;
+    str += `:${aEndpointSpec.port}`;
   }
   // TODO: path
   return str;

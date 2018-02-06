@@ -101,7 +101,7 @@ export class OldRules {
       if (host !== null) {
         spec.h = host;
         if (OldRules.shouldWildcardBeAddedToEndpoint(uriObj)) {
-          spec.h = "*." + spec.h;
+          spec.h = `*.${spec.h}`;
         }
         if (uriObj.port !== -1) {
           spec.port = uriObj.port;
@@ -110,7 +110,7 @@ export class OldRules {
     } else {
       spec.h = aEndpointString.split("/")[0];
       if (OldRules.shouldWildcardBeAddedToEndpoint(spec.h)) {
-        spec.h = "*." + spec.h;
+        spec.h = `*.${spec.h}`;
       }
     }
     return spec;

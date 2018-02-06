@@ -62,7 +62,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({"defaultPolicy.allow": allow});
           updateDisplay();
           showManageSubscriptionsLink();
-        });
+        }
+    );
 
     elManager.addListener(
         $id("defaultdeny"), "change",
@@ -71,7 +72,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({"defaultPolicy.allow": !deny});
           updateDisplay();
           showManageSubscriptionsLink();
-        });
+        }
+    );
 
     elManager.addListener(
         $id("allowsamedomain"), "change",
@@ -80,7 +82,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "defaultPolicy.allowSameDomain": allowSameDomain,
           });
-        });
+        }
+    );
 
     elManager.addListener(
         $id("allowtoplevel"), "change",
@@ -89,7 +92,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "defaultPolicy.allowTopLevel": allowTopLevel,
           });
-        });
+        }
+    );
 
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);

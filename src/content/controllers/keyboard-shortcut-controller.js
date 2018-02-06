@@ -45,16 +45,18 @@ export const KeyboardShortcutController = {
         },
         "keyboardShortcuts.openMenu.enabled",
         "keyboardShortcuts.openMenu.combo"));
-    keyboardShortcuts.push(new KeyboardShortcut("openRequestLog", "none",
+    keyboardShortcuts.push(new KeyboardShortcut(
+        "openRequestLog", "none",
         function(window) {
           window.rpcontinued.overlay.toggleRequestLog();
         },
         "keyboardShortcuts.openRequestLog.enabled",
-        "keyboardShortcuts.openRequestLog.combo"));
+        "keyboardShortcuts.openRequestLog.combo"
+    ));
   },
 
   shutdown() {
-    keyboardShortcuts.forEach(ks => {
+    keyboardShortcuts.forEach((ks) => {
       ks.destroy();
     });
     keyboardShortcuts.length = 0;

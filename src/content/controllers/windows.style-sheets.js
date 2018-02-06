@@ -30,31 +30,37 @@ export const StyleSheetsController = (function() {
   const STYLE_SHEETS = Object.freeze([
     "chrome://rpcontinued/skin/requestpolicy.css",
     LegacyApi.miscInfos.isSeamonkey ?
-        "chrome://rpcontinued/skin/toolbarbutton-seamonkey.css" :
-        "chrome://rpcontinued/skin/toolbarbutton.css",
+      "chrome://rpcontinued/skin/toolbarbutton-seamonkey.css" :
+      "chrome://rpcontinued/skin/toolbarbutton.css",
   ]);
 
   function loadStyleSheets() {
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
+    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"].
+        getService(Ci.nsIStyleSheetService);
 
     for (let styleSheet of STYLE_SHEETS) {
       let styleSheetURI = Services.io.newURI(styleSheet, null, null);
-      styleSheetService.loadAndRegisterSheet(styleSheetURI,
-          styleSheetService.AUTHOR_SHEET);
+      styleSheetService.loadAndRegisterSheet(
+          styleSheetURI,
+          styleSheetService.AUTHOR_SHEET
+      );
     }
   }
 
   function unloadStyleSheets() {
-    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"]
-        .getService(Ci.nsIStyleSheetService);
+    let styleSheetService = Cc["@mozilla.org/content/style-sheet-service;1"].
+        getService(Ci.nsIStyleSheetService);
 
     for (let styleSheet of STYLE_SHEETS) {
       let styleSheetURI = Services.io.newURI(styleSheet, null, null);
-      if (styleSheetService.sheetRegistered(styleSheetURI,
-              styleSheetService.AUTHOR_SHEET)) {
-        styleSheetService.unregisterSheet(styleSheetURI,
-            styleSheetService.AUTHOR_SHEET);
+      if (styleSheetService.sheetRegistered(
+          styleSheetURI,
+          styleSheetService.AUTHOR_SHEET
+      )) {
+        styleSheetService.unregisterSheet(
+            styleSheetURI,
+            styleSheetService.AUTHOR_SHEET
+        );
       }
     }
   }

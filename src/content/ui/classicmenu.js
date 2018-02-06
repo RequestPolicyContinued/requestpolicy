@@ -71,7 +71,7 @@ export function loadClassicmenuIntoWindow(window) {
     const isAllow = "allow" in aRuleSpec && aRuleSpec.allow;
     const hasOrigin = "origin" in aRuleSpec && aRuleSpec.origin;
     const hasDest = "dest" in aRuleSpec && aRuleSpec.dest;
-    const type = "" +
+    const type =
         (isTemp ? "t" : "") +
         (isAllow ? "a" : "d") +
         (hasOrigin ? "o" : "") +
@@ -137,5 +137,6 @@ export function loadClassicmenuIntoWindow(window) {
     return item;
   };
 
+  // eslint-disable-next-line no-param-reassign
   window.rpcontinued.classicmenu = self;
 }

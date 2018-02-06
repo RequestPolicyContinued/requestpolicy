@@ -46,9 +46,11 @@
 
   function getMemoryInfo() {
     var nRRAllowed = getNRequestResultObjects(
-        Requests._requestSets.allowedRequests);
+        Requests._requestSets.allowedRequests
+    );
     var nRRDenied = getNRequestResultObjects(
-        Requests._requestSets.rejectedRequests);
+        Requests._requestSets.rejectedRequests
+    );
     return {
       nRRAllowed: nRRAllowed,
       nRRDenied: nRRDenied,
@@ -66,6 +68,7 @@
    * @param {Object} obj
    */
   function deleteOwnProperties(obj) {
+    /* eslint-disable no-param-reassign */
     for (var key in obj) {
       if (obj.hasOwnProperty(key)) {
         delete obj[key];
@@ -92,12 +95,12 @@
     info.append(list);
 
     var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests,
-        } = getMemoryInfo();
-    list.append("<li>RequestResult objects: " + nRRTotal +
-        " (" + nRRAllowed + " allowed requests, " +
-        nRRDenied + " denied requests)</li>");
-    list.append("<li>Clicked links: " + nClickedLinks + "</li>");
-    list.append("<li>Favicon requests: " + nFaviconRequests + "</li>");
+    } = getMemoryInfo();
+    list.append(`<li>RequestResult objects: ${nRRTotal
+    } (${nRRAllowed} allowed requests, ${
+      nRRDenied} denied requests)</li>`);
+    list.append(`<li>Clicked links: ${nClickedLinks}</li>`);
+    list.append(`<li>Favicon requests: ${nFaviconRequests}</li>`);
   };
 
   window.freeMemory = function() {
@@ -109,8 +112,8 @@
     results.append(" DONE.<br />Successfully removed...");
     var list = $("<ul>");
     results.append(list);
-    list.append("<li>" + nRRTotal + " RequestResult objects</li>");
-    list.append("<li>" + nClickedLinks + " clicked links</li>");
-    list.append("<li>" + nFaviconRequests + " favicon requests</li>");
+    list.append(`<li>${nRRTotal} RequestResult objects</li>`);
+    list.append(`<li>${nClickedLinks} clicked links</li>`);
+    list.append(`<li>${nFaviconRequests} favicon requests</li>`);
   };
 })();

@@ -65,25 +65,29 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         function() {
           if (LOG_MESSAGE_LISTENERS) {
             log.log(
-                "From now on new message listeners will be added " +
-                "immediately. Environment: \"" + self.environment.name + "\"");
+                `${"From now on new message listeners will be added " +
+                "immediately. Environment: \""}${self.environment.name}"`
+            );
           }
           self.addNewListenersImmediately = true;
           self.addAllListeners();
-        });
+        }
+    );
     self.environment.addShutdownFunction(
         EnvLevel.INTERFACE,
         function() {
           // clean up when the environment shuts down
           self.removeAllListeners();
-        });
+        }
+    );
   } else {
     // aEnv is not defined! Try to report an error.
     if (log) {
       console.error(
           "No Environment was specified for a new " +
           "ManagerForMessageListeners! This means that the listeners " +
-          "won't be unregistered!");
+          "won't be unregistered!"
+      );
     }
   }
 
@@ -108,20 +112,23 @@ export function ManagerForMessageListeners(aEnv, aMM) {
  *     added immediately, i.e. without waiting for the environment
  *     to start up.
  */
-ManagerForMessageListeners.prototype.addListener = function(aMessageName,
-                                                            aCallback,
-                                                            aCallbackOnShutdown,
-                                                            aAddImmediately) {
+ManagerForMessageListeners.prototype.addListener = function(
+    aMessageName,
+    aCallback,
+    aCallbackOnShutdown,
+    aAddImmediately
+) {
   let self = this;
   if (typeof aCallback !== "function") {
-    console.error("The callback for a message listener" +
-        "must be a function! The message name was \"" + aMessageName + "\"");
+    console.error(`${"The callback for a message listener" +
+        "must be a function! The message name was \""}${aMessageName}"`);
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
     log.warn("The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
+    // eslint-disable-next-line no-param-reassign
     aMessageName = aMessageName.substr(C.MM_PREFIX.length);
   }
 
@@ -131,8 +138,8 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
     callback: function(aMessage) {
       if (self.environment.envState === EnvState.SHUTTING_DOWN) {
         // eslint-disable-next-line no-console
-        console.log("[RequestPolicy] Listener for " + aMessageName +
-            " has been called, but RP is already shutting down.");
+        console.log(`[RequestPolicy] Listener for ${aMessageName
+        } has been called, but RP is already shutting down.`);
         if (typeof aCallbackOnShutdown === "function") {
           return aCallbackOnShutdown(aMessage);
         }
@@ -145,9 +152,10 @@ ManagerForMessageListeners.prototype.addListener = function(aMessageName,
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {
       log.log(
-          "Immediately adding message listener for \"" +
-          listener.messageName + "\". Environment: \"" +
-          self.environment.name + "\"");
+          `Immediately adding message listener for "${
+            listener.messageName}". Environment: "${
+            self.environment.name}"`
+      );
     }
     self.mm.addMessageListener(listener.messageID, listener.callback);
     listener.listening = true;
@@ -164,9 +172,10 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
     if (listener.listening === false) {
       if (LOG_MESSAGE_LISTENERS) {
         log.log(
-            "Lazily adding message listener for \"" +
-            listener.messageName + "\". Environment: \"" +
-            self.environment.name + "\"");
+            `Lazily adding message listener for "${
+              listener.messageName}". Environment: "${
+              self.environment.name}"`
+        );
       }
       self.mm.addMessageListener(listener.messageID, listener.callback);
       listener.listening = true;
@@ -189,7 +198,8 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     // }
     if (LOG_MESSAGE_LISTENERS) {
       log.log(
-          "Removing message listener for \"" + listener.messageName + "\".");
+          `Removing message listener for "${listener.messageName}".`
+      );
     }
     // try {
     self.mm.removeMessageListener(listener.messageID, listener.callback);

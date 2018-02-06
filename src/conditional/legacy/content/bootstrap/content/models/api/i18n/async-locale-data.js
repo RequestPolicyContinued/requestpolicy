@@ -64,15 +64,17 @@ export class AsyncLocaleData extends LocaleData {
    */
   getDefaultLocale() {
     const manifestUrl = ChromeFilesUtils.getChromeUrl(
-      "content/bootstrap/data/manifest.json");
+        "content/bootstrap/data/manifest.json"
+    );
 
-    return ChromeFilesUtils.parseJSON(manifestUrl).then(manifest => {
+    return ChromeFilesUtils.parseJSON(manifestUrl).then((manifest) => {
       if (manifest && manifest.default_locale) {
         let bcp47tag = I18nUtils.normalizeToBCP47(manifest.default_locale);
         return Promise.resolve(bcp47tag);
       } else {
         return Promise.reject(
-          new Error("'default_locale' key not found in manifest.json"));
+            new Error("'default_locale' key not found in manifest.json")
+        );
       }
     });
   }
@@ -87,13 +89,17 @@ export class AsyncLocaleData extends LocaleData {
     // During build, a JSON file containing all available locales should be
     // generated.
     const localesListJSON = ChromeFilesUtils.getChromeUrl(
-      "content/bootstrap/data/locales.json");
+        "content/bootstrap/data/locales.json"
+    );
 
-    return ChromeFilesUtils.parseJSON(localesListJSON)
-      .then(localesDirNames => {
-        return Promise.all(localesDirNames.map(dirName =>
-          [I18nUtils.normalizeToBCP47(dirName), dirName]));
-      }).then(mapAsArray => new Map(mapAsArray));
+    return ChromeFilesUtils.parseJSON(
+        localesListJSON
+    ).then((localesDirNames) => Promise.all(
+        localesDirNames.map((dirName) => [
+          I18nUtils.normalizeToBCP47(dirName),
+          dirName,
+        ])
+    )).then((mapAsArray) => new Map(mapAsArray));
   }
 
   /**
@@ -130,14 +136,14 @@ export class AsyncLocaleData extends LocaleData {
    * @return {Promise}
    */
   loadLocalesMessages(localesMap) {
-    return Promise.all(Array.from(localesMap.keys()).map(key => {
+    return Promise.all(Array.from(localesMap.keys()).map((key) => {
       let dir = localesMap.get(key);
       let file = `content/_locales/${dir}/messages.json`;
       const url = ChromeFilesUtils.getChromeUrl(file);
 
-      return ChromeFilesUtils.parseJSON(url).then(messages => {
-        return Promise.resolve({"locale": key, "messages": messages});
-      });
+      return ChromeFilesUtils.parseJSON(url).then(
+          (messages) => Promise.resolve({"locale": key, "messages": messages})
+      );
     }));
   }
 
@@ -153,9 +159,9 @@ export class AsyncLocaleData extends LocaleData {
     let normDefault = I18nUtils.normalizeToBCP47(defaultLocale);
     let normUi = I18nUtils.normalizeToBCP47(uiLocale);
 
-    let loadedTags = Array.from(this.messages.keys()).filter(tag =>
-      tag.toLowerCase() !== this.BUILTIN.toLowerCase()).map(tag =>
-      I18nUtils.normalizeToBCP47(tag));
+    let loadedTags = Array.from(this.messages.keys()).
+        filter((tag) => tag.toLowerCase() !== this.BUILTIN.toLowerCase()).
+        map((tag) => I18nUtils.normalizeToBCP47(tag));
 
     let bestDefault = I18nUtils.getBestAvailableLocale(loadedTags, normDefault);
     if (!bestDefault) {
@@ -182,21 +188,25 @@ export class AsyncLocaleData extends LocaleData {
     let defaultLocale;
     let uiLocale;
 
-    const p = this.getDefaultLocale()
-      .then(result => defaultLocale = result)
-      .then(() => uiLocale = this.getAppLocale())
-      .then(() => this.getAvailableLocales())
-      .then(AllLocales => this.getBestMatches([defaultLocale, uiLocale],
-        AllLocales))
-      .then(bestMatches => this.loadLocalesMessages(bestMatches))
-      .then(localesMessages => Promise.all(localesMessages.map(
-        obj => this.addLocale(obj.locale, obj.messages)))
-      ).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale))
-      .then(() => {
-        this.dReady.resolve();
-        this.ready = true;
-        return;
-      });
+    const p = this.getDefaultLocale().
+        then((result) => defaultLocale = result).
+        then(() => uiLocale = this.getAppLocale()).
+        then(() => this.getAvailableLocales()).
+        then((AllLocales) => this.getBestMatches(
+            [defaultLocale, uiLocale],
+            AllLocales
+        )).
+        then((bestMatches) => this.loadLocalesMessages(bestMatches)).
+        then((localesMessages) => Promise.all(
+            localesMessages.map(
+                (obj) => this.addLocale(obj.locale, obj.messages)
+            )
+        )).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale)).
+        then(() => {
+          this.dReady.resolve();
+          this.ready = true;
+          return;
+        });
     p.catch((e) => {
       console.error("LazyLocaleData.startup()");
       console.dir(e);

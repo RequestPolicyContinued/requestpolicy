@@ -54,12 +54,12 @@ PrefBranch.prototype.getAll = function() {
 };
 
 PrefBranch.prototype.get = function(aPrefName) {
-  let getterFnName = "get" + this._type(aPrefName);
+  let getterFnName = `get${this._type(aPrefName)}`;
   return this.branch[getterFnName](aPrefName);
 };
 
 PrefBranch.prototype.set = function(aPrefName, aValue) {
-  let setterFnName = "set" + this._type(aPrefName);
+  let setterFnName = `set${this._type(aPrefName)}`;
   return this.branch[setterFnName](aPrefName, aValue);
 };
 

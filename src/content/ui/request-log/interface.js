@@ -52,10 +52,11 @@ export function loadRLInterfaceIntoWindow(window) {
   requestLog.copyToClipboard = function(columnName) {
     const content = requestLog.treeView.getCellText(
         requestLog.tree.currentIndex,
-        requestLog.tree.columns.getNamedColumn(columnName));
+        requestLog.tree.columns.getNamedColumn(columnName)
+    );
 
-    const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-        .getService(Ci.nsIClipboardHelper);
+    const clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"].
+        getService(Ci.nsIClipboardHelper);
     clipboardHelper.copyString(content);
   };
 
@@ -68,7 +69,8 @@ export function loadRLInterfaceIntoWindow(window) {
   requestLog.openInNewTab = function(columnName) {
     const content = requestLog.treeView.getCellText(
         requestLog.tree.currentIndex,
-        requestLog.tree.columns.getNamedColumn(columnName));
+        requestLog.tree.columns.getNamedColumn(columnName)
+    );
 
     let forbidden = true;
     try {
@@ -84,7 +86,8 @@ export function loadRLInterfaceIntoWindow(window) {
     if (forbidden) {
       const alertTitle = browser.i18n.getMessage("actionForbidden");
       const alertText = browser.i18n.getMessage(
-        "urlCanOnlyBeCopiedToClipboard");
+          "urlCanOnlyBeCopiedToClipboard"
+      );
       Services.prompt.alert(null, alertTitle, alertText);
       return;
     }

@@ -25,8 +25,8 @@
 /* global Components */
 
 (function() {
-  let {FakeWebExt} = Components.utils.import(
-      "chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
+  let {FakeWebExt} = Components.utils.
+      import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {});
 
   let cfmm = Function("return this")(); // ContentFrameMessageManager
 

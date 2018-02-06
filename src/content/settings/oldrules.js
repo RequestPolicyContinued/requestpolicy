@@ -55,7 +55,7 @@ import {$id} from "./common";
     for (var i = 0; i < rules.length; i++) {
       var entry = rules[i];
       var origin = entry.o ?
-                   RuleUtils.endpointSpecToDisplayString(entry.o) : "";
+        RuleUtils.endpointSpecToDisplayString(entry.o) : "";
       var dest = entry.d ? RuleUtils.endpointSpecToDisplayString(entry.d) : "";
       addRulesTableRow(table, "allow", origin, dest, entry);
     }
@@ -75,9 +75,9 @@ import {$id} from "./common";
     var row = $("<tr>").addClass(actionClass).appendTo(table);
 
     row.append(
-      $("<td>").text(action),
-      $("<td>").text(origin),
-      $("<td>").text(dest)
+        $("<td>").text(action),
+        $("<td>").text(origin),
+        $("<td>").text(dest)
     );
   }
 

@@ -36,14 +36,15 @@ describe("Log", () => {
         log[fnName]("test");
 
         const expectedArgs = [
-          C.LOG_PREFIX + "test",
+          `${C.LOG_PREFIX}test`,
         ];
         assert.strictEqual(spiedFn.callCount, 1,
             `console.${fnName} called once`);
         assert.deepEqual(
             spiedFn.getCall(0).args,
             expectedArgs,
-            `console.${fnName} called with "${expectedArgs[0]}"`);
+            `console.${fnName} called with "${expectedArgs[0]}"`
+        );
       });
     }
 
@@ -68,14 +69,15 @@ describe("Log", () => {
         extendedLogger[fnName]("test");
 
         const expectedArgs = [
-          C.LOG_PREFIX + "[testname] test",
+          `${C.LOG_PREFIX}[testname] test`,
         ];
         assert(spiedFn.calledOnce,
             `console.${fnName} called once`);
         assert.deepEqual(
             spiedFn.getCall(0).args,
             expectedArgs,
-            `console.${fnName} called with "${expectedArgs[0]}"`);
+            `console.${fnName} called with "${expectedArgs[0]}"`
+        );
       });
     }
 
@@ -96,16 +98,19 @@ describe("Log", () => {
 
         const expectedCallCount = isCalled ? 1 : 0;
 
-        assert.equal(spiedFn.callCount, expectedCallCount,
-          `console.${fnName} ${isCalled ? "called once" : "not called"}`);
+        assert.equal(
+            spiedFn.callCount, expectedCallCount,
+            `console.${fnName} ${isCalled ? "called once" : "not called"}`
+        );
         if (isCalled) {
           const expectedArgs = [
-            C.LOG_PREFIX + "test",
+            `${C.LOG_PREFIX}test`,
           ];
           assert.deepEqual(
               spiedFn.getCall(0).args,
               expectedArgs,
-              `console.${fnName} called with "${expectedArgs[0]}"`);
+              `console.${fnName} called with "${expectedArgs[0]}"`
+          );
         }
       });
     }

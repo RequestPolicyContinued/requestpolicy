@@ -41,7 +41,7 @@ function createErrorTriggeringService() {
   const isMainEnvironment =
       typeof browser.extension.getBackgroundPage === "function";
   const where = isMainEnvironment ? "backgroundscript" : "contentscript";
-  const topic = "requestpolicy-trigger-error-" + where;
+  const topic = `requestpolicy-trigger-error-${where}`;
 
   const observer = {
     observe(aSubject, aTopic, aData) {
@@ -55,7 +55,7 @@ function createErrorTriggeringService() {
         Promise.resolve().then(() => {
           produceReferenceError();
           return;
-        }).catch(e => {
+        }).catch((e) => {
           console.error(e);
         });
       }
@@ -104,8 +104,10 @@ function createErrorTriggeringService() {
 
   function runAsync(aFunction) {
     const runnable = {run: aFunction};
-    Services.tm.currentThread.dispatch(runnable,
-        Ci.nsIEventTarget.DISPATCH_NORMAL);
+    Services.tm.currentThread.dispatch(
+        runnable,
+        Ci.nsIEventTarget.DISPATCH_NORMAL
+    );
   }
 
   return self;

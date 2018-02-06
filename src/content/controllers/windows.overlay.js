@@ -34,6 +34,7 @@ export const OverlayController = (function() {
 
   self.loadIntoWindow = function(window) {
     // create a scope variable
+    // eslint-disable-next-line no-param-reassign
     window.rpcontinued = {};
 
     loadOverlayIntoWindow(window);
@@ -56,6 +57,7 @@ export const OverlayController = (function() {
     // Remove the scope variable.
     // This wouldn't be needed when the window is closed, but this has to be
     // done when RP is being disabled.
+    // eslint-disable-next-line no-param-reassign
     delete window.rpcontinued;
   };
 

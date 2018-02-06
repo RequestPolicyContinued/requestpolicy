@@ -24,7 +24,7 @@
 import {Log} from "content/models/log";
 import {PolicyManager} from "content/lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
-     SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
+  SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
 import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 
 const log = Log.instance;
@@ -44,10 +44,11 @@ function loadSubscriptionRules() {
       "subscriptions"
   ).then((result) => {
     const rawData = result.hasOwnProperty("subscriptions") ?
-        result.subscriptions : undefined;
+      result.subscriptions : undefined;
     subscriptions = UserSubscriptions.create(rawData);
     return PolicyManager.loadSubscriptionRules(
-        subscriptions.getSubscriptionInfo());
+        subscriptions.getSubscriptionInfo()
+    );
   }).then(({failures}) => {
     // TODO: check a preference that indicates the last time we checked for
     // updates. Don't do it if we've done it too recently.
@@ -71,7 +72,7 @@ function loadSubscriptionRules() {
       }
     }
     function updateCompleted(result) {
-      log.info("Subscription updates completed: " + result);
+      log.info(`Subscription updates completed: ${result}`);
     }
     subscriptions.update(updateCompleted, serials);
     return;
@@ -101,7 +102,7 @@ export const rpService = {
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        log.log("XXX updated: " + data);
+        log.log(`XXX updated: ${data}`);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
@@ -111,7 +112,7 @@ export const rpService = {
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        log.log("XXX added: " + data);
+        log.log(`XXX added: ${data}`);
         let subInfo = JSON.parse(data);
         const pLoadSubscriptionRules = PolicyManager.
             loadSubscriptionRules(subInfo);
@@ -128,7 +129,7 @@ export const rpService = {
               }
             }
             let updateCompleted = function(result) {
-              log.info("Subscription update completed: " + result);
+              log.info(`Subscription update completed: ${result}`);
             };
             subscriptions.update(updateCompleted, serials);
           }
@@ -140,14 +141,14 @@ export const rpService = {
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        log.log("YYY: " + data);
+        log.log(`YYY: ${data}`);
         let subInfo = JSON.parse(data);
         PolicyManager.unloadSubscriptionRules(subInfo);
         break;
       }
 
       default:
-        console.error("unknown topic observed: " + topic);
+        console.error(`unknown topic observed: ${topic}`);
     }
   },
 };

@@ -37,11 +37,11 @@ describe("AsyncLocaleData", function() {
     let mockHttp = {httpRequest: function(url, option) {}};
     let mockServices = new MockServices();
 
-    sinon.stub(mockComp.utils, "import")
-      .withArgs("resource://gre/modules/NetUtil.jsm")
-      .returns({NetUtil: mockNu})
-      .withArgs("resource://gre/modules/Http.jsm")
-      .returns(mockHttp);
+    sinon.stub(mockComp.utils, "import").
+        withArgs("resource://gre/modules/NetUtil.jsm").
+        returns({NetUtil: mockNu}).
+        withArgs("resource://gre/modules/Http.jsm").
+        returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;
@@ -125,38 +125,38 @@ describe("AsyncLocaleData", function() {
 
   describe("getDefaultLocale()", function() {
     it("Should return value from manifest.json", function() {
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
-        .resolves({default_locale: "zh"});
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          resolves({default_locale: "zh"});
 
       let promise = asyncLocaleData.getDefaultLocale();
-      return expect(promise).to.be.eventually.fulfilled
-        .with.a("string").which.equal("zh");
+      return expect(promise).to.be.eventually.fulfilled.
+          with.a("string").which.equal("zh");
     });
 
     it("Should return a normalized BCP 47 tag", function() {
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
-        .resolves({default_locale: "fr_CA"});
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          resolves({default_locale: "fr_CA"});
 
       let promise = asyncLocaleData.getDefaultLocale();
-      return expect(promise).to.be.eventually.fulfilled
-        .with.a("string").which.equal("fr-ca");
+      return expect(promise).to.be.eventually.fulfilled.
+          with.a("string").which.equal("fr-ca");
     });
 
     it("Should reject if default_locale isn't present", function() {
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
-        .resolves({name: "RPC"});
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          resolves({name: "RPC"});
 
       let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.rejectedWith(Error);
     });
 
     it("Should reject if can't parse manifest.json", function() {
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json")
-        .rejects();
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/bootstrap/data/manifest.json").
+          rejects();
 
       let promise = asyncLocaleData.getDefaultLocale();
       return expect(promise).to.be.eventually.rejectedWith(Error);
@@ -167,19 +167,19 @@ describe("AsyncLocaleData", function() {
     it("Should return a map of available locales", function() {
       ChromeFilesUtils.parseJSON.resolves(["fr", "en"]);
       let promise = asyncLocaleData.getAvailableLocales();
-      return expect(promise).to.be.eventually.fulfilled
-        .with.a("map").which.have.all.keys("fr", "en")
-        .and.include("fr")
-        .and.include("en");
+      return expect(promise).to.be.eventually.fulfilled.
+          with.a("map").which.have.all.keys("fr", "en").
+          and.include("fr").
+          and.include("en");
     });
 
     it("Should normalize tag", function() {
       ChromeFilesUtils.parseJSON.resolves(["Fr_fR", "eN_Us"]);
       let promise = asyncLocaleData.getAvailableLocales();
-      return expect(promise).to.be.eventually.fulfilled
-        .with.a("map").which.have.all.keys("fr-fr", "en-us")
-        .and.include("Fr_fR")
-        .and.include("eN_Us");
+      return expect(promise).to.be.eventually.fulfilled.
+          with.a("map").which.have.all.keys("fr-fr", "en-us").
+          and.include("Fr_fR").
+          and.include("eN_Us");
     });
 
     it("Should be rejected on parseJSON rejection", function() {
@@ -202,20 +202,20 @@ describe("AsyncLocaleData", function() {
 
     it("Should return only requested locales", function() {
       let result = asyncLocaleData.getBestMatches(["fr", "en-us"], localesMap);
-      return expect(result).to.be.a("map")
-        .which.have.all.keys("fr", "en-us")
-        .and.include("fr")
-        .and.include("en_US")
-        .and.to.not.have.any.keys("de");
+      return expect(result).to.be.a("map").
+          which.have.all.keys("fr", "en-us").
+          and.include("fr").
+          and.include("en_US").
+          and.to.not.have.any.keys("de");
     });
 
     it("Should return best match", function() {
       let result = asyncLocaleData.getBestMatches(["fr-FR", "en-us"], localesMap);
-      return expect(result).to.be.a("map")
-        .which.have.all.keys("fr", "en-us")
-        .and.include("fr")
-        .and.include("en_US")
-        .and.to.not.have.any.keys("de");
+      return expect(result).to.be.a("map").
+          which.have.all.keys("fr", "en-us").
+          and.include("fr").
+          and.include("en_US").
+          and.to.not.have.any.keys("de");
     });
 
     it("Shouldn't return duplicates", function() {
@@ -232,25 +232,25 @@ describe("AsyncLocaleData", function() {
   describe("loadLocalesMessages(localesMap)", function() {
     it("Should load all requested locale", function() {
       let localesMap = new Map([["fr", "fr"], ["en-us", "en_US"]]);
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/_locales/fr/messages.json")
-        .resolves("des messages")
-        .withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json")
-        .resolves("some messages");
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/_locales/fr/messages.json").
+          resolves("des messages").
+          withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json").
+          resolves("some messages");
       let promise = asyncLocaleData.loadLocalesMessages(localesMap);
-      return expect(promise).to.be.eventually.fulfilled
-        .with.an("array")
-        .which.deep.include({locale: "fr", messages: "des messages"})
-        .and.deep.include({locale: "en-us", messages: "some messages"});
+      return expect(promise).to.be.eventually.fulfilled.
+          with.an("array").
+          which.deep.include({locale: "fr", messages: "des messages"}).
+          and.deep.include({locale: "en-us", messages: "some messages"});
     });
 
     it("Should be rejected if JSON parsing fails", function() {
       let localesMap = new Map([["fr", "fr"], ["en-us", "en_US"]]);
-      ChromeFilesUtils.parseJSON
-        .withArgs("chrome://rpcontinued/content/_locales/fr/messages.json")
-        .resolves("des messages")
-        .withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json")
-        .rejects();
+      ChromeFilesUtils.parseJSON.
+          withArgs("chrome://rpcontinued/content/_locales/fr/messages.json").
+          resolves("des messages").
+          withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json").
+          rejects();
 
       let promise = asyncLocaleData.loadLocalesMessages(localesMap);
       return expect(promise).to.be.eventually.rejectedWith(Error);

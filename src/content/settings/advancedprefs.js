@@ -102,7 +102,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "prefetch.link.disableOnStartup": event.target.checked,
           });
-        });
+        }
+    );
 
     elManager.addListener(
         $id("pref-prefetch.link.restoreDefaultOnUninstall"), "change",
@@ -110,12 +111,15 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "prefetch.link.restoreDefaultOnUninstall": event.target.checked,
           });
-        });
+        }
+    );
 
     // DNS prefetch.
     elManager.addListener($id("pref-dnsPrefetch"), "change", function(event) {
-      LegacyApi.prefs.set("root/ network.dns.disablePrefetch",
-          !event.target.checked);
+      LegacyApi.prefs.set(
+          "root/ network.dns.disablePrefetch",
+          !event.target.checked
+      );
       LegacyApi.prefs.save();
     });
 
@@ -125,7 +129,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "prefetch.dns.disableOnStartup": event.target.checked,
           });
-        });
+        }
+    );
 
     elManager.addListener(
         $id("pref-prefetch.dns.restoreDefaultOnUninstall"), "change",
@@ -133,15 +138,20 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "prefetch.dns.restoreDefaultOnUninstall": event.target.checked,
           });
-        });
+        }
+    );
 
     // Speculative pre-connections.
-    elManager.addListener($id("pref-speculativePreConnections"), "change",
+    elManager.addListener(
+        $id("pref-speculativePreConnections"), "change",
         function(event) {
-      LegacyApi.prefs.set("root/ network.http.speculative-parallel-limit",
-          event.target.checked ? 6 : 0);
-      LegacyApi.prefs.save();
-    });
+          LegacyApi.prefs.set(
+              "root/ network.http.speculative-parallel-limit",
+              event.target.checked ? 6 : 0
+          );
+          LegacyApi.prefs.save();
+        }
+    );
 
     elManager.addListener(
         $id("pref-prefetch.preconnections.disableOnStartup"), "change",
@@ -149,7 +159,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "prefetch.preconnections.disableOnStartup": event.target.checked,
           });
-        });
+        }
+    );
 
     elManager.addListener(
         $id("pref-prefetch.preconnections.restoreDefaultOnUninstall"), "change",
@@ -158,7 +169,8 @@ import {WinEnv, elManager, $id} from "./common";
             "prefetch.preconnections.restoreDefaultOnUninstall":
                 event.target.checked,
           });
-        });
+        }
+    );
 
     var sortingListener = function(event) {
       Storage.set({"menu.sorting": event.target.value});
@@ -173,7 +185,8 @@ import {WinEnv, elManager, $id} from "./common";
           Storage.set({
             "menu.info.showNumRequests": event.target.checked,
           });
-        });
+        }
+    );
 
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListeners([

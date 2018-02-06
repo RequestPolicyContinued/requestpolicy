@@ -47,14 +47,16 @@ export class ObserverManager {
           () => {
             // unregister when the environment shuts down
             this.unregisterAllObservers();
-          });
+          }
+      );
     } else {
       // aEnv is not defined! Try to report an error.
       if (log) {
         log.warn(
             "No Environment was specified for " +
             "a new ObserverManager! This means that the observers " +
-            "won't be unregistered!");
+            "won't be unregistered!"
+        );
       }
     }
 

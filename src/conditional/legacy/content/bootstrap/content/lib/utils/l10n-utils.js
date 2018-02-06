@@ -26,7 +26,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
- /*
+/*
   * Original file from https://github.com/piroor/webextensions-lib-l10n
   */
 
@@ -47,18 +47,21 @@ export function matchKeyPattern(aString) {
 }
 
 export function updateString(i18n, aString) {
-  return aString.replace(MSG_REGEXP, (matched, message) => {
-    return i18n.getMessage(message, [], {defaultValue: matched});
-  });
+  return aString.replace(
+      MSG_REGEXP,
+      (matched, message) => i18n.getMessage(
+          message, [], {defaultValue: matched}
+      )
+  );
 }
 
 export function updateDocument(i18n, document) {
   let texts = document.evaluate(
-    "descendant::text()[contains(self::text(), \"__MSG_\")]",
-    document,
-    null,
-    7, // XPathResult.ORDERED_NODE_SNAPSHOT_TYPE
-    null
+      "descendant::text()[contains(self::text(), \"__MSG_\")]",
+      document,
+      null,
+      7, // XPathResult.ORDERED_NODE_SNAPSHOT_TYPE
+      null
   );
   for (let i = 0, maxi = texts.snapshotLength; i < maxi; i++) {
     let text = texts.snapshotItem(i);
@@ -66,11 +69,11 @@ export function updateDocument(i18n, document) {
   }
 
   let attributes = document.evaluate(
-    "descendant::*/attribute::*[contains(., \"__MSG_\")]",
-    document,
-    null,
-    7, // XPathResult.ORDERED_NODE_SNAPSHOT_TYPE
-    null
+      "descendant::*/attribute::*[contains(., \"__MSG_\")]",
+      document,
+      null,
+      7, // XPathResult.ORDERED_NODE_SNAPSHOT_TYPE
+      null
   );
   for (let i = 0, maxi = attributes.snapshotLength; i < maxi; i++) {
     let attribute = attributes.snapshotItem(i);

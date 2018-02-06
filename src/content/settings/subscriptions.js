@@ -34,8 +34,7 @@ import {WinEnv, elManager} from "./common";
   // ===========================================================================
 
   function getInputElement(subName) {
-    var elements = document.body.querySelectorAll(
-        "input[name=" + subName + "]");
+    var elements = document.body.querySelectorAll(`input[name=${subName}]`);
     if (elements.length <= 0) {
       return null;
     }
@@ -48,9 +47,9 @@ import {WinEnv, elManager} from "./common";
     for (var i = 0, len = divs.length; i < len; ++i) {
       var div = divs[i];
       elements.push({
-          id: div.id,
-          div: div,
-          input: getInputElement(div.id)});
+        id: div.id,
+        div: div,
+        input: getInputElement(div.id)});
     }
     return elements;
   }
@@ -75,12 +74,16 @@ import {WinEnv, elManager} from "./common";
     subInfo.official[subName] = true;
     if (enabled) {
       userSubs.addSubscription("official", subName);
-      Services.obs.notifyObservers(null, SUBSCRIPTION_ADDED_TOPIC,
-            JSON.stringify(subInfo));
+      Services.obs.notifyObservers(
+          null, SUBSCRIPTION_ADDED_TOPIC,
+          JSON.stringify(subInfo)
+      );
     } else {
       userSubs.removeSubscription("official", subName);
-      Services.obs.notifyObservers(null, SUBSCRIPTION_REMOVED_TOPIC,
-            JSON.stringify(subInfo));
+      Services.obs.notifyObservers(
+          null, SUBSCRIPTION_REMOVED_TOPIC,
+          JSON.stringify(subInfo)
+      );
     }
   }
 
@@ -98,7 +101,7 @@ import {WinEnv, elManager} from "./common";
     for (var subName in available) {
       var el = getInputElement(subName);
       if (!el) {
-        log.log("Skipping unexpected official subName: " + subName);
+        log.log(`Skipping unexpected official subName: ${subName}`);
         continue;
       }
       elManager.addListener(el, "change", handleSubscriptionCheckboxChange);

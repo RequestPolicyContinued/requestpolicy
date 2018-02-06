@@ -30,7 +30,7 @@ export const RequestReason = {
   SubscriptionPolicy: 2,
   DefaultPolicy: 3,
   DefaultPolicyInconsistentRules: 4,
-      // if there are allow _and_ deny rules for the same request
+  // if there are allow _and_ deny rules for the same request
   DefaultSameDomain: 5,
   Compatibility: 6,
 
@@ -43,7 +43,7 @@ export const RequestReason = {
   IdenticalIdentifier: 13,
 
   RelativeUrl: 14,
-      // TODO: give user control about relative urls on the page
+  // TODO: give user control about relative urls on the page
 };
 
 // =============================================================================

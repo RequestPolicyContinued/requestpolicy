@@ -59,12 +59,16 @@ export const RPContentPolicy = (function() {
   function register() {
     // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
-        registerFactory(self.classID, self.classDescription, self.contractID,
-            self);
+        registerFactory(
+            self.classID, self.classDescription, self.contractID,
+            self
+        );
 
     for (let category of XPCOM_CATEGORIES) {
-      catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
-          true);
+      catMan.addCategoryEntry(
+          category, self.contractID, self.contractID, false,
+          true
+      );
     }
   }
 
@@ -82,7 +86,8 @@ export const RPContentPolicy = (function() {
             console.dir(e);
           }
         }
-      });
+      }
+  );
 
   let unregister = (function() {
     return function() {
@@ -139,16 +144,16 @@ export const RPContentPolicy = (function() {
   })();
 
   MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
-                                         unregister);
+      unregister);
 
   // ---------------------------------------------------------------------------
   // nsISupports interface implementation
   // ---------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIContentPolicy,
-                                               Ci.nsIObserver,
-                                               Ci.nsIFactory,
-                                               Ci.nsISupportsWeakReference]);
+    Ci.nsIObserver,
+    Ci.nsIFactory,
+    Ci.nsISupportsWeakReference]);
 
   // ---------------------------------------------------------------------------
   // nsIContentPolicy interface implementation
@@ -156,11 +161,14 @@ export const RPContentPolicy = (function() {
 
   // https://developer.mozilla.org/en/nsIContentPolicy
 
-  self.shouldLoad = function(aContentType, aContentLocation, aRequestOrigin,
-      aContext, aMimeTypeGuess, aExtra, aRequestPrincipal) {
+  self.shouldLoad = function(
+      aContentType, aContentLocation, aRequestOrigin,
+      aContext, aMimeTypeGuess, aExtra, aRequestPrincipal
+  ) {
     const request = new NormalRequest(
         aContentType, aContentLocation, aRequestOrigin, aContext,
-        aMimeTypeGuess, aExtra, aRequestPrincipal);
+        aMimeTypeGuess, aExtra, aRequestPrincipal
+    );
     return RequestProcessor.process(request);
     // TODO: implement the following
     // return request.shouldLoad(aContentType, aContentLocation, aRequestOrigin,
@@ -205,12 +213,16 @@ export const RPChannelEventSink = (function() {
   function register() {
     // eslint-disable-next-line new-cap
     Cm.QueryInterface(Ci.nsIComponentRegistrar).
-        registerFactory(self.classID, self.classDescription, self.contractID,
-            self);
+        registerFactory(
+            self.classID, self.classDescription, self.contractID,
+            self
+        );
 
     for (let category of XPCOM_CATEGORIES) {
-      catMan.addCategoryEntry(category, self.contractID, self.contractID, false,
-          true);
+      catMan.addCategoryEntry(
+          category, self.contractID, self.contractID, false,
+          true
+      );
     }
   }
 
@@ -228,7 +240,8 @@ export const RPChannelEventSink = (function() {
             console.dir(e);
           }
         }
-      });
+      }
+  );
 
   let unregister = (function() {
     return function unregister() {
@@ -257,9 +270,9 @@ export const RPChannelEventSink = (function() {
   // ---------------------------------------------------------------------------
 
   self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIChannelEventSink,
-                                               Ci.nsIObserver,
-                                               Ci.nsIFactory,
-                                               Ci.nsISupportsWeakReference]);
+    Ci.nsIObserver,
+    Ci.nsIFactory,
+    Ci.nsISupportsWeakReference]);
 
   // ---------------------------------------------------------------------------
   // nsIChannelEventSink interface implementation
@@ -274,8 +287,10 @@ export const RPChannelEventSink = (function() {
    * @param  {integer} aFlags
    * @param  {nsIAsyncVerifyRedirectCallback} aCallback
    */
-  self.asyncOnChannelRedirect = function(aOldChannel, aNewChannel, aFlags,
-      aCallback) {
+  self.asyncOnChannelRedirect = function(
+      aOldChannel, aNewChannel, aFlags,
+      aCallback
+  ) {
     let request = new RedirectRequest(aOldChannel, aNewChannel, aFlags);
     let rv = RequestProcessor.processUrlRedirection(request);
     let result = rv === CP_REJECT ? CES_REJECT : CES_ACCEPT;

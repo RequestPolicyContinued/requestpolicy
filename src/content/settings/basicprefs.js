@@ -63,7 +63,8 @@ import {WinEnv, elManager, $id} from "./common";
             "indicateBlockedObjects": event.target.checked,
           });
           updateDisplay();
-        });
+        }
+    );
 
     elManager.addListener(
         $id("pref-dontIndicateBlacklistedObjects"), "change",
@@ -72,7 +73,8 @@ import {WinEnv, elManager, $id} from "./common";
             "indicateBlacklistedObjects": !event.target.checked,
           });
           updateDisplay();
-        });
+        }
+    );
 
     elManager.addListener($id("pref-autoReload"), "change", function(event) {
       Storage.set({"autoReload": event.target.checked});
@@ -86,7 +88,8 @@ import {WinEnv, elManager, $id} from "./common";
             "privateBrowsingPermanentWhitelisting": event.target.checked,
           });
           updateDisplay();
-        });
+        }
+    );
 
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListener("", updateDisplay);

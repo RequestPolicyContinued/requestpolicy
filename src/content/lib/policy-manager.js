@@ -74,9 +74,9 @@ export const PolicyManager = {
   loadUserRules() {
     log.info("loadUserRules loading user rules");
     const pRawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
-    pRawRuleset.then((rawRuleset) => {
-      this.userRulesetExistedOnStartup = !!rawRuleset;
-      if (!rawRuleset) rawRuleset = RawRuleset.create();
+    pRawRuleset.then((aRawRuleset) => {
+      this.userRulesetExistedOnStartup = !!aRawRuleset;
+      const rawRuleset = aRawRuleset || RawRuleset.create();
       userRulesets.user = {
         "rawRuleset": rawRuleset,
         "ruleset": rawRuleset.toRuleset("user"),
@@ -142,8 +142,7 @@ export const PolicyManager = {
 
     for (let listName in subscriptionInfo) {
       for (let subName in subscriptionInfo[listName]) {
-        log.info("unloadSubscriptionRules: " +
-                 listName + " / " + subName);
+        log.info(`unloadSubscriptionRules: ${listName} / ${subName}`);
         if (!subscriptionRulesets[listName] ||
             !subscriptionRulesets[listName][subName]) {
           if (!failures[listName]) {
@@ -166,7 +165,7 @@ export const PolicyManager = {
     if (ruleAction !== C.RULE_ACTION_ALLOW &&
         ruleAction !== C.RULE_ACTION_DENY) {
       // eslint-disable-next-line no-throw-literal
-      throw "Invalid rule type: " + ruleAction;
+      throw `Invalid rule type: ${ruleAction}`;
     }
   },
 
@@ -189,14 +188,17 @@ export const PolicyManager = {
   },
 
   addRule(ruleAction, ruleData, noStore) {
-    log.info("addRule " + ruleAction + " " +
-        Ruleset.rawRuleToCanonicalString(ruleData));
+    log.info(
+        `addRule ${ruleAction} ${Ruleset.rawRuleToCanonicalString(ruleData)}`
+    );
     // userRulesets.user.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets.user.rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets.user.ruleset);
+    userRulesets.user.rawRuleset.addRule(
+        ruleAction, ruleData,
+        userRulesets.user.ruleset
+    );
 
     // TODO: only save if we actually added a rule. This will require
     // modifying |RawRuleset.addRule()| to indicate whether a rule
@@ -205,7 +207,8 @@ export const PolicyManager = {
     // become annoying when there is a large file to write.
     if (!noStore) {
       RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user");
+          userRulesets.user.rawRuleset, "user"
+      );
     }
 
     // userRulesets.user.ruleset.print();
@@ -224,18 +227,21 @@ export const PolicyManager = {
 
   storeRules() {
     RulesetStorage.saveRawRulesetToFile(
-        userRulesets.user.rawRuleset, "user");
+        userRulesets.user.rawRuleset, "user"
+    );
   },
 
   addTemporaryRule(ruleAction, ruleData) {
-    log.info("addTemporaryRule " + ruleAction + " " +
-        Ruleset.rawRuleToCanonicalString(ruleData));
+    log.info(`addTemporaryRule ${ruleAction} ${
+      Ruleset.rawRuleToCanonicalString(ruleData)}`);
     // userRulesets.temp.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets.temp.rawRuleset.addRule(ruleAction, ruleData,
-          userRulesets.temp.ruleset);
+    userRulesets.temp.rawRuleset.addRule(
+        ruleAction, ruleData,
+        userRulesets.temp.ruleset
+    );
 
     // userRulesets.temp.ruleset.print();
 
@@ -243,18 +249,22 @@ export const PolicyManager = {
   },
 
   removeRule(ruleAction, ruleData, noStore) {
-    log.info("removeRule " + ruleAction + " " +
-        Ruleset.rawRuleToCanonicalString(ruleData));
+    log.info(`removeRule ${ruleAction} ${
+      Ruleset.rawRuleToCanonicalString(ruleData)}`);
     // userRulesets.user.ruleset.print();
     // userRulesets.temp.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    userRulesets.user.rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets.user.ruleset);
-    userRulesets.temp.rawRuleset.removeRule(ruleAction, ruleData,
-          userRulesets.temp.ruleset);
+    userRulesets.user.rawRuleset.removeRule(
+        ruleAction, ruleData,
+        userRulesets.user.ruleset
+    );
+    userRulesets.temp.rawRuleset.removeRule(
+        ruleAction, ruleData,
+        userRulesets.temp.ruleset
+    );
 
     // TODO: only save if we actually removed a rule. This will require
     // modifying |RawRuleset.removeRule()| to indicate whether a rule
@@ -263,7 +273,8 @@ export const PolicyManager = {
     // become annoying when there is a large file to write.
     if (!noStore) {
       RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user");
+          userRulesets.user.rawRuleset, "user"
+      );
     }
 
     // userRulesets.user.ruleset.print();
@@ -301,7 +312,7 @@ export const PolicyManager = {
     return result;
   },
 
-  checkRequest(origin, dest, aRuleset, result) {
+  checkRequest(origin, dest, aRuleset, aResult) {
     if (!(origin instanceof Ci.nsIURI)) {
       // eslint-disable-next-line no-throw-literal
       throw "Origin must be an nsIURI.";
@@ -310,9 +321,7 @@ export const PolicyManager = {
       // eslint-disable-next-line no-throw-literal
       throw "Destination must be an nsIURI.";
     }
-    if (!result) {
-      result = new RequestResult();
-    }
+    const result = aResult || new RequestResult();
     for (let name in aRuleset) {
       let {ruleset} = aRuleset[name];
       // ruleset.setPrintFunction(print);

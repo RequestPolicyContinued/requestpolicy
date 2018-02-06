@@ -38,11 +38,11 @@ export const LogController = {
     browser.storage.local.get([
       "log",
       "log.level",
-    ]).then(result => {
+    ]).then((result) => {
       log.setEnabled(result.log);
       log.setLevel(result["log.level"]);
       return;
-    }).catch(e => {
+    }).catch((e) => {
       log.error("Error initializing the Log:", e);
     });
 

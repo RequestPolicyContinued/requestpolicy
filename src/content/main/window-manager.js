@@ -24,7 +24,7 @@ import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
 import {Windows} from "content/models/windows";
 import {OverlayController} from "content/controllers/windows.overlay";
 import {ToolbarButtonController}
-    from "content/controllers/windows.toolbarbutton";
+  from "content/controllers/windows.toolbarbutton";
 import {StyleSheetsController} from "content/controllers/windows.style-sheets";
 import {FramescriptServices} from "content/main/framescript-services";
 import {pWindowsAvailable} from "content/models/ui-startup";
@@ -44,7 +44,8 @@ let WindowSubControllers = (function() {
   ]);
 
   const SUBCONTROLLERS_REVERSE = Object.freeze(
-      SUBCONTROLLERS.slice().reverse());
+      SUBCONTROLLERS.slice().reverse()
+  );
 
   function callForEachController(fnName, reverse, ...args) {
     let controllers = reverse ? SUBCONTROLLERS_REVERSE : SUBCONTROLLERS;
@@ -57,10 +58,14 @@ let WindowSubControllers = (function() {
 
   self.startup = callForEachController.bind(null, "startup", false);
   self.shutdown = callForEachController.bind(null, "shutdown", true);
-  self.loadIntoWindow = callForEachController.bind(null, "loadIntoWindow",
-                                                   false);
-  self.unloadFromWindow = callForEachController.bind(null, "unloadFromWindow",
-                                                     true);
+  self.loadIntoWindow = callForEachController.bind(
+      null, "loadIntoWindow",
+      false
+  );
+  self.unloadFromWindow = callForEachController.bind(
+      null, "unloadFromWindow",
+      true
+  );
 
   return self;
 })();
@@ -76,8 +81,8 @@ export const rpWindowManager = (function() {
   self.pStartup = dStartup.promise;
 
   let frameScriptURI =
-      "chrome://rpcontinued/content/bootstrap/environments/framescript.js?" +
-      Math.random();
+      `chrome://rpcontinued/content/bootstrap/environments/framescript.js?${
+        Math.random()}`;
 
   function loadIntoWindow(window) {
     WindowSubControllers.loadIntoWindow(window);
@@ -111,7 +116,8 @@ export const rpWindowManager = (function() {
           console.error("rpWindowManager startup error:");
           console.dir(e);
         });
-      });
+      }
+  );
 
   MainEnvironment.addShutdownFunction(
       EnvLevel.INTERFACE,
@@ -130,7 +136,8 @@ export const rpWindowManager = (function() {
         Windows._stopListening();
         Windows.forEachOpenWindow(unloadFromWindow);
         WindowSubControllers.shutdown();
-      });
+      }
+  );
 
   return self;
 })();

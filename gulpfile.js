@@ -53,11 +53,11 @@ const fileFilter = (function() {
   // eslint-disable-next-line complexity
   function pathMatches(aPath, aFilter) {
     if (Array.isArray(aFilter)) {
-      return aFilter.some(filter => pathMatches(aPath, filter));
+      return aFilter.some((filter) => pathMatches(aPath, filter));
     }
     let {name: stem, ext} = nodePath.parse(aPath);
     if ("pathRegex" in aFilter) {
-      if (!_array(aFilter.pathRegex).some(p => aPath.match(p))) return false;
+      if (!_array(aFilter.pathRegex).some((p) => aPath.match(p))) return false;
     }
     if ("stem" in aFilter) {
       if (!_set(aFilter.stem).has(stem)) return false;
@@ -91,7 +91,7 @@ const fileFilter = (function() {
   // eslint-disable-next-line complexity
   function fileMatches(aFilter, aVinylFile) {
     if (Array.isArray(aFilter)) {
-      return aFilter.some(filter => fileMatches(filter, aVinylFile));
+      return aFilter.some((filter) => fileMatches(filter, aVinylFile));
     }
     if (!pathMatches(aVinylFile.path, aFilter)) return false;
     if ("originalPath" in aFilter) {
@@ -107,7 +107,7 @@ const fileFilter = (function() {
   }
 
   function conditionFactory(aFilter) {
-    return aVinylFile => fileMatches(aFilter, aVinylFile);
+    return (aVinylFile) => fileMatches(aFilter, aVinylFile);
   }
 
   return {
@@ -123,15 +123,17 @@ const fileFilter = (function() {
 
 function maxDate(dates) {
   return dates.reduce(
-      (max, current) => current > max ? current : max,
-      new Date(0));
+      // eslint-disable-next-line no-extra-parens
+      (max, current) => (current > max ? current : max),
+      new Date(0)
+  );
 }
 
 function promiseMaxDate(datePromises) {
   const pMaxDate = Promise.
       all(datePromises).
-      then(dates => maxDate(dates));
-  pMaxDate.catch(e => {
+      then((dates) => maxDate(dates));
+  pMaxDate.catch((e) => {
     console.error(e);
   });
   return pMaxDate;
@@ -149,7 +151,7 @@ const getDependenciesMaxMtime = (function() {
     "gulpfile.js",
     "package.json",
     "tsconfig.json",
-  ].map(filename => rootDir + "/" + filename);
+  ].map((filename) => `${rootDir}/${filename}`);
 
   return function getDependenciesMtime() {
     if (!pMaxMtime) {
@@ -163,7 +165,7 @@ const getDependenciesMaxMtime = (function() {
 function compareLastModifiedTime(stream, sourceFile, targetPath) {
   return Promise.all([
     getDependenciesMaxMtime().
-        then(maxMtime => maxDate([maxMtime, sourceFile.stat.mtime])),
+        then((maxMtime) => maxDate([maxMtime, sourceFile.stat.mtime])),
     promiseMtime(targetPath),
   ]).then(([depsMaxMtime, targetMtime]) => {
     if (depsMaxMtime > targetMtime) {
@@ -175,6 +177,7 @@ function compareLastModifiedTime(stream, sourceFile, targetPath) {
 
 function _sanitizeArgsForAddTask(aFn) {
   return function(name, deps, fn) {
+    /* eslint-disable no-param-reassign */
     if (fn === undefined && typeof deps === "function") {
       fn = deps;
       deps = [];
@@ -207,7 +210,7 @@ gulp.task = (function() {
 const addGulpTasks = _sanitizeArgsForAddTask((namePrefix, forcedDeps, taskAdder) => {
   const tasks = [];
   const addTaskFn = _sanitizeArgsForAddTask((name, deps, taskFn) => {
-    name = namePrefix + ":" + name;
+    name = `${namePrefix}:${name}`;
     deps = forcedDeps.concat(deps);
     tasks.push(name);
     taskFn = taskFn.bind(null, namePrefix);
@@ -239,8 +242,10 @@ function getInstallRdfLocalizedSection() {
   function getValues(localeDirname, defaultValues=null) {
     const filepath = `${localesPath}/${localeDirname}/messages.json`;
     const fileContents = require(filepath);
-    const get = (key, fileKey) => fileKey in fileContents ?
-        fileContents[fileKey].message : defaultValues[key];
+    const get = (key, fileKey) => (
+      fileKey in fileContents ? fileContents[fileKey].message :
+        defaultValues[key]
+    );
     return {
       locale: localeDirname.replace("_", "-"),
       name: get("name", "extensionName"),
@@ -278,22 +283,23 @@ function getInstallRdfLocalizedSection() {
 
 const versionData = {};
 
-gulp.task("versionData:uniqueVersionSuffix", () => {
-  return new Promise((resolve, reject) => {
-    exec(`
-      rev_count=$(git rev-list HEAD | wc --lines);
-      commit_sha=$(git rev-parse --short HEAD);
-      echo ".\${rev_count}.r\${commit_sha}.pre";
-    `, (err, out) => {
-      if (err) {
-        reject(err);
-        return;
+gulp.task("versionData:uniqueVersionSuffix", () => new Promise((resolve, reject) => {
+  exec(
+      `
+        rev_count=$(git rev-list HEAD | wc --lines);
+        commit_sha=$(git rev-parse --short HEAD);
+        echo ".\${rev_count}.r\${commit_sha}.pre";
+      `,
+      (err, out) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        versionData.uniqueVersionSuffix = out.trim();
+        resolve();
       }
-      versionData.uniqueVersionSuffix = out.trim();
-      resolve();
-    });
-  });
-});
+  );
+}));
 
 gulp.task("versionData:nonUniqueVersion", () => {
   versionData.nonUniqueVersion = config.version;
@@ -326,11 +332,11 @@ const EXTENSION_TYPES = [
 ];
 const DEFAULT_EXTENSION_TYPE = "legacy";
 
-BUILDS.forEach(build => {
+BUILDS.forEach((build) => {
   gulp.task(`build:${build.alias}`, [`build:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
   gulp.task(`xpi:${build.alias}`, [`xpi:${DEFAULT_EXTENSION_TYPE}:${build.alias}`]);
 
-  EXTENSION_TYPES.forEach(extensionType => {
+  EXTENSION_TYPES.forEach((extensionType) => {
     const buildDirRelative = `build/${extensionType}/${build.alias}`;
     const buildDir = `${rootDir}/${buildDirRelative}`;
 
@@ -343,20 +349,18 @@ BUILDS.forEach(build => {
     // clean, XPI
     // -------------------------------------------------------------------------
 
-    gulp.task(`clean:${extensionType}:${build.alias}`, () => {
-      return del([buildDir]);
-    });
+    gulp.task(`clean:${extensionType}:${build.alias}`, () => del([buildDir]));
 
     gulp.task(`xpi:${extensionType}:${build.alias}`,
-              [`build:${extensionType}:${build.alias}`],
-              () => {
-      const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix :
-                        `-${extensionType}-${build.alias}`;
-      let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
-          pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
-          pipe(gulp.dest("dist"));
-      return stream;
-    });
+        [`build:${extensionType}:${build.alias}`],
+        () => {
+          const xpiSuffix = "xpiSuffix" in build ? build.xpiSuffix :
+            `-${extensionType}-${build.alias}`;
+          let stream = gulp.src(`${buildDir}/**/*`, { base: buildDir }).
+              pipe(zip(`${EXTENSION_NAME}${xpiSuffix}.xpi`)).
+              pipe(gulp.dest("dist"));
+          return stream;
+        });
 
     // -------------------------------------------------------------------------
     // build data
@@ -364,7 +368,7 @@ BUILDS.forEach(build => {
 
     const buildData = {};
 
-    addGulpTasks(`buildData:${extensionType}:${build.alias}`, addTask => {
+    addGulpTasks(`buildData:${extensionType}:${build.alias}`, (addTask) => {
       addTask("preprocessContext", [TASK_NAMES.version], () => {
         const context = buildData.ppContext = {
           "BUILD_ALIAS": build.alias,
@@ -388,15 +392,15 @@ BUILDS.forEach(build => {
 
     const conditionalDirsRelative = [extensionType].
         concat(build.alias === "ui-testing" ? ["ui-testing"] : []).
-        map(name => `conditional/${name}`);
+        map((name) => `conditional/${name}`);
     const conditionalDirsWithSrc = conditionalDirsRelative.
-        map(dir => `${srcDir}/${dir}`);
+        map((dir) => `${srcDir}/${dir}`);
 
     // eslint-disable-next-line camelcase
     function mergeInConditional_mapDirname(dirname) {
-      conditionalDirsRelative.forEach(dir => {
+      conditionalDirsRelative.forEach((dir) => {
         // non-root files
-        dirname = dirname.replace(dir + "/", "");
+        dirname = dirname.replace(`${dir}/`, "");
         // root files, e.g. conditional/legacy/bootstrap.js
         dirname = dirname.replace(dir, "");
       });
@@ -413,7 +417,7 @@ BUILDS.forEach(build => {
         if (curFilename.startsWith("**")) {
           throw new Error("paths passed must not start with '**'");
         }
-        return accumulator.concat(roots.map(root => `${root}/${curFilename}`));
+        return accumulator.concat(roots.map((root) => `${root}/${curFilename}`));
       }, []);
     }
 
@@ -423,9 +427,10 @@ BUILDS.forEach(build => {
 
     const buildDeps = [];
     if (build.forceCleanBuild) buildDeps.push(`clean:${extensionType}:${build.alias}`);
-    addGulpTasks(`build:${extensionType}:${build.alias}`, buildDeps,
-                 // eslint-disable-next-line complexity
-                 (addBuildTask, buildTaskPrefix) => {
+    // eslint-disable-next-line complexity
+    addGulpTasks(`build:${extensionType}:${build.alias}`, buildDeps, (
+        addBuildTask, buildTaskPrefix
+    ) => {
       addBuildTask("copiedFiles", () => {
         let files = [
           "README",
@@ -469,22 +474,23 @@ BUILDS.forEach(build => {
       addPreprocessedFilesBuildTask("xml", [
         "content/**/*.html",
       ].concat(
-        extensionType === "webextension" ? [
-        ] : extensionType === "legacy" ? [
-          "install.rdf",
-        ] : []
+          extensionType === "webextension" ? [
+          ] : [],
+          extensionType === "legacy" ? [
+            "install.rdf",
+          ] : []
       ));
 
       addPreprocessedFilesBuildTask("js", [
       ].concat(
-        extensionType === "webextension" ? [
-          "_locales/**/messages.json",
-          "manifest.json",
-        ] : extensionType === "legacy" ? [
-          "content/bootstrap/data/locales.json",
-          "content/bootstrap/data/manifest.json",
-          "content/_locales/**/messages.json",
-        ] : []
+          extensionType === "webextension" ? [
+            "_locales/**/messages.json",
+            "manifest.json",
+          ] : extensionType === "legacy" ? [
+            "content/bootstrap/data/locales.json",
+            "content/bootstrap/data/manifest.json",
+            "content/_locales/**/messages.json",
+          ] : []
       ));
 
       // ---
@@ -522,10 +528,10 @@ BUILDS.forEach(build => {
           tsConfigPath,
         } = moduleRootInfos[aModuleRootAlias];
         const otherModuleRoots = Object.keys(moduleRootInfos).
-            filter(alias => alias !== aModuleRootAlias).
-            map(alias => moduleRootInfos[alias].moduleRoot);
+            filter((alias) => alias !== aModuleRootAlias).
+            map((alias) => moduleRootInfos[alias].moduleRoot);
         const subRoots = otherModuleRoots.
-            filter(otherRoot => otherRoot.startsWith(`${moduleRoot}/`));
+            filter((otherRoot) => otherRoot.startsWith(`${moduleRoot}/`));
         const tsProject = ts.createProject(tsConfigPath, tsConfigOverride);
 
         return addBuildTask(`js:${aModuleRootAlias}`, [TASK_NAMES.ppContext], () => {
@@ -539,7 +545,7 @@ BUILDS.forEach(build => {
             subRootFiles.push(`${subRoot}/*`);
           }
           subRootFiles = inAnyRoot(subRootFiles);
-          files = files.concat(subRootFiles.map(file => "!" + file));
+          files = files.concat(subRootFiles.map((file) => `!${file}`));
 
           let stream = gulp.src(files, { base: srcDir }).
               pipe(gulpif(!build.forceCleanBuild, changed(buildDir, {
@@ -555,8 +561,8 @@ BUILDS.forEach(build => {
                   (match, fn, nextChar) => {
                     let argsPrefix =
                         nextChar === ")" ? `"[RequestPolicy]")` :
-                        nextChar === "" ? `"[RequestPolicy] " + ` :
-                        `${nextChar}[RequestPolicy] `;
+                          nextChar === "" ? `"[RequestPolicy] " + ` :
+                            `${nextChar}[RequestPolicy] `;
                     return `console.${fn}(${argsPrefix}`;
                   }
               )).
@@ -571,7 +577,8 @@ BUILDS.forEach(build => {
 
               // jsm files
               stream.
-                  pipe(fileFilter.include({isModule: false})));
+                  pipe(fileFilter.include({isModule: false}))
+          );
 
           stream = stream.
               // WORKAROUND NOTICE:
@@ -592,8 +599,7 @@ BUILDS.forEach(build => {
                         destPath: buildDir,
                         sourceRoot: `file://${srcDir}`,
                       })
-                  )
-              )).
+                  ))).
               pipe(gulp.dest(buildDir));
           return stream;
         });

@@ -29,17 +29,17 @@ describe("browser.runtime", function() {
 
     // Stubbing in order to return a Manifest object with empty permissions
     // Needed because of manifestHasPermission() in api.js
-    sinon.stub(mockNu, "readInputStreamToString")
-      .returns(`{"permissions" : []}`);
+    sinon.stub(mockNu, "readInputStreamToString").
+        returns(`{"permissions" : []}`);
 
     let mockHttp = {httpRequest: function(url, option) {}};
 
     // Stubbing in order to perform imports in api.js and required scripts
-    sinon.stub(mockComp.utils, "import")
-      .withArgs("resource://gre/modules/NetUtil.jsm").returns({NetUtil: mockNu})
-      .withArgs("resource://gre/modules/AddonManager.jsm", {}).returns({})
-      .withArgs("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).returns({})
-      .withArgs("resource://gre/modules/Http.jsm").returns(mockHttp);
+    sinon.stub(mockComp.utils, "import").
+        withArgs("resource://gre/modules/NetUtil.jsm").returns({NetUtil: mockNu}).
+        withArgs("resource://gre/modules/AddonManager.jsm", {}).returns({}).
+        withArgs("resource://gre/modules/PrivateBrowsingUtils.jsm", {}).returns({}).
+        withArgs("resource://gre/modules/Http.jsm").returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
     global.Cu = mockComp.utils;

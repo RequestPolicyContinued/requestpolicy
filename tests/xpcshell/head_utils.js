@@ -7,6 +7,7 @@ Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm-utils"
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {
+    // eslint-disable-next-line no-param-reassign
     destFilename = "";
   }
   const testResources = do_get_file("resources", false);
@@ -14,7 +15,7 @@ function copyRulesetFileToProfile(filename, destFilename) {
   const file = testResources.clone();
   file.append(filename);
   if (!file.exists()) {
-    throw "Test resource does not exist: " + file.path;
+    throw `Test resource does not exist: ${file.path}`;
   }
   // An empty second argument means keep the same filename when copying.
   file.copyTo(profilePolicyDir, destFilename);

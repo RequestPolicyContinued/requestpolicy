@@ -53,7 +53,8 @@ var {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 var {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 
 var {Loader} = Cu.import(
-    "resource://gre/modules/commonjs/toolkit/loader.js", {});
+    "resource://gre/modules/commonjs/toolkit/loader.js", {}
+);
 
 var console = (function() {
   let {name: appName, platformVersion} = Services.appinfo;
@@ -63,9 +64,10 @@ var console = (function() {
     return Services.vc.compare(platformVersion, aMinVersion) >= 0;
   }
 
-  const uri = isGecko && isVersionAtLeast("44") ?
-              "resource://gre/modules/Console.jsm" :
-              "resource://gre/modules/devtools/Console.jsm";
+  const uri =
+      isGecko && isVersionAtLeast("44") ?
+        "resource://gre/modules/Console.jsm" :
+        "resource://gre/modules/devtools/Console.jsm";
   return Cu.import(uri, {}).console;
 })();
 
@@ -286,7 +288,7 @@ var FakeWebExt = (function() {
       const pageName = document.documentElement.id;
       api.legacyApi.i18n.updateDocument(document);
       commonjsEnv.load({
-        mainFile: "content/settings/" + pageName,
+        mainFile: `content/settings/${pageName}`,
         additionalGlobals: [
           ["$", $],
           ["window", window],

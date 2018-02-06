@@ -345,7 +345,7 @@ class BaseEnvironment {
       try {
         f(...aBootstrapArgs);
       } catch (e) {
-        console.error("Error in Bootstrap function! Details:");
+        console.error("Error in bootstrap function! Details:");
         console.dir(e);
       }
       log.log("function called! (" + aFunctions.length +

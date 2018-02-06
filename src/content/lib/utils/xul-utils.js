@@ -137,11 +137,10 @@ function getParentElement(aDocument, aElementSpec) {
  * @return {string}
  */
 function getLocalizedValue(aRawValue) {
-  const {L10nUtils} = LegacyApi;
-  if (!L10nUtils.matchKeyPattern(aRawValue)) {
+  if (!LegacyApi.i18n.matchKeyPattern(aRawValue)) {
     return aRawValue;
   }
-  return L10nUtils.updateString(aRawValue);
+  return LegacyApi.i18n.updateString(aRawValue);
 }
 
 /**

@@ -740,7 +740,7 @@ export function loadOverlayIntoWindow(window) {
    * so that RequestPolicy can register a link-click.
    *
    * The original methods are defined in Firefox' nsContextMenu.js:
-   * http://mxr.mozilla.org/mozilla-central/source/browser/base/content/nsContextMenu.js
+   * http://mxr.mozilla.org/mozilla-central/source/api/base/content/nsContextMenu.js
    *
    * The openLinkInTab() method doesn't need to be wrapped because new tabs
    * are already recognized by tabAdded(), which is wrapped elsewhere.

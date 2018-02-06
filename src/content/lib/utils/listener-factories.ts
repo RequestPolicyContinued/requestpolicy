@@ -31,15 +31,19 @@ interface IObject<T> {
   [key: string]: T;
 }
 
-export function createListenersMap(aEventNames: string[], aOptions: {
-    assignListenersTo: IObject<Listeners>,
-    assignInterfacesTo: IObject<IListenInterface>,
-} = {assignListenersTo: {}, assignInterfacesTo: {}}) {
-  const {
-    assignListenersTo: listenersMap,
-    assignInterfacesTo: interfaces,
-  } = aOptions;
-
+export function createListenersMap(
+    aEventNames: ReadonlyArray<string>,
+    {
+        assignInterfacesTo: interfaces = {},
+        assignListenersTo: listenersMap = {},
+    }: {
+        assignInterfacesTo?: IObject<IListenInterface>,
+        assignListenersTo?: IObject<Listeners>,
+    } = {
+        assignInterfacesTo: {},
+        assignListenersTo: {},
+    },
+) {
   const eventNames =
       Array.isArray(aEventNames) ? aEventNames : [aEventNames];
   eventNames.forEach((eventName) => {

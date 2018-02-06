@@ -20,15 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {isJsonPref, JsonPrefs} from "bootstrap/models/json-prefs";
 import {Prefs} from "bootstrap/models/prefs";
 import {C} from "content/data/constants";
 import {
   AbstractObjectInterface,
   IKeysObject,
-  IKeysWithDefaults,
 } from "content/lib/classes/object-interface";
-import {createListenersMap} from "content/lib/utils/listener-factories";
+import {isJsonPref, JsonPrefs} from "./json-prefs";
 
 // =============================================================================
 
@@ -36,13 +34,15 @@ function getPrefsModel(aKey: string) {
   return isJsonPref(aKey) ? JsonPrefs : Prefs;
 }
 
-class SyncLocalStorageArea extends AbstractObjectInterface<any> {
+export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   protected getAll() {
     return Prefs.branches.rp.getAll().concat(JsonPrefs.getAll());
   }
+
   protected getNothing() {
     return {};
   }
+
   protected getByKeys(aKeys: string[]) {
     const results: IKeysObject = {};
     aKeys.forEach((key) => {
@@ -53,36 +53,14 @@ class SyncLocalStorageArea extends AbstractObjectInterface<any> {
     });
     return results;
   }
+
   protected setByKey(aKey: string, aValue: any) {
     getPrefsModel(aKey).set(aKey, aValue);
   }
+
   protected removeByKeys(aKeys: string[]) {
     if (aKeys.length !== 0) {
       throw new Error("Not implemented!");
     }
   }
 }
-
-const slsa = new SyncLocalStorageArea();
-
-const {
-  interfaces: eventTargets,
-} = createListenersMap([
-  "onChanged",
-]);
-
-export const StorageApi = {
-  local: {
-    get(aKeys: string | string[] | IKeysWithDefaults | null | undefined) {
-      return Promise.resolve(slsa.get(aKeys));
-    },
-    set(aKeys: {[k: string]: any}) {
-      try {
-        return Promise.resolve(slsa.set(aKeys));
-      } catch (e) {
-        return Promise.reject(e);
-      }
-    },
-  },
-  onChanged: eventTargets.onChanged,
-};

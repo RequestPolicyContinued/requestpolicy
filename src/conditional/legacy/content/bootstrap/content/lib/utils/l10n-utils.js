@@ -30,8 +30,6 @@
   * Original file from https://github.com/piroor/webextensions-lib-l10n
   */
 
-import * as ApiScope from "bootstrap/models/api";
-
 /**
  * Replace all |__MSG_(.*)__| tokens with the matching string from
  * the current locale.
@@ -48,14 +46,13 @@ export function matchKeyPattern(aString) {
   return MSG_REGEXP.test(aString);
 }
 
-export function updateString(aString) {
+export function updateString(i18n, aString) {
   return aString.replace(MSG_REGEXP, (matched, message) => {
-    return ApiScope.Api.browser.i18n.
-        getMessage(message, [], {defaultValue: matched});
+    return i18n.getMessage(message, [], {defaultValue: matched});
   });
 }
 
-export function updateDocument(document) {
+export function updateDocument(i18n, document) {
   let texts = document.evaluate(
     "descendant::text()[contains(self::text(), \"__MSG_\")]",
     document,
@@ -65,7 +62,7 @@ export function updateDocument(document) {
   );
   for (let i = 0, maxi = texts.snapshotLength; i < maxi; i++) {
     let text = texts.snapshotItem(i);
-    text.nodeValue = updateString(text.nodeValue);
+    text.nodeValue = updateString(i18n, text.nodeValue);
   }
 
   let attributes = document.evaluate(
@@ -77,6 +74,6 @@ export function updateDocument(document) {
   );
   for (let i = 0, maxi = attributes.snapshotLength; i < maxi; i++) {
     let attribute = attributes.snapshotItem(i);
-    attribute.value = updateString(attribute.value);
+    attribute.value = updateString(i18n, attribute.value);
   }
 }

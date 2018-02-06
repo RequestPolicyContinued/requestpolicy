@@ -153,7 +153,7 @@ var FakeWebExt = (function() {
     commonjsEnv: null,
   };
 
-  FakeWebExt.Api = null;
+  FakeWebExt.api = null;
 
   // ---------------------------------------------------------------------------
   // startup
@@ -175,29 +175,31 @@ var FakeWebExt = (function() {
 
     // eslint-disable-next-line no-constant-condition
     if ("/* @echo BUILD_ALIAS */" === "ui-testing") {
-      // "export" fake environment Api
-      FakeWebExt.Api = fakeEnv.exports.Api;
+      // "export" fake environment api
+      FakeWebExt.api = fakeEnv.exports.api;
     }
 
-    const {Api} = fakeEnv.exports;
+    const {api} = fakeEnv.exports;
 
     // initialize the fake environment
-    const p = Api.init().then(() => {
-      fakeEnv.exports.Bootstrap._startup();
+    const p = Promise.all([
+      api.startup(),
 
-      // start up the add-on
-      const {Manifest} = fakeEnv.exports;
-      addon.commonjsEnv = createCommonjsEnv();
-      addon.commonjsEnv.load({
-        mainFile: Manifest.background.scripts[0],
-        additionalGlobals: [
-          ["browser", Api.browser],
-          ["LegacyApi", Api.LegacyApi],
-          ["_setBackgroundPage", Api._setBackgroundPage],
-        ],
-      });
-      return;
-    });
+      api.whenReady.then(() => {
+        // start up the add-on
+        const {Manifest} = fakeEnv.exports;
+        addon.commonjsEnv = createCommonjsEnv();
+        addon.commonjsEnv.load({
+          mainFile: Manifest.background.scripts[0],
+          additionalGlobals: [
+            ["browser", api.backgroundApi],
+            ["LegacyApi", api.legacyApi],
+            ["_setBackgroundPage", api.bootstrap.setBackgroundPage],
+          ],
+        });
+        return;
+      }),
+    ]);
     p.catch((e) => {
       console.error("Error starting up!");
       console.dir(e);
@@ -218,13 +220,19 @@ var FakeWebExt = (function() {
     addon.commonjsEnv = null;
 
     // shut down the fake environment
-    fakeEnv.exports.Bootstrap._shutdown();
-    fakeEnv.commonjsEnv.unload();
+    fakeEnv.exports.api.shutdown().then(() => {
+      fakeEnv.commonjsEnv.unload();
 
-    // clean up
-    fakeEnv.commonjsEnv = null;
-    fakeEnv.exports = null;
-    FakeWebExt.Api = null;
+      // clean up
+      fakeEnv.commonjsEnv = null;
+      fakeEnv.exports = null;
+      FakeWebExt.api = null;
+
+      return;
+    }).catch((e) => {
+      console.error("Failed to shut down!");
+      console.dir(e);
+    });
   };
 
   // ---------------------------------------------------------------------------
@@ -234,14 +242,14 @@ var FakeWebExt = (function() {
   const mmShutdownMessage = "/* @echo EXTENSION_ID */" + ":shutdown";
 
   FakeWebExt.startupFramescript = function(cfmm) {
-    const {ContentScriptsApi} = fakeEnv.exports;
+    const {api} = fakeEnv.exports;
 
     const commonjsEnv = createCommonjsEnv();
     commonjsEnv.load({
       mainFile: "content/framescripts/main",
       additionalGlobals: [
         ["cfmm", cfmm],
-        ["browser", ContentScriptsApi.browser],
+        ["browser", api.contentApi],
       ],
     });
 
@@ -266,21 +274,21 @@ var FakeWebExt = (function() {
 
   FakeWebExt.startupSettingsPage = function(window) {
     const {document, $} = window;
-    const {Api} = fakeEnv.exports;
+    const {api} = fakeEnv.exports;
 
     const commonjsEnv = createCommonjsEnv();
 
     function onDOMContentLoaded() {
       document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
       const pageName = document.documentElement.id;
-      Api.LegacyApi.L10nUtils.updateDocument(document);
+      api.legacyApi.i18n.updateDocument(document);
       commonjsEnv.load({
         mainFile: "content/settings/" + pageName,
         additionalGlobals: [
           ["$", $],
           ["window", window],
           ["document", document],
-          ["browser", Api.browser],
+          ["browser", api.backgroundApi],
         ],
       });
     }
@@ -292,7 +300,7 @@ var FakeWebExt = (function() {
   // ---------------------------------------------------------------------------
 
   FakeWebExt.startupRequestLog = function(window) {
-    let {Api} = fakeEnv.exports;
+    let {api} = fakeEnv.exports;
 
     const commonjsEnv = createCommonjsEnv();
 
@@ -300,7 +308,7 @@ var FakeWebExt = (function() {
       mainFile: "content/ui/request-log/main",
       additionalGlobals: [
         ["window", window],
-        ["browser", Api.browser],
+        ["browser", api.backgroundApi],
       ],
     });
   };

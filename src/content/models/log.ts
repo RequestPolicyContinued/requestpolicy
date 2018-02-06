@@ -206,6 +206,12 @@ export class Log {
     this.logInternal(LogLevel.WARNING, "warn", msg, ...args);
   }
 
+  public onError(msg: string | string[], ...args: any[]) {
+    return (error: any) => {
+      this.error(msg, error, ...args);
+    };
+  }
+
   // setter methods
 
   public setEnabled(enabled: boolean | null) {

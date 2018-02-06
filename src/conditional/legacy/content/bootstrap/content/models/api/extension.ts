@@ -20,15 +20,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// Before anything else, handle default preferences. This is necessary because
-// bootsrapped addons have to handle their default preferences manually,
-// see Mozilla Bug 564675.
-// tslint:disable-next-line import-spacing
-import {DefaultPreferencesController}
-    from "bootstrap/controllers/default-preferences-controller";
-DefaultPreferencesController.startup();
+import {Module} from "content/lib/classes/module";
 
-import {Api} from "bootstrap/models/api";
+export class Extension extends Module {
+  protected moduleName = "extension";
 
-export const api = Api.instance;
-export {Manifest} from "bootstrap/models/manifest";
+  private backgroundPage: any;
+
+  public get backgroundApi() {
+    return {
+      getBackgroundPage: this.getBackgroundPage.bind(this),
+    };
+  }
+
+  public get contentApi() {
+    return {
+      getURL: null,
+      inIncognitoContext: null,
+    };
+  }
+
+  public setBackgroundPage(aObject: any) {
+    this.backgroundPage = aObject;
+  }
+
+  public getBackgroundPage() {
+    return this.backgroundPage;
+  }
+}

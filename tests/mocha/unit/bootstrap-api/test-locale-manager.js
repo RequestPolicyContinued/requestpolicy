@@ -15,7 +15,7 @@ const sinon = require("sinon");
 chai.use(chaiAsPromised);
 const {expect} = chai;
 
-const {LocaleData} = require("bootstrap/models/browser/i18n/locale-data");
+const {LocaleData} = require("bootstrap/models/api/i18n/locale-data");
 
 // Loads mocking classes
 // Those mocks are needed because some scripts loads XPCOM objects like :
@@ -47,7 +47,7 @@ describe("LocaleManager", function() {
     global.Services = mockServices;
 
     ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files");
-    LocaleManager = require("bootstrap/models/browser/i18n/locale-manager").
+    LocaleManager = require("bootstrap/models/api/i18n/locale-manager").
         LocaleManager.instance;
 
     // Create stubs

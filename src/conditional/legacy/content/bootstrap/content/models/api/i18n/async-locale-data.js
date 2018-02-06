@@ -178,7 +178,7 @@ export class AsyncLocaleData extends LocaleData {
     };
   }
 
-  init() {
+  startup() {
     let defaultLocale;
     let uiLocale;
 
@@ -198,7 +198,7 @@ export class AsyncLocaleData extends LocaleData {
         return;
       });
     p.catch((e) => {
-      console.error("LazyLocaleData.init()");
+      console.error("LazyLocaleData.startup()");
       console.dir(e);
       this.dReady.reject(e);
     });

@@ -17,11 +17,9 @@ const sinon = require("sinon");
 const MockNetUtil = require("./lib/mock-netutil");
 const MockServices = require("./lib/mock-services");
 const MockComponents = require("./lib/mock-components");
-const Utils = require("./lib/utils");
 
 describe("browser.runtime", function() {
   let runtime = null;
-  let pathAliasProxy;
 
   before(function() {
     let mockComp = new MockComponents();
@@ -46,9 +44,7 @@ describe("browser.runtime", function() {
     global.Ci = mockComp.interfaces;
     global.Services = new MockServices();
 
-    pathAliasProxy = Utils.createPathAliasProxy();
-
-    const {Log} = require("content/models/log");
+    const {Log} = require("models/log");
     const {AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data");
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
     // eslint-disable-next-line no-unused-vars
@@ -58,62 +54,62 @@ describe("browser.runtime", function() {
 
   describe("getURL(path)", function() {
     it("Mapping into about:requestpolicy nominal case", function() {
-      let path = "content/settings/pref.html";
+      let path = "settings/pref.html";
       let expected = "about:requestpolicy?pref";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if relative path doesn't start with /", function() {
-      let path = "content/settings/prefs.html";
+      let path = "settings/prefs.html";
       let expected = "about:requestpolicy?prefs";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if relative path starts with ./", function() {
-      let path = "./content/settings/prefs.html";
+      let path = "./settings/prefs.html";
       let expected = "about:requestpolicy?prefs";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if mix-cased extension", function() {
-      let path = "./content/settings/extmixcase.HtMl";
+      let path = "./settings/extmixcase.HtMl";
       let expected = "about:requestpolicy?extmixcase";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if upper-cased extension", function() {
-      let path = "./content/settings/extupcase.HTML";
+      let path = "./settings/extupcase.HTML";
       let expected = "about:requestpolicy?extupcase";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if double extension", function() {
-      let path = "/content/settings/doubleext.html.html";
+      let path = "/settings/doubleext.html.html";
       let expected = "about:requestpolicy?doubleext.html";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if special chars in filename", function() {
-      let path = "/content/settings/.sp3c1@l-_[char].html";
+      let path = "/settings/.sp3c1@l-_[char].html";
       let expected = "about:requestpolicy?.sp3c1@l-_[char]";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into about:requestpolicy if mix-cased filename", function() {
-      let path = "/content/settings/CaSe.html";
+      let path = "/settings/CaSe.html";
       let expected = "about:requestpolicy?CaSe";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into chrome://rpcontinued/ if subdir name contains .html", function() {
-      let path = "/content/settings/subdir.html/foo.css";
-      let expected = "chrome://rpcontinued/content/settings/subdir.html/foo.css";
+      let path = "/settings/subdir.html/foo.css";
+      let expected = "chrome://rpcontinued/settings/subdir.html/foo.css";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Should map into chrome://rpcontinued/ if other extension than html", function() {
-      let path = "/content/settings/otherext.css";
-      let expected = "chrome://rpcontinued/content/settings/otherext.css";
+      let path = "/settings/otherext.css";
+      let expected = "chrome://rpcontinued/settings/otherext.css";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
@@ -148,14 +144,14 @@ describe("browser.runtime", function() {
     });
 
     it("Mapping into chrome://rpcontinued/ with relative path not starting with /", function() {
-      let path = "content/settings/otherext.css";
-      let expected = "chrome://rpcontinued/content/settings/otherext.css";
+      let path = "settings/otherext.css";
+      let expected = "chrome://rpcontinued/settings/otherext.css";
       assert.strictEqual(runtime.getURL(path), expected);
     });
 
     it("Mapping into chrome://rpcontinued/ with relative path starting with ./", function() {
-      let path = "./content/settings/otherext.css";
-      let expected = "chrome://rpcontinued/content/settings/otherext.css";
+      let path = "./settings/otherext.css";
+      let expected = "chrome://rpcontinued/settings/otherext.css";
       assert.strictEqual(runtime.getURL(path), expected);
     });
   });
@@ -164,7 +160,5 @@ describe("browser.runtime", function() {
     global.Cu = null;
     global.Ci = null;
     global.Services = null;
-
-    pathAliasProxy.revoke();
   });
 });

@@ -9,15 +9,11 @@
  */
 
 const {expect} = require("chai");
-const Utils = require("./lib/utils");
 
 describe("I18nUtils", function() {
   let I18nUtils;
-  let pathAliasProxy;
 
   before(function() {
-    pathAliasProxy = Utils.createPathAliasProxy();
-
     I18nUtils = require("bootstrap/models/api/i18n/i18n-utils");
   });
 
@@ -90,9 +86,5 @@ describe("I18nUtils", function() {
       let result = I18nUtils.getBestAvailableLocale(["en-US"], "fr");
       expect(result).to.be.undefined;
     });
-  });
-
-  after(function() {
-    pathAliasProxy.revoke();
   });
 });

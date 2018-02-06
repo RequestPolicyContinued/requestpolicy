@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {defer, IDeferred} from "content/lib/utils/js-utils";
+import {defer, IDeferred} from "lib/utils/js-utils";
 
 // =============================================================================
 

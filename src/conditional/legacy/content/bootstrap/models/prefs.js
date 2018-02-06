@@ -24,7 +24,7 @@
 import {PrefBranch} from "bootstrap/lib/classes/pref-branch";
 import {
   getComplexValueFromPrefBranch,
-} from "content/lib/utils/try-catch-utils";
+} from "lib/utils/try-catch-utils";
 
 // =============================================================================
 // Prefs

@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
-import {NormalRequest, RedirectRequest} from "content/lib/request";
-import * as Utils from "content/lib/utils/misc-utils";
-import * as RequestProcessor from "content/lib/request-processor";
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
+import {Log} from "models/log";
+import {NormalRequest, RedirectRequest} from "lib/request";
+import * as Utils from "lib/utils/misc-utils";
+import * as RequestProcessor from "lib/request-processor";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 const log = Log.instance;
 

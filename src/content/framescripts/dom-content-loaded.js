@@ -21,18 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
-import * as DomainUtil from "content/lib/utils/domain-utils";
+import {Log} from "models/log";
+import * as DomainUtil from "lib/utils/domain-utils";
 import {
   Environment,
   Level as EnvLevel,
   MainEnvironment,
-} from "content/lib/environment";
-import {C} from "content/data/constants";
+} from "lib/environment";
+import {C} from "data/constants";
 
-import {overlayComm} from "content/framescripts/managers";
+import {overlayComm} from "framescripts/managers";
 import {ManagerForBlockedContent}
-  from "content/framescripts/blocked-content.js";
+  from "framescripts/blocked-content.js";
 
 const log = Log.instance;
 

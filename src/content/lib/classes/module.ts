@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {defer} from "content/lib/utils/js-utils";
-import {Log} from "content/models/log";
+import {defer} from "lib/utils/js-utils";
+import {Log} from "models/log";
 
 export interface IModule {
   startup?: () => Promise<void>;

@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MainEnvironment} from "content/lib/environment";
-import {IRuleSpecs, RawRuleset} from "content/lib/ruleset";
-import {RulesetStorage} from "content/lib/ruleset-storage";
-import {Log} from "content/models/log";
+import {MainEnvironment} from "lib/environment";
+import {IRuleSpecs, RawRuleset} from "lib/ruleset";
+import {RulesetStorage} from "lib/ruleset-storage";
+import {Log} from "models/log";
 
 const log = Log.instance.extend({
   name: "Subscriptions",

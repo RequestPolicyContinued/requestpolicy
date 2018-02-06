@@ -23,8 +23,8 @@
 import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
 import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
 import {Prefs} from "bootstrap/models/prefs";
-import {Module} from "content/lib/classes/module";
-import {Log} from "content/models/log";
+import {Module} from "lib/classes/module";
+import {Log} from "models/log";
 import {Extension} from "./api/extension";
 import {I18n} from "./api/i18n";
 import {Management} from "./api/management";

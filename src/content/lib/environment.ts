@@ -22,9 +22,9 @@
 
 import {
   ManagerForEventListeners,
-} from "content/lib/manager-for-event-listeners";
-import {ObserverManager} from "content/lib/observer-manager";
-import {Log} from "content/models/log";
+} from "lib/manager-for-event-listeners";
+import {ObserverManager} from "lib/observer-manager";
+import {Log} from "models/log";
 
 // =============================================================================
 // utilities

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Intl as IntlPolyfill} from "content/lib/polyfills/intl/8.intl";
+import {Intl as IntlPolyfill} from "lib/polyfills/intl/8.intl";
 
 /**
  * Convert a Chrome-compatible locale code to the appropriate

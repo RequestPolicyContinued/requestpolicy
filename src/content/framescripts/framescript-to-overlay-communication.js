@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel} from "content/lib/environment";
-import {Log} from "content/models/log";
-import {C} from "content/data/constants";
-import {mlManager} from "content/framescripts/managers";
+import {Level as EnvLevel} from "lib/environment";
+import {Log} from "models/log";
+import {C} from "data/constants";
+import {mlManager} from "framescripts/managers";
 
 const log = Log.instance;
 

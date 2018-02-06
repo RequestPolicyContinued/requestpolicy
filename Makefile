@@ -420,7 +420,7 @@ _mocha_test_targets = mocha-tests mocha-unit-tests mocha-integration-tests
 mocha-tests: ALIASES := unit
 mocha-unit-tests: ALIASES := unit
 $(_mocha_test_targets): node-packages non-ui-testing-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/non-ui-testing/ \
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/non-ui-testing/content/ \
 	$(MOCHA) \
 		--recursive \
 		--compilers coffee:coffeescript/register \

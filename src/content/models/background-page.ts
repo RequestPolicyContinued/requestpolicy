@@ -22,25 +22,25 @@
 
 declare const LegacyApi: any;
 
-import {C} from "content/data/constants";
-import {OldRules} from "content/lib/classes/old-rules";
-import {Environment, MainEnvironment} from "content/lib/environment";
-import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {PolicyManager} from "content/lib/policy-manager";
-import * as RequestProcessor from "content/lib/request-processor";
+import {C} from "data/constants";
+import {OldRules} from "lib/classes/old-rules";
+import {Environment, MainEnvironment} from "lib/environment";
+import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {PolicyManager} from "lib/policy-manager";
+import * as RequestProcessor from "lib/request-processor";
 import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
-} from "content/lib/subscription";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import * as RuleUtils from "content/lib/utils/rule-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {rpService} from "content/main/requestpolicy-service";
-import {Log} from "content/models/log";
-import * as Metadata from "content/models/metadata";
-import {Requests} from "content/models/requests";
-import {Storage} from "content/models/storage";
-import {VersionInfos} from "content/models/version-infos";
+} from "lib/subscription";
+import * as DomainUtil from "lib/utils/domain-utils";
+import * as RuleUtils from "lib/utils/rule-utils";
+import * as WindowUtils from "lib/utils/window-utils";
+import {rpService} from "main/requestpolicy-service";
+import {Log} from "models/log";
+import * as Metadata from "models/metadata";
+import {Requests} from "models/requests";
+import {Storage} from "models/storage";
+import {VersionInfos} from "models/version-infos";
 
 export const BackgroundPage = {
   C,

@@ -21,18 +21,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
-import {PolicyManager} from "content/lib/policy-manager";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import {Request} from "content/lib/request";
+import {Log} from "models/log";
+import {Storage} from "models/storage";
+import {PolicyManager} from "lib/policy-manager";
+import * as DomainUtil from "lib/utils/domain-utils";
+import {Request} from "lib/request";
 import {
   RequestReason,
   RequestResult,
-} from "content/lib/request-result";
-import {MainEnvironment} from "content/lib/environment";
-import * as Utils from "content/lib/utils/misc-utils";
-import {CompatibilityRules} from "content/models/compatibility-rules";
+} from "lib/request-result";
+import {MainEnvironment} from "lib/environment";
+import * as Utils from "lib/utils/misc-utils";
+import {CompatibilityRules} from "models/compatibility-rules";
 import {
   AllowedRedirectsReverse,
   ClickedLinks,
@@ -42,14 +42,14 @@ import {
   SubmittedForms,
   SubmittedFormsReverse,
   UserAllowedRedirects,
-} from "content/models/metadata";
-import {Requests} from "content/models/requests";
+} from "models/metadata";
+import {Requests} from "models/requests";
 
-import RPContentPolicy from "content/main/content-policy";
+import RPContentPolicy from "main/content-policy";
 import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
-} from "content/lib/utils/try-catch-utils";
+} from "lib/utils/try-catch-utils";
 
 const log = Log.instance;
 

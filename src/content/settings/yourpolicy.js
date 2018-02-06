@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager, $id} from "content/settings/common";
+import {WinEnv, elManager, $id} from "settings/common";
 
 (function() {
   var {

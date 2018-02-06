@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {promiseObserverTopic} from "content/legacy/lib/utils/xpcom-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {Windows} from "content/models/windows";
+import {promiseObserverTopic} from "legacy/lib/utils/xpcom-utils";
+import * as WindowUtils from "lib/utils/window-utils";
+import {Windows} from "models/windows";
 
 function areWindowsAvailable() {
   if (WindowUtils.getMostRecentBrowserWindow() === null) {

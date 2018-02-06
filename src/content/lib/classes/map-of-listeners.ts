@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Listener, Listeners} from "content/lib/classes/listeners";
-import {MapOfCustomSets} from "content/lib/classes/map-of-custom-sets";
+import {Listener, Listeners} from "lib/classes/listeners";
+import {MapOfCustomSets} from "lib/classes/map-of-custom-sets";
 
 export class MapOfListeners<K = string>
     extends MapOfCustomSets<K, Listener, Listeners> {

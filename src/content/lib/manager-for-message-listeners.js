@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, State as EnvState} from "content/lib/environment";
-import {Log} from "content/models/log";
-import {C} from "content/data/constants";
+import {Level as EnvLevel, State as EnvState} from "lib/environment";
+import {Log} from "models/log";
+import {C} from "data/constants";
 
 const log = Log.instance;
 

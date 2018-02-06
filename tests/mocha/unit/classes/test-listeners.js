@@ -2,7 +2,7 @@
 
 const {assert} = require("chai");
 
-const {Listeners} = require("content/lib/classes/listeners");
+const {Listeners} = require("lib/classes/listeners");
 
 describe("Listeners", () => {
   describe("emit()", () => {

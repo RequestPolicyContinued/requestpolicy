@@ -21,7 +21,7 @@
  */
 
 import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
-import {Module} from "content/lib/classes/module";
+import {Module} from "lib/classes/module";
 import {AsyncLocaleData} from "./i18n/async-locale-data";
 
 export class I18n extends Module {

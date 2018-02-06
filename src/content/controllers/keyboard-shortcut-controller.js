@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {KeyboardShortcut} from "content/lib/classes/keyboard-shortcut";
-import {Storage} from "content/models/storage";
-import {pWindowsAvailable} from "content/models/ui-startup";
-import {rpWindowManager} from "content/main/window-manager";
+import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
+import {Storage} from "models/storage";
+import {pWindowsAvailable} from "models/ui-startup";
+import {rpWindowManager} from "main/window-manager";
 
 // =============================================================================
 // KeyboardShortcutController

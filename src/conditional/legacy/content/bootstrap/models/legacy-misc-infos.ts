@@ -22,7 +22,7 @@
  */
 
 import {Prefs} from "bootstrap/models/prefs";
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 
 declare const Services: any;
 

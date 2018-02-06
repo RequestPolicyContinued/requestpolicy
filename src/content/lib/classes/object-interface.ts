@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {createListenersMap} from "content/lib/utils/listener-factories";
+import {createListenersMap} from "lib/utils/listener-factories";
 
 export interface IKeysObject {
   [key: string]: any;

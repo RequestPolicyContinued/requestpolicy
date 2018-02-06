@@ -21,19 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel} from "content/lib/environment";
-import {Log} from "content/models/log";
-import {Storage} from "content/models/storage";
-import {PolicyManager} from "content/lib/policy-manager";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import {Ruleset} from "content/lib/ruleset";
+import {Level as EnvLevel} from "lib/environment";
+import {Log} from "models/log";
+import {Storage} from "models/storage";
+import {PolicyManager} from "lib/policy-manager";
+import * as DomainUtil from "lib/utils/domain-utils";
+import {Ruleset} from "lib/ruleset";
 import {
   GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
-} from "content/lib/classes/gui-location";
-import * as DOMUtils from "content/lib/utils/dom-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import {C} from "content/data/constants";
-import {Requests} from "content/models/requests";
+} from "lib/classes/gui-location";
+import * as DOMUtils from "lib/utils/dom-utils";
+import * as WindowUtils from "lib/utils/window-utils";
+import {C} from "data/constants";
+import {Requests} from "models/requests";
 
 const log = Log.instance;
 

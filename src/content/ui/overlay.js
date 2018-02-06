@@ -25,27 +25,27 @@ import {
   Environment,
   Level as EnvLevel,
   MainEnvironment,
-} from "content/lib/environment";
+} from "lib/environment";
 import {
   ManagerForMessageListeners,
-} from "content/lib/manager-for-message-listeners";
-import {Log} from "content/models/log";
-import {ManagerForPrefObservers} from "content/lib/manager-for-pref-observer";
-import {Storage} from "content/models/storage";
-import * as RequestProcessor from "content/lib/request-processor";
-import {PolicyManager} from "content/lib/policy-manager";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import * as WindowUtils from "content/lib/utils/window-utils";
-import * as JSUtils from "content/lib/utils/js-utils";
-import * as Utils from "content/lib/utils/misc-utils";
-import * as DOMUtils from "content/lib/utils/dom-utils";
-import {C} from "content/data/constants";
-import {CompatibilityRules} from "content/models/compatibility-rules";
-import {Requests} from "content/models/requests";
+} from "lib/manager-for-message-listeners";
+import {Log} from "models/log";
+import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
+import {Storage} from "models/storage";
+import * as RequestProcessor from "lib/request-processor";
+import {PolicyManager} from "lib/policy-manager";
+import * as DomainUtil from "lib/utils/domain-utils";
+import * as WindowUtils from "lib/utils/window-utils";
+import * as JSUtils from "lib/utils/js-utils";
+import * as Utils from "lib/utils/misc-utils";
+import * as DOMUtils from "lib/utils/dom-utils";
+import {C} from "data/constants";
+import {CompatibilityRules} from "models/compatibility-rules";
+import {Requests} from "models/requests";
 import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
-} from "content/lib/utils/try-catch-utils";
+} from "lib/utils/try-catch-utils";
 
 const log = Log.instance;
 
@@ -498,7 +498,7 @@ export function loadOverlayIntoWindow(window) {
       let label = $str("allowAllRedirections");
       classicmenu.addCustomMenuItem(addRulePopup, label, () => {
         maybeOpenLinkInNewTab(
-            browser.runtime.getURL("content/settings/defaultpolicy.html"),
+            browser.runtime.getURL("settings/defaultpolicy.html"),
             [], true
         );
       });
@@ -1129,16 +1129,16 @@ export function loadOverlayIntoWindow(window) {
   self.openPrefs = maybeOpenLinkInNewTab.bind(null,
       "about:requestpolicy",
       [
-        browser.runtime.getURL("content/settings/basicprefs.html"),
+        browser.runtime.getURL("settings/basicprefs.html"),
       ], true);
   // @endif
   // @if EXTENSION_TYPE!='legacy'
   self.openPrefs = maybeOpenLinkInNewTab.bind(null,
-      browser.runtime.getURL("content/settings/basicprefs.html"),
+      browser.runtime.getURL("settings/basicprefs.html"),
       [], true);
   // @endif
   self.openPolicyManager = maybeOpenLinkInNewTab.bind(null,
-      browser.runtime.getURL("content/settings/yourpolicy.html"), [], true);
+      browser.runtime.getURL("settings/yourpolicy.html"), [], true);
   self.openHelp = maybeOpenLinkInNewTab.bind(null, "https://github.com/" +
       "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support", []);
 

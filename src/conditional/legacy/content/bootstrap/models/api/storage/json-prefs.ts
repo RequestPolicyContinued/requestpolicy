@@ -21,7 +21,7 @@
  */
 
 import * as FileUtils from "bootstrap/lib/utils/file-utils";
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 
 // =============================================================================
 

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MapOfSets} from "content/lib/classes/map-of-sets";
+import {MapOfSets} from "lib/classes/map-of-sets";
 import {Prefs} from "bootstrap/models/prefs";
 
 // =============================================================================

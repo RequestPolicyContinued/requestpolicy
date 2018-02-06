@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IMaybeIncompleteRawRuleset, RawRuleset} from "content/lib/ruleset";
-import {Log} from "content/models/log";
+import {IMaybeIncompleteRawRuleset, RawRuleset} from "lib/ruleset";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

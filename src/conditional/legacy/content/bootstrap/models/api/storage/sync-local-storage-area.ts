@@ -21,11 +21,11 @@
  */
 
 import {Prefs} from "bootstrap/models/prefs";
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 import {
   AbstractObjectInterface,
   IKeysObject,
-} from "content/lib/classes/object-interface";
+} from "lib/classes/object-interface";
 import {isJsonPref, JsonPrefs} from "./json-prefs";
 
 // =============================================================================

@@ -31,7 +31,7 @@
 
 declare const Ci: any;
 
-import * as WindowUtils from "content/lib/utils/window-utils";
+import * as WindowUtils from "lib/utils/window-utils";
 
 const value = <T = any>(val: T) => ({value: val});
 const error = <T = any>(err: T) => ({error: err, value: null});

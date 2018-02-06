@@ -10,7 +10,7 @@
 createBrowserApi = require "../lib/sinon-chrome"
 browser = createBrowserApi()
 
-{CompatibilityRules} = require "content/lib/classes/compatibility-rules"
+{CompatibilityRules} = require "lib/classes/compatibility-rules"
 
 describe "CompatibilityRules", ->
   before () ->

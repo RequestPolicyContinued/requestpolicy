@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as DomainUtil from "content/lib/utils/domain-utils";
+import * as DomainUtil from "lib/utils/domain-utils";
 import {
   getComplexValueFromPrefBranch,
-} from "content/lib/utils/try-catch-utils";
+} from "lib/utils/try-catch-utils";
 
 declare const Cc: any;
 declare const Ci: any;

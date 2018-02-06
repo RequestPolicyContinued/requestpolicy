@@ -23,43 +23,43 @@
 let allControllers: Array<{[key: string]: any}> = [];
 
 // import the Log first! It needs to get logging prefs from storage (async).
-import {LogController} from "content/controllers/log-controller";
-import {Controllers} from "content/lib/classes/controllers";
+import {LogController} from "controllers/log-controller";
+import {Controllers} from "lib/classes/controllers";
 {
   const controllers = [LogController];
   (new Controllers(controllers)).startup();
   allControllers = allControllers.concat(controllers);
 }
 
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 import {
   COMMONJS_UNLOAD_SUBJECT,
-} from "content/legacy/lib/commonjs-unload-subject";
+} from "legacy/lib/commonjs-unload-subject";
 
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
-import {PrefManager} from "content/main/pref-manager";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
+import {PrefManager} from "main/pref-manager";
 
-import "content/main/about-uri";
-import "content/main/content-policy";
-import "content/main/requestpolicy-service";
-import "content/main/window-manager";
+import "main/about-uri";
+import "main/content-policy";
+import "main/requestpolicy-service";
+import "main/window-manager";
 
 import {
   InitialSetupController,
-} from "content/controllers/initial-setup-controller";
+} from "controllers/initial-setup-controller";
 import {
   KeyboardShortcutController,
-} from "content/controllers/keyboard-shortcut-controller";
+} from "controllers/keyboard-shortcut-controller";
 import {
   NotificationsController,
-} from "content/controllers/notification-controller";
-import {OldRulesController} from "content/controllers/old-rules-controller";
+} from "controllers/notification-controller";
+import {OldRulesController} from "controllers/old-rules-controller";
 import {
   OtherRPInstallationsController,
-} from "content/controllers/other-rp-installations-controller";
+} from "controllers/other-rp-installations-controller";
 
 // @if BUILD_ALIAS='ui-testing'
-import "content/ui-testing/services";
+import "ui-testing/services";
 // @endif
 
 const controllersToBeStartedUp = [
@@ -75,7 +75,7 @@ allControllers = allControllers.concat(controllersToBeStartedUp);
 
 // =============================================================================
 
-import {BackgroundPage} from "content/models/background-page";
+import {BackgroundPage} from "models/background-page";
 
 declare const _setBackgroundPage: (
   backgroundPage: {[name: string]: any},

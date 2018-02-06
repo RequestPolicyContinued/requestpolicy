@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import {Requests} from "content/models/requests";
-import {Storage} from "content/models/storage";
+import * as DomainUtil from "lib/utils/domain-utils";
+import {Requests} from "models/requests";
+import {Storage} from "models/storage";
 
 const initFunctions = [];
 

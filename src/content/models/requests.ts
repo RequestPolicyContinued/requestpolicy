@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {RequestSet} from "content/lib/request-set";
-import * as DomainUtil from "content/lib/utils/domain-utils";
-import {createListenersMap} from "content/lib/utils/listener-factories";
-import {Log} from "content/models/log";
+import {RequestSet} from "lib/request-set";
+import * as DomainUtil from "lib/utils/domain-utils";
+import {createListenersMap} from "lib/utils/listener-factories";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

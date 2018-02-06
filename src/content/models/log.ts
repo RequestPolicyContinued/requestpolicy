@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 
 // ===========================================================================
 // constants & utilities

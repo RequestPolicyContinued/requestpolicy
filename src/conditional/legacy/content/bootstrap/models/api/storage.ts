@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Module} from "content/lib/classes/module";
-import {IKeysWithDefaults} from "content/lib/classes/object-interface";
-import {createListenersMap} from "content/lib/utils/listener-factories";
+import {Module} from "lib/classes/module";
+import {IKeysWithDefaults} from "lib/classes/object-interface";
+import {createListenersMap} from "lib/utils/listener-factories";
 import {SyncLocalStorageArea} from "./storage/sync-local-storage-area";
 
 export class Storage extends Module {

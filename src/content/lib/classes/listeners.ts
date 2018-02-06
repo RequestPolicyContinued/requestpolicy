@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { OverridableSet } from "content/lib/classes/set";
+import { OverridableSet } from "lib/classes/set";
 
 export type Listener = (...args: any[]) => void;
 

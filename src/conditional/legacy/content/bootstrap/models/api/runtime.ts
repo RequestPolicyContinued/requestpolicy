@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MaybePromise} from "content/lib/classes/maybe-promise";
-import {Module} from "content/lib/classes/module";
-import {createListenersMap} from "content/lib/utils/listener-factories";
+import {MaybePromise} from "lib/classes/maybe-promise";
+import {Module} from "lib/classes/module";
+import {createListenersMap} from "lib/utils/listener-factories";
 
 declare const Services: any;
 
@@ -58,9 +58,9 @@ export class Runtime extends Module {
 
   /**
    * Map a relative path to manifest.json to a legacy path (XUL/XPCOM).
-   * All paths pointing to a html file in /content/settings/ are mapped into
+   * All paths pointing to a html file in /settings/ are mapped into
    * about:requestpolicy?, other paths are mapped into chrome://rpcontinued/ :
-   *  - /content/settings/filename.html will become about:requestpolicy?filename
+   *  - /settings/filename.html will become about:requestpolicy?filename
    *  - /foo/bar.file.css will become chrome://rpcontinued/foo/bar.file.css
    * Leading / or ./ are ignored and the path is case sensitive.
    *
@@ -78,7 +78,7 @@ export class Runtime extends Module {
     // to split it isn't recommended if the pattern doesn't change
     // eslint-disable-next-line max-len
     const patternAbout =
-        /^(?:\.\/|\/)?content\/settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
+        /^(?:\.\/|\/)?settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
 
     // Pattern to match prepending with chrome://rpcontinued/
     // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"

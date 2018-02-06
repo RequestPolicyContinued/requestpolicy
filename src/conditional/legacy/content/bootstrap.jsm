@@ -115,8 +115,8 @@ function createCommonjsEnv() {
       // eslint-disable-next-line new-cap
       loaderWrapper.loader = Loader.Loader({
         paths: Object.assign({
-          "content/": "chrome://rpcontinued/content/",
-          "": "resource://gre/modules/commonjs/",
+          "toolkit/": "resource://gre/modules/commonjs/toolkit/",
+          "": "chrome://rpcontinued/content/",
         }, additionalPaths),
         globals,
       });
@@ -170,9 +170,6 @@ var FakeWebExt = (function() {
     fakeEnv.exports = fakeEnv.commonjsEnv.load({
       mainFile: "bootstrap/main",
       additionalGlobals: [],
-      additionalPaths: {
-        "bootstrap/": "chrome://rpcontinued/content/bootstrap/",
-      },
     });
 
     // eslint-disable-next-line no-constant-condition
@@ -192,7 +189,8 @@ var FakeWebExt = (function() {
         addon.commonjsEnv = createCommonjsEnv();
         // eslint-disable-next-line no-unused-vars
         const background = addon.commonjsEnv.load({
-          mainFile: api.manifest.background.scripts[0],
+          mainFile: api.manifest.background.scripts[0].
+              replace(/^content\//, ""),
           additionalGlobals: [
             ["browser", api.backgroundApi],
             ["LegacyApi", api.legacyApi],
@@ -250,7 +248,7 @@ var FakeWebExt = (function() {
 
     const commonjsEnv = createCommonjsEnv();
     commonjsEnv.load({
-      mainFile: "content/framescripts/main",
+      mainFile: "framescripts/main",
       additionalGlobals: [
         ["cfmm", cfmm],
         ["browser", api.contentApi],
@@ -287,7 +285,7 @@ var FakeWebExt = (function() {
       const pageName = document.documentElement.id;
       api.legacyApi.i18n.updateDocument(document);
       commonjsEnv.load({
-        mainFile: `content/settings/${pageName}`,
+        mainFile: `settings/${pageName}`,
         additionalGlobals: [
           ["$", $],
           ["window", window],
@@ -309,7 +307,7 @@ var FakeWebExt = (function() {
     const commonjsEnv = createCommonjsEnv();
 
     commonjsEnv.load({
-      mainFile: "content/ui/request-log/main",
+      mainFile: "ui/request-log/main",
       additionalGlobals: [
         ["window", window],
         ["browser", api.backgroundApi],

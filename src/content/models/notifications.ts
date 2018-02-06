@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IListenInterface} from "content/lib/classes/listeners";
-import {OverridableSet} from "content/lib/classes/set";
-import {createListenersMap} from "content/lib/utils/listener-factories";
-import * as WindowUtils from "content/lib/utils/window-utils";
+import {IListenInterface} from "lib/classes/listeners";
+import {OverridableSet} from "lib/classes/set";
+import {createListenersMap} from "lib/utils/listener-factories";
+import * as WindowUtils from "lib/utils/window-utils";
 
 export enum NotificationID {
   InitialSetup,

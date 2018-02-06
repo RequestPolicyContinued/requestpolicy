@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {defineLazyGetter} from "content/lib/utils/js-utils";
+import {defineLazyGetter} from "lib/utils/js-utils";
 
 export const MozModules: {
   FileUtils?: any,

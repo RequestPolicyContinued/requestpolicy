@@ -23,10 +23,10 @@
 
 declare const LegacyApi: any;
 
-import {IController} from "content/lib/classes/controllers";
-import {NotificationID, Notifications} from "content/models/notifications";
-import {Storage} from "content/models/storage";
-import {VersionInfos} from "content/models/version-infos";
+import {IController} from "lib/classes/controllers";
+import {NotificationID, Notifications} from "models/notifications";
+import {Storage} from "models/storage";
+import {VersionInfos} from "models/version-infos";
 
 function onNotificationsTabOpened(aId: NotificationID) {
   if (aId !== NotificationID.InitialSetup) return;

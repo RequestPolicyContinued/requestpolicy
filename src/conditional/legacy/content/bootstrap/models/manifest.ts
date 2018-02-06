@@ -24,7 +24,7 @@ import {
   getChromeUrl,
   parseJSON,
 } from "bootstrap/lib/utils/chrome-files-utils";
-import { Module } from "content/lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class Manifest extends Module {
   public manifest: any;

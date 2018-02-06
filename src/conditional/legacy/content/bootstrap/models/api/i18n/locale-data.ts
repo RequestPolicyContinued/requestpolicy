@@ -17,7 +17,7 @@
  * revision bc6315c22e6950b7022f6caf8929428399a1499f.
  */
 
-import {CIMap} from "content/lib/classes/case-insensitive-map";
+import {CIMap} from "lib/classes/case-insensitive-map";
 
 export class LocaleData {
   public static BUILTIN = "@@BUILTIN_MESSAGES";

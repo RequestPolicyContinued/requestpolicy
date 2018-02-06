@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { IListenInterface } from "content/lib/classes/listeners";
-import { Module } from "content/lib/classes/module";
-import { createListenersMap } from "content/lib/utils/listener-factories";
-import { Log } from "content/models/log";
+import { IListenInterface } from "lib/classes/listeners";
+import { Module } from "lib/classes/module";
+import { createListenersMap } from "lib/utils/listener-factories";
+import { Log } from "models/log";
 
 const {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 

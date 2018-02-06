@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
-import {PolicyManager} from "content/lib/policy-manager";
+import {Log} from "models/log";
+import {PolicyManager} from "lib/policy-manager";
 import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC} from "content/lib/subscription";
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
+  SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 const log = Log.instance;
 

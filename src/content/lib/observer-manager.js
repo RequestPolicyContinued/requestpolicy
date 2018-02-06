@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XPCOMObserver} from "content/lib/classes/xpcom-observer";
-import {Level as EnvLevel} from "content/lib/environment";
-import {Log} from "content/models/log";
+import {XPCOMObserver} from "lib/classes/xpcom-observer";
+import {Level as EnvLevel} from "lib/environment";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

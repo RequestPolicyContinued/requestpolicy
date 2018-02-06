@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
-import * as Utils from "content/lib/utils/misc-utils";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
+import * as Utils from "lib/utils/misc-utils";
 
 // =============================================================================
 // utilities, constants

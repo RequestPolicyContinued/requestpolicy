@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {IController} from "content/lib/classes/controllers";
-import {NotificationID, Notifications} from "content/models/notifications";
-import {pWindowsAvailable} from "content/models/ui-startup";
+import {IController} from "lib/classes/controllers";
+import {NotificationID, Notifications} from "models/notifications";
+import {pWindowsAvailable} from "models/ui-startup";
 
 function showNotification(id: NotificationID) {
   Notifications.openTab(id);

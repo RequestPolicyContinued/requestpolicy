@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "content/models/log";
+import {Log} from "models/log";
 
 const log = Log.instance;
 

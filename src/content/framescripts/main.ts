@@ -20,20 +20,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import "content/framescripts/blocked-content";
-import "content/framescripts/dom-content-loaded";
-import "content/framescripts/misc";
+import "framescripts/blocked-content";
+import "framescripts/dom-content-loaded";
+import "framescripts/misc";
 
-import {C} from "content/data/constants";
+import {C} from "data/constants";
 import {
   COMMONJS_UNLOAD_SUBJECT,
-} from "content/legacy/lib/commonjs-unload-subject";
+} from "legacy/lib/commonjs-unload-subject";
 
 if (C.UI_TESTING) {
-  import("content/ui-testing/services");
+  import("ui-testing/services");
 }
 
-import {Level as EnvLevel, MainEnvironment} from "content/lib/environment";
+import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 // =============================================================================
 

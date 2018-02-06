@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Module} from "content/lib/classes/module";
+import {Module} from "lib/classes/module";
 
 export class Extension extends Module {
   protected moduleName = "extension";

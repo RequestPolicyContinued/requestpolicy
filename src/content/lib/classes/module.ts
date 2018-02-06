@@ -49,7 +49,7 @@ export abstract class Module implements IModule {
     }
     const p = Promise.all(promises);
     p.catch(this.log.onError("whenReady"));
-    return p.then(() => undefined);
+    return p.then(() => { return; });
   }
 
   private dSelfBootstrap = {

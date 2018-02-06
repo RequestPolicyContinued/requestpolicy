@@ -31,4 +31,3 @@ DefaultPreferencesController.startup();
 import {Api} from "bootstrap/models/api";
 
 export const api = Api.instance;
-export {Manifest} from "bootstrap/models/manifest";

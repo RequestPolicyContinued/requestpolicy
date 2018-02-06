@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,22 +20,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
+import {
+  getChromeUrl,
+  parseJSON,
+} from "bootstrap/lib/utils/chrome-files-utils";
+import { Module } from "content/lib/classes/module";
 
-// =============================================================================
-// Manifest
-// =============================================================================
+export class Manifest extends Module {
+  public manifest: any;
+  public moduleName = "manifest";
 
-export const Manifest = (function() {
-  const uri = "chrome://rpcontinued/content/bootstrap/data/manifest.json";
-  const charset = "UTF-8";
-
-  const uriObj = NetUtil.newURI(uri, charset);
-  const channel = NetUtil.newChannel(uriObj);
-  const inputStream = channel.open();
-  const count = inputStream.available();
-  const data = NetUtil.readInputStreamToString(inputStream, count, {charset});
-  inputStream.close();
-
-  return Object.freeze(JSON.parse(data));
-})();
+  public async startupSelf() {
+    const manifestUrl = getChromeUrl("content/bootstrap/data/manifest.json");
+    await parseJSON(manifestUrl).then((manifest) => {
+      this.manifest = manifest;
+    });
+  }
+}

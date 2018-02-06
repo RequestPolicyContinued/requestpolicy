@@ -30,6 +30,7 @@ import {I18n} from "./api/i18n";
 import {Management} from "./api/management";
 import {Runtime} from "./api/runtime";
 import {Storage} from "./api/storage";
+import {Manifest} from "./manifest";
 
 export class Api extends Module {
   private static lInstance: Api;
@@ -45,6 +46,7 @@ export class Api extends Module {
     extension: new Extension({log: this.log}),
     i18n: new I18n({log: this.log}),
     management: new Management({log: this.log}),
+    manifest: new Manifest({log: this.log}),
     runtime: new Runtime({log: this.log}),
     storage: new Storage({log: this.log}),
   };
@@ -76,6 +78,10 @@ export class Api extends Module {
       prefs: Prefs,
       storage: {},
     };
+  }
+
+  public get manifest() {
+    return this.subModules.manifest.manifest;
   }
 
   public get bootstrap() {

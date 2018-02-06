@@ -64,7 +64,7 @@ export class AsyncLocaleData extends LocaleData {
    */
   getDefaultLocale() {
     const manifestUrl = ChromeFilesUtils.getChromeUrl(
-        "content/bootstrap/data/manifest.json"
+        "content/bootstrap-data/manifest.json"
     );
 
     return ChromeFilesUtils.parseJSON(manifestUrl).then((manifest) => {
@@ -89,7 +89,7 @@ export class AsyncLocaleData extends LocaleData {
     // During build, a JSON file containing all available locales should be
     // generated.
     const localesListJSON = ChromeFilesUtils.getChromeUrl(
-        "content/bootstrap/data/locales.json"
+        "content/bootstrap-data/locales.json"
     );
 
     return ChromeFilesUtils.parseJSON(

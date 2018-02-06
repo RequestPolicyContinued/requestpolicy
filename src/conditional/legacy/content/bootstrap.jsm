@@ -171,7 +171,7 @@ var FakeWebExt = (function() {
       mainFile: "bootstrap/main",
       additionalGlobals: [],
       additionalPaths: {
-        "bootstrap/": "chrome://rpcontinued/content/bootstrap/content/",
+        "bootstrap/": "chrome://rpcontinued/content/bootstrap/",
       },
     });
 

@@ -81,7 +81,7 @@ export const rpWindowManager = (function() {
   self.pStartup = dStartup.promise;
 
   let frameScriptURI =
-      `chrome://rpcontinued/content/bootstrap/environments/framescript.js?${
+      `chrome://rpcontinued/content/bootstrap-environments/framescript.js?${
         Math.random()}`;
 
   function loadIntoWindow(window) {

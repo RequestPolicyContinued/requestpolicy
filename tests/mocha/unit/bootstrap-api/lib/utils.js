@@ -5,7 +5,7 @@ function createPathAliasProxy() {
       // hack require(). https://stackoverflow.com/a/42648141
       // eslint-disable-next-line no-param-reassign
       argumentsList[0] = argumentsList[0].
-          replace(/^bootstrap\//, "content/bootstrap/content/");
+          replace(/^bootstrap\//, "content/bootstrap/");
       return Reflect.apply(target, thisArg, argumentsList);
     },
   });

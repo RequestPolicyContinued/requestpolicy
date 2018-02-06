@@ -35,7 +35,7 @@
     "baseUrl": "src",
     "paths": {
       "bootstrap/*": [
-        "conditional/legacy/content/bootstrap/content/*"
+        "conditional/legacy/content/bootstrap/*"
       ],
       "*": [
         "*",

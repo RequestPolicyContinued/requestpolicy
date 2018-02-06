@@ -30,7 +30,7 @@
 // =============================================================================
 
 const {utils: Cu} = Components;
-const BOOTSTRAP = "chrome://rpcontinued/content/bootstrap/bootstrap.jsm";
+const BOOTSTRAP = "chrome://rpcontinued/content/bootstrap.jsm";
 
 function reasonConstantToString(c) {
   switch (c) {

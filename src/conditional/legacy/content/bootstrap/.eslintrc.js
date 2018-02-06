@@ -1,5 +1,5 @@
 module.exports = {
-  "extends": "../../../../../../src/.eslintrc.legacy-module.js",
+  "extends": "../../../../../src/.eslintrc.legacy-module.js",
 
   "globals": {
     "browser": false,

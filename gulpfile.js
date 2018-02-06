@@ -69,9 +69,9 @@ const fileFilter = (function() {
   }
 
   const nonModulePaths = [
-    "conditional/legacy/bootstrap",
-    "content/bootstrap/data/",
-    "content/bootstrap/environments/",
+    "conditional/legacy/bootstrap", // bootstrapped extension's entry point
+    "content/bootstrap-data/",
+    "content/bootstrap-environments/",
   ];
   const nonModuleStems = [
   ];
@@ -487,8 +487,8 @@ BUILDS.forEach((build) => {
             "_locales/**/messages.json",
             "manifest.json",
           ] : extensionType === "legacy" ? [
-            "content/bootstrap/data/locales.json",
-            "content/bootstrap/data/manifest.json",
+            "content/bootstrap-data/locales.json",
+            "content/bootstrap-data/manifest.json",
             "content/_locales/**/messages.json",
           ] : []
       ));

@@ -10,7 +10,7 @@ import json
 
 GET_BACKGROUND_PAGE = """
     Components.utils.
-        import("chrome://rpcontinued/content/bootstrap/bootstrap.jsm", {}).
+        import("chrome://rpcontinued/content/bootstrap.jsm", {}).
         FakeWebExt.api.backgroundApi.extension.getBackgroundPage()
 """
 

@@ -5,6 +5,7 @@
 from rp_ui_harness import RequestPolicyTestCase
 from marionette_driver.errors import NoSuchElementException
 from rp_ui_harness.test_data.rules import ExemplaryOldRules
+from marionette import SkipTest
 
 
 class TestYourPolicy(RequestPolicyTestCase):

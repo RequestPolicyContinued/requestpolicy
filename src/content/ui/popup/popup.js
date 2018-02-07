@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* eslint-env browser */
-
 (function() {
   // We use window.top because the popup can be embedded in a frame
   let overlay = window.parent.rpcontinued.overlay;

@@ -271,6 +271,24 @@ var FakeWebExt = (function() {
   };
 
   // ---------------------------------------------------------------------------
+  // startupBrowserAction
+  // ---------------------------------------------------------------------------
+
+  FakeWebExt.startupBrowserAction = function(window) {
+    const {document} = window;
+    const {api} = fakeEnv.exports;
+
+    // eslint-disable-next-line no-param-reassign
+    window.browser = api.contentApi;
+
+    function onDOMContentLoaded() {
+      document.removeEventListener("DOMContentLoaded", onDOMContentLoaded);
+      api.legacyApi.i18n.updateDocument(document);
+    }
+    document.addEventListener("DOMContentLoaded", onDOMContentLoaded);
+  };
+
+  // ---------------------------------------------------------------------------
   // startupSettingsPage
   // ---------------------------------------------------------------------------
 

@@ -58,13 +58,12 @@ const {LOG_FLAG_STATE} = C;
  * @param {Window} window
  */
 export function loadOverlayIntoWindow(window) {
-  let {document, rpcontinued} = window;
+  let {rpcontinued} = window;
 
   // ===========================================================================
 
   let gBrowser = WindowUtils.getTabBrowser(window);
 
-  let $id = document.getElementById.bind(document);
   const $str = browser.i18n.getMessage.bind(browser.i18n);
 
   // create an environment for this overlay.
@@ -109,6 +108,24 @@ export function loadOverlayIntoWindow(window) {
     // We don't need to worry about setting it here.
     requestLog: null,
     OverlayEnvironment: OverlayEnvironment,
+  };
+
+  /**
+   * Return a DOM element by its id. First search in the main document,
+   * and if not found search in the document included in the frame.
+   *
+   * @param {string} id the DOM element's id
+   * @return {Element} the DOM element or null if not found
+   */
+  let $id = function(id) {
+    let element = window.top.document.getElementById(id);
+    if (!element) {
+      let popupframe = window.top.document.getElementById("rpc-popup-frame");
+      if (popupframe && popupframe.contentDocument) {
+        element = popupframe.contentDocument.getElementById(id);
+      }
+    }
+    return element;
   };
 
   self.toString = function() {
@@ -1004,15 +1021,14 @@ export function loadOverlayIntoWindow(window) {
   /**
    * Toggles disabling of all blocking for the current session.
    *
-   * @param {Event} event
+   * @return {boolean} True if the blocking is temporary disabled,
+   * false otherise
    */
-  self.toggleTemporarilyAllowAll = function(event) {
+  self.toggleTemporarilyAllowAll = function() {
     const disabled = !Storage.alias.isBlockingDisabled();
     Storage.alias.setBlockingDisabled(disabled);
 
-    // Change the link displayed in the menu.
-    $id("rpc-link-enable-blocking").hidden = !disabled;
-    $id("rpc-link-disable-blocking").hidden = disabled;
+    return disabled;
   };
 
   /**

@@ -509,9 +509,13 @@ tslint: node-packages
 #-------------------------------------------------------------------------------
 
 .PHONY: check-locales
-check-locales: python-packages
+check-locales: check-we-locales check-legacy-locales
+
+.PHONY: check-we-locales
+check-we-locales: python-packages
 	@echo $@
 	@./tests/l10n/check-we-locales.py
+
 include tests/l10n/Makefile
 
 #-------------------------------------------------------------------------------

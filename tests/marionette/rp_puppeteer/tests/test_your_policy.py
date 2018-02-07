@@ -5,6 +5,7 @@
 from rp_ui_harness import RequestPolicyTestCase
 from rp_ui_harness.test_data.rules import ExemplaryRules
 from functools import partial
+from marionette import SkipTest
 
 
 class YourPolicyTestCase(RequestPolicyTestCase):

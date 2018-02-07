@@ -10,9 +10,19 @@ class MenuTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
-            self.menu.close()
+            if not self.disabled:
+                self.menu.close()
         finally:
             super(RequestPolicyTestCase, self).tearDown()
+
+    @property
+    def disabled(self):
+        return not self.menu.is_working
+
+    @property
+    def skip_if_disabled(self):
+        if self.disabled:
+            raise SkipTest("menu is defunct")
 
 
 # ==============================================================================
@@ -24,8 +34,7 @@ class MenuTests:
         test_close = True
 
         def test_open_close(self):
-            raise SkipTest(
-                "menu.open() often fails due to a TimeoutException")
+            self.skip_if_disabled()
 
             try:
                 self.assertFalse(self.menu.is_open())
@@ -60,8 +69,7 @@ class TestTriggeringMenuViaShortcut(MenuTests.TriggeringMenuTests):
 
 class TestMenu(MenuTestCase):
     def test_total_num_requests(self):
-        raise SkipTest(
-            "menu.open() often fails due to a TimeoutException")
+        self.skip_if_disabled()
 
         with self.requests.listen():
             with self.marionette.using_context("content"):

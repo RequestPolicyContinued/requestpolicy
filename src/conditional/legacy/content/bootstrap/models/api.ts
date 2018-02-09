@@ -33,61 +33,62 @@ import {Storage} from "./api/storage";
 import {Manifest} from "./manifest";
 
 export class Api extends Module {
-  private static lInstance: Api;
-  public static get instance(): Api {
-    if (!Api.lInstance) {
-      Api.lInstance = new Api({log: Log.instance});
-    }
-    return Api.lInstance;
+  constructor(
+      log: Log,
+      public readonly extension: Extension,
+      public readonly i18n: I18n,
+      public readonly management: Management,
+      public readonly manifest: Manifest,
+      public readonly runtime: Runtime,
+      public readonly storage: Storage,
+  ) {
+    super("API", log);
   }
 
-  protected moduleName = "API";
-  protected subModules = {
-    extension: new Extension({log: this.log}),
-    i18n: new I18n({log: this.log}),
-    management: new Management({log: this.log}),
-    manifest: new Manifest({log: this.log}),
-    runtime: new Runtime({log: this.log}),
-    storage: new Storage({log: this.log}),
-  };
+  protected get subModules() {
+    return {
+      extension: this.extension,
+      i18n: this.i18n,
+      management: this.management,
+      manifest: this.manifest,
+      runtime: this.runtime,
+      storage: this.storage,
+    };
+  }
 
   public get backgroundApi() {
     return {
-      extension: this.subModules.extension.backgroundApi,
-      i18n: this.subModules.i18n.backgroundApi,
-      management: this.subModules.management.backgroundApi,
-      runtime: this.subModules.runtime.backgroundApi,
-      storage: this.subModules.storage.backgroundApi,
+      extension: this.extension.backgroundApi,
+      i18n: this.i18n.backgroundApi,
+      management: this.management.backgroundApi,
+      runtime: this.runtime.backgroundApi,
+      storage: this.storage.backgroundApi,
     };
   }
 
   public get contentApi() {
     return {
-      extension: this.subModules.extension.contentApi,
-      i18n: this.subModules.i18n.contentApi,
-      runtime: this.subModules.runtime.contentApi,
-      storage: this.subModules.storage.contentApi,
+      extension: this.extension.contentApi,
+      i18n: this.i18n.contentApi,
+      runtime: this.runtime.contentApi,
+      storage: this.storage.contentApi,
     };
   }
 
   public get legacyApi() {
     return {
       PrefObserver,
-      i18n: this.subModules.i18n.legacyApi,
+      i18n: this.i18n.legacyApi,
       miscInfos: LegacyMiscInfos,
       prefs: Prefs,
       storage: {},
     };
   }
 
-  public get manifest() {
-    return this.subModules.manifest.manifest;
-  }
-
   public get bootstrap() {
     return {
-      setBackgroundPage: this.subModules.extension.setBackgroundPage.
-          bind(this.subModules.extension),
+      setBackgroundPage: this.extension.setBackgroundPage.
+          bind(this.extension),
     };
   }
 }

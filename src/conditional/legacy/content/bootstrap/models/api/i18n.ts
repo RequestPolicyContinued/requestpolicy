@@ -22,13 +22,21 @@
 
 import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
 import {Module} from "lib/classes/module";
+import { Log } from "models/log";
 import {AsyncLocaleData} from "./i18n/async-locale-data";
 
 export class I18n extends Module {
-  protected moduleName = "i18n";
-  protected subModules = {
-    localeData: new AsyncLocaleData(),
-  };
+  protected localeData = new AsyncLocaleData();
+
+  constructor(log: Log) {
+    super("browser.i18n", log);
+  }
+
+  protected get subModules() {
+    return {
+      localeData: this.localeData,
+    };
+  }
 
   public get backgroundApi() {
     return {
@@ -64,7 +72,7 @@ export class I18n extends Module {
    * @return {string} Message localized for current locale.
    */
   public getMessage(messageName: string, substitutions: any) {
-    return this.subModules.localeData.
+    return this.localeData.
         localizeMessage(messageName, substitutions);
   }
 
@@ -74,6 +82,6 @@ export class I18n extends Module {
    * @return {string} The browser UI language code as a BCP 47 tag.
    */
   public getUILanguage() {
-    return this.subModules.localeData.getAppLocale();
+    return this.localeData.getAppLocale();
   }
 }

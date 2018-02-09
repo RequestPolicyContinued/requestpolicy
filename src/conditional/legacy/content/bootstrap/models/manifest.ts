@@ -25,15 +25,19 @@ import {
   parseJSON,
 } from "bootstrap/lib/utils/chrome-files-utils";
 import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 
 export class Manifest extends Module {
-  public manifest: any;
-  public moduleName = "manifest";
+  public data: any;
+
+  constructor(log: Log) {
+    super("manifest", log);
+  }
 
   public async startupSelf() {
     const manifestUrl = getChromeUrl("content/bootstrap-data/manifest.json");
-    await parseJSON(manifestUrl).then((manifest) => {
-      this.manifest = manifest;
+    await parseJSON(manifestUrl).then((data) => {
+      this.data = data;
     });
   }
 }

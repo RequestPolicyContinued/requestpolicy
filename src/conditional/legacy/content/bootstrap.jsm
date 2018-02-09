@@ -189,7 +189,7 @@ var FakeWebExt = (function() {
         addon.commonjsEnv = createCommonjsEnv();
         // eslint-disable-next-line no-unused-vars
         const background = addon.commonjsEnv.load({
-          mainFile: api.manifest.background.scripts[0].
+          mainFile: api.manifest.data.background.scripts[0].
               replace(/^content\//, ""),
           additionalGlobals: [
             ["browser", api.backgroundApi],

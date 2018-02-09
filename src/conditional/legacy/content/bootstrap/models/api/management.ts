@@ -38,8 +38,6 @@ export class Management extends Module {
   public onInstalled: IListenInterface;
   public onUninstalled: IListenInterface;
 
-  protected moduleName = "management";
-
   private addonListener: any = {};
 
   private MANAGEMENT_EVENTS = Object.freeze([
@@ -51,8 +49,8 @@ export class Management extends Module {
 
   private events = createListenersMap(this.MANAGEMENT_EVENTS);
 
-  constructor({log}: {log: Log}) {
-    super({log});
+  constructor(log: Log) {
+    super("browser.management", log);
 
     this.MANAGEMENT_EVENTS.forEach((aEvent) => {
       this.addonListener[aEvent] =

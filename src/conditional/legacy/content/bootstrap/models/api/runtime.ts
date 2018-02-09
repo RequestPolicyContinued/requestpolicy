@@ -24,13 +24,16 @@
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
+import { Log } from "models/log";
 
 declare const Services: any;
 
 export class Runtime extends Module {
-  protected moduleName = "runtime";
-
   private events = createListenersMap(["onMessage"]);
+
+  constructor(log: Log) {
+    super("browser.runtime", log);
+  }
 
   get backgroundApi() {
     return {

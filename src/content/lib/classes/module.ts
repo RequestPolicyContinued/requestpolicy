@@ -32,8 +32,9 @@ export interface IModule {
 export abstract class Module implements IModule {
   protected log: Log;
 
-  protected abstract moduleName: string;
-  protected subModules: {[key: string]: IModule} | undefined = undefined;
+  protected get subModules(): {[key: string]: IModule} | undefined {
+    return undefined;
+  }
   protected dSelfReady = defer();
 
   public get whenReady() {
@@ -85,8 +86,11 @@ export abstract class Module implements IModule {
   public get pStartup() { return this.pBootstrap.startup; }
   public get pShutdown() { return this.pBootstrap.shutdown; }
 
-  constructor({log}: {log: Log}) {
-    this.log = log.extend({name: this.moduleName});
+  constructor(
+      public readonly moduleName: string,
+      parentLog: Log,
+  ) {
+    this.log = parentLog.extend({name: moduleName});
   }
 
   public async startup(): Promise<void> {

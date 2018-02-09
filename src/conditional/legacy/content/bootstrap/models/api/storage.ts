@@ -23,14 +23,17 @@
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
+import { Log } from "models/log";
 import {SyncLocalStorageArea} from "./storage/sync-local-storage-area";
 
 export class Storage extends Module {
-  protected moduleName = "storage";
-
   private slsa = new SyncLocalStorageArea();
 
   private events = createListenersMap(["onChanged"]);
+
+  constructor(log: Log) {
+    super("browser.storage", log);
+  }
 
   public get backgroundApi() {
     return {

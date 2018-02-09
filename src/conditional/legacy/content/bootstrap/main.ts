@@ -23,11 +23,35 @@
 // Before anything else, handle default preferences. This is necessary because
 // bootsrapped addons have to handle their default preferences manually,
 // see Mozilla Bug 564675.
-// tslint:disable-next-line import-spacing
-import {DefaultPreferencesController}
-    from "bootstrap/controllers/default-preferences-controller";
+import {
+  DefaultPreferencesController,
+} from "bootstrap/controllers/default-preferences-controller";
 DefaultPreferencesController.startup();
 
-import {Api} from "bootstrap/models/api";
+import { Api } from "bootstrap/models/api";
+import { Extension } from "bootstrap/models/api/extension";
+import { I18n } from "bootstrap/models/api/i18n";
+import { Management } from "bootstrap/models/api/management";
+import { Runtime } from "bootstrap/models/api/runtime";
+import { Storage } from "bootstrap/models/api/storage";
+import { Manifest } from "bootstrap/models/manifest";
+import { Log } from "models/log";
 
-export const api = Api.instance;
+const log = Log.instance;
+
+const extension = new Extension(log);
+const i18n = new I18n(log);
+const management = new Management(log);
+const manifest = new Manifest(log);
+const runtime = new Runtime(log);
+const storage = new Storage(log);
+
+export const api = new Api(
+    log,
+    extension,
+    i18n,
+    management,
+    manifest,
+    runtime,
+    storage,
+);

@@ -21,11 +21,14 @@
  */
 
 import {Module} from "lib/classes/module";
+import {Log} from "models/log";
 
 export class Extension extends Module {
-  protected moduleName = "extension";
-
   private backgroundPage: any;
+
+  constructor(log: Log) {
+    super("browser.extension", log);
+  }
 
   public get backgroundApi() {
     return {

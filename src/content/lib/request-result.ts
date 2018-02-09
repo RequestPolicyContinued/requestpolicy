@@ -27,6 +27,7 @@
 
 export const RequestReason = {
   UserPolicy: 1,
+  // tslint:disable-next-line:object-literal-sort-keys
   SubscriptionPolicy: 2,
   DefaultPolicy: 3,
   DefaultPolicyInconsistentRules: 4,
@@ -46,6 +47,9 @@ export const RequestReason = {
   // TODO: give user control about relative urls on the page
 };
 
+type TRequestReason = number;
+type MatchedRules = any;
+
 // =============================================================================
 // RequestResult
 // =============================================================================
@@ -61,34 +65,36 @@ export const RequestReason = {
  * @param {number} resultReason
  */
 export class RequestResult {
-  static countOriginToDestRules(aMatchedRules) {
+  private static countOriginToDestRules(aMatchedRules: MatchedRules) {
     let n = 0;
-    for (let [, [type]] of aMatchedRules) {
+    for (const [, [type]] of aMatchedRules) {
       if (type === "origin-to-dest") ++n;
     }
     return n;
   }
 
-  constructor(isAllowed, resultReason) {
-    this.matchedAllowRules = [];
-    this.matchedDenyRules = [];
+  // FIXME: should be private
+  public matchedAllowRules: MatchedRules[] = [];
+  public matchedDenyRules: MatchedRules[] = [];
 
-    this.isAllowed = isAllowed;
-    this.resultReason = resultReason;
-  }
+  constructor(
+      // FIXME: should be private
+      public isAllowed?: boolean,
+      public resultReason?: TRequestReason,
+  ) {}
 
-  allowRulesExist() {
+  public allowRulesExist() {
     return this.matchedAllowRules.length > 0;
   }
 
-  denyRulesExist() {
+  public denyRulesExist() {
     return this.matchedDenyRules.length > 0;
   }
 
-  resolveConflict() {
-    let nODAllowRules = RequestResult.
+  public resolveConflict() {
+    const nODAllowRules = RequestResult.
         countOriginToDestRules(this.matchedAllowRules);
-    let nODDenyRules = RequestResult.
+    const nODDenyRules = RequestResult.
         countOriginToDestRules(this.matchedDenyRules);
     if (nODAllowRules === 0 && nODDenyRules > 0) {
       return {conflictCanBeResolved: true, shouldAllow: false};
@@ -99,7 +105,7 @@ export class RequestResult {
     return {conflictCanBeResolved: false, shouldAllow: undefined};
   }
 
-  isDefaultPolicyUsed() {
+  public isDefaultPolicyUsed() {
     // returns whether the default policy has been or will be used
     // for this request.
     return this.resultReason ===
@@ -109,7 +115,7 @@ export class RequestResult {
         this.resultReason === RequestReason.DefaultSameDomain;
   }
 
-  isOnBlacklist() {
+  public isOnBlacklist() {
     // TODO: implement a real blacklist. currently, if a request is blocked
     // *not* by the default policy it's by a blacklist
     return this.isAllowed ? false : !this.isDefaultPolicyUsed();

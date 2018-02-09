@@ -22,11 +22,11 @@
 
 declare const LegacyApi: any;
 
+import {rp} from "app/background/app.background";
 import {C} from "data/constants";
 import {OldRules} from "lib/classes/old-rules";
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {PolicyManager} from "lib/policy-manager";
 import * as RequestProcessor from "lib/request-processor";
 import {
   SUBSCRIPTION_ADDED_TOPIC,
@@ -35,7 +35,6 @@ import {
 import * as DomainUtil from "lib/utils/domain-utils";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import {rpService} from "main/requestpolicy-service";
 import {Log} from "models/log";
 import * as Metadata from "models/metadata";
 import {Requests} from "models/requests";
@@ -52,7 +51,6 @@ export const BackgroundPage = {
   ManagerForPrefObservers,
   Metadata,
   OldRules,
-  PolicyManager,
   RequestProcessor,
   Requests,
   RuleUtils,
@@ -61,5 +59,5 @@ export const BackgroundPage = {
   Storage,
   VersionInfos,
   WindowUtils,
-  rpService,
+  rp,
 };

@@ -23,7 +23,6 @@
 
 import {Log} from "models/log";
 import {Storage} from "models/storage";
-import {PolicyManager} from "lib/policy-manager";
 import * as DomainUtil from "lib/utils/domain-utils";
 import {Request} from "lib/request";
 import {
@@ -50,6 +49,7 @@ import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
 } from "lib/utils/try-catch-utils";
+import {rp} from "app/background/app.background";
 
 const log = Log.instance;
 
@@ -510,7 +510,7 @@ export function process(request) {
       );
     }
 
-    request.requestResult = PolicyManager.checkRequestAgainstUserRules(
+    request.requestResult = rp.policy.checkRequestAgainstUserRules(
         request.aRequestOrigin, request.aContentLocation
     );
     for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
@@ -565,7 +565,7 @@ export function process(request) {
       return reject("Blocked by user policy", request);
     }
 
-    request.requestResult = PolicyManager.
+    request.requestResult = rp.policy.
         checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
             request.aContentLocation);
     for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
@@ -871,7 +871,7 @@ function checkRedirect(request) {
   const destURIObj = DomainUtil.getUriObject(destURI);
 
   {
-    let result = PolicyManager.checkRequestAgainstUserRules(originURIObj,
+    let result = rp.policy.checkRequestAgainstUserRules(originURIObj,
         destURIObj);
     if (result.denyRulesExist() && result.allowRulesExist()) {
       let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
@@ -890,7 +890,7 @@ function checkRedirect(request) {
   }
 
   {
-    let result = PolicyManager.checkRequestAgainstSubscriptionRules(
+    let result = rp.policy.checkRequestAgainstSubscriptionRules(
         originURIObj, destURIObj
     );
     if (result.denyRulesExist() && result.allowRulesExist()) {

@@ -33,7 +33,6 @@ import {Log} from "models/log";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import {Storage} from "models/storage";
 import * as RequestProcessor from "lib/request-processor";
-import {PolicyManager} from "lib/policy-manager";
 import * as DomainUtil from "lib/utils/domain-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import * as JSUtils from "lib/utils/js-utils";
@@ -46,6 +45,7 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
+import {rp} from "app/background/app.background";
 
 const log = Log.instance;
 
@@ -1037,7 +1037,7 @@ export function loadOverlayIntoWindow(window) {
    * @param {Event} event
    */
   self.revokeTemporaryPermissions = function(event) {
-    PolicyManager.revokeTemporaryRules();
+    rp.policy.revokeTemporaryRules();
     self._needsReloadOnMenuClose = true;
     popupElement.hidePopup();
   };

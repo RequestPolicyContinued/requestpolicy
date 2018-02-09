@@ -83,8 +83,8 @@ class Rules(BaseLib):
         """Save the rules to the json file."""
 
         return self.marionette.execute_script("""
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
-          PolicyManager.storeRules();
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
+          rp.policy.storeRules();
         """)
 
     ##################################
@@ -101,9 +101,9 @@ class Rules(BaseLib):
           var rulesetName = arguments[0];
           var allow = arguments[1];
 
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
-          var rawRuleset = PolicyManager.getUserRulesets()[rulesetName]
-                                        .rawRuleset;
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
+          var rawRuleset = rp.policy.getUserRulesets()[rulesetName]
+                                    .rawRuleset;
           if (allow === true) {
             return rawRuleset.getAllowRuleCount();
           } else {
@@ -121,9 +121,9 @@ class Rules(BaseLib):
           var rulesetName = arguments[0];
           var ruleActionString = arguments[1];
 
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
-          var rawRuleset = PolicyManager.getUserRulesets()[rulesetName]
-                                        .rawRuleset;
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
+          var rawRuleset = rp.policy.getUserRulesets()[rulesetName]
+                                    .rawRuleset;
           return rawRuleset.entries[ruleActionString];
         """, script_args=[ruleset_name, rule_action_string])
 
@@ -224,11 +224,11 @@ class Rule(BaseLib):
           var temp = arguments[2];
           var noStore = arguments[3];
 
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
           if (temp === true) {
-            PolicyManager.addTemporaryRule(ruleAction, ruleData);
+            rp.policy.addTemporaryRule(ruleAction, ruleData);
           } else {
-            PolicyManager.addRule(ruleAction, ruleData, noStore);
+            rp.policy.addRule(ruleAction, ruleData, noStore);
           }
         """, script_args=[self._rule_action, self.rule_data, self.temp,
                           not store])
@@ -241,8 +241,8 @@ class Rule(BaseLib):
           var ruleData = arguments[1];
           var noStore = arguments[2];
 
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
-          PolicyManager.removeRule(ruleAction, ruleData, noStore);
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
+          rp.policy.removeRule(ruleAction, ruleData, noStore);
         """, script_args=[self._rule_action, self.rule_data, not store])
 
     def exists(self):
@@ -253,10 +253,10 @@ class Rule(BaseLib):
           var ruleAction = arguments[1];
           var ruleData = arguments[2];
 
-          var {PolicyManager} = """ + GET_BACKGROUND_PAGE + """;
-          return PolicyManager.getUserRulesets()[rulesetName]
-                              .rawRuleset
-                              .ruleExists(ruleAction, ruleData);
+          var {rp} = """ + GET_BACKGROUND_PAGE + """;
+          return rp.policy.getUserRulesets()[rulesetName]
+                          .rawRuleset
+                          .ruleExists(ruleAction, ruleData);
         """, script_args=[self._ruleset_name, self._rule_action,
                           self.rule_data])
 

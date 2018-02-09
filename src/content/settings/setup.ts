@@ -21,16 +21,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import * as JQuery from "jquery";
+import { UserSubscriptionsInfo } from "lib/subscription";
+import {BackgroundPage} from "main";
 import {$id} from "./common";
 
-(function() {
-  var {
+declare const Services: any;
+declare const $: typeof JQuery;
+
+(() => {
+  const {
     VersionInfos,
     Storage,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
-    rpService,
-  } = browser.extension.getBackgroundPage();
+    rp,
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
 
@@ -61,18 +67,19 @@ import {$id} from "./common";
   }
 
   function handleSubscriptionsChange() {
-    var enableSubs = $id("enablesubs").checked;
-    var subs = {
-      "allow_embedded": {},
-      "allow_extensions": {},
-      "allow_functionality": {},
-      "allow_mozilla": {},
-      "allow_sameorg": {},
-      "deny_trackers": {},
+    const enableSubs = $id("enablesubs").checked;
+    const subs = {
+      allow_embedded: {},
+      allow_extensions: {},
+      allow_functionality: {},
+      allow_mozilla: {},
+      allow_sameorg: {},
+      deny_trackers: {},
     };
-    var userSubs = rpService.getSubscriptions();
-    for (var subName in subs) {
-      var subInfo = {};
+    const userSubs = rp.policy.subscriptions.getSubscriptions();
+    // tslint:disable-next-line:forin
+    for (const subName in subs) {
+      const subInfo: UserSubscriptionsInfo = {};
       subInfo.official = {};
       subInfo.official[subName] = true;
       // FIXME: Add a pref to disable subscriptions globally (#713)
@@ -80,13 +87,13 @@ import {$id} from "./common";
         userSubs.addSubscription("official", subName);
         Services.obs.notifyObservers(
             null, SUBSCRIPTION_ADDED_TOPIC,
-            JSON.stringify(subInfo)
+            JSON.stringify(subInfo),
         );
       } else {
         userSubs.removeSubscription("official", subName);
         Services.obs.notifyObservers(
             null, SUBSCRIPTION_REMOVED_TOPIC,
-            JSON.stringify(subInfo)
+            JSON.stringify(subInfo),
         );
       }
     }
@@ -108,7 +115,7 @@ import {$id} from "./common";
     return args;
   }*/
 
-  window.onload = function() {
+  window.onload = () => {
     if (VersionInfos.isRPUpgrade) {
       // Skip the welcome screen.
       showConfigure();
@@ -116,7 +123,7 @@ import {$id} from "./common";
 
     // Populate the form values based on the user's current settings.
 
-    var defaultAllow = Storage.get("defaultPolicy.allow");
+    const defaultAllow = Storage.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {

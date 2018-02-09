@@ -49,7 +49,7 @@ describe("browser.runtime", function() {
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
     // eslint-disable-next-line no-unused-vars
     let {Runtime} = require("bootstrap/models/api/runtime");
-    runtime = new Runtime({log: Log.instance});
+    runtime = new Runtime(Log.instance);
   });
 
   describe("getURL(path)", function() {

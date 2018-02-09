@@ -139,7 +139,7 @@ function dump(arr, level=0) {
 // =============================================================================
 
 export class RawRuleset implements IRawRuleset {
-  public static create(data: IMaybeIncompleteRawRuleset) {
+  public static create(data?: IMaybeIncompleteRawRuleset) {
     let metadata: IMetadata = {version: 1};
     let entries: IMaybeRuleSpecs = {};
     if (data) {

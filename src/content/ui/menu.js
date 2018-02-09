@@ -24,7 +24,6 @@
 import {Level as EnvLevel} from "lib/environment";
 import {Log} from "models/log";
 import {Storage} from "models/storage";
-import {PolicyManager} from "lib/policy-manager";
 import * as DomainUtil from "lib/utils/domain-utils";
 import {Ruleset} from "lib/ruleset";
 import {
@@ -34,6 +33,7 @@ import * as DOMUtils from "lib/utils/dom-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {C} from "data/constants";
 import {Requests} from "models/requests";
+import {rp} from "app/background/app.background";
 
 const log = Log.instance;
 
@@ -192,7 +192,7 @@ export function loadMenuIntoWindow(window) {
       $id("rpc-link-disable-blocking").hidden = disabled;
 
       let tempPermLink = $id("rpc-revoke-temporary-permissions");
-      if (PolicyManager.temporaryRulesExist()) {
+      if (rp.policy.temporaryRulesExist()) {
         tempPermLink.className = "rpc-revoke-temporary-permissions-enable";
       } else {
         tempPermLink.className = "rpc-revoke-temporary-permissions-disable";
@@ -476,21 +476,21 @@ export function loadMenuIntoWindow(window) {
       };
       // if (Storage.alias.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
-          !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
-              !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+          !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
+              !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         // show "Block requests" if the destination was allowed
         // OR if there's no blocking rule (i.e. the request was blocked
         // "by default") -- this enables support for blacklisting.
-        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
             self._addMenuItemDenyOriginToDest(lists.addRules, ruleData);
           }
           self._addMenuItemTempDenyOriginToDest(lists.addRules, ruleData);
         }
 
-        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
             self._addMenuItemDenyDest(lists.addRules, destOnlyRuleData);
           }
@@ -498,24 +498,24 @@ export function loadMenuIntoWindow(window) {
         }
       }
       if (self._isCurrentlySelectedDestBlocked ||
-          !PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-              !PolicyManager.ruleExists(
+          !rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+              !rp.policy.ruleExists(
                   C.RULE_ACTION_ALLOW,
                   destOnlyRuleData
               )) {
         // show "Allow requests" if the destination was blocked
         // OR if there's no allow-rule (i.e. the request was allowed
         // "by default") -- this enables support for whitelisting.
-        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
             self._addMenuItemAllowOriginToDest(lists.addRules, ruleData);
           }
           self._addMenuItemTempAllowOriginToDest(lists.addRules, ruleData);
         }
 
-        if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
             self._addMenuItemAllowDest(lists.addRules, destOnlyRuleData);
           }
@@ -771,22 +771,22 @@ export function loadMenuIntoWindow(window) {
   self._processRuleChange = function(ruleAction, ruleData) {
     switch (ruleAction) {
       case "allow":
-        PolicyManager.addAllowRule(ruleData);
+        rp.policy.addAllowRule(ruleData);
         break;
       case "allow-temp":
-        PolicyManager.addTemporaryAllowRule(ruleData);
+        rp.policy.addTemporaryAllowRule(ruleData);
         break;
       case "stop-allow":
-        PolicyManager.removeAllowRule(ruleData);
+        rp.policy.removeAllowRule(ruleData);
         break;
       case "deny":
-        PolicyManager.addDenyRule(ruleData);
+        rp.policy.addDenyRule(ruleData);
         break;
       case "deny-temp":
-        PolicyManager.addTemporaryDenyRule(ruleData);
+        rp.policy.addTemporaryDenyRule(ruleData);
         break;
       case "stop-deny":
-        PolicyManager.removeDenyRule(ruleData);
+        rp.policy.removeDenyRule(ruleData);
         break;
       default:
         // eslint-disable-next-line no-throw-literal
@@ -1390,8 +1390,8 @@ export function loadMenuIntoWindow(window) {
           "h": destHost,
         },
       };
-      if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-          !PolicyManager.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+      if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+          !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemAllowOriginToDest(list, ruleData);
         }
@@ -1403,8 +1403,8 @@ export function loadMenuIntoWindow(window) {
           "h": destHost,
         },
       };
-      if (!PolicyManager.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-          !PolicyManager.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+      if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+          !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemAllowDest(list, destOnlyRuleData);
         }

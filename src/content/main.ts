@@ -39,9 +39,9 @@ import {
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 import {PrefManager} from "main/pref-manager";
 
+import {rp} from "app/background/app.background";
 import "main/about-uri";
 import "main/content-policy";
-import "main/requestpolicy-service";
 import "main/window-manager";
 
 import {
@@ -100,6 +100,7 @@ const shutdownMessage = `${C.MM_PREFIX}shutdown`;
 function shutdown(aShutdownArgs: any) {
   (new Controllers(allControllers)).shutdown();
   MainEnvironment.shutdown(aShutdownArgs);
+  rp.shutdown();
 }
 
 declare const Services: any;
@@ -141,8 +142,7 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 (function startup() {
   PrefManager.init();
 
-  // TODO: Initialize the "models" first. Then initialize the other
-  // controllers, which is currently "rpService", "ContentPolicy" etc.
+  rp.startup();
 
   try {
     // Remark: startup() takes the arguments as an array!

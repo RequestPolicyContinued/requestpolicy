@@ -26,8 +26,8 @@ import {$id} from "./common";
 (function() {
   var {
     LegacyApi,
-    PolicyManager,
     OldRules,
+    rp,
     RuleUtils,
   } = browser.extension.getBackgroundPage();
 
@@ -103,7 +103,7 @@ import {$id} from "./common";
       // eslint-disable-next-line no-throw-literal
       throw "rules is undefined or empty";
     }
-    PolicyManager.addAllowRules(rules);
+    rp.policy.addAllowRules(rules);
     $("#doimport").hide();
     $("#policy").hide();
     $("#importoptions").hide();

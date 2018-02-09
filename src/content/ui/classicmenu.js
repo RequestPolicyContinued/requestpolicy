@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {PolicyManager} from "lib/policy-manager";
 import * as DOMUtils from "lib/utils/dom-utils";
+import {rp} from "app/background/app.background";
 
 export function loadClassicmenuIntoWindow(window) {
   let self = {};
@@ -125,7 +125,7 @@ export function loadClassicmenuIntoWindow(window) {
     originAndOrDestArray = Object.freeze(originAndOrDestArray);
 
     const callbackFn = function() {
-      PolicyManager.addRuleBySpec(aRuleSpec);
+      rp.policy.addRuleBySpec(aRuleSpec);
       aAllowRedirectFn();
     };
     const label = browser.i18n.getMessage(labelName, originAndOrDestArray);

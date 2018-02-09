@@ -21,21 +21,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager, $id} from "settings/common";
+import * as JQuery from "jquery";
+import {BackgroundPage} from "main";
+import {$id, elManager, WinEnv} from "settings/common";
 
-(function() {
-  var {
+declare const $: typeof JQuery;
+
+(() => {
+  const {
     C,
     LegacyApi,
-    PolicyManager,
     RuleUtils,
-  } = browser.extension.getBackgroundPage();
+    rp,
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   const $str = browser.i18n.getMessage.bind(browser.i18n);
 
   // ===========================================================================
 
-  $(function() {
+  $(() => {
     // l10n for input placeholders.
     $id("rulesearch").placeholder = $str("search");
     $("[name=originscheme]").prop("placeholder", $str("scheme"));
@@ -48,35 +52,37 @@ import {WinEnv, elManager, $id} from "settings/common";
 
   const SEARCH_DELAY = 100;
 
-  var searchTimeoutId = null;
+  let searchTimeoutId: any = null;
 
-  function populateRuleTable(filter) {
+  function populateRuleTable(filter: any) {
     // FIXME: populating the rules table is very slow
 
     searchTimeoutId = null;
 
-    var table = $id("rules");
+    const table = $id("rules");
 
     clearRulesTable(table);
 
-    var entries;
+    let entries;
 
     // Get and display user rules
-    var user = PolicyManager.getUserRulesets().user;
+    const user = rp.policy.getUserRulesets().user;
     entries = user.rawRuleset.raw.entries;
     addRules(entries, "User", filter, false);
 
     // Get and display temorary rules
-    var temp = PolicyManager.getUserRulesets().temp;
+    const temp = rp.policy.getUserRulesets().temp;
     entries = temp.rawRuleset.raw.entries;
     addRules(entries, "Temporary", filter, false);
 
     if (!C.UI_TESTING) {
       // Get and display subscription rules
       // (Ignore subscription rules when UI testing.)
-      var subscriptionLists = PolicyManager.getSubscriptionRulesets();
-      for (var subscriptionList in subscriptionLists) {
-        for (var subscription in subscriptionLists[subscriptionList]) {
+      const subscriptionLists = rp.policy.subscriptions.getRulesets();
+      // tslint:disable-next-line:forin
+      for (const subscriptionList in subscriptionLists) {
+        // tslint:disable-next-line:forin
+        for (const subscription in subscriptionLists[subscriptionList]) {
           entries = subscriptionLists[subscriptionList][subscription].
               rawRuleset.raw.entries;
           addRules(entries, subscription, filter, true);
@@ -85,14 +91,16 @@ import {WinEnv, elManager, $id} from "settings/common";
     }
   }
 
-  function addRules(entries, source, filter, readOnly) {
-    var table = $("#rules");
-    for (var entryType in entries) {
-      for (var i = 0; i < entries[entryType].length; i++) {
-        var entry = entries[entryType][i];
-        var origin = entry.o ?
+  function addRules(entries: any, source: any, filter: any, readOnly: any) {
+    const table = $("#rules");
+    // tslint:disable-next-line:forin
+    for (const entryType in entries) {
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < entries[entryType].length; i++) {
+        const entry = entries[entryType][i];
+        const origin = entry.o ?
           RuleUtils.endpointSpecToDisplayString(entry.o) : "";
-        var dest = entry.d ?
+        const dest = entry.d ?
           RuleUtils.endpointSpecToDisplayString(entry.d) : "";
         if (filter) {
           if (origin.indexOf(filter) === -1 && dest.indexOf(filter) === -1) {
@@ -101,53 +109,59 @@ import {WinEnv, elManager, $id} from "settings/common";
         }
         addRulesTableRow(
             table, entryType, origin, dest, entry, source,
-            readOnly
+            readOnly,
         );
       }
     }
   }
 
-  function deleteRule(event) {
+  function deleteRule(event: any) {
     // TODO: the rule should not be referenced by the rule data but
     //       by some unique identifier. Currently, if there's exactly
     //       the same rule twice, (one of them might be a temporary
     //       rule), both will get removed.
-    var anchor = $(event.target);
-    var ruleAction = anchor.data("requestpolicyRuleAction");
-    var ruleData = anchor.data("requestpolicyRuleData");
+    const anchor = $(event.target);
+    const ruleAction = anchor.data("requestpolicyRuleAction");
+    const ruleData = anchor.data("requestpolicyRuleData");
     if (ruleAction === "allow") {
-      PolicyManager.removeAllowRule(ruleData);
+      rp.policy.removeAllowRule(ruleData);
     } else {
-      PolicyManager.removeDenyRule(ruleData);
+      rp.policy.removeDenyRule(ruleData);
     }
     anchor.closest("tr").remove();
   }
 
-  function clearRulesTable(table) {
-    var children = table.getElementsByTagName("tr");
+  function clearRulesTable(table: any) {
+    const children = table.getElementsByTagName("tr");
     while (children.length) {
-      var child = children.item(0);
+      const child = children.item(0);
       child.parentNode.removeChild(child);
     }
   }
 
   function addRulesTableRow(
-      table, aRuleAction, origin, dest, ruleData, source, readOnly
+      table: any,
+      aRuleAction: any,
+      origin: any,
+      dest: any,
+      ruleData: any,
+      source: any,
+      readOnly: any,
   ) {
     const ruleAction = aRuleAction === "allow" ? "allow" : "block";
-    var ruleActionString = $str(ruleAction);
+    const ruleActionString = $str(ruleAction);
 
-    var row = $("<tr>").addClass(ruleAction).appendTo(table);
+    const row = $("<tr>").addClass(ruleAction).appendTo(table);
 
     row.append(
         $("<td>").text(ruleActionString),
         $("<td>").text(origin),
         $("<td>").text(dest),
-        $("<td>").text(source)
+        $("<td>").text(source),
     );
 
     if (!readOnly) {
-      var anchor = $("<a>");
+      const anchor = $("<a>");
       anchor.text("x").addClass("deleterule");
       anchor.data("requestpolicyRuleAction", ruleAction);
       anchor.data("requestpolicyRuleData", ruleData);
@@ -158,7 +172,7 @@ import {WinEnv, elManager, $id} from "settings/common";
     }
   }
 
-  window.addRule = function() {
+  (window as any).addRule = () => {
     try {
       addRuleHelper();
     } catch (e) {
@@ -172,23 +186,23 @@ import {WinEnv, elManager, $id} from "settings/common";
   };
 
   function addRuleHelper() {
-    var form = document.forms.addruleform;
-    var allow = form.elements.allowrule.checked ? true : false;
-    var temporary = form.elements.temporary.checked ? true : false;
-    var originScheme = form.elements.originscheme.value;
-    var originHost = form.elements.originhost.value;
-    var originPort = form.elements.originport.value;
-    var destScheme = form.elements.destscheme.value;
-    var destHost = form.elements.desthost.value;
-    var destPort = form.elements.destport.value;
+    const form = (document.forms as any).addruleform;
+    const allow = form.elements.allowrule.checked ? true : false;
+    const temporary = form.elements.temporary.checked ? true : false;
+    const originScheme = form.elements.originscheme.value;
+    const originHost = form.elements.originhost.value;
+    const originPort = form.elements.originport.value;
+    const destScheme = form.elements.destscheme.value;
+    const destHost = form.elements.desthost.value;
+    const destPort = form.elements.destport.value;
     // TODO: we either need to sanity check the ruleData here
     //       or the policy needs to do this when it is added.
     //       Probably better to do it in the policy code.
-    function ruleInfoToRuleDataPart(scheme, host, port) {
+    function ruleInfoToRuleDataPart(scheme: any, host: any, port: any) {
       if (!scheme && !host && !port) {
         return null;
       }
-      var part = {};
+      const part: any = {};
       if (scheme) {
         part.s = scheme;
       }
@@ -200,15 +214,15 @@ import {WinEnv, elManager, $id} from "settings/common";
       }
       return part;
     }
-    var originPart = ruleInfoToRuleDataPart(
+    const originPart = ruleInfoToRuleDataPart(
         originScheme, originHost,
-        originPort
+        originPort,
     );
-    var destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
+    const destPart = ruleInfoToRuleDataPart(destScheme, destHost, destPort);
     if (!originPart && !destPart) {
       return;
     }
-    var ruleData = {};
+    const ruleData: any = {};
     if (originPart) {
       ruleData.o = originPart;
     }
@@ -217,37 +231,39 @@ import {WinEnv, elManager, $id} from "settings/common";
     }
     if (allow) {
       if (temporary) {
-        PolicyManager.addTemporaryAllowRule(ruleData);
+        rp.policy.addTemporaryAllowRule(ruleData);
       } else {
-        PolicyManager.addAllowRule(ruleData);
+        rp.policy.addAllowRule(ruleData);
       }
     } else {
       if (temporary) {
-        PolicyManager.addTemporaryDenyRule(ruleData);
+        rp.policy.addTemporaryDenyRule(ruleData);
       } else {
-        PolicyManager.addDenyRule(ruleData);
+        rp.policy.addDenyRule(ruleData);
       }
     }
   }
 
-  window.onload = function() {
-    var search = $id("rulesearch");
-    elManager.addListener(search, "keyup", function(event) {
-      if (searchTimeoutId !== null) {
-        window.clearTimeout(searchTimeoutId);
+  window.onload = () => {
+    {
+      const search = $id("rulesearch");
+      elManager.addListener(search, "keyup", (event: any) => {
+        if (searchTimeoutId !== null) {
+          window.clearTimeout(searchTimeoutId);
+        }
+        searchTimeoutId = window.setTimeout(() => {
+          populateRuleTable(event.target.value);
+        }, SEARCH_DELAY);
+      }, false);
+      populateRuleTable(search.value);
+      if (LegacyApi.prefs.oldRulesExist()) {
+        $("#oldrulesexist").show();
       }
-      searchTimeoutId = window.setTimeout(function() {
-        populateRuleTable(event.target.value);
-      }, SEARCH_DELAY);
-    }, false);
-    populateRuleTable(search.value);
-    if (LegacyApi.prefs.oldRulesExist()) {
-      $("#oldrulesexist").show();
     }
 
     // observe rule changes and update the table then
-    WinEnv.obMan.observe(["rpcontinued-rules-changed"], function() {
-      var search = $id("rulesearch");
+    WinEnv.obMan.observe(["rpcontinued-rules-changed"], () => {
+      const search = $id("rulesearch");
       populateRuleTable(search.value);
     });
   };

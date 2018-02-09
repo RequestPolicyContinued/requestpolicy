@@ -22,182 +22,100 @@
  */
 
 import {C} from "data/constants";
-import {Log} from "models/log";
+import {Module} from "lib/classes/module";
 import {RequestResult} from "lib/request-result";
-import {Ruleset, RawRuleset} from "lib/ruleset";
-import {RulesetStorage} from "lib/ruleset-storage";
-
-const log = Log.instance.extend({
-  name: "PolicyManager",
-});
-
-// =============================================================================
-// constants
-// =============================================================================
+import {RawRuleset, Ruleset} from "lib/ruleset";
+import { IUri } from "lib/utils/domain-utils";
+import { Log } from "models/log";
+import { RulesetStorage } from "./ruleset-storage";
+import { Subscriptions } from "./subscriptions";
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
-const RULESET_NOT_EXISTING = {};
-
-// =============================================================================
-// utilities
-// =============================================================================
+declare const Ci: any;
+declare const Services: any;
+type RuleAction = typeof C.RULE_ACTION_ALLOW | typeof C.RULE_ACTION_DENY;
+type RuleData = any;
 
 function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
-// =============================================================================
-// PolicyManager
-// =============================================================================
+export class Policy extends Module {
+  public userRulesetExistedOnStartup: boolean;
+  private userRulesets: any = {};
 
-let userRulesets = {};
-let subscriptionRulesets = {};
+  constructor(
+      log: Log,
+      public readonly subscriptions: Subscriptions,
+      public readonly rulesetStorage: RulesetStorage,
+  ) {
+    super("app.policy", log);
+    this.subscriptions = subscriptions;
+  }
 
-/**
- * Provides a simplified interface to handling multiple
- * rulesets, checking requests against multiple rulesets, etc.
- */
-export const PolicyManager = {
-  getUserRulesets() {
-    return userRulesets;
-  },
-  getSubscriptionRulesets() {
-    return subscriptionRulesets;
-  },
+  public getUserRulesets() {
+    return this.userRulesets;
+  }
 
-  getUserRuleCount() {
-    let rawRuleset = userRulesets.user.rawRuleset;
+  public getUserRuleCount() {
+    const rawRuleset = this.userRulesets.user.rawRuleset;
     return rawRuleset.getAllowRuleCount() + rawRuleset.getDenyRuleCount();
-  },
+  }
 
-  loadUserRules() {
-    log.info("loadUserRules loading user rules");
-    const pRawRuleset = RulesetStorage.loadRawRulesetFromFile("user");
-    pRawRuleset.then((aRawRuleset) => {
+  public loadUserRules(): Promise<void> {
+    this.log.info("loadUserRules loading user rules");
+    const pRawRuleset = this.rulesetStorage.loadRawRulesetFromFile("user");
+    const p = pRawRuleset.then((aRawRuleset) => {
       this.userRulesetExistedOnStartup = !!aRawRuleset;
       const rawRuleset = aRawRuleset || RawRuleset.create();
-      userRulesets.user = {
-        "rawRuleset": rawRuleset,
-        "ruleset": rawRuleset.toRuleset("user"),
+      this.userRulesets.user = {
+        rawRuleset,
+        ruleset: rawRuleset.toRuleset("user"),
       },
-      userRulesets.user.ruleset.userRuleset = true;
-      // userRulesets.user.ruleset.print();
+      this.userRulesets.user.ruleset.userRuleset = true;
+      // this.userRulesets.user.ruleset.print();
       // Temporary rules. These are never stored.
       this.revokeTemporaryRules();
 
       notifyRulesChanged();
       return;
-    }).catch((e) => {
-      log.error("PolicyManager.loadUserRules():", e);
     });
-  },
+    p.catch(this.log.onError("loadUserRules()"));
+    return p;
+  }
 
-  loadSubscriptionRules(subscriptionInfo) {
-    let failures = {};
-    const promises = [];
-
-    // Read each subscription from a file.
-    for (let listName in subscriptionInfo) {
-      for (let subName in subscriptionInfo[listName]) {
-        log.info(`loadSubscriptionRules: ${listName} / ${subName}`);
-        const pRawRuleset = RulesetStorage.
-            loadRawRulesetFromFile(subName, listName);
-        const pDone = pRawRuleset.then((rawRuleset) => {
-          if (!rawRuleset) return Promise.reject(RULESET_NOT_EXISTING);
-          if (!subscriptionRulesets[listName]) {
-            subscriptionRulesets[listName] = {};
-          }
-          let list = subscriptionRulesets[listName];
-          list[subName] = {
-            rawRuleset,
-            ruleset: rawRuleset.toRuleset(subName),
-          };
-          list[subName].ruleset.userRuleset = false;
-          // list[subName].ruleset.print();
-          return;
-        }).catch((e) => {
-          if (e === RULESET_NOT_EXISTING) {
-            log.warn("Ruleset does not exist (yet).");
-          } else {
-            log.error("Error when loading ruleset from file: ", e);
-          }
-          if (!failures[listName]) {
-            failures[listName] = {};
-          }
-          failures[listName][subName] = null;
-        });
-        promises.push(pDone);
-      }
-    }
-
-    return Promise.all(promises).then(() => {
-      notifyRulesChanged();
-      return {failures};
-    });
-  },
-
-  unloadSubscriptionRules(subscriptionInfo) {
-    const failures = {};
-
-    for (let listName in subscriptionInfo) {
-      for (let subName in subscriptionInfo[listName]) {
-        log.info(`unloadSubscriptionRules: ${listName} / ${subName}`);
-        if (!subscriptionRulesets[listName] ||
-            !subscriptionRulesets[listName][subName]) {
-          if (!failures[listName]) {
-            failures[listName] = {};
-          }
-          failures[listName][subName] = null;
-          continue;
-        }
-        let list = subscriptionRulesets[listName];
-        delete list[subName];
-      }
-    }
-
-    notifyRulesChanged();
-
-    return failures;
-  },
-
-  assertRuleAction(ruleAction) {
-    if (ruleAction !== C.RULE_ACTION_ALLOW &&
-        ruleAction !== C.RULE_ACTION_DENY) {
-      // eslint-disable-next-line no-throw-literal
-      throw `Invalid rule type: ${ruleAction}`;
-    }
-  },
-
-  ruleExists(ruleAction, ruleData) {
+  public ruleExists(ruleAction: RuleAction, ruleData: RuleData) {
     this.assertRuleAction(ruleAction);
-    for (let name in userRulesets) {
-      if (userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
+    for (const name in this.userRulesets) {
+      if (this.userRulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
         return true;
       }
     }
-    for (let listName in subscriptionRulesets) {
-      let rulesets = subscriptionRulesets[listName];
-      for (let name in rulesets) {
+    const subscriptionRulesets = this.subscriptions.getRulesets();
+    // tslint:disable-next-line:forin
+    for (const listName in subscriptionRulesets) {
+      const rulesets = subscriptionRulesets[listName];
+      for (const name in rulesets) {
         if (rulesets[name].rawRuleset.ruleExists(ruleAction, ruleData)) {
           return true;
         }
       }
     }
     return false;
-  },
+  }
 
-  addRule(ruleAction, ruleData, noStore) {
-    log.info(
-        `addRule ${ruleAction} ${Ruleset.rawRuleToCanonicalString(ruleData)}`
+  public addRule(ruleAction: RuleAction, ruleData: RuleData, noStore: boolean) {
+    this.log.info(
+        `addRule ${ruleAction} ${Ruleset.rawRuleToCanonicalString(ruleData)}`,
     );
-    // userRulesets.user.ruleset.print();
+    // this.userRulesets.user.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets.user.rawRuleset.addRule(
+    this.userRulesets.user.rawRuleset.addRule(
         ruleAction, ruleData,
-        userRulesets.user.ruleset
+        this.userRulesets.user.ruleset,
     );
 
     // TODO: only save if we actually added a rule. This will require
@@ -206,64 +124,72 @@ export const PolicyManager = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-      RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user"
+      this.rulesetStorage.saveRawRulesetToFile(
+          this.userRulesets.user.rawRuleset, "user",
       );
     }
 
-    // userRulesets.user.ruleset.print();
+    // this.userRulesets.user.ruleset.print();
 
     notifyRulesChanged();
-  },
+  }
 
-  addRules(aRuleAction, aRuleDataList, aNoStore=false) {
-    for (let ruleData of aRuleDataList) {
-      PolicyManager.addRule(aRuleAction, ruleData, true);
+  public addRules(
+      aRuleAction: RuleAction,
+      aRuleDataList: any,
+      aNoStore = false,
+  ) {
+    for (const ruleData of aRuleDataList) {
+      this.addRule(aRuleAction, ruleData, true);
     }
     if (false === aNoStore) {
-      PolicyManager.storeRules();
+      this.storeRules();
     }
-  },
+  }
 
-  storeRules() {
-    RulesetStorage.saveRawRulesetToFile(
-        userRulesets.user.rawRuleset, "user"
+  public storeRules() {
+    this.rulesetStorage.saveRawRulesetToFile(
+        this.userRulesets.user.rawRuleset, "user",
     );
-  },
+  }
 
-  addTemporaryRule(ruleAction, ruleData) {
-    log.info(`addTemporaryRule ${ruleAction} ${
+  public addTemporaryRule(ruleAction: RuleAction, ruleData: RuleData) {
+    this.log.info(`addTemporaryRule ${ruleAction} ${
       Ruleset.rawRuleToCanonicalString(ruleData)}`);
-    // userRulesets.temp.ruleset.print();
+    // this.userRulesets.temp.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
-    userRulesets.temp.rawRuleset.addRule(
+    this.userRulesets.temp.rawRuleset.addRule(
         ruleAction, ruleData,
-        userRulesets.temp.ruleset
+        this.userRulesets.temp.ruleset,
     );
 
-    // userRulesets.temp.ruleset.print();
+    // this.userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
-  },
+  }
 
-  removeRule(ruleAction, ruleData, noStore) {
-    log.info(`removeRule ${ruleAction} ${
+  public removeRule(
+      ruleAction: RuleAction,
+      ruleData: RuleData,
+      noStore: boolean,
+  ) {
+    this.log.info(`removeRule ${ruleAction} ${
       Ruleset.rawRuleToCanonicalString(ruleData)}`);
-    // userRulesets.user.ruleset.print();
-    // userRulesets.temp.ruleset.print();
+    // this.userRulesets.user.ruleset.print();
+    // this.userRulesets.temp.ruleset.print();
 
     this.assertRuleAction(ruleAction);
     // TODO: check rule format validity
     // TODO: use noStore
-    userRulesets.user.rawRuleset.removeRule(
+    this.userRulesets.user.rawRuleset.removeRule(
         ruleAction, ruleData,
-        userRulesets.user.ruleset
+        this.userRulesets.user.ruleset,
     );
-    userRulesets.temp.rawRuleset.removeRule(
+    this.userRulesets.temp.rawRuleset.removeRule(
         ruleAction, ruleData,
-        userRulesets.temp.ruleset
+        this.userRulesets.temp.ruleset,
     );
 
     // TODO: only save if we actually removed a rule. This will require
@@ -272,109 +198,147 @@ export const PolicyManager = {
     // TODO: can we do this in the background and add some locking? It will
     // become annoying when there is a large file to write.
     if (!noStore) {
-      RulesetStorage.saveRawRulesetToFile(
-          userRulesets.user.rawRuleset, "user"
+      this.rulesetStorage.saveRawRulesetToFile(
+          this.userRulesets.user.rawRuleset, "user",
       );
     }
 
-    // userRulesets.user.ruleset.print();
-    // userRulesets.temp.ruleset.print();
+    // this.userRulesets.user.ruleset.print();
+    // this.userRulesets.temp.ruleset.print();
 
     notifyRulesChanged();
-  },
+  }
 
-  temporaryRulesExist() {
-    return userRulesets.temp.rawRuleset.getAllowRuleCount() ||
-           userRulesets.temp.rawRuleset.getDenyRuleCount();
-  },
+  public temporaryRulesExist() {
+    return this.userRulesets.temp.rawRuleset.getAllowRuleCount() ||
+           this.userRulesets.temp.rawRuleset.getDenyRuleCount();
+  }
 
-  revokeTemporaryRules() {
+  public revokeTemporaryRules() {
     const rawRuleset = RawRuleset.create();
-    userRulesets.temp = {
-      "rawRuleset": rawRuleset,
-      "ruleset": rawRuleset.toRuleset("temp"),
+    this.userRulesets.temp = {
+      rawRuleset,
+      ruleset: rawRuleset.toRuleset("temp"),
     };
-    userRulesets.temp.ruleset.userRuleset = true;
+    this.userRulesets.temp.ruleset.userRuleset = true;
 
     notifyRulesChanged();
-  },
+  }
 
-  checkRequestAgainstUserRules(origin, dest) {
-    return this.checkRequest(origin, dest, userRulesets);
-  },
+  public checkRequestAgainstUserRules(origin: IUri, dest: IUri) {
+    return this.checkRequest(origin, dest, this.userRulesets);
+  }
 
-  checkRequestAgainstSubscriptionRules(origin, dest) {
+  public checkRequestAgainstSubscriptionRules(origin: IUri, dest: IUri) {
     const result = new RequestResult();
-    for (let listName in subscriptionRulesets) {
-      let ruleset = subscriptionRulesets[listName];
+    const subscriptionRulesets = this.subscriptions.getRulesets();
+    // tslint:disable-next-line:forin
+    for (const listName in subscriptionRulesets) {
+      const ruleset = subscriptionRulesets[listName];
       this.checkRequest(origin, dest, ruleset, result);
     }
     return result;
-  },
+  }
 
-  checkRequest(origin, dest, aRuleset, aResult) {
+  public checkRequest(
+      origin: IUri,
+      dest: IUri,
+      aRuleset: any,
+      aResult?: RequestResult,
+  ) {
     if (!(origin instanceof Ci.nsIURI)) {
       // eslint-disable-next-line no-throw-literal
-      throw "Origin must be an nsIURI.";
+      throw new Error("Origin must be an nsIURI.");
     }
     if (!(dest instanceof Ci.nsIURI)) {
       // eslint-disable-next-line no-throw-literal
-      throw "Destination must be an nsIURI.";
+      throw new Error("Destination must be an nsIURI.");
     }
     const result = aResult || new RequestResult();
-    for (let name in aRuleset) {
-      let {ruleset} = aRuleset[name];
+    // tslint:disable-next-line:forin
+    for (const name in aRuleset) {
+      const {ruleset} = aRuleset[name];
       // ruleset.setPrintFunction(print);
       // ruleset.print();
 
       // TODO wrap this in a try/catch.
-      let [tempAllows, tempDenies] = ruleset.check(origin, dest);
+      const [tempAllows, tempDenies] = ruleset.check(origin, dest);
       // I'm not convinced I like appending these [ruleset, matchedRule] arrays,
       // but it works for now.
-      for (let tempAllow of tempAllows) {
+      for (const tempAllow of tempAllows) {
         result.matchedAllowRules.push([ruleset, tempAllow]);
       }
-      for (let tempDeny of tempDenies) {
+      for (const tempDeny of tempDenies) {
         result.matchedDenyRules.push([ruleset, tempDeny]);
       }
     }
     return result;
-  },
-};
+  }
 
-// =============================================================================
-// PolicyManager (alias functions)
-// =============================================================================
+  // ---------------------------------------------------------------------------
+  // alias functions
+  // ---------------------------------------------------------------------------
 
-const PM = PolicyManager;
+  // tslint:disable:member-ordering
+  public addAllowRule = this.addRule.bind(this, C.RULE_ACTION_ALLOW);
+  public addTemporaryAllowRule =
+      this.addTemporaryRule.bind(this, C.RULE_ACTION_ALLOW);
+  public removeAllowRule = this.removeRule.bind(this, C.RULE_ACTION_ALLOW);
+  public addDenyRule = this.addRule.bind(this, C.RULE_ACTION_DENY);
+  public addTemporaryDenyRule =
+      this.addTemporaryRule.bind(this, C.RULE_ACTION_DENY);
+  public removeDenyRule = this.removeRule.bind(this, C.RULE_ACTION_DENY);
 
-Object.assign(PolicyManager, {
-  addAllowRule: PM.addRule.bind(PM, C.RULE_ACTION_ALLOW),
-  addTemporaryAllowRule: PM.addTemporaryRule.bind(PM, C.RULE_ACTION_ALLOW),
-  removeAllowRule: PM.removeRule.bind(PM, C.RULE_ACTION_ALLOW),
-  addDenyRule: PM.addRule.bind(PM, C.RULE_ACTION_DENY),
-  addTemporaryDenyRule: PM.addTemporaryRule.bind(PM, C.RULE_ACTION_DENY),
-  removeDenyRule: PM.removeRule.bind(PM, C.RULE_ACTION_DENY),
+  public addAllowRules = this.addRules.bind(this, C.RULE_ACTION_ALLOW);
+  public addDenyRules = this.addRules.bind(this, C.RULE_ACTION_DENY);
+  // tslint:enable:member-ordering
 
-  addAllowRules: PM.addRules.bind(PM, C.RULE_ACTION_ALLOW),
-  addDenyRules: PM.addRules.bind(PM, C.RULE_ACTION_DENY),
-
-  getRuleData(aOrigin, aDest) {
-    let ruleData = {};
+  public getRuleData(aOrigin: string | undefined, aDest: string | undefined) {
+    const ruleData: RuleData = {};
     if (aOrigin !== undefined) {
-      ruleData.o = {"h": aOrigin};
+      ruleData.o = {h: aOrigin};
     }
     if (aDest !== undefined) {
-      ruleData.d = {"h": aDest};
+      ruleData.d = {h: aDest};
     }
     return ruleData;
-  },
+  }
 
-  addRuleBySpec(aSpec, noStore) {
-    const fn = aSpec.temp ? PM.addTemporaryRule : PM.addRule;
+  public addRuleBySpec(aSpec: any, noStore: boolean) {
     const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
     const ruleData = this.getRuleData(aSpec.origin, aSpec.dest);
 
-    fn(ruleAction, ruleData, noStore);
-  },
-});
+    if (aSpec.temp) {
+      this.addTemporaryRule(ruleAction, ruleData);
+    } else {
+      this.addRule(ruleAction, ruleData, noStore);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // private functions
+  // ---------------------------------------------------------------------------
+
+  protected get subModules() {
+    return {
+      rulesetStorage: this.rulesetStorage,
+      subscriptions: this.subscriptions,
+    };
+  }
+
+  protected async startupSelf() {
+    await this.loadUserRules();
+  }
+
+  // ---------------------------------------------------------------------------
+  // private functions
+  // ---------------------------------------------------------------------------
+
+  private assertRuleAction(ruleAction: RuleAction) {
+    if (ruleAction !== C.RULE_ACTION_ALLOW &&
+        ruleAction !== C.RULE_ACTION_DENY) {
+      // eslint-disable-next-line no-throw-literal
+      throw new Error(`Invalid rule type: ${ruleAction}`);
+    }
+  }
+}

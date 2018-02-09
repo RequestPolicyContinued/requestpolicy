@@ -21,150 +21,240 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IListenInterface } from "lib/classes/listeners";
+import { Module } from "lib/classes/module";
+import {MainEnvironment} from "lib/environment";
+import {
+  SUBSCRIPTION_ADDED_TOPIC,
+  SUBSCRIPTION_REMOVED_TOPIC,
+  SUBSCRIPTION_UPDATED_TOPIC,
+  UserSubscriptions,
+  UserSubscriptionsInfo,
+} from "lib/subscription";
+import {createListenersMap} from "lib/utils/listener-factories";
 import {Log} from "models/log";
-import {PolicyManager} from "lib/policy-manager";
-import {UserSubscriptions, SUBSCRIPTION_UPDATED_TOPIC, SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC} from "lib/subscription";
-import {Level as EnvLevel, MainEnvironment} from "lib/environment";
+import {RulesetStorage} from "./ruleset-storage";
 
-const log = Log.instance;
+const RULESET_NOT_EXISTING = {};
 
-// =============================================================================
-// rpService
-// =============================================================================
+type Failures = any;
+interface IFailures { failures: Failures; }
+type Serials = any;
+type SubscriptionRulesets = any;
 
-let subscriptions = null;
+export class Subscriptions extends Module {
+  public onRulesChanged: IListenInterface;
 
-function loadUserRules() {
-  PolicyManager.loadUserRules();
-}
+  private subscriptions: UserSubscriptions;
+  private subscriptionRulesets: SubscriptionRulesets = {};
+  private events = createListenersMap(["onRulesChanged"]);
 
-function loadSubscriptionRules() {
-  const pDone = browser.storage.local.get(
-      "subscriptions"
-  ).then((result) => {
-    const rawData = result.hasOwnProperty("subscriptions") ?
-      result.subscriptions : undefined;
-    subscriptions = UserSubscriptions.create(rawData);
-    return PolicyManager.loadSubscriptionRules(
-        subscriptions.getSubscriptionInfo()
-    );
-  }).then(({failures}) => {
-    // TODO: check a preference that indicates the last time we checked for
-    // updates. Don't do it if we've done it too recently.
-    // TODO: Maybe we should probably ship snapshot versions of the official
-    // rulesets so that they can be available immediately after installation.
-    let serials = {};
-    for (let listName in failures) {
-      serials[listName] = {};
-      for (let subName in failures[listName]) {
-        serials[listName][subName] = -1;
-      }
-    }
-    const loadedSubs = PolicyManager.getSubscriptionRulesets();
-    for (let listName in loadedSubs) {
-      for (let subName in loadedSubs[listName]) {
-        if (!serials[listName]) {
-          serials[listName] = {};
+  constructor(
+      log: Log,
+      private rulesetStorage: RulesetStorage,
+  ) {
+    super("rules", log);
+
+    this.onRulesChanged = this.events.interfaces.onRulesChanged;
+
+  }
+
+  public getRulesets() {
+    return this.subscriptionRulesets;
+  }
+
+  public loadSubscriptionRules() {
+    const pDone = browser.storage.local.get(
+        "subscriptions",
+    ).then((result) => {
+      const rawData = result.hasOwnProperty("subscriptions") ?
+        result.subscriptions : undefined;
+      this.subscriptions = UserSubscriptions.create(rawData);
+      return this.loadSubscriptionRulesFromSubInfo(
+          this.subscriptions.getSubscriptionInfo(),
+      );
+    }).then(({failures}) => {
+      // TODO: check a preference that indicates the last time we checked for
+      // updates. Don't do it if we've done it too recently.
+      // TODO: Maybe we should probably ship snapshot versions of the official
+      // rulesets so that they can be available immediately after installation.
+      const serials: Serials = {};
+      // tslint:disable-next-line:forin
+      for (const listName in failures) {
+        serials[listName] = {};
+        // tslint:disable-next-line:forin
+        for (const subName in failures[listName]) {
+          serials[listName][subName] = -1;
         }
-        let rawRuleset = loadedSubs[listName][subName].rawRuleset;
-        serials[listName][subName] = rawRuleset.metadata.serial;
+      }
+      // tslint:disable-next-line:forin
+      for (const listName in this.subscriptionRulesets) {
+        // tslint:disable-next-line:forin
+        for (const subName in this.subscriptionRulesets[listName]) {
+          if (!serials[listName]) {
+            serials[listName] = {};
+          }
+          const {rawRuleset} = this.subscriptionRulesets[listName][subName];
+          serials[listName][subName] = rawRuleset.metadata.serial;
+        }
+      }
+      this.subscriptions.update((result) => {
+        this.log.info(`Subscription updates completed: ${result}`);
+      }, serials);
+      return;
+    });
+    pDone.catch((e) => {
+      this.log.error("loadConfigAndRules():", e);
+    });
+    return pDone;
+  }
+
+  public loadSubscriptionRulesFromSubInfo(
+      subscriptionInfo: UserSubscriptionsInfo,
+  ): Promise<IFailures> {
+    const failures: Failures = {};
+    const promises: Array<Promise<void>> = [];
+
+    // Read each subscription from a file.
+    // tslint:disable-next-line:forin
+    for (const listName in subscriptionInfo) {
+      // tslint:disable-next-line:forin
+      for (const subName in subscriptionInfo[listName]) {
+        this.log.info(`loadSubscriptionRules: ${listName} / ${subName}`);
+        const pRawRuleset = this.rulesetStorage.
+            loadRawRulesetFromFile(subName, listName);
+        const pDone = pRawRuleset.then((rawRuleset) => {
+          if (!rawRuleset) return Promise.reject(RULESET_NOT_EXISTING);
+          if (!this.subscriptionRulesets[listName]) {
+            this.subscriptionRulesets[listName] = {};
+          }
+          const list = this.subscriptionRulesets[listName];
+          list[subName] = {
+            rawRuleset,
+            ruleset: rawRuleset.toRuleset(subName),
+          };
+          list[subName].ruleset.userRuleset = false;
+          // list[subName].ruleset.print();
+          return Promise.resolve();
+        }).catch((e) => {
+          if (e === RULESET_NOT_EXISTING) {
+            this.log.warn("Ruleset does not exist (yet).");
+          } else {
+            this.log.error("Error when loading ruleset from file: ", e);
+          }
+          if (!failures[listName]) {
+            failures[listName] = {};
+          }
+          failures[listName][subName] = null;
+        });
+        promises.push(pDone);
       }
     }
-    function updateCompleted(result) {
-      log.info(`Subscription updates completed: ${result}`);
+
+    return Promise.all(promises).then(() => {
+      this.events.listenersMap.onRulesChanged.emit();
+      return {failures};
+    });
+  }
+
+  public unloadSubscriptionRules(subscriptionInfo: UserSubscriptionsInfo) {
+    const failures: Failures = {};
+
+    // tslint:disable-next-line:forin
+    for (const listName in subscriptionInfo) {
+      // tslint:disable-next-line:forin
+      for (const subName in subscriptionInfo[listName]) {
+        this.log.info(`unloadSubscriptionRules: ${listName} / ${subName}`);
+        if (!this.subscriptionRulesets[listName] ||
+            !this.subscriptionRulesets[listName][subName]) {
+          if (!failures[listName]) {
+            failures[listName] = {};
+          }
+          failures[listName][subName] = null;
+          continue;
+        }
+        const list = this.subscriptionRulesets[listName];
+        delete list[subName];
+      }
     }
-    subscriptions.update(updateCompleted, serials);
-    return;
-  });
-  pDone.catch((e) => {
-    log.error("loadConfigAndRules():", e);
-  });
-}
 
-function loadRules() {
-  loadUserRules();
-  loadSubscriptionRules();
-}
+    this.events.listenersMap.onRulesChanged.emit();
 
-export const rpService = {
-  getSubscriptions() {
-    return subscriptions;
-  },
+    return failures;
+  }
+
+  public getSubscriptions() {
+    return this.subscriptions;
+  }
 
   // ---------------------------------------------------------------------------
   // nsIObserver interface
   // ---------------------------------------------------------------------------
 
-  observe(subject, topic, data) {
+  public observe(subject: any, topic: any, data: any) {
     switch (topic) {
       // FIXME: The subscription logic should reside in the
       // subscription module.
 
       case SUBSCRIPTION_UPDATED_TOPIC: {
-        log.log(`XXX updated: ${data}`);
+        this.log.log(`XXX updated: ${data}`);
         // TODO: check if the subscription is enabled. The user might have
         // disabled it between the time the update started and when it
         // completed.
-        let subInfo = JSON.parse(data);
-        PolicyManager.loadSubscriptionRules(subInfo);
+        const subInfo = JSON.parse(data);
+        this.loadSubscriptionRulesFromSubInfo(subInfo);
         break;
       }
 
       case SUBSCRIPTION_ADDED_TOPIC: {
-        log.log(`XXX added: ${data}`);
-        let subInfo = JSON.parse(data);
-        const pLoadSubscriptionRules = PolicyManager.
-            loadSubscriptionRules(subInfo);
-        pLoadSubscriptionRules.then(({failures}) => {
-          let failed = Object.getOwnPropertyNames(failures).length > 0;
+        this.log.log(`XXX added: ${data}`);
+        const subInfo: UserSubscriptionsInfo = JSON.parse(data);
+        const pLoadSubscriptionRules =
+            this.loadSubscriptionRulesFromSubInfo(subInfo);
+        pLoadSubscriptionRules.then(({failures}: IFailures) => {
+          const failed = Object.getOwnPropertyNames(failures).length > 0;
           if (failed) {
-            let serials = {};
-            for (let listName in subInfo) {
+            const serials: Serials = {};
+            // tslint:disable-next-line:forin
+            for (const listName in subInfo) {
               if (!serials[listName]) {
                 serials[listName] = {};
               }
-              for (let subName in subInfo[listName]) {
+              // tslint:disable-next-line:forin
+              for (const subName in subInfo[listName]) {
                 serials[listName][subName] = -1;
               }
             }
-            let updateCompleted = function(result) {
-              log.info(`Subscription update completed: ${result}`);
-            };
-            subscriptions.update(updateCompleted, serials);
+            this.subscriptions.update((result) => {
+              this.log.info(`Subscription update completed: ${result}`);
+            }, serials);
           }
           return;
         }).catch((e) => {
-          log.error("SUBSCRIPTION_ADDED_TOPIC", e);
+          this.log.error("SUBSCRIPTION_ADDED_TOPIC", e);
         });
         break;
       }
 
       case SUBSCRIPTION_REMOVED_TOPIC: {
-        log.log(`YYY: ${data}`);
-        let subInfo = JSON.parse(data);
-        PolicyManager.unloadSubscriptionRules(subInfo);
+        this.log.log(`YYY: ${data}`);
+        const subInfo = JSON.parse(data);
+        this.unloadSubscriptionRules(subInfo);
         break;
       }
 
       default:
         console.error(`unknown topic observed: ${topic}`);
     }
-  },
-};
+  }
 
-// ---------------------------------------------------------------------------
-// startup and shutdown functions
-// ---------------------------------------------------------------------------
+  protected startupSelf() {
+    MainEnvironment.obMan.observe([
+      SUBSCRIPTION_UPDATED_TOPIC,
+      SUBSCRIPTION_ADDED_TOPIC,
+      SUBSCRIPTION_REMOVED_TOPIC,
+    ], this.observe.bind(this));
 
-// prepare back-end
-MainEnvironment.addStartupFunction(EnvLevel.BACKEND, loadRules);
-
-function registerObservers() {
-  MainEnvironment.obMan.observe([
-    SUBSCRIPTION_UPDATED_TOPIC,
-    SUBSCRIPTION_ADDED_TOPIC,
-    SUBSCRIPTION_REMOVED_TOPIC,
-  ], rpService.observe);
+    return this.loadSubscriptionRules();
+  }
 }
-MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, registerObservers);

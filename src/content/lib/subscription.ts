@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { rp } from "app/background/app.background";
 import {MainEnvironment} from "lib/environment";
 import {IRuleSpecs, RawRuleset} from "lib/ruleset";
-import {RulesetStorage} from "lib/ruleset-storage";
 import {Log} from "models/log";
 
 const log = Log.instance.extend({
@@ -143,6 +143,8 @@ interface ISerialObj {
 
 type Serials = IObject<ISerialObj>;
 
+export type UserSubscriptionsInfo = ISubsObject<null | true>;
+
 // =============================================================================
 // UserSubscriptions
 // =============================================================================
@@ -194,9 +196,9 @@ export class UserSubscriptions {
     });
   }
 
-  public getSubscriptionInfo(): ISubsObject<null> {
+  public getSubscriptionInfo(): UserSubscriptionsInfo {
     const lists = this.data.lists;
-    const result: ISubsObject<null> = {};
+    const result: UserSubscriptionsInfo = {};
     // tslint:disable-next-line prefer-const forin
     for (let listName in lists) {
       if (!lists[listName].subscriptions) {
@@ -538,8 +540,9 @@ class Subscription {
         // The rest of the sanity checking is done by RawRuleset.
         try {
           const rawRuleset = RawRuleset.create(this.data);
-          RulesetStorage.saveRawRulesetToFile(rawRuleset, this.name,
-                this.list);
+          rp.policy.rulesetStorage.saveRawRulesetToFile(
+              rawRuleset, this.name, this.list,
+          );
         } catch (e) {
           setTimeout(() => errorCallback(this, e.toString()), 0);
           return;

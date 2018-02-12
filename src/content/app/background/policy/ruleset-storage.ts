@@ -21,51 +21,51 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {Module} from "lib/classes/module";
 import {IMaybeIncompleteRawRuleset, RawRuleset} from "lib/ruleset";
 import {Log} from "models/log";
 
-const log = Log.instance;
-
-// =============================================================================
-
-function getKey(policyName: string, subscriptionListName?: string) {
-  let key = "policies/";
-  if (subscriptionListName) {
-    key += `subscriptions/${subscriptionListName}/`;
+export class RulesetStorage extends Module {
+  constructor(log: Log) {
+    super("RulesetStorage", log);
   }
-  key += policyName;
-  return key;
-}
 
-// =============================================================================
-// RulesetStorage
-// =============================================================================
-
-export const RulesetStorage = {
-  loadRawRulesetFromFile(policyName: string, subscriptionListName?: string) {
-    const key = getKey(policyName, subscriptionListName);
+  public loadRawRulesetFromFile(
+      policyName: string,
+      subscriptionListName?: string,
+  ) {
+    const key = this.getKey(policyName, subscriptionListName);
     const pResult = browser.storage.local.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
       return RawRuleset.create(aResult[key] as IMaybeIncompleteRawRuleset);
     });
     pRawRuleset.catch((e) => {
-      log.error("RulesetStorage.loadRawRulesetFromFile():", e);
+      this.log.error("RulesetStorage.loadRawRulesetFromFile():", e);
     });
     return pRawRuleset;
-  },
+  }
 
-  saveRawRulesetToFile(
+  public saveRawRulesetToFile(
       policy: RawRuleset,
       policyName: string,
       subscriptionListName?: string,
   ) {
-    const key = getKey(policyName, subscriptionListName);
+    const key = this.getKey(policyName, subscriptionListName);
     const p = browser.storage.local.set({
       [key]: policy,
     });
     p.catch((e) => {
-      log.error("RulesetStorage.saveRawRulesetToFile():", e);
+      this.log.error("RulesetStorage.saveRawRulesetToFile():", e);
     });
-  },
-};
+  }
+
+  private getKey(policyName: string, subscriptionListName?: string) {
+    let key = "policies/";
+    if (subscriptionListName) {
+      key += `subscriptions/${subscriptionListName}/`;
+    }
+    key += policyName;
+    return key;
+  }
+}

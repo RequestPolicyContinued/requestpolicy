@@ -21,20 +21,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager} from "./common";
+import { UserSubscriptionsInfo } from "lib/subscription";
+import {BackgroundPage} from "main";
+import {elManager, WinEnv} from "./common";
 
-(function() {
-  var {
+declare const Services: any;
+
+(() => {
+  const {
     Log: {instance: log},
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
-    rpService,
-  } = browser.extension.getBackgroundPage();
+    rp,
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
 
-  function getInputElement(subName) {
-    var elements = document.body.querySelectorAll(`input[name=${subName}]`);
+  function getInputElement(subName: any) {
+    const elements = document.body.querySelectorAll(`input[name=${subName}]`);
     if (elements.length <= 0) {
       return null;
     }
@@ -42,64 +46,66 @@ import {WinEnv, elManager} from "./common";
   }
 
   function getAllSubscriptionElements() {
-    var divs = document.getElementsByClassName("subscription");
-    var elements = [];
-    for (var i = 0, len = divs.length; i < len; ++i) {
-      var div = divs[i];
+    const divs = document.getElementsByClassName("subscription");
+    const elements = [];
+    for (let i = 0, len = divs.length; i < len; ++i) {
+      const div = divs[i];
       elements.push({
+        div,
         id: div.id,
-        div: div,
-        input: getInputElement(div.id)});
+        input: getInputElement(div.id),
+      });
     }
     return elements;
   }
 
   function updateDisplay() {
-    var userSubs = rpService.getSubscriptions();
-    var subsInfo = userSubs.getSubscriptionInfo();
-    var allSubElements = getAllSubscriptionElements();
-    for (var i = 0, len = allSubElements.length; i < len; ++i) {
-      var element = allSubElements[i];
-      element.input.checked = element.id in subsInfo.official;
+    const userSubs = rp.policy.subscriptions.getSubscriptions();
+    const subsInfo = userSubs.getSubscriptionInfo();
+    const allSubElements = getAllSubscriptionElements();
+    for (let i = 0, len = allSubElements.length; i < len; ++i) {
+      const element = allSubElements[i];
+      (element.input as any).checked = element.id in subsInfo.official;
     }
   }
 
-  function handleSubscriptionCheckboxChange(event) {
-    var userSubs = rpService.getSubscriptions();
+  function handleSubscriptionCheckboxChange(event: any) {
+    const userSubs = rp.policy.subscriptions.getSubscriptions();
 
-    var subName = event.target.name;
-    var enabled = event.target.checked;
-    var subInfo = {};
+    const subName = event.target.name;
+    const enabled = event.target.checked;
+    const subInfo: UserSubscriptionsInfo = {};
     subInfo.official = {};
     subInfo.official[subName] = true;
     if (enabled) {
       userSubs.addSubscription("official", subName);
       Services.obs.notifyObservers(
           null, SUBSCRIPTION_ADDED_TOPIC,
-          JSON.stringify(subInfo)
+          JSON.stringify(subInfo),
       );
     } else {
       userSubs.removeSubscription("official", subName);
       Services.obs.notifyObservers(
           null, SUBSCRIPTION_REMOVED_TOPIC,
-          JSON.stringify(subInfo)
+          JSON.stringify(subInfo),
       );
     }
   }
 
-  window.onload = function() {
+  window.onload = () => {
     updateDisplay();
 
-    var available = {
-      "allow_embedded": {},
-      "allow_extensions": {},
-      "allow_functionality": {},
-      "allow_mozilla": {},
-      "allow_sameorg": {},
-      "deny_trackers": {},
+    const available = {
+      allow_embedded: {},
+      allow_extensions: {},
+      allow_functionality: {},
+      allow_mozilla: {},
+      allow_sameorg: {},
+      deny_trackers: {},
     };
-    for (var subName in available) {
-      var el = getInputElement(subName);
+    // tslint:disable-next-line:forin
+    for (const subName in available) {
+      const el = getInputElement(subName);
       if (!el) {
         log.log(`Skipping unexpected official subName: ${subName}`);
         continue;

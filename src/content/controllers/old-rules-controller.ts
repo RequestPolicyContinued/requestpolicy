@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/background/app.background";
 import {IController} from "lib/classes/controllers";
 import {OldRules} from "lib/classes/old-rules";
-import {PolicyManager} from "lib/policy-manager";
 import {Log} from "models/log";
 import {VersionInfos} from "models/version-infos";
 
@@ -35,7 +35,7 @@ function importOldRules() {
   try {
     const oldRules = new OldRules();
     const rules = oldRules.getAsNewRules();
-    PolicyManager.addAllowRules(rules);
+    rp.policy.addAllowRules(rules);
     return true;
   } catch (e) {
     console.error("Failed to import old rules. Details:");
@@ -55,6 +55,7 @@ function importOldRulesAutomatically() {
 export const OldRulesController: IController = {
   startupPreconditions: [
     VersionInfos.pReady,
+    rp.policy.whenReady,
   ],
   startup() {
     // If the user ...
@@ -63,7 +64,7 @@ export const OldRulesController: IController = {
     //   * and upgrades again
     // the user ruleset already exists after the first step.
     const isFirstRPUpgrade = true === VersionInfos.isRPUpgrade &&
-        false === PolicyManager.userRulesetExistedOnStartup;
+        false === rp.policy.userRulesetExistedOnStartup;
 
     if (isFirstRPUpgrade) {
       importOldRulesAutomatically();

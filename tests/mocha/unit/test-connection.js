@@ -24,7 +24,7 @@ describe("connection", function() {
         moduleName,
         Log.instance,
         targetName,
-        port,
+        Promise.resolve(port),
         gotMessage
     );
   });
@@ -35,42 +35,49 @@ describe("connection", function() {
   });
 
   function fullyStartupConnection() {
-    connection.startup();
-    port.onMessage.dispatch({
-      id: "startup",
-      isResponse: true,
-      target: moduleName,
-      value: "ready",
+    connection.startup().then(() => {
+      port.onMessage.dispatch({
+        id: "startup",
+        isResponse: true,
+        target: moduleName,
+        value: "ready",
+      });
+      return;
+    }).catch((e) => {
+      console.error(e);
     });
   }
 
   it("first add message listener, then send message", function() {
-    connection.startup();
-    sinon.assert.callOrder(
-        port.onMessage.addListener,
-        port.postMessage
-    );
-    sinon.assert.calledWithMatch(port.postMessage, {
-      id: "startup",
-      isResponse: false,
-      target: targetName,
-      value: "ready",
+    return connection.startup().then(() => {
+      sinon.assert.callOrder(
+          port.onMessage.addListener,
+          port.postMessage
+      );
+      sinon.assert.calledWithMatch(port.postMessage, {
+        id: "startup",
+        isResponse: false,
+        target: targetName,
+        value: "ready",
+      });
+      return;
     });
   });
 
   it("responds to startup message from target", function() {
-    connection.startup();
-    port.postMessage.reset();
-    const pCalled = new Promise((resolve) => {
-      port.postMessage.callsFake(resolve);
-    });
-    port.onMessage.dispatch({
-      id: "startup",
-      isResponse: false,
-      target: moduleName,
-      value: "ready",
-    });
-    return pCalled.then(() => {
+    return connection.startup().then(() => {
+      port.postMessage.reset();
+      const pCalled = new Promise((resolve) => {
+        port.postMessage.callsFake(resolve);
+      });
+      port.onMessage.dispatch({
+        id: "startup",
+        isResponse: false,
+        target: moduleName,
+        value: "ready",
+      });
+      return pCalled;
+    }).then(() => {
       sinon.assert.calledOnce(port.postMessage);
       sinon.assert.calledWithMatch(port.postMessage, {
         id: "startup",
@@ -83,33 +90,37 @@ describe("connection", function() {
   });
 
   it("is not ready before target startup", function() {
-    connection.startup();
-    assert.strictEqual(connection.isReady(), false);
+    return connection.startup().then(() => {
+      assert.strictEqual(connection.isReady(), false);
+      return;
+    });
   });
 
   it("is ready after receiving startup response", function() {
-    connection.startup();
-    port.onMessage.dispatch({
-      id: "startup",
-      isResponse: true,
-      target: moduleName,
-      value: "ready",
-    });
-    return connection.whenReady.then(() => {
+    return connection.startup().then(() => {
+      port.onMessage.dispatch({
+        id: "startup",
+        isResponse: true,
+        target: moduleName,
+        value: "ready",
+      });
+      return connection.whenReady;
+    }).then(() => {
       assert.strictEqual(connection.isReady(), true);
       return;
     });
   });
 
   it("is ready after receiving startup message (non-response)", function() {
-    connection.startup();
-    port.onMessage.dispatch({
-      id: "startup",
-      isResponse: false,
-      target: moduleName,
-      value: "ready",
-    });
-    return connection.whenReady.then(() => {
+    return connection.startup().then(() => {
+      port.onMessage.dispatch({
+        id: "startup",
+        isResponse: false,
+        target: moduleName,
+        value: "ready",
+      });
+      return connection.whenReady;
+    }).then(() => {
       assert.strictEqual(connection.isReady(), true);
       return;
     });

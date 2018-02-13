@@ -38,48 +38,26 @@ type messageCallback<TIncoming, TResponseToIncoming> =
 
 export class Connection<TIncoming, TResponseToIncoming> extends Module {
 
-  // factory functions
-
-  public static async createSlave<TIncoming, TResponseToIncoming>(
-      moduleName: string,
-      log: Log,
-      targetName: string,
-      connectable: {
-        onConnect: typeof browser.runtime.onConnect;
-      },
-      gotMessage: messageCallback<TIncoming, TResponseToIncoming>,
-  ): Promise<Connection<TIncoming, TResponseToIncoming>> {
-    const port = await new Promise<Port>((resolve, reject) => {
-      const onConnectListener = (aPort: Port) => {
-        resolve(aPort);
-        connectable.onConnect.removeListener(onConnectListener);
-      };
-      connectable.onConnect.addListener(onConnectListener);
-    });
-    return new Connection<TIncoming, TResponseToIncoming>(
-        moduleName,
-        log,
-        targetName,
-        port,
-        gotMessage,
-    );
-  }
-
   // properties, constructor
 
   private expectedResponses = new Map<string, IDeferred<any, any>>();
+  private port: Port;
 
   constructor(
       moduleName: string,
       log: Log,
       protected targetName: string,
-      private port: Port,
+      private pPort: Promise<Port>,
       public gotMessage: messageCallback<TIncoming, TResponseToIncoming>,
   ) {
     super(moduleName, log);
+  }
 
+  public async startupSelf() {
+    this.port = await this.pPort;
     this.port.onMessage.addListener(this.receiveMessage.bind(this));
     this.port.postMessage(this.buildMessage("startup", "ready", false));
+    // NOTE: the startup is NOT done yet
   }
 
   // methods

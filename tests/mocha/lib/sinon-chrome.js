@@ -29,6 +29,8 @@ for (let ns of stableApiFx) {
   }
 }
 
-module.exports = function createBrowserApi() {
-  return new Api(stableApiFx).create();
+module.exports = {
+  createBrowserApi() {
+    return new Api(stableApiFx).create();
+  },
 };

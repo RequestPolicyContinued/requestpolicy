@@ -22,6 +22,7 @@
 
 import { Module } from "lib/classes/module";
 import { defer, IDeferred } from "lib/utils/js-utils";
+import { createListenersMap } from "lib/utils/listener-factories";
 import { Log } from "models/log";
 
 type Port = browser.runtime.Port;
@@ -33,12 +34,9 @@ interface IMessage<T> {
   value: T;
 }
 
-type messageCallback<TIncoming, TResponseToIncoming> =
-    (aType: string, aMessage: TIncoming) => Promise<TResponseToIncoming>;
-
 export class Connection<TIncoming, TResponseToIncoming> extends Module {
-
-  // properties, constructor
+  private events = createListenersMap(["onMessage"]);
+  public get onMessage() { return this.events.interfaces.onMessage; }
 
   private expectedResponses = new Map<string, IDeferred<any, any>>();
   private port: Port;
@@ -48,7 +46,6 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
       log: Log,
       protected targetName: string,
       private pPort: Promise<Port>,
-      public gotMessage: messageCallback<TIncoming, TResponseToIncoming>,
   ) {
     super(moduleName, log);
   }
@@ -63,17 +60,9 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
   // methods
 
   public sendMessage<T, TResponse>(
-      id: string,
       value: T,
   ): Promise<TResponse> {
-    if (this.expectedResponses.has(id)) {
-      const errorMsg =
-          `There's already a pending response for message id "${id}"`;
-      this.log.error(errorMsg);
-      const error = new Error(errorMsg);
-      return Promise.reject(error);
-    }
-
+    const id = String(Math.random());
     const dResponse = defer<TResponse>();
     this.expectedResponses.set(id, dResponse);
 
@@ -104,10 +93,28 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
         d.resolve(aMessage.value);
       }
     } else {
-      this.gotMessage(aMessage.id, aMessage.value).
+      this.gotMessage(aMessage.value).
           then(this.sendResponse.bind(this, aMessage.id)).
           catch(this.log.onError(`receiveMessage()`, aMessage));
     }
+  }
+
+  private async gotMessage(aMessage: TIncoming): Promise<any> {
+    const responsesRaw: any = this.events.listenersMap.onMessage.emit(aMessage);
+    let responses: any[];
+    if (responsesRaw && typeof responsesRaw.then === "function") {
+      responses = await responsesRaw;
+    } else {
+      responses = responsesRaw;
+    }
+    responses = responses.filter((response) => !!response);
+    if (responses.length === 0) {
+      return;
+    }
+    if (responses.length > 1) {
+      return Promise.reject("Got multiple responses!");
+    }
+    return responses[0];
   }
 
   private sendResponse<TResponse>(id: string, value: TResponse): void {

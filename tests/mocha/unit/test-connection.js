@@ -15,17 +15,14 @@ describe("connection", function() {
   const targetName = "my-target";
   let port;
   let connection;
-  let gotMessage;
 
   beforeEach(() => {
     port = createPort(sinon);
-    gotMessage = sinon.stub();
     connection = new Connection(
         moduleName,
         Log.instance,
         targetName,
-        Promise.resolve(port),
-        gotMessage
+        Promise.resolve(port)
     );
   });
 
@@ -129,9 +126,11 @@ describe("connection", function() {
   it("resolves to response when sending a message", function() {
     fullyStartupConnection();
     return connection.whenReady.then(() => {
-      const p = connection.sendMessage("foo_id", "bar_value");
+      port.postMessage.resetHistory();
+      const p = connection.sendMessage("bar_value");
+      const {id} = port.postMessage.getCall(0).args[0];
       port.onMessage.dispatch({
-        id: "foo_id",
+        id,
         isResponse: true,
         target: moduleName,
         value: "baz_response",
@@ -145,7 +144,9 @@ describe("connection", function() {
 
   it("calls 'gotMessage' callback when receiving a non-response message", function() {
     fullyStartupConnection();
+    const gotMessage = sinon.stub();
     return connection.whenReady.then(() => {
+      connection.onMessage.addListener(gotMessage);
       const pGotMessageCalled = new Promise((resolve) => {
         gotMessage.callsFake(() => {
           resolve();
@@ -161,29 +162,30 @@ describe("connection", function() {
       return pGotMessageCalled;
     }).then(() => {
       sinon.assert.calledOnce(gotMessage);
-      sinon.assert.calledWithMatch(gotMessage, "foo_id", "bar_value");
+      sinon.assert.calledWithMatch(gotMessage, "bar_value");
       return;
     });
   });
 
   it("sends back the response returned by 'gotMessage'", function() {
     fullyStartupConnection();
+    const gotMessage = sinon.stub();
     return connection.whenReady.then(() => {
-      const pGotMessageCalled = new Promise((resolve) => {
-        gotMessage.callsFake(() => {
-          resolve();
-          return Promise.resolve("baz_response");
-        });
+      connection.onMessage.addListener(gotMessage);
+      gotMessage.resolves("baz_response");
+      port.postMessage.resetHistory();
+      const pPostMessageCalled = new Promise((resolve) => {
+        port.postMessage.callsFake(resolve);
       });
-      port.postMessage.reset();
       port.onMessage.dispatch({
         id: "foo_id",
         isResponse: false,
         target: moduleName,
         value: "bar_value",
       });
-      return pGotMessageCalled;
+      return pPostMessageCalled;
     }).then(() => {
+      sinon.assert.calledOnce(port.postMessage);
       sinon.assert.calledWithMatch(port.postMessage, {
         id: "foo_id",
         isResponse: true,
@@ -191,36 +193,6 @@ describe("connection", function() {
         value: "baz_response",
       });
       return;
-    });
-  });
-
-  it("sendMessage() rejects on two subsequent identical calls " +
-      "w/o a response in between", function() {
-    fullyStartupConnection();
-
-    function sendMessage() {
-      return connection.sendMessage("foo_id", "bar_value");
-    }
-    return connection.whenReady.then(() => {
-      const pGotMessageCalled = new Promise((resolve) => {
-        port.postMessage.callsFake(resolve);
-      });
-      sendMessage();
-      return pGotMessageCalled;
-    }).then(() => {
-      const originalError = console.error;
-      console.error = sinon.stub();
-      // eslint-disable-next-line promise/no-nesting
-      return sendMessage().then(() => {
-        assert.fail(0, 1);
-        return;
-      }).catch(() => {
-        console.error.reset();
-        return Promise.resolve();
-      }).then(() => {
-        console.error = originalError;
-        return;
-      });
     });
   });
 });

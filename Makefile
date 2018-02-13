@@ -141,8 +141,7 @@ define make_files
 endef
 
 .PHONY: all \
-	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
-	non-ui-testing-files
+	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi
 
 all: xpi
 xpi: nightly-xpi
@@ -158,9 +157,6 @@ amo-beta-xpi: node-packages
 	$(call make_xpi,amo-beta)
 amo-nightly-xpi: node-packages
 	$(call make_xpi,amo-nightly)
-
-non-ui-testing-files: node-packages
-	$(call make_files,non-ui-testing)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name)-legacy-nightly.xpi
 xpi_file__dev          := $(dist_dir)/$(extension_name)-legacy-dev.xpi
@@ -419,12 +415,13 @@ _mocha_test_targets = mocha-tests mocha-unit-tests mocha-integration-tests
 .PHONY: $(_mocha_test_targets)
 mocha-tests: ALIASES := unit
 mocha-unit-tests: ALIASES := unit
-$(_mocha_test_targets): node-packages non-ui-testing-files
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}$(build_dir_root)/legacy/non-ui-testing/content/ \
+$(_mocha_test_targets): node-packages
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/ \
 	$(MOCHA) \
 		--recursive \
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
+		--require ts-node/register \
 		tests/mocha/lib/helper \
 		$(patsubst %,tests/mocha/%/,$(ALIASES))
 

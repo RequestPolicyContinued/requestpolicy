@@ -422,8 +422,9 @@ $(_mocha_test_targets): node-packages
 		--compilers coffee:coffeescript/register \
 		--require source-map-support/register \
 		--require ts-node/register \
-		tests/mocha/lib/helper \
-		$(patsubst %,tests/mocha/%/,$(ALIASES))
+		tests/mocha/lib/helper.* \
+		$(patsubst %,tests/mocha/%/*,$(ALIASES)) \
+		$(patsubst %,tests/mocha/%/**/*,$(ALIASES))
 
 #-------------------------------------------------------------------------------
 # UI tests

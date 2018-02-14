@@ -22,7 +22,7 @@
       // "es2017.object" // support since Fx47
     ],
     "typeRoots": [
-      "@types",
+      "node_modules/@types",
       "node_modules/web-ext-types"
     ],
 

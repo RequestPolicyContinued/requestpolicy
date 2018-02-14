@@ -8,11 +8,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const {assert} = require("chai");
+import {assert} from "chai";
 
 function resetConsoleErrors() {
   if ("reset" in console.error) {
-    console.error.reset();
+    (console.error as sinon.SinonStub).reset();
   }
 }
 

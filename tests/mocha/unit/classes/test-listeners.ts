@@ -1,8 +1,9 @@
 "use strict";
 
-const {assert} = require("chai");
+import {assert} from "chai";
 
-const {Listeners} = require("lib/classes/listeners");
+import {Listeners} from "lib/classes/listeners";
+
 
 describe("Listeners", () => {
   describe("emit()", () => {
@@ -28,7 +29,7 @@ describe("Listeners", () => {
         const checkReturnValues = (returnValues) => {
           assert.sameDeepMembers(returnValues, expectedRVs);
         };
-        if (aWithPromises) return emitRV.then(checkReturnValues);
+        if (aWithPromises) return (emitRV as Promise<any[]>).then(checkReturnValues);
         checkReturnValues(emitRV);
       });
     }

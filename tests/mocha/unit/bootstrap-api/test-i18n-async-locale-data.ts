@@ -8,9 +8,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
-const sinon = require("sinon");
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
+import * as sinon from "sinon";
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -18,9 +18,9 @@ const {expect} = chai;
 // Loads mocking classes
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
-const MockNetUtil = require("./lib/mock-netutil");
-const MockComponents = require("./lib/mock-components");
-const MockServices = require("./lib/mock-services");
+import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
+import {Components as MockComponents} from "./lib/mock-components";
+import {Services as MockServices} from "./lib/mock-services";
 
 let sandbox = sinon.createSandbox();
 
@@ -29,11 +29,15 @@ describe("AsyncLocaleData", function() {
   let asyncLocaleData = null;
   let AsyncLocaleData;
 
+  let mockComp: MockComponents;
+  let mockNu: MockNetUtil;
+  let mockServices: MockServices;
+
   before(function() {
-    let mockComp = new MockComponents();
-    let mockNu = new MockNetUtil();
+    mockComp = new MockComponents();
+    mockNu = new MockNetUtil();
+    mockServices = new MockServices();
     let mockHttp = {httpRequest: function(url, option) {}};
-    let mockServices = new MockServices();
 
     sinon.stub(mockComp.utils, "import").
         withArgs("resource://gre/modules/NetUtil.jsm").
@@ -42,8 +46,8 @@ describe("AsyncLocaleData", function() {
         returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
-    global.Cu = mockComp.utils;
-    global.Services = mockServices;
+    (global as any).Cu = mockComp.utils;
+    (global as any).Services = mockServices;
 
     ({AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data"));
     ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
@@ -58,17 +62,17 @@ describe("AsyncLocaleData", function() {
 
   afterEach(function() {
     sandbox.restore();
-    global.Services.locale = {};
+    mockServices.locale = {};
   });
 
   after(function() {
-    global.Cu = null;
-    global.Services = null;
+    (global as any).Cu = null;
+    (global as any).Services = null;
   });
 
   describe("getAppLocale()", function() {
     it("Should always use getAppLocaleAsBCP47 if available", function() {
-      global.Services.locale = {
+      mockServices.locale = {
         getAppLocaleAsBCP47: function() {
           return "fr";
         },
@@ -82,7 +86,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should use getApplicationLocale as fallback", function() {
-      global.Services.locale = {
+      mockServices.locale = {
         getApplicationLocale: function() {
           return {getCategory: () => "fr"};
         },
@@ -93,7 +97,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should return normalized BCP 47 tag", function() {
-      global.Services.locale = {
+      mockServices.locale = {
         getAppLocaleAsBCP47: function() {
           return "fr-FR";
         },
@@ -104,7 +108,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should throw RangeError if not a valid BCP 47 tag", function() {
-      global.Services.locale = {
+      mockServices.locale = {
         getAppLocaleAsBCP47: function() {
           return "-invalid tag";
         },

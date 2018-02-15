@@ -35,7 +35,8 @@ export abstract class Module implements IModule {
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
   }
-  protected dSelfReady = defer();
+  private dSelfReady = defer();
+  private ready = false;
 
   public get whenReady() {
     const promises: Array<Promise<void>> =
@@ -45,8 +46,6 @@ export abstract class Module implements IModule {
     p.catch(this.log.onError("whenReady"));
     return p.then(() => { return; });
   }
-
-  private ready = false;
 
   private dSelfBootstrap = {
     shutdown: defer(),

@@ -38,16 +38,9 @@ export abstract class Module implements IModule {
   protected dSelfReady = defer();
 
   public get whenReady() {
-    let promises: Array<Promise<void>> = [
-      this.dSelfReady.promise,
-    ];
-    if (this.subModules) {
-      promises = promises.concat(
-          Object.keys(this.subModules).
-          map((key) => this.subModules![key]).
-          map((m) => m.whenReady),
-      );
-    }
+    const promises: Array<Promise<void>> =
+        this.getSubmodules().map((m) => m.whenReady);
+    promises.push(this.dSelfReady.promise);
     const p = Promise.all(promises);
     p.catch(this.log.onError("whenReady"));
     return p.then(() => { return; });
@@ -136,13 +129,25 @@ export abstract class Module implements IModule {
     }
   }
 
-  private async runSubmoduleFns(fnName: "startup" | "shutdown") {
-    const p = this.subModules ? Promise.all(
-        Object.keys(this.subModules).
+  private getSubmodules(): IModule[] {
+    if (!this.subModules) return [];
+    return Object.keys(this.subModules).
         map((key) => this.subModules![key]).
+        filter((m, index) => {
+          if (!m) {
+            this.log.error(`submodule #${index + 1} is ${JSON.stringify(m)}`);
+            console.trace();
+          }
+          return !!m;
+        });
+  }
+
+  private async runSubmoduleFns(fnName: "startup" | "shutdown") {
+    const p = Promise.all(
+        this.getSubmodules().
         filter((m) => fnName in m).
         map((m) => m[fnName]!()),
-    ) : Promise.resolve();
+    );
     p.catch(this.log.onError(`submodule ${fnName}`));
     this.dChildBootstrap[fnName].resolve(p);
   }

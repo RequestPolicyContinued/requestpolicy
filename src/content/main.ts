@@ -39,7 +39,7 @@ import {
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 import {PrefManager} from "main/pref-manager";
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import "main/about-uri";
 import "main/content-policy";
 import "main/window-manager";

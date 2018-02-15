@@ -35,23 +35,10 @@ export abstract class Module implements IModule {
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
   }
-  protected dSelfReady = defer();
 
-  public get whenReady() {
-    let promises: Array<Promise<void>> = [
-      this.dSelfReady.promise,
-    ];
-    if (this.subModules) {
-      promises = promises.concat(
-          Object.keys(this.subModules).
-          map((key) => this.subModules![key]).
-          map((m) => m.whenReady),
-      );
-    }
-    const p = Promise.all(promises);
-    p.catch(this.log.onError("whenReady"));
-    return p.then(() => { return; });
-  }
+  private dReady = defer();
+  private ready = false;
+  public get whenReady() { return this.dReady.promise; }
 
   private dSelfBootstrap = {
     shutdown: defer(),
@@ -94,28 +81,17 @@ export abstract class Module implements IModule {
   }
 
   public async startup(): Promise<void> {
-    try {
-      await Promise.all(this.startupPreconditions);
-      await this.runSubmoduleFns("startup");
-      await this.runSelfFn("startup");
-      if (this.dSelfReady.promiseState === "pending") {
-        this.dSelfReady.resolve(undefined);
-      }
-    } catch (e) {
-      this.log.error("startup()", e);
-      throw e;
-    }
+    const p = this.startup_();
+    p.catch(this.log.onError("startup()"));
+    await p;
+    this.ready = true;
+    this.dReady.resolve(undefined);
   }
 
   public async shutdown(): Promise<void> {
-    try {
-      await Promise.all(this.shutdownPreconditions);
-      await this.runSelfFn("shutdown");
-      await this.runSubmoduleFns("shutdown");
-    } catch (e) {
-      this.log.error("shutdown()", e);
-      throw e;
-    }
+    const p = this.shutdown_();
+    p.catch(this.log.onError("shutdown()"));
+    await p;
   }
 
   protected startupSelf(): Promise<void> {
@@ -126,22 +102,57 @@ export abstract class Module implements IModule {
     return Promise.resolve();
   }
 
-  private async runSubmoduleFns(fnName: "startup" | "shutdown") {
-    const p = this.subModules ? Promise.all(
-        Object.keys(this.subModules).
-        map((key) => this.subModules![key]).
-        filter((m) => fnName in m).
-        map((m) => m[fnName]!()),
-    ) : Promise.resolve();
-    p.catch(this.log.onError(`submodule ${fnName}`));
-    this.dChildBootstrap[fnName].resolve(p);
+  protected assertReady() {
+    if (!this.ready) {
+      const msg = `Module "${this.moduleName}" is not ready yet!`;
+      this.log.error(msg);
+      console.trace();
+      throw new Error(msg);
+    }
   }
 
-  private async runSelfFn(fnName: "startup" | "shutdown") {
+  private async startup_(): Promise<void> {
+    await Promise.all(this.startupPreconditions);
+    await this.runSubmoduleFns("startup");
+    await this.runSelfFn("startup");
+  }
+
+  private async shutdown_(): Promise<void> {
+    await Promise.all(this.shutdownPreconditions);
+    await this.runSelfFn("shutdown");
+    await this.runSubmoduleFns("shutdown");
+  }
+
+  private getSubmodules(): IModule[] {
+    if (!this.subModules) return [];
+    return Object.keys(this.subModules).
+        map((key) => this.subModules![key]).
+        filter((m, index) => {
+          if (!m) {
+            this.log.error(`submodule #${index + 1} is ${JSON.stringify(m)}`);
+            console.trace();
+          }
+          return !!m;
+        });
+  }
+
+  private runSubmoduleFns(fnName: "startup" | "shutdown"): Promise<void> {
+    const p = Promise.all(
+        this.getSubmodules().
+        filter((m) => fnName in m).
+        map((m) => m[fnName]!()),
+    );
+    p.catch(this.log.onError(`submodule ${fnName}`));
+    this.dChildBootstrap[fnName].resolve(p);
+    return p as Promise<any>;
+  }
+
+  private runSelfFn(fnName: "startup" | "shutdown"): Promise<void> {
     const selfFnName =
         `${fnName}Self` as "startupSelf" | "shutdownSelf";
     const p = this[selfFnName] ? this[selfFnName]!() : Promise.resolve();
     p.catch(this.log.onError(`self-${fnName}`));
     this.dSelfBootstrap[fnName].resolve(p);
+    return p;
   }
 }

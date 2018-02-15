@@ -22,7 +22,7 @@
  */
 
 import * as DOMUtils from "lib/utils/dom-utils";
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 
 export function loadClassicmenuIntoWindow(window) {
   let self = {};

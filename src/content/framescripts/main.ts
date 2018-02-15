@@ -33,6 +33,7 @@ if (C.UI_TESTING) {
   import("ui-testing/services");
 }
 
+import {rp} from "app/app.content";
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 // =============================================================================
@@ -45,8 +46,10 @@ MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, () => {
                                            (subject: any) => {
     if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
       MainEnvironment.shutdown();
+      rp.shutdown();
     }
   });
 });
 
+rp.startup();
 MainEnvironment.startup();

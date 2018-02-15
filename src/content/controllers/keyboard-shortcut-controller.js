@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.background";
 import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
-import {Storage} from "models/storage";
 import {pWindowsAvailable} from "models/ui-startup";
 import {rpWindowManager} from "main/window-manager";
 
@@ -33,7 +33,7 @@ const keyboardShortcuts = [];
 
 export const KeyboardShortcutController = {
   startupPreconditions: [
-    Storage.pReady,
+    rp.storage.pReady,
     pWindowsAvailable,
     rpWindowManager.pStartup,
   ],

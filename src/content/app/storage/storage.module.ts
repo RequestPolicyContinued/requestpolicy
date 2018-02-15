@@ -21,25 +21,28 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
+
 declare const LegacyApi: any;
 
-// =============================================================================
-// Storage class
-// =============================================================================
-
-export class StorageClass {
+export class Storage extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
-  public pReady: Promise<void>;
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;
 
-  constructor({
-      cachedKeys,
-      boolAliases,
-  }: {
-      cachedKeys: string[],
-      boolAliases: Array<[string, string]>,
-  }) {
+  constructor(
+      log: Log,
+      {
+          cachedKeys,
+          boolAliases,
+      }: {
+          cachedKeys: string[],
+          boolAliases: Array<[string, string]>,
+      },
+  ) {
+    super("app.storage", log);
+
     this.cachedKeys = cachedKeys;
     this.cachedKeysSet = new Set(cachedKeys);
 
@@ -47,15 +50,15 @@ export class StorageClass {
       this.alias[`is${alias}`] = () => this.get(storageKey);
       this.alias[`set${alias}`] = (value) => this.set({[storageKey]: value});
     });
-
-    this.pReady = Promise.resolve();
   }
 
   public isKeyCached(aKey: string) {
+    this.assertReady();
     return this.cachedKeysSet.has(aKey);
   }
 
   public get(aKeys: "" | string | string[] | null | undefined): any {
+    this.assertReady();
     if (aKeys === "") return {};
     if (aKeys === null || aKeys === undefined) {
       return this.get(this.cachedKeys);
@@ -79,6 +82,7 @@ export class StorageClass {
   }
 
   public set(aKeys: {[key: string]: any}) {
+    this.assertReady();
     try {
       Object.keys(aKeys).forEach((key) => {
         LegacyApi.prefs.set(key, aKeys[key]);
@@ -93,49 +97,3 @@ export class StorageClass {
     }
   }
 }
-
-// =============================================================================
-// Storage
-// =============================================================================
-
-export const Storage = new StorageClass({
-  boolAliases: [
-    ["defaultPolicy.allow", "DefaultAllow"],
-    ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
-    ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
-    ["startWithAllowAllEnabled", "BlockingDisabled"],
-  ],
-  cachedKeys: [
-    "autoReload",
-    "confirmSiteInfo",
-    "contextMenu",
-    "defaultPolicy.allow",
-    "defaultPolicy.allowSameDomain",
-    "defaultPolicy.allowTopLevel",
-    "indicateBlacklistedObjects",
-    "indicateBlockedObjects",
-    "keyboardShortcuts.openMenu.enabled",
-    "keyboardShortcuts.openMenu.combo",
-    "keyboardShortcuts.openRequestLog.enabled",
-    "keyboardShortcuts.openRequestLog.combo",
-    "lastAppVersion",
-    "lastVersion",
-    "log",
-    "log.level",
-    "menu.info.showNumRequests",
-    "menu.sorting",
-    "prefetch.dns.disableOnStartup",
-    "prefetch.dns.restoreDefaultOnUninstall",
-    "prefetch.link.disableOnStartup",
-    "prefetch.link.restoreDefaultOnUninstall",
-    "prefetch.preconnections.disableOnStartup",
-    "prefetch.preconnections.restoreDefaultOnUninstall",
-    "privateBrowsingPermanentWhitelisting",
-    "startWithAllowAllEnabled",
-    "welcomeWindowShown",
-    // @if BUILD_ALIAS='ui-testing'
-    "unitTesting.consoleErrors.counter",
-    "unitTesting.loggingErrors.counter",
-    // @endif
-  ],
-});

@@ -22,35 +22,16 @@
 
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
-import { Policy } from "./policy/policy.main";
-import { RulesetStorage } from "./policy/ruleset-storage";
-import { Subscriptions } from "./policy/subscriptions";
 
-export class AppBackground extends Module {
+export class AppContent extends Module {
   constructor(
       log: Log,
-      public readonly policy: Policy,
   ) {
-    super("App", log);
+    super("AppContent", log);
   }
 
   public get subModules() {
     return {
-      policy: this.policy,
     };
   }
-}
-
-export let rp: AppBackground;
-{
-  const log = Log.instance;
-
-  const rulesetStorage = new RulesetStorage(log);
-  const subscriptions = new Subscriptions(log, rulesetStorage);
-  const policy = new Policy(log, subscriptions, rulesetStorage);
-
-  rp = new AppBackground(
-      log,
-      policy,
-  );
 }

@@ -21,8 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Storage} from "models/storage";
-
 let {PrivateBrowsingUtils} = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {}
 );
@@ -86,11 +84,12 @@ export function isWindowPrivate(aWindow) {
  * Should it be possible to add permanent rules in that window?
  *
  * @param {Window} aWindow
+ * @param {Storage} storage
  * @return {boolean}
  */
-export function mayPermanentRulesBeAdded(aWindow) {
+export function mayPermanentRulesBeAdded(aWindow, storage) {
   return isWindowPrivate(aWindow) === false ||
-      Storage.get("privateBrowsingPermanentWhitelisting");
+      storage.get("privateBrowsingPermanentWhitelisting");
 }
 
 //

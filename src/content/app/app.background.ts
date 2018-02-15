@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2011 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,29 +20,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.background";
-import {IController} from "lib/classes/controllers";
-import {Log} from "models/log";
-import {VersionInfos} from "models/version-infos";
+import { Log } from "models/log";
+import { AppBackground } from "./app.background.module";
+import { Policy } from "./policy/policy.module";
+import { RulesetStorage } from "./policy/ruleset-storage";
+import { Subscriptions } from "./policy/subscriptions";
+import * as RPStorageConfig from "./storage/rp-config.background";
+import { Storage } from "./storage/storage.module";
 
 const log = Log.instance;
 
-function updateLastVersions() {
-  const {curAppVersion, curRPVersion} = VersionInfos;
-  browser.storage.local.set({
-    lastAppVersion: curAppVersion,
-    lastVersion: curRPVersion,
-  }).catch((e) => {
-    log.error(`Failed to update last app and RP version:`, e);
-  });
-}
+const rulesetStorage = new RulesetStorage(log);
+const subscriptions = new Subscriptions(log, rulesetStorage);
+const policy = new Policy(log, subscriptions, rulesetStorage);
+const storage = new Storage(log, RPStorageConfig);
 
-export const VersionInfosController: IController = {
-  startupPreconditions: [
-    rp.storage.whenReady,
-    VersionInfos.pReady,
-  ],
-  startup() {
-    updateLastVersions();
-  },
-};
+export const rp = new AppBackground(
+    log,
+    policy,
+    storage,
+);

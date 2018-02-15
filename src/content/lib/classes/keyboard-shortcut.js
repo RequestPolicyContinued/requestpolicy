@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.background";
 import {Windows} from "models/windows";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {Storage} from "models/storage";
 import * as XULUtils from "lib/utils/xul-utils";
 import {MainEnvironment} from "lib/environment";
 
@@ -163,13 +163,13 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
-    return Storage.get(this._userComboPrefName);
+    return rp.storage.get(this._userComboPrefName);
   },
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
-    return Storage.get(this._userEnabledPrefName);
+    return rp.storage.get(this._userEnabledPrefName);
   },
 });
 

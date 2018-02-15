@@ -23,27 +23,27 @@
 
 declare const LegacyApi: any;
 
+import {rp} from "app/app.background";
 import {IController} from "lib/classes/controllers";
 import {NotificationID, Notifications} from "models/notifications";
-import {Storage} from "models/storage";
 import {VersionInfos} from "models/version-infos";
 
 function onNotificationsTabOpened(aId: NotificationID) {
   if (aId !== NotificationID.InitialSetup) return;
   Notifications.onTabOpened.removeListener(onNotificationsTabOpened);
-  Storage.set({welcomeWindowShown: true});
+  rp.storage.set({welcomeWindowShown: true});
 }
 
 function maybeShowSetupTab() {
-  if (Storage.get("welcomeWindowShown")) return;
+  if (rp.storage.get("welcomeWindowShown")) return;
 
   if (VersionInfos.isRPUpgrade) {
     // If the use has just upgraded from an 0.x version, set the
     // default-policy preferences based on the old preferences.
-    Storage.set({"defaultPolicy.allow": false});
+    rp.storage.set({"defaultPolicy.allow": false});
     if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
-      const identLevel = Storage.get("uriIdentificationLevel");
-      Storage.set({
+      const identLevel = rp.storage.get("uriIdentificationLevel");
+      rp.storage.set({
         "defaultPolicy.allowSameDomain": identLevel === 1,
       });
     }
@@ -55,7 +55,7 @@ function maybeShowSetupTab() {
 
 export const InitialSetupController: IController = {
   startupPreconditions: [
-    Storage.pReady,
+    rp.storage.whenReady,
     VersionInfos.pReady,
   ],
   startup() {

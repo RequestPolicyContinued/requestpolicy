@@ -26,26 +26,26 @@ import {WinEnv, elManager, $id} from "./common";
 (function() {
   var {
     ManagerForPrefObservers,
-    Storage,
+    rp,
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
 
   function updateDisplay() {
-    var indicate = Storage.get("indicateBlockedObjects");
+    var indicate = rp.storage.get("indicateBlockedObjects");
     $id("pref-indicateBlockedObjects").checked = indicate;
     $id("indicateBlockedImages-details").hidden = !indicate;
 
     $id("pref-dontIndicateBlacklistedObjects").checked =
-        !Storage.get("indicateBlacklistedObjects");
+        !rp.storage.get("indicateBlacklistedObjects");
 
     $id("pref-autoReload").checked =
-        Storage.get("autoReload");
+        rp.storage.get("autoReload");
 
     $id("pref-privateBrowsingPermanentWhitelisting").checked =
-        Storage.get("privateBrowsingPermanentWhitelisting");
+        rp.storage.get("privateBrowsingPermanentWhitelisting");
 
-    // if (Storage.get("defaultPolicy.allow")) {
+    // if (rp.storage.get("defaultPolicy.allow")) {
     //   var word = "allow";
     // } else {
     //   var word = "block";
@@ -59,7 +59,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-indicateBlockedObjects"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "indicateBlockedObjects": event.target.checked,
           });
           updateDisplay();
@@ -69,7 +69,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-dontIndicateBlacklistedObjects"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "indicateBlacklistedObjects": !event.target.checked,
           });
           updateDisplay();
@@ -77,14 +77,14 @@ import {WinEnv, elManager, $id} from "./common";
     );
 
     elManager.addListener($id("pref-autoReload"), "change", function(event) {
-      Storage.set({"autoReload": event.target.checked});
+      rp.storage.set({"autoReload": event.target.checked});
       updateDisplay();
     });
 
     elManager.addListener(
         $id("pref-privateBrowsingPermanentWhitelisting"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "privateBrowsingPermanentWhitelisting": event.target.checked,
           });
           updateDisplay();

@@ -40,7 +40,8 @@ WHITELIST = [
       # es6 generators
       r"""JavaScript strict warning: """
       r"""chrome://rpcontinued/content/[^ ]+, line [0-9]+: """
-      r"""ReferenceError: reference to undefined property op\[1\]"""
+      r"""ReferenceError: reference to undefined property """
+      r"""(op\[1\]|t\[2\])"""
   ),
 
   # other

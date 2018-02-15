@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {IController} from "lib/classes/controllers";
 import {OldRules} from "lib/classes/old-rules";
 import {Log} from "models/log";

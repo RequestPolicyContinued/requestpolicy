@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.background";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
@@ -31,7 +32,6 @@ import {IUri} from "lib/utils/domain-utils";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";
-import {Storage} from "models/storage";
 
 const logRequests = Log.instance.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -263,14 +263,14 @@ export class Request {
   public checkByDefaultPolicy() {
     if (
         this.isAllowedByDefault() ||
-        Storage.alias.isDefaultAllow() ||
-        Storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
+        rp.storage.alias.isDefaultAllow() ||
+        rp.storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
     ) return new RequestResult(true, RequestReason.DefaultPolicy);
 
     const originUri = this.originURI;
     const destUri = this.destURI;
 
-    if (Storage.alias.isDefaultAllowSameDomain()) {
+    if (rp.storage.alias.isDefaultAllowSameDomain()) {
       const originDomain = originUri ?
           DomainUtil.getBaseDomain(originUri) : null;
       const destDomain = DomainUtil.getBaseDomain(destUri);

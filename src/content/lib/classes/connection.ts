@@ -38,6 +38,8 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
   private events = createListenersMap(["onMessage"]);
   public get onMessage() { return this.events.interfaces.onMessage; }
 
+  private dConnectionReady = defer<void>();
+
   private expectedResponses = new Map<string, IDeferred<any, any>>();
   private port: Port;
 
@@ -55,6 +57,7 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
     this.port.onMessage.addListener(this.receiveMessage.bind(this));
     this.port.postMessage(this.buildMessage("startup", "ready", false));
     // NOTE: the startup is NOT done yet
+    await this.dConnectionReady.promise;
   }
 
   // methods
@@ -74,7 +77,7 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
   private receiveMessage(aMessage: IMessage<any>): void {
     if (aMessage.target !== this.moduleName) return;
     if (aMessage.id === "startup" && aMessage.value === "ready") {
-      this.setSelfReady();
+      this.dConnectionReady.resolve(undefined);
       if (!aMessage.isResponse) {
         this.port.postMessage(this.buildMessage("startup", "ready", true));
       }

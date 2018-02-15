@@ -29,16 +29,6 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 
 // =============================================================================
 
-function createMessage(aType: string, aValue: any) {
-  return {
-    target: "webext-side-settings-migration-controller",
-    type: aType,
-    value: aValue,
-  };
-}
-
-// =============================================================================
-
 type StorageMessageType = "full-storage" | "storage-change" |
     "request:full-storage";
 interface IResponse {
@@ -100,7 +90,7 @@ export class LegacySideSettingsMigrationController {
     ]).then(() => {
       this.eRuntime.onMessage.addListener(this.receiveMessage.bind(this));
       browser.storage.onChanged.addListener(this.storageChanged.bind(this));
-      this.eRuntime.sendMessage(createMessage("startup", "ready"));
+      this.eRuntime.sendMessage(this.createMessage("startup", "ready"));
     });
     return pStartup;
   }
@@ -139,7 +129,7 @@ export class LegacySideSettingsMigrationController {
 
   private getFullWebextStorage(): Promise<browser.storage.StorageResults> {
     return this.eRuntime.sendMessage(
-        createMessage("request", "full-storage")).then((response: any) => {
+        this.createMessage("request", "full-storage")).then((response: any) => {
       this.assertSuccessful(response, "request:full-storage");
       return response.value as browser.storage.StorageResults;
     });
@@ -156,7 +146,7 @@ export class LegacySideSettingsMigrationController {
   private sendFullStorage(): Promise<void> {
     const p = browser.storage.local.get(null).then((fullStorage) => {
       return this.eRuntime.sendMessage(
-          createMessage("full-storage", fullStorage));
+          this.createMessage("full-storage", fullStorage));
     }).then((response: any) => {
       this.assertSuccessful(response, "full-storage");
       this.shouldSendFullStorage = false;
@@ -180,7 +170,7 @@ export class LegacySideSettingsMigrationController {
       return this.sendFullStorage();
     }
     return this.eRuntime.sendMessage(
-        createMessage("storage-change", aStorageChange),
+        this.createMessage("storage-change", aStorageChange),
     ).then((response: any) => {
       this.assertSuccessful(response, "storage-change");
     }).catch((e: any) => {
@@ -219,5 +209,13 @@ export class LegacySideSettingsMigrationController {
     } else {
       this.dStorageReadyForAccess.resolve(undefined);
     }
+  }
+
+  private createMessage(aType: string, aValue: any) {
+    return {
+      target: "webext-side-settings-migration-controller",
+      type: aType,
+      value: aValue,
+    };
   }
 }

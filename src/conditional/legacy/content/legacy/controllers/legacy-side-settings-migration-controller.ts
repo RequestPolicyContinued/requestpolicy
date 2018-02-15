@@ -29,15 +29,6 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 
 // =============================================================================
 
-const log = {
-  error(message: string, error?: any) {
-    console.error("[Legacy settings migration] " + message, error);
-    if (error) {
-      console.dir(error);
-    }
-  },
-};
-
 function createMessage(aType: string, aValue: any) {
   return {
     target: "webext-side-settings-migration-controller",
@@ -74,6 +65,15 @@ export class LegacySideSettingsMigrationController {
   private dInitialSync = defer<void>();
   private dStorageReadyForAccess = defer<void>();
 
+  private log = {
+    error(message: string, error?: any) {
+      console.error("[Legacy settings migration] " + message, error);
+      if (error) {
+        console.dir(error);
+      }
+    },
+  };
+
   public startup(): Promise<void> {
     if (this.startupCalled) {
       throw new Error("startup() has already been called!");
@@ -90,7 +90,7 @@ export class LegacySideSettingsMigrationController {
         }).catch((e) => {
           const rv = Promise.reject(e);
           if (e === "embedded webextension not available") return rv;
-          log.error(
+          this.log.error(
               "Failed to initialize legacy settings export controller.", e);
           return rv;
         });
@@ -132,7 +132,7 @@ export class LegacySideSettingsMigrationController {
       msg = "Response value contains an error.";
     }
     if (msg) {
-      log.error(msg, aResponse);
+      this.log.error(msg, aResponse);
       throw new Error(msg);
     }
   }
@@ -162,7 +162,7 @@ export class LegacySideSettingsMigrationController {
       this.shouldSendFullStorage = false;
     });
     p.catch((e: any) => {
-      log.error(
+      this.log.error(
           "Error on sending the full storage to the embedded WebExtension:",
           e);
 
@@ -174,7 +174,7 @@ export class LegacySideSettingsMigrationController {
       aStorageChange: browser.storage.StorageChange,
   ): Promise<void> {
     if (!this.isStorageReadyForAccess) {
-      log.error("Not ready for storage changes yet!");
+      this.log.error("Not ready for storage changes yet!");
     }
     if (this.shouldSendFullStorage) {
       return this.sendFullStorage();
@@ -184,7 +184,7 @@ export class LegacySideSettingsMigrationController {
     ).then((response: any) => {
       this.assertSuccessful(response, "storage-change");
     }).catch((e: any) => {
-      log.error(
+      this.log.error(
           "Error on sending StorageChange to the empedded WebExtension:",
           e);
       this.shouldSendFullStorage = true;
@@ -211,7 +211,7 @@ export class LegacySideSettingsMigrationController {
         this.pullFullStorage() :
         this.sendFullStorage();
     pInitialSync.catch((e: any) => {
-      log.error(`Error on initial sync (${isPull ? "pull" : "push"}):`, e);
+      this.log.error(`Error on initial sync (${isPull ? "pull" : "push"}):`, e);
     });
     this.dInitialSync.resolve(pInitialSync);
     if (isPull) {

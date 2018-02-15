@@ -20,19 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { AppBackground } from "app/background/app.background.module";
+import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 import { Policy } from "./policy/policy.main";
-import { RulesetStorage } from "./policy/ruleset-storage";
-import { Subscriptions } from "./policy/subscriptions";
 
-const log = Log.instance;
+export class AppBackground extends Module {
+  constructor(
+      log: Log,
+      public readonly policy: Policy,
+  ) {
+    super("App", log);
+  }
 
-const rulesetStorage = new RulesetStorage(log);
-const subscriptions = new Subscriptions(log, rulesetStorage);
-const policy = new Policy(log, subscriptions, rulesetStorage);
-
-export const rp = new AppBackground(
-    log,
-    policy,
-);
+  public get subModules() {
+    return {
+      policy: this.policy,
+    };
+  }
+}

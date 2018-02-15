@@ -53,6 +53,8 @@ export abstract class Module implements IModule {
     return p.then(() => { return; });
   }
 
+  private ready = false;
+
   private dSelfBootstrap = {
     shutdown: defer(),
     startup: defer(),
@@ -98,9 +100,8 @@ export abstract class Module implements IModule {
       await Promise.all(this.startupPreconditions);
       await this.runSubmoduleFns("startup");
       await this.runSelfFn("startup");
-      if (this.dSelfReady.promiseState === "pending") {
-        this.dSelfReady.resolve(undefined);
-      }
+      this.ready = true;
+      this.dSelfReady.resolve(undefined);
     } catch (e) {
       this.log.error("startup()", e);
       throw e;
@@ -124,6 +125,15 @@ export abstract class Module implements IModule {
 
   protected shutdownSelf(): Promise<void> {
     return Promise.resolve();
+  }
+
+  protected assertReady() {
+    if (!this.ready) {
+      const msg = `Module "${this.moduleName}" is not ready yet!`;
+      this.log.error(msg);
+      console.trace();
+      throw new Error(msg);
+    }
   }
 
   private async runSubmoduleFns(fnName: "startup" | "shutdown") {

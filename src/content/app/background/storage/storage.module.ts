@@ -53,10 +53,12 @@ export class Storage extends Module {
   }
 
   public isKeyCached(aKey: string) {
+    this.assertReady();
     return this.cachedKeysSet.has(aKey);
   }
 
   public get(aKeys: "" | string | string[] | null | undefined): any {
+    this.assertReady();
     if (aKeys === "") return {};
     if (aKeys === null || aKeys === undefined) {
       return this.get(this.cachedKeys);
@@ -80,6 +82,7 @@ export class Storage extends Module {
   }
 
   public set(aKeys: {[key: string]: any}) {
+    this.assertReady();
     try {
       Object.keys(aKeys).forEach((key) => {
         LegacyApi.prefs.set(key, aKeys[key]);

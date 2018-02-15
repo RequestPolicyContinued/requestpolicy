@@ -12,7 +12,7 @@ const requirejs = require("../lib/requirejs");
 
 const {defer} = require("lib/utils/js-utils");
 
-const {LegacySideSettingsMigrationController: LegacySideController} = require(
+const {LegacySideSettingsMigrationController} = require(
     "legacy/controllers/legacy-side-settings-migration-controller"
 );
 const PWebextSideController = requirejs([
@@ -42,8 +42,11 @@ describe("legacy settings migration:", function() {
   const eweExternalBrowser = createBrowserApi();
   const eweInternalBrowser = createBrowserApi();
 
+  let LegacySideController;
   let WebextSideController;
-  let controllers;
+  function controllers() {
+    return {LegacySideController, WebextSideController};
+  }
 
   before(() => {
     const embeddedWE = {browser: eweExternalBrowser};
@@ -51,10 +54,13 @@ describe("legacy settings migration:", function() {
     global.browser = browser;
     return PWebextSideController.then((aWebextSideController) => {
       WebextSideController = aWebextSideController;
-      controllers = {WebextSideController, LegacySideController};
       aWebextSideController._injectBrowser(eweInternalBrowser);
       return;
     });
+  });
+
+  beforeEach(() => {
+    LegacySideController = new LegacySideSettingsMigrationController();
   });
 
   function restoreAll() {
@@ -119,10 +125,10 @@ describe("legacy settings migration:", function() {
       });
       webextStorage.local.remove.resolves();
 
-      let p = controllers[startupOrder[0]].startup();
+      let p = controllers()[startupOrder[0]].startup();
       p = p.then(() => {
-        controllers[startupOrder[1]].startup();
-        return LegacySideController._controller.pInitialSync;
+        controllers()[startupOrder[1]].startup();
+        return LegacySideController.pInitialSync;
       }).then(
           () => afterInitialSync({webextStorage, legacyStorage})
       );

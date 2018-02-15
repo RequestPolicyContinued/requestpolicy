@@ -70,7 +70,7 @@ const localStorageArea = browser.storage.local;
 const settingsMigration = new SettingsMigration(
     log,
     browser.storage.local,
-    LegacySideSettingsMigrationController._controller.
+    LegacySideSettingsMigrationController.instance.
         pStorageReadyForAccess, // FIXME
 );
 const storageReadyPromise = settingsMigration.whenReady;

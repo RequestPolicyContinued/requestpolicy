@@ -9,7 +9,7 @@ const {
 } = require("../lib/settings-migration-utils");
 const {destructureOptions} = require("../lib/utils");
 
-const {LegacySideSettingsMigrationController: LegacySideController} = require(
+const {LegacySideSettingsMigrationController} = require(
     "legacy/controllers/legacy-side-settings-migration-controller"
 );
 
@@ -25,6 +25,8 @@ describe("legacy-side settings migration controller", function() {
 
   const browser = createBrowserApi();
   const eweExternalBrowser = createBrowserApi();
+
+  let LegacySideController;
 
   before(() => {
     assert.notStrictEqual(browser, eweExternalBrowser);
@@ -48,6 +50,10 @@ describe("legacy-side settings migration controller", function() {
       browser: eweExternalBrowser,
     });
     global.browser = browser;
+  });
+
+  beforeEach(() => {
+    LegacySideController = new LegacySideSettingsMigrationController();
   });
 
   function restoreAll() {
@@ -136,7 +142,7 @@ describe("legacy-side settings migration controller", function() {
         return;
       }).then(() => {
         afterReadyMessageSent({eRuntime, storage});
-        return LegacySideController._controller.pInitialSync;
+        return LegacySideController.pInitialSync;
       }).then(() => {
         afterInitialSync({eRuntime, storage});
         return;

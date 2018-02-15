@@ -56,7 +56,16 @@ interface IResponse {
   value: any;
 }
 
-class Controller {
+export class LegacySideSettingsMigrationController {
+  private static lInstance: LegacySideSettingsMigrationController;
+  public static get instance(): LegacySideSettingsMigrationController {
+    if (!LegacySideSettingsMigrationController.lInstance) {
+      LegacySideSettingsMigrationController.lInstance =
+          new LegacySideSettingsMigrationController();
+    }
+    return LegacySideSettingsMigrationController.lInstance;
+  }
+
   private eRuntime: any = false;
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
@@ -212,15 +221,3 @@ class Controller {
     }
   }
 }
-
-let controller: Controller;
-
-export const LegacySideSettingsMigrationController = {
-  startup(): Promise<void> {
-    controller = new Controller();
-    return controller.startup();
-  },
-  get _controller() {
-    return controller;
-  },
-};

@@ -28,7 +28,7 @@ import {
 } from "./controllers/legacy-side-settings-migration-controller";
 
 const controllers = new Controllers([
-  LegacySideSettingsMigrationController,
+  LegacySideSettingsMigrationController.instance,
 ]);
 
 MainEnvironment.addStartupFunction(Level.BACKEND, () => {

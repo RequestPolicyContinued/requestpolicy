@@ -141,7 +141,7 @@ export abstract class Module implements IModule {
         });
   }
 
-  private async runSubmoduleFns(fnName: "startup" | "shutdown") {
+  private runSubmoduleFns(fnName: "startup" | "shutdown"): Promise<void> {
     const p = Promise.all(
         this.getSubmodules().
         filter((m) => fnName in m).
@@ -149,13 +149,15 @@ export abstract class Module implements IModule {
     );
     p.catch(this.log.onError(`submodule ${fnName}`));
     this.dChildBootstrap[fnName].resolve(p);
+    return p as Promise<any>;
   }
 
-  private async runSelfFn(fnName: "startup" | "shutdown") {
+  private runSelfFn(fnName: "startup" | "shutdown"): Promise<void> {
     const selfFnName =
         `${fnName}Self` as "startupSelf" | "shutdownSelf";
     const p = this[selfFnName] ? this[selfFnName]!() : Promise.resolve();
     p.catch(this.log.onError(`self-${fnName}`));
     this.dSelfBootstrap[fnName].resolve(p);
+    return p;
   }
 }

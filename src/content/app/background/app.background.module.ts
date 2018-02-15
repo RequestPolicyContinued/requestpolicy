@@ -22,7 +22,7 @@
 
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
-import { Policy } from "./policy/policy.main";
+import { Policy } from "./policy/policy.module";
 
 export class AppBackground extends Module {
   constructor(

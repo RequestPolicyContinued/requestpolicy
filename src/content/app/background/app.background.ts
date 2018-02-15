@@ -22,7 +22,7 @@
 
 import { AppBackground } from "app/background/app.background.module";
 import { Log } from "models/log";
-import { Policy } from "./policy/policy.main";
+import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 

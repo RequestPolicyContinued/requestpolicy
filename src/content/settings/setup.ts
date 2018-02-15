@@ -32,7 +32,6 @@ declare const $: typeof JQuery;
 (() => {
   const {
     VersionInfos,
-    Storage,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rp,
@@ -46,14 +45,14 @@ declare const $: typeof JQuery;
   }
 
   function handleDefaultPolicyChange() {
-    Storage.set({
+    rp.storage.set({
       "defaultPolicy.allow": $id("defaultallow").checked,
     });
     setAllowSameDomainBlockDisplay();
   }
 
   function handleAllowSameDomainChange() {
-    Storage.set({
+    rp.storage.set({
       "defaultPolicy.allowSameDomain": $id("allowsamedomain").checked,
     });
   }
@@ -123,7 +122,7 @@ declare const $: typeof JQuery;
 
     // Populate the form values based on the user's current settings.
 
-    const defaultAllow = Storage.get("defaultPolicy.allow");
+    const defaultAllow = rp.storage.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
@@ -131,7 +130,7 @@ declare const $: typeof JQuery;
     }
 
     $id("allowsamedomain").checked =
-        Storage.get("defaultPolicy.allowSameDomain");
+        rp.storage.get("defaultPolicy.allowSameDomain");
 
     // FIXME: Add a pref to disable subscriptions globally;  issue #713
     // Subscriptions are only simple here if we assume the user

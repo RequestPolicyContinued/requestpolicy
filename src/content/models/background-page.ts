@@ -38,7 +38,6 @@ import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";
 import * as Metadata from "models/metadata";
 import {Requests} from "models/requests";
-import {Storage} from "models/storage";
 import {VersionInfos} from "models/version-infos";
 
 export const BackgroundPage = {
@@ -56,7 +55,6 @@ export const BackgroundPage = {
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
-  Storage,
   VersionInfos,
   WindowUtils,
   rp,

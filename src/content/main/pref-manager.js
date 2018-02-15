@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/background/app.background";
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
-import {Storage} from "models/storage";
 import {Log} from "models/log";
 
 const log = Log.instance;
@@ -37,11 +37,11 @@ export const PrefManager = (function() {
   // TODO: move to bootstrap.js
   function handleUninstallOrDisable() {
     const resetLinkPrefetch =
-        Storage.get("prefetch.link.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.link.restoreDefaultOnUninstall");
     const resetDNSPrefetch =
-        Storage.get("prefetch.dns.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.dns.restoreDefaultOnUninstall");
     const resetPreConnections =
-        Storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
     if (resetLinkPrefetch) {
       if (LegacyApi.prefs.isSet("root/ network.prefetch-next")) {
@@ -98,7 +98,7 @@ export const PrefManager = (function() {
       }
     }
     // Disable Speculative pre-connections.
-    if (Storage.get("prefetch.preconnections.disableOnStartup")) {
+    if (rp.storage.get("prefetch.preconnections.disableOnStartup")) {
       let prefName = "root/ network.http.speculative-parallel-limit";
       if (!LegacyApi.prefs.isSet(prefName) ||
           LegacyApi.prefs.get(prefName) !== 0) {

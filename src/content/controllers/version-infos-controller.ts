@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/background/app.background";
 import {IController} from "lib/classes/controllers";
 import {Log} from "models/log";
-import {Storage} from "models/storage";
 import {VersionInfos} from "models/version-infos";
 
 const log = Log.instance;
@@ -40,7 +40,7 @@ function updateLastVersions() {
 
 export const VersionInfosController: IController = {
   startupPreconditions: [
-    Storage.pReady,
+    rp.storage.whenReady,
     VersionInfos.pReady,
   ],
   startup() {

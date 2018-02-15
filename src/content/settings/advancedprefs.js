@@ -27,7 +27,7 @@ import {WinEnv, elManager, $id} from "./common";
   var {
     LegacyApi,
     ManagerForPrefObservers,
-    Storage,
+    rp,
   } = browser.extension.getBackgroundPage();
 
   // ===========================================================================
@@ -38,20 +38,20 @@ import {WinEnv, elManager, $id} from "./common";
         LegacyApi.prefs.get("root/ network.prefetch-next");
 
     $id("pref-prefetch.link.disableOnStartup").checked =
-        Storage.get("prefetch.link.disableOnStartup");
+        rp.storage.get("prefetch.link.disableOnStartup");
 
     $id("pref-prefetch.link.restoreDefaultOnUninstall").checked =
-        Storage.get("prefetch.link.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.link.restoreDefaultOnUninstall");
 
     // DNS prefetch.
     $id("pref-dnsPrefetch").checked =
         !LegacyApi.prefs.get("root/ network.dns.disablePrefetch");
 
     $id("pref-prefetch.dns.disableOnStartup").checked =
-        Storage.get("prefetch.dns.disableOnStartup");
+        rp.storage.get("prefetch.dns.disableOnStartup");
 
     $id("pref-prefetch.dns.restoreDefaultOnUninstall").checked =
-        Storage.get("prefetch.dns.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.dns.restoreDefaultOnUninstall");
 
     // Speculative pre-connections.
     $id("pref-speculativePreConnections").checked =
@@ -59,15 +59,15 @@ import {WinEnv, elManager, $id} from "./common";
             get("root/ network.http.speculative-parallel-limit") !== 0;
 
     $id("pref-prefetch.preconnections.disableOnStartup").checked =
-        Storage.get("prefetch.preconnections.disableOnStartup");
+        rp.storage.get("prefetch.preconnections.disableOnStartup");
 
     $id("pref-prefetch.preconnections.restoreDefaultOnUninstall").checked =
-        Storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
+        rp.storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
 
     // TODO: Create a class which acts as an API for preferences and which
     // ensures that the returned value is always a valid value for "string"
     // preferences.
-    var sorting = Storage.get("menu.sorting");
+    var sorting = rp.storage.get("menu.sorting");
 
     if (sorting === $id("sortByNumRequests").value) {
       $id("sortByNumRequests").checked = true;
@@ -84,7 +84,7 @@ import {WinEnv, elManager, $id} from "./common";
     }
 
     $id("menu.info.showNumRequests").checked =
-        Storage.get("menu.info.showNumRequests");
+        rp.storage.get("menu.info.showNumRequests");
   }
 
   window.onload = function() {
@@ -99,7 +99,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.link.disableOnStartup"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.link.disableOnStartup": event.target.checked,
           });
         }
@@ -108,7 +108,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.link.restoreDefaultOnUninstall"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.link.restoreDefaultOnUninstall": event.target.checked,
           });
         }
@@ -126,7 +126,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.dns.disableOnStartup"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.dns.disableOnStartup": event.target.checked,
           });
         }
@@ -135,7 +135,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.dns.restoreDefaultOnUninstall"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.dns.restoreDefaultOnUninstall": event.target.checked,
           });
         }
@@ -156,7 +156,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.preconnections.disableOnStartup"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.preconnections.disableOnStartup": event.target.checked,
           });
         }
@@ -165,7 +165,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("pref-prefetch.preconnections.restoreDefaultOnUninstall"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "prefetch.preconnections.restoreDefaultOnUninstall":
                 event.target.checked,
           });
@@ -173,7 +173,7 @@ import {WinEnv, elManager, $id} from "./common";
     );
 
     var sortingListener = function(event) {
-      Storage.set({"menu.sorting": event.target.value});
+      rp.storage.set({"menu.sorting": event.target.value});
     };
     elManager.addListener($id("sortByNumRequests"), "change", sortingListener);
     elManager.addListener($id("sortByDestName"), "change", sortingListener);
@@ -182,7 +182,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("menu.info.showNumRequests"), "change",
         function(event) {
-          Storage.set({
+          rp.storage.set({
             "menu.info.showNumRequests": event.target.checked,
           });
         }

@@ -23,11 +23,13 @@
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 import { Policy } from "./policy/policy.module";
+import { Storage } from "./storage/storage.module";
 
 export class AppBackground extends Module {
   constructor(
       log: Log,
       public readonly policy: Policy,
+      public readonly storage: Storage,
   ) {
     super("App", log);
   }

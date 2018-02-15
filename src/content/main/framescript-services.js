@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/background/app.background";
 import * as DomainUtil from "lib/utils/domain-utils";
 import {Requests} from "models/requests";
-import {Storage} from "models/storage";
 
 const initFunctions = [];
 
@@ -59,8 +59,8 @@ export const FramescriptServices = {
 
     const blockedURIs = {};
 
-    if (Storage.get("indicateBlockedObjects")) {
-      const indicateBlacklisted = Storage.get("indicateBlacklistedObjects");
+    if (rp.storage.get("indicateBlockedObjects")) {
+      const indicateBlacklisted = rp.storage.get("indicateBlacklistedObjects");
 
       const rejectedRequests = Requests._requestSets.rejectedRequests.
           getOriginUri(originURI);

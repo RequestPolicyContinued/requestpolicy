@@ -25,14 +25,18 @@ import { Log } from "models/log";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
+import * as RPStorageConfig from "./storage/rp-config";
+import { Storage } from "./storage/storage.module";
 
 const log = Log.instance;
 
 const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
+const storage = new Storage(log, RPStorageConfig);
 
 export const rp = new AppBackground(
     log,
     policy,
+    storage,
 );

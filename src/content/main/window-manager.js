@@ -29,6 +29,7 @@ import {StyleSheetsController} from "controllers/windows.style-sheets";
 import {FramescriptServices} from "main/framescript-services";
 import {pWindowsAvailable} from "models/ui-startup";
 import {defer} from "lib/utils/js-utils";
+import {rp} from "app/background/app.background";
 
 // =============================================================================
 // WindowSubControllers
@@ -95,7 +96,10 @@ export const rpWindowManager = (function() {
   MainEnvironment.addStartupFunction(
       EnvLevel.INTERFACE,
       function() {
-        pWindowsAvailable.then(() => {
+        Promise.all([
+          pWindowsAvailable,
+          rp.storage.whenReady,
+        ]).then(() => {
           WindowSubControllers.startup();
           Windows.forEachOpenWindow(loadIntoWindow);
           Windows.addListener("load", loadIntoWindow);

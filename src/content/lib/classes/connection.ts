@@ -34,7 +34,7 @@ interface IMessage<T> {
   value: T;
 }
 
-export class Connection<TIncoming, TResponseToIncoming> extends Module {
+export class Connection<TRx, TRxResp> extends Module {
   private events = createListenersMap(["onMessage"]);
   public get onMessage() { return this.events.interfaces.onMessage; }
 
@@ -62,11 +62,9 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
 
   // methods
 
-  public sendMessage<T, TResponse>(
-      value: T,
-  ): Promise<TResponse> {
+  public sendMessage<TTx, TTxResp>(value: TTx): Promise<TTxResp> {
     const id = String(Math.random());
-    const dResponse = defer<TResponse>();
+    const dResponse = defer<TTxResp>();
     this.expectedResponses.set(id, dResponse);
 
     const message = this.buildMessage(id, value, false);
@@ -102,13 +100,17 @@ export class Connection<TIncoming, TResponseToIncoming> extends Module {
     }
   }
 
-  private async gotMessage(aMessage: TIncoming): Promise<any> {
-    const responsesRaw: any = this.events.listenersMap.onMessage.emit(aMessage);
-    let responses: any[];
-    if (responsesRaw && typeof responsesRaw.then === "function") {
+  private async gotMessage(aMessage: TRx): Promise<TRxResp | void> {
+    const responsesRaw: TRxResp[] | Promise<TRxResp[]> =
+        this.events.listenersMap.onMessage.emit(aMessage);
+    let responses: TRxResp[];
+    if (
+        responsesRaw &&
+        typeof (responsesRaw as Promise<TRxResp[]>).then === "function"
+    ) {
       responses = await responsesRaw;
     } else {
-      responses = responsesRaw;
+      responses = responsesRaw as TRxResp[];
     }
     responses = responses.filter((response) => !!response);
     if (responses.length === 0) {

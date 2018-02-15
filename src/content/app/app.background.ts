@@ -20,12 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { AppBackground } from "app/background/app.background.module";
 import { Log } from "models/log";
+import { AppBackground } from "./app.background.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
-import * as RPStorageConfig from "./storage/rp-config";
+import * as RPStorageConfig from "./storage/rp-config.background";
 import { Storage } from "./storage/storage.module";
 
 const log = Log.instance;

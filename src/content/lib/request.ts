@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,

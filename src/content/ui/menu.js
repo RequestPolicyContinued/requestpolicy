@@ -32,7 +32,7 @@ import * as DOMUtils from "lib/utils/dom-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {C} from "data/constants";
 import {Requests} from "models/requests";
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 
 const log = Log.instance;
 

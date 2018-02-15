@@ -22,7 +22,7 @@
 
 declare const LegacyApi: any;
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {C} from "data/constants";
 import {OldRules} from "lib/classes/old-rules";
 import {Environment, MainEnvironment} from "lib/environment";

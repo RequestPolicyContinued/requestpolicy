@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import * as DomainUtil from "lib/utils/domain-utils";
 import {Requests} from "models/requests";
 

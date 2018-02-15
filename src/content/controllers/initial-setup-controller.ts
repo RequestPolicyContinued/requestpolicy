@@ -23,7 +23,7 @@
 
 declare const LegacyApi: any;
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {IController} from "lib/classes/controllers";
 import {NotificationID, Notifications} from "models/notifications";
 import {VersionInfos} from "models/version-infos";

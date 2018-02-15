@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
 import {pWindowsAvailable} from "models/ui-startup";
 import {rpWindowManager} from "main/window-manager";

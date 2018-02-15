@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {IController} from "lib/classes/controllers";
 import {Log} from "models/log";
 import {VersionInfos} from "models/version-infos";

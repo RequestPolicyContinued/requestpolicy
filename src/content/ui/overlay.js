@@ -44,7 +44,7 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 
 const log = Log.instance;
 

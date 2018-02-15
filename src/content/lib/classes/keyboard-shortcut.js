@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 import {Windows} from "models/windows";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as XULUtils from "lib/utils/xul-utils";

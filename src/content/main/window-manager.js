@@ -29,7 +29,7 @@ import {StyleSheetsController} from "controllers/windows.style-sheets";
 import {FramescriptServices} from "main/framescript-services";
 import {pWindowsAvailable} from "models/ui-startup";
 import {defer} from "lib/utils/js-utils";
-import {rp} from "app/background/app.background";
+import {rp} from "app/app.background";
 
 // =============================================================================
 // WindowSubControllers

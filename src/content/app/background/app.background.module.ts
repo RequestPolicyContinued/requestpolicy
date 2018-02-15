@@ -37,6 +37,7 @@ export class AppBackground extends Module {
   public get subModules() {
     return {
       policy: this.policy,
+      storage: this.storage,
     };
   }
 }

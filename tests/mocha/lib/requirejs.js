@@ -3,7 +3,7 @@ const requirejs = require("requirejs");
 
 const cwd = process.cwd();
 requirejs.config({
-  baseUrl: `${cwd}/build/legacy/non-ui-testing/`,
+  baseUrl: `${cwd}/build/legacy/non-ui-testing/webextension/`,
 });
 
 module.exports = (paths) => new Promise((resolve, reject) => {

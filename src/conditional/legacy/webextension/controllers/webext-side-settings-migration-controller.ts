@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "webextension/lib/constants";
+import {C} from "lib/constants";
 
 const TARGET_NAME = "webext-side-settings-migration-controller";
 const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";

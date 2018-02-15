@@ -1,8 +1,8 @@
-import {Controllers} from "webextension/lib/classes/controllers";
+import {Controllers} from "lib/classes/controllers";
 
 import {
   WebextSideSettingsMigrationController,
-} from "webextension/controllers/webext-side-settings-migration-controller";
+} from "controllers/webext-side-settings-migration-controller";
 
 const controllers = new Controllers([
   WebextSideSettingsMigrationController,

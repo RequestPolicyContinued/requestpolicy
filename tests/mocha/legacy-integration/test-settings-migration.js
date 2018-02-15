@@ -16,7 +16,7 @@ const {LegacySideSettingsMigrationController} = require(
     "legacy/controllers/legacy-side-settings-migration-controller"
 );
 const PWebextSideController = requirejs([
-  "webextension/controllers/webext-side-settings-migration-controller",
+  "controllers/webext-side-settings-migration-controller",
 ]).then(({WebextSideSettingsMigrationController}) => WebextSideSettingsMigrationController);
 
 function stubStorageLocalGet(aStorage, aInitialFullStorage) {

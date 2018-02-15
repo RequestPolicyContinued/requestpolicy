@@ -42,7 +42,7 @@ export class LegacySideSettingsMigrationController {
   public static get instance(): LegacySideSettingsMigrationController {
     if (!LegacySideSettingsMigrationController.lInstance) {
       LegacySideSettingsMigrationController.lInstance =
-          new LegacySideSettingsMigrationController();
+          new LegacySideSettingsMigrationController(browser.storage);
     }
     return LegacySideSettingsMigrationController.lInstance;
   }
@@ -64,6 +64,10 @@ export class LegacySideSettingsMigrationController {
     },
   };
 
+  constructor(
+      private storage: typeof browser.storage,
+  ) {}
+
   public startup(): Promise<void> {
     if (this.startupCalled) {
       throw new Error("startup() has already been called!");
@@ -71,7 +75,7 @@ export class LegacySideSettingsMigrationController {
     this.startupCalled = true;
 
     const pGotLastStorageChange =
-        browser.storage.local.get("lastStorageChange").then((result) => {
+        this.storage.local.get("lastStorageChange").then((result) => {
           this.lastStorageChange = result.lastStorageChange || null;
         });
     const pGotEmbeddedRuntime =
@@ -89,7 +93,7 @@ export class LegacySideSettingsMigrationController {
       pGotLastStorageChange,
     ]).then(() => {
       this.eRuntime.onMessage.addListener(this.receiveMessage.bind(this));
-      browser.storage.onChanged.addListener(this.storageChanged.bind(this));
+      this.storage.onChanged.addListener(this.storageChanged.bind(this));
       this.eRuntime.sendMessage(this.createMessage("startup", "ready"));
     });
     return pStartup;
@@ -137,14 +141,14 @@ export class LegacySideSettingsMigrationController {
 
   private pullFullStorage(): Promise<void> {
     return this.getFullWebextStorage().then((fullStorage) => {
-      return browser.storage.local.set(fullStorage);
+      return this.storage.local.set(fullStorage);
     }).then(() => {
       this.shouldSendFullStorage = false;
     });
   }
 
   private sendFullStorage(): Promise<void> {
-    const p = browser.storage.local.get(null).then((fullStorage) => {
+    const p = this.storage.local.get(null).then((fullStorage) => {
       return this.eRuntime.sendMessage(
           this.createMessage("full-storage", fullStorage));
     }).then((response: any) => {

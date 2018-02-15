@@ -60,7 +60,9 @@ describe("legacy settings migration:", function() {
   });
 
   beforeEach(() => {
-    LegacySideController = new LegacySideSettingsMigrationController();
+    LegacySideController = new LegacySideSettingsMigrationController(
+        browser.storage
+    );
   });
 
   function restoreAll() {

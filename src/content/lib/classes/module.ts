@@ -35,17 +35,10 @@ export abstract class Module implements IModule {
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
   }
-  private dSelfReady = defer();
-  private ready = false;
 
-  public get whenReady() {
-    const promises: Array<Promise<void>> =
-        this.getSubmodules().map((m) => m.whenReady);
-    promises.push(this.dSelfReady.promise);
-    const p = Promise.all(promises);
-    p.catch(this.log.onError("whenReady"));
-    return p.then(() => { return; });
-  }
+  private dReady = defer();
+  private ready = false;
+  public get whenReady() { return this.dReady.promise; }
 
   private dSelfBootstrap = {
     shutdown: defer(),
@@ -88,27 +81,17 @@ export abstract class Module implements IModule {
   }
 
   public async startup(): Promise<void> {
-    try {
-      await Promise.all(this.startupPreconditions);
-      await this.runSubmoduleFns("startup");
-      await this.runSelfFn("startup");
-      this.ready = true;
-      this.dSelfReady.resolve(undefined);
-    } catch (e) {
-      this.log.error("startup()", e);
-      throw e;
-    }
+    const p = this.startup_();
+    p.catch(this.log.onError("startup()"));
+    await p;
+    this.ready = true;
+    this.dReady.resolve(undefined);
   }
 
   public async shutdown(): Promise<void> {
-    try {
-      await Promise.all(this.shutdownPreconditions);
-      await this.runSelfFn("shutdown");
-      await this.runSubmoduleFns("shutdown");
-    } catch (e) {
-      this.log.error("shutdown()", e);
-      throw e;
-    }
+    const p = this.shutdown_();
+    p.catch(this.log.onError("shutdown()"));
+    await p;
   }
 
   protected startupSelf(): Promise<void> {
@@ -126,6 +109,18 @@ export abstract class Module implements IModule {
       console.trace();
       throw new Error(msg);
     }
+  }
+
+  private async startup_(): Promise<void> {
+    await Promise.all(this.startupPreconditions);
+    await this.runSubmoduleFns("startup");
+    await this.runSelfFn("startup");
+  }
+
+  private async shutdown_(): Promise<void> {
+    await Promise.all(this.shutdownPreconditions);
+    await this.runSelfFn("shutdown");
+    await this.runSubmoduleFns("shutdown");
   }
 
   private getSubmodules(): IModule[] {

@@ -14,7 +14,7 @@ const {defer} = require("lib/utils/js-utils");
 
 const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
-    "legacy/controllers/legacy-side-settings-migration-controller"
+    "app/legacy/legacy-side-settings-migration-controller"
 );
 const PWebextSideController = requirejs([
   "controllers/webext-side-settings-migration-controller",

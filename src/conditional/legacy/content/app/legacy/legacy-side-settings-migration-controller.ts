@@ -40,16 +40,6 @@ interface IResponse {
 }
 
 export class LegacySideSettingsMigrationController extends Module {
-  private static lInstance: LegacySideSettingsMigrationController;
-  public static get instance(): LegacySideSettingsMigrationController {
-    if (!LegacySideSettingsMigrationController.lInstance) {
-      LegacySideSettingsMigrationController.lInstance =
-          new LegacySideSettingsMigrationController(
-              Log.instance, browser.storage);
-    }
-    return LegacySideSettingsMigrationController.lInstance;
-  }
-
   private eRuntime: any = false;
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;

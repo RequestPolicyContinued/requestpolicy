@@ -20,17 +20,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Controllers} from "lib/classes/controllers";
-import {Level, MainEnvironment} from "lib/environment";
-
 import {
   LegacySideSettingsMigrationController,
-} from "./controllers/legacy-side-settings-migration-controller";
+} from "app/legacy/legacy-side-settings-migration-controller";
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 
-const controllers = new Controllers([
-  LegacySideSettingsMigrationController.instance,
-]);
+export class LegacyModule extends Module {
+  constructor(
+      log: Log,
+      public readonly settingsMigration: LegacySideSettingsMigrationController,
+  ) {
+    super("LegacyModules", log);
+  }
 
-MainEnvironment.addStartupFunction(Level.BACKEND, () => {
-  controllers.startup();
-});
+  public get subModules() {
+    return {
+      settingsMigration: this.settingsMigration,
+    };
+  }
+}

@@ -11,7 +11,7 @@ const {destructureOptions} = require("../lib/utils");
 
 const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
-    "legacy/controllers/legacy-side-settings-migration-controller"
+    "app/legacy/legacy-side-settings-migration-controller"
 );
 
 function maybeAssignLastStorageChange(aObj, aFullStorage) {

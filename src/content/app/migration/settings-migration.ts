@@ -21,22 +21,28 @@
  */
 
 import { App } from "app/interfaces";
+import {
+  LegacySideSettingsMigrationController,
+} from "app/legacy/legacy-side-settings-migration-controller";
 import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class SettingsMigration extends Module
     implements App.migration.ISettingsMigration {
+  protected get startupPreconditions() {
+    return this.settingsMigration ? [this.settingsMigration.whenReady] : [];
+  }
+
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private waitFor: Promise<void>,
+      private settingsMigration?: LegacySideSettingsMigrationController,
   ) {
     super("app.migration.settings", log);
   }
 
-  protected async startupSelf() {
-    await this.waitFor;
+  protected startupSelf() {
     return Promise.all([
       this.performMergeActions(),
       this.performRemoveActions(),

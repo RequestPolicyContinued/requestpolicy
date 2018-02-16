@@ -21,6 +21,10 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
+import {
+  LegacySideSettingsMigrationController,
+} from "app/legacy/legacy-side-settings-migration-controller";
+import {LegacyModule} from "app/legacy/legacy.module";
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
@@ -38,9 +42,6 @@ import { CachedSettings } from "app/storage/cached-settings";
 import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
-import {
-  LegacySideSettingsMigrationController,
-} from "legacy/controllers/legacy-side-settings-migration-controller";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
@@ -67,11 +68,19 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
+let webextSettingsMigration: LegacySideSettingsMigrationController | undefined;
+let legacy: LegacyModule | undefined;
+
+if (C.EXTENSION_TYPE === "legacy") {
+  webextSettingsMigration = new LegacySideSettingsMigrationController(
+      log, browser.storage);
+  legacy = new LegacyModule(log, webextSettingsMigration);
+}
+
 const settingsMigration = new SettingsMigration(
     log,
     browser.storage.local,
-    LegacySideSettingsMigrationController.instance.
-        pStorageReadyForAccess, // FIXME
+    webextSettingsMigration,
 );
 const storageReadyPromise = settingsMigration.whenReady;
 
@@ -149,4 +158,5 @@ export const rp = new AppBackground(
     rpServices,
     storage,
     ui,
+    legacy,
 );

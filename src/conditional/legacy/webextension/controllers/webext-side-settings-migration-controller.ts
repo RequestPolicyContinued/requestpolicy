@@ -20,25 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "lib/constants";
-
 const TARGET_NAME = "webext-side-settings-migration-controller";
 const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";
-
-// =============================================================================
-
-// a little hack for non-ui-testing
-const defaultBrowser = C.BUILD_ALIAS === "non-ui-testing" ?
-    {runtime: null, storage: null} : browser;
-let currentBrowser = defaultBrowser;
-function _injectBrowser(aNewBrowser: any) {
-  if (C.BUILD_ALIAS !== "non-ui-testing") return;
-  currentBrowser = aNewBrowser || defaultBrowser;
-}
-type tBrowser = typeof browser;
-function getBrowser() {
-  return currentBrowser as tBrowser;
-}
 
 // =============================================================================
 
@@ -49,16 +32,20 @@ interface IStorageChanges { [key: string]: StorageChange; }
 
 // =============================================================================
 
-class Controller {
+export class WebextSideSettingsMigrationController {
   private lastStorageChange: string | null = null;
 
+  constructor(
+      private runtime: typeof browser.runtime,
+      private storage: typeof browser.storage,
+  ) {}
+
   public startup() {
-    const {runtime, storage} = getBrowser();
-    return storage.local.get(
+    return this.storage.local.get(
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange = result.lastStorageChange || null;
-      runtime.onMessage.addListener(this.receiveMessage.bind(this));
+      this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
       return this.sendStartupMessage();
     });
   }
@@ -77,11 +64,11 @@ class Controller {
   }
 
   private getFullStorage() {
-    return getBrowser().storage.local.get(null);
+    return this.storage.local.get(null);
   }
 
   private setFullStorage(aFullStorage: {[key: string]: any}) {
-    return getBrowser().storage.local.set(aFullStorage);
+    return this.storage.local.set(aFullStorage);
   }
 
   private applyStorageChange(aStorageChanges: IStorageChanges) {
@@ -98,11 +85,10 @@ class Controller {
         keysToRemove.push(key);
       }
     }
-    const {storage} = getBrowser();
     const hasKeysToRemove = keysToRemove.length !== 0;
     const promises = [];
-    if (hasKeysToRemove) promises.push(storage.local.remove(keysToRemove));
-    if (hasKeysToSet) promises.push(storage.local.set(keysToSet));
+    if (hasKeysToRemove) promises.push(this.storage.local.remove(keysToRemove));
+    if (hasKeysToSet) promises.push(this.storage.local.set(keysToSet));
     return Promise.all(promises);
   }
 
@@ -145,7 +131,7 @@ class Controller {
   }
 
   private sendMessage(aType: string, aValue: any): Promise<void> {
-    return getBrowser().runtime.sendMessage(this.createMessage(aType, aValue));
+    return this.runtime.sendMessage(this.createMessage(aType, aValue));
   }
 
   private respond<T = void>(
@@ -162,16 +148,3 @@ class Controller {
     ));
   }
 }
-
-let controller: Controller;
-
-export const WebextSideSettingsMigrationController = {
-  startup(): Promise<void> {
-    controller = new Controller();
-    return controller.startup();
-  },
-  _injectBrowser,
-  get _controller() {
-    return controller;
-  },
-};

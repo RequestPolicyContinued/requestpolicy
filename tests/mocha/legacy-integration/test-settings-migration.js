@@ -16,7 +16,7 @@ const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
     "app/legacy/legacy-side-settings-migration-controller"
 );
-const PWebextSideController = requirejs([
+const PWebextSideSettingsMigrationController = requirejs([
   "controllers/webext-side-settings-migration-controller",
 ]).then(({WebextSideSettingsMigrationController}) => WebextSideSettingsMigrationController);
 
@@ -44,6 +44,7 @@ describe("legacy settings migration:", function() {
   const eweInternalBrowser = createBrowserApi();
 
   let LegacySideController;
+  let WebextSideSettingsMigrationController;
   let WebextSideController;
   function controllers() {
     return {
@@ -62,9 +63,8 @@ describe("legacy settings migration:", function() {
     const embeddedWE = {browser: eweExternalBrowser};
     global._pEmbeddedWebExtension = Promise.resolve(embeddedWE);
     global.browser = browser;
-    return PWebextSideController.then((aWebextSideController) => {
-      WebextSideController = aWebextSideController;
-      aWebextSideController._injectBrowser(eweInternalBrowser);
+    return PWebextSideSettingsMigrationController.then((aWSSMC) => {
+      WebextSideSettingsMigrationController = aWSSMC;
       return;
     });
   });
@@ -72,7 +72,13 @@ describe("legacy settings migration:", function() {
   beforeEach(() => {
     eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
     LegacySideController = new LegacySideSettingsMigrationController(
-        Log.instance, browser.storage, eweExternalBrowser.runtime
+        Log.instance,
+        browser.storage,
+        eweExternalBrowser.runtime
+    );
+    WebextSideController = new WebextSideSettingsMigrationController(
+        eweInternalBrowser.runtime,
+        eweInternalBrowser.storage
     );
   });
 
@@ -373,9 +379,5 @@ describe("legacy settings migration:", function() {
   after(() => {
     delete global._pEmbeddedWebExtension;
     delete global.browser;
-    return PWebextSideController.then((aWebextSideController) => {
-      aWebextSideController._injectBrowser(null);
-      return;
-    });
   });
 });

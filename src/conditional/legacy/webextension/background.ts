@@ -5,7 +5,10 @@ import {
 } from "controllers/webext-side-settings-migration-controller";
 
 const controllers = new Controllers([
-  WebextSideSettingsMigrationController,
+  new WebextSideSettingsMigrationController(
+      browser.runtime,
+      browser.storage,
+  ),
 ]);
 
 console.log("Embedded WebExtension is being loaded.");

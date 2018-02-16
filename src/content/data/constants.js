@@ -43,6 +43,8 @@ export const C = {
   LOG_PREFIX: "[RequestPolicy] ",
 
   EXTENSION_ID: "/* @echo EXTENSION_ID */",
+  EWE_CONNECTION_LEGACY_ID: "legacy-to-ewe",
+  EWE_CONNECTION_EWE_ID: "ewe-to-legacy",
 
   // NOTE: do not generate the run ID here,
   //   because "constants.js" gets loaded multiple times, i.e.,

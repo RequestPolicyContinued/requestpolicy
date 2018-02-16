@@ -21,6 +21,7 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
+import { EmbeddedWebExtension } from "app/legacy/embedded-we";
 import {
   LegacySideSettingsMigrationController,
 } from "app/legacy/legacy-side-settings-migration-controller";
@@ -30,6 +31,9 @@ import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
+
+interface IEmbeddedWebExtension { browser: typeof browser; }
+declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
 import { dAsyncSettings, log } from "app/log";
@@ -42,6 +46,7 @@ import { CachedSettings } from "app/storage/cached-settings";
 import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
+import { Connection } from "lib/classes/connection";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
@@ -71,11 +76,27 @@ const localStorageArea = browser.storage.local;
 let webextSettingsMigration: LegacySideSettingsMigrationController | undefined;
 let legacy: LegacyModule | undefined;
 
+// @if EXTENSION_TYPE='legacy'
 if (C.EXTENSION_TYPE === "legacy") {
+  const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
+  const ewe = new EmbeddedWebExtension(log, pEweBrowser);
+  const pEwePort = pEweBrowser.then(
+      (eweBrowser) => eweBrowser.runtime.connect(),
+  );
+  const eweConnection = new Connection(
+      C.EWE_CONNECTION_LEGACY_ID,
+      log,
+      C.EWE_CONNECTION_EWE_ID,
+      pEwePort,
+  );
   webextSettingsMigration = new LegacySideSettingsMigrationController(
-      log, browser.storage);
-  legacy = new LegacyModule(log, webextSettingsMigration);
+      log,
+      browser.storage,
+      eweConnection,
+  );
+  legacy = new LegacyModule(log, ewe, eweConnection, webextSettingsMigration);
 }
+// @endif
 
 const settingsMigration = new SettingsMigration(
     log,

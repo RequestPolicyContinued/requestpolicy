@@ -20,16 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 import { Log } from "models/log";
-
-interface IEmbeddedWebExtension {
-  browser: typeof browser;
-}
-declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
-
-// =============================================================================
 
 type StorageMessageType = "full-storage" | "storage-change" |
     "request:full-storage";
@@ -40,7 +34,6 @@ interface IResponse {
 }
 
 export class LegacySideSettingsMigrationController extends Module {
-  private eRuntime: any = false;
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
@@ -53,6 +46,7 @@ export class LegacySideSettingsMigrationController extends Module {
   constructor(
       log: Log,
       private storage: typeof browser.storage,
+      private connectionToEWE: IConnection,
   ) {
     super("Legacy settings migration", log);
   }
@@ -62,23 +56,14 @@ export class LegacySideSettingsMigrationController extends Module {
         this.storage.local.get("lastStorageChange").then((result) => {
           this.lastStorageChange = result.lastStorageChange || null;
         });
-    const pGotEmbeddedRuntime =
-        _pEmbeddedWebExtension.then((aEmbeddedApi) => {
-          this.eRuntime = aEmbeddedApi.browser.runtime;
-        }).catch((e) => {
-          const rv = Promise.reject(e);
-          if (e === "embedded webextension not available") return rv;
-          this.log.error(
-              "Failed to initialize legacy settings export controller.", e);
-          return rv;
-        });
     return Promise.all([
-      pGotEmbeddedRuntime,
+      this.connectionToEWE.whenReady,
       pGotLastStorageChange,
     ]).then(() => {
-      this.eRuntime.onMessage.addListener(this.receiveMessage.bind(this));
+      this.connectionToEWE.onMessage.
+          addListener(this.receiveMessage.bind(this));
       this.storage.onChanged.addListener(this.storageChanged.bind(this));
-      this.eRuntime.sendMessage(this.createMessage("startup", "ready"));
+      this.connectionToEWE.sendMessage(this.createMessage("startup", "ready"));
       this.dWaitingForEWE.resolve(undefined);
       return this.dInitialSync.promise;
     });
@@ -116,7 +101,7 @@ export class LegacySideSettingsMigrationController extends Module {
   }
 
   private getFullWebextStorage(): Promise<browser.storage.StorageResults> {
-    return this.eRuntime.sendMessage(
+    return this.connectionToEWE.sendMessage(
         this.createMessage("request", "full-storage")).then((response: any) => {
       this.assertSuccessful(response, "request:full-storage");
       return response.value as browser.storage.StorageResults;
@@ -133,7 +118,7 @@ export class LegacySideSettingsMigrationController extends Module {
 
   private sendFullStorage(): Promise<void> {
     const p = this.storage.local.get(null).then((fullStorage) => {
-      return this.eRuntime.sendMessage(
+      return this.connectionToEWE.sendMessage(
           this.createMessage("full-storage", fullStorage));
     }).then((response: any) => {
       this.assertSuccessful(response, "full-storage");
@@ -157,7 +142,7 @@ export class LegacySideSettingsMigrationController extends Module {
     if (this.shouldSendFullStorage) {
       return this.sendFullStorage();
     }
-    return this.eRuntime.sendMessage(
+    return this.connectionToEWE.sendMessage(
         this.createMessage("storage-change", aStorageChange),
     ).then((response: any) => {
       this.assertSuccessful(response, "storage-change");

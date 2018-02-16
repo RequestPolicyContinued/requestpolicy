@@ -54,8 +54,9 @@ describe("legacy-side settings migration controller", function() {
   });
 
   beforeEach(() => {
+    eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
     LegacySideController = new LegacySideSettingsMigrationController(
-        Log.instance, browser.storage
+        Log.instance, browser.storage, eweExternalBrowser.runtime
     );
   });
 

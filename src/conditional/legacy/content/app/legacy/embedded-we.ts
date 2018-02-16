@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,27 +20,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { EmbeddedWebExtension } from "app/legacy/embedded-we";
-import {
-  LegacySideSettingsMigrationController,
-} from "app/legacy/legacy-side-settings-migration-controller";
-import { Connection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 
-export class LegacyModule extends Module {
+export class EmbeddedWebExtension extends Module {
+  public browser: typeof browser;
+
   constructor(
       log: Log,
-      public readonly ewe: EmbeddedWebExtension,
-      public readonly eweConnection: Connection<any, any>,
-      public readonly settingsMigration: LegacySideSettingsMigrationController,
+      public readonly pBrowser: Promise<typeof browser>,
   ) {
-    super("LegacyModules", log);
+    super("EmbeddedWebExtension", log);
   }
 
-  public get subModules() {
-    return {
-      settingsMigration: this.settingsMigration,
-    };
+  protected startupSelf() {
+    return this.pBrowser.then((browser) => {
+      this.browser = browser;
+    });
   }
 }

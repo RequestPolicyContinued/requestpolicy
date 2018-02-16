@@ -105,6 +105,8 @@ export abstract class Module implements IModule {
     this.debugLog.log("done shutting down");
   }
 
+  public isReady() { return this.ready; }
+
   protected startupSelf(): Promise<void> {
     return Promise.resolve();
   }

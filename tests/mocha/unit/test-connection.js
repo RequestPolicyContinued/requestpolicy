@@ -31,8 +31,16 @@ describe("connection", function() {
     sinon.restore();
   });
 
+  function startupUntilStartupMessageSent() {
+    const pStartupMessageSent = new Promise((resolve) => {
+      port.postMessage.onFirstCall().callsFake(resolve);
+    });
+    connection.startup();
+    return pStartupMessageSent;
+  }
+
   function fullyStartupConnection() {
-    connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       port.onMessage.dispatch({
         id: "startup",
         isResponse: true,
@@ -40,13 +48,11 @@ describe("connection", function() {
         value: "ready",
       });
       return;
-    }).catch((e) => {
-      console.error(e);
     });
   }
 
   it("first add message listener, then send message", function() {
-    return connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       sinon.assert.callOrder(
           port.onMessage.addListener,
           port.postMessage
@@ -62,9 +68,9 @@ describe("connection", function() {
   });
 
   it("responds to startup message from target", function() {
-    return connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       port.postMessage.reset();
-      const pCalled = new Promise((resolve) => {
+      const pResponseSent = new Promise((resolve) => {
         port.postMessage.callsFake(resolve);
       });
       port.onMessage.dispatch({
@@ -73,7 +79,7 @@ describe("connection", function() {
         target: moduleName,
         value: "ready",
       });
-      return pCalled;
+      return pResponseSent;
     }).then(() => {
       sinon.assert.calledOnce(port.postMessage);
       sinon.assert.calledWithMatch(port.postMessage, {
@@ -87,14 +93,14 @@ describe("connection", function() {
   });
 
   it("is not ready before target startup", function() {
-    return connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       assert.strictEqual(connection.isReady(), false);
       return;
     });
   });
 
   it("is ready after receiving startup response", function() {
-    return connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       port.onMessage.dispatch({
         id: "startup",
         isResponse: true,
@@ -109,7 +115,7 @@ describe("connection", function() {
   });
 
   it("is ready after receiving startup message (non-response)", function() {
-    return connection.startup().then(() => {
+    return startupUntilStartupMessageSent().then(() => {
       port.onMessage.dispatch({
         id: "startup",
         isResponse: false,
@@ -124,8 +130,7 @@ describe("connection", function() {
   });
 
   it("resolves to response when sending a message", function() {
-    fullyStartupConnection();
-    return connection.whenReady.then(() => {
+    return fullyStartupConnection().then(() => {
       port.postMessage.resetHistory();
       const p = connection.sendMessage("bar_value");
       const {id} = port.postMessage.getCall(0).args[0];
@@ -143,9 +148,8 @@ describe("connection", function() {
   });
 
   it("calls 'gotMessage' callback when receiving a non-response message", function() {
-    fullyStartupConnection();
     const gotMessage = sinon.stub();
-    return connection.whenReady.then(() => {
+    return fullyStartupConnection().then(() => {
       connection.onMessage.addListener(gotMessage);
       const pGotMessageCalled = new Promise((resolve) => {
         gotMessage.callsFake(() => {
@@ -168,24 +172,29 @@ describe("connection", function() {
   });
 
   it("sends back the response returned by 'gotMessage'", function() {
-    fullyStartupConnection();
     const gotMessage = sinon.stub();
-    return connection.whenReady.then(() => {
+    return fullyStartupConnection().then(() => {
       connection.onMessage.addListener(gotMessage);
       gotMessage.resolves("baz_response");
-      port.postMessage.resetHistory();
+
+      // I don't know why, but `resetHistory()` did not work here. It caused
+      // the fake function (below) not to be called. So instead I use
+      // `calledOnce()` (and `calledTwice()` below).
+      sinon.assert.calledOnce(port.postMessage);
+      // port.postMessage.resetHistory();
+
       const pPostMessageCalled = new Promise((resolve) => {
         port.postMessage.callsFake(resolve);
-      });
-      port.onMessage.dispatch({
-        id: "foo_id",
-        isResponse: false,
-        target: moduleName,
-        value: "bar_value",
+        port.onMessage.dispatch({
+          id: "foo_id",
+          isResponse: false,
+          target: moduleName,
+          value: "bar_value",
+        });
       });
       return pPostMessageCalled;
     }).then(() => {
-      sinon.assert.calledOnce(port.postMessage);
+      sinon.assert.calledTwice(port.postMessage);
       sinon.assert.calledWithMatch(port.postMessage, {
         id: "foo_id",
         isResponse: true,

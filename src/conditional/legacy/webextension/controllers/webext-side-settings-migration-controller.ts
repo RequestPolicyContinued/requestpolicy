@@ -42,33 +42,10 @@ function getBrowser() {
 
 // =============================================================================
 
-function createMessage(aType: string, aValue: any) {
-  return {
-    target: REMOTE_TARGET_NAME,
-    type: aType,
-    value: aValue,
-  };
-}
-
-function sendMessage(aType: string, aValue: any): Promise<void> {
-  return getBrowser().runtime.sendMessage(createMessage(aType, aValue));
-}
-
 type StorageMessageType = "full-storage" | "storage-change" |
     "request:full-storage";
 type StorageChange = browser.storage.StorageChange;
 interface IStorageChanges { [key: string]: StorageChange; }
-
-function respond<T = void>(aMsgType: StorageMessageType, aPromise: Promise<T>) {
-  const responseMsgType = `${aMsgType}:response`;
-  return aPromise.then((value?: T) => createMessage(
-      responseMsgType,
-      value,
-  )).catch((e: any) => createMessage(
-      responseMsgType,
-      {error: e.toString()},
-  ));
-}
 
 // =============================================================================
 
@@ -87,7 +64,7 @@ class Controller {
   }
 
   private sendStartupMessage(): Promise<void> {
-    const p = sendMessage("startup", {
+    const p = this.sendMessage("startup", {
       lastStorageChange: this.lastStorageChange,
       ready: true,
     });
@@ -142,18 +119,47 @@ class Controller {
       case "request":
         switch (aMessage.value) {
           case "full-storage":
-            return respond("request:full-storage", this.getFullStorage());
+            return this.respond("request:full-storage", this.getFullStorage());
           default:
             return Promise.reject(`Unknown '${aMessage.value}' request.`);
         }
       case "full-storage":
-        return respond("full-storage", this.setFullStorage(aMessage.value));
+        return this.respond(
+            "full-storage",
+            this.setFullStorage(aMessage.value),
+        );
       case "storage-change":
-        return respond("storage-change",
+        return this.respond("storage-change",
             this.applyStorageChange(aMessage.value as StorageChange));
       default:
         return Promise.reject(`Unknown type '${aMessage.type}'.`);
     }
+  }
+
+  private createMessage(aType: string, aValue: any) {
+    return {
+      target: REMOTE_TARGET_NAME,
+      type: aType,
+      value: aValue,
+    };
+  }
+
+  private sendMessage(aType: string, aValue: any): Promise<void> {
+    return getBrowser().runtime.sendMessage(this.createMessage(aType, aValue));
+  }
+
+  private respond<T = void>(
+      aMsgType: StorageMessageType,
+      aPromise: Promise<T>,
+  ) {
+    const responseMsgType = `${aMsgType}:response`;
+    return aPromise.then((value?: T) => this.createMessage(
+        responseMsgType,
+        value,
+    )).catch((e: any) => this.createMessage(
+        responseMsgType,
+        {error: e.toString()},
+    ));
   }
 }
 

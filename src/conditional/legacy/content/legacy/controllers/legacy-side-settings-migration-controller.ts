@@ -20,7 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
+import { Log } from "models/log";
 
 interface IEmbeddedWebExtension {
   browser: typeof browser;
@@ -37,12 +39,13 @@ interface IResponse {
   value: any;
 }
 
-export class LegacySideSettingsMigrationController {
+export class LegacySideSettingsMigrationController extends Module {
   private static lInstance: LegacySideSettingsMigrationController;
   public static get instance(): LegacySideSettingsMigrationController {
     if (!LegacySideSettingsMigrationController.lInstance) {
       LegacySideSettingsMigrationController.lInstance =
-          new LegacySideSettingsMigrationController(browser.storage);
+          new LegacySideSettingsMigrationController(
+              Log.instance, browser.storage);
     }
     return LegacySideSettingsMigrationController.lInstance;
   }
@@ -55,18 +58,12 @@ export class LegacySideSettingsMigrationController {
   private dInitialSync = defer<void>();
   private dStorageReadyForAccess = defer<void>();
 
-  private log = {
-    error(message: string, error?: any) {
-      console.error("[Legacy settings migration] " + message, error);
-      if (error) {
-        console.dir(error);
-      }
-    },
-  };
-
   constructor(
+      log: Log,
       private storage: typeof browser.storage,
-  ) {}
+  ) {
+    super("Legacy settings migration", log);
+  }
 
   public startup(): Promise<void> {
     if (this.startupCalled) {

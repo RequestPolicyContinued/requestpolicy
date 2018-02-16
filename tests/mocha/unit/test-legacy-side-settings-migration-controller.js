@@ -9,6 +9,7 @@ const {
 } = require("../lib/settings-migration-utils");
 const {destructureOptions} = require("../lib/utils");
 
+const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
     "legacy/controllers/legacy-side-settings-migration-controller"
 );
@@ -54,7 +55,7 @@ describe("legacy-side settings migration controller", function() {
 
   beforeEach(() => {
     LegacySideController = new LegacySideSettingsMigrationController(
-        browser.storage
+        Log.instance, browser.storage
     );
   });
 

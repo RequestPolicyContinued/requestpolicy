@@ -12,6 +12,7 @@ const requirejs = require("../lib/requirejs");
 
 const {defer} = require("lib/utils/js-utils");
 
+const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
     "legacy/controllers/legacy-side-settings-migration-controller"
 );
@@ -61,7 +62,7 @@ describe("legacy settings migration:", function() {
 
   beforeEach(() => {
     LegacySideController = new LegacySideSettingsMigrationController(
-        browser.storage
+        Log.instance, browser.storage
     );
   });
 

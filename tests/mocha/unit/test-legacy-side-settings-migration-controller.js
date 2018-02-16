@@ -129,7 +129,8 @@ describe("legacy-side settings migration controller", function() {
       storage.local.get.withArgs("lastStorageChange").resolves(
           maybeAssignLastStorageChange({}, legacySideInitialFullStorage)
       );
-      let p = LegacySideController.startup().then(() => {
+      LegacySideController.startup();
+      let p = LegacySideController.pWaitingForEWE.then(() => {
         afterControllerStartedUp({eRuntime, storage});
         return;
       });

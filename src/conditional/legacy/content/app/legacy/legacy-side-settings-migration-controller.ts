@@ -44,8 +44,11 @@ export class LegacySideSettingsMigrationController extends Module {
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
-  private dInitialSync = defer<void>();
   private dStorageReadyForAccess = defer<void>();
+  private dInitialSync = defer<void>();
+
+  // FIXME: this is only necessary for testing -- bad style!
+  private dWaitingForEWE = defer<void>();
 
   constructor(
       log: Log,
@@ -76,18 +79,19 @@ export class LegacySideSettingsMigrationController extends Module {
       this.eRuntime.onMessage.addListener(this.receiveMessage.bind(this));
       this.storage.onChanged.addListener(this.storageChanged.bind(this));
       this.eRuntime.sendMessage(this.createMessage("startup", "ready"));
+      this.dWaitingForEWE.resolve(undefined);
+      return this.dInitialSync.promise;
     });
   }
 
-  public get pInitialSync() {
-    return this.dInitialSync.promise;
-  }
+  public get pWaitingForEWE() { return this.dWaitingForEWE.promise; }
   public get pStorageReadyForAccess() {
     return this.dStorageReadyForAccess.promise;
   }
   public get isStorageReadyForAccess() {
     return this.dStorageReadyForAccess.promiseState === "fulfilled";
   }
+  public get pInitialSync() { return this.dInitialSync.promise; }
 
   private assertSuccessful(
       aResponse: IResponse,

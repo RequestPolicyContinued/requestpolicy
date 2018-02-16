@@ -46,7 +46,16 @@ describe("legacy settings migration:", function() {
   let LegacySideController;
   let WebextSideController;
   function controllers() {
-    return {LegacySideController, WebextSideController};
+    return {
+      LegacySideController: {
+        // hack...
+        startup() {
+          LegacySideController.startup();
+          return LegacySideController.pWaitingForEWE;
+        },
+      },
+      WebextSideController,
+    };
   }
 
   before(() => {

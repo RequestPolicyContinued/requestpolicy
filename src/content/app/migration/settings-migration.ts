@@ -31,7 +31,8 @@ import { Module } from "lib/classes/module";
 export class SettingsMigration extends Module
     implements App.migration.ISettingsMigration {
   protected get startupPreconditions() {
-    return this.settingsMigration ? [this.settingsMigration.whenReady] : [];
+    return this.settingsMigration ?
+        [this.settingsMigration.pStorageReadyForAccess] : [];
   }
 
   constructor(

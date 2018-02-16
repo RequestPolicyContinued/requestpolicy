@@ -44,7 +44,6 @@ export class LegacySideSettingsMigrationController extends Module {
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
-  private startupCalled: boolean = false;
   private dInitialSync = defer<void>();
   private dStorageReadyForAccess = defer<void>();
 
@@ -55,12 +54,7 @@ export class LegacySideSettingsMigrationController extends Module {
     super("Legacy settings migration", log);
   }
 
-  public startup(): Promise<void> {
-    if (this.startupCalled) {
-      throw new Error("startup() has already been called!");
-    }
-    this.startupCalled = true;
-
+  protected startupSelf(): Promise<void> {
     const pGotLastStorageChange =
         this.storage.local.get("lastStorageChange").then((result) => {
           this.lastStorageChange = result.lastStorageChange || null;
@@ -75,7 +69,7 @@ export class LegacySideSettingsMigrationController extends Module {
               "Failed to initialize legacy settings export controller.", e);
           return rv;
         });
-    const pStartup = Promise.all([
+    return Promise.all([
       pGotEmbeddedRuntime,
       pGotLastStorageChange,
     ]).then(() => {
@@ -83,7 +77,6 @@ export class LegacySideSettingsMigrationController extends Module {
       this.storage.onChanged.addListener(this.storageChanged.bind(this));
       this.eRuntime.sendMessage(this.createMessage("startup", "ready"));
     });
-    return pStartup;
   }
 
   public get pInitialSync() {

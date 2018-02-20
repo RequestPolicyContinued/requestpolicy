@@ -18,6 +18,7 @@
     "no-console": [
       false
     ],
+    "no-floating-promises": [true],
     "no-reference": false
   },
   "rulesDirectory": []

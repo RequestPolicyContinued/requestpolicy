@@ -56,7 +56,8 @@ export class InitialSetup extends Module {
     Notifications.onTabOpened.removeListener(
         this.onNotificationsTabOpenedListener,
     );
-    this.storage.set({welcomeWindowShown: true});
+    this.storage.set({welcomeWindowShown: true}).
+        catch(this.log.onError("onNotificationsTabOpened"));
   }
 
   private maybeShowSetupTab() {
@@ -65,12 +66,13 @@ export class InitialSetup extends Module {
     if (VersionInfos.isRPUpgrade) {
       // If the use has just upgraded from an 0.x version, set the
       // default-policy preferences based on the old preferences.
-      this.storage.set({"defaultPolicy.allow": false});
+      this.storage.set({"defaultPolicy.allow": false}).
+          catch(this.log.onError("set defaultPolicy.allow"));
       if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
         const identLevel = this.storage.get("uriIdentificationLevel");
         this.storage.set({
           "defaultPolicy.allowSameDomain": identLevel === 1,
-        });
+        }).catch(this.log.onError("set defaultPolicy.allowSameDomain"));
       }
     }
 

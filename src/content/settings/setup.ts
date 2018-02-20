@@ -35,7 +35,10 @@ declare const $: typeof JQuery;
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rp,
+    Log,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
+
+  const log = Log.instance;
 
   // ===========================================================================
 
@@ -47,14 +50,14 @@ declare const $: typeof JQuery;
   function handleDefaultPolicyChange() {
     rp.storage.set({
       "defaultPolicy.allow": $id("defaultallow").checked,
-    });
+    }).catch(log.onError("handleDefaultPolicyChange"));
     setAllowSameDomainBlockDisplay();
   }
 
   function handleAllowSameDomainChange() {
     rp.storage.set({
       "defaultPolicy.allowSameDomain": $id("allowsamedomain").checked,
-    });
+    }).catch(log.onError("handleAllowSameDomainChange"));
   }
 
   function setAllowSameDomainBlockDisplay() {

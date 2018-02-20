@@ -202,7 +202,8 @@ export class Subscriptions extends Module {
         // disabled it between the time the update started and when it
         // completed.
         const subInfo = JSON.parse(data);
-        this.loadSubscriptionRulesFromSubInfo(subInfo);
+        this.loadSubscriptionRulesFromSubInfo(subInfo).
+            catch(this.log.onError("SUBSCRIPTION_UPDATED_TOPIC"));
         break;
       }
 

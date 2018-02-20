@@ -501,7 +501,9 @@ ts: node-packages
 	@$(TSC)
 tslint: node-packages
 	@echo $@
-	@$(TSLINT) --exclude '**/third-party/**/*' 'src/**/*.ts' \
+	@$(TSLINT) --project tsconfig.json \
+		--exclude '**/third-party/**/*' \
+		'src/**/*.ts' \
 		| $(_remove_leading_empty_lines)
 
 #-------------------------------------------------------------------------------

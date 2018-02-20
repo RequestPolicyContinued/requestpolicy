@@ -46,7 +46,11 @@ export class Controllers {
       if (typeof controller.startup === "function") {
         if (typeof controller.startupPreconditions !== "undefined") {
           Promise.all(controller.startupPreconditions).
-              then(controller.startup);
+              then(controller.startup).
+              catch((e) => {
+                console.error("controller startup");
+                console.dir(e);
+              });
         } else {
           controller.startup();
         }

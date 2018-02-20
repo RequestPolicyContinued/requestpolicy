@@ -30,6 +30,9 @@ import {Controllers} from "lib/classes/controllers";
   (new Controllers(controllers)).startup();
   allControllers = allControllers.concat(controllers);
 }
+import { Log } from "models/log";
+
+const log = Log.instance;
 
 import {C} from "data/constants";
 import {
@@ -96,7 +99,7 @@ const shutdownMessage = `${C.MM_PREFIX}shutdown`;
 function shutdown(aShutdownArgs: any) {
   (new Controllers(allControllers)).shutdown();
   MainEnvironment.shutdown(aShutdownArgs);
-  rp.shutdown();
+  rp.shutdown().catch(log.onError("main shutdown"));
 }
 
 declare const Services: any;
@@ -138,7 +141,7 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 (function startup() {
   PrefManager.init();
 
-  rp.startup();
+  rp.startup().catch(log.onError("main startup"));
 
   try {
     // Remark: startup() takes the arguments as an array!

@@ -48,6 +48,7 @@ import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
+import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
@@ -81,7 +82,7 @@ if (C.EXTENSION_TYPE === "legacy") {
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
   const ewe = new EmbeddedWebExtension(log, pEweBrowser);
   const pEwePort = pEweBrowser.then(
-      (eweBrowser) => eweBrowser.runtime.connect(),
+      (eweBrowser) => getPortFromSlaveConnectable(eweBrowser.runtime),
   );
   const eweConnection = new Connection(
       C.EWE_CONNECTION_LEGACY_ID,

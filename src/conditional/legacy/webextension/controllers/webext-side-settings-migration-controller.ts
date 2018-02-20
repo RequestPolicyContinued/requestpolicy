@@ -52,6 +52,8 @@ export class WebextSideSettingsMigrationController extends Module {
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange = result.lastStorageChange || null;
+      return this.connectionToLegacy.whenReady;
+    }).then(() => {
       this.connectionToLegacy.onMessage.addListener(
           this.receiveMessage.bind(this));
       return this.sendStartupMessage();

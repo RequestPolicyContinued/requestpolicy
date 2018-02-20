@@ -48,10 +48,6 @@ import {
 import "ui-testing/services";
 // @endif
 
-// @if EXTENSION_TYPE='legacy'
-import "legacy/main";
-// @endif
-
 let allControllers: Array<{[key: string]: any}> = [];
 
 const controllersToBeStartedUp = [

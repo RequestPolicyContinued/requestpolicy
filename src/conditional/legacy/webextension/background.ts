@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { EweModule } from "app/ewe.module";
 import {
   WebextSideSettingsMigrationController,
 } from "controllers/webext-side-settings-migration-controller";
-import { Log } from "models/log";
-import { EweModule } from "app/ewe.module";
-import { Connection } from "lib/classes/connection";
 import { C } from "data/constants";
+import { Connection } from "lib/classes/connection";
+import { Log } from "models/log";
 
 const log = Log.instance;
 const pLegacyPort = browser.runtime.connect();
@@ -42,10 +42,10 @@ const settingsMigration = new WebextSideSettingsMigrationController(
 const ewe = new EweModule(log, legacyConnection, settingsMigration);
 
 log.log("Embedded WebExtension is being loaded.");
-ewe.startup();
+ewe.startup().catch(log.onError("EWE startup"));
 
 window.addEventListener("unload", () => {
   // Only synchronous tasks can be done here.
   log.log("Embedded WebExtension is being unloaded.");
-  ewe.shutdown();
+  ewe.shutdown().catch(log.onError("EWE shutdown"));
 });

@@ -52,7 +52,8 @@ export class WebextSideSettingsMigrationController extends Module {
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange = result.lastStorageChange || null;
-      this.connectionToLegacy.onMessage.addListener(this.receiveMessage.bind(this));
+      this.connectionToLegacy.onMessage.addListener(
+          this.receiveMessage.bind(this));
       return this.sendStartupMessage();
     });
   }
@@ -136,7 +137,9 @@ export class WebextSideSettingsMigrationController extends Module {
   }
 
   private sendMessage(aType: string, aValue: any): Promise<void> {
-    return this.connectionToLegacy.sendMessage(this.createMessage(aType, aValue));
+    return this.connectionToLegacy.sendMessage(
+        this.createMessage(aType, aValue),
+    );
   }
 
   private respond<T = void>(

@@ -20,12 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { Connection } from "lib/classes/connection";
-import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 import {
   WebextSideSettingsMigrationController,
 } from "controllers/webext-side-settings-migration-controller";
+import { Connection } from "lib/classes/connection";
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 
 export class EweModule extends Module {
   constructor(

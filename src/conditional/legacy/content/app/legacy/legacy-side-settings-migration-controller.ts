@@ -63,10 +63,14 @@ export class LegacySideSettingsMigrationController extends Module {
       this.connectionToEWE.onMessage.
           addListener(this.receiveMessage.bind(this));
       this.storage.onChanged.addListener(this.storageChanged.bind(this));
-      this.connectionToEWE.sendMessage(this.createMessage("startup", "ready"));
+      const p = this.connectionToEWE.sendMessage(
+          this.createMessage("startup", "ready"),
+      );
       this.dWaitingForEWE.resolve(undefined);
-      return this.dInitialSync.promise;
-    });
+      return p;
+    }).then(() => (
+      this.dInitialSync.promise
+    ));
   }
 
   public get pWaitingForEWE() { return this.dWaitingForEWE.promise; }

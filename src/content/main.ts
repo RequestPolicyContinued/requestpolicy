@@ -45,9 +45,6 @@ import "main/content-policy";
 import "main/window-manager";
 
 import {
-  InitialSetupController,
-} from "controllers/initial-setup-controller";
-import {
   KeyboardShortcutController,
 } from "controllers/keyboard-shortcut-controller";
 import {
@@ -67,7 +64,6 @@ const controllersToBeStartedUp = [
   OldRulesController,
 
   OtherRPInstallationsController,
-  InitialSetupController,
 
   NotificationsController,
 ];

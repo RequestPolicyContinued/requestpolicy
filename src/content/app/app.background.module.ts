@@ -24,12 +24,14 @@ import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 import { Policy } from "./policy/policy.module";
 import { Storage } from "./storage/storage.module";
+import { Ui } from "./ui/ui.module";
 
 export class AppBackground extends Module {
   constructor(
       log: Log,
       public readonly policy: Policy,
       public readonly storage: Storage,
+      public readonly ui: Ui,
   ) {
     super("App", log);
   }
@@ -38,6 +40,7 @@ export class AppBackground extends Module {
     return {
       policy: this.policy,
       storage: this.storage,
+      ui: this.ui,
     };
   }
 }

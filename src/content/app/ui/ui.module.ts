@@ -20,30 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { InitialSetup } from "app/ui/initial-setup";
+import {Module} from "lib/classes/module";
 import { Log } from "models/log";
-import { AppBackground } from "./app.background.module";
-import { Policy } from "./policy/policy.module";
-import { RulesetStorage } from "./policy/ruleset-storage";
-import { Subscriptions } from "./policy/subscriptions";
-import * as RPStorageConfig from "./storage/rp-config.background";
-import { Storage } from "./storage/storage.module";
-import { Ui } from "./ui/ui.module";
+import { InitialSetup } from "./initial-setup";
 
-const log = Log.instance;
+export class Ui extends Module {
+  constructor(
+      log: Log,
+      public readonly initialSetup: InitialSetup,
+  ) {
+    super("app.ui", log);
+  }
 
-const rulesetStorage = new RulesetStorage(log);
-const subscriptions = new Subscriptions(log, rulesetStorage);
-const policy = new Policy(log, subscriptions, rulesetStorage);
-
-const storage = new Storage(log, RPStorageConfig);
-
-const initialSetup = new InitialSetup(log, storage);
-const ui = new Ui(log, initialSetup);
-
-export const rp = new AppBackground(
-    log,
-    policy,
-    storage,
-    ui,
-);
+  protected get subModules() {
+    return {
+      initialSetup: this.initialSetup,
+    };
+  }
+}

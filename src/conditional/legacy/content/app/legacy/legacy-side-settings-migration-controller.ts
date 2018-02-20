@@ -157,8 +157,6 @@ export class LegacySideSettingsMigrationController extends Module {
 
   private receiveMessage(
       aMessage: any,
-      aSender: browser.runtime.MessageSender,
-      aSendResponse: (rv: any) => void,
   ): void {
     if (aMessage.target !== "legacy-side-settings-migration-controller") return;
     if (aMessage.type !== "startup") return;

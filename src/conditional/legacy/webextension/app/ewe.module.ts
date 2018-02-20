@@ -20,32 +20,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Connection } from "lib/classes/connection";
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 import {
   WebextSideSettingsMigrationController,
 } from "controllers/webext-side-settings-migration-controller";
-import { Log } from "models/log";
-import { EweModule } from "app/ewe.module";
-import { Connection } from "lib/classes/connection";
-import { C } from "data/constants";
 
-const log = Log.instance;
-const pLegacyPort = browser.runtime.connect();
-const legacyConnection = new Connection(
-    C.EWE_CONNECTION_EWE_ID,
-    log,
-    C.EWE_CONNECTION_LEGACY_ID,
-    Promise.resolve(pLegacyPort),
-);
-const settingsMigration = new WebextSideSettingsMigrationController(
-    log, legacyConnection, browser.storage,
-);
-const ewe = new EweModule(log, legacyConnection, settingsMigration);
+export class EweModule extends Module {
+  constructor(
+      log: Log,
+      public readonly legacyConnection: Connection<any, any>,
+      public readonly settingsMigration: WebextSideSettingsMigrationController,
+  ) {
+    super("LegacyModules", log);
+  }
 
-log.log("Embedded WebExtension is being loaded.");
-ewe.startup();
-
-window.addEventListener("unload", () => {
-  // Only synchronous tasks can be done here.
-  log.log("Embedded WebExtension is being unloaded.");
-  ewe.shutdown();
-});
+  public get subModules() {
+    return {
+      settingsMigration: this.settingsMigration,
+    };
+  }
+}

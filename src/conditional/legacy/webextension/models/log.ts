@@ -1,0 +1,1 @@
+../../../../content/models/log.ts

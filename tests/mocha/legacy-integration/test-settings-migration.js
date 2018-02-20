@@ -77,6 +77,7 @@ describe("legacy settings migration:", function() {
         eweExternalBrowser.runtime
     );
     WebextSideController = new WebextSideSettingsMigrationController(
+        Log.instance,
         eweInternalBrowser.runtime,
         eweInternalBrowser.storage
     );

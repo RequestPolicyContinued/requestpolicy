@@ -28,7 +28,7 @@ import {
 
 const controllers = new Controllers([
   new WebextSideSettingsMigrationController(
-      browser.runtime,
+      browser.runtime as any,
       browser.storage,
   ),
 ]);

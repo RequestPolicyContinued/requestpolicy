@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IConnection } from "lib/classes/connection";
+
 const TARGET_NAME = "webext-side-settings-migration-controller";
 const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";
 
@@ -36,7 +38,7 @@ export class WebextSideSettingsMigrationController {
   private lastStorageChange: string | null = null;
 
   constructor(
-      private runtime: typeof browser.runtime,
+      private connectionToLegacy: IConnection,
       private storage: typeof browser.storage,
   ) {}
 
@@ -45,7 +47,7 @@ export class WebextSideSettingsMigrationController {
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange = result.lastStorageChange || null;
-      this.runtime.onMessage.addListener(this.receiveMessage.bind(this));
+      this.connectionToLegacy.onMessage.addListener(this.receiveMessage.bind(this));
       return this.sendStartupMessage();
     });
   }
@@ -94,8 +96,6 @@ export class WebextSideSettingsMigrationController {
 
   private receiveMessage(
       aMessage: any,
-      aSender: browser.runtime.MessageSender,
-      aSendResponse: (rv: any) => void,
   ): Promise<any> | void {
     if (aMessage.target !== TARGET_NAME) return;
     switch (aMessage.type) {
@@ -131,7 +131,7 @@ export class WebextSideSettingsMigrationController {
   }
 
   private sendMessage(aType: string, aValue: any): Promise<void> {
-    return this.runtime.sendMessage(this.createMessage(aType, aValue));
+    return this.connectionToLegacy.sendMessage(this.createMessage(aType, aValue));
   }
 
   private respond<T = void>(

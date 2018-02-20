@@ -8,17 +8,15 @@ const {
 const {createBrowserApi} = require("../lib/sinon-chrome");
 const {destructureOptions} = require("../lib/utils");
 
-const requirejs = require("../lib/requirejs");
-
 const {defer} = require("lib/utils/js-utils");
 
 const {Log} = require("models/log");
 const {LegacySideSettingsMigrationController} = require(
     "app/legacy/legacy-side-settings-migration-controller"
 );
-const PWebextSideSettingsMigrationController = requirejs([
-  "controllers/webext-side-settings-migration-controller",
-]).then(({WebextSideSettingsMigrationController}) => WebextSideSettingsMigrationController);
+const {WebextSideSettingsMigrationController} = require(
+    "controllers/webext-side-settings-migration-controller"
+);
 
 function stubStorageLocalGet(aStorage, aInitialFullStorage) {
   aStorage.local.get.withArgs(null).resolves(aInitialFullStorage);
@@ -44,7 +42,6 @@ describe("legacy settings migration:", function() {
   const eweInternalBrowser = createBrowserApi();
 
   let LegacySideController;
-  let WebextSideSettingsMigrationController;
   let WebextSideController;
   function controllers() {
     return {
@@ -63,10 +60,6 @@ describe("legacy settings migration:", function() {
     const embeddedWE = {browser: eweExternalBrowser};
     global._pEmbeddedWebExtension = Promise.resolve(embeddedWE);
     global.browser = browser;
-    return PWebextSideSettingsMigrationController.then((aWSSMC) => {
-      WebextSideSettingsMigrationController = aWSSMC;
-      return;
-    });
   });
 
   beforeEach(() => {

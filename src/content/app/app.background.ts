@@ -81,14 +81,14 @@ let legacy: LegacyModule | undefined;
 if (C.EXTENSION_TYPE === "legacy") {
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
   const ewe = new EmbeddedWebExtension(log, pEweBrowser);
-  const pEwePort = pEweBrowser.then(
+  const promiseEwePort = () => pEweBrowser.then(
       (eweBrowser) => getPortFromSlaveConnectable(eweBrowser.runtime),
   );
   const eweConnection = new Connection(
       C.EWE_CONNECTION_LEGACY_ID,
       log,
       C.EWE_CONNECTION_EWE_ID,
-      pEwePort,
+      promiseEwePort,
   );
   webextSettingsMigration = new LegacySideSettingsMigrationController(
       log,

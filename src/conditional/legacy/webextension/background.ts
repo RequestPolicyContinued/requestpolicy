@@ -29,12 +29,12 @@ import { Connection } from "lib/classes/connection";
 import { Log } from "models/log";
 
 const log = Log.instance;
-const pLegacyPort = browser.runtime.connect();
+const promiseLegacyPort = () => Promise.resolve(browser.runtime.connect());
 const legacyConnection = new Connection(
     C.EWE_CONNECTION_EWE_ID,
     log,
     C.EWE_CONNECTION_LEGACY_ID,
-    Promise.resolve(pLegacyPort),
+    promiseLegacyPort,
 );
 const settingsMigration = new WebextSideSettingsMigrationController(
     log, legacyConnection, browser.storage,

@@ -47,13 +47,13 @@ export class Connection<TRx, TRxResp> extends Module {
       moduleName: string,
       log: Log,
       protected targetName: string,
-      private pPort: Promise<Port>,
+      private promisePort: () => Promise<Port>,
   ) {
     super(moduleName, log);
   }
 
   public async startupSelf() {
-    this.port = await this.pPort;
+    this.port = await this.promisePort();
     this.port.onMessage.addListener(this.receiveMessage.bind(this));
     this.port.postMessage(this.buildMessage("startup", "ready", false));
     // NOTE: the startup is NOT done yet

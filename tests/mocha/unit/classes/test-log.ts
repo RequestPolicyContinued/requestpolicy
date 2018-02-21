@@ -10,10 +10,10 @@
 
 "use strict";
 
-const {assert} = require("chai");
+import {assert} from "chai";
 
-const {Log} = require("models/log");
-const {C} = require("data/constants");
+import {Log} from "models/log";
+import {C} from "data/constants";
 
 describe("Log", () => {
   const sinon = require("sinon").sandbox.create();
@@ -115,7 +115,7 @@ describe("Log", () => {
       });
     }
 
-    _it("log", {callCount: false});
+    _it("log", {isCalled: false});
     _it("info", {isCalled: false});
     _it("warn", {isCalled: false});
     _it("error", {isCalled: true});

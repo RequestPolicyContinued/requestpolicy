@@ -10,10 +10,10 @@
 
 "use strict";
 
-let {assert} = require("chai");
+import {assert} from "chai";
 let {isTrue, strictEqual} = assert;
 
-let Utils = require("lib/utils/misc-utils");
+import * as Utils from "lib/utils/misc-utils";
 
 describe("Utils", function() {
   describe("wrapFunction(), unwrapFunction()", function() {
@@ -145,7 +145,8 @@ describe("Utils", function() {
       isTrue(param2 === "bar");
 
       // test that errors are catched
-      throw "test error"; // eslint-disable-line no-throw-literal
+      // tslint:disable-next-line:no-string-throw
+      throw "test error";
     }
   });
 });

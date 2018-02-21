@@ -318,7 +318,6 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 /* eslint-disable max-len */
 const BUILDS = [
   { alias: "ui-testing",     isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "non-ui-testing", isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
   { alias: "dev",            isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
   { alias: "nightly",        isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
   { alias: "beta",           isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
@@ -622,17 +621,10 @@ BUILDS.forEach((build) => {
               pipe(rename(mergeInConditional)).
 
               pipe(gulpif(build.isDev,
-                  gulpif(
-                      build.alias === "non-ui-testing",
-                      sourcemaps.write({
-                        destPath: buildDir,
-                        sourceRoot: srcDir,
-                      }),
-                      sourcemaps.write({
-                        destPath: buildDir,
-                        sourceRoot: `file://${srcDir}`,
-                      })
-                  ))).
+                  sourcemaps.write({
+                    destPath: buildDir,
+                    sourceRoot: `file://${srcDir}`,
+                  }))).
               pipe(gulp.dest(buildDir));
           return stream;
         });

@@ -1,5 +1,5 @@
+import * as Api from "sinon-chrome/api";
 const stableApiFx = require("sinon-chrome/config/stable-api-ff.json");
-const Api = require("sinon-chrome/api");
 
 for (let ns of stableApiFx) {
   if (ns.namespace === "management") {
@@ -29,6 +29,6 @@ for (let ns of stableApiFx) {
   }
 }
 
-module.exports = function createBrowserApi() {
+export function createBrowserApi() {
   return new Api(stableApiFx).create();
-};
+}

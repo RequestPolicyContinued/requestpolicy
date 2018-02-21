@@ -8,9 +8,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const chai = require("chai");
-const chaiAsPromised = require("chai-as-promised");
-const sinon = require("sinon");
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
+import * as sinon from "sinon";
 
 chai.use(chaiAsPromised);
 const {assert, expect} = chai;
@@ -18,8 +18,8 @@ const {assert, expect} = chai;
 // Loads mocking classes
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
-const MockNetUtil = require("./lib/mock-netutil");
-const MockComponents = require("./lib/mock-components");
+import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
+import {Components as MockComponents} from "./lib/mock-components";
 
 describe("ChromeFilesUtils", function() {
   let ChromeFilesUtils = null;
@@ -39,7 +39,7 @@ describe("ChromeFilesUtils", function() {
         returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
-    global.Cu = mockComp.utils;
+    (global as any).Cu = mockComp.utils;
 
     ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
   });
@@ -142,6 +142,6 @@ describe("ChromeFilesUtils", function() {
   });
 
   after(function() {
-    global.Cu = null;
+    (global as any).Cu = null;
   });
 });

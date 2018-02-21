@@ -8,15 +8,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-const {assert} = require("chai");
-const sinon = require("sinon");
+import {assert} from "chai";
+import * as sinon from "sinon";
 
 // Loads mocking classes
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
-const MockNetUtil = require("./lib/mock-netutil");
-const MockServices = require("./lib/mock-services");
-const MockComponents = require("./lib/mock-components");
+import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
+import {Services as MockServices} from "./lib/mock-services";
+import {Components as MockComponents} from "./lib/mock-components";
 
 describe("browser.runtime", function() {
   let runtime = null;
@@ -40,9 +40,9 @@ describe("browser.runtime", function() {
         withArgs("resource://gre/modules/Http.jsm").returns(mockHttp);
 
     // Replaces global declaration done in bootstrap.js
-    global.Cu = mockComp.utils;
-    global.Ci = mockComp.interfaces;
-    global.Services = new MockServices();
+    (global as any).Cu = mockComp.utils;
+    (global as any).Ci = mockComp.interfaces;
+    (global as any).Services = new MockServices();
 
     const {Log} = require("models/log");
     const {AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data");
@@ -157,8 +157,8 @@ describe("browser.runtime", function() {
   });
 
   after(function() {
-    global.Cu = null;
-    global.Ci = null;
-    global.Services = null;
+    (global as any).Cu = null;
+    (global as any).Ci = null;
+    (global as any).Services = null;
   });
 });

@@ -38,20 +38,17 @@ export const C = {
   get UI_TESTING() {
     return this.BUILD_ALIAS === "ui-testing";
   },
-  get NON_UI_TESTING() {
-    return this.BUILD_ALIAS === "non-ui-testing";
-  },
 
   LOG_PREFIX: "[RequestPolicy] ",
 
   EXTENSION_ID: "/* @echo EXTENSION_ID */",
 
-  // NOTE: do not generate the run ID here (except for non-UI tests),
+  // NOTE: do not generate the run ID here,
   //   because "constants.js" gets loaded multiple times, i.e.,
   //   in multiple environments.
   CONTEXT_ID: Math.random(),
   get RUN_ID() {
-    return this.NON_UI_TESTING ? this.CONTEXT_ID : RUN_ID;
+    return RUN_ID;
   },
 
   FIREFOX_ID: "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",

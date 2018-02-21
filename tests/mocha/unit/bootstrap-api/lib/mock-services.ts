@@ -7,32 +7,31 @@
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefBranch
 // =============================================================================
 
-function nsIPrefBranch() {}
-
-nsIPrefBranch.prototype.QueryInterface = function() {
-  return null;
-};
+class nsIPrefBranch {
+  QueryInterface() {
+    return null;
+  }
+}
 
 // =============================================================================
 // Partial mock of nsIPrefService XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrefService
 // =============================================================================
-function nsIPrefService() {}
 
-nsIPrefService.prototype.getBranch = function(aPrefRoot) {
-  return new nsIPrefBranch();
-};
+class nsIPrefService {
+  getBranch(aPrefRoot) {
+    return new nsIPrefBranch();
+  }
 
-nsIPrefService.prototype.savePrefFile = function(aFile) {};
+  savePrefFile(aFile) {}
+}
 
 // =============================================================================
 // Partial mock of Services.jsm
 // See : https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/Services.jsm
 // =============================================================================
 
-function Services() {
-  this.prefs = new nsIPrefService();
-  this.locale = {};
+export class Services {
+  prefs = new nsIPrefService();
+  locale = {};
 }
-
-module.exports = Services;

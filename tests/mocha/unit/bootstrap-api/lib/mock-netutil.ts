@@ -7,45 +7,43 @@
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIChannel
 // =============================================================================
 
-function nsIInputStream() {}
+class nsIInputStream {
+  available() {
+    return 0;
+  }
 
-nsIInputStream.prototype.available = function() {
-  return 0;
-};
-
-nsIInputStream.prototype.close = function() {};
+  close() {}
+}
 
 // =============================================================================
 // Partial mock of nsIChannel XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIChannel
 // =============================================================================
-function nsIChannel() {}
-
-nsIChannel.prototype.open = function() {
-  return new nsIInputStream();
-};
+class nsIChannel {
+  open() {
+    return new nsIInputStream();
+  }
+}
 
 // =============================================================================
 // Partial mock of NetUtil.jsm
 // See : https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/NetUtil.jsm
 // =============================================================================
 
-function NetUtil() {}
+export class NetUtil {
+  newURI(uri, charset) {
+    return "";
+  }
 
-NetUtil.prototype.newURI = function(uri, charset) {
-  return "";
-};
+  newChannel(uriObj) {
+    return new nsIChannel();
+  }
 
-NetUtil.prototype.newChannel = function(uriObj) {
-  return new nsIChannel();
-};
+  readInputStreamToString(inputStream, count, charset) {
+    return "";
+  }
 
-NetUtil.prototype.readInputStreamToString = function(inputStream, count, charset) {
-  return "";
-};
-
-NetUtil.prototype.asyncFetch = function(source, callback) {
-  return "";
-};
-
-module.exports = NetUtil;
+  asyncFetch(source, callback) {
+    return "";
+  }
+}

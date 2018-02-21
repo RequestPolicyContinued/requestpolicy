@@ -6,24 +6,23 @@
 // Partial mock of Components.utils XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.utils
 // =============================================================================
-function Utils() {}
-Utils.prototype.import = function(mod) {};
+class Utils {
+  import(mod) {}
+}
 
 // =============================================================================
 // Partial mock of Components.interfaces XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.interfaces
 // =============================================================================
-function Interfaces() {
-  this.nsIPrefBranch2 = null;
+class Interfaces {
+  public nsIPrefBranch2 = null;
 }
 
 // =============================================================================
 // Partial mock of Components XPCOM Class
 // See https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components_object
 // =============================================================================
-function Components() {
-  this.utils = new Utils();
-  this.interfaces = new Interfaces();
+export class Components {
+  public utils = new Utils();
+  public interfaces = new Interfaces();
 }
-
-module.exports = Components;

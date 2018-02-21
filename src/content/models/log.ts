@@ -108,7 +108,7 @@ export class Log {
   };
   private parent: Log | null = null;
 
-  private constructor(aOptions: ILogOptions, aParent?: Log) {
+  public constructor(aOptions?: ILogOptions, aParent?: Log) {
     const options: IAllLogOptions<null> =
         Object.assign({}, DEFAULT_OPTIONS, aOptions);
     let {enabled, name} = options;

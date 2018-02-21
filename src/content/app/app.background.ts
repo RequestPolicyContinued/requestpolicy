@@ -76,7 +76,6 @@ const localStorageArea = browser.storage.local;
 let webextSettingsMigration: LegacySideSettingsMigrationController | undefined;
 let legacy: LegacyModule | undefined;
 
-// @if EXTENSION_TYPE='legacy'
 if (C.EXTENSION_TYPE === "legacy") {
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
   const promiseEwePort = () => pEweBrowser.then(
@@ -95,7 +94,6 @@ if (C.EXTENSION_TYPE === "legacy") {
   );
   legacy = new LegacyModule(log, eweConnection, webextSettingsMigration);
 }
-// @endif
 
 const settingsMigration = new SettingsMigration(
     log,

@@ -60,6 +60,7 @@ export class LegacySideSettingsMigrationController extends Module {
       this.connectionToEWE.whenReady,
       pGotLastStorageChange,
     ]).then(() => {
+      this.log.log("checkpoint");
       this.connectionToEWE.onMessage.
           addListener(this.receiveMessage.bind(this));
       this.storage.onChanged.addListener(this.storageChanged.bind(this));

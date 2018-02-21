@@ -38,6 +38,7 @@ export class EweModule extends Module {
 
   public get subModules() {
     return {
+      legacyConnection: this.legacyConnection,
       settingsMigration: this.settingsMigration,
     };
   }

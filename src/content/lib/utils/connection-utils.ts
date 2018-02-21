@@ -35,3 +35,26 @@ export function getPortFromSlaveConnectable(
     connectable.onConnect.addListener(onConnectListener);
   });
 }
+
+export function getPortFromMasterConnectable(
+    connectable: {
+      sendMessage: typeof browser.runtime.sendMessage;
+      connect: typeof browser.runtime.connect;
+    },
+    maxTries: number = 100,
+): Promise<Port> {
+  return new Promise(async (resolve, reject) => {
+    let response: any;
+    let i = -1;
+    do {
+      ++i;
+      console.log(`trying to connect to slave, try #${i}`);
+      if (i >= maxTries) {
+        reject(`slave did not respond, even after ${maxTries} tries`);
+        return;
+      }
+      response = await connectable.sendMessage("isConnectionSlaveReady");
+    } while (response !== "connectionSlaveIsReady");
+    resolve();
+  }).then(() => browser.runtime.connect());
+}

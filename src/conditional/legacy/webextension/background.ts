@@ -26,10 +26,11 @@ import {
 } from "controllers/webext-side-settings-migration-controller";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
+import { getPortFromMasterConnectable } from "lib/utils/connection-utils";
 import { Log } from "models/log";
 
 const log = Log.instance;
-const promiseLegacyPort = () => Promise.resolve(browser.runtime.connect());
+const promiseLegacyPort = () => getPortFromMasterConnectable(browser.runtime);
 const legacyConnection = new Connection(
     C.EWE_CONNECTION_EWE_ID,
     log,

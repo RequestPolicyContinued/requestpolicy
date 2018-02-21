@@ -141,7 +141,8 @@ define make_files
 endef
 
 .PHONY: all \
-	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi
+	xpi nightly-xpi beta-xpi ui-testing-xpi amo-beta-xpi amo-nightly-xpi \
+	nightly-files
 
 all: xpi
 xpi: nightly-xpi
@@ -157,6 +158,9 @@ amo-beta-xpi: node-packages
 	$(call make_xpi,amo-beta)
 amo-nightly-xpi: node-packages
 	$(call make_xpi,amo-nightly)
+
+nightly-files: node-packages
+	$(call make_files,nightly)
 
 xpi_file__nightly      := $(dist_dir)/$(extension_name)-legacy-nightly.xpi
 xpi_file__dev          := $(dist_dir)/$(extension_name)-legacy-dev.xpi

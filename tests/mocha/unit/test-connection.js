@@ -22,7 +22,7 @@ describe("connection", function() {
         moduleName,
         Log.instance,
         targetName,
-        Promise.resolve(port)
+        () => Promise.resolve(port)
     );
   });
 

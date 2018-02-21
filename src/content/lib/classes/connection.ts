@@ -53,9 +53,12 @@ export class Connection<TRx, TRxResp> extends Module {
   }
 
   public async startupSelf() {
-    const pPort = this.promisePort();
-    pPort.catch(this.log.onError("promisePort()"));
-    this.port = await pPort;
+    try {
+      this.port = await this.promisePort();
+    } catch (e) {
+      this.log.error("failed to get port", e);
+      return;
+    }
     this.port.onMessage.addListener(this.receiveMessage.bind(this));
     this.port.postMessage(this.buildMessage("startup", "ready", false));
     // NOTE: the startup is NOT done yet

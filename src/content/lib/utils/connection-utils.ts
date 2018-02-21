@@ -25,6 +25,7 @@ type Port = browser.runtime.Port;
 export function getPortFromSlaveConnectable(
     connectable: {
       onConnect: typeof browser.runtime.onConnect;
+      onMessage: typeof browser.runtime.onMessage;
     },
 ): Promise<Port> {
   return new Promise<Port>((resolve, reject) => {
@@ -33,6 +34,18 @@ export function getPortFromSlaveConnectable(
       connectable.onConnect.removeListener(onConnectListener);
     };
     connectable.onConnect.addListener(onConnectListener);
+
+    const onMessageListener = (
+        message: any,
+        sender: browser.runtime.MessageSender,
+        sendResponse: (response: any) => void,
+    ) => {
+      if (message === "isConnectionSlaveReady") {
+        sendResponse("connectionSlaveIsReady");
+        connectable.onMessage.removeListener(onMessageListener);
+      }
+    };
+    connectable.onMessage.addListener(onMessageListener);
   });
 }
 
@@ -53,7 +66,12 @@ export function getPortFromMasterConnectable(
         reject(`slave did not respond, even after ${maxTries} tries`);
         return;
       }
-      response = await connectable.sendMessage("isConnectionSlaveReady");
+      try {
+        response = await connectable.sendMessage("isConnectionSlaveReady");
+      } catch (e) {
+        // uncomment for inspection
+        console.dir(e);
+      }
     } while (response !== "connectionSlaveIsReady");
     resolve();
   }).then(() => browser.runtime.connect());

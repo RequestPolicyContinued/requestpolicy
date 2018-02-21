@@ -33,7 +33,7 @@ export class LegacyModule extends Module {
       public readonly eweConnection: Connection<any, any>,
       public readonly settingsMigration: LegacySideSettingsMigrationController,
   ) {
-    super("LegacyModules", log);
+    super("app.legacy", log);
   }
 
   public get subModules() {

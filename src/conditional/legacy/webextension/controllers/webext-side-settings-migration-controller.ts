@@ -44,7 +44,7 @@ export class WebextSideSettingsMigrationController extends Module {
       private connectionToLegacy: IConnection,
       private storage: typeof browser.storage,
   ) {
-    super("Legacy settings migration (EWE)", log);
+    super("ewe.settingsMigration", log);
   }
 
   public startupSelf() {

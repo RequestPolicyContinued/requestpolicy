@@ -48,7 +48,7 @@ export class LegacySideSettingsMigrationController extends Module {
       private storage: typeof browser.storage,
       private connectionToEWE: IConnection,
   ) {
-    super("Legacy settings migration", log);
+    super("app.legacy.settingsMigration", log);
   }
 
   protected startupSelf(): Promise<void> {

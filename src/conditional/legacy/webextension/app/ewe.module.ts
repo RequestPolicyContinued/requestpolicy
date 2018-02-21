@@ -33,7 +33,7 @@ export class EweModule extends Module {
       public readonly legacyConnection: Connection<any, any>,
       public readonly settingsMigration: WebextSideSettingsMigrationController,
   ) {
-    super("LegacyModules", log);
+    super("ewe", log);
   }
 
   public get subModules() {

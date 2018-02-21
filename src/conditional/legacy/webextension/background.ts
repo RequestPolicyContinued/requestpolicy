@@ -27,9 +27,13 @@ import {
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
 import { getPortFromMasterConnectable } from "lib/utils/connection-utils";
-import { Log } from "models/log";
+import { Log, LogLevel } from "models/log";
 
-const log = Log.instance;
+const log = new Log({
+  enabled: true,
+  level: LogLevel.ALL,
+  name: "ewe",
+});
 const promiseLegacyPort = () => getPortFromMasterConnectable(browser.runtime);
 const legacyConnection = new Connection(
     C.EWE_CONNECTION_EWE_ID,

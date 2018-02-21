@@ -70,7 +70,7 @@ export function getPortFromMasterConnectable(
         response = await connectable.sendMessage("isConnectionSlaveReady");
       } catch (e) {
         // uncomment for inspection
-        console.dir(e);
+        // console.dir(e);
       }
     } while (response !== "connectionSlaveIsReady");
     resolve();

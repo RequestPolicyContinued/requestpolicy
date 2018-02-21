@@ -40,6 +40,8 @@ export class LegacyModule extends Module {
 
   public get subModules() {
     return {
+      ewe: this.ewe,
+      eweConnection: this.eweConnection,
       settingsMigration: this.settingsMigration,
     };
   }

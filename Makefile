@@ -421,7 +421,7 @@ mocha-tests: ALIASES := unit legacy-integration
 mocha-unit-tests: ALIASES := unit
 mocha-integration-tests: ALIASES := legacy-integration
 $(_mocha_test_targets): node-packages
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/ \
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/:src/conditional/legacy/webextension/ \
 	$(MOCHA) \
 		--recursive \
 		--compilers coffee:coffeescript/register \

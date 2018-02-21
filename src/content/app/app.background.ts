@@ -78,9 +78,13 @@ let legacy: LegacyModule | undefined;
 
 if (C.EXTENSION_TYPE === "legacy") {
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
-  const promiseEwePort = () => pEweBrowser.then(
-      (eweBrowser) => getPortFromSlaveConnectable(eweBrowser.runtime),
-  );
+  const promiseEwePort = () => {
+    log.log("promiseEwePort()");
+    return pEweBrowser.then((eweBrowser) => {
+      log.log("eweBrowser");
+      return getPortFromSlaveConnectable(eweBrowser.runtime);
+    });
+  };
   const eweConnection = new Connection(
       C.EWE_CONNECTION_LEGACY_ID,
       log,

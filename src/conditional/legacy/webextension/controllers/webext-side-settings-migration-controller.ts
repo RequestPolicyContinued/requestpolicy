@@ -113,18 +113,22 @@ export class WebextSideSettingsMigrationController extends Module {
       case "request":
         switch (aMessage.value) {
           case "full-storage":
-            return this.respond("request:full-storage", this.getFullStorage());
+            return this.respond(
+                "request:full-storage",
+                () => this.getFullStorage(),
+            );
           default:
             return Promise.reject(`Unknown '${aMessage.value}' request.`);
         }
       case "full-storage":
         return this.respond(
             "full-storage",
-            this.setFullStorage(aMessage.value),
+            () => this.setFullStorage(aMessage.value),
         );
       case "storage-change":
-        return this.respond("storage-change",
-            this.applyStorageChange(aMessage.value as StorageChange));
+        return this.respond(
+            "storage-change",
+            () => this.applyStorageChange(aMessage.value as StorageChange));
       default:
         return Promise.reject(`Unknown type '${aMessage.type}'.`);
     }
@@ -144,17 +148,21 @@ export class WebextSideSettingsMigrationController extends Module {
     );
   }
 
-  private respond<T = void>(
+  private async respond<T = void>(
       aMsgType: StorageMessageType,
-      aPromise: Promise<T>,
+      getResponseValue: () => Promise<T>,
   ) {
     const responseMsgType = `${aMsgType}:response`;
-    return aPromise.then((value?: T) => this.createMessage(
-        responseMsgType,
-        value,
-    )).catch((e: any) => this.createMessage(
-        responseMsgType,
-        {error: e.toString()},
-    ));
+    try {
+      return getResponseValue().then((value?: T) => this.createMessage(
+          responseMsgType,
+          value,
+      ));
+    } catch (e) {
+      return this.createMessage(
+          responseMsgType,
+          {error: e.toString()},
+      );
+    }
   }
 }

@@ -21,7 +21,6 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import { EmbeddedWebExtension } from "app/legacy/embedded-we";
 import {
   LegacySideSettingsMigrationController,
 } from "app/legacy/legacy-side-settings-migration-controller";
@@ -80,7 +79,6 @@ let legacy: LegacyModule | undefined;
 // @if EXTENSION_TYPE='legacy'
 if (C.EXTENSION_TYPE === "legacy") {
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
-  const ewe = new EmbeddedWebExtension(log, pEweBrowser);
   const promiseEwePort = () => pEweBrowser.then(
       (eweBrowser) => getPortFromSlaveConnectable(eweBrowser.runtime),
   );
@@ -95,7 +93,7 @@ if (C.EXTENSION_TYPE === "legacy") {
       browser.storage,
       eweConnection,
   );
-  legacy = new LegacyModule(log, ewe, eweConnection, webextSettingsMigration);
+  legacy = new LegacyModule(log, eweConnection, webextSettingsMigration);
 }
 // @endif
 

@@ -20,7 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { EmbeddedWebExtension } from "app/legacy/embedded-we";
 import {
   LegacySideSettingsMigrationController,
 } from "app/legacy/legacy-side-settings-migration-controller";
@@ -31,7 +30,6 @@ import { Log } from "models/log";
 export class LegacyModule extends Module {
   constructor(
       log: Log,
-      public readonly ewe: EmbeddedWebExtension,
       public readonly eweConnection: Connection<any, any>,
       public readonly settingsMigration: LegacySideSettingsMigrationController,
   ) {
@@ -40,7 +38,6 @@ export class LegacyModule extends Module {
 
   public get subModules() {
     return {
-      ewe: this.ewe,
       eweConnection: this.eweConnection,
       settingsMigration: this.settingsMigration,
     };

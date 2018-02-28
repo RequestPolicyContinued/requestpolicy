@@ -1,9 +1,29 @@
 /* exported
+    createRPFile,
+    removeAllRPFiles,
     copyRulesetFileToProfile,
     deleteFileFromProfile,
 */
 
 const RPFileUtils = require("bootstrap/lib/utils/file-utils");
+
+function createRPFile(aPath, aContent) {
+  const file = RPFileUtils.getRPFile(aPath);
+
+  const foStream = Cc["@mozilla.org/network/file-output-stream;1"].
+      createInstance(Ci.nsIFileOutputStream);
+  foStream.init(file, 0x02 | 0x08 | 0x20, 0o666, 0);
+
+  const converter = Cc["@mozilla.org/intl/converter-output-stream;1"].
+      createInstance(Ci.nsIConverterOutputStream);
+  converter.init(foStream, "UTF-8", 0, 0);
+  converter.writeString(aContent);
+  converter.close(); // this closes foStream
+}
+
+function removeAllRPFiles() {
+  RPFileUtils.getRPDir().remove(true);
+}
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {

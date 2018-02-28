@@ -35,38 +35,47 @@ interface IFile {
   isFile(): boolean;
   isDirectory(): boolean;
 }
-interface IFileObject {
-  [k: string]: IFile;
-}
-
-// =============================================================================
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
 // =============================================================================
 
+function getRPPath(aPath: string) {
+  return REQUESTPOLICY_DIR + (aPath ? "/" + aPath : "");
+}
+
 export function getRPFile(aPath: string) {
-  const path = `${REQUESTPOLICY_DIR}/${aPath}`;
-  const pathArray = path.split("/");
-  return MozFileUtils.getFile("ProfD", pathArray);
+  return getProfileFile(getRPPath(aPath));
+}
+
+export function getRPDir(aPath: string, shouldCreate?: boolean) {
+  return getProfileDir(getRPPath(aPath), shouldCreate);
+}
+
+function getProfileFile(aPath: string) {
+  return MozFileUtils.getFile("ProfD", aPath.split("/"));
+}
+
+function getProfileDir(aPath: string, shouldCreate: boolean = true) {
+  return MozFileUtils.getDir("ProfD", aPath.split("/"), shouldCreate);
 }
 
 export function getAllRPFiles(aDir?: {
     path: string,
     file: IFile,
-}): IFileObject {
-  const dirPath = aDir ? aDir.path : "requestpolicy";
+}): string[] {
+  const dirPath = aDir ? aDir.path : "";
   const dirFile = aDir ? aDir.file : getRPFile(dirPath);
-  if (!dirFile.exists()) return {};
+  if (!dirFile.exists()) return [];
   const entries = dirFile.directoryEntries;
-  const files: IFileObject = {};
+  let files: string[] = [];
   while (entries.hasMoreElements()) {
     const file: IFile = entries.getNext().QueryInterface(Ci.nsIFile);
-    const path: string = `${dirPath}/${file.leafName}`;
+    const path: string = (dirPath ? `${dirPath}/` : "") + file.leafName;
     if (file.isFile()) {
-      files[path] = file;
+      files.push(path);
     } else if (file.isDirectory()) {
-      Object.assign(files, getAllRPFiles({path, file}));
+      files = files.concat(getAllRPFiles({path, file}));
     }
   }
   return files;

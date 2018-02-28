@@ -39,13 +39,18 @@ function getFile(aKey: string) {
   return FileUtils.getRPFile(`${aKey}.json`);
 }
 
+function getKeyFromPath(aPath: string) {
+  return aPath.replace(/\.json$/, "");
+}
+
 // =============================================================================
 
 export const JsonPrefs = {
   getAll() {
     const allFiles = FileUtils.getAllRPFiles();
     const allPrefs: {[k: string]: any} = {};
-    Object.keys(allFiles).forEach((key) => {
+    allFiles.forEach((path) => {
+      const key = getKeyFromPath(path);
       allPrefs[key] = this.get(key);
     });
     return allPrefs;

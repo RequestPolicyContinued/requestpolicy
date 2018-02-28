@@ -1,17 +1,35 @@
 #!/bin/bash
 
+set -euo pipefail
+
 TEST_DIR=`dirname $0`/xpcshell
 
-MOZ_SRC_DIR=/moz/mozilla-central
+MOZ_SRC_DIR=/moz/source
 MOZ_OBJ_DIR=($MOZ_SRC_DIR/obj-*)
 MOZ_BIN_DIR=$MOZ_OBJ_DIR/dist/bin
 
-if [ "$1" = "--help" ]; then
-  echo 'Hints:'
-  echo '  * Append a test filename to run a single test. Example:'
-  echo "      $0 test_file.js"
-  echo
-else
+NO_MAKE=
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+
+  case $key in
+    --no-make)
+    NO_MAKE=YES
+    shift
+    ;;
+
+    *)
+    POSITIONAL+=("$1")
+    shift
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+if [ "$NO_MAKE" != "YES" ]; then
   (cd `dirname $0`/.. ; make nightly-files)
 fi
 

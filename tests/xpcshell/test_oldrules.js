@@ -1,21 +1,19 @@
 /* exported run_test */
-Cu.import("chrome://rpcontinued/content/lib/classes/old-rules.jsm");
-Cu.import("chrome://rpcontinued/content/models/prefs.jsm");
+const {OldRules} = require("lib/classes/old-rules");
+const {Prefs} = require("bootstrap/models/prefs");
 
 
 function run_test() {
   "use strict";
 
-  test_0();
-  test_1();
-  test_2();
+  run_next_test();
 }
 
 
 /**
  * Usual rulues.
  */
-function test_0() {
+add_test(function() {
   "use strict";
 
   testGetOldRulesAsNewRules(
@@ -104,13 +102,15 @@ function test_0() {
       {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}},
     ]);
   });
-}
+
+  run_next_test();
+});
 
 
 /**
  * Rules where the URIs don't have an "authority" part.
  */
-function test_1() {
+add_test(function() {
   "use strict";
 
   testGetOldRulesAsNewRules(
@@ -135,13 +135,15 @@ function test_1() {
         {o: {s: "foo6o"}, d: {s: "foo6d"}},
       ]
   );
-}
+
+  run_next_test();
+});
 
 
 /**
  * Special cases.
  */
-function test_2() {
+add_test(function() {
   "use strict";
 
   // invalid rules
@@ -149,7 +151,7 @@ function test_2() {
   function testInvalidRule(originToDest) {
     Assert.throws(function() {
       testGetOldRulesAsNewRules(["", "", originToDest], []);
-    }, OldRulesParseError);
+    }, /^OldRulesParseError: Invalid old rule/);
   }
 
   testInvalidRule("|");
@@ -184,7 +186,9 @@ function test_2() {
         {o: {s: "http", h: "foo.bar.الاردن"}},
       ]
   );
-}
+
+  run_next_test();
+});
 
 
 function usingOldRulePrefs(aPrefs, aFunction) {

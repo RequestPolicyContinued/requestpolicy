@@ -3,7 +3,7 @@
     deleteFileFromProfile,
 */
 
-Components.utils.import("chrome://rpcontinued/content/lib/utils/files.jsm-utils");
+const RPFileUtils = require("bootstrap/lib/utils/file-utils");
 
 function copyRulesetFileToProfile(filename, destFilename) {
   if (!destFilename) {
@@ -11,7 +11,7 @@ function copyRulesetFileToProfile(filename, destFilename) {
     destFilename = "";
   }
   const testResources = do_get_file("resources", false);
-  const profilePolicyDir = FileUtil.getRPUserDir("policies");
+  const profilePolicyDir = RPFileUtils.getRPDir("policies");
   const file = testResources.clone();
   file.append(filename);
   if (!file.exists()) {
@@ -25,7 +25,7 @@ function copyRulesetFileToProfile(filename, destFilename) {
  * @throws If the file to delete doesn't exist.
  */
 function deleteFileFromProfile(filename) {
-  const profilePolicyDir = FileUtil.getRPUserDir("policies");
+  const profilePolicyDir = RPFileUtils.getRPDir("policies");
   const file = profilePolicyDir.clone();
   file.append(filename);
   file.remove(false);

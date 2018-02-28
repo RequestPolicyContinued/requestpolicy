@@ -1,9 +1,15 @@
-/* exported Cc, Ci, Cr, Cu */
-const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
+/* exported Cc, Ci, Cr, Cu, require */
+const {
+  classes: Cc,
+  interfaces: Ci,
+  manager: Cm,
+  results: Cr,
+  utils: Cu,
+} = Components;
 
 // Note: "resource://test" always resolves to the current test folder.
 
-Cu.import("resource://gre/modules/Services.jsm");
+const {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
 // -----------------------------------------------------------------------------
 // Initialize the profile.
@@ -23,7 +29,7 @@ function getRPChromeManifest() {
   const cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
   const manifestFile = cwd.parent.parent.clone();
-  manifestFile.appendRelativePath("build/nightly/chrome.manifest");
+  manifestFile.appendRelativePath("build/legacy/nightly/chrome.manifest");
   return manifestFile;
 }
 
@@ -35,23 +41,73 @@ function registerRPChromeManifest() {
 registerRPChromeManifest();
 
 // -----------------------------------------------------------------------------
+// CommonJS
+// -----------------------------------------------------------------------------
+
+const {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+const {Loader} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
+const {console} = Cu.import("resource://gre/modules/Console.jsm", {});
+const {clearTimeout, setTimeout} = Cu.import("resource://gre/modules/Timer.jsm");
+
+const RUN_ID = Math.random();
+
+const LegacyApi = {};
+
+function getGlobals() {
+  return {
+    Cc, Ci, Cm, Cr, Cu,
+    ComponentsID: Components.ID,
+    RUN_ID,
+    Services,
+    XPCOMUtils,
+
+    clearTimeout,
+    console,
+    setTimeout,
+
+    LegacyApi,
+  };
+}
+
+function createCommonjsEnv() {
+  let loaderWrapper = {};
+  let main;
+
+  return {
+    load(mainFile) {
+      let globals = getGlobals();
+      // eslint-disable-next-line new-cap
+      loaderWrapper.loader = Loader.Loader({
+        paths: Object.assign({
+          "toolkit/": "resource://gre/modules/commonjs/toolkit/",
+          "": "chrome://rpcontinued/content/",
+        }),
+        globals,
+      });
+      main = Loader.main(loaderWrapper.loader, mainFile);
+      return main;
+    },
+    unload: (function(Loader, loaderWrapper) {
+      return function unload(aReason) {
+        Loader.unload(loaderWrapper.loader, aReason);
+      };
+    })(Loader, loaderWrapper),
+  };
+}
+
+const COMMONJS = createCommonjsEnv();
+const require = COMMONJS.load.bind(COMMONJS);
+
+// -----------------------------------------------------------------------------
+// LegacyApi
+// -----------------------------------------------------------------------------
+
+LegacyApi.prefs = require("bootstrap/models/prefs").Prefs;
+
+// -----------------------------------------------------------------------------
 // Load the default preferences
 // -----------------------------------------------------------------------------
 
-Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
-                                    "main/default-pref-handler.js", {});
-
-// -----------------------------------------------------------------------------
-// Set up the Log module
-// -----------------------------------------------------------------------------
-
-{
-  let tmpScope = {};
-  Cu.import("chrome://rpcontinued/content/models/log.jsm", tmpScope);
-
-  // Use |do_print| instead of |dump| because that's what's
-  // available for xpcshell tests.
-  tmpScope.Log.printFunc = function(msg) {
-    do_print(msg.trimRight());
-  };
-}
+const {DefaultPreferencesController} =
+    require("bootstrap/controllers/default-preferences-controller");
+DefaultPreferencesController.startup();

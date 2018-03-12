@@ -21,19 +21,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {RuleData} from "app/policy/policy.module";
+import {BackgroundPage} from "main";
 import {$id} from "./common";
 
-(function() {
-  var {
+(() => {
+  const {
     LegacyApi,
     OldRules,
     rp,
     RuleUtils,
-  } = browser.extension.getBackgroundPage();
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
 
-  var rules = null;
+  let rules: RuleData[];
 
   // currently unused
   // function clearRulesTable() {
@@ -46,22 +48,30 @@ import {$id} from "./common";
   // }
 
   function populateRuleTable() {
-    var table = $id("rules");
+    const table = $id("rules");
 
-    var oldRules = new OldRules();
+    const oldRules = new OldRules();
     // Setting the global rules var here.
     rules = oldRules.getAsNewRules();
 
-    for (var i = 0; i < rules.length; i++) {
-      var entry = rules[i];
-      var origin = entry.o ?
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < rules.length; i++) {
+      const entry = rules[i];
+      const origin = entry.o ?
         RuleUtils.endpointSpecToDisplayString(entry.o) : "";
-      var dest = entry.d ? RuleUtils.endpointSpecToDisplayString(entry.d) : "";
+      const dest = entry.d ?
+          RuleUtils.endpointSpecToDisplayString(entry.d) : "";
       addRulesTableRow(table, "allow", origin, dest, entry);
     }
   }
 
-  function addRulesTableRow(table, ruleAction, origin, dest, ruleData) {
+  function addRulesTableRow(
+      table: HTMLTableElement,
+      ruleAction: "allow" | "block",
+      origin: string,
+      dest: string,
+      ruleData: RuleData,
+  ) {
     let actionClass;
     let action;
     if (ruleAction === "allow") {
@@ -72,16 +82,16 @@ import {$id} from "./common";
       action = browser.i18n.getMessage("block");
     }
 
-    var row = $("<tr>").addClass(actionClass).appendTo(table);
+    const row = $("<tr>").addClass(actionClass).appendTo(table);
 
     row.append(
         $("<td>").text(action),
         $("<td>").text(origin),
-        $("<td>").text(dest)
+        $("<td>").text(dest),
     );
   }
 
-  window.deleteOldRules = function() {
+  (window as any).deleteOldRules = () => {
     LegacyApi.prefs.reset("allowedOrigins");
     LegacyApi.prefs.reset("allowedDestinations");
     LegacyApi.prefs.reset("allowedOriginsToDestinations");
@@ -93,15 +103,15 @@ import {$id} from "./common";
     $("#deleteOldRules").hide();
   };
 
-  window.showReimportOptions = function() {
+  (window as any).showReimportOptions = () => {
     $("#showReimportOptions").hide();
     $("#reimportOldRules").show();
   };
 
-  window.importOldRules = function() {
+  (window as any).importOldRules = () => {
     if (!rules || rules.length === 0) {
       // eslint-disable-next-line no-throw-literal
-      throw "rules is undefined or empty";
+      throw new Error("rules is undefined or empty");
     }
     rp.policy.addAllowRules(rules);
     $("#doimport").hide();
@@ -110,8 +120,8 @@ import {$id} from "./common";
     $("#importdone").show();
   };
 
-  window.onload = function() {
-    var oldRulesExist = LegacyApi.prefs.oldRulesExist();
+  window.onload = () => {
+    const oldRulesExist = LegacyApi.prefs.oldRulesExist();
     if (!oldRulesExist) {
       $("#hasrules").hide();
       $("#norules").show();

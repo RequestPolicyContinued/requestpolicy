@@ -55,7 +55,7 @@ export class OldRules {
    * @param  {string|nsIURI} aEndpoint
    * @return {boolean}
    */
-  public static shouldWildcardBeAddedToEndpoint(aEndpoint: any) {
+  private static shouldWildcardBeAddedToEndpoint(aEndpoint: any) {
     if (!IDNService) {
       IDNService = Cc["@mozilla.org/network/idn-service;1"].
           getService(Ci.nsIIDNService);
@@ -92,7 +92,7 @@ export class OldRules {
    * @param {string} aEndpointString
    * @return {Object} The endpoints' specifications.
    */
-  public static getEndpointSpecFromString(aEndpointString: string) {
+  private static getEndpointSpecFromString(aEndpointString: string) {
     const spec: any = {};
     if (DomainUtil.isValidUri(aEndpointString)) {
       const uriObj = DomainUtil.getUriObject(aEndpointString);
@@ -151,45 +151,6 @@ export class OldRules {
   }
 
   /**
-   * The three strings containing the old rules.
-   */
-  public get prefStrings() {
-    if (!this.lazyPrefStrings) {
-      this.lazyPrefStrings = this.customPrefStrings || {
-        dests: OldRules.getPrefString("allowedDestinations"),
-        origins: OldRules.getPrefString("allowedOrigins"),
-        originsToDests: OldRules.getPrefString(
-            "allowedOriginsToDestinations"),
-      };
-    }
-    return this.lazyPrefStrings;
-  }
-
-  /**
-   * Three `Set`s containing the rules as strings.
-   */
-  public get prefStringSets() {
-    function splitString(aRulesString: string): Set<string> {
-      const rules = new Set(aRulesString.split(" "));
-
-      // The string might contain double spaces.
-      rules.delete("");
-
-      return rules;
-    }
-
-    if (!this.lazyPrefStringSets) {
-      const {origins, dests, originsToDests} = this.prefStrings;
-      this.lazyPrefStringSets = {
-        dests: splitString(dests),
-        origins: splitString(origins),
-        originsToDests: splitString(originsToDests),
-      };
-    }
-    return this.lazyPrefStringSets;
-  }
-
-  /**
    * Convert the pref strings to rule objects.
    *
    * @return {Array<Object>}
@@ -233,6 +194,45 @@ export class OldRules {
     }
 
     return rules;
+  }
+
+  /**
+   * The three strings containing the old rules.
+   */
+  private get prefStrings() {
+    if (!this.lazyPrefStrings) {
+      this.lazyPrefStrings = this.customPrefStrings || {
+        dests: OldRules.getPrefString("allowedDestinations"),
+        origins: OldRules.getPrefString("allowedOrigins"),
+        originsToDests: OldRules.getPrefString(
+            "allowedOriginsToDestinations"),
+      };
+    }
+    return this.lazyPrefStrings;
+  }
+
+  /**
+   * Three `Set`s containing the rules as strings.
+   */
+  private get prefStringSets() {
+    function splitString(aRulesString: string): Set<string> {
+      const rules = new Set(aRulesString.split(" "));
+
+      // The string might contain double spaces.
+      rules.delete("");
+
+      return rules;
+    }
+
+    if (!this.lazyPrefStringSets) {
+      const {origins, dests, originsToDests} = this.prefStrings;
+      this.lazyPrefStringSets = {
+        dests: splitString(dests),
+        origins: splitString(origins),
+        originsToDests: splitString(originsToDests),
+      };
+    }
+    return this.lazyPrefStringSets;
   }
 }
 

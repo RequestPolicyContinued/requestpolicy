@@ -51,72 +51,6 @@ let IDNService: any = null;
 
 export class OldRules {
   /**
-   * @static
-   * @param  {string|nsIURI} aEndpoint
-   * @return {boolean}
-   */
-  private static shouldWildcardBeAddedToEndpoint(aEndpoint: any) {
-    if (!IDNService) {
-      IDNService = Cc["@mozilla.org/network/idn-service;1"].
-          getService(Ci.nsIIDNService);
-    }
-    let host: string | null;
-    let getBaseDomain;
-    if (aEndpoint instanceof Ci.nsIURI) {
-      const uri = aEndpoint;
-      host = DomainUtil.getHostByUriObj(uri);
-      getBaseDomain = () => Services.eTLD.getBaseDomain(uri, 0);
-    } else {
-      host = aEndpoint;
-      getBaseDomain = () => Services.eTLD.getBaseDomainFromHost(host, 0);
-    }
-
-    try {
-      let baseDomain = getBaseDomain();
-      baseDomain = IDNService.convertToDisplayIDN(baseDomain, {});
-      return host === baseDomain;
-    } catch (e) {
-      if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
-        return false;
-      } else if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
-        return false;
-      } else {
-        // eslint-disable-next-line no-throw-literal
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * @static
-   * @param {string} aEndpointString
-   * @return {Object} The endpoints' specifications.
-   */
-  private static getEndpointSpecFromString(aEndpointString: string) {
-    const spec: any = {};
-    if (DomainUtil.isValidUri(aEndpointString)) {
-      const uriObj = DomainUtil.getUriObject(aEndpointString);
-      spec.s = uriObj.scheme;
-      const host = DomainUtil.getHostByUriObj(uriObj);
-      if (host !== null) {
-        spec.h = host;
-        if (OldRules.shouldWildcardBeAddedToEndpoint(uriObj)) {
-          spec.h = `*.${spec.h}`;
-        }
-        if (uriObj.port !== -1) {
-          spec.port = uriObj.port;
-        }
-      }
-    } else {
-      spec.h = aEndpointString.split("/")[0];
-      if (OldRules.shouldWildcardBeAddedToEndpoint(spec.h)) {
-        spec.h = `*.${spec.h}`;
-      }
-    }
-    return spec;
-  }
-
-  /**
    * @param {string} aPrefName
    * @return {string} The value of the pref, or an empty string if
    *     the pref does not exist.
@@ -135,6 +69,8 @@ export class OldRules {
   private customPrefStrings: IPrefStrings | null = null;
   private lazyPrefStrings: IPrefStrings;
   private lazyPrefStringSets: IPrefStringSets;
+
+  private eTLDService = Services.eTLD;
 
   constructor(
       aOrigins = "",
@@ -162,14 +98,14 @@ export class OldRules {
     // tslint:disable-next-line prefer-const
     for (let origin of origins) {
       rules.push({
-        o: OldRules.getEndpointSpecFromString(origin),
+        o: this.getEndpointSpecFromString(origin),
       });
     }
 
     // tslint:disable-next-line prefer-const
     for (let dest of dests) {
       rules.push({
-        d: OldRules.getEndpointSpecFromString(dest),
+        d: this.getEndpointSpecFromString(dest),
       });
     }
 
@@ -181,8 +117,8 @@ export class OldRules {
         const [origin, dest] = parts;
         if (origin !== "" && dest !== "") {
           rules.push({
-            d: OldRules.getEndpointSpecFromString(dest),
-            o: OldRules.getEndpointSpecFromString(origin),
+            d: this.getEndpointSpecFromString(dest),
+            o: this.getEndpointSpecFromString(origin),
           });
           continue;
         }
@@ -194,6 +130,70 @@ export class OldRules {
     }
 
     return rules;
+  }
+
+  /**
+   * @param  {string|nsIURI} aEndpoint
+   * @return {boolean}
+   */
+  private shouldWildcardBeAddedToEndpoint(aEndpoint: any) {
+    if (!IDNService) {
+      IDNService = Cc["@mozilla.org/network/idn-service;1"].
+          getService(Ci.nsIIDNService);
+    }
+    let host: string | null;
+    let getBaseDomain;
+    if (aEndpoint instanceof Ci.nsIURI) {
+      const uri = aEndpoint;
+      host = DomainUtil.getHostByUriObj(uri);
+      getBaseDomain = () => this.eTLDService.getBaseDomain(uri, 0);
+    } else {
+      host = aEndpoint;
+      getBaseDomain = () => this.eTLDService.getBaseDomainFromHost(host, 0);
+    }
+
+    try {
+      let baseDomain = getBaseDomain();
+      baseDomain = IDNService.convertToDisplayIDN(baseDomain, {});
+      return host === baseDomain;
+    } catch (e) {
+      if (e.name === "NS_ERROR_INSUFFICIENT_DOMAIN_LEVELS") {
+        return false;
+      } else if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
+        return false;
+      } else {
+        // eslint-disable-next-line no-throw-literal
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * @param {string} aEndpointString
+   * @return {Object} The endpoints' specifications.
+   */
+  private getEndpointSpecFromString(aEndpointString: string) {
+    const spec: any = {};
+    if (DomainUtil.isValidUri(aEndpointString)) {
+      const uriObj = DomainUtil.getUriObject(aEndpointString);
+      spec.s = uriObj.scheme;
+      const host = DomainUtil.getHostByUriObj(uriObj);
+      if (host !== null) {
+        spec.h = host;
+        if (this.shouldWildcardBeAddedToEndpoint(uriObj)) {
+          spec.h = `*.${spec.h}`;
+        }
+        if (uriObj.port !== -1) {
+          spec.port = uriObj.port;
+        }
+      }
+    } else {
+      spec.h = aEndpointString.split("/")[0];
+      if (this.shouldWildcardBeAddedToEndpoint(spec.h)) {
+        spec.h = `*.${spec.h}`;
+      }
+    }
+    return spec;
   }
 
   /**

@@ -21,14 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Module } from "lib/classes/module";
+import { IRuleSpec } from "lib/ruleset";
 import * as DomainUtil from "lib/utils/domain-utils";
-import {
-  getComplexValueFromPrefBranch,
-} from "lib/utils/try-catch-utils";
+import { Log } from "models/log";
 
 declare const Cc: any;
 declare const Ci: any;
-declare const LegacyApi: any;
 declare const Services: any;
 
 interface IPrefStrings {
@@ -37,63 +36,37 @@ interface IPrefStrings {
   originsToDests: string;
 }
 
-interface IPrefStringSets {
-  dests: Set<IPrefStrings["dests"]>;
-  origins: Set<IPrefStrings["origins"]>;
-  originsToDests: Set<IPrefStrings["originsToDests"]>;
-}
-
 let IDNService: any = null;
 
+function splitString(aRulesString: string): Set<string> {
+  const rules = new Set(aRulesString.split(" "));
+
+  // The string might contain double spaces.
+  rules.delete("");
+
+  return rules;
+}
+
 // =============================================================================
-// OldRules
+// V0RulesService
 // =============================================================================
 
-export class OldRules {
-  /**
-   * @param {string} aPrefName
-   * @return {string} The value of the pref, or an empty string if
-   *     the pref does not exist.
-   */
-  private static getPrefString(aPrefName: string): string {
-    const result = getComplexValueFromPrefBranch(
-        LegacyApi.prefs.branches.rp.branch, aPrefName, Ci.nsISupportsString);
-    if (!result.error) return result.value!;
-    const e = result.error;
-    if (e.name !== "NS_ERROR_UNEXPECTED") {
-      console.dir(e);
-    }
-    return "";
-  }
-
-  private customPrefStrings: IPrefStrings | null = null;
-  private lazyPrefStrings: IPrefStrings;
-  private lazyPrefStringSets: IPrefStringSets;
-
+export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
-  constructor(
-      aOrigins = "",
-      aDestinations = "",
-      aOriginsToDestinations = "",
-  ) {
-    if (aOrigins || aDestinations || aOriginsToDestinations) {
-      this.customPrefStrings = {
-        dests: String(aDestinations),
-        origins: String(aOrigins),
-        originsToDests: String(aOriginsToDestinations),
-      };
-    }
+  constructor(log: Log) {
+    super("app.services.rules.v0", log);
   }
 
   /**
    * Convert the pref strings to rule objects.
-   *
-   * @return {Array<Object>}
    */
-  public getAsNewRules() {
+  public parse(aPrefStrings: IPrefStrings): IRuleSpec[] {
+    const dests = splitString(aPrefStrings.dests);
+    const origins = splitString(aPrefStrings.origins);
+    const originsToDests = splitString(aPrefStrings.originsToDests);
+
     const rules = [];
-    const {origins, dests, originsToDests} = this.prefStringSets;
 
     // tslint:disable-next-line prefer-const
     for (let origin of origins) {
@@ -125,7 +98,7 @@ export class OldRules {
       }
 
       // eslint-disable-next-line no-throw-literal
-      throw new OldRulesParseError("Invalid old rule: \"" + originToDest +
+      throw new V0RulesParseError("Invalid old rule: \"" + originToDest +
           "\"");
     }
 
@@ -195,52 +168,13 @@ export class OldRules {
     }
     return spec;
   }
-
-  /**
-   * The three strings containing the old rules.
-   */
-  private get prefStrings() {
-    if (!this.lazyPrefStrings) {
-      this.lazyPrefStrings = this.customPrefStrings || {
-        dests: OldRules.getPrefString("allowedDestinations"),
-        origins: OldRules.getPrefString("allowedOrigins"),
-        originsToDests: OldRules.getPrefString(
-            "allowedOriginsToDestinations"),
-      };
-    }
-    return this.lazyPrefStrings;
-  }
-
-  /**
-   * Three `Set`s containing the rules as strings.
-   */
-  private get prefStringSets() {
-    function splitString(aRulesString: string): Set<string> {
-      const rules = new Set(aRulesString.split(" "));
-
-      // The string might contain double spaces.
-      rules.delete("");
-
-      return rules;
-    }
-
-    if (!this.lazyPrefStringSets) {
-      const {origins, dests, originsToDests} = this.prefStrings;
-      this.lazyPrefStringSets = {
-        dests: splitString(dests),
-        origins: splitString(origins),
-        originsToDests: splitString(originsToDests),
-      };
-    }
-    return this.lazyPrefStringSets;
-  }
 }
 
 // =============================================================================
-// OldRulesParseError
+// V0RulesParseError
 // =============================================================================
 
 // tslint:disable-next-line max-classes-per-file
-export class OldRulesParseError extends Error {
-  public name = "OldRulesParseError";
+export class V0RulesParseError extends Error {
+  public name = "V0RulesParseError";
 }

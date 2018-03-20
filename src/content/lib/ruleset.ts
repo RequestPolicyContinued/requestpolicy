@@ -73,7 +73,7 @@ interface IEndpointSpec {
 
 type EndpointSpecType = "o" | "d"; // origin, destination
 
-interface IRuleSpec {
+export interface IRuleSpec {
   o?: IEndpointSpec;
   d?: IEndpointSpec;
 }

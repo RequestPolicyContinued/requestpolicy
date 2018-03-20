@@ -21,8 +21,8 @@
  */
 
 import {rp} from "app/app.background";
+import { getRPV0PrefStrings } from "legacy/lib/utils/xpcom-utils";
 import {IController} from "lib/classes/controllers";
-import {OldRules} from "lib/classes/old-rules";
 import {Log} from "models/log";
 import {VersionInfos} from "models/version-infos";
 
@@ -33,8 +33,8 @@ const log = Log.instance;
  */
 function importOldRules() {
   try {
-    const oldRules = new OldRules();
-    const rules = oldRules.getAsNewRules();
+    const prefStrings = getRPV0PrefStrings();
+    const rules = rp.services.rules.v0.parse(prefStrings);
     rp.policy.addAllowRules(rules);
     return true;
   } catch (e) {

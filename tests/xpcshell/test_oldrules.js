@@ -1,5 +1,6 @@
 /* exported run_test */
-const {OldRules} = require("lib/classes/old-rules");
+const {V0RulesService} = require("app/services/rules/v0-rules-service");
+const v0RulesService = new V0RulesService(log);
 const {Prefs} = require("bootstrap/models/prefs");
 
 
@@ -230,7 +231,7 @@ function testGetOldRulesAsNewRules(oldRulePrefValues, expectedRuleSpecs) {
 
   let [origins, destinations, originsToDestinations] = oldRulePrefValues;
 
-  const oldRules = new OldRules(origins, destinations, originsToDestinations);
+  const oldRules = v0RulesService.parse(origins, destinations, originsToDestinations);
   const actualRuleSpecs = oldRules.getAsNewRules();
   assertRuleSpecsEqual(actualRuleSpecs, expectedRuleSpecs);
 }

@@ -20,30 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RPServices } from "app/services/services.module";
+import { RulesServices } from "app/services/rules/rules-services.module";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
-import { Policy } from "./policy/policy.module";
-import { Storage } from "./storage/storage.module";
-import { Ui } from "./ui/ui.module";
 
-export class AppBackground extends Module {
+export class RPServices extends Module {
   constructor(
       log: Log,
-      public readonly policy: Policy,
-      public readonly services: RPServices,
-      public readonly storage: Storage,
-      public readonly ui: Ui,
+      public readonly rules: RulesServices,
   ) {
-    super("App", log);
+    super("app.services", log);
   }
 
-  public get subModules() {
+  protected get subModules() {
     return {
-      policy: this.policy,
-      services: this.services,
-      storage: this.storage,
-      ui: this.ui,
+      rules: this.rules,
     };
   }
 }

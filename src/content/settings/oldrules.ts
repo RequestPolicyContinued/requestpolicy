@@ -28,9 +28,9 @@ import {$id} from "./common";
 (() => {
   const {
     LegacyApi,
-    OldRules,
     rp,
     RuleUtils,
+    XpcomUtils,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
@@ -50,9 +50,10 @@ import {$id} from "./common";
   function populateRuleTable() {
     const table = $id("rules");
 
-    const oldRules = new OldRules();
+    const prefStrings = XpcomUtils.getRPV0PrefStrings();
     // Setting the global rules var here.
-    rules = oldRules.getAsNewRules();
+    rules = rp.services.rules.v0.parse(prefStrings);
+    rp.policy.addAllowRules(rules);
 
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < rules.length; i++) {

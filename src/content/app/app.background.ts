@@ -20,6 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { RulesServices } from "app/services/rules/rules-services.module";
+import { V0RulesService } from "app/services/rules/v0-rules-service";
+import { RPServices } from "app/services/services.module";
 import { InitialSetup } from "app/ui/initial-setup";
 import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
@@ -36,6 +39,10 @@ const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
 
+const v0RulesService = new V0RulesService(log);
+const rulesServices = new RulesServices(log, v0RulesService);
+const rpServices = new RPServices(log, rulesServices);
+
 const storage = new Storage(log, RPStorageConfig);
 
 const initialSetup = new InitialSetup(log, storage);
@@ -44,6 +51,7 @@ const ui = new Ui(log, initialSetup);
 export const rp = new AppBackground(
     log,
     policy,
+    rpServices,
     storage,
     ui,
 );

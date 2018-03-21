@@ -21,12 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import * as JSUtils from "lib/utils/js-utils";
 import {Log} from "models/log";
 
 const log = Log.instance;
-
-declare const Services: any;
 
 interface IInfos {
   curAppVersion: string;
@@ -88,7 +87,7 @@ promises.isRPUpgrade =
       // Compare with version 1.0.0a8 since that version introduced
       // the "welcome window".
       VersionInfos.isRPUpgrade = !!lastRPVersion &&
-          Services.vc.compare(lastRPVersion, "1.0.0a8") <= 0;
+          compareVersions(lastRPVersion, "1.0.0a8") <= 0;
       return VersionInfos.isRPUpgrade;
     });
 checkPromise("isRPUpgrade");

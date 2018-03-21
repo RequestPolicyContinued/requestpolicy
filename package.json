@@ -40,6 +40,7 @@
     "web-ext-types": "github:myrdd/web-ext-types"
   },
   "dependencies": {
-    "jquery": "^3.3.1"
+    "jquery": "^3.3.1",
+    "mozilla-version-comparator": "^1.0.2"
   }
 }

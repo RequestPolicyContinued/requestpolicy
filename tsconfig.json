@@ -41,13 +41,11 @@
         "conditional/webextension/content/*"
       ]
     }
-  }
-  ,
+  },
   "include": [
     "src/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/third-party"
+    "**/third-party/static"
   ]
 }

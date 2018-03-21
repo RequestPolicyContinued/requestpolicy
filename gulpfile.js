@@ -338,7 +338,6 @@ BUILDS.forEach((build) => {
   EXTENSION_TYPES.forEach((extensionType) => {
     const buildDirRelative = `build/${extensionType}/${build.alias}`;
     const buildDir = `${rootDir}/${buildDirRelative}`;
-    const thirdPartyBuildDir = `${buildDir}/content/lib/third-party`;
 
     const TASK_NAMES = {
       ppContext: `buildData:${extensionType}:${build.alias}:preprocessContext`,
@@ -437,7 +436,7 @@ BUILDS.forEach((build) => {
           "README",
           "LICENSE",
           "content/**/*.css",
-          "content/lib/third-party/**/*.js",
+          "content/lib/third-party/static/**/*.js",
           "skin/*.css",
           "skin/*.png",
           "skin/*.svg",
@@ -456,38 +455,6 @@ BUILDS.forEach((build) => {
         let stream = gulp.src(files, { base: srcDir }).
             pipe(rename(mergeInConditional)).
             pipe(gulp.dest(buildDir));
-        return stream;
-      });
-
-      addBuildTask("thirdPartyFiles", () => {
-        const base = "node_modules";
-        const specs = [
-          {
-            srcRoot: "jquery/dist",
-            srcFiles: ["jquery.min.js"],
-            destRoot: "",
-          },
-        ];
-        let files = [];
-        specs.forEach(({srcRoot, srcFiles, destRoot}) => {
-          srcFiles.forEach((srcFile) => {
-            files.push(`${base}/${srcRoot}/${srcFile}`);
-          });
-        });
-
-        let stream = gulp.src(files, {base}).
-            pipe(rename((path) => {
-              let {dirname} = path;
-              specs.forEach(({srcRoot, destRoot}) => {
-                if (typeof destRoot !== "string") return;
-                if (!dirname.startsWith(srcRoot)) return;
-                dirname = dirname.replace(srcRoot, destRoot);
-                if (!dirname.startsWith("/")) return;
-                dirname = dirname.slice(1);
-              });
-              path.dirname = dirname;
-            })).
-            pipe(gulp.dest(thirdPartyBuildDir));
         return stream;
       });
 
@@ -570,7 +537,7 @@ BUILDS.forEach((build) => {
         return addBuildTask(`js:${aModuleRootAlias}`, [TASK_NAMES.ppContext], () => {
           let files = [`${moduleRoot}/**/*.*(js|jsm|ts)`].concat(additionalFiles);
           files = inAnyRoot(files);
-          files.push("!**/third-party/**/*");
+          files.push("!**/third-party/static/**/*");
 
           let subRootFiles = [];
           for (let subRoot of subRoots) {

@@ -130,6 +130,14 @@ export class VersionInfoService extends Module {
         });
     checkPromise("lastAppVersion");
 
+    promises.curAppVersion =
+        browser.runtime.getBrowserInfo().
+        then(({version}) => {
+          infos.curAppVersion = version;
+          return version;
+        });
+    checkPromise("curAppVersion");
+
     // -------------------------------------------------------------------------
     // store last*Version
     // -------------------------------------------------------------------------

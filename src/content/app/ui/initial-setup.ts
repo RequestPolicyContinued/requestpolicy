@@ -23,17 +23,17 @@
 
 declare const LegacyApi: any;
 
+import { VersionInfoService } from "app/services/version-info-service";
 import { Storage } from "app/storage/storage.module";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 import {NotificationID, Notifications} from "models/notifications";
-import {VersionInfos} from "models/version-infos";
 
 export class InitialSetup extends Module {
   protected get startupPreconditions() {
     return [
       this.storage.whenReady,
-      VersionInfos.pReady,
+      this.versionInfo.whenReady,
     ];
   }
 
@@ -43,6 +43,7 @@ export class InitialSetup extends Module {
   constructor(
       log: Log,
       private storage: Storage,
+      private versionInfo: VersionInfoService,
   ) {
     super("app.ui.initialSetup", log);
   }
@@ -63,7 +64,7 @@ export class InitialSetup extends Module {
   private maybeShowSetupTab() {
     if (this.storage.get("welcomeWindowShown")) return;
 
-    if (VersionInfos.isRPUpgrade) {
+    if (this.versionInfo.isRPUpgrade) {
       // If the use has just upgraded from an 0.x version, set the
       // default-policy preferences based on the old preferences.
       this.storage.set({"defaultPolicy.allow": false}).

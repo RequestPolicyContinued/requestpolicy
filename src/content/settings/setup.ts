@@ -31,7 +31,6 @@ declare const $: typeof JQuery;
 
 (() => {
   const {
-    VersionInfos,
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
     rp,
@@ -118,7 +117,7 @@ declare const $: typeof JQuery;
   }*/
 
   window.onload = () => {
-    if (VersionInfos.isRPUpgrade) {
+    if (rp.services.versionInfo.isRPUpgrade) {
       // Skip the welcome screen.
       showConfigure();
     }

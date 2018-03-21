@@ -15,6 +15,7 @@ class TestOpenMenu(RequestPolicyTestCase):
     # Test Methods #
     ################
 
+    @unittest.skip("self.browser.send_shortcut currently is buggy")
     def test_shortcut_disabled(self):
         pref_name = ("extensions.requestpolicy."
                      "keyboardShortcuts.openMenu.enabled")

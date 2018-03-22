@@ -187,8 +187,7 @@ export const ManagerForDOMContentLoaded = (function() {
       // were meta redirects in the statusbar menu.
       // TODO: move this logic to the requestpolicy service.
 
-      // The dest may be empty if the origin is what should be refreshed. This
-      // will be handled by DomainUtil.determineRedirectUri().
+      // The dest may be empty if the origin is what should be refreshed.
       let {delay, destURI} = DomainUtil.parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.

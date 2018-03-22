@@ -53,8 +53,6 @@ export interface IUri {
 const IDN_SERVICE = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);
 
-const STANDARDURL_CONTRACTID = "@mozilla.org/network/standard-url;1";
-
 export enum Level {
   // Use example.com from http://www.a.example.com:81
   DOMAIN = 1,
@@ -299,29 +297,6 @@ export function formatIDNUri(uri: string) {
   // code clearer and this one we want to raise an exception if the uri is
   // not valid.
   return getUriObject(uri).spec;
-}
-
-/**
- * Given an origin URI string and a destination path to redirect to, returns a
- * string which is a valid uri which will be/should be redirected to. This
- * takes into account whether the destPath is a full URI, an absolute path
- * (starts with a slash), a protocol relative path (starts with two slashes),
- * or is relative to the originUri path.
- *
- * @param {String} originUri
- * @param {String} destPath
- * @return {String}
- */
-export function determineRedirectUri(
-    originUri: string,
-    destPath: string,
-): string {
-  const baseUri = getUriObject(originUri);
-  const urlType = Ci.nsIStandardURL.URLTYPE_AUTHORITY;
-  const newUri = Cc[STANDARDURL_CONTRACTID].createInstance(Ci.nsIStandardURL);
-  newUri.init(urlType, 0, destPath, null, baseUri);
-  const resolvedUri = newUri.QueryInterface(Ci.nsIURI);
-  return resolvedUri.spec;
 }
 
 /**

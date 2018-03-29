@@ -1,4 +1,3 @@
-
 /*********************************************
  * ________________ Overview _________________
  *
@@ -39,6 +38,7 @@
  *********************************************
  */
 
+@import url("toolbarbutton-variables.css");
 
 /*
  * Case: customizing.
@@ -47,18 +47,15 @@
  */
 toolbarpaletteitem #rpcontinuedToolbarButton,
 toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16) !important;
 }
 toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
 toolbar[iconsize="large"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png) !important;
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-24) !important;
 }
 toolbarpaletteitem[place="palette"] #rpcontinuedToolbarButton,
 toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png) !important;
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32) !important;
 }
 
 
@@ -71,14 +68,12 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
 /*** Australis only: (the new menu) ***/
 /* default: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"],
 /* blocked: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32);
 }
 /*** non-Australis only ***/
 /* default: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton,
 /* blocked: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
@@ -87,8 +82,7 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
 /** non-Australis: **/
 /* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
 /* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16);
 }
 
 
@@ -100,21 +94,18 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
 
 /*** Australis only: (the new menu) ***/
 /* allowed: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-32);
 }
 /*** non-Australis only ***/
 /* allowed: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-allowed.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** selectors for Australis **/
 /* allowed: */ #rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="false"],
 /** selectors for non-Australis **/
 /* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-16);
 }
 
 /*
@@ -124,19 +115,16 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
 
 /*** Australis only: (the new menu) ***/
 #rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-32);
 }
 /*** non-Australis only ***/
 toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-disabled.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
 #rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedPermissive="true"],
 /** non-Australis: **/
 toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-16);
 }

@@ -1,0 +1,13 @@
+#rpcontinuedToolbarButton {
+  --rpc-toolbarbutton-icon-blocked-32: url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
+  --rpc-toolbarbutton-icon-blocked-24: url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
+  --rpc-toolbarbutton-icon-blocked-16: url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+
+  --rpc-toolbarbutton-icon-allowed-32: url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
+  --rpc-toolbarbutton-icon-allowed-24: url(chrome://rpcontinued/skin/requestpolicy-icon-24-allowed.png);
+  --rpc-toolbarbutton-icon-allowed-16: url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+
+  --rpc-toolbarbutton-icon-disabled-32: url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
+  --rpc-toolbarbutton-icon-disabled-24: url(chrome://rpcontinued/skin/requestpolicy-icon-24-disabled.png);
+  --rpc-toolbarbutton-icon-disabled-16: url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+}

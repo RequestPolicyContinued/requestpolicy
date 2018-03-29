@@ -1,3 +1,4 @@
+@import url("toolbarbutton-variables.css");
 
 /*
  * Case: customizing.
@@ -7,12 +8,10 @@
 /* 32px is the default icon size in SeaMonkey */
 toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
 #palette-box #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png) !important;
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32) !important;
 }
 toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16) !important;
 }
 
 
@@ -24,13 +23,11 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
 
 /* default: */ toolbar #rpcontinuedToolbarButton,
 /* blocked: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32);
 }
 /* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
 /* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16);
 }
 
 
@@ -40,12 +37,10 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  */
 
 /* allowed: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-32);
 }
 /* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-16);
 }
 
 
@@ -55,10 +50,8 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  */
 
 toolbar #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-32);
 }
 toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-16);
 }

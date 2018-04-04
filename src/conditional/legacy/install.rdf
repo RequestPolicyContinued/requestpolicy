@@ -19,7 +19,7 @@
     <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>
 
     <!-- @ifndef AMO -->
-    <em:updateURL>https://requestpolicycontinued.github.io/updates/update-nightly.rdf</em:updateURL>
+    <em:updateURL>https://requestpolicycontinued.github.io/updates/update-<!-- @echo RELEASE_CHANNEL -->.rdf</em:updateURL>
     <!-- @endif -->
 
 <!-- @echo INSTALL_RDF_LOCALIZED_SECTION -->

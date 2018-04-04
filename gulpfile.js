@@ -317,12 +317,12 @@ gulp.task("versionData:uniqueVersion", ["versionData:uniqueVersionSuffix"], () =
 
 /* eslint-disable max-len */
 const BUILDS = [
-  { alias: "ui-testing",     isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "dev",            isDev: true,  forceCleanBuild: false, isAMO: false, version: "uniqueVersion" },
-  { alias: "nightly",        isDev: false, forceCleanBuild: true,  isAMO: false, version: "uniqueVersion" },
-  { alias: "beta",           isDev: false, forceCleanBuild: true,  isAMO: false, version: "nonUniqueVersion" },
-  { alias: "amo-nightly",    isDev: false, forceCleanBuild: true,  isAMO: true,  version: "uniqueVersion" },
-  { alias: "amo-beta",       isDev: false, forceCleanBuild: true,  isAMO: true,  version: "nonUniqueVersion" },
+  { alias: "ui-testing",     isDev: true,  forceCleanBuild: false, isAMO: false, channel: "nightly", version: "uniqueVersion" },
+  { alias: "dev",            isDev: true,  forceCleanBuild: false, isAMO: false, channel: "nightly", version: "uniqueVersion" },
+  { alias: "nightly",        isDev: false, forceCleanBuild: true,  isAMO: false, channel: "nightly", version: "uniqueVersion" },
+  { alias: "beta",           isDev: false, forceCleanBuild: true,  isAMO: false, channel: "beta",    version: "nonUniqueVersion" },
+  { alias: "amo-nightly",    isDev: false, forceCleanBuild: true,  isAMO: true,  channel: "nightly", version: "uniqueVersion" },
+  { alias: "amo-beta",       isDev: false, forceCleanBuild: true,  isAMO: true,  channel: "beta",    version: "nonUniqueVersion" },
 ];
 /* eslint-enable max-len */
 
@@ -374,6 +374,7 @@ BUILDS.forEach((build) => {
           "BUILD_ALIAS": build.alias,
           "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
           "EXTENSION_TYPE": extensionType,
+          "RELEASE_CHANNEL": build.channel,
           "RP_HOMEPAGE_URL": config.homepage,
           "RP_VERSION": versionData[build.version],
           "LOCALES": JSON.stringify(locales.get()),

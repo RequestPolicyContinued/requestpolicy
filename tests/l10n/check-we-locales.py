@@ -7,6 +7,7 @@ import re
 from language_tags import tags
 from termcolor import colored
 
+
 def parseJSON(file):
     json_data = open(file).read()
     return json.loads(json_data)
@@ -53,12 +54,14 @@ def checkManifest(manifest, localesDirNames, errors):
         if (defaultLocaleName not in localesDirNames):
             defaultLocaleName = ""
             newErrors.append({
-                'msg': "'{0}' default locale doesn't exist in _locales dir".format(defaultLocaleName),
+                'msg': ("'{0}' default locale doesn't exist in _locales dir"
+                        .format(defaultLocaleName)),
                 'level': "ERROR"
             })
     else:
         newErrors.append({
-            'msg': "'default_locale' key not found in manifest.json".format(defaultLocaleName),
+            'msg': ("'default_locale' key not found in manifest.json"
+                    .format(defaultLocaleName)),
             'level': "ERROR"
         })
 
@@ -88,7 +91,8 @@ def checkDefaultLocaleKeys(defaultLocale, errors):
 
         if 'description' not in entry:
             newErrors.append({
-                'msg': "'description' entry not found for key '{0}'".format(key),
+                'msg': ("'description' entry not found for key '{0}'"
+                        .format(key)),
                 'level': "WARN"
             })
         elif not entry['description']:
@@ -128,7 +132,8 @@ def compareToDefaultLocale(locale, localeName, defaultLocale, errors):
 
         if 'description' not in entry:
             newErrors.append({
-                'msg': "'description' entry not found for key '{0}'".format(key),
+                'msg': ("'description' entry not found for key '{0}'"
+                        .format(key)),
                 'level': "WARN"
             })
         elif not entry['description']:
@@ -137,8 +142,10 @@ def compareToDefaultLocale(locale, localeName, defaultLocale, errors):
                 'level': "WARN"
             })
 
-    ignoredKeys = ["extensionName", "allow_accesskey", "addRule_accesskey",
-    "deny_accesskey", "more_accesskey"]
+    ignoredKeys = [
+        "extensionName", "allow_accesskey", "addRule_accesskey",
+        "deny_accesskey", "more_accesskey"
+    ]
     for key in ignoredKeys:
         if key in remainingKeys:
             remainingKeys.remove(key)
@@ -192,7 +199,8 @@ def printErrors(errors):
                         print("\t\t- {0}".format(d))
 
     if errorNum or warnNum or otherNum:
-        summary = "Found {0} errors, {1} warnings and {2} other things".format(errorNum, warnNum, otherNum)
+        summary = ("Found {0} errors, {1} warnings and {2} other things"
+                   .format(errorNum, warnNum, otherNum))
         color = "yellow"
         if errorNum > 0:
             color = "red"
@@ -222,7 +230,8 @@ def main():
         for localeName in localesDirNames:
             if localeName != defaultLocaleName:
                 locale = parseJSON(path.format(localesDir, localeName))
-                compareToDefaultLocale(locale, localeName, defaultLocale, errors)
+                compareToDefaultLocale(locale, localeName, defaultLocale,
+                                       errors)
 
     summary = printErrors(errors)
     if summary['errors'] > 0:

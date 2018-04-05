@@ -29,8 +29,9 @@ import * as I18nUtils from "./i18n-utils";
  * This object manages loading locales for i18n support.
  */
 export class AsyncLocaleData extends LocaleData {
-  constructor() {
+  constructor(getAppLocale) {
     super();
+    this._getAppLocale = getAppLocale;
     this.dReady = defer();
     this.ready = false;
   }
@@ -45,14 +46,7 @@ export class AsyncLocaleData extends LocaleData {
    * @return {String}
    */
   getAppLocale() {
-    let appLocale;
-    if (Services.locale.getAppLocaleAsBCP47) {
-      appLocale = Services.locale.getAppLocaleAsBCP47();
-    } else {
-      // Fallback for older version of gecko
-      let nsILocale = Services.locale.getApplicationLocale();
-      appLocale = nsILocale.getCategory("NSILOCALE_MESSAGES");
-    }
+    const appLocale = this._getAppLocale();
     return I18nUtils.normalizeToBCP47(appLocale);
   }
 

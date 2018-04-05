@@ -110,6 +110,8 @@ export function getRequestHeaderFromHttpChannel(
 // other
 //
 
+export {getAppLocale} from "./try-catch-utils.mpl";
+
 export function getComplexValueFromPrefBranch(
     prefBranch: any,
     prefName: string,

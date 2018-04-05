@@ -57,7 +57,7 @@ describe("AsyncLocaleData", function() {
   });
 
   beforeEach(function() {
-    asyncLocaleData = new AsyncLocaleData();
+    asyncLocaleData = new AsyncLocaleData(() => "en-US");
   });
 
   afterEach(function() {
@@ -71,48 +71,15 @@ describe("AsyncLocaleData", function() {
   });
 
   describe("getAppLocale()", function() {
-    it("Should always use getAppLocaleAsBCP47 if available", function() {
-      mockServices.locale = {
-        getAppLocaleAsBCP47: function() {
-          return "fr";
-        },
-        getApplicationLocale: function() {
-          return "en";
-        },
-      };
-
-      let result = asyncLocaleData.getAppLocale();
-      expect(result).to.equal("fr");
-    });
-
-    it("Should use getApplicationLocale as fallback", function() {
-      mockServices.locale = {
-        getApplicationLocale: function() {
-          return {getCategory: () => "fr"};
-        },
-      };
-
-      let result = asyncLocaleData.getAppLocale();
-      expect(result).to.equal("fr");
-    });
-
     it("Should return normalized BCP 47 tag", function() {
-      mockServices.locale = {
-        getAppLocaleAsBCP47: function() {
-          return "fr-FR";
-        },
-      };
+      asyncLocaleData = new AsyncLocaleData(() => "fr-FR");
 
       let result = asyncLocaleData.getAppLocale();
       expect(result).to.equal("fr-fr");
     });
 
     it("Should throw RangeError if not a valid BCP 47 tag", function() {
-      mockServices.locale = {
-        getAppLocaleAsBCP47: function() {
-          return "-invalid tag";
-        },
-      };
+      asyncLocaleData = new AsyncLocaleData(() => "-invalid tag");
 
       let fn = function() {
         return asyncLocaleData.getAppLocale();

@@ -22,11 +22,12 @@
 
 import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
 import {Module} from "lib/classes/module";
+import { getAppLocale } from "lib/utils/try-catch-utils";
 import { Log } from "models/log";
 import {AsyncLocaleData} from "./i18n/async-locale-data";
 
 export class I18n extends Module {
-  protected localeData = new AsyncLocaleData();
+  protected localeData = new AsyncLocaleData(getAppLocale);
 
   constructor(log: Log) {
     super("browser.i18n", log);

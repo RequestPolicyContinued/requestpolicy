@@ -22,7 +22,6 @@
 
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
-import { RPServices } from "app/services/services.module";
 import { VersionInfoService } from "app/services/version-info-service";
 import { InitialSetup } from "app/ui/initial-setup";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
@@ -31,6 +30,8 @@ import { AppBackground } from "./app.background.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
+import { RPServices } from "./services/services.module";
+import { UriService } from "./services/uri-service";
 import * as RPStorageConfig from "./storage/rp-config.background";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
@@ -43,14 +44,15 @@ const policy = new Policy(log, subscriptions, rulesetStorage);
 
 const storage = new Storage(log, RPStorageConfig);
 
-const v0RulesService = new V0RulesService(log);
+const uriService = new UriService(log);
+const v0RulesService = new V0RulesService(log, uriService);
 const rulesServices = new RulesServices(log, v0RulesService);
 const versionComparator = { compare: compareVersions };
 const versionInfoService = new VersionInfoService(
     log, versionComparator, storage,
 );
 const rpServices = new RPServices(
-    log, rulesServices, versionInfoService,
+    log, rulesServices, uriService, versionInfoService,
 );
 
 const initialSetup = new InitialSetup(log, storage, versionInfoService);

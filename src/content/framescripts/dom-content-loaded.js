@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.content";
 import {Log} from "models/log";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {
   Environment,
   Level as EnvLevel,
@@ -36,6 +36,7 @@ import {ManagerForBlockedContent}
   from "framescripts/blocked-content.js";
 
 const log = Log.instance;
+const uriServices = rp.services.uri;
 
 export const ManagerForDOMContentLoaded = (function() {
   let self = {};
@@ -192,7 +193,7 @@ export const ManagerForDOMContentLoaded = (function() {
       let {delay, destURI} = parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.
-      if (!DomainUtil.isValidUri(destURI)) {
+      if (!uriServices.isValidUri(destURI)) {
         originalDestURI = destURI;
         destURI = doc.documentURIObject.resolve(destURI);
       }

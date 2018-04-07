@@ -21,8 +21,9 @@
  */
 
 import {rp} from "app/app.background";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {Requests} from "models/requests";
+
+const uriService = rp.services.uri;
 
 const initFunctions = [];
 
@@ -55,7 +56,7 @@ export const FramescriptServices = {
   ) {
     const {documentURI} = aMessage;
     // The document URI could contain a "fragment" part.
-    const originURI = DomainUtil.getUriObject(documentURI).specIgnoringRef;
+    const originURI = uriService.getUriObject(documentURI).specIgnoringRef;
 
     const blockedURIs = {};
 
@@ -81,7 +82,7 @@ export const FramescriptServices = {
             if (indicateBlacklisted ||
                 containsNonBlacklistedRequests(requests)) {
               blockedURIs[destUri] = blockedURIs[destUri] ||
-                  {identifier: DomainUtil.getIdentifier(destUri)};
+                  {identifier: uriService.getIdentifier(destUri)};
             }
           }
         }

@@ -23,7 +23,6 @@
 
 import {Level as EnvLevel} from "lib/environment";
 import {Log} from "models/log";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {Ruleset} from "lib/ruleset";
 import {
   GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
@@ -35,6 +34,7 @@ import {Requests} from "models/requests";
 import {rp} from "app/app.background";
 
 const log = Log.instance;
+const uriService = rp.services.uri;
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -200,7 +200,7 @@ export function loadMenuIntoWindow(window) {
       self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
 
       try {
-        self._currentBaseDomain = DomainUtil.getBaseDomain(self._currentUri);
+        self._currentBaseDomain = uriService.getBaseDomain(self._currentUri);
         if (self._currentBaseDomain === null) {
           log.info(`${"Unable to prepare menu because " +
               "the current uri has no host: "}${self._currentUri}`);
@@ -218,7 +218,7 @@ export function loadMenuIntoWindow(window) {
           getTopLevelDocumentUriIdentifier();
 
       // log.info("self._currentUri: " + self._currentUri);
-      self._currentUriObj = DomainUtil.getUriObject(self._currentUri);
+      self._currentUriObj = uriService.getUriObject(self._currentUri);
 
       self._isChromeUri = self._currentUriObj.scheme === "chrome";
       // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
@@ -858,7 +858,7 @@ export function loadMenuIntoWindow(window) {
     const properties = new GUILocationProperties();
 
     for (let originUri in allRequests) {
-      const originBase = DomainUtil.getBaseDomain(originUri);
+      const originBase = uriService.getBaseDomain(originUri);
       if (originBase !== self._currentBaseDomain) {
         continue;
       }
@@ -878,7 +878,7 @@ export function loadMenuIntoWindow(window) {
 
     const guiOrigins = [];
     for (let originUri in allRequests) {
-      const originBase = DomainUtil.getBaseDomain(originUri);
+      const originBase = uriService.getBaseDomain(originUri);
       if (originBase === self._currentBaseDomain) {
         continue;
       }
@@ -928,7 +928,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._isIPAddressOrSingleName = function(hostname) {
-    return DomainUtil.isIPAddress(hostname) ||
+    return uriService.isIPAddress(hostname) ||
         hostname.indexOf(".") === -1;
   };
 
@@ -1217,7 +1217,7 @@ export function loadMenuIntoWindow(window) {
     // reqSet.print('allowedRequests');
 
     // TODO: there is no dest if no dest is selected (origin only).
-    // var destBase = DomainUtil.getBaseDomain(
+    // var destBase = uriService.getBaseDomain(
     //      self._currentlySelectedDest);
 
     for (let destBase in requests) {
@@ -1295,7 +1295,7 @@ export function loadMenuIntoWindow(window) {
     reqSet.print("deniedRequests");
 
     // TODO: there is no dest if no dest is selected (origin only).
-    // var destBase = DomainUtil.getBaseDomain(
+    // var destBase = uriService.getBaseDomain(
     //     self._currentlySelectedDest);
 
     for (let destBase in requests) {
@@ -1377,7 +1377,7 @@ export function loadMenuIntoWindow(window) {
       for (let destIdent in requests[destBase]) {
         let destinations = requests[destBase][destIdent];
         for (let destUri in destinations) {
-          destHosts[DomainUtil.getHost(destUri)] = null;
+          destHosts[uriService.getHost(destUri)] = null;
         }
       }
     }

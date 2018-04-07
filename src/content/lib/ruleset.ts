@@ -21,9 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { rp } from "app/app.background";
 import {C} from "data/constants";
-import * as DomainUtils from "lib/utils/domain-utils";
-import { getHostByUriObj } from "lib/utils/domain-utils";
 import {IUri} from "lib/classes/uri";
 import {Log} from "models/log";
 
@@ -669,8 +668,10 @@ class Rule {
       return false;
     }
 
+    const uriService = rp.services.uri;
+
     // Check the port only in case the URI has a host at all.
-    if (DomainUtils.uriObjHasPort(uriObj)) {
+    if (uriService.uriObjHasPort(uriObj)) {
       if (this.port) {
         // If the rule's port is "*" it means any port. We use this convention
         // because we assume an empty port in a rule means default ports rather
@@ -681,7 +682,7 @@ class Rule {
           if (
               rulePort === uriObj.port ||
               uriObj.port === -1 &&
-                  rulePort === DomainUtils.
+                  rulePort === uriService.
                                getDefaultPortForScheme(uriObj.scheme)
           ) {
             // Port Match is OK, so continue
@@ -695,7 +696,7 @@ class Rule {
         if (!endpointSpecHasHost) {
           // Both host and port are undefined, so skip the default-port-check.
         } else {
-          if (!DomainUtils.hasStandardPort(uriObj)) {
+          if (!uriService.hasStandardPort(uriObj)) {
             // dprint("isMatch: wrong port (not the default port and the " +
             //     "rule assumes default)");
             return false;
@@ -994,7 +995,7 @@ export class Ruleset {
       // eslint-disable-next-line no-throw-literal
       throw new Error("INVALID_HOST");
     }
-    if (DomainUtils.isIPAddress(host)) {
+    if (rp.services.uri.isIPAddress(host)) {
       return this._getIPAddress(host);
     } else {
       return this._getDomain(host);
@@ -1006,7 +1007,7 @@ export class Ruleset {
       // eslint-disable-next-line no-throw-literal
       throw new Error("INVALID_HOST");
     }
-    if (DomainUtils.isIPAddress(host)) {
+    if (rp.services.uri.isIPAddress(host)) {
       return this._addIPAddress(host);
     } else {
       return this._addDomain(host);
@@ -1036,7 +1037,7 @@ export class Ruleset {
       return;
     }
 
-    if (DomainUtils.isIPAddress(host)) {
+    if (rp.services.uri.isIPAddress(host)) {
       const addrEntry = this.ipAddr[host];
       if (addrEntry) {
         yield [addrEntry, true];
@@ -1069,8 +1070,9 @@ export class Ruleset {
   public check(origin: IUri, dest: IUri): [Match[], Match[]] {
     const matchedAllowRules: Match[] = [];
     const matchedDenyRules: Match[] = [];
-    const originHost = getHostByUriObj(origin) || "";
-    const destHost = getHostByUriObj(dest) || "";
+    const uriService = rp.services.uri;
+    const originHost = uriService.getHostByUriObj(origin) || "";
+    const destHost = uriService.getHostByUriObj(dest) || "";
 
     // dprint("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.

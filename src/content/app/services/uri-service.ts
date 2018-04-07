@@ -21,18 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Module } from "lib/classes/module";
 import { IUri } from "lib/classes/uri";
-import {Log} from "models/log";
-
-const log = Log.instance;
+import { Log } from "models/log";
 
 declare const Cc: any;
 declare const Ci: any;
 declare const Services: any;
-
-// =============================================================================
-// DomainUtils
-// =============================================================================
 
 /*
  * It's worth noting that many of the functions in this module will
@@ -45,37 +40,40 @@ declare const Services: any;
 const IDN_SERVICE = Cc["@mozilla.org/network/idn-service;1"]
     .getService(Ci.nsIIDNService);
 
-export enum Level {
+enum HostLevel {
   // Use example.com from http://www.a.example.com:81
   DOMAIN = 1,
-  // LEVEL_HOST: Use www.a.example.com from http://www.a.example.com:81
+  // Use www.a.example.com from http://www.a.example.com:81
   HOST = 2,
-  // LEVEL_SOP: Use http://www.a.example.com:81 from http://www.a.example.com:81
+  // Use http://www.a.example.com:81 from http://www.a.example.com:81
   SOP = 3,
 }
 
-export const LEVEL_DOMAIN = Level.DOMAIN;
-export const LEVEL_HOST = Level.HOST;
-export const LEVEL_SOP = Level.SOP;
+export class UriService extends Module {
+  public get hostLevels() { return HostLevel; }
 
-export function getIdentifier(aUri: string, aLevel: Level = Level.SOP): string {
+  constructor(log: Log, nameRoot = "app") {
+    super(`${nameRoot}.services.uri`, log);
+  }
+
+public getIdentifier(aUri: string, aLevel: HostLevel = HostLevel.SOP): string {
   let identifier: string | null | false;
   let identifierGettingFn: (uri: typeof aUri) => string | null;
 
   // We only have one identifier that we're using now:
-  //     the pre-path / LEVEL_SOP.
+  //     the pre-path / HostLevel.SOP.
   // TODO: figure out how we want to rename this function and clean up the
   // unused parts.
 
   switch (aLevel) {
-    case Level.DOMAIN:
+    case HostLevel.DOMAIN:
       identifierGettingFn = () => null;
       break;
-    case LEVEL_HOST:
-      identifierGettingFn = getHost;
+    case HostLevel.HOST:
+      identifierGettingFn = this.getHost.bind(this);
       break;
-    case LEVEL_SOP:
-      identifierGettingFn = getPrePath;
+    case HostLevel.SOP:
+      identifierGettingFn = this.getPrePath.bind(this);
       break;
     default:
       throw new Error(
@@ -101,13 +99,13 @@ export function getIdentifier(aUri: string, aLevel: Level = Level.SOP): string {
       identifier = aUri.split(",")[0];
       return identifier.split(";")[0];
     }
-    log.info("Unable to getIdentifier from uri " +
+    this.log.info("Unable to getIdentifier from uri " +
         aUri + " using identifier level " + aLevel + ".");
     return aUri;
   }
 }
 
-export function getHostByUriObj(aUriObj: IUri): string | null {
+public getHostByUriObj(aUriObj: IUri): string | null {
   try {
     return aUriObj.host;
   } catch (e) {
@@ -115,11 +113,11 @@ export function getHostByUriObj(aUriObj: IUri): string | null {
   }
 }
 
-export function getHost(aUri: string): string | null {
-  return getHostByUriObj(getUriObject(aUri));
+public getHost(aUri: string): string | null {
+  return this.getHostByUriObj(this.getUriObject(aUri));
 }
 
-export function uriObjHasPort(aUriObj: IUri): boolean {
+public uriObjHasPort(aUriObj: IUri): boolean {
   try {
     // tslint:disable-next-line no-unused-expression
     aUriObj.port;
@@ -134,7 +132,7 @@ export function uriObjHasPort(aUriObj: IUri): boolean {
  * automatically convert ACE formatting to UTF8 for IDNs in the various
  * attributes of the object that are available.
  */
-export function getUriObject(uri: string): IUri {
+public getUriObject(uri: string): IUri {
   // fixme: if `uri` is relative, `newURI()` throws NS_ERROR_MALFORMED_URI.
   // possible solution: use nsIURI.resolve() instead for relative uris
 
@@ -143,22 +141,22 @@ export function getUriObject(uri: string): IUri {
     return Services.io.newURI(uri, null, null);
   } catch (e) {
     const msg = "getUriObject() exception on uri <" + uri + ">.";
-    log.log(msg);
+    this.log.log(msg);
     throw e;
   }
 }
 
-export function isValidUri(uri: string): boolean {
+public isValidUri(uri: string): boolean {
   try {
-    getUriObject(uri);
+    this.getUriObject(uri);
     return true;
   } catch (e) {
     return false;
   }
 }
 
-export function getBaseDomain(uri: string): string | null {
-  const host = getHost(uri);
+public getBaseDomain(uri: string): string | null {
+  const host = this.getHost(uri);
   if (host === null) {
     return null;
   }
@@ -181,7 +179,7 @@ export function getBaseDomain(uri: string): string | null {
   }
 }
 
-export function isIPAddress(host: string): boolean {
+public isIPAddress(host: string): boolean {
   try {
     Services.eTLD.getBaseDomainFromHost(host, 0);
     return false;
@@ -200,8 +198,8 @@ export function isIPAddress(host: string): boolean {
   }
 }
 
-export function getPath(uri: string): string {
-  return getUriObject(uri).path;
+public getPath(uri: string): string {
+  return this.getUriObject(uri).path;
 }
 
 /**
@@ -209,11 +207,11 @@ export function getPath(uri: string): string {
  * a prePath in UTF8 format for all IDNs, even if the uri passed to
  * the function is ACE formatted.
  */
-export function getPrePath(uri: string): string {
-  return getUriObject(uri).prePath;
+public getPrePath(uri: string): string {
+  return this.getUriObject(uri).prePath;
 }
 
-export function stripFragment(uri: string) {
+public stripFragment(uri: string) {
   return uri.split("#")[0];
 }
 
@@ -225,9 +223,9 @@ export function stripFragment(uri: string) {
  * @param {String} uri
  * @return {String}
  */
-export function ensureUriHasPath(uri: string): string {
+public ensureUriHasPath(uri: string): string {
   try {
-    return getUriObject(uri).spec;
+    return this.getUriObject(uri).spec;
   } catch (e) {
     return uri;
   }
@@ -244,12 +242,12 @@ export function ensureUriHasPath(uri: string): string {
  * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
  *     was ACE formatted.
  */
-export function formatIDNUri(uri: string) {
+public formatIDNUri(uri: string) {
   // Throws an exception if uri is invalid. This is almost the same as the
   // ensureUriHasPath function, but the separate function makes the calling
   // code clearer and this one we want to raise an exception if the uri is
   // not valid.
-  return getUriObject(uri).spec;
+  return this.getUriObject(uri).spec;
 }
 
 /**
@@ -258,7 +256,7 @@ export function formatIDNUri(uri: string) {
  * @param {nsIURI} uri
  * @return {Boolean}
  */
-export function hasStandardPort(uri: IUri) {
+public hasStandardPort(uri: IUri) {
   // A port value of -1 in the uriObj means the default for the protocol.
   return uri.port === -1 ||
          uri.scheme !== "http" && uri.scheme !== "https" ||
@@ -266,14 +264,15 @@ export function hasStandardPort(uri: IUri) {
          uri.port === 443 && uri.scheme === "https";
 }
 
-export function getDefaultPortForScheme(scheme: string): number | null {
+public getDefaultPortForScheme(scheme: string): number | null {
   switch (scheme) {
     case "http":
       return 80;
     case "https":
       return 443;
     default:
-      log.warn("Unknown default port for scheme " + scheme + ".");
+      this.log.warn("Unknown default port for scheme " + scheme + ".");
       return null;
   }
+}
 }

@@ -32,7 +32,6 @@ import {
 import {Log} from "models/log";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as RequestProcessor from "lib/request-processor";
-import * as DomainUtil from "lib/utils/domain-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import * as JSUtils from "lib/utils/js-utils";
 import * as Utils from "lib/utils/misc-utils";
@@ -45,6 +44,8 @@ import {
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
 import {rp} from "app/app.background";
+
+const uriService = rp.services.uri;
 
 const log = Log.instance;
 
@@ -353,7 +354,7 @@ export function loadOverlayIntoWindow(window) {
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
-        if (DomainUtil.getUriObject(destURI).schemeIs("javascript")) {
+        if (uriService.getUriObject(destURI).schemeIs("javascript")) {
           log.warn(
               `Ignoring redirect to javascript URI <${destURI}>`
           );
@@ -384,7 +385,7 @@ export function loadOverlayIntoWindow(window) {
     if (aUri.length < aMaxLength) {
       return aUri;
     } else {
-      let prePathLength = DomainUtil.getPrePath(aUri).length + 1;
+      let prePathLength = uriService.getPrePath(aUri).length + 1;
       let len = Math.max(prePathLength, aMaxLength);
       return `${aUri.substring(0, len)}...`;
     }
@@ -456,8 +457,8 @@ export function loadOverlayIntoWindow(window) {
     classicmenu.emptyMenu(addRulePopup);
 
     let m = rpcontinued.menu;
-    const originBaseDomain = DomainUtil.getBaseDomain(redirectOriginUri);
-    const destBaseDomain = DomainUtil.getBaseDomain(redirectTargetUri);
+    const originBaseDomain = uriService.getBaseDomain(redirectOriginUri);
+    const destBaseDomain = uriService.getBaseDomain(redirectTargetUri);
 
     let origin = null;
     let dest = null;
@@ -622,7 +623,7 @@ export function loadOverlayIntoWindow(window) {
   self._updateBlockedContentState = function() {
     RequestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
-      let uri = DomainUtil.stripFragment(browser.currentURI.spec);
+      let uri = uriService.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
         log.log(
             `Checking for blocked requests from page <${uri}>`
@@ -1005,7 +1006,7 @@ export function loadOverlayIntoWindow(window) {
    * @return {String} The current document's identifier.
    */
   self.getTopLevelDocumentUriIdentifier = function() {
-    return DomainUtil.getIdentifier(self.getTopLevelDocumentUri());
+    return uriService.getIdentifier(self.getTopLevelDocumentUri());
   };
 
   /**
@@ -1016,7 +1017,7 @@ export function loadOverlayIntoWindow(window) {
   self.getTopLevelDocumentUri = function() {
     let uri = gBrowser.selectedBrowser.currentURI.spec;
     return CompatibilityRules.getTopLevelDocTranslation(uri) ||
-        DomainUtil.stripFragment(uri);
+        uriService.stripFragment(uri);
   };
 
   /**

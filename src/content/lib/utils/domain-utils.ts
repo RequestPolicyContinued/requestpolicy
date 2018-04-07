@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IUri } from "lib/classes/uri";
 import {Log} from "models/log";
 
 const log = Log.instance;
@@ -28,15 +29,6 @@ const log = Log.instance;
 declare const Cc: any;
 declare const Ci: any;
 declare const Services: any;
-
-export interface IUri {
-  spec: string;
-  scheme: string;
-  host: string;
-  port: number;
-  prePath: string;
-  path: string;
-}
 
 // =============================================================================
 // DomainUtils

@@ -23,9 +23,9 @@
 
 import {C} from "data/constants";
 import {Module} from "lib/classes/module";
+import {IUri} from "lib/classes/uri";
 import {RequestResult} from "lib/request-result";
 import {RawRuleset, Ruleset} from "lib/ruleset";
-import { IUri } from "lib/utils/domain-utils";
 import { Log } from "models/log";
 import { RulesetStorage } from "./ruleset-storage";
 import { Subscriptions } from "./subscriptions";

@@ -24,6 +24,7 @@
 import {C} from "data/constants";
 import * as DomainUtils from "lib/utils/domain-utils";
 import { getHostByUriObj } from "lib/utils/domain-utils";
+import {IUri} from "lib/classes/uri";
 import {Log} from "models/log";
 
 const log = Log.instance;
@@ -43,8 +44,6 @@ function dwarn(msg: string) {
 // =============================================================================
 // types
 // =============================================================================
-
-type IUri = DomainUtils.IUri;
 
 interface IObject<T> {
   [k: string]: T;

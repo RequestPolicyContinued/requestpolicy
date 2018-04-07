@@ -22,13 +22,13 @@
  */
 
 import {rp} from "app/app.background";
+import {IUri} from "lib/classes/uri";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
   RequestResult,
 } from "lib/request-result";
 import * as DomainUtil from "lib/utils/domain-utils";
-import {IUri} from "lib/utils/domain-utils";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";

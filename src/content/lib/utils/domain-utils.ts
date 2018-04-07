@@ -225,45 +225,6 @@ export function stripFragment(uri: string) {
   return uri.split("#")[0];
 }
 
-// TODO: Maybe this should have a different home.
-/**
- * Gets the relevant pieces out of a meta refresh or header refresh string.
- *
- * @return {Object} The delay in seconds and the url to refresh to.
- *     The url may be an empty string if the current url should be
- *     refreshed.
- * @throws Generic exception if the refreshString has an invalid format,
- *     including if the seconds can't be parsed as a float.
- */
-export function parseRefresh(
-    refreshString: string,
-): {
-    delay: number,
-    destURI: string,
-} {
-  const parts = /^\s*(\S*?)\s*(;\s*url\s*=\s*(.*?)\s*)?$/i.exec(refreshString);
-  if (parts === null) {
-    throw new Error("parseRefresh regex did not match");
-  }
-  const delay = parseFloat(parts[1]);
-  if (isNaN(delay)) {
-    throw new Error("Invalid delay value in refresh string: " + parts[1]);
-  }
-  let url = parts[3];
-  if (url === undefined) {
-    url = "";
-  }
-  // Strip off enclosing quotes around the url.
-  if (url) {
-    const first = url[0];
-    const last = url[url.length - 1];
-    if (first === last && (first === "'" || first === "\"")) {
-      url = url.substring(1, url.length - 1);
-    }
-  }
-  return {delay, destURI: url};
-}
-
 /**
  * Adds a path of "/" to the uri if it doesn't have one. That is,
  * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return

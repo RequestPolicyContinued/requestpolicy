@@ -28,6 +28,7 @@ import {
   Level as EnvLevel,
   MainEnvironment,
 } from "lib/environment";
+import {parseRefresh} from "lib/utils/html-utils";
 import {C} from "data/constants";
 
 import {overlayComm} from "framescripts/managers";
@@ -188,7 +189,7 @@ export const ManagerForDOMContentLoaded = (function() {
       // TODO: move this logic to the requestpolicy service.
 
       // The dest may be empty if the origin is what should be refreshed.
-      let {delay, destURI} = DomainUtil.parseRefresh(metaTag.content);
+      let {delay, destURI} = parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.
       if (!DomainUtil.isValidUri(destURI)) {

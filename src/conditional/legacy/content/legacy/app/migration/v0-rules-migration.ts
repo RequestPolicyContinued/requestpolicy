@@ -20,55 +20,62 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.background";
+import { Policy } from "app/policy/policy.module";
+import { V0RulesService } from "app/services/rules/v0-rules-service";
+import { VersionInfoService } from "app/services/version-info-service";
 import { getRPV0PrefStrings } from "legacy/lib/utils/xpcom-utils";
-import {IController} from "lib/classes/controllers";
-import {Log} from "models/log";
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 
-const log = Log.instance;
-
-/**
- * @return {boolean} If the import was successful.
- */
-function importOldRules() {
-  try {
-    const prefStrings = getRPV0PrefStrings();
-    const rules = rp.services.rules.v0.parse(prefStrings);
-    rp.policy.addAllowRules(rules);
-    return true;
-  } catch (e) {
-    console.error("Failed to import old rules. Details:");
-    console.dir(e);
-    return false;
+export class V0RulesMigration extends Module {
+  constructor(
+      log: Log,
+      private policy: Policy,
+      private v0RulesService: V0RulesService,
+      private versionInfoService: VersionInfoService,
+  ) {
+    super("app.migration.v0Rules", log);
   }
-}
 
-function importOldRulesAutomatically() {
-  log.info("Performing automatic rule import.");
-  const rv = importOldRules();
-  if (false === rv) {
-    console.error("Failed to automatically import old rules.");
-  }
-}
-
-export const OldRulesController: IController = {
-  startupPreconditions: [
-    rp.services.versionInfo.whenReady,
-    rp.policy.whenReady,
-  ],
-  startup() {
+  protected async startupSelf() {
     // If the user ...
     //   * upgrades to 1.0,
     //   * downgrades back to 0.5
     //   * and upgrades again
     // the user ruleset already exists after the first step.
-    const isFirstRPUpgrade = true === rp.services.versionInfo.isRPUpgrade &&
-        false === rp.policy.userRulesetExistedOnStartup;
+    await this.versionInfoService.whenReady;
+    if (!this.versionInfoService.isRPUpgrade) { return; }
 
-    if (isFirstRPUpgrade) {
-      importOldRulesAutomatically();
-    } else {
-      // TODO inform the user about old rules
+    await this.policy.whenReady;
+    if (this.policy.userRulesetExistedOnStartup) { return; }
+
+    await this.v0RulesService.whenReady;
+
+    // it's the first RP upgrade
+    this.importOldRulesAutomatically();
+  }
+
+  /**
+   * @return {boolean} If the import was successful.
+   */
+  private importOldRules() {
+    try {
+      const prefStrings = getRPV0PrefStrings();
+      const rules = this.v0RulesService.parse(prefStrings);
+      this.policy.addAllowRules(rules);
+      return true;
+    } catch (e) {
+      console.error("Failed to import old rules. Details:");
+      console.dir(e);
+      return false;
     }
-  },
-};
+  }
+
+  private importOldRulesAutomatically() {
+    this.log.info("Performing automatic rule import.");
+    const rv = this.importOldRules();
+    if (false === rv) {
+      console.error("Failed to automatically import old rules.");
+    }
+  }
+}

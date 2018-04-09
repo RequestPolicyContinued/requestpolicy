@@ -53,7 +53,6 @@ import {
 import {
   NotificationsController,
 } from "controllers/notification-controller";
-import {OldRulesController} from "controllers/old-rules-controller";
 import {
   OtherRPInstallationsController,
 } from "controllers/other-rp-installations-controller";
@@ -64,7 +63,6 @@ import "ui-testing/services";
 
 const controllersToBeStartedUp = [
   KeyboardShortcutController,
-  OldRulesController,
 
   OtherRPInstallationsController,
 

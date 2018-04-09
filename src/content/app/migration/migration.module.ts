@@ -20,33 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RPServices } from "app/services/services.module";
-import { Module } from "lib/classes/module";
+import { V0RulesMigration } from "legacy/app/migration/v0-rules";
+import { IModule, Module } from "lib/classes/module";
 import { Log } from "models/log";
-import { Migration } from "./migration/migration.module";
-import { Policy } from "./policy/policy.module";
-import { Storage } from "./storage/storage.module";
-import { Ui } from "./ui/ui.module";
 
-export class AppBackground extends Module {
+export class Migration extends Module {
   constructor(
       log: Log,
-      public readonly migration: Migration,
-      public readonly policy: Policy,
-      public readonly services: RPServices,
-      public readonly storage: Storage,
-      public readonly ui: Ui,
+      public readonly v0Rules: V0RulesMigration | null,
   ) {
-    super("App", log);
+    super("app.migration", log);
   }
 
-  public get subModules() {
-    return {
-      migration: this.migration,
-      policy: this.policy,
-      services: this.services,
-      storage: this.storage,
-      ui: this.ui,
-    };
+  protected get subModules() {
+    const rv: {[k: string]: IModule} = {};
+    if (this.v0Rules) { rv.v0Rules = this.v0Rules; }
+    return rv;
   }
 }

@@ -24,7 +24,7 @@ declare const LegacyApi: any;
 
 import {rp} from "app/app.background";
 import {C} from "data/constants";
-import {OldRules} from "lib/classes/old-rules";
+import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as RequestProcessor from "lib/request-processor";
@@ -38,7 +38,6 @@ import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";
 import * as Metadata from "models/metadata";
 import {Requests} from "models/requests";
-import {VersionInfos} from "models/version-infos";
 
 export const BackgroundPage = {
   C,
@@ -49,13 +48,12 @@ export const BackgroundPage = {
   MainEnvironment,
   ManagerForPrefObservers,
   Metadata,
-  OldRules,
   RequestProcessor,
   Requests,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
-  VersionInfos,
   WindowUtils,
+  XpcomUtils,
   rp,
 };

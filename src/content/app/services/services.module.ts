@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2011 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,29 +20,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.background";
-import {IController} from "lib/classes/controllers";
-import {Log} from "models/log";
-import {VersionInfos} from "models/version-infos";
+import { RulesServices } from "app/services/rules/rules-services.module";
+import { VersionInfoService } from "app/services/version-info-service";
+import { Module } from "lib/classes/module";
+import { Log } from "models/log";
 
-const log = Log.instance;
+export class RPServices extends Module {
+  constructor(
+      log: Log,
+      public readonly rules: RulesServices,
+      public readonly versionInfo: VersionInfoService,
+  ) {
+    super("app.services", log);
+  }
 
-function updateLastVersions() {
-  const {curAppVersion, curRPVersion} = VersionInfos;
-  browser.storage.local.set({
-    lastAppVersion: curAppVersion,
-    lastVersion: curRPVersion,
-  }).catch((e) => {
-    log.error(`Failed to update last app and RP version:`, e);
-  });
+  protected get subModules() {
+    return {
+      rules: this.rules,
+      versionInfo: this.versionInfo,
+    };
+  }
 }
-
-export const VersionInfosController: IController = {
-  startupPreconditions: [
-    rp.storage.whenReady,
-    VersionInfos.pReady,
-  ],
-  startup() {
-    updateLastVersions();
-  },
-};

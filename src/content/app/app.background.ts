@@ -20,7 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { RulesServices } from "app/services/rules/rules-services.module";
+import { V0RulesService } from "app/services/rules/v0-rules-service";
+import { RPServices } from "app/services/services.module";
+import { VersionInfoService } from "app/services/version-info-service";
 import { InitialSetup } from "app/ui/initial-setup";
+import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
 import { Policy } from "./policy/policy.module";
@@ -38,12 +43,23 @@ const policy = new Policy(log, subscriptions, rulesetStorage);
 
 const storage = new Storage(log, RPStorageConfig);
 
-const initialSetup = new InitialSetup(log, storage);
+const v0RulesService = new V0RulesService(log);
+const rulesServices = new RulesServices(log, v0RulesService);
+const versionComparator = { compare: compareVersions };
+const versionInfoService = new VersionInfoService(
+    log, versionComparator, storage,
+);
+const rpServices = new RPServices(
+    log, rulesServices, versionInfoService,
+);
+
+const initialSetup = new InitialSetup(log, storage, versionInfoService);
 const ui = new Ui(log, initialSetup);
 
 export const rp = new AppBackground(
     log,
     policy,
+    rpServices,
     storage,
     ui,
 );

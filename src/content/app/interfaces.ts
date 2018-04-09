@@ -20,30 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RPServices } from "app/services/services.module";
-import { Module } from "lib/classes/module";
-import { Log } from "models/log";
-import { Policy } from "./policy/policy.module";
-import { Storage } from "./storage/storage.module";
-import { Ui } from "./ui/ui.module";
+import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 
-export class AppBackground extends Module {
-  constructor(
-      log: Log,
-      public readonly policy: Policy,
-      public readonly services: RPServices,
-      public readonly storage: Storage,
-      public readonly ui: Ui,
-  ) {
-    super("App", log);
-  }
-
-  public get subModules() {
-    return {
-      policy: this.policy,
-      services: this.services,
-      storage: this.storage,
-      ui: this.ui,
-    };
-  }
+export interface IVersionComparator {
+  compare: typeof compareVersions;
 }

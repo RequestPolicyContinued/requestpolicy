@@ -35,7 +35,7 @@ export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 declare const Ci: any;
 declare const Services: any;
 type RuleAction = typeof C.RULE_ACTION_ALLOW | typeof C.RULE_ACTION_DENY;
-type RuleData = any;
+export type RuleData = any;
 
 function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
@@ -136,7 +136,7 @@ export class Policy extends Module {
 
   public addRules(
       aRuleAction: RuleAction,
-      aRuleDataList: any,
+      aRuleDataList: RuleData[],
       aNoStore = false,
   ) {
     for (const ruleData of aRuleDataList) {

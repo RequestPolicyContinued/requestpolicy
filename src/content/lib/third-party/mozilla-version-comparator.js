@@ -1,0 +1,1 @@
+../../../../node_modules/mozilla-version-comparator/mozilla-version-comparator.js

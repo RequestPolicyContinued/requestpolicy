@@ -1,7 +1,13 @@
 /* exported run_test */
+const {Log} = require("models/log");
+const log = Log.instance;
+
+const {UriService} = require("app/services/uri-service");
+const uriService = new UriService(log);
+
 const {V0RulesService} = require("app/services/rules/v0-rules-service");
-const v0RulesService = new V0RulesService(log);
-const {Prefs} = require("bootstrap/models/prefs");
+const v0RulesService = new V0RulesService(log, uriService);
+// const {Prefs} = require("bootstrap/models/prefs");
 
 
 function run_test() {
@@ -90,6 +96,7 @@ add_test(function() {
   // The prefs don't exist.
   testGetOldRulesAsNewRules([undefined, undefined, undefined], []);
 
+  /*
   // Get the old rules from the prefs.
   // Some rules are defined in the prefs.
   usingOldRulePrefs({
@@ -103,6 +110,7 @@ add_test(function() {
       {o: {h: "*.mozilla.org"}, d: {h: "*.mozilla.net"}},
     ]);
   });
+  */
 
   run_next_test();
 });
@@ -152,7 +160,7 @@ add_test(function() {
   function testInvalidRule(originToDest) {
     Assert.throws(function() {
       testGetOldRulesAsNewRules(["", "", originToDest], []);
-    }, /^OldRulesParseError: Invalid old rule/);
+    }, /^V0RulesParseError: Invalid old rule/);
   }
 
   testInvalidRule("|");
@@ -192,6 +200,7 @@ add_test(function() {
 });
 
 
+/*
 function usingOldRulePrefs(aPrefs, aFunction) {
   "use strict";
 
@@ -225,14 +234,14 @@ function setOldRulePref(aPrefName, aValue) {
   Prefs.branches.rp.branch.
       setComplexValue(aPrefName, Ci.nsISupportsString, str);
 }
+*/
 
 function testGetOldRulesAsNewRules(oldRulePrefValues, expectedRuleSpecs) {
   "use strict";
 
-  let [origins, destinations, originsToDestinations] = oldRulePrefValues;
+  let [origins, dests, originsToDests] = oldRulePrefValues;
 
-  const oldRules = v0RulesService.parse(origins, destinations, originsToDestinations);
-  const actualRuleSpecs = oldRules.getAsNewRules();
+  const actualRuleSpecs = v0RulesService.parse({origins, dests, originsToDests});
   assertRuleSpecsEqual(actualRuleSpecs, expectedRuleSpecs);
 }
 

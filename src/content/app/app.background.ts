@@ -20,13 +20,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// @if EXTENSION_TYPE='legacy'
+import {V0RulesMigration} from "legacy/app/migration/v0-rules";
+// @endif
+
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
 import { InitialSetup } from "app/ui/initial-setup";
+import { C } from "data/constants";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
+import { Migration } from "./migration/migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
@@ -37,6 +43,18 @@ import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 
 const log = Log.instance;
+
+//
+// NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:
+//
+// 1. All optional modules should be defined as `const` using ternary operator.
+// 2. All optional modules should fall back to `null` if unused or not
+//    applicable. Do **not** use `undefined`.
+//
+// Rule 1+2 combined will ensure that nobody forgets to pass an optional
+// module to the constructor of another module. (Optional constructor
+// parameters are `undefined` and can be forgotten, `null` cannot.)
+//
 
 const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
@@ -55,11 +73,19 @@ const rpServices = new RPServices(
     log, rulesServices, uriService, versionInfoService,
 );
 
+const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
+    new V0RulesMigration(
+        log, policy, v0RulesService, versionInfoService,
+    ) : null;
+
+const migration = new Migration(log, v0RulesMigration);
+
 const initialSetup = new InitialSetup(log, storage, versionInfoService);
 const ui = new Ui(log, initialSetup);
 
 export const rp = new AppBackground(
     log,
+    migration,
     policy,
     rpServices,
     storage,

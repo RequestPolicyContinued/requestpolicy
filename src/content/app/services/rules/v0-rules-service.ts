@@ -38,7 +38,7 @@ interface IPrefStrings {
 
 let IDNService: any = null;
 
-function splitString(aRulesString: string): Set<string> {
+function splitString(aRulesString: string = ""): Set<string> {
   const rules = new Set(aRulesString.split(" "));
 
   // The string might contain double spaces.

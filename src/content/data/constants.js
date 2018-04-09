@@ -34,6 +34,7 @@ export const C = {
 
   AMO: env`/* @echo AMO */`,
   BUILD_ALIAS: `/* @echo BUILD_ALIAS */`,
+  EXTENSION_TYPE: `/* @echo EXTENSION_TYPE */`,
 
   get UI_TESTING() {
     return this.BUILD_ALIAS === "ui-testing";

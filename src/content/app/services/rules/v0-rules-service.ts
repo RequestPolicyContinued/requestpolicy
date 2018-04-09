@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { UriService } from "app/services/uri-service";
 import { Module } from "lib/classes/module";
 import { IRuleSpec } from "lib/ruleset";
-import * as DomainUtil from "lib/utils/domain-utils";
 import { Log } from "models/log";
 
 declare const Cc: any;
@@ -54,7 +54,10 @@ function splitString(aRulesString: string): Set<string> {
 export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
-  constructor(log: Log) {
+  constructor(
+      log: Log,
+      private uriService: UriService,
+  ) {
     super("app.services.rules.v0", log);
   }
 
@@ -118,7 +121,7 @@ export class V0RulesService extends Module {
     let getBaseDomain;
     if (aEndpoint instanceof Ci.nsIURI) {
       const uri = aEndpoint;
-      host = DomainUtil.getHostByUriObj(uri);
+      host = this.uriService.getHostByUriObj(uri);
       getBaseDomain = () => this.eTLDService.getBaseDomain(uri, 0);
     } else {
       host = aEndpoint;
@@ -147,10 +150,10 @@ export class V0RulesService extends Module {
    */
   private getEndpointSpecFromString(aEndpointString: string) {
     const spec: any = {};
-    if (DomainUtil.isValidUri(aEndpointString)) {
-      const uriObj = DomainUtil.getUriObject(aEndpointString);
+    if (this.uriService.isValidUri(aEndpointString)) {
+      const uriObj = this.uriService.getUriObject(aEndpointString);
       spec.s = uriObj.scheme;
-      const host = DomainUtil.getHostByUriObj(uriObj);
+      const host = this.uriService.getHostByUriObj(uriObj);
       if (host !== null) {
         spec.h = host;
         if (this.shouldWildcardBeAddedToEndpoint(uriObj)) {

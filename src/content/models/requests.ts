@@ -21,12 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.background";
 import {RequestSet} from "lib/request-set";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {createListenersMap} from "lib/utils/listener-factories";
 import {Log} from "models/log";
 
 const log = Log.instance;
+const uriService = rp.services.uri;
 
 const logGettingSavedRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_GETTING_SAVED_REQUESTS"},
@@ -111,7 +112,7 @@ function getRequestsHelper(
   // domain and hostname levels.
   // tslint:disable-next-line prefer-const
   for (let originUri in requests) {
-    if (DomainUtil.getBaseDomain(originUri) !== currentlySelectedOrigin) {
+    if (uriService.getBaseDomain(originUri) !== currentlySelectedOrigin) {
       // only return requests from the given base domain
       continue;
     }
@@ -154,7 +155,7 @@ function getRequestsHelper(
 /* eslint-disable */
 
 // function _getOtherOriginsHelperFromDOM(document, reqSet) {
-//   var documentUri = DomainUtil
+//   var documentUri = uriService
 //       .stripFragment(document.documentURI);
 //   log.log("Looking for other origins within DOM of "
 //       + documentUri);
@@ -175,7 +176,7 @@ function getRequestsHelper(
 //       if (!childDocument) {
 //         continue;
 //       }
-//       var childUri = DomainUtil
+//       var childUri = uriService
 //           .stripFragment(childDocument.documentURI);
 //       if (childUri == "about:blank") {
 //         // iframe empty or not loaded yet, or maybe blocked.
@@ -187,8 +188,8 @@ function getRequestsHelper(
 //       log.log("Found DOM child " + tagType
 //           + " with src <" + childUri + "> in document <" +
 //           documentUri + ">");
-//       //var childUriIdent = DomainUtil.getIdentifier(childUri,
-//       //    DomainUtil.LEVEL_SOP);
+//       //var childUriIdent = uriService.getIdentifier(childUri,
+//       //    uriService.LEVEL_SOP);
 //       // if (!origins[childUriIdent]) {
 //       //   origins[childUriIdent] = {};
 //       // }
@@ -319,7 +320,7 @@ function getAllRequestsInBrowser(browser: any) {
   // main allowed/denied request sets before adding them.
   // _getOtherOriginsHelperFromDOM(document, reqSet);
 
-  const uri = DomainUtil.stripFragment(browser.currentURI.spec);
+  const uri = uriService.stripFragment(browser.currentURI.spec);
   _addRecursivelyAllRequestsFromURI(uri, reqSet, {});
   return reqSet;
 }

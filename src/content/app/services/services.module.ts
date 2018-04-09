@@ -21,6 +21,7 @@
  */
 
 import { RulesServices } from "app/services/rules/rules-services.module";
+import { UriService } from "app/services/uri-service";
 import { VersionInfoService } from "app/services/version-info-service";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
@@ -29,6 +30,7 @@ export class RPServices extends Module {
   constructor(
       log: Log,
       public readonly rules: RulesServices,
+      public readonly uri: UriService,
       public readonly versionInfo: VersionInfoService,
   ) {
     super("app.services", log);
@@ -37,6 +39,7 @@ export class RPServices extends Module {
   protected get subModules() {
     return {
       rules: this.rules,
+      uri: this.uri,
       versionInfo: this.versionInfo,
     };
   }

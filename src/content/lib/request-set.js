@@ -21,11 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.background";
 import {Log} from "models/log";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {RequestResult} from "lib/request-result";
 
 const log = Log.instance;
+const uriService = rp.services.uri;
 
 // =============================================================================
 // utilities
@@ -33,7 +34,7 @@ const log = Log.instance;
 
 function getUriIdentifier(uri) {
   try {
-    return DomainUtil.getIdentifier(uri, DomainUtil.LEVEL_SOP);
+    return uriService.getIdentifier(uri, uriService.hostLevels.SOP);
   } catch (e) {
     const msg = `getUriIdentifier exception on uri <${uri}> ` +
         `. Exception was: ${e}`;
@@ -134,7 +135,7 @@ export class RequestSet {
     }
     const dests = this._origins[originUri];
 
-    const destBase = DomainUtil.getBaseDomain(destUri);
+    const destBase = uriService.getBaseDomain(destUri);
     if (!dests[destBase]) {
       dests[destBase] = {};
     }
@@ -181,7 +182,7 @@ export class RequestSet {
     }
     const dests = this._origins[originUri];
 
-    const destBase = DomainUtil.getBaseDomain(destUri);
+    const destBase = uriService.getBaseDomain(destUri);
     if (!dests[destBase]) {
       return;
     }

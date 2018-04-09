@@ -32,7 +32,6 @@ import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
 } from "lib/subscription";
-import * as DomainUtil from "lib/utils/domain-utils";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";
@@ -41,7 +40,6 @@ import {Requests} from "models/requests";
 
 export const BackgroundPage = {
   C,
-  DomainUtil,
   Environment,
   LegacyApi,
   Log,

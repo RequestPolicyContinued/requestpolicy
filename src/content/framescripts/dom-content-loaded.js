@@ -21,13 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {rp} from "app/app.content";
 import {Log} from "models/log";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {
   Environment,
   Level as EnvLevel,
   MainEnvironment,
 } from "lib/environment";
+import {parseRefresh} from "lib/utils/html-utils";
 import {C} from "data/constants";
 
 import {overlayComm} from "framescripts/managers";
@@ -35,6 +36,7 @@ import {ManagerForBlockedContent}
   from "framescripts/blocked-content.js";
 
 const log = Log.instance;
+const uriServices = rp.services.uri;
 
 export const ManagerForDOMContentLoaded = (function() {
   let self = {};
@@ -188,10 +190,10 @@ export const ManagerForDOMContentLoaded = (function() {
       // TODO: move this logic to the requestpolicy service.
 
       // The dest may be empty if the origin is what should be refreshed.
-      let {delay, destURI} = DomainUtil.parseRefresh(metaTag.content);
+      let {delay, destURI} = parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.
-      if (!DomainUtil.isValidUri(destURI)) {
+      if (!uriServices.isValidUri(destURI)) {
         originalDestURI = destURI;
         destURI = doc.documentURIObject.resolve(destURI);
       }

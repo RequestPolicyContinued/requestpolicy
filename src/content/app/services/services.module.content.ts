@@ -20,17 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RPContentServices } from "app/services/services.module.content";
 import { UriService } from "app/services/uri-service";
+import { Module } from "lib/classes/module";
 import { Log } from "models/log";
-import { AppContent } from "./app.content.module";
 
-const log = Log.instance;
+export class RPContentServices extends Module {
+  constructor(
+      log: Log,
+      public readonly uri: UriService,
+  ) {
+    super("AppContent.services", log);
+  }
 
-const uriService = new UriService(log, "AppContent");
-const rpServices = new RPContentServices(log, uriService);
-
-export const rp = new AppContent(
-    log,
-    rpServices,
-);
+  protected get subModules() {
+    return {
+      uri: this.uri,
+    };
+  }
+}

@@ -22,7 +22,6 @@
  */
 
 import {Log} from "models/log";
-import * as DomainUtil from "lib/utils/domain-utils";
 import {Request} from "lib/request";
 import {
   RequestReason,
@@ -51,6 +50,7 @@ import {
 import {rp} from "app/app.background";
 
 const log = Log.instance;
+const uriService = rp.services.uri;
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -343,7 +343,7 @@ export function process(request) {
           newOriginURI = request.aContext.ownerDocument.documentURI;
         }
         if (newOriginURI) {
-          newOriginURI = DomainUtil.stripFragment(newOriginURI);
+          newOriginURI = uriService.stripFragment(newOriginURI);
           log.log(`Considering origin <${
             originURI}> to be origin <${newOriginURI}>`);
           originURI = newOriginURI;
@@ -438,7 +438,7 @@ export function process(request) {
       return accept("User-allowed redirect", request, true);
     }
 
-    let originHost = DomainUtil.getHostByUriObj(request.aRequestOrigin);
+    let originHost = uriService.getHostByUriObj(request.aRequestOrigin);
 
     if (request.aRequestOrigin.scheme === "chrome") {
       if (originHost === "browser") {
@@ -497,8 +497,8 @@ export function process(request) {
     // destination page. As a simple hack around this, for now we'll always
     // allow request to the same origin. It would be nice to have a a better
     // solution but I'm not sure what that solution is.
-    const originIdent = DomainUtil.getIdentifier(originURI);
-    const destIdent = DomainUtil.getIdentifier(destURI);
+    const originIdent = uriService.getIdentifier(originURI);
+    const destIdent = uriService.getIdentifier(destURI);
     if (originIdent === destIdent &&
         originIdent !== null && destIdent !== null) {
       request.requestResult = new RequestResult(true,
@@ -717,19 +717,19 @@ MainEnvironment.obMan.observe(["http-on-modify-request"],
     examineHttpRequest);
 
 export function registerHistoryRequest(destinationUrl) {
-  destinationUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(destinationUrl)
+  destinationUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(destinationUrl)
   );
   historyRequests[destinationUrl] = true;
   log.info(`History item requested: <${destinationUrl}>.`);
 }
 
 export function registerFormSubmitted(originUrl, destinationUrl) {
-  originUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(originUrl)
+  originUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(originUrl)
   );
-  destinationUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(destinationUrl)
+  destinationUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(destinationUrl)
   );
 
   log.info(
@@ -760,11 +760,11 @@ export function registerFormSubmitted(originUrl, destinationUrl) {
 }
 
 export function registerLinkClicked(originUrl, destinationUrl) {
-  originUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(originUrl)
+  originUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(originUrl)
   );
-  destinationUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(destinationUrl)
+  destinationUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(destinationUrl)
   );
 
   log.info(
@@ -798,11 +798,11 @@ export function registerLinkClicked(originUrl, destinationUrl) {
 }
 
 export function registerAllowedRedirect(originUrl, destinationUrl) {
-  originUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(originUrl)
+  originUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(originUrl)
   );
-  destinationUrl = DomainUtil.ensureUriHasPath(
-      DomainUtil.stripFragment(destinationUrl)
+  destinationUrl = uriService.ensureUriHasPath(
+      uriService.stripFragment(destinationUrl)
   );
 
   log.info(`User-allowed redirect from <${
@@ -828,8 +828,8 @@ MainEnvironment.obMan.observe(
 );
 
 function mapDestinations(origDestUri, newDestUri) {
-  origDestUri = DomainUtil.stripFragment(origDestUri);
-  newDestUri = DomainUtil.stripFragment(newDestUri);
+  origDestUri = uriService.stripFragment(origDestUri);
+  newDestUri = uriService.stripFragment(newDestUri);
   log.info(
       `Mapping destination <${origDestUri}> to <${newDestUri}>.`
   );
@@ -837,7 +837,7 @@ function mapDestinations(origDestUri, newDestUri) {
     MappedDestinations[newDestUri] = {};
   }
   MappedDestinations[newDestUri][origDestUri] =
-      DomainUtil.getUriObject(origDestUri);
+      uriService.getUriObject(origDestUri);
 }
 
 /**
@@ -866,8 +866,8 @@ function checkRedirect(request) {
   const originURI = request.originURI;
   const destURI = request.destURI;
 
-  const originURIObj = DomainUtil.getUriObject(originURI);
-  const destURIObj = DomainUtil.getUriObject(destURI);
+  const originURIObj = uriService.getUriObject(originURI);
+  const destURIObj = uriService.getUriObject(destURI);
 
   {
     let result = rp.policy.checkRequestAgainstUserRules(originURIObj,

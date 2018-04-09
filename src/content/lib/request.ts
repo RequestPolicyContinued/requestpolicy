@@ -22,13 +22,12 @@
  */
 
 import {rp} from "app/app.background";
+import {IUri} from "lib/classes/uri";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
   RequestResult,
 } from "lib/request-result";
-import * as DomainUtil from "lib/utils/domain-utils";
-import {IUri} from "lib/utils/domain-utils";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {Log} from "models/log";
@@ -38,6 +37,8 @@ const logRequests = Log.instance.extend({
   level: "all",
   name: "Requests",
 });
+
+const uriService = rp.services.uri;
 
 declare const Ci: any;
 declare const Services: any;
@@ -188,7 +189,7 @@ export class Request {
       return true;
     }
 
-    const destHost = DomainUtil.getHostByUriObj(dest);
+    const destHost = uriService.getHostByUriObj(dest);
 
     // "global" dest are [some sort of interal requests]
     // "browser" dest are [???]
@@ -248,7 +249,7 @@ export class Request {
       }
     }
 
-    const destHost = DomainUtil.getHostByUriObj(dest);
+    const destHost = uriService.getHostByUriObj(dest);
 
     if (
         dest.scheme === "resource" && (
@@ -272,8 +273,8 @@ export class Request {
 
     if (rp.storage.alias.isDefaultAllowSameDomain()) {
       const originDomain = originUri ?
-          DomainUtil.getBaseDomain(originUri) : null;
-      const destDomain = DomainUtil.getBaseDomain(destUri);
+          uriService.getBaseDomain(originUri) : null;
+      const destDomain = uriService.getBaseDomain(destUri);
 
       if (originDomain !== null && destDomain !== null) {
         // apply this rule only if both origin and dest URIs
@@ -293,9 +294,10 @@ export class Request {
       return new RequestResult(true, RequestReason.DefaultSameDomain);
     }
 
+    const LEVEL_SOP = uriService.hostLevels.SOP;
     const originIdent = originUri ?
-        DomainUtil.getIdentifier(originUri, DomainUtil.LEVEL_SOP) : null;
-    const destIdent = DomainUtil.getIdentifier(destUri, DomainUtil.LEVEL_SOP);
+        uriService.getIdentifier(originUri, LEVEL_SOP) : null;
+    const destIdent = uriService.getIdentifier(destUri, LEVEL_SOP);
     return new RequestResult(originIdent === destIdent,
         RequestReason.DefaultSameDomain);
   }
@@ -359,12 +361,12 @@ export class NormalRequest extends Request {
 
   public setOriginURI(originURI: string) {
     this.originURI = originURI;
-    this.aRequestOrigin = DomainUtil.getUriObject(originURI);
+    this.aRequestOrigin = uriService.getUriObject(originURI);
   }
 
   public setDestURI(destURI: string) {
     this.destURI = destURI;
-    this.aContentLocation = DomainUtil.getUriObject(destURI);
+    this.aContentLocation = uriService.getUriObject(destURI);
   }
 
   get destURIWithRef() {

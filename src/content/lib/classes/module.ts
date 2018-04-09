@@ -31,6 +31,7 @@ export interface IModule {
 
 export abstract class Module implements IModule {
   protected log: Log;
+  protected debugLog: Log;
 
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
@@ -78,20 +79,25 @@ export abstract class Module implements IModule {
       parentLog: Log,
   ) {
     this.log = parentLog.extend({name: moduleName});
+    this.debugLog = this.log.extend({enabled: false});
   }
 
   public async startup(): Promise<void> {
+    this.debugLog.log("starting up...");
     const p = this.startup_();
     p.catch(this.log.onError("startup()"));
     await p;
     this.ready = true;
     this.dReady.resolve(undefined);
+    this.debugLog.log("startup done");
   }
 
   public async shutdown(): Promise<void> {
+    this.debugLog.log("shutting down...");
     const p = this.shutdown_();
     p.catch(this.log.onError("shutdown()"));
     await p;
+    this.debugLog.log("shut down");
   }
 
   protected startupSelf(): Promise<void> {

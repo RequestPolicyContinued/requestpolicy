@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { V0RulesMigration } from "legacy/app/migration/v0-rules";
+import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { IModule, Module } from "lib/classes/module";
 import { Log } from "models/log";
 

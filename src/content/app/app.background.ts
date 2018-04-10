@@ -21,7 +21,7 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import {V0RulesMigration} from "legacy/app/migration/v0-rules";
+import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 // @endif
 
 import { RulesServices } from "app/services/rules/rules-services.module";

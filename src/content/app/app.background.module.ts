@@ -34,7 +34,7 @@ export class AppBackground extends Module {
       public readonly services: App.IRPServices,
       public readonly storage: App.IStorage,
       public readonly ui: App.IUi,
-      public readonly legacy?: LegacyModule,
+      public readonly legacy: LegacyModule | null,
   ) {
     super("App", log);
   }

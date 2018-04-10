@@ -73,10 +73,11 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
-let webextSettingsMigration: LegacySideSettingsMigrationController | undefined;
-let legacy: LegacyModule | undefined;
-
-if (C.EXTENSION_TYPE === "legacy") {
+const {legacy, webextSettingsMigration}: {
+  webextSettingsMigration: LegacySideSettingsMigrationController | null,
+  legacy: LegacyModule | null,
+} = C.EXTENSION_TYPE === "legacy" ? (() => {
+  // @if EXTENSION_TYPE='legacy'
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
   const promiseEwePort = () => {
     log.log("promiseEwePort()");
@@ -91,13 +92,23 @@ if (C.EXTENSION_TYPE === "legacy") {
       C.EWE_CONNECTION_EWE_ID,
       promiseEwePort,
   );
-  webextSettingsMigration = new LegacySideSettingsMigrationController(
+  const rvWebextSettingsMigration = new LegacySideSettingsMigrationController(
       log,
       browser.storage,
       eweConnection,
   );
-  legacy = new LegacyModule(log, eweConnection, webextSettingsMigration);
-}
+  const rvLegacy = new LegacyModule(
+      log, eweConnection, rvWebextSettingsMigration,
+  );
+  return {
+    legacy: rvLegacy,
+    webextSettingsMigration: rvWebextSettingsMigration,
+  };
+  // @endif
+})() : {
+  legacy: null,
+  webextSettingsMigration: null,
+};
 
 const settingsMigration = new SettingsMigration(
     log,

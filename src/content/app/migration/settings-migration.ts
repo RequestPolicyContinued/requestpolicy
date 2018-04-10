@@ -38,7 +38,7 @@ export class SettingsMigration extends Module
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private settingsMigration?: LegacySideSettingsMigrationController,
+      private settingsMigration: LegacySideSettingsMigrationController | null,
   ) {
     super("app.migration.settings", log);
   }

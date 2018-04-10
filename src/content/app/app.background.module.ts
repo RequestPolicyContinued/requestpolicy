@@ -21,9 +21,9 @@
  */
 
 import { App } from "app/interfaces";
-import { LegacyModule } from "app/legacy/legacy.module";
+import { Runtime } from "app/runtime/runtime.module";
 import { Common } from "common/interfaces";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class AppBackground extends Module {
   constructor(
@@ -31,26 +31,23 @@ export class AppBackground extends Module {
       public readonly browserSettings: App.IBrowserSettings,
       public readonly migration: App.IMigration,
       public readonly policy: App.IPolicy,
+      public readonly runtime: Runtime,
       public readonly services: App.IRPServices,
       public readonly storage: App.IStorage,
       public readonly ui: App.IUi,
-      public readonly legacy: LegacyModule | null,
   ) {
     super("App", log);
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    return {
       browserSettings: this.browserSettings,
       migration: this.migration,
       policy: this.policy,
+      runtime: this.runtime,
       services: this.services,
       storage: this.storage,
       ui: this.ui,
     };
-    if (this.legacy) {
-      rv.legacy = this.legacy;
-    }
-    return rv;
   }
 }

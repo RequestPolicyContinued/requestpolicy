@@ -10,8 +10,8 @@ const {
 const {destructureOptions} = require("../lib/utils");
 
 const {Log} = require("models/log");
-const {LegacySideSettingsMigrationController} = require(
-    "app/legacy/legacy-side-settings-migration-controller"
+const {SettingsMigrationToWebExtension} = require(
+    "legacy/app/migration/settings-migration-to-we"
 );
 
 function maybeAssignLastStorageChange(aObj, aFullStorage) {
@@ -55,7 +55,7 @@ describe("legacy-side settings migration controller", function() {
 
   beforeEach(() => {
     eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
-    LegacySideController = new LegacySideSettingsMigrationController(
+    LegacySideController = new SettingsMigrationToWebExtension(
         Log.instance, browser.storage, eweExternalBrowser.runtime
     );
   });
@@ -170,7 +170,7 @@ describe("legacy-side settings migration controller", function() {
           eRuntime.sendMessage
       );
       sinon.assert.calledWithMatch(eRuntime.sendMessage, {
-        target: "webext-side-settings-migration-controller",
+        target: "settings-migration-from-xpcom",
         type: "startup",
         value: "ready",
       });
@@ -184,7 +184,7 @@ describe("legacy-side settings migration controller", function() {
     onFullStorageMessageSent({args: aFullStorageMessageArgs}) {
       assert.deepEqual(aFullStorageMessageArgs, [
         {
-          target: "webext-side-settings-migration-controller",
+          target: "settings-migration-from-xpcom",
           type: "full-storage",
           value: {foo: "bar"},
         },
@@ -308,7 +308,7 @@ describe("legacy-side settings migration controller", function() {
       storageChangeSuccess: success,
       afterStorageChangeDispatched({eRuntime}) {
         sinon.assert.calledWithMatch(eRuntime.sendMessage, {
-          target: "webext-side-settings-migration-controller",
+          target: "settings-migration-from-xpcom",
           type: "storage-change",
           value: storageChange,
         });

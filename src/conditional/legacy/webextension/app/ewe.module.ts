@@ -21,8 +21,8 @@
  */
 
 import {
-  WebextSideSettingsMigrationController,
-} from "controllers/webext-side-settings-migration-controller";
+  SettingsMigrationFromXpcom,
+} from "controllers/settings-migration-from-xpcom";
 import { Connection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
@@ -31,7 +31,7 @@ export class EweModule extends Module {
   constructor(
       log: Log,
       public readonly legacyConnection: Connection<any, any>,
-      public readonly settingsMigration: WebextSideSettingsMigrationController,
+      public readonly settingsMigration: SettingsMigrationFromXpcom,
   ) {
     super("ewe", log);
   }

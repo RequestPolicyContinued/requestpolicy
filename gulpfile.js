@@ -158,7 +158,7 @@ function promiseMtimes(path, mtimes = []) {
       );
       p.catch((e) => {
         console.error(`readlink("${path}"):`, e);
-      })
+      });
       return p;
     }
     return mtimes2;

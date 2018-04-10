@@ -21,11 +21,11 @@
  */
 
 import { App } from "app/interfaces";
-import {
-  LegacySideSettingsMigrationController,
-} from "app/legacy/legacy-side-settings-migration-controller";
 import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 import { Common } from "common/interfaces";
+import {
+  SettingsMigrationToWebExtension,
+} from "legacy/app/migration/settings-migration-to-we";
 import { Module } from "lib/classes/module";
 
 export class SettingsMigration extends Module
@@ -38,7 +38,7 @@ export class SettingsMigration extends Module
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private settingsMigration: LegacySideSettingsMigrationController | null,
+      private settingsMigration: SettingsMigrationToWebExtension | null,
   ) {
     super("app.migration.settings", log);
   }

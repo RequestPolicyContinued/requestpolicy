@@ -33,7 +33,7 @@ interface IResponse {
   value: any;
 }
 
-export class LegacySideSettingsMigrationController extends Module {
+export class SettingsMigrationToWebExtension extends Module {
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
@@ -48,7 +48,7 @@ export class LegacySideSettingsMigrationController extends Module {
       private storage: typeof browser.storage,
       private connectionToEWE: IConnection,
   ) {
-    super("app.legacy.settingsMigration", log);
+    super("app.migration.xpcomToWE", log);
   }
 
   protected startupSelf(): Promise<void> {
@@ -189,7 +189,7 @@ export class LegacySideSettingsMigrationController extends Module {
 
   private createMessage(aType: string, aValue: any) {
     return {
-      target: "webext-side-settings-migration-controller",
+      target: "settings-migration-from-xpcom",
       type: aType,
       value: aValue,
     };

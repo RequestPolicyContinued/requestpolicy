@@ -21,12 +21,11 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import {
-  LegacySideSettingsMigrationController,
-} from "app/legacy/legacy-side-settings-migration-controller";
-import {LegacyModule} from "app/legacy/legacy.module";
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
+import {
+  SettingsMigrationToWebExtension,
+} from "legacy/app/migration/settings-migration-to-we";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
@@ -37,6 +36,7 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 
 import { dAsyncSettings, log } from "app/log";
 import { SettingsMigration } from "app/migration/settings-migration";
+import { Runtime } from "app/runtime/runtime.module";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
@@ -73,9 +73,9 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
-const {legacy, webextSettingsMigration}: {
-  webextSettingsMigration: LegacySideSettingsMigrationController | null,
-  legacy: LegacyModule | null,
+const {eweConnection, webextSettingsMigration}: {
+  webextSettingsMigration: SettingsMigrationToWebExtension | null,
+  eweConnection: Connection<any, any> | null,
 } = C.EXTENSION_TYPE === "legacy" ? (() => {
   // @if EXTENSION_TYPE='legacy'
   const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
@@ -86,27 +86,24 @@ const {legacy, webextSettingsMigration}: {
       return getPortFromSlaveConnectable(eweBrowser.runtime);
     });
   };
-  const eweConnection = new Connection(
+  const rvEWEConnection = new Connection(
       C.EWE_CONNECTION_LEGACY_ID,
       log,
       C.EWE_CONNECTION_EWE_ID,
       promiseEwePort,
   );
-  const rvWebextSettingsMigration = new LegacySideSettingsMigrationController(
+  const rvWebextSettingsMigration = new SettingsMigrationToWebExtension(
       log,
       browser.storage,
-      eweConnection,
-  );
-  const rvLegacy = new LegacyModule(
-      log, eweConnection, rvWebextSettingsMigration,
+      rvEWEConnection,
   );
   return {
-    legacy: rvLegacy,
+    eweConnection: rvEWEConnection,
     webextSettingsMigration: rvWebextSettingsMigration,
   };
   // @endif
 })() : {
-  legacy: null,
+  eweConnection: null,
   webextSettingsMigration: null,
 };
 
@@ -129,6 +126,7 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
 const rulesetStorage = new RulesetStorage(log, localStorageArea);
 const subscriptions = new Subscriptions(log, rulesetStorage, localStorageArea);
 const policy = new Policy(log, subscriptions, rulesetStorage);
+const runtime = new Runtime(log, eweConnection);
 
 const asyncSettings = new AsyncSettings(
     log,
@@ -188,8 +186,8 @@ export const rp = new AppBackground(
     browserSettings,
     migration,
     policy,
+    runtime,
     rpServices,
     storage,
     ui,
-    legacy,
 );

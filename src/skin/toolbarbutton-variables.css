@@ -1,4 +1,4 @@
-#rpcontinuedToolbarButton {
+#/* @echo ALPHABETICAL_ID */ToolbarButton {
   --rpc-toolbarbutton-icon-blocked-32: url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
   --rpc-toolbarbutton-icon-blocked-24: url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
   --rpc-toolbarbutton-icon-blocked-16: url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);

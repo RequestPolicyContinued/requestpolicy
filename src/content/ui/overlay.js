@@ -88,7 +88,7 @@ export function loadOverlayIntoWindow(window) {
 
   let initialized = false;
 
-  let toolbarButtonId = "rpcontinuedToolbarButton";
+  let toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 
   let overlayId = 0;
 
@@ -1067,7 +1067,7 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self.openMenuAtToolbarButton = function() {
-    let anchor = $id("rpcontinuedToolbarButton");
+    let anchor = $id("/* @echo ALPHABETICAL_ID */ToolbarButton");
     // rpcontinued.overlay._toolbox.insertBefore(
     //     rpcontinued.overlay.popupElement, null);
     popupElement.openPopup(anchor, "after_start", 0, 0, true, true);
@@ -1109,7 +1109,7 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self.isToolbarButtonVisible = function() {
-    return DOMUtils.isElementVisible($id("rpcontinuedToolbarButton"));
+    return DOMUtils.isElementVisible($id("/* @echo ALPHABETICAL_ID */ToolbarButton"));
   };
 
   function openLinkInNewTab(url, relatedToCurrent) {

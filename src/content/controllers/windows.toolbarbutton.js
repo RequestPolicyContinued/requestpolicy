@@ -38,7 +38,7 @@ if (LegacyApi.miscInfos.isAustralis) {
 export const ToolbarButtonController = (function() {
   let self = {};
 
-  const toolbarButtonId = "rpcontinuedToolbarButton";
+  const toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 
   let isAustralis = LegacyApi.miscInfos.isAustralis;
 

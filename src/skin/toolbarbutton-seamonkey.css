@@ -6,11 +6,11 @@
  * (the !important keyword is necessary.)
  */
 /* 32px is the default icon size in SeaMonkey */
-toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
-#palette-box #rpcontinuedToolbarButton {
+toolbar > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton,
+#palette-box #/* @echo ALPHABETICAL_ID */ToolbarButton {
   list-style-image: var(--rpc-toolbarbutton-icon-blocked-32) !important;
 }
-toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
+toolbar[iconsize="small"] > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton {
   list-style-image: var(--rpc-toolbarbutton-icon-blocked-16) !important;
 }
 
@@ -21,12 +21,12 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> red flag.
  */
 
-/* default: */ toolbar #rpcontinuedToolbarButton,
-/* blocked: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
+/* default: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image: var(--rpc-toolbarbutton-icon-blocked-32);
 }
-/* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
-/* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
+/* default: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
   list-style-image: var(--rpc-toolbarbutton-icon-blocked-16);
 }
 
@@ -36,10 +36,10 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> grey flag.
  */
 
-/* allowed: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
+/* allowed: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image: var(--rpc-toolbarbutton-icon-allowed-32);
 }
-/* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
+/* allowed: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
   list-style-image: var(--rpc-toolbarbutton-icon-allowed-16);
 }
 
@@ -49,9 +49,9 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> yellow flag.
  */
 
-toolbar #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
+toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image: var(--rpc-toolbarbutton-icon-disabled-32);
 }
-toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
+toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
   list-style-image: var(--rpc-toolbarbutton-icon-disabled-16);
 }

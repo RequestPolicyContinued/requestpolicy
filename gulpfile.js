@@ -40,6 +40,8 @@ const srcDir = `${rootDir}/${srcDirRelative}`; // eslint-disable-line no-unused-
 const EXTENSION_NAME        = "requestpolicy";
 const EXTENSION_ID__AMO     = "rpcontinued@amo.requestpolicy.org";
 const EXTENSION_ID__OFF_AMO = "rpcontinued@non-amo.requestpolicy.org";
+const ALPHABETICAL_ID__AMO     = "rpcontinued";
+const ALPHABETICAL_ID__OFF_AMO = "rpcontinuedOffAmo";
 
 const fileFilter = (function() {
   function _array(aAny) {
@@ -372,6 +374,7 @@ BUILDS.forEach((build) => {
         const context = buildData.ppContext = {
           "BUILD_ALIAS": build.alias,
           "EXTENSION_ID": build.isAMO ? EXTENSION_ID__AMO : EXTENSION_ID__OFF_AMO,
+          "ALPHABETICAL_ID": build.isAMO ? ALPHABETICAL_ID__AMO : ALPHABETICAL_ID__OFF_AMO,
           "EXTENSION_TYPE": extensionType,
           "RELEASE_CHANNEL": build.channel,
           "RP_HOMEPAGE_URL": config.homepage,
@@ -435,9 +438,7 @@ BUILDS.forEach((build) => {
         let files = [
           "README",
           "LICENSE",
-          "content/**/*.css",
           "content/lib/third-party/static/**/*.js",
-          "skin/*.css",
           "skin/*.png",
           "skin/*.svg",
         ];
@@ -482,6 +483,7 @@ BUILDS.forEach((build) => {
       ));
 
       addPreprocessedFilesBuildTask("js", [
+        "content/**/*.css",
       ].concat(
           extensionType === "webextension" ? [
             "_locales/**/messages.json",
@@ -490,6 +492,7 @@ BUILDS.forEach((build) => {
             "content/bootstrap-data/locales.json",
             "content/bootstrap-data/manifest.json",
             "content/_locales/**/messages.json",
+            "skin/*.css",
           ] : []
       ));
 

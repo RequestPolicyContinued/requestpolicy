@@ -43,7 +43,7 @@ exports.toolbarbutton = [
 
     tag: "toolbarbutton",
     attributes: {
-      id: "rpcontinuedToolbarButton",
+      id: "/* @echo ALPHABETICAL_ID */ToolbarButton",
       label: "RequestPolicy",
       tooltiptext: "RequestPolicy Continued",
       popup: "rpc-popup",

@@ -21,21 +21,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Prefs} from "bootstrap/models/prefs";
-import {C} from "data/constants";
+import { API, JSMs } from "bootstrap/api/interfaces";
+import { C } from "data/constants";
 
-declare const Services: any;
+export class MiscInfos {
+  public lastAppVersion: string = this.prefs.get("lastAppVersion");
 
-export const lastAppVersion: string = Prefs.get("lastAppVersion");
+  public isFirefox: boolean = this.appinfo.ID === C.FIREFOX_ID;
+  public isSeamonkey: boolean = this.appinfo.ID === C.SEAMONKEY_ID;
+  public isGecko: boolean = this.appinfo.name !== "Pale Moon";
+  public isAustralis: boolean = this.isFirefox &&
+      this.vc.compare(this.appinfo.platformVersion, "29") >= 0;
 
-const {ID: appID, name: appName, platformVersion} = Services.appinfo;
-export const isFirefox: boolean = appID === C.FIREFOX_ID;
-export const isSeamonkey: boolean = appID === C.SEAMONKEY_ID;
-export const isGecko: boolean = appName !== "Pale Moon";
-export const isAustralis: boolean = isFirefox &&
-    Services.vc.compare(platformVersion, "29") >= 0;
+  constructor(
+      private appinfo: JSMs.Services["appinfo"],
+      private prefs: API.storage.IPrefs,
+      private vc: JSMs.Services["vc"],
+  ) {}
 
-export function isGeckoVersionAtLeast(aMinVersion: string): boolean {
-  return isGecko &&
-      Services.vc.compare(platformVersion, aMinVersion) >= 0;
+  public isGeckoVersionAtLeast(aMinVersion: string): boolean {
+    return this.isGecko &&
+        this.vc.compare(this.appinfo.platformVersion, aMinVersion) >= 0;
+  }
 }

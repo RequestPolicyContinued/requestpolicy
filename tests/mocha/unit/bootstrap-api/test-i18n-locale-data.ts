@@ -20,7 +20,7 @@ describe("LocaleData", function() {
   let LocaleData;
 
   before(function() {
-    ({LocaleData} = require("bootstrap/models/api/i18n/locale-data"));
+    ({LocaleData} = require("bootstrap/api/i18n/locale-data"));
   });
 
   describe("has(locale)", function() {

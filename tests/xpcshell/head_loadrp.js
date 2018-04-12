@@ -102,7 +102,7 @@ const require = COMMONJS.load.bind(COMMONJS);
 // LegacyApi
 // -----------------------------------------------------------------------------
 
-LegacyApi.prefs = require("bootstrap/models/prefs").Prefs;
+LegacyApi.prefs = require("bootstrap/models/prefs").Prefs.instance;
 
 // -----------------------------------------------------------------------------
 // Load the default preferences

@@ -21,17 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
-import { Log } from "models/log";
 
 declare const Services: any;
 
 export class Runtime extends Module {
   private events = createListenersMap(["onMessage"]);
 
-  constructor(log: Log) {
+  constructor(log: API.ILog) {
     super("browser.runtime", log);
   }
 

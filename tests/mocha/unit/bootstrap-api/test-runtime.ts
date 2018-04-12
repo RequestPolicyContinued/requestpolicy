@@ -45,10 +45,10 @@ describe("browser.runtime", function() {
     (global as any).Services = new MockServices();
 
     const {Log} = require("models/log");
-    const {AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data");
+    const {AsyncLocaleData} = require("bootstrap/api/i18n/async-locale-data");
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
     // eslint-disable-next-line no-unused-vars
-    let {Runtime} = require("bootstrap/models/api/runtime");
+    let {Runtime} = require("bootstrap/api/runtime");
     runtime = new Runtime(Log.instance);
   });
 

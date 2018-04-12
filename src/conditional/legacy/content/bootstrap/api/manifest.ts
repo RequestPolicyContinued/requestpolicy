@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,34 +20,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Module} from "lib/classes/module";
-import {Log} from "models/log";
+import { API } from "bootstrap/api/interfaces";
+import { Module } from "lib/classes/module";
 
-export class Extension extends Module {
-  private backgroundPage: any;
+export class Manifest extends Module {
+  public data: any;
 
-  constructor(log: Log) {
-    super("browser.extension", log);
+  constructor(
+      log: API.ILog,
+      private chromeFileService: API.services.IChromeFileService,
+  ) {
+    super("manifest", log);
   }
 
-  public get backgroundApi() {
-    return {
-      getBackgroundPage: this.getBackgroundPage.bind(this),
-    };
-  }
-
-  public get contentApi() {
-    return {
-      getURL: null,
-      inIncognitoContext: null,
-    };
-  }
-
-  public setBackgroundPage(aObject: any) {
-    this.backgroundPage = aObject;
-  }
-
-  public getBackgroundPage() {
-    return this.backgroundPage;
+  public async startupSelf() {
+    const manifestUrl = this.chromeFileService.
+        getChromeUrl("bootstrap-data/manifest.json");
+    await this.chromeFileService.parseJSON(manifestUrl).then((data) => {
+      this.data = data;
+    });
   }
 }

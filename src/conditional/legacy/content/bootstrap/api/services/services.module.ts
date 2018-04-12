@@ -20,18 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {defineLazyGetter} from "lib/utils/js-utils";
+import { API } from "bootstrap/api/interfaces";
+import {Module} from "lib/classes/module";
 
-export const MozModules: {
-  FileUtils?: any,
-  NetUtil?: any,
-} = {};
-
-[
-  ["FileUtils", "resource://gre/modules/FileUtils.jsm"],
-  ["NetUtil", "resource://gre/modules/NetUtil.jsm"],
-].forEach(([name, uri]) => {
-  defineLazyGetter(MozModules, name, () => {
-    return Cu.import(uri)[name];
-  });
-});
+export class ServicesApi extends Module {
+  constructor(
+      log: API.ILog,
+      public chromeFileService: API.services.IChromeFileService,
+      public fileService: API.services.IFileService,
+  ) {
+    super("browser.storage", log);
+  }
+}

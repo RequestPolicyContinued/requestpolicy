@@ -21,74 +21,57 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MozModules} from "bootstrap/models/moz-modules";
-
-const {FileUtils: MozFileUtils} = MozModules;
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
 
 // =============================================================================
 
-declare const Cc: any;
-declare const Ci: any;
-interface IFile {
-  leafName: string;
-  exists(): boolean;
-  isFile(): boolean;
-  isDirectory(): boolean;
-}
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
 const REQUESTPOLICY_DIR = "requestpolicy";
 
 // =============================================================================
 
-function getRPPath(aPath: string) {
-  return REQUESTPOLICY_DIR + (aPath ? "/" + aPath : "");
+export class FileService {
+  constructor(
+      private xpc: API.IXPConnectService,
+      private mozFileUtils: JSMs.FileUtils,
+  ) {}
+
+public getRPFile(aPath: string) {
+  return this.getProfileFile(this.getRPPath(aPath));
 }
 
-export function getRPFile(aPath: string) {
-  return getProfileFile(getRPPath(aPath));
+public getRPDir(aPath: string, shouldCreate?: boolean) {
+  return this.getProfileDir(this.getRPPath(aPath), shouldCreate);
 }
 
-export function getRPDir(aPath: string, shouldCreate?: boolean) {
-  return getProfileDir(getRPPath(aPath), shouldCreate);
-}
-
-function getProfileFile(aPath: string) {
-  return MozFileUtils.getFile("ProfD", aPath.split("/"));
-}
-
-function getProfileDir(aPath: string, shouldCreate: boolean = true) {
-  return MozFileUtils.getDir("ProfD", aPath.split("/"), shouldCreate);
-}
-
-export function getAllRPFiles(aDir?: {
+public getAllRPFiles(aDir?: {
     path: string,
-    file: IFile,
+    file: XPCOM.nsIFile,
 }): string[] {
   const dirPath = aDir ? aDir.path : "";
-  const dirFile = aDir ? aDir.file : getRPFile(dirPath);
+  const dirFile = aDir ? aDir.file : this.getRPFile(dirPath);
   if (!dirFile.exists()) return [];
   const entries = dirFile.directoryEntries;
   let files: string[] = [];
   while (entries.hasMoreElements()) {
-    const file: IFile = entries.getNext().QueryInterface(Ci.nsIFile);
+    const file: XPCOM.nsIFile = entries.getNext().QueryInterface(Ci.nsIFile);
     const path: string = (dirPath ? `${dirPath}/` : "") + file.leafName;
     if (file.isFile()) {
       files.push(path);
     } else if (file.isDirectory()) {
-      files = files.concat(getAllRPFiles({path, file}));
+      files = files.concat(this.getAllRPFiles({path, file}));
     }
   }
   return files;
 }
 
-export function fileToString(file: IFile): string {
-  const stream = Cc["@mozilla.org/network/file-input-stream;1"].
-      createInstance(Ci.nsIFileInputStream);
+public fileToString(file: XPCOM.nsIFile): string {
+  const stream = this.xpc.createFileInputStreamInstance();
   stream.init(file, 0x01, 0o444, 0);
   stream.QueryInterface(Ci.nsILineInputStream);
 
-  const cstream = Cc["@mozilla.org/intl/converter-input-stream;1"].
-      createInstance(Ci.nsIConverterInputStream);
+  const cstream = this.xpc.createConverterInputStreamInstance();
   cstream.init(stream, "UTF-8", 0, 0);
 
   let str = "";
@@ -108,17 +91,28 @@ export function fileToString(file: IFile): string {
  * Writes a string to a file (truncates the file if it exists, creates it if
  * it doesn't).
  */
-export function stringToFile(str: string, file: IFile) {
-  const stream = Cc["@mozilla.org/network/file-output-stream;1"]
-      .createInstance(Ci.nsIFileOutputStream);
+public stringToFile(str: string, file: XPCOM.nsIFile) {
+  const stream = this.xpc.createFileOutputStreamInstance();
   // write, create, append on write, truncate
   // tslint:disable-next-line no-bitwise
   stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
 
-  const cos = Cc["@mozilla.org/intl/converter-output-stream;1"].
-      createInstance(Ci.nsIConverterOutputStream);
+  const cos = this.xpc.createConverterOutputStreamInstance();
   cos.init(stream, "UTF-8", 4096, 0x0000);
   cos.writeString(str);
   cos.close();
   stream.close();
+}
+
+  private getRPPath(aPath: string) {
+    return REQUESTPOLICY_DIR + (aPath ? "/" + aPath : "");
+  }
+
+  private getProfileFile(aPath: string) {
+    return this.mozFileUtils.getFile("ProfD", aPath.split("/"));
+  }
+
+  private getProfileDir(aPath: string, shouldCreate: boolean = true) {
+    return this.mozFileUtils.getDir("ProfD", aPath.split("/"), shouldCreate);
+  }
 }

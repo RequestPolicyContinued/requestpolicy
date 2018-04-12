@@ -1,6 +1,6 @@
 /* exported run_test */
 
-const {JsonPrefs} = require("bootstrap/models/api/storage/json-prefs");
+const {JsonPrefs} = require("bootstrap/api/storage/json-prefs");
 
 function run_test() {
   run_next_test();

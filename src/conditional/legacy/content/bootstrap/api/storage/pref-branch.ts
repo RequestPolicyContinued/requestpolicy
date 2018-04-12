@@ -20,16 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-declare const Ci: any;
-declare const Services: any;
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
 export type PrefTypes = "BoolPref" | "CharPref" | "IntPref";
 type GetterFnName = "getBoolPref" | "getCharPref" | "getIntPref";
 type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
-
-// =============================================================================
-// PrefBranch
-// =============================================================================
 
 /**
  * @param {string} aBranchRoot
@@ -37,10 +34,11 @@ type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
  *     Pref Types are "BoolPref", "CharPref", "IntPref", "ComplexValue".
  */
 export class PrefBranch {
-  public readonly branch = Services.prefs.getBranch(this.branchRoot).
-      QueryInterface(Ci.nsIPrefBranch2);
+  public readonly branch = this.prefsService.getBranch(this.branchRoot).
+      QueryInterface<XPCOM.nsIPrefBranch2>(Ci.nsIPrefBranch2);
 
   constructor(
+      private prefsService: JSMs.Services["prefs"],
       public readonly branchRoot: string,
       // How should a pref name "foo.bar.baz" be translated to
       // "getBoolPref" or "setIntPref"?
@@ -82,11 +80,15 @@ export class PrefBranch {
     return this.branch.prefHasUserValue(aPrefName);
   }
 
-  public addObserver(aDomain: string, aObserver: any, aHoldWeak: boolean) {
+  public addObserver(
+      aDomain: string,
+      aObserver: XPCOM.nsIObserver,
+      aHoldWeak: boolean,
+  ) {
     return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
   }
 
-  public removeObserver(aDomain: string, aObserver: any) {
+  public removeObserver(aDomain: string, aObserver: XPCOM.nsIObserver) {
     return this.branch.removeObserver(aDomain, aObserver);
   }
 

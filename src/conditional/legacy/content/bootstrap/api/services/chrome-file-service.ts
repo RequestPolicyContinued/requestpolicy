@@ -8,9 +8,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 
-const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
-const {httpRequest} = Cu.import("resource://gre/modules/Http.jsm");
+export class ChromeFileService {
+  constructor(
+      private netUtil: JSMs.NetUtil,
+      private http: JSMs.Http,
+  ) {}
 
 /**
  * Return the complete chrome url based on a relative path to
@@ -19,7 +23,7 @@ const {httpRequest} = Cu.import("resource://gre/modules/Http.jsm");
  * @param {string} path Relative path from RequestPolicy main dir
  * @return {string} Chrome URL
  */
-export function getChromeUrl(path) {
+public getChromeUrl(path: string) {
   // Removes leading ./ or / and append to chrome://rpcontinued/
   const replacer = /^(?:\.\/|\/)?(?:content\/)?(.+)$/mg;
   return path.replace(replacer, "chrome://rpcontinued/content/$1");
@@ -33,7 +37,7 @@ export function getChromeUrl(path) {
  * @param {string} aChromeUrl
  * @return {Promise}
  */
-export function readDirectory(aChromeUrl) {
+public readDirectory(aChromeUrl: string) {
   let chromeUrl = aChromeUrl;
   if (!chromeUrl) {
     return Promise.reject(new Error("Invalid null argument"));
@@ -41,21 +45,21 @@ export function readDirectory(aChromeUrl) {
     chromeUrl = `${chromeUrl}/`;
   }
 
-  return sendHttpGet(chromeUrl).then((responseText) => {
-    let fileList = [];
+  return this.sendHttpGet(chromeUrl).then((responseText) => {
+    const fileList = [];
     // The http response contains in each line:
     // 201: filename content-length last-modified file-type
     // We capture the filename and file-type
     const extractor = /^201:\s(\S+)\s+\d+\s+\S+\s+(\S+)\s*$/gm;
-    let entry;
+    let entry: RegExpExecArray | null;
     const nextEntry = () => {
       entry = extractor.exec(responseText);
       return entry;
     };
     while (nextEntry()) {
       fileList.push({
-        name: entry[1],
-        isDir: entry[2].toLowerCase() === "directory",
+        isDir: entry![2].toLowerCase() === "directory",
+        name: entry![1],
       });
     }
 
@@ -69,18 +73,18 @@ export function readDirectory(aChromeUrl) {
  * @param {string} chromeUrl
  * @return {Promise}
  */
-export function parseJSON(chromeUrl) {
+public parseJSON(chromeUrl: string): Promise<any> {
   return new Promise((resolve, reject) => {
     try {
-      NetUtil.asyncFetch(chromeUrl, (inputStream, status) => {
+      this.netUtil.asyncFetch(chromeUrl, (inputStream, status) => {
         try {
-          if (!isSuccessCode(status)) {
+          if (!this.isSuccessCode(status)) {
             // Convert status code to a string
             // eslint-disable-next-line new-cap
             reject(new Error(`Enable to load '${chromeUrl}': ${status}`));
             return;
           }
-          let text = NetUtil.readInputStreamToString(inputStream,
+          const text = this.netUtil.readInputStreamToString(inputStream,
               inputStream.available(), {charset: "utf-8"});
           inputStream.close();
           resolve(JSON.parse(text));
@@ -98,44 +102,44 @@ export function parseJSON(chromeUrl) {
  * Return a promise which is fulfilled with the response text
  * of the HTTP GET request. The promise is rejected with an Error if the
  * status code isn't 200 or upon any other errors.
- * @param {string} url
- * @return {Promise}
  */
-function sendHttpGet(url) {
+private sendHttpGet(url: string): Promise<XMLHttpRequest["responseText"]> {
   return new Promise((resolve, reject) => {
     try {
-      const xhrOptions = {
+      const xhrOptions: JSMs.IHttpRequestOptions = {
         method: "GET",
-        onLoad: function(responseText, xhr) {
+        onLoad(responseText, xhr) {
           if (xhr && xhr.status === 200) {
             resolve(responseText);
           } else {
             reject(new Error(`Invalid status code when reading '${url}'`));
           }
         },
-        onError: function(error) {
+        onError(error) {
           reject(new Error(`Error reading '${url}': ${error}`));
         },
       };
 
-      httpRequest(url, xhrOptions);
+      this.http.httpRequest(url, xhrOptions);
     } catch (e) {
       reject(e);
     }
   });
 }
 
+// tslint:disable:max-line-length
 /**
  * Determines whether a given XPCOM return code (that is, an nsresult value)
  * indicates the success or failure of an operation, returning true or false
  * respectively.
  * An XPCOM return code indicates success if its high-order bit is 0, and
  * it indicates failure if its high-order bit is 1.
+ * tslint:disable-next-line:max-line-length
  * see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.isSuccessCode
- *
- * @param {nsresult} returnCode XPCOM return code to check
- * @return {boolean}
  */
-function isSuccessCode(returnCode) {
+// tslint:enable:max-line-length
+private isSuccessCode(returnCode: XPCOM.nsResult): boolean {
+  // tslint:disable-next-line:no-bitwise
   return (returnCode & 0x80000000) === 0;
+}
 }

@@ -22,7 +22,7 @@
 
 import {Level as EnvLevel, Environment} from "lib/environment";
 
-const {PrefObserver} = LegacyApi;
+const {createPrefObserver} = LegacyApi;
 
 // =============================================================================
 // ManagerForPrefObservers
@@ -40,7 +40,7 @@ export const ManagerForPrefObservers = (function() {
     if (observers.has(aEnv)) {
       return observers.get(aEnv);
     }
-    let prefObserver = new PrefObserver();
+    let prefObserver = createPrefObserver();
     aEnv.addShutdownFunction(EnvLevel.INTERFACE, () => {
       prefObserver.removeAllListeners();
     });

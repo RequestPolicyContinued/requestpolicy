@@ -73,7 +73,9 @@ class Menu(BaseLib):
 
     @property
     def _toolbar_button(self):
-        return self.marionette.find_element("id", "/* @echo ALPHABETICAL_ID */ToolbarButton")
+        return self.marionette.find_element(
+            "id", "rpcontinuedOffAmoToolbarButton"
+        )
 
     @property
     def _popup(self):

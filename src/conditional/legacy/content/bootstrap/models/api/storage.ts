@@ -49,13 +49,13 @@ export class Storage extends Module {
     return this.backgroundApi;
   }
 
-  public getLocal(
+  private getLocal(
       aKeys: string | string[] | IKeysWithDefaults | null | undefined,
   ) {
     return Promise.resolve(this.slsa.get(aKeys));
   }
 
-  public setLocal(aKeys: {[k: string]: any}) {
+  private setLocal(aKeys: {[k: string]: any}) {
     try {
       return Promise.resolve(this.slsa.set(aKeys));
     } catch (e) {

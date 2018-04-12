@@ -108,7 +108,7 @@ export abstract class Module implements IModule {
     return Promise.resolve();
   }
 
-  protected assertReady() {
+  protected assertReady(): void | never {
     if (!this.ready) {
       const msg = `Module "${this.moduleName}" is not ready yet!`;
       this.log.error(msg);
@@ -118,9 +118,18 @@ export abstract class Module implements IModule {
   }
 
   private async startup_(): Promise<void> {
-    await Promise.all(this.startupPreconditions);
-    await this.runSubmoduleFns("startup");
-    await this.runSelfFn("startup");
+    if (this.startupPreconditions.length !== 0) {
+      this.debugLog.log(
+          `await ${this.startupPreconditions.length} preconditions`,
+      );
+      await Promise.all(this.startupPreconditions);
+    }
+    this.debugLog.log("startup");
+    await Promise.all([
+      this.runSubmoduleFns("startup"),
+      this.runSelfFn("startup"),
+    ]);
+    this.debugLog.log("startup done");
   }
 
   private async shutdown_(): Promise<void> {

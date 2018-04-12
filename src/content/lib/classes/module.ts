@@ -147,7 +147,7 @@ export abstract class Module implements IModule {
         this.getSubmodules().
         filter((m) => fnName in m).
         map((m) => m[fnName]!()),
-    );
+    ).then(() => undefined);
     p.catch(this.log.onError(`submodule ${fnName}`));
     this.dChildBootstrap[fnName].resolve(p);
     return p as Promise<any>;

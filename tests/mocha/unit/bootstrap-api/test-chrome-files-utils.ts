@@ -50,13 +50,13 @@ describe("ChromeFilesUtils", function() {
 
   describe("getChromeUrl(path)", function() {
     it("Map path to file", function() {
-      let path = "content/foo.ext";
+      let path = "foo.ext";
       let expected = "chrome://rpcontinued/content/foo.ext";
       assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
     });
 
     it("Map path to directory", function() {
-      let path = "content/bar/";
+      let path = "bar/";
       let expected = "chrome://rpcontinued/content/bar/";
       assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
     });

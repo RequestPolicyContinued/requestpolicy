@@ -21,8 +21,8 @@ const {httpRequest} = Cu.import("resource://gre/modules/Http.jsm");
  */
 export function getChromeUrl(path) {
   // Removes leading ./ or / and append to chrome://rpcontinued/
-  const replacer = /^(?:\.\/|\/)?(.+)$/mg;
-  return path.replace(replacer, "chrome://rpcontinued/$1");
+  const replacer = /^(?:\.\/|\/)?(?:content\/)?(.+)$/mg;
+  return path.replace(replacer, "chrome://rpcontinued/content/$1");
 }
 
 /**

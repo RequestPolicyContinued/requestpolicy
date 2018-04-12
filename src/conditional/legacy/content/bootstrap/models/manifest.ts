@@ -35,7 +35,7 @@ export class Manifest extends Module {
   }
 
   public async startupSelf() {
-    const manifestUrl = getChromeUrl("content/bootstrap-data/manifest.json");
+    const manifestUrl = getChromeUrl("bootstrap-data/manifest.json");
     await parseJSON(manifestUrl).then((data) => {
       this.data = data;
     });

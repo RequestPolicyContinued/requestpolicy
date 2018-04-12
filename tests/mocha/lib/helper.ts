@@ -5,7 +5,7 @@ import * as Sinon from "sinon";
 const sinon = Sinon.sandbox.create();
 
 beforeEach(function() {
-  sinon.stub(console, "error");
+  sinon.spy(console, "error");
 });
 
 afterEach(function() {

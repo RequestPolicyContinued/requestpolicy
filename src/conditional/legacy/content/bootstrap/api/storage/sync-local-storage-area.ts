@@ -30,7 +30,7 @@ import {
 export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   constructor(
       private prefs: API.storage.IPrefs,
-      private jsonPrefs: API.storage.IJsonPrefs,
+      private jsonStorage: API.storage.IJsonStorage,
   ) {
     super();
   }
@@ -39,7 +39,7 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
     return Object.assign(
         {},
         this.prefs.branches.rp.getAll(),
-        this.jsonPrefs.getAll(),
+        this.jsonStorage.getAll(),
     );
   }
 
@@ -50,8 +50,8 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   protected getByKeys(aKeys: string[]) {
     const results: IKeysObject = {};
     aKeys.forEach((key) => {
-      const result = this.jsonPrefs.isJsonPref(key) ?
-          this.jsonPrefs.get(key) : this.prefs.get(key);
+      const result = this.jsonStorage.isJsonStorageKey(key) ?
+          this.jsonStorage.get(key) : this.prefs.get(key);
       if (result !== C.UNDEFINED) {
         results[key] = result;
       }
@@ -60,8 +60,8 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   }
 
   protected setByKey(aKey: string, aValue: any) {
-     if (this.jsonPrefs.isJsonPref(aKey)) {
-       this.jsonPrefs.set(aKey, aValue);
+     if (this.jsonStorage.isJsonStorageKey(aKey)) {
+       this.jsonStorage.set(aKey, aValue);
      } else {
        this.prefs.set<any>(aKey, aValue);
      }

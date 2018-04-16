@@ -406,7 +406,7 @@ import { Runtime } from "./runtime";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
-import { JsonPrefs } from "./storage/json-prefs";
+import { JsonStorage } from "./storage/json-storage";
 import { PrefBranch, PrefTypes } from "./storage/pref-branch";
 import { PrefObserver } from "./storage/pref-observer";
 import { Prefs } from "./storage/prefs";
@@ -442,7 +442,7 @@ export namespace API {
   export namespace storage {
     export type IStorage = Storage;
     export type IPrefObserver = PrefObserver;
-    export type IJsonPrefs = JsonPrefs;
+    export type IJsonStorage = JsonStorage;
     export type IPrefBranch = PrefBranch;
     export type IPrefs = Prefs;
     export type ISyncLocalStorageArea = SyncLocalStorageArea;

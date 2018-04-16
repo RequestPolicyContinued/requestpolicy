@@ -42,7 +42,7 @@ import { Runtime } from "./api/runtime";
 import { ChromeFileService } from "./api/services/chrome-file-service";
 import { FileService } from "./api/services/file-service";
 import { XPConnectService } from "./api/services/xpconnect-service";
-import { JsonPrefs } from "./api/storage/json-prefs";
+import { JsonStorage } from "./api/storage/json-storage";
 import { PrefBranch, PrefTypes } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
 import { Prefs } from "./api/storage/prefs";
@@ -85,7 +85,7 @@ const prefs = new Prefs(Services.prefs, prefBranchFactory, TryCatchUtils);
 const prefObserverFactory: API.storage.PrefObserverFactory =
     () => new PrefObserver(prefs);
 
-const jsonPrefs = new JsonPrefs(fileService);
+const jsonPrefs = new JsonStorage(fileService);
 const slsa = new SyncLocalStorageArea(prefs, jsonPrefs);
 const storage = new Storage(log, slsa);
 const miscInfos = new MiscInfos(Services.appinfo, prefs, Services.vc);

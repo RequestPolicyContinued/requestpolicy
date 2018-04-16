@@ -23,12 +23,12 @@
 import { API } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 
-export class JsonPrefs {
+export class JsonStorage {
   constructor(
       private filesService: API.services.IFileService,
   ) {}
 
-  public isJsonPref(aKey: string) {
+  public isJsonStorageKey(aKey: string) {
     return aKey.startsWith("policies/") || aKey === "subscriptions";
   }
 
@@ -58,7 +58,7 @@ export class JsonPrefs {
   }
 
   private assertValidKey(aKey: string) {
-    if (!this.isJsonPref(aKey)) {
+    if (!this.isJsonStorageKey(aKey)) {
       throw new Error(`Invalid key "${aKey}".`);
     }
   }

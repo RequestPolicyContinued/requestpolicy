@@ -8,8 +8,8 @@ const {
 const {FileService} = require("bootstrap/api/services/file-service");
 const fileService = new FileService(xpconnectService, mozFileUtils);
 
-const {JsonPrefs} = require("bootstrap/api/storage/json-prefs");
-const jsonPrefs = new JsonPrefs(fileService);
+const {JsonStorage} = require("bootstrap/api/storage/json-storage");
+const jsonStorage = new JsonStorage(fileService);
 
 function run_test() {
   run_next_test();
@@ -17,10 +17,10 @@ function run_test() {
 
 add_test(function() {
   // exercise
-  const allJsonPrefs = jsonPrefs.getAll();
+  const fullJsonStorage = jsonStorage.getAll();
 
   // verify
-  Assert.deepEqual(allJsonPrefs, {});
+  Assert.deepEqual(fullJsonStorage, {});
 
   run_next_test();
 });
@@ -33,10 +33,10 @@ add_test(function() {
   createRPFile("policies/bar/barB.json", `{"bar": "B"}`);
 
   // exercise
-  const allJsonPrefs = jsonPrefs.getAll();
+  const fullJsonStorage = jsonStorage.getAll();
 
   // verify
-  Assert.deepEqual(allJsonPrefs, {
+  Assert.deepEqual(fullJsonStorage, {
     "policies/foo/foo1": {foo: 1},
     "policies/foo/foo2": {foo: 2},
     "policies/bar/barA": {bar: "A"},

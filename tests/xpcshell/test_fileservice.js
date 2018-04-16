@@ -73,10 +73,10 @@ add_test(function() {
   createRPFile("policies/foo/foo1.json", `{"foo": 1}`);
 
   // exercise
-  const allJsonPrefFiles = fileService.getAllRPFiles();
+  const allJsonStorageFiles = fileService.getAllRPFiles();
 
   // verify
-  Assert.deepEqual(allJsonPrefFiles, [
+  Assert.deepEqual(allJsonStorageFiles, [
     "policies/foo/foo1.json",
   ]);
 

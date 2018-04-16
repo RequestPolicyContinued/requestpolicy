@@ -36,7 +36,11 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   }
 
   protected getAll() {
-    return this.prefs.branches.rp.getAll().concat(this.jsonPrefs.getAll());
+    return Object.assign(
+        {},
+        this.prefs.branches.rp.getAll(),
+        this.jsonPrefs.getAll(),
+    );
   }
 
   protected getNothing() {

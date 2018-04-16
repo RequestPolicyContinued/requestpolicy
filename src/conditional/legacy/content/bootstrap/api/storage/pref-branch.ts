@@ -46,8 +46,11 @@ export class PrefBranch {
   ) {}
 
   public getAll() {
-    return Object.keys(this.namesToTypesMap).
-        map((prefName) => this.get(prefName));
+    const allPrefs: {[key: string]: any} = {};
+    Object.keys(this.namesToTypesMap).forEach((prefName) => {
+      allPrefs[prefName] = this.get(prefName);
+    });
+    return allPrefs;
   }
 
   public get<T extends string | number | boolean>(

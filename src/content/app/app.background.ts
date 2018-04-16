@@ -21,7 +21,10 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
+import { API } from "bootstrap/api/interfaces";
+import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
+declare const LegacyApi: any;
 // @endif
 
 import { RulesServices } from "app/services/rules/rules-services.module";
@@ -56,6 +59,15 @@ const log = Log.instance;
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
+const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService() : null;
+const mozServices = C.EXTENSION_TYPE === "legacy" ?
+    jsmService!.getServices() : null;
+const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
+  prefsService: mozServices!.prefs,
+  rpPrefBranch: LegacyApi.prefs.branches.rp as API.storage.IPrefBranch,
+  tryCatchUtils: LegacyApi.tryCatchUtils,
+} : null;
+
 const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
@@ -63,7 +75,11 @@ const policy = new Policy(log, subscriptions, rulesetStorage);
 const storage = new Storage(log, RPStorageConfig);
 
 const uriService = new UriService(log);
-const v0RulesService = new V0RulesService(log, uriService);
+const v0RulesService = new V0RulesService(
+    log,
+    uriService,
+    xpcApi,
+);
 const rulesServices = new RulesServices(log, v0RulesService);
 const versionComparator = { compare: compareVersions };
 const versionInfoService = new VersionInfoService(

@@ -27,10 +27,8 @@ import {$id} from "./common";
 
 (() => {
   const {
-    LegacyApi,
     rp,
     RuleUtils,
-    XpcomUtils,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
@@ -50,9 +48,9 @@ import {$id} from "./common";
   function populateRuleTable() {
     const table = $id("rules");
 
-    const prefStrings = XpcomUtils.getRPV0PrefStrings();
+    const prefStrings = rp.services.rules.v0.getRPV0PrefStrings();
     // Setting the global rules var here.
-    rules = rp.services.rules.v0.parse(prefStrings);
+    rules = rp.services.rules.v0.parse(prefStrings!);
     rp.policy.addAllowRules(rules);
 
     // tslint:disable-next-line:prefer-for-of
@@ -93,10 +91,7 @@ import {$id} from "./common";
   }
 
   (window as any).deleteOldRules = () => {
-    LegacyApi.prefs.reset("allowedOrigins");
-    LegacyApi.prefs.reset("allowedDestinations");
-    LegacyApi.prefs.reset("allowedOriginsToDestinations");
-    LegacyApi.prefs.save();
+    rp.services.rules.v0.deleteOldRules();
     $("#doimport").hide();
     $("#deletedone").show();
     $("#showReimportOptions").hide();
@@ -122,7 +117,7 @@ import {$id} from "./common";
   };
 
   window.onload = () => {
-    const oldRulesExist = LegacyApi.prefs.oldRulesExist();
+    const oldRulesExist = rp.services.rules.v0.oldRulesExist();
     if (!oldRulesExist) {
       $("#hasrules").hide();
       $("#norules").show();

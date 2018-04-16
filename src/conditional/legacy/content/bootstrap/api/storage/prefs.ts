@@ -21,9 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
-
-declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+import { API, JSMs } from "bootstrap/api/interfaces";
 
 // =============================================================================
 // Prefs
@@ -72,7 +70,6 @@ export class Prefs {
   constructor(
       private prefsService: JSMs.Services["prefs"],
       private prefBranchFactory: API.storage.PrefBranchFactory,
-      private tryCatchUtils: API.ITryCatchUtils,
   ) {}
 
   public save() {
@@ -134,25 +131,6 @@ export class Prefs {
   public _removeObserver(aFakeDomain: string, aObserver: any) {
     const {branch, name: domain} = this.getBranchAndRealName(aFakeDomain);
     return branch.removeObserver(domain, aObserver);
-  }
-
-  // ===========================================================================
-  // Prefs - Aliases
-  // ===========================================================================
-
-  public oldRulesExist() {
-    return !(this.isOldRulePrefEmpty("allowedOrigins") &&
-             this.isOldRulePrefEmpty("allowedDestinations") &&
-             this.isOldRulePrefEmpty("allowedOriginsToDestinations"));
-  }
-
-  private isOldRulePrefEmpty(pref: string) {
-    const result = this.tryCatchUtils.getComplexValueFromPrefBranch(
-        this.branches.rp.branch,
-        pref,
-        Ci.nsISupportsString,
-    );
-    return !!result.error || !result.value;
   }
 
   // ===========================================================================

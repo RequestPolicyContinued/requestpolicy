@@ -80,7 +80,7 @@ const prefBranchFactory: API.storage.PrefBranchFactory = (
   namesToTypesMap: {[key: string]: PrefTypes},
 ) => new PrefBranch(Services.prefs, branchRoot, namesToTypesMap);
 
-const prefs = new Prefs(Services.prefs, prefBranchFactory, TryCatchUtils);
+const prefs = new Prefs(Services.prefs, prefBranchFactory);
 
 const prefObserverFactory: API.storage.PrefObserverFactory =
     () => new PrefObserver(prefs);

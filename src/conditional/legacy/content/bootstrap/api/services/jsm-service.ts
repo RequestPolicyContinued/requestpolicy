@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,21 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {
-  XPCOMObserver,
-  XPCOMObserverTopic,
-} from "lib/classes/xpcom-observer";
-import {defer} from "lib/utils/js-utils";
+import { JSMs } from "bootstrap/api/interfaces";
 
-export function promiseObserverTopic(aTopic: XPCOMObserverTopic) {
-  const deferred = defer<[any, string, any]>();
-
-  function callback(subject: any, topic: string, data: any) {
-    observer.unregister();
-    deferred.resolve([subject, topic, data]);
+export class JSMService {
+  public getServices(): JSMs.Services {
+    return Cu.import("resource://gre/modules/Services.jsm", {});
   }
-
-  const observer = new XPCOMObserver(aTopic, callback);
-
-  return deferred.promise;
 }

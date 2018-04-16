@@ -11,8 +11,8 @@ PREF_WELCOME_WIN_SHOWN = "extensions.requestpolicy.welcomeWindowShown"
 
 class CommonTests:
     class TestRequestPolicyRestartlessness(RequestPolicyTestCase):
-        """These tests ensure that RequestPolicy can be uninstalled/installed and
-        disabled/enabled restartless.
+        """These tests ensure that RequestPolicy can be uninstalled/installed
+        and disabled/enabled restartless.
         """
 
         def test_disable_enable(self):

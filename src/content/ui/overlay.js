@@ -1109,7 +1109,9 @@ export function loadOverlayIntoWindow(window) {
   };
 
   self.isToolbarButtonVisible = function() {
-    return DOMUtils.isElementVisible($id("/* @echo ALPHABETICAL_ID */ToolbarButton"));
+    return DOMUtils.isElementVisible(
+        $id("/* @echo ALPHABETICAL_ID */ToolbarButton")
+    );
   };
 
   function openLinkInNewTab(url, relatedToCurrent) {

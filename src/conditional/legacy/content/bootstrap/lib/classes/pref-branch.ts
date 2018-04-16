@@ -20,6 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+declare const Ci: any;
+declare const Services: any;
+
+export type PrefTypes = "BoolPref" | "CharPref" | "IntPref";
+type GetterFnName = "getBoolPref" | "getCharPref" | "getIntPref";
+type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
+
 // =============================================================================
 // PrefBranch
 // =============================================================================
@@ -29,52 +36,65 @@
  * @param {Object} aPrefNameToTypeMap A map from Pref Names to Pref Types.
  *     Pref Types are "BoolPref", "CharPref", "IntPref", "ComplexValue".
  */
-export function PrefBranch(aBranchRoot, aPrefNameToTypeMap) {
-  this.branchRoot = aBranchRoot;
-  /* eslint-disable new-cap */
-  this.branch = Services.prefs.getBranch(aBranchRoot).
+export class PrefBranch {
+  public readonly branch = Services.prefs.getBranch(this.branchRoot).
       QueryInterface(Ci.nsIPrefBranch2);
-  /* eslint-enable new-cap */
 
-  // How should a pref name "foo.bar.baz" be translated to
-  // "getBoolPref" or "setIntPref"?
-  this._namesToTypesMap = aPrefNameToTypeMap;
-}
+constructor(
+    public readonly branchRoot: string,
+    // How should a pref name "foo.bar.baz" be translated to
+    // "getBoolPref" or "setIntPref"?
+    private _namesToTypesMap: {[key: string]: PrefTypes},
+) {}
 
-PrefBranch.prototype._type = function(aPrefName) {
+private _type(aPrefName: string): PrefTypes {
   if (!(aPrefName in this._namesToTypesMap)) {
     throw new Error(`Unknown pref "${aPrefName}"`);
   }
   return this._namesToTypesMap[aPrefName];
-};
+}
 
-PrefBranch.prototype.getAll = function() {
+// tslint:disable:member-ordering
+public getAll() {
   return Object.keys(this._namesToTypesMap).
       map((prefName) => this.get(prefName));
-};
+}
 
-PrefBranch.prototype.get = function(aPrefName) {
-  let getterFnName = `get${this._type(aPrefName)}`;
-  return this.branch[getterFnName](aPrefName);
-};
+public get<T extends string | number | boolean>(
+    aPrefName: string,
+): T {
+  const getterFnName = `get${this._type(aPrefName)}` as GetterFnName;
+  return (
+    this.branch[getterFnName] as
+    (prefName: string) => T
+  )(aPrefName);
+}
 
-PrefBranch.prototype.set = function(aPrefName, aValue) {
-  let setterFnName = `set${this._type(aPrefName)}`;
-  return this.branch[setterFnName](aPrefName, aValue);
-};
+// sorry for this very ugly-looking function
+public set<T extends string | number | boolean>(
+    aPrefName: string,
+    aValue: T,
+): void {
+  const setterFnName = `set${this._type(aPrefName)}` as SetterFnName;
+  (
+    this.branch[setterFnName] as
+    (prefName: string, value: T) => void
+  )(aPrefName, aValue);
+}
 
-PrefBranch.prototype.reset = function(aPrefName) {
+public reset(aPrefName: string) {
   this.branch.clearUserPref(aPrefName);
-};
+}
 
-PrefBranch.prototype.isSet = function(aPrefName) {
+public isSet(aPrefName: string) {
   return this.branch.prefHasUserValue(aPrefName);
-};
+}
 
-PrefBranch.prototype.addObserver = function(aDomain, aObserver, aHoldWeak) {
+public addObserver(aDomain: string, aObserver: any, aHoldWeak: boolean) {
   return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
-};
+}
 
-PrefBranch.prototype.removeObserver = function(aDomain, aObserver) {
+public removeObserver(aDomain: string, aObserver: any) {
   return this.branch.removeObserver(aDomain, aObserver);
-};
+}
+}

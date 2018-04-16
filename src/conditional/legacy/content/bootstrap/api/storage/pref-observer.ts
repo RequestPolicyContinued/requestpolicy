@@ -20,43 +20,43 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {MapOfSets} from "lib/classes/map-of-sets";
-import {Prefs} from "bootstrap/models/prefs";
 
-// =============================================================================
-// PrefObserver
-// =============================================================================
+type Listener = (prefName: string) => void;
 
 export class PrefObserver {
-  constructor() {
-    this._maps = {
-      // Storage for listeners.
-      domainsToListeners: new MapOfSets(),
+  private maps = {
+    // Storage for listeners.
+    domainsToListeners: new MapOfSets<string, Listener>(),
 
-      // Storage for observers.
-      domainsToObservers: new Map(),
-    };
-  }
+    // Storage for observers.
+    domainsToObservers: new Map(),
+  };
+
+  constructor(
+      private prefs: API.storage.IPrefs,
+  ) {}
 
   /**
    * @param {string} aDomain The preference on which to listen for changes.
    * @param {Function} aListener The callback.
    */
-  addListener(aDomain, aListener) {
-    if (false === this._maps.domainsToObservers.has(aDomain)) {
+  public addListener(aDomain: string, aListener: Listener) {
+    if (false === this.maps.domainsToObservers.has(aDomain)) {
       // start to observe this Pref Domain
-      let observer = {
+      const observer = {
         observe: this._onObserve.bind(this, aDomain),
       };
-      Prefs._addObserver(aDomain, observer);
-      this._maps.domainsToObservers.set(aDomain, observer);
+      this.prefs._addObserver(aDomain, observer);
+      this.maps.domainsToObservers.set(aDomain, observer);
     }
 
-    this._maps.domainsToListeners.addToSet(aDomain, aListener);
+    this.maps.domainsToListeners.addToSet(aDomain, aListener);
   }
 
-  addListeners(aDomains, aListener) {
-    for (let domain of aDomains) {
+  public addListeners(aDomains: string, aListener: Listener) {
+    for (const domain of aDomains) {
       this.addListener(domain, aListener);
     }
   }
@@ -65,20 +65,20 @@ export class PrefObserver {
    * @param {string} aDomain The preference which is being observed for changes.
    * @param {Function} aListener The callback.
    */
-  removeListener(aDomain, aListener) {
-    this._maps.domainsToListeners.deleteFromSet(aDomain, aListener);
+  public removeListener(aDomain: string, aListener: Listener) {
+    this.maps.domainsToListeners.deleteFromSet(aDomain, aListener);
 
     // no more listeners?
-    if (false === this._maps.domainsToListeners.has(aDomain)) {
+    if (false === this.maps.domainsToListeners.has(aDomain)) {
       // stop to observe this Pref Domain
-      let observer = this._maps.domainsToObservers.get(aDomain);
-      Prefs._removeObserver(aDomain, observer);
-      this._maps.domainsToObservers.delete(aDomain);
+      const observer = this.maps.domainsToObservers.get(aDomain);
+      this.prefs._removeObserver(aDomain, observer);
+      this.maps.domainsToObservers.delete(aDomain);
     }
   }
 
-  removeListeners(aDomains, aListener) {
-    for (let domain of aDomains) {
+  public removeListeners(aDomains: string, aListener: Listener) {
+    for (const domain of aDomains) {
       this.removeListener(domain, aListener);
     }
   }
@@ -86,10 +86,10 @@ export class PrefObserver {
   /**
    * Remove all listeners in this Pref Observer.
    */
-  removeAllListeners() {
-    for (let domain of this._maps.domainsToListeners.keys()) {
-      let listeners = this._maps.domainsToListeners.get(domain);
-      for (let listener of listeners.values()) {
+  public removeAllListeners() {
+    for (const domain of this.maps.domainsToListeners.keys()) {
+      const listeners = this.maps.domainsToListeners.get(domain);
+      for (const listener of listeners!.values()) {
         this.removeListener(domain, listener);
       }
     }
@@ -104,10 +104,15 @@ export class PrefObserver {
    * @param {string} aData The name of the preference which has changed,
    *     relative to the "root" of the aSubject branch.
    */
-  _onObserve(aDomain, aSubject, aTopic, aData) {
-    let prefName = aData;
-    let listeners = this._maps.domainsToListeners.get(aDomain);
-    for (let listener of listeners.values()) {
+  public _onObserve(
+      aDomain: string,
+      aSubject: any,
+      aTopic: string,
+      aData: string,
+  ) {
+    const prefName = aData;
+    const listeners = this.maps.domainsToListeners.get(aDomain);
+    for (const listener of listeners!.values()) {
       listener.call(null, prefName);
     }
   }

@@ -20,16 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as L10nUtils from "bootstrap/lib/utils/l10n-utils";
+import { API } from "bootstrap/api/interfaces";
 import {Module} from "lib/classes/module";
-import { getAppLocale } from "lib/utils/try-catch-utils";
-import { Log } from "models/log";
-import {AsyncLocaleData} from "./i18n/async-locale-data";
+import * as L10nUtils from "./l10n-utils";
 
 export class I18n extends Module {
-  protected localeData = new AsyncLocaleData(getAppLocale);
-
-  constructor(log: Log) {
+  constructor(
+      log: API.ILog,
+      protected localeData: API.i18n.IAsyncLocaleData,
+  ) {
     super("browser.i18n", log);
   }
 

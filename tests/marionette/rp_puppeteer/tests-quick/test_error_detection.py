@@ -23,7 +23,7 @@ class ErrorDetectionTests(object):
             "error", "backgroundscript", msg=msg)
         self._do_checks(
             n,
-            "^console.error:\s+\[RequestPolicy\] " + msg + "$")
+            r'^console.error:\s+\[RequestPolicy\] ' + msg + '$')
 
     def test_reference_error(self, n=1):
         self.error_triggerer.trigger_error(

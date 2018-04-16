@@ -21,17 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
-import { Log } from "models/log";
 
 declare const Services: any;
 
 export class Runtime extends Module {
   private events = createListenersMap(["onMessage"]);
 
-  constructor(log: Log) {
+  constructor(log: API.ILog) {
     super("browser.runtime", log);
   }
 
@@ -72,16 +72,14 @@ export class Runtime extends Module {
    */
   private getURL(path: string) {
     // Pattern to match mapping into about:requestpolicy?file
-    // 1) ^(?:\.\/|\/)? : matches even if path starts with "content/"
-    // or "./content"
-    // 2) content\/settings\/ : checks path (case sensitive)
+    // 1) ^(?:\.\/|\/)? : matches even if path starts with "/" or "./"
+    // 2) settings\/ : checks path (case sensitive)
     // 3) ([^\/]+) : capturing group for the filename
     // 4) \.[hH][tT][mM][lL]$ : matches html extension (case insensitive)
     // Disable max-length line lint on this one because using new RegExp
     // to split it isn't recommended if the pattern doesn't change
-    // eslint-disable-next-line max-len
     const patternAbout =
-        /^(?:\.\/|\/)?settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
+        /^(?:\.\/|\/)?(?:content\/)?settings\/([^/]+)\.[hH][tT][mM][lL]$/mg;
 
     // Pattern to match prepending with chrome://rpcontinued/
     // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"

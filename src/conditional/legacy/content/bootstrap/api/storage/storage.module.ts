@@ -20,18 +20,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
 import { Log } from "models/log";
-import {SyncLocalStorageArea} from "./storage/sync-local-storage-area";
 
 export class Storage extends Module {
-  private slsa = new SyncLocalStorageArea();
-
   private events = createListenersMap(["onChanged"]);
 
-  constructor(log: Log) {
+  constructor(
+      log: Log,
+      private slsa: API.storage.ISyncLocalStorageArea,
+  ) {
     super("browser.storage", log);
   }
 
@@ -49,13 +50,13 @@ export class Storage extends Module {
     return this.backgroundApi;
   }
 
-  public getLocal(
+  private getLocal(
       aKeys: string | string[] | IKeysWithDefaults | null | undefined,
   ) {
     return Promise.resolve(this.slsa.get(aKeys));
   }
 
-  public setLocal(aKeys: {[k: string]: any}) {
+  private setLocal(aKeys: {[k: string]: any}) {
     try {
       return Promise.resolve(this.slsa.set(aKeys));
     } catch (e) {

@@ -28,23 +28,67 @@ import {
 } from "bootstrap/controllers/default-preferences-controller";
 DefaultPreferencesController.startup();
 
-import { Api } from "bootstrap/models/api";
-import { Extension } from "bootstrap/models/api/extension";
-import { I18n } from "bootstrap/models/api/i18n";
-import { Management } from "bootstrap/models/api/management";
-import { Runtime } from "bootstrap/models/api/runtime";
-import { Storage } from "bootstrap/models/api/storage";
-import { Manifest } from "bootstrap/models/manifest";
+import * as TryCatchUtils from "lib/utils/try-catch-utils";
 import { Log } from "models/log";
+import { Api } from "./api/api.module";
+import { Extension } from "./api/extension";
+import { AsyncLocaleData } from "./api/i18n/async-locale-data";
+import { I18n } from "./api/i18n/i18n.module";
+import { API, JSMs } from "./api/interfaces";
+import { Management } from "./api/management";
+import { Manifest } from "./api/manifest";
+import { MiscInfos } from "./api/misc-infos";
+import { Runtime } from "./api/runtime";
+import { ChromeFileService } from "./api/services/chrome-file-service";
+import { FileService } from "./api/services/file-service";
+import { XPConnectService } from "./api/services/xpconnect-service";
+import { JsonStorage } from "./api/storage/json-storage";
+import { PrefBranch, PrefTypes } from "./api/storage/pref-branch";
+import { PrefObserver } from "./api/storage/pref-observer";
+import { Prefs } from "./api/storage/prefs";
+import { Storage } from "./api/storage/storage.module";
+import { SyncLocalStorageArea } from "./api/storage/sync-local-storage-area";
+
+declare const Services: JSMs.Services;
+
+const {
+  NetUtil: mozNetUtil,
+} = Cu.import("resource://gre/modules/NetUtil.jsm") as {
+  NetUtil: JSMs.NetUtil,
+};
+const mozHttp = Cu.import("resource://gre/modules/Http.jsm") as JSMs.Http;
+const {
+  FileUtils: mozFileUtils,
+} = Cu.import("resource://gre/modules/FileUtils.jsm") as {
+  FileUtils: JSMs.FileUtils,
+};
 
 const log = Log.instance;
 
 const extension = new Extension(log);
-const i18n = new I18n(log);
+const xpconnectService = new XPConnectService();
+const fileService = new FileService(xpconnectService, mozFileUtils);
+const chromeFileService = new ChromeFileService(mozNetUtil, mozHttp);
+const localeData = new AsyncLocaleData(TryCatchUtils, chromeFileService);
+const i18n = new I18n(log, localeData);
 const management = new Management(log);
-const manifest = new Manifest(log);
+const manifest = new Manifest(log, chromeFileService);
 const runtime = new Runtime(log);
-const storage = new Storage(log);
+
+const prefBranchFactory: API.storage.PrefBranchFactory = (
+  branchRoot: string,
+  namesToTypesMap: {[key: string]: PrefTypes},
+) => new PrefBranch(Services.prefs, branchRoot, namesToTypesMap);
+
+const prefs = new Prefs(Services.prefs, prefBranchFactory, TryCatchUtils);
+
+const prefObserverFactory: API.storage.PrefObserverFactory =
+    () => new PrefObserver(prefs);
+
+const jsonPrefs = new JsonStorage(fileService);
+const slsa = new SyncLocalStorageArea(prefs, jsonPrefs);
+const storage = new Storage(log, slsa);
+const miscInfos = new MiscInfos(Services.appinfo, prefs, Services.vc);
 
 export const api = new Api(
     log,
@@ -54,4 +98,7 @@ export const api = new Api(
     manifest,
     runtime,
     storage,
+    miscInfos,
+    prefs,
+    prefObserverFactory,
 );

@@ -151,7 +151,7 @@ export class UriService extends Module {
 
   public isValidUri(uri: string): boolean {
     try {
-      this.getUriObject(uri);
+      Services.io.newURI(uri, null, null);
       return true;
     } catch (e) {
       return false;

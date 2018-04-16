@@ -47,7 +47,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
 
     if (typeof aKeys === "string") {
       keys = [aKeys];
-    } else if (typeof aKeys === "object") {
+    } else if (typeof aKeys === "object" && aKeys !== null) {
       if (Array.isArray(aKeys)) {
         keys = aKeys as string[];
       } else {

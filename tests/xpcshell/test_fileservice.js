@@ -1,6 +1,13 @@
 /* exported run_test */
 
-const FileUtils = require("bootstrap/lib/utils/file-utils");
+const {XPConnectService} = require("bootstrap/api/services/xpconnect-service");
+const xpcService = new XPConnectService();
+const {
+  FileUtils: mozFileUtils,
+} = Cu.import("resource://gre/modules/FileUtils.jsm", {});
+
+const {FileService} = require("bootstrap/api/services/file-service");
+const fileService = new FileService(xpcService, mozFileUtils);
 
 function run_test() {
   run_next_test();
@@ -23,7 +30,7 @@ add_test(function() {
   // Ask for RP user dir.
 
   // exercise
-  const dir = FileUtils.getRPDir();
+  const dir = fileService.getRPDir();
 
   // verify
   Assert.ok(dir.exists());
@@ -39,7 +46,7 @@ add_test(function() {
   // Ask for a subdirectory or the RP user dir.
 
   // exercise
-  const dir = FileUtils.getRPDir("foo");
+  const dir = fileService.getRPDir("foo");
 
   // verify
   Assert.ok(dir.exists());
@@ -53,7 +60,7 @@ add_test(function() {
 
 add_test(function() {
   // exercise
-  const allRPFiles = FileUtils.getAllRPFiles();
+  const allRPFiles = fileService.getAllRPFiles();
 
   // verify
   Assert.deepEqual(allRPFiles, {});
@@ -66,10 +73,10 @@ add_test(function() {
   createRPFile("policies/foo/foo1.json", `{"foo": 1}`);
 
   // exercise
-  const allJsonPrefFiles = FileUtils.getAllRPFiles();
+  const allJsonStorageFiles = fileService.getAllRPFiles();
 
   // verify
-  Assert.deepEqual(allJsonPrefFiles, [
+  Assert.deepEqual(allJsonStorageFiles, [
     "policies/foo/foo1.json",
   ]);
 

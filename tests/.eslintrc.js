@@ -6,6 +6,7 @@ module.exports = {
       "ignoreUrls": true,
     }],
     "new-cap": "off",
+    "no-unused-vars": ["error"],
     "strict": "off",
   },
 };

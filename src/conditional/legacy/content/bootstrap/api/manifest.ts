@@ -20,23 +20,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {
-  getChromeUrl,
-  parseJSON,
-} from "bootstrap/lib/utils/chrome-files-utils";
+import { API } from "bootstrap/api/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class Manifest extends Module {
   public data: any;
 
-  constructor(log: Log) {
+  constructor(
+      log: API.ILog,
+      private chromeFileService: API.services.IChromeFileService,
+  ) {
     super("manifest", log);
   }
 
   public async startupSelf() {
-    const manifestUrl = getChromeUrl("content/bootstrap-data/manifest.json");
-    await parseJSON(manifestUrl).then((data) => {
+    const manifestUrl = this.chromeFileService.
+        getChromeUrl("bootstrap-data/manifest.json");
+    await this.chromeFileService.parseJSON(manifestUrl).then((data) => {
       this.data = data;
     });
   }

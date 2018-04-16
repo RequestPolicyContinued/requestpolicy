@@ -32,7 +32,7 @@ const ALLOWED_NAMES = new Set<AllowedName>([
 ]);
 
 interface IData {
-  deferred: IDeferred<void>;
+  deferred: IDeferred<void, any>;
   registered: boolean;
 }
 

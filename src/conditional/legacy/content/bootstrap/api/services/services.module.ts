@@ -20,34 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {Module} from "lib/classes/module";
-import {Log} from "models/log";
 
-export class Extension extends Module {
-  private backgroundPage: any;
-
-  constructor(log: Log) {
-    super("browser.extension", log);
-  }
-
-  public get backgroundApi() {
-    return {
-      getBackgroundPage: this.getBackgroundPage.bind(this),
-    };
-  }
-
-  public get contentApi() {
-    return {
-      getURL: null,
-      inIncognitoContext: null,
-    };
-  }
-
-  public setBackgroundPage(aObject: any) {
-    this.backgroundPage = aObject;
-  }
-
-  public getBackgroundPage() {
-    return this.backgroundPage;
+export class ServicesApi extends Module {
+  constructor(
+      log: API.ILog,
+      public chromeFileService: API.services.IChromeFileService,
+      public fileService: API.services.IFileService,
+  ) {
+    super("browser.storage", log);
   }
 }

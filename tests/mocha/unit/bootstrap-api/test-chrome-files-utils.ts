@@ -20,28 +20,20 @@ const {assert, expect} = chai;
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
 import {Components as MockComponents} from "./lib/mock-components";
+import {ChromeFileService} from "bootstrap/api/services/chrome-file-service";
 
-describe("ChromeFilesUtils", function() {
-  let ChromeFilesUtils = null;
+describe("ChromeFileService", function() {
+  let chromeFileService: ChromeFileService = null;
   let stubHttpRequest = null;
 
   before(function() {
-    let mockComp = new MockComponents();
-    let mockNu = new MockNetUtil();
+    const mockNetUtil = new MockNetUtil();
+    const mockHttp = {
+      httpRequest: sinon.stub(),
+    };
+    stubHttpRequest = mockHttp.httpRequest;
 
-    let mockHttp = {httpRequest: function(url, option) {}};
-    stubHttpRequest = sinon.stub(mockHttp, "httpRequest");
-
-    sinon.stub(mockComp.utils, "import").
-        withArgs("resource://gre/modules/NetUtil.jsm").
-        returns({NetUtil: mockNu}).
-        withArgs("resource://gre/modules/Http.jsm").
-        returns(mockHttp);
-
-    // Replaces global declaration done in bootstrap.js
-    (global as any).Cu = mockComp.utils;
-
-    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
+    chromeFileService = new ChromeFileService(mockNetUtil as any, mockHttp as any);
   });
 
   afterEach(function() {
@@ -50,33 +42,33 @@ describe("ChromeFilesUtils", function() {
 
   describe("getChromeUrl(path)", function() {
     it("Map path to file", function() {
-      let path = "content/foo.ext";
+      let path = "foo.ext";
       let expected = "chrome://rpcontinued/content/foo.ext";
-      assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
+      assert.strictEqual(chromeFileService.getChromeUrl(path), expected);
     });
 
     it("Map path to directory", function() {
-      let path = "content/bar/";
+      let path = "bar/";
       let expected = "chrome://rpcontinued/content/bar/";
-      assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
+      assert.strictEqual(chromeFileService.getChromeUrl(path), expected);
     });
 
     it("Should remove leading /", function() {
       let path = "/content/bar/";
       let expected = "chrome://rpcontinued/content/bar/";
-      assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
+      assert.strictEqual(chromeFileService.getChromeUrl(path), expected);
     });
 
     it("Should remove leading ./", function() {
       let path = "./content/bar/";
       let expected = "chrome://rpcontinued/content/bar/";
-      assert.strictEqual(ChromeFilesUtils.getChromeUrl(path), expected);
+      assert.strictEqual(chromeFileService.getChromeUrl(path), expected);
     });
   });
 
   describe("readDirectory(chromePath)", function() {
     it("Should be rejected if path is null", function() {
-      let promise = ChromeFilesUtils.readDirectory(null);
+      let promise = chromeFileService.readDirectory(null);
       return expect(promise).to.be.rejectedWith(Error);
     });
 
@@ -85,7 +77,7 @@ describe("ChromeFilesUtils", function() {
         option.onLoad("", {status: 200});
       });
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).
           to.be.eventually.fulfilled.with.an("array").
           that.is.empty;
@@ -96,7 +88,7 @@ describe("ChromeFilesUtils", function() {
         option.onLoad(null, {status: 200});
       });
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).
           to.be.eventually.fulfilled.with.an("array").
           that.is.empty;
@@ -107,7 +99,7 @@ describe("ChromeFilesUtils", function() {
         option.onLoad("", {status: 404});
       });
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).to.be.rejectedWith(Error);
     });
 
@@ -116,14 +108,14 @@ describe("ChromeFilesUtils", function() {
         option.onLoad("", {status: null});
       });
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).to.be.rejectedWith(Error);
     });
 
     it("Should be rejected if httpRequest throws", function() {
       stubHttpRequest.throws();
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).to.be.rejectedWith(Error);
     });
 
@@ -133,7 +125,7 @@ describe("ChromeFilesUtils", function() {
         + "201: barDir 0 0 DIRECTORY", {status: 200});
       });
 
-      let promise = ChromeFilesUtils.readDirectory("bar/");
+      let promise = chromeFileService.readDirectory("bar/");
       return expect(promise).
           to.be.eventually.fulfilled.with.an("array").
           that.deep.include({name: "foo.ext", isDir: false}).

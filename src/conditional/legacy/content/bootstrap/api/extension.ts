@@ -20,18 +20,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {defineLazyGetter} from "lib/utils/js-utils";
+import { API } from "bootstrap/api/interfaces";
+import {Module} from "lib/classes/module";
 
-export const MozModules: {
-  FileUtils?: any,
-  NetUtil?: any,
-} = {};
+export class Extension extends Module {
+  private backgroundPage: any;
 
-[
-  ["FileUtils", "resource://gre/modules/FileUtils.jsm"],
-  ["NetUtil", "resource://gre/modules/NetUtil.jsm"],
-].forEach(([name, uri]) => {
-  defineLazyGetter(MozModules, name, () => {
-    return Cu.import(uri)[name];
-  });
-});
+  constructor(log: API.ILog) {
+    super("browser.extension", log);
+  }
+
+  public get backgroundApi() {
+    return {
+      getBackgroundPage: this.getBackgroundPage.bind(this),
+    };
+  }
+
+  public get contentApi() {
+    return {
+      getURL: null,
+      inIncognitoContext: null,
+    };
+  }
+
+  public setBackgroundPage(aObject: any) {
+    this.backgroundPage = aObject;
+  }
+
+  public getBackgroundPage() {
+    return this.backgroundPage;
+  }
+}

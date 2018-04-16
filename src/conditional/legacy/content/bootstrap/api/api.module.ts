@@ -20,27 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {PrefObserver} from "bootstrap/lib/classes/pref-observer";
-import * as LegacyMiscInfos from "bootstrap/models/legacy-misc-infos";
-import {Prefs} from "bootstrap/models/prefs";
-import {Module} from "lib/classes/module";
-import {Log} from "models/log";
-import {Extension} from "./api/extension";
-import {I18n} from "./api/i18n";
-import {Management} from "./api/management";
-import {Runtime} from "./api/runtime";
-import {Storage} from "./api/storage";
-import {Manifest} from "./manifest";
+import { Module } from "lib/classes/module";
+import { API } from "./interfaces";
 
 export class Api extends Module {
   constructor(
-      log: Log,
-      public readonly extension: Extension,
-      public readonly i18n: I18n,
-      public readonly management: Management,
-      public readonly manifest: Manifest,
-      public readonly runtime: Runtime,
-      public readonly storage: Storage,
+      log: API.ILog,
+      public readonly extension: API.extension.IExtension,
+      public readonly i18n: API.i18n.II18n,
+      public readonly management: API.management.IManagement,
+      public readonly manifest: API.IManifest,
+      public readonly runtime: API.runtime.IRuntime,
+      public readonly storage: API.storage.IStorage,
+      private readonly miscInfos: API.IMiscInfos,
+      private readonly prefs: API.storage.IPrefs,
+      private readonly prefObserverFactory: API.storage.PrefObserverFactory,
   ) {
     super("API", log);
   }
@@ -77,10 +71,10 @@ export class Api extends Module {
 
   public get legacyApi() {
     return {
-      PrefObserver,
+      createPrefObserver: this.prefObserverFactory,
       i18n: this.i18n.legacyApi,
-      miscInfos: LegacyMiscInfos,
-      prefs: Prefs,
+      miscInfos: this.miscInfos,
+      prefs: this.prefs,
       storage: {},
     };
   }

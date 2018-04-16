@@ -22,42 +22,38 @@ import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
 import {Components as MockComponents} from "./lib/mock-components";
 import {Services as MockServices} from "./lib/mock-services";
 
+import {AsyncLocaleData} from "bootstrap/api/i18n/async-locale-data";
+import {ChromeFileService} from "bootstrap/api/services/chrome-file-service";
+
 let sandbox = sinon.createSandbox();
 
-describe("AsyncLocaleData", function() {
-  let ChromeFilesUtils = null;
-  let asyncLocaleData = null;
-  let AsyncLocaleData;
+type stubbedCFS = ChromeFileService & { parseJSON: sinon.SinonStub };
 
-  let mockComp: MockComponents;
+function createMockTryCatchUtils(appLocale: string) {
+  return { getAppLocale() { return appLocale; } }
+}
+
+describe("AsyncLocaleData", function() {
+  let chromeFileService: stubbedCFS = null;
+  let asyncLocaleData: AsyncLocaleData = null;
+
   let mockNu: MockNetUtil;
   let mockServices: MockServices;
+  let mockTryCatchUtils = null;
 
   before(function() {
-    mockComp = new MockComponents();
     mockNu = new MockNetUtil();
     mockServices = new MockServices();
-    let mockHttp = {httpRequest: function(url, option) {}};
+    const mockHttp = {httpRequest: function(url, option) {}};
+    mockTryCatchUtils = createMockTryCatchUtils("en-US");
 
-    sinon.stub(mockComp.utils, "import").
-        withArgs("resource://gre/modules/NetUtil.jsm").
-        returns({NetUtil: mockNu}).
-        withArgs("resource://gre/modules/Http.jsm").
-        returns(mockHttp);
-
-    // Replaces global declaration done in bootstrap.js
-    (global as any).Cu = mockComp.utils;
-    (global as any).Services = mockServices;
-
-    ({AsyncLocaleData} = require("bootstrap/models/api/i18n/async-locale-data"));
-    ChromeFilesUtils = require("bootstrap/lib/utils/chrome-files-utils");
-
-    // Create stubs
-    sinon.stub(ChromeFilesUtils, "parseJSON");
+    const cfs = new ChromeFileService(mockNu as any, mockHttp as any);
+    sinon.stub(cfs, "parseJSON");
+    chromeFileService = cfs as stubbedCFS;
   });
 
   beforeEach(function() {
-    asyncLocaleData = new AsyncLocaleData(() => "en-US");
+    asyncLocaleData = new AsyncLocaleData(mockTryCatchUtils, chromeFileService);
   });
 
   afterEach(function() {
@@ -65,21 +61,22 @@ describe("AsyncLocaleData", function() {
     mockServices.locale = {};
   });
 
-  after(function() {
-    (global as any).Cu = null;
-    (global as any).Services = null;
-  });
-
   describe("getAppLocale()", function() {
     it("Should return normalized BCP 47 tag", function() {
-      asyncLocaleData = new AsyncLocaleData(() => "fr-FR");
+      asyncLocaleData = new AsyncLocaleData(
+          createMockTryCatchUtils("fr-FR") as any,
+          chromeFileService,
+      );
 
       let result = asyncLocaleData.getAppLocale();
       expect(result).to.equal("fr-fr");
     });
 
     it("Should throw RangeError if not a valid BCP 47 tag", function() {
-      asyncLocaleData = new AsyncLocaleData(() => "-invalid tag");
+      asyncLocaleData = new AsyncLocaleData(
+          createMockTryCatchUtils("-invalid tag") as any,
+          chromeFileService,
+      );
 
       let fn = function() {
         return asyncLocaleData.getAppLocale();
@@ -90,7 +87,7 @@ describe("AsyncLocaleData", function() {
 
   describe("getDefaultLocale()", function() {
     it("Should return value from manifest.json", function() {
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({default_locale: "zh"});
 
@@ -100,7 +97,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should return a normalized BCP 47 tag", function() {
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({default_locale: "fr_CA"});
 
@@ -110,7 +107,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should reject if default_locale isn't present", function() {
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           resolves({name: "RPC"});
 
@@ -119,7 +116,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should reject if can't parse manifest.json", function() {
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/bootstrap-data/manifest.json").
           rejects();
 
@@ -130,7 +127,7 @@ describe("AsyncLocaleData", function() {
 
   describe("getAvailableLocales()", function() {
     it("Should return a map of available locales", function() {
-      ChromeFilesUtils.parseJSON.resolves(["fr", "en"]);
+      chromeFileService.parseJSON.resolves(["fr", "en"]);
       let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.eventually.fulfilled.
           with.a("map").which.have.all.keys("fr", "en").
@@ -139,7 +136,7 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should normalize tag", function() {
-      ChromeFilesUtils.parseJSON.resolves(["Fr_fR", "eN_Us"]);
+      chromeFileService.parseJSON.resolves(["Fr_fR", "eN_Us"]);
       let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.eventually.fulfilled.
           with.a("map").which.have.all.keys("fr-fr", "en-us").
@@ -148,13 +145,13 @@ describe("AsyncLocaleData", function() {
     });
 
     it("Should be rejected on parseJSON rejection", function() {
-      ChromeFilesUtils.parseJSON.rejects();
+      chromeFileService.parseJSON.rejects();
       let promise = asyncLocaleData.getAvailableLocales();
       return expect(promise).to.be.rejectedWith(Error);
     });
 
     it("Should be rejected on parseJSON exception", function() {
-      ChromeFilesUtils.parseJSON.returns(new Promise((resolve, reject) => {
+      chromeFileService.parseJSON.returns(new Promise((resolve, reject) => {
         throw new Error();
       }));
       let promise = asyncLocaleData.getAvailableLocales();
@@ -197,7 +194,7 @@ describe("AsyncLocaleData", function() {
   describe("loadLocalesMessages(localesMap)", function() {
     it("Should load all requested locale", function() {
       let localesMap = new Map([["fr", "fr"], ["en-us", "en_US"]]);
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/_locales/fr/messages.json").
           resolves("des messages").
           withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json").
@@ -211,7 +208,7 @@ describe("AsyncLocaleData", function() {
 
     it("Should be rejected if JSON parsing fails", function() {
       let localesMap = new Map([["fr", "fr"], ["en-us", "en_US"]]);
-      ChromeFilesUtils.parseJSON.
+      chromeFileService.parseJSON.
           withArgs("chrome://rpcontinued/content/_locales/fr/messages.json").
           resolves("des messages").
           withArgs("chrome://rpcontinued/content/_locales/en_US/messages.json").

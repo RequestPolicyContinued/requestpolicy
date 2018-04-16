@@ -20,23 +20,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Prefs} from "bootstrap/models/prefs";
-import {C} from "data/constants";
+import { API } from "bootstrap/api/interfaces";
+import { C } from "data/constants";
 import {
   AbstractObjectInterface,
   IKeysObject,
 } from "lib/classes/object-interface";
-import {isJsonPref, JsonPrefs} from "./json-prefs";
-
-// =============================================================================
-
-function getPrefsModel(aKey: string) {
-  return isJsonPref(aKey) ? JsonPrefs : Prefs;
-}
 
 export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
+  constructor(
+      private prefs: API.storage.IPrefs,
+      private jsonStorage: API.storage.IJsonStorage,
+  ) {
+    super();
+  }
+
   protected getAll() {
-    return Prefs.branches.rp.getAll().concat(JsonPrefs.getAll());
+    return Object.assign(
+        {},
+        this.prefs.branches.rp.getAll(),
+        this.jsonStorage.getAll(),
+    );
   }
 
   protected getNothing() {
@@ -46,7 +50,8 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   protected getByKeys(aKeys: string[]) {
     const results: IKeysObject = {};
     aKeys.forEach((key) => {
-      const result = getPrefsModel(key).get(key);
+      const result = this.jsonStorage.isJsonStorageKey(key) ?
+          this.jsonStorage.get(key) : this.prefs.get(key);
       if (result !== C.UNDEFINED) {
         results[key] = result;
       }
@@ -55,7 +60,11 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   }
 
   protected setByKey(aKey: string, aValue: any) {
-    getPrefsModel(aKey).set(aKey, aValue);
+     if (this.jsonStorage.isJsonStorageKey(aKey)) {
+       this.jsonStorage.set(aKey, aValue);
+     } else {
+       this.prefs.set<any>(aKey, aValue);
+     }
   }
 
   protected removeByKeys(aKeys: string[]) {

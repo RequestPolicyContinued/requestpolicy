@@ -19,17 +19,14 @@
         "*",
         "../../src/content/*",
         "../../src/conditional/legacy/content/*",
-        "../../node_modules/*",
       ]
     }
   }
   ,
   "include": [
-    "./**/*",
+    "../../src/**/*",
   ],
   "exclude": [
-    "node_modules",
-    "**/third-party",
-    "../../src",
+    "**/third-party/static",
   ]
 }

@@ -36,37 +36,44 @@ enum PromiseState {
   rejected = "rejected",
 }
 
-export interface IDeferred<T> {
+export interface IDeferred<T, RejectT> {
   promise: Promise<T>;
   promiseState: PromiseState;
-  reject: (arg: any) => void;
-  resolve: (arg: any) => void;
+  // FIXME: It's necessary to pass `undefined` if `T` is `void`.
+  // depends on https://github.com/Microsoft/TypeScript/issues/4260
+  reject: (arg: RejectT | Promise<RejectT>) => void;
+  resolve: (arg: T | Promise<T>) => void;
 }
 
 /**
  * Defer some task.
  */
-export function defer<T = void>(): IDeferred<T> {
+export function defer<T = void, RejectT = any>(): IDeferred<T, RejectT> {
   let promiseState: PromiseState = PromiseState.pending;
-  let rejectFn: (value: T) => void;
+  let rejectFn: (value: RejectT) => void;
   let resolveFn: (value: T) => void;
 
-  const promise = new Promise<T>((resolve, reject) => {
-    rejectFn = reject;
-    resolveFn = resolve;
+  const promise = new Promise<T>((aResolveFn, aRejectFn) => {
+    rejectFn = aRejectFn;
+    resolveFn = aResolveFn;
   });
+
+  function reject(value: RejectT) {
+    promiseState = PromiseState.rejected;
+    rejectFn(value);
+  }
+  function resolve(value: T) {
+    promiseState = PromiseState.fulfilled;
+    resolveFn(value);
+  }
 
   return {
     promise,
-    promiseState,
-    reject(arg: T) {
-      promiseState = PromiseState.rejected;
-      rejectFn(arg);
+    get promiseState() {
+      return promiseState;
     },
-    resolve(arg: T) {
-      promiseState = PromiseState.fulfilled;
-      resolveFn(arg);
-    },
+    reject,
+    resolve,
   };
 }
 

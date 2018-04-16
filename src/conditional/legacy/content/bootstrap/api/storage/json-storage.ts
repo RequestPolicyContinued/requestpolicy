@@ -20,52 +20,54 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as FileUtils from "bootstrap/lib/utils/file-utils";
-import {C} from "data/constants";
+import { API } from "bootstrap/api/interfaces";
+import { C } from "data/constants";
 
-// =============================================================================
+export class JsonStorage {
+  constructor(
+      private filesService: API.services.IFileService,
+  ) {}
 
-export function isJsonPref(aKey: string) {
-  return aKey.startsWith("policies/") || aKey === "subscriptions";
-}
-
-function assertValidKey(aKey: string) {
-  if (!isJsonPref(aKey)) {
-    throw new Error(`Invalid key "${aKey}".`);
+  public isJsonStorageKey(aKey: string) {
+    return aKey.startsWith("policies/") || aKey === "subscriptions";
   }
-}
 
-function getFile(aKey: string) {
-  return FileUtils.getRPFile(`${aKey}.json`);
-}
-
-function getKeyFromPath(aPath: string) {
-  return aPath.replace(/\.json$/, "");
-}
-
-// =============================================================================
-
-export const JsonPrefs = {
-  getAll() {
-    const allFiles = FileUtils.getAllRPFiles();
+  public getAll() {
+    const allFiles = this.filesService.getAllRPFiles();
     const allPrefs: {[k: string]: any} = {};
     allFiles.forEach((path) => {
-      const key = getKeyFromPath(path);
+      const key = this.getKeyFromPath(path);
       allPrefs[key] = this.get(key);
     });
     return allPrefs;
-  },
-  get(aKey: string) {
-    assertValidKey(aKey);
-    const file = getFile(aKey);
+  }
+
+  public get(aKey: string) {
+    this.assertValidKey(aKey);
+    const file = this.getFile(aKey);
     if (!file.exists()) return C.UNDEFINED;
-    const contents = FileUtils.fileToString(file);
+    const contents = this.filesService.fileToString(file);
     return JSON.parse(contents);
-  },
-  set(aKey: string, aValue: any) {
-    assertValidKey(aKey);
-    const file = getFile(aKey);
+  }
+
+  public set(aKey: string, aValue: any) {
+    this.assertValidKey(aKey);
+    const file = this.getFile(aKey);
     const newContents = JSON.stringify(aValue);
-    FileUtils.stringToFile(newContents, file);
-  },
-};
+    this.filesService.stringToFile(newContents, file);
+  }
+
+  private assertValidKey(aKey: string) {
+    if (!this.isJsonStorageKey(aKey)) {
+      throw new Error(`Invalid key "${aKey}".`);
+    }
+  }
+
+  private getKeyFromPath(aPath: string) {
+    return aPath.replace(/\.json$/, "");
+  }
+
+  private getFile(aKey: string) {
+    return this.filesService.getRPFile(`${aKey}.json`);
+  }
+}

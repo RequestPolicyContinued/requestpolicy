@@ -140,11 +140,6 @@ export class Prefs {
   // Prefs - Aliases
   // ===========================================================================
 
-  public isPrefetchEnabled() {
-    return this.get("root/ network.prefetch-next") ||
-        !this.get("root/ network.dns.disablePrefetch");
-  }
-
   public oldRulesExist() {
     return !(this.isOldRulePrefEmpty("allowedOrigins") &&
              this.isOldRulePrefEmpty("allowedDestinations") &&

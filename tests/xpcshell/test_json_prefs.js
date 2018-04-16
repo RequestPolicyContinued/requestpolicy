@@ -1,6 +1,15 @@
 /* exported run_test */
 
+const {XPConnectService} = require("bootstrap/api/services/xpconnect-service");
+const xpconnectService = new XPConnectService();
+const {
+  FileUtils: mozFileUtils,
+} = Cu.import("resource://gre/modules/FileUtils.jsm", {});
+const {FileService} = require("bootstrap/api/services/file-service");
+const fileService = new FileService(xpconnectService, mozFileUtils);
+
 const {JsonPrefs} = require("bootstrap/api/storage/json-prefs");
+const jsonPrefs = new JsonPrefs(fileService);
 
 function run_test() {
   run_next_test();
@@ -8,7 +17,7 @@ function run_test() {
 
 add_test(function() {
   // exercise
-  const allJsonPrefs = JsonPrefs.getAll();
+  const allJsonPrefs = jsonPrefs.getAll();
 
   // verify
   Assert.deepEqual(allJsonPrefs, {});
@@ -24,7 +33,7 @@ add_test(function() {
   createRPFile("policies/bar/barB.json", `{"bar": "B"}`);
 
   // exercise
-  const allJsonPrefs = JsonPrefs.getAll();
+  const allJsonPrefs = jsonPrefs.getAll();
 
   // verify
   Assert.deepEqual(allJsonPrefs, {

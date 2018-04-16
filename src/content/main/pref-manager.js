@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 import {Log} from "models/log";
 
 const log = Log.instance;
@@ -32,37 +31,6 @@ const log = Log.instance;
 
 export const PrefManager = (function() {
   let self = {};
-
-  // TODO: move to bootstrap.js
-  function handleUninstallOrDisable() {
-    const resetLinkPrefetch = LegacyApi.prefs.
-        get("prefetch.link.restoreDefaultOnUninstall");
-    const resetDNSPrefetch = LegacyApi.prefs.
-        get("prefetch.dns.restoreDefaultOnUninstall");
-    const resetPreConnections = LegacyApi.prefs.
-        get("prefetch.preconnections.restoreDefaultOnUninstall");
-
-    if (resetLinkPrefetch) {
-      if (LegacyApi.prefs.isSet("root/ network.prefetch-next")) {
-        LegacyApi.prefs.reset("root/ network.prefetch-next");
-      }
-    }
-    if (resetDNSPrefetch) {
-      if (LegacyApi.prefs.isSet("root/ network.dns.disablePrefetch")) {
-        LegacyApi.prefs.reset("root/ network.dns.disablePrefetch");
-      }
-      if (LegacyApi.prefs.isSet("root/ network.dns.disablePrefetchFromHTTPS")) {
-        LegacyApi.prefs.reset("root/ network.dns.disablePrefetchFromHTTPS");
-      }
-    }
-    if (resetPreConnections) {
-      let prefName = "root/ network.http.speculative-parallel-limit";
-      if (LegacyApi.prefs.isSet(prefName)) {
-        LegacyApi.prefs.reset(prefName);
-      }
-    }
-    LegacyApi.prefs.save();
-  }
 
   self.init = function() {
     // ================================
@@ -122,16 +90,6 @@ export const PrefManager = (function() {
 
     LegacyApi.prefs.save();
   };
-
-  function maybeHandleUninstallOrDisable(data, reason) {
-    if (reason === "ADDON_DISABLE" || reason === "ADDON_UNINSTALL") {
-      // TODO: Handle uninstallation in bootstrap.js, not here, RP might be
-      //       disabled when being uninstalled.
-      handleUninstallOrDisable();
-    }
-  }
-  MainEnvironment.addShutdownFunction(EnvLevel.BACKEND,
-      maybeHandleUninstallOrDisable);
 
   return self;
 })();

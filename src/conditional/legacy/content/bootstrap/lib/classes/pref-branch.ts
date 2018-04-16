@@ -40,61 +40,60 @@ export class PrefBranch {
   public readonly branch = Services.prefs.getBranch(this.branchRoot).
       QueryInterface(Ci.nsIPrefBranch2);
 
-constructor(
-    public readonly branchRoot: string,
-    // How should a pref name "foo.bar.baz" be translated to
-    // "getBoolPref" or "setIntPref"?
-    private _namesToTypesMap: {[key: string]: PrefTypes},
-) {}
+  constructor(
+      public readonly branchRoot: string,
+      // How should a pref name "foo.bar.baz" be translated to
+      // "getBoolPref" or "setIntPref"?
+      private namesToTypesMap: {[key: string]: PrefTypes},
+  ) {}
 
-private _type(aPrefName: string): PrefTypes {
-  if (!(aPrefName in this._namesToTypesMap)) {
-    throw new Error(`Unknown pref "${aPrefName}"`);
+  public getAll() {
+    return Object.keys(this.namesToTypesMap).
+        map((prefName) => this.get(prefName));
   }
-  return this._namesToTypesMap[aPrefName];
-}
 
-// tslint:disable:member-ordering
-public getAll() {
-  return Object.keys(this._namesToTypesMap).
-      map((prefName) => this.get(prefName));
-}
+  public get<T extends string | number | boolean>(
+      aPrefName: string,
+  ): T {
+    const getterFnName = `get${this.type(aPrefName)}` as GetterFnName;
+    return (
+      this.branch[getterFnName] as
+      (prefName: string) => T
+    )(aPrefName);
+  }
 
-public get<T extends string | number | boolean>(
-    aPrefName: string,
-): T {
-  const getterFnName = `get${this._type(aPrefName)}` as GetterFnName;
-  return (
-    this.branch[getterFnName] as
-    (prefName: string) => T
-  )(aPrefName);
-}
+  // sorry for this very ugly-looking function
+  public set<T extends string | number | boolean>(
+      aPrefName: string,
+      aValue: T,
+  ): void {
+    const setterFnName = `set${this.type(aPrefName)}` as SetterFnName;
+    (
+      this.branch[setterFnName] as
+      (prefName: string, value: T) => void
+    )(aPrefName, aValue);
+  }
 
-// sorry for this very ugly-looking function
-public set<T extends string | number | boolean>(
-    aPrefName: string,
-    aValue: T,
-): void {
-  const setterFnName = `set${this._type(aPrefName)}` as SetterFnName;
-  (
-    this.branch[setterFnName] as
-    (prefName: string, value: T) => void
-  )(aPrefName, aValue);
-}
+  public reset(aPrefName: string) {
+    this.branch.clearUserPref(aPrefName);
+  }
 
-public reset(aPrefName: string) {
-  this.branch.clearUserPref(aPrefName);
-}
+  public isSet(aPrefName: string) {
+    return this.branch.prefHasUserValue(aPrefName);
+  }
 
-public isSet(aPrefName: string) {
-  return this.branch.prefHasUserValue(aPrefName);
-}
+  public addObserver(aDomain: string, aObserver: any, aHoldWeak: boolean) {
+    return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
+  }
 
-public addObserver(aDomain: string, aObserver: any, aHoldWeak: boolean) {
-  return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
-}
+  public removeObserver(aDomain: string, aObserver: any) {
+    return this.branch.removeObserver(aDomain, aObserver);
+  }
 
-public removeObserver(aDomain: string, aObserver: any) {
-  return this.branch.removeObserver(aDomain, aObserver);
-}
+  private type(aPrefName: string): PrefTypes {
+    if (!(aPrefName in this.namesToTypesMap)) {
+      throw new Error(`Unknown pref "${aPrefName}"`);
+    }
+    return this.namesToTypesMap[aPrefName];
+  }
 }

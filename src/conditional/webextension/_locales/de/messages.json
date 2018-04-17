@@ -224,16 +224,6 @@
     "description": "Enabled"
   },
 
-  "disableOnStartup": {
-    "message": "Beim Start von Firefox deaktivieren",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Bei der Deinstallation von RequestPolicy Standardeinstellung wiederherstellen",
-    "description": "Restore default when RequestPolicy is uninstalled"
-  },
-
   "menuPreferences": {
     "message": "Menü-Einstellungen",
     "description": "Menu Preferences"

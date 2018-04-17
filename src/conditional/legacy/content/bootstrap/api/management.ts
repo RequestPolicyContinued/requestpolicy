@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
@@ -32,7 +33,7 @@ type ExtensionInfo = browser.management.ExtensionInfo;
 type AddonListenerCallback =
     "onEnabled" | "onDisabled" | "onInstalled" | "onUninstalled";
 
-export class Management extends Module {
+export class Management extends Module implements API.management.IManagement {
   public onEnabled: IListenInterface;
   public onDisabled: IListenInterface;
   public onInstalled: IListenInterface;

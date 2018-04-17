@@ -229,16 +229,6 @@
     "description": "Enabled"
   },
 
-  "disableOnStartup": {
-    "message": "Wyłącz przy starcie",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Przywróć domyślne ustawienie, gdy RequestPolicy zostanie odinstalowane",
-    "description": "Restore default when RequestPolicy is uninstalled"
-  },
-
   "menuPreferences": {
     "message": "Ustawienia menu",
     "description": "Menu Preferences"

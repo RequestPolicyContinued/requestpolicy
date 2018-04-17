@@ -144,29 +144,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Laŭligila antaŭakirado",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNSa antaŭakirado",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Ŝaltita",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Malŝalti ĉe starto de la programo",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Restarigi la defaŭltan agordon ĉe malinstalo de RequestPolicy",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

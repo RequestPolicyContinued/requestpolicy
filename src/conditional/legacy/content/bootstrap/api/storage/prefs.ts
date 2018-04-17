@@ -23,22 +23,26 @@
 
 import { API, JSMs } from "bootstrap/api/interfaces";
 
-// =============================================================================
-// Prefs
-// =============================================================================
-
-export class Prefs {
-  public branches = {
-    root: this.prefBranchFactory("", {
+export const PREF_BRANCH_SPECS: {
+  root: API.storage.IPrefBranchSpec,
+  rp: API.storage.IPrefBranchSpec,
+} = {
+  root: {
+    branchRoot: "",
+    namesToTypes: {
       "network.dns.disablePrefetch": "BoolPref",
       "network.dns.disablePrefetchFromHTTPS": "BoolPref",
       "network.http.speculative-parallel-limit": "IntPref",
       "network.predictor.enabled": "BoolPref",
       "network.prefetch-next": "BoolPref",
-    }),
+    },
+  },
 
-    rp: this.prefBranchFactory("extensions.requestpolicy.", {
+  rp: {
+    branchRoot: "extensions.requestpolicy.",
+    namesToTypes: {
       "autoReload": "BoolPref",
+      "browserSettings.disablePrefetching": "BoolPref",
       "confirmSiteInfo": "BoolPref",
       "contextMenu": "BoolPref",
       "defaultPolicy.allow": "BoolPref",
@@ -56,16 +60,30 @@ export class Prefs {
       "log.level": "IntPref",
       "menu.info.showNumRequests": "BoolPref",
       "menu.sorting": "CharPref",
-      "prefetch.dns.disableOnStartup": "BoolPref",
-      "prefetch.dns.restoreDefaultOnUninstall": "BoolPref",
-      "prefetch.link.disableOnStartup": "BoolPref",
-      "prefetch.link.restoreDefaultOnUninstall": "BoolPref",
-      "prefetch.preconnections.disableOnStartup": "BoolPref",
-      "prefetch.preconnections.restoreDefaultOnUninstall": "BoolPref",
       "privateBrowsingPermanentWhitelisting": "BoolPref",
       "startWithAllowAllEnabled": "BoolPref",
       "welcomeWindowShown": "BoolPref",
-    }),
+
+      // OBSOLETE PREFS which are transitioned/merged into a new pref
+      // (do not remove from this list!)
+      // tslint:disable-next-line:object-literal-sort-keys
+      "prefetch.dns.disableOnStartup": "BoolPref",
+      "prefetch.link.disableOnStartup": "BoolPref",
+      "prefetch.preconnections.disableOnStartup": "BoolPref",
+    },
+  },
+};
+
+export class Prefs {
+  public branches = {
+    root: this.prefBranchFactory(
+        PREF_BRANCH_SPECS.root.branchRoot,
+        PREF_BRANCH_SPECS.root.namesToTypes,
+    ),
+    rp: this.prefBranchFactory(
+        PREF_BRANCH_SPECS.rp.branchRoot,
+        PREF_BRANCH_SPECS.rp.namesToTypes,
+    ),
   };
 
   constructor(
@@ -138,20 +156,7 @@ export class Prefs {
   // Helper functions
   // ===========================================================================
 
-  /**
-   * Translate an alias into a real prefName, and also return the branch.
-   *
-   * Valid "fake pref names" are:
-   *   - "root/ network.prefetch-next" (root pref branch)
-   *   - "welcomeWindowShown" (RequestPolicy pref branch)
-   */
   private getBranchAndRealName(aFakePrefName: string) {
-    if (aFakePrefName.startsWith("root/ ")) {
-      return {
-        branch: this.branches.root,
-        name: aFakePrefName.slice(6),
-      };
-    }
     return {
       branch: this.branches.rp,
       name: aFakePrefName,

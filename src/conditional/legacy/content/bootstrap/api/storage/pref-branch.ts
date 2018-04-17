@@ -28,6 +28,15 @@ export type PrefType = "BoolPref" | "CharPref" | "IntPref";
 type GetterFnName = "getBoolPref" | "getCharPref" | "getIntPref";
 type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
 
+export interface IPrefNamesToTypes {
+  [key: string]: PrefType;
+}
+
+export interface IPrefBranchSpec {
+  branchRoot: string;
+  namesToTypes: IPrefNamesToTypes;
+}
+
 /**
  * @param {string} aBranchRoot
  * @param {Object} aPrefNameToTypeMap A map from Pref Names to Pref Types.
@@ -42,7 +51,7 @@ export class PrefBranch {
       public readonly branchRoot: string,
       // How should a pref name "foo.bar.baz" be translated to
       // "getBoolPref" or "setIntPref"?
-      private namesToTypesMap: {[key: string]: PrefType},
+      private namesToTypesMap: IPrefNamesToTypes,
   ) {}
 
   public getAll() {

@@ -30,6 +30,7 @@ export const boolAliases: Array<[string, string]> = [
 
 export const cachedKeys = [
   "autoReload",
+  "browserSettings.disablePrefetching",
   "confirmSiteInfo",
   "contextMenu",
   "defaultPolicy.allow",
@@ -47,12 +48,6 @@ export const cachedKeys = [
   "log.level",
   "menu.info.showNumRequests",
   "menu.sorting",
-  "prefetch.dns.disableOnStartup",
-  "prefetch.dns.restoreDefaultOnUninstall",
-  "prefetch.link.disableOnStartup",
-  "prefetch.link.restoreDefaultOnUninstall",
-  "prefetch.preconnections.disableOnStartup",
-  "prefetch.preconnections.restoreDefaultOnUninstall",
   "privateBrowsingPermanentWhitelisting",
   "startWithAllowAllEnabled",
   "welcomeWindowShown",

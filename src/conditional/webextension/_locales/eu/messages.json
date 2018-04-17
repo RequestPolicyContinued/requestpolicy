@@ -219,34 +219,9 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "Loturen aurre-erakarpena",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNSaren aurre-erakarpena",
-    "description": "DNS Prefetching"
-  },
-
-  "speculativePreConnections": {
-    "message": "Aurre-konexio espekulatiboak",
-    "description": "Speculative pre-connections"
-  },
-
   "enabled": {
     "message": "Gaituta",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Ezgaitu abioan",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Berrezarri lehenetsia RequestPolicy desinstalatzerakoan",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

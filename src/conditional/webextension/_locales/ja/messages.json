@@ -214,29 +214,9 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "リンクの先読み",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNS の先読み",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "有効にする",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "起動時に無効にする",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "RequestPolicy が削除されたとき、既定の設定に戻す",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

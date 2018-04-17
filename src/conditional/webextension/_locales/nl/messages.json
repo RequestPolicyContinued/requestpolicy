@@ -139,29 +139,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Vooraf ophalen koppelingen",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Vooraf ophalen DNS",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Ingeschakeld",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Uitschakelen bij opstarten",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Standaard herstellen wanneer RequestPolicy is gedeïnstalleerd",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

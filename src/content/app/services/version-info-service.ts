@@ -93,9 +93,9 @@ export class VersionInfoService extends Module {
 
     promises.lastRPVersion =
         browser.storage.local.get("lastVersion").
-        then(({lastVersion}) => {
-          infos.lastRPVersion = lastVersion;
-          return lastVersion;
+        then((result) => {
+          infos.lastRPVersion = result.lastRPVersion as IInfos["lastRPVersion"];
+          return infos.lastRPVersion;
         });
     checkPromise("lastRPVersion");
 
@@ -124,9 +124,10 @@ export class VersionInfoService extends Module {
 
     promises.lastAppVersion =
         browser.storage.local.get("lastAppVersion").
-        then(({lastAppVersion}) => {
-          infos.lastAppVersion = lastAppVersion;
-          return lastAppVersion;
+        then((result) => {
+          infos.lastAppVersion =
+              result.lastAppVersion as IInfos["lastAppVersion"];
+          return infos.lastAppVersion;
         });
     checkPromise("lastAppVersion");
 

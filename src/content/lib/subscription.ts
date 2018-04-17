@@ -156,8 +156,18 @@ export type UserSubscriptionsInfo = ISubsObject<null | true>;
  */
 export class UserSubscriptions {
   public static create(
-      data: IMaybeIncompleteUserSubscriptionsData = {},
+      aData: any,
   ): UserSubscriptions {
+    let data: IMaybeIncompleteUserSubscriptionsData;
+    if (!aData) {
+      data = {};
+    } else {
+      const checkResult = UserSubscriptions.checkDataObj(aData);
+      if (!checkResult.valid) {
+        throw new Error(`Invalid subscription data: ${checkResult.error}`);
+      }
+      data = aData;
+    }
     if (!data.lists) {
       data.lists = {
         official: {
@@ -175,6 +185,20 @@ export class UserSubscriptions {
     return new UserSubscriptions(data as IUserSubscriptionsData);
   }
 
+  public static checkDataObj(
+      dataObj: any,
+  ): {valid: true} | {valid: false, error: string} {
+    if (!dataObj || typeof dataObj !== "object") {
+      return {valid: false, error: "not an object"};
+    }
+    // IMaybeIncompleteUserSubscriptionsData
+    if ("lists" in dataObj) {
+      // IDataPerList
+      // TODO
+    }
+    return {valid: true};
+  }
+
   private data: IUserSubscriptionsData;
   private get lists(): IDataPerList {
     return this.data.lists;
@@ -190,7 +214,7 @@ export class UserSubscriptions {
 
   public save() {
     browser.storage.local.set({
-      subscriptions: this.data,
+      subscriptions: this.data as any, // FIXME (as any)
     }).catch((e) => {
       log.error("UserSubscriptions.save():", e);
     });

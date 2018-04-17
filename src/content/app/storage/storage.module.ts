@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { SettingsMigration } from "app/migration/settings-migration";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 
@@ -28,6 +29,11 @@ declare const LegacyApi: any;
 
 export class Storage extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
+
+  protected readonly startupPreconditions = [
+    this.settingsMigration.whenReady,
+  ];
+
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;
 
@@ -40,6 +46,7 @@ export class Storage extends Module {
           cachedKeys: string[],
           boolAliases: Array<[string, string]>,
       },
+      private settingsMigration: SettingsMigration,
   ) {
     super("app.storage", log);
 

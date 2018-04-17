@@ -40,7 +40,6 @@ import {
 } from "legacy/lib/commonjs-unload-subject";
 
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
-import {PrefManager} from "main/pref-manager";
 
 import {rp} from "app/app.background";
 import "main/about-uri";
@@ -137,8 +136,6 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 // =============================================================================
 
 (function startup() {
-  PrefManager.init();
-
   rp.startup().catch(log.onError("main startup"));
 
   try {

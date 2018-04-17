@@ -22,7 +22,7 @@
  */
 
 import {Module} from "lib/classes/module";
-import {IMaybeIncompleteRawRuleset, RawRuleset} from "lib/ruleset";
+import {RawRuleset} from "lib/ruleset";
 import {Log} from "models/log";
 
 export class RulesetStorage extends Module {
@@ -38,7 +38,7 @@ export class RulesetStorage extends Module {
     const pResult = browser.storage.local.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
-      return RawRuleset.create(aResult[key] as IMaybeIncompleteRawRuleset);
+      return RawRuleset.create(aResult[key]);
     });
     pRawRuleset.catch((e) => {
       this.log.error("RulesetStorage.loadRawRulesetFromFile():", e);
@@ -53,7 +53,7 @@ export class RulesetStorage extends Module {
   ) {
     const key = this.getKey(policyName, subscriptionListName);
     const p = browser.storage.local.set({
-      [key]: policy,
+      [key]: policy as any, // FIXME (as any)
     });
     p.catch((e) => {
       this.log.error("RulesetStorage.saveRawRulesetToFile():", e);

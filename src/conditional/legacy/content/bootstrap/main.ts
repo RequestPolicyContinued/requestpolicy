@@ -28,7 +28,7 @@ import {
 } from "bootstrap/controllers/default-preferences-controller";
 DefaultPreferencesController.startup();
 
-import * as TryCatchUtils from "lib/utils/try-catch-utils";
+import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { Log } from "models/log";
 import { Api } from "./api/api.module";
 import { Extension } from "./api/extension";
@@ -73,7 +73,7 @@ const extension = new Extension(log);
 const xpconnectService = new XPConnectService();
 const fileService = new FileService(xpconnectService, mozFileUtils);
 const chromeFileService = new ChromeFileService(mozNetUtil, mozHttp);
-const localeData = new AsyncLocaleData(TryCatchUtils, chromeFileService);
+const localeData = new AsyncLocaleData(tryCatchUtils, chromeFileService);
 const i18n = new I18n(log, localeData);
 const management = new Management(log);
 const manifest = new Manifest(log, chromeFileService);
@@ -110,4 +110,5 @@ export const api = new Api(
     miscInfos,
     prefs,
     prefObserverFactory,
+    tryCatchUtils,
 );

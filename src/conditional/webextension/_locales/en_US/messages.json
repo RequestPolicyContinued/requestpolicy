@@ -239,34 +239,19 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "Link Prefetching",
-    "description": "Link Prefetching"
+  "networkPrediction": {
+    "message": "Network Prediction",
+    "description": "Network Prediction, see https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/privacy/network"
   },
-
-  "dnsPrefetching": {
-    "message": "DNS Prefetching",
-    "description": "DNS Prefetching"
-  },
-
-  "speculativePreConnections": {
-    "message": "Speculative pre-connections",
-    "description": "Speculative pre-connections"
+  
+  "disableNetworkPrediction": {
+    "message": "Disable Network Prediction (prefetching [links, DNS], speculative pre-connections, etc.)",
+    "description": "Disable Network Prediction (...details...), see https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/privacy/network"
   },
 
   "enabled": {
     "message": "Enabled",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Disable on startup",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Restore default when RequestPolicy is uninstalled",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

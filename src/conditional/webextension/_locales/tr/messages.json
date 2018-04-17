@@ -134,29 +134,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Link Hafızalama",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNS Hafızalama",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Aktifleştirildi",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Başlangıçta etkisizleştir",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "RequestPolicy silindiğinde herşeyi eski haline getir",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

@@ -36,6 +36,7 @@ export class Api extends Module {
       private readonly miscInfos: API.IMiscInfos,
       private readonly prefs: API.storage.IPrefs,
       private readonly prefObserverFactory: API.storage.PrefObserverFactory,
+      private readonly tryCatchUtils: API.ITryCatchUtils,
   ) {
     super("API", log);
   }
@@ -79,6 +80,7 @@ export class Api extends Module {
       miscInfos: this.miscInfos,
       prefs: this.prefs,
       storage: {},
+      tryCatchUtils: this.tryCatchUtils,
     };
   }
 

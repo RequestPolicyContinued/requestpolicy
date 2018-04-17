@@ -27,6 +27,7 @@ import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: any;
 // @endif
 
+import { SettingsMigration } from "app/migration/settings-migration";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
@@ -71,8 +72,9 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
 const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
+const settingsMigration = new SettingsMigration(log, browser.storage.local);
 
-const storage = new Storage(log, RPStorageConfig);
+const storage = new Storage(log, RPStorageConfig, settingsMigration);
 
 const uriService = new UriService(log);
 const v0RulesService = new V0RulesService(
@@ -94,7 +96,7 @@ const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
         log, policy, v0RulesService, versionInfoService,
     ) : null;
 
-const migration = new Migration(log, v0RulesMigration);
+const migration = new Migration(log, settingsMigration, v0RulesMigration);
 
 const initialSetup = new InitialSetup(log, storage, versionInfoService);
 const ui = new Ui(log, initialSetup);

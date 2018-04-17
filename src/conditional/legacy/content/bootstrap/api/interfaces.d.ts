@@ -403,12 +403,17 @@ import { Management } from "./management";
 import { Manifest } from "./manifest";
 import { MiscInfos } from "./misc-infos";
 import { NetworkPredictionEnabledSetting } from "./privacy/network-prediction-enabled";
+import { PrivacyApi } from "./privacy/privacy.module";
 import { Runtime } from "./runtime";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
 import { JsonStorage } from "./storage/json-storage";
-import { PrefBranch, PrefType } from "./storage/pref-branch";
+import {
+  IPrefBranchSpec as IPrefBranchSpec_,
+  PrefBranch,
+  PrefType,
+} from "./storage/pref-branch";
 import { PrefObserver } from "./storage/pref-observer";
 import { Prefs } from "./storage/prefs";
 import { Storage } from "./storage/storage.module";
@@ -416,7 +421,6 @@ import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
 import { Log } from "models/log";
-import { PrivacyApi } from "./privacy/privacy.module";
 
 export namespace API {
   export namespace extension {
@@ -454,6 +458,7 @@ export namespace API {
     export type IPrefObserver = PrefObserver;
     export type IJsonStorage = JsonStorage;
     export type IPrefBranch = PrefBranch;
+    export type IPrefBranchSpec = IPrefBranchSpec_;
     export type IPrefs = Prefs;
     export type ISyncLocalStorageArea = SyncLocalStorageArea;
 

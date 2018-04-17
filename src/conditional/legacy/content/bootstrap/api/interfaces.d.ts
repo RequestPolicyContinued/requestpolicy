@@ -125,9 +125,10 @@ export namespace XPCOM {
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
   }
 
-  export interface nsIObserver extends nsISupports {
+  export interface nsIObserver_without_nsISupports {
     observe(aSubject: nsISupports, aTopic: string, aData: string): void;
   }
+  export type nsIObserver = nsIObserver_without_nsISupports & nsISupports;
 
   export interface nsIObserverService extends nsISupports {
     addObserver(anObserver: nsIObserver, aTopic: string, ownsWeak: boolean): void;
@@ -146,7 +147,7 @@ export namespace XPCOM {
   }
 
   export interface nsIPrefBranch extends nsISupports {
-    addObserver(aDomain: string, aObserver: nsIObserver, aHoldWeak: boolean): void;
+    addObserver(aDomain: string, aObserver: nsIObserver_without_nsISupports, aHoldWeak: boolean): void;
     clearUserPref(aPrefName: string): void;
     deleteBranch(aStartingAt: string): void;
     getBoolPref(aPrefName: string): boolean;
@@ -157,7 +158,7 @@ export namespace XPCOM {
     lockPref(aPrefName: string): void;
     prefHasUserValue(aPrefName: string): boolean;
     prefIsLocked(aPrefName: string): boolean;
-    removeObserver(aDomain: string, aObserver: nsIObserver): void;
+    removeObserver(aDomain: string, aObserver: nsIObserver_without_nsISupports): void;
     resetBranch(aStartingAt: string): void;
     setBoolPref(aPrefName: string, aValue: boolean): void;
     setCharPref(aPrefName: string, aValue: string): void;

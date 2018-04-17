@@ -118,40 +118,6 @@ export class Prefs {
     return branch.isSet(name);
   }
 
-  // ---------------------------------------------------------------------------
-  // Observer functions
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Notes about addObserver and removeObserver:
-   *
-   * The functions take fake domain names, but the actual observers
-   * will get the "real" pref names / domain names. If translation
-   * of names is needed, the two functions could be replaced by
-   * "addListener" and "removeListener" functions. In other words,
-   * the "domainsToObservers" object in "PrefObserver" could be moved
-   * here, and "PrefObserver" would only manage the listeners per
-   * environment.
-   *
-   * The addObserver and removeObserver functions are preixed with
-   * an underscore because they shouldn't be used directly, only
-   * by PrefObserver.
-   */
-
-  public _addObserver(
-      aFakeDomain: string,
-      aObserver: any,
-      aHoldWeak?: boolean,
-  ) {
-    const {branch, name: domain} = this.getBranchAndRealName(aFakeDomain);
-    return branch.addObserver(domain, aObserver, !!aHoldWeak);
-  }
-
-  public _removeObserver(aFakeDomain: string, aObserver: any) {
-    const {branch, name: domain} = this.getBranchAndRealName(aFakeDomain);
-    return branch.removeObserver(domain, aObserver);
-  }
-
   // ===========================================================================
   // Helper functions
   // ===========================================================================

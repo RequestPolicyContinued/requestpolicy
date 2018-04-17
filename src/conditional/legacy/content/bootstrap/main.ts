@@ -91,7 +91,7 @@ const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
 const privacy = new PrivacyApi(log, networkPredictionEnabled);
 
 const prefObserverFactory: API.storage.PrefObserverFactory =
-    () => new PrefObserver(prefs);
+    () => new PrefObserver(prefs.branches.rp);
 
 const jsonPrefs = new JsonStorage(fileService);
 const slsa = new SyncLocalStorageArea(prefs, jsonPrefs);

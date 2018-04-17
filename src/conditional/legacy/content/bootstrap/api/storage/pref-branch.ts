@@ -94,13 +94,16 @@ export class PrefBranch {
 
   public addObserver(
       aDomain: string,
-      aObserver: XPCOM.nsIObserver,
-      aHoldWeak: boolean,
+      aObserver: XPCOM.nsIObserver_without_nsISupports,
+      aHoldWeak?: boolean,
   ) {
-    return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
+    return this.branch.addObserver(aDomain, aObserver, !!aHoldWeak);
   }
 
-  public removeObserver(aDomain: string, aObserver: XPCOM.nsIObserver) {
+  public removeObserver(
+      aDomain: string,
+      aObserver: XPCOM.nsIObserver_without_nsISupports,
+  ) {
     return this.branch.removeObserver(aDomain, aObserver);
   }
 

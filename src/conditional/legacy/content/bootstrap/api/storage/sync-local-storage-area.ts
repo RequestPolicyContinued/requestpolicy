@@ -61,12 +61,12 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   }
 
   protected setByKey(aKey: string, aValue: any) {
-     if (this.jsonStorage.isJsonStorageKey(aKey)) {
-       this.jsonStorage.set(aKey, aValue);
-     } else {
-       this.rpPrefBranch.set<any>(aKey, aValue);
-       this.prefsService.savePrefFile(null);
-     }
+    if (this.jsonStorage.isJsonStorageKey(aKey)) {
+      this.jsonStorage.set(aKey, aValue);
+    } else {
+      this.rpPrefBranch.set<any>(aKey, aValue);
+      this.prefsService.savePrefFile(null);
+    }
   }
 
   protected removeByKeys(aKeys: string[]) {

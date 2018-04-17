@@ -64,6 +64,7 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
        this.jsonStorage.set(aKey, aValue);
      } else {
        this.prefs.set<any>(aKey, aValue);
+       this.prefs.save();
      }
   }
 

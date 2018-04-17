@@ -480,4 +480,5 @@ export namespace API {
   }
 
   export type IApi = Api;
+  export type ILegacyApi = Api["legacyApi"];
 }

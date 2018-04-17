@@ -22,10 +22,11 @@
  */
 
 import { SettingsMigration } from "app/migration/settings-migration";
+import { API } from "bootstrap/api/interfaces";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 
-declare const LegacyApi: any;
+declare const LegacyApi: API.ILegacyApi;
 
 export class Storage extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};

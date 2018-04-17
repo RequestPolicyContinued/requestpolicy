@@ -24,7 +24,7 @@
 import { API } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
-declare const LegacyApi: any;
+declare const LegacyApi: API.ILegacyApi;
 // @endif
 
 import { SettingsMigration } from "app/migration/settings-migration";

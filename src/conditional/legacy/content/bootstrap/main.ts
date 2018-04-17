@@ -38,12 +38,16 @@ import { API, JSMs } from "./api/interfaces";
 import { Management } from "./api/management";
 import { Manifest } from "./api/manifest";
 import { MiscInfos } from "./api/misc-infos";
+import {
+  NetworkPredictionEnabledSetting,
+} from "./api/privacy/network-prediction-enabled";
+import { PrivacyApi } from "./api/privacy/privacy.module";
 import { Runtime } from "./api/runtime";
 import { ChromeFileService } from "./api/services/chrome-file-service";
 import { FileService } from "./api/services/file-service";
 import { XPConnectService } from "./api/services/xpconnect-service";
 import { JsonStorage } from "./api/storage/json-storage";
-import { PrefBranch, PrefTypes } from "./api/storage/pref-branch";
+import { PrefBranch, PrefType } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
 import { Prefs } from "./api/storage/prefs";
 import { Storage } from "./api/storage/storage.module";
@@ -77,10 +81,14 @@ const runtime = new Runtime(log);
 
 const prefBranchFactory: API.storage.PrefBranchFactory = (
   branchRoot: string,
-  namesToTypesMap: {[key: string]: PrefTypes},
+  namesToTypesMap: {[key: string]: PrefType},
 ) => new PrefBranch(Services.prefs, branchRoot, namesToTypesMap);
 
 const prefs = new Prefs(Services.prefs, prefBranchFactory);
+const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
+    log, prefs.branches.root,
+);
+const privacy = new PrivacyApi(log, networkPredictionEnabled);
 
 const prefObserverFactory: API.storage.PrefObserverFactory =
     () => new PrefObserver(prefs);
@@ -96,6 +104,7 @@ export const api = new Api(
     i18n,
     management,
     manifest,
+    privacy,
     runtime,
     storage,
     miscInfos,

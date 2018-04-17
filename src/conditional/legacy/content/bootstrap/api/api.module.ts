@@ -30,6 +30,7 @@ export class Api extends Module {
       public readonly i18n: API.i18n.II18n,
       public readonly management: API.management.IManagement,
       public readonly manifest: API.IManifest,
+      public readonly privacy: API.privacy.IPrivacy,
       public readonly runtime: API.runtime.IRuntime,
       public readonly storage: API.storage.IStorage,
       private readonly miscInfos: API.IMiscInfos,
@@ -45,6 +46,7 @@ export class Api extends Module {
       i18n: this.i18n,
       management: this.management,
       manifest: this.manifest,
+      privacy: this.privacy,
       runtime: this.runtime,
       storage: this.storage,
     };
@@ -55,6 +57,7 @@ export class Api extends Module {
       extension: this.extension.backgroundApi,
       i18n: this.i18n.backgroundApi,
       management: this.management.backgroundApi,
+      privacy: this.privacy,
       runtime: this.runtime.backgroundApi,
       storage: this.storage.backgroundApi,
     };

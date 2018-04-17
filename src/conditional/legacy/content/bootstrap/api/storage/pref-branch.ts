@@ -24,7 +24,7 @@ import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
-export type PrefTypes = "BoolPref" | "CharPref" | "IntPref";
+export type PrefType = "BoolPref" | "CharPref" | "IntPref";
 type GetterFnName = "getBoolPref" | "getCharPref" | "getIntPref";
 type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
 
@@ -42,7 +42,7 @@ export class PrefBranch {
       public readonly branchRoot: string,
       // How should a pref name "foo.bar.baz" be translated to
       // "getBoolPref" or "setIntPref"?
-      private namesToTypesMap: {[key: string]: PrefTypes},
+      private namesToTypesMap: {[key: string]: PrefType},
   ) {}
 
   public getAll() {
@@ -95,7 +95,7 @@ export class PrefBranch {
     return this.branch.removeObserver(aDomain, aObserver);
   }
 
-  private type(aPrefName: string): PrefTypes {
+  private type(aPrefName: string): PrefType {
     if (!(aPrefName in this.namesToTypesMap)) {
       throw new Error(`Unknown pref "${aPrefName}"`);
     }

@@ -402,12 +402,13 @@ import { I18n } from "./i18n/i18n.module";
 import { Management } from "./management";
 import { Manifest } from "./manifest";
 import { MiscInfos } from "./misc-infos";
+import { NetworkPredictionEnabledSetting } from "./privacy/network-prediction-enabled";
 import { Runtime } from "./runtime";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
 import { JsonStorage } from "./storage/json-storage";
-import { PrefBranch, PrefTypes } from "./storage/pref-branch";
+import { PrefBranch, PrefType } from "./storage/pref-branch";
 import { PrefObserver } from "./storage/pref-observer";
 import { Prefs } from "./storage/prefs";
 import { Storage } from "./storage/storage.module";
@@ -415,6 +416,7 @@ import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
 import { Log } from "models/log";
+import { PrivacyApi } from "./privacy/privacy.module";
 
 export namespace API {
   export namespace extension {
@@ -428,6 +430,14 @@ export namespace API {
 
   export namespace management {
     export type IManagement = Management;
+  }
+
+  export namespace privacy {
+    export namespace network {
+      export type networkPredictionEnabled = NetworkPredictionEnabledSetting;
+    }
+
+    export type IPrivacy = PrivacyApi;
   }
 
   export namespace runtime {
@@ -449,7 +459,7 @@ export namespace API {
 
     export type PrefBranchFactory = (
         branchRoot: string,
-        namesToTypesMap: {[key: string]: PrefTypes},
+        namesToTypesMap: {[key: string]: PrefType},
     ) => IPrefBranch;
     export type PrefObserverFactory = () => PrefObserver;
   }

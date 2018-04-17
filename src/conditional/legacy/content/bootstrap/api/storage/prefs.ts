@@ -33,6 +33,7 @@ export class Prefs {
       "network.dns.disablePrefetch": "BoolPref",
       "network.dns.disablePrefetchFromHTTPS": "BoolPref",
       "network.http.speculative-parallel-limit": "IntPref",
+      "network.predictor.enabled": "BoolPref",
       "network.prefetch-next": "BoolPref",
     }),
 

@@ -77,12 +77,12 @@ export class Storage extends Module {
         console.error(`Key "${key} is not cached in Storage!`);
         return;
       }
-      return LegacyApi.prefs.get(key);
+      return LegacyApi.rpPrefBranch.get(key);
     }
     if (Array.isArray(aKeys)) {
       const result: {[key: string]: any} = {};
       aKeys.forEach((key) => {
-        result[key] = LegacyApi.prefs.get(key);
+        result[key] = LegacyApi.rpPrefBranch.get(key);
       });
       return result;
     }
@@ -93,9 +93,9 @@ export class Storage extends Module {
     this.assertReady();
     try {
       Object.keys(aKeys).forEach((key) => {
-        LegacyApi.prefs.set(key, aKeys[key]);
+        LegacyApi.rpPrefBranch.set(key, aKeys[key]);
       });
-      LegacyApi.prefs.save();
+      LegacyApi.prefsService.savePrefFile(null);
       return Promise.resolve();
     } catch (error) {
       console.error("Error when saving to storage! Details:");

@@ -416,7 +416,6 @@ import {
   PrefType,
 } from "./storage/pref-branch";
 import { PrefObserver } from "./storage/pref-observer";
-import { Prefs } from "./storage/prefs";
 import { Storage } from "./storage/storage.module";
 import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
 
@@ -460,7 +459,6 @@ export namespace API {
     export type IJsonStorage = JsonStorage;
     export type IPrefBranch = PrefBranch;
     export type IPrefBranchSpec = IPrefBranchSpec_;
-    export type IPrefs = Prefs;
     export type ISyncLocalStorageArea = SyncLocalStorageArea;
 
     export type PrefBranchFactory = (

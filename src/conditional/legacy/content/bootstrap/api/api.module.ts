@@ -21,7 +21,7 @@
  */
 
 import { Module } from "lib/classes/module";
-import { API } from "./interfaces";
+import { API, JSMs } from "./interfaces";
 
 export class Api extends Module {
   constructor(
@@ -33,8 +33,9 @@ export class Api extends Module {
       public readonly privacy: API.privacy.IPrivacy,
       public readonly runtime: API.runtime.IRuntime,
       public readonly storage: API.storage.IStorage,
+      private readonly prefsService: JSMs.Services["prefs"],
       private readonly miscInfos: API.IMiscInfos,
-      private readonly prefs: API.storage.IPrefs,
+      private readonly rpPrefBranch: API.storage.IPrefBranch,
       private readonly prefObserverFactory: API.storage.PrefObserverFactory,
       private readonly tryCatchUtils: API.ITryCatchUtils,
   ) {
@@ -78,7 +79,8 @@ export class Api extends Module {
       createPrefObserver: this.prefObserverFactory,
       i18n: this.i18n.legacyApi,
       miscInfos: this.miscInfos,
-      prefs: this.prefs,
+      prefsService: this.prefsService,
+      rpPrefBranch: this.rpPrefBranch,
       storage: {},
       tryCatchUtils: this.tryCatchUtils,
     };

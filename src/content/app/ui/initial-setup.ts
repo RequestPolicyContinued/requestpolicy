@@ -70,7 +70,7 @@ export class InitialSetup extends Module {
       // default-policy preferences based on the old preferences.
       this.storage.set({"defaultPolicy.allow": false}).
           catch(this.log.onError("set defaultPolicy.allow"));
-      if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
+      if (LegacyApi.rpPrefBranch.isSet("uriIdentificationLevel")) {
         const identLevel = this.storage.get("uriIdentificationLevel");
         this.storage.set({
           "defaultPolicy.allowSameDomain": identLevel === 1,

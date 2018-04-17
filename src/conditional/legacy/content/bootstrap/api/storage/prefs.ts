@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API, JSMs } from "bootstrap/api/interfaces";
+import { API } from "bootstrap/api/interfaces";
 
 export const PREF_BRANCH_SPECS: {
   root: API.storage.IPrefBranchSpec,
@@ -73,59 +73,3 @@ export const PREF_BRANCH_SPECS: {
     },
   },
 };
-
-export class Prefs {
-  public branches = {
-    root: this.prefBranchFactory(
-        PREF_BRANCH_SPECS.root.branchRoot,
-        PREF_BRANCH_SPECS.root.namesToTypes,
-    ),
-    rp: this.prefBranchFactory(
-        PREF_BRANCH_SPECS.rp.branchRoot,
-        PREF_BRANCH_SPECS.rp.namesToTypes,
-    ),
-  };
-
-  constructor(
-      private prefsService: JSMs.Services["prefs"],
-      private prefBranchFactory: API.storage.PrefBranchFactory,
-  ) {}
-
-  public save() {
-    this.prefsService.savePrefFile(null);
-  }
-
-  public get<T extends string | number | boolean>(aFakePrefName: string) {
-    const {branch, name} = this.getBranchAndRealName(aFakePrefName);
-    return branch.get<T>(name);
-  }
-
-  public set<T extends string | number | boolean>(
-      aFakePrefName: string,
-      aValue: T,
-  ): void {
-    const {branch, name} = this.getBranchAndRealName(aFakePrefName);
-    return branch.set<T>(name, aValue);
-  }
-
-  public reset(aFakePrefName: string) {
-    const {branch, name} = this.getBranchAndRealName(aFakePrefName);
-    return branch.reset(name);
-  }
-
-  public isSet(aFakePrefName: string) {
-    const {branch, name} = this.getBranchAndRealName(aFakePrefName);
-    return branch.isSet(name);
-  }
-
-  // ===========================================================================
-  // Helper functions
-  // ===========================================================================
-
-  private getBranchAndRealName(aFakePrefName: string) {
-    return {
-      branch: this.branches.rp,
-      name: aFakePrefName,
-    };
-  }
-}

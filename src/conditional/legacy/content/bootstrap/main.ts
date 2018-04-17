@@ -47,9 +47,9 @@ import { ChromeFileService } from "./api/services/chrome-file-service";
 import { FileService } from "./api/services/file-service";
 import { XPConnectService } from "./api/services/xpconnect-service";
 import { JsonStorage } from "./api/storage/json-storage";
-import { PrefBranch, PrefType } from "./api/storage/pref-branch";
+import { PrefBranch } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
-import { Prefs } from "./api/storage/prefs";
+import { PREF_BRANCH_SPECS } from "./api/storage/prefs";
 import { Storage } from "./api/storage/storage.module";
 import { SyncLocalStorageArea } from "./api/storage/sync-local-storage-area";
 
@@ -79,24 +79,28 @@ const management = new Management(log);
 const manifest = new Manifest(log, chromeFileService);
 const runtime = new Runtime(log);
 
-const prefBranchFactory: API.storage.PrefBranchFactory = (
-  branchRoot: string,
-  namesToTypesMap: {[key: string]: PrefType},
-) => new PrefBranch(Services.prefs, branchRoot, namesToTypesMap);
+const createPrefBranch = (
+    spec: API.storage.IPrefBranchSpec,
+) => new PrefBranch(Services.prefs, spec.branchRoot, spec.namesToTypes);
+const rootPrefBranch = createPrefBranch(PREF_BRANCH_SPECS.root);
+const rpPrefBranch = createPrefBranch(PREF_BRANCH_SPECS.rp);
 
-const prefs = new Prefs(Services.prefs, prefBranchFactory);
 const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
-    log, prefs.branches.root,
+    log, rootPrefBranch,
 );
 const privacy = new PrivacyApi(log, networkPredictionEnabled);
 
 const prefObserverFactory: API.storage.PrefObserverFactory =
-    () => new PrefObserver(prefs.branches.rp);
+    () => new PrefObserver(rpPrefBranch);
 
 const jsonPrefs = new JsonStorage(fileService);
-const slsa = new SyncLocalStorageArea(prefs, jsonPrefs);
+const slsa = new SyncLocalStorageArea(
+    Services.prefs, rpPrefBranch, jsonPrefs,
+);
 const storage = new Storage(log, slsa);
-const miscInfos = new MiscInfos(Services.appinfo, prefs, Services.vc);
+const miscInfos = new MiscInfos(
+    Services.appinfo, rpPrefBranch, Services.vc,
+);
 
 export const api = new Api(
     log,
@@ -107,8 +111,9 @@ export const api = new Api(
     privacy,
     runtime,
     storage,
+    Services.prefs,
     miscInfos,
-    prefs,
+    rpPrefBranch,
     prefObserverFactory,
     tryCatchUtils,
 );

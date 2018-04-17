@@ -65,7 +65,7 @@ const mozServices = C.EXTENSION_TYPE === "legacy" ?
     jsmService!.getServices() : null;
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
-  rpPrefBranch: LegacyApi.prefs.branches.rp as API.storage.IPrefBranch,
+  rpPrefBranch: LegacyApi.rpPrefBranch,
   tryCatchUtils: LegacyApi.tryCatchUtils,
 } : null;
 

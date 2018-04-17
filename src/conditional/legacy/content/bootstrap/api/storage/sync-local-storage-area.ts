@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { API, JSMs } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 import {
   AbstractObjectInterface,
@@ -29,7 +29,8 @@ import {
 
 export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   constructor(
-      private prefs: API.storage.IPrefs,
+      private prefsService: JSMs.Services["prefs"],
+      private rpPrefBranch: API.storage.IPrefBranch,
       private jsonStorage: API.storage.IJsonStorage,
   ) {
     super();
@@ -38,7 +39,7 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
   protected getAll() {
     return Object.assign(
         {},
-        this.prefs.branches.rp.getAll(),
+        this.rpPrefBranch.getAll(),
         this.jsonStorage.getAll(),
     );
   }
@@ -51,7 +52,7 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
     const results: IKeysObject = {};
     aKeys.forEach((key) => {
       const result = this.jsonStorage.isJsonStorageKey(key) ?
-          this.jsonStorage.get(key) : this.prefs.get(key);
+          this.jsonStorage.get(key) : this.rpPrefBranch.get(key);
       if (result !== C.UNDEFINED) {
         results[key] = result;
       }
@@ -63,8 +64,8 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
      if (this.jsonStorage.isJsonStorageKey(aKey)) {
        this.jsonStorage.set(aKey, aValue);
      } else {
-       this.prefs.set<any>(aKey, aValue);
-       this.prefs.save();
+       this.rpPrefBranch.set<any>(aKey, aValue);
+       this.prefsService.savePrefFile(null);
      }
   }
 

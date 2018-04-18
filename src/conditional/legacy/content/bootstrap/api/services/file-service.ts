@@ -41,7 +41,7 @@ export class FileService {
     return this.getProfileFile(this.getRPPath(aPath));
   }
 
-  public getRPDir(aPath: string, shouldCreate?: boolean) {
+  public getRPDir(aPath?: string, shouldCreate?: boolean) {
     return this.getProfileDir(this.getRPPath(aPath), shouldCreate);
   }
 
@@ -104,7 +104,7 @@ export class FileService {
     stream.close();
   }
 
-  private getRPPath(aPath: string) {
+  private getRPPath(aPath?: string) {
     return REQUESTPOLICY_DIR + (aPath ? "/" + aPath : "");
   }
 

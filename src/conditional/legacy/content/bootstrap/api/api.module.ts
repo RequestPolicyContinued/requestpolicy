@@ -59,7 +59,7 @@ export class Api extends Module {
       extension: this.extension.backgroundApi,
       i18n: this.i18n.backgroundApi,
       management: this.management.backgroundApi,
-      privacy: this.privacy,
+      privacy: this.privacy.backgroundApi,
       runtime: this.runtime.backgroundApi,
       storage: this.storage.backgroundApi,
     };

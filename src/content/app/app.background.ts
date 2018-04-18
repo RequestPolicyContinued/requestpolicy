@@ -37,6 +37,7 @@ import { C } from "data/constants";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
+import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
@@ -77,6 +78,11 @@ const settingsMigration = new SettingsMigration(log, browser.storage.local);
 
 const storage = new Storage(log, RPStorageConfig, settingsMigration);
 
+const browserSettings = new BrowserSettings(
+    log, storage,
+    (browser as any).privacy.network.networkPredictionEnabled,
+);
+
 const uriService = new UriService(log);
 const v0RulesService = new V0RulesService(
     log,
@@ -104,6 +110,7 @@ const ui = new Ui(log, initialSetup);
 
 export const rp = new AppBackground(
     log,
+    browserSettings,
     migration,
     policy,
     rpServices,

@@ -24,6 +24,7 @@
 
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import {Log} from "../models/log";
+import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import {Storage} from "./storage/storage.module";
 
 export interface IVersionComparator {
@@ -31,6 +32,10 @@ export interface IVersionComparator {
 }
 
 export namespace App {
+  export namespace browserSettings {
+    export type IBrowserSettings = BrowserSettings;
+  }
+
   export type ILog = Log;
   export type IStorage = Storage;
 }

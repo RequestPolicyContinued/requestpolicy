@@ -31,6 +31,7 @@ import { Ui } from "./ui/ui.module";
 export class AppBackground extends Module {
   constructor(
       log: App.ILog,
+      public readonly browserSettings: App.browserSettings.IBrowserSettings,
       public readonly migration: Migration,
       public readonly policy: Policy,
       public readonly services: RPServices,
@@ -42,6 +43,7 @@ export class AppBackground extends Module {
 
   public get subModules() {
     return {
+      browserSettings: this.browserSettings,
       migration: this.migration,
       policy: this.policy,
       services: this.services,

@@ -2,9 +2,11 @@
 
 const {XPConnectService} = require("bootstrap/api/services/xpconnect-service");
 const xpconnectService = new XPConnectService();
-const {
-  FileUtils: mozFileUtils,
-} = Cu.import("resource://gre/modules/FileUtils.jsm", {});
+
+const {JSMService} = require("bootstrap/api/services/jsm-service");
+const jsmService = new JSMService(Cu);
+const mozFileUtils = jsmService.getFileUtils();
+
 const {FileService} = require("bootstrap/api/services/file-service");
 const fileService = new FileService(xpconnectService, mozFileUtils);
 

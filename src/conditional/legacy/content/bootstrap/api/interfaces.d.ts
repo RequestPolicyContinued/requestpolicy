@@ -80,10 +80,48 @@ export namespace XPCOM {
 
   export interface nsIFile extends nsISupports {
     directoryEntries: nsISimpleEnumerator;
+    diskSpaceAvailable: number;
+    fileSize: number;
+    fileSizeOfLink: number;
+    followLinks: boolean;
+    lastModifiedTime: number;
+    lastModifiedTimeOfLink: number;
     leafName: string;
+    parent: nsIFile;
+    path: string;
+    permissions: number;
+    permissionsOfLink: number;
+    persistentDescriptor: string;
+    target: string;
+
+    append(node: string): void;
+    appendRelativePath(relativeFilePath: string): void;
+    clone(): nsIFile;
+    contains(inFile: nsIFile): boolean;
+    copyTo(newParentDir: nsIFile, newName: string): void;
+    copyToFollowingLinks(newParentDir: nsIFile, newName: string): void;
+    create(type: number, permissions: number): void;
+    createUnique(type: number, permissions: number): void;
+    equals(inFile: nsIFile): boolean;
     exists(): boolean;
-    isFile(): boolean;
+    getRelativeDescriptor(fromFile: nsIFile): string;
+    initWithFile(aFile: nsIFile): void;
+    initWithPath(filePath: string): void;
     isDirectory(): boolean;
+    isExecutable(): boolean;
+    isFile(): boolean;
+    isHidden(): boolean;
+    isReadable(): boolean;
+    isSpecial(): boolean;
+    isSymlink(): boolean;
+    isWritable(): boolean;
+    launch(): void;
+    moveTo(newParentDir: nsIFile, newName: string): void;
+    normalize(): void;
+    remove(recursive: boolean): void;
+    renameTo(newParentDir: nsIFile, newName: string): void;
+    reveal(): void;
+    setRelativeDescriptor(fromFile: nsIFile, relativeDesc: string): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIFileStreams.idl

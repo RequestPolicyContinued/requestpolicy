@@ -18,6 +18,8 @@ declare const do_get_profile: any;
 
 // xpcshell testing
 declare const add_test: any;
+declare const do_test_finished: any;
+declare const do_test_pending: any;
 declare const run_next_test: any;
 
 // xpcshell assertions

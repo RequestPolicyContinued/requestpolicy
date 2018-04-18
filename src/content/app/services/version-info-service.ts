@@ -21,11 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { IVersionComparator } from "app/interfaces";
+import { App, IVersionComparator } from "app/interfaces";
 import { Storage } from "app/storage/storage.module";
 import { Module } from "lib/classes/module";
 import * as JSUtils from "lib/utils/js-utils";
-import { Log } from "models/log";
 
 interface IInfos {
   curAppVersion: string;
@@ -63,7 +62,7 @@ export class VersionInfoService extends Module {
   private infos: IInfos;
 
   constructor(
-      log: Log,
+      log: App.ILog,
       private versionComparator: IVersionComparator,
       private storage: Storage,
   ) {

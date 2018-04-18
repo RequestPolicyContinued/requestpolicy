@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import {MainEnvironment} from "lib/environment";
@@ -32,7 +33,6 @@ import {
   UserSubscriptionsInfo,
 } from "lib/subscription";
 import {createListenersMap} from "lib/utils/listener-factories";
-import {Log} from "models/log";
 import {RulesetStorage} from "./ruleset-storage";
 
 const RULESET_NOT_EXISTING = {};
@@ -50,7 +50,7 @@ export class Subscriptions extends Module {
   private events = createListenersMap(["onRulesChanged"]);
 
   constructor(
-      log: Log,
+      log: App.ILog,
       private rulesetStorage: RulesetStorage,
   ) {
     super("rules", log);

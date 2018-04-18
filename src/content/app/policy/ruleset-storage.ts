@@ -21,12 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import {Module} from "lib/classes/module";
 import {RawRuleset} from "lib/ruleset";
-import {Log} from "models/log";
 
 export class RulesetStorage extends Module {
-  constructor(log: Log) {
+  constructor(log: App.ILog) {
     super("RulesetStorage", log);
   }
 

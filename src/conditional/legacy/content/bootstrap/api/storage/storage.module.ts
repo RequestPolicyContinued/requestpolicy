@@ -24,13 +24,12 @@ import { API } from "bootstrap/api/interfaces";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
-import { Log } from "models/log";
 
 export class Storage extends Module {
   private events = createListenersMap(["onChanged"]);
 
   constructor(
-      log: Log,
+      log: API.ILog,
       private slsa: API.storage.ISyncLocalStorageArea,
   ) {
     super("browser.storage", log);

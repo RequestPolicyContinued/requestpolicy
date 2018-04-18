@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { VersionInfoService } from "app/services/version-info-service";
 import { Storage } from "app/storage/storage.module";
 import { API } from "bootstrap/api/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 import {NotificationID, Notifications} from "models/notifications";
 
 declare const LegacyApi: API.ILegacyApi;
@@ -42,7 +42,7 @@ export class InitialSetup extends Module {
       this.onNotificationsTabOpened.bind(this);
 
   constructor(
-      log: Log,
+      log: App.ILog,
       private storage: Storage,
       private versionInfo: VersionInfoService,
   ) {

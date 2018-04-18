@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class RulesServices extends Module {
   constructor(
-      log: Log,
+      log: App.ILog,
       public readonly v0: V0RulesService,
   ) {
     super("app.services.rules", log);

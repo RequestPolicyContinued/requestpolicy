@@ -20,14 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { IModule, Module } from "lib/classes/module";
-import { Log } from "models/log";
 import { SettingsMigration } from "./settings-migration";
 
 export class Migration extends Module {
   constructor(
-      log: Log,
+      log: App.ILog,
       public readonly settingsMigration: SettingsMigration,
       public readonly v0Rules: V0RulesMigration | null,
   ) {

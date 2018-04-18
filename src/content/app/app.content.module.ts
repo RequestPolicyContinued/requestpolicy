@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { RPContentServices } from "app/services/services.module.content";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class AppContent extends Module {
   constructor(
-      log: Log,
+      log: App.ILog,
       public readonly services: RPContentServices,
   ) {
     super("AppContent", log);

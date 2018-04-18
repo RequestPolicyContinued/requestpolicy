@@ -24,7 +24,6 @@ import { API } from "bootstrap/api/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
-import { Log } from "models/log";
 
 const {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
@@ -50,7 +49,7 @@ export class Management extends Module implements API.management.IManagement {
 
   private events = createListenersMap(this.MANAGEMENT_EVENTS);
 
-  constructor(log: Log) {
+  constructor(log: API.ILog) {
     super("browser.management", log);
 
     this.MANAGEMENT_EVENTS.forEach((aEvent) => {

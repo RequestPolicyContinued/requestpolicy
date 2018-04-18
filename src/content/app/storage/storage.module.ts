@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { SettingsMigration } from "app/migration/settings-migration";
 import { API } from "bootstrap/api/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 declare const LegacyApi: API.ILegacyApi;
 
@@ -41,7 +41,7 @@ export class Storage extends Module {
   private cachedKeysSet: Set<string>;
 
   constructor(
-      log: Log,
+      log: App.ILog,
       {
           cachedKeys,
           boolAliases,

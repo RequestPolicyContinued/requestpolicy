@@ -40,6 +40,7 @@ export class Storage extends Module {
     return {
       local: {
         get: this.getLocal.bind(this),
+        remove: this.removeLocal.bind(this),
         set: this.setLocal.bind(this),
       },
       onChanged: this.events.interfaces.onChanged,
@@ -59,6 +60,18 @@ export class Storage extends Module {
   private setLocal(aKeys: {[k: string]: any}) {
     try {
       return Promise.resolve(this.slsa.set(aKeys));
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  private removeLocal(aKeys: string | string[]): Promise<void> {
+    try {
+      const result = this.slsa.remove(aKeys);
+      if (result && "errors" in result) {
+        return Promise.reject(result.errors);
+      }
+      return Promise.resolve();
     } catch (e) {
       return Promise.reject(e);
     }

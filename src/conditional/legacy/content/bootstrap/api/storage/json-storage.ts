@@ -57,6 +57,13 @@ export class JsonStorage implements API.storage.IJsonStorage {
     this.filesService.stringToFile(newContents, file);
   }
 
+  public remove(aKey: string) {
+    this.assertValidKey(aKey);
+    const file = this.getFile(aKey);
+    if (!file.exists()) return;
+    file.remove(false);
+  }
+
   private assertValidKey(aKey: string) {
     if (!this.isJsonStorageKey(aKey)) {
       throw new Error(`Invalid key "${aKey}".`);

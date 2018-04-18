@@ -71,8 +71,15 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any>
   }
 
   protected removeByKeys(aKeys: string[]) {
-    if (aKeys.length !== 0) {
-      throw new Error("Not implemented!");
-    }
+    const errors: IKeysObject = {};
+    aKeys.forEach((key) => {
+      try {
+        this.jsonStorage.isJsonStorageKey(key) ?
+            this.jsonStorage.remove(key) : this.rpPrefBranch.reset(key);
+      } catch (e) {
+        errors[key] = e;
+      }
+    });
+    return {errors};
   }
 }

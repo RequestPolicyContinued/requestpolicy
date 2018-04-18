@@ -31,9 +31,11 @@ declare const LegacyApi: API.ILegacyApi;
 export class Storage extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
-  protected readonly startupPreconditions = [
-    this.settingsMigration.whenReady,
-  ];
+  protected get startupPreconditions() {
+    return [
+      this.settingsMigration.whenReady,
+    ];
+  }
 
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;

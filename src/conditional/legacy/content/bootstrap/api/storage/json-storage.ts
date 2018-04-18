@@ -23,7 +23,7 @@
 import { API } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 
-export class JsonStorage {
+export class JsonStorage implements API.storage.IJsonStorage {
   constructor(
       private filesService: API.services.IFileService,
   ) {}

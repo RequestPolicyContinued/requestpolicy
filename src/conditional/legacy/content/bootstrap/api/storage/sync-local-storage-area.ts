@@ -27,7 +27,8 @@ import {
   IKeysObject,
 } from "lib/classes/object-interface";
 
-export class SyncLocalStorageArea extends AbstractObjectInterface<any> {
+export class SyncLocalStorageArea extends AbstractObjectInterface<any>
+    implements API.storage.ISyncLocalStorageArea {
   constructor(
       private prefsService: JSMs.Services["prefs"],
       private rpPrefBranch: API.storage.IPrefBranch,

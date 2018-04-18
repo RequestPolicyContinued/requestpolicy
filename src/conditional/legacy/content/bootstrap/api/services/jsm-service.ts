@@ -28,11 +28,11 @@ export class JSMService {
   ) {}
 
   public getFileUtils(): JSMs.FileUtils {
-    return this.import("resource://gre/modules/FileUtils.jsm");
+    return this.import("resource://gre/modules/FileUtils.jsm").FileUtils;
   }
 
   public getServices(): JSMs.Services {
-    return this.import("resource://gre/modules/Services.jsm");
+    return this.import("resource://gre/modules/Services.jsm").Services;
   }
 
   private import(uri: string): any {

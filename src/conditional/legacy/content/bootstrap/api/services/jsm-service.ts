@@ -20,10 +20,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { JSMs } from "bootstrap/api/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 
 export class JSMService {
+  constructor(
+      private readonly cu: XPCOM.nsXPCComponents_Utils,
+  ) {}
+
   public getServices(): JSMs.Services {
-    return Cu.import("resource://gre/modules/Services.jsm", {});
+    return this.import("resource://gre/modules/Services.jsm");
+  }
+
+  private import(uri: string): any {
+    return this.cu.import(uri, {});
   }
 }

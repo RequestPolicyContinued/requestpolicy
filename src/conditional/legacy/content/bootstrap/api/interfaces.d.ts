@@ -360,6 +360,10 @@ export namespace XPCOM {
     nsIPrefBranch2: XPCOM.nsIJSID;
     nsISupportsString: XPCOM.nsIJSID;
   }
+
+  export interface nsXPCComponents_Utils {
+    import<T = any>(aResourceURI: string, targetObj?: any): T;
+  }
 }
 
 export namespace JSMs {

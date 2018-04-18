@@ -21,10 +21,11 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import { API } from "bootstrap/api/interfaces";
+import { API, XPCOM } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
+declare const Cu: XPCOM.nsXPCComponents_Utils;
 // @endif
 
 import { SettingsMigration } from "app/migration/settings-migration";
@@ -60,7 +61,7 @@ const log = Log.instance;
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
-const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService() : null;
+const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
 const mozServices = C.EXTENSION_TYPE === "legacy" ?
     jsmService!.getServices() : null;
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {

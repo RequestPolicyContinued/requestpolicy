@@ -37,72 +37,72 @@ export class FileService {
       private mozFileUtils: JSMs.FileUtils,
   ) {}
 
-public getRPFile(aPath: string) {
-  return this.getProfileFile(this.getRPPath(aPath));
-}
-
-public getRPDir(aPath: string, shouldCreate?: boolean) {
-  return this.getProfileDir(this.getRPPath(aPath), shouldCreate);
-}
-
-public getAllRPFiles(aDir?: {
-    path: string,
-    file: XPCOM.nsIFile,
-}): string[] {
-  const dirPath = aDir ? aDir.path : "";
-  const dirFile = aDir ? aDir.file : this.getRPFile(dirPath);
-  if (!dirFile.exists()) return [];
-  const entries = dirFile.directoryEntries;
-  let files: string[] = [];
-  while (entries.hasMoreElements()) {
-    const file: XPCOM.nsIFile = entries.getNext().QueryInterface(Ci.nsIFile);
-    const path: string = (dirPath ? `${dirPath}/` : "") + file.leafName;
-    if (file.isFile()) {
-      files.push(path);
-    } else if (file.isDirectory()) {
-      files = files.concat(this.getAllRPFiles({path, file}));
-    }
+  public getRPFile(aPath: string) {
+    return this.getProfileFile(this.getRPPath(aPath));
   }
-  return files;
-}
 
-public fileToString(file: XPCOM.nsIFile): string {
-  const stream = this.xpc.createFileInputStreamInstance();
-  stream.init(file, 0x01, 0o444, 0);
-  stream.QueryInterface(Ci.nsILineInputStream);
+  public getRPDir(aPath: string, shouldCreate?: boolean) {
+    return this.getProfileDir(this.getRPPath(aPath), shouldCreate);
+  }
 
-  const cstream = this.xpc.createConverterInputStreamInstance();
-  cstream.init(stream, "UTF-8", 0, 0);
+  public getAllRPFiles(aDir?: {
+      path: string,
+      file: XPCOM.nsIFile,
+  }): string[] {
+    const dirPath = aDir ? aDir.path : "";
+    const dirFile = aDir ? aDir.file : this.getRPFile(dirPath);
+    if (!dirFile.exists()) return [];
+    const entries = dirFile.directoryEntries;
+    let files: string[] = [];
+    while (entries.hasMoreElements()) {
+      const file: XPCOM.nsIFile = entries.getNext().QueryInterface(Ci.nsIFile);
+      const path: string = (dirPath ? `${dirPath}/` : "") + file.leafName;
+      if (file.isFile()) {
+        files.push(path);
+      } else if (file.isDirectory()) {
+        files = files.concat(this.getAllRPFiles({path, file}));
+      }
+    }
+    return files;
+  }
 
-  let str = "";
-  const data: any = {};
-  let read;
-  do {
-    // Read as much as we can and put it in |data.value|.
-    read = cstream.readString(0xffffffff, data);
-    str += data.value;
-  } while (read !== 0);
-  cstream.close(); // This closes |fstream|.
+  public fileToString(file: XPCOM.nsIFile): string {
+    const stream = this.xpc.createFileInputStreamInstance();
+    stream.init(file, 0x01, 0o444, 0);
+    stream.QueryInterface(Ci.nsILineInputStream);
 
-  return str;
-}
+    const cstream = this.xpc.createConverterInputStreamInstance();
+    cstream.init(stream, "UTF-8", 0, 0);
 
-/**
- * Writes a string to a file (truncates the file if it exists, creates it if
- * it doesn't).
- */
-public stringToFile(str: string, file: XPCOM.nsIFile) {
-  const stream = this.xpc.createFileOutputStreamInstance();
-  // write, create, append on write, truncate
-  // tslint:disable-next-line no-bitwise
-  stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
+    let str = "";
+    const data: any = {};
+    let read;
+    do {
+      // Read as much as we can and put it in |data.value|.
+      read = cstream.readString(0xffffffff, data);
+      str += data.value;
+    } while (read !== 0);
+    cstream.close(); // This closes |fstream|.
 
-  const cos = this.xpc.createConverterOutputStreamInstance();
-  cos.init(stream, "UTF-8", 4096, 0x0000);
-  cos.writeString(str);
-  cos.close();
-  stream.close();
-}
+    return str;
+  }
+
+  /**
+   * Writes a string to a file (truncates the file if it exists, creates it if
+   * it doesn't).
+   */
+  public stringToFile(str: string, file: XPCOM.nsIFile) {
+    const stream = this.xpc.createFileOutputStreamInstance();
+    // write, create, append on write, truncate
+    // tslint:disable-next-line no-bitwise
+    stream.init(file, 0x02 | 0x08 | 0x10 | 0x20, -1, 0);
+
+    const cos = this.xpc.createConverterOutputStreamInstance();
+    cos.init(stream, "UTF-8", 4096, 0x0000);
+    cos.writeString(str);
+    cos.close();
+    stream.close();
+  }
 
   private getRPPath(aPath: string) {
     return REQUESTPOLICY_DIR + (aPath ? "/" + aPath : "");

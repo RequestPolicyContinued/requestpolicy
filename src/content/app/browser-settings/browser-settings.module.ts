@@ -23,10 +23,13 @@
 import { App } from "app/interfaces";
 import { Module } from "lib/classes/module";
 
-export class BrowserSettings extends Module {
-  protected startupPreconditions = [
-    this.storage.whenReady,
-  ];
+export class BrowserSettings extends Module
+    implements App.browserSettings.IBrowserSettings {
+  protected get startupPreconditions() {
+    return [
+      this.storage.whenReady,
+    ];
+  }
 
   constructor(
       log: App.ILog,

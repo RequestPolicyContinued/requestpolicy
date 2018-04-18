@@ -5,11 +5,28 @@ const log = Log.instance;
 const {UriService} = require("app/services/uri-service");
 const uriService = new UriService(log);
 
+const {JSMService} = require("bootstrap/api/services/jsm-service");
+const jsmService = new JSMService(Cu);
+const mozServices = jsmService.getServices();
+const prefsService = mozServices.prefs;
+
+const {PrefBranch} = require("bootstrap/api/storage/pref-branch");
+const {PREF_BRANCH_SPECS} = require("bootstrap/api/storage/prefs");
+const rpPrefBranch = new PrefBranch(
+    prefsService,
+    PREF_BRANCH_SPECS.root.branchRoot,
+    PREF_BRANCH_SPECS.root.namesToTypes
+);
+const tryCatchUtils = require("lib/utils/try-catch-utils");
+
+const xpcApi = {prefsService, rpPrefBranch, tryCatchUtils};
+
 const {V0RulesService} = require("app/services/rules/v0-rules-service");
-const v0RulesService = new V0RulesService(log, uriService);
+const v0RulesService = new V0RulesService(log, uriService, xpcApi);
 // const {Prefs} = require("bootstrap/models/prefs");
 
 
+// @ts-ignore
 function run_test() {
   "use strict";
 

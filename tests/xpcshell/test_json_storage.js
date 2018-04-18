@@ -13,6 +13,7 @@ const fileService = new FileService(xpconnectService, mozFileUtils);
 const {JsonStorage} = require("bootstrap/api/storage/json-storage");
 const jsonStorage = new JsonStorage(fileService);
 
+// @ts-ignore
 function run_test() {
   run_next_test();
 }

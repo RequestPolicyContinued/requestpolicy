@@ -6,10 +6,8 @@
 */
 
 const {
-  createRPFile,
-  removeAllRPFiles,
-  copyRulesetFileToProfile,
-  deleteFileFromProfile,
+  // @ts-ignore
+  createRPFile, removeAllRPFiles, copyRulesetFileToProfile, deleteFileFromProfile,
 } = (function() {
   const {XPConnectService} = require("bootstrap/api/services/xpconnect-service");
   const xpcService = new XPConnectService();

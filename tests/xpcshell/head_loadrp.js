@@ -1,6 +1,9 @@
 /* exported Cc, Ci, Cr, Cu, require */
 
-const {Cc, Ci, Cr, Cu, require} = (function() {
+const {
+  // @ts-ignore
+  Cc, Ci, Cr, Cu, require,
+} = (function() {
   const {
     classes: Cc,
     interfaces: Ci,

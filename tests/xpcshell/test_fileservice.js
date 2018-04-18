@@ -10,6 +10,7 @@ const mozFileUtils = jsmService.getFileUtils();
 const {FileService} = require("bootstrap/api/services/file-service");
 const fileService = new FileService(xpcService, mozFileUtils);
 
+// @ts-ignore
 function run_test() {
   run_next_test();
 }

@@ -51,3 +51,48 @@ add_test(function() {
 
   run_next_test();
 });
+
+add_test(function() {
+  // setup
+  createRPFile("policies/foo/foo1.json", `{"foo": 1}`);
+  createRPFile("policies/foo/foo2.json", `{"foo": 2}`);
+  createRPFile("policies/foo/foo3.json", `{"foo": 3}`);
+  createRPFile("policies/bar/barA.json", `{"bar": "A"}`);
+  createRPFile("policies/bar/barB.json", `{"bar": "B"}`);
+
+  // exercise
+  jsonStorage.remove("policies/foo/foo2");
+  jsonStorage.remove("policies/bar/barB");
+  const fullJsonStorage = jsonStorage.getAll();
+
+  // verify
+  Assert.deepEqual(fullJsonStorage, {
+    "policies/foo/foo1": {foo: 1},
+    "policies/foo/foo3": {foo: 3},
+    "policies/bar/barA": {bar: "A"},
+  });
+
+  // cleanup
+  removeAllRPFiles();
+
+  run_next_test();
+});
+
+add_test(function() {
+  // setup
+  createRPFile("policies/foo/foo1.json", `{"foo": 1}`);
+
+  // exercise
+  jsonStorage.remove("policies/foo/foo");
+  const fullJsonStorage = jsonStorage.getAll();
+
+  // verify
+  Assert.deepEqual(fullJsonStorage, {
+    "policies/foo/foo1": {foo: 1},
+  });
+
+  // cleanup
+  removeAllRPFiles();
+
+  run_next_test();
+});

@@ -1,8 +1,8 @@
-/* exported Cc, Ci, Cr, Cu, require */
+/* exported Cc, Ci, Cr, Cu, console, require */
 
 const {
   // @ts-ignore
-  Cc, Ci, Cr, Cu, require,
+  Cc, Ci, Cr, Cu, console, require,
 } = (function() {
   const {
     classes: Cc,
@@ -107,5 +107,5 @@ const {
       require("bootstrap/controllers/default-preferences-controller");
   DefaultPreferencesController.startup();
 
-  return {Cc, Ci, Cr, Cu, require};
+  return {Cc, Ci, Cr, Cu, console, require};
 })();

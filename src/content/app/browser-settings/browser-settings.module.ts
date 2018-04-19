@@ -34,19 +34,18 @@ export class BrowserSettings extends Module
   constructor(
       log: App.ILog,
       private storage: App.IStorage,
-      private networkPredictionEnabled:
-          browser.privacy.network.networkPredictionEnabled,
+      private networkPrivacyApi: browser.privacy.network,
   ) {
     super("app.browserSettings", log);
   }
 
   protected startupSelf() {
     if (this.storage.get("browserSettings.disablePrefetching")) {
-      this.networkPredictionEnabled.set({value: false}).catch(
+      this.networkPrivacyApi.networkPredictionEnabled.set({value: false}).catch(
           this.log.onError("set networkPredictionEnabled false"),
       );
     } else {
-      this.networkPredictionEnabled.clear({}).catch(
+      this.networkPrivacyApi.networkPredictionEnabled.clear({}).catch(
           this.log.onError("clear networkPredictionEnabled setting"),
       );
     }

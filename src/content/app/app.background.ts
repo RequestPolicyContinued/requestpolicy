@@ -80,7 +80,7 @@ const storage = new Storage(log, RPStorageConfig, settingsMigration);
 
 const browserSettings = new BrowserSettings(
     log, storage,
-    (browser as any).privacy.network.networkPredictionEnabled,
+    (browser as any).privacy.network,
 );
 
 const uriService = new UriService(log);

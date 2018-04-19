@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log, rp} from "app/app.background";
+import {rp} from "app/app.background";
+import { log } from "app/log";
 import {IUri} from "lib/classes/uri";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {

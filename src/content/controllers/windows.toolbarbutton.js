@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log} from "app/app.content";
+import {log} from "app/log";
 import * as XULUtils from "lib/utils/xul-utils";
 
 let CustomizableUI = null;

@@ -20,19 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { dAsyncSettings, log } from "app/log";
 import { RPContentServices } from "app/services/services.module.content";
 import { UriService } from "app/services/uri-service";
 import { Storage } from "app/storage/storage.module";
-import { RPLog } from "lib/classes/rp-log";
-import { defer } from "lib/utils/js-utils";
 import { AppContent } from "./app.content.module";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
 
 const storageReadyPromise = Promise.resolve();
-const dAsyncSettings = defer<App.storage.IAsyncSettings>();
-export const log = new RPLog(dAsyncSettings.promise);
 
 const uriService = new UriService(log, "AppContent");
 const rpServices = new RPContentServices(log, uriService);

@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log} from "app/app.background";
+import {log} from "app/log";
 import {
   getLoadContextFromHttpChannel,
   getBrowserFromLoadContext,

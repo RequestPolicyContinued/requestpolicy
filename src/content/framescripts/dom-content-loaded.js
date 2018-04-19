@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp, log} from "app/app.content";
+import {rp} from "app/app.content";
+import {log} from "app/log";
 import {
   Environment,
   Level as EnvLevel,

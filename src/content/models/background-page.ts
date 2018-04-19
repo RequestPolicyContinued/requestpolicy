@@ -20,7 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log, rp} from "app/app.background";
+import {rp} from "app/app.background";
+import {log} from "app/log";
 import { API } from "bootstrap/api/interfaces";
 import {C} from "data/constants";
 import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";

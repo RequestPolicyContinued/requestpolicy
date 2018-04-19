@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log, rp} from "app/app.background";
+import {rp} from "app/app.background";
+import {log} from "app/log";
 import {RequestSet} from "lib/request-set";
 import {createListenersMap} from "lib/utils/listener-factories";
 

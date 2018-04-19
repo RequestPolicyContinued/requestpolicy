@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { log as mainLog, rp } from "app/app.background";
+import { rp } from "app/app.background";
+import { log as mainLog} from "app/log";
 import {MainEnvironment} from "lib/environment";
 import {IRuleSpecs, RawRuleset} from "lib/ruleset";
 

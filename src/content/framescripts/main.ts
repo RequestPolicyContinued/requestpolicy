@@ -32,7 +32,8 @@ import {
 import "ui-testing/services";
 // @endif
 
-import {log, rp} from "app/app.content";
+import {rp} from "app/app.content";
+import { log } from "app/log";
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 // =============================================================================

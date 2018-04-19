@@ -42,7 +42,8 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
-import {rp, log} from "app/app.background";
+import {rp} from "app/app.background";
+import {log} from "app/log";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;

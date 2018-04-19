@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log} from "app/app.content";
+import {log} from "app/log";
 import {Level as EnvLevel} from "lib/environment";
 import {C} from "data/constants";
 import {mlManager} from "framescripts/managers";

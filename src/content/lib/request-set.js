@@ -21,7 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp, log} from "app/app.background";
+import {rp} from "app/app.background";
+import {log} from "app/log";
 import {RequestResult} from "lib/request-result";
 
 const uriService = rp.services.uri;

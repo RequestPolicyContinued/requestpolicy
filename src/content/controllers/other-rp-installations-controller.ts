@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { log } from "app/app.background";
+import { log } from "app/log";
 import {C} from "data/constants";
 import {FilteredManagement} from "lib/classes/filtered-management";
 import {NotificationID, Notifications} from "models/notifications";

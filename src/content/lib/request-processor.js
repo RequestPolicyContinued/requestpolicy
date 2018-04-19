@@ -41,12 +41,13 @@ import {
 } from "models/metadata";
 import {Requests} from "models/requests";
 
+import {log} from "app/log";
 import RPContentPolicy from "main/content-policy";
 import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
 } from "lib/utils/try-catch-utils";
-import {rp, log} from "app/app.background";
+import {rp} from "app/app.background";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;

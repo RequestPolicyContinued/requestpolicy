@@ -28,6 +28,7 @@ declare const LegacyApi: API.ILegacyApi;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
 // @endif
 
+import { dAsyncSettings, log } from "app/log";
 import { SettingsMigration } from "app/migration/settings-migration";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
@@ -37,9 +38,7 @@ import { CachedSettings } from "app/storage/cached-settings";
 import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
-import { RPLog } from "lib/classes/rp-log";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
-import { defer } from "lib/utils/js-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
@@ -63,12 +62,8 @@ import { Ui } from "./ui/ui.module";
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
-const dAsyncSettings = defer<AsyncSettings>();
-const dStorageReady = defer<void>();
-const storageReadyPromise = dStorageReady.promise;
-export const log = new RPLog(dAsyncSettings.promise);
 const settingsMigration = new SettingsMigration(log, browser.storage.local);
-dStorageReady.resolve(settingsMigration.whenReady);
+const storageReadyPromise = settingsMigration.whenReady;
 
 const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
 const mozServices = C.EXTENSION_TYPE === "legacy" ?

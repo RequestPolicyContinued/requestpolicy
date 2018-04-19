@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {log} from "app/app.background";
+import {log} from "app/log";
 import {NormalRequest, RedirectRequest} from "lib/request";
 import * as Utils from "lib/utils/misc-utils";
 import * as RequestProcessor from "lib/request-processor";

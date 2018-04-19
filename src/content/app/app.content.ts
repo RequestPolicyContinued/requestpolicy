@@ -22,10 +22,10 @@
 
 import { RPContentServices } from "app/services/services.module.content";
 import { UriService } from "app/services/uri-service";
-import { Log } from "models/log";
+import { RPLog } from "lib/classes/rp-log";
 import { AppContent } from "./app.content.module";
 
-const log = Log.instance;
+export const log = new RPLog(browser.storage.local);
 
 const uriService = new UriService(log, "AppContent");
 const rpServices = new RPContentServices(log, uriService);

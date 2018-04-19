@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
 
 export class Extension extends Module {
   private backgroundPage: any;
 
-  constructor(log: API.ILog) {
+  constructor(log: Common.ILog) {
     super("browser.extension", log);
   }
 

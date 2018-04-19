@@ -20,12 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class SettingsMigration extends Module {
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private storage: browser.storage.StorageArea,
   ) {
     super("app.migration.settings", log);

@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import {MainEnvironment} from "lib/environment";
@@ -50,7 +50,7 @@ export class Subscriptions extends Module {
   private events = createListenersMap(["onRulesChanged"]);
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private rulesetStorage: RulesetStorage,
   ) {
     super("rules", log);

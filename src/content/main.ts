@@ -20,19 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let allControllers: Array<{[key: string]: any}> = [];
-
-// import the Log first! It needs to get logging prefs from storage (async).
-import {LogController} from "controllers/log-controller";
 import {Controllers} from "lib/classes/controllers";
-{
-  const controllers = [LogController];
-  (new Controllers(controllers)).startup();
-  allControllers = allControllers.concat(controllers);
-}
-import { Log } from "models/log";
-
-const log = Log.instance;
 
 import {C} from "data/constants";
 import {
@@ -41,7 +29,7 @@ import {
 
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
-import {rp} from "app/app.background";
+import {log, rp} from "app/app.background";
 import "main/about-uri";
 import "main/content-policy";
 import "main/window-manager";
@@ -60,6 +48,7 @@ import {
 import "ui-testing/services";
 // @endif
 
+let allControllers: Array<{[key: string]: any}> = [];
 const controllersToBeStartedUp = [
   KeyboardShortcutController,
 

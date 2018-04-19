@@ -21,12 +21,13 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class NetworkPredictionEnabledSetting extends Module
     implements API.privacy.network.networkPredictionEnabled {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       private rootPrefBranch: API.storage.IPrefBranch,
   ) {
     super("browser.privacy.network.networkPredictionEnabled", log);

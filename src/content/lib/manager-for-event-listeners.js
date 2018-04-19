@@ -21,10 +21,7 @@
  */
 
 import {Level as EnvLevel} from "lib/environment";
-import {Log} from "models/log";
 import {C} from "data/constants";
-
-const log = Log.instance;
 
 const {LOG_EVENT_LISTENERS} = C;
 
@@ -66,11 +63,12 @@ export class ManagerForEventListeners {
     // Note: the startup functions have to be defined *last*, as they might get
     //       called immediately.
     if (aEnv) {
+      this.log = aEnv.log;
       this.environment.addStartupFunction(
           EnvLevel.INTERFACE,
           () => {
             if (LOG_EVENT_LISTENERS) {
-              log.log(`${"From now on new event listeners will be " +
+              this.log.log(`${"From now on new event listeners will be " +
                   "added immediately. Environment: \""}${
                 this.environment.name}"`);
             }
@@ -86,14 +84,11 @@ export class ManagerForEventListeners {
           }
       );
     } else {
-      // aEnv is not defined! Try to report an error.
-      if (log) {
-        console.error(
-            "No Environment was specified for a new " +
-            "ManagerForEventListeners! " +
-            "This means that the listeners won't be removed!"
-        );
-      }
+      console.error(
+          "No Environment was specified for a new " +
+          "ManagerForEventListeners! " +
+          "This means that the listeners won't be removed!"
+      );
     }
   }
 
@@ -113,7 +108,7 @@ export class ManagerForEventListeners {
     };
     if (self.addNewListenersImmediately) {
       if (LOG_EVENT_LISTENERS) {
-        log.log(`Immediately adding event listener for "${
+        this.log.log(`Immediately adding event listener for "${
           listener.eventType}". Environment: "${
           self.environment.name}"`);
       }
@@ -130,7 +125,7 @@ export class ManagerForEventListeners {
     for (let listener of self.listeners) {
       if (listener.listening === false) {
         if (LOG_EVENT_LISTENERS) {
-          log.log(`Lazily adding event listener for "${
+          this.log.log(`Lazily adding event listener for "${
             listener.eventType}". Environment: "${
             self.environment.name}"`);
         }
@@ -147,7 +142,7 @@ export class ManagerForEventListeners {
     while (self.listeners.length > 0) {
       let listener = self.listeners.pop();
       if (LOG_EVENT_LISTENERS) {
-        log.log(`Removing event listener for "${listener.eventType
+        this.log.log(`Removing event listener for "${listener.eventType
         }". Environment: "${self.environment.name}"`);
       }
       listener.target.removeEventListener(listener.eventType, listener.callback,

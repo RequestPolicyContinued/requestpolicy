@@ -21,6 +21,7 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
@@ -49,7 +50,7 @@ export class Management extends Module implements API.management.IManagement {
 
   private events = createListenersMap(this.MANAGEMENT_EVENTS);
 
-  constructor(log: API.ILog) {
+  constructor(log: Common.ILog) {
     super("browser.management", log);
 
     this.MANAGEMENT_EVENTS.forEach((aEvent) => {

@@ -1,7 +1,7 @@
 /* exported run_test */
 
-const {Log} = require("models/log");
-const log = Log.instance;
+const {Log} = require("lib/classes/log");
+const log = new Log();
 
 const {JSMService} = require("bootstrap/api/services/jsm-service");
 const jsmService = new JSMService(Cu);

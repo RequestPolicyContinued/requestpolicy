@@ -20,12 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { API, JSMs } from "./interfaces";
 
 export class Api extends Module {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       public readonly extension: API.extension.IExtension,
       public readonly i18n: API.i18n.II18n,
       public readonly management: API.management.IManagement,

@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import {defer} from "lib/utils/js-utils";
-import {Log} from "models/log";
 
 export interface IModule {
   startup?: () => Promise<void>;
@@ -30,8 +30,8 @@ export interface IModule {
 }
 
 export abstract class Module implements IModule {
-  protected log: Log;
-  protected debugLog: Log;
+  protected log: Common.ILog;
+  protected debugLog: Common.ILog;
 
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
@@ -76,7 +76,7 @@ export abstract class Module implements IModule {
 
   constructor(
       public readonly moduleName: string,
-      parentLog: Log,
+      parentLog: Common.ILog,
   ) {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false});

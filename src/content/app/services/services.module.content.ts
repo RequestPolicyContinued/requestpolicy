@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
 import { UriService } from "app/services/uri-service";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class RPContentServices extends Module {
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       public readonly uri: UriService,
   ) {
     super("AppContent.services", log);

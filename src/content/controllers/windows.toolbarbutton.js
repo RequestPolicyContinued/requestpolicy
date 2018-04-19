@@ -20,10 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {log} from "app/app.content";
 import * as XULUtils from "lib/utils/xul-utils";
-import {Log} from "models/log";
-
-const log = Log.instance;
 
 let CustomizableUI = null;
 if (LegacyApi.miscInfos.isAustralis) {

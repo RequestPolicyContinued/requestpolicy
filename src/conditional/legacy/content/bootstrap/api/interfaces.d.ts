@@ -462,7 +462,6 @@ import { Storage } from "./storage/storage.module";
 import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
-import { Log } from "models/log";
 
 export namespace API {
   export namespace extension {
@@ -510,7 +509,6 @@ export namespace API {
     export type PrefObserverFactory = () => PrefObserver;
   }
 
-  export type ILog = Log;
   export type IManifest = Manifest;
   export type IMiscInfos = MiscInfos;
   export type IXPConnectService = XPConnectService;

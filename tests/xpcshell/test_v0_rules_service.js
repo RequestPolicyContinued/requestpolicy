@@ -1,6 +1,6 @@
 /* exported run_test */
-const {Log} = require("models/log");
-const log = Log.instance;
+const {Log} = require("lib/classes/log");
+const log = new Log();
 
 const {UriService} = require("app/services/uri-service");
 const uriService = new UriService(log);

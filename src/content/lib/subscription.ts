@@ -21,12 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { rp } from "app/app.background";
+import { log as mainLog, rp } from "app/app.background";
 import {MainEnvironment} from "lib/environment";
 import {IRuleSpecs, RawRuleset} from "lib/ruleset";
-import {Log} from "models/log";
 
-const log = Log.instance.extend({
+const log = mainLog.extend({
   name: "Subscriptions",
 });
 

@@ -21,6 +21,7 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 type networkPredictionEnabledSetting =
@@ -28,7 +29,7 @@ type networkPredictionEnabledSetting =
 
 export class PrivacyApi extends Module {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       private networkPredictionEnabled: networkPredictionEnabledSetting,
   ) {
     super("browser.privacy", log);

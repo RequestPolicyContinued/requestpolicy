@@ -21,10 +21,7 @@
  */
 
 import {Level as EnvLevel, State as EnvState} from "lib/environment";
-import {Log} from "models/log";
 import {C} from "data/constants";
-
-const log = Log.instance;
 
 const {LOG_MESSAGE_LISTENERS} = C;
 
@@ -60,11 +57,12 @@ export function ManagerForMessageListeners(aEnv, aMM) {
   // Note: the startup functions have to be defined *last*, as they might get
   //       called immediately.
   if (aEnv) {
+    self.log = aEnv.log;
     self.environment.addStartupFunction(
         EnvLevel.INTERFACE,
         function() {
           if (LOG_MESSAGE_LISTENERS) {
-            log.log(
+            self.log.log(
                 `${"From now on new message listeners will be added " +
                 "immediately. Environment: \""}${self.environment.name}"`
             );
@@ -81,23 +79,18 @@ export function ManagerForMessageListeners(aEnv, aMM) {
         }
     );
   } else {
-    // aEnv is not defined! Try to report an error.
-    if (log) {
-      console.error(
-          "No Environment was specified for a new " +
-          "ManagerForMessageListeners! This means that the listeners " +
-          "won't be unregistered!"
-      );
-    }
+    console.error(
+        "No Environment was specified for a new " +
+        "ManagerForMessageListeners! This means that the listeners " +
+        "won't be unregistered!"
+    );
   }
 
   self.mm = aMM;
 
   if (!self.mm) {
-    if (log) {
-      log.warn("No Message Manager was specified " +
-                     "for a new ManagerForMessageListeners!");
-    }
+    self.log.warn("No Message Manager was specified " +
+                    "for a new ManagerForMessageListeners!");
   }
 }
 
@@ -125,7 +118,7 @@ ManagerForMessageListeners.prototype.addListener = function(
     return;
   }
   if (aMessageName.indexOf(C.MM_PREFIX) === 0) {
-    log.warn("The message name that has been passed to " +
+    self.log.warn("The message name that has been passed to " +
                    "`addListener()` contains the MM Prefix. " +
                    "Extracting the message name.");
     // eslint-disable-next-line no-param-reassign
@@ -151,7 +144,7 @@ ManagerForMessageListeners.prototype.addListener = function(
   };
   if (aAddImmediately === true || self.addNewListenersImmediately) {
     if (LOG_MESSAGE_LISTENERS) {
-      log.log(
+      self.log.log(
           `Immediately adding message listener for "${
             listener.messageName}". Environment: "${
             self.environment.name}"`
@@ -171,7 +164,7 @@ ManagerForMessageListeners.prototype.addAllListeners = function() {
   for (let listener of self.listeners) {
     if (listener.listening === false) {
       if (LOG_MESSAGE_LISTENERS) {
-        log.log(
+        self.log.log(
             `Lazily adding message listener for "${
               listener.messageName}". Environment: "${
               self.environment.name}"`
@@ -197,7 +190,7 @@ ManagerForMessageListeners.prototype.removeAllListeners = function() {
     //   continue;
     // }
     if (LOG_MESSAGE_LISTENERS) {
-      log.log(
+      self.log.log(
           `Removing message listener for "${listener.messageName}".`
       );
     }

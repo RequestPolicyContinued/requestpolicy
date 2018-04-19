@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import {Module} from "lib/classes/module";
 import {IUri} from "lib/classes/uri";
@@ -46,7 +46,7 @@ export class Policy extends Module {
   private userRulesets: any = {};
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       public readonly subscriptions: Subscriptions,
       public readonly rulesetStorage: RulesetStorage,
   ) {

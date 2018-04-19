@@ -44,12 +44,13 @@ describe("browser.runtime", function() {
     (global as any).Ci = mockComp.interfaces;
     (global as any).Services = new MockServices();
 
-    const {Log} = require("models/log");
+    const {Log} = require("lib/classes/log");
+    const log = new Log();
     const {AsyncLocaleData} = require("bootstrap/api/i18n/async-locale-data");
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
     // eslint-disable-next-line no-unused-vars
     let {Runtime} = require("bootstrap/api/runtime");
-    runtime = new Runtime(Log.instance);
+    runtime = new Runtime(log);
   });
 
   describe("getURL(path)", function() {

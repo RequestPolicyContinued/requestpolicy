@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
@@ -31,7 +31,7 @@ declare const Services: any;
 export class Runtime extends Module {
   private events = createListenersMap(["onMessage"]);
 
-  constructor(log: API.ILog) {
+  constructor(log: Common.ILog) {
     super("browser.runtime", log);
   }
 

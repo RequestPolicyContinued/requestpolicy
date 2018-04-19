@@ -20,15 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
 import { Policy } from "app/policy/policy.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class V0RulesMigration extends Module {
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private policy: Policy,
       private v0RulesService: V0RulesService,
       private versionInfoService: VersionInfoService,

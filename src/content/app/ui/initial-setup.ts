@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
 import { VersionInfoService } from "app/services/version-info-service";
 import { Storage } from "app/storage/storage.module";
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import {NotificationID, Notifications} from "models/notifications";
 
@@ -42,7 +42,7 @@ export class InitialSetup extends Module {
       this.onNotificationsTabOpened.bind(this);
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private storage: Storage,
       private versionInfo: VersionInfoService,
   ) {

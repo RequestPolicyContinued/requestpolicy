@@ -33,11 +33,9 @@ declare const $: typeof JQuery;
   const {
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
+    log,
     rp,
-    Log,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
-
-  const log = Log.instance;
 
   // ===========================================================================
 

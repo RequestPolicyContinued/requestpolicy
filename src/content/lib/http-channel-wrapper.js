@@ -20,14 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {log} from "app/app.background";
 import {
   getLoadContextFromHttpChannel,
   getBrowserFromLoadContext,
   getDocShellFromHttpChannel,
 } from "lib/utils/try-catch-utils";
-import {Log} from "models/log";
-
-const log = Log.instance;
 
 // =============================================================================
 // HttpChannelWrapper

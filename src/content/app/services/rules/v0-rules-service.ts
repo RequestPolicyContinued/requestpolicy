@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
 import { UriService } from "app/services/uri-service";
 import { API, JSMs } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { IRuleSpec } from "lib/ruleset";
 
@@ -56,7 +56,7 @@ export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private uriService: UriService,
       private xpcApi: {
         prefsService: JSMs.Services["prefs"];

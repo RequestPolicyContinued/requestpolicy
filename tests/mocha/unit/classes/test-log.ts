@@ -12,8 +12,8 @@
 
 import {assert} from "chai";
 
-import {Log} from "models/log";
 import {C} from "data/constants";
+import {Log} from "lib/classes/log";
 
 describe("Log", () => {
   const sinon = require("sinon").sandbox.create();

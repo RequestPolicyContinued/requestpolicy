@@ -22,7 +22,6 @@
  */
 
 import {Level as EnvLevel} from "lib/environment";
-import {Log} from "models/log";
 import {Ruleset} from "lib/ruleset";
 import {
   GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
@@ -31,9 +30,8 @@ import * as DOMUtils from "lib/utils/dom-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {C} from "data/constants";
 import {Requests} from "models/requests";
-import {rp} from "app/app.background";
+import {rp, log} from "app/app.background";
 
-const log = Log.instance;
 const uriService = rp.services.uri;
 
 export function loadMenuIntoWindow(window) {

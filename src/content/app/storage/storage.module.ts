@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
 import { SettingsMigration } from "app/migration/settings-migration";
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 declare const LegacyApi: API.ILegacyApi;
@@ -41,7 +41,7 @@ export class Storage extends Module {
   private cachedKeysSet: Set<string>;
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       {
           cachedKeys,
           boolAliases,

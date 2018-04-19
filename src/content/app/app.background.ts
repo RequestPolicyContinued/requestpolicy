@@ -34,8 +34,8 @@ import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
+import { RPLog } from "lib/classes/rp-log";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
-import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
@@ -48,7 +48,7 @@ import * as RPStorageConfig from "./storage/rp-config.background";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 
-const log = Log.instance;
+export const log = new RPLog(browser.storage.local);
 
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:

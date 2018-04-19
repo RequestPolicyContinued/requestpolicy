@@ -20,12 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import {log} from "app/app.content";
 import {Level as EnvLevel} from "lib/environment";
-import {Log} from "models/log";
 import {C} from "data/constants";
 import {mlManager} from "framescripts/managers";
-
-const log = Log.instance;
 
 // =============================================================================
 // constants

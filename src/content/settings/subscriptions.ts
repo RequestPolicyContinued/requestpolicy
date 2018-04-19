@@ -29,9 +29,9 @@ declare const Services: any;
 
 (() => {
   const {
-    Log: {instance: log},
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
+    log,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 

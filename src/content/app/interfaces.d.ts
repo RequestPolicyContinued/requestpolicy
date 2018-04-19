@@ -23,7 +23,6 @@
 // tslint:disable:no-namespace
 
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
-import {Log} from "../models/log";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import {Storage} from "./storage/storage.module";
 
@@ -36,6 +35,5 @@ export namespace App {
     export type IBrowserSettings = BrowserSettings;
   }
 
-  export type ILog = Log;
   export type IStorage = Storage;
 }

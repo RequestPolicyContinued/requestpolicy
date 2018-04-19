@@ -21,6 +21,7 @@
  */
 
 import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class BrowserSettings extends Module
@@ -32,7 +33,7 @@ export class BrowserSettings extends Module
   }
 
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       private storage: App.IStorage,
       private networkPrivacyApi: browser.privacy.network,
   ) {

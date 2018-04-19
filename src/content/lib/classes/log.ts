@@ -89,18 +89,6 @@ const ROOT_OPTIONS: IInternalLogOptions = {
 };
 
 export class Log {
-  private static lInstance: Log;
-  public static get instance(): Log {
-    if (!Log.lInstance) {
-      Log.lInstance = new Log({
-        enabled: true,
-        level: LogLevel.ALL,
-        prefix: "",
-      });
-    }
-    return Log.lInstance;
-  }
-
   private ownInternalOptions: IInternalLogOptions<null> = {
     enabled: null,
     level: null,
@@ -311,5 +299,3 @@ export class Log {
     dir(...aDirArgs);
   }
 }
-
-export const log = Log.instance;

@@ -21,8 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.content";
-import {Log} from "models/log";
+import {rp, log} from "app/app.content";
 import {
   Environment,
   Level as EnvLevel,
@@ -35,7 +34,6 @@ import {overlayComm} from "framescripts/managers";
 import {ManagerForBlockedContent}
   from "framescripts/blocked-content.js";
 
-const log = Log.instance;
 const uriServices = rp.services.uri;
 
 export const ManagerForDOMContentLoaded = (function() {

@@ -29,7 +29,6 @@ import {
 import {
   ManagerForMessageListeners,
 } from "lib/manager-for-message-listeners";
-import {Log} from "models/log";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as RequestProcessor from "lib/request-processor";
 import * as WindowUtils from "lib/utils/window-utils";
@@ -43,11 +42,9 @@ import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
-import {rp} from "app/app.background";
+import {rp, log} from "app/app.background";
 
 const uriService = rp.services.uri;
-
-const log = Log.instance;
 
 const {LOG_FLAG_STATE} = C;
 

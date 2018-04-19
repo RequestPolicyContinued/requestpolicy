@@ -20,16 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// Before anything else, handle default preferences. This is necessary because
-// bootsrapped addons have to handle their default preferences manually,
-// see Mozilla Bug 564675.
-import {
-  DefaultPreferencesController,
-} from "bootstrap/controllers/default-preferences-controller";
-DefaultPreferencesController.startup();
-
+import { Log } from "lib/classes/log";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
-import { Log } from "models/log";
 import { Api } from "./api/api.module";
 import { Extension } from "./api/extension";
 import { AsyncLocaleData } from "./api/i18n/async-locale-data";
@@ -53,6 +45,8 @@ import { PREF_BRANCH_SPECS } from "./api/storage/prefs";
 import { Storage } from "./api/storage/storage.module";
 import { SyncLocalStorageArea } from "./api/storage/sync-local-storage-area";
 
+const log = new Log();
+
 declare const Services: JSMs.Services;
 
 const {
@@ -66,8 +60,6 @@ const {
 } = Cu.import("resource://gre/modules/FileUtils.jsm") as {
   FileUtils: JSMs.FileUtils,
 };
-
-const log = Log.instance;
 
 const extension = new Extension(log);
 const xpconnectService = new XPConnectService();

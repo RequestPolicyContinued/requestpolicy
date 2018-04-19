@@ -20,19 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let allControllers: Array<{[key: string]: any}> = [];
-
-// import the Log first! It needs to get logging prefs from storage (async).
-import {LogController} from "controllers/log-controller";
-import {Controllers} from "lib/classes/controllers";
-{
-  const controllers = [LogController];
-  (new Controllers(controllers)).startup();
-  allControllers = allControllers.concat(controllers);
-}
-import { Log } from "models/log";
-const log = Log.instance;
-
 import "framescripts/blocked-content";
 import "framescripts/dom-content-loaded";
 import "framescripts/misc";
@@ -45,7 +32,7 @@ import {
 import "ui-testing/services";
 // @endif
 
-import {rp} from "app/app.content";
+import {log, rp} from "app/app.content";
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 // =============================================================================
@@ -59,7 +46,6 @@ MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, () => {
     if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
       MainEnvironment.shutdown();
       rp.shutdown().catch(log.onError("framescript shutdown"));
-      (new Controllers(allControllers)).shutdown();
     }
   });
 });

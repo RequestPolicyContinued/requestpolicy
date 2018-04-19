@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "models/log";
 import {Request} from "lib/request";
 import {
   RequestReason,
@@ -47,9 +46,8 @@ import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
 } from "lib/utils/try-catch-utils";
-import {rp} from "app/app.background";
+import {rp, log} from "app/app.background";
 
-const log = Log.instance;
 const uriService = rp.services.uri;
 
 const logRequests = log.extend({

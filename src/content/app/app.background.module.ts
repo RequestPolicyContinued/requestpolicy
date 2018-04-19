@@ -22,6 +22,7 @@
 
 import { App } from "app/interfaces";
 import { RPServices } from "app/services/services.module";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { Migration } from "./migration/migration.module";
 import { Policy } from "./policy/policy.module";
@@ -30,7 +31,7 @@ import { Ui } from "./ui/ui.module";
 
 export class AppBackground extends Module {
   constructor(
-      log: App.ILog,
+      log: Common.ILog,
       public readonly browserSettings: App.browserSettings.IBrowserSettings,
       public readonly migration: Migration,
       public readonly policy: Policy,

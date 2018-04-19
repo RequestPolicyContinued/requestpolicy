@@ -37,7 +37,7 @@
     "ts-node": "^4.1.0",
     "tslint": "^5.5.0",
     "typescript": "^2.4.2",
-    "web-ext-types": "github:myrdd/web-ext-types#ef0b925"
+    "web-ext-types": "github:myrdd/web-ext-types#8d773c8"
   },
   "dependencies": {
     "jquery": "^3.3.1",

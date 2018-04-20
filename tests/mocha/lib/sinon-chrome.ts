@@ -1,4 +1,6 @@
+// @ts-ignore
 import * as Api from "sinon-chrome/api";
+import * as SinonChrome from "sinon-chrome";
 const stableApiFx = require("sinon-chrome/config/stable-api-ff.json");
 
 for (let ns of stableApiFx) {
@@ -29,6 +31,6 @@ for (let ns of stableApiFx) {
   }
 }
 
-export function createBrowserApi() {
+export function createBrowserApi(): typeof SinonChrome {
   return new Api(stableApiFx).create();
 }

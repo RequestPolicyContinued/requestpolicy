@@ -99,13 +99,5 @@ const {
   const COMMONJS = createCommonjsEnv();
   const require = COMMONJS.load.bind(COMMONJS);
 
-  // -----------------------------------------------------------------------------
-  // Load the default preferences
-  // -----------------------------------------------------------------------------
-
-  const {DefaultPreferencesController} =
-      require("bootstrap/controllers/default-preferences-controller");
-  DefaultPreferencesController.startup();
-
   return {Cc, Ci, Cr, Cu, console, require};
 })();

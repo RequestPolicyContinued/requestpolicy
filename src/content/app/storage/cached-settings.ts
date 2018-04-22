@@ -25,6 +25,10 @@ import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
+interface IDefaultValues {
+  [key: string]: string | number | boolean;
+}
+
 export class CachedSettings extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
@@ -36,15 +40,18 @@ export class CachedSettings extends Module {
 
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;
+  private defaultValues: IDefaultValues;
 
   constructor(
       log: Common.ILog,
       {
           cachedKeys,
           boolAliases,
+          defaultValues,
       }: {
           cachedKeys: string[],
           boolAliases: Array<[string, string]>,
+          defaultValues: IDefaultValues,
       },
       private storageReadyPromise: Promise<void>,
       private rpPrefBranch: API.storage.IPrefBranch,
@@ -54,6 +61,7 @@ export class CachedSettings extends Module {
 
     this.cachedKeys = cachedKeys;
     this.cachedKeysSet = new Set(cachedKeys);
+    this.defaultValues = defaultValues;
 
     boolAliases.forEach(([storageKey, alias]) => {
       this.alias[`is${alias}`] = () => this.get(storageKey);
@@ -66,7 +74,10 @@ export class CachedSettings extends Module {
     return this.cachedKeysSet.has(aKey);
   }
 
-  public get(aKeys: "" | string | string[] | null | undefined): any {
+  public get<T = any>(aKeys: ""): {};
+  public get<T = any>(aKeys: string[] | null | undefined): {[key: string]: T};
+  public get<T = any>(aKeys: string): T;
+  public get(aKeys: "" | string | string[] | null | undefined) {
     this.assertReady();
     if (aKeys === "") return {};
     if (aKeys === null || aKeys === undefined) {
@@ -74,20 +85,16 @@ export class CachedSettings extends Module {
     }
     if (typeof aKeys === "string") {
       const key = aKeys;
-      if (!this.isKeyCached(key)) {
-        console.error(`Key "${key} is not cached in Storage!`);
-        return;
-      }
-      return this.rpPrefBranch.get(key);
+      return this.getRaw(key);
     }
     if (Array.isArray(aKeys)) {
       const result: {[key: string]: any} = {};
       aKeys.forEach((key) => {
-        result[key] = this.rpPrefBranch.get(key);
+        result[key] = this.getRaw(key);
       });
       return result;
     }
-    console.error();
+    throw new Error(`Invalid key "${aKeys}"`);
   }
 
   public set(aKeys: {[key: string]: any}) {
@@ -104,5 +111,13 @@ export class CachedSettings extends Module {
       console.dir(error);
       return Promise.reject(error);
     }
+  }
+
+  private getRaw(aKey: string): any {
+    if (!this.isKeyCached(aKey)) {
+      throw new Error(`Key "${aKey}" is not cached in Storage!`);
+    }
+    const result = this.rpPrefBranch.get(aKey);
+    return result === undefined ? this.defaultValues[aKey] : result;
   }
 }

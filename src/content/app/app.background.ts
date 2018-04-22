@@ -46,7 +46,7 @@ import { Subscriptions } from "./policy/subscriptions";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
 import { Storage } from "./storage/cached-settings";
-import * as RPStorageConfig from "./storage/rp-config.background";
+import * as RPStorageConfig from "./storage/setting-specs";
 import { Ui } from "./ui/ui.module";
 
 //

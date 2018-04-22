@@ -25,7 +25,8 @@ import { API, JSMs } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 
 export class MiscInfos {
-  public lastAppVersion: string = this.rpPrefBranch.get("lastAppVersion");
+  public lastAppVersion: string =
+      this.rpPrefBranch.get("lastAppVersion") as string;
 
   public isFirefox: boolean = this.appinfo.ID === C.FIREFOX_ID;
   public isSeamonkey: boolean = this.appinfo.ID === C.SEAMONKEY_ID;

@@ -45,4 +45,9 @@ export class XPConnectService {
     return Cc["@mozilla.org/network/file-output-stream;1"].
         createInstance(Ci.nsIFileOutputStream);
   }
+
+  public createSupportsStringInstance(): XPCOM.nsISupportsString {
+    return Cc["@mozilla.org/supports-string;1"].
+        createInstance(Ci.nsISupportsString);
+  }
 }

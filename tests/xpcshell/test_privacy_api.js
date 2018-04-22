@@ -13,13 +13,15 @@ const {
 } = require("bootstrap/api/privacy/network-prediction-enabled");
 const { PrivacyApi } = require("bootstrap/api/privacy/privacy.module");
 const { PrefBranch } = require("bootstrap/api/storage/pref-branch");
-const { PREF_BRANCH_SPECS } = require("bootstrap/api/storage/prefs");
+const { XPConnectService } = require("bootstrap/api/services/xpconnect-service");
 
 function createPrivacyApi() {
+  const xpconnectService = new XPConnectService();
   const rootPrefBranch = new PrefBranch(
+      Ci,
       prefsService,
-      PREF_BRANCH_SPECS.root.branchRoot,
-      PREF_BRANCH_SPECS.root.namesToTypes
+      xpconnectService,
+      ""
   );
   const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
       log, rootPrefBranch

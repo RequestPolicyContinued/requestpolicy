@@ -11,11 +11,13 @@ const mozServices = jsmService.getServices();
 const prefsService = mozServices.prefs;
 
 const {PrefBranch} = require("bootstrap/api/storage/pref-branch");
-const {PREF_BRANCH_SPECS} = require("bootstrap/api/storage/prefs");
+const { XPConnectService } = require("bootstrap/api/services/xpconnect-service");
+const xpconnectService = new XPConnectService();
 const rpPrefBranch = new PrefBranch(
+    Ci,
     prefsService,
-    PREF_BRANCH_SPECS.root.branchRoot,
-    PREF_BRANCH_SPECS.root.namesToTypes
+    xpconnectService,
+    "extensions.requestpolicy."
 );
 const tryCatchUtils = require("lib/utils/try-catch-utils");
 

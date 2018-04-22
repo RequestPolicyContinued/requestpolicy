@@ -190,7 +190,8 @@ export namespace XPCOM {
     deleteBranch(aStartingAt: string): void;
     getBoolPref(aPrefName: string): boolean;
     getCharPref(aPrefName: string): string;
-    getComplexValue(aPrefName: string, aType: nsIJSID): nsIJSID;
+    getChildList(aStartingAt: string, aCount?: {value: number}): string[];
+    getComplexValue<T extends nsISupports>(aPrefName: string, aType: nsIJSID): T;
     getIntPref(aPrefName: string): number;
     getPrefType(aPrefName: string): number;
     lockPref(aPrefName: string): void;
@@ -271,6 +272,35 @@ export namespace XPCOM {
     ): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISupportsPrimitives.idl
+  interface nsISupportsPrimitive extends nsISupports {
+    type: number;
+
+    TYPE_ID:                 1;  // nsISupportsID
+    TYPE_CSTRING:            2;  // nsISupportsCString
+    TYPE_STRING:             3;  // nsISupportsString
+    TYPE_PRBOOL:             4;  // nsISupportsPRBool
+    TYPE_PRUINT8:            5;  // nsISupportsPRUint8
+    TYPE_PRUINT16:           6;  // nsISupportsPRUint16
+    TYPE_PRUINT32:           7;  // nsISupportsPRUint32
+    TYPE_PRUINT64:           8;  // nsISupportsPRUint64
+    TYPE_PRTIME:             9;  // nsISupportsPRTime
+    TYPE_CHAR:              10;  // nsISupportsChar
+    TYPE_PRINT16:           11;  // nsISupportsPRInt16
+    TYPE_PRINT32:           12;  // nsISupportsPRInt32
+    TYPE_PRINT64:           13;  // nsISupportsPRInt64
+    TYPE_FLOAT:             14;  // nsISupportsFloat
+    TYPE_DOUBLE:            15;  // nsISupportsDouble
+    TYPE_VOID:              16;  // nsISupportsVoid
+    TYPE_INTERFACE_POINTER: 17;  // nsISupportsInterfacePointer
+  }
+
+  interface nsISupportsString extends nsISupportsPrimitive {
+    type: nsISupportsPrimitive["TYPE_STRING"];
+    data: string;
+    toString(): string;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIUnicharInputStream.idl
   interface nsIUnicharInputStream extends nsISupports {
     readString(aCount: number, aString: string): number;
@@ -348,6 +378,7 @@ export namespace XPCOM {
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-output-stream;1": XPCOM.nsIJSCID;
+    "@mozilla.org/supports-string;1": XPCOM.nsIJSCID;
   }
 
   export interface nsXPCComponents_Interfaces {
@@ -453,7 +484,6 @@ import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
 import { JsonStorage } from "./storage/json-storage";
 import {
-  IPrefBranchSpec as IPrefBranchSpec_,
   PrefBranch,
   PrefType,
 } from "./storage/pref-branch";
@@ -499,7 +529,6 @@ export namespace API {
     export type IPrefObserver = PrefObserver;
     export type IJsonStorage = JsonStorage;
     export type IPrefBranch = PrefBranch;
-    export type IPrefBranchSpec = IPrefBranchSpec_;
     export type ISyncLocalStorageArea = SyncLocalStorageArea;
 
     export type PrefBranchFactory = (

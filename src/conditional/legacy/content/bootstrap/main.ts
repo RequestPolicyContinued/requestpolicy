@@ -26,7 +26,7 @@ import { Api } from "./api/api.module";
 import { Extension } from "./api/extension";
 import { AsyncLocaleData } from "./api/i18n/async-locale-data";
 import { I18n } from "./api/i18n/i18n.module";
-import { API, JSMs } from "./api/interfaces";
+import { API, JSMs, XPCOM } from "./api/interfaces";
 import { Management } from "./api/management";
 import { Manifest } from "./api/manifest";
 import { MiscInfos } from "./api/misc-infos";
@@ -41,13 +41,13 @@ import { XPConnectService } from "./api/services/xpconnect-service";
 import { JsonStorage } from "./api/storage/json-storage";
 import { PrefBranch } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
-import { PREF_BRANCH_SPECS } from "./api/storage/prefs";
 import { Storage } from "./api/storage/storage.module";
 import { SyncLocalStorageArea } from "./api/storage/sync-local-storage-area";
 
 const log = new Log();
 
 declare const Services: JSMs.Services;
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
 const {
   NetUtil: mozNetUtil,
@@ -72,10 +72,10 @@ const manifest = new Manifest(log, chromeFileService);
 const runtime = new Runtime(log);
 
 const createPrefBranch = (
-    spec: API.storage.IPrefBranchSpec,
-) => new PrefBranch(Services.prefs, spec.branchRoot, spec.namesToTypes);
-const rootPrefBranch = createPrefBranch(PREF_BRANCH_SPECS.root);
-const rpPrefBranch = createPrefBranch(PREF_BRANCH_SPECS.rp);
+    branchRoot: string,
+) => new PrefBranch(Ci, Services.prefs, xpconnectService, branchRoot);
+const rootPrefBranch = createPrefBranch("");
+const rpPrefBranch = createPrefBranch("extensions.requestpolicy.");
 
 const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
     log, rootPrefBranch,

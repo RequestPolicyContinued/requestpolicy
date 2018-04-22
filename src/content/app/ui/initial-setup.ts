@@ -22,7 +22,7 @@
  */
 
 import { VersionInfoService } from "app/services/version-info-service";
-import { Storage } from "app/storage/storage.module";
+import { Storage } from "app/storage/cached-settings";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";

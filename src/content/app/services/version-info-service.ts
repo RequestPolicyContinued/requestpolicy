@@ -22,7 +22,7 @@
  */
 
 import { IVersionComparator } from "app/interfaces";
-import { Storage } from "app/storage/storage.module";
+import { Storage } from "app/storage/cached-settings";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import * as JSUtils from "lib/utils/js-utils";

@@ -26,7 +26,7 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { Migration } from "./migration/migration.module";
 import { Policy } from "./policy/policy.module";
-import { Storage } from "./storage/storage.module";
+import { Storage } from "./storage/cached-settings";
 import { Ui } from "./ui/ui.module";
 
 export class AppBackground extends Module {

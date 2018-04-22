@@ -24,7 +24,7 @@
 
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
-import {Storage} from "./storage/storage.module";
+import {Storage} from "./storage/cached-settings";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;

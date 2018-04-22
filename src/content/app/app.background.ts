@@ -44,8 +44,8 @@ import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
+import { Storage } from "./storage/cached-settings";
 import * as RPStorageConfig from "./storage/rp-config.background";
-import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 
 export const log = new RPLog(browser.storage.local);

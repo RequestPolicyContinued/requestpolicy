@@ -24,27 +24,24 @@ import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class AppBackground extends Module {
+export class Storage extends Module implements App.IStorage {
+  protected get startupPreconditions() {
+    return [
+      this.storageReadyPromise,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
-      public readonly browserSettings: App.IBrowserSettings,
-      public readonly migration: App.IMigration,
-      public readonly policy: App.IPolicy,
-      public readonly services: App.IRPServices,
-      public readonly storage: App.IStorage,
-      public readonly ui: App.IUi,
+      public readonly cachedSettings: App.storage.ICachedSettings,
+      private storageReadyPromise: Promise<void>,
   ) {
-    super("App", log);
+    super("app.storage", log);
   }
 
   protected get subModules() {
     return {
-      browserSettings: this.browserSettings,
-      migration: this.migration,
-      policy: this.policy,
-      services: this.services,
-      storage: this.storage,
-      ui: this.ui,
+      cachedSettings: this.cachedSettings,
     };
   }
 }

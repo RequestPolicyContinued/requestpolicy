@@ -32,6 +32,8 @@ import { SettingsMigration } from "app/migration/settings-migration";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
+import { CachedSettings } from "app/storage/cached-settings";
+import { Storage } from "app/storage/storage.module";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
 import { RPLog } from "lib/classes/rp-log";
@@ -45,7 +47,6 @@ import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
-import { Storage } from "./storage/cached-settings";
 import * as RPStorageConfig from "./storage/setting-specs";
 import { Ui } from "./ui/ui.module";
 
@@ -80,12 +81,15 @@ const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
 
-const storage = new Storage(
+const cachedSettings = new CachedSettings(
     log, RPStorageConfig, storageReadyPromise,
+);
+const storage = new Storage(
+    log, cachedSettings, storageReadyPromise,
 );
 
 const browserSettings = new BrowserSettings(
-    log, storage,
+    log, cachedSettings,
     (browser as any).privacy.network,
 );
 
@@ -98,7 +102,7 @@ const v0RulesService = new V0RulesService(
 const rulesServices = new RulesServices(log, v0RulesService);
 const versionComparator = { compare: compareVersions };
 const versionInfoService = new VersionInfoService(
-    log, versionComparator, storage,
+    log, versionComparator, cachedSettings,
 );
 const rpServices = new RPServices(
     log, rulesServices, uriService, versionInfoService,
@@ -111,7 +115,9 @@ const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
 
 const migration = new Migration(log, settingsMigration, v0RulesMigration);
 
-const initialSetup = new InitialSetup(log, storage, versionInfoService);
+const initialSetup = new InitialSetup(
+    log, cachedSettings, versionInfoService,
+);
 const ui = new Ui(log, initialSetup);
 
 export const rp = new AppBackground(

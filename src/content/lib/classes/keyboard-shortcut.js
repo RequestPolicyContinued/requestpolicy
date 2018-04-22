@@ -26,6 +26,8 @@ import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as XULUtils from "lib/utils/xul-utils";
 import {MainEnvironment} from "lib/environment";
 
+const {cachedSettings} = rp.storage;
+
 // =============================================================================
 // KeyboardShortcut
 // =============================================================================
@@ -163,13 +165,13 @@ KeyboardShortcut.prototype._removeElement = function(window) {
 
 Object.defineProperty(KeyboardShortcut.prototype, "userCombo", {
   get: function() {
-    return rp.storage.get(this._userComboPrefName);
+    return cachedSettings.get(this._userComboPrefName);
   },
 });
 
 Object.defineProperty(KeyboardShortcut.prototype, "userEnabled", {
   get: function() {
-    return rp.storage.get(this._userEnabledPrefName);
+    return cachedSettings.get(this._userEnabledPrefName);
   },
 });
 

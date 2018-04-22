@@ -33,6 +33,7 @@ import {Requests} from "models/requests";
 import {rp, log} from "app/app.background";
 
 const uriService = rp.services.uri;
+const {cachedSettings} = rp.storage;
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -117,7 +118,7 @@ export function loadMenuIntoWindow(window) {
    * @return {boolean} If the question has been confirmed or not.
    */
   function confirm(dialogMessage, alwaysAskPrefName, params={}) {
-    let shouldAsk = rp.storage.get(alwaysAskPrefName);
+    let shouldAsk = cachedSettings.get(alwaysAskPrefName);
     if (shouldAsk === false) {
       // never ask
       return true;
@@ -138,7 +139,7 @@ export function loadMenuIntoWindow(window) {
 
     if (confirmed) {
       // "OK" has been pressed
-      rp.storage.set(alwaysAskPrefName, checkboxObj.value);
+      cachedSettings.set(alwaysAskPrefName, checkboxObj.value);
       return true;
     }
     // "Cancel" has been pressed
@@ -184,7 +185,7 @@ export function loadMenuIntoWindow(window) {
       lists.addRules = $id("rpc-rules-add");
       lists.removeRules = $id("rpc-rules-remove");
 
-      const disabled = rp.storage.alias.isBlockingDisabled();
+      const disabled = cachedSettings.alias.isBlockingDisabled();
       $id("rpc-link-enable-blocking").hidden = !disabled;
       $id("rpc-link-disable-blocking").hidden = disabled;
 
@@ -287,8 +288,8 @@ export function loadMenuIntoWindow(window) {
 
     if (true === guiLocations) {
       // get prefs
-      let sorting = rp.storage.get("menu.sorting");
-      let showNumRequests = rp.storage.get("menu.info.showNumRequests");
+      let sorting = cachedSettings.get("menu.sorting");
+      let showNumRequests = cachedSettings.get("menu.info.showNumRequests");
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -331,7 +332,7 @@ export function loadMenuIntoWindow(window) {
     self._originDomainnameItem.textContent = self._currentBaseDomain;
     self._isUncontrollableOrigin = false;
 
-    let showNumRequests = rp.storage.get("menu.info.showNumRequests");
+    let showNumRequests = cachedSettings.get("menu.info.showNumRequests");
 
     let props = self._getOriginGUILocationProperties();
 
@@ -444,14 +445,14 @@ export function loadMenuIntoWindow(window) {
     };
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, rp.storage
+        window, cachedSettings
     );
 
     // Note: in PBR we'll need to still use the old string for the temporary
     // rule. We won't be able to use just "allow temporarily".
 
     if (!self._currentlySelectedDest) {
-      if (rp.storage.alias.isDefaultAllow()) {
+      if (cachedSettings.alias.isDefaultAllow()) {
         if (mayPermRulesBeAdded === true) {
           self._addMenuItemDenyOrigin(lists.addRules, ruleData);
         }
@@ -473,7 +474,7 @@ export function loadMenuIntoWindow(window) {
           "h": self._addWildcard(dest),
         },
       };
-      // if (rp.storage.alias.isDefaultAllow()) {
+      // if (cachedSettings.alias.isDefaultAllow()) {
       if (self._isCurrentlySelectedDestAllowed ||
           !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
               !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
@@ -524,8 +525,8 @@ export function loadMenuIntoWindow(window) {
     }
 
     if (self._currentlySelectedDest) {
-      if (!rp.storage.alias.isDefaultAllow() &&
-          !rp.storage.alias.isDefaultAllowSameDomain()) {
+      if (!cachedSettings.alias.isDefaultAllow() &&
+          !cachedSettings.alias.isDefaultAllowSameDomain()) {
         self._populateDetailsAddSubdomainAllowRules(lists.addRules);
       }
     }
@@ -563,7 +564,7 @@ export function loadMenuIntoWindow(window) {
 
   self._setPrivateBrowsingStyles = function() {
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, rp.storage
+        window, cachedSettings
     );
     let val = mayPermRulesBeAdded === true ? "" : "privatebrowsing";
     $id("rpc-details").setAttribute("class", val);
@@ -828,8 +829,8 @@ export function loadMenuIntoWindow(window) {
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
       if (
-        rp.storage.alias.isDefaultAllow() ||
-          rp.storage.alias.isDefaultAllowSameDomain()
+        cachedSettings.alias.isDefaultAllow() ||
+          cachedSettings.alias.isDefaultAllowSameDomain()
       ) {
         if (destBase === self._currentlySelectedOrigin) {
           continue;
@@ -871,8 +872,8 @@ export function loadMenuIntoWindow(window) {
   self._getOtherOriginsAsGUILocations = function() {
     const allRequests = self._allRequestsOnDocument.getAll();
 
-    const allowSameDomain = rp.storage.alias.isDefaultAllow() ||
-        rp.storage.alias.isDefaultAllowSameDomain();
+    const allowSameDomain = cachedSettings.alias.isDefaultAllow() ||
+        cachedSettings.alias.isDefaultAllowSameDomain();
 
     const guiOrigins = [];
     for (let originUri in allRequests) {
@@ -1381,7 +1382,7 @@ export function loadMenuIntoWindow(window) {
     }
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, rp.storage
+        window, cachedSettings
     );
 
     for (let destHost in destHosts) {

@@ -21,8 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { IVersionComparator } from "app/interfaces";
-import { Storage } from "app/storage/cached-settings";
+import { App, IVersionComparator } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import * as JSUtils from "lib/utils/js-utils";
@@ -65,14 +64,14 @@ export class VersionInfoService extends Module {
   constructor(
       log: Common.ILog,
       private versionComparator: IVersionComparator,
-      private storage: Storage,
+      private cachedSettings: App.storage.ICachedSettings,
   ) {
     super("app.services.versionInfo", log);
   }
 
   protected get startupPreconditions() {
     return [
-      this.storage.whenReady,
+      this.cachedSettings.whenReady,
     ];
   }
 

@@ -21,8 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { VersionInfoService } from "app/services/version-info-service";
-import { Storage } from "app/storage/cached-settings";
+import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
@@ -33,7 +32,7 @@ declare const LegacyApi: API.ILegacyApi;
 export class InitialSetup extends Module {
   protected get startupPreconditions() {
     return [
-      this.storage.whenReady,
+      this.cachedSettings.whenReady,
       this.versionInfo.whenReady,
     ];
   }
@@ -43,8 +42,8 @@ export class InitialSetup extends Module {
 
   constructor(
       log: Common.ILog,
-      private storage: Storage,
-      private versionInfo: VersionInfoService,
+      private cachedSettings: App.storage.ICachedSettings,
+      private versionInfo: App.services.IVersionInfoService,
   ) {
     super("app.ui.initialSetup", log);
   }
@@ -58,21 +57,21 @@ export class InitialSetup extends Module {
     Notifications.onTabOpened.removeListener(
         this.onNotificationsTabOpenedListener,
     );
-    this.storage.set({welcomeWindowShown: true}).
+    this.cachedSettings.set({welcomeWindowShown: true}).
         catch(this.log.onError("onNotificationsTabOpened"));
   }
 
   private maybeShowSetupTab() {
-    if (this.storage.get("welcomeWindowShown")) return;
+    if (this.cachedSettings.get("welcomeWindowShown")) return;
 
     if (this.versionInfo.isRPUpgrade) {
       // If the use has just upgraded from an 0.x version, set the
       // default-policy preferences based on the old preferences.
-      this.storage.set({"defaultPolicy.allow": false}).
+      this.cachedSettings.set({"defaultPolicy.allow": false}).
           catch(this.log.onError("set defaultPolicy.allow"));
       if (LegacyApi.rpPrefBranch.isSet("uriIdentificationLevel")) {
-        const identLevel = this.storage.get("uriIdentificationLevel");
-        this.storage.set({
+        const identLevel = this.cachedSettings.get("uriIdentificationLevel");
+        this.cachedSettings.set({
           "defaultPolicy.allowSameDomain": identLevel === 1,
         }).catch(this.log.onError("set defaultPolicy.allowSameDomain"));
       }

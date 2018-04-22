@@ -261,16 +261,17 @@ export class Request {
   }
 
   public checkByDefaultPolicy() {
+    const {cachedSettings} = rp.storage;
     if (
         this.isAllowedByDefault() ||
-        rp.storage.alias.isDefaultAllow() ||
-        rp.storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
+        cachedSettings.alias.isDefaultAllow() ||
+        cachedSettings.alias.isDefaultAllowTopLevel() && this.isTopLevel()
     ) return new RequestResult(true, RequestReason.DefaultPolicy);
 
     const originUri = this.originURI;
     const destUri = this.destURI;
 
-    if (rp.storage.alias.isDefaultAllowSameDomain()) {
+    if (cachedSettings.alias.isDefaultAllowSameDomain()) {
       const originDomain = originUri ?
           uriService.getBaseDomain(originUri) : null;
       const destDomain = uriService.getBaseDomain(destUri);

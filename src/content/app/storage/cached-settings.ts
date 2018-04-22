@@ -27,7 +27,7 @@ import { Module } from "lib/classes/module";
 
 declare const LegacyApi: API.ILegacyApi;
 
-export class Storage extends Module {
+export class CachedSettings extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
   protected get startupPreconditions() {
@@ -50,7 +50,7 @@ export class Storage extends Module {
       },
       private storageReadyPromise: Promise<void>,
   ) {
-    super("app.storage", log);
+    super("app.storage.cachedSettings", log);
 
     this.cachedKeys = cachedKeys;
     this.cachedKeysSet = new Set(cachedKeys);

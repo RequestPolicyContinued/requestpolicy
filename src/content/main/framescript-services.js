@@ -24,6 +24,7 @@ import {rp} from "app/app.background";
 import {Requests} from "models/requests";
 
 const uriService = rp.services.uri;
+const {cachedSettings} = rp.storage;
 
 const initFunctions = [];
 
@@ -60,8 +61,9 @@ export const FramescriptServices = {
 
     const blockedURIs = {};
 
-    if (rp.storage.get("indicateBlockedObjects")) {
-      const indicateBlacklisted = rp.storage.get("indicateBlacklistedObjects");
+    if (cachedSettings.get("indicateBlockedObjects")) {
+      const indicateBlacklisted =
+          cachedSettings.get("indicateBlacklistedObjects");
 
       const rejectedRequests = Requests._requestSets.rejectedRequests.
           getOriginUri(originURI);

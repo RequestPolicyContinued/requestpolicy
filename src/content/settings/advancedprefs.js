@@ -28,18 +28,19 @@ import {WinEnv, elManager, $id} from "./common";
     ManagerForPrefObservers,
     rp,
   } = browser.extension.getBackgroundPage();
+  const {cachedSettings} = rp.storage;
 
   // ===========================================================================
 
   function updateDisplay() {
     // browser settings
     $id("pref-browserSettings.disablePrefetching").checked =
-        rp.storage.get("browserSettings.disablePrefetching");
+        cachedSettings.get("browserSettings.disablePrefetching");
 
     // TODO: Create a class which acts as an API for preferences and which
     // ensures that the returned value is always a valid value for "string"
     // preferences.
-    var sorting = rp.storage.get("menu.sorting");
+    var sorting = cachedSettings.get("menu.sorting");
 
     if (sorting === $id("sortByNumRequests").value) {
       $id("sortByNumRequests").checked = true;
@@ -56,7 +57,7 @@ import {WinEnv, elManager, $id} from "./common";
     }
 
     $id("menu.info.showNumRequests").checked =
-        rp.storage.get("menu.info.showNumRequests");
+        cachedSettings.get("menu.info.showNumRequests");
   }
 
   window.onload = function() {
@@ -67,14 +68,14 @@ import {WinEnv, elManager, $id} from "./common";
         $id("pref-browserSettings.disablePrefetching"),
         "change",
         (event) => {
-          rp.storage.set({
+          cachedSettings.set({
             "browserSettings.disablePrefetching": event.target.checked,
           });
         }
     );
 
     var sortingListener = function(event) {
-      rp.storage.set({"menu.sorting": event.target.value});
+      cachedSettings.set({"menu.sorting": event.target.value});
     };
     elManager.addListener($id("sortByNumRequests"), "change", sortingListener);
     elManager.addListener($id("sortByDestName"), "change", sortingListener);
@@ -83,7 +84,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("menu.info.showNumRequests"), "change",
         function(event) {
-          rp.storage.set({
+          cachedSettings.set({
             "menu.info.showNumRequests": event.target.checked,
           });
         }

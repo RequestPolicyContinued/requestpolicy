@@ -24,24 +24,23 @@ import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class BrowserSettings extends Module
-    implements App.browserSettings.IBrowserSettings {
+export class BrowserSettings extends Module implements App.IBrowserSettings {
   protected get startupPreconditions() {
     return [
-      this.storage.whenReady,
+      this.cachedSettings.whenReady,
     ];
   }
 
   constructor(
       log: Common.ILog,
-      private storage: App.IStorage,
+      private cachedSettings: App.storage.ICachedSettings,
       private networkPrivacyApi: browser.privacy.network,
   ) {
     super("app.browserSettings", log);
   }
 
   protected startupSelf() {
-    if (this.storage.get("browserSettings.disablePrefetching")) {
+    if (this.cachedSettings.get("browserSettings.disablePrefetching")) {
       this.networkPrivacyApi.networkPredictionEnabled.set({value: false}).catch(
           this.log.onError("set networkPredictionEnabled false"),
       );

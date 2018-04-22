@@ -49,6 +49,7 @@ import {
 import {rp, log} from "app/app.background";
 
 const uriService = rp.services.uri;
+const {cachedSettings} = rp.storage;
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -111,7 +112,7 @@ function reject(reason, request) {
   logRequests.log(`** BLOCKED ** reason: ${reason
   }. ${request.detailsToString()}`);
 
-  if (rp.storage.alias.isBlockingDisabled()) {
+  if (cachedSettings.alias.isBlockingDisabled()) {
     return CP_OK;
   }
 
@@ -541,7 +542,7 @@ export function process(request) {
       }
       request.requestResult.resultReason =
           RequestReason.DefaultPolicyInconsistentRules;
-      if (rp.storage.alias.isDefaultAllow()) {
+      if (cachedSettings.alias.isDefaultAllow()) {
         request.requestResult.isAllowed = true;
         return accept("User policy indicates both allow and block. " +
             "Using default allow policy", request);
@@ -589,7 +590,7 @@ export function process(request) {
       }
       request.requestResult.resultReason =
           RequestReason.DefaultPolicyInconsistentRules;
-      if (rp.storage.alias.isDefaultAllow()) {
+      if (cachedSettings.alias.isDefaultAllow()) {
         request.requestResult.isAllowed = true;
         return accept(
             "Subscription rules indicate both allow and block. " +
@@ -675,7 +676,7 @@ export function process(request) {
   } catch (e) {
     console.error("Fatal Error:");
     console.dir(e);
-    if (rp.storage.alias.isBlockingDisabled()) {
+    if (cachedSettings.alias.isBlockingDisabled()) {
       log.warn("Allowing request due to internal error.");
       return CP_OK;
     }
@@ -873,7 +874,7 @@ function checkRedirect(request) {
     if (result.denyRulesExist() && result.allowRulesExist()) {
       let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
       result.isAllowed = conflictCanBeResolved ? shouldAllow :
-        rp.storage.alias.isDefaultAllow();
+        cachedSettings.alias.isDefaultAllow();
       return result;
     }
     if (result.denyRulesExist()) {
@@ -893,7 +894,7 @@ function checkRedirect(request) {
     if (result.denyRulesExist() && result.allowRulesExist()) {
       let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
       result.isAllowed = conflictCanBeResolved ? shouldAllow :
-        rp.storage.alias.isDefaultAllow();
+        cachedSettings.alias.isDefaultAllow();
       return result;
     }
     if (result.denyRulesExist()) {
@@ -1041,7 +1042,7 @@ export function processUrlRedirection(request) {
 
   // The header isn't allowed, so remove it.
   try {
-    if (rp.storage.alias.isBlockingDisabled()) {
+    if (cachedSettings.alias.isBlockingDisabled()) {
       return CP_OK;
     }
 
@@ -1108,7 +1109,7 @@ export function processUrlRedirection(request) {
   } catch (e) {
     console.error("Fatal Error:");
     console.dir(e);
-    if (rp.storage.alias.isBlockingDisabled()) {
+    if (cachedSettings.alias.isBlockingDisabled()) {
       log.warn("Allowing request due to internal error.");
       return CP_OK;
     }

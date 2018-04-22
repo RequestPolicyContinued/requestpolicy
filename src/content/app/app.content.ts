@@ -25,7 +25,8 @@ import { UriService } from "app/services/uri-service";
 import { RPLog } from "lib/classes/rp-log";
 import { AppContent } from "./app.content.module";
 
-export const log = new RPLog(browser.storage.local);
+const storageReadyPromise = Promise.resolve();
+export const log = new RPLog(browser.storage.local, storageReadyPromise);
 
 const uriService = new UriService(log, "AppContent");
 const rpServices = new RPContentServices(log, uriService);

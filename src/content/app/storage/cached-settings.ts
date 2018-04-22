@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { SettingsMigration } from "app/migration/settings-migration";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
@@ -33,7 +32,7 @@ export class Storage extends Module {
 
   protected get startupPreconditions() {
     return [
-      this.settingsMigration.whenReady,
+      this.storageReadyPromise,
     ];
   }
 
@@ -49,7 +48,7 @@ export class Storage extends Module {
           cachedKeys: string[],
           boolAliases: Array<[string, string]>,
       },
-      private settingsMigration: SettingsMigration,
+      private storageReadyPromise: Promise<void>,
   ) {
     super("app.storage", log);
 

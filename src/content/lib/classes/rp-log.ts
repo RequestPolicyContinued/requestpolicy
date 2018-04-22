@@ -25,6 +25,7 @@ import { Log, LogLevel } from "lib/classes/log";
 export class RPLog extends Log {
   constructor(
       private storage: browser.storage.StorageArea,
+      private storageReadyPromise: Promise<void>,
   ) {
     super({
       enabled: true,
@@ -32,10 +33,12 @@ export class RPLog extends Log {
       prefix: "",
     });
 
-    const pEnabled = this.storage.get([
-      "log",
-      "log.level",
-    ]).then((result) => {
+    const pEnabled = this.storageReadyPromise.then(() => (
+      this.storage.get([
+        "log",
+        "log.level",
+      ])
+    )).then((result) => {
       this.setEnabled(result.log as boolean);
       this.setLevel(result["log.level"] as LogLevel);
     });

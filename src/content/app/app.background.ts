@@ -36,6 +36,7 @@ import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
 import { RPLog } from "lib/classes/rp-log";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
+import { defer } from "lib/utils/js-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
@@ -47,8 +48,6 @@ import { UriService } from "./services/uri-service";
 import { Storage } from "./storage/cached-settings";
 import * as RPStorageConfig from "./storage/rp-config.background";
 import { Ui } from "./ui/ui.module";
-
-export const log = new RPLog(browser.storage.local);
 
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:
@@ -62,6 +61,12 @@ export const log = new RPLog(browser.storage.local);
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
+const dStorageReady = defer<void>();
+const storageReadyPromise = dStorageReady.promise;
+export const log = new RPLog(browser.storage.local, storageReadyPromise);
+const settingsMigration = new SettingsMigration(log, browser.storage.local);
+dStorageReady.resolve(settingsMigration.whenReady);
+
 const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
 const mozServices = C.EXTENSION_TYPE === "legacy" ?
     jsmService!.getServices() : null;
@@ -74,9 +79,10 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
 const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
-const settingsMigration = new SettingsMigration(log, browser.storage.local);
 
-const storage = new Storage(log, RPStorageConfig, settingsMigration);
+const storage = new Storage(
+    log, RPStorageConfig, storageReadyPromise,
+);
 
 const browserSettings = new BrowserSettings(
     log, storage,

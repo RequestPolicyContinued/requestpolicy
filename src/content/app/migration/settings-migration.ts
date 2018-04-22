@@ -20,10 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class SettingsMigration extends Module {
+export class SettingsMigration extends Module
+    implements App.migration.ISettingsMigration {
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
@@ -40,39 +43,10 @@ export class SettingsMigration extends Module {
 
   private async performMergeActions(): Promise<void> {
     const pMerges = Promise.all([
-      this.mergePrefetchingSettings(),
+      new PrefetchSettingsMerger(this.log, this.storage).performAction(),
     ]).then(() => undefined);
     pMerges.catch(this.log.onError("merge settings"));
     return pMerges;
-  }
-
-  private async mergePrefetchingSettings(): Promise<void> {
-    const values = await this.storage.get([
-      "prefetch.link.disableOnStartup",
-      "prefetch.dns.disableOnStartup",
-      "prefetch.preconnections.disableOnStartup",
-    ]);
-    const obsoletePrefetchSettingsExist =
-        values.hasOwnProperty("prefetch.link.disableOnStartup") ||
-        values.hasOwnProperty("prefetch.dns.disableOnStartup") ||
-        values.hasOwnProperty("prefetch.preconnections.disableOnStartup");
-    if (!obsoletePrefetchSettingsExist) return;
-    const shouldDisablePrefetching =
-        !!values["prefetch.link.disableOnStartup"] ||
-        !!values["prefetch.dns.disableOnStartup"] ||
-        !!values["prefetch.preconnections.disableOnStartup"];
-    const pMerge = Promise.all([
-      this.storage.remove([
-        "prefetch.link.disableOnStartup",
-        "prefetch.dns.disableOnStartup",
-        "prefetch.preconnections.disableOnStartup",
-      ]),
-      this.storage.set({
-        "browserSettings.disablePrefetching": shouldDisablePrefetching,
-      }),
-    ]);
-    pMerge.catch(this.log.onError("merge prefetch settings"));
-    await pMerge;
   }
 
   private performRemoveActions(): Promise<void> {

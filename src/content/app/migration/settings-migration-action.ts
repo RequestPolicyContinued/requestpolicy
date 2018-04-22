@@ -20,25 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// tslint:disable:no-namespace
+import { Common } from "common/interfaces";
 
-import * as compareVersions from "lib/third-party/mozilla-version-comparator";
-import { BrowserSettings } from "./browser-settings/browser-settings.module";
-import { SettingsMigration } from "./migration/settings-migration";
-import {Storage} from "./storage/cached-settings";
+export abstract class SettingsMigrationAction {
+  constructor(
+      protected log: Common.ILog,
+      protected storage: browser.storage.StorageArea,
+  ) {}
 
-export interface IVersionComparator {
-  compare: typeof compareVersions;
-}
-
-export namespace App {
-  export namespace browserSettings {
-    export type IBrowserSettings = BrowserSettings;
-  }
-
-  export namespace migration {
-    export type ISettingsMigration = SettingsMigration;
-  }
-
-  export type IStorage = Storage;
+  public abstract performAction(): Promise<void>;
 }

@@ -1,32 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false,
-    "module": "commonjs",
-    "target": "es2015",
-    "lib": [
-      "es5",
-      "es2015",
-    ],
-    "typeRoots": [
-      "../../node_modules/@types",
-      "../../node_modules/web-ext-types",
-    ],
-
-    "baseUrl": "./",
-    "paths": {
-      "*": [
-        "*",
-        "../../src/content/*",
-        "../../src/conditional/legacy/content/*",
-      ]
-    }
-  }
-  ,
+    "target": "esnext",
+    "noImplicitAny": false,
+  },
   "include": [
-    "../../src/**/*",
+    "../../src",
+    ".",
   ],
-  "exclude": [
-    "**/third-party/static",
-  ]
 }

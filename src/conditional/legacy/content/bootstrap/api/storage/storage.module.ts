@@ -20,18 +20,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
 
+type xpcomPrefBranch = XPCOM.nsIPrefBranch;
+type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
+
 export class Storage extends Module {
   private events = createListenersMap(["onChanged"]);
+
+  private prefObserver: prefObserver = {
+    observe: this.observePrefChange.bind(this),
+  };
 
   constructor(
       log: Common.ILog,
       private slsa: API.storage.ISyncLocalStorageArea,
+      private rpPrefBranch: API.storage.IPrefBranch,
   ) {
     super("browser.storage", log);
   }
@@ -49,6 +57,16 @@ export class Storage extends Module {
 
   public get contentApi() {
     return this.backgroundApi;
+  }
+
+  protected startupSelf() {
+    this.rpPrefBranch.addObserver("", this.prefObserver);
+    return Promise.resolve();
+  }
+
+  protected shutdownSelf() {
+    this.rpPrefBranch.removeObserver("", this.prefObserver);
+    return Promise.resolve();
   }
 
   private getLocal(
@@ -75,5 +93,16 @@ export class Storage extends Module {
     } catch (e) {
       return Promise.reject(e);
     }
+  }
+
+  private observePrefChange(
+      aSubject: xpcomPrefBranch,
+      aTopic: "nsPref:changed",
+      aData: string,
+  ) {
+    const prefName = aData;
+    const newValue = this.rpPrefBranch.get(prefName);
+    const changes: browser.storage.StorageChange = {newValue};
+    this.events.listenersMap.onChanged.emit({changes});
   }
 }

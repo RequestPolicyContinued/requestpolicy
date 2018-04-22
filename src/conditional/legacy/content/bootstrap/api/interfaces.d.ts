@@ -163,10 +163,11 @@ export namespace XPCOM {
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
   }
 
-  export interface nsIObserver_without_nsISupports {
-    observe(aSubject: nsISupports, aTopic: string, aData: string): void;
+  export interface nsIObserver_without_nsISupports<T extends nsISupports = nsISupports> {
+    observe(aSubject: T, aTopic: string, aData: string): void;
   }
-  export type nsIObserver = nsIObserver_without_nsISupports & nsISupports;
+  export type nsIObserver<T extends nsISupports = nsISupports> =
+      nsIObserver_without_nsISupports<T> & nsISupports;
 
   export interface nsIObserverService extends nsISupports {
     addObserver(anObserver: nsIObserver, aTopic: string, ownsWeak: boolean): void;

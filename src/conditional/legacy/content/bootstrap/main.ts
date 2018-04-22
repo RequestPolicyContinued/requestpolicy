@@ -89,7 +89,7 @@ const jsonPrefs = new JsonStorage(fileService);
 const slsa = new SyncLocalStorageArea(
     Services.prefs, rpPrefBranch, jsonPrefs,
 );
-const storage = new Storage(log, slsa);
+const storage = new Storage(log, slsa, rpPrefBranch);
 const miscInfos = new MiscInfos(
     Services.appinfo, rpPrefBranch, Services.vc,
 );

@@ -107,7 +107,7 @@ export class PrefBranch implements API.storage.IPrefBranch {
 
   public addObserver(
       aDomain: string,
-      aObserver: XPCOM.nsIObserver_without_nsISupports,
+      aObserver: XPCOM.nsIObserver_without_nsISupports<XPCOM.nsIPrefBranch>,
       aHoldWeak?: boolean,
   ) {
     return this.branch.addObserver(aDomain, aObserver, !!aHoldWeak);
@@ -115,7 +115,7 @@ export class PrefBranch implements API.storage.IPrefBranch {
 
   public removeObserver(
       aDomain: string,
-      aObserver: XPCOM.nsIObserver_without_nsISupports,
+      aObserver: XPCOM.nsIObserver_without_nsISupports<XPCOM.nsIPrefBranch>,
   ) {
     return this.branch.removeObserver(aDomain, aObserver);
   }

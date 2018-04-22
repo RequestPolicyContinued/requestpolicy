@@ -116,7 +116,7 @@ const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
 const migration = new Migration(log, settingsMigration, v0RulesMigration);
 
 const initialSetup = new InitialSetup(
-    log, cachedSettings, versionInfoService,
+    log, cachedSettings, versionInfoService, xpcApi! /* FIXME */,
 );
 const ui = new Ui(log, initialSetup);
 

@@ -27,8 +27,6 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import {NotificationID, Notifications} from "models/notifications";
 
-declare const LegacyApi: API.ILegacyApi;
-
 export class InitialSetup extends Module {
   protected get startupPreconditions() {
     return [
@@ -44,6 +42,9 @@ export class InitialSetup extends Module {
       log: Common.ILog,
       private cachedSettings: App.storage.ICachedSettings,
       private versionInfo: App.services.IVersionInfoService,
+      private xpcApi: {
+        rpPrefBranch: API.ILegacyApi["rpPrefBranch"],
+      },
   ) {
     super("app.ui.initialSetup", log);
   }
@@ -69,7 +70,7 @@ export class InitialSetup extends Module {
       // default-policy preferences based on the old preferences.
       this.cachedSettings.set({"defaultPolicy.allow": false}).
           catch(this.log.onError("set defaultPolicy.allow"));
-      if (LegacyApi.rpPrefBranch.isSet("uriIdentificationLevel")) {
+      if (this.xpcApi.rpPrefBranch.isSet("uriIdentificationLevel")) {
         const identLevel = this.cachedSettings.get("uriIdentificationLevel");
         this.cachedSettings.set({
           "defaultPolicy.allowSameDomain": identLevel === 1,

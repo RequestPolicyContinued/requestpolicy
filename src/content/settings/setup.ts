@@ -36,7 +36,7 @@ declare const $: typeof JQuery;
     log,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
-  const {cachedSettings} = rp.storage;
+  const cachedSettings = rp.storage.cachedSettings!;
 
   // ===========================================================================
 

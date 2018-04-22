@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { RPContentServices } from "app/services/services.module.content";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
@@ -28,6 +29,7 @@ export class AppContent extends Module {
   constructor(
       log: Common.ILog,
       public readonly services: RPContentServices,
+      public readonly storage: App.IStorage,
   ) {
     super("AppContent", log);
   }
@@ -35,6 +37,7 @@ export class AppContent extends Module {
   public get subModules() {
     return {
       services: this.services,
+      storage: this.storage,
     };
   }
 }

@@ -261,7 +261,7 @@ export class Request {
   }
 
   public checkByDefaultPolicy() {
-    const {cachedSettings} = rp.storage;
+    const cachedSettings = rp.storage.cachedSettings!;
     if (
         this.isAllowedByDefault() ||
         cachedSettings.alias.isDefaultAllow() ||

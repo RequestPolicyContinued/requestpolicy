@@ -32,6 +32,7 @@ import { CachedSettings } from "./storage/cached-settings";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 import { VersionInfoService } from "./services/version-info-service";
+import { AsyncSettings } from "app/storage/async-settings";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -47,6 +48,7 @@ export namespace App {
   }
 
   export namespace storage {
+    export type IAsyncSettings = AsyncSettings;
     export type ICachedSettings = CachedSettings;
   }
 

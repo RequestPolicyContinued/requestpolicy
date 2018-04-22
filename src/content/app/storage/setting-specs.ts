@@ -21,38 +21,108 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export const boolAliases: Array<[string, string]> = [
+const boolAliases: Array<[string, string]> = [
   ["defaultPolicy.allow", "DefaultAllow"],
   ["defaultPolicy.allowSameDomain", "DefaultAllowSameDomain"],
   ["defaultPolicy.allowTopLevel", "DefaultAllowTopLevel"],
   ["startWithAllowAllEnabled", "BlockingDisabled"],
 ];
 
-export const cachedKeys = [
-  "autoReload",
-  "browserSettings.disablePrefetching",
-  "confirmSiteInfo",
-  "contextMenu",
-  "defaultPolicy.allow",
-  "defaultPolicy.allowSameDomain",
-  "defaultPolicy.allowTopLevel",
-  "indicateBlacklistedObjects",
-  "indicateBlockedObjects",
-  "keyboardShortcuts.openMenu.enabled",
-  "keyboardShortcuts.openMenu.combo",
-  "keyboardShortcuts.openRequestLog.enabled",
-  "keyboardShortcuts.openRequestLog.combo",
-  "lastAppVersion",
-  "lastVersion",
-  "log",
-  "log.level",
-  "menu.info.showNumRequests",
-  "menu.sorting",
-  "privateBrowsingPermanentWhitelisting",
-  "startWithAllowAllEnabled",
-  "welcomeWindowShown",
+type tDefaultValue = boolean | number | string;
+
+const keys: {
+  [key: string]: {
+    cached: boolean,
+    defaultValue?: tDefaultValue,
+  },
+} = {
+  "autoReload": {
+    cached: true, defaultValue: true,
+  },
+  "browserSettings.disablePrefetching": {
+    cached: true, defaultValue: true,
+  },
+  "confirmSiteInfo": {
+    cached: true, defaultValue: true,
+  },
+  "contextMenu": {
+    cached: true, defaultValue: true,
+  },
+  "defaultPolicy.allow": {
+    cached: true, defaultValue: false,
+  },
+  "defaultPolicy.allowSameDomain": {
+    cached: true, defaultValue: true,
+  },
+  "defaultPolicy.allowTopLevel": {
+    cached: true, defaultValue: false,
+  },
+  "indicateBlacklistedObjects": {
+    cached: true, defaultValue: false,
+  },
+  "indicateBlockedObjects": {
+    cached: true, defaultValue: true,
+  },
+  "keyboardShortcuts.openMenu.combo": {
+    cached: true, defaultValue: "default",
+  },
+  "keyboardShortcuts.openMenu.enabled": {
+    cached: true, defaultValue: true,
+  },
+  "keyboardShortcuts.openRequestLog.combo": {
+    cached: true, defaultValue: "default",
+  },
+  "keyboardShortcuts.openRequestLog.enabled": {
+    cached: true, defaultValue: true,
+  },
+  "lastAppVersion": {
+    cached: true, defaultValue: "0.0",
+  },
+  "lastVersion": {
+    cached: true, defaultValue: "0.0",
+  },
+  "log": {
+    cached: true, defaultValue: 0,
+  },
+  "log.level": {
+    cached: true, defaultValue: false,
+  },
+  "menu.info.showNumRequests": {
+    cached: true, defaultValue: true,
+  },
+  "menu.sorting": {
+    cached: true, defaultValue: "numRequests",
+  },
+  "privateBrowsingPermanentWhitelisting": {
+    cached: true, defaultValue: false,
+  },
+  "startWithAllowAllEnabled": {
+    cached: true, defaultValue: false,
+  },
+  "welcomeWindowShown": {
+    cached: true, defaultValue: false,
+  },
+
   // @if BUILD_ALIAS='ui-testing'
-  "unitTesting.consoleErrors.counter",
-  "unitTesting.loggingErrors.counter",
+  // tslint:disable-next-line:object-literal-sort-keys
+  "unitTesting.consoleErrors.counter": {cached: true},
+  "unitTesting.loggingErrors.counter": {cached: true},
   // @endif
-];
+};
+
+const cachedKeys: string[] = [];
+const defaultValues: {[key: string]: tDefaultValue} = {};
+
+Object.keys(keys).forEach((key) => {
+  const spec = keys[key];
+  if (spec.cached) cachedKeys.push(key);
+  if (spec.hasOwnProperty("defaultValue")) {
+    defaultValues[key] = spec.defaultValue!;
+  }
+});
+
+export const SETTING_SPECS = {
+  boolAliases,
+  cachedKeys,
+  defaultValues,
+};

@@ -22,7 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { Module } from "lib/classes/module";
+import { IModule, Module } from "lib/classes/module";
 
 export class Storage extends Module implements App.IStorage {
   protected get startupPreconditions() {
@@ -33,15 +33,20 @@ export class Storage extends Module implements App.IStorage {
 
   constructor(
       log: Common.ILog,
-      public readonly cachedSettings: App.storage.ICachedSettings,
+      public readonly asyncSettings: App.storage.IAsyncSettings,
+      public readonly cachedSettings: App.storage.ICachedSettings | null,
       private storageReadyPromise: Promise<void>,
   ) {
     super("app.storage", log);
   }
 
   protected get subModules() {
-    return {
-      cachedSettings: this.cachedSettings,
+    const rv: {[k: string]: IModule} = {
+      asyncSettings: this.asyncSettings,
     };
+    if (this.cachedSettings !== null) {
+      rv.cachedSettings = this.cachedSettings;
+    }
+    return rv;
   }
 }

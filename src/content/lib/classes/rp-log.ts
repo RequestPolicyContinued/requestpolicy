@@ -20,12 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { Log, LogLevel } from "lib/classes/log";
 
 export class RPLog extends Log {
+  private asyncSettings: App.storage.IAsyncSettings;
+
   constructor(
-      private storage: browser.storage.StorageArea,
-      private storageReadyPromise: Promise<void>,
+      asyncSettingsPromise: Promise<App.storage.IAsyncSettings>,
   ) {
     super({
       enabled: true,
@@ -33,22 +35,25 @@ export class RPLog extends Log {
       prefix: "",
     });
 
-    const pEnabled = this.storageReadyPromise.then(() => (
-      this.storage.get([
+    const pInitialized = asyncSettingsPromise.then((asyncSettings) => {
+      this.asyncSettings = asyncSettings;
+      return asyncSettings.whenReady;
+    }).then(() => {
+      return this.asyncSettings.get([
         "log",
         "log.level",
-      ])
-    )).then((result) => {
+      ]);
+    }).then((result) => {
       this.setEnabled(result.log as boolean);
       this.setLevel(result["log.level"] as LogLevel);
+
+      this.asyncSettings.onChanged.addListener(
+          this.onStorageChange.bind(this),
+      );
     });
-    pEnabled.catch((e) => {
+    pInitialized.catch((e) => {
       this.error("Error initializing the logger:", e);
     });
-
-    browser.storage.onChanged.addListener(
-        this.onStorageChange.bind(this),
-    );
   }
 
   private onStorageChange(

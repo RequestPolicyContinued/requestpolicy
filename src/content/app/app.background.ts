@@ -32,8 +32,9 @@ import { SettingsMigration } from "app/migration/settings-migration";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
+import { AsyncSettings } from "app/storage/async-settings";
 import { CachedSettings } from "app/storage/cached-settings";
-import { Storage } from "app/storage/storage.module";
+import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
 import { RPLog } from "lib/classes/rp-log";
@@ -47,7 +48,7 @@ import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
-import * as RPStorageConfig from "./storage/setting-specs";
+import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 
 //
@@ -62,9 +63,10 @@ import { Ui } from "./ui/ui.module";
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
+const dAsyncSettings = defer<AsyncSettings>();
 const dStorageReady = defer<void>();
 const storageReadyPromise = dStorageReady.promise;
-export const log = new RPLog(browser.storage.local, storageReadyPromise);
+export const log = new RPLog(dAsyncSettings.promise);
 const settingsMigration = new SettingsMigration(log, browser.storage.local);
 dStorageReady.resolve(settingsMigration.whenReady);
 
@@ -81,11 +83,20 @@ const rulesetStorage = new RulesetStorage(log);
 const subscriptions = new Subscriptions(log, rulesetStorage);
 const policy = new Policy(log, subscriptions, rulesetStorage);
 
-const cachedSettings = new CachedSettings(
-    log, RPStorageConfig, storageReadyPromise,
+const asyncSettings = new AsyncSettings(
+    log,
+    browser.storage,
+    browser.storage.local,
+    SETTING_SPECS.defaultValues,
+    storageReadyPromise,
 );
+dAsyncSettings.resolve(asyncSettings);
+const cachedSettings = new CachedSettings(log, {
+  boolAliases: SETTING_SPECS.boolAliases,
+  cachedKeys: SETTING_SPECS.cachedKeys,
+}, storageReadyPromise);
 const storage = new Storage(
-    log, cachedSettings, storageReadyPromise,
+    log, asyncSettings, cachedSettings, storageReadyPromise,
 );
 
 const browserSettings = new BrowserSettings(

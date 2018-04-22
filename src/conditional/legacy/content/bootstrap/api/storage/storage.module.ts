@@ -102,7 +102,8 @@ export class Storage extends Module {
   ) {
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
-    const changes: browser.storage.StorageChange = {newValue};
+    const changes: browser.storage.StorageChange =
+        newValue === undefined ? {} : {newValue};
     this.events.listenersMap.onChanged.emit({changes});
   }
 }

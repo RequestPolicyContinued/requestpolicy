@@ -52,9 +52,12 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any>
   protected getByKeys(aKeys: string[]) {
     const results: IKeysObject = {};
     aKeys.forEach((key) => {
-      const result = this.jsonStorage.isJsonStorageKey(key) ?
-          this.jsonStorage.get(key) : this.rpPrefBranch.get(key);
-      if (result !== C.UNDEFINED) {
+      const isJson = this.jsonStorage.isJsonStorageKey(key);
+      const result = isJson ?
+          this.jsonStorage.get(key) :
+          this.rpPrefBranch.get(key);
+      const undefinedValue = isJson ? C.UNDEFINED : undefined;
+      if (result !== undefinedValue) {
         results[key] = result;
       }
     });

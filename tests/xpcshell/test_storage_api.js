@@ -36,6 +36,72 @@ function run_test() {
   run_next_test();
 }
 
+//
+// get()
+//
+
+["foo", ["foo"], {foo: "DEFAULT"}].forEach((getParameter) => {
+  add_test(function() {
+    // setup
+    rpPrefBranch.set("foo", "bar");
+    const storageApi = createStorageApi();
+    storageApi.startup();
+    do_test_pending();
+
+    // eslint-disable-next-line arrow-body-style
+    storageApi.whenReady.then(() => {
+      // exercise
+      return storageApi.backgroundApi.local.get(getParameter);
+    }).then((result) => {
+      // verify
+      Assert.deepEqual(result, {foo: "bar"});
+
+      // cleanup
+      rpPrefBranch.reset("foo");
+      storageApi.shutdown();
+
+      do_test_finished();
+      return;
+    }).catch((e) => {
+      console.dir(e);
+      Assert.ok(false, e);
+    });
+
+    run_next_test();
+  });
+});
+
+add_test(function() {
+  // setup
+  const storageApi = createStorageApi();
+  storageApi.startup();
+  do_test_pending();
+
+  // eslint-disable-next-line arrow-body-style
+  storageApi.whenReady.then(() => {
+    // exercise
+    return storageApi.backgroundApi.local.get({foo: "DEFAULT"});
+  }).then((result) => {
+    // verify
+    Assert.deepEqual(result, {foo: "DEFAULT"});
+
+    // cleanup
+    storageApi.shutdown();
+
+    do_test_finished();
+    return;
+  }).catch((e) => {
+    console.dir(e);
+    Assert.ok(false, e);
+  });
+
+  run_next_test();
+});
+
+//
+// onChanged
+//
+
 [true, 42, "someValue"].forEach((testValue) => {
   add_test(function() {
     // setup
@@ -74,4 +140,43 @@ function run_test() {
 
     run_next_test();
   });
+});
+
+// removed pref
+add_test(function() {
+  // setup
+  rpPrefBranch.set("someRandomPrefName", "foo");
+  let observedEvent;
+  const dListenerFnCalled = defer();
+  let listenerFn = (event) => {
+    observedEvent = event;
+    dListenerFnCalled.resolve(undefined);
+  };
+  const storageApi = createStorageApi();
+  storageApi.startup();
+  do_test_pending();
+  storageApi.whenReady.then(() => {
+    storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+    // exercise
+    rpPrefBranch.reset("someRandomPrefName");
+
+    return dListenerFnCalled.promise;
+  }).then(() => {
+    // verify
+    Assert.deepEqual(observedEvent, {changes: {}});
+
+    // cleanup
+    storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+    rpPrefBranch.reset("someRandomPrefName");
+    storageApi.shutdown();
+
+    do_test_finished();
+    return;
+  }).catch((e) => {
+    console.dir(e);
+    Assert.ok(false, e);
+  });
+
+  run_next_test();
 });

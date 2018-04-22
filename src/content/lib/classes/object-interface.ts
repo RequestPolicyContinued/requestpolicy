@@ -63,8 +63,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
     const results = this.getByKeys(keys);
     if (isObjectWithDefaults) {
       const defaults = aKeys as IKeysWithDefaults;
-      // tslint:disable-next-line prefer-const
-      for (let key in keys) {
+      for (const key of keys) {
         if (!(results.hasOwnProperty(key))) {
           results[key] = defaults[key];
         }

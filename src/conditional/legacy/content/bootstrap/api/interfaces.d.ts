@@ -587,7 +587,6 @@ export namespace API {
   export type IXPConnectService = XPConnectService;
   export interface ITryCatchUtils {
     getAppLocale: typeof TryCatchUtils.getAppLocale;
-    getComplexValueFromPrefBranch: typeof TryCatchUtils.getComplexValueFromPrefBranch;
   }
 
   export type IApi = Api;

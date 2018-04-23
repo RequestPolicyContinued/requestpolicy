@@ -123,13 +123,8 @@ export class V0RulesService extends Module {
 
   public getRPV0PrefString(aPrefName: string): string {
     if (!this.xpcApi) return "";
-    const result = this.getComplexV0Pref(aPrefName);
-    if (!result.error) return result.value;
-    const e = result.error;
-    if (e.name !== "NS_ERROR_UNEXPECTED") {
-      console.dir(e);
-    }
-    return "";
+    const result = this.getV0RulePref(aPrefName);
+    return result || "";
   }
 
   public getRPV0PrefStrings() {
@@ -217,17 +212,13 @@ export class V0RulesService extends Module {
 
   private isV0RulePrefEmpty(pref: string) {
     if (!this.xpcApi) return true;
-    const result = this.getComplexV0Pref(pref);
-    return !!result.error || !result.value;
+    return !this.xpcApi.rpPrefBranch.isSet(pref);
   }
 
-  private getComplexV0Pref(pref: string): any {
+  private getV0RulePref(pref: string): string | null {
     if (!this.xpcApi) return null;
-    return this.xpcApi.tryCatchUtils.getComplexValueFromPrefBranch(
-        this.xpcApi.rpPrefBranch,
-        pref,
-        Ci.nsISupportsString,
-    );
+    if (!this.xpcApi.rpPrefBranch.isSet(pref)) return null;
+    return this.xpcApi.rpPrefBranch.get(pref) as string;
   }
 }
 

@@ -65,6 +65,8 @@ export class VersionInfoService extends Module {
       log: Common.ILog,
       private versionComparator: IVersionComparator,
       private cachedSettings: App.storage.ICachedSettings,
+      private managementApi: typeof browser.management,
+      private runtimeApi: typeof browser.runtime,
   ) {
     super("app.services.versionInfo", log);
   }
@@ -90,12 +92,9 @@ export class VersionInfoService extends Module {
     // RP version info
     // -------------------------------------------------------------------------
 
-    promises.lastRPVersion =
-        browser.storage.local.get("lastVersion").
-        then((result) => {
-          infos.lastRPVersion = result.lastVersion as IInfos["lastRPVersion"];
-          return infos.lastRPVersion;
-        });
+    promises.lastRPVersion = Promise.resolve(
+        this.cachedSettings.get("lastVersion") as IInfos["lastRPVersion"],
+    );
     checkPromise("lastRPVersion");
 
     promises.isRPUpgrade =
@@ -110,7 +109,7 @@ export class VersionInfoService extends Module {
     checkPromise("isRPUpgrade");
 
     promises.curRPVersion =
-        browser.management.getSelf().
+        this.managementApi.getSelf().
         then((addon) => {
           infos.curRPVersion = addon.version;
           return infos.curRPVersion;
@@ -121,17 +120,13 @@ export class VersionInfoService extends Module {
     // app version info
     // -------------------------------------------------------------------------
 
-    promises.lastAppVersion =
-        browser.storage.local.get("lastAppVersion").
-        then((result) => {
-          infos.lastAppVersion =
-              result.lastAppVersion as IInfos["lastAppVersion"];
-          return infos.lastAppVersion;
-        });
+    promises.lastAppVersion = Promise.resolve(
+        this.cachedSettings.get("lastAppVersion") as IInfos["lastAppVersion"],
+    );
     checkPromise("lastAppVersion");
 
     promises.curAppVersion =
-        browser.runtime.getBrowserInfo().
+        this.runtimeApi.getBrowserInfo().
         then(({version}) => {
           infos.curAppVersion = version;
           return version;
@@ -145,7 +140,7 @@ export class VersionInfoService extends Module {
     return Promise.all(JSUtils.objectValues(promises)).then(() => {
       this.infos = infos as IInfos;
       const {curAppVersion, curRPVersion} = infos;
-      return browser.storage.local.set({
+      return this.cachedSettings.set({
         lastAppVersion: curAppVersion,
         lastVersion: curRPVersion,
       });

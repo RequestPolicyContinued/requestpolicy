@@ -112,6 +112,8 @@ const rulesServices = new RulesServices(log, v0RulesService);
 const versionComparator = { compare: compareVersions };
 const versionInfoService = new VersionInfoService(
     log, versionComparator, cachedSettings,
+    browser.management,
+    browser.runtime,
 );
 const rpServices = new RPServices(
     log, rulesServices, uriService, versionInfoService,

@@ -91,10 +91,13 @@ const asyncSettings = new AsyncSettings(
     storageReadyPromise,
 );
 dAsyncSettings.resolve(asyncSettings);
-const cachedSettings = new CachedSettings(log, {
-  boolAliases: SETTING_SPECS.boolAliases,
-  cachedKeys: SETTING_SPECS.cachedKeys,
-}, storageReadyPromise);
+const cachedSettings = new CachedSettings(
+    log,
+    SETTING_SPECS,
+    storageReadyPromise,
+    LegacyApi.rpPrefBranch, /* FIXME */
+    LegacyApi.prefsService, /* FIXME */
+);
 const storage = new Storage(
     log, asyncSettings, cachedSettings, storageReadyPromise,
 );

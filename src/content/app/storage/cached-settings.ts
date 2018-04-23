@@ -25,8 +25,6 @@ import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-declare const LegacyApi: API.ILegacyApi;
-
 export class CachedSettings extends Module {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
@@ -49,6 +47,8 @@ export class CachedSettings extends Module {
           boolAliases: Array<[string, string]>,
       },
       private storageReadyPromise: Promise<void>,
+      private rpPrefBranch: API.storage.IPrefBranch,
+      private prefsService: API.ILegacyApi["prefsService"],
   ) {
     super("app.storage.cachedSettings", log);
 
@@ -78,12 +78,12 @@ export class CachedSettings extends Module {
         console.error(`Key "${key} is not cached in Storage!`);
         return;
       }
-      return LegacyApi.rpPrefBranch.get(key);
+      return this.rpPrefBranch.get(key);
     }
     if (Array.isArray(aKeys)) {
       const result: {[key: string]: any} = {};
       aKeys.forEach((key) => {
-        result[key] = LegacyApi.rpPrefBranch.get(key);
+        result[key] = this.rpPrefBranch.get(key);
       });
       return result;
     }
@@ -94,9 +94,9 @@ export class CachedSettings extends Module {
     this.assertReady();
     try {
       Object.keys(aKeys).forEach((key) => {
-        LegacyApi.rpPrefBranch.set(key, aKeys[key]);
+        this.rpPrefBranch.set(key, aKeys[key]);
       });
-      LegacyApi.prefsService.savePrefFile(null);
+      this.prefsService.savePrefFile(null);
       return Promise.resolve();
     } catch (error) {
       console.error("Error when saving to storage! Details:");

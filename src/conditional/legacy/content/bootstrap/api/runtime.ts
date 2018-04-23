@@ -21,17 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
 
-declare const Services: any;
-
 export class Runtime extends Module {
   private events = createListenersMap(["onMessage"]);
 
-  constructor(log: Common.ILog) {
+  constructor(
+      log: Common.ILog,
+      private mozAppinfo: JSMs.Services["appinfo"],
+  ) {
     super("browser.runtime", log);
   }
 
@@ -55,7 +57,7 @@ export class Runtime extends Module {
   }
 
   private getBrowserInfo() {
-    const {name, vendor, version, appBuildID: buildID} = Services.appinfo;
+    const {name, vendor, version, appBuildID: buildID} = this.mozAppinfo;
     return Promise.resolve({name, vendor, version, buildID});
   }
 

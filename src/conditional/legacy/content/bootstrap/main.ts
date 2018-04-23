@@ -69,7 +69,7 @@ const localeData = new AsyncLocaleData(tryCatchUtils, chromeFileService);
 const i18n = new I18n(log, localeData);
 const management = new Management(log);
 const manifest = new Manifest(log, chromeFileService);
-const runtime = new Runtime(log);
+const runtime = new Runtime(log, Services.appinfo);
 
 const createPrefBranch = (
     branchRoot: string,

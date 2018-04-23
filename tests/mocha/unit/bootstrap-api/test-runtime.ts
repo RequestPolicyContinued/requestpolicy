@@ -17,13 +17,15 @@ import * as sinon from "sinon";
 import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
 import {Services as MockServices} from "./lib/mock-services";
 import {Components as MockComponents} from "./lib/mock-components";
+import { Runtime } from "bootstrap/api/runtime";
 
 describe("browser.runtime", function() {
-  let runtime = null;
+  let runtime: Runtime;
 
   before(function() {
     let mockComp = new MockComponents();
     let mockNu = new MockNetUtil();
+    let mockServices = new MockServices();
 
     // Stubbing in order to return a Manifest object with empty permissions
     // Needed because of manifestHasPermission() in api.js
@@ -48,9 +50,7 @@ describe("browser.runtime", function() {
     const log = new Log();
     const {AsyncLocaleData} = require("bootstrap/api/i18n/async-locale-data");
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
-    // eslint-disable-next-line no-unused-vars
-    let {Runtime} = require("bootstrap/api/runtime");
-    runtime = new Runtime(log);
+    runtime = new Runtime(log, mockServices as any);
   });
 
   describe("getURL(path)", function() {

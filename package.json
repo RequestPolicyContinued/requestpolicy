@@ -41,6 +41,6 @@
   },
   "dependencies": {
     "jquery": "^3.3.1",
-    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator"
+    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator#3b77635"
   }
 }

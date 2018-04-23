@@ -27,8 +27,20 @@ export class JSMService {
       private readonly cu: XPCOM.nsXPCComponents_Utils,
   ) {}
 
+  public getAddonManager(): JSMs.AddonManager {
+    return this.import("resource://gre/modules/AddonManager.jsm").AddonManager;
+  }
+
   public getFileUtils(): JSMs.FileUtils {
     return this.import("resource://gre/modules/FileUtils.jsm").FileUtils;
+  }
+
+  public getHttp(): JSMs.Http {
+    return this.import("resource://gre/modules/Http.jsm");
+  }
+
+  public getNetUtil(): JSMs.NetUtil {
+    return this.import("resource://gre/modules/NetUtil.jsm").NetUtil;
   }
 
   public getServices(): JSMs.Services {

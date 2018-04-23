@@ -8,21 +8,31 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// eslint-disable-next-line no-unused-vars
+import {JSMs} from "bootstrap/api/interfaces";
+
 const PREF_MATCH_OS_LOCALE = "intl.locale.matchOS";
 const PREF_SELECTED_LOCALE = "general.useragent.locale";
 
 // https://dxr.mozilla.org/comm-esr45/source/mozilla/toolkit/mozapps/extensions/AddonManager.jsm#283-308
 
-export function getAppLocale() {
+// eslint-disable-next-line valid-jsdoc
+/**
+ *
+ * @param {JSMs.Services["prefs"]} prefsService
+ * @param {JSMs.Services["locale"]} localeService
+ * @return {string}
+ */
+export function getAppLocale(prefsService, localeService) {
   try {
-    if (Services.prefs.getBoolPref(PREF_MATCH_OS_LOCALE)) {
-      return Services.locale.getLocaleComponentForUserAgent();
+    if (prefsService.getBoolPref(PREF_MATCH_OS_LOCALE)) {
+      return localeService.getLocaleComponentForUserAgent();
     }
     // eslint-disable-next-line no-empty
   } catch (e) {}
 
   try {
-    let locale = Services.prefs.getComplexValue(
+    let locale = prefsService.getComplexValue(
         PREF_SELECTED_LOCALE,
         Ci.nsIPrefLocalizedString
     );
@@ -31,7 +41,7 @@ export function getAppLocale() {
   } catch (e) {}
 
   try {
-    return Services.prefs.getCharPref(PREF_SELECTED_LOCALE);
+    return prefsService.getCharPref(PREF_SELECTED_LOCALE);
     // eslint-disable-next-line no-empty
   } catch (e) {}
 

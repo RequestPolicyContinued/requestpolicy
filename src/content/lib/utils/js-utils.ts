@@ -146,7 +146,7 @@ export function objectValues(obj: any): any[] {
  * @return {Array<number>}
  */
 export function range(n: number): number[] {
-  const array = [];
+  const array: number[] = [];
   for (let i = 0; i < n; i++) {
     array.push(i);
   }

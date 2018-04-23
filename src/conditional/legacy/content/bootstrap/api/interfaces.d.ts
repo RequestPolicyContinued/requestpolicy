@@ -78,6 +78,8 @@ export namespace XPCOM {
     ): void;
   }
 
+  export interface nsIDOMWindow extends nsISupports {}
+
   export interface nsIFile extends nsISupports {
     directoryEntries: nsISimpleEnumerator;
     diskSpaceAvailable: number;
@@ -161,6 +163,18 @@ export namespace XPCOM {
 
     addRequest(aRequest: nsIRequest, aContext: nsISupports): void;
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
+  }
+
+  interface nsILocale extends nsISupports {
+    getCategory(category: string): string;
+  }
+
+  export interface nsILocaleService extends nsISupports {
+    getApplicationLocale(): nsILocale;
+    getLocaleComponentForUserAgent(): string;
+    getLocaleFromAcceptLanguage(acceptLanguage: string): nsILocale;
+    getSystemLocale(): nsILocale;
+    newLocale(aLocale: string): nsILocale;
   }
 
   export interface nsIObserver_without_nsISupports<T extends nsISupports = nsISupports> {
@@ -399,6 +413,34 @@ export namespace XPCOM {
 }
 
 export namespace JSMs {
+  type AddonCallback = (addon: Addon) => void;
+  type AddonListCallback = (addons: Addon[]) => void;
+  type InstallCallback = (install: AddonInstall) => void;
+  type InstallListCallback = (installs: AddonInstall[]) => void;
+  interface Addon {}
+  interface AddonInstall {}
+  interface AddonListener {}
+  interface InstallListener {}
+  interface TypeListener {}
+  export interface AddonManager {
+    getAllInstalls(callback: InstallListCallback): void;
+    getInstallsByTypes(types: string[], callback: InstallListCallback): void;
+    installAddonsFromWebpage(mimetype: string, source: XPCOM.nsIDOMWindow, uri: XPCOM.nsIURI, installs: AddonInstall[]): void;
+    addInstallListener(listener: InstallListener): void;
+    removeInstallListener(listener: InstallListener): void;
+    getAllAddons(callback: AddonListCallback): void;
+    getAddonByID(id: string, callback: AddonCallback): void;
+    getAddonBySyncGUID(id: string, callback: AddonCallback): void;
+    getAddonsByIDs(ids: string[], callback: AddonListCallback): void;
+    getAddonsByTypes(types: string[], callback: AddonListCallback): void;
+    getAddonsWithOperationsByTypes(types: string[], callback: AddonListCallback): void;
+    addAddonListener(listener: AddonListener): void;
+    removeAddonListener(listener: AddonListener): void;
+    addTypeListener(listener: TypeListener): void;
+    removeTypeListener(listener: TypeListener): void;
+    getURIForResourceInFile(aFile: XPCOM.nsIFile, aPath: string): XPCOM.nsIURI;
+  }
+
   export interface IHttpRequestOptions {
     headers?: string[];
     postData?: string | string[] | null | undefined;
@@ -465,6 +507,7 @@ export namespace JSMs {
 
   export interface Services {
     appinfo: XPCOM.nsIXULAppInfo & XPCOM.nsIXULRuntime;
+    locale: XPCOM.nsILocaleService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
     vc: XPCOM.nsIVersionComparator;
   }

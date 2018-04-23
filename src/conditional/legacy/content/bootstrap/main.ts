@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { JSMService } from "bootstrap/api/services/jsm-service";
 import { Log } from "lib/classes/log";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { Api } from "./api/api.module";
@@ -49,25 +50,22 @@ const log = new Log();
 declare const Services: JSMs.Services;
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
-const {
-  NetUtil: mozNetUtil,
-} = Cu.import("resource://gre/modules/NetUtil.jsm") as {
-  NetUtil: JSMs.NetUtil,
-};
-const mozHttp = Cu.import("resource://gre/modules/Http.jsm") as JSMs.Http;
-const {
-  FileUtils: mozFileUtils,
-} = Cu.import("resource://gre/modules/FileUtils.jsm") as {
-  FileUtils: JSMs.FileUtils,
-};
+const jsmService = new JSMService(Cu);
+const mozAddonManager = jsmService.getAddonManager();
+const mozNetUtil = jsmService.getNetUtil();
+const mozHttp = jsmService.getHttp();
+const mozFileUtils = jsmService.getFileUtils();
+const mozServices = jsmService.getServices();
 
 const extension = new Extension(log);
 const xpconnectService = new XPConnectService();
 const fileService = new FileService(xpconnectService, mozFileUtils);
 const chromeFileService = new ChromeFileService(mozNetUtil, mozHttp);
-const localeData = new AsyncLocaleData(tryCatchUtils, chromeFileService);
+const localeData = new AsyncLocaleData(
+    tryCatchUtils, chromeFileService, mozServices,
+);
 const i18n = new I18n(log, localeData);
-const management = new Management(log);
+const management = new Management(log, mozAddonManager);
 const manifest = new Manifest(log, chromeFileService);
 const runtime = new Runtime(log, Services.appinfo);
 

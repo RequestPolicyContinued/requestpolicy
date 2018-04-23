@@ -75,7 +75,7 @@ export class V0RulesService extends Module {
     const origins = splitString(aPrefStrings.origins);
     const originsToDests = splitString(aPrefStrings.originsToDests);
 
-    const rules = [];
+    const rules: IRuleSpec[] = [];
 
     // tslint:disable-next-line prefer-const
     for (let origin of origins) {

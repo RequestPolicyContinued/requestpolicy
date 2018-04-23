@@ -500,7 +500,9 @@ pycodestyle: python-packages
 	@$(PY_PYCODESTYLE) tests/marionette/
 ts: node-packages
 	@echo $@
-	@$(TSC)
+	@$(TSC) --noEmit
+	@#$(TSC) --noEmit -p tests/mocha     # failing
+	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
 	@echo $@
 	@$(TSLINT) --project tsconfig.json \

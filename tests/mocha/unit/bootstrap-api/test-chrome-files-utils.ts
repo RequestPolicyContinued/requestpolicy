@@ -19,12 +19,11 @@ const {assert, expect} = chai;
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
-import {Components as MockComponents} from "./lib/mock-components";
 import {ChromeFileService} from "bootstrap/api/services/chrome-file-service";
 
 describe("ChromeFileService", function() {
-  let chromeFileService: ChromeFileService = null;
-  let stubHttpRequest = null;
+  let chromeFileService: ChromeFileService;
+  let stubHttpRequest;
 
   before(function() {
     const mockNetUtil = new MockNetUtil();
@@ -68,7 +67,7 @@ describe("ChromeFileService", function() {
 
   describe("readDirectory(chromePath)", function() {
     it("Should be rejected if path is null", function() {
-      let promise = chromeFileService.readDirectory(null);
+      let promise = chromeFileService.readDirectory(null as any);
       return expect(promise).to.be.rejectedWith(Error);
     });
 

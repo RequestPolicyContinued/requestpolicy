@@ -20,7 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export class MapOfCustomSets<K, V, S extends Set<V>> {
+import { OverridableSet } from "lib/classes/set";
+
+export class MapOfCustomSets<K, V, S extends Set<V> | OverridableSet<V>> {
   private map: Map<K, S>;
   private getNewSet: () => S;
 

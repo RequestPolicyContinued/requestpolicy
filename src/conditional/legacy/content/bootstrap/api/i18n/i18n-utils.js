@@ -45,7 +45,7 @@ export function normalizeToBCP47(tag) {
  *
  * @param {Array} availableLocales list of BCP 47 tags of available locales
  * @param {String} locale canonicalized BCP 47 tag of requested locale
- * @return {String} Best match BCP 47 tag
+ * @return {String|undefined} Best match BCP 47 tag
  */
 export function getBestAvailableLocale(availableLocales, locale) {
   let lcAvailable = availableLocales.map((l) => l.toLowerCase());

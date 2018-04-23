@@ -38,7 +38,7 @@ export class Listeners extends OverridableSet<Listener> {
   };
 
   public emit(...args: any[]) {
-    const returnValues = [];
+    const returnValues: any[] = [];
     let withPromises = false;
     // tslint:disable-next-line prefer-const
     for (let listener of this.values()) {

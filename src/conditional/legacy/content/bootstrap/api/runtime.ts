@@ -87,7 +87,7 @@ export class Runtime extends Module {
     // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"
     const patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
 
-    let legacyPath = null;
+    let legacyPath: string;
 
     if (patternAbout.test(path)) {
       legacyPath = path.replace(patternAbout, "about:requestpolicy?$1");

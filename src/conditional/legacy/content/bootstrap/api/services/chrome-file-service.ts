@@ -46,7 +46,10 @@ public readDirectory(aChromeUrl: string) {
   }
 
   return this.sendHttpGet(chromeUrl).then((responseText) => {
-    const fileList = [];
+    const fileList: Array<{
+      isDir: boolean,
+      name: string,
+    }> = [];
     // The http response contains in each line:
     // 201: filename content-length last-modified file-type
     // We capture the filename and file-type

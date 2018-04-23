@@ -80,6 +80,11 @@ export abstract class Module implements IModule {
   ) {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false});
+
+    setTimeout(() => {
+      if (this.ready) return;
+      this.log.error(`not ready even after 5 seconds!`);
+    }, 5000);
   }
 
   public async startup(): Promise<void> {

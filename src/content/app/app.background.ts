@@ -62,6 +62,8 @@ import { Ui } from "./ui/ui.module";
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
+const localStorageArea = browser.storage.local;
+
 const settingsMigration = new SettingsMigration(log, browser.storage.local);
 const storageReadyPromise = settingsMigration.whenReady;
 
@@ -74,8 +76,8 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   tryCatchUtils: LegacyApi.tryCatchUtils,
 } : null;
 
-const rulesetStorage = new RulesetStorage(log);
-const subscriptions = new Subscriptions(log, rulesetStorage);
+const rulesetStorage = new RulesetStorage(log, localStorageArea);
+const subscriptions = new Subscriptions(log, rulesetStorage, localStorageArea);
 const policy = new Policy(log, subscriptions, rulesetStorage);
 
 const asyncSettings = new AsyncSettings(

@@ -22,7 +22,6 @@
 
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
-import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
 

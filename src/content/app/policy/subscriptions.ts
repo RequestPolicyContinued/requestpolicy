@@ -52,6 +52,7 @@ export class Subscriptions extends Module {
   constructor(
       log: Common.ILog,
       private rulesetStorage: RulesetStorage,
+      private storageArea: browser.storage.StorageArea,
   ) {
     super("rules", log);
 
@@ -64,7 +65,7 @@ export class Subscriptions extends Module {
   }
 
   public loadSubscriptionRules() {
-    const pDone = browser.storage.local.get(
+    const pDone = this.storageArea.get(
         "subscriptions",
     ).then((result) => {
       const rawData = result.hasOwnProperty("subscriptions") ?

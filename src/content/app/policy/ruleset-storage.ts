@@ -26,7 +26,10 @@ import {Module} from "lib/classes/module";
 import {RawRuleset} from "lib/ruleset";
 
 export class RulesetStorage extends Module {
-  constructor(log: Common.ILog) {
+  constructor(
+      log: Common.ILog,
+      private storageArea: browser.storage.StorageArea,
+  ) {
     super("RulesetStorage", log);
   }
 
@@ -35,7 +38,7 @@ export class RulesetStorage extends Module {
       subscriptionListName?: string,
   ) {
     const key = this.getKey(policyName, subscriptionListName);
-    const pResult = browser.storage.local.get(key);
+    const pResult = this.storageArea.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
       return RawRuleset.create(aResult[key]);
@@ -52,7 +55,7 @@ export class RulesetStorage extends Module {
       subscriptionListName?: string,
   ) {
     const key = this.getKey(policyName, subscriptionListName);
-    const p = browser.storage.local.set({
+    const p = this.storageArea.set({
       [key]: policy as any, // FIXME (as any)
     });
     p.catch((e) => {

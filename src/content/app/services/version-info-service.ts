@@ -93,7 +93,7 @@ export class VersionInfoService extends Module {
     promises.lastRPVersion =
         browser.storage.local.get("lastVersion").
         then((result) => {
-          infos.lastRPVersion = result.lastRPVersion as IInfos["lastRPVersion"];
+          infos.lastRPVersion = result.lastVersion as IInfos["lastRPVersion"];
           return infos.lastRPVersion;
         });
     checkPromise("lastRPVersion");

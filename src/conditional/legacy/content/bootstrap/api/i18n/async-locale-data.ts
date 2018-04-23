@@ -21,6 +21,7 @@
  */
 
 import { API, JSMs } from "bootstrap/api/interfaces";
+import { IModule } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 import * as I18nUtils from "./i18n-utils";
 import {LocaleData} from "./locale-data";
@@ -28,7 +29,7 @@ import {LocaleData} from "./locale-data";
 /**
  * This object manages loading locales for i18n support.
  */
-export class AsyncLocaleData extends LocaleData {
+export class AsyncLocaleData extends LocaleData implements IModule {
   private dReady = defer();
 
   constructor(

@@ -16,6 +16,7 @@ import {C} from "data/constants";
 import {Log, LogLevel} from "lib/classes/log";
 import { defer } from "lib/utils/js-utils";
 import * as Sinon from "sinon";
+import { resetConsoleErrors } from "../../lib/utils";
 
 describe("Log", () => {
   const sinon = Sinon.sandbox.create();
@@ -144,7 +145,7 @@ describe("Log", () => {
             dEnabled.resolve(false);
           });
 
-          it("does log after promise is resolved w/ true", async function() {
+          it("does log as soon as promise is resolved w/ true", async function() {
             // setup
             stubConsoleFn(fnName);
             const spiedFn = console[fnName] as Sinon.SinonSpy;
@@ -159,6 +160,23 @@ describe("Log", () => {
             // verify
             sinon.assert.calledOnce(spiedFn);
             sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] test`);
+          });
+
+          it("does log immediately in case the promise is already resolved", async function() {
+            // setup
+            stubConsoleFn(fnName);
+            const spiedFn = console[fnName] as Sinon.SinonSpy;
+            const dEnabled = defer<boolean>();
+            const log = new Log({enabled: dEnabled.promise, level: "all"});
+            dEnabled.resolve(true);
+            await dEnabled.promise;
+
+            // exercise
+            log[fnName]("test");
+
+            // verify
+            sinon.assert.calledOnce(spiedFn);
+            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}test`);
           });
 
           if (fnName !== "error") {
@@ -285,6 +303,24 @@ describe("Log", () => {
       test_level("ALL", LogLevel.ALL);
     });
 
+    it("logs an error when resolved with a non-boolean value", async function() {
+      // setup
+      sinon.stub(console, "dir");
+      sinon.stub(console, "trace");
+      const errorFn = console.error as Sinon.SinonSpy & typeof console.error;
+      const dEnabled = defer<any>();
+      const log = new Log({enabled: dEnabled.promise, level: "all"});
+
+      // exercise
+      dEnabled.resolve(0);
+      await dEnabled.promise;
+
+      // verify
+      sinon.assert.called(errorFn);
+      assert.strictEqual(log.enabled, true, "The log is enabled due to an error.");
+      resetConsoleErrors();
+    });
+
     it("works with extended logs", async function() {
       // setup
       stubConsoleFn("info");
@@ -300,10 +336,23 @@ describe("Log", () => {
       dEnabled.resolve(true);
       await Promise.resolve();
 
-      // verify (2)
+      // verify
       sinon.assert.calledTwice(spiedFn);
       sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] mainLog`);
       sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] log`);
     });
   });
+
+  describe("[other tests]", function() {
+    it("setEnabled() throws an error when called with a non-boolean value", function() {
+      // setup
+      sinon.stub(console, "dir");
+      sinon.stub(console, "trace");
+      const log = new Log({enabled: false});
+
+      // exercise & verify
+      assert.throws(() => log.setEnabled(0 as any));
+      resetConsoleErrors();
+    });
+  })
 });

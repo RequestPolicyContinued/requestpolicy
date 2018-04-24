@@ -216,6 +216,12 @@ export class Log implements Common.ILog {
       const delayedLog: IDelayedLogArgs[] = [];
       this.ownDelayedLogs.set(pEnabled, delayedLog);
       pEnabled.then((finallyEnabled) => {
+        if (typeof finallyEnabled !== "boolean") {
+          console.error(`[${this.ownInternalOptions.prefix}] promise was ` +
+              `resolved with a non-boolean value! Using 'true' instead.`);
+          console.dir(finallyEnabled);
+          finallyEnabled = true;
+        }
         if (this.ownInternalOptions.enabled === pEnabled) {
           this.ownInternalOptions.enabled = finallyEnabled;
         }
@@ -230,6 +236,8 @@ export class Log implements Common.ILog {
         console.error(`An error occurred:`);
         console.dir(e);
       });
+    } else if (typeof enabled !== "boolean") {
+      throw new Error(`'${enabled}' is not boolean!`);
     }
     this.ownInternalOptions.enabled = enabled;
   }

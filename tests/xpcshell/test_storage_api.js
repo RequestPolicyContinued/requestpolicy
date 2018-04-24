@@ -102,6 +102,7 @@ add_test(function() {
 // onChanged
 //
 
+// pref change
 [true, 42, "someValue"].forEach((testValue) => {
   add_test(function() {
     // setup
@@ -142,7 +143,48 @@ add_test(function() {
   });
 });
 
-// removed pref
+// pref creation
+[true, 42, "someValue"].forEach((testValue) => {
+  add_test(function() {
+    // setup
+    rpPrefBranch.reset("someRandomPrefName");
+    let observedEvent;
+    const dListenerFnCalled = defer();
+    let listenerFn = (event) => {
+      observedEvent = event;
+      dListenerFnCalled.resolve(undefined);
+    };
+    const storageApi = createStorageApi();
+    storageApi.startup();
+    do_test_pending();
+    storageApi.whenReady.then(() => {
+      storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+      // exercise
+      rpPrefBranch.set("someRandomPrefName", testValue);
+
+      return dListenerFnCalled.promise;
+    }).then(() => {
+      // verify
+      Assert.deepEqual(observedEvent, {changes: {newValue: testValue}});
+
+      // cleanup
+      storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+      rpPrefBranch.reset("someRandomPrefName");
+      storageApi.shutdown();
+
+      do_test_finished();
+      return;
+    }).catch((e) => {
+      console.dir(e);
+      Assert.ok(false, e);
+    });
+
+    run_next_test();
+  });
+});
+
+// pref removed
 add_test(function() {
   // setup
   rpPrefBranch.set("someRandomPrefName", "foo");

@@ -21,9 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { IUri } from "lib/classes/uri";
-import { Log } from "models/log";
 
 declare const Cc: any;
 declare const Ci: any;
@@ -52,7 +52,7 @@ enum HostLevel {
 export class UriService extends Module {
   public get hostLevels() { return HostLevel; }
 
-  constructor(log: Log, nameRoot = "app") {
+  constructor(log: Common.ILog, nameRoot = "app") {
     super(`${nameRoot}.services.uri`, log);
   }
 

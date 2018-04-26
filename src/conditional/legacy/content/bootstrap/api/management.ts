@@ -20,25 +20,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { IListenInterface } from "lib/classes/listeners";
+import { API, JSMs } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
-import { Log } from "models/log";
-
-const {AddonManager} = Cu.import("resource://gre/modules/AddonManager.jsm", {});
 
 type Addon = any;
 type ExtensionInfo = browser.management.ExtensionInfo;
 type AddonListenerCallback =
     "onEnabled" | "onDisabled" | "onInstalled" | "onUninstalled";
 
-export class Management extends Module {
-  public onEnabled: IListenInterface;
-  public onDisabled: IListenInterface;
-  public onInstalled: IListenInterface;
-  public onUninstalled: IListenInterface;
-
-  private addonListener: any = {};
+export class Management extends Module implements API.management.IManagement {
+  private addonListener = {
+    onDisabled: this.onAddonListenerEvent.bind(this, "onDisabled"),
+    onEnabled: this.onAddonListenerEvent.bind(this, "onEnabled"),
+    onInstalled: this.onAddonListenerEvent.bind(this, "onInstalled"),
+    onUninstalled: this.onAddonListenerEvent.bind(this, "onUninstalled"),
+  };
 
   private MANAGEMENT_EVENTS = Object.freeze([
     "onEnabled",
@@ -49,13 +47,11 @@ export class Management extends Module {
 
   private events = createListenersMap(this.MANAGEMENT_EVENTS);
 
-  constructor(log: Log) {
+  constructor(
+      log: Common.ILog,
+      private addonManager: JSMs.AddonManager,
+  ) {
     super("browser.management", log);
-
-    this.MANAGEMENT_EVENTS.forEach((aEvent) => {
-      this.addonListener[aEvent] =
-          this.onAddonListenerEvent.bind(this, aEvent);
-    });
   }
 
   public get backgroundApi() {
@@ -73,7 +69,7 @@ export class Management extends Module {
 
   public get(aId: string) {
     const p = new Promise((resolve, reject) => {
-      AddonManager.getAddonByID(aId, (addon: Addon) => {
+      this.addonManager.getAddonByID(aId, (addon: Addon) => {
         try {
           if (addon) {
             resolve(this.mapAddonInfoToWebextExtensionInfo(addon));
@@ -98,9 +94,9 @@ export class Management extends Module {
   }
 
   public getAll() {
-    const pExtensionInfo = new Promise((resolve) => (
-      AddonManager.getAllAddons(resolve)
-    )).then((addons: any[]) => (
+    const pExtensionInfo = new Promise<JSMs.Addon[]>((resolve) => (
+      this.addonManager.getAllAddons(resolve)
+    )).then((addons) => (
       addons.map(this.mapAddonInfoToWebextExtensionInfo)
     ));
     pExtensionInfo.catch(this.log.onError("getAll()"));
@@ -112,11 +108,11 @@ export class Management extends Module {
   }
 
   protected async startupSelf() {
-    AddonManager.addAddonListener(this.addonListener);
+    this.addonManager.addAddonListener(this.addonListener);
   }
 
   protected async shutdownSelf() {
-    AddonManager.removeAddonListener(this.addonListener);
+    this.addonManager.removeAddonListener(this.addonListener);
   }
 
   private mapAddonInfoToWebextExtensionInfo(aAddon: Addon): ExtensionInfo {

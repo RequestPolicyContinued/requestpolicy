@@ -21,13 +21,14 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class Manifest extends Module {
   public data: any;
 
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       private chromeFileService: API.services.IChromeFileService,
   ) {
     super("manifest", log);

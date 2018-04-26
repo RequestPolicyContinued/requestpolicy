@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-declare const LegacyApi: any;
-
 import {rp} from "app/app.background";
+import {log} from "app/log";
+import { API } from "bootstrap/api/interfaces";
 import {C} from "data/constants";
 import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";
 import {Environment, MainEnvironment} from "lib/environment";
@@ -34,15 +34,15 @@ import {
 } from "lib/subscription";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import {Log} from "models/log";
 import * as Metadata from "models/metadata";
 import {Requests} from "models/requests";
+
+declare const LegacyApi: API.ILegacyApi;
 
 export const BackgroundPage = {
   C,
   Environment,
   LegacyApi,
-  Log,
   MainEnvironment,
   ManagerForPrefObservers,
   Metadata,
@@ -53,5 +53,6 @@ export const BackgroundPage = {
   SUBSCRIPTION_REMOVED_TOPIC,
   WindowUtils,
   XpcomUtils,
+  log,
   rp,
 };

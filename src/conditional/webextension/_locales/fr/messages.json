@@ -234,34 +234,9 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "Préchargement des liens",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Préchargement DNS",
-    "description": "DNS Prefetching"
-  },
-
-  "speculativePreConnections": {
-    "message": "Pré-connexions spéculatives",
-    "description": "Speculative pre-connections"
-  },
-
   "enabled": {
     "message": "Activé",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Désactiver au démarrage",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Rétablir les paramètres par défaut lorsque RequestPolicy est désinstallé",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

@@ -500,11 +500,14 @@ pycodestyle: python-packages
 	@$(PY_PYCODESTYLE) tests/marionette/
 ts: node-packages
 	@echo $@
-	@$(TSC)
+	@$(TSC) --noEmit
+	@#$(TSC) --noEmit -p tests/mocha     # failing
+	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
 	@echo $@
 	@$(TSLINT) --project tsconfig.json \
 		--exclude '**/third-party/**/*' \
+		--exclude '**/*.d.ts' \
 		'src/**/*.ts' \
 		| $(_remove_leading_empty_lines)
 

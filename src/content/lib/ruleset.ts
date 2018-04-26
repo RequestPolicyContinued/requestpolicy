@@ -22,11 +22,9 @@
  */
 
 import { rp } from "app/app.background";
+import { log } from "app/log";
 import {C} from "data/constants";
 import {IUri} from "lib/classes/uri";
-import {Log} from "models/log";
-
-const log = Log.instance;
 
 // =============================================================================
 // utilities
@@ -137,14 +135,17 @@ function dump(arr, level=0) {
 // =============================================================================
 
 export class RawRuleset implements IRawRuleset {
-  public static create(data?: IMaybeIncompleteRawRuleset) {
+  public static create(aData?: any) {
     let metadata: IMetadata = {version: 1};
     let entries: IMaybeRuleSpecs = {};
-    if (data) {
+    if (aData) {
       // TODO: sanity check imported data, decide whether to ignore unrecognized
       // keys.
-      // TODO: wrap in try/catch block
-      RawRuleset.checkDataObj(data);
+      const checkResult = RawRuleset.checkDataObj(aData);
+      if (!checkResult.valid) {
+        throw new Error(`Invalid policy data: ${checkResult.error}`);
+      }
+      const data = aData as IMaybeIncompleteRawRuleset;
       metadata = data.metadata;
       entries = data.entries;
     }
@@ -157,25 +158,29 @@ export class RawRuleset implements IRawRuleset {
     return new RawRuleset(metadata, entries as IRuleSpecs);
   }
 
-  private static checkDataObj(dataObj: IMaybeIncompleteRawRuleset) {
+  private static checkDataObj(
+      dataObj: any,
+  ): {valid: true} | {valid: false, error: string} {
+    if (typeof dataObj !== "object") {
+      return {valid: false, error: "not an object"};
+    }
     if (!("metadata" in dataObj)) {
-      // eslint-disable-next-line no-throw-literal
-      throw new Error("Invalid policy data: no 'metadata' key");
+      return {valid: false, error: "no 'metadata' key"};
     }
     if (!("version" in dataObj.metadata)) {
-      // eslint-disable-next-line no-throw-literal
-      throw new Error("Invalid policy data: no 'version' key");
+      return {valid: false, error: "no 'version' key"};
     }
     if (dataObj.metadata.version !== 1) {
-      // eslint-disable-next-line no-throw-literal
-      throw new Error(
-          "Wrong metadata version. Expected 1, was " +
-          dataObj.metadata.version);
+      return {
+        error: `Wrong metadata version. ` +
+            `Expected 1, was ${dataObj.metadata.version}`,
+        valid: false,
+      };
     }
     if (!("entries" in dataObj)) {
-      // eslint-disable-next-line no-throw-literal
-      throw new Error("Invalid policy data: no 'entries' key");
+      return {valid: false, error: "no 'entries' key"};
     }
+    return {valid: true};
   }
 
   public readonly metadata: IMetadata;

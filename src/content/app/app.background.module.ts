@@ -20,28 +20,26 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RPServices } from "app/services/services.module";
+import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
-import { Migration } from "./migration/migration.module";
-import { Policy } from "./policy/policy.module";
-import { Storage } from "./storage/storage.module";
-import { Ui } from "./ui/ui.module";
 
 export class AppBackground extends Module {
   constructor(
-      log: Log,
-      public readonly migration: Migration,
-      public readonly policy: Policy,
-      public readonly services: RPServices,
-      public readonly storage: Storage,
-      public readonly ui: Ui,
+      log: Common.ILog,
+      public readonly browserSettings: App.IBrowserSettings,
+      public readonly migration: App.IMigration,
+      public readonly policy: App.IPolicy,
+      public readonly services: App.IRPServices,
+      public readonly storage: App.IStorage,
+      public readonly ui: App.IUi,
   ) {
     super("App", log);
   }
 
-  public get subModules() {
+  protected get subModules() {
     return {
+      browserSettings: this.browserSettings,
       migration: this.migration,
       policy: this.policy,
       services: this.services,

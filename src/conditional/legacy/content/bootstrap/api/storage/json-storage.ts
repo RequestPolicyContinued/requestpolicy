@@ -23,7 +23,7 @@
 import { API } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 
-export class JsonStorage {
+export class JsonStorage implements API.storage.IJsonStorage {
   constructor(
       private filesService: API.services.IFileService,
   ) {}
@@ -55,6 +55,13 @@ export class JsonStorage {
     const file = this.getFile(aKey);
     const newContents = JSON.stringify(aValue);
     this.filesService.stringToFile(newContents, file);
+  }
+
+  public remove(aKey: string) {
+    this.assertValidKey(aKey);
+    const file = this.getFile(aKey);
+    if (!file.exists()) return;
+    file.remove(false);
   }
 
   private assertValidKey(aKey: string) {

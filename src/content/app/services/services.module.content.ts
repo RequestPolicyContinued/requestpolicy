@@ -21,12 +21,12 @@
  */
 
 import { UriService } from "app/services/uri-service";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class RPContentServices extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
       public readonly uri: UriService,
   ) {
     super("AppContent.services", log);

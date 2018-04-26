@@ -1,6 +1,9 @@
-/* exported Cc, Ci, Cr, Cu, require */
+/* exported Cc, Ci, Cr, Cu, console, require */
 
-const {Cc, Ci, Cr, Cu, require} = (function() {
+const {
+  // @ts-ignore
+  Cc, Ci, Cr, Cu, console, require,
+} = (function() {
   const {
     classes: Cc,
     interfaces: Ci,
@@ -53,8 +56,6 @@ const {Cc, Ci, Cr, Cu, require} = (function() {
 
   const RUN_ID = Math.random();
 
-  const LegacyApi = {};
-
   function getGlobals() {
     return {
       Cc, Ci, Cm, Cr, Cu,
@@ -66,8 +67,6 @@ const {Cc, Ci, Cr, Cu, require} = (function() {
       clearTimeout,
       console,
       setTimeout,
-
-      LegacyApi,
     };
   }
 
@@ -100,27 +99,5 @@ const {Cc, Ci, Cr, Cu, require} = (function() {
   const COMMONJS = createCommonjsEnv();
   const require = COMMONJS.load.bind(COMMONJS);
 
-  // -----------------------------------------------------------------------------
-  // LegacyApi
-  // -----------------------------------------------------------------------------
-
-  const {Prefs} = require("bootstrap/api/storage/prefs");
-  const {PrefBranch} = require("bootstrap/api/storage/pref-branch");
-  const TryCatchUtils = require("lib/utils/try-catch-utils");
-
-  const prefBranchFactory = (branchRoot, namesToTypesMap) => new PrefBranch(
-      Services.prefs, branchRoot, namesToTypesMap
-  );
-
-  LegacyApi.prefs = new Prefs(Services.prefs, prefBranchFactory, TryCatchUtils);
-
-  // -----------------------------------------------------------------------------
-  // Load the default preferences
-  // -----------------------------------------------------------------------------
-
-  const {DefaultPreferencesController} =
-      require("bootstrap/controllers/default-preferences-controller");
-  DefaultPreferencesController.startup();
-
-  return {Cc, Ci, Cr, Cu, require};
+  return {Cc, Ci, Cr, Cu, console, require};
 })();

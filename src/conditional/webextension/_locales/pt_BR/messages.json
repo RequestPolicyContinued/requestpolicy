@@ -139,29 +139,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Pré-carregamento de links",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Pré-busca de nomes de domínio (DNS)",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Ativo",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Desativado ao iniciar o navegador",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Restaurar padrão quando RequestPolicy for desinstalado",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

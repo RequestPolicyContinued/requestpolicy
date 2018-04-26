@@ -78,12 +78,52 @@ export namespace XPCOM {
     ): void;
   }
 
+  export interface nsIDOMWindow extends nsISupports {}
+
   export interface nsIFile extends nsISupports {
     directoryEntries: nsISimpleEnumerator;
+    diskSpaceAvailable: number;
+    fileSize: number;
+    fileSizeOfLink: number;
+    followLinks: boolean;
+    lastModifiedTime: number;
+    lastModifiedTimeOfLink: number;
     leafName: string;
+    parent: nsIFile;
+    path: string;
+    permissions: number;
+    permissionsOfLink: number;
+    persistentDescriptor: string;
+    target: string;
+
+    append(node: string): void;
+    appendRelativePath(relativeFilePath: string): void;
+    clone(): nsIFile;
+    contains(inFile: nsIFile): boolean;
+    copyTo(newParentDir: nsIFile, newName: string): void;
+    copyToFollowingLinks(newParentDir: nsIFile, newName: string): void;
+    create(type: number, permissions: number): void;
+    createUnique(type: number, permissions: number): void;
+    equals(inFile: nsIFile): boolean;
     exists(): boolean;
-    isFile(): boolean;
+    getRelativeDescriptor(fromFile: nsIFile): string;
+    initWithFile(aFile: nsIFile): void;
+    initWithPath(filePath: string): void;
     isDirectory(): boolean;
+    isExecutable(): boolean;
+    isFile(): boolean;
+    isHidden(): boolean;
+    isReadable(): boolean;
+    isSpecial(): boolean;
+    isSymlink(): boolean;
+    isWritable(): boolean;
+    launch(): void;
+    moveTo(newParentDir: nsIFile, newName: string): void;
+    normalize(): void;
+    remove(recursive: boolean): void;
+    renameTo(newParentDir: nsIFile, newName: string): void;
+    reveal(): void;
+    setRelativeDescriptor(fromFile: nsIFile, relativeDesc: string): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIFileStreams.idl
@@ -125,9 +165,23 @@ export namespace XPCOM {
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
   }
 
-  export interface nsIObserver extends nsISupports {
-    observe(aSubject: nsISupports, aTopic: string, aData: string): void;
+  interface nsILocale extends nsISupports {
+    getCategory(category: string): string;
   }
+
+  export interface nsILocaleService extends nsISupports {
+    getApplicationLocale(): nsILocale;
+    getLocaleComponentForUserAgent(): string;
+    getLocaleFromAcceptLanguage(acceptLanguage: string): nsILocale;
+    getSystemLocale(): nsILocale;
+    newLocale(aLocale: string): nsILocale;
+  }
+
+  export interface nsIObserver_without_nsISupports<T extends nsISupports = nsISupports> {
+    observe(aSubject: T, aTopic: string, aData: string): void;
+  }
+  export type nsIObserver<T extends nsISupports = nsISupports> =
+      nsIObserver_without_nsISupports<T> & nsISupports;
 
   export interface nsIObserverService extends nsISupports {
     addObserver(anObserver: nsIObserver, aTopic: string, ownsWeak: boolean): void;
@@ -146,18 +200,19 @@ export namespace XPCOM {
   }
 
   export interface nsIPrefBranch extends nsISupports {
-    addObserver(aDomain: string, aObserver: nsIObserver, aHoldWeak: boolean): void;
+    addObserver(aDomain: string, aObserver: nsIObserver_without_nsISupports, aHoldWeak: boolean): void;
     clearUserPref(aPrefName: string): void;
     deleteBranch(aStartingAt: string): void;
     getBoolPref(aPrefName: string): boolean;
     getCharPref(aPrefName: string): string;
-    getComplexValue(aPrefName: string, aType: nsIJSID): nsIJSID;
+    getChildList(aStartingAt: string, aCount?: {value: number}): string[];
+    getComplexValue<T extends nsISupports>(aPrefName: string, aType: nsIJSID): T;
     getIntPref(aPrefName: string): number;
     getPrefType(aPrefName: string): number;
     lockPref(aPrefName: string): void;
     prefHasUserValue(aPrefName: string): boolean;
     prefIsLocked(aPrefName: string): boolean;
-    removeObserver(aDomain: string, aObserver: nsIObserver): void;
+    removeObserver(aDomain: string, aObserver: nsIObserver_without_nsISupports): void;
     resetBranch(aStartingAt: string): void;
     setBoolPref(aPrefName: string, aValue: boolean): void;
     setCharPref(aPrefName: string, aValue: string): void;
@@ -230,6 +285,35 @@ export namespace XPCOM {
         aOffset: number,
         aCount: number,
     ): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISupportsPrimitives.idl
+  interface nsISupportsPrimitive extends nsISupports {
+    type: number;
+
+    TYPE_ID:                 1;  // nsISupportsID
+    TYPE_CSTRING:            2;  // nsISupportsCString
+    TYPE_STRING:             3;  // nsISupportsString
+    TYPE_PRBOOL:             4;  // nsISupportsPRBool
+    TYPE_PRUINT8:            5;  // nsISupportsPRUint8
+    TYPE_PRUINT16:           6;  // nsISupportsPRUint16
+    TYPE_PRUINT32:           7;  // nsISupportsPRUint32
+    TYPE_PRUINT64:           8;  // nsISupportsPRUint64
+    TYPE_PRTIME:             9;  // nsISupportsPRTime
+    TYPE_CHAR:              10;  // nsISupportsChar
+    TYPE_PRINT16:           11;  // nsISupportsPRInt16
+    TYPE_PRINT32:           12;  // nsISupportsPRInt32
+    TYPE_PRINT64:           13;  // nsISupportsPRInt64
+    TYPE_FLOAT:             14;  // nsISupportsFloat
+    TYPE_DOUBLE:            15;  // nsISupportsDouble
+    TYPE_VOID:              16;  // nsISupportsVoid
+    TYPE_INTERFACE_POINTER: 17;  // nsISupportsInterfacePointer
+  }
+
+  interface nsISupportsString extends nsISupportsPrimitive {
+    type: nsISupportsPrimitive["TYPE_STRING"];
+    data: string;
+    toString(): string;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIUnicharInputStream.idl
@@ -309,6 +393,7 @@ export namespace XPCOM {
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-output-stream;1": XPCOM.nsIJSCID;
+    "@mozilla.org/supports-string;1": XPCOM.nsIJSCID;
   }
 
   export interface nsXPCComponents_Interfaces {
@@ -321,9 +406,41 @@ export namespace XPCOM {
     nsIPrefBranch2: XPCOM.nsIJSID;
     nsISupportsString: XPCOM.nsIJSID;
   }
+
+  export interface nsXPCComponents_Utils {
+    import<T = any>(aResourceURI: string, targetObj?: any): T;
+  }
 }
 
 export namespace JSMs {
+  type AddonCallback = (addon: Addon) => void;
+  type AddonListCallback = (addons: Addon[]) => void;
+  type InstallCallback = (install: AddonInstall) => void;
+  type InstallListCallback = (installs: AddonInstall[]) => void;
+  interface Addon {}
+  interface AddonInstall {}
+  interface AddonListener {}
+  interface InstallListener {}
+  interface TypeListener {}
+  export interface AddonManager {
+    getAllInstalls(callback: InstallListCallback): void;
+    getInstallsByTypes(types: string[], callback: InstallListCallback): void;
+    installAddonsFromWebpage(mimetype: string, source: XPCOM.nsIDOMWindow, uri: XPCOM.nsIURI, installs: AddonInstall[]): void;
+    addInstallListener(listener: InstallListener): void;
+    removeInstallListener(listener: InstallListener): void;
+    getAllAddons(callback: AddonListCallback): void;
+    getAddonByID(id: string, callback: AddonCallback): void;
+    getAddonBySyncGUID(id: string, callback: AddonCallback): void;
+    getAddonsByIDs(ids: string[], callback: AddonListCallback): void;
+    getAddonsByTypes(types: string[], callback: AddonListCallback): void;
+    getAddonsWithOperationsByTypes(types: string[], callback: AddonListCallback): void;
+    addAddonListener(listener: AddonListener): void;
+    removeAddonListener(listener: AddonListener): void;
+    addTypeListener(listener: TypeListener): void;
+    removeTypeListener(listener: TypeListener): void;
+    getURIForResourceInFile(aFile: XPCOM.nsIFile, aPath: string): XPCOM.nsIURI;
+  }
+
   export interface IHttpRequestOptions {
     headers?: string[];
     postData?: string | string[] | null | undefined;
@@ -390,6 +507,7 @@ export namespace JSMs {
 
   export interface Services {
     appinfo: XPCOM.nsIXULAppInfo & XPCOM.nsIXULRuntime;
+    locale: XPCOM.nsILocaleService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
     vc: XPCOM.nsIVersionComparator;
   }
@@ -402,19 +520,22 @@ import { I18n } from "./i18n/i18n.module";
 import { Management } from "./management";
 import { Manifest } from "./manifest";
 import { MiscInfos } from "./misc-infos";
+import { NetworkPredictionEnabledSetting } from "./privacy/network-prediction-enabled";
+import { PrivacyApi } from "./privacy/privacy.module";
 import { Runtime } from "./runtime";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
 import { JsonStorage } from "./storage/json-storage";
-import { PrefBranch, PrefTypes } from "./storage/pref-branch";
+import {
+  PrefBranch,
+  PrefType,
+} from "./storage/pref-branch";
 import { PrefObserver } from "./storage/pref-observer";
-import { Prefs } from "./storage/prefs";
 import { Storage } from "./storage/storage.module";
 import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
-import { Log } from "models/log";
 
 export namespace API {
   export namespace extension {
@@ -428,6 +549,14 @@ export namespace API {
 
   export namespace management {
     export type IManagement = Management;
+  }
+
+  export namespace privacy {
+    export namespace network {
+      export type networkPredictionEnabled = NetworkPredictionEnabledSetting;
+    }
+
+    export type IPrivacy = PrivacyApi;
   }
 
   export namespace runtime {
@@ -444,24 +573,22 @@ export namespace API {
     export type IPrefObserver = PrefObserver;
     export type IJsonStorage = JsonStorage;
     export type IPrefBranch = PrefBranch;
-    export type IPrefs = Prefs;
     export type ISyncLocalStorageArea = SyncLocalStorageArea;
 
     export type PrefBranchFactory = (
         branchRoot: string,
-        namesToTypesMap: {[key: string]: PrefTypes},
+        namesToTypesMap: {[key: string]: PrefType},
     ) => IPrefBranch;
     export type PrefObserverFactory = () => PrefObserver;
   }
 
-  export type ILog = Log;
   export type IManifest = Manifest;
   export type IMiscInfos = MiscInfos;
   export type IXPConnectService = XPConnectService;
   export interface ITryCatchUtils {
     getAppLocale: typeof TryCatchUtils.getAppLocale;
-    getComplexValueFromPrefBranch: typeof TryCatchUtils.getComplexValueFromPrefBranch;
   }
 
   export type IApi = Api;
+  export type ILegacyApi = Api["legacyApi"];
 }

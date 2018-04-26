@@ -20,8 +20,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import * as compareVersions from "lib/third-party/mozilla-version-comparator";
+import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
 
-export interface IVersionComparator {
-  compare: typeof compareVersions;
+type networkPredictionEnabledSetting =
+    API.privacy.network.networkPredictionEnabled;
+
+export class PrivacyApi extends Module {
+  constructor(
+      log: Common.ILog,
+      private networkPredictionEnabled: networkPredictionEnabledSetting,
+  ) {
+    super("browser.privacy", log);
+  }
+
+  public get backgroundApi() {
+    return {
+      network: {
+        networkPredictionEnabled: this.networkPredictionEnabled,
+      },
+    };
+  }
+
+  public get contentApi() {
+    return this.backgroundApi;
+  }
+
+  protected get subModules() {
+    return {
+      networkPredictionEnabled: this.networkPredictionEnabled,
+    };
+  }
 }

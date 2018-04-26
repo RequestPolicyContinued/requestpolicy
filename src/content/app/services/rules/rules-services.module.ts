@@ -21,12 +21,12 @@
  */
 
 import { V0RulesService } from "app/services/rules/v0-rules-service";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class RulesServices extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
       public readonly v0: V0RulesService,
   ) {
     super("app.services.rules", log);

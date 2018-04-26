@@ -30,7 +30,6 @@ declare const $: typeof JQuery;
 (() => {
   const {
     C,
-    LegacyApi,
     RuleUtils,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
@@ -256,7 +255,7 @@ declare const $: typeof JQuery;
         }, SEARCH_DELAY);
       }, false);
       populateRuleTable(search.value);
-      if (LegacyApi.prefs.oldRulesExist()) {
+      if (rp.services.rules.v0.oldRulesExist()) {
         $("#oldrulesexist").show();
       }
     }

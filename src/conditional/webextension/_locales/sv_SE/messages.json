@@ -129,29 +129,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Länkförhämtning",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNS-förhämtning",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Aktiverad",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Inaktivera vid start",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Återställ standard när RequestPolicy avinstalleras",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

@@ -20,8 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import {defer} from "lib/utils/js-utils";
-import {Log} from "models/log";
 
 export interface IModule {
   startup?: () => Promise<void>;
@@ -30,8 +30,8 @@ export interface IModule {
 }
 
 export abstract class Module implements IModule {
-  protected log: Log;
-  protected debugLog: Log;
+  protected log: Common.ILog;
+  protected debugLog: Common.ILog;
 
   protected get subModules(): {[key: string]: IModule} | undefined {
     return undefined;
@@ -76,16 +76,21 @@ export abstract class Module implements IModule {
 
   constructor(
       public readonly moduleName: string,
-      parentLog: Log,
+      parentLog: Common.ILog,
   ) {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false});
+
+    setTimeout(() => {
+      if (this.ready) return;
+      this.log.error(`not ready even after 5 seconds!`);
+    }, 5000);
   }
 
   public async startup(): Promise<void> {
     this.debugLog.log("starting up...");
     const p = this.startup_();
-    p.catch(this.log.onError("startup()"));
+    p.catch(this.log.onError("error on startup"));
     await p;
     this.ready = true;
     this.dReady.resolve(undefined);
@@ -95,9 +100,9 @@ export abstract class Module implements IModule {
   public async shutdown(): Promise<void> {
     this.debugLog.log("shutting down...");
     const p = this.shutdown_();
-    p.catch(this.log.onError("shutdown()"));
+    p.catch(this.log.onError("error on shutdown"));
     await p;
-    this.debugLog.log("shut down");
+    this.debugLog.log("done shutting down");
   }
 
   protected startupSelf(): Promise<void> {
@@ -119,17 +124,19 @@ export abstract class Module implements IModule {
 
   private async startup_(): Promise<void> {
     if (this.startupPreconditions.length !== 0) {
+      const n = this.startupPreconditions.length;
       this.debugLog.log(
-          `await ${this.startupPreconditions.length} preconditions`,
+          `awaiting ${n} precondition${ n > 1 ? "s" : "" }...`,
       );
       await Promise.all(this.startupPreconditions);
+      this.debugLog.log("done awaiting preconditions");
     }
-    this.debugLog.log("startup");
+    this.debugLog.log(`starting up self and submodules...`);
     await Promise.all([
       this.runSubmoduleFns("startup"),
       this.runSelfFn("startup"),
     ]);
-    this.debugLog.log("startup done");
+    this.debugLog.log("done starting up self and submodules");
   }
 
   private async shutdown_(): Promise<void> {

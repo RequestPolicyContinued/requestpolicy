@@ -25,49 +25,22 @@ import {WinEnv, elManager, $id} from "./common";
 
 (function() {
   var {
-    LegacyApi,
     ManagerForPrefObservers,
     rp,
   } = browser.extension.getBackgroundPage();
+  const {cachedSettings} = rp.storage;
 
   // ===========================================================================
 
   function updateDisplay() {
-    // Link prefetch.
-    $id("pref-linkPrefetch").checked =
-        LegacyApi.prefs.get("root/ network.prefetch-next");
-
-    $id("pref-prefetch.link.disableOnStartup").checked =
-        rp.storage.get("prefetch.link.disableOnStartup");
-
-    $id("pref-prefetch.link.restoreDefaultOnUninstall").checked =
-        rp.storage.get("prefetch.link.restoreDefaultOnUninstall");
-
-    // DNS prefetch.
-    $id("pref-dnsPrefetch").checked =
-        !LegacyApi.prefs.get("root/ network.dns.disablePrefetch");
-
-    $id("pref-prefetch.dns.disableOnStartup").checked =
-        rp.storage.get("prefetch.dns.disableOnStartup");
-
-    $id("pref-prefetch.dns.restoreDefaultOnUninstall").checked =
-        rp.storage.get("prefetch.dns.restoreDefaultOnUninstall");
-
-    // Speculative pre-connections.
-    $id("pref-speculativePreConnections").checked =
-        LegacyApi.prefs.
-            get("root/ network.http.speculative-parallel-limit") !== 0;
-
-    $id("pref-prefetch.preconnections.disableOnStartup").checked =
-        rp.storage.get("prefetch.preconnections.disableOnStartup");
-
-    $id("pref-prefetch.preconnections.restoreDefaultOnUninstall").checked =
-        rp.storage.get("prefetch.preconnections.restoreDefaultOnUninstall");
+    // browser settings
+    $id("pref-browserSettings.disablePrefetching").checked =
+        cachedSettings.get("browserSettings.disablePrefetching");
 
     // TODO: Create a class which acts as an API for preferences and which
     // ensures that the returned value is always a valid value for "string"
     // preferences.
-    var sorting = rp.storage.get("menu.sorting");
+    var sorting = cachedSettings.get("menu.sorting");
 
     if (sorting === $id("sortByNumRequests").value) {
       $id("sortByNumRequests").checked = true;
@@ -84,96 +57,25 @@ import {WinEnv, elManager, $id} from "./common";
     }
 
     $id("menu.info.showNumRequests").checked =
-        rp.storage.get("menu.info.showNumRequests");
+        cachedSettings.get("menu.info.showNumRequests");
   }
 
   window.onload = function() {
     updateDisplay();
 
-    // Link prefetch.
-    elManager.addListener($id("pref-linkPrefetch"), "change", function(event) {
-      LegacyApi.prefs.set("root/ network.prefetch-next", event.target.checked);
-      LegacyApi.prefs.save();
-    });
-
+    // prefetching
     elManager.addListener(
-        $id("pref-prefetch.link.disableOnStartup"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.link.disableOnStartup": event.target.checked,
-          });
-        }
-    );
-
-    elManager.addListener(
-        $id("pref-prefetch.link.restoreDefaultOnUninstall"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.link.restoreDefaultOnUninstall": event.target.checked,
-          });
-        }
-    );
-
-    // DNS prefetch.
-    elManager.addListener($id("pref-dnsPrefetch"), "change", function(event) {
-      LegacyApi.prefs.set(
-          "root/ network.dns.disablePrefetch",
-          !event.target.checked
-      );
-      LegacyApi.prefs.save();
-    });
-
-    elManager.addListener(
-        $id("pref-prefetch.dns.disableOnStartup"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.dns.disableOnStartup": event.target.checked,
-          });
-        }
-    );
-
-    elManager.addListener(
-        $id("pref-prefetch.dns.restoreDefaultOnUninstall"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.dns.restoreDefaultOnUninstall": event.target.checked,
-          });
-        }
-    );
-
-    // Speculative pre-connections.
-    elManager.addListener(
-        $id("pref-speculativePreConnections"), "change",
-        function(event) {
-          LegacyApi.prefs.set(
-              "root/ network.http.speculative-parallel-limit",
-              event.target.checked ? 6 : 0
-          );
-          LegacyApi.prefs.save();
-        }
-    );
-
-    elManager.addListener(
-        $id("pref-prefetch.preconnections.disableOnStartup"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.preconnections.disableOnStartup": event.target.checked,
-          });
-        }
-    );
-
-    elManager.addListener(
-        $id("pref-prefetch.preconnections.restoreDefaultOnUninstall"), "change",
-        function(event) {
-          rp.storage.set({
-            "prefetch.preconnections.restoreDefaultOnUninstall":
-                event.target.checked,
+        $id("pref-browserSettings.disablePrefetching"),
+        "change",
+        (event) => {
+          cachedSettings.set({
+            "browserSettings.disablePrefetching": event.target.checked,
           });
         }
     );
 
     var sortingListener = function(event) {
-      rp.storage.set({"menu.sorting": event.target.value});
+      cachedSettings.set({"menu.sorting": event.target.value});
     };
     elManager.addListener($id("sortByNumRequests"), "change", sortingListener);
     elManager.addListener($id("sortByDestName"), "change", sortingListener);
@@ -182,7 +84,7 @@ import {WinEnv, elManager, $id} from "./common";
     elManager.addListener(
         $id("menu.info.showNumRequests"), "change",
         function(event) {
-          rp.storage.set({
+          cachedSettings.set({
             "menu.info.showNumRequests": event.target.checked,
           });
         }
@@ -191,9 +93,6 @@ import {WinEnv, elManager, $id} from "./common";
     // call updateDisplay() every time a preference gets changed
     ManagerForPrefObservers.get(WinEnv).addListeners([
       "",
-      "root/ network.prefetch-next",
-      "root/ network.dns.disablePrefetch",
-      "root/ network.http.speculative-parallel-limit",
     ], updateDisplay);
   };
 })();

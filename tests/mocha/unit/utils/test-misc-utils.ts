@@ -112,7 +112,8 @@ describe("Utils", function() {
       functionCalls += "_0";
 
       // check that "this" is correctly set
-      isTrue(this.testProp === "foo"); // eslint-disable-line no-invalid-this
+      // @ts-ignore
+      isTrue(this.testProp === "foo");
 
       // check that the parameters have been passed correctly
       isTrue(param1 === "foo");

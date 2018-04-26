@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import {MainEnvironment} from "lib/environment";
@@ -32,7 +33,6 @@ import {
   UserSubscriptionsInfo,
 } from "lib/subscription";
 import {createListenersMap} from "lib/utils/listener-factories";
-import {Log} from "models/log";
 import {RulesetStorage} from "./ruleset-storage";
 
 const RULESET_NOT_EXISTING = {};
@@ -50,8 +50,9 @@ export class Subscriptions extends Module {
   private events = createListenersMap(["onRulesChanged"]);
 
   constructor(
-      log: Log,
+      log: Common.ILog,
       private rulesetStorage: RulesetStorage,
+      private storageArea: browser.storage.StorageArea,
   ) {
     super("rules", log);
 
@@ -64,7 +65,7 @@ export class Subscriptions extends Module {
   }
 
   public loadSubscriptionRules() {
-    const pDone = browser.storage.local.get(
+    const pDone = this.storageArea.get(
         "subscriptions",
     ).then((result) => {
       const rawData = result.hasOwnProperty("subscriptions") ?

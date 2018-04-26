@@ -35,7 +35,7 @@ export class PrefObserver {
   };
 
   constructor(
-      private prefs: API.storage.IPrefs,
+      private rpPrefBranch: API.storage.IPrefBranch,
   ) {}
 
   /**
@@ -48,7 +48,7 @@ export class PrefObserver {
       const observer = {
         observe: this._onObserve.bind(this, aDomain),
       };
-      this.prefs._addObserver(aDomain, observer);
+      this.rpPrefBranch.addObserver(aDomain, observer);
       this.maps.domainsToObservers.set(aDomain, observer);
     }
 
@@ -72,7 +72,7 @@ export class PrefObserver {
     if (false === this.maps.domainsToListeners.has(aDomain)) {
       // stop to observe this Pref Domain
       const observer = this.maps.domainsToObservers.get(aDomain);
-      this.prefs._removeObserver(aDomain, observer);
+      this.rpPrefBranch.removeObserver(aDomain, observer);
       this.maps.domainsToObservers.delete(aDomain);
     }
   }

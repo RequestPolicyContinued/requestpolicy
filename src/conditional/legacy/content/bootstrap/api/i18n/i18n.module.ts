@@ -21,12 +21,13 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
 import * as L10nUtils from "./l10n-utils";
 
 export class I18n extends Module {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       protected localeData: API.i18n.IAsyncLocaleData,
   ) {
     super("browser.i18n", log);

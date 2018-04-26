@@ -1,15 +1,34 @@
 /* exported run_test */
-const {Log} = require("models/log");
-const log = Log.instance;
+const {Log} = require("lib/classes/log");
+const log = new Log();
 
 const {UriService} = require("app/services/uri-service");
 const uriService = new UriService(log);
 
+const {JSMService} = require("bootstrap/api/services/jsm-service");
+const jsmService = new JSMService(Cu);
+const mozServices = jsmService.getServices();
+const prefsService = mozServices.prefs;
+
+const {PrefBranch} = require("bootstrap/api/storage/pref-branch");
+const { XPConnectService } = require("bootstrap/api/services/xpconnect-service");
+const xpconnectService = new XPConnectService();
+const rpPrefBranch = new PrefBranch(
+    Ci,
+    prefsService,
+    xpconnectService,
+    "extensions.requestpolicy."
+);
+const tryCatchUtils = require("lib/utils/try-catch-utils");
+
+const xpcApi = {prefsService, rpPrefBranch, tryCatchUtils};
+
 const {V0RulesService} = require("app/services/rules/v0-rules-service");
-const v0RulesService = new V0RulesService(log, uriService);
+const v0RulesService = new V0RulesService(log, uriService, xpcApi);
 // const {Prefs} = require("bootstrap/models/prefs");
 
 
+// @ts-ignore
 function run_test() {
   "use strict";
 

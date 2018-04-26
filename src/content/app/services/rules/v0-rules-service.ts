@@ -22,9 +22,10 @@
  */
 
 import { UriService } from "app/services/uri-service";
+import { API, JSMs } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { IRuleSpec } from "lib/ruleset";
-import { Log } from "models/log";
 
 declare const Cc: any;
 declare const Ci: any;
@@ -55,8 +56,13 @@ export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
   constructor(
-      log: Log,
+      log: Common.ILog,
       private uriService: UriService,
+      private xpcApi: {
+        prefsService: JSMs.Services["prefs"];
+        rpPrefBranch: API.storage.IPrefBranch,
+        tryCatchUtils: API.ITryCatchUtils,
+      } | null,
   ) {
     super("app.services.rules.v0", log);
   }
@@ -69,7 +75,7 @@ export class V0RulesService extends Module {
     const origins = splitString(aPrefStrings.origins);
     const originsToDests = splitString(aPrefStrings.originsToDests);
 
-    const rules = [];
+    const rules: IRuleSpec[] = [];
 
     // tslint:disable-next-line prefer-const
     for (let origin of origins) {
@@ -106,6 +112,38 @@ export class V0RulesService extends Module {
     }
 
     return rules;
+  }
+
+  public oldRulesExist() {
+    if (!this.xpcApi) return false;
+    return !(this.isV0RulePrefEmpty("allowedOrigins") &&
+             this.isV0RulePrefEmpty("allowedDestinations") &&
+             this.isV0RulePrefEmpty("allowedOriginsToDestinations"));
+  }
+
+  public getRPV0PrefString(aPrefName: string): string {
+    if (!this.xpcApi) return "";
+    const result = this.getV0RulePref(aPrefName);
+    return result || "";
+  }
+
+  public getRPV0PrefStrings() {
+    if (!this.xpcApi) {
+      return null;
+    }
+    return {
+      dests: this.getRPV0PrefString("allowedDestinations"),
+      origins: this.getRPV0PrefString("allowedOrigins"),
+      originsToDests: this.getRPV0PrefString("allowedOriginsToDestinations"),
+    };
+  }
+
+  public deleteOldRules() {
+    if (!this.xpcApi) return;
+    this.xpcApi.rpPrefBranch.reset("allowedOrigins");
+    this.xpcApi.rpPrefBranch.reset("allowedDestinations");
+    this.xpcApi.rpPrefBranch.reset("allowedOriginsToDestinations");
+    this.xpcApi.prefsService.savePrefFile(null);
   }
 
   /**
@@ -170,6 +208,17 @@ export class V0RulesService extends Module {
       }
     }
     return spec;
+  }
+
+  private isV0RulePrefEmpty(pref: string) {
+    if (!this.xpcApi) return true;
+    return !this.xpcApi.rpPrefBranch.isSet(pref);
+  }
+
+  private getV0RulePref(pref: string): string | null {
+    if (!this.xpcApi) return null;
+    if (!this.xpcApi.rpPrefBranch.isSet(pref)) return null;
+    return this.xpcApi.rpPrefBranch.get(pref) as string;
   }
 }
 

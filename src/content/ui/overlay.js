@@ -29,7 +29,6 @@ import {
 import {
   ManagerForMessageListeners,
 } from "lib/manager-for-message-listeners";
-import {Log} from "models/log";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
 import * as RequestProcessor from "lib/request-processor";
 import * as WindowUtils from "lib/utils/window-utils";
@@ -44,10 +43,10 @@ import {
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
 import {rp} from "app/app.background";
+import {log} from "app/log";
 
 const uriService = rp.services.uri;
-
-const log = Log.instance;
+const {cachedSettings} = rp.storage;
 
 const {LOG_FLAG_STATE} = C;
 
@@ -170,7 +169,7 @@ export function loadOverlayIntoWindow(window) {
         // object's observerBlockedRequests() method will be called.
         Requests.onRequest.addListener(self.observeRequest);
 
-        setContextMenuEntryEnabled(rp.storage.get("contextMenu"));
+        setContextMenuEntryEnabled(cachedSettings.get("contextMenu"));
 
         OverlayEnvironment.shutdownOnUnload(window);
         OverlayEnvironment.startup();
@@ -350,7 +349,7 @@ export function loadOverlayIntoWindow(window) {
       // We don't automatically perform any allowed redirects. Instead, we
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
-      if (!rp.storage.alias.isBlockingDisabled() &&
+      if (!cachedSettings.alias.isBlockingDisabled() &&
           !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
@@ -470,7 +469,7 @@ export function loadOverlayIntoWindow(window) {
     }
 
     let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, rp.storage
+        window, cachedSettings
     );
 
     const allowRedirection = function() {
@@ -503,7 +502,7 @@ export function loadOverlayIntoWindow(window) {
       // eslint-disable-next-line no-param-reassign
       aRuleSpec.allow = true;
       classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
-        if (rp.storage.get("autoReload")) {
+        if (cachedSettings.get("autoReload")) {
           allowRedirection();
         }
       });
@@ -672,7 +671,7 @@ export function loadOverlayIntoWindow(window) {
     const button = $id(toolbarButtonId);
     let contextMenuEntry = $id("rpcontinuedContextMenuEntry");
     if (button) {
-      let isPermissive = rp.storage.alias.isBlockingDisabled();
+      let isPermissive = cachedSettings.alias.isBlockingDisabled();
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry.setAttribute("rpcontinuedPermissive", isPermissive);
     }
@@ -991,7 +990,7 @@ export function loadOverlayIntoWindow(window) {
   self.onPopupHidden = function(event) {
     const rulesChanged = rpcontinued.menu.processQueuedRuleChanges();
     if (rulesChanged || self._needsReloadOnMenuClose) {
-      if (rp.storage.get("autoReload")) {
+      if (cachedSettings.get("autoReload")) {
         let mm = gBrowser.selectedBrowser.messageManager;
         mm.sendAsyncMessage(`${C.MM_PREFIX}reload`);
       }
@@ -1027,8 +1026,8 @@ export function loadOverlayIntoWindow(window) {
    * false otherise
    */
   self.toggleTemporarilyAllowAll = function() {
-    const disabled = !rp.storage.alias.isBlockingDisabled();
-    rp.storage.alias.setBlockingDisabled(disabled);
+    const disabled = !cachedSettings.alias.isBlockingDisabled();
+    cachedSettings.alias.setBlockingDisabled(disabled);
 
     return disabled;
   };

@@ -22,10 +22,9 @@
  */
 
 import {rp} from "app/app.background";
-import {Log} from "models/log";
+import {log} from "app/log";
 import {RequestResult} from "lib/request-result";
 
-const log = Log.instance;
 const uriService = rp.services.uri;
 
 // =============================================================================

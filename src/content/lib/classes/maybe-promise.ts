@@ -20,40 +20,68 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {isPromise} from "lib/utils/js-utils";
+import {isThenable} from "lib/utils/js-utils";
+
+type IMaybePromiseSpec<T> = {
+  status: "PROMISE";
+  promise: Promise<T>;
+} | {
+  status: "fulfilled";
+  resolutionValue: T;
+} | {
+  status: "rejected";
+  rejectionValue: any;
+};
 
 export class MaybePromise<T> {
   public static resolve<U>(aVal: U | Promise<U> | MaybePromise<U>) {
     if (aVal instanceof MaybePromise) return aVal as MaybePromise<U>;
-    const mp = new MaybePromise<U>();
-    if (isPromise(aVal)) {
-      mp.promise = aVal;
-      mp.status = "PROMISE";
+    if (isThenable(aVal)) {
+      return new MaybePromise<U>({
+        promise: aVal,
+        status: "PROMISE",
+      });
     } else {
-      mp.resolutionValue = aVal;
-      mp.status = "fulfilled";
+      return new MaybePromise<U>({
+        resolutionValue: aVal,
+        status: "fulfilled",
+      });
     }
-    return mp;
   }
 
   public static reject<U>(aRejectValue: U) {
-    const mp = new MaybePromise();
-    mp.rejectionValue = aRejectValue;
-    mp.status = "rejected";
-    return mp;
+    return new MaybePromise({
+      rejectionValue: aRejectValue,
+      status: "rejected",
+    });
   }
 
-  private promise: Promise<T>;
-  private resolutionValue: T;
-  private rejectionValue: any;
+  private promise?: Promise<T>;
+  private resolutionValue?: T;
+  private rejectionValue?: any;
   private status: "PROMISE" | "fulfilled" | "rejected";
+
+  private constructor(spec: IMaybePromiseSpec<T>) {
+    this.status = spec.status;
+    switch (spec.status) {
+      case "PROMISE":
+        this.promise = spec.promise;
+        break;
+      case "fulfilled":
+        this.resolutionValue = spec.resolutionValue;
+        break;
+      case "rejected":
+        this.rejectionValue = spec.rejectionValue;
+        break;
+    }
+  }
 
   public then(
       aThen?: <U>(val: T) => U,
       aCatch?: (val: any) => any,
   ): any {
     if (this.status === "PROMISE") {
-      return MaybePromise.resolve(this.promise.then(aThen, aCatch));
+      return MaybePromise.resolve(this.promise!.then(aThen, aCatch));
     }
     if (this.status === "rejected") {
       if (aCatch) {
@@ -67,7 +95,7 @@ export class MaybePromise<T> {
     }
     if (aThen) {
       try {
-        return MaybePromise.resolve(aThen(this.resolutionValue));
+        return MaybePromise.resolve(aThen(this.resolutionValue!));
       } catch (e) {
         return MaybePromise.reject(e);
       }
@@ -93,16 +121,16 @@ export class MaybePromise<T> {
   }
 
   public toPromise(): Promise<T> {
-    if (this.status === "PROMISE") return this.promise;
+    if (this.status === "PROMISE") return this.promise!;
     if (this.status === "fulfilled") {
-      return Promise.resolve(this.resolutionValue);
+      return Promise.resolve(this.resolutionValue!);
     }
     return Promise.reject(this.rejectionValue);
   }
 
   public getPromise(): Promise<T> {
     this.assertIsPromiseWrapper();
-    return this.promise;
+    return this.promise!;
   }
 
   public getValue(): T {
@@ -110,7 +138,7 @@ export class MaybePromise<T> {
     if (this.status === "rejected") {
       throw new Error("The MaybePromise has been rejected!");
     }
-    return this.resolutionValue;
+    return this.resolutionValue!;
   }
 
   public getRejectionValue(): any {

@@ -20,59 +20,81 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
 
-declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+export type PrefType = "Bool" | "Char" | "Int";
 
-export type PrefTypes = "BoolPref" | "CharPref" | "IntPref";
-type GetterFnName = "getBoolPref" | "getCharPref" | "getIntPref";
-type SetterFnName = "setBoolPref" | "setCharPref" | "setIntPref";
+export interface IPrefNamesToTypes {
+  [key: string]: PrefType;
+}
 
-/**
- * @param {string} aBranchRoot
- * @param {Object} aPrefNameToTypeMap A map from Pref Names to Pref Types.
- *     Pref Types are "BoolPref", "CharPref", "IntPref", "ComplexValue".
- */
-export class PrefBranch {
+export class PrefBranch implements API.storage.IPrefBranch {
+  private static PREF_INVALID = 0;
+  private static PREF_STRING = 32;
+  private static PREF_INT = 64;
+  private static PREF_BOOL = 128;
+
   public readonly branch = this.prefsService.getBranch(this.branchRoot).
-      QueryInterface<XPCOM.nsIPrefBranch2>(Ci.nsIPrefBranch2);
+      QueryInterface<XPCOM.nsIPrefBranch2>(this.ci.nsIPrefBranch2);
 
   constructor(
+      private ci: XPCOM.nsXPCComponents_Interfaces,
       private prefsService: JSMs.Services["prefs"],
+      private xpcService: API.IXPConnectService,
       public readonly branchRoot: string,
-      // How should a pref name "foo.bar.baz" be translated to
-      // "getBoolPref" or "setIntPref"?
-      private namesToTypesMap: {[key: string]: PrefTypes},
   ) {}
 
   public getAll() {
     const allPrefs: {[key: string]: any} = {};
-    Object.keys(this.namesToTypesMap).forEach((prefName) => {
+    const childList = this.prefsService.getChildList("");
+    childList.forEach((prefName) => {
       allPrefs[prefName] = this.get(prefName);
     });
     return allPrefs;
   }
 
-  public get<T extends string | number | boolean>(
+  public get(
       aPrefName: string,
-  ): T {
-    const getterFnName = `get${this.type(aPrefName)}` as GetterFnName;
-    return (
-      this.branch[getterFnName] as
-      (prefName: string) => T
-    )(aPrefName);
+  ): string | number | boolean | undefined {
+    if (!this.isSet(aPrefName)) return undefined;
+    const type = this.branch.getPrefType(aPrefName);
+    switch (type) {
+      case PrefBranch.PREF_STRING:
+        return this.branch.getComplexValue<XPCOM.nsISupportsString>(
+            aPrefName, this.ci.nsISupportsString,
+        ).data;
+      case PrefBranch.PREF_INT:
+        return this.branch.getIntPref(aPrefName);
+      case PrefBranch.PREF_BOOL:
+        return this.branch.getBoolPref(aPrefName);
+
+      case PrefBranch.PREF_INVALID: /* falls through */
+      default:
+        throw new Error(`Unknown type <${type}> of pref "${aPrefName}"`);
+    }
   }
 
-  // sorry for this very ugly-looking function
   public set<T extends string | number | boolean>(
       aPrefName: string,
       aValue: T,
   ): void {
-    const setterFnName = `set${this.type(aPrefName)}` as SetterFnName;
-    (
-      this.branch[setterFnName] as
-      (prefName: string, value: T) => void
-    )(aPrefName, aValue);
+    const type = typeof aValue;
+    switch (type) {
+      case "string":
+        const str = this.xpcService.createSupportsStringInstance();
+        str.data = aValue as string;
+        this.branch.setComplexValue(aPrefName, this.ci.nsISupportsString, str);
+        break;
+      case "number":
+        this.branch.setIntPref(aPrefName, aValue as number);
+        break;
+      case "boolean":
+        this.branch.setBoolPref(aPrefName, aValue as boolean);
+        break;
+
+      default:
+        throw new Error(`Invalid type <${type}>. Value is "${aValue}".`);
+    }
   }
 
   public reset(aPrefName: string) {
@@ -85,20 +107,16 @@ export class PrefBranch {
 
   public addObserver(
       aDomain: string,
-      aObserver: XPCOM.nsIObserver,
-      aHoldWeak: boolean,
+      aObserver: XPCOM.nsIObserver_without_nsISupports<XPCOM.nsIPrefBranch>,
+      aHoldWeak?: boolean,
   ) {
-    return this.branch.addObserver(aDomain, aObserver, aHoldWeak);
+    return this.branch.addObserver(aDomain, aObserver, !!aHoldWeak);
   }
 
-  public removeObserver(aDomain: string, aObserver: XPCOM.nsIObserver) {
+  public removeObserver(
+      aDomain: string,
+      aObserver: XPCOM.nsIObserver_without_nsISupports<XPCOM.nsIPrefBranch>,
+  ) {
     return this.branch.removeObserver(aDomain, aObserver);
-  }
-
-  private type(aPrefName: string): PrefTypes {
-    if (!(aPrefName in this.namesToTypesMap)) {
-      throw new Error(`Unknown pref "${aPrefName}"`);
-    }
-    return this.namesToTypesMap[aPrefName];
   }
 }

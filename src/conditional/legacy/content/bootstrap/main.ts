@@ -20,75 +20,77 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// Before anything else, handle default preferences. This is necessary because
-// bootsrapped addons have to handle their default preferences manually,
-// see Mozilla Bug 564675.
-import {
-  DefaultPreferencesController,
-} from "bootstrap/controllers/default-preferences-controller";
-DefaultPreferencesController.startup();
-
-import * as TryCatchUtils from "lib/utils/try-catch-utils";
-import { Log } from "models/log";
+import { JSMService } from "bootstrap/api/services/jsm-service";
+import { Log } from "lib/classes/log";
+import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { Api } from "./api/api.module";
 import { Extension } from "./api/extension";
 import { AsyncLocaleData } from "./api/i18n/async-locale-data";
 import { I18n } from "./api/i18n/i18n.module";
-import { API, JSMs } from "./api/interfaces";
+import { API, JSMs, XPCOM } from "./api/interfaces";
 import { Management } from "./api/management";
 import { Manifest } from "./api/manifest";
 import { MiscInfos } from "./api/misc-infos";
+import {
+  NetworkPredictionEnabledSetting,
+} from "./api/privacy/network-prediction-enabled";
+import { PrivacyApi } from "./api/privacy/privacy.module";
 import { Runtime } from "./api/runtime";
 import { ChromeFileService } from "./api/services/chrome-file-service";
 import { FileService } from "./api/services/file-service";
 import { XPConnectService } from "./api/services/xpconnect-service";
 import { JsonStorage } from "./api/storage/json-storage";
-import { PrefBranch, PrefTypes } from "./api/storage/pref-branch";
+import { PrefBranch } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
-import { Prefs } from "./api/storage/prefs";
 import { Storage } from "./api/storage/storage.module";
 import { SyncLocalStorageArea } from "./api/storage/sync-local-storage-area";
 
+const log = new Log();
+
 declare const Services: JSMs.Services;
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
-const {
-  NetUtil: mozNetUtil,
-} = Cu.import("resource://gre/modules/NetUtil.jsm") as {
-  NetUtil: JSMs.NetUtil,
-};
-const mozHttp = Cu.import("resource://gre/modules/Http.jsm") as JSMs.Http;
-const {
-  FileUtils: mozFileUtils,
-} = Cu.import("resource://gre/modules/FileUtils.jsm") as {
-  FileUtils: JSMs.FileUtils,
-};
-
-const log = Log.instance;
+const jsmService = new JSMService(Cu);
+const mozAddonManager = jsmService.getAddonManager();
+const mozNetUtil = jsmService.getNetUtil();
+const mozHttp = jsmService.getHttp();
+const mozFileUtils = jsmService.getFileUtils();
+const mozServices = jsmService.getServices();
 
 const extension = new Extension(log);
 const xpconnectService = new XPConnectService();
 const fileService = new FileService(xpconnectService, mozFileUtils);
 const chromeFileService = new ChromeFileService(mozNetUtil, mozHttp);
-const localeData = new AsyncLocaleData(TryCatchUtils, chromeFileService);
+const localeData = new AsyncLocaleData(
+    tryCatchUtils, chromeFileService, mozServices,
+);
 const i18n = new I18n(log, localeData);
-const management = new Management(log);
+const management = new Management(log, mozAddonManager);
 const manifest = new Manifest(log, chromeFileService);
-const runtime = new Runtime(log);
+const runtime = new Runtime(log, Services.appinfo);
 
-const prefBranchFactory: API.storage.PrefBranchFactory = (
-  branchRoot: string,
-  namesToTypesMap: {[key: string]: PrefTypes},
-) => new PrefBranch(Services.prefs, branchRoot, namesToTypesMap);
+const createPrefBranch = (
+    branchRoot: string,
+) => new PrefBranch(Ci, Services.prefs, xpconnectService, branchRoot);
+const rootPrefBranch = createPrefBranch("");
+const rpPrefBranch = createPrefBranch("extensions.requestpolicy.");
 
-const prefs = new Prefs(Services.prefs, prefBranchFactory, TryCatchUtils);
+const networkPredictionEnabled = new NetworkPredictionEnabledSetting(
+    log, rootPrefBranch,
+);
+const privacy = new PrivacyApi(log, networkPredictionEnabled);
 
 const prefObserverFactory: API.storage.PrefObserverFactory =
-    () => new PrefObserver(prefs);
+    () => new PrefObserver(rpPrefBranch);
 
 const jsonPrefs = new JsonStorage(fileService);
-const slsa = new SyncLocalStorageArea(prefs, jsonPrefs);
-const storage = new Storage(log, slsa);
-const miscInfos = new MiscInfos(Services.appinfo, prefs, Services.vc);
+const slsa = new SyncLocalStorageArea(
+    Services.prefs, rpPrefBranch, jsonPrefs,
+);
+const storage = new Storage(log, slsa, rpPrefBranch);
+const miscInfos = new MiscInfos(
+    Services.appinfo, rpPrefBranch, Services.vc,
+);
 
 export const api = new Api(
     log,
@@ -96,9 +98,12 @@ export const api = new Api(
     i18n,
     management,
     manifest,
+    privacy,
     runtime,
     storage,
+    Services.prefs,
     miscInfos,
-    prefs,
+    rpPrefBranch,
     prefObserverFactory,
+    tryCatchUtils,
 );

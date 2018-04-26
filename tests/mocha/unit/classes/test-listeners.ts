@@ -13,7 +13,7 @@ describe("Listeners", () => {
     }) {
       it(aDescription, function() {
         const listeners = new Listeners();
-        const expectedRVs = [];
+        const expectedRVs: any[] = [];
         aRVSpecs.forEach((rvSpec) => {
           if (!("value" in rvSpec)) {
             listeners.add(() => {});

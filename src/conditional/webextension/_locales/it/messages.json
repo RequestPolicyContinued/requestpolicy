@@ -219,29 +219,9 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "Prefetching dei Link",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Prefetching DNS",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Abilitato",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Disabilita all'avvio",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Ripristina i predefiniti quando RequestPolicy viene disinstallato",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

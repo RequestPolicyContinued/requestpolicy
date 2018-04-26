@@ -22,9 +22,6 @@
 
 import {XPCOMObserver} from "lib/classes/xpcom-observer";
 import {Level as EnvLevel} from "lib/environment";
-import {Log} from "models/log";
-
-const log = Log.instance;
 
 // =============================================================================
 // ObserverManager
@@ -42,6 +39,7 @@ export class ObserverManager {
     this.environment = aEnv;
 
     if (aEnv) {
+      this.log = aEnv.log;
       this.environment.addShutdownFunction(
           EnvLevel.INTERFACE,
           () => {
@@ -50,14 +48,11 @@ export class ObserverManager {
           }
       );
     } else {
-      // aEnv is not defined! Try to report an error.
-      if (log) {
-        log.warn(
-            "No Environment was specified for " +
-            "a new ObserverManager! This means that the observers " +
-            "won't be unregistered!"
-        );
-      }
+      console.error(
+          "No Environment was specified for " +
+          "a new ObserverManager! This means that the observers " +
+          "won't be unregistered!"
+      );
     }
 
     // an object holding all observers for unregistering when unloading the page

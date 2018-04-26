@@ -23,13 +23,12 @@
 import { Policy } from "app/policy/policy.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
-import { getRPV0PrefStrings } from "legacy/lib/utils/xpcom-utils";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class V0RulesMigration extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
       private policy: Policy,
       private v0RulesService: V0RulesService,
       private versionInfoService: VersionInfoService,
@@ -60,7 +59,8 @@ export class V0RulesMigration extends Module {
    */
   private importOldRules() {
     try {
-      const prefStrings = getRPV0PrefStrings();
+      const prefStrings = this.v0RulesService.getRPV0PrefStrings();
+      if (prefStrings === null) return null;
       const rules = this.v0RulesService.parse(prefStrings);
       this.policy.addAllowRules(rules);
       return true;

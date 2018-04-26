@@ -21,28 +21,34 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
+import { API, XPCOM } from "bootstrap/api/interfaces";
+import {JSMService} from "bootstrap/api/services/jsm-service";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
+declare const LegacyApi: API.ILegacyApi;
+declare const Cu: XPCOM.nsXPCComponents_Utils;
 // @endif
 
+import { dAsyncSettings, log } from "app/log";
+import { SettingsMigration } from "app/migration/settings-migration";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
+import { AsyncSettings } from "app/storage/async-settings";
+import { CachedSettings } from "app/storage/cached-settings";
+import { SETTING_SPECS } from "app/storage/setting-specs";
 import { InitialSetup } from "app/ui/initial-setup";
 import { C } from "data/constants";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
-import { Log } from "models/log";
 import { AppBackground } from "./app.background.module";
+import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
-import * as RPStorageConfig from "./storage/rp-config.background";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
-
-const log = Log.instance;
 
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:
@@ -56,18 +62,60 @@ const log = Log.instance;
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
-const rulesetStorage = new RulesetStorage(log);
-const subscriptions = new Subscriptions(log, rulesetStorage);
+const localStorageArea = browser.storage.local;
+
+const settingsMigration = new SettingsMigration(log, browser.storage.local);
+const storageReadyPromise = settingsMigration.whenReady;
+
+const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
+const mozServices = C.EXTENSION_TYPE === "legacy" ?
+    jsmService!.getServices() : null;
+const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
+  prefsService: mozServices!.prefs,
+  rpPrefBranch: LegacyApi.rpPrefBranch,
+  tryCatchUtils: LegacyApi.tryCatchUtils,
+} : null;
+
+const rulesetStorage = new RulesetStorage(log, localStorageArea);
+const subscriptions = new Subscriptions(log, rulesetStorage, localStorageArea);
 const policy = new Policy(log, subscriptions, rulesetStorage);
 
-const storage = new Storage(log, RPStorageConfig);
+const asyncSettings = new AsyncSettings(
+    log,
+    browser.storage,
+    browser.storage.local,
+    SETTING_SPECS.defaultValues,
+    storageReadyPromise,
+);
+dAsyncSettings.resolve(asyncSettings);
+const cachedSettings = new CachedSettings(
+    log,
+    SETTING_SPECS,
+    storageReadyPromise,
+    LegacyApi.rpPrefBranch, /* FIXME */
+    LegacyApi.prefsService, /* FIXME */
+);
+const storage = new Storage(
+    log, asyncSettings, cachedSettings, storageReadyPromise,
+);
+
+const browserSettings = new BrowserSettings(
+    log, cachedSettings,
+    (browser as any).privacy.network,
+);
 
 const uriService = new UriService(log);
-const v0RulesService = new V0RulesService(log, uriService);
+const v0RulesService = new V0RulesService(
+    log,
+    uriService,
+    xpcApi,
+);
 const rulesServices = new RulesServices(log, v0RulesService);
 const versionComparator = { compare: compareVersions };
 const versionInfoService = new VersionInfoService(
-    log, versionComparator, storage,
+    log, versionComparator, cachedSettings,
+    browser.management,
+    browser.runtime,
 );
 const rpServices = new RPServices(
     log, rulesServices, uriService, versionInfoService,
@@ -78,13 +126,16 @@ const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
         log, policy, v0RulesService, versionInfoService,
     ) : null;
 
-const migration = new Migration(log, v0RulesMigration);
+const migration = new Migration(log, settingsMigration, v0RulesMigration);
 
-const initialSetup = new InitialSetup(log, storage, versionInfoService);
+const initialSetup = new InitialSetup(
+    log, cachedSettings, versionInfoService, xpcApi! /* FIXME */,
+);
 const ui = new Ui(log, initialSetup);
 
 export const rp = new AppBackground(
     log,
+    browserSettings,
     migration,
     policy,
     rpServices,

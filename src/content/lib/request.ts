@@ -22,6 +22,7 @@
  */
 
 import {rp} from "app/app.background";
+import { log } from "app/log";
 import {IUri} from "lib/classes/uri";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
@@ -30,9 +31,8 @@ import {
 } from "lib/request-result";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import {Log} from "models/log";
 
-const logRequests = Log.instance.extend({
+const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
   level: "all",
   name: "Requests",
@@ -262,16 +262,17 @@ export class Request {
   }
 
   public checkByDefaultPolicy() {
+    const cachedSettings = rp.storage.cachedSettings!;
     if (
         this.isAllowedByDefault() ||
-        rp.storage.alias.isDefaultAllow() ||
-        rp.storage.alias.isDefaultAllowTopLevel() && this.isTopLevel()
+        cachedSettings.alias.isDefaultAllow() ||
+        cachedSettings.alias.isDefaultAllowTopLevel() && this.isTopLevel()
     ) return new RequestResult(true, RequestReason.DefaultPolicy);
 
     const originUri = this.originURI;
     const destUri = this.destURI;
 
-    if (rp.storage.alias.isDefaultAllowSameDomain()) {
+    if (cachedSettings.alias.isDefaultAllowSameDomain()) {
       const originDomain = originUri ?
           uriService.getBaseDomain(originUri) : null;
       const destDomain = uriService.getBaseDomain(destUri);

@@ -63,8 +63,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
     const results = this.getByKeys(keys);
     if (isObjectWithDefaults) {
       const defaults = aKeys as IKeysWithDefaults;
-      // tslint:disable-next-line prefer-const
-      for (let key in keys) {
+      for (const key of keys) {
         if (!(results.hasOwnProperty(key))) {
           results[key] = defaults[key];
         }
@@ -83,19 +82,21 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
     this.eventListenersMap.onChanged.emit();
   }
 
-  public remove(aKeys: string | string[]) {
+  public remove(aKeys: string | string[]): {errors: IKeysObject} | void {
     if (typeof aKeys === "string") {
       aKeys = [aKeys];
     }
-    this.removeByKeys(aKeys);
+    const rv = this.removeByKeys(aKeys);
     this.eventListenersMap.onChanged.emit();
+    if (rv && Object.keys(rv.errors).length === 0) return;
+    return rv;
   }
 
   protected abstract getAll(): TKeys;
   protected abstract getNothing(): TKeys;
   protected abstract getByKeys(keys: string[]): TKeys;
   protected abstract setByKey(key: string, value: any): void;
-  protected abstract removeByKeys(keys: string[]): void;
+  protected abstract removeByKeys(keys: string[]): {errors: IKeysObject} | void;
 }
 
 // =============================================================================

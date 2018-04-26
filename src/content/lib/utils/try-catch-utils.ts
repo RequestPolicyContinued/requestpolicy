@@ -112,18 +112,6 @@ export function getRequestHeaderFromHttpChannel(
 
 export {getAppLocale} from "./try-catch-utils.mpl";
 
-export function getComplexValueFromPrefBranch(
-    prefBranch: any,
-    prefName: string,
-    type: any,
-): RV<string> {
-  try {
-    return value(prefBranch.getComplexValue(prefName, type).data as string);
-  } catch (e) {
-    return error(e);
-  }
-}
-
 export function getBrowserFromLoadContext(loadContext: any) {
   try {
     if (loadContext.topFrameElement) {

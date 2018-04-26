@@ -37,10 +37,10 @@
     "ts-node": "^4.1.0",
     "tslint": "^5.5.0",
     "typescript": "^2.4.2",
-    "web-ext-types": "github:myrdd/web-ext-types#d5a9541ab27d13c41e877ce70dcc1248c54a0b2c"
+    "web-ext-types": "github:myrdd/web-ext-types#8d773c8"
   },
   "dependencies": {
     "jquery": "^3.3.1",
-    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator"
+    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator#3b77635"
   }
 }

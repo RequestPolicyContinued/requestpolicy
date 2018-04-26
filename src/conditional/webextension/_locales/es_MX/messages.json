@@ -204,34 +204,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Descarga anticipada de enlaces",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Descarga anticipada de DNS",
-    "description": "DNS Prefetching"
-  },
-
-  "speculativePreConnections": {
-    "message": "Pre-conexiones especuladas",
-    "description": "Speculative pre-connections"
-  },
-
   "enabled": {
     "message": "Activado",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Deshabilitar al inicio",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Restaurar predeterminados cuando RequestPolicy es desinstalado",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

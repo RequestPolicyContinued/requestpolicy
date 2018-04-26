@@ -98,7 +98,7 @@ export const rpWindowManager = (function() {
       function() {
         Promise.all([
           pWindowsAvailable,
-          rp.storage.whenReady,
+          rp.storage.cachedSettings.whenReady,
         ]).then(() => {
           WindowSubControllers.startup();
           Windows.forEachOpenWindow(loadIntoWindow);

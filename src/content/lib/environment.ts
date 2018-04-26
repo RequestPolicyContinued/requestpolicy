@@ -20,20 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Log } from "lib/classes/log";
 import {
   ManagerForEventListeners,
 } from "lib/manager-for-event-listeners";
 import {ObserverManager} from "lib/observer-manager";
-import {Log} from "models/log";
 
 // =============================================================================
 // utilities
 // =============================================================================
-
-const log = Log.instance.extend({
-  enabledCondition: {type: "C", C: "LOG_ENVIRONMENT"},
-  name: "Environment",
-});
 
 type tStartupOrShutdown = "startup" | "shutdown";
 type tBootstrapArgs = any[];
@@ -161,6 +156,11 @@ class BaseEnvironment {
   // BaseEnvironment
   // ---------------------------------------------------------------------------
 
+  public readonly log = new Log({
+    enabledCondition: {type: "C", C: "LOG_ENVIRONMENT"},
+    name: "Environment",
+  });
+
   public isMainEnvironment: boolean = false;
 
   // generate an unique ID for debugging purposes
@@ -189,7 +189,7 @@ class BaseEnvironment {
       startup: BaseEnvironment.generateLevelObjects(),
     };
 
-    log.log("created new Environment \"" + this.name + "\"");
+    this.log.log("created new Environment \"" + this.name + "\"");
   }
 
   public isShuttingDownOrShutDown() {
@@ -220,12 +220,12 @@ class BaseEnvironment {
    */
   public registerInnerEnvironment(aEnv: BaseEnvironment) {
     if (this.envState === State.NOT_STARTED) {
-      log.warn("registerInnerEnvironment() has been called but " +
+      this.log.warn("registerInnerEnvironment() has been called but " +
           "the outer environment hasn't started up yet. " +
           "Starting up now.");
       this.startup();
     }
-    log.log("registering inner environment");
+    this.log.log("registering inner environment");
     this.innerEnvs.add(aEnv);
   }
   /**
@@ -269,7 +269,7 @@ class BaseEnvironment {
       //
       // ==> call the function immediately.
       f();
-      log.cbLog(() => [
+      this.log.cbLog(() => [
         `calling shutdown function immediately: ` +
         `"${f.name || "anonymous"}" (${this.name})`,
       ]);
@@ -283,12 +283,12 @@ class BaseEnvironment {
   }
 
   public startup(aBootstrapArgs?: tBootstrapArgs, aUntilLevel?: Level) {
-    log.log("starting up: " + this.name);
+    this.log.log("starting up: " + this.name);
     this._bootstrap("startup", aBootstrapArgs, aUntilLevel);
   }
 
   public shutdown(aBootstrapArgs?: tBootstrapArgs, aUntilLevel?: Level) {
-    log.log("shutting down: " + this.name);
+    this.log.log("shutting down: " + this.name);
     this._bootstrap("shutdown", aBootstrapArgs, aUntilLevel);
   }
 
@@ -348,7 +348,7 @@ class BaseEnvironment {
         console.error("Error in bootstrap function! Details:");
         console.dir(e);
       }
-      log.log("function called! (" + aFunctions.length +
+      this.log.log("function called! (" + aFunctions.length +
           " functions left)");
     }
   }
@@ -371,7 +371,7 @@ class BaseEnvironment {
 
     if (levelObj.levelState === LevelState.NOT_ENTERED) {
       levelObj.levelState = LevelState.PROCESSING;
-      log.log("processing level " + aLevel + " of startup (" +
+      this.log.log("processing level " + aLevel + " of startup (" +
           this.uid + ")");
 
       if (aStartupOrShutdown === "shutdown") {
@@ -384,7 +384,7 @@ class BaseEnvironment {
       this._callFunctions(levelObj.functions, aBootstrapArgs);
 
       levelObj.levelState = LevelState.FINISHED_PROCESSING;
-      log.log("processing level " + aLevel + " of startup " +
+      this.log.log("processing level " + aLevel + " of startup " +
           "(" + this.uid + ") finished");
     }
   }
@@ -424,7 +424,7 @@ class BaseEnvironment {
    * @param {string} aStartupOrShutdown
    */
   private _logStartupOrShutdown(aStartupOrShutdown: tStartupOrShutdown) {
-    log.cbLog(() => [
+    this.log.cbLog(() => [
       `${aStartupOrShutdown}: ${this.envInfo}. ` +
       (this.outerEnv ?
           " OuterEnv is " + this.outerEnv.envInfo + "." :
@@ -508,7 +508,7 @@ export class Environment extends BaseEnvironment {
    */
   public shutdownOnUnload(aEventTarget: EventTarget) {
     this.elManager.addListener(aEventTarget, "unload", () => {
-      log.log(
+      this.log.log(
           "an EventTarget's `unload` function " +
           "has been called. Going to shut down Environment " +
           `"${this.name}`);

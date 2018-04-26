@@ -129,29 +129,9 @@
     "description": "Allow adding non-temporary rules when using Private Browsing Mode"
   },
 
-  "linkPrefetching": {
-    "message": "Предварительная загрузка ссылок",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "Упреждающее чтение DNS",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "Включено",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "Отключать при запуске",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Восстанавливать по умолчанию при удалении RequestPolicy",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "origin": {

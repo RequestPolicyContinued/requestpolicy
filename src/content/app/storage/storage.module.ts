@@ -2,8 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2008 Justin Samuel
- * Copyright (c) 2014 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,79 +20,33 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { Module } from "lib/classes/module";
-import { Log } from "models/log";
+import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
+import { IModule, Module } from "lib/classes/module";
 
-declare const LegacyApi: any;
-
-export class Storage extends Module {
-  public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
-  private cachedKeys: string[];
-  private cachedKeysSet: Set<string>;
+export class Storage extends Module implements App.IStorage {
+  protected get startupPreconditions() {
+    return [
+      this.storageReadyPromise,
+    ];
+  }
 
   constructor(
-      log: Log,
-      {
-          cachedKeys,
-          boolAliases,
-      }: {
-          cachedKeys: string[],
-          boolAliases: Array<[string, string]>,
-      },
+      log: Common.ILog,
+      public readonly asyncSettings: App.storage.IAsyncSettings,
+      public readonly cachedSettings: App.storage.ICachedSettings | null,
+      private storageReadyPromise: Promise<void>,
   ) {
     super("app.storage", log);
-
-    this.cachedKeys = cachedKeys;
-    this.cachedKeysSet = new Set(cachedKeys);
-
-    boolAliases.forEach(([storageKey, alias]) => {
-      this.alias[`is${alias}`] = () => this.get(storageKey);
-      this.alias[`set${alias}`] = (value) => this.set({[storageKey]: value});
-    });
   }
 
-  public isKeyCached(aKey: string) {
-    this.assertReady();
-    return this.cachedKeysSet.has(aKey);
-  }
-
-  public get(aKeys: "" | string | string[] | null | undefined): any {
-    this.assertReady();
-    if (aKeys === "") return {};
-    if (aKeys === null || aKeys === undefined) {
-      return this.get(this.cachedKeys);
+  protected get subModules() {
+    const rv: {[k: string]: IModule} = {
+      asyncSettings: this.asyncSettings,
+    };
+    if (this.cachedSettings !== null) {
+      rv.cachedSettings = this.cachedSettings;
     }
-    if (typeof aKeys === "string") {
-      const key = aKeys;
-      if (!this.isKeyCached(key)) {
-        console.error(`Key "${key} is not cached in Storage!`);
-        return;
-      }
-      return LegacyApi.prefs.get(key);
-    }
-    if (Array.isArray(aKeys)) {
-      const result: {[key: string]: any} = {};
-      aKeys.forEach((key) => {
-        result[key] = LegacyApi.prefs.get(key);
-      });
-      return result;
-    }
-    console.error();
-  }
-
-  public set(aKeys: {[key: string]: any}) {
-    this.assertReady();
-    try {
-      Object.keys(aKeys).forEach((key) => {
-        LegacyApi.prefs.set(key, aKeys[key]);
-      });
-      LegacyApi.prefs.save();
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error when saving to storage! Details:");
-      console.dir(aKeys);
-      console.dir(error);
-      return Promise.reject(error);
-    }
+    return rv;
   }
 }

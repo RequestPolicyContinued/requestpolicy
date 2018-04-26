@@ -33,11 +33,10 @@ declare const $: typeof JQuery;
   const {
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
+    log,
     rp,
-    Log,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
-
-  const log = Log.instance;
+  const cachedSettings = rp.storage.cachedSettings!;
 
   // ===========================================================================
 
@@ -47,14 +46,14 @@ declare const $: typeof JQuery;
   }
 
   function handleDefaultPolicyChange() {
-    rp.storage.set({
+    cachedSettings.set({
       "defaultPolicy.allow": $id("defaultallow").checked,
     }).catch(log.onError("handleDefaultPolicyChange"));
     setAllowSameDomainBlockDisplay();
   }
 
   function handleAllowSameDomainChange() {
-    rp.storage.set({
+    cachedSettings.set({
       "defaultPolicy.allowSameDomain": $id("allowsamedomain").checked,
     }).catch(log.onError("handleAllowSameDomainChange"));
   }
@@ -124,7 +123,7 @@ declare const $: typeof JQuery;
 
     // Populate the form values based on the user's current settings.
 
-    const defaultAllow = rp.storage.get("defaultPolicy.allow");
+    const defaultAllow = cachedSettings.get("defaultPolicy.allow");
     $id("defaultallow").checked = defaultAllow;
     $id("defaultdeny").checked = !defaultAllow;
     if (!defaultAllow) {
@@ -132,7 +131,7 @@ declare const $: typeof JQuery;
     }
 
     $id("allowsamedomain").checked =
-        rp.storage.get("defaultPolicy.allowSameDomain");
+        cachedSettings.get("defaultPolicy.allowSameDomain");
 
     // FIXME: Add a pref to disable subscriptions globally;  issue #713
     // Subscriptions are only simple here if we assume the user

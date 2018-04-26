@@ -20,7 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { API, JSMs } from "bootstrap/api/interfaces";
+import { IModule } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 import * as I18nUtils from "./i18n-utils";
 import {LocaleData} from "./locale-data";
@@ -28,12 +29,13 @@ import {LocaleData} from "./locale-data";
 /**
  * This object manages loading locales for i18n support.
  */
-export class AsyncLocaleData extends LocaleData {
+export class AsyncLocaleData extends LocaleData implements IModule {
   private dReady = defer();
 
   constructor(
       private tryCatchUtils: API.ITryCatchUtils,
       private chromeFileService: API.services.IChromeFileService,
+      private mozServices: JSMs.Services,
   ) {
     super();
   }
@@ -48,7 +50,10 @@ export class AsyncLocaleData extends LocaleData {
    * @return {String}
    */
   public getAppLocale() {
-    const appLocale = this.tryCatchUtils.getAppLocale();
+    const appLocale = this.tryCatchUtils.getAppLocale(
+        this.mozServices.prefs,
+        this.mozServices.locale,
+    );
     return I18nUtils.normalizeToBCP47(appLocale);
   }
 

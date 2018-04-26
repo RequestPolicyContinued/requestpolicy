@@ -20,20 +20,24 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { IModule, Module } from "lib/classes/module";
-import { Log } from "models/log";
+import { SettingsMigration } from "./settings-migration";
 
 export class Migration extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
+      public readonly settingsMigration: SettingsMigration,
       public readonly v0Rules: V0RulesMigration | null,
   ) {
     super("app.migration", log);
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {};
+    const rv: {[k: string]: IModule} = {
+      settingsMigration: this.settingsMigration,
+    };
     if (this.v0Rules) { rv.v0Rules = this.v0Rules; }
     return rv;
   }

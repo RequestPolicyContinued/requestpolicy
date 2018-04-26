@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,32 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Log} from "models/log";
+import { AsyncSettings } from "app/storage/async-settings";
+import { RPLog } from "lib/classes/rp-log";
+import { defer } from "lib/utils/js-utils";
 
-const log = Log.instance;
-
-function onStorageChange(aChanges, aAreaName) {
-  if (aChanges.hasOwnProperty("log")) {
-    log.setEnabled(aChanges.log.newValue);
-  }
-  if (aChanges.hasOwnProperty("log.level")) {
-    log.setLevel(aChanges["log.level"].newValue);
-  }
-}
-
-export const LogController = {
-  startup() {
-    browser.storage.local.get([
-      "log",
-      "log.level",
-    ]).then((result) => {
-      log.setEnabled(result.log);
-      log.setLevel(result["log.level"]);
-      return;
-    }).catch((e) => {
-      log.error("Error initializing the Log:", e);
-    });
-
-    browser.storage.onChanged.addListener(onStorageChange);
-  },
-};
+export const dAsyncSettings = defer<AsyncSettings>();
+export const log = new RPLog(dAsyncSettings.promise);

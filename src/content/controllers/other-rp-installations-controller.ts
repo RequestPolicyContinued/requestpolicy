@@ -21,12 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { log } from "app/log";
 import {C} from "data/constants";
 import {FilteredManagement} from "lib/classes/filtered-management";
-import {Log} from "models/log";
 import {NotificationID, Notifications} from "models/notifications";
-
-const log = Log.instance;
 
 const {AMO} = C;
 

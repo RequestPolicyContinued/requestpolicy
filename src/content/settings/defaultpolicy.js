@@ -28,11 +28,12 @@ import {WinEnv, elManager, $id} from "./common";
     ManagerForPrefObservers,
     rp,
   } = browser.extension.getBackgroundPage();
+  const {cachedSettings} = rp.storage;
 
   // ===========================================================================
 
   function updateDisplay() {
-    var defaultallow = rp.storage.get("defaultPolicy.allow");
+    var defaultallow = cachedSettings.get("defaultPolicy.allow");
     if (defaultallow) {
       $id("defaultallow").checked = true;
       $id("defaultdenysetting").hidden = true;
@@ -41,10 +42,10 @@ import {WinEnv, elManager, $id} from "./common";
       $id("defaultdenysetting").hidden = false;
     }
 
-    var allowsamedomain = rp.storage.get("defaultPolicy.allowSameDomain");
+    var allowsamedomain = cachedSettings.get("defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
 
-    let allowTopLevel = rp.storage.get("defaultPolicy.allowTopLevel");
+    let allowTopLevel = cachedSettings.get("defaultPolicy.allowTopLevel");
     $id("allowtoplevel").checked = allowTopLevel;
   }
 
@@ -59,7 +60,7 @@ import {WinEnv, elManager, $id} from "./common";
         $id("defaultallow"), "change",
         function(event) {
           var allow = event.target.checked;
-          rp.storage.set({"defaultPolicy.allow": allow});
+          cachedSettings.set({"defaultPolicy.allow": allow});
           updateDisplay();
           showManageSubscriptionsLink();
         }
@@ -69,7 +70,7 @@ import {WinEnv, elManager, $id} from "./common";
         $id("defaultdeny"), "change",
         function(event) {
           var deny = event.target.checked;
-          rp.storage.set({"defaultPolicy.allow": !deny});
+          cachedSettings.set({"defaultPolicy.allow": !deny});
           updateDisplay();
           showManageSubscriptionsLink();
         }
@@ -79,7 +80,7 @@ import {WinEnv, elManager, $id} from "./common";
         $id("allowsamedomain"), "change",
         function(event) {
           var allowSameDomain = event.target.checked;
-          rp.storage.set({
+          cachedSettings.set({
             "defaultPolicy.allowSameDomain": allowSameDomain,
           });
         }
@@ -89,7 +90,7 @@ import {WinEnv, elManager, $id} from "./common";
         $id("allowtoplevel"), "change",
         function(event) {
           let allowTopLevel = event.target.checked;
-          rp.storage.set({
+          cachedSettings.set({
             "defaultPolicy.allowTopLevel": allowTopLevel,
           });
         }

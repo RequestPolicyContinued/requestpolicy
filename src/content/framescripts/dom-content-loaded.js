@@ -22,7 +22,7 @@
  */
 
 import {rp} from "app/app.content";
-import {Log} from "models/log";
+import {log} from "app/log";
 import {
   Environment,
   Level as EnvLevel,
@@ -35,7 +35,6 @@ import {overlayComm} from "framescripts/managers";
 import {ManagerForBlockedContent}
   from "framescripts/blocked-content.js";
 
-const log = Log.instance;
 const uriServices = rp.services.uri;
 
 export const ManagerForDOMContentLoaded = (function() {

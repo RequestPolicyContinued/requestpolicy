@@ -33,7 +33,7 @@ const keyboardShortcuts = [];
 
 export const KeyboardShortcutController = {
   startupPreconditions: [
-    rp.storage.pReady,
+    rp.storage.cachedSettings.pReady,
     pWindowsAvailable,
     rpWindowManager.pStartup,
   ],

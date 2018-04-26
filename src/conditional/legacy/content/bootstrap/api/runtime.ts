@@ -21,17 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { API } from "bootstrap/api/interfaces";
+import { JSMs } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
 
-declare const Services: any;
-
 export class Runtime extends Module {
   private events = createListenersMap(["onMessage"]);
 
-  constructor(log: API.ILog) {
+  constructor(
+      log: Common.ILog,
+      private mozAppinfo: JSMs.Services["appinfo"],
+  ) {
     super("browser.runtime", log);
   }
 
@@ -55,7 +57,7 @@ export class Runtime extends Module {
   }
 
   private getBrowserInfo() {
-    const {name, vendor, version, appBuildID: buildID} = Services.appinfo;
+    const {name, vendor, version, appBuildID: buildID} = this.mozAppinfo;
     return Promise.resolve({name, vendor, version, buildID});
   }
 
@@ -85,7 +87,7 @@ export class Runtime extends Module {
     // 1) ^(?:\.\/|\/)? : non capturing group for leading "/" or "./"
     const patternChrome = /^(?:\.\/|\/)?(.+)$/mg;
 
-    let legacyPath = null;
+    let legacyPath: string;
 
     if (patternAbout.test(path)) {
       legacyPath = path.replace(patternAbout, "about:requestpolicy?$1");

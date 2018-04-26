@@ -20,21 +20,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { API } from "./interfaces";
+import { API, JSMs } from "./interfaces";
 
 export class Api extends Module {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       public readonly extension: API.extension.IExtension,
       public readonly i18n: API.i18n.II18n,
       public readonly management: API.management.IManagement,
       public readonly manifest: API.IManifest,
+      public readonly privacy: API.privacy.IPrivacy,
       public readonly runtime: API.runtime.IRuntime,
       public readonly storage: API.storage.IStorage,
+      private readonly prefsService: JSMs.Services["prefs"],
       private readonly miscInfos: API.IMiscInfos,
-      private readonly prefs: API.storage.IPrefs,
+      private readonly rpPrefBranch: API.storage.IPrefBranch,
       private readonly prefObserverFactory: API.storage.PrefObserverFactory,
+      private readonly tryCatchUtils: API.ITryCatchUtils,
   ) {
     super("API", log);
   }
@@ -45,6 +49,7 @@ export class Api extends Module {
       i18n: this.i18n,
       management: this.management,
       manifest: this.manifest,
+      privacy: this.privacy,
       runtime: this.runtime,
       storage: this.storage,
     };
@@ -55,6 +60,7 @@ export class Api extends Module {
       extension: this.extension.backgroundApi,
       i18n: this.i18n.backgroundApi,
       management: this.management.backgroundApi,
+      privacy: this.privacy.backgroundApi,
       runtime: this.runtime.backgroundApi,
       storage: this.storage.backgroundApi,
     };
@@ -74,8 +80,10 @@ export class Api extends Module {
       createPrefObserver: this.prefObserverFactory,
       i18n: this.i18n.legacyApi,
       miscInfos: this.miscInfos,
-      prefs: this.prefs,
+      prefsService: this.prefsService,
+      rpPrefBranch: this.rpPrefBranch,
       storage: {},
+      tryCatchUtils: this.tryCatchUtils,
     };
   }
 

@@ -21,18 +21,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
-declare const LegacyApi: any;
-
-import { VersionInfoService } from "app/services/version-info-service";
-import { Storage } from "app/storage/storage.module";
+import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 import {NotificationID, Notifications} from "models/notifications";
 
 export class InitialSetup extends Module {
   protected get startupPreconditions() {
     return [
-      this.storage.whenReady,
+      this.cachedSettings.whenReady,
       this.versionInfo.whenReady,
     ];
   }
@@ -41,9 +39,12 @@ export class InitialSetup extends Module {
       this.onNotificationsTabOpened.bind(this);
 
   constructor(
-      log: Log,
-      private storage: Storage,
-      private versionInfo: VersionInfoService,
+      log: Common.ILog,
+      private cachedSettings: App.storage.ICachedSettings,
+      private versionInfo: App.services.IVersionInfoService,
+      private xpcApi: {
+        rpPrefBranch: API.ILegacyApi["rpPrefBranch"],
+      },
   ) {
     super("app.ui.initialSetup", log);
   }
@@ -57,21 +58,21 @@ export class InitialSetup extends Module {
     Notifications.onTabOpened.removeListener(
         this.onNotificationsTabOpenedListener,
     );
-    this.storage.set({welcomeWindowShown: true}).
+    this.cachedSettings.set({welcomeWindowShown: true}).
         catch(this.log.onError("onNotificationsTabOpened"));
   }
 
   private maybeShowSetupTab() {
-    if (this.storage.get("welcomeWindowShown")) return;
+    if (this.cachedSettings.get("welcomeWindowShown")) return;
 
     if (this.versionInfo.isRPUpgrade) {
       // If the use has just upgraded from an 0.x version, set the
       // default-policy preferences based on the old preferences.
-      this.storage.set({"defaultPolicy.allow": false}).
+      this.cachedSettings.set({"defaultPolicy.allow": false}).
           catch(this.log.onError("set defaultPolicy.allow"));
-      if (LegacyApi.prefs.isSet("uriIdentificationLevel")) {
-        const identLevel = this.storage.get("uriIdentificationLevel");
-        this.storage.set({
+      if (this.xpcApi.rpPrefBranch.isSet("uriIdentificationLevel")) {
+        const identLevel = this.cachedSettings.get("uriIdentificationLevel");
+        this.cachedSettings.set({
           "defaultPolicy.allowSameDomain": identLevel === 1,
         }).catch(this.log.onError("set defaultPolicy.allowSameDomain"));
       }

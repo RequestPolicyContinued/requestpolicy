@@ -19,11 +19,11 @@ const {expect} = chai;
 // Those mocks are needed because some scripts loads XPCOM objects like :
 // const {NetUtil} = Cu.import("resource://gre/modules/NetUtil.jsm");
 import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
-import {Components as MockComponents} from "./lib/mock-components";
 import {Services as MockServices} from "./lib/mock-services";
 
 import {AsyncLocaleData} from "bootstrap/api/i18n/async-locale-data";
 import {ChromeFileService} from "bootstrap/api/services/chrome-file-service";
+import { CIMap } from "lib/classes/case-insensitive-map";
 
 let sandbox = sinon.createSandbox();
 
@@ -34,12 +34,12 @@ function createMockTryCatchUtils(appLocale: string) {
 }
 
 describe("AsyncLocaleData", function() {
-  let chromeFileService: stubbedCFS = null;
-  let asyncLocaleData: AsyncLocaleData = null;
+  let chromeFileService: stubbedCFS;
+  let asyncLocaleData: AsyncLocaleData;
 
   let mockNu: MockNetUtil;
   let mockServices: MockServices;
-  let mockTryCatchUtils = null;
+  let mockTryCatchUtils;
 
   before(function() {
     mockNu = new MockNetUtil();
@@ -53,7 +53,9 @@ describe("AsyncLocaleData", function() {
   });
 
   beforeEach(function() {
-    asyncLocaleData = new AsyncLocaleData(mockTryCatchUtils, chromeFileService);
+    asyncLocaleData = new AsyncLocaleData(
+        mockTryCatchUtils, chromeFileService, mockServices as any,
+    );
   });
 
   afterEach(function() {
@@ -66,6 +68,7 @@ describe("AsyncLocaleData", function() {
       asyncLocaleData = new AsyncLocaleData(
           createMockTryCatchUtils("fr-FR") as any,
           chromeFileService,
+          mockServices as any,
       );
 
       let result = asyncLocaleData.getAppLocale();
@@ -76,6 +79,7 @@ describe("AsyncLocaleData", function() {
       asyncLocaleData = new AsyncLocaleData(
           createMockTryCatchUtils("-invalid tag") as any,
           chromeFileService,
+          mockServices as any,
       );
 
       let fn = function() {
@@ -221,34 +225,34 @@ describe("AsyncLocaleData", function() {
 
   describe("updateLocalesPrefs(defaultLocale, uiLocale)", function() {
     it("Should find best match for default locale", function() {
-      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en-US", "de");
       expect(result.default).to.equal("en");
       expect(asyncLocaleData.defaultLocale).to.equal("en");
     });
 
     it("Should find best match for ui locale", function() {
-      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en", "fr-FR");
       expect(result.selected).to.equal("fr");
       expect(asyncLocaleData.selectedLocale).to.equal("fr");
     });
 
     it("Should throw error if no match for default locale", function() {
-      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let fn = () => asyncLocaleData.updateLocalesPrefs("de", "fr");
       expect(fn).to.throw(Error);
     });
 
     it("Should use fallback if no match for ui locale", function() {
-      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en", "de");
       expect(result.selected).to.equal("de");
       expect(asyncLocaleData.selectedLocale).to.equal("de");
     });
 
     it("Should normalized locales tag during search", function() {
-      asyncLocaleData.messages = new Map([["en", {}], ["fr", {}]]);
+      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("En-uS", "fR-fR");
       expect(result.default).to.equal("en");
       expect(result.selected).to.equal("fr");

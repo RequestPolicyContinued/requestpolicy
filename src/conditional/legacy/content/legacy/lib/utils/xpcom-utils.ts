@@ -25,12 +25,6 @@ import {
   XPCOMObserverTopic,
 } from "lib/classes/xpcom-observer";
 import {defer} from "lib/utils/js-utils";
-import {
-  getComplexValueFromPrefBranch,
-} from "lib/utils/try-catch-utils";
-
-declare const Ci: any;
-declare const LegacyApi: any;
 
 export function promiseObserverTopic(aTopic: XPCOMObserverTopic) {
   const deferred = defer<[any, string, any]>();
@@ -43,31 +37,4 @@ export function promiseObserverTopic(aTopic: XPCOMObserverTopic) {
   const observer = new XPCOMObserver(aTopic, callback);
 
   return deferred.promise;
-}
-
-/**
- * @param {string} aPrefName
- * @return {string} The value of the pref, or an empty string if
- *     the pref does not exist.
- */
-function getRPV0PrefString(aPrefName: string): string {
-  const result = getComplexValueFromPrefBranch(
-      LegacyApi.prefs.branches.rp.branch, aPrefName, Ci.nsISupportsString);
-  if (!result.error) return result.value!;
-  const e = result.error;
-  if (e.name !== "NS_ERROR_UNEXPECTED") {
-    console.dir(e);
-  }
-  return "";
-}
-
-/**
- * The three strings containing the old rules.
- */
-export function getRPV0PrefStrings() {
-  return {
-    dests: getRPV0PrefString("allowedDestinations"),
-    origins: getRPV0PrefString("allowedOrigins"),
-    originsToDests: getRPV0PrefString("allowedOriginsToDestinations"),
-  };
 }

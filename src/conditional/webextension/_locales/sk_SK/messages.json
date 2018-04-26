@@ -149,16 +149,6 @@
     "description": "Enabled"
   },
 
-  "disableOnStartup": {
-    "message": "Vypnúť pri spustení",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "Obnoviť pôvodné pri odinštalovaní RequestPolicy",
-    "description": "Restore default when RequestPolicy is uninstalled"
-  },
-
   "origin": {
     "message": "Zdroj",
     "description": "Origin"

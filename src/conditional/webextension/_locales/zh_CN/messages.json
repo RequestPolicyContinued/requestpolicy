@@ -219,29 +219,9 @@
     "description": "Advanced Preferences"
   },
 
-  "linkPrefetching": {
-    "message": "链接预取",
-    "description": "Link Prefetching"
-  },
-
-  "dnsPrefetching": {
-    "message": "DNS 预取",
-    "description": "DNS Prefetching"
-  },
-
   "enabled": {
     "message": "启用",
     "description": "Enabled"
-  },
-
-  "disableOnStartup": {
-    "message": "在启动时禁用",
-    "description": "Disable on startup"
-  },
-
-  "restoreDefaultOnUninstall": {
-    "message": "RequestPolicy 卸载时恢复默认",
-    "description": "Restore default when RequestPolicy is uninstalled"
   },
 
   "menuPreferences": {

@@ -16,7 +16,7 @@ function genMaybePromise({isFulfilled, isPromiseWrapper, value = {}}) {
 
 function callDescribeOrIt(aDescribeOrIt, aDescription, aFn, aArgs) {
   aDescribeOrIt(aDescription, function() {
-    // eslint-disable-next-line no-invalid-this
+    // @ts-ignore
     aFn.apply(this, aArgs);
   });
 }
@@ -39,11 +39,10 @@ function callForFulfilledAndRejected(aDescribeOrIt, aFn, aDescriptionPrefix = ""
   });
 }
 
-// eslint-disable-next-line camelcase
 function callFor_fulfilledAndRejected_fakeAndRealPromise(aDescribe, aFn, aDescriptionPrefix = "") {
   callForFulfilledAndRejected(aDescribe, function({isFulfilled}) {
     callForFakeAndRealPromise(describe, function({isPromiseWrapper}) {
-      // eslint-disable-next-line no-invalid-this
+      // @ts-ignore
       aFn.call(this, {isPromiseWrapper, isFulfilled});
     }, aDescriptionPrefix);
   }, aDescriptionPrefix);

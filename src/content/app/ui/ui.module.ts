@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
-import { Log } from "models/log";
 import { InitialSetup } from "./initial-setup";
 
 export class Ui extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
       public readonly initialSetup: InitialSetup,
   ) {
     super("app.ui", log);

@@ -74,7 +74,7 @@ export function registerAsyncStartup(
 }
 
 export function whenReady(...aDependencies: AllowedName[]) {
-  const promises = [];
+  const promises: Array<Promise<void>> = [];
   // tslint:disable-next-line prefer-const
   for (let name of aDependencies) {
     if (!ALLOWED_NAMES.has(name)) {

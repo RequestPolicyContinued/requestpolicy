@@ -29,9 +29,9 @@ declare const Services: any;
 
 (() => {
   const {
-    Log: {instance: log},
     SUBSCRIPTION_ADDED_TOPIC,
     SUBSCRIPTION_REMOVED_TOPIC,
+    log,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
@@ -47,7 +47,11 @@ declare const Services: any;
 
   function getAllSubscriptionElements() {
     const divs = document.getElementsByClassName("subscription");
-    const elements = [];
+    const elements: Array<{
+      div: Element;
+      id: string;
+      input: Element | null;
+    }> = [];
     for (let i = 0, len = divs.length; i < len; ++i) {
       const div = divs[i];
       elements.push({

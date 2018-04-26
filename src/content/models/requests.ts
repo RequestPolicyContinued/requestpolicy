@@ -22,11 +22,10 @@
  */
 
 import {rp} from "app/app.background";
+import {log} from "app/log";
 import {RequestSet} from "lib/request-set";
 import {createListenersMap} from "lib/utils/listener-factories";
-import {Log} from "models/log";
 
-const log = Log.instance;
 const uriService = rp.services.uri;
 
 const logGettingSavedRequests = log.extend({

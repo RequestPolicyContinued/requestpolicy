@@ -20,19 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let allControllers: Array<{[key: string]: any}> = [];
-
-// import the Log first! It needs to get logging prefs from storage (async).
-import {LogController} from "controllers/log-controller";
 import {Controllers} from "lib/classes/controllers";
-{
-  const controllers = [LogController];
-  (new Controllers(controllers)).startup();
-  allControllers = allControllers.concat(controllers);
-}
-import { Log } from "models/log";
-
-const log = Log.instance;
 
 import {C} from "data/constants";
 import {
@@ -40,7 +28,6 @@ import {
 } from "legacy/lib/commonjs-unload-subject";
 
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
-import {PrefManager} from "main/pref-manager";
 
 import {rp} from "app/app.background";
 import "main/about-uri";
@@ -61,6 +48,7 @@ import {
 import "ui-testing/services";
 // @endif
 
+let allControllers: Array<{[key: string]: any}> = [];
 const controllersToBeStartedUp = [
   KeyboardShortcutController,
 
@@ -72,6 +60,7 @@ allControllers = allControllers.concat(controllersToBeStartedUp);
 
 // =============================================================================
 
+import { log } from "app/log";
 import {BackgroundPage} from "models/background-page";
 
 declare const _setBackgroundPage: (
@@ -137,8 +126,6 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 // =============================================================================
 
 (function startup() {
-  PrefManager.init();
-
   rp.startup().catch(log.onError("main startup"));
 
   try {

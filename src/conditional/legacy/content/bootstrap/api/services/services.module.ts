@@ -21,11 +21,12 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
 
 export class ServicesApi extends Module {
   constructor(
-      log: API.ILog,
+      log: Common.ILog,
       public chromeFileService: API.services.IChromeFileService,
       public fileService: API.services.IFileService,
   ) {

@@ -106,7 +106,7 @@ export function defineLazyGetter<V = any>(
   });
 }
 
-export function isPromise<T>(aObj: T | Promise<T>): aObj is Promise<T> {
+export function isThenable<T>(aObj: T | Promise<T>): aObj is Promise<T> {
   if (!aObj) return false;
   if (typeof aObj !== "object") return false;
   return typeof (aObj as Promise<T>).then === "function";

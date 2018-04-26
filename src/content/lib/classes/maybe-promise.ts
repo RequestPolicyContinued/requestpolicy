@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {isPromise} from "lib/utils/js-utils";
+import {isThenable} from "lib/utils/js-utils";
 
 type IMaybePromiseSpec<T> = {
   status: "PROMISE";
@@ -36,7 +36,7 @@ type IMaybePromiseSpec<T> = {
 export class MaybePromise<T> {
   public static resolve<U>(aVal: U | Promise<U> | MaybePromise<U>) {
     if (aVal instanceof MaybePromise) return aVal as MaybePromise<U>;
-    if (isPromise(aVal)) {
+    if (isThenable(aVal)) {
       return new MaybePromise<U>({
         promise: aVal,
         status: "PROMISE",

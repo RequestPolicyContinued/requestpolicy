@@ -24,8 +24,8 @@ import { App } from "app/interfaces";
 import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 import { Common } from "common/interfaces";
 import {
-  SettingsMigrationToWebExtension,
-} from "legacy/app/migration/settings-migration-to-we";
+  StorageMigrationToWebExtension,
+} from "legacy/app/migration/storage-migration-to-we";
 import { Module } from "lib/classes/module";
 
 export class SettingsMigration extends Module
@@ -38,7 +38,7 @@ export class SettingsMigration extends Module
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private settingsMigration: SettingsMigrationToWebExtension | null,
+      private settingsMigration: StorageMigrationToWebExtension | null,
   ) {
     super("app.migration.settings", log);
   }

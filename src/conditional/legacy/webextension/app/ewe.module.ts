@@ -21,8 +21,8 @@
  */
 
 import {
-  SettingsMigrationFromXpcom,
-} from "controllers/settings-migration-from-xpcom";
+  StorageMigrationFromXpcom,
+} from "controllers/storage-migration-from-xpcom";
 import { Connection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
@@ -31,7 +31,7 @@ export class EweModule extends Module {
   constructor(
       log: Log,
       public readonly legacyConnection: Connection<any, any>,
-      public readonly settingsMigration: SettingsMigrationFromXpcom,
+      public readonly settingsMigration: StorageMigrationFromXpcom,
   ) {
     super("ewe", log);
   }

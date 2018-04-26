@@ -22,8 +22,8 @@
 
 import { EweModule } from "app/ewe.module";
 import {
-  SettingsMigrationFromXpcom,
-} from "controllers/settings-migration-from-xpcom";
+  StorageMigrationFromXpcom,
+} from "controllers/storage-migration-from-xpcom";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
 import { getPortFromMasterConnectable } from "lib/utils/connection-utils";
@@ -41,7 +41,7 @@ const legacyConnection = new Connection(
     C.EWE_CONNECTION_LEGACY_ID,
     promiseLegacyPort,
 );
-const settingsMigration = new SettingsMigrationFromXpcom(
+const settingsMigration = new StorageMigrationFromXpcom(
     log, legacyConnection, browser.storage,
 );
 const ewe = new EweModule(log, legacyConnection, settingsMigration);

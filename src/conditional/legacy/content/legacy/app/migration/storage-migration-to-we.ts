@@ -33,7 +33,7 @@ interface IResponse {
   value: any;
 }
 
-export class SettingsMigrationToWebExtension extends Module {
+export class StorageMigrationToWebExtension extends Module {
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
@@ -189,7 +189,7 @@ export class SettingsMigrationToWebExtension extends Module {
 
   private createMessage(aType: string, aValue: any) {
     return {
-      target: "settings-migration-from-xpcom",
+      target: "storage-migration-from-xpcom",
       type: aType,
       value: aValue,
     };

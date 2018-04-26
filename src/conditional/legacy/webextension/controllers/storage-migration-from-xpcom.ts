@@ -24,7 +24,7 @@ import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import { Log } from "models/log";
 
-const TARGET_NAME = "settings-migration-from-xpcom";
+const TARGET_NAME = "storage-migration-from-xpcom";
 const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";
 
 // =============================================================================
@@ -36,7 +36,7 @@ interface IStorageChanges { [key: string]: StorageChange; }
 
 // =============================================================================
 
-export class SettingsMigrationFromXpcom extends Module {
+export class StorageMigrationFromXpcom extends Module {
   private lastStorageChange: string | null = null;
 
   constructor(

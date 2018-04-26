@@ -11,11 +11,11 @@ const {destructureOptions} = require("../lib/utils");
 const {defer} = require("lib/utils/js-utils");
 
 const {Log} = require("models/log");
-const {SettingsMigrationToWebExtension} = require(
-    "legacy/app/migration/settings-migration-to-we"
+const {StorageMigrationToWebExtension} = require(
+    "legacy/app/migration/storage-migration-to-we"
 );
-const {SettingsMigrationFromXpcom} = require(
-    "controllers/settings-migration-from-xpcom"
+const {StorageMigrationFromXpcom} = require(
+    "controllers/storage-migration-from-xpcom"
 );
 
 function stubStorageLocalGet(aStorage, aInitialFullStorage) {
@@ -64,12 +64,12 @@ describe("legacy settings migration:", function() {
 
   beforeEach(() => {
     eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
-    LegacySideController = new SettingsMigrationToWebExtension(
+    LegacySideController = new StorageMigrationToWebExtension(
         Log.instance,
         browser.storage,
         eweExternalBrowser.runtime
     );
-    WebextSideController = new SettingsMigrationFromXpcom(
+    WebextSideController = new StorageMigrationFromXpcom(
         Log.instance,
         eweInternalBrowser.runtime,
         eweInternalBrowser.storage

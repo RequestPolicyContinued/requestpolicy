@@ -24,8 +24,8 @@
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {
-  SettingsMigrationToWebExtension,
-} from "legacy/app/migration/settings-migration-to-we";
+  StorageMigrationToWebExtension,
+} from "legacy/app/migration/storage-migration-to-we";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
@@ -74,7 +74,7 @@ import { Ui } from "./ui/ui.module";
 const localStorageArea = browser.storage.local;
 
 const {eweConnection, webextSettingsMigration}: {
-  webextSettingsMigration: SettingsMigrationToWebExtension | null,
+  webextSettingsMigration: StorageMigrationToWebExtension | null,
   eweConnection: Connection<any, any> | null,
 } = C.EXTENSION_TYPE === "legacy" ? (() => {
   // @if EXTENSION_TYPE='legacy'
@@ -92,7 +92,7 @@ const {eweConnection, webextSettingsMigration}: {
       C.EWE_CONNECTION_EWE_ID,
       promiseEwePort,
   );
-  const rvWebextSettingsMigration = new SettingsMigrationToWebExtension(
+  const rvWebextSettingsMigration = new StorageMigrationToWebExtension(
       log,
       browser.storage,
       rvEWEConnection,

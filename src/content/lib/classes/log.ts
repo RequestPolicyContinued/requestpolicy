@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import {C} from "data/constants";
 
 // ===========================================================================
@@ -53,7 +54,7 @@ interface IEnabledCondition {
 }
 
 interface IAllLogOptions<TAdditional = never> {
-  enabled: boolean | TAdditional;
+  enabled: boolean | TAdditional | Promise<boolean>;
   enabledCondition: IEnabledCondition | TAdditional;
   level: LogLevel | TAdditional;
   name: string | TAdditional;
@@ -88,12 +89,19 @@ const ROOT_OPTIONS: IInternalLogOptions = {
   prefix: C.LOG_PREFIX,
 };
 
-export class Log {
+type Stage2LogArgs = [LogLevel, LogFnName, string[], any[]];
+interface IDelayedLogArgs {
+  forceLog: boolean;
+  logArgs: Stage2LogArgs;
+}
+
+export class Log implements Common.ILog {
   private ownInternalOptions: IInternalLogOptions<null> = {
     enabled: null,
     level: null,
     prefix: "",
   };
+  private ownDelayedLogs: Map<Promise<boolean>, IDelayedLogArgs[]> = new Map();
   private parent: Log | null = null;
 
   public constructor(aOptions?: ILogOptions, aParent?: Log) {
@@ -126,7 +134,7 @@ export class Log {
 
   // getter methods
 
-  public get enabled(): boolean {
+  public get enabled(): boolean | Promise<boolean> {
     return this.getInternalOption("enabled");
   }
 
@@ -179,19 +187,19 @@ export class Log {
   }
 
   public error(msg: string | string[], ...errorsAndOtherDirArgs: any[]) {
-    this.logInternal(LogLevel.ERROR, "error", msg, ...errorsAndOtherDirArgs);
+    this.maybeLogInternal(LogLevel.ERROR, "error", msg, errorsAndOtherDirArgs);
   }
 
   public log(msg: string | string[], ...args: any[]) {
-    this.logInternal(LogLevel.DEBUG, "log", msg, ...args);
+    this.maybeLogInternal(LogLevel.DEBUG, "log", msg, args);
   }
 
   public info(msg: string | string[], ...args: any[]) {
-    this.logInternal(LogLevel.INFO, "info", msg, ...args);
+    this.maybeLogInternal(LogLevel.INFO, "info", msg, args);
   }
 
   public warn(msg: string | string[], ...args: any[]) {
-    this.logInternal(LogLevel.WARNING, "warn", msg, ...args);
+    this.maybeLogInternal(LogLevel.WARNING, "warn", msg, args);
   }
 
   public onError(msg: string | string[], ...args: any[]) {
@@ -202,7 +210,27 @@ export class Log {
 
   // setter methods
 
-  public setEnabled(enabled: boolean | null) {
+  public setEnabled(enabled: boolean | null | Promise<boolean>) {
+    if (typeof (enabled as Promise<boolean>).then === "function") {
+      const pEnabled = enabled as Promise<boolean>;
+      const delayedLog: IDelayedLogArgs[] = [];
+      this.ownDelayedLogs.set(pEnabled, delayedLog);
+      pEnabled.then((finallyEnabled) => {
+        if (this.ownInternalOptions.enabled === pEnabled) {
+          this.ownInternalOptions.enabled = finallyEnabled;
+        }
+        delayedLog.forEach(({forceLog, logArgs}) => {
+          if (finallyEnabled || forceLog) {
+            logArgs[2][0] = `[DELAYED] ${logArgs[2][0]}`;
+            this.logNowInternal.apply(this, logArgs);
+          }
+        });
+        this.ownDelayedLogs.delete(pEnabled);
+      }).catch((e) => {
+        console.error(`An error occurred:`);
+        console.dir(e);
+      });
+    }
     this.ownInternalOptions.enabled = enabled;
   }
 
@@ -268,11 +296,17 @@ export class Log {
     return ROOT_OPTIONS[aOption];
   }
 
-  private shouldLog(aLevel: LogLevel) {
-    if (this.enabled && aLevel >= this.level) {
-      return true;
+  private getDelayedLog(aEnabledPromise: Promise<boolean>): IDelayedLogArgs[] {
+    if (this.ownDelayedLogs.has(aEnabledPromise)) {
+      return this.ownDelayedLogs.get(aEnabledPromise)!;
     }
+    if (this.parent !== null) {
+      return this.parent.getDelayedLog(aEnabledPromise);
+    }
+    throw new Error(`Promise not found: ${aEnabledPromise}`);
+  }
 
+  private shouldLog(aLevel: LogLevel): boolean | Promise<boolean> {
     if (aLevel >= MINIMUM_LOGGING_LEVEL) {
       // log even if logging is disabled
       return true;
@@ -283,18 +317,54 @@ export class Log {
       return true;
     }
 
+    if (aLevel >= this.level) {
+      const isPromise = typeof this.enabled !== "boolean";
+      if (isPromise) {
+        return this.enabled as Promise<boolean>;
+      } else if (this.enabled) {
+        return true;
+      }
+    }
+
     return false;
   }
 
-  private logInternal(
+  private maybeLogInternal(
       aLevel: LogLevel,
       aFnName: LogFnName,
       aMsg: string | string[],
-      ...aDirArgs: any[],
+      aDirArgs: any[],
   ) {
-    if (!this.shouldLog(aLevel)) return;
-    if (typeof aMsg !== "object") aMsg = [aMsg];
-    const [firstMsg, ...otherMsgs] = aMsg;
+    const shouldLog = this.shouldLog(aLevel);
+    if (shouldLog === false) return;
+
+    const msgs = typeof aMsg === "object" ? aMsg : [aMsg];
+
+    const isPromise = typeof this.enabled !== "boolean";
+    if (!isPromise) {
+      // shouldLog is definitely true
+      return this.logNowInternal(aLevel, aFnName, msgs, aDirArgs);
+    }
+    const forceLog = shouldLog === true;
+    const delayedLog = this.getDelayedLog(this.enabled as Promise<boolean>);
+    if (!delayedLog) {
+      console.error(`delayedLog for ${this.enabled} is undefined`);
+      console.dir(this.enabled);
+      return;
+    }
+    delayedLog.push({
+      forceLog,
+      logArgs: [aLevel, aFnName, msgs, aDirArgs],
+    });
+  }
+
+  private logNowInternal(
+      aLevel: LogLevel,
+      aFnName: LogFnName,
+      aMsgs: string[],
+      aDirArgs: any[],
+  ) {
+    const [firstMsg, ...otherMsgs] = aMsgs;
     console[aFnName](this.prefix + firstMsg, ...otherMsgs);
     dir(...aDirArgs);
   }

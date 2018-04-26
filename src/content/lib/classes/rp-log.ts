@@ -35,7 +35,7 @@ export class RPLog extends Log {
       prefix: "",
     });
 
-    const pInitialized = asyncSettingsPromise.then((asyncSettings) => {
+    const pEnabled = asyncSettingsPromise.then((asyncSettings) => {
       this.asyncSettings = asyncSettings;
       return asyncSettings.whenReady;
     }).then(() => {
@@ -44,16 +44,19 @@ export class RPLog extends Log {
         "log.level",
       ]);
     }).then((result) => {
-      this.setEnabled(result.log as boolean);
       this.setLevel(result["log.level"] as LogLevel);
+      const enable = result.log as boolean;
 
       this.asyncSettings.onChanged.addListener(
           this.onStorageChange.bind(this),
       );
+
+      return enable;
     });
-    pInitialized.catch((e) => {
+    pEnabled.catch((e) => {
       this.error("Error initializing the logger:", e);
     });
+    this.setEnabled(pEnabled);
   }
 
   private onStorageChange(

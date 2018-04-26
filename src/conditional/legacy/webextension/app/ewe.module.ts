@@ -31,7 +31,7 @@ export class EweModule extends Module {
   constructor(
       log: Log,
       public readonly legacyConnection: Connection<any, any>,
-      public readonly settingsMigration: StorageMigrationFromXpcom,
+      public readonly storageMigrationFromXpcom: StorageMigrationFromXpcom,
   ) {
     super("ewe", log);
   }
@@ -39,7 +39,7 @@ export class EweModule extends Module {
   public get subModules() {
     return {
       legacyConnection: this.legacyConnection,
-      settingsMigration: this.settingsMigration,
+      storageMigrationFromXpcom: this.storageMigrationFromXpcom,
     };
   }
 }

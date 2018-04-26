@@ -73,8 +73,8 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
-const {eweConnection, webextSettingsMigration}: {
-  webextSettingsMigration: StorageMigrationToWebExtension | null,
+const {eweConnection, webextStorageMigration}: {
+  webextStorageMigration: StorageMigrationToWebExtension | null,
   eweConnection: Connection<any, any> | null,
 } = C.EXTENSION_TYPE === "legacy" ? (() => {
   // @if EXTENSION_TYPE='legacy'
@@ -92,25 +92,25 @@ const {eweConnection, webextSettingsMigration}: {
       C.EWE_CONNECTION_EWE_ID,
       promiseEwePort,
   );
-  const rvWebextSettingsMigration = new StorageMigrationToWebExtension(
+  const rvWebextStorageMigration = new StorageMigrationToWebExtension(
       log,
       browser.storage,
       rvEWEConnection,
   );
   return {
     eweConnection: rvEWEConnection,
-    webextSettingsMigration: rvWebextSettingsMigration,
+    webextStorageMigration: rvWebextStorageMigration,
   };
   // @endif
 })() : {
   eweConnection: null,
-  webextSettingsMigration: null,
+  webextStorageMigration: null,
 };
 
 const settingsMigration = new SettingsMigration(
     log,
     browser.storage.local,
-    webextSettingsMigration,
+    webextStorageMigration,
 );
 const storageReadyPromise = settingsMigration.whenReady;
 

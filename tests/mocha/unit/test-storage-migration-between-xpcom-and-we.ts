@@ -17,7 +17,7 @@ import {createBrowserApi} from "../lib/sinon-chrome";
 import { Log } from "lib/classes/log";
 import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 
-describe("SettingsMigration:", function() {
+describe("StorageMigration:", function() {
   const sinon = sinonStatic.createSandbox();
 
   let browserApi: typeof SinonChrome;

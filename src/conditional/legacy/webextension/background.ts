@@ -41,10 +41,10 @@ const legacyConnection = new Connection(
     C.EWE_CONNECTION_LEGACY_ID,
     promiseLegacyPort,
 );
-const settingsMigration = new StorageMigrationFromXpcom(
+const storageMigrationFromXpcom = new StorageMigrationFromXpcom(
     log, legacyConnection, browser.storage,
 );
-const ewe = new EweModule(log, legacyConnection, settingsMigration);
+const ewe = new EweModule(log, legacyConnection, storageMigrationFromXpcom);
 
 log.log("Embedded WebExtension is being loaded.");
 ewe.startup().catch(log.onError("EWE startup"));

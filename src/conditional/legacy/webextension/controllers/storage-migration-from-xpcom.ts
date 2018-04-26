@@ -44,7 +44,7 @@ export class StorageMigrationFromXpcom extends Module {
       private connectionToLegacy: IConnection,
       private storage: typeof browser.storage,
   ) {
-    super("ewe.settingsMigration", log);
+    super("ewe.storageMigrationFromXpcom", log);
   }
 
   public startupSelf() {

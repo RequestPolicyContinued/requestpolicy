@@ -82,10 +82,10 @@ const keys: {
     cached: true, defaultValue: "0.0",
   },
   "log": {
-    cached: true, defaultValue: 0,
+    cached: true, defaultValue: false,
   },
   "log.level": {
-    cached: true, defaultValue: false,
+    cached: true, defaultValue: 0,
   },
   "menu.info.showNumRequests": {
     cached: true, defaultValue: true,

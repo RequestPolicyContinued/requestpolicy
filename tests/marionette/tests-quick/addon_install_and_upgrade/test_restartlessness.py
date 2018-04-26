@@ -56,3 +56,20 @@ class TestAfterNavigate(CommonTests.TestRequestPolicyRestartlessness):
 
         with self.marionette.using_context("content"):
             self.marionette.navigate("http://localhost/")
+
+
+PREF_LOG_ENABLED = "extensions.requestpolicy.log"
+PREF_LOG_LEVEL = "extensions.requestpolicy.log.level"
+
+
+class TestWithFullLogging(CommonTests.TestRequestPolicyRestartlessness):
+    def setUp(self):
+        super(TestWithFullLogging, self).setUp()
+        self.marionette.set_pref(PREF_LOG_ENABLED, True)
+        self.marionette.set_pref(PREF_LOG_LEVEL, 1000)
+        # Wait some time in order to ensure the browser is in idle.
+        time.sleep(0.2)
+
+    def tearDown(self):
+        self.prefs.reset_pref(PREF_LOG_ENABLED)
+        self.prefs.reset_pref(PREF_LOG_LEVEL)

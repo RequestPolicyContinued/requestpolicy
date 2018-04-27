@@ -1,4 +1,6 @@
 /* eslint-env node */
+// eslint-disable-next-line spaced-comment
+/// <reference types="node" />
 "use strict";
 
 /* eslint max-len: [error, 100], no-multi-spaces: off, object-curly-spacing: off */

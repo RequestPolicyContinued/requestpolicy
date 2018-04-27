@@ -9,7 +9,7 @@ const {
 } = require("../lib/settings-migration-utils");
 const {destructureOptions} = require("../lib/utils");
 
-const {Log} = require("models/log");
+const {Log} = require("lib/classes/log");
 const {StorageMigrationToWebExtension} = require(
     "legacy/app/migration/storage-migration-to-we"
 );
@@ -55,8 +55,9 @@ describe("legacy-side settings migration controller", function() {
 
   beforeEach(() => {
     eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
+    const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
-        Log.instance, browser.storage, eweExternalBrowser.runtime
+        log, browser.storage, eweExternalBrowser.runtime
     );
   });
 

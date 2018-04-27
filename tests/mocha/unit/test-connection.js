@@ -3,7 +3,7 @@
 const {assert} = require("chai");
 const {createBrowserApi, createPort} = require("../lib/sinon-chrome");
 
-const {Log} = require("models/log");
+const {Log} = require("lib/classes/log");
 const {Connection} = require("lib/classes/connection");
 
 describe("connection", function() {
@@ -18,9 +18,10 @@ describe("connection", function() {
 
   beforeEach(() => {
     port = createPort(sinon);
+    const log = new Log();
     connection = new Connection(
         moduleName,
-        Log.instance,
+        log,
         targetName,
         () => Promise.resolve(port)
     );

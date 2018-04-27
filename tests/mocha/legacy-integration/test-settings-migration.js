@@ -10,7 +10,7 @@ const {destructureOptions} = require("../lib/utils");
 
 const {defer} = require("lib/utils/js-utils");
 
-const {Log} = require("models/log");
+const {Log} = require("lib/classes/log");
 const {StorageMigrationToWebExtension} = require(
     "legacy/app/migration/storage-migration-to-we"
 );
@@ -64,13 +64,14 @@ describe("legacy settings migration:", function() {
 
   beforeEach(() => {
     eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
+    const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
-        Log.instance,
+        log,
         browser.storage,
         eweExternalBrowser.runtime
     );
     WebextSideController = new StorageMigrationFromXpcom(
-        Log.instance,
+        log,
         eweInternalBrowser.runtime,
         eweInternalBrowser.storage
     );

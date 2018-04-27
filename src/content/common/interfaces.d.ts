@@ -23,4 +23,13 @@
 import { Log } from "lib/classes/log";
 export namespace Common {
   export type ILog = Log;
+
+  export interface IMasterConnectable {
+    sendMessage: typeof browser.runtime.sendMessage;
+    connect: typeof browser.runtime.connect;
+  }
+  export interface ISlaveConnectable {
+    onConnect: typeof browser.runtime.onConnect;
+    onMessage: typeof browser.runtime.onMessage;
+  }
 }

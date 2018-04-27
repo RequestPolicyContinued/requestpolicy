@@ -20,13 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
+
 type Port = browser.runtime.Port;
 
 export function getPortFromSlaveConnectable(
-    connectable: {
-      onConnect: typeof browser.runtime.onConnect;
-      onMessage: typeof browser.runtime.onMessage;
-    },
+    connectable: Common.ISlaveConnectable,
 ): Promise<Port> {
   return new Promise<Port>((resolve, reject) => {
     const onConnectListener = (aPort: Port) => {
@@ -50,10 +49,7 @@ export function getPortFromSlaveConnectable(
 }
 
 export function getPortFromMasterConnectable(
-    connectable: {
-      sendMessage: typeof browser.runtime.sendMessage;
-      connect: typeof browser.runtime.connect;
-    },
+    connectable: Common.IMasterConnectable,
     maxTries: number = 100,
 ): Promise<Port> {
   return new Promise(async (resolve, reject) => {

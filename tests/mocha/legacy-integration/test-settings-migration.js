@@ -2,6 +2,7 @@
 
 const {assert} = require("chai");
 const mrdescribe = require("mocha-repeat");
+const Sinon = require("sinon");
 const {
   getFullStorageDirection,
 } = require("../lib/settings-migration-utils");
@@ -34,7 +35,7 @@ function maybeAssignLastStorageChange(aObj, aLastStorageChange) {
 
 
 describe("legacy settings migration:", function() {
-  const sinon = require("sinon").sandbox.create();
+  const sinon = Sinon.sandbox.create();
   afterEach(() => sinon.restore());
 
   const browser = createBrowserApi();

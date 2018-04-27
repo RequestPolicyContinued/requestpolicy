@@ -3,6 +3,7 @@
 const {assert} = require("chai");
 const deepFreeze = require("deep-freeze");
 const mrdescribe = require("mocha-repeat");
+const Sinon = require("sinon");
 const {createBrowserApi} = require("../lib/sinon-chrome");
 const {
   getFullStorageDirection,
@@ -21,7 +22,7 @@ function maybeAssignLastStorageChange(aObj, aFullStorage) {
 }
 
 describe("legacy-side settings migration controller", function() {
-  const sinon = require("sinon").sandbox.create();
+  const sinon = Sinon.sandbox.create();
   afterEach(() => sinon.restore());
 
   const browser = createBrowserApi();

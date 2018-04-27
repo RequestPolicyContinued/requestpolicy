@@ -9,7 +9,7 @@ function isPull({
   return new Date(webextLastStorageChange) > new Date(legacyLastStorageChange);
 }
 
-module.exports.getFullStorageDirection = function({
+export function getFullStorageDirection({
   legacySideInitialFullStorage,
   webextSideInitialFullStorage,
 }) {

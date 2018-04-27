@@ -6,6 +6,9 @@
     "paths": {
       "*": [
         "*"
+      ],
+      "common/interfaces": [
+        "../../../content/common/interfaces"
       ]
     }
   },

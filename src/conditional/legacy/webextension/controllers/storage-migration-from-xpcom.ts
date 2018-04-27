@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 const TARGET_NAME = "storage-migration-from-xpcom";
 const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";
@@ -40,7 +40,7 @@ export class StorageMigrationFromXpcom extends Module {
   private lastStorageChange: string | null = null;
 
   constructor(
-      log: Log,
+      log: Common.ILog,
       private connectionToLegacy: IConnection,
       private storage: typeof browser.storage,
   ) {
@@ -51,7 +51,8 @@ export class StorageMigrationFromXpcom extends Module {
     return this.storage.local.get(
         "lastStorageChange",
     ).then((result) => {
-      this.lastStorageChange = result.lastStorageChange || null;
+      this.lastStorageChange =
+          (result.lastStorageChange as string | undefined) || null;
       return this.connectionToLegacy.whenReady;
     }).then(() => {
       this.connectionToLegacy.onMessage.addListener(

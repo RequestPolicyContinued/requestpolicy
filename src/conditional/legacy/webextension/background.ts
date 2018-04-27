@@ -26,8 +26,8 @@ import {
 } from "controllers/storage-migration-from-xpcom";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
+import { Log, LogLevel } from "lib/classes/log";
 import { getPortFromMasterConnectable } from "lib/utils/connection-utils";
-import { Log, LogLevel } from "models/log";
 
 const log = new Log({
   enabled: true,

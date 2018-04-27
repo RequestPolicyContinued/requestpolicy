@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 import { defer, IDeferred } from "lib/utils/js-utils";
 import { createListenersMap } from "lib/utils/listener-factories";
-import { Log } from "models/log";
 
 type Port = browser.runtime.Port;
 
@@ -45,7 +45,7 @@ export class Connection<TRx, TRxResp> extends Module {
 
   constructor(
       moduleName: string,
-      log: Log,
+      log: Common.ILog,
       protected targetName: string,
       private promisePort: () => Promise<Port>,
   ) {

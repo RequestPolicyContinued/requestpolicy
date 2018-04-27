@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
-import { Log } from "models/log";
 
 type StorageMessageType = "full-storage" | "storage-change" |
     "request:full-storage";
@@ -44,7 +44,7 @@ export class StorageMigrationToWebExtension extends Module {
   private dWaitingForEWE = defer<void>();
 
   constructor(
-      log: Log,
+      log: Common.ILog,
       private storage: typeof browser.storage,
       private connectionToEWE: IConnection,
   ) {
@@ -54,7 +54,8 @@ export class StorageMigrationToWebExtension extends Module {
   protected startupSelf(): Promise<void> {
     const pGotLastStorageChange =
         this.storage.local.get("lastStorageChange").then((result) => {
-          this.lastStorageChange = result.lastStorageChange || null;
+          this.lastStorageChange =
+              (result.lastStorageChange as string | undefined) || null;
         });
     return Promise.all([
       this.connectionToEWE.whenReady,
@@ -105,11 +106,11 @@ export class StorageMigrationToWebExtension extends Module {
     }
   }
 
-  private getFullWebextStorage(): Promise<browser.storage.StorageResults> {
+  private getFullWebextStorage(): Promise<browser.storage.StorageObject> {
     return this.connectionToEWE.sendMessage(
         this.createMessage("request", "full-storage")).then((response: any) => {
       this.assertSuccessful(response, "request:full-storage");
-      return response.value as browser.storage.StorageResults;
+      return response.value as browser.storage.StorageObject;
     });
   }
 

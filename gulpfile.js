@@ -153,9 +153,11 @@ function promiseMtimes(path, mtimes = []) {
   return promiseLstat(path).then((stats) => {
     const mtimes2 = mtimes.concat([stats.mtime]);
     if (stats.isSymbolicLink()) {
+      // eslint-disable-next-line promise/no-nesting
       const p = promiseReadlink(path).then(
           (linkTarget) => promiseMtimes(linkTarget, mtimes2)
       );
+      // eslint-disable-next-line promise/no-nesting
       p.catch((e) => {
         console.error(`readlink("${path}"):`, e);
       });

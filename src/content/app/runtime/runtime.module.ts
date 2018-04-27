@@ -20,13 +20,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Connection } from "lib/classes/connection";
 import { IModule, Module } from "lib/classes/module";
-import { Log } from "models/log";
 
 export class Runtime extends Module {
   constructor(
-      log: Log,
+      log: Common.ILog,
       public readonly eweConnection: Connection<any, any> | null,
   ) {
     super("app.runtime", log);

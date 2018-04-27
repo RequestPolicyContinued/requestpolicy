@@ -25,7 +25,7 @@ import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 
 const TARGET_NAME = "storage-migration-from-xpcom";
-const REMOTE_TARGET_NAME = "legacy-side-settings-migration-controller";
+const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
 
 // =============================================================================
 

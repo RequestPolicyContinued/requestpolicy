@@ -93,7 +93,7 @@ export class StorageMigrationToWebExtension extends Module {
     }
     let msg;
     const expectedType = `${aType}:response`;
-    if (aResponse.target !== "legacy-side-settings-migration-controller") {
+    if (aResponse.target !== "legacy-side-storage-migration-controller") {
       msg = "Incorrect target.";
     } else if (aResponse.type !== expectedType) {
       msg = `incorrect response type. expected "${expectedType}".`;
@@ -164,7 +164,7 @@ export class StorageMigrationToWebExtension extends Module {
   private receiveMessage(
       aMessage: any,
   ): void {
-    if (aMessage.target !== "legacy-side-settings-migration-controller") return;
+    if (aMessage.target !== "legacy-side-storage-migration-controller") return;
     if (aMessage.type !== "startup") return;
     if (!aMessage.value.ready) return;
     const isPull =

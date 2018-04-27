@@ -105,7 +105,7 @@ describe("legacy-side settings migration controller", function() {
         const value = {ready: true};
         maybeAssignLastStorageChange(value, webextSideInitialFullStorage);
         eRuntime.onMessage.dispatch({
-          target: "legacy-side-settings-migration-controller",
+          target: "legacy-side-storage-migration-controller",
           type: "startup",
           value,
         });
@@ -113,7 +113,7 @@ describe("legacy-side settings migration controller", function() {
 
       function fullStorageResponse() {
         return Promise.resolve({
-          target: "legacy-side-settings-migration-controller",
+          target: "legacy-side-storage-migration-controller",
           type: `${isPull ? "request:" : ""}full-storage:response`,
           value: isPull ? webextSideInitialFullStorage : {success: true},
         });
@@ -121,7 +121,7 @@ describe("legacy-side settings migration controller", function() {
 
       function storageChangeResponse() {
         return Promise.resolve({
-          target: "legacy-side-settings-migration-controller",
+          target: "legacy-side-storage-migration-controller",
           type: "storage-change:response",
           value: {success: storageChangeSuccess},
         });

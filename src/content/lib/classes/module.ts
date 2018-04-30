@@ -23,6 +23,9 @@
 import { Common } from "common/interfaces";
 import {defer} from "lib/utils/js-utils";
 
+const MAX_WAIT_FOR_STARTUP_SECONDS = 2;
+const MAX_STARTUP_SECONDS = 4;
+
 export interface IModule {
   startup?: () => Promise<void>;
   shutdown?: () => Promise<void>;
@@ -37,6 +40,7 @@ export abstract class Module implements IModule {
     return undefined;
   }
 
+  private startupCalled = false;
   private dReady = defer();
   private ready = false;
   public get whenReady() { return this.dReady.promise; }
@@ -82,12 +86,19 @@ export abstract class Module implements IModule {
     this.debugLog = this.log.extend({enabled: false});
 
     setTimeout(() => {
-      if (this.ready) return;
-      this.log.error(`not ready even after 5 seconds!`);
-    }, 5000);
+      if (this.startupCalled) return;
+      this.log.error(`[severe] startup() hasn't been invoked ` +
+          `even after ${MAX_WAIT_FOR_STARTUP_SECONDS} seconds!`);
+    }, 1000 * MAX_WAIT_FOR_STARTUP_SECONDS);
   }
 
   public async startup(): Promise<void> {
+    this.startupCalled = true;
+    setTimeout(() => {
+      if (this.ready) return;
+      this.log.error(`startup didn't finish ` +
+          `even after ${MAX_STARTUP_SECONDS} seconds!`);
+    }, 1000 * MAX_STARTUP_SECONDS);
     this.debugLog.log("starting up...");
     const p = this.startup_();
     p.catch(this.log.onError("error on startup"));

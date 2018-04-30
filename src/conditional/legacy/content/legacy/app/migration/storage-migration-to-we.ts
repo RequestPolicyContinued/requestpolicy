@@ -25,7 +25,7 @@ import { IConnection } from "lib/classes/connection";
 import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 
-type StorageMessageType = "full-storage" | "storage-change" |
+type StorageMessageType = "full-storage" | "storage-changes" |
     "request:full-storage";
 interface IResponse {
   target: string;
@@ -148,7 +148,7 @@ export class StorageMigrationToWebExtension extends Module {
   }
 
   private storageChanged(
-      aStorageChange: browser.storage.StorageChange,
+      aStorageChanges: browser.storage.ChangeDict,
   ): Promise<void> {
     if (!this.isStorageReadyForAccess) {
       this.log.error("Not ready for storage changes yet!");
@@ -157,12 +157,12 @@ export class StorageMigrationToWebExtension extends Module {
       return this.sendFullStorage();
     }
     return this.connectionToEWE.sendMessage(
-        this.createMessage("storage-change", aStorageChange),
+        this.createMessage("storage-changes", aStorageChanges),
     ).then((response: any) => {
-      this.assertSuccessful(response, "storage-change");
+      this.assertSuccessful(response, "storage-changes");
     }).catch((e: any) => {
       this.log.error(
-          "Error on sending StorageChange to the empedded WebExtension:",
+          "Error on sending storage changes to the empedded WebExtension:",
           e);
       this.shouldSendFullStorage = true;
       return this.sendFullStorage();

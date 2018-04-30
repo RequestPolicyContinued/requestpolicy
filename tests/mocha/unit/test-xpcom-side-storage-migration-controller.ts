@@ -70,24 +70,24 @@ describe("legacy-side settings migration controller", function() {
       ["afterReadyMessageSent", () => {}],
       ["onFullStorageMessageSent", () => {}],
       ["afterInitialSync", () => {}],
-      ["afterStorageChangeDispatched", () => {}],
+      ["afterStorageChangesDispatched", () => {}],
       ["stopAfter", "never"],
       ["storageChangeSuccess", true],
       ["legacySideInitialFullStorage", {}],
       ["webextSideInitialFullStorage", {}],
-      ["storageChange", null],
+      ["storageChanges", null],
     ], aOptions);
 
     const afterControllerStartedUp = o("afterControllerStartedUp");
     const afterReadyMessageSent = o("afterReadyMessageSent");
     const onFullStorageMessageSent = o("onFullStorageMessageSent");
     const afterInitialSync = o("afterInitialSync");
-    const afterStorageChangeDispatched = o("afterStorageChangeDispatched");
+    const afterStorageChangesDispatched = o("afterStorageChangesDispatched");
     const stopAfter = o("stopAfter");
     const storageChangeSuccess = o("storageChangeSuccess");
     const legacySideInitialFullStorage = o("legacySideInitialFullStorage");
     const webextSideInitialFullStorage = o("webextSideInitialFullStorage");
-    const storageChange = o("storageChange");
+    const storageChanges = o("storageChanges");
 
     const fullStorageDirection = getFullStorageDirection(
         {legacySideInitialFullStorage, webextSideInitialFullStorage}
@@ -117,10 +117,10 @@ describe("legacy-side settings migration controller", function() {
         });
       }
 
-      function storageChangeResponse() {
+      function storageChangesResponse() {
         return Promise.resolve({
           target: "legacy-side-storage-migration-controller",
-          type: "storage-change:response",
+          type: "storage-changes:response",
           value: {success: storageChangeSuccess},
         });
       }
@@ -151,11 +151,11 @@ describe("legacy-side settings migration controller", function() {
         afterInitialSync({eRuntime, storage});
         return;
       });
-      if (!storageChange) return p;
+      if (!storageChanges) return p;
       p = p.then(() => {
-        eRuntime.sendMessage.resolves(storageChangeResponse());
-        storage.onChanged.dispatch(storageChange, "local");
-        afterStorageChangeDispatched({eRuntime, storage});
+        eRuntime.sendMessage.resolves(storageChangesResponse());
+        storage.onChanged.dispatch(storageChanges, "local");
+        afterStorageChangesDispatched({eRuntime, storage});
         return;
       });
     };
@@ -290,26 +290,26 @@ describe("legacy-side settings migration controller", function() {
     });
   });
 
-  function createStorageChangeTest(aOptions) {
+  function createStorageChangesTest(aOptions) {
     const o = destructureOptions([
       ["legacySideInitialFullStorage"],
-      ["storageChange"],
+      ["storageChanges"],
       ["success", true],
     ], aOptions);
 
     const legacySideInitialFullStorage = o("legacySideInitialFullStorage");
-    const storageChange = o("storageChange");
+    const storageChanges = o("storageChanges");
     const success = o("success");
 
     return createTest({
       legacySideInitialFullStorage,
-      storageChange,
+      storageChanges,
       storageChangeSuccess: success,
-      afterStorageChangeDispatched({eRuntime}) {
+      afterStorageChangesDispatched({eRuntime}) {
         sinon.assert.calledWithMatch(eRuntime.sendMessage, {
           target: "storage-migration-from-xpcom",
-          type: "storage-change",
-          value: storageChange,
+          type: "storage-changes",
+          value: storageChanges,
         });
 
         const errorFn = console.error as typeof console.error & Sinon.SinonStub;
@@ -324,20 +324,20 @@ describe("legacy-side settings migration controller", function() {
     });
   }
 
-  it("send storage change", createStorageChangeTest({
+  it("send storage changes", createStorageChangesTest({
     legacySideInitialFullStorage: {
       foo: "bar",
     },
-    storageChange: {
+    storageChanges: {
       bar: {newValue: "baz"},
     },
   }));
 
-  it("send the storage change (including deletion)", createStorageChangeTest({
+  it("send the storage changes (including deletion)", createStorageChangesTest({
     legacySideInitialFullStorage: {
       foo: "bar",
     },
-    storageChange: {
+    storageChanges: {
       foo: {},
       baz: {newValue: ["foo"]},
     },

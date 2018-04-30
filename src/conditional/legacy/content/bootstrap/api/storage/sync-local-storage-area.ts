@@ -37,6 +37,10 @@ export class SyncLocalStorageArea extends AbstractObjectInterface<any>
     super();
   }
 
+  public isJsonStorageKey(key: string) {
+    return this.jsonStorage.isJsonStorageKey(key);
+  }
+
   protected getAll() {
     return Object.assign(
         {},

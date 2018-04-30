@@ -29,10 +29,9 @@ const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
 
 // =============================================================================
 
-type StorageMessageType = "full-storage" | "storage-change" |
+type StorageMessageType = "full-storage" | "storage-changes" |
     "request:full-storage";
-type StorageChange = browser.storage.StorageChange;
-interface IStorageChanges { [key: string]: StorageChange; }
+type IStorageChanges = browser.storage.ChangeDict;
 
 // =============================================================================
 
@@ -86,7 +85,7 @@ export class StorageMigrationFromXpcom extends Module {
     return this.storage.local.set(aFullStorage);
   }
 
-  private applyStorageChange(aStorageChanges: IStorageChanges) {
+  private applyStorageChanges(aStorageChanges: IStorageChanges) {
     const keysToRemove: string[] = [];
     let hasKeysToSet = false;
     const keysToSet: {[key: string]: any} = {};
@@ -130,10 +129,10 @@ export class StorageMigrationFromXpcom extends Module {
             "full-storage",
             () => this.setFullStorage(aMessage.value),
         );
-      case "storage-change":
+      case "storage-changes":
         return this.respond(
-            "storage-change",
-            () => this.applyStorageChange(aMessage.value as StorageChange));
+            "storage-changes",
+            () => this.applyStorageChanges(aMessage.value as IStorageChanges));
       default:
         return Promise.reject(`Unknown type '${aMessage.type}'.`);
     }

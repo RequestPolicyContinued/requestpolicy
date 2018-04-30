@@ -48,7 +48,7 @@ export class RPLog extends Log {
       const enable = result.log as boolean;
 
       this.asyncSettings.onChanged.addListener(
-          this.onStorageChange.bind(this),
+          this.onStorageChanged.bind(this),
       );
 
       return enable;
@@ -59,8 +59,8 @@ export class RPLog extends Log {
     this.setEnabled(pEnabled);
   }
 
-  private onStorageChange(
-      aChanges: {[key: string]: browser.storage.StorageChange},
+  private onStorageChanged(
+      aChanges: browser.storage.ChangeDict,
       aAreaName: browser.storage.StorageName,
   ) {
     if (aChanges.hasOwnProperty("log")) {

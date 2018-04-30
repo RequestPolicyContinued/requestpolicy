@@ -76,10 +76,13 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
     if (typeof aKeys !== "object") {
       throw new Error("aKeys must be an object!");
     }
+    const storageChanges: browser.storage.ChangeDict = {};
     Object.keys(aKeys).forEach((key) => {
-      this.setByKey(key, aKeys[key]);
+      const newValue = aKeys[key];
+      this.setByKey(key, newValue);
+      storageChanges[key] = {newValue};
     });
-    this.eventListenersMap.onChanged.emit();
+    this.eventListenersMap.onChanged.emit(storageChanges);
   }
 
   public remove(aKeys: string | string[]): {errors: IKeysObject} | void {
@@ -87,7 +90,9 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
       aKeys = [aKeys];
     }
     const rv = this.removeByKeys(aKeys);
-    this.eventListenersMap.onChanged.emit();
+    const changes = {};
+    aKeys.forEach((key) => changes[key] = {});
+    this.eventListenersMap.onChanged.emit(changes);
     if (rv && Object.keys(rv.errors).length === 0) return;
     return rv;
   }

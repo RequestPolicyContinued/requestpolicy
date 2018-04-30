@@ -19,8 +19,7 @@ import { AsyncSettings } from "app/storage/async-settings";
 import { Log } from "lib/classes/log";
 import { defer } from "lib/utils/js-utils";
 
-interface IObject<T> { [key: string]: T; }
-type IStorageChanges = IObject<browser.storage.StorageChange>;
+type IStorageChanges = browser.storage.ChangeDict;
 
 describe("AsyncSettings", function() {
   const sinon = sinonStatic.createSandbox();

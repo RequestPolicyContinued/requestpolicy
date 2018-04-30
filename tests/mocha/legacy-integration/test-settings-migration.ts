@@ -146,15 +146,15 @@ describe("legacy settings migration:", function() {
 
         webextStorage.local.set.resolves();
         webextStorage.local.remove.resolves();
-        const dStorageChange = defer();
+        const dStorageChanges = defer();
         onRuntimeSendMessageCalled = (aMessage, aResponse) => {
-          if (aMessage.type === "storage-change") {
-            dStorageChange.resolve(aResponse);
+          if (aMessage.type === "storage-changes") {
+            dStorageChanges.resolve(aResponse);
             onRuntimeSendMessageCalled = null;
           }
         };
         legacyStorage.onChanged.dispatch(storageChanges, "local");
-        return dStorageChange.promise;
+        return dStorageChanges.promise;
       }).then(() => afterStorageChangesDispatched({webextStorage, legacyStorage}));
       return p;
     };
@@ -264,8 +264,8 @@ describe("legacy settings migration:", function() {
     }
   });
 
-  describe("storage change tests", function() {
-    function createStorageChangeTest(aOptions) {
+  describe("storage changes tests", function() {
+    function createStorageChangesTest(aOptions) {
       const o = destructureOptions([
         ["legacySideInitialFullStorage", {key1: "foo", key2: "bar"}],
         ["webextSideInitialFullStorage", {}],
@@ -315,7 +315,7 @@ describe("legacy settings migration:", function() {
       });
     }
 
-    it("legacy storage change: adding new keys", createStorageChangeTest({
+    it("legacy storage changes: adding new keys", createStorageChangesTest({
       storageChanges: {
         new1: {newValue: 1},
         new2: {newValue: 2},
@@ -326,7 +326,7 @@ describe("legacy settings migration:", function() {
       },
     }));
 
-    it("legacy storage change: updating existing keys", createStorageChangeTest({
+    it("legacy storage changes: updating existing keys", createStorageChangesTest({
       storageChanges: {
         key1: {newValue: 1},
         key2: {newValue: 2},
@@ -337,7 +337,7 @@ describe("legacy settings migration:", function() {
       },
     }));
 
-    it("legacy storage change: removing existing keys", createStorageChangeTest({
+    it("legacy storage changes: removing existing keys", createStorageChangesTest({
       storageChanges: {
         key1: {},
         key2: {},
@@ -345,7 +345,7 @@ describe("legacy settings migration:", function() {
       expectedStorageRemoveKeys: ["key1", "key2"],
     }));
 
-    it("storage change after full storage push", createStorageChangeTest({
+    it("storage changes after full storage push", createStorageChangesTest({
       webextSideInitialFullStorage: {lastStorageChange: "2017"},
       storageChanges: {
         key1: {newValue: "new!11"},

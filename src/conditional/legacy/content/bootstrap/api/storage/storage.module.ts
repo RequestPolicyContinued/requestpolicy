@@ -35,6 +35,7 @@ export class Storage extends Module {
   private prefObserver: prefObserver = {
     observe: this.observePrefChange.bind(this),
   };
+  private slsaChangedListener = this.onSlsaChanged.bind(this);
 
   constructor(
       log: Common.ILog,
@@ -61,10 +62,12 @@ export class Storage extends Module {
 
   protected startupSelf() {
     this.rpPrefBranch.addObserver("", this.prefObserver);
+    this.slsa.onChanged.addListener(this.slsaChangedListener);
     return Promise.resolve();
   }
 
   protected shutdownSelf() {
+    this.slsa.onChanged.removeListener(this.slsaChangedListener);
     this.rpPrefBranch.removeObserver("", this.prefObserver);
     return Promise.resolve();
   }
@@ -102,8 +105,19 @@ export class Storage extends Module {
   ) {
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
-    const changes: browser.storage.StorageChange =
-        newValue === undefined ? {} : {newValue};
-    this.events.listenersMap.onChanged.emit({changes});
+    const changes: browser.storage.ChangeDict = {
+      [prefName]: newValue === undefined ? {} : {newValue},
+    };
+    this.events.listenersMap.onChanged.emit(changes);
+  }
+
+  private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
+    const changes: browser.storage.ChangeDict = {};
+    Object.keys(aChanges).forEach((key) => {
+      if (!this.slsa.isJsonStorageKey(key)) return;
+      changes[key] = aChanges[key];
+    });
+    if (Object.keys(changes).length === 0) return;
+    this.events.listenersMap.onChanged.emit(changes);
   }
 }

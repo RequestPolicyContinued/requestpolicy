@@ -84,10 +84,10 @@ export class AsyncSettings extends Module
   }
 
   private onChangedEvent(
-      changes: IObject<browser.storage.StorageChange>,
+      changes: browser.storage.ChangeDict,
       areaName: string,
   ) {
-    const changes2: IObject<browser.storage.StorageChange> = {};
+    const changes2: browser.storage.ChangeDict = {};
     Object.keys(changes).forEach((key) => {
       if (!this.defaultSettings.hasOwnProperty(key)) return;
       const change = changes[key];

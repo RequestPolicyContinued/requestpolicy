@@ -125,7 +125,7 @@ describe("Log", () => {
   });
 
   describe("delayed", () => {
-    describe("severities", function() {
+    describe("severities (except errors)", function() {
       function test_severity(fnName) {
         describe(fnName, function() {
           it("does not log before promise is resolved", function() {
@@ -179,23 +179,21 @@ describe("Log", () => {
             sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}test`);
           });
 
-          if (fnName !== "error") {
-            it("does not log if promise is resolved w/ false", async function() {
-              // setup
-              stubConsoleFn(fnName);
-              const spiedFn = console[fnName] as Sinon.SinonSpy;
-              const dEnabled = defer<boolean>();
-              const log = new Log({enabled: dEnabled.promise, level: "all"});
+          it("does not log if promise is resolved w/ false", async function() {
+            // setup
+            stubConsoleFn(fnName);
+            const spiedFn = console[fnName] as Sinon.SinonSpy;
+            const dEnabled = defer<boolean>();
+            const log = new Log({enabled: dEnabled.promise, level: "all"});
 
-              // exercise
-              log[fnName]("test");
-              dEnabled.resolve(false);
-              await Promise.resolve();
+            // exercise
+            log[fnName]("test");
+            dEnabled.resolve(false);
+            await Promise.resolve();
 
-              // verify
-              sinon.assert.notCalled(spiedFn);
-            });
-          }
+            // verify
+            sinon.assert.notCalled(spiedFn);
+          });
 
           it("should dir() with the correct arguments", async function() {
             // setup
@@ -215,46 +213,117 @@ describe("Log", () => {
             sinon.assert.calledWithExactly(spiedConsoleDir, "bar");
           });
 
-          if (fnName !== "error") {
-            it("allows multiple promises", async function() {
-              // setup
-              stubConsoleFn(fnName);
-              const spiedFn = console[fnName] as Sinon.SinonSpy;
-              const dEnabled1 = defer<boolean>();
-              const dEnabled2 = defer<boolean>();
-              const dEnabled3 = defer<boolean>();
-              const log = new Log({enabled: false, level: "all"});
+          it("allows multiple promises", async function() {
+            // setup
+            stubConsoleFn(fnName);
+            const spiedFn = console[fnName] as Sinon.SinonSpy;
+            const dEnabled1 = defer<boolean>();
+            const dEnabled2 = defer<boolean>();
+            const dEnabled3 = defer<boolean>();
+            const log = new Log({enabled: false, level: "all"});
 
-              // exercise (1)
-              log.setEnabled(dEnabled1.promise)
-              log[fnName]("1");
-              log.setEnabled(dEnabled2.promise)
-              log[fnName]("2");
-              log.setEnabled(dEnabled3.promise)
-              log[fnName]("3");
+            // exercise (1)
+            log.setEnabled(dEnabled1.promise)
+            log[fnName]("1");
+            log.setEnabled(dEnabled2.promise)
+            log[fnName]("2");
+            log.setEnabled(dEnabled3.promise)
+            log[fnName]("3");
 
-              // verify (1)
-              sinon.assert.notCalled(spiedFn);
+            // verify (1)
+            sinon.assert.notCalled(spiedFn);
 
-              // exercise (2)
-              dEnabled1.resolve(true);
-              dEnabled2.resolve(false);
-              dEnabled3.resolve(true);
-              await Promise.resolve();
+            // exercise (2)
+            dEnabled1.resolve(true);
+            dEnabled2.resolve(false);
+            dEnabled3.resolve(true);
+            await Promise.resolve();
 
-              // verify (2)
-              sinon.assert.calledTwice(spiedFn);
-              sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 1`);
-              sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 3`);
-            });
-          }
+            // verify (2)
+            sinon.assert.calledTwice(spiedFn);
+            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 1`);
+            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 3`);
+          });
         });
       }
 
       test_severity("log");
       test_severity("info");
       test_severity("warn");
-      test_severity("error");
+
+      describe("error", function() {
+        it("does log before promise is resolved", function() {
+          // setup
+          stubConsoleFn("error");
+          const consoleError = console.error as Sinon.SinonSpy & typeof console.error;
+          const dEnabled = defer<boolean>();
+          const log = new Log({enabled: dEnabled.promise, level: "all"});
+
+          // exercise
+          log.error("test");
+
+          // verify
+          sinon.assert.calledOnce(consoleError);
+          sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}test`);
+
+          // cleanup
+          dEnabled.resolve(false);
+        });
+
+        it("does log again as soon as promise is resolved", async function() {
+          // setup
+          stubConsoleFn("error");
+          const consoleError = console.error as Sinon.SinonSpy & typeof console.error;
+          const dEnabled = defer<boolean>();
+          const log = new Log({enabled: dEnabled.promise, level: "all"});
+
+          // exercise
+          log.error("test");
+
+          dEnabled.resolve(true);
+          consoleError.resetHistory();
+          await Promise.resolve();
+
+          // verify
+          sinon.assert.calledOnce(consoleError);
+          sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}[DELAYED] test`);
+        });
+
+        it("does log immediately in case the promise is already resolved", async function() {
+          // setup
+          stubConsoleFn("error");
+          const consoleError = console.error as Sinon.SinonSpy & typeof console.error;
+          const dEnabled = defer<boolean>();
+          const log = new Log({enabled: dEnabled.promise, level: "all"});
+          dEnabled.resolve(true);
+          await dEnabled.promise;
+
+          // exercise
+          log.error("test");
+
+          // verify
+          sinon.assert.calledOnce(consoleError);
+          sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}test`);
+        });
+
+        it("does log delayed even if the promise is resolved w/ false", async function() {
+          // setup
+          stubConsoleFn("error");
+          const consoleError = console.error as Sinon.SinonSpy & typeof console.error;
+          const dEnabled = defer<boolean>();
+          const log = new Log({enabled: dEnabled.promise, level: "all"});
+
+          // exercise
+          log.error("test");
+          consoleError.resetHistory();
+          dEnabled.resolve(false);
+          await Promise.resolve();
+
+          // verify
+          sinon.assert.calledOnce(consoleError);
+          sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}[DELAYED] test`);
+        });
+      });
     });
 
     describe("levels", function() {
@@ -263,7 +332,7 @@ describe("Log", () => {
           it("always logs errors, even with multiple promises", async function() {
             // setup
             stubConsoleFn("error");
-            const spiedFn = console.error as Sinon.SinonSpy & typeof console.error;
+            const consoleError = console.error as Sinon.SinonSpy & typeof console.error;
             const dEnabled1 = defer<boolean>();
             const dEnabled2 = defer<boolean>();
             const dEnabled3 = defer<boolean>();
@@ -278,19 +347,23 @@ describe("Log", () => {
             log.error("3");
 
             // verify (1)
-            sinon.assert.notCalled(spiedFn);
+            sinon.assert.calledThrice(consoleError);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}1`);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}2`);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}3`);
 
             // exercise (2)
+            consoleError.resetHistory();
             dEnabled1.resolve(false);
             dEnabled2.resolve(true);
             dEnabled3.resolve(false);
             await Promise.resolve();
 
             // verify (2)
-            sinon.assert.calledThrice(spiedFn);
-            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 1`);
-            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 2`);
-            sinon.assert.calledWithExactly(spiedFn, `${C.LOG_PREFIX}[DELAYED] 3`);
+            sinon.assert.calledThrice(consoleError);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}[DELAYED] 1`);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}[DELAYED] 2`);
+            sinon.assert.calledWithExactly(consoleError, `${C.LOG_PREFIX}[DELAYED] 3`);
           });
         });
       }
@@ -305,8 +378,9 @@ describe("Log", () => {
 
     it("logs an error when resolved with a non-boolean value", async function() {
       // setup
-      sinon.stub(console, "dir");
-      sinon.stub(console, "trace");
+      stubConsoleFn("error");
+      stubConsoleFn("dir");
+      stubConsoleFn("trace");
       const errorFn = console.error as Sinon.SinonSpy & typeof console.error;
       const dEnabled = defer<any>();
       const log = new Log({enabled: dEnabled.promise, level: "all"});

@@ -345,15 +345,17 @@ export class Log implements Common.ILog {
   ) {
     const shouldLog = this.shouldLog(aLevel);
     if (shouldLog === false) return;
+    const forceLog = shouldLog === true;
 
     const msgs = typeof aMsg === "object" ? aMsg : [aMsg];
 
     const isPromise = typeof this.enabled !== "boolean";
-    if (!isPromise) {
+    if (!isPromise || forceLog) {
       // shouldLog is definitely true
-      return this.logNowInternal(aLevel, aFnName, msgs, aDirArgs);
+      const rv = this.logNowInternal(aLevel, aFnName, msgs, aDirArgs);
+      if (!isPromise) return rv;
+      // promises are also added to the delayed log
     }
-    const forceLog = shouldLog === true;
     const delayedLog = this.getDelayedLog(this.enabled as Promise<boolean>);
     if (!delayedLog) {
       console.error(`delayedLog for ${this.enabled} is undefined`);

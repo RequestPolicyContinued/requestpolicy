@@ -38,13 +38,17 @@ interface IStorageChanges { [key: string]: StorageChange; }
 
 export class StorageMigrationFromXpcom extends Module {
   private lastStorageChange: string | null = null;
+  private connectionToLegacy: IConnection;
 
   constructor(
       log: Common.ILog,
-      private connectionToLegacy: IConnection,
+      private pConnectionToLegacy: Promise<IConnection>,
       private storage: typeof browser.storage,
   ) {
     super("ewe.storageMigrationFromXpcom", log);
+
+    pConnectionToLegacy.then((c) => this.connectionToLegacy = c).
+        catch(this.log.onError("connectionToLegacy"));
   }
 
   public startupSelf() {
@@ -53,7 +57,7 @@ export class StorageMigrationFromXpcom extends Module {
     ).then((result) => {
       this.lastStorageChange =
           (result.lastStorageChange as string | undefined) || null;
-      return this.connectionToLegacy.whenReady;
+      return this.pConnectionToLegacy;
     }).then(() => {
       this.connectionToLegacy.onMessage.addListener(
           this.receiveMessage.bind(this));
@@ -97,7 +101,7 @@ export class StorageMigrationFromXpcom extends Module {
       }
     }
     const hasKeysToRemove = keysToRemove.length !== 0;
-    const promises = [];
+    const promises: Array<Promise<void>> = [];
     if (hasKeysToRemove) promises.push(this.storage.local.remove(keysToRemove));
     if (hasKeysToSet) promises.push(this.storage.local.set(keysToSet));
     return Promise.all(promises);

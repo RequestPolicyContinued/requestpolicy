@@ -22,19 +22,29 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { Module } from "lib/classes/module";
+import { IModule, Module } from "lib/classes/module";
 
-export class Migration extends Module implements App.IMigration {
+export class StorageMigration extends Module
+    implements App.migration.IStorageMigration {
   constructor(
       log: Common.ILog,
-      public readonly storageMigration: App.migration.IStorageMigration,
+      public readonly settingsMigration:
+          App.migration.storage.ISettingsMigration,
+      public readonly v0Rules: App.migration.storage.IV0RulesMigration | null,
+      private storageMigrationToWE:
+          App.migration.storage.IStorageMigrationToWebExtension | null,
   ) {
-    super("app.migration", log);
+    super("app.migration.storage", log);
   }
 
   protected get subModules() {
-    return {
-      storageMigration: this.storageMigration,
+    const rv: {[k: string]: IModule} = {
+      settingsMigration: this.settingsMigration,
     };
+    if (this.storageMigrationToWE) {
+      rv.storageMigrationToWE = this.storageMigrationToWE;
+    }
+    if (this.v0Rules) { rv.v0Rules = this.v0Rules; }
+    return rv;
   }
 }

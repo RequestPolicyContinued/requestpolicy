@@ -42,7 +42,9 @@ const legacyConnection = new Connection(
     promiseLegacyPort,
 );
 const storageMigrationFromXpcom = new StorageMigrationFromXpcom(
-    log, legacyConnection, browser.storage,
+    log,
+    legacyConnection.whenReady.then(() => legacyConnection),
+    browser.storage,
 );
 const ewe = new EweModule(log, legacyConnection, storageMigrationFromXpcom);
 

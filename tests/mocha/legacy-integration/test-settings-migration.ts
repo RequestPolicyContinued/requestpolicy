@@ -63,7 +63,7 @@ describe("legacy settings migration:", function() {
     );
     WebextSideController = new StorageMigrationFromXpcom(
         log,
-        eweInternalBrowser.runtime,
+        Promise.resolve(eweInternalBrowser.runtime),
         eweInternalBrowser.storage
     );
   });

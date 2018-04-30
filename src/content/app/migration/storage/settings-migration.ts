@@ -21,15 +21,15 @@
  */
 
 import { App } from "app/interfaces";
-import { PrefetchSettingsMerger } from "app/migration/merge-prefetch-settings";
 import { Common } from "common/interfaces";
 import {
   StorageMigrationToWebExtension,
 } from "legacy/app/migration/storage-migration-to-we";
 import { Module } from "lib/classes/module";
+import { PrefetchSettingsMerger } from "./merge-prefetch-settings";
 
 export class SettingsMigration extends Module
-    implements App.migration.ISettingsMigration {
+    implements App.migration.storage.ISettingsMigration {
   protected get startupPreconditions() {
     return this.storageMigrationToWE ?
         [this.storageMigrationToWE.pStorageReadyForAccess] : [];
@@ -40,7 +40,7 @@ export class SettingsMigration extends Module
       private storage: browser.storage.StorageArea,
       private storageMigrationToWE: StorageMigrationToWebExtension | null,
   ) {
-    super("app.migration.settings", log);
+    super("app.migration.storage.settings", log);
   }
 
   protected startupSelf() {

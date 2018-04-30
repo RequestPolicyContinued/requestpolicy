@@ -25,14 +25,17 @@
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { Migration } from "./migration/migration.module";
-import { SettingsMigration } from "./migration/settings-migration";
+import { SettingsMigration } from "./migration/storage/settings-migration";
 import { Policy } from "./policy/policy.module";
 import { RPServices } from "./services/services.module";
 import { CachedSettings } from "./storage/cached-settings";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 import { VersionInfoService } from "./services/version-info-service";
-import { AsyncSettings } from "app/storage/async-settings";
+import { AsyncSettings } from "./storage/async-settings";
+import { StorageMigration } from "./migration/storage/storage-migration.module";
+import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
+import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -40,7 +43,12 @@ export interface IVersionComparator {
 
 export namespace App {
   export namespace migration {
-    export type ISettingsMigration = SettingsMigration;
+    export namespace storage {
+      export type ISettingsMigration = SettingsMigration;
+      export type IV0RulesMigration = V0RulesMigration;
+      export type IStorageMigrationToWebExtension = StorageMigrationToWebExtension;
+    }
+    export type IStorageMigration = StorageMigration;
   }
 
   export namespace services {

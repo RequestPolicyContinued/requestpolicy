@@ -35,7 +35,10 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
 import { dAsyncSettings, log } from "app/log";
-import { SettingsMigration } from "app/migration/settings-migration";
+import { SettingsMigration } from "app/migration/storage/settings-migration";
+import {
+  StorageMigration,
+} from "app/migration/storage/storage-migration.module";
 import { Runtime } from "app/runtime/runtime.module";
 import { RulesServices } from "app/services/rules/rules-services.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
@@ -174,8 +177,14 @@ const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
     new V0RulesMigration(
         log, policy, v0RulesService, versionInfoService,
     ) : null;
+const storageMigration = new StorageMigration(
+    log,
+    settingsMigration,
+    v0RulesMigration,
+    webextStorageMigration,
+);
 
-const migration = new Migration(log, settingsMigration, v0RulesMigration);
+const migration = new Migration(log, storageMigration);
 
 const initialSetup = new InitialSetup(
     log, cachedSettings, versionInfoService, xpcApi! /* FIXME */,

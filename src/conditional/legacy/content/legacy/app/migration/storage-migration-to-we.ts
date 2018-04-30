@@ -53,10 +53,8 @@ export class StorageMigrationToWebExtension extends Module {
   ) {
     super("app.migration.xpcomToWE", log);
 
-    pConnectionToEWE.then((c) => {
-      this.debugLog.log("got Connection to EWE");
-      this.connectionToEWE = c;
-    });
+    pConnectionToEWE.then((c) => this.connectionToEWE = c).
+        catch(this.log.onError("connectionToEWE"));
   }
 
   protected startupSelf(): Promise<void> {

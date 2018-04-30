@@ -47,36 +47,42 @@ export class StorageMigrationToWebExtension extends Module {
 
   constructor(
       log: Common.ILog,
-      private storage: typeof browser.storage,
+      private storageArea: browser.storage.StorageArea,
+      private onStorageChanged: typeof browser.storage.onChanged,
       private pConnectionToEWE: Promise<IConnection>,
   ) {
     super("app.migration.xpcomToWE", log);
 
-    pConnectionToEWE.then((c) => this.connectionToEWE = c);
+    pConnectionToEWE.then((c) => {
+      this.debugLog.log("got Connection to EWE");
+      this.connectionToEWE = c;
+    });
   }
 
   protected startupSelf(): Promise<void> {
     const pGotLastStorageChange =
-        this.storage.local.get("lastStorageChange").then((result) => {
+        this.storageArea.get("lastStorageChange").then((result) => {
           this.lastStorageChange =
               (result.lastStorageChange as string | undefined) || null;
-        });
+        }).catch(this.log.onError("get lastStorageChange"));
     return Promise.all([
       this.pConnectionToEWE,
       pGotLastStorageChange,
     ]).then(() => {
-      this.log.log("checkpoint");
+      this.debugLog.log("checkpoint");
       this.connectionToEWE.onMessage.
           addListener(this.receiveMessage.bind(this));
-      this.storage.onChanged.addListener(this.storageChanged.bind(this));
+      this.onStorageChanged.addListener(this.storageChanged.bind(this));
       const p = this.connectionToEWE.sendMessage(
           this.createMessage("startup", "ready"),
       );
+      this.debugLog.log("waiting for EWE to be ready");
       this.dWaitingForEWE.resolve(undefined);
       return p;
-    }).then(() => (
-      this.dInitialSync.promise
-    ));
+    }).then(() => {
+      this.debugLog.log("waiting for synchronization to be done");
+      return this.dInitialSync.promise;
+    });
   }
 
   public get pWaitingForEWE() { return this.dWaitingForEWE.promise; }
@@ -120,14 +126,14 @@ export class StorageMigrationToWebExtension extends Module {
 
   private pullFullStorage(): Promise<void> {
     return this.getFullWebextStorage().then((fullStorage) => {
-      return this.storage.local.set(fullStorage);
+      return this.storageArea.set(fullStorage);
     }).then(() => {
       this.shouldSendFullStorage = false;
     });
   }
 
   private sendFullStorage(): Promise<void> {
-    const p = this.storage.local.get(null).then((fullStorage) => {
+    const p = this.storageArea.get(null).then((fullStorage) => {
       return this.connectionToEWE.sendMessage(
           this.createMessage("full-storage", fullStorage));
     }).then((response: any) => {

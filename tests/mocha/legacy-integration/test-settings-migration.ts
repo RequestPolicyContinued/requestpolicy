@@ -57,7 +57,8 @@ describe("legacy settings migration:", function() {
     const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
         log,
-        browser.storage,
+        browser.storage.local,
+        browser.storage.onChanged,
         Promise.resolve(eweExternalBrowser.runtime),
     );
     WebextSideController = new StorageMigrationFromXpcom(
@@ -183,7 +184,6 @@ describe("legacy settings migration:", function() {
       webextSideLastStorageChange: possibleTestParameterValues.lastStorageChange,
     };
 
-    /* eslint-disable indent */
     mrdescribe("by startup order",
                 testParameters.startupOrder,
                 function(startupOrder) {
@@ -201,7 +201,6 @@ describe("legacy settings migration:", function() {
         });
       });
     });
-    /* eslint-enable indent */
 
     function createStartupTest(aOptions) {
       const o = destructureOptions([

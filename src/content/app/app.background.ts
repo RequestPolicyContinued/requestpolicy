@@ -94,7 +94,8 @@ const {eweConnection, webextStorageMigration}: {
   );
   const rvWebextStorageMigration = new StorageMigrationToWebExtension(
       log,
-      browser.storage,
+      browser.storage.local,
+      browser.storage.onChanged,
       rvEWEConnection.whenReady.then(() => rvEWEConnection),
   );
   return {

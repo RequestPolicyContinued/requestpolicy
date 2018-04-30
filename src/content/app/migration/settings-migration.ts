@@ -31,14 +31,14 @@ import { Module } from "lib/classes/module";
 export class SettingsMigration extends Module
     implements App.migration.ISettingsMigration {
   protected get startupPreconditions() {
-    return this.storageMigration ?
-        [this.storageMigration.pStorageReadyForAccess] : [];
+    return this.storageMigrationToWE ?
+        [this.storageMigrationToWE.pStorageReadyForAccess] : [];
   }
 
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private storageMigration: StorageMigrationToWebExtension | null,
+      private storageMigrationToWE: StorageMigrationToWebExtension | null,
   ) {
     super("app.migration.settings", log);
   }

@@ -1,19 +1,19 @@
 "use strict";
 
-const {assert} = require("chai");
-const deepFreeze = require("deep-freeze");
-const mrdescribe = require("mocha-repeat");
-const Sinon = require("sinon");
-const {createBrowserApi} = require("../lib/sinon-chrome");
-const {
+import {assert} from "chai";
+import deepFreeze = require("deep-freeze");
+import mrdescribe = require("mocha-repeat");
+import Sinon = require("sinon");
+import {createBrowserApi} from "../lib/sinon-chrome";
+import {
   getFullStorageDirection,
-} = require("../lib/settings-migration-utils");
-const {destructureOptions} = require("../lib/utils");
+} from "../lib/settings-migration-utils";
+import {destructureOptions} from "../lib/utils";
 
-const {Log} = require("lib/classes/log");
-const {StorageMigrationToWebExtension} = require(
-    "legacy/app/migration/storage-migration-to-we"
-);
+import {Log} from "lib/classes/log";
+import {
+  StorageMigrationToWebExtension,
+} from "legacy/app/migration/storage-migration-to-we";
 
 function maybeAssignLastStorageChange(aObj, aFullStorage) {
   return Object.assign(aObj, aFullStorage.lastStorageChange ? {
@@ -47,18 +47,12 @@ describe("legacy-side settings migration controller", function() {
     };
     assertNotStrictEqual("onChanged");
     assertNotStrictEqual("local");
-
-    global._pEmbeddedWebExtension = Promise.resolve({
-      browser: eweExternalBrowser,
-    });
-    global.browser = browser;
   });
 
   beforeEach(() => {
-    eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
     const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
-        log, browser.storage, eweExternalBrowser.runtime
+        log, browser.storage, Promise.resolve(eweExternalBrowser.runtime)
     );
   });
 
@@ -315,10 +309,11 @@ describe("legacy-side settings migration controller", function() {
           value: storageChange,
         });
 
-        sinon.assert.callCount(console.error, success ? 0 : 1);
+        const errorFn = console.error as typeof console.error & Sinon.SinonStub;
+        sinon.assert.callCount(errorFn, success ? 0 : 1);
         if (!success) {
           assert.strictEqual(
-              console.error.getCall(0).args[0].startsWith("[RequestPolicy]"),
+              errorFn.getCall(0).args[0].startsWith("[RequestPolicy]"),
               true, "An RP error has been logged"
           );
         }
@@ -346,9 +341,4 @@ describe("legacy-side settings migration controller", function() {
   }));
 
   afterEach(restoreAll);
-
-  after(() => {
-    delete global._pEmbeddedWebExtension;
-    delete global.browser;
-  });
 });

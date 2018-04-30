@@ -150,5 +150,4 @@ export class Connection<TRx, TRxResp> extends Module {
 export interface IConnection {
   sendMessage: typeof Connection.prototype.sendMessage;
   onMessage: typeof Connection.prototype.onMessage;
-  whenReady: typeof Connection.prototype.whenReady;
 }

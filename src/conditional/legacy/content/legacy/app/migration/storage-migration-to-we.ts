@@ -40,15 +40,19 @@ export class StorageMigrationToWebExtension extends Module {
   private dStorageReadyForAccess = defer<void>();
   private dInitialSync = defer<void>();
 
+  private connectionToEWE: IConnection;
+
   // FIXME: this is only necessary for testing -- bad style!
   private dWaitingForEWE = defer<void>();
 
   constructor(
       log: Common.ILog,
       private storage: typeof browser.storage,
-      private connectionToEWE: IConnection,
+      private pConnectionToEWE: Promise<IConnection>,
   ) {
     super("app.migration.xpcomToWE", log);
+
+    pConnectionToEWE.then((c) => this.connectionToEWE = c);
   }
 
   protected startupSelf(): Promise<void> {
@@ -58,7 +62,7 @@ export class StorageMigrationToWebExtension extends Module {
               (result.lastStorageChange as string | undefined) || null;
         });
     return Promise.all([
-      this.connectionToEWE.whenReady,
+      this.pConnectionToEWE,
       pGotLastStorageChange,
     ]).then(() => {
       this.log.log("checkpoint");

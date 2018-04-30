@@ -1,23 +1,19 @@
 "use strict";
 
-const {assert} = require("chai");
-const mrdescribe = require("mocha-repeat");
-const Sinon = require("sinon");
-const {
+import {assert} from "chai";
+import * as mrdescribe from "mocha-repeat";
+import * as Sinon from "sinon";
+import {
   getFullStorageDirection,
-} = require("../lib/settings-migration-utils");
-const {createBrowserApi} = require("../lib/sinon-chrome");
-const {destructureOptions} = require("../lib/utils");
+} from "../lib/settings-migration-utils";
+import {createBrowserApi} from "../lib/sinon-chrome";
+import {destructureOptions} from "../lib/utils";
 
-const {defer} = require("lib/utils/js-utils");
+import {defer} from "lib/utils/js-utils";
 
-const {Log} = require("lib/classes/log");
-const {StorageMigrationToWebExtension} = require(
-    "legacy/app/migration/storage-migration-to-we"
-);
-const {StorageMigrationFromXpcom} = require(
-    "controllers/storage-migration-from-xpcom"
-);
+import {Log} from "lib/classes/log";
+import {StorageMigrationToWebExtension} from "legacy/app/migration/storage-migration-to-we";
+import {StorageMigrationFromXpcom} from "controllers/storage-migration-from-xpcom";
 
 function stubStorageLocalGet(aStorage, aInitialFullStorage) {
   aStorage.local.get.withArgs(null).resolves(aInitialFullStorage);
@@ -42,8 +38,8 @@ describe("legacy settings migration:", function() {
   const eweExternalBrowser = createBrowserApi();
   const eweInternalBrowser = createBrowserApi();
 
-  let LegacySideController;
-  let WebextSideController;
+  let LegacySideController: StorageMigrationToWebExtension;
+  let WebextSideController: StorageMigrationFromXpcom;
   function controllers() {
     return {
       LegacySideController: {
@@ -57,19 +53,12 @@ describe("legacy settings migration:", function() {
     };
   }
 
-  before(() => {
-    const embeddedWE = {browser: eweExternalBrowser};
-    global._pEmbeddedWebExtension = Promise.resolve(embeddedWE);
-    global.browser = browser;
-  });
-
   beforeEach(() => {
-    eweExternalBrowser.runtime.whenReady = () => Promise.resolve(); // FIXME
     const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
         log,
         browser.storage,
-        eweExternalBrowser.runtime
+        Promise.resolve(eweExternalBrowser.runtime),
     );
     WebextSideController = new StorageMigrationFromXpcom(
         log,
@@ -108,7 +97,7 @@ describe("legacy settings migration:", function() {
     );
     const isPush = fullStorageDirection === "push";
 
-    let onRuntimeSendMessageCalled = null;
+    let onRuntimeSendMessageCalled: ((aMessage, aResponse) => void) | null = null;
 
     function redirectMessages(aFromRuntime, aToRuntime) {
       aFromRuntime.sendMessage.callsFake((aMessage) => {
@@ -371,9 +360,4 @@ describe("legacy settings migration:", function() {
   });
 
   afterEach(restoreAll);
-
-  after(() => {
-    delete global._pEmbeddedWebExtension;
-    delete global.browser;
-  });
 });

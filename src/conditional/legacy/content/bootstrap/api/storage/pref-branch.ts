@@ -46,7 +46,7 @@ export class PrefBranch implements API.storage.IPrefBranch {
 
   public getAll() {
     const allPrefs: {[key: string]: any} = {};
-    const childList = this.prefsService.getChildList("");
+    const childList = this.branch.getChildList("");
     childList.forEach((prefName) => {
       allPrefs[prefName] = this.get(prefName);
     });

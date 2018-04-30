@@ -71,7 +71,7 @@ describe("SettingsMigration:", function() {
             "prefetch.preconnections.disableOnStartup",
           ]);
           stubbedStorageArea.set.calledWithMatch({
-            "browserSettings.disablePrefetching": true,
+            "browserSettings.disableNetworkPrediction": true,
           });
         };
       }
@@ -102,7 +102,7 @@ describe("SettingsMigration:", function() {
             "prefetch.link.disableOnStartup": false,
             "prefetch.dns.disableOnStartup": false,
             "prefetch.preconnections.disableOnStartup": false,
-            "browserSettings.disablePrefetching": true,
+            "browserSettings.disableNetworkPrediction": true,
           });
 
           // exercise

@@ -239,11 +239,16 @@
     "description": "Advanced Preferences"
   },
 
+  "browserSettings": {
+    "message": "Browser Settings",
+    "description": "Browser Settings"
+  },
+
   "networkPrediction": {
     "message": "Network Prediction",
     "description": "Network Prediction, see https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/privacy/network"
   },
-  
+
   "disableNetworkPrediction": {
     "message": "Disable Network Prediction (prefetching [links, DNS], speculative pre-connections, etc.)",
     "description": "Disable Network Prediction (...details...), see https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/privacy/network"

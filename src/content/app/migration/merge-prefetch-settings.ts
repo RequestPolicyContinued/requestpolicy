@@ -25,7 +25,7 @@ import { SettingsMigrationAction } from "./settings-migration-action";
 export class PrefetchSettingsMerger extends SettingsMigrationAction {
   public async performAction(): Promise<void> {
     const values = await this.storage.get([
-      "browserSettings.disablePrefetching",
+      "browserSettings.disableNetworkPrediction",
       "prefetch.link.disableOnStartup",
       "prefetch.dns.disableOnStartup",
       "prefetch.preconnections.disableOnStartup",
@@ -38,7 +38,7 @@ export class PrefetchSettingsMerger extends SettingsMigrationAction {
     if (!obsoletePrefetchSettingsExist) return;
 
     const targetSettingExists =
-        values.hasOwnProperty("browserSettings.disablePrefetching");
+        values.hasOwnProperty("browserSettings.disableNetworkPrediction");
     const promises: Array<Promise<void>> = [];
 
     if (!targetSettingExists) {
@@ -48,7 +48,8 @@ export class PrefetchSettingsMerger extends SettingsMigrationAction {
           !!values["prefetch.preconnections.disableOnStartup"];
       promises.push(
           this.storage.set({
-            "browserSettings.disablePrefetching": shouldDisablePrefetching,
+            "browserSettings.disableNetworkPrediction":
+                shouldDisablePrefetching,
           }),
       );
     }

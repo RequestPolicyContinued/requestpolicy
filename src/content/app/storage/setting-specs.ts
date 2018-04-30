@@ -39,7 +39,7 @@ const keys: {
   "autoReload": {
     cached: true, defaultValue: true,
   },
-  "browserSettings.disablePrefetching": {
+  "browserSettings.disableNetworkPrediction": {
     cached: true, defaultValue: true,
   },
   "confirmSiteInfo": {

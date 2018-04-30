@@ -34,8 +34,8 @@ import {WinEnv, elManager, $id} from "./common";
 
   function updateDisplay() {
     // browser settings
-    $id("pref-browserSettings.disablePrefetching").checked =
-        cachedSettings.get("browserSettings.disablePrefetching");
+    $id("pref-browserSettings.disableNetworkPrediction").checked =
+        cachedSettings.get("browserSettings.disableNetworkPrediction");
 
     // TODO: Create a class which acts as an API for preferences and which
     // ensures that the returned value is always a valid value for "string"
@@ -65,11 +65,11 @@ import {WinEnv, elManager, $id} from "./common";
 
     // prefetching
     elManager.addListener(
-        $id("pref-browserSettings.disablePrefetching"),
+        $id("pref-browserSettings.disableNetworkPrediction"),
         "change",
         (event) => {
           cachedSettings.set({
-            "browserSettings.disablePrefetching": event.target.checked,
+            "browserSettings.disableNetworkPrediction": event.target.checked,
           });
         }
     );

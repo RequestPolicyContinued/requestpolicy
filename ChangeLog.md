@@ -7,6 +7,10 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 * improvements
   * Add an option to allow all website redirections (top-level requests).
     (#53)
+* other changes
+  * merge the fine-grained settings to disable Link Prefetching,
+    DNS Prefetching and Speculative Pre-Connections into one setting
+    called "Disable Network Prediction".
 
 
 #### Version 1.0.beta13.2

@@ -40,7 +40,7 @@ export class BrowserSettings extends Module implements App.IBrowserSettings {
   }
 
   protected startupSelf() {
-    if (this.cachedSettings.get("browserSettings.disablePrefetching")) {
+    if (this.cachedSettings.get("browserSettings.disableNetworkPrediction")) {
       this.networkPrivacyApi.networkPredictionEnabled.set({value: false}).catch(
           this.log.onError("set networkPredictionEnabled false"),
       );

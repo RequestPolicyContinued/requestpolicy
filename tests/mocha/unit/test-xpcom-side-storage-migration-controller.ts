@@ -52,7 +52,10 @@ describe("legacy-side settings migration controller", function() {
   beforeEach(() => {
     const log = new Log();
     LegacySideController = new StorageMigrationToWebExtension(
-        log, browser.storage, Promise.resolve(eweExternalBrowser.runtime)
+        log,
+        browser.storage.local,
+        browser.storage.onChanged,
+        Promise.resolve(eweExternalBrowser.runtime),
     );
   });
 

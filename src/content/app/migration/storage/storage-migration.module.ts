@@ -26,15 +26,25 @@ import { IModule, Module } from "lib/classes/module";
 
 export class StorageMigration extends Module
     implements App.migration.IStorageMigration {
+  protected get startupPreconditions() {
+    return [
+      this.pStorageMigrationToWE.then(() => undefined),
+    ];
+  }
+
+  private storageMigrationToWE:
+      App.migration.storage.IStorageMigrationToWebExtension | null;
+
   constructor(
       log: Common.ILog,
       public readonly settingsMigration:
           App.migration.storage.ISettingsMigration,
       public readonly v0Rules: App.migration.storage.IV0RulesMigration | null,
-      private storageMigrationToWE:
-          App.migration.storage.IStorageMigrationToWebExtension | null,
+      private pStorageMigrationToWE:
+          Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage", log);
+    pStorageMigrationToWE.then((m) => this.storageMigrationToWE = m);
   }
 
   protected get subModules() {

@@ -76,45 +76,57 @@ import { Ui } from "./ui/ui.module";
 
 const localStorageArea = browser.storage.local;
 
-const {eweConnection, webextStorageMigration}: {
-  webextStorageMigration: StorageMigrationToWebExtension | null,
-  eweConnection: Connection<any, any> | null,
+const {pEWEConnection, pWebextStorageMigration}: {
+  pWebextStorageMigration:
+      Promise<StorageMigrationToWebExtension | null>,
+  pEWEConnection: Promise<Connection<any, any> | null>,
 } = C.EXTENSION_TYPE === "legacy" ? (() => {
   // @if EXTENSION_TYPE='legacy'
-  const pEweBrowser = _pEmbeddedWebExtension.then(({browser}) => browser);
-  const promiseEwePort = () => {
-    log.log("promiseEwePort()");
-    return pEweBrowser.then((eweBrowser) => {
-      log.log("eweBrowser");
+  const getEWEModules = (ewe: IEmbeddedWebExtension) => {
+    const eweBrowser = ewe.browser;
+    const promiseEwePort = () => {
       return getPortFromSlaveConnectable(eweBrowser.runtime);
-    });
+    };
+    const rvEWEConnection = new Connection(
+        C.EWE_CONNECTION_LEGACY_ID,
+        log,
+        C.EWE_CONNECTION_EWE_ID,
+        promiseEwePort,
+    );
+    const rvWebextStorageMigration = new StorageMigrationToWebExtension(
+        log,
+        browser.storage.local,
+        browser.storage.onChanged,
+        rvEWEConnection.whenReady.then(() => rvEWEConnection),
+    );
+    return {
+      eweConnection: rvEWEConnection,
+      webextStorageMigration: rvWebextStorageMigration,
+    };
   };
-  const rvEWEConnection = new Connection(
-      C.EWE_CONNECTION_LEGACY_ID,
-      log,
-      C.EWE_CONNECTION_EWE_ID,
-      promiseEwePort,
-  );
-  const rvWebextStorageMigration = new StorageMigrationToWebExtension(
-      log,
-      browser.storage.local,
-      browser.storage.onChanged,
-      rvEWEConnection.whenReady.then(() => rvEWEConnection),
+
+  const pModules = _pEmbeddedWebExtension.then(
+      getEWEModules,
+      () => ({
+        eweConnection: null,
+        webextStorageMigration: null,
+      }),
   );
   return {
-    eweConnection: rvEWEConnection,
-    webextStorageMigration: rvWebextStorageMigration,
+    pEWEConnection: pModules.then(({eweConnection}) => eweConnection),
+    pWebextStorageMigration: pModules.
+        then(({webextStorageMigration}) => webextStorageMigration),
   };
   // @endif
 })() : {
-  eweConnection: null,
-  webextStorageMigration: null,
+  pEWEConnection: Promise.resolve(null),
+  pWebextStorageMigration: Promise.resolve(null),
 };
 
 const settingsMigration = new SettingsMigration(
     log,
     browser.storage.local,
-    webextStorageMigration,
+    pWebextStorageMigration,
 );
 const storageReadyPromise = settingsMigration.whenReady;
 
@@ -130,7 +142,7 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
 const rulesetStorage = new RulesetStorage(log, localStorageArea);
 const subscriptions = new Subscriptions(log, rulesetStorage, localStorageArea);
 const policy = new Policy(log, subscriptions, rulesetStorage);
-const runtime = new Runtime(log, eweConnection);
+const runtime = new Runtime(log, pEWEConnection);
 
 const asyncSettings = new AsyncSettings(
     log,
@@ -181,7 +193,7 @@ const storageMigration = new StorageMigration(
     log,
     settingsMigration,
     v0RulesMigration,
-    webextStorageMigration,
+    pWebextStorageMigration,
 );
 
 const migration = new Migration(log, storageMigration);

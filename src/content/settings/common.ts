@@ -21,28 +21,30 @@
  * ***** END LICENSE BLOCK *****
  */
 
-var {WinEnv, elManager, $id} = (function() {
-  var {
+import { BackgroundPage } from "main";
+
+const {WinEnv, elManager, $id} = (() => {
+  const {
     Environment,
     MainEnvironment,
-  } = browser.extension.getBackgroundPage();
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
 
   // ===========================================================================
 
   // create a new Environment for this window
-  var WinEnv = new Environment(MainEnvironment, "WinEnv");
+  const rvWinEnv = new Environment(MainEnvironment, "WinEnv");
   // The Environment has to be shut down when the content window gets unloaded.
-  WinEnv.shutdownOnUnload(window);
+  rvWinEnv.shutdownOnUnload(window);
   // start up right now, as there won't be any startup functions
-  WinEnv.startup();
-  var elManager = WinEnv.elManager;
+  rvWinEnv.startup();
+  const rvElManager = rvWinEnv.elManager;
 
-  var $id = window.document.getElementById.bind(window.document);
+  const rv$id = window.document.getElementById.bind(window.document);
 
   return {
-    WinEnv: WinEnv,
-    elManager: elManager,
-    $id: $id,
+    $id: rv$id,
+    WinEnv: rvWinEnv,
+    elManager: rvElManager,
   };
 })();
 

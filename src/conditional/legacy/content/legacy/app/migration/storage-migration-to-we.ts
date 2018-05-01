@@ -70,7 +70,6 @@ export class StorageMigrationToWebExtension extends Module {
       this.debugLog.log("checkpoint");
       this.connectionToEWE.onMessage.
           addListener(this.receiveMessage.bind(this));
-      this.onStorageChanged.addListener(this.storageChanged.bind(this));
       const p = this.connectionToEWE.sendMessage(
           this.createMessage("startup", "ready"),
       );
@@ -80,6 +79,8 @@ export class StorageMigrationToWebExtension extends Module {
     }).then(() => {
       this.debugLog.log("waiting for synchronization to be done");
       return this.dInitialSync.promise;
+    }).then(() => {
+      this.onStorageChanged.addListener(this.storageChanged.bind(this));
     });
   }
 

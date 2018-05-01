@@ -90,7 +90,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
       aKeys = [aKeys];
     }
     const rv = this.removeByKeys(aKeys);
-    const changes = {};
+    const changes: browser.storage.ChangeDict = {};
     aKeys.forEach((key) => changes[key] = {});
     this.eventListenersMap.onChanged.emit(changes);
     if (rv && Object.keys(rv.errors).length === 0) return;

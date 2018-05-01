@@ -21,19 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager, $id} from "./common";
+import { BackgroundPage } from "main";
+import {$id, elManager, WinEnv} from "./common";
 
-(function() {
-  var {
+(() => {
+  const {
     ManagerForPrefObservers,
     rp,
-  } = browser.extension.getBackgroundPage();
-  const {cachedSettings} = rp.storage;
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
+  const cachedSettings = rp.storage.cachedSettings!;
 
   // ===========================================================================
 
   function updateDisplay() {
-    var indicate = cachedSettings.get("indicateBlockedObjects");
+    const indicate = cachedSettings.get("indicateBlockedObjects");
     $id("pref-indicateBlockedObjects").checked = indicate;
     $id("indicateBlockedImages-details").hidden = !indicate;
 
@@ -54,42 +55,58 @@ import {WinEnv, elManager, $id} from "./common";
     // $id("defaultpolicyword").innerHTML = word;
   }
 
-  window.onload = function() {
+  function handleBlockedObjectsIndicationChange() {
+    console.log("handleBlockedObjectsIndicationChange");
+    cachedSettings.set({
+      indicateBlockedObjects: $id("pref-indicateBlockedObjects").checked,
+    });
+    updateDisplay();
+  }
+
+  function handleBlacklistedObjectsIndicationChange() {
+    console.log("handleBlacklistedObjectsIndicationChange");
+    cachedSettings.set({
+      indicateBlacklistedObjects:
+          !$id("pref-dontIndicateBlacklistedObjects").checked,
+    });
+    updateDisplay();
+  }
+
+  function handleAutoReloadChange() {
+    console.log("handleAutoReloadChange");
+    cachedSettings.set({
+      autoReload: $id("pref-autoReload").checked,
+    });
+    updateDisplay();
+  }
+
+  function handlePrivateBrowsingPermanentWhitelistingChange() {
+    console.log("handlePrivateBrowsingPermanentWhitelistingChange");
+    cachedSettings.set({
+      privateBrowsingPermanentWhitelisting:
+          $id("pref-privateBrowsingPermanentWhitelisting").checked,
+    });
+    updateDisplay();
+  }
+
+  window.onload = () => {
     updateDisplay();
 
     elManager.addListener(
         $id("pref-indicateBlockedObjects"), "change",
-        function(event) {
-          cachedSettings.set({
-            "indicateBlockedObjects": event.target.checked,
-          });
-          updateDisplay();
-        }
+        handleBlockedObjectsIndicationChange,
     );
-
     elManager.addListener(
         $id("pref-dontIndicateBlacklistedObjects"), "change",
-        function(event) {
-          cachedSettings.set({
-            "indicateBlacklistedObjects": !event.target.checked,
-          });
-          updateDisplay();
-        }
+        handleBlacklistedObjectsIndicationChange,
     );
-
-    elManager.addListener($id("pref-autoReload"), "change", function(event) {
-      cachedSettings.set({"autoReload": event.target.checked});
-      updateDisplay();
-    });
-
+    elManager.addListener(
+        $id("pref-autoReload"), "change",
+        handleAutoReloadChange,
+    );
     elManager.addListener(
         $id("pref-privateBrowsingPermanentWhitelisting"), "change",
-        function(event) {
-          cachedSettings.set({
-            "privateBrowsingPermanentWhitelisting": event.target.checked,
-          });
-          updateDisplay();
-        }
+        handlePrivateBrowsingPermanentWhitelistingChange,
     );
 
     // call updateDisplay() every time a preference gets changed

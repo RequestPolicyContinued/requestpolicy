@@ -25,11 +25,20 @@ import { Connection } from "lib/classes/connection";
 import { IModule, Module } from "lib/classes/module";
 
 export class Runtime extends Module {
+  protected get startupPreconditions() {
+    return [
+      this.pEWEConnection.then(() => undefined),
+    ];
+  }
+
+  private eweConnection: Connection<any, any> | null;
+
   constructor(
       log: Common.ILog,
-      public readonly eweConnection: Connection<any, any> | null,
+      public readonly pEWEConnection: Promise<Connection<any, any> | null>,
   ) {
     super("app.runtime", log);
+    pEWEConnection.then((m) => this.eweConnection = m);
   }
 
   protected get subModules() {

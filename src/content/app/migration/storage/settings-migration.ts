@@ -30,24 +30,26 @@ import { PrefetchSettingsMerger } from "./merge-prefetch-settings";
 
 export class SettingsMigration extends Module
     implements App.migration.storage.ISettingsMigration {
-  protected get startupPreconditions() {
-    return this.storageMigrationToWE ?
-        [this.storageMigrationToWE.pStorageReadyForAccess] : [];
-  }
+  private storageMigrationToWE: StorageMigrationToWebExtension | null;
 
   constructor(
       log: Common.ILog,
       private storage: browser.storage.StorageArea,
-      private storageMigrationToWE: StorageMigrationToWebExtension | null,
+      private pStorageMigrationToWE:
+          Promise<StorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage.settings", log);
   }
 
-  protected startupSelf() {
-    return Promise.all([
+  protected async startupSelf() {
+    this.storageMigrationToWE = await this.pStorageMigrationToWE;
+    if (this.storageMigrationToWE) {
+      await this.storageMigrationToWE.pStorageReadyForAccess;
+    }
+    await Promise.all([
       this.performMergeActions(),
       this.performRemoveActions(),
-    ]).then(() => undefined);
+    ]);
   }
 
   private async performMergeActions(): Promise<void> {

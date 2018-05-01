@@ -32,6 +32,7 @@ type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
 export class Storage extends Module {
   private events = createListenersMap(["onChanged"]);
 
+  private ignorePrefObserverChangesTemporarily = false;
   private prefObserver: prefObserver = {
     observe: this.observePrefChange.bind(this),
   };
@@ -75,19 +76,30 @@ export class Storage extends Module {
   private getLocal(
       aKeys: string | string[] | IKeysWithDefaults | null | undefined,
   ) {
-    return Promise.resolve(this.slsa.get(aKeys));
+    this.ignorePrefObserverChangesTemporarily = true;
+    try {
+      return Promise.resolve(this.slsa.get(aKeys));
+    } catch (e) {
+      return Promise.reject(e);
+    } finally {
+      this.ignorePrefObserverChangesTemporarily = false;
+    }
   }
 
   private setLocal(aKeys: {[k: string]: any}) {
+    this.ignorePrefObserverChangesTemporarily = true;
     try {
       return Promise.resolve(this.slsa.set(aKeys));
     } catch (e) {
       return Promise.reject(e);
+    } finally {
+      this.ignorePrefObserverChangesTemporarily = false;
     }
   }
 
   private removeLocal(aKeys: string | string[]): Promise<void> {
-    try {
+      this.ignorePrefObserverChangesTemporarily = true;
+      try {
       const result = this.slsa.remove(aKeys);
       if (result && "errors" in result) {
         return Promise.reject(result.errors);
@@ -95,6 +107,8 @@ export class Storage extends Module {
       return Promise.resolve();
     } catch (e) {
       return Promise.reject(e);
+    } finally {
+      this.ignorePrefObserverChangesTemporarily = false;
     }
   }
 
@@ -103,6 +117,7 @@ export class Storage extends Module {
       aTopic: "nsPref:changed",
       aData: string,
   ) {
+    if (this.ignorePrefObserverChangesTemporarily) return;
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
     const changes: browser.storage.ChangeDict = {
@@ -112,12 +127,6 @@ export class Storage extends Module {
   }
 
   private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
-    const changes: browser.storage.ChangeDict = {};
-    Object.keys(aChanges).forEach((key) => {
-      if (!this.slsa.isJsonStorageKey(key)) return;
-      changes[key] = aChanges[key];
-    });
-    if (Object.keys(changes).length === 0) return;
-    this.events.listenersMap.onChanged.emit(changes);
+    this.events.listenersMap.onChanged.emit(aChanges);
   }
 }

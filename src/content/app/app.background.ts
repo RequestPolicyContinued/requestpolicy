@@ -156,8 +156,8 @@ const cachedSettings = new CachedSettings(
     log,
     SETTING_SPECS,
     storageReadyPromise,
+    browser.storage.local,
     LegacyApi.rpPrefBranch, /* FIXME */
-    LegacyApi.prefsService, /* FIXME */
 );
 const storage = new Storage(
     log, asyncSettings, cachedSettings, storageReadyPromise,

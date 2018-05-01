@@ -83,7 +83,7 @@ export abstract class Module implements IModule {
       parentLog: Common.ILog,
   ) {
     this.log = parentLog.extend({name: moduleName});
-    this.debugLog = this.log.extend({enabled: false});
+    this.debugLog = this.log.extend({enabled: false, level: "all"});
 
     setTimeout(() => {
       if (this.startupCalled) return;

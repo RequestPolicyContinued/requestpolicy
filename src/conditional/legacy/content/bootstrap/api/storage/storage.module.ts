@@ -76,13 +76,10 @@ export class Storage extends Module {
   private getLocal(
       aKeys: string | string[] | IKeysWithDefaults | null | undefined,
   ) {
-    this.ignorePrefObserverChangesTemporarily = true;
     try {
       return Promise.resolve(this.slsa.get(aKeys));
     } catch (e) {
       return Promise.reject(e);
-    } finally {
-      this.ignorePrefObserverChangesTemporarily = false;
     }
   }
 
@@ -123,10 +120,12 @@ export class Storage extends Module {
     const changes: browser.storage.ChangeDict = {
       [prefName]: newValue === undefined ? {} : {newValue},
     };
+    this.debugLog.log(`pref changes:`, changes);
     this.events.listenersMap.onChanged.emit(changes);
   }
 
   private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
+    this.debugLog.log(`pref changes:`, aChanges);
     this.events.listenersMap.onChanged.emit(aChanges);
   }
 }

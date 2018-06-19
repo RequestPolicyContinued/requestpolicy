@@ -38,7 +38,8 @@ export class Runtime extends Module {
       public readonly pEWEConnection: Promise<Connection<any, any> | null>,
   ) {
     super("app.runtime", log);
-    pEWEConnection.then((m) => this.eweConnection = m);
+    pEWEConnection.then((m) => this.eweConnection = m).
+        catch(this.log.onError("pEWEConnection"));
   }
 
   protected get subModules() {

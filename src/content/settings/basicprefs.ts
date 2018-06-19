@@ -26,6 +26,7 @@ import {$id, elManager, WinEnv} from "./common";
 
 (() => {
   const {
+    log,
     ManagerForPrefObservers,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
@@ -56,36 +57,32 @@ import {$id, elManager, WinEnv} from "./common";
   }
 
   function handleBlockedObjectsIndicationChange() {
-    console.log("handleBlockedObjectsIndicationChange");
     cachedSettings.set({
       indicateBlockedObjects: $id("pref-indicateBlockedObjects").checked,
-    });
+    }).catch(log.onError("handleBlockedObjectsIndicationChange"));
     updateDisplay();
   }
 
   function handleBlacklistedObjectsIndicationChange() {
-    console.log("handleBlacklistedObjectsIndicationChange");
     cachedSettings.set({
       indicateBlacklistedObjects:
           !$id("pref-dontIndicateBlacklistedObjects").checked,
-    });
+    }).catch(log.onError("handleBlacklistedObjectsIndicationChange"));
     updateDisplay();
   }
 
   function handleAutoReloadChange() {
-    console.log("handleAutoReloadChange");
     cachedSettings.set({
       autoReload: $id("pref-autoReload").checked,
-    });
+    }).catch(log.onError("handleAutoReloadChange"));
     updateDisplay();
   }
 
   function handlePrivateBrowsingPermanentWhitelistingChange() {
-    console.log("handlePrivateBrowsingPermanentWhitelistingChange");
     cachedSettings.set({
       privateBrowsingPermanentWhitelisting:
           $id("pref-privateBrowsingPermanentWhitelisting").checked,
-    });
+    }).catch(log.onError("handlePrivateBrowsingPermanentWhitelistingChange"));
     updateDisplay();
   }
 

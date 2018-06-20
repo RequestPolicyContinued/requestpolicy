@@ -23,8 +23,8 @@
 import { Common } from "common/interfaces";
 import {defer} from "lib/utils/js-utils";
 
-const MAX_WAIT_FOR_STARTUP_SECONDS = 2;
-const MAX_STARTUP_SECONDS = 4;
+const MAX_WAIT_FOR_STARTUP_SECONDS = 15;
+const MAX_STARTUP_SECONDS = 15;
 
 export interface IModule {
   startup?: () => Promise<void>;
@@ -78,6 +78,9 @@ export abstract class Module implements IModule {
   public get pStartup() { return this.pBootstrap.startup; }
   public get pShutdown() { return this.pBootstrap.shutdown; }
 
+  private timedOutWaitingForStartup = false;
+  private creationTime: number;
+
   constructor(
       public readonly moduleName: string,
       parentLog: Common.ILog,
@@ -85,6 +88,7 @@ export abstract class Module implements IModule {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false, level: "all"});
 
+    this.creationTime = new Date().getTime()
     setTimeout(() => {
       if (this.startupCalled) return;
       this.log.error(`[severe] startup() hasn't been invoked ` +
@@ -94,18 +98,37 @@ export abstract class Module implements IModule {
 
   public async startup(): Promise<void> {
     this.startupCalled = true;
+
+    let timedOutStartingUp = false;
     setTimeout(() => {
       if (this.ready) return;
+      timedOutStartingUp = true;
       this.log.error(`startup didn't finish ` +
           `even after ${MAX_STARTUP_SECONDS} seconds!`);
     }, 1000 * MAX_STARTUP_SECONDS);
-    this.debugLog.log("starting up...");
+    const startupStartTime = new Date().getTime();
+    if (this.timedOutWaitingForStartup) {
+      this.log.error(
+          `starting up... / needed to wait ` +
+          `${(startupStartTime - this.creationTime) / 1000} seconds!`);
+    } else {
+      this.debugLog.log("starting up...");
+    }
+
     const p = this.startup_();
     p.catch(this.log.onError("error on startup"));
     await p;
     this.ready = true;
     this.dReady.resolve(undefined);
-    this.debugLog.log("startup done");
+
+    if (timedOutStartingUp) {
+      const startupEndTime = new Date().getTime();
+      this.log.error(
+          `startup done / startup took ` +
+          `${(startupEndTime - startupStartTime) / 1000} seconds!`);
+    } else {
+      this.debugLog.log("startup done");
+    }
   }
 
   public async shutdown(): Promise<void> {

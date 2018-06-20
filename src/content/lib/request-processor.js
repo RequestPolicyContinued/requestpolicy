@@ -110,8 +110,8 @@ let historyRequests = {};
 // We always call this from shouldLoad to reject a request.
 function reject(reason, request) {
   /* eslint-disable no-param-reassign */
-  logRequests.log(`** BLOCKED ** reason: ${reason
-  }. ${request.detailsToString()}`);
+  logRequests.log(`** BLOCKED ** reason: ${reason}. ` +
+      `${request.detailsToString()}`);
 
   if (cachedSettings.alias.isBlockingDisabled()) {
     return CP_OK;
@@ -164,8 +164,8 @@ function reject(reason, request) {
  * @return {number}
  */
 function accept(reason, request, unforbidable) {
-  logRequests.log(`** ALLOWED ** reason: ${
-    reason}. ${request.detailsToString()}`);
+  logRequests.log(`** ALLOWED ** reason: ${reason}. ` +
+      `${request.detailsToString()}`);
 
   cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
   Requests.notifyNewRequest({
@@ -207,16 +207,15 @@ function isDuplicateRequest(request) {
     if (date.getTime() - lastShouldLoadCheck.time <
         lastShouldLoadCheckTimeout) {
       logRequests.log(
-          `Using cached shouldLoad() result of ${
-            lastShouldLoadCheck.result} for request to <${
-            request.destURI}> from <${request.originURI}>.`
+          `Using cached shouldLoad() result of ${lastShouldLoadCheck.result} ` +
+          `for request to <${request.destURI}> from <${request.originURI}>.`
       );
       return true;
     } else {
       logRequests.log(
-          `shouldLoad() cache expired for result of ${
-            lastShouldLoadCheck.result} for request to <${
-            request.destURI}> from <${request.originURI}>.`
+          `shouldLoad() cache expired for result of ` +
+          `${lastShouldLoadCheck.result} for request to ` +
+          `<${request.destURI}> from <${request.originURI}>.`
       );
     }
   }
@@ -255,9 +254,8 @@ export function process(request) {
   // log.dir(request.aContentLocation);
   try {
     if (request.isInternal()) {
-      logRequests.log(`${"Allowing a request that seems to be internal. " +
-                  "Origin: "}${request.originURI}, Dest: ${
-        request.destURI}`);
+      logRequests.log(`Allowing a request that seems to be internal. ` +
+          `Origin: ${request.originURI}, Dest: ${request.destURI}`);
       return CP_OK;
     }
 
@@ -293,8 +291,8 @@ export function process(request) {
       //   -> https://bugzilla.mozilla.org/show_bug.cgi?id=767134#c15
       if (request.aRequestPrincipal) {
         logRequests.log(
-            `${"Allowing request that appears to be a URL entered in the " +
-            "location bar or some other good explanation: "}${destURI}`
+            `Allowing request that appears to be a URL entered in the ` +
+            `location bar or some other good explanation: ${destURI}`
         );
         Requests._removeSavedRequestsByOriginURI(destURI);
         return CP_OK;
@@ -344,8 +342,8 @@ export function process(request) {
         }
         if (newOriginURI) {
           newOriginURI = uriService.stripFragment(newOriginURI);
-          log.log(`Considering origin <${
-            originURI}> to be origin <${newOriginURI}>`);
+          log.log(`Considering origin <${originURI}> ` +
+              `to be origin <${newOriginURI}>`);
           originURI = newOriginURI;
           request.setOriginURI(originURI);
         }
@@ -365,8 +363,8 @@ export function process(request) {
     // http://code.google.com/p/SOME_PROJECT/source/detail?r=SOME_REVISION
     if (originURI === destURI) {
       logRequests.log(
-          `${"Allowing (but not recording) request " +
-          "where origin is the same as the destination: "}${originURI}`
+          `Allowing (but not recording) request ` +
+          `where origin is the same as the destination: ${originURI}`
       );
       return CP_OK;
     }
@@ -504,8 +502,8 @@ export function process(request) {
       request.requestResult = new RequestResult(true,
           RequestReason.IdenticalIdentifier);
       return accept(
-          `${"Allowing request where origin protocol, host, and port are the" +
-          " same as the destination: "}${originIdent}`, request
+          `Allowing request where origin protocol, host, and port are the` +
+          ` same as the destination: ${originIdent}`, request
       );
     }
 
@@ -624,8 +622,8 @@ export function process(request) {
         request.requestResult = new RequestResult(true,
             RequestReason.Compatibility);
         return accept(
-            `Extension/application compatibility rule matched [${
-              rule.info}]`, request, true
+            `Extension/application compatibility rule matched [${rule.info}]`,
+            request, true
         );
       }
     }
@@ -638,8 +636,8 @@ export function process(request) {
         request.requestResult = new RequestResult(true,
             RequestReason.Compatibility);
         return accept(
-            `Extension/application compatibility rule matched [${
-              info.addonName}]`, request, true
+            `Extension/application compatibility rule matched ` +
+            `[${info.addonName}]`, request, true
         );
       }
     }
@@ -805,8 +803,7 @@ export function registerAllowedRedirect(originUrl, destinationUrl) {
       uriService.stripFragment(destinationUrl)
   );
 
-  log.info(`User-allowed redirect from <${
-    originUrl}> to <${destinationUrl}>.`);
+  log.info(`User-allowed redirect from <${originUrl}> to <${destinationUrl}>.`);
 
   if (UserAllowedRedirects[originUrl] === undefined) {
     UserAllowedRedirects[originUrl] = {};
@@ -949,9 +946,8 @@ export function processUrlRedirection(request) {
   // to a "data" URI.
   if (request.isInternal()) {
     logRequests.log(
-        `${"Allowing a redirection that seems to be internal. " +
-        "Origin: "}${request.originURI}, Dest: ${
-          request.destURI}`
+        `Allowing a redirection that seems to be internal. ` +
+        `Origin: ${request.originURI}, Dest: ${request.destURI}`
     );
     return CP_OK;
   }

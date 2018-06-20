@@ -510,14 +510,15 @@ export function process(request) {
     request.requestResult = rp.policy.checkRequestAgainstUserRules(
         request.aRequestOrigin, request.aContentLocation
     );
-    for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-      log.log("Matched deny rules");
-      log.dir(matchedDenyRule);
-    }
-    for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-      log.log("Matched allow rules");
-      log.dir(matchedAllowRule);
-    }
+    // for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
+    //   log.log("Matched deny rules");
+    //   log.dir(matchedDenyRule);
+    // }
+    // for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
+    //   log.log("Matched allow rules");
+    //   log.dir(matchedAllowRule);
+    // }
+
     // If there are both allow and deny rules, then fall back on the default
     // policy. I believe this is effectively the same as giving precedence
     // to allow rules when in default allow mode and giving precedence to
@@ -565,14 +566,14 @@ export function process(request) {
     request.requestResult = rp.policy.
         checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
             request.aContentLocation);
-    for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
-      log.log("Matched deny rules");
-      log.dir(matchedDenyRule);
-    }
-    for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
-      log.log("Matched allow rules");
-      log.dir(matchedAllowRule);
-    }
+    // for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
+    //   log.log("Matched deny rules");
+    //   log.dir(matchedDenyRule);
+    // }
+    // for (let matchedAllowRule of request.requestResult.matchedAllowRules) {
+    //   log.log("Matched allow rules");
+    //   log.dir(matchedAllowRule);
+    // }
     if (request.requestResult.allowRulesExist() &&
         request.requestResult.denyRulesExist()) {
       let {conflictCanBeResolved, shouldAllow,

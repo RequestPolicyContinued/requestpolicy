@@ -673,8 +673,7 @@ export function process(request) {
         reject("Denied by default policy", request);
     }
   } catch (e) {
-    console.error("Fatal Error:");
-    console.dir(e);
+    log.error("Fatal Error:", e);
     if (cachedSettings.alias.isBlockingDisabled()) {
       log.warn("Allowing request due to internal error.");
       return CP_OK;
@@ -1104,8 +1103,7 @@ export function processUrlRedirection(request) {
     );
     return CP_REJECT;
   } catch (e) {
-    console.error("Fatal Error:");
-    console.dir(e);
+    log.error("Fatal Error:", e);
     if (cachedSettings.alias.isBlockingDisabled()) {
       log.warn("Allowing request due to internal error.");
       return CP_OK;

@@ -21,7 +21,7 @@
  */
 
 import {rp} from "app/app.background";
-import {KeyboardShortcut} from "lib/classes/keyboard-shortcut";
+import {KeyboardShortcut} from "lib/keyboard-shortcut";
 import {pWindowsAvailable} from "models/ui-startup";
 import {rpWindowManager} from "main/window-manager";
 

@@ -26,6 +26,7 @@ import {
   getBrowserFromLoadContext,
   getDocShellFromHttpChannel,
 } from "lib/utils/try-catch-utils";
+import {getBrowserForWindow} from "lib/utils/window-utils";
 
 // =============================================================================
 // HttpChannelWrapper
@@ -66,7 +67,9 @@ export class HttpChannelWrapper {
       if (loadContext === null) {
         this._browser = null;
       } else {
-        const result = getBrowserFromLoadContext(loadContext);
+        const result = getBrowserFromLoadContext(
+            loadContext, getBrowserForWindow,
+        );
         this._browser = result.value;
         if (this._browser === null) {
           log.warn(`${"The browser for " +

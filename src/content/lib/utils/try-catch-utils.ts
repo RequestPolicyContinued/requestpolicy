@@ -31,8 +31,6 @@
 
 declare const Ci: any;
 
-import * as WindowUtils from "lib/utils/window-utils";
-
 const value = <T = any>(val: T) => ({value: val});
 const error = <T = any>(err: T) => ({error: err, value: null});
 
@@ -112,7 +110,10 @@ export function getRequestHeaderFromHttpChannel(
 
 export {getAppLocale} from "./try-catch-utils.mpl";
 
-export function getBrowserFromLoadContext(loadContext: any) {
+export function getBrowserFromLoadContext(
+    loadContext: any,
+    getBrowserForWindow: (win: any) => any,
+) {
   try {
     if (loadContext.topFrameElement) {
       // the top frame element should be already the browser element
@@ -120,7 +121,7 @@ export function getBrowserFromLoadContext(loadContext: any) {
     } else {
       // we hope the associated window is available. in multiprocessor
       // firefox it's not available.
-      return value(WindowUtils.getBrowserForWindow(loadContext.topWindow));
+      return value(getBrowserForWindow(loadContext.topWindow));
     }
   } catch (e) {
     return error(e);

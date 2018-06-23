@@ -5,7 +5,7 @@ import * as mrdescribe from "mocha-repeat";
 import * as Sinon from "sinon";
 import {
   getFullStorageDirection,
-} from "../lib/settings-migration-utils";
+} from "../lib/storage-migration-utils";
 import {createBrowserApi} from "../lib/sinon-chrome";
 import {destructureOptions} from "../lib/utils";
 

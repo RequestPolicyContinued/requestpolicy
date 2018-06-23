@@ -7,7 +7,7 @@ import Sinon = require("sinon");
 import {createBrowserApi} from "../lib/sinon-chrome";
 import {
   getFullStorageDirection,
-} from "../lib/settings-migration-utils";
+} from "../lib/storage-migration-utils";
 import {destructureOptions} from "../lib/utils";
 
 import {Log} from "lib/classes/log";

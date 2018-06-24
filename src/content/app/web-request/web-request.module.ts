@@ -21,35 +21,22 @@
  */
 
 import { App } from "app/interfaces";
-import { Runtime } from "app/runtime/runtime.module";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class AppBackground extends Module {
-  constructor(
-      log: Common.ILog,
-      public readonly browserSettings: App.IBrowserSettings,
-      public readonly migration: App.IMigration,
-      public readonly policy: App.IPolicy,
-      public readonly runtime: Runtime,
-      public readonly services: App.IRPServices,
-      public readonly storage: App.IStorage,
-      public readonly ui: App.IUi,
-      public readonly webRequest: App.IWebRequest,
-  ) {
-    super("app", log);
-  }
-
+export class WebRequest extends Module implements App.IWebRequest {
   protected get subModules() {
     return {
-      browserSettings: this.browserSettings,
-      migration: this.migration,
-      policy: this.policy,
-      runtime: this.runtime,
-      services: this.services,
-      storage: this.storage,
-      ui: this.ui,
-      webRequest: this.webRequest,
+      rpChannelEventSink: this.rpChannelEventSink,
+      rpContentPolicy: this.rpContentPolicy,
     };
+  }
+
+  constructor(
+      log: Common.ILog,
+      public readonly rpChannelEventSink: App.webRequest.IRPChannelEventSink,
+      public readonly rpContentPolicy: App.webRequest.IRPContentPolicy,
+  ) {
+    super("app.browserSettings", log);
   }
 }

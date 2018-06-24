@@ -44,7 +44,6 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
   private dCapturing = defer();
 
   constructor(
-      moduleName: string,
       parentLog: Common.ILog,
       xpconnectService: API.IXPConnectService,
       xpcComponentInterfaces: XPCOM.nsXPCComponents_Interfaces,
@@ -55,7 +54,7 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
       private readonly normalRequestFactory: NonDI.NormalRequestFactory,
   ) {
     super(
-        moduleName,
+        "app.webRequest.contentPolicy",
         parentLog,
         xpconnectService,
         xpcComponentInterfaces,

@@ -46,7 +46,6 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
   private dCapturing = defer();
 
   constructor(
-      moduleName: string,
       parentLog: Common.ILog,
       xpconnectService: API.IXPConnectService,
       xpcComponentInterfaces: XPCOM.nsXPCComponents_Interfaces,
@@ -57,7 +56,7 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
       private readonly redirectRequestFactory: NonDI.RedirectRequestFactory,
   ) {
     super(
-        moduleName,
+        "app.webRequest.channelEventSink",
         parentLog,
         xpconnectService,
         xpcComponentInterfaces,

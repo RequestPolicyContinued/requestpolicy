@@ -34,6 +34,9 @@ import { Ui } from "./ui/ui.module";
 import { VersionInfoService } from "./services/version-info-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { StorageMigration } from "./migration/storage/storage-migration.module";
+import { RPChannelEventSink } from "./web-request/channel-event-sink";
+import { RPContentPolicy } from "./web-request/content-policy";
+import { WebRequest } from "./web-request/web-request.module";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
 
@@ -60,10 +63,16 @@ export namespace App {
     export type ICachedSettings = CachedSettings;
   }
 
+  export namespace webRequest {
+    export type IRPChannelEventSink = RPChannelEventSink;
+    export type IRPContentPolicy = RPContentPolicy;
+  }
+
   export type IBrowserSettings = BrowserSettings;
   export type IMigration = Migration;
   export type IPolicy = Policy;
   export type IRPServices = RPServices;
   export type IStorage = Storage;
   export type IUi = Ui;
+  export type IWebRequest = WebRequest;
 }

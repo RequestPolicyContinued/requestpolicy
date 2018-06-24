@@ -42,7 +42,6 @@ import {
 import {Requests} from "models/requests";
 
 import {log} from "app/log";
-import RPContentPolicy from "main/content-policy";
 import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
@@ -653,7 +652,7 @@ export function process(request) {
         const mappedDestUriObj =
             MappedDestinations[destURI][mappedDest];
         logRequests.log(`Checking mapped destination: ${mappedDest}`);
-        let mappedResult = RPContentPolicy.shouldLoad(
+        let mappedResult = process(
             request.aContentType, mappedDestUriObj, request.aRequestOrigin,
             request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION
         );

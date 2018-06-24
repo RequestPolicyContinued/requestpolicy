@@ -24,6 +24,7 @@ import { XPCOM } from "bootstrap/api/interfaces";
 
 declare const Cc: XPCOM.nsXPCComponents_Classes;
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Cm: XPCOM.nsXPCComponents_Manager;
 
 export class XPConnectService {
   public createConverterInputStreamInstance(): XPCOM.nsIConverterInputStream {
@@ -49,5 +50,18 @@ export class XPConnectService {
   public createSupportsStringInstance(): XPCOM.nsISupportsString {
     return Cc["@mozilla.org/supports-string;1"].
         createInstance(Ci.nsISupportsString);
+  }
+
+  // services
+
+  public getCategoryManagerService(): XPCOM.nsICategoryManager {
+    return Cc["@mozilla.org/categorymanager;1"].
+        getService<XPCOM.nsICategoryManager>(Ci.nsICategoryManager);
+  }
+
+  // other
+
+  public getComponentRegistrar(): XPCOM.nsIComponentRegistrar {
+    return Cm.QueryInterface(Ci.nsIComponentRegistrar);
   }
 }

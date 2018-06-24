@@ -1207,4 +1207,5 @@ function isContentRequest(request) {
   return !!loadContext.isContent;
 }
 
+// FIXME
 export const whenReady = Promise.resolve();

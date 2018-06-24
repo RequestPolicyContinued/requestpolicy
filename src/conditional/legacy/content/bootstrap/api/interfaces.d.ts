@@ -53,9 +53,43 @@ export namespace XPCOM {
     getService<T extends nsISupports>(id: nsIJSID): T;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIAsyncVerifyRedirectCallback.idl
+  export interface nsIAsyncVerifyRedirectCallback extends nsISupports {
+    onRedirectVerifyCallback(result: nsResult): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsICategoryManager.idl
+  export interface nsICategoryManager extends nsISupports {
+    addCategoryEntry(
+        aCategory: string,
+        aEntry: string,
+        aValue: string,
+        aPersist: boolean,
+        aReplace: boolean,
+    ): string;
+    deleteCategoryEntry(aCategory: string, aEntry: string, aPersist: boolean): void;
+  }
+
   export interface nsIChannel extends nsIRequest {
     asyncOpen(aListener: nsIStreamListener, aContext: nsISupports): void;
     open(): nsIInputStream;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsIComponentManager.idl
+  export interface nsIComponentManager extends nsISupports {}
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsIComponentRegistrar.idl
+  export interface nsIComponentRegistrar extends nsISupports {
+    registerFactory(
+        aClass: nsIJSCID,
+        aClassName: string,
+        aContractID: string,
+        aFactory: nsIFactory,
+    ): void;
+    unregisterFactory(
+        aClass: nsIJSCID,
+        aFactory: nsIFactory,
+    ): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIConverterInputStream.idl
@@ -79,6 +113,8 @@ export namespace XPCOM {
   }
 
   export interface nsIDOMWindow extends nsISupports {}
+
+  export interface nsIFactory {}
 
   export interface nsIFile extends nsISupports {
     directoryEntries: nsISimpleEnumerator;
@@ -386,9 +422,12 @@ export namespace XPCOM {
   export interface nsXPCComponents {
     classes: nsXPCComponents_Classes;
     interfaces: nsXPCComponents_Interfaces;
+    results: nsXPCComponents_Results;
+    ID: <T extends nsIJSCID>(iid: string) => T;
   }
 
   export interface nsXPCComponents_Classes {
+    "@mozilla.org/categorymanager;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
@@ -397,14 +436,34 @@ export namespace XPCOM {
   }
 
   export interface nsXPCComponents_Interfaces {
+    nsICategoryManager: XPCOM.nsIJSID;
+    nsIChannelEventSink: XPCOM.nsIJSID;
+    nsIComponentRegistrar: XPCOM.nsIJSID;
+    nsIContentPolicy: XPCOM.nsIJSID & {
+      ACCEPT: number,
+      REJECT_SERVER: number,
+    };
     nsIConverterInputStream: XPCOM.nsIJSID;
     nsIConverterOutputStream: XPCOM.nsIJSID;
+    nsIFactory: XPCOM.nsIJSID;
     nsIFile: XPCOM.nsIJSID;
     nsIFileInputStream: XPCOM.nsIJSID;
     nsIFileOutputStream: XPCOM.nsIJSID;
     nsILineInputStream: XPCOM.nsIJSID;
+    nsIObserver: XPCOM.nsIJSID;
     nsIPrefBranch2: XPCOM.nsIJSID;
     nsISupportsString: XPCOM.nsIJSID;
+    nsISupportsWeakReference: XPCOM.nsIJSID;
+  }
+
+  export interface nsXPCComponents_Manager extends nsIComponentManager {
+  }
+
+  export interface nsXPCComponents_Results {
+    NS_ERROR_FACTORY_EXISTS: nsResult;
+    NS_ERROR_FAILURE: nsResult;
+    NS_ERROR_NO_AGGREGATION: nsResult;
+    NS_OK: nsResult;
   }
 
   export interface nsXPCComponents_Utils {
@@ -510,6 +569,10 @@ export namespace JSMs {
     locale: XPCOM.nsILocaleService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
     vc: XPCOM.nsIVersionComparator;
+  }
+
+  export interface XPCOMUtils {
+    generateQI(interfaces: XPCOM.nsIJSID[]): XPCOM.nsISupports["QueryInterface"];
   }
 }
 

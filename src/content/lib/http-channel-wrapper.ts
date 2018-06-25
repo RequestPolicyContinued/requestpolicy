@@ -27,25 +27,32 @@ import {
   getDocShellFromHttpChannel,
 } from "lib/utils/try-catch-utils";
 import {getBrowserForWindow} from "lib/utils/window-utils";
-
-// =============================================================================
-// HttpChannelWrapper
-// =============================================================================
+import {XPCOM, JSMs} from "bootstrap/api/interfaces";
+import {C} from "data/constants";
 
 export class HttpChannelWrapper {
-  constructor(aHttpChannel) {
-    this._httpChannel = aHttpChannel;
-  }
+  private _docShell: XPCOM.nsIDocShell | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  private _browser: XPCOM.nsIDOMXULElement | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  private _loadContext: XPCOM.nsILoadContext | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  private _uri: XPCOM.nsIURI | typeof C["UNDEFINED"] = C.UNDEFINED;
 
-  get uri() {
-    if (!this.hasOwnProperty("_uri")) {
-      this._uri = Services.io.newURI(this._httpChannel.name, null, null);
+  constructor(
+      private mozIOService: JSMs.Services["io"],
+      private _httpChannel: XPCOM.nsIHttpChannel,
+  ) {}
+
+  get uri(): XPCOM.nsIURI {
+    if (this._uri === C.UNDEFINED) {
+      this._uri = this.mozIOService.newURI(this._httpChannel.name, null, null);
     }
-    return this._uri;
+    return this._uri as XPCOM.nsIURI;
   }
 
-  get loadContext() {
-    if (!this.hasOwnProperty("_loadContext")) {
+  get loadContext(): XPCOM.nsILoadContext | null {
+    if (this._loadContext === C.UNDEFINED) {
       const result = getLoadContextFromHttpChannel(this._httpChannel);
       this._loadContext = result.value;
       if (this._loadContext === null) {
@@ -53,15 +60,14 @@ export class HttpChannelWrapper {
             "Load Context couldn't be found! "}${result.error}`);
       }
     }
-    return this._loadContext;
+    return this._loadContext as XPCOM.nsILoadContext | null;
   }
 
   /**
    * Get the <browser> related to this request.
-   * @return {?nsIDOMXULElement}
    */
-  get browser() {
-    if (!this.hasOwnProperty("_browser")) {
+  get browser(): XPCOM.nsIDOMXULElement | null {
+    if (this._browser === C.UNDEFINED) {
       let loadContext = this.loadContext;
 
       if (loadContext === null) {
@@ -71,28 +77,34 @@ export class HttpChannelWrapper {
             loadContext, getBrowserForWindow,
         );
         this._browser = result.value;
-        if (this._browser === null) {
-          log.warn(`${"The browser for " +
-              "the HTTPChannel's Load Context couldn't be " +
-              "found! "}${result.error}`);
+        if ("error" in result) {
+          log.warn(
+              "Error getting the HTTPChannel's load context: ",
+              result.error,
+          );
+        } else if (this._browser === null) {
+          log.warn(
+              "The browser for the HTTPChannel's load context " +
+              "couldn't be found!");
         }
       }
     }
-    return this._browser;
+    return this._browser as XPCOM.nsIDOMXULElement | null;
   }
 
   /**
    * Get the DocShell related to this request.
-   * @return {?nsIDocShell}
    */
-  get docShell() {
+  get docShell(): XPCOM.nsIDocShell | null {
     if (!this.hasOwnProperty("_docShell")) {
       const result = getDocShellFromHttpChannel(this._httpChannel);
       this._docShell = result.value;
-      if (this._docShell === null) {
-        log.warn("The HTTPChannel's DocShell couldn't be found!", result.error);
+      if ("error" in result) {
+        log.warn("Error getting the HTTPChannel's DocShell: ", result.error);
+      } else if (this._docShell === null) {
+        log.warn("The HTTPChannel's DocShell couldn't be found!");
       }
     }
-    return this._docShell;
+    return this._docShell as XPCOM.nsIDocShell | null;
   }
 }

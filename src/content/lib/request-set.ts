@@ -31,13 +31,12 @@ const uriService = rp.services.uri;
 // utilities
 // =============================================================================
 
-function getUriIdentifier(uri) {
+function getUriIdentifier(uri: string) {
   try {
     return uriService.getIdentifier(uri, uriService.hostLevels.SOP);
   } catch (e) {
-    const msg = `getUriIdentifier exception on uri <${uri}> ` +
-        `. Exception was: ${e}`;
-    // eslint-disable-next-line no-throw-literal
+    const msg = `getUriIdentifier exception on uri <${uri}>. ` +
+        `Exception was: ${e}`;
     throw new Error(msg);
   }
 }
@@ -47,11 +46,12 @@ function getUriIdentifier(uri) {
 // =============================================================================
 
 export class RequestSet {
-  constructor() {
-    this._origins = {};
-  }
+  private _origins: any = {};
 
-  print(name, printFn = log.log.bind(log)) {
+  print(
+      name: string,
+      printFn: (s: string) => void = log.log.bind(log),
+  ) {
     printFn("-------------------------------------------------");
     printFn(`== Request Set <${name}> ==`);
     // "Take that, Big-O!"
@@ -82,7 +82,7 @@ export class RequestSet {
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
   getAllMergedOrigins() {
-    const result = {};
+    const result: any = {};
     for (let originUri in this._origins) {
       const dests = this._origins[originUri];
       for (let destBase in dests) {
@@ -109,16 +109,15 @@ export class RequestSet {
     return result;
   }
 
-  getOriginUri(originUri) {
+  getOriginUri(originUri: string) {
     return this._origins[originUri] || {};
   }
 
-  /**
-   * @param {string} originUri
-   * @param {string} destUri
-   * @param {RequestResult} aRequestResult
-   */
-  addRequest(originUri, destUri, aRequestResult) {
+  addRequest(
+      originUri: string,
+      destUri: string,
+      aRequestResult: RequestResult,
+  ) {
     let requestResult = aRequestResult;
     if (requestResult === undefined) {
       log.warn(
@@ -134,7 +133,12 @@ export class RequestSet {
     }
     const dests = this._origins[originUri];
 
-    const destBase = uriService.getBaseDomain(destUri);
+    const destBase_ = uriService.getBaseDomain(destUri);
+    if (destBase_ === null) {
+      log.warn(`Got 'null' base domain for URI <${destUri}>`);
+    }
+    // FIXME
+    const destBase = destBase_!;
     if (!dests[destBase]) {
       dests[destBase] = {};
     }
@@ -171,17 +175,18 @@ export class RequestSet {
     }
   }
 
-  /**
-   * @param {string} originUri
-   * @param {string} destUri
-   */
-  removeRequest(originUri, destUri) {
+  removeRequest(originUri: string, destUri: string) {
     if (!this._origins[originUri]) {
       return;
     }
     const dests = this._origins[originUri];
 
-    const destBase = uriService.getBaseDomain(destUri);
+    const destBase_ = uriService.getBaseDomain(destUri);
+    if (destBase_ === null) {
+      log.warn(`Got 'null' base domain for URI <${destUri}>`);
+    }
+    // FIXME
+    const destBase = destBase_!;
     if (!dests[destBase]) {
       return;
     }
@@ -212,10 +217,7 @@ export class RequestSet {
     delete this._origins[originUri];
   }
 
-  /**
-   * @param {string} originUri
-   */
-  removeOriginUri(originUri) {
+  removeOriginUri(originUri: string) {
     delete this._origins[originUri];
   }
 

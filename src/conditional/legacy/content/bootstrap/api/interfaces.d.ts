@@ -27,8 +27,9 @@
 
 export namespace XPCOM {
   export type char = number;
-  export type nsResult = number;
+  export type nsContentPolicyType = number;
   export type nsLoadFlags = number;
+  export type nsResult = number;
 
   export interface nsISupports {
     QueryInterface<T extends nsISupports>(id: nsIJSID): T;
@@ -37,7 +38,7 @@ export namespace XPCOM {
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.classes
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.interfaces
 
-  export interface nsIJSID {
+  export interface nsIJSID extends Function {
     name: string;
     number: string;
     valid: boolean;
@@ -72,6 +73,7 @@ export namespace XPCOM {
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIChannel.idl
   export interface nsIChannel extends nsIRequest {
+    readonly loadInfo: nsILoadInfo;
     originalURI: nsIURI;
     readonly URI: nsIURI;
     notificationCallbacks: nsIInterfaceRequestor;
@@ -96,6 +98,12 @@ export namespace XPCOM {
     ): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicy.idl
+  export interface nsIContentPolicy extends nsIContentPolicyBase {}
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicyBase.idl
+  interface nsIContentPolicyBase extends nsISupports {}
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIConverterInputStream.idl
   export interface nsIConverterInputStream extends nsIUnicharInputStream {
     init(
@@ -116,23 +124,43 @@ export namespace XPCOM {
     ): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIDirectoryService.idl
+  export interface nsIDirectoryService extends nsISupports {}
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShell.idl
   export interface nsIDocShell extends nsIDocShellTreeItem {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShellTreeItem.idl
-  export interface nsIDocShellTreeItem extends nsISupports {}
+  export interface nsIDocShellTreeItem extends nsISupports {
+	  readonly rootTreeItem: nsIDocShellTreeItem;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMDocument.idl
+  export interface nsIDOMDocument extends nsIDOMNode {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMElement.idl
   export interface nsIDOMElement extends nsIDOMNode {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMNode.idl
-  export interface nsIDOMNode extends nsISupports {}
+  export interface nsIDOMNode extends nsISupports {
+    readonly localName: string;
+    readonly nodeName: string;
+    readonly nodeType: number;
+  }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindow.idl
   export interface nsIDOMWindow extends nsISupports {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/xul/nsIDOMXULElement.idl
   export interface nsIDOMXULElement extends nsIDOMElement {}
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/dns/nsIEffectiveTLDService.idl
+  export interface nsIEffectiveTLDService extends nsISupports {
+    getBaseDomainFromHost(
+        aHost: string,
+        aAdditionalParts?: number,
+    ): string;
+  }
 
   export interface nsIFactory {}
 
@@ -199,10 +227,25 @@ export namespace XPCOM {
     init(file: nsIFile, ioFlags: number, perm: number, behaviorFlags: number): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsIProperties.idl
+  export interface nsIProperties extends nsISupports {
+    get<T extends nsISupports>(prop: string, iid: nsIJSID): T;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/file/nsIFileProtocolHandler.idl
+  export interface nsIFileProtocolHandler extends nsIProtocolHandler {
+    getURLSpecFromDir(file: nsIFile): string;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/http/nsIHttpChannel.idl
   export interface nsIHttpChannel extends nsIChannel {
     referrer: nsIURI;
     getRequestHeader(aHeader: string): string;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/dns/nsIIDNService.idl
+  export interface nsIIDNService extends nsISupports {
+    convertToDisplayIDN(input: string, isASCII: {}): string;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIInputStream.idl
@@ -219,6 +262,7 @@ export namespace XPCOM {
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIIOService.idl
   interface nsIIOService extends nsISupports {
+    getProtocolHandler(aScheme: string): nsIProtocolHandler;
     newURI(
         aSpec: string,
         aOriginCharset: string | null,
@@ -247,6 +291,11 @@ export namespace XPCOM {
 
     addRequest(aRequest: nsIRequest, aContext: nsISupports): void;
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsILoadInfo.idl
+  export interface nsILoadInfo extends nsISupports {
+    externalContentPolicyType: nsContentPolicyType;
   }
 
   interface nsILocale extends nsISupports {
@@ -316,6 +365,12 @@ export namespace XPCOM {
     savePrefFile(aFile: nsIFile | null): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/caps/nsIPrincipal.idl
+  export interface nsIPrincipal extends nsISerializable {}
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIProtocolHandler.idl
+  export interface nsIProtocolHandler extends nsISupports {}
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIRequest.idl
   interface nsIRequest extends nsISupports {
     LOAD_REQUESTMASK: number;
@@ -355,6 +410,14 @@ export namespace XPCOM {
         aStatusCode: nsResult,
     ): void;
   }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/caps/nsIScriptSecurityManager.idl
+  export interface nsIScriptSecurityManager extends nsISupports {
+    isSystemPrincipal(aPrincipal: nsIPrincipal): boolean;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISerializable.idl
+  interface nsISerializable extends nsISupports {}
 
   interface nsISimpleEnumerator extends nsISupports {
     getNext(): nsISupports;
@@ -445,6 +508,11 @@ export namespace XPCOM {
     compare(a: string, b: string): number;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediator.idl
+  export interface nsIWindowMediator extends nsISupports {
+    getMostRecentWindow(aWindowType: string | null): nsIDOMWindow;
+  }
+
   export interface nsIXULAppInfo extends nsISupports {
     appBuildID: string;
     ID: string;
@@ -468,6 +536,9 @@ export namespace XPCOM {
     XPCOMABI1: string;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsPIDOMWindow.h
+  export interface nsPIDOMWindow extends nsIDOMWindow {}
+
   export interface nsXPCComponents {
     classes: nsXPCComponents_Classes;
     interfaces: nsXPCComponents_Interfaces;
@@ -481,6 +552,7 @@ export namespace XPCOM {
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-output-stream;1": XPCOM.nsIJSCID;
+    "@mozilla.org/network/idn-service;1": XPCOM.nsIJSCID;
     "@mozilla.org/supports-string;1": XPCOM.nsIJSCID;
   }
 
@@ -495,18 +567,27 @@ export namespace XPCOM {
       ACCEPT: number,
       REJECT_SERVER: number,
       TYPE_DOCUMENT: number,
+      TYPE_DTD: number,
+      TYPE_OTHER: number,
     };
     nsIConverterInputStream: XPCOM.nsIJSID;
     nsIConverterOutputStream: XPCOM.nsIJSID;
     nsIDocShell: XPCOM.nsIJSID;
+    nsIDocShellTreeItem: XPCOM.nsIJSID;
+    nsIDOMDocument: XPCOM.nsIJSID;
+    nsIDOMHTMLElement: XPCOM.nsIJSID;
     nsIDOMNode: XPCOM.nsIJSID & {
       DOCUMENT_NODE: number,
     };
+    nsIDOMWindow: XPCOM.nsIJSID;
+    nsIDOMXULElement: XPCOM.nsIJSID;
     nsIFactory: XPCOM.nsIJSID;
     nsIFile: XPCOM.nsIJSID;
     nsIFileInputStream: XPCOM.nsIJSID;
     nsIFileOutputStream: XPCOM.nsIJSID;
+    nsIFileProtocolHandler: XPCOM.nsIJSID;
     nsIHttpChannel: XPCOM.nsIJSID;
+    nsIIDNService: XPCOM.nsIJSID;
     nsIInterfaceRequestor: XPCOM.nsIJSID;
     nsILineInputStream: XPCOM.nsIJSID;
     nsILoadContext: XPCOM.nsIJSID;
@@ -515,6 +596,7 @@ export namespace XPCOM {
     nsISupportsString: XPCOM.nsIJSID;
     nsISupportsWeakReference: XPCOM.nsIJSID;
     nsIURI: XPCOM.nsIJSID;
+    nsIWebNavigation: XPCOM.nsIJSID;
   }
 
   export interface nsXPCComponents_Manager extends nsIComponentManager {
@@ -626,16 +708,73 @@ export namespace JSMs {
     ): string;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/toolkit/modules/PrivateBrowsingUtils.jsm
+  export interface PrivateBrowsingUtils {
+    isWindowPrivate(aWindow: XPCOM.nsIDOMWindow): boolean;
+  }
+
   export interface Services {
     appinfo: XPCOM.nsIXULAppInfo & XPCOM.nsIXULRuntime;
+    dirsvc: XPCOM.nsIDirectoryService & XPCOM.nsIProperties;
+    eTLD: XPCOM.nsIEffectiveTLDService;
     io: XPCOM.nsIIOService2;
     locale: XPCOM.nsILocaleService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
+    scriptSecurityManager: XPCOM.nsIScriptSecurityManager;
     vc: XPCOM.nsIVersionComparator;
+    wm: XPCOM.nsIWindowMediator;
   }
 
   export interface XPCOMUtils {
     generateQI(interfaces: XPCOM.nsIJSID[]): XPCOM.nsISupports["QueryInterface"];
+  }
+}
+
+export namespace XUL {
+  export interface contentDocument extends XPCOM.nsIDOMDocument {
+    readonly defaultView: contentWindow;
+    getElementById: Document["getElementById"];
+  }
+
+  export interface chromeWindow extends XPCOM.nsIDOMWindow {
+    gBrowser: tabBrowser | null;  // bug 1009938 - may be null in SeaMonkey
+    getBrowser(): tabBrowser;
+
+    rpcontinued: any;  // FIXME
+  }
+
+  export interface contentWindow extends XPCOM.nsIDOMWindow {
+    readonly top: XUL.contentWindow;
+    readonly document: contentDocument;
+    addEventListener: Window["addEventListener"];
+    removeEventListener: Window["removeEventListener"];
+  }
+
+  export interface contentNode extends XPCOM.nsIDOMNode {
+    ownerDocument: contentDocument;
+  }
+
+  // <tabbrowser>
+  export interface tabBrowser extends XPCOM.nsIDOMXULElement {
+    tabContainer: tabContainer
+  }
+
+  // <tabs>
+  export interface tabContainer extends XPCOM.nsIDOMXULElement {
+    readonly children: tab[];
+  }
+
+  // <tab>
+  export interface tab extends XPCOM.nsIDOMXULElement {
+    readonly linkedBrowser: browser;
+  }
+
+  // <browser>
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
+  export interface browser extends XPCOM.nsIDOMXULElement {
+    readonly contentWindow: contentWindow;
+    currentURI: XPCOM.nsIURI;
+    readonly ownerGlobal: chromeWindow;
   }
 }
 

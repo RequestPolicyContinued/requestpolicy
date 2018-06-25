@@ -21,13 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { XPCOM, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { IUri } from "lib/classes/uri";
-
-declare const Cc: any;
-declare const Ci: any;
-declare const Services: any;
 
 /*
  * It's worth noting that many of the functions in this module will
@@ -36,9 +32,6 @@ declare const Services: any;
  * formatted URIs when the TLD is one in which Mozilla supports
  * UTF8 IDNs.
  */
-
-const IDN_SERVICE = Cc["@mozilla.org/network/idn-service;1"]
-    .getService(Ci.nsIIDNService);
 
 enum HostLevel {
   // Use example.com from http://www.a.example.com:81
@@ -52,7 +45,13 @@ enum HostLevel {
 export class UriService extends Module {
   public get hostLevels() { return HostLevel; }
 
-  constructor(log: Common.ILog, nameRoot = "app") {
+  constructor(
+      log: Common.ILog,
+      nameRoot = "app",
+      private mozETLDService: JSMs.Services["eTLD"],
+      private mozIDNService: XPCOM.nsIIDNService,
+      private mozIOService: JSMs.Services["io"],
+  ) {
     super(`${nameRoot}.services.uri`, log);
   }
 
@@ -108,7 +107,7 @@ export class UriService extends Module {
     }
   }
 
-  public getHostByUriObj(aUriObj: IUri): string | null {
+  public getHostByUriObj(aUriObj: XPCOM.nsIURI): string | null {
     try {
       return aUriObj.host;
     } catch (e) {
@@ -120,7 +119,7 @@ export class UriService extends Module {
     return this.getHostByUriObj(this.getUriObject(aUri));
   }
 
-  public uriObjHasPort(aUriObj: IUri): boolean {
+  public uriObjHasPort(aUriObj: XPCOM.nsIURI): boolean {
     try {
       // tslint:disable-next-line no-unused-expression
       aUriObj.port;
@@ -135,13 +134,13 @@ export class UriService extends Module {
    * automatically convert ACE formatting to UTF8 for IDNs in the various
    * attributes of the object that are available.
    */
-  public getUriObject(uri: string): IUri {
+  public getUriObject(uri: string): XPCOM.nsIURI {
     // fixme: if `uri` is relative, `newURI()` throws NS_ERROR_MALFORMED_URI.
     // possible solution: use nsIURI.resolve() instead for relative uris
 
     // Throws an exception if uri is invalid.
     try {
-      return Services.io.newURI(uri, null, null);
+      return this.mozIOService.newURI(uri, null, null);
     } catch (e) {
       const msg = "getUriObject() exception on uri <" + uri + ">.";
       this.log.log(msg);
@@ -151,7 +150,7 @@ export class UriService extends Module {
 
   public isValidUri(uri: string): boolean {
     try {
-      Services.io.newURI(uri, null, null);
+      this.mozIOService.newURI(uri, null, null);
       return true;
     } catch (e) {
       return false;
@@ -165,12 +164,12 @@ export class UriService extends Module {
     }
     try {
       // The nsIEffectiveTLDService functions will always leave IDNs as ACE.
-      const baseDomain = Services.eTLD.getBaseDomainFromHost(host, 0);
+      const baseDomain = this.mozETLDService.getBaseDomainFromHost(host, 0);
       // Note: we use convertToDisplayIDN rather than convertACEtoUTF8() because
       // we want to only convert IDNs that that are in Mozilla's IDN whitelist.
       // The second argument will have the property named "value" set to true if
       // the result is ASCII/ACE encoded, false otherwise.
-      return IDN_SERVICE.convertToDisplayIDN(baseDomain, {});
+      return this.mozIDNService.convertToDisplayIDN(baseDomain, {});
     } catch (e) {
       if (e.name === "NS_ERROR_HOST_IS_IP_ADDRESS") {
         return host;
@@ -184,7 +183,7 @@ export class UriService extends Module {
 
   public isIPAddress(host: string): boolean {
     try {
-      Services.eTLD.getBaseDomainFromHost(host, 0);
+      this.mozETLDService.getBaseDomainFromHost(host, 0);
       return false;
     } catch (e) {
       switch (e.name) {
@@ -222,9 +221,6 @@ export class UriService extends Module {
    * Adds a path of "/" to the uri if it doesn't have one. That is,
    * "http://127.0.0.1" is returned as "http://127.0.0.1/". Will return
    * the origin uri if the provided one is not valid.
-   *
-   * @param {String} uri
-   * @return {String}
    */
   public ensureUriHasPath(uri: string): string {
     try {
@@ -240,12 +236,8 @@ export class UriService extends Module {
    * displaying in UTF8 format. See
    * http://www.mozilla.org/projects/security/tld-idn-policy-list.html
    * for more info.
-   *
-   * @param {String} uri The uri.
-   * @return {nsIURI} The same uri but with UTF8 formatting if the original uri
-   *     was ACE formatted.
    */
-  public formatIDNUri(uri: string) {
+  public formatIDNUri(uri: string): string {
     // Throws an exception if uri is invalid. This is almost the same as the
     // ensureUriHasPath function, but the separate function makes the calling
     // code clearer and this one we want to raise an exception if the uri is
@@ -255,11 +247,8 @@ export class UriService extends Module {
 
   /**
    * Determines whether a URI uses the standard port for its scheme.
-   *
-   * @param {nsIURI} uri
-   * @return {Boolean}
    */
-  public hasStandardPort(uri: IUri) {
+  public hasStandardPort(uri: XPCOM.nsIURI): boolean {
     // A port value of -1 in the uriObj means the default for the protocol.
     return uri.port === -1 ||
           uri.scheme !== "http" && uri.scheme !== "https" ||

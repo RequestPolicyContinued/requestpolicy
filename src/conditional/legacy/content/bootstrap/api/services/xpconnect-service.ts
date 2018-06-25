@@ -59,6 +59,11 @@ export class XPConnectService {
         getService<XPCOM.nsICategoryManager>(Ci.nsICategoryManager);
   }
 
+  public getIDNService(): XPCOM.nsIIDNService {
+    return Cc["@mozilla.org/network/idn-service;1"].
+          getService<XPCOM.nsIIDNService>(Ci.nsIIDNService);
+  }
+
   // other
 
   public getComponentRegistrar(): XPCOM.nsIComponentRegistrar {

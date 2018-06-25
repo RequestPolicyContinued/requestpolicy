@@ -47,7 +47,7 @@ import {
   queryInterface,
 } from "lib/utils/try-catch-utils";
 import {rp} from "app/app.background";
-import { XPCOM } from "bootstrap/api/interfaces";
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Cr: XPCOM.nsXPCComponents_Results;
@@ -126,8 +126,9 @@ function reject(reason: string, request: NormalRequest) {
   }
 
   if (request.aContext) {
-    // fixme: `rpcontinuedBlocked` is probably not needed anymore.
+    // FIXME: `rpcontinuedBlocked` is probably not needed anymore.
     //        There's now `rpcontinuedIdentified`.
+    // @ts-ignore
     request.aContext.rpcontinuedBlocked = true;
   }
 
@@ -229,10 +230,12 @@ function isDuplicateRequest(request: Request): boolean {
   return false;
 }
 
-function getDomNodeFromRequestContext(context: any) {
+function getDomNodeFromRequestContext(
+    context: XPCOM.nsIDOMNode | XPCOM.nsIDOMWindow | XPCOM.nsISupports,
+): XPCOM.nsIDOMNode | undefined {
   const result = queryInterface(context, Ci.nsIDOMNode);
   if (!result.error) {
-    return result.value;
+    return result.value as XPCOM.nsIDOMNode;
   }
   const e = result.error;
   if (e.result !== Cr.NS_ERROR_NO_INTERFACE) {
@@ -262,7 +265,7 @@ export function process(request: NormalRequest): number {
     let originURI: string = request.originURI!;
     let destURI = request.destURI;
 
-    if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
+    if (request.aRequestOrigin!.scheme === "moz-nullprincipal") {
       // Before RP has been forked, there was a hack: in case of a request
       // with the origin's scheme being 'moz-nullprincipal', RequestPolicy
       // used the documentURI of the request's context as the "real" origin
@@ -299,7 +302,7 @@ export function process(request: NormalRequest): number {
       }
     }
 
-    if (request.aRequestOrigin.scheme === "view-source") {
+    if (request.aRequestOrigin!.scheme === "view-source") {
       let newOriginURI = originURI.split(":").slice(1).join(":");
       logRequests.log(
           `Considering view-source origin <${originURI}> ` +
@@ -332,13 +335,14 @@ export function process(request: NormalRequest): number {
       const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeType === Ci.nsIDOMNode.DOCUMENT_NODE) {
         let newOriginURI;
-        if (request.aContext.documentURI &&
-            request.aContext.documentURI !== "about:blank") {
-          newOriginURI = request.aContext.documentURI;
-        } else if (request.aContext.ownerDocument &&
-            request.aContext.ownerDocument.documentURI &&
-            request.aContext.ownerDocument.documentURI !== "about:blank") {
-          newOriginURI = request.aContext.ownerDocument.documentURI;
+        const docNode = request.aContext as any;
+        if (docNode.documentURI &&
+            docNode.documentURI !== "about:blank") {
+          newOriginURI = docNode.documentURI;
+        } else if (docNode.ownerDocument &&
+            docNode.ownerDocument.documentURI &&
+            docNode.ownerDocument.documentURI !== "about:blank") {
+          newOriginURI = docNode.ownerDocument.documentURI;
         }
         if (newOriginURI) {
           newOriginURI = uriService.stripFragment(newOriginURI);
@@ -372,7 +376,8 @@ export function process(request: NormalRequest): number {
     if (request.aContext) {
       const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeName === "LINK" &&
-          (domNode.rel === "icon" || domNode.rel === "shortcut icon")) {
+          (((domNode as any) as HTMLLinkElement).rel === "icon" ||
+           ((domNode as any) as HTMLLinkElement).rel === "shortcut icon")) {
         FaviconRequests[destURI] = true;
       }
     }
@@ -436,9 +441,9 @@ export function process(request: NormalRequest): number {
       return accept("User-allowed redirect", request, true);
     }
 
-    let originHost = uriService.getHostByUriObj(request.aRequestOrigin);
+    let originHost = uriService.getHostByUriObj(request.aRequestOrigin!);
 
-    if (request.aRequestOrigin.scheme === "chrome") {
+    if (request.aRequestOrigin!.scheme === "chrome") {
       if (originHost === "browser") {
         // "browser" origin shows up for favicon.ico and an address entered
         // in address bar.
@@ -476,7 +481,8 @@ export function process(request: NormalRequest): number {
     if (request.aContext) {
       const domNode = getDomNodeFromRequestContext(request.aContext);
       if (domNode && domNode.nodeName === "xul:browser" &&
-          domNode.currentURI && domNode.currentURI.spec === "about:blank") {
+          (domNode as XUL.browser).currentURI &&
+          (domNode as XUL.browser).currentURI.spec === "about:blank") {
         request.requestResult = new RequestResult(true,
             RequestReason.NewWindow);
         return accept("New window (should probably only be an allowed " +
@@ -508,7 +514,7 @@ export function process(request: NormalRequest): number {
     }
 
     request.requestResult = rp.policy.checkRequestAgainstUserRules(
-        request.aRequestOrigin, request.aContentLocation
+        request.aRequestOrigin!, request.aContentLocation
     );
     // for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
     //   log.log("Matched deny rules");
@@ -564,7 +570,7 @@ export function process(request: NormalRequest): number {
     }
 
     request.requestResult = rp.policy.
-        checkRequestAgainstSubscriptionRules(request.aRequestOrigin,
+        checkRequestAgainstSubscriptionRules(request.aRequestOrigin!,
             request.aContentLocation);
     // for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
     //   log.log("Matched deny rules");
@@ -631,7 +637,7 @@ export function process(request: NormalRequest): number {
 
     if (request.aContext) {
       let info = CompatibilityRules.checkBaseUriWhitelist(
-          request.aContext.baseURI
+          ((request.aContext as any) as Node).baseURI!,
       );
       if (info.isWhitelisted) {
         request.requestResult = new RequestResult(true,

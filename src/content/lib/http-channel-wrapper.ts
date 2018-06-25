@@ -27,13 +27,13 @@ import {
   getDocShellFromHttpChannel,
 } from "lib/utils/try-catch-utils";
 import {getBrowserForWindow} from "lib/utils/window-utils";
-import {XPCOM, JSMs} from "bootstrap/api/interfaces";
+import {XPCOM, JSMs, XUL} from "bootstrap/api/interfaces";
 import {C} from "data/constants";
 
 export class HttpChannelWrapper {
   private _docShell: XPCOM.nsIDocShell | null | typeof C["UNDEFINED"] =
       C.UNDEFINED;
-  private _browser: XPCOM.nsIDOMXULElement | null | typeof C["UNDEFINED"] =
+  private _browser: XUL.browser | null | typeof C["UNDEFINED"] =
       C.UNDEFINED;
   private _loadContext: XPCOM.nsILoadContext | null | typeof C["UNDEFINED"] =
       C.UNDEFINED;
@@ -41,7 +41,7 @@ export class HttpChannelWrapper {
 
   constructor(
       private mozIOService: JSMs.Services["io"],
-      private _httpChannel: XPCOM.nsIHttpChannel,
+      public _httpChannel: XPCOM.nsIHttpChannel,
   ) {}
 
   get uri(): XPCOM.nsIURI {
@@ -66,7 +66,7 @@ export class HttpChannelWrapper {
   /**
    * Get the <browser> related to this request.
    */
-  get browser(): XPCOM.nsIDOMXULElement | null {
+  get browser(): XUL.browser | null {
     if (this._browser === C.UNDEFINED) {
       let loadContext = this.loadContext;
 
@@ -76,7 +76,7 @@ export class HttpChannelWrapper {
         const result = getBrowserFromLoadContext(
             loadContext, getBrowserForWindow,
         );
-        this._browser = result.value;
+        this._browser = result.value as XUL.browser;
         if ("error" in result) {
           log.warn(
               "Error getting the HTTPChannel's load context: ",
@@ -89,7 +89,7 @@ export class HttpChannelWrapper {
         }
       }
     }
-    return this._browser as XPCOM.nsIDOMXULElement | null;
+    return this._browser as XUL.browser | null;
   }
 
   /**

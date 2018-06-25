@@ -21,9 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-let {PrivateBrowsingUtils} = Cu.import(
+import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
+import { App } from "app/interfaces";
+
+let PrivateBrowsingUtils: JSMs.PrivateBrowsingUtils = Cu.import(
     "resource://gre/modules/PrivateBrowsingUtils.jsm", {}
-);
+).PrivateBrowsingUtils;
+
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Services: JSMs.Services;
 
 export function getMostRecentWindow(aWindowType = null) {
   return Services.wm.getMostRecentWindow(aWindowType);
@@ -32,18 +38,19 @@ export function getMostRecentWindow(aWindowType = null) {
 export const getMostRecentBrowserWindow =
     getMostRecentWindow.bind(null, "navigator:browser");
 
-export function getChromeWindow(aContentWindow) {
-  /* eslint-disable new-cap */
-  return aContentWindow.top.QueryInterface(Ci.nsIInterfaceRequestor).
+export function getChromeWindow(
+    aContentWindow: XUL.contentWindow,
+): XUL.chromeWindow {
+  return aContentWindow.top.
+      QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
       getInterface(Ci.nsIWebNavigation).
-      QueryInterface(Ci.nsIDocShellTreeItem).
+      QueryInterface<XPCOM.nsIDocShellTreeItem>(Ci.nsIDocShellTreeItem).
       rootTreeItem.
-      QueryInterface(Ci.nsIInterfaceRequestor).
+      QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
       getInterface(Ci.nsIDOMWindow);
-  /* eslint-enable new-cap */
 }
 
-export function getBrowserForWindow(aContentWindow) {
+export function getBrowserForWindow(aContentWindow: XUL.contentWindow) {
   let win = getChromeWindow(aContentWindow);
   let tabs = getTabsForWindow(win);
   for (let tab of tabs) {
@@ -54,21 +61,22 @@ export function getBrowserForWindow(aContentWindow) {
   return null;
 }
 
-export function getChromeWindowForDocShell(aDocShell) {
-  /* eslint-disable new-cap */
-  return aDocShell.QueryInterface(Ci.nsIDocShellTreeItem).
+export function getChromeWindowForDocShell(aDocShell: XPCOM.nsIDocShell) {
+  return aDocShell.
+      QueryInterface<XPCOM.nsIDocShellTreeItem>(Ci.nsIDocShellTreeItem).
       rootTreeItem.
-      QueryInterface(Ci.nsIInterfaceRequestor).
+      QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
       getInterface(Ci.nsIDOMWindow);
-  /* eslint-enable new-cap */
 }
 
-export function getTabBrowser(aChromeWindow) {
+export function getTabBrowser(aChromeWindow: XUL.chromeWindow) {
   // bug 1009938 - may be null in SeaMonkey
   return aChromeWindow.gBrowser || aChromeWindow.getBrowser();
 }
 
-export function getTabsForWindow(aChromeWindow) {
+export function getTabsForWindow(
+    aChromeWindow: XUL.chromeWindow,
+): XUL.tab[] {
   return getTabBrowser(aChromeWindow).tabContainer.children;
 }
 
@@ -76,18 +84,17 @@ export function getTabsForWindow(aChromeWindow) {
 // Private Browsing
 //
 
-export function isWindowPrivate(aWindow) {
+export function isWindowPrivate(aWindow: XPCOM.nsIDOMWindow) {
   return PrivateBrowsingUtils.isWindowPrivate(aWindow);
 }
 
 /**
  * Should it be possible to add permanent rules in that window?
- *
- * @param {Window} aWindow
- * @param {Storage} storage
- * @return {boolean}
  */
-export function mayPermanentRulesBeAdded(aWindow, storage) {
+export function mayPermanentRulesBeAdded(
+    aWindow: XPCOM.nsIDOMWindow,
+    storage: App.storage.ICachedSettings,
+): boolean {
   return isWindowPrivate(aWindow) === false ||
       storage.get("privateBrowsingPermanentWhitelisting");
 }
@@ -99,15 +106,13 @@ export function mayPermanentRulesBeAdded(aWindow, storage) {
 /**
  * Wait for a window to be loaded and then add a list of Elements „by ID“ to
  * a scope. The scope is optional, but in any case will be returned.
- *
- * @param {Window} aWindow
- * @param {Array<string>} aElementIDs
- * @param {Object?} aScope
- * @param {function?} aCallback
- * @return {Object} the scope of the elements
  */
-export function getElementsByIdOnLoad(aWindow, aElementIDs, aScope,
-    aCallback) {
+export function getElementsByIdOnLoad(
+    aWindow: XUL.contentWindow,
+    aElementIDs: string[],
+    aScope?: {[key: string]: any},
+    aCallback?: () => void,
+): {[key: string]: any} {
   let scope = aScope || {};
   let document = aWindow.document;
   let callback = function() {

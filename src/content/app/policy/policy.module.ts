@@ -24,11 +24,11 @@
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import {Module} from "lib/classes/module";
-import {IUri} from "lib/classes/uri";
 import {RequestResult} from "lib/request-result";
 import {RawRuleset, Ruleset} from "lib/ruleset";
 import { RulesetStorage } from "./ruleset-storage";
 import { Subscriptions } from "./subscriptions";
+import { XPCOM } from "bootstrap/api/interfaces";
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
@@ -225,11 +225,17 @@ export class Policy extends Module {
     notifyRulesChanged();
   }
 
-  public checkRequestAgainstUserRules(origin: IUri, dest: IUri) {
+  public checkRequestAgainstUserRules(
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
+  ) {
     return this.checkRequest(origin, dest, this.userRulesets);
   }
 
-  public checkRequestAgainstSubscriptionRules(origin: IUri, dest: IUri) {
+  public checkRequestAgainstSubscriptionRules(
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
+  ) {
     const result = new RequestResult();
     const subscriptionRulesets = this.subscriptions.getRulesets();
     // tslint:disable-next-line:forin
@@ -241,8 +247,8 @@ export class Policy extends Module {
   }
 
   public checkRequest(
-      origin: IUri,
-      dest: IUri,
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
       aRuleset: any,
       aResult?: RequestResult,
   ) {

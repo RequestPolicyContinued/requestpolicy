@@ -24,7 +24,7 @@
 import { rp } from "app/app.background";
 import { log } from "app/log";
 import {C} from "data/constants";
-import {IUri} from "lib/classes/uri";
+import { XPCOM } from "bootstrap/api/interfaces";
 
 // =============================================================================
 // utilities
@@ -664,7 +664,7 @@ class Rule {
   }
 
   public isMatch(
-      uriObj: IUri,
+      uriObj: XPCOM.nsIURI,
       endpointSpecHasHost: boolean,
   ): boolean {
     if (this.scheme && this.scheme !== "*" && this.scheme !== uriObj.scheme) {
@@ -1072,7 +1072,7 @@ export class Ruleset {
     }
   }
 
-  public check(origin: IUri, dest: IUri): [Match[], Match[]] {
+  public check(origin: XPCOM.nsIURI, dest: XPCOM.nsIURI): [Match[], Match[]] {
     const matchedAllowRules: Match[] = [];
     const matchedDenyRules: Match[] = [];
     const uriService = rp.services.uri;

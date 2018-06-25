@@ -23,7 +23,6 @@
 
 import {rp} from "app/app.background";
 import { log } from "app/log";
-import {IUri} from "lib/classes/uri";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
@@ -31,6 +30,7 @@ import {
 } from "lib/request-result";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
+import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -40,8 +40,8 @@ const logRequests = log.extend({
 
 const uriService = rp.services.uri;
 
-declare const Ci: any;
-declare const Services: any;
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Services: JSMs.Services;
 
 // =============================================================================
 // constants
@@ -81,8 +81,8 @@ const DEFAULT_ALLOWED_DESTINATION_RESOURCE_URIS = new Set([
 
 const profileUri = (() => {
   const fileHandler = Services.io.getProtocolHandler("file").
-      QueryInterface(Ci.nsIFileProtocolHandler);
-  const profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
+      QueryInterface<XPCOM.nsIFileProtocolHandler>(Ci.nsIFileProtocolHandler);
+  const profileDir = Services.dirsvc.get<XPCOM.nsIFile>("ProfD", Ci.nsIFile);
   return fileHandler.getURLSpecFromDir(profileDir);
 })();
 
@@ -134,6 +134,8 @@ export class Request {
   }
 
   public isTopLevel() {
+    // FIXME
+    // @ts-ignore
     return this.getContentPolicyType() === Ci.nsIContentPolicy.TYPE_DOCUMENT;
   }
 
@@ -265,8 +267,8 @@ export class Request {
     const cachedSettings = rp.storage.cachedSettings!;
     if (
         this.isAllowedByDefault() ||
-        cachedSettings.alias.isDefaultAllow() ||
-        cachedSettings.alias.isDefaultAllowTopLevel() && this.isTopLevel()
+        cachedSettings.alias.isDefaultAllow() /* FIXME */ /* ||
+        cachedSettings.alias.isDefaultAllowTopLevel() && this.isTopLevel() */
     ) return new RequestResult(true, RequestReason.DefaultPolicy);
 
     const originUri = this.originURI;
@@ -285,11 +287,12 @@ export class Request {
       }
     }
 
-    const originObj: IUri = this.originUriObj;
-    const destObj: IUri = this.destUriObj;
+    const originObj: XPCOM.nsIURI | null = this.originUriObj;
+    const destObj: XPCOM.nsIURI = this.destUriObj;
 
     // Allow requests from http:80 to https:443 of the same host.
-    if (originObj.scheme === "http" && destObj.scheme === "https" &&
+    if (originObj !== null &&
+        originObj.scheme === "http" && destObj.scheme === "https" &&
         originObj.port === -1 && destObj.port === -1 &&
         originObj.host === destObj.host) {
       return new RequestResult(true, RequestReason.DefaultSameDomain);
@@ -299,6 +302,7 @@ export class Request {
     const originIdent = originUri ?
         uriService.getIdentifier(originUri, LEVEL_SOP) : null;
     const destIdent = uriService.getIdentifier(destUri, LEVEL_SOP);
+    // FIXME: case "null === null" is always true
     return new RequestResult(originIdent === destIdent,
         RequestReason.DefaultSameDomain);
   }
@@ -314,24 +318,17 @@ export class Request {
 
 // tslint:disable-next-line max-classes-per-file
 export class NormalRequest extends Request {
-  public aContentType: any;
-  public aContentLocation: any;
-  public aRequestOrigin: any;
-  public aContext: any;
-  public aMimeTypeGuess: any;
-  public aExtra: any;
-  public aRequestPrincipal: any;
-
-  public shouldLoadResult: any;
+  public shouldLoadResult: number;
 
   constructor(
-      aContentType: any,
-      aContentLocation: any,
-      aRequestOrigin: any,
-      aContext: any,
-      aMimeTypeGuess: any,
-      aExtra: any,
-      aRequestPrincipal: any,
+      public aContentType: XPCOM.nsContentPolicyType,
+      public aContentLocation: XPCOM.nsIURI,
+      public aRequestOrigin?: XPCOM.nsIURI | null,
+      public aContext?:
+          XPCOM.nsIDOMNode | XPCOM.nsIDOMWindow | XPCOM.nsISupports | null,
+      public aMimeTypeGuess?: string,
+      public aExtra?: any,
+      public aRequestPrincipal?: XPCOM.nsIPrincipal,
   ) {
     super(
         // About originURI and destURI:
@@ -343,17 +340,10 @@ export class NormalRequest extends Request {
             // originURI
         aContentLocation.specIgnoringRef, // destURI
     );
-    this.aContentType = aContentType;
-    this.aContentLocation = aContentLocation;
-    this.aRequestOrigin = aRequestOrigin;
-    this.aContext = aContext;
-    this.aMimeTypeGuess = aMimeTypeGuess;
-    this.aExtra = aExtra;
-    this.aRequestPrincipal = aRequestPrincipal;
   }
 
   get originUriObj() {
-    return this.aRequestOrigin;
+    return this.aRequestOrigin || null;
   }
 
   get destUriObj() {
@@ -395,7 +385,8 @@ export class NormalRequest extends Request {
     if (
         this.aExtra &&
         this.aExtra instanceof Ci.nsISupportsString &&
-        this.aExtra.data === "conPolCheckFromDocShell"
+        (this.aExtra as XPCOM.nsISupportsString).data ===
+            "conPolCheckFromDocShell"
     ) return true;
 
     if (
@@ -432,33 +423,33 @@ export class NormalRequest extends Request {
 
   /**
    * Get the content window (nsIDOMWindow) related to this request.
-   *
-   * @return {?Window}
    */
-  public getContentWindow() {
+  public getContentWindow(): XUL.contentWindow | null {
     const context = this.aContext;
     if (!context) {
       return null;
     }
 
     if (context instanceof Ci.nsIDOMXULElement &&
-        context.localName === "browser") {
-      return context.contentWindow;
+        (context as XPCOM.nsIDOMXULElement).localName === "browser") {
+        return ((context as any) as XUL.browser).contentWindow;
     }
 
     {
-      const result = queryInterface(context, Ci.nsIDOMWindow);
-      if (!result.error) return result.value;
+      const result = queryInterface<XPCOM.nsIDOMWindow>(
+          context, Ci.nsIDOMWindow,
+      );
+      if (!result.error) return result.value as any;
     }
-    let doc;
+    let doc: XUL.contentDocument | undefined = undefined;
     {
       const result = queryInterface(context, Ci.nsIDOMDocument);
-      if (!result.error) doc = result.value;
+      if (!result.error) doc = result.value as any;
     }
     if (!doc) {
       const result = queryInterface(context, Ci.nsIDOMNode);
       if (!result.error) {
-        const node = result.value;
+        const node: XUL.contentNode = result.value as any;
         doc = node.ownerDocument;
       }
     }
@@ -468,10 +459,8 @@ export class NormalRequest extends Request {
 
   /**
    * Get the chrome window related to this request.
-   *
-   * @return {?nsIDOMWindow}
    */
-  public getChromeWindow() {
+  public getChromeWindow(): XUL.chromeWindow | null {
     const contentWindow = this.getContentWindow();
     if (contentWindow) {
       return WindowUtils.getChromeWindow(contentWindow);
@@ -482,16 +471,14 @@ export class NormalRequest extends Request {
 
   /**
    * Get the <browser> related to this request.
-   *
-   * @return {nsIDOMXULElement}
    */
   public getBrowser() {
     const context = this.aContext;
     if (context instanceof Ci.nsIDOMXULElement &&
-        context.localName === "browser") {
+        (context as XPCOM.nsIDOMXULElement).localName === "browser") {
       return context;
     } else {
-      return WindowUtils.getBrowserForWindow(this.getContentWindow());
+      return WindowUtils.getBrowserForWindow(this.getContentWindow()!);
     }
   }
 }
@@ -506,8 +493,8 @@ export class RedirectRequest extends Request {
   public readonly newChannel: HttpChannelWrapper;
 
   constructor(aOldChannel: any, aNewChannel: any, aFlags: any) {
-    const oldChannel = new HttpChannelWrapper(aOldChannel);
-    const newChannel = new HttpChannelWrapper(aNewChannel);
+    const oldChannel = new HttpChannelWrapper(Services.io, aOldChannel);
+    const newChannel = new HttpChannelWrapper(Services.io, aNewChannel);
     super(
         oldChannel.uri.specIgnoringRef,
         newChannel.uri.specIgnoringRef,
@@ -516,7 +503,7 @@ export class RedirectRequest extends Request {
     this.newChannel = newChannel;
   }
 
-  get browser() {
+  get browser(): XUL.browser | null {
     return this.oldChannel.browser;
   }
 
@@ -539,10 +526,6 @@ export class RedirectRequest extends Request {
   public getContentPolicyType() {
     const {loadInfo} = this.oldChannel._httpChannel;
     if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
-    if (typeof loadInfo.contentPolicyType !== "undefined") {
-      // FF < 44.0
-      return loadInfo.contentPolicyType;
-    }
     return loadInfo.externalContentPolicyType;
   }
 }

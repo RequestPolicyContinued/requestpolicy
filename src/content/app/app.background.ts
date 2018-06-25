@@ -21,14 +21,18 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import { API, XPCOM } from "bootstrap/api/interfaces";
+import { API, XPCOM, JSMs } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {
   StorageMigrationToWebExtension,
 } from "legacy/app/migration/storage-migration-to-we";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Cr: XPCOM.nsXPCComponents_Results;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
+declare const ComponentsID: XPCOM.nsXPCComponents["ID"];
+declare const XPCOMUtils: JSMs.XPCOMUtils;
 
 interface IEmbeddedWebExtension { browser: typeof browser; }
 declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
@@ -61,6 +65,12 @@ import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
+import { WebRequest } from "app/web-request/web-request.module";
+import { RPChannelEventSink } from "app/web-request/channel-event-sink";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
+import * as RequestProcessor from "lib/request-processor";
+import { RedirectRequest, NormalRequest } from "lib/request";
+import { RPContentPolicy } from "app/web-request/content-policy";
 
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:
@@ -168,7 +178,9 @@ const browserSettings = new BrowserSettings(
     (browser as any).privacy.network,
 );
 
-const uriService = new UriService(log);
+const xpconnectService = new XPConnectService();
+const uriService = new UriService(log, undefined, mozServices!.eTLD,
+    xpconnectService.getIDNService(), mozServices!.io);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -203,6 +215,33 @@ const initialSetup = new InitialSetup(
 );
 const ui = new Ui(log, initialSetup);
 
+const redirectRequestFactory = (
+    aOldChannel: XPCOM.nsIChannel,
+    aNewChannel: XPCOM.nsIChannel,
+    aFlags: number,
+) => new RedirectRequest(aOldChannel, aNewChannel, aFlags);
+const normalRequestFactory = (
+    aContentType: any,
+    aContentLocation: any,
+    aRequestOrigin: any,
+    aContext: any,
+    aMimeTypeGuess: any,
+    aExtra: any,
+    aRequestPrincipal: any,
+) => new NormalRequest(
+    aContentType, aContentLocation, aRequestOrigin,
+    aContext, aMimeTypeGuess, aExtra, aRequestPrincipal,
+);
+const rpChannelEventSink = new RPChannelEventSink(
+    log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
+    RequestProcessor, redirectRequestFactory,
+);
+const rpContentPolicy = new RPContentPolicy(
+    log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
+    RequestProcessor, normalRequestFactory,
+);
+const rpWebRequest = new WebRequest(log, rpChannelEventSink, rpContentPolicy);
+
 export const rp = new AppBackground(
     log,
     browserSettings,
@@ -212,4 +251,5 @@ export const rp = new AppBackground(
     rpServices,
     storage,
     ui,
+    rpWebRequest,
 );

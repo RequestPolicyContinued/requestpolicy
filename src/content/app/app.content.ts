@@ -27,10 +27,16 @@ import { Storage } from "app/storage/storage.module";
 import { AppContent } from "./app.content.module";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
+import { JSMs } from "bootstrap/api/interfaces";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
+
+declare const Services: JSMs.Services;
 
 const storageReadyPromise = Promise.resolve();
 
-const uriService = new UriService(log, "AppContent");
+const xpconnectService = new XPConnectService();
+const uriService = new UriService(log, "AppContent", Services.eTLD,
+    xpconnectService.getIDNService(), Services.io);
 const rpServices = new RPContentServices(log, uriService);
 
 const asyncSettings = new AsyncSettings(

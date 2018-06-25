@@ -70,6 +70,7 @@ export namespace XPCOM {
     deleteCategoryEntry(aCategory: string, aEntry: string, aPersist: boolean): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIChannel.idl
   export interface nsIChannel extends nsIRequest {
     asyncOpen(aListener: nsIStreamListener, aContext: nsISupports): void;
     open(): nsIInputStream;
@@ -179,6 +180,11 @@ export namespace XPCOM {
     init(file: nsIFile, ioFlags: number, perm: number, behaviorFlags: number): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/http/nsIHttpChannel.idl
+  export interface nsIHttpChannel extends nsIChannel {
+    referrer: nsIURI;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIInputStream.idl
   export interface nsIInputStream extends nsISupports {
     close(): void;
@@ -268,6 +274,7 @@ export namespace XPCOM {
     savePrefFile(aFile: nsIFile | null): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIRequest.idl
   interface nsIRequest extends nsISupports {
     LOAD_REQUESTMASK: number;
     LOAD_NORMAL: number;
@@ -437,23 +444,32 @@ export namespace XPCOM {
 
   export interface nsXPCComponents_Interfaces {
     nsICategoryManager: XPCOM.nsIJSID;
+    nsIChannel: XPCOM.nsIJSID & {
+      LOAD_INITIAL_DOCUMENT_URI: number;
+    };
     nsIChannelEventSink: XPCOM.nsIJSID;
     nsIComponentRegistrar: XPCOM.nsIJSID;
     nsIContentPolicy: XPCOM.nsIJSID & {
       ACCEPT: number,
       REJECT_SERVER: number,
+      TYPE_DOCUMENT: number,
     };
     nsIConverterInputStream: XPCOM.nsIJSID;
     nsIConverterOutputStream: XPCOM.nsIJSID;
+    nsIDOMNode: XPCOM.nsIJSID & {
+      DOCUMENT_NODE: number,
+    };
     nsIFactory: XPCOM.nsIJSID;
     nsIFile: XPCOM.nsIJSID;
     nsIFileInputStream: XPCOM.nsIJSID;
     nsIFileOutputStream: XPCOM.nsIJSID;
+    nsIHttpChannel: XPCOM.nsIJSID;
     nsILineInputStream: XPCOM.nsIJSID;
     nsIObserver: XPCOM.nsIJSID;
     nsIPrefBranch2: XPCOM.nsIJSID;
     nsISupportsString: XPCOM.nsIJSID;
     nsISupportsWeakReference: XPCOM.nsIJSID;
+    nsIURI: XPCOM.nsIJSID;
   }
 
   export interface nsXPCComponents_Manager extends nsIComponentManager {
@@ -463,6 +479,7 @@ export namespace XPCOM {
     NS_ERROR_FACTORY_EXISTS: nsResult;
     NS_ERROR_FAILURE: nsResult;
     NS_ERROR_NO_AGGREGATION: nsResult;
+    NS_ERROR_NO_INTERFACE: nsResult;
     NS_OK: nsResult;
   }
 

@@ -502,15 +502,16 @@ export class NormalRequest extends Request {
 
 // tslint:disable-next-line max-classes-per-file
 export class RedirectRequest extends Request {
-  private oldChannel: HttpChannelWrapper;
-  private newChannel: HttpChannelWrapper;
+  public readonly oldChannel: HttpChannelWrapper;
+  public readonly newChannel: HttpChannelWrapper;
 
   constructor(aOldChannel: any, aNewChannel: any, aFlags: any) {
     const oldChannel = new HttpChannelWrapper(aOldChannel);
     const newChannel = new HttpChannelWrapper(aNewChannel);
     super(
         oldChannel.uri.specIgnoringRef,
-        newChannel.uri.specIgnoringRef);
+        newChannel.uri.specIgnoringRef,
+    );
     this.oldChannel = oldChannel;
     this.newChannel = newChannel;
   }

@@ -23,13 +23,13 @@
 
 const obj = () => ({});
 
-export const ClickedLinks = obj();
-export const ClickedLinksReverse = obj();
-export const SubmittedForms = obj();
-export const SubmittedFormsReverse = obj();
+export const ClickedLinks: any = obj();
+export const ClickedLinksReverse: any = obj();
+export const SubmittedForms: any = obj();
+export const SubmittedFormsReverse: any = obj();
 
-export const FaviconRequests = obj();
-export const MappedDestinations = obj();
+export const FaviconRequests: any = obj();
+export const MappedDestinations: any = obj();
 
-export const AllowedRedirectsReverse = obj();
-export const UserAllowedRedirects = obj();
+export const AllowedRedirectsReverse: any = obj();
+export const UserAllowedRedirects: any = obj();

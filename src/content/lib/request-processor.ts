@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Request} from "lib/request";
+import {Request, NormalRequest, RedirectRequest} from "lib/request";
 import {
   RequestReason,
   RequestResult,
@@ -47,9 +47,13 @@ import {
   queryInterface,
 } from "lib/utils/try-catch-utils";
 import {rp} from "app/app.background";
+import { XPCOM } from "bootstrap/api/interfaces";
+
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Cr: XPCOM.nsXPCComponents_Results;
 
 const uriService = rp.services.uri;
-const {cachedSettings} = rp.storage;
+const cachedSettings = rp.storage.cachedSettings!;
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -93,21 +97,26 @@ let lastShouldLoadCheckTimeout = 200;
  * Object that caches the last shouldLoad
  * @type {Object}
  */
-let lastShouldLoadCheck = {
+let lastShouldLoadCheck: {
+  "origin": string | undefined | null,
+  "destination": string | null,
+  "time": number,
+  "result": number | null,
+} = {
   "origin": null,
   "destination": null,
   "time": 0,
   "result": null,
 };
 
-let historyRequests = {};
+let historyRequests: any = {};
 
 // ---------------------------------------------------------------------------
 // private functions
 // ---------------------------------------------------------------------------
 
 // We always call this from shouldLoad to reject a request.
-function reject(reason, request) {
+function reject(reason: string, request: NormalRequest) {
   /* eslint-disable no-param-reassign */
   logRequests.log(`** BLOCKED ** reason: ${reason}. ` +
       `${request.detailsToString()}`);
@@ -127,7 +136,7 @@ function reject(reason, request) {
     isAllowed: false,
     isInsert: false,
     requestResult: request.requestResult,
-    originUri: request.originURI,
+    originUri: request.originURI!,
     destUri: request.destURI,
   });
 
@@ -156,13 +165,11 @@ function reject(reason, request) {
 // cases we just return CP_OK rather than return this function which
 // ultimately returns CP_OK. Fourth param, "unforbidable", is set to true if
 // this request shouldn't be recorded as an allowed request.
-/**
- * @param {string} reason
- * @param {Request} request
- * @param {boolean} unforbidable
- * @return {number}
- */
-function accept(reason, request, unforbidable) {
+function accept(
+    reason: string,
+    request: NormalRequest,
+    unforbidable?: boolean,
+): number {
   logRequests.log(`** ALLOWED ** reason: ${reason}. ` +
       `${request.detailsToString()}`);
 
@@ -171,7 +178,7 @@ function accept(reason, request, unforbidable) {
     isAllowed: true,
     isInsert: false,
     requestResult: request.requestResult,
-    originUri: request.originURI,
+    originUri: request.originURI!,
     destUri: request.destURI,
     unforbidable,
   });
@@ -179,7 +186,11 @@ function accept(reason, request, unforbidable) {
   return CP_OK;
 }
 
-function cacheShouldLoadResult(result, originUri, destUri) {
+function cacheShouldLoadResult(
+    result: number,
+    originUri: string | undefined,
+    destUri: string,
+) {
   const date = new Date();
   lastShouldLoadCheck.time = date.getTime();
   lastShouldLoadCheck.destination = destUri;
@@ -195,11 +206,8 @@ function cacheShouldLoadResult(result, originUri, destUri) {
  *
  * Duplicate shouldLoad() calls can be produced for example by creating a
  * page containing many <img> with the same image (same `src`).
- *
- * @param {Request} request
- * @return {boolean} True if the request is a duplicate of the previous one.
  */
-function isDuplicateRequest(request) {
+function isDuplicateRequest(request: Request): boolean {
   if (lastShouldLoadCheck.origin === request.originURI &&
       lastShouldLoadCheck.destination === request.destURI) {
     const date = new Date();
@@ -221,7 +229,7 @@ function isDuplicateRequest(request) {
   return false;
 }
 
-function getDomNodeFromRequestContext(context) {
+function getDomNodeFromRequestContext(context: any) {
   const result = queryInterface(context, Ci.nsIDOMNode);
   if (!result.error) {
     return result.value;
@@ -236,14 +244,7 @@ function getDomNodeFromRequestContext(context) {
 // public functions
 // ---------------------------------------------------------------------------
 
-/**
- * Process a NormalRequest.
- *
- * @param {NormalRequest} request
- * @return {number}
- */
-// eslint-disable-next-line complexity
-export function process(request) {
+export function process(request: NormalRequest): number {
   // uncomment for debugging:
   // log.log("request: " +
   //              (request.aRequestOrigin ? request.aRequestOrigin.spec :
@@ -258,7 +259,7 @@ export function process(request) {
       return CP_OK;
     }
 
-    let originURI = request.originURI;
+    let originURI: string = request.originURI!;
     let destURI = request.destURI;
 
     if (request.aRequestOrigin.scheme === "moz-nullprincipal") {
@@ -350,7 +351,7 @@ export function process(request) {
     }
 
     if (isDuplicateRequest(request)) {
-      return lastShouldLoadCheck.result;
+      return lastShouldLoadCheck.result!;
     }
 
     // Sometimes, clicking a link to a fragment will result in a request
@@ -637,7 +638,7 @@ export function process(request) {
             RequestReason.Compatibility);
         return accept(
             `Extension/application compatibility rule matched ` +
-            `[${info.addonName}]`, request, true
+            `[${info.addonNames}]`, request, true
         );
       }
     }
@@ -652,10 +653,11 @@ export function process(request) {
         const mappedDestUriObj =
             MappedDestinations[destURI][mappedDest];
         logRequests.log(`Checking mapped destination: ${mappedDest}`);
-        let mappedResult = process(
+        let mappedResult = process(new NormalRequest(
             request.aContentType, mappedDestUriObj, request.aRequestOrigin,
-            request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION
-        );
+            request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION,
+            undefined,
+        ));
         if (mappedResult === CP_OK) {
           return CP_OK;
         }
@@ -693,12 +695,10 @@ export function process(request) {
  *
  * Currently this just looks for prefetch requests that are getting through
  * which we currently can't stop.
- *
- * @param {string} aSubject
  */
-let examineHttpRequest = function(aSubject) {
-  // eslint-disable-next-line new-cap
-  const httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+let examineHttpRequest = function(aSubject: XPCOM.nsISupports) {
+  const httpChannel =
+      aSubject.QueryInterface<XPCOM.nsIHttpChannel>(Ci.nsIHttpChannel);
   const result = getRequestHeaderFromHttpChannel(httpChannel, "X-moz");
   // Determine if prefetch requests are slipping through.
   if (result.value === "prefetch") {
@@ -713,7 +713,7 @@ let examineHttpRequest = function(aSubject) {
 MainEnvironment.obMan.observe(["http-on-modify-request"],
     examineHttpRequest);
 
-export function registerHistoryRequest(destinationUrl) {
+export function registerHistoryRequest(destinationUrl: string) {
   destinationUrl = uriService.ensureUriHasPath(
       uriService.stripFragment(destinationUrl)
   );
@@ -721,7 +721,7 @@ export function registerHistoryRequest(destinationUrl) {
   log.info(`History item requested: <${destinationUrl}>.`);
 }
 
-export function registerFormSubmitted(originUrl, destinationUrl) {
+export function registerFormSubmitted(originUrl: string, destinationUrl: string) {
   originUrl = uriService.ensureUriHasPath(
       uriService.stripFragment(originUrl)
   );
@@ -756,7 +756,10 @@ export function registerFormSubmitted(originUrl, destinationUrl) {
   }
 }
 
-export function registerLinkClicked(originUrl, destinationUrl) {
+export function registerLinkClicked(
+    originUrl: string,
+    destinationUrl: string,
+) {
   originUrl = uriService.ensureUriHasPath(
       uriService.stripFragment(originUrl)
   );
@@ -794,7 +797,10 @@ export function registerLinkClicked(originUrl, destinationUrl) {
   }
 }
 
-export function registerAllowedRedirect(originUrl, destinationUrl) {
+export function registerAllowedRedirect(
+    originUrl: string,
+    destinationUrl: string,
+) {
   originUrl = uriService.ensureUriHasPath(
       uriService.stripFragment(originUrl)
   );
@@ -818,12 +824,15 @@ export function registerAllowedRedirect(originUrl, destinationUrl) {
 
 MainEnvironment.obMan.observe(
     [HTTPS_EVERYWHERE_REWRITE_TOPIC],
-    function(subject, topic, data) {
-      handleHttpsEverywhereUriRewrite(subject, data);
+    function(subject: XPCOM.nsISupports, topic: string, data: string) {
+      handleHttpsEverywhereUriRewrite(subject as any, data);
     }
 );
 
-function mapDestinations(origDestUri, newDestUri) {
+function mapDestinations(
+    origDestUri: string,
+    newDestUri: string,
+) {
   origDestUri = uriService.stripFragment(origDestUri);
   newDestUri = uriService.stripFragment(newDestUri);
   log.info(
@@ -839,17 +848,16 @@ function mapDestinations(origDestUri, newDestUri) {
 /**
  * Handles observer notifications sent by the HTTPS Everywhere extension
  * that inform us of URIs that extension has rewritten.
- *
- * @param {nsIURI} oldURI
- * @param {string} newSpec
  */
-function handleHttpsEverywhereUriRewrite(oldURI, newSpec) {
-  // eslint-disable-next-line new-cap
+function handleHttpsEverywhereUriRewrite(
+    oldURI: XPCOM.nsIURI,
+    newSpec: string,
+) {
   oldURI = oldURI.QueryInterface(Ci.nsIURI);
   mapDestinations(oldURI.spec, newSpec);
 }
 
-function checkRedirect(request) {
+function checkRedirect(request: Request) {
   // TODO: Find a way to get rid of repitition of code between this and
   // shouldLoad().
 
@@ -859,7 +867,7 @@ function checkRedirect(request) {
   // This is not including link clicks, form submissions, and user-allowed
   // redirects.
 
-  const originURI = request.originURI;
+  const originURI = request.originURI!;
   const destURI = request.destURI;
 
   const originURIObj = uriService.getUriObject(originURI);
@@ -923,12 +931,12 @@ function checkRedirect(request) {
   return result;
 }
 
-export function isAllowedRedirect(originURI, destURI) {
+export function isAllowedRedirect(originURI: string, destURI: string) {
   const request = new Request(originURI, destURI);
   return true === checkRedirect(request).isAllowed;
 }
 
-export function processUrlRedirection(request) {
+export function processUrlRedirection(request: RedirectRequest) {
   // Currently, if a user clicks a link to download a file and that link
   // redirects and is subsequently blocked, the user will see the blocked
   // destination in the menu. However, after they have allowed it from
@@ -951,7 +959,8 @@ export function processUrlRedirection(request) {
     return CP_OK;
   }
 
-  let {originURI, destURI} = request;
+  let originURI = request.originURI!;
+  let destURI = request.destURI;
 
   // Allow redirects of requests from privileged code.
   // FIXME: should the check instead be ' === false' in case the
@@ -1011,8 +1020,8 @@ export function processUrlRedirection(request) {
     // destination of the target of the redirect. This is because future
     // requests (such as using back/forward) might show up as directly from
     // the initial origin to the ultimate redirected destination.
-    if (request.oldChannel.referrer) {
-      let realOrigin = request.oldChannel.referrer.spec;
+    if (request.oldChannel._httpChannel.referrer) {
+      let realOrigin = request.oldChannel._httpChannel.referrer.spec;
 
       if (ClickedLinks[realOrigin] &&
           ClickedLinks[realOrigin][originURI]) {
@@ -1054,7 +1063,7 @@ export function processUrlRedirection(request) {
 
       if (ClickedLinksReverse.hasOwnProperty(initialOrigin)) {
         let linkClickDest = initialOrigin;
-        let linkClickOrigin;
+        let linkClickOrigin: string;
 
         // fixme: bad smell! the same link (linkClickDest) could have
         //        been clicked from different origins!
@@ -1078,7 +1087,7 @@ export function processUrlRedirection(request) {
         Requests.notifyNewRequest({
           isAllowed: true,
           isInsert: true,
-          originUri: linkClickOrigin,
+          originUri: linkClickOrigin!,
           destUri: linkClickDest,
           requestResult: request.requestResult,
         });
@@ -1093,7 +1102,7 @@ export function processUrlRedirection(request) {
       isAllowed: false,
       isInsert: false,
       requestResult: request.requestResult,
-      originUri: request.originURI,
+      originUri: request.originURI!,
       destUri: request.destURI,
     });
 
@@ -1113,7 +1122,7 @@ export function processUrlRedirection(request) {
   }
 }
 
-function showRedirectNotification(request) {
+function showRedirectNotification(request: RedirectRequest) {
   let browser = request.browser;
   if (browser === null) {
     return false;
@@ -1136,10 +1145,7 @@ function showRedirectNotification(request) {
   return true;
 }
 
-/**
- * @param {RedirectRequest} aRequest
- */
-function maybeShowRedirectNotification(aRequest) {
+function maybeShowRedirectNotification(aRequest: RedirectRequest) {
   // Check if the request corresponds to a top-level document load.
   {
     let {loadFlags} = aRequest;
@@ -1161,13 +1167,10 @@ function maybeShowRedirectNotification(aRequest) {
   }
 }
 
-/**
- * @param {RedirectRequest} aRequest
- * @return {string}
- */
-function getOriginOfInitialRedirect(aRequest) {
-  let initialOrigin = aRequest.originURI;
-  let initialDest = aRequest.destURI; // eslint-disable-line no-unused-vars
+function getOriginOfInitialRedirect(aRequest: RedirectRequest): string {
+  let initialOrigin = aRequest.originURI!;
+  // @ts-ignore: 'initialDest' is declared but its value is never read.
+  let initialDest = aRequest.destURI;
 
   // Prevent infinite loops, that is, bound the number of iterations.
   // Note: An apparent redirect loop doesn't mean a problem with a
@@ -1192,11 +1195,8 @@ function getOriginOfInitialRedirect(aRequest) {
 /**
  * Checks whether a request is initiated by a content window. If it's from a
  * content window, then it's from unprivileged code.
- *
- * @param {RedirectRequest} request
- * @return {boolean}
  */
-function isContentRequest(request) {
+function isContentRequest(request: RedirectRequest): boolean {
   let loadContext = request.oldChannel.loadContext;
 
   if (loadContext === null) {

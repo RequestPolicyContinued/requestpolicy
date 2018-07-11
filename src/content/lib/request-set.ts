@@ -21,17 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.background";
+import { App } from "app/interfaces";
 import {log} from "app/log";
 import {RequestResult} from "lib/request-result";
-
-const uriService = rp.services.uri;
 
 // =============================================================================
 // utilities
 // =============================================================================
 
-function getUriIdentifier(uri: string) {
+function getUriIdentifier(uri: string, uriService: App.services.IUriService) {
   try {
     return uriService.getIdentifier(uri, uriService.hostLevels.SOP);
   } catch (e) {
@@ -119,6 +117,7 @@ export class RequestSet {
       originUri: string,
       destUri: string,
       aRequestResult: RequestResult,
+      uriService: App.services.IUriService,
   ) {
     let requestResult = aRequestResult;
     if (requestResult === undefined) {
@@ -145,7 +144,7 @@ export class RequestSet {
       dests[destBase] = {};
     }
 
-    const destIdent = getUriIdentifier(destUri);
+    const destIdent = getUriIdentifier(destUri, uriService);
     if (!dests[destBase][destIdent]) {
       dests[destBase][destIdent] = {};
     }
@@ -177,7 +176,11 @@ export class RequestSet {
     }
   }
 
-  public removeRequest(originUri: string, destUri: string) {
+  public removeRequest(
+      originUri: string,
+      destUri: string,
+      uriService: App.services.IUriService,
+  ) {
     if (!this.origins[originUri]) { return; }
     const dests = this.origins[originUri];
 
@@ -189,7 +192,7 @@ export class RequestSet {
     const destBase = destBaseOrNull!;
     if (!dests[destBase]) { return; }
 
-    const destIdent = getUriIdentifier(destUri);
+    const destIdent = getUriIdentifier(destUri, uriService);
     if (!dests[destBase][destIdent]) { return; }
 
     if (!dests[destBase][destIdent][destUri]) { return; }

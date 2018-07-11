@@ -53,6 +53,7 @@ declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Cr: XPCOM.nsXPCComponents_Results;
 
 const uriService = rp.services.uri;
+const requestService = rp.services.request;
 const cachedSettings = rp.storage.cachedSettings!;
 
 const logRequests = log.extend({
@@ -145,8 +146,8 @@ function reject(reason: string, request: NormalRequest) {
     // This was a blocked top-level document request. This may be due to
     // a blocked attempt by javascript to set the document location.
 
-    const browser = request.getBrowser();
-    const window = request.getChromeWindow();
+    const browser = requestService.getBrowser(request);
+    const window = requestService.getChromeWindow(request);
 
     if (!browser || !window || typeof window.rpcontinued === "undefined") {
       log.warn("The user could not be notified " +
@@ -256,7 +257,7 @@ export function process(request: NormalRequest): number {
   // log.dir(request.aRequestOrigin);
   // log.dir(request.aContentLocation);
   try {
-    if (request.isInternal()) {
+    if (requestService.isInternalRequest(request)) {
       logRequests.log(`Allowing a request that seems to be internal. ` +
           `Origin: ${request.originURI}, Dest: ${request.destURI}`);
       return CP_OK;
@@ -310,7 +311,7 @@ export function process(request: NormalRequest): number {
           `to be origin <${newOriginURI}>`,
       );
       originURI = newOriginURI;
-      request.setOriginURI(originURI);
+      request.setOriginURI(originURI, uriService);
     }
 
     if (request.aContentLocation.scheme === "view-source") {
@@ -328,7 +329,7 @@ export function process(request: NormalRequest): number {
             `to be destination <${newDestURI}>`,
         );
         destURI = newDestURI;
-        request.setDestURI(destURI);
+        request.setDestURI(destURI, uriService);
       }
     }
 
@@ -350,7 +351,7 @@ export function process(request: NormalRequest): number {
           log.log(`Considering origin <${originURI}> ` +
               `to be origin <${newOriginURI}>`);
           originURI = newOriginURI;
-          request.setOriginURI(originURI);
+          request.setOriginURI(originURI, uriService);
         }
       }
     }
@@ -672,7 +673,7 @@ export function process(request: NormalRequest): number {
       }
     }
 
-    request.requestResult = request.checkByDefaultPolicy();
+    request.requestResult = requestService.checkByDefaultPolicy(request);
     if (request.requestResult.isAllowed) {
       return accept("Allowed by default policy", request);
     } else {
@@ -939,7 +940,7 @@ function checkRedirect(request: Request) {
   }
 
   {
-    const result = request.checkByDefaultPolicy();
+    const result = requestService.checkByDefaultPolicy(request);
     return result;
   }
 }
@@ -964,7 +965,7 @@ export function processUrlRedirection(request: RedirectRequest) {
   // Check for internal redirections. For example, the add-on
   // "Decentraleyes" redirects external resources like jQuery
   // to a "data" URI.
-  if (request.isInternal()) {
+  if (requestService.isInternalRequest(request)) {
     logRequests.log(
         `Allowing a redirection that seems to be internal. ` +
         `Origin: ${request.originURI}, Dest: ${request.destURI}`,

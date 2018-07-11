@@ -57,6 +57,7 @@ import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
 import { Runtime } from "./runtime/runtime.module";
+import { RequestService } from "./services/request-service";
 import { RulesServices } from "./services/rules/rules-services.module";
 import { V0RulesService } from "./services/rules/v0-rules-service";
 import { RPServices } from "./services/services.module";
@@ -181,6 +182,7 @@ const browserSettings = new BrowserSettings(
 const xpconnectService = new XPConnectService();
 const uriService = new UriService(log, undefined, mozServices!.eTLD,
     xpconnectService.getIDNService(), mozServices!.io);
+const requestService = new RequestService(log, uriService, cachedSettings);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -194,7 +196,7 @@ const versionInfoService = new VersionInfoService(
     browser.runtime,
 );
 const rpServices = new RPServices(
-    log, rulesServices, uriService, versionInfoService,
+    log, requestService, rulesServices, uriService, versionInfoService,
 );
 
 const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?

@@ -84,12 +84,20 @@ function notifyNewRequest({
         // The destination URI may itself originate further requests.
         removeSavedRequestsByOriginURI(destUri);
       }
-      requestSets.rejectedRequests.removeRequest(originUri, destUri);
-      requestSets.allowedRequests.addRequest(originUri, destUri, requestResult);
+      requestSets.rejectedRequests.removeRequest(
+          originUri, destUri, uriService,
+      );
+      requestSets.allowedRequests.addRequest(
+          originUri, destUri, requestResult, uriService,
+      );
     }
   } else {
-    requestSets.rejectedRequests.addRequest(originUri, destUri, requestResult);
-    requestSets.allowedRequests.removeRequest(originUri, destUri);
+    requestSets.rejectedRequests.addRequest(
+        originUri, destUri, requestResult, uriService,
+    );
+    requestSets.allowedRequests.removeRequest(
+        originUri, destUri, uriService,
+    );
   }
   eventListenersMap.onRequest.emit({
     destUri,
@@ -140,7 +148,7 @@ function getRequestsHelper(
             //       contain a blocked list, an allowed list (and maybe a list
             //       of all requests).
             if (isAllowed === dest[i].isAllowed) {
-              result.addRequest(originUri, destUri, dest[i]);
+              result.addRequest(originUri, destUri, dest[i], uriService);
             }
           }
         }

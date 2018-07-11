@@ -20,15 +20,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RulesServices } from "app/services/rules/rules-services.module";
-import { UriService } from "app/services/uri-service";
-import { VersionInfoService } from "app/services/version-info-service";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
+import { RequestService } from "./request-service";
+import { RulesServices } from "./rules/rules-services.module";
+import { UriService } from "./uri-service";
+import { VersionInfoService } from "./version-info-service";
 
 export class RPServices extends Module {
   constructor(
       log: Common.ILog,
+      public readonly request: RequestService,
       public readonly rules: RulesServices,
       public readonly uri: UriService,
       public readonly versionInfo: VersionInfoService,
@@ -38,6 +40,7 @@ export class RPServices extends Module {
 
   protected get subModules() {
     return {
+      request: this.request,
       rules: this.rules,
       uri: this.uri,
       versionInfo: this.versionInfo,

@@ -31,6 +31,8 @@ import { RPServices } from "./services/services.module";
 import { CachedSettings } from "./storage/cached-settings";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
+import { RequestService } from "./services/request-service";
+import { UriService } from "./services/uri-service";
 import { VersionInfoService } from "./services/version-info-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { StorageMigration } from "./migration/storage/storage-migration.module";
@@ -56,6 +58,8 @@ export namespace App {
 
   export namespace services {
     export type IVersionInfoService = VersionInfoService;
+    export type IRequestService = RequestService;
+    export type IUriService = UriService;
   }
 
   export namespace storage {

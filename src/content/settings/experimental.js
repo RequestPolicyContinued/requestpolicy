@@ -27,7 +27,7 @@
 
   function getNRequestResultObjects(aRequestSet) {
     var n = 0;
-    var origins = aRequestSet._origins;
+    var origins = aRequestSet.origins;
     for (var originURI in origins) {
       var originUriRequests = origins[originURI];
       for (var destBase in originUriRequests) {
@@ -79,8 +79,8 @@
   function freeMemory() {
     var memoryInfo = getMemoryInfo();
 
-    deleteOwnProperties(Requests._requestSets.allowedRequests._origins);
-    deleteOwnProperties(Requests._requestSets.rejectedRequests._origins);
+    deleteOwnProperties(Requests._requestSets.allowedRequests.origins);
+    deleteOwnProperties(Requests._requestSets.rejectedRequests.origins);
     deleteOwnProperties(Metadata.ClickedLinks);
     deleteOwnProperties(Metadata.ClickedLinksReverse);
     deleteOwnProperties(Metadata.FaviconRequests);

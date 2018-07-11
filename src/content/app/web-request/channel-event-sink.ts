@@ -21,22 +21,25 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {XPCOM, JSMs, API} from "bootstrap/api/interfaces";
-import {
-  XpcomClassFactoryModule
-} from "legacy/lib/classes/xpcom-class-factory-module";
+import {API, JSMs, XPCOM} from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
-import { NonDI } from "non-di-interfaces";
+import {
+  XpcomClassFactoryModule,
+} from "legacy/lib/classes/xpcom-class-factory-module";
 import { defer } from "lib/utils/js-utils";
+import { NonDI } from "non-di-interfaces";
 
 export class RPChannelEventSink extends XpcomClassFactoryModule {
   protected readonly XPCOM_CATEGORIES = ["net-channel-event-sinks"];
 
-  protected readonly classDescription = "RequestPolicy ChannelEventSink Implementation";
+  protected readonly classDescription =
+      "RequestPolicy ChannelEventSink Implementation";
   protected readonly interfaceID = "{dc6e2000-2ff0-11e6-bdf4-0800200c9a66}";
-  protected readonly contractID = "@requestpolicy.org/net-channel-event-sinks;1";
+  protected readonly contractID =
+      "@requestpolicy.org/net-channel-event-sinks;1";
 
-  private readonly CP_REJECT = this.xpcComponentInterfaces.nsIContentPolicy.REJECT_SERVER;
+  private readonly CP_REJECT =
+      this.xpcComponentInterfaces.nsIContentPolicy.REJECT_SERVER;
   private readonly CES_ACCEPT = this.xpcComponentResults.NS_OK;
   private readonly CES_REJECT = this.xpcComponentResults.NS_ERROR_FAILURE;
 
@@ -66,7 +69,31 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
     );
   }
 
-  getImplementedInterfaces() {
+  // ---------------------------------------------------------------------------
+  // nsIChannelEventSink interface implementation
+  // ---------------------------------------------------------------------------
+
+  public asyncOnChannelRedirect(
+      aOldChannel: XPCOM.nsIChannel,
+      aNewChannel: XPCOM.nsIChannel,
+      aFlags: number,
+      aCallback: XPCOM.nsIAsyncVerifyRedirectCallback,
+  ) {
+    let result: number;
+    if (this.forcedReturnValue !== null) {
+      result = this.forcedReturnValue;
+    } else {
+      const request = this.redirectRequestFactory(
+          aOldChannel, aNewChannel, aFlags);
+      const rv = this.requestProcessor.processUrlRedirection(request);
+      result = rv === this.CP_REJECT ? this.CES_REJECT : this.CES_ACCEPT;
+    }
+    aCallback.onRedirectVerifyCallback(result);
+  }
+
+  // ---------------------------------------------------------------------------
+
+  protected getImplementedInterfaces() {
     return super.getImplementedInterfaces().concat([
       this.xpcComponentInterfaces.nsIChannelEventSink,
       this.xpcComponentInterfaces.nsIObserver,
@@ -89,25 +116,4 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
     this.forcedReturnValue = this.CES_ACCEPT;
     super.beforeUnregistering();
   }
-
-  // ---------------------------------------------------------------------------
-  // nsIChannelEventSink interface implementation
-  // ---------------------------------------------------------------------------
-
-  public asyncOnChannelRedirect(
-      aOldChannel: XPCOM.nsIChannel,
-      aNewChannel: XPCOM.nsIChannel,
-      aFlags: number,
-      aCallback: XPCOM.nsIAsyncVerifyRedirectCallback,
-  ) {
-    let result: number;
-    if (this.forcedReturnValue !== null) {
-      result = this.forcedReturnValue;
-    } else {
-      let request = this.redirectRequestFactory(aOldChannel, aNewChannel, aFlags);
-      let rv = this.requestProcessor.processUrlRedirection(request);
-      result = rv === this.CP_REJECT ? this.CES_REJECT : this.CES_ACCEPT;
-    }
-    aCallback.onRedirectVerifyCallback(result);
-  };
 }

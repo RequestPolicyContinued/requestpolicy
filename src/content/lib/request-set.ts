@@ -46,24 +46,25 @@ function getUriIdentifier(uri: string) {
 // =============================================================================
 
 export class RequestSet {
-  private _origins: any = {};
+  private origins: any = {};
 
-  print(
+  public print(
       name: string,
       printFn: (s: string) => void = log.log.bind(log),
   ) {
     printFn("-------------------------------------------------");
     printFn(`== Request Set <${name}> ==`);
     // "Take that, Big-O!"
-    const origins = this._origins;
-    for (let oUri in origins) {
+    const origins = this.origins;
+    // tslint:disable:forin
+    for (const oUri in origins) {
       printFn(`${"      " + "Origin uri: <"}${oUri}>`);
-      for (let dBase in origins[oUri]) {
+      for (const dBase in origins[oUri]) {
         const dests = origins[oUri];
         printFn(`${"        " + "Dest base domain: <"}${dBase}>`);
-        for (let dIdent in dests[dBase]) {
+        for (const dIdent in dests[dBase]) {
           printFn(`${"          " + "Dest identifier: <"}${dIdent}>`);
-          for (let dUri in dests[dBase][dIdent]) {
+          for (const dUri in dests[dBase][dIdent]) {
             const n = dests[dBase][dIdent][dUri].length;
             printFn(`${"            " + "Dest uri: ("}${n} requests) <${
               dUri}>`);
@@ -74,26 +75,27 @@ export class RequestSet {
     printFn("-------------------------------------------------");
   }
 
-  getAll() {
-    return this._origins;
+  public getAll() {
+    return this.origins;
   }
 
   // TODO: the name of this method, getAllMergedOrigins, is confusing. Is it
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
-  getAllMergedOrigins() {
+  public getAllMergedOrigins() {
     const result: any = {};
-    for (let originUri in this._origins) {
-      const dests = this._origins[originUri];
-      for (let destBase in dests) {
+    // tslint:disable:forin
+    for (const originUri in this.origins) {
+      const dests = this.origins[originUri];
+      for (const destBase in dests) {
         if (!result[destBase]) {
           result[destBase] = {};
         }
-        for (let destIdent in dests[destBase]) {
+        for (const destIdent in dests[destBase]) {
           if (!result[destBase][destIdent]) {
             result[destBase][destIdent] = {};
           }
-          for (let destUri in dests[destBase][destIdent]) {
+          for (const destUri in dests[destBase][destIdent]) {
             if (!result[destBase][destIdent][destUri]) {
               result[destBase][destIdent][destUri] =
                   dests[destBase][destIdent][destUri];
@@ -109,11 +111,11 @@ export class RequestSet {
     return result;
   }
 
-  getOriginUri(originUri: string) {
-    return this._origins[originUri] || {};
+  public getOriginUri(originUri: string) {
+    return this.origins[originUri] || {};
   }
 
-  addRequest(
+  public addRequest(
       originUri: string,
       destUri: string,
       aRequestResult: RequestResult,
@@ -123,22 +125,22 @@ export class RequestSet {
       log.warn(
           "addRequest() was called without a requestResult object!" +
           " Creating a new one. -- " +
-          `"origin: <${originUri}>, destination: <${destUri}>`
+          `"origin: <${originUri}>, destination: <${destUri}>`,
       );
       requestResult = new RequestResult();
     }
 
-    if (!this._origins[originUri]) {
-      this._origins[originUri] = {};
+    if (!this.origins[originUri]) {
+      this.origins[originUri] = {};
     }
-    const dests = this._origins[originUri];
+    const dests = this.origins[originUri];
 
-    const destBase_ = uriService.getBaseDomain(destUri);
-    if (destBase_ === null) {
+    const destBaseOrNull = uriService.getBaseDomain(destUri);
+    if (destBaseOrNull === null) {
       log.warn(`Got 'null' base domain for URI <${destUri}>`);
     }
     // FIXME
-    const destBase = destBase_!;
+    const destBase = destBaseOrNull!;
     if (!dests[destBase]) {
       dests[destBase] = {};
     }
@@ -175,30 +177,22 @@ export class RequestSet {
     }
   }
 
-  removeRequest(originUri: string, destUri: string) {
-    if (!this._origins[originUri]) {
-      return;
-    }
-    const dests = this._origins[originUri];
+  public removeRequest(originUri: string, destUri: string) {
+    if (!this.origins[originUri]) { return; }
+    const dests = this.origins[originUri];
 
-    const destBase_ = uriService.getBaseDomain(destUri);
-    if (destBase_ === null) {
+    const destBaseOrNull = uriService.getBaseDomain(destUri);
+    if (destBaseOrNull === null) {
       log.warn(`Got 'null' base domain for URI <${destUri}>`);
     }
     // FIXME
-    const destBase = destBase_!;
-    if (!dests[destBase]) {
-      return;
-    }
+    const destBase = destBaseOrNull!;
+    if (!dests[destBase]) { return; }
 
     const destIdent = getUriIdentifier(destUri);
-    if (!dests[destBase][destIdent]) {
-      return;
-    }
+    if (!dests[destBase][destIdent]) { return; }
 
-    if (!dests[destBase][destIdent][destUri]) {
-      return;
-    }
+    if (!dests[destBase][destIdent][destUri]) { return; }
     delete dests[destBase][destIdent][destUri];
 
     if (Object.getOwnPropertyNames(dests[destBase][destIdent]).length > 0) {
@@ -206,32 +200,29 @@ export class RequestSet {
     }
     delete dests[destBase][destIdent];
 
-    if (Object.getOwnPropertyNames(dests[destBase]).length > 0) {
-      return;
-    }
+    if (Object.getOwnPropertyNames(dests[destBase]).length > 0) { return; }
     delete dests[destBase];
 
-    if (Object.getOwnPropertyNames(dests).length > 0) {
-      return;
-    }
-    delete this._origins[originUri];
+    if (Object.getOwnPropertyNames(dests).length > 0) { return; }
+    delete this.origins[originUri];
   }
 
-  removeOriginUri(originUri: string) {
-    delete this._origins[originUri];
+  public removeOriginUri(originUri: string) {
+    delete this.origins[originUri];
   }
 
-  containsBlockedRequests() {
-    let origins = this._origins;
-    for (let originURI in origins) {
-      let originUriRequests = origins[originURI];
-      for (let destBase in originUriRequests) {
-        let destBaseRequests = originUriRequests[destBase];
-        for (let destIdent in destBaseRequests) {
-          let destIdentRequests = destBaseRequests[destIdent];
-          for (let destURI in destIdentRequests) {
-            let destUriRequests = destIdentRequests[destURI];
-            for (let request of destUriRequests) {
+  public containsBlockedRequests() {
+    const origins = this.origins;
+    // tslint:disable:forin
+    for (const originURI in origins) {
+      const originUriRequests = origins[originURI];
+      for (const destBase in originUriRequests) {
+        const destBaseRequests = originUriRequests[destBase];
+        for (const destIdent in destBaseRequests) {
+          const destIdentRequests = destBaseRequests[destIdent];
+          for (const destURI in destIdentRequests) {
+            const destUriRequests = destIdentRequests[destURI];
+            for (const request of destUriRequests) {
               if (true !== request.isAllowed) {
                 return true;
               }

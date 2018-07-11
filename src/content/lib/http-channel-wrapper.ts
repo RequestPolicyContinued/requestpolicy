@@ -21,16 +21,17 @@
  */
 
 import {log} from "app/log";
+import {JSMs, XPCOM, XUL} from "bootstrap/api/interfaces";
+import {C} from "data/constants";
 import {
-  getLoadContextFromHttpChannel,
   getBrowserFromLoadContext,
   getDocShellFromHttpChannel,
+  getLoadContextFromHttpChannel,
 } from "lib/utils/try-catch-utils";
 import {getBrowserForWindow} from "lib/utils/window-utils";
-import {XPCOM, JSMs, XUL} from "bootstrap/api/interfaces";
-import {C} from "data/constants";
 
 export class HttpChannelWrapper {
+  // tslint:disable:variable-name
   private _docShell: XPCOM.nsIDocShell | null | typeof C["UNDEFINED"] =
       C.UNDEFINED;
   private _browser: XUL.browser | null | typeof C["UNDEFINED"] =
@@ -38,22 +39,23 @@ export class HttpChannelWrapper {
   private _loadContext: XPCOM.nsILoadContext | null | typeof C["UNDEFINED"] =
       C.UNDEFINED;
   private _uri: XPCOM.nsIURI | typeof C["UNDEFINED"] = C.UNDEFINED;
+  // tslint:enable:variable-name
 
   constructor(
       private mozIOService: JSMs.Services["io"],
-      public _httpChannel: XPCOM.nsIHttpChannel,
+      public httpChannel: XPCOM.nsIHttpChannel,
   ) {}
 
   get uri(): XPCOM.nsIURI {
     if (this._uri === C.UNDEFINED) {
-      this._uri = this.mozIOService.newURI(this._httpChannel.name, null, null);
+      this._uri = this.mozIOService.newURI(this.httpChannel.name, null, null);
     }
     return this._uri as XPCOM.nsIURI;
   }
 
   get loadContext(): XPCOM.nsILoadContext | null {
     if (this._loadContext === C.UNDEFINED) {
-      const result = getLoadContextFromHttpChannel(this._httpChannel);
+      const result = getLoadContextFromHttpChannel(this.httpChannel);
       this._loadContext = result.value;
       if (this._loadContext === null) {
         log.warn(`${"The HTTPChannel's " +
@@ -68,7 +70,7 @@ export class HttpChannelWrapper {
    */
   get browser(): XUL.browser | null {
     if (this._browser === C.UNDEFINED) {
-      let loadContext = this.loadContext;
+      const loadContext = this.loadContext;
 
       if (loadContext === null) {
         this._browser = null;
@@ -97,7 +99,7 @@ export class HttpChannelWrapper {
    */
   get docShell(): XPCOM.nsIDocShell | null {
     if (!this.hasOwnProperty("_docShell")) {
-      const result = getDocShellFromHttpChannel(this._httpChannel);
+      const result = getDocShellFromHttpChannel(this.httpChannel);
       this._docShell = result.value;
       if ("error" in result) {
         log.warn("Error getting the HTTPChannel's DocShell: ", result.error);

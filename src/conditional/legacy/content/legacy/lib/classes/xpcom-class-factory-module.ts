@@ -21,12 +21,17 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { XPCOM, JSMs } from "bootstrap/api/interfaces";
-import { Module } from "lib/classes/module";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
 
 export abstract class XpcomClassFactoryModule extends Module {
+  // nsISupports interface implementation
+  public QueryInterface = this.XPCOMUtils.generateQI(
+      this.getImplementedInterfaces(),
+  );
+
   protected abstract readonly XPCOM_CATEGORIES: string[];
 
   protected abstract readonly classDescription: string;
@@ -35,22 +40,31 @@ export abstract class XpcomClassFactoryModule extends Module {
 
   private readonly classID = this.xpcComponentID(this.interfaceID);
 
-  // nsISupports interface implementation
-  public QueryInterface = this.XPCOMUtils.generateQI(
-      this.getImplementedInterfaces(),
-  );
-
   constructor(
       moduleName: string,
       parentLog: Common.ILog,
       protected readonly xpconnectService: XPConnectService,
-      protected readonly xpcComponentInterfaces: XPCOM.nsXPCComponents_Interfaces,
+      protected readonly xpcComponentInterfaces:
+          XPCOM.nsXPCComponents_Interfaces,
       protected readonly xpcComponentResults: XPCOM.nsXPCComponents_Results,
       protected readonly xpcComponentID: XPCOM.nsXPCComponents["ID"],
       protected readonly XPCOMUtils: JSMs.XPCOMUtils,
   ) {
     super(moduleName, parentLog);
   }
+
+  // ---------------------------------------------------------------------------
+  // nsIFactory interface implementation
+  // ---------------------------------------------------------------------------
+
+  public createInstance(outer: any, iid: XPCOM.nsIJSID) {
+    if (outer) {
+      throw this.xpcComponentResults.NS_ERROR_NO_AGGREGATION;
+    }
+    return this.QueryInterface(iid);
+  }
+
+  // ---------------------------------------------------------------------------
 
   protected getImplementedInterfaces(): XPCOM.nsIJSID[] {
     return [this.xpcComponentInterfaces.nsIFactory];
@@ -80,6 +94,7 @@ export abstract class XpcomClassFactoryModule extends Module {
     return this.unregister();
   }
 
+  // tslint:disable-next-line:no-empty
   protected beforeUnregistering(): void {}
 
   private register() {
@@ -88,13 +103,13 @@ export abstract class XpcomClassFactoryModule extends Module {
 
     registrar.registerFactory(
         this.classID, this.classDescription, this.contractID,
-        this
+        this,
     );
 
-    for (let category of this.XPCOM_CATEGORIES) {
+    for (const category of this.XPCOM_CATEGORIES) {
       catMan.addCategoryEntry(
           category, this.contractID, this.contractID, false,
-          true
+          true,
       );
     }
   }
@@ -113,16 +128,5 @@ export abstract class XpcomClassFactoryModule extends Module {
     await Promise.resolve();
 
     registrar.unregisterFactory(this.classID, this);
-  }
-
-  // ---------------------------------------------------------------------------
-  // nsIFactory interface implementation
-  // ---------------------------------------------------------------------------
-
-  public createInstance(outer: any, iid: XPCOM.nsIJSID) {
-    if (outer) {
-      throw this.xpcComponentResults.NS_ERROR_NO_AGGREGATION;
-    }
-    return this.QueryInterface(iid);
   }
 }

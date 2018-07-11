@@ -88,7 +88,7 @@ export abstract class Module implements IModule {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false, level: "all"});
 
-    this.creationTime = new Date().getTime()
+    this.creationTime = new Date().getTime();
     setTimeout(() => {
       if (this.startupCalled) return;
       this.log.error(`[severe] startup() hasn't been invoked ` +

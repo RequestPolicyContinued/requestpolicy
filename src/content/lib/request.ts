@@ -23,6 +23,7 @@
 
 import {rp} from "app/app.background";
 import { log } from "app/log";
+import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 import {
   RequestReason,
@@ -30,7 +31,6 @@ import {
 } from "lib/request-result";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -441,7 +441,7 @@ export class NormalRequest extends Request {
       );
       if (!result.error) return result.value as any;
     }
-    let doc: XUL.contentDocument | undefined = undefined;
+    let doc: XUL.contentDocument | undefined;
     {
       const result = queryInterface(context, Ci.nsIDOMDocument);
       if (!result.error) doc = result.value as any;
@@ -508,7 +508,7 @@ export class RedirectRequest extends Request {
   }
 
   get loadFlags() {
-    return this.oldChannel._httpChannel.loadFlags;
+    return this.oldChannel.httpChannel.loadFlags;
   }
 
   get originUriObj() {
@@ -524,7 +524,7 @@ export class RedirectRequest extends Request {
   }
 
   public getContentPolicyType() {
-    const {loadInfo} = this.oldChannel._httpChannel;
+    const {loadInfo} = this.oldChannel.httpChannel;
     if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
     return loadInfo.externalContentPolicyType;
   }

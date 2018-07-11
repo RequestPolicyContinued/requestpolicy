@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { XPCOM, JSMs } from "bootstrap/api/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 

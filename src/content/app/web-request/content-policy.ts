@@ -21,18 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
-import { Common } from "common/interfaces";
-import { XPCOM, JSMs, API } from "bootstrap/api/interfaces";
-import { NonDI } from "non-di-interfaces";
 import { defer } from "lib/utils/js-utils";
+import { NonDI } from "non-di-interfaces";
 
 export class RPContentPolicy extends XpcomClassFactoryModule {
   protected readonly XPCOM_CATEGORIES = ["content-policy"];
 
-  protected readonly classDescription = "RequestPolicy ContentPolicy Implementation";
+  protected readonly classDescription =
+      "RequestPolicy ContentPolicy Implementation";
   protected readonly interfaceID = "{d734b30a-996c-4805-be24-25a0738249fe}";
   protected readonly contractID = "@requestpolicy.org/content-policy;1";
 
@@ -64,7 +65,28 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
     );
   }
 
-  getImplementedInterfaces() {
+  // ---------------------------------------------------------------------------
+  // nsIContentPolicy interface implementation
+  // ---------------------------------------------------------------------------
+
+  public shouldLoad(
+      aContentType: any, aContentLocation: any, aRequestOrigin: any,
+      aContext: any, aMimeTypeGuess: any, aExtra: any, aRequestPrincipal: any,
+  ) {
+    if (this.forcedReturnValue !== null) {
+      return this.forcedReturnValue;
+    }
+
+    const request = this.normalRequestFactory(
+        aContentType, aContentLocation, aRequestOrigin, aContext,
+        aMimeTypeGuess, aExtra, aRequestPrincipal,
+    );
+    return this.requestProcessor.process(request);
+  }
+
+  // ---------------------------------------------------------------------------
+
+  protected getImplementedInterfaces() {
     return super.getImplementedInterfaces().concat([
       this.xpcComponentInterfaces.nsIContentPolicy,
       this.xpcComponentInterfaces.nsIObserver,
@@ -84,24 +106,5 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
 
   protected beforeUnregistering() {
     this.forcedReturnValue = this.CP_OK;
-  }
-
-  // ---------------------------------------------------------------------------
-  // nsIContentPolicy interface implementation
-  // ---------------------------------------------------------------------------
-
-  public shouldLoad(
-      aContentType: any, aContentLocation: any, aRequestOrigin: any,
-      aContext: any, aMimeTypeGuess: any, aExtra: any, aRequestPrincipal: any,
-  ) {
-    if (this.forcedReturnValue !== null) {
-      return this.forcedReturnValue;
-    }
-
-    const request = this.normalRequestFactory(
-        aContentType, aContentLocation, aRequestOrigin, aContext,
-        aMimeTypeGuess, aExtra, aRequestPrincipal,
-    );
-    return this.requestProcessor.process(request);
   }
 }

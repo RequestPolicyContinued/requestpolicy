@@ -291,7 +291,7 @@ function getAllowedRequests(
 /**
  * TODO: This comment is quite old. It might not be necessary anymore to
  *       check the DOM since all requests are recorded, like:
- *       RequestSet._origins[originURI][destBase][destIdent][destURI][i]
+ *       RequestSet.origins[originURI][destBase][destIdent][destURI][i]
  * Info: As soon as requests are saved per Tab, this function isn't needed
  *       anymore.
  *

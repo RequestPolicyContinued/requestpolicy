@@ -24,11 +24,11 @@ import { dAsyncSettings, log } from "app/log";
 import { RPContentServices } from "app/services/services.module.content";
 import { UriService } from "app/services/uri-service";
 import { Storage } from "app/storage/storage.module";
+import { JSMs } from "bootstrap/api/interfaces";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { AppContent } from "./app.content.module";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
-import { JSMs } from "bootstrap/api/interfaces";
-import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 
 declare const Services: JSMs.Services;
 

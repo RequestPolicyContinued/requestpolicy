@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import {Module} from "lib/classes/module";
@@ -28,7 +29,6 @@ import {RequestResult} from "lib/request-result";
 import {RawRuleset, Ruleset} from "lib/ruleset";
 import { RulesetStorage } from "./ruleset-storage";
 import { Subscriptions } from "./subscriptions";
-import { XPCOM } from "bootstrap/api/interfaces";
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 

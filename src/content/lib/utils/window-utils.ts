@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { App } from "app/interfaces";
+import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 
-let PrivateBrowsingUtils: JSMs.PrivateBrowsingUtils = Cu.import(
-    "resource://gre/modules/PrivateBrowsingUtils.jsm", {}
+const PrivateBrowsingUtils: JSMs.PrivateBrowsingUtils = Cu.import(
+    "resource://gre/modules/PrivateBrowsingUtils.jsm", {},
 ).PrivateBrowsingUtils;
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
@@ -51,9 +51,9 @@ export function getChromeWindow(
 }
 
 export function getBrowserForWindow(aContentWindow: XUL.contentWindow) {
-  let win = getChromeWindow(aContentWindow);
-  let tabs = getTabsForWindow(win);
-  for (let tab of tabs) {
+  const win = getChromeWindow(aContentWindow);
+  const tabs = getTabsForWindow(win);
+  for (const tab of tabs) {
     if (tab.linkedBrowser.contentWindow === aContentWindow.top) {
       return tab.linkedBrowser;
     }
@@ -113,12 +113,13 @@ export function getElementsByIdOnLoad(
     aScope?: {[key: string]: any},
     aCallback?: () => void,
 ): {[key: string]: any} {
-  let scope = aScope || {};
-  let document = aWindow.document;
-  let callback = function() {
+  const scope = aScope || {};
+  const document = aWindow.document;
+  const callback = () => {
     aWindow.removeEventListener("load", callback);
 
-    for (let elementName in aElementIDs) {
+    // tslint:disable-next-line:forin
+    for (const elementName in aElementIDs) {
       scope[elementName] = document.getElementById(aElementIDs[elementName]);
     }
     if (aCallback) {

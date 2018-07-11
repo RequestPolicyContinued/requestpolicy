@@ -21,7 +21,7 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import { API, XPCOM, JSMs } from "bootstrap/api/interfaces";
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {
   StorageMigrationToWebExtension,
@@ -38,39 +38,39 @@ interface IEmbeddedWebExtension { browser: typeof browser; }
 declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
-import { dAsyncSettings, log } from "app/log";
-import { SettingsMigration } from "app/migration/storage/settings-migration";
-import {
-  StorageMigration,
-} from "app/migration/storage/storage-migration.module";
-import { Runtime } from "app/runtime/runtime.module";
-import { RulesServices } from "app/services/rules/rules-services.module";
-import { V0RulesService } from "app/services/rules/v0-rules-service";
-import { VersionInfoService } from "app/services/version-info-service";
-import { AsyncSettings } from "app/storage/async-settings";
-import { CachedSettings } from "app/storage/cached-settings";
-import { SETTING_SPECS } from "app/storage/setting-specs";
-import { InitialSetup } from "app/ui/initial-setup";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
+import { NormalRequest, RedirectRequest } from "lib/request";
+import * as RequestProcessor from "lib/request-processor";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
+import { dAsyncSettings, log } from "./log";
 import { Migration } from "./migration/migration.module";
+import { SettingsMigration } from "./migration/storage/settings-migration";
+import {
+  StorageMigration,
+} from "./migration/storage/storage-migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
+import { Runtime } from "./runtime/runtime.module";
+import { RulesServices } from "./services/rules/rules-services.module";
+import { V0RulesService } from "./services/rules/v0-rules-service";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
+import { VersionInfoService } from "./services/version-info-service";
+import { AsyncSettings } from "./storage/async-settings";
+import { CachedSettings } from "./storage/cached-settings";
+import { SETTING_SPECS } from "./storage/setting-specs";
 import { Storage } from "./storage/storage.module";
+import { InitialSetup } from "./ui/initial-setup";
 import { Ui } from "./ui/ui.module";
-import { WebRequest } from "app/web-request/web-request.module";
-import { RPChannelEventSink } from "app/web-request/channel-event-sink";
-import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
-import * as RequestProcessor from "lib/request-processor";
-import { RedirectRequest, NormalRequest } from "lib/request";
-import { RPContentPolicy } from "app/web-request/content-policy";
+import { RPChannelEventSink } from "./web-request/channel-event-sink";
+import { RPContentPolicy } from "./web-request/content-policy";
+import { WebRequest } from "./web-request/web-request.module";
 
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:

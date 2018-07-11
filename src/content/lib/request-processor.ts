@@ -21,12 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Request, NormalRequest, RedirectRequest} from "lib/request";
+import {MainEnvironment} from "lib/environment";
+import {NormalRequest, RedirectRequest, Request} from "lib/request";
 import {
   RequestReason,
   RequestResult,
 } from "lib/request-result";
-import {MainEnvironment} from "lib/environment";
 import * as Utils from "lib/utils/misc-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
 import {
@@ -41,13 +41,13 @@ import {
 } from "models/metadata";
 import {Requests} from "models/requests";
 
+import {rp} from "app/app.background";
 import {log} from "app/log";
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
 } from "lib/utils/try-catch-utils";
-import {rp} from "app/app.background";
-import { XPCOM, XUL } from "bootstrap/api/interfaces";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Cr: XPCOM.nsXPCComponents_Results;
@@ -88,7 +88,7 @@ const HTTPS_EVERYWHERE_REWRITE_TOPIC = "https-everywhere-uri-rewrite";
  *
  * @type {number}
  */
-let lastShouldLoadCheckTimeout = 200;
+const lastShouldLoadCheckTimeout = 200;
 
 // Calls to shouldLoad appear to be repeated, so successive repeated calls and
 // their result (accept or reject) are tracked to avoid duplicate processing
@@ -97,19 +97,19 @@ let lastShouldLoadCheckTimeout = 200;
  * Object that caches the last shouldLoad
  * @type {Object}
  */
-let lastShouldLoadCheck: {
+const lastShouldLoadCheck: {
   "origin": string | undefined | null,
   "destination": string | null,
   "time": number,
   "result": number | null,
 } = {
-  "origin": null,
-  "destination": null,
-  "time": 0,
-  "result": null,
+  destination: null,
+  origin: null,
+  result: null,
+  time: 0,
 };
 
-let historyRequests: any = {};
+const historyRequests: any = {};
 
 // ---------------------------------------------------------------------------
 // private functions
@@ -134,26 +134,26 @@ function reject(reason: string, request: NormalRequest) {
 
   cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
   Requests.notifyNewRequest({
+    destUri: request.destURI,
     isAllowed: false,
     isInsert: false,
-    requestResult: request.requestResult,
     originUri: request.originURI!,
-    destUri: request.destURI,
+    requestResult: request.requestResult,
   });
 
   if (Ci.nsIContentPolicy.TYPE_DOCUMENT === request.aContentType) {
     // This was a blocked top-level document request. This may be due to
     // a blocked attempt by javascript to set the document location.
 
-    let browser = request.getBrowser();
-    let window = request.getChromeWindow();
+    const browser = request.getBrowser();
+    const window = request.getChromeWindow();
 
     if (!browser || !window || typeof window.rpcontinued === "undefined") {
       log.warn("The user could not be notified " +
           "about the blocked top-level document request!");
     } else {
       window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
-          browser, request.originURI, request.destURIWithRef
+          browser, request.originURI, request.destURIWithRef,
       );
     }
   }
@@ -176,11 +176,11 @@ function accept(
 
   cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
   Requests.notifyNewRequest({
+    destUri: request.destURI,
     isAllowed: true,
     isInsert: false,
-    requestResult: request.requestResult,
     originUri: request.originURI!,
-    destUri: request.destURI,
+    requestResult: request.requestResult,
     unforbidable,
   });
 
@@ -216,14 +216,14 @@ function isDuplicateRequest(request: Request): boolean {
         lastShouldLoadCheckTimeout) {
       logRequests.log(
           `Using cached shouldLoad() result of ${lastShouldLoadCheck.result} ` +
-          `for request to <${request.destURI}> from <${request.originURI}>.`
+          `for request to <${request.destURI}> from <${request.originURI}>.`,
       );
       return true;
     } else {
       logRequests.log(
           `shouldLoad() cache expired for result of ` +
           `${lastShouldLoadCheck.result} for request to ` +
-          `<${request.destURI}> from <${request.originURI}>.`
+          `<${request.destURI}> from <${request.originURI}>.`,
       );
     }
   }
@@ -285,6 +285,7 @@ export function process(request: NormalRequest): number {
       //
       // ### Links:
       // * nsIPrincipal:
+              // tslint:disable-next-line:max-line-length
       //   -> https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrincipal
       //
       // * discussion about RequestPolicy with regard to detecting that
@@ -295,7 +296,7 @@ export function process(request: NormalRequest): number {
       if (request.aRequestPrincipal) {
         logRequests.log(
             `Allowing request that appears to be a URL entered in the ` +
-            `location bar or some other good explanation: ${destURI}`
+            `location bar or some other good explanation: ${destURI}`,
         );
         Requests._removeSavedRequestsByOriginURI(destURI);
         return CP_OK;
@@ -303,10 +304,10 @@ export function process(request: NormalRequest): number {
     }
 
     if (request.aRequestOrigin!.scheme === "view-source") {
-      let newOriginURI = originURI.split(":").slice(1).join(":");
+      const newOriginURI = originURI.split(":").slice(1).join(":");
       logRequests.log(
           `Considering view-source origin <${originURI}> ` +
-          `to be origin <${newOriginURI}>`
+          `to be origin <${newOriginURI}>`,
       );
       originURI = newOriginURI;
       request.setOriginURI(originURI);
@@ -318,13 +319,13 @@ export function process(request: NormalRequest): number {
         // "View Selection Source" has been clicked
         logRequests.log(
             "Allowing \"data:text/html\" view-source destination" +
-            " (Selection Source)"
+            " (Selection Source)",
         );
         return CP_OK;
       } else {
         logRequests.log(
             `Considering view-source destination <${destURI}> ` +
-            `to be destination <${newDestURI}>`
+            `to be destination <${newDestURI}>`,
         );
         destURI = newDestURI;
         request.setDestURI(destURI);
@@ -368,7 +369,7 @@ export function process(request: NormalRequest): number {
     if (originURI === destURI) {
       logRequests.log(
           `Allowing (but not recording) request ` +
-          `where origin is the same as the destination: ${originURI}`
+          `where origin is the same as the destination: ${originURI}`,
       );
       return CP_OK;
     }
@@ -441,7 +442,7 @@ export function process(request: NormalRequest): number {
       return accept("User-allowed redirect", request, true);
     }
 
-    let originHost = uriService.getHostByUriObj(request.aRequestOrigin!);
+    const originHost = uriService.getHostByUriObj(request.aRequestOrigin!);
 
     if (request.aRequestOrigin!.scheme === "chrome") {
       if (originHost === "browser") {
@@ -452,7 +453,7 @@ export function process(request: NormalRequest): number {
         return accept(
             "User action (e.g. address entered in address bar) " +
             "or other good explanation (e.g. new window/tab opened)",
-            request
+            request,
         );
       } else {
         // TODO: It seems sketchy to allow all requests from chrome. If I
@@ -467,7 +468,7 @@ export function process(request: NormalRequest): number {
         return accept(
             "User action (e.g. address entered in address bar) " +
             "or other good explanation (e.g. new window/tab opened)",
-            request
+            request,
         );
       }
     }
@@ -509,12 +510,12 @@ export function process(request: NormalRequest): number {
           RequestReason.IdenticalIdentifier);
       return accept(
           `Allowing request where origin protocol, host, and port are the` +
-          ` same as the destination: ${originIdent}`, request
+          ` same as the destination: ${originIdent}`, request,
       );
     }
 
     request.requestResult = rp.policy.checkRequestAgainstUserRules(
-        request.aRequestOrigin!, request.aContentLocation
+        request.aRequestOrigin!, request.aContentLocation,
     );
     // for (let matchedDenyRule of request.requestResult.matchedDenyRules) {
     //   log.log("Matched deny rules");
@@ -535,7 +536,7 @@ export function process(request: NormalRequest): number {
     // question.
     if (request.requestResult.allowRulesExist() &&
         request.requestResult.denyRulesExist()) {
-      let {conflictCanBeResolved, shouldAllow,
+      const {conflictCanBeResolved, shouldAllow,
       } = request.requestResult.resolveConflict();
       if (conflictCanBeResolved) {
         request.requestResult.resultReason = RequestReason.UserPolicy;
@@ -582,7 +583,7 @@ export function process(request: NormalRequest): number {
     // }
     if (request.requestResult.allowRulesExist() &&
         request.requestResult.denyRulesExist()) {
-      let {conflictCanBeResolved, shouldAllow,
+      const {conflictCanBeResolved, shouldAllow,
       } = request.requestResult.resolveConflict();
       if (conflictCanBeResolved) {
         request.requestResult.resultReason =
@@ -600,7 +601,7 @@ export function process(request: NormalRequest): number {
         request.requestResult.isAllowed = true;
         return accept(
             "Subscription rules indicate both allow and block. " +
-            "Using default allow policy", request
+            "Using default allow policy", request,
         );
       } else {
         request.requestResult.isAllowed = false;
@@ -621,22 +622,22 @@ export function process(request: NormalRequest): number {
       return accept("Allowed by subscription policy", request);
     }
 
-    for (let rule of CompatibilityRules) {
-      let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
+    for (const rule of CompatibilityRules) {
+      const allowOrigin = rule.origin ? originURI.startsWith(rule.origin) :
         true;
-      let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
+      const allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
       if (allowOrigin && allowDest) {
         request.requestResult = new RequestResult(true,
             RequestReason.Compatibility);
         return accept(
             `Extension/application compatibility rule matched [${rule.info}]`,
-            request, true
+            request, true,
         );
       }
     }
 
     if (request.aContext) {
-      let info = CompatibilityRules.checkBaseUriWhitelist(
+      const info = CompatibilityRules.checkBaseUriWhitelist(
           ((request.aContext as any) as Node).baseURI!,
       );
       if (info.isWhitelisted) {
@@ -644,7 +645,7 @@ export function process(request: NormalRequest): number {
             RequestReason.Compatibility);
         return accept(
             `Extension/application compatibility rule matched ` +
-            `[${info.addonNames}]`, request, true
+            `[${info.addonNames}]`, request, true,
         );
       }
     }
@@ -655,11 +656,12 @@ export function process(request: NormalRequest): number {
     // Check aExtra against CP_MAPPEDDESTINATION to stop further recursion.
     if (request.aExtra !== CP_MAPPEDDESTINATION &&
         MappedDestinations[destURI]) {
-      for (let mappedDest in MappedDestinations[destURI]) {
+      // tslint:disable-next-line:forin
+      for (const mappedDest in MappedDestinations[destURI]) {
         const mappedDestUriObj =
             MappedDestinations[destURI][mappedDest];
         logRequests.log(`Checking mapped destination: ${mappedDest}`);
-        let mappedResult = process(new NormalRequest(
+        const mappedResult = process(new NormalRequest(
             request.aContentType, mappedDestUriObj, request.aRequestOrigin,
             request.aContext, request.aMimeTypeGuess, CP_MAPPEDDESTINATION,
             undefined,
@@ -702,7 +704,7 @@ export function process(request: NormalRequest): number {
  * Currently this just looks for prefetch requests that are getting through
  * which we currently can't stop.
  */
-let examineHttpRequest = function(aSubject: XPCOM.nsISupports) {
+const examineHttpRequest = (aSubject: XPCOM.nsISupports) => {
   const httpChannel =
       aSubject.QueryInterface<XPCOM.nsIHttpChannel>(Ci.nsIHttpChannel);
   const result = getRequestHeaderFromHttpChannel(httpChannel, "X-moz");
@@ -711,7 +713,7 @@ let examineHttpRequest = function(aSubject: XPCOM.nsISupports) {
     // Seems to be too late to block it at this point. Calling the
     // cancel(status) method didn't stop it.
     log.warn(
-        `Discovered prefetch request being sent to: ${httpChannel.name}`
+        `Discovered prefetch request being sent to: ${httpChannel.name}`,
     );
   }
 };
@@ -721,22 +723,25 @@ MainEnvironment.obMan.observe(["http-on-modify-request"],
 
 export function registerHistoryRequest(destinationUrl: string) {
   destinationUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(destinationUrl)
+      uriService.stripFragment(destinationUrl),
   );
   historyRequests[destinationUrl] = true;
   log.info(`History item requested: <${destinationUrl}>.`);
 }
 
-export function registerFormSubmitted(originUrl: string, destinationUrl: string) {
+export function registerFormSubmitted(
+    originUrl: string,
+    destinationUrl: string,
+) {
   originUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(originUrl)
+      uriService.stripFragment(originUrl),
   );
   destinationUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(destinationUrl)
+      uriService.stripFragment(destinationUrl),
   );
 
   log.info(
-      `Form submitted from <${originUrl}> to <${destinationUrl}>.`
+      `Form submitted from <${originUrl}> to <${destinationUrl}>.`,
   );
 
   // Drop the query string from the destination url because form GET requests
@@ -767,14 +772,14 @@ export function registerLinkClicked(
     destinationUrl: string,
 ) {
   originUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(originUrl)
+      uriService.stripFragment(originUrl),
   );
   destinationUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(destinationUrl)
+      uriService.stripFragment(destinationUrl),
   );
 
   log.info(
-      `Link clicked from <${originUrl}> to <${destinationUrl}>.`
+      `Link clicked from <${originUrl}> to <${destinationUrl}>.`,
   );
 
   if (ClickedLinks[originUrl] === undefined) {
@@ -808,10 +813,10 @@ export function registerAllowedRedirect(
     destinationUrl: string,
 ) {
   originUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(originUrl)
+      uriService.stripFragment(originUrl),
   );
   destinationUrl = uriService.ensureUriHasPath(
-      uriService.stripFragment(destinationUrl)
+      uriService.stripFragment(destinationUrl),
   );
 
   log.info(`User-allowed redirect from <${originUrl}> to <${destinationUrl}>.`);
@@ -830,9 +835,9 @@ export function registerAllowedRedirect(
 
 MainEnvironment.obMan.observe(
     [HTTPS_EVERYWHERE_REWRITE_TOPIC],
-    function(subject: XPCOM.nsISupports, topic: string, data: string) {
+    (subject: XPCOM.nsISupports, topic: string, data: string) => {
       handleHttpsEverywhereUriRewrite(subject as any, data);
-    }
+    },
 );
 
 function mapDestinations(
@@ -842,7 +847,7 @@ function mapDestinations(
   origDestUri = uriService.stripFragment(origDestUri);
   newDestUri = uriService.stripFragment(newDestUri);
   log.info(
-      `Mapping destination <${origDestUri}> to <${newDestUri}>.`
+      `Mapping destination <${origDestUri}> to <${newDestUri}>.`,
   );
   if (!MappedDestinations[newDestUri]) {
     MappedDestinations[newDestUri] = {};
@@ -880,10 +885,10 @@ function checkRedirect(request: Request) {
   const destURIObj = uriService.getUriObject(destURI);
 
   {
-    let result = rp.policy.checkRequestAgainstUserRules(originURIObj,
+    const result = rp.policy.checkRequestAgainstUserRules(originURIObj,
         destURIObj);
     if (result.denyRulesExist() && result.allowRulesExist()) {
-      let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
+      const {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
       result.isAllowed = conflictCanBeResolved ? shouldAllow :
         cachedSettings.alias.isDefaultAllow();
       return result;
@@ -899,11 +904,11 @@ function checkRedirect(request: Request) {
   }
 
   {
-    let result = rp.policy.checkRequestAgainstSubscriptionRules(
-        originURIObj, destURIObj
+    const result = rp.policy.checkRequestAgainstSubscriptionRules(
+        originURIObj, destURIObj,
     );
     if (result.denyRulesExist() && result.allowRulesExist()) {
-      let {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
+      const {conflictCanBeResolved, shouldAllow} = result.resolveConflict();
       result.isAllowed = conflictCanBeResolved ? shouldAllow :
         cachedSettings.alias.isDefaultAllow();
       return result;
@@ -925,16 +930,18 @@ function checkRedirect(request: Request) {
     return new RequestResult(true, RequestReason.RelativeUrl);
   }
 
-  for (let rule of CompatibilityRules) {
-    let allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
-    let allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
+  for (const rule of CompatibilityRules) {
+    const allowOrigin = rule.origin ? originURI.startsWith(rule.origin) : true;
+    const allowDest = rule.dest ? destURI.startsWith(rule.dest) : true;
     if (allowOrigin && allowDest) {
       return new RequestResult(true, RequestReason.Compatibility);
     }
   }
 
-  let result = request.checkByDefaultPolicy();
-  return result;
+  {
+    const result = request.checkByDefaultPolicy();
+    return result;
+  }
 }
 
 export function isAllowedRedirect(originURI: string, destURI: string) {
@@ -960,13 +967,13 @@ export function processUrlRedirection(request: RedirectRequest) {
   if (request.isInternal()) {
     logRequests.log(
         `Allowing a redirection that seems to be internal. ` +
-        `Origin: ${request.originURI}, Dest: ${request.destURI}`
+        `Origin: ${request.originURI}, Dest: ${request.destURI}`,
     );
     return CP_OK;
   }
 
-  let originURI = request.originURI!;
-  let destURI = request.destURI;
+  const originURI = request.originURI!;
+  const destURI = request.destURI;
 
   // Allow redirects of requests from privileged code.
   // FIXME: should the check instead be ' === false' in case the
@@ -974,7 +981,7 @@ export function processUrlRedirection(request: RedirectRequest) {
   if (!isContentRequest(request)) {
     // However, favicon requests that are redirected appear as non-content
     // requests. So, check if the original request was for a favicon.
-    let originPath = request.originUriObj.path;
+    const originPath = request.originUriObj.path;
     // We always have to check "/favicon.ico" because Firefox will use this
     // as a default path and that request won't pass through shouldLoad().
     if (originPath === "/favicon.ico" ||
@@ -985,13 +992,13 @@ export function processUrlRedirection(request: RedirectRequest) {
       log.info(
           `Redirection from <${originURI}> to <${destURI}> ` +
           `appears to be a redirected favicon request. ` +
-          `This will be treated as a content request.`
+          `This will be treated as a content request.`,
       );
     } else {
       logRequests.warn(
           `** ALLOWED ** redirection from <${originURI}> ` +
           `to <${destURI}>. ` +
-          `Original request is from privileged code.`
+          `Original request is from privileged code.`,
       );
       return CP_OK;
     }
@@ -1000,7 +1007,7 @@ export function processUrlRedirection(request: RedirectRequest) {
   // Ignore redirects to javascript. The browser will ignore them, as well.
   if (request.destUriObj.schemeIs("javascript")) {
     log.warn(
-        `Ignoring redirect to javascript URI <${destURI}>`
+        `Ignoring redirect to javascript URI <${destURI}>`,
     );
     return CP_OK;
   }
@@ -1010,14 +1017,14 @@ export function processUrlRedirection(request: RedirectRequest) {
     logRequests.warn(
         `** ALLOWED ** redirection from <${originURI}> ` +
         `to <${destURI}>. ` +
-        `Same hosts or allowed origin/destination.`
+        `Same hosts or allowed origin/destination.`,
     );
     Requests.notifyNewRequest({
+      destUri: destURI,
       isAllowed: true,
       isInsert: false,
-      requestResult: request.requestResult,
       originUri: originURI,
-      destUri: destURI,
+      requestResult: request.requestResult,
     });
     AllowedRedirectsReverse[destURI] = originURI;
 
@@ -1026,15 +1033,15 @@ export function processUrlRedirection(request: RedirectRequest) {
     // destination of the target of the redirect. This is because future
     // requests (such as using back/forward) might show up as directly from
     // the initial origin to the ultimate redirected destination.
-    if (request.oldChannel._httpChannel.referrer) {
-      let realOrigin = request.oldChannel._httpChannel.referrer.spec;
+    if (request.oldChannel.httpChannel.referrer) {
+      const realOrigin = request.oldChannel.httpChannel.referrer.spec;
 
       if (ClickedLinks[realOrigin] &&
           ClickedLinks[realOrigin][originURI]) {
         logRequests.log(
             `${"This redirect was from a link click." +
             " Registering an additional click to <"}${destURI}> ` +
-            `from <${realOrigin}>`
+            `from <${realOrigin}>`,
         );
         registerLinkClicked(realOrigin, destURI);
       } else if (SubmittedForms[realOrigin] &&
@@ -1042,7 +1049,7 @@ export function processUrlRedirection(request: RedirectRequest) {
         logRequests.log(
             `${"This redirect was from a form submission." +
             " Registering an additional form submission to <"}${destURI
-            }> ` + `from <${realOrigin}>`
+            }> ` + `from <${realOrigin}>`,
         );
         registerFormSubmitted(realOrigin, destURI);
       }
@@ -1065,15 +1072,15 @@ export function processUrlRedirection(request: RedirectRequest) {
     // Example:
     //   "link click" -> "first redirect" -> "second redirect"
     {
-      let initialOrigin = getOriginOfInitialRedirect(request);
+      const initialOrigin = getOriginOfInitialRedirect(request);
 
       if (ClickedLinksReverse.hasOwnProperty(initialOrigin)) {
-        let linkClickDest = initialOrigin;
+        const linkClickDest = initialOrigin;
         let linkClickOrigin: string;
 
         // fixme: bad smell! the same link (linkClickDest) could have
         //        been clicked from different origins!
-        for (let i in ClickedLinksReverse[linkClickDest]) {
+        for (const i in ClickedLinksReverse[linkClickDest]) {
           if (ClickedLinksReverse[linkClickDest].
               hasOwnProperty(i)) {
             // We hope there's only one possibility of a source page
@@ -1091,10 +1098,10 @@ export function processUrlRedirection(request: RedirectRequest) {
         // We set the "isInsert" parameter so we don't clobber the existing
         // info about allowed and deleted requests.
         Requests.notifyNewRequest({
+          destUri: linkClickDest,
           isAllowed: true,
           isInsert: true,
           originUri: linkClickOrigin!,
-          destUri: linkClickDest,
           requestResult: request.requestResult,
         });
       }
@@ -1105,16 +1112,16 @@ export function processUrlRedirection(request: RedirectRequest) {
     }
 
     Requests.notifyNewRequest({
+      destUri: request.destURI,
       isAllowed: false,
       isInsert: false,
-      requestResult: request.requestResult,
       originUri: request.originURI!,
-      destUri: request.destURI,
+      requestResult: request.requestResult,
     });
 
     logRequests.warn(
         `** BLOCKED ** redirection from <${originURI}> ` +
-        `to <${destURI}>.`
+        `to <${destURI}>.`,
     );
     return CP_REJECT;
   } catch (e) {
@@ -1129,14 +1136,14 @@ export function processUrlRedirection(request: RedirectRequest) {
 }
 
 function showRedirectNotification(request: RedirectRequest) {
-  let browser = request.browser;
+  const browser = request.browser;
   if (browser === null) {
     return false;
   }
 
   const window = browser.ownerGlobal;
 
-  Utils.tryMultipleTimes(function() {
+  Utils.tryMultipleTimes(() => {
     const showNotification = Utils.getObjectPath(window, "rpcontinued",
         "overlay", "_showRedirectNotification");
     if (!showNotification) {
@@ -1154,21 +1161,22 @@ function showRedirectNotification(request: RedirectRequest) {
 function maybeShowRedirectNotification(aRequest: RedirectRequest) {
   // Check if the request corresponds to a top-level document load.
   {
-    let {loadFlags} = aRequest;
-    let topLevelDocFlag = Ci.nsIChannel.LOAD_INITIAL_DOCUMENT_URI;
+    const {loadFlags} = aRequest;
+    const topLevelDocFlag = Ci.nsIChannel.LOAD_INITIAL_DOCUMENT_URI;
 
+    // tslint:disable-next-line:no-bitwise
     if ((loadFlags & topLevelDocFlag) !== topLevelDocFlag) {
       return;
     }
   }
 
-  let rv = showRedirectNotification(aRequest);
+  const rv = showRedirectNotification(aRequest);
   if (true !== rv) {
     log.warn(
         `${"A redirection of a top-level document has been observed, " +
         "but it was not possible to notify the user! The redirection " +
         "was from page <"}${aRequest.originURI}> ` +
-        `to <${aRequest.destURI}>.`
+        `to <${aRequest.destURI}>.`,
     );
   }
 }
@@ -1203,7 +1211,7 @@ function getOriginOfInitialRedirect(aRequest: RedirectRequest): string {
  * content window, then it's from unprivileged code.
  */
 function isContentRequest(request: RedirectRequest): boolean {
-  let loadContext = request.oldChannel.loadContext;
+  const loadContext = request.oldChannel.loadContext;
 
   if (loadContext === null) {
     return false;

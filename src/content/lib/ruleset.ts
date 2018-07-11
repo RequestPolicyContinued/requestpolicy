@@ -23,8 +23,8 @@
 
 import { rp } from "app/app.background";
 import { log } from "app/log";
-import {C} from "data/constants";
 import { XPCOM } from "bootstrap/api/interfaces";
+import {C} from "data/constants";
 
 // =============================================================================
 // utilities

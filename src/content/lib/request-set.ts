@@ -44,7 +44,8 @@ function getUriIdentifier(uri: string, uriService: App.services.IUriService) {
 // =============================================================================
 
 export class RequestSet {
-  private origins: any = {};
+  // FIXME: should be private
+  public origins: any = {};
 
   public print(
       name: string,

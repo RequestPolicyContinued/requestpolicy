@@ -21,14 +21,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager, $id} from "./common";
+import { BackgroundPage } from "main";
+import {$id, elManager, WinEnv} from "./common";
 
-(function() {
-  var {
+(() => {
+  const {
     ManagerForPrefObservers,
     rp,
-  } = browser.extension.getBackgroundPage();
-  const {cachedSettings} = rp.storage;
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
+  const cachedSettings = rp.storage.cachedSettings!;
 
   // ===========================================================================
 
@@ -40,7 +41,7 @@ import {WinEnv, elManager, $id} from "./common";
     // TODO: Create a class which acts as an API for preferences and which
     // ensures that the returned value is always a valid value for "string"
     // preferences.
-    var sorting = cachedSettings.get("menu.sorting");
+    const sorting = cachedSettings.get("menu.sorting");
 
     if (sorting === $id("sortByNumRequests").value) {
       $id("sortByNumRequests").checked = true;
@@ -60,21 +61,21 @@ import {WinEnv, elManager, $id} from "./common";
         cachedSettings.get("menu.info.showNumRequests");
   }
 
-  window.onload = function() {
+  window.onload = () => {
     updateDisplay();
 
     // prefetching
     elManager.addListener(
         $id("pref-browserSettings.disableNetworkPrediction"),
         "change",
-        (event) => {
+        (event: any) => {
           cachedSettings.set({
             "browserSettings.disableNetworkPrediction": event.target.checked,
           });
-        }
+        },
     );
 
-    var sortingListener = function(event) {
+    const sortingListener = (event: any) => {
       cachedSettings.set({"menu.sorting": event.target.value});
     };
     elManager.addListener($id("sortByNumRequests"), "change", sortingListener);
@@ -83,11 +84,11 @@ import {WinEnv, elManager, $id} from "./common";
 
     elManager.addListener(
         $id("menu.info.showNumRequests"), "change",
-        function(event) {
+        (event: any) => {
           cachedSettings.set({
             "menu.info.showNumRequests": event.target.checked,
           });
-        }
+        },
     );
 
     // call updateDisplay() every time a preference gets changed

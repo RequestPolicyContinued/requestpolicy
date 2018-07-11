@@ -20,23 +20,30 @@
  * ***** END LICENSE BLOCK *****
  */
 
-(function() {
-  var {Metadata, rp} = browser.extension.getBackgroundPage();
+import { RequestSet } from "lib/request-set";
+import { BackgroundPage } from "main";
+
+(() => {
+  const {
+    Metadata,
+    rp,
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
   const {requestMemory} = rp.webRequest;
 
   // ===========================================================================
 
-  function getNRequestResultObjects(aRequestSet) {
-    var n = 0;
-    var origins = aRequestSet.origins;
-    for (var originURI in origins) {
-      var originUriRequests = origins[originURI];
-      for (var destBase in originUriRequests) {
-        var destBaseRequests = originUriRequests[destBase];
-        for (var destIdent in destBaseRequests) {
-          var destIdentRequests = destBaseRequests[destIdent];
-          for (var destURI in destIdentRequests) {
-            var destUriRequests = destIdentRequests[destURI];
+  function getNRequestResultObjects(aRequestSet: RequestSet) {
+    let n = 0;
+    const origins = aRequestSet.origins;
+    // tslint:disable:forin
+    for (const originURI in origins) {
+      const originUriRequests = origins[originURI];
+      for (const destBase in originUriRequests) {
+        const destBaseRequests = originUriRequests[destBase];
+        for (const destIdent in destBaseRequests) {
+          const destIdentRequests = destBaseRequests[destIdent];
+          for (const destURI in destIdentRequests) {
+            const destUriRequests = destIdentRequests[destURI];
             n += Object.getOwnPropertyNames(destUriRequests).length;
           }
         }
@@ -46,31 +53,29 @@
   }
 
   function getMemoryInfo() {
-    var nRRAllowed = getNRequestResultObjects(
-        requestMemory.requestSets.allowedRequests
+    const nRRAllowed = getNRequestResultObjects(
+        requestMemory.requestSets.allowedRequests,
     );
-    var nRRDenied = getNRequestResultObjects(
-        requestMemory.requestSets.rejectedRequests
+    const nRRDenied = getNRequestResultObjects(
+        requestMemory.requestSets.rejectedRequests,
     );
     return {
-      nRRAllowed: nRRAllowed,
-      nRRDenied: nRRDenied,
-      nRRTotal: nRRAllowed + nRRDenied,
       nClickedLinks: Object.
           getOwnPropertyNames(Metadata.ClickedLinks).length,
       nFaviconRequests: Object.
           getOwnPropertyNames(Metadata.FaviconRequests).length,
+      nRRAllowed,
+      nRRDenied,
+      nRRTotal: nRRAllowed + nRRDenied,
     };
   }
 
   /**
    * Delete all own properties of an object.
-   *
-   * @param {Object} obj
    */
-  function deleteOwnProperties(obj) {
+  function deleteOwnProperties(obj: any) {
     /* eslint-disable no-param-reassign */
-    for (var key in obj) {
+    for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         delete obj[key];
       }
@@ -78,7 +83,7 @@
   }
 
   function freeMemory() {
-    var memoryInfo = getMemoryInfo();
+    const memoryInfo = getMemoryInfo();
 
     deleteOwnProperties(requestMemory.requestSets.allowedRequests.origins);
     deleteOwnProperties(requestMemory.requestSets.rejectedRequests.origins);
@@ -89,13 +94,13 @@
     return memoryInfo;
   }
 
-  window.onload = function() {
-    var info = $("#memory-information");
+  window.onload = () => {
+    const info = $("#memory-information");
     info.html("Some numbers:");
-    var list = $("<ul>");
+    const list = $("<ul>");
     info.append(list);
 
-    var {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests,
+    const {nRRAllowed, nRRDenied, nRRTotal, nClickedLinks, nFaviconRequests,
     } = getMemoryInfo();
     list.append(`<li>RequestResult objects: ${nRRTotal
     } (${nRRAllowed} allowed requests, ${
@@ -104,14 +109,14 @@
     list.append(`<li>Favicon requests: ${nFaviconRequests}</li>`);
   };
 
-  window.freeMemory = function() {
-    var results = $("#free-memory-results");
+  (window as any).freeMemory = () => {
+    const results = $("#free-memory-results");
     results.html("<br />Starting to free memory... ");
 
-    var {nRRTotal, nClickedLinks, nFaviconRequests} = freeMemory();
+    const {nRRTotal, nClickedLinks, nFaviconRequests} = freeMemory();
 
     results.append(" DONE.<br />Successfully removed...");
-    var list = $("<ul>");
+    const list = $("<ul>");
     results.append(list);
     list.append(`<li>${nRRTotal} RequestResult objects</li>`);
     list.append(`<li>${nClickedLinks} clicked links</li>`);

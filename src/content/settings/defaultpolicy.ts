@@ -21,19 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {WinEnv, elManager, $id} from "./common";
+import { BackgroundPage } from "main";
+import {$id, elManager, WinEnv} from "./common";
 
-(function() {
-  var {
+(() => {
+  const {
     ManagerForPrefObservers,
     rp,
-  } = browser.extension.getBackgroundPage();
-  const {cachedSettings} = rp.storage;
+  } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
+  const cachedSettings = rp.storage.cachedSettings!;
 
   // ===========================================================================
 
   function updateDisplay() {
-    var defaultallow = cachedSettings.get("defaultPolicy.allow");
+    const defaultallow = cachedSettings.get("defaultPolicy.allow");
     if (defaultallow) {
       $id("defaultallow").checked = true;
       $id("defaultdenysetting").hidden = true;
@@ -42,10 +43,10 @@ import {WinEnv, elManager, $id} from "./common";
       $id("defaultdenysetting").hidden = false;
     }
 
-    var allowsamedomain = cachedSettings.get("defaultPolicy.allowSameDomain");
+    const allowsamedomain = cachedSettings.get("defaultPolicy.allowSameDomain");
     $id("allowsamedomain").checked = allowsamedomain;
 
-    let allowTopLevel = cachedSettings.get("defaultPolicy.allowTopLevel");
+    const allowTopLevel = cachedSettings.get("defaultPolicy.allowTopLevel");
     $id("allowtoplevel").checked = allowTopLevel;
   }
 
@@ -53,47 +54,47 @@ import {WinEnv, elManager, $id} from "./common";
     $id("subscriptionschanged").style.display = "block";
   }
 
-  window.onload = function() {
+  window.onload = () => {
     updateDisplay();
 
     elManager.addListener(
         $id("defaultallow"), "change",
-        function(event) {
-          var allow = event.target.checked;
+        (event: any) => {
+          const allow = event.target.checked;
           cachedSettings.set({"defaultPolicy.allow": allow});
           updateDisplay();
           showManageSubscriptionsLink();
-        }
+        },
     );
 
     elManager.addListener(
         $id("defaultdeny"), "change",
-        function(event) {
-          var deny = event.target.checked;
+        (event: any) => {
+          const deny = event.target.checked;
           cachedSettings.set({"defaultPolicy.allow": !deny});
           updateDisplay();
           showManageSubscriptionsLink();
-        }
+        },
     );
 
     elManager.addListener(
         $id("allowsamedomain"), "change",
-        function(event) {
-          var allowSameDomain = event.target.checked;
+        (event: any) => {
+          const allowSameDomain = event.target.checked;
           cachedSettings.set({
             "defaultPolicy.allowSameDomain": allowSameDomain,
           });
-        }
+        },
     );
 
     elManager.addListener(
         $id("allowtoplevel"), "change",
-        function(event) {
-          let allowTopLevel = event.target.checked;
+        (event: any) => {
+          const allowTopLevel = event.target.checked;
           cachedSettings.set({
             "defaultPolicy.allowTopLevel": allowTopLevel,
           });
-        }
+        },
     );
 
     // call updateDisplay() every time a preference gets changed

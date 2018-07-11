@@ -23,10 +23,8 @@
 
 import { UriService } from "app/services/uri-service";
 import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
+import {RequestResult} from "lib/classes/request-result";
 import {HttpChannelWrapper} from "lib/http-channel-wrapper";
-import {
-  RequestResult,
-} from "lib/request-result";
 
 declare const Services: JSMs.Services;
 

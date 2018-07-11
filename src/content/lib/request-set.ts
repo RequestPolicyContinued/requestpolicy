@@ -23,7 +23,7 @@
 
 import { App } from "app/interfaces";
 import {log} from "app/log";
-import {RequestResult} from "lib/request-result";
+import {RequestResult} from "lib/classes/request-result";
 
 // =============================================================================
 // utilities

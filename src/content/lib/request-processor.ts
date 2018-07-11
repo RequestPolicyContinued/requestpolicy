@@ -21,12 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {MainEnvironment} from "lib/environment";
-import {NormalRequest, RedirectRequest, Request} from "lib/request";
 import {
   RequestReason,
   RequestResult,
-} from "lib/request-result";
+} from "lib/classes/request-result";
+import {MainEnvironment} from "lib/environment";
+import {NormalRequest, RedirectRequest, Request} from "lib/request";
 import * as Utils from "lib/utils/misc-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
 

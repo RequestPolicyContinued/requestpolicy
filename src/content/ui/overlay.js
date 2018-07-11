@@ -41,7 +41,6 @@ import * as Utils from "lib/utils/misc-utils";
 import * as DOMUtils from "lib/utils/dom-utils";
 import {C} from "data/constants";
 import {CompatibilityRules} from "models/compatibility-rules";
-import {Requests} from "models/requests";
 import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
@@ -51,6 +50,7 @@ import {log} from "app/log";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;
+const {requestMemory} = rp.webRequest;
 
 const {LOG_FLAG_STATE} = C;
 
@@ -171,7 +171,7 @@ export function loadOverlayIntoWindow(window) {
         // Register this window with the requestpolicy service so that we can be
         // notified of blocked requests. When blocked requests happen, this
         // object's observerBlockedRequests() method will be called.
-        Requests.onRequest.addListener(self.observeRequest);
+        requestMemory.onRequest.addListener(self.observeRequest);
 
         setContextMenuEntryEnabled(cachedSettings.get("contextMenu"));
 
@@ -205,7 +205,7 @@ export function loadOverlayIntoWindow(window) {
   OverlayEnvironment.addShutdownFunction(
       EnvLevel.INTERFACE,
       function() {
-        Requests.onRequest.removeListener(self.observeRequest);
+        requestMemory.onRequest.removeListener(self.observeRequest);
         unwrapAddTab();
         self._removeHistoryObserver();
         self._removeLocationObserver();
@@ -635,7 +635,7 @@ export function loadOverlayIntoWindow(window) {
 
       // TODO: this needs to be rewritten. checking if there is blocked
       // content could be done much more efficiently.
-      let documentContainsBlockedContent = Requests.
+      let documentContainsBlockedContent = requestMemory.
           getAllRequestsInBrowser(browser).containsBlockedRequests();
       self._setContentBlockedState(documentContainsBlockedContent);
 

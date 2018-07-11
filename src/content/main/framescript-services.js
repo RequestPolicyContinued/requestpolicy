@@ -21,10 +21,10 @@
  */
 
 import {rp} from "app/app.background";
-import {Requests} from "models/requests";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;
+const requestMemory = rp.webRequest.requestMemory;
 
 const initFunctions = [];
 
@@ -65,7 +65,7 @@ export const FramescriptServices = {
       const indicateBlacklisted =
           cachedSettings.get("indicateBlacklistedObjects");
 
-      const rejectedRequests = Requests._requestSets.rejectedRequests.
+      const rejectedRequests = requestMemory.requestSets.rejectedRequests.
           getOriginUri(originURI);
       for (let destBase in rejectedRequests) {
         for (let destIdent in rejectedRequests[destBase]) {

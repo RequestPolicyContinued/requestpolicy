@@ -71,6 +71,7 @@ import { InitialSetup } from "./ui/initial-setup";
 import { Ui } from "./ui/ui.module";
 import { RPChannelEventSink } from "./web-request/channel-event-sink";
 import { RPContentPolicy } from "./web-request/content-policy";
+import { RequestMemory } from "./web-request/request-memory";
 import { WebRequest } from "./web-request/web-request.module";
 
 //
@@ -217,6 +218,7 @@ const initialSetup = new InitialSetup(
 );
 const ui = new Ui(log, initialSetup);
 
+const requestMemory = new RequestMemory(log, uriService);
 const redirectRequestFactory = (
     aOldChannel: XPCOM.nsIChannel,
     aNewChannel: XPCOM.nsIChannel,
@@ -242,7 +244,12 @@ const rpContentPolicy = new RPContentPolicy(
     log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
     RequestProcessor, normalRequestFactory,
 );
-const rpWebRequest = new WebRequest(log, rpChannelEventSink, rpContentPolicy);
+const rpWebRequest = new WebRequest(
+    log,
+    requestMemory,
+    rpChannelEventSink,
+    rpContentPolicy,
+);
 
 export const rp = new AppBackground(
     log,

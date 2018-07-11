@@ -39,7 +39,6 @@ import {
   SubmittedFormsReverse,
   UserAllowedRedirects,
 } from "models/metadata";
-import {Requests} from "models/requests";
 
 import {rp} from "app/app.background";
 import {log} from "app/log";
@@ -55,6 +54,7 @@ declare const Cr: XPCOM.nsXPCComponents_Results;
 const uriService = rp.services.uri;
 const requestService = rp.services.request;
 const cachedSettings = rp.storage.cachedSettings!;
+const {requestMemory} = rp.webRequest;
 
 const logRequests = log.extend({
   enabledCondition: {type: "C", C: "LOG_REQUESTS"},
@@ -134,7 +134,7 @@ function reject(reason: string, request: NormalRequest) {
   }
 
   cacheShouldLoadResult(CP_REJECT, request.originURI, request.destURI);
-  Requests.notifyNewRequest({
+  requestMemory.notifyNewRequest({
     destUri: request.destURI,
     isAllowed: false,
     isInsert: false,
@@ -176,7 +176,7 @@ function accept(
       `${request.detailsToString()}`);
 
   cacheShouldLoadResult(CP_OK, request.originURI, request.destURI);
-  Requests.notifyNewRequest({
+  requestMemory.notifyNewRequest({
     destUri: request.destURI,
     isAllowed: true,
     isInsert: false,
@@ -299,7 +299,7 @@ export function process(request: NormalRequest): number {
             `Allowing request that appears to be a URL entered in the ` +
             `location bar or some other good explanation: ${destURI}`,
         );
-        Requests._removeSavedRequestsByOriginURI(destURI);
+        requestMemory.removeSavedRequestsByOriginURI(destURI);
         return CP_OK;
       }
     }
@@ -1020,7 +1020,7 @@ export function processUrlRedirection(request: RedirectRequest) {
         `to <${destURI}>. ` +
         `Same hosts or allowed origin/destination.`,
     );
-    Requests.notifyNewRequest({
+    requestMemory.notifyNewRequest({
       destUri: destURI,
       isAllowed: true,
       isInsert: false,
@@ -1098,7 +1098,7 @@ export function processUrlRedirection(request: RedirectRequest) {
         // else.
         // We set the "isInsert" parameter so we don't clobber the existing
         // info about allowed and deleted requests.
-        Requests.notifyNewRequest({
+        requestMemory.notifyNewRequest({
           destUri: linkClickDest,
           isAllowed: true,
           isInsert: true,
@@ -1112,7 +1112,7 @@ export function processUrlRedirection(request: RedirectRequest) {
       // }
     }
 
-    Requests.notifyNewRequest({
+    requestMemory.notifyNewRequest({
       destUri: request.destURI,
       isAllowed: false,
       isInsert: false,

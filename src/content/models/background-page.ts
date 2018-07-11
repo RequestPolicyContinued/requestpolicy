@@ -35,7 +35,6 @@ import {
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import * as Metadata from "models/metadata";
-import {Requests} from "models/requests";
 
 declare const LegacyApi: API.ILegacyApi;
 
@@ -47,7 +46,6 @@ export const BackgroundPage = {
   ManagerForPrefObservers,
   Metadata,
   RequestProcessor,
-  Requests,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,

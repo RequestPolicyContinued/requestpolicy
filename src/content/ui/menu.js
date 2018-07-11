@@ -29,12 +29,12 @@ import {
 import * as DOMUtils from "lib/utils/dom-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 import {C} from "data/constants";
-import {Requests} from "models/requests";
 import {rp} from "app/app.background";
 import {log} from "app/log";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;
+const {requestMemory} = rp.webRequest;
 
 export function loadMenuIntoWindow(window) {
   let {document, rpcontinued} = window;
@@ -236,7 +236,7 @@ export function loadMenuIntoWindow(window) {
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      self._allRequestsOnDocument = Requests.
+      self._allRequestsOnDocument = requestMemory.
           getAllRequestsInBrowser(gBrowser.selectedBrowser);
       self._allRequestsOnDocument.print("_allRequestsOnDocument");
 
@@ -804,7 +804,7 @@ export function loadMenuIntoWindow(window) {
   //  else there will be errors from within getDeniedRequests().“
 
   self._getBlockedDestinationsAsGUILocations = function() {
-    const reqSet = Requests.getDeniedRequests(
+    const reqSet = requestMemory.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument
     );
     const requests = reqSet.getAllMergedOrigins();
@@ -819,7 +819,7 @@ export function loadMenuIntoWindow(window) {
   };
 
   self._getAllowedDestinationsAsGUILocations = function() {
-    const reqSet = Requests.getAllowedRequests(
+    const reqSet = requestMemory.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument
     );
     const requests = reqSet.getAllMergedOrigins();
@@ -1204,7 +1204,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = Requests.getAllowedRequests(
+    let reqSet = requestMemory.getAllowedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument
     );
     let requests = reqSet.getAllMergedOrigins();
@@ -1282,7 +1282,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = Requests.getDeniedRequests(
+    let reqSet = requestMemory.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument
     );
     let requests = reqSet.getAllMergedOrigins();
@@ -1362,7 +1362,7 @@ export function loadMenuIntoWindow(window) {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = Requests.getDeniedRequests(
+    let reqSet = requestMemory.getDeniedRequests(
         self._currentlySelectedOrigin, self._allRequestsOnDocument
     );
     let requests = reqSet.getAllMergedOrigins();

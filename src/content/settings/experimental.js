@@ -21,7 +21,8 @@
  */
 
 (function() {
-  var {Metadata, Requests} = browser.extension.getBackgroundPage();
+  var {Metadata, rp} = browser.extension.getBackgroundPage();
+  const {requestMemory} = rp.webRequest;
 
   // ===========================================================================
 
@@ -46,10 +47,10 @@
 
   function getMemoryInfo() {
     var nRRAllowed = getNRequestResultObjects(
-        Requests._requestSets.allowedRequests
+        requestMemory.requestSets.allowedRequests
     );
     var nRRDenied = getNRequestResultObjects(
-        Requests._requestSets.rejectedRequests
+        requestMemory.requestSets.rejectedRequests
     );
     return {
       nRRAllowed: nRRAllowed,
@@ -79,8 +80,8 @@
   function freeMemory() {
     var memoryInfo = getMemoryInfo();
 
-    deleteOwnProperties(Requests._requestSets.allowedRequests.origins);
-    deleteOwnProperties(Requests._requestSets.rejectedRequests.origins);
+    deleteOwnProperties(requestMemory.requestSets.allowedRequests.origins);
+    deleteOwnProperties(requestMemory.requestSets.rejectedRequests.origins);
     deleteOwnProperties(Metadata.ClickedLinks);
     deleteOwnProperties(Metadata.ClickedLinksReverse);
     deleteOwnProperties(Metadata.FaviconRequests);

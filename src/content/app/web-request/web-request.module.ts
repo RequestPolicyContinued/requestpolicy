@@ -27,6 +27,7 @@ import { Module } from "lib/classes/module";
 export class WebRequest extends Module implements App.IWebRequest {
   protected get subModules() {
     return {
+      metadataMemory: this.metadataMemory,
       requestMemory: this.requestMemory,
       rpChannelEventSink: this.rpChannelEventSink,
       rpContentPolicy: this.rpContentPolicy,
@@ -35,10 +36,11 @@ export class WebRequest extends Module implements App.IWebRequest {
 
   constructor(
       log: Common.ILog,
+      public readonly metadataMemory: App.webRequest.IMetadataMemory,
       public readonly requestMemory: App.webRequest.IRequestMemory,
       public readonly rpChannelEventSink: App.webRequest.IRPChannelEventSink,
       public readonly rpContentPolicy: App.webRequest.IRPContentPolicy,
   ) {
-    super("app.browserSettings", log);
+    super("app.webRequest", log);
   }
 }

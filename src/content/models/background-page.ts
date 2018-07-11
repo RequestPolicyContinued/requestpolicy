@@ -34,7 +34,6 @@ import {
 } from "lib/subscription";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import * as Metadata from "models/metadata";
 
 declare const LegacyApi: API.ILegacyApi;
 
@@ -44,7 +43,6 @@ export const BackgroundPage = {
   LegacyApi,
   MainEnvironment,
   ManagerForPrefObservers,
-  Metadata,
   RequestProcessor,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,

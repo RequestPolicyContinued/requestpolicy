@@ -29,16 +29,6 @@ import {
 } from "lib/request-result";
 import * as Utils from "lib/utils/misc-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
-import {
-  AllowedRedirectsReverse,
-  ClickedLinks,
-  ClickedLinksReverse,
-  FaviconRequests,
-  MappedDestinations,
-  SubmittedForms,
-  SubmittedFormsReverse,
-  UserAllowedRedirects,
-} from "models/metadata";
 
 import {rp} from "app/app.background";
 import {log} from "app/log";
@@ -50,6 +40,17 @@ import {
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Cr: XPCOM.nsXPCComponents_Results;
+
+const {
+  AllowedRedirectsReverse,
+  ClickedLinks,
+  ClickedLinksReverse,
+  FaviconRequests,
+  MappedDestinations,
+  SubmittedForms,
+  SubmittedFormsReverse,
+  UserAllowedRedirects,
+} = rp.webRequest.metadataMemory;
 
 const uriService = rp.services.uri;
 const requestService = rp.services.request;

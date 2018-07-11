@@ -21,15 +21,19 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Module } from "lib/classes/module";
+
 const obj = () => ({});
 
-export const ClickedLinks: any = obj();
-export const ClickedLinksReverse: any = obj();
-export const SubmittedForms: any = obj();
-export const SubmittedFormsReverse: any = obj();
+export class MetadataMemory extends Module {
+  public ClickedLinks: any = obj();
+  public ClickedLinksReverse: any = obj();
+  public SubmittedForms: any = obj();
+  public SubmittedFormsReverse: any = obj();
 
-export const FaviconRequests: any = obj();
-export const MappedDestinations: any = obj();
+  public FaviconRequests: any = obj();
+  public MappedDestinations: any = obj();
 
-export const AllowedRedirectsReverse: any = obj();
-export const UserAllowedRedirects: any = obj();
+  public AllowedRedirectsReverse: any = obj();
+  public UserAllowedRedirects: any = obj();
+}

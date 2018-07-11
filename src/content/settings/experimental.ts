@@ -25,10 +25,9 @@ import { BackgroundPage } from "main";
 
 (() => {
   const {
-    Metadata,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
-  const {requestMemory} = rp.webRequest;
+  const {metadataMemory, requestMemory} = rp.webRequest;
 
   // ===========================================================================
 
@@ -61,9 +60,9 @@ import { BackgroundPage } from "main";
     );
     return {
       nClickedLinks: Object.
-          getOwnPropertyNames(Metadata.ClickedLinks).length,
+          getOwnPropertyNames(metadataMemory.ClickedLinks).length,
       nFaviconRequests: Object.
-          getOwnPropertyNames(Metadata.FaviconRequests).length,
+          getOwnPropertyNames(metadataMemory.FaviconRequests).length,
       nRRAllowed,
       nRRDenied,
       nRRTotal: nRRAllowed + nRRDenied,
@@ -87,9 +86,9 @@ import { BackgroundPage } from "main";
 
     deleteOwnProperties(requestMemory.requestSets.allowedRequests.origins);
     deleteOwnProperties(requestMemory.requestSets.rejectedRequests.origins);
-    deleteOwnProperties(Metadata.ClickedLinks);
-    deleteOwnProperties(Metadata.ClickedLinksReverse);
-    deleteOwnProperties(Metadata.FaviconRequests);
+    deleteOwnProperties(metadataMemory.ClickedLinks);
+    deleteOwnProperties(metadataMemory.ClickedLinksReverse);
+    deleteOwnProperties(metadataMemory.FaviconRequests);
 
     return memoryInfo;
   }

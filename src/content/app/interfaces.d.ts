@@ -45,6 +45,7 @@ import { WebRequest } from "./web-request/web-request.module";
 import { MetadataMemory } from "./web-request/metadata-memory";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
+import { RequestProcessor } from "lib/request-processor";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -78,6 +79,7 @@ export namespace App {
     export type IRequestMemory = RequestMemory;
     export type IRPChannelEventSink = RPChannelEventSink;
     export type IRPContentPolicy = RPContentPolicy;
+    export type IRequestProcessor = RequestProcessor;
   }
 
   export type IBrowserSettings = BrowserSettings;

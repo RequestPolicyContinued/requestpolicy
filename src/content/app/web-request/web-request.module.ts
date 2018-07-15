@@ -29,6 +29,7 @@ export class WebRequest extends Module implements App.IWebRequest {
     return {
       metadataMemory: this.metadataMemory,
       requestMemory: this.requestMemory,
+      requestProcessor: this.requestProcessor,
       rpChannelEventSink: this.rpChannelEventSink,
       rpContentPolicy: this.rpContentPolicy,
     };
@@ -38,6 +39,7 @@ export class WebRequest extends Module implements App.IWebRequest {
       log: Common.ILog,
       public readonly metadataMemory: App.webRequest.IMetadataMemory,
       public readonly requestMemory: App.webRequest.IRequestMemory,
+      public readonly requestProcessor: App.webRequest.IRequestProcessor,
       public readonly rpChannelEventSink: App.webRequest.IRPChannelEventSink,
       public readonly rpContentPolicy: App.webRequest.IRPContentPolicy,
   ) {

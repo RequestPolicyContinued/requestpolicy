@@ -27,7 +27,6 @@ import {C} from "data/constants";
 import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import * as RequestProcessor from "lib/request-processor";
 import {
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,
@@ -43,7 +42,6 @@ export const BackgroundPage = {
   LegacyApi,
   MainEnvironment,
   ManagerForPrefObservers,
-  RequestProcessor,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,

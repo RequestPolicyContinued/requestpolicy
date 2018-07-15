@@ -30,7 +30,6 @@ import {
   ManagerForMessageListeners,
 } from "lib/manager-for-message-listeners";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import * as RequestProcessor from "lib/request-processor";
 import * as WindowUtils from "lib/utils/window-utils";
 import {
   arrayIncludes,
@@ -50,7 +49,7 @@ import {log} from "app/log";
 
 const uriService = rp.services.uri;
 const {cachedSettings} = rp.storage;
-const {requestMemory} = rp.webRequest;
+const {requestMemory, requestProcessor} = rp.webRequest;
 
 const {LOG_FLAG_STATE} = C;
 
@@ -315,14 +314,14 @@ export function loadOverlayIntoWindow(window) {
   });
 
   mlManager.addListener("notifyLinkClicked", function(message) {
-    RequestProcessor.registerLinkClicked(
+    requestProcessor.registerLinkClicked(
         message.data.origin,
         message.data.dest
     );
   });
 
   mlManager.addListener("notifyFormSubmitted", function(message) {
-    RequestProcessor.registerFormSubmitted(
+    requestProcessor.registerFormSubmitted(
         message.data.origin,
         message.data.dest
     );
@@ -354,7 +353,7 @@ export function loadOverlayIntoWindow(window) {
       // just detect when they will be blocked and show a notification. If
       // the docShell has allowMetaRedirects disabled, it will be respected.
       if (!cachedSettings.alias.isBlockingDisabled() &&
-          !RequestProcessor.isAllowedRedirect(documentURI, destURI)) {
+          !requestProcessor.isAllowedRedirect(documentURI, destURI)) {
         // Ignore redirects to javascript. The browser will ignore them
         // as well.
         if (uriService.getUriObject(destURI).schemeIs("javascript")) {
@@ -485,7 +484,7 @@ export function loadOverlayIntoWindow(window) {
       //       this is not necessary at all.
       // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
 
-      RequestProcessor.registerAllowedRedirect(
+      requestProcessor.registerAllowedRedirect(
           redirectOriginUri,
           redirectTargetUri
       );
@@ -624,7 +623,7 @@ export function loadOverlayIntoWindow(window) {
    * notifications.
    */
   self._updateBlockedContentState = function() {
-    RequestProcessor.whenReady.then(() => {
+    requestProcessor.whenReady.then(() => {
       let browser = gBrowser.selectedBrowser;
       let uri = uriService.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
@@ -782,7 +781,7 @@ export function loadOverlayIntoWindow(window) {
       window.gContextMenuContentData.docLocation :
       this.target.ownerDocument.URL;
     let dest = this.linkURL;
-    RequestProcessor.registerLinkClicked(origin, dest);
+    requestProcessor.registerLinkClicked(origin, dest);
   }
 
   function wrapFunctionErrorCallback(aMessage, aError) {
@@ -866,7 +865,7 @@ export function loadOverlayIntoWindow(window) {
     }
 
     if (referrerURI) {
-      RequestProcessor.registerLinkClicked(referrerURI.spec, aURI);
+      requestProcessor.registerLinkClicked(referrerURI.spec, aURI);
     }
   }
 
@@ -897,17 +896,17 @@ export function loadOverlayIntoWindow(window) {
     // Implements nsISHistoryListener (and nsISupportsWeakReference)
     self.historyListener = {
       OnHistoryGoBack: function(backURI) {
-        RequestProcessor.registerHistoryRequest(backURI.asciiSpec);
+        requestProcessor.registerHistoryRequest(backURI.asciiSpec);
         return true;
       },
 
       OnHistoryGoForward: function(forwardURI) {
-        RequestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
+        requestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
         return true;
       },
 
       OnHistoryGotoIndex: function(index, gotoURI) {
-        RequestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
+        requestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
         return true;
       },
 

@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import {API, JSMs, XPCOM} from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {
@@ -56,7 +57,7 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
       xpcComponentResults: XPCOM.nsXPCComponents_Results,
       xpcComponentID: XPCOM.nsXPCComponents["ID"],
       XPCOMUtils: JSMs.XPCOMUtils,
-      private readonly requestProcessor: NonDI.IRequestProcessor,
+      private readonly requestProcessor: App.webRequest.IRequestProcessor,
       private readonly redirectRequestFactory: NonDI.RedirectRequestFactory,
   ) {
     super(

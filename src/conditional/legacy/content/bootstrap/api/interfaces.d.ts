@@ -317,10 +317,10 @@ export namespace XPCOM {
       nsIObserver_without_nsISupports<T> & nsISupports;
 
   export interface nsIObserverService extends nsISupports {
-    addObserver(anObserver: nsIObserver, aTopic: string, ownsWeak: boolean): void;
+    addObserver(anObserver: nsIObserver_without_nsISupports, aTopic: string, ownsWeak: boolean): void;
     enumerateObservers(aTopic: string): nsISimpleEnumerator;
     notifyObservers(aSubject: nsISupports, aTopic: string, someData: string): void;
-    removeObserver(anObserver: nsIObserver, aTopic: string): void;
+    removeObserver(anObserver: nsIObserver_without_nsISupports, aTopic: string): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIOutputStream.idl
@@ -719,6 +719,7 @@ export namespace JSMs {
     eTLD: XPCOM.nsIEffectiveTLDService;
     io: XPCOM.nsIIOService2;
     locale: XPCOM.nsILocaleService;
+    obs: XPCOM.nsIObserverService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
     scriptSecurityManager: XPCOM.nsIScriptSecurityManager;
     vc: XPCOM.nsIVersionComparator;

@@ -45,7 +45,7 @@ import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
 import { NormalRequest, RedirectRequest } from "lib/classes/request";
-import * as RequestProcessor from "lib/request-processor";
+import {RequestProcessor} from "lib/request-processor";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
@@ -149,6 +149,8 @@ const storageReadyPromise = settingsMigration.whenReady;
 const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
 const mozServices = C.EXTENSION_TYPE === "legacy" ?
     jsmService!.getServices() : null;
+const mozObserverService = C.EXTENSION_TYPE === "legacy" ?
+    mozServices!.obs : null;
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
   rpPrefBranch: LegacyApi.rpPrefBranch,
@@ -236,6 +238,19 @@ const ui = new Ui(log, initialSetup);
 
 const metadataMemory = new MetadataMemory(log);
 const requestMemory = new RequestMemory(log, uriService);
+const requestProcessor = new RequestProcessor(
+    log,
+    Ci,
+    Cr,
+    mozObserverService,
+    policy,
+    httpChannelService,
+    requestService,
+    uriService,
+    cachedSettings,
+    requestMemory,
+    metadataMemory,
+);
 const redirectRequestFactory = (
     aOldChannel: HttpChannelWrapper,
     aNewChannel: HttpChannelWrapper,
@@ -259,16 +274,17 @@ const normalRequestFactory = (
 );
 const rpChannelEventSink = new RPChannelEventSink(
     log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
-    RequestProcessor, redirectRequestFactory,
+    requestProcessor, redirectRequestFactory,
 );
 const rpContentPolicy = new RPContentPolicy(
     log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
-    RequestProcessor, normalRequestFactory,
+    requestProcessor, normalRequestFactory,
 );
 const rpWebRequest = new WebRequest(
     log,
     metadataMemory,
     requestMemory,
+    requestProcessor,
     rpChannelEventSink,
     rpContentPolicy,
 );

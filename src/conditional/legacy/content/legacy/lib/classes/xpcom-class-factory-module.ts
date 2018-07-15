@@ -38,7 +38,13 @@ export abstract class XpcomClassFactoryModule extends Module {
   protected abstract readonly interfaceID: string;
   protected abstract readonly contractID: string;
 
-  private readonly classID = this.xpcComponentID(this.interfaceID);
+  // tslint:disable-next-line:variable-name
+  private _classID: XPCOM.nsIJSCID;
+
+  private get classID() {
+    if (!this._classID) this._classID = this.xpcComponentID(this.interfaceID);
+    return this._classID;
+  }
 
   constructor(
       moduleName: string,

@@ -44,7 +44,7 @@ import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
-import { NormalRequest, RedirectRequest } from "lib/request";
+import { NormalRequest, RedirectRequest } from "lib/classes/request";
 import * as RequestProcessor from "lib/request-processor";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";

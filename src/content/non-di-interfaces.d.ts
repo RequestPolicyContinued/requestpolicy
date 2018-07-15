@@ -24,7 +24,7 @@
 
 import { XPCOM } from "bootstrap/api/interfaces";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
-import { RedirectRequest, NormalRequest } from "lib/request";
+import { RedirectRequest, NormalRequest } from "lib/classes/request";
 import * as RequestProcessor from "lib/request-processor";
 
 export namespace NonDI {

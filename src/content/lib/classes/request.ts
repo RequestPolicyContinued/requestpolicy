@@ -22,11 +22,9 @@
  */
 
 import { App } from "app/interfaces";
-import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { XPCOM } from "bootstrap/api/interfaces";
 import {HttpChannelWrapper} from "lib/classes/http-channel-wrapper";
 import {RequestResult} from "lib/classes/request-result";
-
-declare const Services: JSMs.Services;
 
 // =============================================================================
 // Request
@@ -48,13 +46,12 @@ export class Request {
     this.destURI = destURI;
   }
 
-  get originUriObj() {
-    if (!this.originURI) return null;
-    return Services.io.newURI(this.originURI, null, null);
+  get originUriObj(): XPCOM.nsIURI | null {
+    throw new Error("Not implemented!");
   }
 
-  get destUriObj() {
-    return Services.io.newURI(this.destURI, null, null);
+  get destUriObj(): XPCOM.nsIURI {
+    throw new Error("Not implemented!");
   }
 
   public setOriginURI(originURI: string, _: App.services.IUriService) {

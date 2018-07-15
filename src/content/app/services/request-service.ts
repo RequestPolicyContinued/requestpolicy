@@ -25,11 +25,11 @@ import { App } from "app/interfaces";
 import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
+import { NormalRequest, RedirectRequest, Request } from "lib/classes/request";
 import {
   RequestReason,
   RequestResult,
 } from "lib/classes/request-result";
-import { NormalRequest, RedirectRequest, Request } from "lib/request";
 import {queryInterface } from "lib/utils/try-catch-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 

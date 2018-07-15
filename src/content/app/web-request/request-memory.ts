@@ -40,7 +40,7 @@ export class RequestMemory extends Module {
 
   constructor(
       log: Common.ILog,
-      private uriService: App.services.IUriService,
+      private readonly uriService: App.services.IUriService,
   ) {
     super("webRequest.requestMemory", log);
     const rv = createListenersMap([

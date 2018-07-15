@@ -41,11 +41,11 @@ import { StorageMigration } from "./migration/storage/storage-migration.module";
 import { RPChannelEventSink } from "./web-request/channel-event-sink";
 import { RPContentPolicy } from "./web-request/content-policy";
 import { RequestMemory } from "./web-request/request-memory";
+import { RequestProcessor } from "./web-request/request-processor";
 import { WebRequest } from "./web-request/web-request.module";
 import { MetadataMemory } from "./web-request/metadata-memory";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
-import { RequestProcessor } from "lib/request-processor";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;

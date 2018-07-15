@@ -52,8 +52,9 @@ const {
   UserAllowedRedirects,
 } = rp.webRequest.metadataMemory;
 
-const uriService = rp.services.uri;
+const httpChannelService = rp.services.httpChannel;
 const requestService = rp.services.request;
+const uriService = rp.services.uri;
 const cachedSettings = rp.storage.cachedSettings!;
 const {requestMemory} = rp.webRequest;
 
@@ -1138,7 +1139,7 @@ export function processUrlRedirection(request: RedirectRequest) {
 }
 
 function showRedirectNotification(request: RedirectRequest) {
-  const browser = request.browser;
+  const browser = requestService.getBrowser(request);
   if (browser === null) {
     return false;
   }
@@ -1213,7 +1214,7 @@ function getOriginOfInitialRedirect(aRequest: RedirectRequest): string {
  * content window, then it's from unprivileged code.
  */
 function isContentRequest(request: RedirectRequest): boolean {
-  const loadContext = request.oldChannel.loadContext;
+  const loadContext = httpChannelService.getLoadContext(request.oldChannel);
 
   if (loadContext === null) {
     return false;

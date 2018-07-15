@@ -21,10 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { UriService } from "app/services/uri-service";
-import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
+import { App } from "app/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import {HttpChannelWrapper} from "lib/classes/http-channel-wrapper";
 import {RequestResult} from "lib/classes/request-result";
-import {HttpChannelWrapper} from "lib/http-channel-wrapper";
 
 declare const Services: JSMs.Services;
 
@@ -57,11 +57,11 @@ export class Request {
     return Services.io.newURI(this.destURI, null, null);
   }
 
-  public setOriginURI(originURI: string, _: UriService) {
+  public setOriginURI(originURI: string, _: App.services.IUriService) {
     this.originURI = originURI;
   }
 
-  public setDestURI(destURI: string, _: UriService) {
+  public setDestURI(destURI: string, _: App.services.IUriService) {
     this.destURI = destURI;
   }
 
@@ -110,12 +110,12 @@ export class NormalRequest extends Request {
     return this.aContentLocation;
   }
 
-  public setOriginURI(originURI: string, uriService: UriService) {
+  public setOriginURI(originURI: string, uriService: App.services.IUriService) {
     this.originURI = originURI;
     this.aRequestOrigin = uriService.getUriObject(originURI);
   }
 
-  public setDestURI(destURI: string, uriService: UriService) {
+  public setDestURI(destURI: string, uriService: App.services.IUriService) {
     this.destURI = destURI;
     this.aContentLocation = uriService.getUriObject(destURI);
   }
@@ -131,37 +131,37 @@ export class NormalRequest extends Request {
 
 // tslint:disable-next-line max-classes-per-file
 export class RedirectRequest extends Request {
-  public readonly oldChannel: HttpChannelWrapper;
-  public readonly newChannel: HttpChannelWrapper;
-
-  constructor(aOldChannel: any, aNewChannel: any, aFlags: any) {
-    const oldChannel = new HttpChannelWrapper(Services.io, aOldChannel);
-    const newChannel = new HttpChannelWrapper(Services.io, aNewChannel);
+  constructor(
+      public readonly oldChannel: HttpChannelWrapper,
+      // @ts-ignore
+      public readonly newChannel: HttpChannelWrapper,
+      aFlags: any,
+      private oldChannelUri: XPCOM.nsIURI,
+      private newChannelUri: XPCOM.nsIURI,
+  ) {
     super(
-        oldChannel.uri.specIgnoringRef,
-        newChannel.uri.specIgnoringRef,
+        oldChannelUri.specIgnoringRef,
+        newChannelUri.specIgnoringRef,
     );
-    this.oldChannel = oldChannel;
-    this.newChannel = newChannel;
-  }
-
-  get browser(): XUL.browser | null {
-    return this.oldChannel.browser;
   }
 
   get loadFlags() {
     return this.oldChannel.httpChannel.loadFlags;
   }
 
+  get loadInfo() {
+    return this.oldChannel.httpChannel.loadInfo;
+  }
+
   get originUriObj() {
-    return this.oldChannel.uri;
+    return this.oldChannelUri;
   }
 
   get destUriObj() {
-    return this.newChannel.uri;
+    return this.newChannelUri;
   }
 
   get destURIWithRef() {
-    return this.newChannel.uri.spec;
+    return this.newChannelUri.spec;
   }
 }

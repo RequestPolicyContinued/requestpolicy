@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2018 Martin Kimmerle
+ * Copyright (c) 2016 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,29 +20,21 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
-import { Common } from "common/interfaces";
-import { Module } from "lib/classes/module";
+import {XPCOM, XUL} from "bootstrap/api/interfaces";
+import {C} from "data/constants";
 
-export class RPServices extends Module {
+export class HttpChannelWrapper {
+  // tslint:disable:variable-name
+  public _docShell: XPCOM.nsIDocShell | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  public _browser: XUL.browser | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  public _loadContext: XPCOM.nsILoadContext | null | typeof C["UNDEFINED"] =
+      C.UNDEFINED;
+  public _uri: XPCOM.nsIURI | typeof C["UNDEFINED"] = C.UNDEFINED;
+  // tslint:enable:variable-name
+
   constructor(
-      log: Common.ILog,
-      public readonly httpChannel: App.services.IHttpChannelService,
-      public readonly request: App.services.IRequestService,
-      public readonly rules: App.services.IRulesServices,
-      public readonly uri: App.services.IUriService,
-      public readonly versionInfo: App.services.IVersionInfoService,
-  ) {
-    super("app.services", log);
-  }
-
-  protected get subModules() {
-    return {
-      httpChannel: this.httpChannel,
-      request: this.request,
-      rules: this.rules,
-      uri: this.uri,
-      versionInfo: this.versionInfo,
-    };
-  }
+      public httpChannel: XPCOM.nsIHttpChannel,
+  ) {}
 }

@@ -86,10 +86,11 @@ const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
 export class RequestService extends Module {
   constructor(
       log: Common.ILog,
+      private httpChannelService: App.services.IHttpChannelService,
       private uriService: App.services.IUriService,
       private cachedSettings: App.storage.ICachedSettings,
   ) {
-    super("app.services.requestService", log);
+    super("app.services.request", log);
   }
 
   public isTopLevelRequest(aRequest: Request) {
@@ -216,7 +217,7 @@ export class RequestService extends Module {
     }
 
     if (aRequest instanceof RedirectRequest) {
-      const {loadInfo} = aRequest.oldChannel.httpChannel;
+      const {loadInfo} = aRequest;
       if (!loadInfo) return Ci.nsIContentPolicy.TYPE_OTHER;
       return loadInfo.externalContentPolicyType;
     }
@@ -266,11 +267,17 @@ export class RequestService extends Module {
     }
   }
 
-  public getBrowser(aRequest: NormalRequest) {
+  public getBrowser(
+      aRequest: NormalRequest | RedirectRequest,
+  ): XUL.browser | null {
+    if (aRequest instanceof RedirectRequest) {
+      return this.httpChannelService.getBrowser(aRequest.oldChannel);
+    }
+
     const context = aRequest.aContext;
     if (context instanceof Ci.nsIDOMXULElement &&
         (context as XPCOM.nsIDOMXULElement).localName === "browser") {
-      return context;
+      return context as XUL.browser;
     } else {
       return WindowUtils.getBrowserForWindow(this.getContentWindow(aRequest)!);
     }

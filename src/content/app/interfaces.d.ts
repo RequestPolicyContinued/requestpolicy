@@ -31,7 +31,9 @@ import { RPServices } from "./services/services.module";
 import { CachedSettings } from "./storage/cached-settings";
 import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
+import { HttpChannelService } from "./services/http-channel-service";
 import { RequestService } from "./services/request-service";
+import { RulesServices } from "./services/rules/rules-services.module";
 import { UriService } from "./services/uri-service";
 import { VersionInfoService } from "./services/version-info-service";
 import { AsyncSettings } from "./storage/async-settings";
@@ -40,9 +42,9 @@ import { RPChannelEventSink } from "./web-request/channel-event-sink";
 import { RPContentPolicy } from "./web-request/content-policy";
 import { RequestMemory } from "./web-request/request-memory";
 import { WebRequest } from "./web-request/web-request.module";
+import { MetadataMemory } from "./web-request/metadata-memory";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
-import { MetadataMemory } from "app/web-request/metadata-memory";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -59,9 +61,11 @@ export namespace App {
   }
 
   export namespace services {
-    export type IVersionInfoService = VersionInfoService;
+    export type IHttpChannelService = HttpChannelService;
     export type IRequestService = RequestService;
+    export type IRulesServices = RulesServices;
     export type IUriService = UriService;
+    export type IVersionInfoService = VersionInfoService;
   }
 
   export namespace storage {

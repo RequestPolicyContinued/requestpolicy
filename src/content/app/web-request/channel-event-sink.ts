@@ -26,6 +26,7 @@ import { Common } from "common/interfaces";
 import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
+import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
 import { defer } from "lib/utils/js-utils";
 import { NonDI } from "non-di-interfaces";
 
@@ -83,8 +84,15 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
     if (this.forcedReturnValue !== null) {
       result = this.forcedReturnValue;
     } else {
+      const oldChannelWrapper = new HttpChannelWrapper(
+          aOldChannel as XPCOM.nsIHttpChannel,  // FIXME
+      );
+      const newChannelWrapper = new HttpChannelWrapper(
+          aNewChannel as XPCOM.nsIHttpChannel,  // FIXME
+      );
       const request = this.redirectRequestFactory(
-          aOldChannel, aNewChannel, aFlags);
+          oldChannelWrapper, newChannelWrapper, aFlags,
+      );
       const rv = this.requestProcessor.processUrlRedirection(request);
       result = rv === this.CP_REJECT ? this.CES_REJECT : this.CES_ACCEPT;
     }

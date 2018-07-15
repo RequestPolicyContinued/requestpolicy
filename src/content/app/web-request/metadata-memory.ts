@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 const obj = () => ({});
@@ -36,4 +37,8 @@ export class MetadataMemory extends Module {
 
   public AllowedRedirectsReverse: any = obj();
   public UserAllowedRedirects: any = obj();
+
+  constructor(log: Common.ILog) {
+    super("app.webRequest.metadataMemory", log);
+  }
 }

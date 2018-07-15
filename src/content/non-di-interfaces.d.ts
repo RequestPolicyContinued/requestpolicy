@@ -22,9 +22,10 @@
 
 // tslint:disable:no-namespace
 
-import * as RequestProcessor from "lib/request-processor";
-import { RedirectRequest, NormalRequest } from "lib/request";
 import { XPCOM } from "bootstrap/api/interfaces";
+import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
+import { RedirectRequest, NormalRequest } from "lib/request";
+import * as RequestProcessor from "lib/request-processor";
 
 export namespace NonDI {
   //
@@ -32,8 +33,8 @@ export namespace NonDI {
   //
 
   export type RedirectRequestFactory = (
-      aOldChannel: XPCOM.nsIChannel,
-      aNewChannel: XPCOM.nsIChannel,
+      aOldChannel: HttpChannelWrapper,
+      aNewChannel: HttpChannelWrapper,
       aFlags: number,
   ) => RedirectRequest;
 

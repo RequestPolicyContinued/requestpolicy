@@ -38,13 +38,17 @@ interface IEmbeddedWebExtension { browser: typeof browser; }
 declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
+import { HttpChannelService } from "app/services/http-channel-service";
+import { MetadataMemory } from "app/web-request/metadata-memory";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
+import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
 import { NormalRequest, RedirectRequest } from "lib/request";
 import * as RequestProcessor from "lib/request-processor";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
+import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { dAsyncSettings, log } from "./log";
@@ -180,10 +184,17 @@ const browserSettings = new BrowserSettings(
     (browser as any).privacy.network,
 );
 
+const httpChannelService = new HttpChannelService(
+    log,
+    mozServices!.io,
+    tryCatchUtils,
+);
 const xpconnectService = new XPConnectService();
 const uriService = new UriService(log, undefined, mozServices!.eTLD,
     xpconnectService.getIDNService(), mozServices!.io);
-const requestService = new RequestService(log, uriService, cachedSettings);
+const requestService = new RequestService(
+    log, httpChannelService, uriService, cachedSettings,
+);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -197,7 +208,12 @@ const versionInfoService = new VersionInfoService(
     browser.runtime,
 );
 const rpServices = new RPServices(
-    log, requestService, rulesServices, uriService, versionInfoService,
+    log,
+    httpChannelService,
+    requestService,
+    rulesServices,
+    uriService,
+    versionInfoService,
 );
 
 const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
@@ -218,12 +234,17 @@ const initialSetup = new InitialSetup(
 );
 const ui = new Ui(log, initialSetup);
 
+const metadataMemory = new MetadataMemory(log);
 const requestMemory = new RequestMemory(log, uriService);
 const redirectRequestFactory = (
-    aOldChannel: XPCOM.nsIChannel,
-    aNewChannel: XPCOM.nsIChannel,
+    aOldChannel: HttpChannelWrapper,
+    aNewChannel: HttpChannelWrapper,
     aFlags: number,
-) => new RedirectRequest(aOldChannel, aNewChannel, aFlags);
+) => new RedirectRequest(
+    aOldChannel, aNewChannel, aFlags,
+    httpChannelService.getUri(aOldChannel),
+    httpChannelService.getUri(aNewChannel),
+);
 const normalRequestFactory = (
     aContentType: any,
     aContentLocation: any,
@@ -246,6 +267,7 @@ const rpContentPolicy = new RPContentPolicy(
 );
 const rpWebRequest = new WebRequest(
     log,
+    metadataMemory,
     requestMemory,
     rpChannelEventSink,
     rpContentPolicy,

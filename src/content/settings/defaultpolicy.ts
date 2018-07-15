@@ -26,6 +26,7 @@ import {$id, elManager, WinEnv} from "./common";
 
 (() => {
   const {
+    log,
     ManagerForPrefObservers,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
@@ -61,7 +62,9 @@ import {$id, elManager, WinEnv} from "./common";
         $id("defaultallow"), "change",
         (event: any) => {
           const allow = event.target.checked;
-          cachedSettings.set({"defaultPolicy.allow": allow});
+          cachedSettings.set({
+            "defaultPolicy.allow": allow,
+          }).catch(log.onError(`set "defaultPolicy.allow"`));
           updateDisplay();
           showManageSubscriptionsLink();
         },
@@ -71,7 +74,9 @@ import {$id, elManager, WinEnv} from "./common";
         $id("defaultdeny"), "change",
         (event: any) => {
           const deny = event.target.checked;
-          cachedSettings.set({"defaultPolicy.allow": !deny});
+          cachedSettings.set({
+            "defaultPolicy.allow": !deny,
+          }).catch(log.onError(`set "defaultPolicy.allow"`));
           updateDisplay();
           showManageSubscriptionsLink();
         },
@@ -83,7 +88,7 @@ import {$id, elManager, WinEnv} from "./common";
           const allowSameDomain = event.target.checked;
           cachedSettings.set({
             "defaultPolicy.allowSameDomain": allowSameDomain,
-          });
+          }).catch(log.onError(`set allowSameDomain`));
         },
     );
 
@@ -93,7 +98,7 @@ import {$id, elManager, WinEnv} from "./common";
           const allowTopLevel = event.target.checked;
           cachedSettings.set({
             "defaultPolicy.allowTopLevel": allowTopLevel,
-          });
+          }).catch(log.onError(`set allowTopLevel`));
         },
     );
 

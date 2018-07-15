@@ -26,6 +26,7 @@ import {$id, elManager, WinEnv} from "./common";
 
 (() => {
   const {
+    log,
     ManagerForPrefObservers,
     rp,
   } = (browser.extension.getBackgroundPage() as any) as typeof BackgroundPage;
@@ -71,12 +72,14 @@ import {$id, elManager, WinEnv} from "./common";
         (event: any) => {
           cachedSettings.set({
             "browserSettings.disableNetworkPrediction": event.target.checked,
-          });
+          }).catch(log.onError(`set disableNetworkPrediction`));
         },
     );
 
     const sortingListener = (event: any) => {
-      cachedSettings.set({"menu.sorting": event.target.value});
+      cachedSettings.set({
+        "menu.sorting": event.target.value,
+      }).catch(log.onError(`set "menu.sorting"`));
     };
     elManager.addListener($id("sortByNumRequests"), "change", sortingListener);
     elManager.addListener($id("sortByDestName"), "change", sortingListener);
@@ -87,7 +90,7 @@ import {$id, elManager, WinEnv} from "./common";
         (event: any) => {
           cachedSettings.set({
             "menu.info.showNumRequests": event.target.checked,
-          });
+          }).catch(log.onError("set showNumRequests"));
         },
     );
 
